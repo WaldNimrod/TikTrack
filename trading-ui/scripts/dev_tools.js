@@ -337,6 +337,74 @@
         }
     }
 
+    // #region agent log - DEBUG SESSION
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            location: 'dev_tools.js:340',
+            message: 'DevTools script loaded, checking required globals',
+            data: {
+                hasLogger: !!window.Logger,
+                hasFieldRendererService: !!window.FieldRendererService,
+                hasUpdatePageSummaryStats: !!window.updatePageSummaryStats,
+                hasUnifiedCacheManager: !!window.UnifiedCacheManager,
+                hasNotificationSystem: !!window.NotificationSystem,
+                hasIconSystem: !!window.IconSystem,
+                timestamp: Date.now()
+            },
+            sessionId: 'debug-session',
+            runId: 'dev-tools-missing-globals',
+            hypothesisId: 'missing-globals'
+        })
+    }).catch(() => {});
+
+    // Monitor resource loading issues
+    window.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'SCRIPT') {
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    location: 'dev_tools.js:resource-monitor',
+                    message: 'Script loading error detected',
+                    data: {
+                        src: e.target.src,
+                        error: e.error ? e.error.message : 'MIME type mismatch or network error',
+                        timestamp: Date.now()
+                    },
+                    sessionId: 'debug-session',
+                    runId: 'resource-loading-errors',
+                    hypothesisId: 'mime-type-issues'
+                })
+            }).catch(() => {});
+        }
+    });
+
+    // Check for missing image resources
+    const images = document.querySelectorAll('img[src*="bar-chart.svg"]');
+    images.forEach(img => {
+        img.addEventListener('error', function() {
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    location: 'dev_tools.js:image-monitor',
+                    message: 'Image loading error detected',
+                    data: {
+                        src: img.src,
+                        alt: img.alt,
+                        timestamp: Date.now()
+                    },
+                    sessionId: 'debug-session',
+                    runId: 'missing-images',
+                    hypothesisId: 'missing-assets'
+                })
+            }).catch(() => {});
+        });
+    });
+    // #endregion
+
     // ===== PUBLIC API =====
 
     // Expose public methods if needed

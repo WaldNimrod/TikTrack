@@ -30,7 +30,7 @@
                 <!-- Statistics Section - FIRST -->
                 <div class="content-section" id="statistics">
                     <div class="section-header">
-                        <h1><img src="images/icons/tabler/bar-chart.svg" width="32" height="32" alt="stats" class="icon"> סטטיסטיקות מערכת</h1>
+                        <h1><img src="images/icons/tabler/chart-bar.svg" width="32" height="32" alt="stats" class="icon"> סטטיסטיקות מערכת</h1>
                         <div class="section-header-controls">
                             <button data-button-type="REFRESH" data-variant="full" data-icon="🔄" data-text="רענן נתונים" data-classes="btn-primary btn-sm" data-onclick="window.refreshDevToolsData()" type="button" title="רענן את נתוני כלי הפיתוח"></button>
                         </div>
@@ -125,14 +125,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -211,7 +211,7 @@
                                                 <td>ניתוח AI</td>
                                                 <td><span class="badge bg-warning">בינה מלאכותית</span></td>
                                                 <td>/ai_analysis</td>
-                                                <td><a href="/ai_analysis" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/AI_ANALYSIS_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/ai_analysis" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/AI_ANALYSIS_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>alerts.html</strong></td>
@@ -255,14 +255,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -271,7 +271,7 @@
                                                 <td>תצוגת בסיס נתונים</td>
                                                 <td><span class="badge bg-dark">בסיס נתונים</span></td>
                                                 <td>/db_display</td>
-                                                <td><a href="/db_display" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/DATABASE/DATABASE_MANAGEMENT.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/db_display" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/DATABASE/DATABASE_MANAGEMENT.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>db_extradata.html</strong></td>
@@ -285,7 +285,7 @@
                                                 <td>ניטור שרת</td>
                                                 <td><span class="badge bg-danger">ניטור</span></td>
                                                 <td>/server-monitor</td>
-                                                <td><a href="/server-monitor" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/SERVER_MONITORING_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/server-monitor" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/SERVER_MONITORING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>background-tasks.html</strong></td>
@@ -299,21 +299,21 @@
                                                 <td>ניהול מערכת</td>
                                                 <td><span class="badge bg-danger">ניטור</span></td>
                                                 <td>/system-management</td>
-                                                <td><a href="/system-management" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/system-management" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>notifications-center.html</strong></td>
                                                 <td>מרכז התראות</td>
                                                 <td><span class="badge bg-primary">התראות</span></td>
                                                 <td>/notifications-center</td>
-                                                <td><a href="/notifications-center" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/NOTIFICATIONS_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/notifications-center" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/NOTIFICATIONS_SYSTEM_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>css-management.html</strong></td>
                                                 <td>ניהול CSS</td>
                                                 <td><span class="badge bg-info">עיצוב</span></td>
                                                 <td>/css-management</td>
-                                                <td><a href="/css-management" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/CSS_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/css-management" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/CSS_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>designs.html</strong></td>
@@ -327,28 +327,28 @@
                                                 <td>תצוגת צבעים</td>
                                                 <td><span class="badge bg-info">עיצוב</span></td>
                                                 <td>/dynamic-colors-display</td>
-                                                <td><a href="/dynamic-colors-display" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/COLOR_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/dynamic-colors-display" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/COLOR_SYSTEM_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>chart_management.html</strong></td>
                                                 <td>ניהול גרפים</td>
                                                 <td><span class="badge bg-success">גרפים</span></td>
                                                 <td>/chart_management</td>
-                                                <td><a href="/chart_management" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CHART_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/chart_management" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CHART_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>tradingview-test-page.html</strong></td>
                                                 <td>בדיקת TradingView</td>
                                                 <td><span class="badge bg-success">גרפים</span></td>
                                                 <td>/mockups/daily-snapshots/tradingview-test-page.html</td>
-                                                <td><a href="/mockups/daily-snapshots/tradingview-test-page.html" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_INTEGRATION_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/mockups/daily-snapshots/tradingview-test-page.html" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_INTEGRATION_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>constraints.html</strong></td>
                                                 <td>אילוצי מערכת</td>
                                                 <td><span class="badge bg-warning">אילוצים</span></td>
                                                 <td>/constraints</td>
-                                                <td><a href="/constraints" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONSTRAINTS_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/constraints" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONSTRAINTS_SYSTEM_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -364,14 +364,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-dev-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -380,35 +380,35 @@
                                                 <td>דשבורד איכות קוד</td>
                                                 <td><span class="badge bg-dark">ניתוח ובדיקה</span></td>
                                                 <td>/code-quality-dashboard</td>
-                                                <td><a href="/code-quality-dashboard" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CODE_QUALITY_SYSTEMS_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/code-quality-dashboard" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CODE_QUALITY_SYSTEMS_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>init-system-management.html</strong></td>
                                                 <td>ניהול מערכת אתחול</td>
                                                 <td><span class="badge bg-dark">ניתוח ובדיקה</span></td>
                                                 <td>/init-system-management</td>
-                                                <td><a href="/init-system-management" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/INIT_SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/init-system-management" target="_blank" class="btn btn-sm btn-outline-dark">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/INIT_SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>cache-management.html</strong></td>
                                                 <td>ניהול מטמון</td>
                                                 <td><span class="badge bg-primary">מטמון וניהול</span></td>
                                                 <td>/cache-management</td>
-                                                <td><a href="/cache-management" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CACHE_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/cache-management" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CACHE_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>tag_management.html</strong></td>
                                                 <td>ניהול תגיות</td>
                                                 <td><span class="badge bg-success">ניהול תגיות</span></td>
                                                 <td>/tag_management</td>
-                                                <td><a href="/tag_management" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TAG_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/tag_management" target="_blank" class="btn btn-sm btn-outline-success">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TAG_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>button-color-mapping.html</strong></td>
                                                 <td>מיפוי צבעי כפתורים</td>
                                                 <td><span class="badge bg-info">כלי עיצוב</span></td>
                                                 <td>/button-color-mapping</td>
-                                                <td><a href="/button-color-mapping" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/BUTTON_COLOR_MAPPING_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/button-color-mapping" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/STYLING/BUTTON_COLOR_MAPPING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>button-color-mapping-simple.html</strong></td>
@@ -422,7 +422,7 @@
                                                 <td>ניהול קבוצות העדפות</td>
                                                 <td><span class="badge bg-info">כלי עיצוב</span></td>
                                                 <td>/preferences-groups-management</td>
-                                                <td><a href="/preferences-groups-management" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/PREFERENCES_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/preferences-groups-management" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/PREFERENCES_MANAGEMENT_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -438,14 +438,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-auth-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -454,7 +454,7 @@
                                                 <td>כניסה למערכת</td>
                                                 <td><span class="badge bg-warning">כניסה והרשמה</span></td>
                                                 <td>/login</td>
-                                                <td><a href="/login" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/AUTH_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/login" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/AUTH_SYSTEM_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>register.html</strong></td>
@@ -468,7 +468,7 @@
                                                 <td>שחזור סיסמה</td>
                                                 <td><span class="badge bg-info">שחזור וניהול</span></td>
                                                 <td>/forgot-password</td>
-                                                <td><a href="/forgot-password" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/PASSWORD_RECOVERY_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/forgot-password" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/PASSWORD_RECOVERY_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>reset-password.html</strong></td>
@@ -491,14 +491,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-test-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -507,14 +507,14 @@
                                                 <td>דשבורד בדיקות CRUD</td>
                                                 <td><span class="badge bg-danger">בדיקות אוטומטיות</span></td>
                                                 <td>/crud_testing_dashboard</td>
-                                                <td><a href="/crud_testing_dashboard" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/CRUD_TESTING_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/crud_testing_dashboard" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/CRUD_TESTING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>conditions-test.html</strong></td>
                                                 <td>בדיקות תנאים</td>
                                                 <td><span class="badge bg-danger">בדיקות אוטומטיות</span></td>
                                                 <td>/conditions-test</td>
-                                                <td><a href="/conditions-test" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/CONDITIONS_TESTING_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/conditions-test" target="_blank" class="btn btn-sm btn-outline-danger">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/CONDITIONS_TESTING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-header-only.html</strong></td>
@@ -528,21 +528,21 @@
                                                 <td>דשבורד נתונים חיצוניים</td>
                                                 <td><span class="badge bg-primary">בדיקות חיצוניות</span></td>
                                                 <td>/external_data_dashboard</td>
-                                                <td><a href="/external_data_dashboard" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/EXTERNAL_DATA/EXTERNAL_DATA_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/external_data_dashboard" target="_blank" class="btn btn-sm btn-outline-primary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/EXTERNAL_DATA/EXTERNAL_DATA_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>tradingview-widgets-showcase.html</strong></td>
                                                 <td>ווידג'טים TradingView</td>
                                                 <td><span class="badge bg-info">בדיקות מתקדמות</span></td>
                                                 <td>/tradingview-widgets-showcase</td>
-                                                <td><a href="/tradingview-widgets-showcase" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_WIDGETS_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/tradingview-widgets-showcase" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_WIDGETS_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>conditions-modals.html</strong></td>
                                                 <td>מודלי תנאים</td>
                                                 <td><span class="badge bg-info">בדיקות מתקדמות</span></td>
                                                 <td>/conditions-modals</td>
-                                                <td><a href="/conditions-modals" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONDITIONS_MODALS_GUIDE.md" target="_blank" class="text-muted small">📖</a></td>
+                                                <td><a href="/conditions-modals" target="_blank" class="btn btn-sm btn-outline-info">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONDITIONS_MODALS_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-bootstrap-popover-comparison.html</strong></td>
@@ -663,14 +663,14 @@
                             </div>
                             <div class="section-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
+                                    <table class="table table-striped table-hover" data-table-type="dev-tools-mockup-pages">
+                                        <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2">שם קובץ</th>
-                                                <th scope="col" class="col-md-3">תיאור</th>
-                                                <th scope="col" class="col-md-2">קטגוריה</th>
-                                                <th scope="col" class="col-md-2">גישה</th>
-                                                <th scope="col" class="col-md-1">פעולות</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -789,12 +789,12 @@
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: dev_tools | Generated: 2025-12-23T09:50:14.151Z -->
-    <!-- 📦 Packages: base, header, dev-tools, init-system -->
+    <!-- 🎯 Page: dev_tools | Generated: 2025-12-23T09:56:11.263Z -->
+    <!-- 📦 Packages: base, header, services, dev-tools, init-system -->
     <!-- 🔧 Mode: development | Use Bundles: false -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 1/4: BASE PACKAGE ===== -->
+    <!-- ===== PACKAGE 1/5: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 1 | Description: Core systems required for all pages -->
     <!-- Dependencies:  -->
@@ -846,7 +846,7 @@
     <script src="scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/4: HEADER PACKAGE ===== -->
+    <!-- ===== PACKAGE 2/5: HEADER PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 1.2 | Description: Header and filter systems loaded separately to avoid bundle conflicts -->
     <!-- Dependencies: base -->
@@ -856,10 +856,10 @@
     <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/4: DEVELOPMENT TOOLS PACKAGE ===== -->
+    <!-- ===== PACKAGE 3/5: SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 14 | Description: Development and debugging tools -->
-    <!-- Dependencies: base, services -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
     <!-- [24] Load Order: 24 | Strategy: async -->

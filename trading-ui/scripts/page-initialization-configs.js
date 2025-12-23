@@ -4400,7 +4400,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 if (!PAGE_CONFIGS['dev_tools']) {
   PAGE_CONFIGS['dev_tools'] = {
     name: 'Development Tools',
-    packages: ['base', 'header', 'dev-tools', 'init-system'],
+    packages: ['base', 'header', 'services', 'crud', 'dev-tools', 'init-system'],
     requiredGlobals: [
       'window.UnifiedAppInitializer', // Unified Init System
       'window.PAGE_CONFIGS', // Unified Init System

@@ -695,7 +695,12 @@ class IntegratedCRUDE2ETester {
         
         try {
             // Perform login via API in parent window (same origin)
-            this.logger?.info('🔐 Authenticating iframe via parent window API', { url: iframe.src });
+            this.logger?.info('🔐 [authenticateIframe] Starting authentication', { 
+                url: iframe.src,
+                iframeId: iframe.id,
+                page: 'crud_testing_dashboard',
+                hypothesisId: 'A'
+            });
             
             const loginResponse = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -709,12 +714,30 @@ class IntegratedCRUDE2ETester {
                 })
             });
 
+            this.logger?.debug('🔐 [authenticateIframe] Login response received', {
+                ok: loginResponse.ok,
+                status: loginResponse.status,
+                statusText: loginResponse.statusText,
+                page: 'crud_testing_dashboard',
+                hypothesisId: 'A'
+            });
+
             if (!loginResponse.ok) {
                 const errorData = await loginResponse.json();
                 throw new Error(`Login failed: ${loginResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
             }
 
             const loginData = await loginResponse.json();
+            
+            this.logger?.debug('🔐 [authenticateIframe] Login data parsed', {
+                status: loginData.status,
+                hasToken: !!loginData.data?.access_token,
+                hasUser: !!loginData.data?.user,
+                userId: loginData.data?.user?.id,
+                username: loginData.data?.user?.username,
+                page: 'crud_testing_dashboard',
+                hypothesisId: 'A'
+            });
             
             if (loginData.status !== 'success' || !loginData.data?.access_token) {
                 throw new Error('Login response missing token');
@@ -742,12 +765,24 @@ class IntegratedCRUDE2ETester {
                 iframeWindow.sessionStorage.setItem('auth_token', authData.token);
                 iframeWindow.sessionStorage.setItem('user_data', JSON.stringify(authData.user));
                 iframeWindow.sessionStorage.setItem('recent_login_timestamp', authData.timestamp.toString());
+                this.logger?.debug('🔐 [authenticateIframe] SessionStorage set', {
+                    tokenSet: !!iframeWindow.sessionStorage.getItem('auth_token'),
+                    userSet: !!iframeWindow.sessionStorage.getItem('user_data'),
+                    page: 'crud_testing_dashboard',
+                    hypothesisId: 'A'
+                });
             }
 
             // Also store in iframe's localStorage
             if (iframeWindow.localStorage) {
                 iframeWindow.localStorage.setItem('auth_token', authData.token);
                 iframeWindow.localStorage.setItem('user_data', JSON.stringify(authData.user));
+                this.logger?.debug('🔐 [authenticateIframe] LocalStorage set', {
+                    tokenSet: !!iframeWindow.localStorage.getItem('auth_token'),
+                    userSet: !!iframeWindow.localStorage.getItem('user_data'),
+                    page: 'crud_testing_dashboard',
+                    hypothesisId: 'A'
+                });
             }
 
             // Send auth data via postMessage as backup
@@ -761,14 +796,32 @@ class IntegratedCRUDE2ETester {
                 try {
                     await iframeWindow.UnifiedCacheManager.set('auth_token', authData.token);
                     await iframeWindow.UnifiedCacheManager.set('user_data', authData.user);
+                    this.logger?.debug('🔐 [authenticateIframe] UnifiedCacheManager set', {
+                        success: true,
+                        page: 'crud_testing_dashboard',
+                        hypothesisId: 'A'
+                    });
                 } catch (cacheError) {
-                    this.logger?.warn('⚠️ Failed to set auth in iframe UnifiedCacheManager', { error: cacheError.message });
+                    this.logger?.warn('⚠️ Failed to set auth in iframe UnifiedCacheManager', { 
+                        error: cacheError.message,
+                        page: 'crud_testing_dashboard',
+                        hypothesisId: 'A'
+                    });
                 }
+            } else {
+                this.logger?.debug('🔐 [authenticateIframe] UnifiedCacheManager not available', {
+                    unifiedCacheExists: !!iframeWindow.UnifiedCacheManager,
+                    hasSetMethod: !!(iframeWindow.UnifiedCacheManager && typeof iframeWindow.UnifiedCacheManager.set === 'function'),
+                    page: 'crud_testing_dashboard',
+                    hypothesisId: 'A'
+                });
             }
 
-            this.logger?.info('✅ Iframe authenticated successfully', {
+            this.logger?.info('✅ [authenticateIframe] Authentication complete', {
                 userId: authData.user?.id,
-                username: authData.user?.username
+                username: authData.user?.username,
+                page: 'crud_testing_dashboard',
+                hypothesisId: 'A'
             });
 
             return true;
@@ -945,7 +998,12 @@ class IntegratedCRUDE2ETester {
         const startTime = Date.now();
         let attemptCount = 0;
         
-        this.logger?.info('🔵 [waitForElementInIframe] Starting wait', { selector, timeout });
+        this.logger?.info('🔵 [waitForElementInIframe] Starting wait', { 
+            selector, 
+            timeout,
+            page: 'crud_testing_dashboard',
+            hypothesisId: 'B'
+        });
         
         while (Date.now() - startTime < timeout) {
             attemptCount++;
@@ -956,7 +1014,9 @@ class IntegratedCRUDE2ETester {
                     this.logger?.warn(`⚠️ [waitForElementInIframe] Attempt ${attemptCount}: No document`, {
                         elapsed: Date.now() - startTime,
                         iframeExists: !!iframe,
-                        iframeContentWindow: !!iframe?.contentWindow
+                        iframeContentWindow: !!iframe?.contentWindow,
+                        page: 'crud_testing_dashboard',
+                        hypothesisId: 'B'
                     });
                     await new Promise(resolve => setTimeout(resolve, 100));
                     continue;
@@ -964,8 +1024,22 @@ class IntegratedCRUDE2ETester {
                 
                 const element = doc.querySelector(selector);
                 const elementExists = !!element;
-                // Don't check visibility - elements exist even if iframe was hidden
-                // Just check if element exists in DOM
+                
+                // Check if API calls are being made (hypothesis C)
+                if (attemptCount === 1) {
+                    // Check if there are any API calls in progress or completed
+                    const apiCallsMade = window.performance?.getEntriesByType('resource')
+                        .filter(r => r.name.includes('/api/') && r.initiatorType === 'fetch')
+                        .length || 0;
+                    this.logger?.debug('🔵 [waitForElementInIframe] First attempt - checking API calls', {
+                        apiCallsMade,
+                        docReadyState: doc.readyState,
+                        docBody: !!doc.body,
+                        docBodyHTML: doc.body?.innerHTML?.substring(0, 200),
+                        page: 'crud_testing_dashboard',
+                        hypothesisId: 'C'
+                    });
+                }
                 
                 if (attemptCount % 10 === 0) { // Log every 10 attempts (1 second)
                     this.logger?.info(`🔵 [waitForElementInIframe] Attempt ${attemptCount}`, {
@@ -976,7 +1050,13 @@ class IntegratedCRUDE2ETester {
                         selector,
                         elementTagName: element?.tagName,
                         elementId: element?.id,
-                        elementClassName: element?.className
+                        elementClassName: element?.className,
+                        // Check DOM structure
+                        tableExists: !!doc.querySelector('table'),
+                        tbodyExists: !!doc.querySelector('tbody'),
+                        mainExists: !!doc.querySelector('main'),
+                        page: 'crud_testing_dashboard',
+                        hypothesisId: 'B'
                     });
                 }
                 
@@ -1004,6 +1084,24 @@ class IntegratedCRUDE2ETester {
         try {
             const doc = this.getIframeDocument(iframe);
             const element = doc?.querySelector(selector);
+            
+            // Check for JavaScript errors in iframe (hypothesis D)
+            const iframeWindow = iframe.contentWindow;
+            const hasErrors = iframeWindow?.console?.error?.toString().includes('error') || false;
+            
+            // Check if services are available (hypothesis E)
+            const servicesAvailable = {
+                UnifiedCRUDService: !!iframeWindow?.UnifiedCRUDService,
+                DataCollectionService: !!iframeWindow?.DataCollectionService,
+                ModalManagerV2: !!iframeWindow?.ModalManagerV2,
+                checkLinkedItemsBeforeAction: !!iframeWindow?.checkLinkedItemsBeforeAction
+            };
+            
+            // Check if API calls were made
+            const apiCalls = window.performance?.getEntriesByType('resource')
+                .filter(r => r.name.includes('/api/') && r.initiatorType === 'fetch')
+                .map(r => ({ url: r.name, status: r.responseStatus || 'pending', duration: r.duration })) || [];
+            
             this.logger?.error('❌ [waitForElementInIframe] Timeout - final state', {
                 selector,
                 attempts: attemptCount,
@@ -1012,7 +1110,14 @@ class IntegratedCRUDE2ETester {
                 elementVisible: element && element.offsetParent !== null,
                 docExists: !!doc,
                 docReadyState: doc?.readyState,
-                docBodyHTML: doc?.body?.innerHTML?.substring(0, 200) // First 200 chars
+                docBodyHTML: doc?.body?.innerHTML?.substring(0, 200), // First 200 chars
+                // Additional debugging info
+                servicesAvailable,
+                apiCallsCount: apiCalls.length,
+                apiCalls: apiCalls.slice(0, 5), // First 5 API calls
+                hasErrors,
+                page: 'crud_testing_dashboard',
+                hypothesisId: 'B,C,D,E'
             });
         } catch (finalError) {
             this.logger?.error('❌ [waitForElementInIframe] Error in final check', {

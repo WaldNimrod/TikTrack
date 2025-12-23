@@ -125,7 +125,11 @@ class SelectPopulatorService {
                             let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
                             if (cached) {
                                 const parsed = JSON.parse(cached);
-                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
+                                window.Logger?.debug?.(`✅ Found preference ${preferenceName} in cache`, {
+                                    page: 'select-populator-service',
+                                    profileId: tryProfileId,
+                                    value: parsed
+                                });
                                 return parsed;
                             }
                             
@@ -133,65 +137,72 @@ class SelectPopulatorService {
                             cached = localStorage.getItem(cacheKey);
                             if (cached) {
                                 const parsed = JSON.parse(cached);
-                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
+                                window.Logger?.debug?.(`✅ Found preference ${preferenceName} in cache (no prefix)`, {
+                                    page: 'select-populator-service',
+                                    profileId: tryProfileId,
+                                    value: parsed
+                                });
                                 return parsed;
                             }
                         } catch (e) {
-                            console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
+                            window.Logger?.warn?.(`⚠️ Error reading from cache for ${preferenceName}`, {
+                                page: 'select-populator-service',
+                                profileId: tryProfileId,
+                                error: e?.message
+                            });
                         }
                     }
-                    
-                    console.log(`⚠️ Preference ${preferenceName} not found in localStorage for any profile`);
                 } catch (e) {
-                    console.warn(`⚠️ Error accessing PreferencesCore/UnifiedCacheManager:`, e);
+                    window.Logger?.warn?.(`⚠️ Error accessing PreferencesCore/UnifiedCacheManager`, {
+                        page: 'select-populator-service',
+                        error: e?.message
+                    });
                     // Continue to fallback methods
                 }
-            } else if (!deps.preferencesCore) {
-                console.log(`⚠️ PreferencesCore not available or not initialized - using fallback methods`);
-            } else if (!deps.unifiedCacheManager) {
-                console.log(`⚠️ UnifiedCacheManager not available or not initialized - using fallback methods`);
             }
             
-            // Try window.currentPreferences (fallback)
+            // CRITICAL: Server now always returns valid values for all requested preferences
+            // Try window.currentPreferences (server-provided values)
             let prefs = {};
             if (window.currentPreferences && typeof window.currentPreferences === 'object') {
                 prefs = window.currentPreferences;
-                console.log(`✅ Using window.currentPreferences, found ${Object.keys(prefs).length} preferences`);
+                window.Logger?.debug?.(`✅ Using window.currentPreferences`, {
+                    page: 'select-populator-service',
+                    count: Object.keys(prefs).length
+                });
             } else if (deps.preferencesSystem && window.PreferencesSystem?.manager?.currentPreferences) {
                 prefs = window.PreferencesSystem.manager.currentPreferences;
-                console.log(`✅ Using PreferencesSystem.currentPreferences, found ${Object.keys(prefs).length} preferences`);
-            } else {
-                console.log(`⚠️ window.currentPreferences not available, trying localStorage fallback`);
-                // Fallback to localStorage
-                try {
-                    const stored = localStorage.getItem('tikTrack_preferences');
-                    if (stored) {
-                        prefs = JSON.parse(stored);
-                        console.log(`✅ Loaded preferences from localStorage, found ${Object.keys(prefs).length} preferences`);
-                    } else {
-                        console.log(`⚠️ No preferences found in localStorage 'tikTrack_preferences'`);
-                    }
-                } catch (e) {
-                    console.warn(`⚠️ Failed to parse localStorage preferences:`, e);
-                }
+                window.Logger?.debug?.(`✅ Using PreferencesSystem.currentPreferences`, {
+                    page: 'select-populator-service',
+                    count: Object.keys(prefs).length
+                });
             }
             
-            console.log(`🔍 Looking for preference: ${preferenceName}`);
+            // Server should have provided the value - just return it
             if (preferenceName in prefs) {
-                console.log(`✅ Found preference ${preferenceName}: ${prefs[preferenceName]}`);
+                window.Logger?.debug?.(`✅ Found preference ${preferenceName}`, {
+                    page: 'select-populator-service',
+                    value: prefs[preferenceName]
+                });
                 return prefs[preferenceName];
-            } else {
-                console.log(`⚠️ Preference ${preferenceName} not found directly`);
             }
             
-            console.log(`🔍 Trying aliases:`, aliases);
+            // Try aliases
             for (const key of aliases) {
                 if (key in prefs) {
-                    console.log(`✅ Found preference via alias ${key}: ${prefs[key]}`);
+                    window.Logger?.debug?.(`✅ Found preference via alias ${key}`, {
+                        page: 'select-populator-service',
+                        value: prefs[key]
+                    });
                     return prefs[key];
                 }
             }
-            console.log(`⚠️ No preference found for ${preferenceName} or any aliases`);
+            
+            // Server should have provided defaults - if not found, return null
+            window.Logger?.warn?.(`⚠️ Preference ${preferenceName} not found - server should have provided it`, {
+                page: 'select-populator-service',
+                aliases
+            });
         } catch (e) {
             console.error(`❌ Error in _getPreferenceFromMemory:`, e);
         }

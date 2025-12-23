@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from config.database import SessionLocal
 from config.settings import DB_PATH
-from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES, COLOR_DEFAULTS, COLOR_DEFAULTS
+from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES, COLOR_DEFAULTS
 from models.user import User
 from services.constraint_service import ConstraintService
 

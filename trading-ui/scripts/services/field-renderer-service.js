@@ -2164,5 +2164,3 @@ window.buildRelatedEntityMeta = (relatedTypeId, relatedId, additionalData, optio
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
 window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
 window.renderUpdatedTimestamp = (value, options) => FieldRendererService.renderUpdatedTimestamp(value, options);
-
-console.log('✅ FieldRendererService loaded successfully, window.FieldRendererService:', typeof window.FieldRendererService);

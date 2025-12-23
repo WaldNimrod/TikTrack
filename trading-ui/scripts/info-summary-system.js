@@ -581,7 +581,7 @@ class InfoSummarySystem {
 
 // Initialize and expose globally
 window.InfoSummarySystem = new InfoSummarySystem();
-console.log('✅ InfoSummarySystem initialized with customTradingAccountsBalance calculator');
+window.Logger?.debug?.('✅ InfoSummarySystem initialized with customTradingAccountsBalance calculator', { page: 'info-summary-system' });
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

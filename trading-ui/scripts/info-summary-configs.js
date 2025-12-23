@@ -672,7 +672,7 @@ const INFO_SUMMARY_CONFIGS = {
 
 // Expose globally
 window.INFO_SUMMARY_CONFIGS = INFO_SUMMARY_CONFIGS;
-console.log('✅ INFO_SUMMARY_CONFIGS loaded, trading_accounts config:', INFO_SUMMARY_CONFIGS.trading_accounts);
+window.Logger?.debug?.('✅ INFO_SUMMARY_CONFIGS loaded', { trading_accounts_config: INFO_SUMMARY_CONFIGS.trading_accounts, page: 'info-summary-configs' });
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

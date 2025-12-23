@@ -93,9 +93,7 @@ class RuntimeValidator {
       const optional = this.results.missing.filter(g => OPTIONAL_SYSTEMS.includes(g));
       
       if (required.length > 0) {
-        console.error('🔴 מערכות נדרשות חסרות:', JSON.stringify(required), 'כל המערכות החסרות:', JSON.stringify(this.results.missing));
-        console.error('🔴 REQUIRED MISSING:', required);
-        console.error('🔴 ALL MISSING:', this.results.missing);
+        console.error('🔴 מערכות נדרשות חסרות:', required);
       }
       if (optional.length > 0) {
         console.debug('ℹ️ מערכות אופציונליות חסרות (זה תקין):', optional);

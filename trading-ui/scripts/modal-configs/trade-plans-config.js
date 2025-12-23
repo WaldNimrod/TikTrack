@@ -303,7 +303,7 @@ function initializeTradePlansModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(tradePlansModalConfig);
-            console.log('✅ Trade Plans modal created successfully');
+            window.Logger?.debug?.('✅ Trade Plans modal created successfully', { page: 'trade-plans-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Trade Plans modal:', error);

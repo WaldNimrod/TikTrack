@@ -242,7 +242,7 @@
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
             try {
                 window.ModalManagerV2.createCRUDModal(tickersModalConfig);
-                console.log('✅ Tickers modal created successfully');
+                window.Logger?.debug?.('✅ Tickers modal created successfully', { page: 'tickers-config' });
                 if (window.Logger) {
                     window.Logger.debug('Tickers modal created successfully', { page: 'tickers' });
                 }
@@ -260,7 +260,7 @@
 
     // Attempt to initialize immediately if ModalManagerV2 is available
     if (window.ModalManagerV2) {
-        console.log('✅ ModalManagerV2 available, initializing Tickers modal...');
+        window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Tickers modal...', { page: 'tickers-config' });
         if (initializeTickersModal()) {
             console.log('✅ Tickers modal initialized successfully');
         } else {
@@ -287,10 +287,10 @@
         const checkInterval = setInterval(() => {
             attempts++;
             if (window.ModalManagerV2) {
-                console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Tickers modal...`);
+                window.Logger?.debug?.(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Tickers modal...`, { page: 'tickers-config' });
                 clearInterval(checkInterval);
                 if (initializeTickersModal()) {
-                    console.log('✅ Tickers modal initialized successfully');
+                    window.Logger?.debug?.('✅ Tickers modal initialized successfully', { page: 'tickers-config' });
                 } else {
                     console.warn('⚠️ Failed to initialize Tickers modal');
                 }

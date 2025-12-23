@@ -161,7 +161,7 @@ function initializeTradingAccountsModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(tradingAccountsModalConfig);
-            console.log('✅ Trading Accounts modal created successfully');
+            window.Logger?.debug?.('✅ Trading Accounts modal created successfully', { page: 'trading-accounts-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Trading Accounts modal:', error);
@@ -173,9 +173,9 @@ function initializeTradingAccountsModal() {
 
 // Attempt to initialize immediately if ModalManagerV2 is available
 if (window.ModalManagerV2) {
-    console.log('✅ ModalManagerV2 available, initializing Trading Accounts modal...');
+    window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Trading Accounts modal...', { page: 'trading-accounts-config' });
     if (initializeTradingAccountsModal()) {
-        console.log('✅ Trading Accounts modal initialized successfully');
+        window.Logger?.debug?.('✅ Trading Accounts modal initialized successfully', { page: 'trading-accounts-config' });
     } else {
         console.warn('⚠️ Failed to initialize Trading Accounts modal');
     }
@@ -200,10 +200,10 @@ function waitForModalManager() {
     const checkInterval = setInterval(() => {
         attempts++;
         if (window.ModalManagerV2) {
-            console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing modal...`);
+            window.Logger?.debug?.(`✅ ModalManagerV2 available after ${attempts} attempts, initializing modal...`, { page: 'trading-accounts-config' });
             clearInterval(checkInterval);
             if (initializeTradingAccountsModal()) {
-                console.log('✅ Trading Accounts modal initialized successfully');
+                window.Logger?.debug?.('✅ Trading Accounts modal initialized successfully', { page: 'trading-accounts-config' });
             } else {
                 console.warn('⚠️ Failed to initialize Trading Accounts modal');
             }

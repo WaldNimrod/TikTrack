@@ -2372,7 +2372,7 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       // Update PreferencesCore with the profile ID from server
       if (window.PreferencesCore && prefPayload?.resolvedProfileId !== undefined) {
         window.PreferencesCore.currentProfileId = prefPayload.resolvedProfileId;
-        console.log('✅ Updated PreferencesCore.currentProfileId to:', prefPayload.resolvedProfileId);
+        window.Logger?.debug?.('✅ Updated PreferencesCore.currentProfileId', { resolvedProfileId: prefPayload.resolvedProfileId, page: 'ui-advanced' });
       }
       
       const prefsRaw = prefPayload?.preferences || {};
@@ -2536,7 +2536,7 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       }
 
       // Debug: log applied primary/secondary
-      console.log('✅ loadUserPreferences complete:', {
+      window.Logger?.debug?.('✅ loadUserPreferences complete', {
         source,
         primary: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
         secondary: getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim()

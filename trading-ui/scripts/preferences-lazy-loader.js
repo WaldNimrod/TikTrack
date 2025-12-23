@@ -442,7 +442,7 @@ class LazyLoader {
               if (Object.keys(defaultPreferences).length > 0) {
                 allPreferences = defaultPreferences;
                 cacheLayer = 'defaults';
-                window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
+                window.Logger?.debug?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
                   page: 'preferences-lazy-loader',
                 });
               }
@@ -487,7 +487,7 @@ class LazyLoader {
         window.PreferencesCore.currentProfileId = profileId;
       }
       
-      window.Logger?.info?.('✅ Updated window.currentPreferences with loaded preferences', {
+      window.Logger?.debug?.('✅ Updated window.currentPreferences with loaded preferences', {
         page: 'preferences-lazy-loader',
         preferencesCount: Object.keys(allPreferences).length,
         currentPreferencesCount: Object.keys(window.currentPreferences).length,
@@ -516,7 +516,7 @@ class LazyLoader {
         detail: window.__preferencesCriticalLoadedDetail,
       }));
 
-      window.Logger?.info?.('✅ Critical preferences loaded', {
+      window.Logger?.debug?.('✅ Critical preferences loaded', {
         page: 'preferences-lazy-loader',
         fromCache,
         cacheLayer,

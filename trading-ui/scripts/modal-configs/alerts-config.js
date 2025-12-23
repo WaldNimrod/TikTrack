@@ -238,7 +238,7 @@ function initializeAlertsModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(alertsModalConfig);
-            console.log('✅ Alerts modal created successfully');
+            window.Logger?.debug?.('✅ Alerts modal created successfully', { page: 'alerts-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Alerts modal:', error);

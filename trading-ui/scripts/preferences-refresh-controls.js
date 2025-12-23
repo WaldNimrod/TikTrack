@@ -330,6 +330,6 @@
     }
   };
 
-  console.log('✅ Preferences Refresh Controls loaded');
+  window.Logger?.debug?.('✅ Preferences Refresh Controls loaded', { page: 'preferences-refresh-controls' });
 })();
 

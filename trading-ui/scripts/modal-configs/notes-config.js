@@ -140,7 +140,7 @@ function initializeNotesModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(notesModalConfig);
-            console.log('✅ Notes modal created successfully');
+            window.Logger?.debug?.('✅ Notes modal created successfully', { page: 'notes-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Notes modal:', error);

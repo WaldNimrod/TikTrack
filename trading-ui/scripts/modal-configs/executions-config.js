@@ -311,7 +311,7 @@ function initializeExecutionsModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(executionsModalConfig);
-            console.log('✅ Executions modal created successfully');
+            window.Logger?.debug?.('✅ Executions modal created successfully', { page: 'executions-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Executions modal:', error);
@@ -329,7 +329,7 @@ if (document.readyState === 'loading') {
         if (window.ModalManagerV2) {
             console.log('✅ ModalManagerV2 available on DOMContentLoaded, initializing Executions modal...');
             if (initializeExecutionsModal()) {
-                console.log('✅ Executions modal initialized successfully');
+                window.Logger?.debug?.('✅ Executions modal initialized successfully', { page: 'executions-config' });
             } else {
                 console.warn('⚠️ Failed to initialize Executions modal');
                 // Fallback: wait for ModalManagerV2
@@ -343,7 +343,7 @@ if (document.readyState === 'loading') {
 } else {
     // DOM already loaded - try immediately
     if (window.ModalManagerV2) {
-        console.log('✅ ModalManagerV2 available, initializing Executions modal...');
+        window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Executions modal...', { page: 'executions-config' });
         if (initializeExecutionsModal()) {
             console.log('✅ Executions modal initialized successfully');
         } else {
@@ -365,10 +365,10 @@ function waitForModalManager() {
     const checkInterval = setInterval(() => {
         attempts++;
         if (window.ModalManagerV2) {
-            console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Executions modal...`);
+            window.Logger?.debug?.(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Executions modal...`, { page: 'executions-config' });
             clearInterval(checkInterval);
             if (initializeExecutionsModal()) {
-                console.log('✅ Executions modal initialized successfully');
+                window.Logger?.debug?.('✅ Executions modal initialized successfully', { page: 'executions-config' });
             } else {
                 console.warn('⚠️ Failed to initialize Executions modal');
             }

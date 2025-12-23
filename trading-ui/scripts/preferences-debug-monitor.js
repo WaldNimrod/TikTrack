@@ -513,7 +513,7 @@
   window.Logger?.info('✅ Preferences Debug Monitor initialized', PAGE_LOG_CONTEXT);
   
   // Log to console as well for immediate visibility
-  console.log('✅ Preferences Debug Monitor initialized', {
+  window.Logger?.debug?.('✅ Preferences Debug Monitor initialized', {
     startMonitoring: typeof window.startPreferencesDebugMonitoring === 'function',
     stopMonitoring: typeof window.stopPreferencesDebugMonitoring === 'function',
     runCheck: typeof window.runPreferencesDebugCheck === 'function',

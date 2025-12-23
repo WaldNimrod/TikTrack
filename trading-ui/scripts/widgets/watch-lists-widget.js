@@ -880,7 +880,7 @@
   window.WatchListsWidget = WatchListsWidget;
 
   // Log that widget is loaded (always log, even if Logger not available)
-  console.log('✅ Watch Lists Widget loaded', PAGE_LOG_CONTEXT);
+  window.Logger?.debug?.('✅ Watch Lists Widget loaded', PAGE_LOG_CONTEXT);
   if (window.Logger) {
     window.Logger.info?.('Watch Lists Widget loaded', PAGE_LOG_CONTEXT);
   }

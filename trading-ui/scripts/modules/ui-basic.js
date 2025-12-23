@@ -846,13 +846,13 @@ window.toggleSection = async function (sectionId) {
       // Remove d-flex/d-block classes that might interfere and set display
       sectionBody.classList.remove('d-none', 'd-flex', 'd-block');
       sectionBody.style.display = 'block';
-      console.log(`✅ Section "${sectionId}" EXPANDED`);
+      window.Logger?.debug?.(`✅ Section "${sectionId}" EXPANDED`, { page: 'ui-basic' });
     } else {
       // Closing section - remove display classes and set to none
       sectionBody.classList.remove('d-flex', 'd-block');
       sectionBody.classList.add('d-none');
       sectionBody.style.display = 'none';
-      console.log(`✅ Section "${sectionId}" COLLAPSED`);
+      window.Logger?.debug?.(`✅ Section "${sectionId}" COLLAPSED`, { page: 'ui-basic' });
     }
 
     // Update icon - use SVG icons from BUTTON_ICONS
@@ -1046,7 +1046,7 @@ window.restoreAllSectionStates = async function () {
         waitCount++;
       }
       if (window.sectionStatesRestored[pageName] === 'completed') {
-        console.log(`✅ restoreAllSectionStates completed (waited for previous call)`);
+        window.Logger?.debug?.(`✅ restoreAllSectionStates completed (waited for previous call)`, { page: 'ui-basic' });
         return;
       }
     } else if (window.sectionStatesRestored[pageName] === 'completed') {

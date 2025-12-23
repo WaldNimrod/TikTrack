@@ -28,7 +28,7 @@ function initializeTradesModal() {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(tradesModalConfig);
-            console.log('✅ Trades modal created successfully');
+            window.Logger?.debug?.('✅ Trades modal created successfully', { page: 'trades-config' });
             return true;
         } catch (error) {
             console.error('❌ Error creating Trades modal:', error);

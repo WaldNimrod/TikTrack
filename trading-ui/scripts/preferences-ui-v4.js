@@ -222,7 +222,7 @@
                                  window.location.pathname.includes('/preferences');
       if (isPreferencesPage) {
         if (window.PreferencesDebugMonitor && typeof window.PreferencesDebugMonitor.startMonitoring === 'function') {
-          window.Logger?.info('🔍 Starting preferences debug monitoring', { page: 'preferences-ui-v4' });
+          window.Logger?.debug('🔍 Starting preferences debug monitoring', { page: 'preferences-ui-v4' });
           window.PreferencesDebugMonitor.startMonitoring();
         } else {
           window.Logger?.warn('⚠️ PreferencesDebugMonitor not available', {
@@ -242,7 +242,7 @@
       
       // CRITICAL: Update summary info automatically after page load
       if (typeof window.updatePreferencesSummary === 'function') {
-        window.Logger?.info?.('📊 Updating preferences summary after initialization...', { 
+        window.Logger?.debug?.('📊 Updating preferences summary after initialization...', { 
           page: 'preferences-ui-v4' 
         });
         await window.updatePreferencesSummary();
@@ -267,7 +267,7 @@
       });
 
       this.initialized = true;
-      window.Logger?.info?.('✅ PreferencesUIV4 initialized', { page: 'preferences-ui-v4' });
+      window.Logger?.debug?.('✅ PreferencesUIV4 initialized', { page: 'preferences-ui-v4' });
     }
 
     _renderUser(profileContext) {
@@ -293,7 +293,7 @@
       if (summaryNameEl) summaryNameEl.textContent = combined;
       if (summaryIdEl) summaryIdEl.textContent = userId != null ? `#${userId}` : '';
       
-      window.Logger?.info?.('👤 PreferencesUIV4: User display updated', {
+      window.Logger?.debug?.('👤 PreferencesUIV4: User display updated', {
         page: 'preferences-ui-v4',
         userId,
         userName,
@@ -322,7 +322,7 @@
       if (summaryNameEl) summaryNameEl.textContent = combined;
       if (summaryInfoEl) summaryInfoEl.textContent = combined;
       
-      window.Logger?.info?.('📘 PreferencesUIV4: Profile display updated', {
+      window.Logger?.debug?.('📘 PreferencesUIV4: Profile display updated', {
         page: 'preferences-ui-v4',
         profileId: profId,
         profileName: profName,

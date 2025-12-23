@@ -2439,43 +2439,81 @@ class IntegratedCRUDE2ETester {
             steps: []
         };
         let testIframe = null;
+        let createdCategoryId = null;
+        let createdTagId = null;
 
         try {
             this.logger?.info('🧪 Starting Tag Management Tests (Categories and Tags)');
             
-            // Test 1: Tag Categories CRUD
-            workflow.steps.push('בודק CRUD לקטגוריות תגיות');
-            this.updateTestResults();
-            
-            const categoryFieldMap = this.getEntityFieldMaps().tag_category;
             testIframe = await this.loadPageInIframe('/tag_management.html');
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = testIframe.contentWindow;
             
             await this.waitForElementInIframe(testIframe, 'table tbody, .table tbody, main, [data-section="main"]', 15000);
             
-            // Test category creation
+            // Test 1: Tag Categories CRUD
+            workflow.steps.push('בודק CRUD לקטגוריות תגיות');
+            this.updateTestResults();
+            
+            const categoryFieldMap = this.getEntityFieldMaps().tag_category;
+            
+            // Create category
             if (iframeWindow.ModalManagerV2) {
                 await iframeWindow.ModalManagerV2.showModal('tagCategoryModal', 'add');
                 await this.waitForElementInIframe(testIframe, '#tagCategoryModal.show', 5000);
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                // Fill category form
-                const categoryName = `Test Category ${Date.now()}`;
-                const nameField = iframeDoc.querySelector('#tagCategoryName');
-                if (nameField) {
-                    nameField.value = categoryName;
-                    nameField.dispatchEvent(new Event('input', { bubbles: true }));
+                // Fill category form using DataCollectionService
+                const categoryTestData = {
+                    name: `Test Category ${Date.now()}`,
+                    description: 'Test category description',
+                    order: 0,
+                    is_active: true
+                };
+                
+                if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
+                    iframeWindow.DataCollectionService.setFormData(categoryFieldMap.fields, categoryTestData);
+                } else {
+                    // Fallback: manual filling
+                    const nameField = iframeDoc.querySelector('#tagCategoryName');
+                    if (nameField) {
+                        nameField.value = categoryTestData.name;
+                        nameField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                 }
                 
-                // Save category
-                const saveButton = iframeDoc.querySelector('#tagCategoryModal button[type="submit"], #tagCategoryModal button.btn-primary');
-                if (saveButton) {
-                    saveButton.click();
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                // Validate form
+                const validationResult = await this.validateFormFieldsInIframe(testIframe, 'tag_category', categoryFieldMap);
+                if (!validationResult.isValid) {
+                    workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
                 }
                 
-                workflow.steps.push('קטגוריה נוצרה בהצלחה');
+                // Save category using UnifiedCRUDService
+                if (iframeWindow.UnifiedCRUDService) {
+                    const formData = iframeWindow.DataCollectionService?.collectFormData(categoryFieldMap.fields) || categoryTestData;
+                    const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity('tag_category', formData, {
+                        modalId: 'tagCategoryModal',
+                        successMessage: 'קטגוריה נוספה בהצלחה',
+                        entityName: 'קטגוריית תגיות',
+                        reloadFn: null
+                    });
+                    
+                    if (saveResult && saveResult.data) {
+                        createdCategoryId = saveResult.data.id || saveResult.id;
+                        workflow.steps.push(`קטגוריה נוצרה בהצלחה (ID: ${createdCategoryId})`);
+                    }
+                } else {
+                    // Fallback: manual save
+                    const saveButton = iframeDoc.querySelector('#tagCategoryModal button[type="submit"], #tagCategoryModal button.btn-primary');
+                    if (saveButton) {
+                        saveButton.click();
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        workflow.steps.push('קטגוריה נוצרה בהצלחה');
+                    }
+                }
+                
+                await this.waitForElementToDisappearInIframe(testIframe, '#tagCategoryModal.show', 10000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 this.updateTestResults();
             }
             
@@ -2489,22 +2527,107 @@ class IntegratedCRUDE2ETester {
                 await this.waitForElementInIframe(testIframe, '#tagModal.show', 5000);
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                // Fill tag form
-                const tagName = `Test Tag ${Date.now()}`;
-                const tagNameField = iframeDoc.querySelector('#tagName');
-                if (tagNameField) {
-                    tagNameField.value = tagName;
-                    tagNameField.dispatchEvent(new Event('input', { bubbles: true }));
+                // Fill tag form using DataCollectionService
+                const tagTestData = {
+                    name: `Test Tag ${Date.now()}`,
+                    category_id: createdCategoryId || null,
+                    description: 'Test tag description',
+                    is_active: true
+                };
+                
+                if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
+                    iframeWindow.DataCollectionService.setFormData(tagFieldMap.fields, tagTestData);
+                } else {
+                    // Fallback: manual filling
+                    const tagNameField = iframeDoc.querySelector('#tagName');
+                    if (tagNameField) {
+                        tagNameField.value = tagTestData.name;
+                        tagNameField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                 }
                 
-                // Save tag
-                const tagSaveButton = iframeDoc.querySelector('#tagModal button[type="submit"], #tagModal button.btn-primary');
-                if (tagSaveButton) {
-                    tagSaveButton.click();
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                // Validate form
+                const tagValidationResult = await this.validateFormFieldsInIframe(testIframe, 'tag', tagFieldMap);
+                if (!tagValidationResult.isValid) {
+                    workflow.steps.push(`אזהרה: ולידציה נכשלה - ${tagValidationResult.errors.join(', ')}`);
                 }
                 
-                workflow.steps.push('תגית נוצרה בהצלחה');
+                // Save tag using UnifiedCRUDService
+                if (iframeWindow.UnifiedCRUDService) {
+                    const tagFormData = iframeWindow.DataCollectionService?.collectFormData(tagFieldMap.fields) || tagTestData;
+                    const tagSaveResult = await iframeWindow.UnifiedCRUDService.saveEntity('tag', tagFormData, {
+                        modalId: 'tagModal',
+                        successMessage: 'תגית נוספה בהצלחה',
+                        entityName: 'תגית',
+                        reloadFn: null
+                    });
+                    
+                    if (tagSaveResult && tagSaveResult.data) {
+                        createdTagId = tagSaveResult.data.id || tagSaveResult.id;
+                        workflow.steps.push(`תגית נוצרה בהצלחה (ID: ${createdTagId})`);
+                    }
+                } else {
+                    // Fallback: manual save
+                    const tagSaveButton = iframeDoc.querySelector('#tagModal button[type="submit"], #tagModal button.btn-primary');
+                    if (tagSaveButton) {
+                        tagSaveButton.click();
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        workflow.steps.push('תגית נוצרה בהצלחה');
+                    }
+                }
+                
+                await this.waitForElementToDisappearInIframe(testIframe, '#tagModal.show', 10000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.updateTestResults();
+            }
+            
+            // Test 3: Delete tag (if created)
+            if (createdTagId && iframeWindow.UnifiedCRUDService) {
+                workflow.steps.push('בודק מחיקת תגית');
+                this.updateTestResults();
+                
+                // Check linked items before deletion
+                if (iframeWindow.checkLinkedItemsBeforeAction) {
+                    const linkedCheck = await iframeWindow.checkLinkedItemsBeforeAction('tag', createdTagId);
+                    if (linkedCheck && linkedCheck.hasLinkedItems) {
+                        workflow.steps.push(`אזהרה: יש פריטים מקושרים לתגית - ${linkedCheck.linkedItems.join(', ')}`);
+                    }
+                }
+                
+                // Delete tag
+                const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('tag', createdTagId, {
+                    successMessage: 'תגית נמחקה בהצלחה',
+                    entityName: 'תגית'
+                });
+                
+                if (deleteResult) {
+                    workflow.steps.push('תגית נמחקה בהצלחה');
+                }
+                this.updateTestResults();
+            }
+            
+            // Test 4: Delete category (if created)
+            if (createdCategoryId && iframeWindow.UnifiedCRUDService) {
+                workflow.steps.push('בודק מחיקת קטגוריה');
+                this.updateTestResults();
+                
+                // Check linked items before deletion
+                if (iframeWindow.checkLinkedItemsBeforeAction) {
+                    const linkedCheck = await iframeWindow.checkLinkedItemsBeforeAction('tag_category', createdCategoryId);
+                    if (linkedCheck && linkedCheck.hasLinkedItems) {
+                        workflow.steps.push(`אזהרה: יש פריטים מקושרים לקטגוריה - ${linkedCheck.linkedItems.join(', ')}`);
+                    }
+                }
+                
+                // Delete category
+                const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('tag_category', createdCategoryId, {
+                    successMessage: 'קטגוריה נמחקה בהצלחה',
+                    entityName: 'קטגוריית תגיות'
+                });
+                
+                if (deleteResult) {
+                    workflow.steps.push('קטגוריה נמחקה בהצלחה');
+                }
                 this.updateTestResults();
             }
             
@@ -2519,7 +2642,7 @@ class IntegratedCRUDE2ETester {
                 status: 'success',
                 steps: workflow.steps,
                 executionTime: executionTime,
-                details: 'Tag management tests completed (categories and tags)'
+                details: 'Tag management tests completed (categories and tags CRUD)'
             });
             
             this.logger?.info(`✅ Tag Management Tests completed in ${executionTime}ms`);
@@ -2539,6 +2662,11 @@ class IntegratedCRUDE2ETester {
                 executionTime: executionTime,
                 error: error.message
             });
+            this.handleTestError(error, 'Tag Management Tests', {
+                workflow: workflow.name,
+                executionTime,
+                steps: workflow.steps
+            });
             this.updateTestResults();
         }
     }
@@ -2553,6 +2681,7 @@ class IntegratedCRUDE2ETester {
             steps: []
         };
         let testIframe = null;
+        let createdProfileId = null;
 
         try {
             this.logger?.info('🧪 Starting Preferences Tests (Profiles and Preferences)');
@@ -2569,29 +2698,72 @@ class IntegratedCRUDE2ETester {
             
             const profileFieldMap = this.getEntityFieldMaps().preference_profile;
             
-            // Try to find and click "Add Profile" button
-            const addProfileButton = iframeDoc.querySelector('button[data-action*="profile"], button:contains("פרופיל"), button[data-button-type="ADD"]');
-            if (addProfileButton) {
-                addProfileButton.click();
+            // Try to open profile modal
+            if (iframeWindow.ModalManagerV2) {
+                await iframeWindow.ModalManagerV2.showModal('preferenceProfileModal', 'add');
+                await this.waitForElementInIframe(testIframe, '#preferenceProfileModal.show', 5000);
                 await new Promise(resolve => setTimeout(resolve, 1000));
+            } else {
+                // Fallback: try to find and click "Add Profile" button
+                const addProfileButton = iframeDoc.querySelector('button[data-action*="profile"], button[data-button-type="ADD"]');
+                if (addProfileButton) {
+                    addProfileButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            // Fill profile form
+            const profileModal = iframeDoc.querySelector('#preferenceProfileModal, .modal.show');
+            if (profileModal) {
+                const profileTestData = {
+                    name: `Test Profile ${Date.now()}`,
+                    description: 'Test preference profile',
+                    is_active: true
+                };
                 
-                // Fill profile form if modal appears
-                const profileModal = iframeDoc.querySelector('#preferenceProfileModal, .modal.show');
-                if (profileModal) {
+                if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
+                    iframeWindow.DataCollectionService.setFormData(profileFieldMap.fields, profileTestData);
+                } else {
+                    // Fallback: manual filling
                     const profileNameField = iframeDoc.querySelector('#preferenceProfileName');
                     if (profileNameField) {
-                        profileNameField.value = `Test Profile ${Date.now()}`;
+                        profileNameField.value = profileTestData.name;
                         profileNameField.dispatchEvent(new Event('input', { bubbles: true }));
                     }
+                }
+                
+                // Validate form
+                const validationResult = await this.validateFormFieldsInIframe(testIframe, 'preference_profile', profileFieldMap);
+                if (!validationResult.isValid) {
+                    workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
+                }
+                
+                // Save profile using UnifiedCRUDService
+                if (iframeWindow.UnifiedCRUDService) {
+                    const formData = iframeWindow.DataCollectionService?.collectFormData(profileFieldMap.fields) || profileTestData;
+                    const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity('preference_profile', formData, {
+                        modalId: 'preferenceProfileModal',
+                        successMessage: 'פרופיל העדפות נוסף בהצלחה',
+                        entityName: 'פרופיל העדפות',
+                        reloadFn: null
+                    });
                     
+                    if (saveResult && saveResult.data) {
+                        createdProfileId = saveResult.data.id || saveResult.id;
+                        workflow.steps.push(`פרופיל העדפות נוצר בהצלחה (ID: ${createdProfileId})`);
+                    }
+                } else {
+                    // Fallback: manual save
                     const saveButton = profileModal.querySelector('button[type="submit"], button.btn-primary');
                     if (saveButton) {
                         saveButton.click();
                         await new Promise(resolve => setTimeout(resolve, 2000));
+                        workflow.steps.push('פרופיל העדפות נוצר בהצלחה');
                     }
                 }
                 
-                workflow.steps.push('פרופיל העדפות נוצר בהצלחה');
+                await this.waitForElementToDisappearInIframe(testIframe, '#preferenceProfileModal.show, .modal.show', 10000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 this.updateTestResults();
             }
             
@@ -2599,15 +2771,63 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push('בודק עדכון ערכי העדפות');
             this.updateTestResults();
             
-            // Try to find a preference field and update it
-            const preferenceInputs = iframeDoc.querySelectorAll('input[type="text"], input[type="number"], select');
-            if (preferenceInputs.length > 0) {
-                const firstInput = preferenceInputs[0];
-                const originalValue = firstInput.value;
-                firstInput.value = 'Test Value';
-                firstInput.dispatchEvent(new Event('change', { bubbles: true }));
+            // Try to find preference fields and update them
+            const preferenceInputs = iframeDoc.querySelectorAll('input[type="text"]:not([readonly]), input[type="number"]:not([readonly]), select:not([disabled])');
+            let updatedCount = 0;
+            
+            for (let i = 0; i < Math.min(preferenceInputs.length, 3); i++) {
+                const input = preferenceInputs[i];
+                const originalValue = input.value;
                 
-                workflow.steps.push('ערך העדפה עודכן');
+                if (input.tagName === 'SELECT') {
+                    // For selects, try to select a different option
+                    if (input.options.length > 1) {
+                        const currentIndex = input.selectedIndex;
+                        const newIndex = (currentIndex + 1) % input.options.length;
+                        input.selectedIndex = newIndex;
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        updatedCount++;
+                    }
+                } else {
+                    // For inputs, set a test value
+                    input.value = `Test Value ${Date.now()}`;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    updatedCount++;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            if (updatedCount > 0) {
+                workflow.steps.push(`${updatedCount} ערכי העדפה עודכנו`);
+            } else {
+                workflow.steps.push('לא נמצאו שדות העדפות לעדכון');
+            }
+            this.updateTestResults();
+            
+            // Test 3: Delete profile (if created)
+            if (createdProfileId && iframeWindow.UnifiedCRUDService) {
+                workflow.steps.push('בודק מחיקת פרופיל העדפות');
+                this.updateTestResults();
+                
+                // Check linked items before deletion
+                if (iframeWindow.checkLinkedItemsBeforeAction) {
+                    const linkedCheck = await iframeWindow.checkLinkedItemsBeforeAction('preference_profile', createdProfileId);
+                    if (linkedCheck && linkedCheck.hasLinkedItems) {
+                        workflow.steps.push(`אזהרה: יש פריטים מקושרים לפרופיל - ${linkedCheck.linkedItems.join(', ')}`);
+                    }
+                }
+                
+                // Delete profile
+                const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('preference_profile', createdProfileId, {
+                    successMessage: 'פרופיל העדפות נמחק בהצלחה',
+                    entityName: 'פרופיל העדפות'
+                });
+                
+                if (deleteResult) {
+                    workflow.steps.push('פרופיל העדפות נמחק בהצלחה');
+                }
                 this.updateTestResults();
             }
             
@@ -2622,7 +2842,7 @@ class IntegratedCRUDE2ETester {
                 status: 'success',
                 steps: workflow.steps,
                 executionTime: executionTime,
-                details: 'Preferences tests completed (profiles and preferences)'
+                details: 'Preferences tests completed (profiles and preferences CRUD)'
             });
             
             this.logger?.info(`✅ Preferences Tests completed in ${executionTime}ms`);
@@ -2642,6 +2862,11 @@ class IntegratedCRUDE2ETester {
                 executionTime: executionTime,
                 error: error.message
             });
+            this.handleTestError(error, 'Preferences Tests', {
+                workflow: workflow.name,
+                executionTime,
+                steps: workflow.steps
+            });
             this.updateTestResults();
         }
     }
@@ -2656,6 +2881,7 @@ class IntegratedCRUDE2ETester {
             steps: []
         };
         let testIframe = null;
+        let createdSessionId = null;
 
         try {
             this.logger?.info('🧪 Starting Data Import Tests (Import Sessions)');
@@ -2666,8 +2892,6 @@ class IntegratedCRUDE2ETester {
             
             await this.waitForElementInIframe(testIframe, 'main, [data-section="main"], .import-container, table tbody', 15000);
             
-            // Note: Data import is more complex - it involves file upload and analysis
-            // For now, we'll just verify the page loads and has the expected structure
             workflow.steps.push('עמוד ייבוא נתונים נטען בהצלחה');
             this.updateTestResults();
             
@@ -2677,6 +2901,109 @@ class IntegratedCRUDE2ETester {
                 workflow.steps.push('טבלת סשני ייבוא נמצאה');
                 this.updateTestResults();
             }
+            
+            // Test: Import Session CRUD (if modal exists)
+            const importSessionFieldMap = this.getEntityFieldMaps().import_session;
+            
+            // Try to open import session modal
+            if (iframeWindow.ModalManagerV2) {
+                try {
+                    await iframeWindow.ModalManagerV2.showModal('importSessionModal', 'add');
+                    await this.waitForElementInIframe(testIframe, '#importSessionModal.show', 5000);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    workflow.steps.push('מודל ייבוא נפתח');
+                    this.updateTestResults();
+                    
+                    // Fill import session form
+                    const sessionTestData = {
+                        name: `Test Import Session ${Date.now()}`,
+                        description: 'Test import session description'
+                    };
+                    
+                    if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
+                        iframeWindow.DataCollectionService.setFormData(importSessionFieldMap.fields, sessionTestData);
+                    } else {
+                        // Fallback: manual filling
+                        const nameField = iframeDoc.querySelector('#importSessionName');
+                        if (nameField) {
+                            nameField.value = sessionTestData.name;
+                            nameField.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    }
+                    
+                    // Validate form
+                    const validationResult = await this.validateFormFieldsInIframe(testIframe, 'import_session', importSessionFieldMap);
+                    if (!validationResult.isValid) {
+                        workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
+                    }
+                    
+                    // Save import session using UnifiedCRUDService
+                    if (iframeWindow.UnifiedCRUDService) {
+                        const formData = iframeWindow.DataCollectionService?.collectFormData(importSessionFieldMap.fields) || sessionTestData;
+                        const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity('import_session', formData, {
+                            modalId: 'importSessionModal',
+                            successMessage: 'סשן ייבוא נוסף בהצלחה',
+                            entityName: 'סשן ייבוא',
+                            reloadFn: null
+                        });
+                        
+                        if (saveResult && saveResult.data) {
+                            createdSessionId = saveResult.data.id || saveResult.id;
+                            workflow.steps.push(`סשן ייבוא נוצר בהצלחה (ID: ${createdSessionId})`);
+                        }
+                    } else {
+                        // Fallback: manual save
+                        const saveButton = iframeDoc.querySelector('#importSessionModal button[type="submit"], #importSessionModal button.btn-primary');
+                        if (saveButton) {
+                            saveButton.click();
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            workflow.steps.push('סשן ייבוא נוצר בהצלחה');
+                        }
+                    }
+                    
+                    await this.waitForElementToDisappearInIframe(testIframe, '#importSessionModal.show', 10000);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    this.updateTestResults();
+                    
+                    // Test: Delete import session (if created)
+                    if (createdSessionId && iframeWindow.UnifiedCRUDService) {
+                        workflow.steps.push('בודק מחיקת סשן ייבוא');
+                        this.updateTestResults();
+                        
+                        // Check linked items before deletion
+                        if (iframeWindow.checkLinkedItemsBeforeAction) {
+                            const linkedCheck = await iframeWindow.checkLinkedItemsBeforeAction('import_session', createdSessionId);
+                            if (linkedCheck && linkedCheck.hasLinkedItems) {
+                                workflow.steps.push(`אזהרה: יש פריטים מקושרים לסשן - ${linkedCheck.linkedItems.join(', ')}`);
+                            }
+                        }
+                        
+                        // Delete import session
+                        const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('import_session', createdSessionId, {
+                            successMessage: 'סשן ייבוא נמחק בהצלחה',
+                            entityName: 'סשן ייבוא'
+                        });
+                        
+                        if (deleteResult) {
+                            workflow.steps.push('סשן ייבוא נמחק בהצלחה');
+                        }
+                        this.updateTestResults();
+                    }
+                } catch (modalError) {
+                    // Modal might not exist or might not be needed for import sessions
+                    workflow.steps.push(`הערה: מודל ייבוא לא זמין או לא נדרש - ${modalError.message}`);
+                    this.updateTestResults();
+                }
+            } else {
+                workflow.steps.push('הערה: מערכת מודלים לא זמינה - בדיקת CRUD מוגבלת');
+                this.updateTestResults();
+            }
+            
+            // Note: File upload testing is complex and requires actual file selection
+            // This is beyond the scope of automated E2E testing
+            workflow.steps.push('הערה: בדיקת העלאת קבצים דורשת אינטראקציה ידנית');
+            this.updateTestResults();
             
             // Cleanup
             if (testIframe && testIframe.parentNode) {
@@ -2689,7 +3016,7 @@ class IntegratedCRUDE2ETester {
                 status: 'success',
                 steps: workflow.steps,
                 executionTime: executionTime,
-                details: 'Data import page loaded successfully (import sessions CRUD is complex and requires file upload)'
+                details: 'Data import tests completed (import sessions CRUD - file upload requires manual testing)'
             });
             
             this.logger?.info(`✅ Data Import Tests completed in ${executionTime}ms`);
@@ -2708,6 +3035,11 @@ class IntegratedCRUDE2ETester {
                 steps: workflow.steps,
                 executionTime: executionTime,
                 error: error.message
+            });
+            this.handleTestError(error, 'Data Import Tests', {
+                workflow: workflow.name,
+                executionTime,
+                steps: workflow.steps
             });
             this.updateTestResults();
         }

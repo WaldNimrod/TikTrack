@@ -170,17 +170,11 @@ class PreferencesAPIClient {
       window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core-new' });
       return null;
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:173',message:'getPreference - Calling loadPreference',data:{preferenceName:preferenceName,userId:userId||this.defaultUserId,profileId:profileId,currentProfileId:this.currentProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     const result = await window.PreferencesData.loadPreference({
       preferenceName,
       userId: userId || this.defaultUserId,
       profileId,
     });
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:180',message:'getPreference - loadPreference result',data:{preferenceName:preferenceName,resultValue:result?.value,resultType:typeof result?.value,isNull:result?.value===null,isUndefined:result?.value===undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     return result?.value ?? null;
   }
 
@@ -956,9 +950,6 @@ class PreferencesCore {
         
         // Update currentProfileId with the profile_id returned from server (if different)
         const serverProfileId = saveResult.profileId;
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:951',message:'savePreference - Server response profile_id',data:{serverProfileId:serverProfileId,finalProfileId:finalProfileId,currentProfileId:this.currentProfileId,preferenceName:preferenceName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         if (serverProfileId !== null && serverProfileId !== undefined && serverProfileId !== finalProfileId) {
           this.currentProfileId = serverProfileId;
           window.Logger?.debug?.('Updated currentProfileId from server response', {
@@ -966,9 +957,6 @@ class PreferencesCore {
             oldProfileId: finalProfileId,
             newProfileId: serverProfileId,
           });
-          // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:960',message:'savePreference - Updated currentProfileId',data:{oldProfileId:finalProfileId,newProfileId:serverProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
         }
 
         // ✅ CRITICAL: Update cache with new value instead of invalidating
@@ -993,10 +981,6 @@ class PreferencesCore {
           const prefixedAllPrefsKey = `tiktrack_${allPrefsKey}`;
           await window.UnifiedCacheManager.remove(prefixedAllPrefsKey, { layer: 'localStorage' });
         }
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:980',message:'savePreference - Updated cache with new value',data:{cacheProfileId:cacheProfileId,preferenceName:preferenceName,value:value,userId:finalUserId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
 
         return {
           success: true,

@@ -65,8 +65,13 @@
             // Initialize UI state
             initializeUI();
 
-            // Register sortable tables
-            registerSortableTables();
+            // Register static tables and setup sorting using central system
+            setTimeout(() => {
+                registerStaticTablesForSorting();
+                if (typeof window.setupSortableHeaders === 'function') {
+                    window.setupSortableHeaders('dev_tools');
+                }
+            }, 200);
 
             // Load initial data
             loadPageData();
@@ -129,15 +134,17 @@
     }
 
     /**
-     * Register sortable tables with UnifiedTableSystem
+     * Register static HTML tables with UnifiedTableSystem for sorting
+     * Uses central UnifiedTableSystem.registry.register() - no duplicate code
      */
-    function registerSortableTables() {
-        if (!window.UnifiedTableSystem) {
+    function registerStaticTablesForSorting() {
+        if (!window.UnifiedTableSystem?.registry) {
             log('UnifiedTableSystem not available, skipping table registration');
             return;
         }
 
         const tableTypes = [
+            'dev-tools-primary-pages',
             'dev-tools-technical-pages',
             'dev-tools-dev-pages',
             'dev-tools-auth-pages',
@@ -148,33 +155,50 @@
         tableTypes.forEach(tableType => {
             try {
                 const table = document.querySelector(`table[data-table-type="${tableType}"]`);
-                if (table) {
-                    // For dev_tools tables, we create static data from the existing HTML rows
-                    const rows = Array.from(table.querySelectorAll('tbody tr'));
-                    const data = rows.map(row => {
-                        const cells = Array.from(row.querySelectorAll('td'));
-                        return cells.map(cell => cell.textContent.trim());
-                    });
+                if (!table) return;
 
-                    window.UnifiedTableSystem.registry.register(tableType, {
-                        dataGetter: () => data,
-                        updateFunction: (sortedData) => {
-                            const tbody = table.querySelector('tbody');
-                            if (tbody && Array.isArray(sortedData)) {
-                                tbody.innerHTML = sortedData.map(row =>
-                                    `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
-                                ).join('');
-                            }
-                        },
-                        tableSelector: `table[data-table-type="${tableType}"]`,
-                        columns: ['filename', 'description', 'category', 'access', 'actions'],
-                        sortable: true,
-                        filterable: false,
-                        defaultSort: { columnIndex: 0, direction: 'asc', key: 'filename' }
-                    });
-
-                    log(`Registered sortable table: ${tableType}`);
+                // Skip if already registered
+                if (window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+                    return;
                 }
+
+                // Store original rows HTML for proper rendering after sorting
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                const originalRowsHTML = rows.map(row => row.outerHTML);
+                
+                // Extract data for sorting (text content only)
+                const data = rows.map(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    return cells.map(cell => cell.textContent.trim());
+                });
+
+                // Register with UnifiedTableSystem (central system - no duplication)
+                window.UnifiedTableSystem.registry.register(tableType, {
+                    dataGetter: () => data,
+                    updateFunction: (sortedData) => {
+                        const tbody = table.querySelector('tbody');
+                        if (!tbody || !Array.isArray(sortedData)) return;
+                        
+                        // Rebuild rows from sorted data by matching first cell text
+                        const sortedRowsHTML = sortedData.map(sortedRow => {
+                            const firstCellText = sortedRow[0];
+                            const originalRow = rows.find(row => {
+                                const firstCell = row.querySelector('td');
+                                return firstCell && firstCell.textContent.trim() === firstCellText;
+                            });
+                            return originalRow ? originalRow.outerHTML : '';
+                        }).filter(html => html);
+                        
+                        tbody.innerHTML = sortedRowsHTML.join('');
+                    },
+                    tableSelector: `table[data-table-type="${tableType}"]`,
+                    columns: ['filename', 'description', 'category', 'subcategory', 'access', 'actions'],
+                    sortable: true,
+                    filterable: false,
+                    defaultSort: { columnIndex: 0, direction: 'asc', key: 'filename' }
+                });
+
+                log(`Registered static table for sorting: ${tableType}`);
             } catch (error) {
                 log(`Error registering table ${tableType}:`, error);
             }

@@ -104,17 +104,11 @@ async function loadAccountsForPreferences() {
 
     if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
       try {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-page.js:107',message:'loadAccountsForPreferences - Calling getPreference',data:{preferenceName:'default_trading_account',finalUserId:finalUserId,finalProfileId:finalProfileId,currentProfileId:window.PreferencesCore?.currentProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         const preferenceValue = await window.PreferencesCore.getPreference(
           'default_trading_account',
           finalUserId,
           finalProfileId,
         );
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-page.js:120',message:'loadAccountsForPreferences - getPreference result',data:{preferenceValue:preferenceValue,preferenceValueType:typeof preferenceValue,isNull:preferenceValue===null,isUndefined:preferenceValue===undefined,isEmpty:preferenceValue===''},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         if (preferenceValue !== null && preferenceValue !== undefined && preferenceValue !== '') {
           if (typeof preferenceValue === 'object') {
             if (Object.prototype.hasOwnProperty.call(preferenceValue, 'id')) {
@@ -126,14 +120,8 @@ async function loadAccountsForPreferences() {
             defaultAccountId = String(preferenceValue);
           }
         }
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-page.js:130',message:'loadAccountsForPreferences - defaultAccountId resolved',data:{defaultAccountId:defaultAccountId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
       } catch (prefError) {
         window.Logger.warn('⚠️ Failed to resolve default_trading_account from PreferencesCore', prefError, { page: 'preferences-page' });
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-page.js:133',message:'loadAccountsForPreferences - getPreference error',data:{error:prefError?.message,errorStack:prefError?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
       }
     }
 

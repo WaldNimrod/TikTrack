@@ -200,7 +200,12 @@ class ColorManager {
 
       const allColors = {};
       colorNames.forEach(name => {
-        const value = fetched?.[name] ?? this.defaultColors[name];
+        // CRITICAL: Use default if value is null, undefined, or empty
+        // This ensures defaults are used when preference doesn't exist for profile
+        const fetchedValue = fetched?.[name];
+        const value = (fetchedValue !== null && fetchedValue !== undefined && fetchedValue !== '') 
+          ? fetchedValue 
+          : this.defaultColors[name];
         allColors[name] = value;
         this.colorCache.set(name, value);
       });
@@ -458,6 +463,12 @@ class ColorPickerManager {
     if (picker.element.hasAttribute('data-auto-save')) {
       this.saveColor(picker.colorKey, colorValue);
     }
+    
+    // CRITICAL: Close color picker dialog after selection
+    // Blur the input to close the native color picker dialog
+    setTimeout(() => {
+      picker.element.blur();
+    }, 100);
   }
 
   /**

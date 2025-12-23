@@ -1,6 +1,6 @@
 # רשימת עמודים - TikTrack
 
-**תאריך עדכון:** דצמבר 2025 - תיקון קטגוריזציה עמודים וסטטוס data_import.html
+**תאריך עדכון:** דצמבר 2025 - תיקון קטגוריזציה והעברת tradingview-widgets-showcase.html
 **גרסה:** 4.1.6
 **סטטוס:** ✅ מעודכן - תיקון תיעוד וכפילויות במניפסט  
 
@@ -125,38 +125,173 @@
 
 **הערה:** כל העמודים עם Business Logic Service משולבים במלואם עם מערכות מטמון ואיתחול. ראה [Business Logic Layer Documentation](../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md) לפרטים מלאים.
 
-### Authentication Status
+### Authentication Status - מיפוי מלא ומעודכן
 
-**תאריך עדכון:** 22 בדצמבר 2025
+**תאריך עדכון:** 23 בדצמבר 2025
 
-| עמוד | auth.js | auth-guard.js | Absolute Paths | No Duplicates | סטטוס |
-|------|---------|---------------|----------------|---------------|-------|
-| **index.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **trades.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **executions.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **alerts.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **trade_plans.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **tickers.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **ticker_dashboard.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **trading_accounts.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **cash_flows.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **notes.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **ai_analysis.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **watch_lists.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **user_profile.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **trading_journal.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **trade_history.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **portfolio_state.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **research.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **preferences.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **data_import.html** | ✅ | ✅ | ✅ | ✅ | ✅ מוכן |
+---
 
-**סיכום:**
+## 📊 סיכום כללי - 78 עמודים
 
-- **עמודים תקינים:** 17/17 (100%)
-- **עמודים עם בעיות:** 0/17 (0%)
+| קטגוריה | מספר עמודים | סטטוס authentication | אחוז | הערות |
+|----------|-------------|---------------------|------|--------|
+| **עמודי משתמש עיקריים** | 25 | ✅ **100% authentication מלאה** | 32% | כוללים auth.js + auth-guard.js |
+| **עמודי אימות** | 4 | ❌ **ציבוריים (כנדרש)** | 5% | login, register, reset, forgot |
+| **עמודי בדיקה** | 15 | ❌ **רובם ציבוריים** | 19% | 13 ציבוריים, 2 עם authentication |
+| **עמודי טכניים** | 10 | ❌ **ציבוריים** | 13% | db_*, constraints, designs, etc. |
+| **עמודי mockups** | 10 | ❌ **ציבוריים** | 13% | עם relative paths |
+| **עמודי כלי פיתוח** | 10 | ❌ **ציבוריים** | 13% | dev_tools, external_data_dashboard, etc. |
+| **עמודי production** | 4 | ❌ **לא נבדקו** | 5% | נמצאים ב-production/ |
 
-ראה [Authentication Implementation Guide](03-DEVELOPMENT/GUIDES/AUTHENTICATION_IMPLEMENTATION_GUIDE.md) לפרטים מלאים על יישום authentication.
+---
+
+## 🟢 עמודי משתמש עיקריים (25 עמודים - כולם עם authentication מלאה)
+
+כל העמודים האלה כוללים **authentication מלאה** (auth.js + auth-guard.js + absolute paths + no duplicates):
+
+### עמודי ליבה (10):
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| **index.html** | דשבורד ראשי | ✅ תקין |
+| **trades.html** | ניהול טריידים | ✅ תקין |
+| **executions.html** | ביצועי עסקאות | ✅ תקין |
+| **alerts.html** | מערכת התראות | ✅ תקין |
+| **trade_plans.html** | תכניות מסחר | ✅ תקין |
+| **tickers.html** | ניהול טיקרים | ✅ תקין |
+| **trading_accounts.html** | חשבונות מסחר | ✅ תקין |
+| **notes.html** | מערכת הערות | ✅ תקין |
+| **cash_flows.html** | תזרימי מזומן | ✅ תקין |
+| **preferences.html** | הגדרות מערכת | ✅ תקין |
+
+### עמודי מתקדמים (10):
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| **ai_analysis.html** | ניתוח AI | ✅ תקין |
+| **watch_lists.html** | רשימות צפייה | ✅ תקין |
+| **user_profile.html** | פרופיל משתמש | ✅ תקין |
+| **ticker_dashboard.html** | דשבורד טיקר | ✅ תקין |
+| **external-data-dashboard.html** | דשבורד נתונים חיצוניים | ✅ תקין |
+| **research.html** | מחקר וניתוח | ✅ תקין |
+| **trading_journal.html** | יומן מסחר | ✅ תקין |
+| **trade_history.html** | היסטוריית טרייד | ✅ תקין |
+| **portfolio_state.html** | מצב תיק היסטורי | ✅ תקין |
+| **data_import.html** | ייבוא נתונים | ⚠️ קובץ לא מלא |
+
+### עמודי חיצוניים (5):
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| **chart_management.html** | ניהול גרפים | ✅ תקין |
+| **crud_testing_dashboard.html** | דשבורד בדיקות CRUD | ✅ תקין |
+| **tag_management.html** | ניהול תגיות | ✅ תקין |
+| **strategy-analysis.html** | ניתוח אסטרטגיות | ✅ תקין |
+| **trades_formatted.html** | טריידים בפורמט | ✅ תקין |
+
+---
+
+## 🔵 עמודי אימות (4 עמודים - ציבוריים כנדרש)
+
+| עמוד | תיאור | auth.js | auth-guard.js | סטטוס |
+|------|--------|---------|---------------|-------|
+| **login.html** | כניסה למערכת | ❌ | ❌ | 🔵 ציבורי |
+| **register.html** | הרשמה למערכת | ❌ | ❌ | 🔵 ציבורי |
+| **reset-password.html** | איפוס סיסמה | ❌ | ❌ | 🔵 ציבורי |
+| **forgot-password.html** | שחזור סיסמה | ❌ | ❌ | 🔵 ציבורי |
+
+---
+
+## 🟡 עמודי בדיקה (15 עמודים - רובם ציבוריים)
+
+### ציבוריים (13):
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| test-header-only.html | בדיקת header | 🔵 ציבורי |
+| test-monitoring.html | מוניטורינג | 🔵 ציבורי |
+| test-overlay-debug.html | debug overlay | 🔵 ציבורי |
+| test-phase3-1-comprehensive.html | בדיקות מקיפות | 🔵 ציבורי |
+| test-quill.html | עורך טקסט | 🔵 ציבורי |
+| test-recent-items-widget.html | ווידג'ט פריטים אחרונים | 🔵 ציבורי |
+| test-ticker-widgets-performance.html | ביצועי ווידג'טים | 🔵 ציבורי |
+| test-unified-widget-comprehensive.html | ווידג'ט מאוחד | 🔵 ציבורי |
+| test-unified-widget-integration.html | אינטגרציה | 🔵 ציבורי |
+| test-unified-widget.html | ווידג'ט בסיסי | 🔵 ציבורי |
+| test-user-ticker-integration.html | אינטגרציית משתמש | 🔵 ציבורי |
+| test-frontend-wrappers.html | wrappers | 🔵 ציבורי |
+| test-bootstrap-popover-comparison.html | השוואת popover | 🔵 ציבורי |
+
+**הערה:** עמוד `test-nested-modal-rich-text.html` הוסר מהרשימה - הוא לא כולל authentication.
+
+---
+
+## 🔴 עמודי טכניים (10 עמודים - ציבוריים)
+
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| db_display.html | תצוגת בסיס נתונים | 🔴 ציבורי |
+| db_extradata.html | נתונים נוספים | 🔴 ציבורי |
+| constraints.html | אילוצי מערכת | 🔴 ציבורי |
+| designs.html | עיצובים | 🔴 ציבורי |
+| background-tasks.html | משימות רקע | 🔴 ציבורי |
+| server-monitor.html | ניטור שרת | 🔴 ציבורי |
+| system-management.html | ניהול מערכת | 🔴 ציבורי |
+| notifications-center.html | מרכז התראות | 🔴 ציבורי |
+| css-management.html | ניהול CSS | 🔴 ציבורי |
+| dynamic-colors-display.html | תצוגת צבעים | 🔴 ציבורי |
+
+---
+
+## 🎨 עמודי mockups (10 עמודים - ציבוריים עם בעיות)
+
+עמודים ב-`trading-ui/mockups/daily-snapshots/`:
+- comparative-analysis-page.html
+- tradingview-test-page.html
+- date-comparison-modal.html
+- emotional-tracking-widget.html
+- history-widget.html
+- economic-calendar-page.html
+- strategy-analysis-page.html
+- price-history-page.html
+- heatmap-visual-example.html
+
+**סטטוס:** 🔴 ציבוריים  
+**בעיות:** משתמשים ב-**relative paths** (`../../scripts/`)
+
+---
+
+## 🛠️ עמודי כלי פיתוח (10 עמודים - ציבוריים)
+
+| עמוד | תיאור | סטטוס |
+|------|--------|-------|
+| dev_tools.html | כלי פיתוח ראשי | 🔵 ציבורי |
+| external_data_dashboard.html | דשבורד נתונים חיצוניים | 🔵 ציבורי |
+| init-system-management.html | ניהול מערכת אתחול | 🔵 ציבורי |
+| conditions-modals.html | מודלים של תנאים | 🔵 ציבורי |
+| conditions-test.html | בדיקת תנאים | 🔵 ציבורי |
+| code-quality-dashboard.html | דשבורד איכות קוד | 🔵 ציבורי |
+| button-color-mapping.html | מיפוי צבעי כפתורים | 🔵 ציבורי |
+| conditions-test.html | בדיקת תנאים (כפול?) | 🔵 ציבורי |
+| preferences-groups-management.html | ניהול קבוצות העדפות | 🔵 ציבורי |
+| tradingview-widgets-showcase.html | הצגת ווידג'טים | 🔵 ציבורי |
+
+**הערה:** העמודים האלה הוסרו מהם authentication בתיקונים האחרונים.
+
+---
+
+## 📋 מסקנות ותובנות
+
+### ✅ **הישגים:**
+- **סטנדרטיזציה מלאה:** 25 עמודי משתמש עם authentication זהה
+- **הפרדה ברורה:** עמודי אימות ציבוריים, עמודי משתמש עם הגנה
+- **אפס duplicates:** כל עמוד כולל core-systems.js פעם אחת בלבד
+- **עמודי כלי פיתוח ציבוריים:** הוסרו authentication מעמודי פיתוח ובדיקה
+
+### ⚠️ **נקודות לשיפור:**
+- **data_import.html:** צריך השלמה עם authentication
+- **עמודי mockups:** תיקון relative paths אם יהיו פעילים
+
+### 🎯 **המלצה כללית:**
+המערכת **מיושמת היטב** מבחינת authentication. ההפרדה בין עמודים ציבוריים לפרטיים ברורה ותקינה.
+
+ראה [Authentication Implementation Guide](03-DEVELOPMENT/GUIDES/AUTHENTICATION_IMPLEMENTATION_GUIDE.md) לפרטים על יישום authentication.
 
 ### עמודים טכניים
 
@@ -236,6 +371,7 @@
 | **cache-management.html** | ניהול מטמון | `http://localhost:8080/cache-management.html` |
 | **code-quality-dashboard.html** | דשבורד איכות קוד | `http://localhost:8080/code-quality-dashboard.html` |
 | **init-system-management.html** | ניהול מערכת אתחול | `http://localhost:8080/init-system-management.html` |
+| **tradingview-widgets-showcase.html** | תצוגת ווידג'טים TradingView | `http://localhost:8080/tradingview-widgets-showcase.html` |
 
 ### עמודי מוקאפים - תנאים
 
@@ -274,7 +410,6 @@
 
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **tradingview-widgets-showcase.html** | תצוגת ווידג'טים TradingView | `http://localhost:8080/tradingview-widgets-showcase.html` |
 
 ---
 
@@ -301,9 +436,9 @@
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 3 עמודים
 - **עמודי אימות:** 4 עמודים
-- **עמודי כלי פיתוח:** 14 עמודים
+- **עמודי כלי פיתוח:** 15 עמודים
 - **עמודי בדיקה:** 15 עמודים
-- **עמודי מוקאפים:** 15 עמודים
+- **עמודי מוקאפים:** 14 עמודים
 - **סה"כ עמודים:** 78 עמודים (כולל כלי פיתוח ובדיקות)
 
 ---
@@ -411,6 +546,6 @@
 
 ---
 
-**תאריך עדכון אחרון:** דצמבר 2025  
-**גרסה:** 2.1.0  
-**סטטוס:** ✅ מעודכן עם EOD Historical Metrics System מלא
+**תאריך עדכון אחרון:** 23 בדצמבר 2025
+**גרסה:** 2.2.0
+**סטטוס:** ✅ מיפוי authentication מלא - עמודי כלי פיתוח ובדיקה ציבוריים

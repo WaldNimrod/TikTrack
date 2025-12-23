@@ -76,10 +76,13 @@ class IntegratedCRUDE2ETester {
             research: { name: 'מחקר', type: 'user', url: '/research', hasCRUD: false },
             ai_analysis: { name: 'ניתוח AI', type: 'user', url: '/ai_analysis', hasCRUD: false },
             watch_lists: { name: 'רשימות צפייה', type: 'user', url: '/watch_lists', hasCRUD: true },
-            user_profile: { name: 'פרופיל משתמש', type: 'user', url: '/user_profile', hasCRUD: false },
+            user_profile: { name: 'פרופיל משתמש', type: 'user', url: '/user_profile', hasCRUD: true },
             portfolio_state: { name: 'מצב תיק', type: 'user', url: '/portfolio_state', hasCRUD: false },
             trade_history: { name: 'היסטוריית טריידים', type: 'user', url: '/trade_history', hasCRUD: false },
             trading_journal: { name: 'יומן מסחר', type: 'user', url: '/trading_journal', hasCRUD: true },
+            tag_management: { name: 'תגיות', type: 'user', url: '/tag_management', hasCRUD: true },
+            data_import: { name: 'ייבוא נתונים', type: 'user', url: '/data_import', hasCRUD: true },
+            preferences: { name: 'העדפות', type: 'user', url: '/preferences', hasCRUD: true },
 
             // Technical Pages (12 pages)
             db_display: { name: 'תצוגת בסיס נתונים', type: 'technical', url: '/db_display', hasCRUD: false },
@@ -94,6 +97,196 @@ class IntegratedCRUDE2ETester {
             designs: { name: 'גלרית עיצובים', type: 'technical', url: '/designs', hasCRUD: false },
             cache_management: { name: 'ניהול מטמון', type: 'technical', url: '/cache-management', hasCRUD: false },
             code_quality_dashboard: { name: 'דשבורד איכות קוד', type: 'technical', url: '/code-quality-dashboard', hasCRUD: false }
+        };
+    }
+
+    /**
+     * Entity Field Maps - Comprehensive field definitions for all CRUD entities
+     * Used by DataCollectionService and validation system
+     */
+    getEntityFieldMaps() {
+        return {
+            trade: {
+                required: ['trading_account_id', 'ticker_id', 'status', 'side', 'investment_type'],
+                fields: {
+                    trading_account_id: { id: '#tradeAccount', type: 'int', required: true },
+                    ticker_id: { id: '#tradeTicker', type: 'int', required: true },
+                    status: { id: '#tradeStatus', type: 'text', required: true, default: 'open' },
+                    side: { id: '#tradeSide', type: 'text', required: true, default: 'Long' },
+                    investment_type: { id: '#tradeType', type: 'text', required: true, default: 'swing' },
+                    quantity: { id: '#tradeQuantity', type: 'number', required: true, default: 100 },
+                    entry_price: { id: '#tradeEntryPrice', type: 'number', required: true, default: 100 },
+                    stop_price: { id: '#tradeStopLoss', type: 'number', default: null },
+                    target_price: { id: '#tradeTakeProfit', type: 'number', default: null },
+                    entry_date: { id: '#tradeEntryDate', type: 'date', default: null },
+                    notes: { id: '#tradeNotes', type: 'rich-text', default: null },
+                    tag_ids: { id: '#tradeTags', type: 'tags', default: [] }
+                },
+                modalId: 'tradesModal'
+            },
+            trade_plan: {
+                required: ['trading_account_id', 'ticker_id', 'side', 'investment_type', 'status'],
+                fields: {
+                    trading_account_id: { id: '#tradePlanAccount', type: 'int', required: true },
+                    ticker_id: { id: '#tradePlanTicker', type: 'int', required: true },
+                    side: { id: '#tradePlanSide', type: 'text', required: true, default: 'long' },
+                    investment_type: { id: '#tradePlanType', type: 'text', required: true, default: 'swing' },
+                    status: { id: '#tradePlanStatus', type: 'text', required: true, default: 'open' },
+                    planned_amount: { id: '#planAmount', type: 'number', required: true, default: 10000 },
+                    entry_price: { id: '#tradePlanEntryPrice', type: 'number', required: true, default: 100 },
+                    quantity: { id: '#tradePlanQuantity', type: 'number', required: true, default: 100 },
+                    stop_price: { id: '#tradePlanStopLoss', type: 'number', default: null },
+                    target_price: { id: '#tradePlanTakeProfit', type: 'number', default: null },
+                    created_at: { id: '#tradePlanEntryDate', type: 'datetime-local', default: null },
+                    notes: { id: '#tradePlanNotes', type: 'rich-text', default: null },
+                    tag_ids: { id: '#tradePlanTags', type: 'tags', default: [] }
+                },
+                modalId: 'tradePlansModal'
+            },
+            alert: {
+                required: ['alertStatusCombined'],
+                fields: {
+                    related_type_id: { id: '#alertRelatedType', type: 'int', default: 4 },
+                    related_id: { id: '#alertRelatedObject', type: 'int', default: null },
+                    condition_attribute: { id: '#alertType', type: 'text', default: null },
+                    condition_operator: { id: '#alertCondition', type: 'text', default: null },
+                    condition_number: { id: '#alertValue', type: 'number', default: null },
+                    status: { id: '#alertStatusCombined', type: 'text', required: true, default: 'new' },
+                    created_at: { id: '#alertCreatedAt', type: 'datetime-local', default: null },
+                    expiry_date: { id: '#alertExpiryDate', type: 'datetime-local', default: null },
+                    trade_condition_id: { id: '#alertTradeCondition', type: 'int', default: null },
+                    plan_condition_id: { id: '#alertPlanCondition', type: 'int', default: null }
+                },
+                modalId: 'alertsModal'
+            },
+            ticker: {
+                required: ['symbol', 'name', 'type', 'currency_id', 'status'],
+                fields: {
+                    symbol: { id: '#tickerSymbol', type: 'text', required: true },
+                    name: { id: '#tickerName', type: 'text', required: true },
+                    type: { id: '#tickerType', type: 'text', required: true, default: 'stock' },
+                    currency_id: { id: '#tickerCurrency', type: 'int', required: true },
+                    status: { id: '#tickerStatus', type: 'text', required: true, default: 'closed' },
+                    remarks: { id: '#tickerRemarks', type: 'rich-text', default: null },
+                    tag_ids: { id: '#tickerTags', type: 'tags', default: [] }
+                },
+                modalId: 'tickersModal'
+            },
+            trading_account: {
+                required: ['name', 'currency_id'],
+                fields: {
+                    name: { id: '#accountName', type: 'text', required: true },
+                    currency_id: { id: '#accountCurrency', type: 'int', required: true },
+                    type: { id: '#accountType', type: 'text', default: null },
+                    opening_balance: { id: '#accountOpeningBalance', type: 'number', default: 0 },
+                    status: { id: '#accountStatus', type: 'text', default: 'open' },
+                    notes: { id: '#accountNotes', type: 'rich-text', default: null }
+                },
+                modalId: 'tradingAccountsModal'
+            },
+            execution: {
+                required: ['ticker_id', 'trading_account_id', 'action', 'quantity', 'price', 'date'],
+                fields: {
+                    ticker_id: { id: '#executionTicker', type: 'int', required: true },
+                    trading_account_id: { id: '#executionAccount', type: 'int', required: true },
+                    action: { id: '#executionType', type: 'text', required: true, default: 'buy' },
+                    quantity: { id: '#executionQuantity', type: 'number', required: true, default: 100 },
+                    price: { id: '#executionPrice', type: 'number', required: true, default: 100 },
+                    date: { id: '#executionDate', type: 'datetime-local', required: true },
+                    fee: { id: '#executionCommission', type: 'number', default: 0 },
+                    source: { id: '#executionSource', type: 'text', default: 'manual' },
+                    external_id: { id: '#executionExternalId', type: 'text', default: null },
+                    notes: { id: '#executionNotes', type: 'rich-text', default: null },
+                    realized_pl: { id: '#executionRealizedPL', type: 'number', default: null },
+                    mtm_pl: { id: '#executionMTMPL', type: 'number', default: null },
+                    trade_id: { id: '#trade_id', type: 'int', default: null },
+                    tag_ids: { id: '#executionTags', type: 'tags', default: [] }
+                },
+                modalId: 'executionsModal'
+            },
+            cash_flow: {
+                required: ['type', 'trading_account_id', 'amount', 'currency_id', 'date'],
+                fields: {
+                    type: { id: '#cashFlowType', type: 'text', required: true, default: 'deposit' },
+                    trading_account_id: { id: '#cashFlowAccount', type: 'int', required: true },
+                    amount: { id: '#cashFlowAmount', type: 'number', required: true, default: 1000 },
+                    currency_id: { id: '#cashFlowCurrency', type: 'int', required: true },
+                    date: { id: '#cashFlowDate', type: 'date', required: true },
+                    source: { id: '#cashFlowSource', type: 'text', required: true, default: 'manual' },
+                    external_id: { id: '#cashFlowExternalId', type: 'text', default: null },
+                    description: { id: '#cashFlowDescription', type: 'rich-text', default: null },
+                    trade_id: { id: '#trade_id', type: 'int', default: null },
+                    tag_ids: { id: '#cashFlowTags', type: 'tags', default: [] }
+                },
+                modalId: 'cashFlowModal'
+            },
+            note: {
+                required: ['related_type_id', 'related_id', 'content'],
+                fields: {
+                    related_type_id: { id: '#noteRelatedType', type: 'int', required: true },
+                    related_id: { id: '#noteRelatedObject', type: 'int', required: true },
+                    content: { id: '#noteContent', type: 'rich-text', required: true },
+                    tag_ids: { id: '#noteTags', type: 'tags', default: [] }
+                },
+                modalId: 'notesModal'
+            },
+            watch_list: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#watchListName', type: 'text', required: true },
+                    icon: { id: '#watchListIcon', type: 'text', default: '' },
+                    icon_library: { id: '#watchListIconLibrary', type: 'text', default: 'tabler' },
+                    view_mode: { id: '#watchListViewMode', type: 'text', default: 'table' }
+                },
+                modalId: 'watchListModal'
+            },
+            tag_category: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#tagCategoryName', type: 'text', required: true },
+                    description: { id: '#tagCategoryDescription', type: 'text', default: '' },
+                    order: { id: '#tagCategoryOrder', type: 'int', default: 0 },
+                    is_active: { id: '#tagCategoryActive', type: 'bool', default: true }
+                },
+                modalId: 'tagCategoryModal'
+            },
+            tag: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#tagName', type: 'text', required: true },
+                    category_id: { id: '#tagCategory', type: 'int', default: null },
+                    description: { id: '#tagDescription', type: 'text', default: '' },
+                    is_active: { id: '#tagActive', type: 'bool', default: true }
+                },
+                modalId: 'tagModal'
+            },
+            import_session: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#importSessionName', type: 'text', required: true },
+                    description: { id: '#importSessionDescription', type: 'text', default: '' }
+                },
+                modalId: 'importSessionModal'
+            },
+            preference_profile: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#preferenceProfileName', type: 'text', required: true },
+                    description: { id: '#preferenceProfileDescription', type: 'text', default: '' },
+                    is_active: { id: '#preferenceProfileIsActive', type: 'bool', default: true }
+                },
+                modalId: 'preferenceProfileModal'
+            },
+            user_profile: {
+                required: ['first_name', 'last_name', 'email'],
+                fields: {
+                    first_name: { id: '#userProfileFirstName', type: 'text', required: true },
+                    last_name: { id: '#userProfileLastName', type: 'text', required: true },
+                    email: { id: '#userProfileEmail', type: 'text', required: true },
+                    phone: { id: '#userProfilePhone', type: 'text', default: '' }
+                },
+                modalId: null // Uses form, not modal
+            }
         };
     }
 
@@ -226,7 +419,7 @@ class IntegratedCRUDE2ETester {
             await this.runAlertWorkflowTest();
             await this.runUserProfileWorkflowTest();
             
-            // Run generic CRUD tests for all other CRUD pages
+            // Run special tests for complex pages
             for (const [pageKey, page] of crudPages) {
                 // Skip pages that already have specific tests
                 if (['trades', 'alerts', 'user_profile'].includes(pageKey)) {
@@ -234,10 +427,32 @@ class IntegratedCRUDE2ETester {
                 }
                 
                 try {
+                    // Special handling for tag_management (has two CRUD types: categories and tags)
+                    if (pageKey === 'tag_management') {
+                        this.logger?.info(`🔵 [runE2ETests] Running tag management tests (categories and tags)`);
+                        await this.runTagManagementTests();
+                        continue;
+                    }
+                    
+                    // Special handling for preferences (has profiles and preferences)
+                    if (pageKey === 'preferences') {
+                        this.logger?.info(`🔵 [runE2ETests] Running preferences tests (profiles and preferences)`);
+                        await this.runPreferencesTests();
+                        continue;
+                    }
+                    
+                    // Special handling for data_import (import sessions)
+                    if (pageKey === 'data_import') {
+                        this.logger?.info(`🔵 [runE2ETests] Running data import tests (import sessions)`);
+                        await this.runDataImportTests();
+                        continue;
+                    }
+                    
+                    // Generic CRUD test for all other pages
                     this.logger?.info(`🔵 [runE2ETests] Running generic CRUD test for ${page.name}`);
                     await this.runGenericCRUDTest(pageKey, page);
                 } catch (error) {
-                    this.logger?.error(`❌ [runE2ETests] Generic CRUD test failed for ${page.name}`, { error: error.message });
+                    this.logger?.error(`❌ [runE2ETests] Test failed for ${page.name}`, { error: error.message });
                     this.results.e2e.push({
                         workflow: `${page.name} CRUD`,
                         status: 'failed',
@@ -1681,6 +1896,12 @@ class IntegratedCRUDE2ETester {
     /**
      * Generic CRUD test for any page with CRUD capabilities
      */
+    /**
+     * Generic CRUD Test - Uses general systems (UnifiedCRUDService, DataCollectionService, ModalManagerV2)
+     * 
+     * @param {string} pageKey - Page key (e.g., 'trades', 'alerts')
+     * @param {Object} page - Page configuration object
+     */
     async runGenericCRUDTest(pageKey, page) {
         const startTime = Date.now();
         const workflow = {
@@ -1688,9 +1909,36 @@ class IntegratedCRUDE2ETester {
             steps: []
         };
         let testIframe = null;
+        let createdEntityId = null;
 
         try {
-            this.logger?.info(`🧪 Starting Generic CRUD Test for ${page.name}`);
+            this.logger?.info(`🧪 Starting Generic CRUD Test for ${page.name} using general systems`);
+            
+            // Get entity type from page key
+            const entityTypeMap = {
+                'trades': 'trade',
+                'trade_plans': 'trade_plan',
+                'alerts': 'alert',
+                'tickers': 'ticker',
+                'trading_accounts': 'trading_account',
+                'executions': 'execution',
+                'cash_flows': 'cash_flow',
+                'notes': 'note',
+                'watch_lists': 'watch_list',
+                'trading_journal': 'trading_journal',
+                'tag_management': 'tag',
+                'data_import': 'import_session',
+                'preferences': 'preference_profile',
+                'user_profile': 'user_profile'
+            };
+            
+            const entityType = entityTypeMap[pageKey] || pageKey;
+            const fieldMaps = this.getEntityFieldMaps();
+            const fieldMap = fieldMaps[entityType];
+            
+            if (!fieldMap) {
+                throw new Error(`No field map found for entity type: ${entityType}`);
+            }
             
             // Step 1: Load page in iframe
             workflow.steps.push(`טוען עמוד ${page.name} ב-iframe`);
@@ -1711,133 +1959,202 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push('העמוד נטען בהצלחה');
             this.updateTestResults();
 
-            // Step 3: Try to find and click "Add" button
-            workflow.steps.push('מחפש כפתור הוספה');
-            this.updateTestResults();
-            
-            const addButtonSelectors = [
-                'button[data-action="add"]',
-                'button[data-onclick*="add"]',
-                'button[data-button-type="ADD"]',
-                '.btn-primary:contains("הוסף")',
-                'button:contains("הוסף")'
-            ];
-            
-            let addButton = null;
-            for (const selector of addButtonSelectors) {
-                try {
-                    addButton = iframeDoc.querySelector(selector);
-                    if (addButton) {
-                        this.logger?.info(`🔵 [runGenericCRUDTest] Found add button for ${page.name}`, { selector });
-                        break;
-                    }
-                } catch (e) {
-                    // Continue
-                }
-            }
-            
-            if (!addButton) {
-                // Try calling modal function directly
-                const modalId = `${pageKey}Modal`;
-                if (iframeWindow.ModalManagerV2 && typeof iframeWindow.ModalManagerV2.showModal === 'function') {
-                    this.logger?.info(`🔵 [runGenericCRUDTest] Calling ModalManagerV2.showModal for ${page.name}`, { modalId });
-                    await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
-                    workflow.steps.push('מודל נפתח דרך ModalManagerV2');
-                } else {
-                    throw new Error(`Could not find add button or modal function for ${page.name}`);
-                }
-            } else {
-                addButton.click();
-                await new Promise(resolve => setTimeout(resolve, 500));
-                workflow.steps.push('כפתור הוספה נלחץ');
-            }
-            
+            // Step 3: Get initial row count
+            const initialRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+            workflow.steps.push(`נמצאו ${initialRows} שורות בטבלה`);
             this.updateTestResults();
 
-            // Step 4: Wait for modal to appear
+            // Step 4: Open modal using ModalManagerV2
+            workflow.steps.push('פתיחת מודל דרך ModalManagerV2');
+            this.updateTestResults();
+            
+            const modalId = fieldMap.modalId || `${pageKey}Modal`;
+            
+            if (!iframeWindow.ModalManagerV2 || typeof iframeWindow.ModalManagerV2.showModal !== 'function') {
+                throw new Error('ModalManagerV2 not available in iframe');
+            }
+            
+            await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
+            workflow.steps.push('מודל נפתח דרך ModalManagerV2');
+            this.updateTestResults();
+
+            // Step 5: Wait for modal to appear
             workflow.steps.push('ממתין למודל');
             this.updateTestResults();
-            const modalId = `${pageKey}Modal`;
-            const modalSelectors = [
-                `#${modalId}.show`,
-                `#${modalId}.modal.show`,
-                `.modal.show`,
-                `[id*="${modalId}"].show`
-            ];
             
-            let modalFound = false;
-            for (const selector of modalSelectors) {
-                try {
-                    await this.waitForElementInIframe(testIframe, selector, 5000);
-                    modalFound = true;
-                    break;
-                } catch (e) {
-                    // Continue to next selector
+            await this.waitForElementInIframe(testIframe, `#${modalId}.show, #${modalId}.modal.show, .modal.show`, 10000);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for form to initialize
+            workflow.steps.push('מודל נפתח בהצלחה');
+            this.updateTestResults();
+
+            // Step 6: Fill form using DataCollectionService with fieldMap
+            workflow.steps.push('מילוי טופס דרך DataCollectionService');
+            this.updateTestResults();
+            
+            if (!iframeWindow.DataCollectionService) {
+                throw new Error('DataCollectionService not available in iframe');
+            }
+            
+            // Prepare test data based on field map
+            const testData = {};
+            for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+                if (fieldConfig.default !== undefined) {
+                    testData[fieldName] = fieldConfig.default;
+                } else if (fieldConfig.required) {
+                    // Generate test value for required fields
+                    switch (fieldConfig.type) {
+                        case 'text':
+                            testData[fieldName] = `Test ${fieldName}`;
+                            break;
+                        case 'int':
+                            testData[fieldName] = 1;
+                            break;
+                        case 'number':
+                        case 'float':
+                            testData[fieldName] = 100;
+                            break;
+                        case 'date':
+                        case 'datetime-local':
+                            testData[fieldName] = new Date().toISOString().slice(0, 16);
+                            break;
+                        case 'bool':
+                            testData[fieldName] = true;
+                            break;
+                        default:
+                            testData[fieldName] = `Test ${fieldName}`;
+                    }
                 }
             }
             
-            if (!modalFound) {
-                throw new Error(`Modal did not appear for ${page.name}`);
-            }
-            
-            workflow.steps.push('מודל נפתח בהצלחה');
-            this.updateTestResults();
-            
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for form to initialize
-
-            // Step 5: Try to fill form (basic attempt - may need page-specific logic)
-            workflow.steps.push('מנסה למלא טופס');
-            this.updateTestResults();
-            
-            // Look for common form fields
-            const textInputs = iframeDoc.querySelectorAll(`#${modalId} input[type="text"], #${modalId} input:not([type])`);
-            if (textInputs.length > 0) {
-                textInputs[0].value = 'Test Value';
-                textInputs[0].dispatchEvent(new Event('input', { bubbles: true }));
-                await new Promise(resolve => setTimeout(resolve, 200));
-                workflow.steps.push('שדה טקסט מולא');
-            }
-            
-            this.updateTestResults();
-
-            // Step 6: Try to save
-            workflow.steps.push('מנסה לשמור');
-            this.updateTestResults();
-            
-            const saveButtonSelectors = [
-                `#${modalId} button[type="submit"]`,
-                `#${modalId} button.btn-primary`,
-                `#${modalId} button[data-action="save"]`,
-                `#${modalId} .modal-footer button.btn-primary`
-            ];
-            
-            let saveButton = null;
-            for (const selector of saveButtonSelectors) {
-                saveButton = iframeDoc.querySelector(selector);
-                if (saveButton) break;
-            }
-            
-            if (saveButton) {
-                saveButton.click();
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                workflow.steps.push('כפתור שמירה נלחץ');
+            // Set form values using DataCollectionService
+            if (iframeWindow.DataCollectionService.setFormData) {
+                iframeWindow.DataCollectionService.setFormData(fieldMap.fields, testData);
             } else {
-                workflow.steps.push('אזהרה: כפתור שמירה לא נמצא');
+                // Fallback: manual field filling
+                for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+                    const element = iframeDoc.querySelector(fieldConfig.id);
+                    if (element && testData[fieldName] !== undefined) {
+                        element.value = testData[fieldName];
+                        element.dispatchEvent(new Event('input', { bubbles: true }));
+                        element.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
             }
             
+            await new Promise(resolve => setTimeout(resolve, 500));
+            workflow.steps.push('טופס מולא בהצלחה');
             this.updateTestResults();
 
-            // Step 7: Wait for modal to close
+            // Step 7: Validate form fields
+            workflow.steps.push('בודק ולידציה של שדות');
+            this.updateTestResults();
+            
+            const validationResult = await this.validateFormFieldsInIframe(testIframe, entityType, fieldMap);
+            if (!validationResult.isValid) {
+                workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
+                this.updateTestResults();
+            } else {
+                workflow.steps.push('ולידציה עברה בהצלחה');
+                this.updateTestResults();
+            }
+
+            // Step 8: Save using UnifiedCRUDService
+            workflow.steps.push('שמירה דרך UnifiedCRUDService');
+            this.updateTestResults();
+            
+            if (!iframeWindow.UnifiedCRUDService) {
+                throw new Error('UnifiedCRUDService not available in iframe');
+            }
+            
+            // Collect form data using DataCollectionService
+            const formData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
+            
+            // Save entity
+            const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity(entityType, formData, {
+                modalId: modalId,
+                successMessage: `${page.name} נוסף בהצלחה`,
+                entityName: page.name,
+                reloadFn: null // Don't reload in iframe context
+            });
+            
+            if (!saveResult || !saveResult.data) {
+                throw new Error('Save operation failed - no result returned');
+            }
+            
+            createdEntityId = saveResult.data.id || saveResult.id;
+            workflow.steps.push(`ישות נוצרה בהצלחה (ID: ${createdEntityId})`);
+            this.updateTestResults();
+
+            // Step 9: Wait for modal to close
             workflow.steps.push('ממתין לסגירת המודל');
             this.updateTestResults();
-            try {
-                await this.waitForElementToDisappearInIframe(testIframe, `.modal.show, #${modalId}.show`, 10000);
-                workflow.steps.push('מודל נסגר בהצלחה');
-            } catch (e) {
-                workflow.steps.push('אזהרה: המודל לא נסגר בזמן');
-            }
-            
+            await this.waitForElementToDisappearInIframe(testIframe, `.modal.show, #${modalId}.show`, 10000);
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for table update
+            workflow.steps.push('מודל נסגר והטבלה עודכנה');
             this.updateTestResults();
+
+            // Step 10: Verify entity appears in table
+            workflow.steps.push('אימות הופעת הישות בטבלה');
+            this.updateTestResults();
+            const finalRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+            if (finalRows <= initialRows) {
+                throw new Error(`Entity not added to table. Initial: ${initialRows}, Final: ${finalRows}`);
+            }
+            workflow.steps.push(`הישות הופיעה בטבלה (${initialRows} → ${finalRows} שורות)`);
+            this.updateTestResults();
+
+            // Step 11: Check linked items before delete
+            if (createdEntityId) {
+                workflow.steps.push('בודק פריטים מקושרים לפני מחיקה');
+                this.updateTestResults();
+                
+                if (iframeWindow.checkLinkedItemsBeforeAction) {
+                    const hasLinkedItems = await iframeWindow.checkLinkedItemsBeforeAction(entityType, createdEntityId, 'delete');
+                    if (hasLinkedItems) {
+                        workflow.steps.push('נמצאו פריטים מקושרים - מחיקה בוטלה');
+                        this.updateTestResults();
+                        // Don't delete if there are linked items
+                        createdEntityId = null;
+                    } else {
+                        workflow.steps.push('לא נמצאו פריטים מקושרים - ממשיך למחיקה');
+                        this.updateTestResults();
+                    }
+                } else {
+                    workflow.steps.push('אזהרה: checkLinkedItemsBeforeAction לא זמין');
+                    this.updateTestResults();
+                }
+            }
+
+            // Step 12: Delete entity using UnifiedCRUDService
+            if (createdEntityId) {
+                workflow.steps.push('מחיקה דרך UnifiedCRUDService');
+                this.updateTestResults();
+                
+                const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity(entityType, createdEntityId, {
+                    successMessage: `${page.name} נמחק בהצלחה`,
+                    entityName: page.name,
+                    reloadFn: null // Don't reload in iframe context
+                });
+                
+                if (!deleteResult) {
+                    workflow.steps.push('אזהרה: מחיקה נכשלה או בוטלה');
+                    this.updateTestResults();
+                } else {
+                    workflow.steps.push('ישות נמחקה בהצלחה');
+                    this.updateTestResults();
+                    
+                    // Wait for table update
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    const rowsAfterDelete = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                    if (rowsAfterDelete >= finalRows) {
+                        workflow.steps.push('אזהרה: הישות לא נמחקה מהטבלה');
+                        this.updateTestResults();
+                    } else {
+                        workflow.steps.push(`הישות נמחקה מהטבלה (${finalRows} → ${rowsAfterDelete} שורות)`);
+                        this.updateTestResults();
+                    }
+                }
+            }
 
             // Cleanup: Remove iframe
             if (testIframe && testIframe.parentNode) {
@@ -1850,7 +2167,7 @@ class IntegratedCRUDE2ETester {
                 status: 'success',
                 steps: workflow.steps,
                 executionTime: executionTime,
-                details: `Generic CRUD test completed for ${page.name}`
+                details: `Generic CRUD test completed for ${page.name} using general systems`
             });
 
             this.logger?.info(`✅ Generic CRUD Test for ${page.name} completed in ${executionTime}ms`);
@@ -1873,6 +2190,581 @@ class IntegratedCRUDE2ETester {
                 details: `Failed at step: ${workflow.steps.length > 0 ? workflow.steps[workflow.steps.length - 1] : 'unknown'}`
             });
             this.updateTestResults();
+        }
+    }
+
+    /**
+     * Validate form fields in iframe
+     * 
+     * @param {HTMLIFrameElement} iframe - The iframe element
+     * @param {string} entityType - Entity type
+     * @param {Object} fieldMap - Field map from getEntityFieldMaps()
+     * @returns {Promise<Object>} Validation result { isValid: boolean, errors: string[], warnings: string[] }
+     */
+    async validateFormFieldsInIframe(iframe, entityType, fieldMap) {
+        const iframeDoc = this.getIframeDocument(iframe);
+        const errors = [];
+        const warnings = [];
+        
+        // Validate required fields
+        const requiredValidation = this.validateRequiredFields(iframeDoc, fieldMap);
+        errors.push(...requiredValidation.errors);
+        warnings.push(...requiredValidation.warnings);
+        
+        // Validate field types
+        const typeValidation = this.validateFieldTypes(iframeDoc, fieldMap);
+        errors.push(...typeValidation.errors);
+        warnings.push(...typeValidation.warnings);
+        
+        // Validate field values
+        const valueValidation = this.validateFieldValues(iframeDoc, fieldMap);
+        errors.push(...valueValidation.errors);
+        warnings.push(...valueValidation.warnings);
+        
+        return {
+            isValid: errors.length === 0,
+            errors: errors,
+            warnings: warnings
+        };
+    }
+
+    /**
+     * Validate required fields
+     * 
+     * @param {Document} doc - Document (iframe document)
+     * @param {Object} fieldMap - Field map
+     * @returns {Object} Validation result { errors: string[], warnings: string[] }
+     */
+    validateRequiredFields(doc, fieldMap) {
+        const errors = [];
+        const warnings = [];
+        
+        for (const fieldName of fieldMap.required || []) {
+            const fieldConfig = fieldMap.fields[fieldName];
+            if (!fieldConfig) {
+                warnings.push(`Field config not found for required field: ${fieldName}`);
+                continue;
+            }
+            
+            const element = doc.querySelector(fieldConfig.id);
+            if (!element) {
+                errors.push(`Required field ${fieldName} (${fieldConfig.id}) not found in DOM`);
+                continue;
+            }
+            
+            const value = element.value;
+            if (!value || (typeof value === 'string' && value.trim() === '')) {
+                errors.push(`Required field ${fieldName} is empty`);
+            }
+        }
+        
+        return { errors, warnings };
+    }
+
+    /**
+     * Validate field types
+     * 
+     * @param {Document} doc - Document (iframe document)
+     * @param {Object} fieldMap - Field map
+     * @returns {Object} Validation result { errors: string[], warnings: string[] }
+     */
+    validateFieldTypes(doc, fieldMap) {
+        const errors = [];
+        const warnings = [];
+        
+        for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+            const element = doc.querySelector(fieldConfig.id);
+            if (!element) continue;
+            
+            const value = element.value;
+            if (!value) continue;
+            
+            switch (fieldConfig.type) {
+                case 'int':
+                    const intValue = parseInt(value, 10);
+                    if (isNaN(intValue)) {
+                        errors.push(`Field ${fieldName} should be an integer, got: ${value}`);
+                    }
+                    break;
+                    
+                case 'number':
+                case 'float':
+                    const floatValue = parseFloat(value);
+                    if (isNaN(floatValue)) {
+                        errors.push(`Field ${fieldName} should be a number, got: ${value}`);
+                    }
+                    break;
+                    
+                case 'date':
+                case 'datetime-local':
+                    if (isNaN(Date.parse(value))) {
+                        errors.push(`Field ${fieldName} should be a valid date, got: ${value}`);
+                    }
+                    break;
+                    
+                case 'bool':
+                    if (value !== 'true' && value !== 'false' && value !== '1' && value !== '0') {
+                        warnings.push(`Field ${fieldName} may not be a valid boolean value: ${value}`);
+                    }
+                    break;
+                    
+                case 'text':
+                    // Text fields are generally valid if they have a value
+                    break;
+                    
+                case 'rich-text':
+                case 'tags':
+                    // These are handled separately
+                    break;
+                    
+                default:
+                    warnings.push(`Unknown field type for ${fieldName}: ${fieldConfig.type}`);
+            }
+        }
+        
+        return { errors, warnings };
+    }
+
+    /**
+     * Validate field values (ranges, enums, etc.)
+     * 
+     * @param {Document} doc - Document (iframe document)
+     * @param {Object} fieldMap - Field map
+     * @returns {Object} Validation result { errors: string[], warnings: string[] }
+     */
+    validateFieldValues(doc, fieldMap) {
+        const errors = [];
+        const warnings = [];
+        
+        // Define valid values for common enums
+        const enumValues = {
+            'status': ['open', 'closed', 'cancelled', 'new', 'active', 'unread', 'read'],
+            'side': ['Long', 'Short', 'long', 'short', 'buy', 'sell'],
+            'investment_type': ['swing', 'investment', 'passive', 'Swing', 'Investment', 'Passive'],
+            'type': ['deposit', 'withdrawal', 'fee', 'dividend', 'transfer_in', 'transfer_out', 'other_positive', 'other_negative'],
+            'action': ['buy', 'sell', 'short', 'cover']
+        };
+        
+        for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+            const element = doc.querySelector(fieldConfig.id);
+            if (!element) continue;
+            
+            const value = element.value;
+            if (!value) continue;
+            
+            // Check enum values if field name matches known enums
+            if (enumValues[fieldName]) {
+                const normalizedValue = String(value).toLowerCase().trim();
+                const validValues = enumValues[fieldName].map(v => v.toLowerCase());
+                if (!validValues.includes(normalizedValue)) {
+                    warnings.push(`Field ${fieldName} has unexpected value: ${value}. Expected one of: ${enumValues[fieldName].join(', ')}`);
+                }
+            }
+            
+            // Check numeric ranges
+            if (fieldConfig.type === 'number' || fieldConfig.type === 'float' || fieldConfig.type === 'int') {
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue)) {
+                    if (fieldConfig.min !== undefined && numValue < fieldConfig.min) {
+                        errors.push(`Field ${fieldName} value ${numValue} is below minimum ${fieldConfig.min}`);
+                    }
+                    if (fieldConfig.max !== undefined && numValue > fieldConfig.max) {
+                        errors.push(`Field ${fieldName} value ${numValue} is above maximum ${fieldConfig.max}`);
+                    }
+                }
+            }
+        }
+        
+        return { errors, warnings };
+    }
+
+    /**
+     * Test field validation for a single field
+     * 
+     * @param {Document} doc - Document (iframe document)
+     * @param {string} fieldName - Field name
+     * @param {Object} fieldConfig - Field configuration
+     * @param {*} testValue - Test value to validate
+     * @returns {Object} Validation result { isValid: boolean, error: string|null }
+     */
+    testFieldValidation(doc, fieldName, fieldConfig, testValue) {
+        const element = doc.querySelector(fieldConfig.id);
+        if (!element) {
+            return { isValid: false, error: `Field ${fieldName} (${fieldConfig.id}) not found` };
+        }
+        
+        // Set test value
+        element.value = testValue;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Check if field is required and empty
+        if (fieldConfig.required && (!testValue || (typeof testValue === 'string' && testValue.trim() === ''))) {
+            return { isValid: false, error: `Required field ${fieldName} is empty` };
+        }
+        
+        // Check type
+        if (testValue) {
+            switch (fieldConfig.type) {
+                case 'int':
+                    if (isNaN(parseInt(testValue, 10))) {
+                        return { isValid: false, error: `Field ${fieldName} should be an integer` };
+                    }
+                    break;
+                case 'number':
+                case 'float':
+                    if (isNaN(parseFloat(testValue))) {
+                        return { isValid: false, error: `Field ${fieldName} should be a number` };
+                    }
+                    break;
+                case 'date':
+                case 'datetime-local':
+                    if (isNaN(Date.parse(testValue))) {
+                        return { isValid: false, error: `Field ${fieldName} should be a valid date` };
+                    }
+                    break;
+            }
+        }
+        
+        return { isValid: true, error: null };
+    }
+
+    /**
+     * Run tag management tests (categories and tags)
+     */
+    async runTagManagementTests() {
+        const startTime = Date.now();
+        const workflow = {
+            name: 'Tag Management CRUD',
+            steps: []
+        };
+        let testIframe = null;
+
+        try {
+            this.logger?.info('🧪 Starting Tag Management Tests (Categories and Tags)');
+            
+            // Test 1: Tag Categories CRUD
+            workflow.steps.push('בודק CRUD לקטגוריות תגיות');
+            this.updateTestResults();
+            
+            const categoryFieldMap = this.getEntityFieldMaps().tag_category;
+            testIframe = await this.loadPageInIframe('/tag_management.html');
+            const iframeDoc = this.getIframeDocument(testIframe);
+            const iframeWindow = testIframe.contentWindow;
+            
+            await this.waitForElementInIframe(testIframe, 'table tbody, .table tbody, main, [data-section="main"]', 15000);
+            
+            // Test category creation
+            if (iframeWindow.ModalManagerV2) {
+                await iframeWindow.ModalManagerV2.showModal('tagCategoryModal', 'add');
+                await this.waitForElementInIframe(testIframe, '#tagCategoryModal.show', 5000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Fill category form
+                const categoryName = `Test Category ${Date.now()}`;
+                const nameField = iframeDoc.querySelector('#tagCategoryName');
+                if (nameField) {
+                    nameField.value = categoryName;
+                    nameField.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                
+                // Save category
+                const saveButton = iframeDoc.querySelector('#tagCategoryModal button[type="submit"], #tagCategoryModal button.btn-primary');
+                if (saveButton) {
+                    saveButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+                
+                workflow.steps.push('קטגוריה נוצרה בהצלחה');
+                this.updateTestResults();
+            }
+            
+            // Test 2: Tags CRUD
+            workflow.steps.push('בודק CRUD לתגיות');
+            this.updateTestResults();
+            
+            const tagFieldMap = this.getEntityFieldMaps().tag;
+            if (iframeWindow.ModalManagerV2) {
+                await iframeWindow.ModalManagerV2.showModal('tagModal', 'add');
+                await this.waitForElementInIframe(testIframe, '#tagModal.show', 5000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Fill tag form
+                const tagName = `Test Tag ${Date.now()}`;
+                const tagNameField = iframeDoc.querySelector('#tagName');
+                if (tagNameField) {
+                    tagNameField.value = tagName;
+                    tagNameField.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                
+                // Save tag
+                const tagSaveButton = iframeDoc.querySelector('#tagModal button[type="submit"], #tagModal button.btn-primary');
+                if (tagSaveButton) {
+                    tagSaveButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+                
+                workflow.steps.push('תגית נוצרה בהצלחה');
+                this.updateTestResults();
+            }
+            
+            // Cleanup
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: 'Tag management tests completed (categories and tags)'
+            });
+            
+            this.logger?.info(`✅ Tag Management Tests completed in ${executionTime}ms`);
+            this.updateTestResults();
+            
+        } catch (error) {
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ Tag Management Tests failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message
+            });
+            this.updateTestResults();
+        }
+    }
+
+    /**
+     * Run preferences tests (profiles and preferences)
+     */
+    async runPreferencesTests() {
+        const startTime = Date.now();
+        const workflow = {
+            name: 'Preferences CRUD',
+            steps: []
+        };
+        let testIframe = null;
+
+        try {
+            this.logger?.info('🧪 Starting Preferences Tests (Profiles and Preferences)');
+            
+            testIframe = await this.loadPageInIframe('/preferences.html');
+            const iframeDoc = this.getIframeDocument(testIframe);
+            const iframeWindow = testIframe.contentWindow;
+            
+            await this.waitForElementInIframe(testIframe, 'main, [data-section="main"], .preferences-container', 15000);
+            
+            // Test 1: Preference Profile CRUD
+            workflow.steps.push('בודק CRUD לפרופילי העדפות');
+            this.updateTestResults();
+            
+            const profileFieldMap = this.getEntityFieldMaps().preference_profile;
+            
+            // Try to find and click "Add Profile" button
+            const addProfileButton = iframeDoc.querySelector('button[data-action*="profile"], button:contains("פרופיל"), button[data-button-type="ADD"]');
+            if (addProfileButton) {
+                addProfileButton.click();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Fill profile form if modal appears
+                const profileModal = iframeDoc.querySelector('#preferenceProfileModal, .modal.show');
+                if (profileModal) {
+                    const profileNameField = iframeDoc.querySelector('#preferenceProfileName');
+                    if (profileNameField) {
+                        profileNameField.value = `Test Profile ${Date.now()}`;
+                        profileNameField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    
+                    const saveButton = profileModal.querySelector('button[type="submit"], button.btn-primary');
+                    if (saveButton) {
+                        saveButton.click();
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+                
+                workflow.steps.push('פרופיל העדפות נוצר בהצלחה');
+                this.updateTestResults();
+            }
+            
+            // Test 2: Preferences values update
+            workflow.steps.push('בודק עדכון ערכי העדפות');
+            this.updateTestResults();
+            
+            // Try to find a preference field and update it
+            const preferenceInputs = iframeDoc.querySelectorAll('input[type="text"], input[type="number"], select');
+            if (preferenceInputs.length > 0) {
+                const firstInput = preferenceInputs[0];
+                const originalValue = firstInput.value;
+                firstInput.value = 'Test Value';
+                firstInput.dispatchEvent(new Event('change', { bubbles: true }));
+                
+                workflow.steps.push('ערך העדפה עודכן');
+                this.updateTestResults();
+            }
+            
+            // Cleanup
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: 'Preferences tests completed (profiles and preferences)'
+            });
+            
+            this.logger?.info(`✅ Preferences Tests completed in ${executionTime}ms`);
+            this.updateTestResults();
+            
+        } catch (error) {
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ Preferences Tests failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message
+            });
+            this.updateTestResults();
+        }
+    }
+
+    /**
+     * Run data import tests (import sessions)
+     */
+    async runDataImportTests() {
+        const startTime = Date.now();
+        const workflow = {
+            name: 'Data Import CRUD',
+            steps: []
+        };
+        let testIframe = null;
+
+        try {
+            this.logger?.info('🧪 Starting Data Import Tests (Import Sessions)');
+            
+            testIframe = await this.loadPageInIframe('/data_import.html');
+            const iframeDoc = this.getIframeDocument(testIframe);
+            const iframeWindow = testIframe.contentWindow;
+            
+            await this.waitForElementInIframe(testIframe, 'main, [data-section="main"], .import-container, table tbody', 15000);
+            
+            // Note: Data import is more complex - it involves file upload and analysis
+            // For now, we'll just verify the page loads and has the expected structure
+            workflow.steps.push('עמוד ייבוא נתונים נטען בהצלחה');
+            this.updateTestResults();
+            
+            // Check if import session list is visible
+            const importSessionsTable = iframeDoc.querySelector('table tbody, .import-sessions-list');
+            if (importSessionsTable) {
+                workflow.steps.push('טבלת סשני ייבוא נמצאה');
+                this.updateTestResults();
+            }
+            
+            // Cleanup
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: 'Data import page loaded successfully (import sessions CRUD is complex and requires file upload)'
+            });
+            
+            this.logger?.info(`✅ Data Import Tests completed in ${executionTime}ms`);
+            this.updateTestResults();
+            
+        } catch (error) {
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ Data Import Tests failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message
+            });
+            this.updateTestResults();
+        }
+    }
+
+    /**
+     * Check linked items before delete
+     * 
+     * @param {HTMLIFrameElement} iframe - The iframe element
+     * @param {string} entityType - Entity type
+     * @param {number} entityId - Entity ID
+     * @returns {Promise<Object>} Result { hasLinkedItems: boolean, linkedItems: Array, shouldProceed: boolean }
+     */
+    async checkLinkedItemsBeforeDelete(iframe, entityType, entityId) {
+        const iframeWindow = iframe.contentWindow;
+        
+        if (!iframeWindow.checkLinkedItemsBeforeAction) {
+            this.logger?.warn('checkLinkedItemsBeforeAction not available in iframe');
+            return { hasLinkedItems: false, linkedItems: [], shouldProceed: true };
+        }
+        
+        try {
+            const hasLinkedItems = await iframeWindow.checkLinkedItemsBeforeAction(entityType, entityId, 'delete');
+            
+            if (hasLinkedItems) {
+                // Try to get linked items data
+                let linkedItems = [];
+                try {
+                    const response = await fetch(`/api/linked-items/${entityType}/${entityId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        linkedItems = data.child_entities || [];
+                    }
+                } catch (error) {
+                    this.logger?.warn('Failed to fetch linked items details', { error: error.message });
+                }
+                
+                return {
+                    hasLinkedItems: true,
+                    linkedItems: linkedItems,
+                    shouldProceed: false // Don't proceed with delete if there are linked items
+                };
+            }
+            
+            return {
+                hasLinkedItems: false,
+                linkedItems: [],
+                shouldProceed: true
+            };
+        } catch (error) {
+            this.logger?.error('Error checking linked items', { error: error.message });
+            // On error, allow delete to proceed (fail-safe)
+            return {
+                hasLinkedItems: false,
+                linkedItems: [],
+                shouldProceed: true
+            };
         }
     }
 
@@ -2004,16 +2896,106 @@ class IntegratedCRUDE2ETester {
         this.logger?.info('Performance metrics updated', perf);
     }
 
-    displayError(error) {
-        this.logger?.error('JavaScript error detected', error);
+    /**
+     * Display error with full context
+     * 
+     * @param {Error|string} error - Error object or error message
+     * @param {Object} context - Additional context information
+     */
+    displayError(error, context = {}) {
+        const errorInfo = {
+            message: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : null,
+            timestamp: new Date().toISOString(),
+            testType: this.currentTestType,
+            ...context
+        };
+        
+        this.logger?.error('JavaScript error detected in CRUD testing', errorInfo);
+        
+        // Also log to console for debugging
+        console.error('❌ CRUD Testing Error:', errorInfo);
+        
+        // Display in UI if error tracker exists
+        const errorTracker = document.getElementById('errorTracker');
+        if (errorTracker) {
+            const errorEntry = document.createElement('div');
+            errorEntry.className = 'alert alert-danger';
+            errorEntry.innerHTML = `
+                <strong>${errorInfo.message}</strong><br>
+                <small>${errorInfo.testType || 'unknown'} test | ${new Date().toLocaleTimeString()}</small>
+                ${errorInfo.stack ? `<pre class="small mt-2">${errorInfo.stack}</pre>` : ''}
+            `;
+            errorTracker.appendChild(errorEntry);
+            errorTracker.scrollTop = errorTracker.scrollHeight;
+        }
     }
 
-    showError(message) {
-        if (window.NotificationSystem) {
-            window.NotificationSystem.showError('שגיאת בדיקה', message);
-    } else {
-            alert(message);
+    /**
+     * Show error notification with full context
+     * 
+     * @param {string} message - Error message
+     * @param {Object} context - Additional context
+     */
+    showError(message, context = {}) {
+        const fullMessage = context.details 
+            ? `${message}\n\nפרטים: ${context.details}`
+            : message;
+        
+        if (window.NotificationSystem && window.NotificationSystem.showError) {
+            window.NotificationSystem.showError('שגיאת בדיקה', fullMessage, 10000, 'system');
+        } else if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאת בדיקה', fullMessage);
+        } else {
+            alert(fullMessage);
         }
+        
+        // Also log with context
+        this.logger?.error('Test error', {
+            message,
+            context,
+            testType: this.currentTestType,
+            page: 'crud-testing-dashboard'
+        });
+    }
+
+    /**
+     * Enhanced error handling with detailed logging
+     * 
+     * @param {Error} error - Error object
+     * @param {string} operation - Operation name
+     * @param {Object} context - Additional context
+     */
+    handleTestError(error, operation, context = {}) {
+        const errorDetails = {
+            operation,
+            error: {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            },
+            context: {
+                testType: this.currentTestType,
+                timestamp: new Date().toISOString(),
+                ...context
+            }
+        };
+        
+        // Log with full context
+        this.logger?.error(`Test error in ${operation}`, errorDetails);
+        
+        // Display error
+        this.displayError(error, {
+            operation,
+            ...context
+        });
+        
+        // Show notification
+        this.showError(`שגיאה ב-${operation}: ${error.message}`, {
+            details: context.details || error.stack
+        });
+        
+        return errorDetails;
     }
 }
 

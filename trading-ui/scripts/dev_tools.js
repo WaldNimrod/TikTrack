@@ -48,6 +48,53 @@
     // ===== INITIALIZATION =====
 
     /**
+     * Wait for UnifiedTableSystem and register tables
+     * Uses polling like designs.js and trading_accounts.js
+     */
+    function waitAndRegisterTables() {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:waitAndRegisterTables',message:'Starting wait for UnifiedTableSystem',data:{readyState:document.readyState,hasUnifiedTableSystem:!!window.UnifiedTableSystem,hasRegistry:!!window.UnifiedTableSystem?.registry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        
+        // Wait for UnifiedTableSystem (loaded in crud package)
+        let checkCount = 0;
+        const waitForUnifiedTableSystem = setInterval(() => {
+            checkCount++;
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:waitAndRegisterTables:interval',message:'Checking UnifiedTableSystem availability',data:{checkCount,hasUnifiedTableSystem:!!window.UnifiedTableSystem,hasRegistry:!!window.UnifiedTableSystem?.registry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            
+            if (window.UnifiedTableSystem?.registry) {
+                clearInterval(waitForUnifiedTableSystem);
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:waitAndRegisterTables:found',message:'UnifiedTableSystem found, registering tables',data:{checkCount,hasEvents:!!window.UnifiedTableSystem?.events,hasSetupSortHandlers:!!window.UnifiedTableSystem?.events?.setupSortHandlers},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                
+                // Register tables - setupSortableHeaders will be called by core-systems.js automatically
+                registerStaticTablesForSorting();
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:waitAndRegisterTables:afterRegister',message:'Tables registered, setupSortableHeaders will be called by core-systems.js',data:{registeredTables:['dev-tools-primary-pages','dev-tools-technical-pages','dev-tools-dev-pages','dev-tools-auth-pages','dev-tools-test-pages','dev-tools-mockup-pages'].map(t=>window.UnifiedTableSystem.registry.isRegistered(t)),hasSetupSortableHeaders:typeof window.setupSortableHeaders==='function'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(waitForUnifiedTableSystem);
+            if (!window.UnifiedTableSystem?.registry) {
+                log('⚠️ UnifiedTableSystem not available after waiting 5 seconds');
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:waitAndRegisterTables:timeout',message:'Timeout waiting for UnifiedTableSystem',data:{checkCount,hasUnifiedTableSystem:!!window.UnifiedTableSystem,hasRegistry:!!window.UnifiedTableSystem?.registry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                // #endregion
+            }
+        }, 5000);
+    }
+
+    /**
      * Main initialization function
      */
     function initialize() {
@@ -65,27 +112,12 @@
             // Initialize UI state
             initializeUI();
 
-            // Register static tables and setup sorting using central system
+            // Register tables with UnifiedTableSystem (like designs.js and trading_accounts.js)
+            // This ensures tables are registered before setupSortableHeaders is called by core-systems.js
+            // Use small delay to ensure DOM is fully ready and UnifiedTableSystem is loaded
             setTimeout(() => {
-                registerStaticTablesForSorting();
-                
-                // Use UnifiedTableSystem directly instead of setupSortableHeaders to avoid window.sortTable dependency
-                if (window.UnifiedTableSystem?.events?.setupSortHandlers) {
-                    const tableTypes = [
-                        'dev-tools-primary-pages',
-                        'dev-tools-technical-pages',
-                        'dev-tools-dev-pages',
-                        'dev-tools-auth-pages',
-                        'dev-tools-test-pages',
-                        'dev-tools-mockup-pages'
-                    ];
-                    tableTypes.forEach(tableType => {
-                        if (window.UnifiedTableSystem.registry.isRegistered(tableType)) {
-                            window.UnifiedTableSystem.events.setupSortHandlers(tableType);
-                        }
-                    });
-                }
-            }, 300);
+                waitAndRegisterTables();
+            }, 200);
 
             // Load initial data
             loadPageData();

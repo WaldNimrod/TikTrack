@@ -255,16 +255,11 @@
           for (const [colorName, defaultValue] of Object.entries(defaultColors)) {
         // CRITICAL: Check if value is missing, null, undefined, or empty string
         // This ensures defaults are loaded even if server returns null/undefined for missing preferences
+        // Server now returns None for preferences not in PreferenceType, so we use ColorManager defaults
         const currentValue = window.currentPreferences[colorName];
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:258',message:'Default color check',data:{colorName:colorName,currentValue:currentValue,hasKey:colorName in (window.currentPreferences||{}),defaultValue:defaultValue,willAdd:(currentValue === null || currentValue === undefined || currentValue === '' || !currentValue)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         if (currentValue === null || currentValue === undefined || currentValue === '' || !currentValue) {
           window.currentPreferences[colorName] = defaultValue;
           colorsAdded++;
-          // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:262',message:'Default color added',data:{colorName:colorName,defaultValue:defaultValue},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
         }
           }
           if (colorsAdded > 0) {

@@ -729,14 +729,10 @@
     });
 
     // נורמליזציה: תמיכה גם במקרה שהשרת מחזיר מערך ערכים/רשומות
+    // CRITICAL: Server now returns None for preferences not in PreferenceType
+    // This allows client to use its own defaults (e.g., ColorManager.defaultColors)
     const raw = payload?.data?.preferences ?? payload?.preferences ?? payload?.data ?? {};
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-data.js:732',message:'Server response received',data:{requestedNames:names,rawType:Array.isArray(raw)?'array':typeof raw,rawKeys:Array.isArray(raw)?raw.length:Object.keys(raw||{}),rawSample:Array.isArray(raw)?raw.slice(0,3):Object.fromEntries(Object.entries(raw||{}).slice(0,3))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
     const { map: normalizedMap } = normalizePreferenceEntries(raw);
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-data.js:735',message:'Normalized map created',data:{normalizedKeys:Object.keys(normalizedMap||{}),normalizedSample:Object.fromEntries(Object.entries(normalizedMap||{}).slice(0,5))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
     await saveCache(cacheKey, normalizedMap, { ttl, layer: 'localStorage' });
     return normalizedMap;
   }

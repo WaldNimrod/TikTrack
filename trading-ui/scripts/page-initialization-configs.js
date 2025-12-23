@@ -4382,7 +4382,7 @@ if (!PAGE_CONFIGS['dev_tools']) {
     cacheStrategy: 'standard',
     requiresFilters: false,
     requiresValidation: false,
-    requiresTables: false,
+    requiresTables: true, // Enable table sorting via core-systems.js
     customInitializers: [
       function () {
         window.Logger.info('🛠️ Initializing Development Tools page...', {

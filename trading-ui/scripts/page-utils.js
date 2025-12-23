@@ -762,7 +762,27 @@ function handleHeaderSort(pageName, columnIndex, event = null) {
       return;
     }
 
-    window.sortTable(tableType, columnIndex);
+    // CRITICAL: Check if sortTable is available, fallback to sortTableData if needed
+    if (typeof window.sortTable === 'function') {
+      window.sortTable(tableType, columnIndex);
+    } else if (typeof window.sortTableData === 'function') {
+      // Fallback: Use UnifiedTableSystem if available
+      if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+        window.UnifiedTableSystem.sorter.sort(tableType, columnIndex);
+      } else {
+        window.Logger?.warn?.('handleHeaderSort: sortTable not available and table not registered', {
+          page: pageName || 'global',
+          tableType,
+          columnIndex,
+        });
+      }
+    } else {
+      window.Logger?.error?.('handleHeaderSort: No sorting function available', {
+        page: pageName || 'global',
+        tableType,
+        columnIndex,
+      });
+    }
 
     if (window.Logger) {
       window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex}`, { page: pageName || 'global' });

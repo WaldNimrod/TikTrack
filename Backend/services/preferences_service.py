@@ -347,15 +347,31 @@ class PreferencesService:
                     PreferenceType.is_active.is_(True),
                 )
             ).all()
+            
+            # Build a map of preference_name -> PreferenceType for quick lookup
+            pref_type_map = {pt.preference_name: pt for pt in pref_types}
+            
             result: Dict[str, Any] = {}
-            for pref_type in pref_types:
-                stmt = select(UserPreference.saved_value).where(
-                    UserPreference.user_id == user_id,
-                    UserPreference.profile_id == profile_id,
-                    UserPreference.preference_id == pref_type.id,
-                )
-                value = session.scalar(stmt)
-                result[pref_type.preference_name] = value if value is not None else pref_type.default_value
+            
+            # CRITICAL: Process ALL requested names, not just those found in PreferenceType
+            # This ensures that even if a preference doesn't exist in PreferenceType,
+            # we still return it (with None/default) so the client can use its own defaults
+            for name in target_names:
+                if name in pref_type_map:
+                    # Preference exists in PreferenceType - get user value or default
+                    pref_type = pref_type_map[name]
+                    stmt = select(UserPreference.saved_value).where(
+                        UserPreference.user_id == user_id,
+                        UserPreference.profile_id == profile_id,
+                        UserPreference.preference_id == pref_type.id,
+                    )
+                    value = session.scalar(stmt)
+                    result[name] = value if value is not None else pref_type.default_value
+                else:
+                    # Preference doesn't exist in PreferenceType - return None
+                    # Client will use its own defaults (e.g., ColorManager.defaultColors)
+                    result[name] = None
+                    
             return result
 
     def get_active_profile_info(self, user_id: int) -> Dict[str, Any]:

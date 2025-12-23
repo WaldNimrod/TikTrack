@@ -99,17 +99,12 @@
             // Initialize UI state
             initializeUI();
 
-            // Register tables with UnifiedTableSystem (like designs.js and trading_accounts.js)
-            // This ensures tables are registered before setupSortableHeaders is called by core-systems.js
-            // Wait for DOM to be fully ready before accessing it
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    setTimeout(waitAndRegisterTables, 100);
-                });
-            } else {
-                // DOM already loaded, but wait a bit for packages to load
-                setTimeout(waitAndRegisterTables, 300);
-            }
+            // Register tables IMMEDIATELY (don't wait) - core-systems.js will call setupSortableHeaders later
+            // This ensures tables are registered before setupSortableHeaders is called
+            // Use requestAnimationFrame to ensure DOM is ready but don't wait too long
+            requestAnimationFrame(() => {
+                waitAndRegisterTables();
+            });
 
             // Load initial data
             loadPageData();

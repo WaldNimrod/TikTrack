@@ -62,7 +62,7 @@ if (window.Logger && window.Logger.info) {
 // ============================================================================
 
 /**
- * ValidationError is already defined in preferences-core-new.js
+ * ValidationError is already defined in preferences-core.js
  * Using the existing ValidationError class
  * If not available, define a fallback
  */

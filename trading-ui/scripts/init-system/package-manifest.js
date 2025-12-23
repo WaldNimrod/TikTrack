@@ -1105,10 +1105,10 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.PreferencesV4',
         description: 'Preferences V4 SDK (group-first)',
         required: true,
-        loadOrder: 0.5  // Must load before preferences-core-new.js
+        loadOrder: 0.5  // Must load before preferences-core.js
       },
       {
-        file: 'preferences-core-new.js',
+        file: 'preferences-core.js',
         globalCheck: 'window.PreferencesCore',
         description: 'Preferences core (without colors)',
         required: true,

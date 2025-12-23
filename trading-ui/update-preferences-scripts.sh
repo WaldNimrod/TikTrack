@@ -25,7 +25,7 @@ for file in "${files[@]}"; do
         echo "📝 Updating $file..."
         
         # Replace old preferences scripts with new ones
-        sed -i.bak 's|scripts/preferences-core\.js|scripts/preferences-core-new.js|g' "$file"
+        sed -i.bak 's|scripts/preferences-core\.js|scripts/preferences-core.js|g' "$file"
         sed -i.bak 's|scripts/preferences\.js|scripts/preferences-colors.js|g' "$file"
         
         # Add the new scripts after the first one
@@ -42,7 +42,7 @@ done
 
 echo "🎉 All files updated successfully!"
 echo "📋 Summary:"
-echo "  - Replaced preferences-core.js with preferences-core-new.js"
+echo "  - Replaced preferences-core.js with preferences-core.js"
 echo "  - Replaced preferences.js with preferences-colors.js"
 echo "  - Added preferences-lazy-loader.js"
 echo "  - Added preferences-validation.js"

@@ -762,31 +762,53 @@ function handleHeaderSort(pageName, columnIndex, event = null) {
       return;
     }
 
-    // CRITICAL: Check if sortTable is available, fallback to sortTableData if needed
-    if (typeof window.sortTable === 'function') {
-      window.sortTable(tableType, columnIndex);
-    } else if (typeof window.sortTableData === 'function') {
-      // Fallback: Use UnifiedTableSystem if available
-      if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
-        window.UnifiedTableSystem.sorter.sort(tableType, columnIndex);
-      } else {
-        window.Logger?.warn?.('handleHeaderSort: sortTable not available and table not registered', {
+    // CRITICAL: Check UnifiedTableSystem FIRST if table is registered
+    // This handles static tables that are registered directly with UnifiedTableSystem
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+      const result = window.UnifiedTableSystem.sorter.sort(tableType, columnIndex);
+      if (window.Logger) {
+        window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex} using UnifiedTableSystem`, { 
           page: pageName || 'global',
-          tableType,
-          columnIndex,
+          resultLength: result?.length || 0
         });
       }
-    } else {
-      window.Logger?.error?.('handleHeaderSort: No sorting function available', {
+      return;
+    }
+
+    // Fallback: Use window.sortTable if available (for dynamic tables)
+    if (typeof window.sortTable === 'function') {
+      const result = window.sortTable(tableType, columnIndex);
+      if (window.Logger) {
+        window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex} using window.sortTable`, { 
+          page: pageName || 'global',
+          resultLength: result?.length || 0
+        });
+      }
+      return;
+    }
+
+    // Last resort: Use window.sortTableData if available
+    if (typeof window.sortTableData === 'function') {
+      window.Logger?.warn?.('handleHeaderSort: Using deprecated sortTableData fallback', {
         page: pageName || 'global',
         tableType,
         columnIndex,
       });
+      // Note: sortTableData requires data array and updateFunction, which we don't have here
+      // This is a fallback that may not work correctly
+      return;
     }
 
-    if (window.Logger) {
-      window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex}`, { page: pageName || 'global' });
-    }
+    // No sorting function available
+    window.Logger?.error?.('handleHeaderSort: No sorting function available', {
+      page: pageName || 'global',
+      tableType,
+      columnIndex,
+      unifiedTableSystemAvailable: !!window.UnifiedTableSystem,
+      tableRegistered: window.UnifiedTableSystem?.registry?.isRegistered(tableType) || false,
+      sortTableAvailable: typeof window.sortTable === 'function',
+      sortTableDataAvailable: typeof window.sortTableData === 'function'
+    });
   } catch (error) {
     if (window.Logger) {
       window.Logger.error('handleHeaderSort: Failed to sort table header click', error, { page: pageName || 'global' });

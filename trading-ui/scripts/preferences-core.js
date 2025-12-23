@@ -31,7 +31,7 @@
  * - No HTML changes required!
  */
 
-// window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
+// window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core" });
 
 // ============================================================================
 // FUNCTION INDEX
@@ -167,7 +167,7 @@ class PreferencesAPIClient {
      */
   async getPreference(preferenceName, userId = null, profileId = null) {
     if (!window.PreferencesData?.loadPreference || typeof window.PreferencesData.loadPreference !== 'function') {
-      window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core-new' });
+      window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core' });
       return null;
     }
     const result = await window.PreferencesData.loadPreference({
@@ -191,7 +191,7 @@ class PreferencesAPIClient {
     while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
       if (waitCount >= maxWaitAttempts) {
         window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available after waiting', { 
-          page: 'preferences-core-new',
+          page: 'preferences-core',
           waitTime: `${maxWaitAttempts * 100}ms`,
         });
         return null;
@@ -202,13 +202,13 @@ class PreferencesAPIClient {
     
     if (waitCount > 0) {
       window.Logger?.debug?.('[PreferencesAPIClient] PreferencesData became available after waiting', {
-        page: 'preferences-core-new',
+        page: 'preferences-core',
         waitTime: `${waitCount * 100}ms`,
       });
     }
     
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
-      page: 'preferences-core-new',
+      page: 'preferences-core',
       userId: userId || this.defaultUserId,
       profileId,
     });
@@ -222,7 +222,7 @@ class PreferencesAPIClient {
     // Handle null payload - PreferencesData.loadAllPreferencesRaw may return null
     if (!payload) {
       window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw returned null', {
-        page: 'preferences-core-new',
+        page: 'preferences-core',
         userId: userId || this.defaultUserId,
         profileId,
       });
@@ -230,7 +230,7 @@ class PreferencesAPIClient {
     }
 
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences received payload', {
-      page: 'preferences-core-new',
+      page: 'preferences-core',
       userId: userId || this.defaultUserId,
       profileId,
       preferencesCount: payload?.preferences 
@@ -248,7 +248,7 @@ class PreferencesAPIClient {
     };
     
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences returning result', {
-      page: 'preferences-core-new',
+      page: 'preferences-core',
       preferencesCount: Object.keys(result.preferences || {}).length,
       preferencesSample: Object.fromEntries(Object.entries(result.preferences || {}).slice(0, 5)),
     });
@@ -395,13 +395,13 @@ class PreferencesValidationManager {
   validate(preferenceName, value, dataType) {
     const validator = this.validators.get(dataType);
     if (!validator) {
-      // window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-core-new" });
+      // window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-core" });
       return true; // Allow unknown types
     }
 
     const isValid = validator(value);
     if (!isValid) {
-      // window.Logger.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-core-new" });
+      // window.Logger.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-core" });
     }
 
     return isValid;
@@ -416,7 +416,7 @@ class PreferencesValidationManager {
     try {
       return await window.PreferencesData.checkPreferenceExists(preferenceName);
     } catch (error) {
-      // window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core-new" });
+      // window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core" });
       return false;
     }
   }
@@ -470,7 +470,7 @@ class PreferencesCore {
     }
 
     if (!window.PreferencesData?.loadDefaultPreference) {
-      window.Logger?.warn?.('[PreferencesCore] loadDefaultPreference API is not available', { page: 'preferences-core-new' });
+      window.Logger?.warn?.('[PreferencesCore] loadDefaultPreference API is not available', { page: 'preferences-core' });
       this.defaultPreferenceCache.set(preferenceName, null);
       return null;
     }
@@ -486,7 +486,7 @@ class PreferencesCore {
     } catch (error) {
       this.defaultPreferenceEndpointAvailable = false;
       this.defaultPreferenceCache.set(preferenceName, null);
-      window.Logger?.debug?.(`⚠️ Error getting default preference ${preferenceName}: ${error?.message}`, { page: 'preferences-core-new' });
+      window.Logger?.debug?.(`⚠️ Error getting default preference ${preferenceName}: ${error?.message}`, { page: 'preferences-core' });
       return null;
     }
   }
@@ -746,7 +746,7 @@ class PreferencesCore {
     const dedupeKey = `getAllPreferences:u${finalUserId}:p${finalProfileId}`;
     if (this._getAllPreferencesInflight.has(dedupeKey)) {
       window.Logger?.debug?.('⏭️ PreferencesCore.getAllPreferences deduplicated - returning existing promise', {
-        page: 'preferences-core-new',
+        page: 'preferences-core',
         dedupeKey,
       });
       return await this._getAllPreferencesInflight.get(dedupeKey);
@@ -823,7 +823,7 @@ class PreferencesCore {
           // If server returned empty preferences, it's an error condition, not a fallback scenario
           if (Object.keys(allPreferences).length === 0) {
             window.Logger?.warn?.('[PreferencesCore] Server returned empty preferences - this should not happen', {
-              page: 'preferences-core-new',
+              page: 'preferences-core',
               userId: finalUserId,
               profileId: finalProfileId,
             });
@@ -925,7 +925,7 @@ class PreferencesCore {
         if (serverProfileId !== null && serverProfileId !== undefined && serverProfileId !== finalProfileId) {
           this.currentProfileId = serverProfileId;
           window.Logger?.debug?.('Updated currentProfileId from server response', {
-            page: 'preferences-core-new',
+            page: 'preferences-core',
             oldProfileId: finalProfileId,
             newProfileId: serverProfileId,
           });
@@ -1242,7 +1242,7 @@ class PreferencesCore {
     const dedupeKey = `initLazy:u${userId ?? 'null'}:p${profileId ?? 'null'}`;
     if (this._initLazyLoadingInflight?.has(dedupeKey)) {
       window.Logger?.debug?.('⏭️ PreferencesCore.initializeWithLazyLoading deduplicated', {
-        page: 'preferences-core-new',
+        page: 'preferences-core',
         dedupeKey,
       });
       return await this._initLazyLoadingInflight.get(dedupeKey);
@@ -1279,7 +1279,7 @@ class PreferencesCore {
 
       } catch (error) {
         window.Logger?.warn?.('⚠️ Error initializing lazy loading', {
-          page: 'preferences-core-new',
+          page: 'preferences-core',
           error: error?.message,
         });
         // Fallback to standard loading
@@ -1389,7 +1389,7 @@ window.getCurrentPreference = async function(preferenceName, options = {}) {
     window.Logger?.warn?.('⚠️ getCurrentPreference failed, falling back to local storage', {
       preferenceName,
       error: error?.message,
-    }, { page: 'preferences-core-new' });
+    }, { page: 'preferences-core' });
   }
 
   if (fallbackToLocalStorage !== false) {
@@ -1402,7 +1402,7 @@ window.getCurrentPreference = async function(preferenceName, options = {}) {
       window.Logger?.warn?.('⚠️ getCurrentPreference localStorage fallback failed', {
         preferenceName,
         error: storageError?.message,
-      }, { page: 'preferences-core-new' });
+      }, { page: 'preferences-core' });
     }
   }
 

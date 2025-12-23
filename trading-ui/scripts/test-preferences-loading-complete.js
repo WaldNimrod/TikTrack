@@ -95,7 +95,7 @@
 
       const order = {
         'preferences-v4.js': scripts.findIndex(s => s.includes('preferences-v4.js')),
-        'preferences-core-new.js': scripts.findIndex(s => s.includes('preferences-core-new.js')),
+        'preferences-core.js': scripts.findIndex(s => s.includes('preferences-core.js')),
         'preferences-ui-v4.js': scripts.findIndex(s => s.includes('preferences-ui-v4.js')),
         'preferences-group-manager.js': scripts.findIndex(s => s.includes('preferences-group-manager.js')),
         'preferences-lazy-loader.js': scripts.findIndex(s => s.includes('preferences-lazy-loader.js'))
@@ -103,10 +103,10 @@
 
       const issues = [];
 
-      // Check preferences-v4.js before preferences-core-new.js
-      if (order['preferences-v4.js'] !== -1 && order['preferences-core-new.js'] !== -1) {
-        if (order['preferences-v4.js'] > order['preferences-core-new.js']) {
-          issues.push('preferences-v4.js should be loaded before preferences-core-new.js');
+      // Check preferences-v4.js before preferences-core.js
+      if (order['preferences-v4.js'] !== -1 && order['preferences-core.js'] !== -1) {
+        if (order['preferences-v4.js'] > order['preferences-core.js']) {
+          issues.push('preferences-v4.js should be loaded before preferences-core.js');
         }
       }
 

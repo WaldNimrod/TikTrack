@@ -56,7 +56,7 @@
 #### `comparative-analysis-page`
 
 - ✅ תיקון שגיאות preferences (2 שגיאות)
-- שיפור: `preferences-core-new.js` - שימוש ב-warn במקום error עבור ValidationError
+- שיפור: `preferences-core.js` - שימוש ב-warn במקום error עבור ValidationError
 - שיפור: בדיקת תוצאה של `savePreference` לפני fallback
 
 #### `economic-calendar-page`
@@ -103,7 +103,7 @@
 - ✅ שיפור התעלמות מאזהרות לא קריטיות
 - ✅ שיפור בדיקת מבנה HTML
 
-#### `preferences-core-new.js`
+#### `preferences-core.js`
 
 - ✅ שימוש ב-warn במקום error עבור ValidationError
 
@@ -119,7 +119,7 @@
 
 1. `trading-ui/scripts/comparative-analysis-page.js` - תיקון inline styles ו-preferences
 2. `trading-ui/scripts/watch-lists-page.js` - תיקון inline styles ו-error handling
-3. `trading-ui/scripts/preferences-core-new.js` - שימוש ב-warn במקום error
+3. `trading-ui/scripts/preferences-core.js` - שימוש ב-warn במקום error
 4. `trading-ui/scripts/mockups-icon-initializer.js` - תיקון זיהוי Tabler icons
 
 ### CSS

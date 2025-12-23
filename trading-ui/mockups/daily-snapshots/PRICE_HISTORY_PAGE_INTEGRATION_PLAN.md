@@ -95,7 +95,7 @@
 
 #### 7. **PreferencesCore** - מערכת העדפות
 
-- **קובץ:** `trading-ui/scripts/preferences-core-new.js`
+- **קובץ:** `trading-ui/scripts/preferences-core.js`
 - **דוקומנטציה:** `documentation/features/preferences/`
 - **שימוש נוכחי:** ✅ יש שימוש חלקי (`loadChartPreferences`, `saveChartPreferences` - שורות 2089-2153)
 - **צריך:** וידוא שכל ההעדפות נשמרות דרך המערכת הכללית

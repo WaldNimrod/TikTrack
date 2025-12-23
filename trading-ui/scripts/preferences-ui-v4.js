@@ -1,3 +1,23 @@
+/**
+ * Preferences UI System V4 - TikTrack
+ * ====================================
+ *
+ * User interface system for preferences page (Group-First architecture)
+ * 
+ * @version 4.0.0
+ * @date January 2025
+ * @author TikTrack Development Team
+ * 
+ * @description
+ * V4 UI system with:
+ * - Group-first loading
+ * - Improved form population
+ * - Better error handling
+ * 
+ * @note This is the newer UI system. preferences-ui.js is the legacy system.
+ * Both are loaded for backward compatibility.
+ */
+
 (() => {
   if (window.PreferencesUIV4) return;
 

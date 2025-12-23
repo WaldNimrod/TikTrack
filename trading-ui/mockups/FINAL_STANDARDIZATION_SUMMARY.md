@@ -35,7 +35,7 @@
 #### `comparative-analysis-page`
 
 - ✅ תיקון 2 שגיאות preferences
-  - שיפור `preferences-core-new.js`: warn במקום error עבור ValidationError
+  - שיפור `preferences-core.js`: warn במקום error עבור ValidationError
   - שיפור `comparative-analysis-page.js`: בדיקת תוצאה של `savePreference`
 
 #### `economic-calendar-page`

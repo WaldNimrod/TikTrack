@@ -170,7 +170,7 @@
         s.includes('preferences-v4.js') || s.includes('services/preferences-v4.js')
       );
       const preferencesCoreIndex = scripts.findIndex(s => 
-        s.includes('preferences-core-new.js') || s.includes('preferences-core.js')
+        s.includes('preferences-core.js') || s.includes('preferences-core.js')
       );
       const preferencesUIV4Index = scripts.findIndex(s => 
         s.includes('preferences-ui-v4.js')
@@ -181,10 +181,10 @@
 
       const issues = [];
       
-      // Check preferences-v4.js before preferences-core-new.js
+      // Check preferences-v4.js before preferences-core.js
       if (preferencesV4Index !== -1 && preferencesCoreIndex !== -1) {
         if (preferencesV4Index > preferencesCoreIndex) {
-          issues.push('preferences-v4.js should be loaded before preferences-core-new.js');
+          issues.push('preferences-v4.js should be loaded before preferences-core.js');
         }
       }
 

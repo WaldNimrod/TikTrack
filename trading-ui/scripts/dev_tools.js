@@ -48,37 +48,75 @@
     // ===== INITIALIZATION =====
 
     /**
-     * Wait for UnifiedTableSystem and register tables
-     * Uses polling like designs.js and trading_accounts.js
-     * Waits for both DOM ready and UnifiedTableSystem loaded
+     * Check if global exists using package manifest globalCheck pattern
+     * Uses the same logic as runtime-validator.js
+     */
+    function checkGlobal(globalPath) {
+        try {
+            const parts = globalPath.replace('window.', '').split('.');
+            let obj = window;
+            for (const part of parts) {
+                if (obj[part] === undefined) return false;
+                obj = obj[part];
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Wait for UnifiedTableSystem using package manifest globalCheck
+     * Uses exact globalCheck from package-manifest.js: 'window.UnifiedTableSystem'
+     * This ensures we wait for the exact global defined in the manifest
      */
     function waitAndRegisterTables() {
-        // Wait for both DOM ready and UnifiedTableSystem (loaded in crud package)
+        // Get globalCheck from package manifest (crud package -> unified-table-system.js)
+        const crudPackage = window.PACKAGE_MANIFEST?.['crud'];
+        const unifiedTableScript = crudPackage?.scripts?.find(s => s.file === 'unified-table-system.js');
+        const globalCheck = unifiedTableScript?.globalCheck || 'window.UnifiedTableSystem';
+        
+        // Wait for UnifiedTableSystem using manifest-defined globalCheck
         const waitForUnifiedTableSystem = setInterval(() => {
-            if (window.UnifiedTableSystem?.registry) {
+            // Check using manifest globalCheck (more accurate than direct check)
+            if (checkGlobal(globalCheck) && window.UnifiedTableSystem?.registry) {
                 clearInterval(waitForUnifiedTableSystem);
                 
                 // Register tables - setupSortableHeaders will be called by core-systems.js automatically
                 registerStaticTablesForSorting();
                 
-                log('✅ Tables registered with UnifiedTableSystem');
+                log(`✅ Tables registered with UnifiedTableSystem (checked via manifest: ${globalCheck})`);
             }
         }, 100);
         
-        // Timeout after 10 seconds (increased from 5 to allow more time for package loading)
+        // Timeout based on package loadOrder: crud package loadOrder is 4, init-system is 22
+        // So UnifiedTableSystem should be available well before core-systems.js calls setupSortableHeaders
+        // But allow extra time for async loading
+        const timeoutMs = 10000; // 10 seconds - should be more than enough for loadOrder 4 package
         setTimeout(() => {
             clearInterval(waitForUnifiedTableSystem);
-            if (!window.UnifiedTableSystem?.registry) {
-                log('⚠️ UnifiedTableSystem not available after waiting 10 seconds - tables will be registered when available');
+            if (!checkGlobal(globalCheck) || !window.UnifiedTableSystem?.registry) {
+                log(`⚠️ UnifiedTableSystem (${globalCheck}) not available after ${timeoutMs}ms - checking package load order`);
+                
+                // Check if crud package is supposed to be loaded
+                const pageConfig = window.PAGE_CONFIGS?.['dev_tools'] || window.pageInitializationConfigs?.['dev_tools'];
+                const hasCrudPackage = pageConfig?.packages?.includes('crud');
+                
+                if (hasCrudPackage) {
+                    log('⚠️ crud package is in page config but UnifiedTableSystem not loaded - may be a load order issue');
+                } else {
+                    log('⚠️ crud package not in page config - this is the issue!');
+                }
+                
                 // Try again after a longer delay - maybe packages are still loading
                 setTimeout(() => {
-                    if (window.UnifiedTableSystem?.registry) {
+                    if (checkGlobal(globalCheck) && window.UnifiedTableSystem?.registry) {
                         registerStaticTablesForSorting();
-                        log('✅ Tables registered with UnifiedTableSystem (delayed)');
+                        log(`✅ Tables registered with UnifiedTableSystem (delayed, checked via manifest: ${globalCheck})`);
                     }
                 }, 2000);
             }
-        }, 10000);
+        }, timeoutMs);
     }
 
     /**

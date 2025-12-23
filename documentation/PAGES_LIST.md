@@ -270,7 +270,6 @@
 | button-color-mapping.html | מיפוי צבעי כפתורים | 🔵 ציבורי |
 | conditions-test.html | בדיקת תנאים (כפול?) | 🔵 ציבורי |
 | preferences-groups-management.html | ניהול קבוצות העדפות | 🔵 ציבורי |
-| tradingview-widgets-showcase.html | הצגת ווידג'טים | 🔵 ציבורי |
 
 **הערה:** העמודים האלה הוסרו מהם authentication בתיקונים האחרונים.
 

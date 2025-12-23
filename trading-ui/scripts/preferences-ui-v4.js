@@ -247,6 +247,8 @@
       if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
         window.Logger?.warn?.('⚠️ window.currentPreferences is empty, waiting for preferences to load...', {
           page: 'preferences-ui-v4',
+          hasColorManager: Boolean(window.ColorManager),
+          hasDefaultColors: Boolean(window.ColorManager?.defaultColors),
         });
         // Wait a bit more and try to load preferences directly
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -267,6 +269,59 @@
             window.Logger?.warn?.('⚠️ Failed to load preferences directly', {
               page: 'preferences-ui-v4',
               error: error?.message,
+            });
+          }
+        }
+        
+        // CRITICAL: If still empty, load default colors from ColorManager
+        // This ensures color pickers are populated even if no preferences exist
+        if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
+          if (window.ColorManager && window.ColorManager.defaultColors) {
+            try {
+              window.Logger?.debug?.('🎨 Loading default colors from ColorManager...', {
+                page: 'preferences-ui-v4',
+                defaultColorsCount: Object.keys(window.ColorManager.defaultColors).length,
+              });
+              const defaultColors = window.ColorManager.defaultColors;
+              if (!window.currentPreferences) {
+                window.currentPreferences = {};
+              }
+              // Merge default colors into currentPreferences
+              Object.assign(window.currentPreferences, defaultColors);
+              window.Logger?.debug?.('✅ Loaded default colors to window.currentPreferences', {
+                page: 'preferences-ui-v4',
+                colorCount: Object.keys(defaultColors).length,
+              });
+            } catch (error) {
+              window.Logger?.warn?.('⚠️ Failed to load default colors', {
+                page: 'preferences-ui-v4',
+                error: error?.message,
+                errorStack: error?.stack,
+              });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ ColorManager or defaultColors not available', {
+              page: 'preferences-ui-v4',
+              hasColorManager: Boolean(window.ColorManager),
+              hasDefaultColors: Boolean(window.ColorManager?.defaultColors),
+            });
+          }
+        }
+      } else {
+        // Even if preferences exist, ensure color defaults are available for missing colors
+        if (window.ColorManager && window.ColorManager.defaultColors) {
+          const defaultColors = window.ColorManager.defaultColors;
+          let colorsAdded = 0;
+          for (const [colorName, defaultValue] of Object.entries(defaultColors)) {
+            if (!window.currentPreferences[colorName]) {
+              window.currentPreferences[colorName] = defaultValue;
+              colorsAdded++;
+            }
+          }
+          if (colorsAdded > 0) {
+            window.Logger?.debug?.('✅ Added missing color defaults to window.currentPreferences', {
+              page: 'preferences-ui-v4',
+              colorsAdded,
             });
           }
         }
@@ -419,7 +474,27 @@
       
       if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
         window.Logger?.warn?.('⚠️ No preferences available to populate forms', { page: 'preferences-ui-v4' });
-        return;
+        // Try to load default colors as last resort
+        if (window.ColorManager && window.ColorManager.defaultColors) {
+          try {
+            if (!window.currentPreferences) {
+              window.currentPreferences = {};
+            }
+            Object.assign(window.currentPreferences, window.ColorManager.defaultColors);
+            window.Logger?.debug?.('✅ Loaded default colors in _populateAllFormFields', {
+              page: 'preferences-ui-v4',
+              colorCount: Object.keys(window.ColorManager.defaultColors).length,
+            });
+          } catch (error) {
+            window.Logger?.warn?.('⚠️ Failed to load default colors in _populateAllFormFields', {
+              page: 'preferences-ui-v4',
+              error: error?.message,
+            });
+            return;
+          }
+        } else {
+          return;
+        }
       }
 
       const form = document.getElementById('preferencesForm');
@@ -488,6 +563,9 @@
           } else if (input.type === 'color') {
             // Handle color inputs - convert to #rrggbb format
             let colorValue = String(value).trim();
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:591',message:'_populateAllFormFields - Processing color input',data:{inputId:input.id,inputName:input.name,key:key,value:value,colorValue:colorValue,valueType:typeof value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+            // #endregion
             if (colorValue.startsWith('#')) {
               // If 8-digit hex (with alpha), strip alpha (e.g., #00000020 -> #000000)
               if (colorValue.length === 9 && /^#[0-9A-Fa-f]{8}$/i.test(colorValue)) {
@@ -501,6 +579,9 @@
                 } else {
                   input.value = colorValue;
                 }
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:605',message:'_populateAllFormFields - Set color value successfully',data:{inputId:input.id,colorValue:colorValue,actualValue:input.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                // #endregion
                 populatedCount++;
               } else {
                 // Invalid format - use default black
@@ -516,6 +597,9 @@
                   originalValue: value,
                   processedValue: colorValue
                 });
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:620',message:'_populateAllFormFields - Invalid color format',data:{inputId:input.id,key:key,originalValue:value,processedValue:colorValue},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                // #endregion
                 populatedCount++;
               }
             } else {
@@ -526,6 +610,9 @@
               } else {
                 input.value = colorValue || '#000000';
               }
+              // #region agent log
+              fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:630',message:'_populateAllFormFields - Color value not hex format',data:{inputId:input.id,key:key,originalValue:value,colorValue:colorValue,setValue:colorValue||'#000000'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+              // #endregion
               populatedCount++;
             }
           } else if (input.type === 'number') {

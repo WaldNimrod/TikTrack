@@ -1,6 +1,6 @@
 # רשימת עמודים - TikTrack
 
-**תאריך עדכון:** דצמבר 2025 - תיקון תיעוד וכפילויות במניפסט
+**תאריך עדכון:** דצמבר 2025 - תיקון קטגוריזציה עמודים וסטטוס data_import.html
 **גרסה:** 4.1.6
 **סטטוס:** ✅ מעודכן - תיקון תיעוד וכפילויות במניפסט  
 
@@ -144,19 +144,17 @@
 | **ai_analysis.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **watch_lists.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **user_profile.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **external-data-dashboard.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **trading_journal.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **trade_history.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **portfolio_state.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **research.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
 | **preferences.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
-| **data_import.html** | ❌ | ❌ | ✅ | ✅ | ⚠️ קובץ לא מלא |
+| **data_import.html** | ✅ | ✅ | ✅ | ✅ | ✅ מוכן |
 
 **סיכום:**
-- **עמודים תקינים:** 19/20 (95%)
-- **עמודים עם בעיות:** 1/20 (5% - data_import.html לא מלא)
 
-**הערה:** `data_import.html` הוא קובץ לא מלא (35 שורות בלבד) ולא פעיל כרגע. בעת השלמת הקובץ, יש לוודא שכלול authentication.
+- **עמודים תקינים:** 17/17 (100%)
+- **עמודים עם בעיות:** 0/17 (0%)
 
 ראה [Authentication Implementation Guide](03-DEVELOPMENT/GUIDES/AUTHENTICATION_IMPLEMENTATION_GUIDE.md) לפרטים מלאים על יישום authentication.
 
@@ -264,6 +262,8 @@
 | **daily-snapshots-emotional-tracking-widget.html** | ווידג'ט מעקב רגשי - מוקאפ | `http://localhost:8080/daily-snapshots-emotional-tracking-widget.html` |
 | **daily-snapshots-heatmap-visual-example.html** | דוגמת מפת חום - מוקאפ | `http://localhost:8080/daily-snapshots-heatmap-visual-example.html` |
 | **daily-snapshots-history-widget.html** | ווידג'ט היסטוריה - מוקאפ | `http://localhost:8080/daily-snapshots-history-widget.html` |
+| **strategy-analysis.html** | ניתוח אסטרטגיות - מוקאפ | `http://localhost:8080/strategy-analysis.html` |
+| **trades_formatted.html** | טריידים מעוצבים - מוקאפ | `http://localhost:8080/trades_formatted.html` |
 | **portfolio_state.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/portfolio_state` | ✅ **משולב** | `/api/portfolio-state/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
 | **trade_history.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/trade_history` | ✅ **משולב** | `/api/trade-history/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
 | **trading_journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading_journal` | ✅ **משולב** | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025 |
@@ -275,8 +275,6 @@
 | עמוד | תיאור | גישה |
 |------|--------|------|
 | **tradingview-widgets-showcase.html** | תצוגת ווידג'טים TradingView | `http://localhost:8080/tradingview-widgets-showcase.html` |
-| **strategy-analysis.html** | ניתוח אסטרטגיות (מוקאפ) | `http://localhost:8080/strategy-analysis.html` |
-| **trades_formatted.html** | טריידים מעוצבים (מוקאפ) | `http://localhost:8080/trades_formatted.html` |
 
 ---
 
@@ -298,14 +296,14 @@
 
 ## 📊 סטטיסטיקות
 
-- **סה"כ עמודים ראשיים:** 25 עמודים
+- **סה"כ עמודים ראשיים:** 22 עמודים
 - **עמודים מרכזיים:** 17 עמודים
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 3 עמודים
 - **עמודי אימות:** 4 עמודים
 - **עמודי כלי פיתוח:** 14 עמודים
 - **עמודי בדיקה:** 15 עמודים
-- **עמודי מוקאפים:** 13 עמודים
+- **עמודי מוקאפים:** 15 עמודים
 - **סה"כ עמודים:** 78 עמודים (כולל כלי פיתוח ובדיקות)
 
 ---

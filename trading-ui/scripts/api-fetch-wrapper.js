@@ -83,7 +83,7 @@
     if (window._checkingAuth) {
       window.Logger?.info?.('⏳ [API Fetch Wrapper] Skipping redirect - authentication check in progress', { url });
       // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api-fetch-wrapper.js:handle401Error',message:'Skipped redirect due to _checkingAuth flag',data:{url:url,checkingAuth:window._checkingAuth},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-auth-redirect',hypothesisId:'AUTH_REDIRECT_FIX'})}).catch(()=>{});
+      // Note: Debug logs removed to prevent CORS errors - use browser console for debugging
       // #endregion
       return;
     }

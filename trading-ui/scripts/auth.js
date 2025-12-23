@@ -85,34 +85,13 @@ function isPublicPage() {
  * Prevents CORS errors on login.html and other public pages
  */
 function sendDebugLog(location, message, data, hypothesisId) {
-  if (isPublicPage()) {
-    return; // Don't send logs on public pages to avoid CORS errors
-  }
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location,
-      message,
-      data,
-      timestamp:Date.now(),
-      sessionId:'debug-session',
-      runId:'run2',
-      hypothesisId
-    })
-  }).catch(()=>{});
+  // Debug logging disabled - only log critical errors via console if needed
+  // Removed to prevent CORS errors and reduce log noise
+  return;
 }
 
 // Bootstrap auth from sessionStorage (dev mode) as early as possible
 (function bootstrapAuthFromSessionStorage() {
-  // #region agent log
-  sendDebugLog('auth.js:73', 'bootstrapAuthFromSessionStorage ENTRY', {
-    hasSessionStorage: typeof sessionStorage !== 'undefined',
-    storedToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_authToken') : null,
-    storedUser: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_currentUser') : null,
-    pathname: window.location?.pathname
-  }, 'C');
-  // #endregion
   try {
     if (typeof sessionStorage === 'undefined') return;
     const storedToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
@@ -121,13 +100,6 @@ function sendDebugLog(location, message, data, hypothesisId) {
     const storedUser = JSON.parse(storedUserRaw);
     authToken = storedToken;
     currentUser = storedUser;
-    // #region agent log
-    sendDebugLog('auth.js:81', 'bootstrapAuthFromSessionStorage SUCCESS', {
-      hasToken: !!authToken,
-      hasUser: !!currentUser,
-      userId: currentUser?.id
-    }, 'C');
-    // #endregion
     // Best effort: sync to UnifiedCacheManager after initialization
     // This ensures bootstrap data is synced to SessionStorageLayer for unified management
     if (window.UnifiedCacheManager) {
@@ -191,9 +163,6 @@ function broadcastAuthEvent(eventPayload) {
 }
 
 async function saveAuthToCache(user, token = 'session_based') {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:123',message:'saveAuthToCache ENTRY',data:{hasUser:!!user,userId:user?.id,hasToken:!!token,tokenType:typeof token,hasUnifiedCache:!!window.UnifiedCacheManager,ucInitialized:window.UnifiedCacheManager?.initialized,hasSessionStorage:typeof sessionStorage!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
     userId: user?.id,
     username: user?.username,
@@ -589,14 +558,7 @@ async function login(username, password) {
       status: response.status,
       error: data.error?.message 
     });
-    // Add confirm dialog to allow user to copy console logs before showing error
-    const errorMsg = data.error?.message || 'שגיאה בהתחברות';
-    const shouldShowError = confirm('❌ שגיאה בהתחברות:\n\n' + errorMsg + '\n\nClick OK to continue, or Cancel to stay on page (allows copying console logs).');
-    if (!shouldShowError) {
-      // User cancelled - stay on page to copy logs
-      return;
-    }
-    throw new Error(errorMsg);
+    throw new Error(data.error?.message || 'שגיאה בהתחברות');
   }
 
   // BREAKPOINT: After successful login response
@@ -612,31 +574,11 @@ async function login(username, password) {
   if (data.data?.user) {
     currentUser = data.data.user;
     authToken = data.data?.access_token;
-    // #region agent log
-    sendDebugLog('auth.js:609', 'BEFORE saveAuthToCache in login()', {
-      hasUser: !!data.data?.user,
-      userId: data.data?.user?.id,
-      hasToken: !!data.data?.access_token,
-      hasUnifiedCache: !!window.UnifiedCacheManager,
-      ucInitialized: window.UnifiedCacheManager?.initialized
-    }, 'B');
-    // #endregion
     await saveAuthToCache(currentUser, authToken);
-    // #region agent log
-    sendDebugLog('auth.js:613', 'AFTER saveAuthToCache in login()', {
-      sessionToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_authToken') : null,
-      sessionUser: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_currentUser') : null
-    }, 'B');
-    // #endregion
     
     // Save timestamp to prevent redirect loop (auth-guard checks this)
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
-      // #region agent log
-      sendDebugLog('auth.js:618', 'recent_login_timestamp saved in login()', {
-        timestamp: sessionStorage.getItem('recent_login_timestamp')
-      }, 'D');
-      // #endregion
     }
   }
 
@@ -1352,9 +1294,6 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1282',message:'checkAuthentication ENTRY',data:{hasOnAuthenticated:!!onAuthenticated,hasOnNotAuthenticated:!!onNotAuthenticated,hasUnifiedCache:!!window.UnifiedCacheManager,ucInitialized:window.UnifiedCacheManager?.initialized,hasSessionStorage:typeof sessionStorage!=='undefined',pathname:window.location?.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
 
     console.log('[auth.js] checkAuthentication: Starting authentication check');
     console.log('[auth.js] checkAuthentication: Looking for stored tokens...');
@@ -1363,9 +1302,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
 
   // Prevent multiple simultaneous calls - wait for existing call instead of skipping
   if (window._checkingAuth) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1293',message:'checkAuthentication already checking - waiting for result',data:{hasPendingResult:!!window._checkingAuthPromise},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     console.log('[auth.js] checkAuthentication: Already checking, waiting for result...');
     // Wait for the existing call to complete instead of returning undefined
     // Try to get the promise immediately
@@ -1399,9 +1335,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   window._checkingAuthPromise = new Promise((resolve) => {
     resolvePromise = resolve;
   });
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1319',message:'checkAuthentication starting - _checkingAuth set to true',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   
   // Wrap everything in try-catch-finally to ensure promise is resolved
   let finalResult;
@@ -1422,18 +1355,9 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
       }
 
       if (window.UnifiedCacheManager.initialized) {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1316',message:'BEFORE UnifiedCacheManager.get authToken',data:{initialized:window.UnifiedCacheManager.initialized,options:authCacheOptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch((e) => {
-          // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1316',message:'UnifiedCacheManager.get authToken ERROR',data:{error:e?.message,stack:e?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
           return null;
         });
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1322',message:'AFTER UnifiedCacheManager.get authToken',data:{hasToken:!!t,tokenType:typeof t,tokenLength:t?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         if (t) {
           tokenAvailable = true;
           effectiveToken = t;
@@ -1471,9 +1395,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     console.log('[auth.js] checkAuthentication: sessionStorage token =', (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) ? 'present' : 'null') : 'no sessionStorage');
 
     if (!tokenAvailable) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1354',message:'No token available - returning no_token',data:{hasOnNotAuthenticated:!!onNotAuthenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       console.log('[auth.js] checkAuthentication: No token found');
       window.Logger?.info?.('❌ [auth.js] No token available, skipping /api/auth/me', { page: 'auth' });
       if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
@@ -1486,17 +1407,11 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     }
 
     console.log('[auth.js] checkAuthentication: Checking server authentication...');
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1363',message:'BEFORE fetch /api/auth/me',data:{tokenAvailable,hasEffectiveToken:!!effectiveToken,tokenLength:effectiveToken?.length,hasAuthHeader:!!effectiveToken,tokenPrefix:effectiveToken?.substring(0,20)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     const response = await fetch('/api/auth/me', {
       method: 'GET',
       headers: effectiveToken ? { 'Authorization': `Bearer ${effectiveToken}` } : undefined
       // Authorization also injected by api-fetch-wrapper if present
     });
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1372',message:'AFTER fetch /api/auth/me',data:{status:response.status,ok:response.ok,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
 
     if (response.ok) {
@@ -1544,9 +1459,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
           });
         }
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1467',message:'AUTHENTICATION SUCCESS - returning authenticated=true',data:{userId:currentUser?.id,username:currentUser?.username,hasOnAuthenticated:!!onAuthenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         finalResult = { authenticated: true, user: currentUser, error: null };
         if (onAuthenticated && typeof onAuthenticated === 'function') {
           onAuthenticated();
@@ -1557,16 +1469,10 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         return finalResult;
       }
     } else if (response.status === 401) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1433',message:'401 response from /api/auth/me - server says unauthenticated',data:{status:response.status,hasEffectiveToken:!!effectiveToken},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       // 401 is expected when not authenticated - silently handle it
       // Don't log as error to avoid console pollution
     }
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1437',message:'checkAuthentication catch block - error occurred',data:{errorMessage:error?.message,errorStack:error?.stack,is401Error:error?.message?.includes('401')},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     // Only log non-401 errors to avoid console pollution
     // 401 errors are expected and handled silently
     if (error.message && !error.message.includes('401')) {
@@ -1580,35 +1486,20 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     }
     window._checkingAuth = false;
     window._checkingAuthPromise = null;
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1501',message:'checkAuthentication finally - _checkingAuth set to false',data:{hasFinalResult:!!finalResult,finalResultAuthenticated:finalResult?.authenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
   }
   
   // Server check failed - check cache first - ONLY UnifiedCacheManager, no fallbacks
   let cachedUser = null;
   if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1447',message:'BEFORE checking cachedUser (server failed)',data:{initialized:window.UnifiedCacheManager.initialized,options:authCacheOptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     cachedUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1450',message:'AFTER checking cachedUser (server failed)',data:{hasCachedUser:!!cachedUser,cachedUserId:cachedUser?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
   }
   
   // If server said unauthenticated, always clear auth cache and force login
   if (cachedUser) {
     console.debug('[auth.js] checkAuthentication: Server check failed, clearing cached auth and showing login');
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1455',message:'Server failed but cachedUser exists - clearing cache',data:{cachedUserId:cachedUser?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
   }
   currentUser = null;
   authToken = null;
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1460',message:'BEFORE removeAuthFromCache (server failed)',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   await removeAuthFromCache();
   
   // No cached user - safe to clear - ONLY UnifiedCacheManager, no fallbacks
@@ -1617,9 +1508,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   await removeAuthFromCache();
   
   // Not authenticated
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1527',message:'AUTHENTICATION FAILED - returning authenticated=false',data:{hasCachedUser:!!cachedUser,hasOnNotAuthenticated:!!onNotAuthenticated,hasShowLoginModal:typeof window.TikTrackAuth?.showLoginModal==='function'},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
 
   finalResult = { authenticated: false, user: null, error: 'authentication_failed' };
   

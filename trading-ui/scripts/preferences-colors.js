@@ -203,9 +203,15 @@ class ColorManager {
         // CRITICAL: Use default if value is null, undefined, or empty
         // This ensures defaults are used when preference doesn't exist for profile
         const fetchedValue = fetched?.[name];
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-colors.js:206',message:'Color value check',data:{colorName:name,fetchedValue:fetchedValue,hasFetchedValue:name in (fetched||{}),defaultValue:this.defaultColors[name],willUseDefault:(fetchedValue === null || fetchedValue === undefined || fetchedValue === '')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         const value = (fetchedValue !== null && fetchedValue !== undefined && fetchedValue !== '') 
           ? fetchedValue 
           : this.defaultColors[name];
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-colors.js:210',message:'Color value resolved',data:{colorName:name,resolvedValue:value,isDefault:value===this.defaultColors[name]},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         allColors[name] = value;
         this.colorCache.set(name, value);
       });
@@ -259,7 +265,12 @@ class ColorManager {
 
     const groupData = {};
     groupColors.forEach(colorName => {
-      groupData[colorName] = fetched?.[colorName] ?? this.defaultColors[colorName];
+      // CRITICAL: Use default if value is null, undefined, or empty
+      // This ensures defaults are used when preference doesn't exist for profile
+      const fetchedValue = fetched?.[colorName];
+      groupData[colorName] = (fetchedValue !== null && fetchedValue !== undefined && fetchedValue !== '') 
+        ? fetchedValue 
+        : this.defaultColors[colorName];
     });
 
     return groupData;

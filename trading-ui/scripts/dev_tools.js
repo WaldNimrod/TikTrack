@@ -68,10 +68,24 @@
             // Register static tables and setup sorting using central system
             setTimeout(() => {
                 registerStaticTablesForSorting();
-                if (typeof window.setupSortableHeaders === 'function') {
-                    window.setupSortableHeaders('dev_tools');
+                
+                // Use UnifiedTableSystem directly instead of setupSortableHeaders to avoid window.sortTable dependency
+                if (window.UnifiedTableSystem?.events?.setupSortHandlers) {
+                    const tableTypes = [
+                        'dev-tools-primary-pages',
+                        'dev-tools-technical-pages',
+                        'dev-tools-dev-pages',
+                        'dev-tools-auth-pages',
+                        'dev-tools-test-pages',
+                        'dev-tools-mockup-pages'
+                    ];
+                    tableTypes.forEach(tableType => {
+                        if (window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+                            window.UnifiedTableSystem.events.setupSortHandlers(tableType);
+                        }
+                    });
                 }
-            }, 200);
+            }, 300);
 
             // Load initial data
             loadPageData();

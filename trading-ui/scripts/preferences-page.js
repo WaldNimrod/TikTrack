@@ -451,6 +451,33 @@ async function createNewProfile() {
       throw new Error('Failed to create profile');
     }
 
+    // CRITICAL: Switch to the newly created profile immediately
+    window.Logger.info(`🔄 Switching to newly created profile: ${profileName} (ID: ${profileId})`, { page: 'preferences-page' });
+    const switchSuccess = await window.switchProfile(profileId, 1);
+    
+    if (!switchSuccess) {
+      window.Logger.warn('⚠️ Failed to switch to newly created profile, but profile was created', { 
+        page: 'preferences-page',
+        profileId,
+        profileName 
+      });
+    }
+
+    // CRITICAL: Reload profiles dropdown to show the new profile
+    if (typeof window.loadProfilesToDropdown === 'function') {
+      const currentUserId = window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1;
+      await window.loadProfilesToDropdown(currentUserId);
+      window.Logger.info('✅ Profiles dropdown reloaded', { page: 'preferences-page' });
+    } else {
+      window.Logger.warn('⚠️ loadProfilesToDropdown function not available', { page: 'preferences-page' });
+    }
+
+    // CRITICAL: Enable interface since we switched to a user profile (not default)
+    if (typeof window.enableAllPreferencesInterface === 'function') {
+      window.enableAllPreferencesInterface();
+      window.Logger.info('✅ Preferences interface enabled for new profile', { page: 'preferences-page' });
+    }
+
     // Clear input
     // Use DataCollectionService to clear field if available
     if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
@@ -459,10 +486,24 @@ async function createNewProfile() {
       nameInput.value = '';
     }
 
-    // Reload page after 1.5 seconds
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 1500);
+    // Show success notification
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification(`פרופיל "${profileName}" נוצר והופעל בהצלחה`);
+    }
+
+    // Reload preferences data to reflect the new active profile
+    if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+      window.Logger.info('🔄 Reinitializing PreferencesUIV4 with new profile...', { page: 'preferences-page' });
+      await window.PreferencesUIV4.initialize();
+    } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+      window.Logger.info('🔄 Reinitializing PreferencesUI with new profile...', { page: 'preferences-page' });
+      await window.PreferencesUI.initialize();
+    }
+
+    // Update summary info
+    if (typeof window.updatePreferencesSummary === 'function') {
+      await window.updatePreferencesSummary();
+    }
 
   } catch (error) {
     window.Logger.error('❌ Error creating profile:', error, { page: 'preferences-page' });
@@ -1031,5 +1072,94 @@ window.createNewProfile = createNewProfile;
 window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.initializePreferencesPage = initializePreferencesPage;
 window.copyDetailedLogLocal = copyDetailedLogLocal;
+
+/**
+ * Update preferences summary information
+ * Updates the info-summary section with current preferences data
+ */
+async function updatePreferencesSummary() {
+  try {
+    const userId = window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1;
+    const profileId = window.PreferencesCore?.currentProfileId || window.PreferencesUI?.currentProfileId || 0;
+    
+    // Update active profile name
+    const activeProfileNameEl = document.getElementById('activeProfileName');
+    if (activeProfileNameEl) {
+      if (window.PreferencesCore && typeof window.PreferencesCore.getActiveProfile === 'function') {
+        const profile = await window.PreferencesCore.getActiveProfile(userId);
+        activeProfileNameEl.textContent = profile?.name || 'ברירת מחדל';
+      } else {
+        activeProfileNameEl.textContent = 'טוען...';
+      }
+    }
+    
+    // Update active user name
+    const activeUserNameEl = document.getElementById('activeUserName');
+    const activeUserIdEl = document.getElementById('activeUserId');
+    if (activeUserNameEl) {
+      if (window.TikTrackAuth && window.TikTrackAuth.getCurrentUser) {
+        const user = window.TikTrackAuth.getCurrentUser();
+        activeUserNameEl.textContent = user?.username || 'משתמש';
+        if (activeUserIdEl) {
+          activeUserIdEl.textContent = user?.id ? `(ID: ${user.id})` : '';
+        }
+      } else {
+        activeUserNameEl.textContent = 'משתמש';
+      }
+    }
+    
+    // Update preferences count
+    const preferencesCountEl = document.getElementById('preferencesCount');
+    if (preferencesCountEl) {
+      if (window.currentPreferences && typeof window.currentPreferences === 'object') {
+        const count = Object.keys(window.currentPreferences).length;
+        preferencesCountEl.textContent = count || 0;
+      } else {
+        preferencesCountEl.textContent = 'טוען...';
+      }
+    }
+    
+    // Update profiles count
+    const profilesCountEl = document.getElementById('profilesCount');
+    if (profilesCountEl) {
+      if (window.PreferencesData && typeof window.PreferencesData.loadProfiles === 'function') {
+        try {
+          const profilesPayload = await window.PreferencesData.loadProfiles({ userId, force: false });
+          const count = profilesPayload?.profiles?.length || 0;
+          profilesCountEl.textContent = count || 0;
+        } catch (e) {
+          profilesCountEl.textContent = 'טוען...';
+        }
+      } else {
+        profilesCountEl.textContent = 'טוען...';
+      }
+    }
+    
+    // Update groups count
+    const groupsCountEl = document.getElementById('groupsCount');
+    if (groupsCountEl) {
+      if (window.PreferencesGroupManager && typeof window.PreferencesGroupManager.getGroups === 'function') {
+        try {
+          const groups = window.PreferencesGroupManager.getGroups();
+          const count = groups?.length || 0;
+          groupsCountEl.textContent = count || 0;
+        } catch (e) {
+          groupsCountEl.textContent = 'טוען...';
+        }
+      } else {
+        groupsCountEl.textContent = 'טוען...';
+      }
+    }
+    
+    window.Logger?.debug?.('✅ Preferences summary updated', { page: 'preferences-page' });
+  } catch (error) {
+    window.Logger?.warn?.('⚠️ Error updating preferences summary', { 
+      page: 'preferences-page',
+      error: error?.message 
+    });
+  }
+}
+
+window.updatePreferencesSummary = updatePreferencesSummary;
 
 window.Logger.debug('✅ preferences-page.js v3.1 loaded successfully', { page: 'preferences-page' });

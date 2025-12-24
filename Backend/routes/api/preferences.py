@@ -860,7 +860,7 @@ def create_profile() -> Any:
         
         # יצירת הפרופיל
         try:
-            profile_id = preferences_service.create_profile(
+            profile_result = preferences_service.create_profile(
                 user_id=user_id,
                 profile_name=profile_name,
                 description=description,
@@ -868,16 +868,18 @@ def create_profile() -> Any:
                 is_default=is_default
             )
             
-            if profile_id:
+            if profile_result and profile_result.get('id'):
+                profile_id = profile_result.get('id')
                 return jsonify({
                     "success": True,
                     "data": {
                         "profile_id": profile_id,
+                        "id": profile_id,  # Also include 'id' for compatibility
                         "user_id": user_id,
                         "profile_name": profile_name,
                         "description": description,
                         "is_default": is_default,
-                        "is_active": False  # פרופיל חדש נוצר לא פעיל
+                        "is_active": profile_result.get('is_active', False)  # Use actual value from service
                     },
                     "timestamp": datetime.now().isoformat()
                 }), 201

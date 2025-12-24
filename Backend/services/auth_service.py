@@ -167,6 +167,22 @@ class AuthService:
                 
                 logger.info(f"Registered new user: {username}")
                 
+                # CRITICAL: Create default profile for new user
+                # Profile name format: username + " פרופיל 1"
+                from models.preferences import PreferenceProfile
+                profile_name = f"{username} פרופיל 1"
+                default_profile = PreferenceProfile(
+                    user_id=user.id,
+                    profile_name=profile_name,
+                    is_active=True,
+                    is_default=False,  # User profile, not system default
+                    description=f"פרופיל ברירת מחדל למשתמש {username}",
+                    created_by=user.id,
+                )
+                session.add(default_profile)
+                session.flush()
+                logger.info(f"Created default profile '{profile_name}' for user {username} (ID: {user.id})")
+                
                 return {
                     'success': True,
                     'user': {

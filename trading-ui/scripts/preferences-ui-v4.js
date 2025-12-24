@@ -142,6 +142,17 @@
           // (it's not wrapped in { preferences: {...} })
           const preferencesMap = allPreferences && typeof allPreferences === 'object' ? allPreferences : {};
           
+          // CRITICAL: All preferences (including colors) should come from getAllPreferences
+          // Colors are already included in PreferenceType table, so no need to load separately
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:147',message:'Loaded preferences from getAllPreferences',data:{preferencesCount:Object.keys(preferencesMap).length,colorKeysCount:Object.keys(preferencesMap).filter(k=>k.includes('Color')).length,colorKeys:Object.keys(preferencesMap).filter(k=>k.includes('Color')).slice(0,10),sampleColors:Object.fromEntries(Object.entries(preferencesMap).filter(([k])=>k.includes('Color')).slice(0,5)),allKeys:Object.keys(preferencesMap).slice(0,20)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.debug?.('✅ Loaded all preferences from server (including colors)', {
+            page: 'preferences-ui-v4',
+            preferencesCount: Object.keys(preferencesMap).length,
+            colorKeysCount: Object.keys(preferencesMap).filter(k => k.includes('Color')).length,
+          });
+          
           // Update global preferences stores with CORRECT userId/profileId
           // CRITICAL: Initialize globals if they don't exist, then merge (don't overwrite)
           if (!window.currentPreferences) {
@@ -224,6 +235,62 @@
       const profileSelect = document.getElementById('profileSelect');
       if (profileSelect && typeof window.loadProfilesToDropdown === 'function') {
         await window.loadProfilesToDropdown(this.currentUserId);
+        
+        // CRITICAL: Check if default profile is active and disable/enable interface accordingly
+        // This must happen AFTER profiles are loaded to get the correct active profile
+        // Use finalUserId and finalProfileId from Step 4 (already defined above)
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:238',message:'Checking if default profile is active',data:{currentProfileId:this.currentProfileId,resolvedProfileId:finalProfileId,hasDisableFunction:Boolean(window.disableAllPreferencesInterface),hasEnableFunction:Boolean(window.enableAllPreferencesInterface)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+        
+        // Get active profile from ProfileManager or PreferencesCore
+        let activeProfile = null;
+        if (window.ProfileManager && typeof window.ProfileManager.getActiveProfile === 'function') {
+          activeProfile = await window.ProfileManager.getActiveProfile(this.currentUserId);
+        } else if (window.PreferencesCore && window.PreferencesCore.latestProfileContext) {
+          const profileContext = window.PreferencesCore.latestProfileContext;
+          if (profileContext.profile) {
+            activeProfile = profileContext.profile;
+          }
+        }
+        
+        // Check if this is the default profile
+        // Default profile is: ID = 0, or is_default = true, or name matches
+        const isDefaultProfile = activeProfile && (
+          activeProfile.id === 0 ||
+          activeProfile.is_default === true ||
+          activeProfile.default === true ||
+          activeProfile.name === 'ברירת מחדל' ||
+          activeProfile.name === 'פרופיל ברירת מחדל'
+        ) || (!activeProfile && (this.currentProfileId === 0 || finalProfileId === 0));
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:256',message:'Default profile check result',data:{isDefaultProfile,activeProfileId:activeProfile?.id,activeProfileName:activeProfile?.name,activeProfileIsDefault:activeProfile?.is_default,currentProfileId:this.currentProfileId,finalProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+        
+        if (isDefaultProfile) {
+          window.Logger?.info?.('🔒 Default profile active - disabling all preferences interface', { 
+            page: 'preferences-ui-v4' 
+          });
+          if (typeof window.disableAllPreferencesInterface === 'function') {
+            window.disableAllPreferencesInterface();
+          } else {
+            window.Logger?.warn?.('⚠️ disableAllPreferencesInterface function not available', { 
+              page: 'preferences-ui-v4' 
+            });
+          }
+        } else {
+          window.Logger?.info?.('✅ User profile active - enabling all preferences interface', { 
+            page: 'preferences-ui-v4' 
+          });
+          if (typeof window.enableAllPreferencesInterface === 'function') {
+            window.enableAllPreferencesInterface();
+          } else {
+            window.Logger?.warn?.('⚠️ enableAllPreferencesInterface function not available', { 
+              page: 'preferences-ui-v4' 
+            });
+          }
+        }
       }
 
       // Load accounts for default account preference (only if element exists - preferences page only)
@@ -263,38 +330,13 @@
       // This is a workaround for race condition where preferences are still loading
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // CRITICAL: Always ensure default colors are loaded, even if preferences exist
-      // This ensures color pickers are populated with defaults for missing colors
-      if (window.ColorManager && window.ColorManager.defaultColors) {
-        try {
-          if (!window.currentPreferences) {
-            window.currentPreferences = {};
-          }
-          const defaultColors = window.ColorManager.defaultColors;
-          let colorsAdded = 0;
-          for (const [colorName, defaultValue] of Object.entries(defaultColors)) {
-        // CRITICAL: Check if value is missing, null, undefined, or empty string
-        // This ensures defaults are loaded even if server returns null/undefined for missing preferences
-        // Server now returns None for preferences not in PreferenceType, so we use ColorManager defaults
-        const currentValue = window.currentPreferences[colorName];
-        if (currentValue === null || currentValue === undefined || currentValue === '' || !currentValue) {
-          window.currentPreferences[colorName] = defaultValue;
-          colorsAdded++;
-        }
-          }
-          if (colorsAdded > 0) {
-            window.Logger?.debug?.('✅ Added default colors to window.currentPreferences', {
-              page: 'preferences-ui-v4',
-              colorsAdded,
-            });
-          }
-        } catch (error) {
-          window.Logger?.warn?.('⚠️ Failed to add default colors', {
-            page: 'preferences-ui-v4',
-            error: error?.message,
-          });
-        }
-      }
+      // CRITICAL: All preferences (including colors) should come from PreferenceType table
+      // Server returns all preferences with their default values from PreferenceType.default_value
+      // No need to add defaults manually - server is the single source of truth
+      window.Logger?.debug?.('✅ Preferences loaded from server (all colors included from PreferenceType)', {
+        page: 'preferences-ui-v4',
+        currentPreferencesCount: window.currentPreferences ? Object.keys(window.currentPreferences).length : 0,
+      });
       
       // Double-check that preferences are loaded before populating
       if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
@@ -325,8 +367,84 @@
         }
       }
       
+      // CRITICAL: Initialize color pickers BEFORE populating form fields
+      // This ensures color pickers are registered and ready to receive values
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:314',message:'Checking ColorPickerManager availability',data:{hasColorPickerManager:Boolean(window.ColorPickerManager),hasInitializePickers:Boolean(window.ColorPickerManager?.initializePickers),hasLoadColors:Boolean(window.ColorPickerManager?.loadColors),currentPreferencesCount:Object.keys(window.currentPreferences||{}).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
+      if (window.ColorPickerManager && typeof window.ColorPickerManager.initializePickers === 'function') {
+        window.Logger?.debug?.('🎨 Initializing color pickers...', { 
+          page: 'preferences-ui-v4' 
+        });
+        try {
+          window.ColorPickerManager.initializePickers();
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:325',message:'Color pickers initialized',data:{pickerCount:window.ColorPickerManager?.pickers?.size||0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.debug?.('✅ Color pickers initialized', { 
+            page: 'preferences-ui-v4' 
+          });
+        } catch (error) {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:333',message:'Failed to initialize color pickers',data:{error:error?.message,errorStack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.warn?.('⚠️ Failed to initialize color pickers', { 
+            page: 'preferences-ui-v4',
+            error: error?.message 
+          });
+        }
+      } else {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:342',message:'ColorPickerManager not available',data:{hasColorPickerManager:Boolean(window.ColorPickerManager),hasInitializePickers:Boolean(window.ColorPickerManager?.initializePickers)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
+        window.Logger?.warn?.('⚠️ ColorPickerManager not available', { 
+          page: 'preferences-ui-v4',
+          hasColorPickerManager: Boolean(window.ColorPickerManager),
+          hasInitializePickers: Boolean(window.ColorPickerManager?.initializePickers)
+        });
+      }
+      
       // CRITICAL: Populate all form fields with loaded preferences
       await this._populateAllFormFields();
+      
+      // CRITICAL: Load colors into color pickers after population
+      // This ensures color pickers display the correct colors from preferences
+      if (window.ColorPickerManager && typeof window.ColorPickerManager.loadColors === 'function' && window.currentPreferences) {
+        window.Logger?.debug?.('🎨 Loading colors into color pickers...', { 
+          page: 'preferences-ui-v4',
+          preferencesCount: Object.keys(window.currentPreferences).length
+        });
+        try {
+          // Extract only color preferences
+          const colorPreferences = {};
+          Object.keys(window.currentPreferences).forEach(key => {
+            if (key.includes('Color') || key.toLowerCase().includes('color')) {
+              colorPreferences[key] = window.currentPreferences[key];
+            }
+          });
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:360',message:'Loading colors into color pickers',data:{colorPreferencesCount:Object.keys(colorPreferences).length,colorPreferencesSample:Object.fromEntries(Object.entries(colorPreferences).slice(0,5)),pickerCount:window.ColorPickerManager?.pickers?.size||0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+          // #endregion
+          if (Object.keys(colorPreferences).length > 0) {
+            window.ColorPickerManager.loadColors(colorPreferences);
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:365',message:'Colors loaded into color pickers',data:{colorCount:Object.keys(colorPreferences).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+            // #endregion
+            window.Logger?.debug?.('✅ Colors loaded into color pickers', { 
+              page: 'preferences-ui-v4',
+              colorCount: Object.keys(colorPreferences).length
+            });
+          }
+        } catch (error) {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:373',message:'Failed to load colors into color pickers',data:{error:error?.message,errorStack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.warn?.('⚠️ Failed to load colors into color pickers', { 
+            page: 'preferences-ui-v4',
+            error: error?.message 
+          });
+        }
+      }
       
       // CRITICAL: Update summary info automatically after page load
       if (typeof window.updatePreferencesSummary === 'function') {
@@ -353,6 +471,59 @@
           }
         }
       });
+
+      // CRITICAL: Initialize buttons AFTER preferences are loaded
+      // This ensures buttons are initialized with correct preferences
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:395',message:'Checking button system availability',data:{hasInitializeButtons:Boolean(window.initializeButtons),hasButtonSystem:Boolean(window.ButtonSystem),hasAdvancedButtonSystem:Boolean(window.advancedButtonSystem),documentReadyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
+      if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+        window.Logger?.debug?.('🔘 Initializing buttons after preferences loaded...', { 
+          page: 'preferences-ui-v4' 
+        });
+        try {
+          await window.initializeButtons();
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:403',message:'Buttons initialized',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.debug?.('✅ Buttons initialized', { 
+            page: 'preferences-ui-v4' 
+          });
+        } catch (error) {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:410',message:'Failed to initialize buttons',data:{error:error?.message,errorStack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+          // #endregion
+          window.Logger?.warn?.('⚠️ Failed to initialize buttons', { 
+            page: 'preferences-ui-v4',
+            error: error?.message 
+          });
+        }
+      } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.Logger?.debug?.('🔘 Initializing buttons via ButtonSystem...', { 
+          page: 'preferences-ui-v4' 
+        });
+        try {
+          await window.ButtonSystem.initializeButtons();
+          window.Logger?.debug?.('✅ Buttons initialized via ButtonSystem', { 
+            page: 'preferences-ui-v4' 
+          });
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Failed to initialize buttons via ButtonSystem', { 
+            page: 'preferences-ui-v4',
+            error: error?.message 
+          });
+        }
+      } else {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-ui-v4.js:428',message:'Button system not available',data:{hasInitializeButtons:Boolean(window.initializeButtons),hasButtonSystem:Boolean(window.ButtonSystem),hasAdvancedButtonSystem:Boolean(window.advancedButtonSystem)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
+        window.Logger?.warn?.('⚠️ Button system not available', { 
+          page: 'preferences-ui-v4',
+          hasInitializeButtons: Boolean(window.initializeButtons),
+          hasButtonSystem: Boolean(window.ButtonSystem),
+          hasAdvancedButtonSystem: Boolean(window.advancedButtonSystem)
+        });
+      }
 
       this.initialized = true;
       window.Logger?.debug?.('✅ PreferencesUIV4 initialized', { page: 'preferences-ui-v4' });
@@ -468,6 +639,16 @@
       window.Logger?.info?.('📋 Populating all form fields with preferences...', { 
         page: 'preferences-ui-v4',
         preferencesCount: Object.keys(window.currentPreferences || {}).length 
+      });
+      
+      // CRITICAL: Ensure colors are loaded before populating form
+      // Colors may not be in PreferenceType table, so they need to be loaded separately
+      // CRITICAL: All preferences (including colors) should come from PreferenceType table
+      // Server returns all preferences with their default values from PreferenceType.default_value
+      // No need to load colors separately - they're already in window.currentPreferences
+      window.Logger?.debug?.('✅ Preferences loaded from server (all colors included from PreferenceType)', {
+        page: 'preferences-ui-v4',
+        currentPreferencesCount: window.currentPreferences ? Object.keys(window.currentPreferences).length : 0,
       });
       
       // CRITICAL: Server now always returns valid values for all requested preferences

@@ -130,15 +130,25 @@ class PreferencesService:
         if profile_id:
             return profile_id
 
+        # CRITICAL: Create a regular user profile (NOT is_default=True)
+        # This ensures users can always edit their preferences
+        # Profile name format: "User {user_id} פרופיל 1"
+        from models.user import User
+        user = session.get(User, user_id)
+        username = user.username if user else f"User{user_id}"
+        profile_name = f"{username} פרופיל 1"
+        
         profile = PreferenceProfile(
             user_id=user_id,
-            profile_name="Default",
+            profile_name=profile_name,
             is_active=True,
-            is_default=True,
-            description="Auto-generated profile",
+            is_default=False,  # CRITICAL: Regular user profile, not system default
+            description=f"פרופיל ברירת מחדל למשתמש {username}",
+            created_by=user_id,
         )
         session.add(profile)
         session.flush()
+        logger.warning(f"Auto-created profile '{profile_name}' for user {user_id} (no existing profile found)")
         return profile.id
 
     def build_profile_context(
@@ -343,7 +353,8 @@ class PreferencesService:
         )
         
         results = session.execute(stmt).all()
-        return {name: value for name, value in results}
+        saved_values_map = {name: value for name, value in results}
+        return saved_values_map
 
     def get_default_preference(self, preference_name: str) -> Any:
         """Get default preference value - uses centralized DEFAULT_PREFERENCES"""
@@ -404,15 +415,20 @@ class PreferencesService:
                     pref_type = pref_type_map[name]
                     saved_value = saved_values_map.get(name)
                     # היררכיה: שמור → default_value → fallback
-                    result[name] = (
-                        saved_value if saved_value is not None else (
-                            pref_type.default_value if pref_type.default_value else 
-                            self._get_fallback_default(name)
-                        )
-                    )
+                    # CRITICAL: Always return a value - never None
+                    if saved_value is not None:
+                        result[name] = saved_value
+                    elif pref_type.default_value is not None and pref_type.default_value != '':
+                        result[name] = pref_type.default_value
+                    else:
+                        fallback = self._get_fallback_default(name)
+                        # If fallback is None, try to get from DEFAULT_PREFERENCES or use empty string
+                        result[name] = fallback if fallback is not None else ''
                 else:
                     # לא קיים ב-PreferenceType - השתמש ב-fallback
-                    result[name] = self._get_fallback_default(name)
+                    fallback = self._get_fallback_default(name)
+                    # CRITICAL: Always return a value - never None
+                    result[name] = fallback if fallback is not None else ''
                     
             return result
 
@@ -507,11 +523,11 @@ class PreferencesService:
     ) -> List[Dict[str, Any]]:
         """
         Get all user preferences for a specific profile
+        CRITICAL: Also includes color preferences that may not exist in PreferenceType table
         """
         cache_key = f"user_preferences:{user_id}:{profile_id}" if use_cache and self._cache_enabled else None
 
         if use_cache and self._cache_enabled and cache_key and cache_key in self.cache:
-            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning cached data")
             return self.cache[cache_key]
 
         with self._session_scope() as session:
@@ -526,23 +542,36 @@ class PreferencesService:
                 .where(PreferenceType.is_active.is_(True))
             )
             pref_results = session.execute(stmt).all()
-
             data = []
+            # Load all saved values efficiently (single query)
+            pref_type_map = {pt.id: pt for pt, _ in pref_results}
+            saved_values_map = self._load_saved_values(session, user_id, profile_id, pref_type_map)
+            
             for pref_type, group_name in pref_results:
-                # Get user preference value if exists
-                stmt = select(UserPreference.saved_value).where(
-                    UserPreference.user_id == user_id,
-                    UserPreference.profile_id == profile_id,
-                    UserPreference.preference_id == pref_type.id,
-                )
-                user_value = session.scalar(stmt)
+                # Get user preference value from saved_values_map (already loaded)
+                user_value = saved_values_map.get(pref_type.preference_name)
 
                 # Use user value or default - ensure always valid value
                 # Hierarchy: saved_value → PreferenceType.default_value → fallback
-                value = user_value if user_value is not None else (
-                    pref_type.default_value if pref_type.default_value else 
-                    self._get_fallback_default(pref_type.preference_name)
-                )
+                # CRITICAL: Always return a value - never None
+                # CRITICAL: For color preferences, treat #000000 as invalid and use default_value instead
+                if user_value is not None:
+                    # For color preferences, treat #000000 as invalid (likely a bug or uninitialized value)
+                    if 'Color' in pref_type.preference_name and (user_value == '#000000' or user_value == '000000' or str(user_value).strip() == '#000000'):
+                        # Use default_value instead of #000000
+                        if pref_type.default_value is not None and pref_type.default_value != '':
+                            value = pref_type.default_value
+                        else:
+                            fallback = self._get_fallback_default(pref_type.preference_name)
+                            value = fallback if fallback is not None else ''
+                    else:
+                        value = user_value
+                elif pref_type.default_value is not None and pref_type.default_value != '':
+                    value = pref_type.default_value
+                else:
+                    fallback = self._get_fallback_default(pref_type.preference_name)
+                    # If fallback is None, use empty string (never return None)
+                    value = fallback if fallback is not None else ''
 
                 data.append({
                     "preference_name": pref_type.preference_name,
@@ -553,9 +582,6 @@ class PreferencesService:
                     "is_custom": user_value is not None,
                 })
 
-            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
-            if len(data) > 0:
-                logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")
 
             if use_cache and self._cache_enabled and cache_key:
                 self.cache[cache_key] = data
@@ -649,7 +675,7 @@ class PreferencesService:
         return True
 
     def create_profile(
-        self, user_id: int, profile_name: str, is_default: bool = False, description: Optional[str] = None
+        self, user_id: int, profile_name: str, is_default: bool = False, description: Optional[str] = None, created_by: Optional[int] = None
     ) -> Dict[str, Any]:
         with self._session_scope(commit=True) as session:
             # Validation: user_id must be provided, profile_name must be non-empty
@@ -664,6 +690,7 @@ class PreferencesService:
                 is_active=not is_default,
                 is_default=is_default,
                 description=description,
+                created_by=created_by if created_by is not None else user_id,  # Default to user_id if not provided
             )
             session.add(profile)
             session.flush()
@@ -705,9 +732,6 @@ class PreferencesService:
             return session.scalar(stmt) is not None
 
     def get_all_preference_types(self) -> List[Dict[str, Any]]:
-        # DEBUG: Log that this method was called
-        print("🔍 DEBUG: get_all_preference_types called - method exists!")
-        logger.info("🔍 DEBUG: get_all_preference_types called")
         with self._session_scope() as session:
             stmt = (
                 select(PreferenceType, PreferenceGroup)

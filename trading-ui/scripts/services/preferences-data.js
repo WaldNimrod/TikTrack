@@ -425,8 +425,9 @@
           pref?.value ??
           pref?.default_value ??
           pref?.defaultValue ??
-          null;
-        map[key] = value;
+          '';
+        // CRITICAL: Never set null - use empty string instead
+        map[key] = value !== null && value !== undefined ? value : '';
       });
       
       // DEBUG: Log output
@@ -880,7 +881,6 @@
         });
         
         const normalized = normalizePreferencesPayload(payload, { userId, profileId });
-        
         window.Logger?.debug?.('🔍 Normalized preferences payload', {
           ...PAGE_LOG_CONTEXT,
           userId,

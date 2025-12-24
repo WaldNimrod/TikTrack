@@ -119,6 +119,23 @@ class UserService:
             session.add(user)
             session.flush()
             logger.info("Created user %s", username)
+            
+            # CRITICAL: Create default profile for new user
+            # Profile name format: username + " פרופיל 1"
+            from models.preferences import PreferenceProfile
+            profile_name = f"{username} פרופיל 1"
+            default_profile = PreferenceProfile(
+                user_id=user.id,
+                profile_name=profile_name,
+                is_active=True,
+                is_default=False,  # User profile, not system default
+                description=f"פרופיל ברירת מחדל למשתמש {username}",
+                created_by=user.id,
+            )
+            session.add(default_profile)
+            session.flush()
+            logger.info("Created default profile '%s' for user %s (ID: %s)", profile_name, username, user.id)
+            
             return self._serialize_user(user)
 
     def update_user(self, user_id: int, **kwargs) -> Optional[Dict[str, Any]]:

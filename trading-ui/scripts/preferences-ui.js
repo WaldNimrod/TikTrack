@@ -2182,18 +2182,20 @@ window.disableAllPreferencesInterface = function() {
   });
 
   // Disable all buttons except profile management (keep profile switching and creation enabled)
-  const allButtons = document.querySelectorAll('#preferencesForm button:not([onclick*="switchActiveProfile"]):not([onclick*="createNewProfile"]):not([id*="switchProfileBtn"]):not([id*="createProfileBtn"])');
+  // CRITICAL: Check both onclick and data-onclick attributes (button system uses data-onclick)
+  const allButtons = document.querySelectorAll('#preferencesForm button:not([onclick*="switchActiveProfile"]):not([onclick*="createNewProfile"]):not([data-onclick*="switchActiveProfile"]):not([data-onclick*="createNewProfile"]):not([id*="switchProfileBtn"]):not([id*="createProfileBtn"])');
   allButtons.forEach(button => {
     button.disabled = true;
     button.classList.add('disabled');
   });
 
   // Keep profile management buttons enabled
-  const profileButtons = document.querySelectorAll('button[onclick*="switchActiveProfile"], button[onclick*="createNewProfile"], #switchProfileBtn, #createProfileBtn');
+  // CRITICAL: Check both onclick and data-onclick attributes (button system uses data-onclick)
+  const profileButtons = document.querySelectorAll('button[onclick*="switchActiveProfile"], button[onclick*="createNewProfile"], button[data-onclick*="switchActiveProfile"], button[data-onclick*="createNewProfile"], #switchProfileBtn, #createProfileBtn');
   profileButtons.forEach(button => {
     button.disabled = false;
     button.classList.remove('disabled');
-    window.Logger.info(`✅ Kept profile management button enabled: ${button.id || button.onclick}`, { page: 'preferences-ui' });
+    window.Logger.info(`✅ Kept profile management button enabled: ${button.id || button.onclick || button.getAttribute('data-onclick')}`, { page: 'preferences-ui' });
   });
 
   // Keep profile select and new profile name input enabled

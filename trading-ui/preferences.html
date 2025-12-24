@@ -404,6 +404,8 @@
     <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
     <!-- [113] Load Order: 113 | Strategy: defer -->
     <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <!-- [113.5] Load Order: 113.5 | Strategy: defer -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager (must load before preferences-ui-v4.js) -->
     <!-- [114] Load Order: 114 | Strategy: defer -->
     <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
     <!-- [115] Load Order: 115 | Strategy: defer -->
@@ -411,10 +413,7 @@
     <!-- [116] Load Order: 116 | Strategy: defer -->
     <script src="scripts/preferences-page.js?v=1.0.0" defer></script> <!-- Preferences page specific functions -->
     <!-- [116.5] Load Order: 116.5 | Strategy: defer -->
-    <script src="scripts/preferences-refresh-controls.js?v=1.0.0" defer></script> <!-- Refresh controls and updatePreferencesSummary function -->
-    <!-- [117] Load Order: 117 | Strategy: defer -->
-    <!-- [118] Load Order: 118 | Strategy: defer -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+    <!-- REMOVED: preferences-refresh-controls.js - File deleted, functionality moved to preferences-page.js -->
     <!-- [119] Load Order: 119 | Strategy: defer -->
     <script src="scripts/testing/automated/preferences-browser-test.js?v=1.0.0" defer></script> <!-- Automated browser test suite for preferences -->
 
@@ -457,7 +456,7 @@
     <!-- =============================================================== -->
 
     <!-- [152] Page-specific: preferences.js | Strategy: defer -->
-    <script src="scripts/preferences.js?v=1.0.0" defer></script> <!-- Main page script -->
+    <!-- REMOVED: preferences.js - File deleted, functionality moved to preferences-page.js -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

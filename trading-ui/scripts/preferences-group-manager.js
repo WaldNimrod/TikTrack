@@ -365,6 +365,10 @@ class PreferencesGroupManager {
       }, {})
       : preferences || {};
 
+    // CRITICAL: All colors should come from PreferenceType table via getAllPreferences
+    // No need to add defaults manually - server is the single source of truth
+    // REMOVED: Logic that added default colors - server should always return valid values from PreferenceType.default_value
+
     let populatedCount = 0;
     const unresolvedKeys = [];
     Object.keys(normalizedPreferences).forEach(rawKey => {
@@ -470,6 +474,11 @@ class PreferencesGroupManager {
       }
     });
 
+    // #region agent log
+    if (sectionId === 'section6') {
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-group-manager.js:509',message:'Finished populating colors section',data:{sectionId,populatedCount,unresolvedKeysCount:unresolvedKeys.length,unresolvedKeys:unresolvedKeys.slice(0,10),colorFieldsFound:Array.from(section.querySelectorAll('input[type="color"]')).map(f=>({id:f.id,name:f.name,dataColorKey:f.getAttribute('data-color-key'),value:f.value})).slice(0,10)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    }
+    // #endregion
     window.Logger?.debug(`Populated ${populatedCount} fields in section ${sectionId}`, {
       page: 'preferences-group-manager',
       unresolvedCount: unresolvedKeys.length,

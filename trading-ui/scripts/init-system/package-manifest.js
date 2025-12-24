@@ -1065,8 +1065,8 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'User preferences system v2.0 (10 files)',
-    version: '1.5.0',
+    description: 'User preferences system v3.0 (Backend-first architecture - complete data from server)',
+    version: '3.0.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
@@ -1143,31 +1143,31 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'preferences-group-manager.js',
+        globalCheck: 'window.PreferencesGroupManager',
+        description: 'Preferences group manager',
+        required: true,
+        loadOrder: 5.5  // Must load before preferences-ui-v4.js (which depends on it)
+      },
+      {
         file: 'preferences-ui-v4.js',
         globalCheck: 'window.PreferencesUIV4',
         description: 'User interface V4 (Group-First)',
         required: true,
-        loadOrder: 5.5  // Must load before preferences-ui.js and preferences-group-manager.js
+        loadOrder: 6  // Must load after preferences-group-manager.js
       },
       {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'User interface',
         required: true,
-        loadOrder: 6
+        loadOrder: 7
       },
       {
         file: 'preferences-page.js',
         globalCheck: 'window.loadAccountsForPreferences',
         description: 'Preferences page specific functions',
         required: false,
-        loadOrder: 7
-      },
-      {
-        file: 'preferences-group-manager.js',
-        globalCheck: 'window.PreferencesGroupManager',
-        description: 'Preferences group manager',
-        required: true,
         loadOrder: 8
       },
       {

@@ -134,13 +134,16 @@ class UnifiedCRUDService {
             }
 
             // Determine if this is create or update
-            const isEdit = options.isEdit || data.id || (options.formId && document.getElementById(options.formId)?.dataset.mode === 'edit');
+            // Special handling for user_profile - always update (PUT) current user profile
+            const isUserProfile = entityType === 'user_profile';
+            const isEdit = isUserProfile ? true : (options.isEdit || data.id || (options.formId && document.getElementById(options.formId)?.dataset.mode === 'edit'));
             const entityId = isEdit ? (data.id || options.entityId) : null;
 
             // Get API endpoint
             const endpoint = this._getEntityAPIEndpoint(entityType);
-            const url = entityId ? `${endpoint}/${entityId}` : endpoint;
-            const method = entityId ? 'PUT' : 'POST';
+            // user_profile always uses /api/auth/me without ID
+            const url = isUserProfile ? endpoint : (entityId ? `${endpoint}/${entityId}` : endpoint);
+            const method = isUserProfile ? 'PUT' : (entityId ? 'PUT' : 'POST');
 
             window.Logger?.info(`Saving ${entityType}`, {
                 method,
@@ -157,14 +160,85 @@ class UnifiedCRUDService {
                 delete payload.id;
             }
 
+            // Special handling for tag_category: convert order to order_index and remove description
+            if (entityType === 'tag_category') {
+                if (payload.order !== undefined) {
+                    payload.order_index = payload.order;
+                    delete payload.order;
+                }
+                // Remove description field - backend API doesn't support it
+                if (payload.description !== undefined) {
+                    delete payload.description;
+                }
+            }
+
+            // Special handling for alerts: convert alertStatusCombined to status + is_triggered
+            if (entityType === 'alert' && payload.status) {
+                // Check if status is a combined value (new, active, unread, read, cancelled)
+                const combinedState = payload.status;
+                const mapping = {
+                    'new': { status: 'open', is_triggered: 'false' },
+                    'active': { status: 'open', is_triggered: 'new' },
+                    'unread': { status: 'closed', is_triggered: 'new' },
+                    'read': { status: 'closed', is_triggered: 'true' },
+                    'cancelled': { status: 'cancelled', is_triggered: 'false' }
+                };
+                
+                if (mapping[combinedState]) {
+                    payload.status = mapping[combinedState].status;
+                    payload.is_triggered = mapping[combinedState].is_triggered;
+                }
+            }
+
             // Send to API
             let response;
+            let isServiceResult = false;
             const useService = this._getEntityServiceMethod(entityType, method === 'POST' ? 'create' : 'update');
             
             if (useService && entityId) {
-                response = await useService(entityId, payload);
+                // For update operations, check service signature
+                // Watch lists services expect (listId, payload, options) signature
+                // Note services expect (noteId, { payload: ... }) signature
+                let serviceResult;
+                if (entityType === 'watch_list') {
+                    // Watch lists services expect (listId, payload, options) signature
+                    serviceResult = await useService(entityId, payload, {});
+                } else if (entityType === 'note') {
+                    // Note services expect (noteId, { payload: ... }) signature
+                    serviceResult = await useService(entityId, { payload });
+                } else {
+                    // Other services might have different signatures
+                    serviceResult = await useService(entityId, payload);
+                }
+                // Check if service returns Response object or result object
+                if (serviceResult instanceof Response) {
+                    response = serviceResult;
+                } else {
+                    // Service returned result object directly - handle it
+                    isServiceResult = true;
+                    response = serviceResult;
+                }
             } else if (useService && !entityId) {
-                response = await useService(payload);
+                // For create operations, check service signature
+                // Some services (like NotesData.createNote) expect { payload: ... } instead of direct payload
+                // But watch_list, execution, and cash_flow services expect (payload, options) signature
+                let serviceResult;
+                if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow') {
+                    // Watch lists, execution, and cash_flow services expect (payload, options) signature
+                    serviceResult = await useService(payload, {});
+                } else {
+                    // Other services might expect { payload: ... } format
+                    const serviceOptions = { payload: payload };
+                    serviceResult = await useService(serviceOptions);
+                }
+                // Check if service returns Response object or result object
+                if (serviceResult instanceof Response) {
+                    response = serviceResult;
+                } else {
+                    // Service returned result object directly - handle it
+                    isServiceResult = true;
+                    response = serviceResult;
+                }
             } else {
                 // Fallback to direct fetch
                 response = await fetch(url, {
@@ -184,14 +258,51 @@ class UnifiedCRUDService {
                     : `${options.entityName || entityType} נוסף בהצלחה!`),
                 entityName: options.entityName || entityType,
                 reloadFn: options.reloadFn || this._getDefaultReloadFunction(entityType),
-                requiresHardReload: options.requiresHardReload || false
+                requiresHardReload: options.requiresHardReload || false,
+                returnErrorDetails: options.returnErrorDetails || false // Pass through for testing context
             };
 
             let crudResult = null;
-            if (entityId) {
-                crudResult = await window.CRUDResponseHandler?.handleUpdateResponse?.(response, crudOptions);
+            if (isServiceResult) {
+                // Service already handled the response and returned result object
+                // Just need to handle modal closing and notifications
+                if (response && response.status === 'success' && response.data) {
+                    // Show success notification
+                    if (typeof window.showSuccessNotification === 'function') {
+                        window.showSuccessNotification('הצלחה', crudOptions.successMessage);
+                    }
+                    
+                    // Close modal
+                    if (crudOptions.modalId && window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                        window.ModalManagerV2.hideModal(crudOptions.modalId);
+                    } else if (crudOptions.modalId && bootstrap?.Modal) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById(crudOptions.modalId));
+                        if (modal) {
+                            modal.hide();
+                        }
+                    }
+                    
+                    // Reload table if needed
+                    if (crudOptions.reloadFn && typeof crudOptions.reloadFn === 'function') {
+                        await crudOptions.reloadFn();
+                    }
+                    
+                    crudResult = response;
+                } else {
+                    // Service returned error - show error notification
+                    const errorMessage = response?.error || response?.message || 'שמירה נכשלה';
+                    if (typeof window.showErrorNotification === 'function') {
+                        window.showErrorNotification('שגיאה', errorMessage);
+                    }
+                    crudResult = null;
+                }
             } else {
-                crudResult = await window.CRUDResponseHandler?.handleSaveResponse?.(response, crudOptions);
+                // Standard Response object - use CRUDResponseHandler
+                if (entityId) {
+                    crudResult = await window.CRUDResponseHandler?.handleUpdateResponse?.(response, crudOptions);
+                } else {
+                    crudResult = await window.CRUDResponseHandler?.handleSaveResponse?.(response, crudOptions);
+                }
             }
 
             // Invalidate cache
@@ -810,7 +921,12 @@ class UnifiedCRUDService {
             'cash_flow': '/api/cash-flows',
             'note': '/api/notes',
             'watch_list': '/api/watch-lists',
-            'import_session': '/api/user-data-import/session'
+            'import_session': '/api/user-data-import/session',
+            'tag': '/api/tags',
+            'tag_category': '/api/tags/categories',
+            'trading_journal': '/api/trading-journal',
+            'preference_profile': '/api/preference-profiles',
+            'user_profile': '/api/auth/me' // Special endpoint for user profile - uses PUT to update current user
         };
 
         return endpointMap[entityType] || `/api/${entityType}`;
@@ -837,7 +953,12 @@ class UnifiedCRUDService {
             'cash_flow': 'cash-flow',
             'note': 'note',
             'watch_list': 'watch-list',
-            'import_session': 'import-session'
+            'import_session': 'import-session',
+            'tag': 'tag',
+            'tag_category': 'tag-category',
+            'trading_journal': 'trading-journal',
+            'preference_profile': 'preference-profile',
+            'user_profile': 'user-profile'
         };
 
         const entityName = entityNameMap[entityType] || entityType;
@@ -872,7 +993,12 @@ class UnifiedCRUDService {
             'cash_flow',
             'note',
             'watch_list',
-            'import_session'
+            'import_session',
+            'tag',
+            'tag_category',
+            'trading_journal',
+            'preference_profile',
+            'user_profile'
         ];
 
         return validTypes.includes(entityType);
@@ -924,7 +1050,7 @@ class UnifiedCRUDService {
                 update: window.TradesData?.updateTrade
             },
             'trade_plan': {
-                create: window.TradePlansData?.createTradePlan,
+                create: window.TradePlansData?.saveTradePlan,
                 update: window.TradePlansData?.updateTradePlan
             },
             'alert': {

@@ -48,10 +48,10 @@ const tradePlansModalConfig = {
             label: 'צד',
             required: true,
             options: [
-                { value: 'long', label: 'לונג (Long)' },
-                { value: 'short', label: 'שורט (Short)' }
+                { value: 'Long', label: 'לונג (Long)' },
+                { value: 'Short', label: 'שורט (Short)' }
             ],
-            defaultValue: 'long',
+            defaultValue: 'Long',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
             description: 'בחירת צד הפעולה המתוכננת'
@@ -75,11 +75,11 @@ const tradePlansModalConfig = {
             required: true,
             fieldName: 'investment_type', // Map to database column name
             options: [
-                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
-                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
-                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
+                { value: 'Swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'Investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'Passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'swing',
+            defaultValue: 'Swing',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },

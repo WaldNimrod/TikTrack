@@ -325,6 +325,7 @@
   async function sendNoteMutation({ noteId, method, payload, headers, signal }) {
     const endpoint = noteId ? ENDPOINTS.detail(noteId) : ENDPOINTS.list;
     const url = buildUrl(endpoint);
+    
 
     const response = await fetch(url, buildMutationRequest({ method, payload, headers, signal }));
 
@@ -336,21 +337,40 @@
   }
 
   async function createNote(options = {}) {
+    const payload = options.payload ?? options.body ?? options.data ?? null;
     return sendNoteMutation({
       method: 'POST',
-      payload: options.payload ?? options.body ?? options.data ?? null,
+      payload: payload,
       headers: options.headers,
       signal: options.signal,
     });
   }
 
   async function updateNote(noteId, options = {}) {
+    // Handle case where options is actually the payload directly (for backward compatibility)
+    let payload = null;
+    let headers = {};
+    let signal = null;
+    
+    if (options && typeof options === 'object' && !options.payload && !options.body && !options.data && !options.headers && !options.signal) {
+      // If options looks like a payload (has content, related_type_id, etc.), treat it as payload
+      if ('content' in options || 'related_type_id' in options || 'related_id' in options || 'id' in options) {
+        payload = options;
+        options = {};
+      }
+    }
+    
+    payload = payload ?? options.payload ?? options.body ?? options.data ?? null;
+    headers = options.headers ?? {};
+    signal = options.signal ?? null;
+    
+    
     return sendNoteMutation({
       noteId,
       method: 'PUT',
-      payload: options.payload ?? options.body ?? options.data ?? null,
-      headers: options.headers,
-      signal: options.signal,
+      payload: payload,
+      headers: headers,
+      signal: signal,
     });
   }
 

@@ -135,15 +135,24 @@ class TradingAccountService:
         """Delete trading_account"""
         from models.trade import Trade
         from models.execution import Execution
+        from models.trade_plan import TradePlan
         
         trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
         if not trading_account:
             return False
         
-        # הגנה על החשבון האחרון
-        all_trading_accounts = db.query(TradingAccount).all()
+        # Check user_id ownership if provided
+        if user_id is not None and trading_account.user_id != user_id:
+            logger.warning(f"Cannot delete trading_account {trading_account_id}: does not belong to user {user_id}")
+            return False
+        
+        # הגנה על החשבון האחרון (filtered by user_id)
+        query_all_accounts = db.query(TradingAccount)
+        if user_id is not None:
+            query_all_accounts = query_all_accounts.filter(TradingAccount.user_id == user_id)
+        all_trading_accounts = query_all_accounts.all()
         if len(all_trading_accounts) == 1:
-            logger.warning(f"Cannot delete trading_account {trading_account_id}: it is the last trading_account in the system")
+            logger.warning(f"Cannot delete trading_account {trading_account_id}: it is the last trading_account for user {user_id}")
             return False
         
         # Check for linked trades (filtered by user_id if provided)
@@ -155,6 +164,15 @@ class TradingAccountService:
             logger.warning(f"Cannot delete trading_account {trading_account_id}: has {len(trades)} linked trades")
             return False
         
+        # Check for linked trade plans (filtered by user_id if provided)
+        query_trade_plans = db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id)
+        if user_id is not None:
+            query_trade_plans = query_trade_plans.filter(TradePlan.user_id == user_id)
+        trade_plans = query_trade_plans.all()
+        if trade_plans:
+            logger.warning(f"Cannot delete trading_account {trading_account_id}: has {len(trade_plans)} linked trade plans")
+            return False
+        
         # Check for linked executions (through trades, filtered by user_id if provided)
         query_executions = db.query(Execution).join(Trade).filter(Trade.trading_account_id == trading_account_id)
         if user_id is not None:
@@ -164,11 +182,25 @@ class TradingAccountService:
             logger.warning(f"Cannot delete trading_account {trading_account_id}: has {len(executions)} linked executions")
             return False
         
+        # Check for linked cash flows (filtered by user_id if provided)
+        query_cash_flows = db.query(CashFlow).filter(CashFlow.trading_account_id == trading_account_id)
+        if user_id is not None:
+            query_cash_flows = query_cash_flows.filter(CashFlow.user_id == user_id)
+        cash_flows = query_cash_flows.all()
+        if cash_flows:
+            logger.warning(f"Cannot delete trading_account {trading_account_id}: has {len(cash_flows)} linked cash flows")
+            return False
+        
         # Safe to delete
-        db.delete(trading_account)
-        db.commit()
-        logger.info(f"Deleted trading_account: {trading_account.name}")
-        return True
+        try:
+            db.delete(trading_account)
+            db.commit()
+            logger.info(f"Deleted trading_account: {trading_account.name}")
+            return True
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error deleting trading_account {trading_account_id}: {str(e)}")
+            raise
     
     @staticmethod
     def get_stats(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> Dict[str, Any]:

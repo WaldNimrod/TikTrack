@@ -10,6 +10,7 @@
     
     <!-- Master Styles -->
     <link rel="stylesheet" href="styles-new/master.css">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <style>
         body {
@@ -79,6 +80,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <div class="container">
         <h1 class="mb-4">🔍 Overlay Debug Test Page</h1>
         
@@ -181,10 +184,33 @@
     </div>
     
     <!-- Load required scripts -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script>
+        <script src="scripts/error-handlers.js?v=1.0.0"></script>
+<script src="scripts/logger-service.js?v=1.0.0"></script>
     <script src="scripts/services/widget-overlay-service.js?v=1.0.0"></script>
     
     <script>
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-overlay-debug',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-overlay-debug',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         // Capture console logs
         const originalLog = console.log;
         const originalWarn = console.warn;
@@ -311,7 +337,7 @@
                 resultDiv.innerHTML = '<div class="status success">✅ Overlay setup successful! Try hovering over items.</div>';
             } catch (error) {
                 resultDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
-                console.error('Setup error:', error);
+                if (window.Logger) { window.Logger.error('Setup error:', { page: 'test-overlay-debug', component: 'test-overlay-debug', error: 'error.message', stack: 'error.stack' }); }
             }
         }
         
@@ -343,13 +369,13 @@
                 resultDiv.innerHTML = '<div class="status success">✅ Positioning test successful! Check item position.</div>';
             } catch (error) {
                 resultDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
-                console.error('Positioning error:', error);
+                if (window.Logger) { window.Logger.error('Positioning error:', { page: 'test-overlay-debug', component: 'test-overlay-debug', error: 'error.message', stack: 'error.stack' }); }
             }
         }
         
         // Initialize on load
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('🔍 Overlay Debug Test Page loaded');
+            if (window.Logger) { window.Logger.info('🔍 Overlay Debug Test Page loaded', { page: 'test-overlay-debug', component: 'test-overlay-debug' }); }
             checkServiceStatus();
             
             // Auto-setup after a short delay
@@ -357,7 +383,7 @@
                 if (window.WidgetOverlayService) {
                     testManualSetup();
                 } else {
-                    console.warn('⚠️ WidgetOverlayService not loaded, waiting...');
+                    if (window.Logger) { window.Logger.warn('⚠️ WidgetOverlayService not loaded, waiting...', { page: 'test-overlay-debug', component: 'test-overlay-debug' }); }
                     // Retry after 1 second
                     setTimeout(() => {
                         checkServiceStatus();
@@ -369,6 +395,8 @@
             }, 500);
         });
     </script>
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
 </body>
 </html>
 

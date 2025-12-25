@@ -45,46 +45,6 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <!-- כרטיסי סטטיסטיקה מרכזיים -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title">סך בדיקות</h5>
-                                        <h3 class="text-primary" id="totalTestsCount">0</h3>
-                                        <small class="text-muted">כל הבדיקות</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title">מוצלחות</h5>
-                                        <h3 class="text-success" id="passedTestsCount">0</h3>
-                                        <small class="text-muted">בדיקות שעברו</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title">נכשלות</h5>
-                                        <h3 class="text-danger" id="failedTestsCount">0</h3>
-                                        <small class="text-muted">בדיקות שנכשלו</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title">זמן ביצוע</h5>
-                                        <h3 class="text-info" id="executionTime">0ms</h3>
-                                        <small class="text-muted">זמן כולל</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- סטטוס כללי -->
                         <div class="row mt-3">
                             <div class="col-md-12">
@@ -154,6 +114,150 @@
                                             <strong>Debug Tools</strong><br>
                                             <small>כלי ניתור ודיבוג</small>
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h6 class="mb-3 text-center">בדיקות רוחביות לכל העמודים</h6>
+                                                <div class="row g-2">
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageDefaultsTest()" title="בדיקת ברירות מחדל">
+                                                            <i class="fas fa-calendar-check"></i><br>
+                                                            <small>ברירות מחדל</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageColorsTest()" title="בדיקת צבעים וסגנונות">
+                                                            <i class="fas fa-palette"></i><br>
+                                                            <small>צבעים וסגנונות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageSortingTest()" title="בדיקת מיון טבלאות">
+                                                            <i class="fas fa-sort"></i><br>
+                                                            <small>מיון טבלאות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-warning btn-sm w-100" onclick="runCrossPageSectionsTest()" title="בדיקת סקשנים">
+                                                            <i class="fas fa-folder-open"></i><br>
+                                                            <small>סקשנים</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageFiltersTest()" title="בדיקת פילטרים">
+                                                            <i class="fas fa-filter"></i><br>
+                                                            <small>פילטרים</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageInfoSummaryTest()" title="בדיקת סיכום מידע">
+                                                            <i class="fas fa-chart-bar"></i><br>
+                                                            <small>סיכום מידע</small>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="mt-3 mb-0 text-muted small text-center">בדיקות רוחביות לכל 24 עמודי המשתמש</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h6 class="mb-3 text-center">בדיקות פרטניות לישויות</h6>
+                                                <div class="row g-2">
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-success btn-sm w-100" onclick="runTradeTestOnly()" title="טריידים">
+                                                            <i class="fas fa-handshake"></i><br>
+                                                            <small>טריידים</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="runTradePlanTestOnly()" title="תכניות מסחר">
+                                                            <i class="fas fa-clipboard-list"></i><br>
+                                                            <small>תכניות מסחר</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-warning btn-sm w-100" onclick="runAlertTestOnly()" title="התראות">
+                                                            <i class="fas fa-bell"></i><br>
+                                                            <small>התראות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-info btn-sm w-100" onclick="runTickerTestOnly()" title="טיקרים">
+                                                            <i class="fas fa-chart-line"></i><br>
+                                                            <small>טיקרים</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-secondary btn-sm w-100" onclick="runTradingAccountTestOnly()" title="חשבונות מסחר">
+                                                            <i class="fas fa-wallet"></i><br>
+                                                            <small>חשבונות מסחר</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-success btn-sm w-100" onclick="runExecutionTestOnly()" title="ביצועי עסקאות">
+                                                            <i class="fas fa-exchange-alt"></i><br>
+                                                            <small>ביצועי עסקאות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="runCashFlowTestOnly()" title="תזרימי מזומן">
+                                                            <i class="fas fa-money-bill-wave"></i><br>
+                                                            <small>תזרימי מזומן</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-info btn-sm w-100" onclick="runNoteTestOnly()" title="הערות">
+                                                            <i class="fas fa-sticky-note"></i><br>
+                                                            <small>הערות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-warning btn-sm w-100" onclick="runWatchListTestOnly()" title="רשימות צפייה">
+                                                            <i class="fas fa-list"></i><br>
+                                                            <small>רשימות צפייה</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-secondary btn-sm w-100" onclick="runUserProfileTestOnly()" title="פרופיל משתמש">
+                                                            <i class="fas fa-user"></i><br>
+                                                            <small>פרופיל משתמש</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-success btn-sm w-100" onclick="runTradingJournalTestOnly()" title="יומן מסחר">
+                                                            <i class="fas fa-book"></i><br>
+                                                            <small>יומן מסחר</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="runTagCategoryTestOnly()" title="תגיות">
+                                                            <i class="fas fa-tags"></i><br>
+                                                            <small>תגיות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-info btn-sm w-100" onclick="runPreferenceProfileTestOnly()" title="העדפות">
+                                                            <i class="fas fa-cog"></i><br>
+                                                            <small>העדפות</small>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-4 col-6">
+                                                        <button class="btn btn-outline-secondary btn-sm w-100" onclick="runImportSessionTestOnly()" title="ייבוא נתונים">
+                                                            <i class="fas fa-file-import"></i><br>
+                                                            <small>ייבוא נתונים</small>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="mt-3 mb-0 text-muted small text-center">בדיקות מפורטות לכל ישות עם instrumentation מלא</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -461,6 +565,28 @@
     <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/15: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v3.0 (Backend-first architecture - complete data from server) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 3.0.0 -->
+
+    <!-- [X] Load Order: X | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/5: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
@@ -486,7 +612,9 @@
     <script src="scripts/crud-testing-enhanced.js?v=1.0.8" defer></script> <!-- CRUD testing enhanced system -->
     <!-- [56] Page-specific: advanced-debug-monitor.js | Strategy: defer -->
     <script src="scripts/advanced-debug-monitor.js?v=1.0.0" defer></script> <!-- Advanced debug and monitoring system -->
-    <!-- [57] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
+    <!-- [57] Page-specific: cross-page-testing-system.js | Strategy: defer -->
+    <script src="scripts/cross-page-testing-system.js?v=1.0.0" defer></script> <!-- Cross-page testing system -->
+    <!-- [58] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
     <script src="scripts/crud_testing_dashboard.js?v=1.0.30" defer></script> <!-- Main page script -->
 
     <!-- =============================================================== -->

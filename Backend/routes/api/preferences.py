@@ -375,9 +375,6 @@ def get_user_preferences() -> Any:
             requested_profile_id=requested_profile_id
         )
         resolved_profile_id = profile_context['resolved_profile_id']
-        
-        # קבלת כל ההעדפות לפי הפרופיל שנבחר בפועל
-        logger.info(f"🔍 DEBUG: /api/preferences/user - user_id={user_id}, requested_profile_id={requested_profile_id}, resolved_profile_id={resolved_profile_id}, use_cache={use_cache}")
 
         preferences = preferences_service.get_all_user_preferences(
             user_id=user_id,
@@ -385,20 +382,13 @@ def get_user_preferences() -> Any:
             use_cache=use_cache
         )
         
-        # DEBUG: Log preferences result
-        logger.info(f"🔍 DEBUG: /api/preferences/user - get_all_user_preferences returned {len(preferences)} preferences")
-        if len(preferences) > 0:
-            logger.info(f"🔍 DEBUG: First 3 preferences: {preferences[:3]}")
-        else:
-            logger.warning(f"⚠️ DEBUG: /api/preferences/user - No preferences returned! user_id={user_id}, profile_id={resolved_profile_id}")
-        
         # ETag for full user preferences
         last_update = profile_context.get('versions', {}).get('last_update') or ''
         etag_source = f"{user_id}:{resolved_profile_id}:{last_update}:{len(preferences)}"
         user_etag = hashlib.sha256(etag_source.encode('utf-8')).hexdigest()
         client_etag = request.headers.get('If-None-Match')
         if client_etag and client_etag == user_etag:
-            logger.info(f"🔍 DEBUG: /api/preferences/user - 304 Not Modified (ETag match)")
+            logger.debug(f"/api/preferences/user - 304 Not Modified (ETag match)")
             resp = jsonify({})
             resp.status_code = 304
             resp.headers['ETag'] = user_etag
@@ -416,9 +406,6 @@ def get_user_preferences() -> Any:
             },
             "timestamp": datetime.now().isoformat()
         }
-        
-        # DEBUG: Log response
-        logger.info(f"🔍 DEBUG: /api/preferences/user - Returning response with {len(preferences)} preferences")
         
         resp = jsonify(response_data)
         resp.headers['ETag'] = user_etag

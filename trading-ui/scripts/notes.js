@@ -637,6 +637,12 @@ async function updateNotesTable(notes, options = {}) {
               const row = document.createElement('tr');
               row.className = 'table-cell-clickable';
               
+              // Add data-id and data-entity-id attributes for E2E testing
+              if (note?.id) {
+                row.setAttribute('data-id', note.id);
+                row.setAttribute('data-entity-id', note.id);
+              }
+              
               // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
               let relatedCellHtml = '-';
               if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
@@ -926,6 +932,12 @@ async function updateNotesTable(notes, options = {}) {
     safeNotes.forEach(note => {
       const row = document.createElement('tr');
       row.className = 'table-cell-clickable';
+      
+      // Add data-id and data-entity-id attributes for E2E testing
+      if (note?.id) {
+        row.setAttribute('data-id', note.id);
+        row.setAttribute('data-entity-id', note.id);
+      }
       
       // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
       let relatedCellHtml = '-';

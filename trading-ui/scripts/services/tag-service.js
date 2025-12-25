@@ -23,7 +23,8 @@
         tags: (categoryId = 'all') => `tags:list:${categoryId}`,
         entity: (entityType, entityId) => `tags:entity:${entityType}:${entityId}`,
         suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`,
-        cloud: 'tags:cloud'
+        cloud: 'tags:cloud',
+        analytics: 'tags:analytics'
     };
 
     /**

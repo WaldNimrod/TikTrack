@@ -719,13 +719,47 @@
     <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 6/10: CONDITIONS PACKAGE ===== -->
+    <!-- ===== PACKAGE 6/11: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v3.0 (Backend-first architecture - complete data from server) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 3.0.0 -->
+
+    <!-- [70] Load Order: 70 | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <!-- [71] Load Order: 71 | Strategy: defer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [72] Load Order: 72 | Strategy: defer -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <!-- [73] Load Order: 73 | Strategy: defer -->
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <!-- [74] Load Order: 74 | Strategy: defer -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <!-- [75] Load Order: 75 | Strategy: defer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <!-- [76] Load Order: 76 | Strategy: defer -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <!-- [77] Load Order: 77 | Strategy: defer -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <!-- [78] Load Order: 78 | Strategy: defer -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <!-- [79] Load Order: 79 | Strategy: defer -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <!-- [80] Load Order: 80 | Strategy: defer -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <!-- [81] Load Order: 81 | Strategy: defer -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <!-- [82] Load Order: 82 | Strategy: defer -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/11: CONDITIONS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 6.5 | Description: Condition systems -->
     <!-- Dependencies: base, validation -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [70] Load Order: 70 | Strategy: defer -->
+    <!-- [83] Load Order: 83 | Strategy: defer -->
     <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
     <!-- [71] Load Order: 71 | Strategy: defer -->
     <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
@@ -747,73 +781,95 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [77] Load Order: 77 | Strategy: async -->
+    <!-- [90] Load Order: 90 | Strategy: async -->
     <script src="scripts/background-tasks.js?v=1.0.0" async></script> <!-- Background tasks -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 8/10: INFO SUMMARY PACKAGE ===== -->
+    <!-- ===== PACKAGE 9/11: INFO SUMMARY PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 18 | Description: Unified data summary system for all pages -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [78] Load Order: 78 | Strategy: defer -->
+    <!-- [91] Load Order: 91 | Strategy: defer -->
     <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
-    <!-- [79] Load Order: 79 | Strategy: defer -->
+    <!-- [92] Load Order: 92 | Strategy: defer -->
     <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/10: DASHBOARD WIDGETS ===== -->
+    <!-- ===== PACKAGE 10/11: DASHBOARD WIDGETS ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
     <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [80] Load Order: 80 | Strategy: defer -->
+    <!-- [93] Load Order: 93 | Strategy: defer -->
     <script src="scripts/services/dashboard-data.js?v=1.0.0" defer></script> <!-- Unified dashboard data service -->
-    <!-- [81] Load Order: 81 | Strategy: defer -->
+    <!-- [94] Load Order: 94 | Strategy: defer -->
     <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0" defer></script> <!-- undefined -->
-    <!-- [82] Load Order: 82 | Strategy: defer -->
+    <!-- [95] Load Order: 95 | Strategy: defer -->
     <script src="scripts/widgets/recent-items-widget.js?v=1.0.0" defer></script> <!-- Unified recent trades and trade plans widget -->
-    <!-- [83] Load Order: 83 | Strategy: defer -->
+    <!-- [96] Load Order: 96 | Strategy: defer -->
     <script src="scripts/widgets/tag-widget.js?v=1.0.0" defer></script> <!-- Unified tag widget (cloud + search) -->
-    <!-- [84] Load Order: 84 | Strategy: defer -->
+    <!-- [97] Load Order: 97 | Strategy: defer -->
     <script src="scripts/active-alerts-component.js?v=1.0.0" defer></script> <!-- Active alerts component -->
-    <!-- [85] Load Order: 85 | Strategy: defer -->
+    <!-- [98] Load Order: 98 | Strategy: defer -->
     <script src="scripts/widgets/ticker-list-widget.js?v=1.0.0" defer></script> <!-- Ticker list widget with KPI cards -->
-    <!-- [86] Load Order: 86 | Strategy: defer -->
+    <!-- [99] Load Order: 99 | Strategy: defer -->
     <script src="scripts/widgets/ticker-chart-widget.js?v=1.0.0" defer></script> <!-- Ticker chart widget with mini charts -->
-    <!-- [87] Load Order: 87 | Strategy: defer -->
+    <!-- [100] Load Order: 100 | Strategy: defer -->
     <script src="scripts/index.js?v=1.0.0" defer></script> <!-- Dashboard page logic -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 10/10: INITIALIZATION PACKAGE ===== -->
+    <!-- ===== PACKAGE 5/15: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v3.0 (Backend-first architecture - complete data from server) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 3.0.0 -->
+
+    <!-- [X] Load Order: X | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/11: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <!-- [101] Load Order: 101 | Strategy: defer -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
+    <!-- [102] Load Order: 102 | Strategy: defer -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
+    <!-- [103] Load Order: 103 | Strategy: defer -->
     <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
+    <!-- [104] Load Order: 104 | Strategy: defer -->
     <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
+    <!-- [105] Load Order: 105 | Strategy: defer -->
     <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [93] Page-specific: server-monitor.js | Strategy: defer -->
+    <!-- [106] Page-specific: server-monitor.js | Strategy: defer -->
     <script src="scripts/server-monitor.js?v=1.0.0" defer></script> <!-- Main page script -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 93 | Unique Scripts Loaded: 93 -->
+    <!-- 📊 Total Scripts Processed: 106 | Unique Scripts Loaded: 106 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
 </html>

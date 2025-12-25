@@ -198,18 +198,26 @@ class ColorManager {
         force: true,
       });
 
-      // CRITICAL: Server now always returns valid values for all requested preferences
-      // No need for business logic here - just use what the server returned
-      const allColors = fetched || {};
+      // CRITICAL: Server returns all preferences from PreferenceType table
+      // All colors should exist in PreferenceType with default_value
+      // Server returns saved_value OR PreferenceType.default_value (never null/empty)
+      const allColors = {};
       
-      // Update cache with values from server
-      Object.entries(allColors).forEach(([name, value]) => {
-        if (value !== null && value !== undefined) {
-          this.colorCache.set(name, value);
-        }
-      });
+      // For each color name, use server value (which includes PreferenceType.default_value)
+      for (const colorName of colorNames) {
+        const fetchedValue = fetched?.[colorName];
+        // Server should always return a value (saved_value OR PreferenceType.default_value)
+        // If server returns null/undefined/empty, it means the preference doesn't exist in PreferenceType
+        // In that case, use frontend default as fallback (but this should not happen)
+        allColors[colorName] = (fetchedValue !== null && fetchedValue !== undefined && fetchedValue !== '') 
+          ? fetchedValue 
+          : this.defaultColors[colorName];
+        
+        // Update cache with final value
+        this.colorCache.set(colorName, allColors[colorName]);
+      }
 
-      window.Logger.info(`✅ Loaded ${Object.keys(allColors, { page: 'preferences-colors' }).length} color preferences`);
+      window.Logger.info(`✅ Loaded ${Object.keys(allColors).length} color preferences`, { page: 'preferences-colors' });
       return allColors;
 
     } catch (error) {

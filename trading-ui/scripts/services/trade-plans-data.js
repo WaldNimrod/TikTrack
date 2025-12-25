@@ -139,14 +139,39 @@
 
 async function saveTradePlan(planData) {
   try {
+    // Normalize investment_type to lowercase for database constraint compatibility
+    // Database expects: 'swing', 'investment', 'passive' (lowercase)
+    // Frontend sends: 'Swing', 'Investment', 'Passive' (Capitalized)
+    const normalizedData = { ...planData };
+    if (normalizedData.investment_type) {
+      normalizedData.investment_type = normalizedData.investment_type.toLowerCase();
+    }
+    
+    // Remove quantity field - TradePlan model does not have this field
+    // Quantity is calculated from planned_amount / entry_price, not stored directly
+    delete normalizedData.quantity;
+    
+    // Remove tag_ids field - Tags are handled separately via TagService, not as part of TradePlan model
+    delete normalizedData.tag_ids;
+    
     const response = await fetch('/api/trade-plans/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(planData)
+      body: JSON.stringify(normalizedData)
     });
 
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData?.error?.message) {
+          errorMessage = errorData.error.message;
+        }
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
@@ -163,11 +188,25 @@ async function saveTradePlan(planData) {
 
 async function updateTradePlan(planId, planData) {
   try {
+    // Normalize investment_type to lowercase for database constraint compatibility
+    // Database expects: 'swing', 'investment', 'passive' (lowercase)
+    // Frontend sends: 'Swing', 'Investment', 'Passive' (Capitalized)
+    const normalizedData = { ...planData };
+    if (normalizedData.investment_type) {
+      normalizedData.investment_type = normalizedData.investment_type.toLowerCase();
+    }
+    
+    // Remove quantity field - TradePlan model does not have this field
+    // Quantity is calculated from planned_amount / entry_price, not stored directly
+    delete normalizedData.quantity;
+    
+    // Remove tag_ids field - Tags are handled separately via TagService, not as part of TradePlan model
+    delete normalizedData.tag_ids;
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     const response = await fetch(`${base}/api/trade-plans/${planId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(planData)
+      body: JSON.stringify(normalizedData)
     });
 
     if (!response.ok) {

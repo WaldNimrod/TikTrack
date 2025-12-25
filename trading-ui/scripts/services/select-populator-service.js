@@ -199,9 +199,12 @@ class SelectPopulatorService {
             }
             
             // Server should have provided defaults - if not found, return null
-            window.Logger?.warn?.(`⚠️ Preference ${preferenceName} not found - server should have provided it`, {
+            // This is not critical - some preferences may be optional or not yet initialized
+            // Log at debug level to avoid console noise during tests
+            window.Logger?.debug?.(`Preference ${preferenceName} not found in memory (may be optional or not yet initialized)`, {
                 page: 'select-populator-service',
-                aliases
+                aliases,
+                note: 'This is expected for optional preferences or during initialization'
             });
         } catch (e) {
             console.error(`❌ Error in _getPreferenceFromMemory:`, e);

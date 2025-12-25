@@ -1445,7 +1445,48 @@ class ModalManagerV2 {
             
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
-                await this.populateForm(modalElement, entityData);
+                // If entityData only has id (or missing required fields), fetch full data from API
+                let fullEntityData = entityData;
+                if (entityData.id && (!entityData.content && !entityData.related_type_id && !entityData.related_id && !entityData.name && !entityData.symbol && !entityData.ticker_symbol)) {
+                    // Only id provided - need to fetch full data
+                    const entityType = modalInfo.config?.entityType;
+                    if (entityType && window.entityDetailsAPI && typeof window.entityDetailsAPI.getEntityDetails === 'function') {
+                        try {
+                            window.Logger?.info('🔍 [ModalManagerV2] Fetching entity data for edit mode', {
+                                modalId,
+                                entityType,
+                                entityId: entityData.id,
+                                page: 'modal-manager-v2'
+                            });
+                            const fetchedData = await window.entityDetailsAPI.getEntityDetails(entityType, entityData.id, {
+                                includeLinkedItems: false,
+                                includeMarketData: false
+                            });
+                            if (fetchedData) {
+                                fullEntityData = fetchedData;
+                                window.Logger?.info('✅ [ModalManagerV2] Entity data fetched successfully', {
+                                    modalId,
+                                    entityType,
+                                    entityId: entityData.id,
+                                    hasContent: !!fullEntityData.content,
+                                    hasRelatedTypeId: !!fullEntityData.related_type_id,
+                                    hasRelatedId: !!fullEntityData.related_id,
+                                    page: 'modal-manager-v2'
+                                });
+                            }
+                        } catch (fetchError) {
+                            window.Logger?.error('❌ [ModalManagerV2] Failed to fetch entity data', {
+                                modalId,
+                                entityType,
+                                entityId: entityData.id,
+                                error: fetchError.message,
+                                page: 'modal-manager-v2'
+                            });
+                            // Continue with partial data - better than nothing
+                        }
+                    }
+                }
+                await this.populateForm(modalElement, fullEntityData);
                 
                 // CRITICAL: For executions modal, save ticker value after populateForm
                 // This ensures the value is preserved when initializeSpecialHandlers clones the select
@@ -1932,6 +1973,35 @@ class ModalManagerV2 {
                 backdropsAfterBackdrop,
                 page: 'modal-manager-v2'
             });
+            
+            // Modal Navigation System - רישום המודל לפני עדכון z-index
+            // רישום תמיד (גם אם אין stack קיים) כדי ש-forceUpdate ימצא את המודל
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            if (window.ModalNavigationService?.registerModalOpen) {
+                const navigationMetadata = {
+                    modalId,
+                    modalType: modalInfo.config ? 'crud-modal' : 'dynamic-modal',
+                    entityType: modalInfo.config?.entityType || null,
+                    entityId: mode === 'edit' && entityData ? entityData.id : null,
+                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config?.title?.[mode] || '',
+                    mode
+                };
+                
+                try {
+                    await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+                    window.Logger?.info('🔍 [Z-INDEX] Modal registered in ModalNavigationService before forceUpdate', {
+                        modalId,
+                        stackLength: window.ModalNavigationService?.getStack?.()?.length || 0,
+                        page: 'modal-manager-v2'
+                    });
+                } catch (error) {
+                    window.Logger?.warn('⚠️ [Z-INDEX] Failed to register modal in ModalNavigationService', {
+                        modalId,
+                        error: error?.message,
+                        page: 'modal-manager-v2'
+                    });
+                }
+            }
             
             // עדכון z-index דרך ModalZIndexManager
             // שימוש ב-requestAnimationFrame לעדכון מיידי יותר
@@ -2463,30 +2533,11 @@ class ModalManagerV2 {
                 modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
             }
             
-            // Modal Navigation System - רק למודלים מקוננים (nested modals)
-            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
-            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
-            
-            if (hasStack) {
-                const navigationMetadata = {
-                    modalId,
-                    modalType: 'crud-modal',
-                    entityType: modalInfo.config.entityType,
-                    entityId: mode === 'edit' && entityData ? entityData.id : null,
-                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
-                    mode
-                };
-
-                if (window.ModalNavigationService?.registerModalOpen) {
-                    await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
-                } else if (window.pushModalToNavigation) {
-                    await window.pushModalToNavigation(modalElement, navigationMetadata);
-                }
-
-                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
-                if (window.modalNavigationManager?.updateModalNavigation) {
-                    window.modalNavigationManager.updateModalNavigation(modalElement);
-                }
+            // Modal Navigation System - עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+            // הרישום ב-ModalNavigationService כבר נעשה למעלה לפני forceUpdate
+            const currentStack = window.ModalNavigationService?.getStack?.() || [];
+            if (currentStack.length > 1 && window.modalNavigationManager?.updateModalNavigation) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
             }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
@@ -4832,18 +4883,48 @@ class ModalManagerV2 {
      */
     _getPreferenceNameForField(fieldId) {
         // Map field IDs to preference names
+        // This function maps modal field IDs to preference names for default value detection
         const preferenceMap = {
+            // Account fields
             'cashFlowAccount': 'default_trading_account',
-            'cashFlowCurrency': 'primaryCurrency',
             'executionAccount': 'default_trading_account',
-            'executionCommission': 'defaultCommission'
+            'tradingAccount': 'default_trading_account',
+            'tradePlanAccount': 'default_trading_account',
+            'planAccount': 'default_trading_account',
+            'tradeAccount': 'default_trading_account',
+            'alertAccount': 'default_trading_account',
+            'noteAccount': 'default_trading_account',
+            'researchAccount': 'default_trading_account',
+            // Currency fields
+            'cashFlowCurrency': 'primaryCurrency',
+            'currency': 'primaryCurrency',
+            'tickerCurrency': 'primaryCurrency',
+            'accountCurrency': 'primaryCurrency',
+            'tradePlanCurrency': 'primaryCurrency',
+            // Commission/Fee fields
+            'executionCommission': 'defaultCommission',
+            'executionFee': 'defaultCommission',
+            'commission': 'defaultCommission',
+            'fee': 'defaultCommission'
         };
         
         // Try to find matching preference
+        // Check for exact match first, then partial match
         for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
-            if (fieldId.includes(fieldPattern) || fieldId === fieldPattern) {
+            if (fieldId === fieldPattern || fieldId.includes(fieldPattern)) {
                 return prefName;
             }
+        }
+        
+        // Fallback: check for common patterns
+        if (fieldId.toLowerCase().includes('account') && !fieldId.toLowerCase().includes('name')) {
+            return 'default_trading_account';
+        }
+        if (fieldId.toLowerCase().includes('currency')) {
+            return 'primaryCurrency';
+        }
+        if (fieldId.toLowerCase().includes('commission') || fieldId.toLowerCase().includes('fee')) {
+            return 'defaultCommission';
         }
         
         return null;
@@ -4917,25 +4998,14 @@ class ModalManagerV2 {
      * @private
      */
     _applyPreferenceDefault(field, fieldElement, preferences) {
-        // Map field IDs to preference names
-        const preferenceMap = {
-            'cashFlowAccount': 'default_trading_account',
-            'cashFlowCurrency': 'primaryCurrency',
-            'executionAccount': 'default_trading_account',
-            'executionCommission': 'defaultCommission',
-            'tradingAccount': 'default_trading_account',
-            'currency': 'primaryCurrency'
-        };
-        
-        // Try to find matching preference
-        for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
-            if (field.id.includes(fieldPattern) || field.id === fieldPattern) {
-                const prefValue = preferences[prefName];
-                if (prefValue) {
-                    fieldElement.value = prefValue;
-                    console.log(`Applied preference default for ${field.id}:`, prefValue);
-                    return true;
-                }
+        // Use the centralized mapping function
+        const prefName = this._getPreferenceNameForField(field.id);
+        if (prefName && preferences[prefName]) {
+            const prefValue = preferences[prefName];
+            if (prefValue !== null && prefValue !== undefined && prefValue !== '') {
+                fieldElement.value = prefValue;
+                window.Logger?.debug?.(`Applied preference default for ${field.id} (${prefName}):`, prefValue, { page: 'modal-manager-v2' });
+                return true;
             }
         }
         

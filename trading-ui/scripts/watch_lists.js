@@ -1934,18 +1934,26 @@
             });
         }
         
-        // Check if container exists in HTML string but not in DOM
-        if (tableTitle && tableTitle.outerHTML.includes('watchListsActionsMenu')) {
-            console.warn('⚠️ [ACTIONS MENU] Container exists in HTML but not found in DOM!', {
-                htmlContainsId: tableTitle.outerHTML.includes('id="watchListsActionsMenu"'),
-                htmlContainsClass: tableTitle.outerHTML.includes('class="actions-menu-wrapper"'),
-                querySelectorResult: tableTitle.querySelector('#watchListsActionsMenu'),
-                querySelectorByClass: tableTitle.querySelector('.actions-menu-wrapper')
-            });
-        }
-        
         // Use the first found container
         const foundContainer = menuContainer || containerInTableTitle || containerInTableActions || containerAnywhere || containerInActiveListSelectParent;
+        
+        // Check if container exists in HTML string but not in DOM
+        // This can happen when container was just created dynamically but DOM hasn't updated yet
+        // Only warn if container is actually missing and we're not about to create it
+        if (tableTitle && tableTitle.outerHTML.includes('watchListsActionsMenu') && !foundContainer) {
+            // Check if container actually exists in DOM (might be timing issue)
+            const actualContainer = document.getElementById('watchListsActionsMenu');
+            if (!actualContainer) {
+                // Container truly missing - this is expected when creating dynamically, so we downgrade to debug
+                window.Logger?.debug?.('🔍 [ACTIONS MENU] Container exists in HTML string but not yet in DOM (will be created)', {
+                    ...PAGE_LOG_CONTEXT,
+                    htmlContainsId: tableTitle.outerHTML.includes('id="watchListsActionsMenu"'),
+                    htmlContainsClass: tableTitle.outerHTML.includes('class="actions-menu-wrapper"'),
+                    querySelectorResult: tableTitle.querySelector('#watchListsActionsMenu'),
+                    querySelectorByClass: tableTitle.querySelector('.actions-menu-wrapper')
+                });
+            }
+        }
         
         if (foundContainer) {
             // Container found - create menu immediately
@@ -2177,7 +2185,8 @@
                             });
                         }, 100);
                     } else {
-                        window.Logger?.warn?.('⚠️ [ACTIONS MENU] ButtonSystemInit.processButtons not available', PAGE_LOG_CONTEXT);
+                        // ButtonSystemInit might not be available in iframe context - this is expected and not an error
+                        window.Logger?.debug?.('🔍 [ACTIONS MENU] ButtonSystemInit.processButtons not available (expected in iframe context)', PAGE_LOG_CONTEXT);
                     }
                     
                     // Initialize actions menu system if available

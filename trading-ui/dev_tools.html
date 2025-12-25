@@ -34,7 +34,7 @@
                     <div class="section-header">
                         <h1><img src="images/icons/tabler/chart-bar.svg" width="32" height="32" alt="stats" class="icon"> סטטיסטיקות מערכת</h1>
                         <div class="section-header-controls">
-                            <button data-button-type="REFRESH" data-variant="full" data-icon="🔄" data-text="רענן נתונים" data-classes="btn-primary btn-sm" data-onclick="window.refreshDevToolsData()" type="button" title="רענן את נתוני כלי הפיתוח"></button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="window.toggleAllSections()" title="פתח/סגור את כל הסקשנים" type="button">▼</button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -46,20 +46,6 @@
                             <div>עמודי אימות: <strong id="authPages">4</strong></div>
                             <div>עמודי בדיקה: <strong id="testPages">16</strong></div>
                             <div>עמודי מוקאפים: <strong id="mockupPages">13</strong></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Development Tools Overview Alert -->
-                <div class="content-section" id="overview-alert">
-                    <div class="section-body">
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <h5><img src="images/icons/tabler/info-circle.svg" width="20" height="20" alt="info" class="icon"> מידע כללי</h5>
-                                    <p class="mb-0">עמוד זה מספק סקירה מלאה של כל העמודים והמערכות במערכת TikTrack, מאורגן לפי קטגוריות עם קישורים ישירים ומידע טכני.</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,9 +66,6 @@
                                                 </th>
                                                 <th scope="col" class="col-description">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button>
-                                                </th>
-                                                <th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
                                                 </th>
                                                 <th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
@@ -105,7 +88,6 @@
                                             <tr>
                                                 <td><strong>index.html</strong></td>
                                                 <td>דשבורד ראשי</td>
-                                                <td>דשבורד ראשי</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">דשבורדים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -115,7 +97,6 @@
                                             <tr>
                                                 <td><strong>trades.html</strong></td>
                                                 <td>טריידים</td>
-                                                <td>ניהול טריידים</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -124,7 +105,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>executions.html</strong></td>
-                                                <td>ביצועי עסקאות</td>
                                                 <td>ביצועי עסקאות</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
@@ -135,7 +115,6 @@
                                             <tr>
                                                 <td><strong>alerts.html</strong></td>
                                                 <td>התראות</td>
-                                                <td>מערכת התראות</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -144,7 +123,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>trade_plans.html</strong></td>
-                                                <td>תכניות מסחר</td>
                                                 <td>תכניות מסחר</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
@@ -155,7 +133,6 @@
                                             <tr>
                                                 <td><strong>tickers.html</strong></td>
                                                 <td>טיקרים</td>
-                                                <td>ניהול טיקרים</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -164,7 +141,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>trading_accounts.html</strong></td>
-                                                <td>חשבונות מסחר</td>
                                                 <td>חשבונות מסחר</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
@@ -175,7 +151,6 @@
                                             <tr>
                                                 <td><strong>notes.html</strong></td>
                                                 <td>הערות</td>
-                                                <td>מערכת הערות</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -185,7 +160,6 @@
                                             <tr>
                                                 <td><strong>cash_flows.html</strong></td>
                                                 <td>תזרימי מזומן</td>
-                                                <td>תזרימי מזומנים</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">עמודי ליבה</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -195,7 +169,6 @@
                                             <tr>
                                                 <td><strong>preferences.html</strong></td>
                                                 <td>העדפות</td>
-                                                <td>הגדרות מערכת</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-dark">עמודים תומכים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -204,7 +177,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>data_import.html</strong></td>
-                                                <td>ייבוא נתונים</td>
                                                 <td>ייבוא נתונים</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-dark">עמודים תומכים</span></td>
@@ -215,7 +187,6 @@
                                             <tr>
                                                 <td><strong>ai_analysis.html</strong></td>
                                                 <td>ניתוח AI</td>
-                                                <td>ניתוח AI</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -225,7 +196,6 @@
                                             <tr>
                                                 <td><strong>watch_lists.html</strong></td>
                                                 <td>רשימות צפייה</td>
-                                                <td>ניהול רשימות צפייה</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -234,7 +204,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>user_profile.html</strong></td>
-                                                <td>פרופיל משתמש</td>
                                                 <td>פרופיל משתמש</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
@@ -245,7 +214,6 @@
                                             <tr>
                                                 <td><strong>ticker_dashboard.html</strong></td>
                                                 <td>דשבורד טיקר</td>
-                                                <td>דשבורד טיקר מורחב</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -255,7 +223,6 @@
                                             <tr>
                                                 <td><strong>research.html</strong></td>
                                                 <td>מחקר</td>
-                                                <td>מחקר וניתוח</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-success">דשבורדים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -264,7 +231,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>trading_journal.html</strong></td>
-                                                <td>יומן מסחר</td>
                                                 <td>יומן מסחר</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
@@ -275,7 +241,6 @@
                                             <tr>
                                                 <td><strong>trade_history.html</strong></td>
                                                 <td>היסטוריית טריידים</td>
-                                                <td>היסטוריית טרייד</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -285,7 +250,6 @@
                                             <tr>
                                                 <td><strong>portfolio_state.html</strong></td>
                                                 <td>מצב תיק</td>
-                                                <td>מצב תיק היסטורי</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עמודי מתקדמים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -295,7 +259,6 @@
                                             <tr>
                                                 <td><strong>tag_management.html</strong></td>
                                                 <td>תגיות</td>
-                                                <td>ניהול תגיות</td>
                                                 <td><span class="badge bg-dark">עמודים מרכזיים</span></td>
                                                 <td><span class="badge bg-dark">עמודים תומכים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
@@ -319,9 +282,7 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
                                         <thead class="table-light"><tr><th scope="col" class="col-content">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם קובץ" data-classes="btn-link sortable-header" data-column="filename"></button>
-                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
-                                                </th><th scope="col" class="col-type">
+                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
                                                 </th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה פנימית" data-classes="btn-link sortable-header" data-column="subcategory"></button>
@@ -333,7 +294,6 @@
                                         <tbody>                                            <tr>
                                                 <td><strong>db_display.html</strong></td>
                                                 <td>תצוגת בסיס נתונים</td>
-                                                <td>תצוגת בסיס נתונים</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">בסיס נתונים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -342,7 +302,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>db_extradata.html</strong></td>
-                                                <td>נתונים נוספים</td>
                                                 <td>נתונים נוספים</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">בסיס נתונים</span></td>
@@ -353,7 +312,6 @@
                                             <tr>
                                                 <td><strong>server-monitor.html</strong></td>
                                                 <td>ניטור שרת</td>
-                                                <td>ניטור שרת</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">ניטור</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -362,7 +320,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>background-tasks.html</strong></td>
-                                                <td>משימות רקע</td>
                                                 <td>משימות רקע</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">ניטור</span></td>
@@ -373,7 +330,6 @@
                                             <tr>
                                                 <td><strong>system-management.html</strong></td>
                                                 <td>ניהול מערכת</td>
-                                                <td>ניהול מערכת</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">ניהול מערכת</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -382,7 +338,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>notifications-center.html</strong></td>
-                                                <td>מרכז התראות</td>
                                                 <td>מרכז התראות</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">התראות</span></td>
@@ -393,7 +348,6 @@
                                             <tr>
                                                 <td><strong>css-management.html</strong></td>
                                                 <td>ניהול CSS</td>
-                                                <td>ניהול CSS</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">עיצוב</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -403,7 +357,6 @@
                                             <tr>
                                                 <td><strong>designs.html</strong></td>
                                                 <td>גלרית עיצובים</td>
-                                                <td>עיצובים</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">עיצוב</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -413,7 +366,6 @@
                                             <tr>
                                                 <td><strong>dynamic-colors-display.html</strong></td>
                                                 <td>תצוגת צבעים</td>
-                                                <td>תצוגת צבעים</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">עיצוב</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -422,7 +374,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>constraints.html</strong></td>
-                                                <td>אילוצי מערכת</td>
                                                 <td>אילוצי מערכת</td>
                                                 <td><span class="badge bg-danger">עמודים טכניים</span></td>
                                                 <td><span class="badge bg-dark">אילוצים</span></td>
@@ -447,9 +398,7 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-dev-pages">
                                         <thead class="table-light"><tr><th scope="col" class="col-content">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם קובץ" data-classes="btn-link sortable-header" data-column="filename"></button>
-                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
-                                                </th><th scope="col" class="col-type">
+                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
                                                 </th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה פנימית" data-classes="btn-link sortable-header" data-column="subcategory"></button>
@@ -461,7 +410,6 @@
                                         <tbody>                                            <tr>
                                                 <td><strong>dev_tools.html</strong></td>
                                                 <td>dev_tools</td>
-                                                <td>כלי פיתוח ראשי</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">כלי ראשי</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -470,7 +418,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>code-quality-dashboard.html</strong></td>
-                                                <td>דשבורד איכות קוד</td>
                                                 <td>דשבורד איכות קוד</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">ניתוח ובדיקה</span></td>
@@ -481,7 +428,6 @@
                                             <tr>
                                                 <td><strong>init-system-management.html</strong></td>
                                                 <td>ניהול מערכת אתחול</td>
-                                                <td>ניהול מערכת אתחול</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">ניהול מערכת</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -490,7 +436,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>cache-management.html</strong></td>
-                                                <td>ניהול מטמון</td>
                                                 <td>ניהול מטמון</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">מטמון וניהול</span></td>
@@ -501,7 +446,6 @@
                                             <tr>
                                                 <td><strong>chart_management.html</strong></td>
                                                 <td>ניהול גרפים</td>
-                                                <td>ניהול גרפים</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">גרפים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -511,7 +455,6 @@
                                             <tr>
                                                 <td><strong>crud_testing_dashboard.html</strong></td>
                                                 <td>בדיקות CRUD</td>
-                                                <td>דשבורד בדיקות CRUD</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">בדיקות</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -521,17 +464,15 @@
                                             <tr>
                                                 <td><strong>conditions-test.html</strong></td>
                                                 <td>בדיקת תנאים</td>
-                                                <td>בדיקת תנאים</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">בדיקות</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/conditions-test" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONDITIONS_TESTING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
+                                                <td><a href="/conditions-test" target="_blank" class="btn btn-sm btn-outline-warning">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/CONDITIONS_TESTING_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#15-conditions-test" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 מדריך בדיקה</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>conditions-modals.html</strong></td>
                                                 <td>conditions-modals</td>
-                                                <td>מודלים של תנאים</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">מודלים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -541,7 +482,6 @@
                                             <tr>
                                                 <td><strong>button-color-mapping.html</strong></td>
                                                 <td>button-color-mapping</td>
-                                                <td>מיפוי צבעי כפתורים</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">עיצוב</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -551,7 +491,6 @@
                                             <tr>
                                                 <td><strong>button-color-mapping-simple.html</strong></td>
                                                 <td>button-color-mapping-simple</td>
-                                                <td>מיפוי צבעי כפתורים (פשוט)</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">עיצוב</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -561,7 +500,6 @@
                                             <tr>
                                                 <td><strong>preferences-groups-management.html</strong></td>
                                                 <td>preferences-groups-management</td>
-                                                <td>ניהול קבוצות העדפות</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">ניהול העדפות</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -571,7 +509,6 @@
                                             <tr>
                                                 <td><strong>tradingview-widgets-showcase.html</strong></td>
                                                 <td>תצוגת ווידג'טים</td>
-                                                <td>תצוגת ווידג'טים TradingView</td>
                                                 <td><span class="badge bg-success">עמודי כלי פיתוח</span></td>
                                                 <td><span class="badge bg-dark">אינטגרציה</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -595,9 +532,7 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-auth-pages">
                                         <thead class="table-light"><tr><th scope="col" class="col-content">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם קובץ" data-classes="btn-link sortable-header" data-column="filename"></button>
-                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
-                                                </th><th scope="col" class="col-type">
+                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
                                                 </th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה פנימית" data-classes="btn-link sortable-header" data-column="subcategory"></button>
@@ -609,7 +544,6 @@
                                         <tbody>                                            <tr>
                                                 <td><strong>login.html</strong></td>
                                                 <td>כניסה</td>
-                                                <td>כניסה למערכת</td>
                                                 <td><span class="badge bg-dark">עמודי אימות</span></td>
                                                 <td><span class="badge bg-dark">כניסה והרשמה</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -619,7 +553,6 @@
                                             <tr>
                                                 <td><strong>register.html</strong></td>
                                                 <td>הרשמה</td>
-                                                <td>הרשמה למערכת</td>
                                                 <td><span class="badge bg-dark">עמודי אימות</span></td>
                                                 <td><span class="badge bg-dark">כניסה והרשמה</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -629,7 +562,6 @@
                                             <tr>
                                                 <td><strong>forgot-password.html</strong></td>
                                                 <td>שכחתי סיסמה</td>
-                                                <td>שחזור סיסמה</td>
                                                 <td><span class="badge bg-dark">עמודי אימות</span></td>
                                                 <td><span class="badge bg-dark">שחזור סיסמה</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -638,7 +570,6 @@
                                             </tr>
                                             <tr>
                                                 <td><strong>reset-password.html</strong></td>
-                                                <td>איפוס סיסמה</td>
                                                 <td>איפוס סיסמה</td>
                                                 <td><span class="badge bg-dark">עמודי אימות</span></td>
                                                 <td><span class="badge bg-dark">שחזור סיסמה</span></td>
@@ -663,9 +594,7 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-test-pages">
                                         <thead class="table-light"><tr><th scope="col" class="col-content">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם קובץ" data-classes="btn-link sortable-header" data-column="filename"></button>
-                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
-                                                </th><th scope="col" class="col-type">
+                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
                                                 </th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה פנימית" data-classes="btn-link sortable-header" data-column="subcategory"></button>
@@ -677,172 +606,155 @@
                                         <tbody>                                            <tr>
                                                 <td><strong>test-header-only.html</strong></td>
                                                 <td>test-header-only</td>
-                                                <td>בדיקת ראש הדף</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-header-only" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-header-only" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#1-test-header-only" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-bootstrap-popover-comparison.html</strong></td>
                                                 <td>test-bootstrap-popover-comparison</td>
-                                                <td>השוואת popover Bootstrap</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-bootstrap-popover-comparison" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-bootstrap-popover-comparison" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#4-test-bootstrap-popover-comparison" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-frontend-wrappers.html</strong></td>
                                                 <td>test-frontend-wrappers</td>
-                                                <td>בדיקת wrappers קדמיים</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-frontend-wrappers" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-frontend-wrappers" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#3-test-frontend-wrappers" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-monitoring.html</strong></td>
                                                 <td>test-monitoring</td>
-                                                <td>בדיקת מוניטורינג</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-monitoring" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-monitoring" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#2-test-monitoring" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-nested-modal-rich-text.html</strong></td>
                                                 <td>test-nested-modal-rich-text</td>
-                                                <td>בדיקת modal מקונן עם rich text</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-nested-modal-rich-text" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-nested-modal-rich-text" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#5-test-nested-modal-rich-text" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-overlay-debug.html</strong></td>
                                                 <td>test-overlay-debug</td>
-                                                <td>בדיקת overlay debug</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-overlay-debug" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-overlay-debug" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#6-test-overlay-debug" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-phase1-recovery.html</strong></td>
                                                 <td>test-phase1-recovery</td>
-                                                <td>בדיקת שחזור phase 1</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-phase1-recovery" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-phase1-recovery" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#17-test-phase1-recovery" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-phase3-1-comprehensive.html</strong></td>
                                                 <td>test-phase3-1-comprehensive</td>
-                                                <td>בדיקת phase 3.1 מקיפה</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-phase3-1-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-phase3-1-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#18-test-phase3-1-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-quill.html</strong></td>
                                                 <td>test-quill</td>
-                                                <td>בדיקת Quill editor</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-quill" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-quill" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#7-test-quill" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-recent-items-widget.html</strong></td>
                                                 <td>test-recent-items-widget</td>
-                                                <td>בדיקת ווידג'ט פריטים אחרונים</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-danger">מוגנים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-recent-items-widget" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-recent-items-widget" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#11-test-recent-items-widget" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-ticker-widgets-performance.html</strong></td>
                                                 <td>test-ticker-widgets-performance</td>
-                                                <td>בדיקת ביצועי ווידג'טים טיקר</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-danger">מוגנים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-ticker-widgets-performance" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-ticker-widgets-performance" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#12-test-ticker-widgets-performance" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-unified-widget-comprehensive.html</strong></td>
                                                 <td>test-unified-widget-comprehensive</td>
-                                                <td>בדיקת ווידג'ט מאוחד מקיף</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-unified-widget-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-unified-widget-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#10-test-unified-widget-comprehensive" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-unified-widget-integration.html</strong></td>
                                                 <td>test-unified-widget-integration</td>
-                                                <td>בדיקת אינטגרציה ווידג'ט מאוחד</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-unified-widget-integration" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-unified-widget-integration" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#9-test-unified-widget-integration" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-unified-widget.html</strong></td>
                                                 <td>test-unified-widget</td>
-                                                <td>בדיקת ווידג'ט מאוחד</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-success">ציבוריים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-unified-widget" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-unified-widget" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#8-test-unified-widget" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>test-user-ticker-integration.html</strong></td>
                                                 <td>test-user-ticker-integration</td>
-                                                <td>בדיקת אינטגרציה טיקר משתמש</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-danger">מוגנים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/test-user-ticker-integration" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/test-user-ticker-integration" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#13-test-user-ticker-integration" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>scripts/test-user-ticker-frontend.html</strong></td>
                                                 <td>scripts/test-user-ticker-frontend</td>
-                                                <td>בדיקת טיקר משתמש (scripts)</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-danger">מוגנים</span></td>
                                                 <td><span class="badge bg-danger">🔴 מוגן</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/scripts/test-user-ticker-frontend.html" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/scripts/test-user-ticker-frontend.html" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#14-scripts-test-user-ticker-frontend" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>external_data_dashboard.html</strong></td>
                                                 <td>נתונים חיצוניים</td>
-                                                <td>דשבורד נתונים חיצוניים</td>
                                                 <td><span class="badge bg-dark">עמודי בדיקה</span></td>
                                                 <td><span class="badge bg-dark">ניטור</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/external_data_dashboard" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/EXTERNAL_DATA_DASHBOARD_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
+                                                <td><a href="/external_data_dashboard" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TOOLS/EXTERNAL_DATA_DASHBOARD_GUIDE.md" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#16-external-data-dashboard" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 מדריך בדיקה</a></td>
                                             </tr>
 </tbody>
                                     </table>
@@ -861,9 +773,7 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-mockup-pages">
                                         <thead class="table-light"><tr><th scope="col" class="col-content">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם קובץ" data-classes="btn-link sortable-header" data-column="filename"></button>
-                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-description">
-                                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header" data-column="description"></button>
-                                                </th><th scope="col" class="col-type">
+                                                </th><th scope="col" class="col-description"><button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם עברית" data-classes="btn-link sortable-header" data-column="hebrew_name"></button></th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה" data-classes="btn-link sortable-header" data-column="category"></button>
                                                 </th><th scope="col" class="col-type">
                                                     <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="קטגוריה פנימית" data-classes="btn-link sortable-header" data-column="subcategory"></button>
@@ -875,16 +785,14 @@
                                         <tbody>                                            <tr>
                                                 <td><strong>comparative-analysis-page.html</strong></td>
                                                 <td>comparative-analysis-page</td>
-                                                <td>ניתוח השוואתי</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
                                                 <td><span class="badge bg-secondary">❌ לא</span></td>
-                                                <td><a href="/mockups/daily-snapshots/comparative-analysis-page.html" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a></td>
+                                                <td><a href="/mockups/daily-snapshots/comparative-analysis-page.html" target="_blank" class="btn btn-sm btn-outline-secondary">לעמוד</a> <a href="documentation/03-DEVELOPMENT/TESTING/TEST_PAGES_GUIDE.md#16-external-data-dashboard" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a></td>
                                             </tr>
                                             <tr>
                                                 <td><strong>tradingview-test-page.html</strong></td>
-                                                <td>בדיקת TradingView</td>
                                                 <td>בדיקת TradingView</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
@@ -895,7 +803,6 @@
                                             <tr>
                                                 <td><strong>date-comparison-modal.html</strong></td>
                                                 <td>date-comparison-modal</td>
-                                                <td>השוואת תאריכים</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -905,7 +812,6 @@
                                             <tr>
                                                 <td><strong>emotional-tracking-widget.html</strong></td>
                                                 <td>emotional-tracking-widget</td>
-                                                <td>תיעוד רגשי</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -915,7 +821,6 @@
                                             <tr>
                                                 <td><strong>history-widget.html</strong></td>
                                                 <td>history-widget</td>
-                                                <td>ווידג'ט היסטוריה</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -925,7 +830,6 @@
                                             <tr>
                                                 <td><strong>economic-calendar-page.html</strong></td>
                                                 <td>economic-calendar-page</td>
-                                                <td>לוח כלכלי</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -935,7 +839,6 @@
                                             <tr>
                                                 <td><strong>strategy-analysis-page.html</strong></td>
                                                 <td>strategy-analysis-page</td>
-                                                <td>ניתוח אסטרטגיות</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -945,7 +848,6 @@
                                             <tr>
                                                 <td><strong>price-history-page.html</strong></td>
                                                 <td>price-history-page</td>
-                                                <td>היסטוריית מחירים</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -955,7 +857,6 @@
                                             <tr>
                                                 <td><strong>heatmap-visual-example.html</strong></td>
                                                 <td>heatmap-visual-example</td>
-                                                <td>דוגמת מפת חום</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-success">daily-snapshots</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -965,7 +866,6 @@
                                             <tr>
                                                 <td><strong>strategy-analysis.html</strong></td>
                                                 <td>strategy-analysis</td>
-                                                <td>ניתוח אסטרטגיות (מוקאפ)</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עתידיים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -975,7 +875,6 @@
                                             <tr>
                                                 <td><strong>trades_formatted.html</strong></td>
                                                 <td>trades_formatted</td>
-                                                <td>טריידים מעוצבים (מוקאפ)</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-warning text-dark">עתידיים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -985,7 +884,6 @@
                                             <tr>
                                                 <td><strong>add-ticker-modal.html</strong></td>
                                                 <td>add-ticker-modal</td>
-                                                <td>הוספת טיקר</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-dark">אחרים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -995,7 +893,6 @@
                                             <tr>
                                                 <td><strong>flag-quick-action.html</strong></td>
                                                 <td>flag-quick-action</td>
-                                                <td>פעולה מהירה</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-dark">אחרים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -1005,7 +902,6 @@
                                             <tr>
                                                 <td><strong>watch-list-modal.html</strong></td>
                                                 <td>watch-list-modal</td>
-                                                <td>רשימת מעקב</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-dark">אחרים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -1015,7 +911,6 @@
                                             <tr>
                                                 <td><strong>watch-lists-page.html</strong></td>
                                                 <td>watch-lists-page</td>
-                                                <td>רשימות מעקב</td>
                                                 <td><span class="badge bg-dark">עמודי מוקאפים</span></td>
                                                 <td><span class="badge bg-dark">אחרים</span></td>
                                                 <td><span class="badge bg-info">🔵 ציבורי</span></td>
@@ -1143,6 +1038,28 @@
     <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
     <!-- [31.7] Load Order: 31.7 | Strategy: defer -->
     <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/15: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v3.0 (Backend-first architecture - complete data from server) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 3.0.0 -->
+
+    <!-- [X] Load Order: X | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/5: INITIALIZATION PACKAGE ===== -->

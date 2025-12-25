@@ -71,7 +71,8 @@ from config.settings import (
     IS_PRODUCTION,
     IS_TESTING,
     ENVIRONMENT,
-    UI_DIR
+    UI_DIR,
+    BASE_DIR
 )
 
 # Import new architecture components
@@ -2640,29 +2641,6 @@ def favicon():
 @app.route('/trading-ui/<path:filename>')
 def serve_ui_files(filename):
     """Serve static UI files explicitly under /trading-ui/* with correct MIME types"""
-    # #region agent log - hypothesis A: Trading UI route with proper MIME types
-    import json
-    import mimetypes
-    import os
-    try:
-        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
-            log_entry = json.dumps({
-                "sessionId": "debug-session",
-                "runId": "initial-run",
-                "hypothesisId": "A",
-                "location": "Backend/app.py:2641",
-                "message": "serve_ui_files called (trading-ui route)",
-                "data": {
-                    "filename": filename,
-                    "full_path": os.path.join(UI_DIR, filename)
-                },
-                "timestamp": int(time.time() * 1000)
-            })
-            f.write(log_entry + '\n')
-    except Exception as e:
-        pass
-    # #endregion
-
     import mimetypes
     full_path = os.path.join(UI_DIR, filename)
     if not os.path.exists(full_path):

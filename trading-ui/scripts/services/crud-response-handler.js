@@ -101,6 +101,26 @@ class CRUDResponseHandler {
                     if (typeof window.showSimpleErrorNotification === 'function') {
                         window.showSimpleErrorNotification('שגיאת ולידציה', message);
                     }
+                    
+                    // Check if this is a duplicate name error
+                    const isDuplicateName = message.includes('already exists') || 
+                                          message.includes('כבר קיים') || 
+                                          (errorData.error && errorData.error.message && 
+                                           (errorData.error.message.includes('already exists') || 
+                                            errorData.error.message.includes('כבר קיים')));
+                    
+                    // Return error details for testing context (when options.returnErrorDetails is true)
+                    if (options.returnErrorDetails) {
+                        return {
+                            success: false,
+                            error: {
+                                message: message,
+                                status: response.status,
+                                errorData: errorData,
+                                isDuplicateName: isDuplicateName
+                            }
+                        };
+                    }
                     return null;
                 }
                 

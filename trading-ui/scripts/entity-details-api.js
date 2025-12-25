@@ -1773,7 +1773,21 @@ class EntityDetailsAPI {
 
             // Use direct entity API endpoint to avoid 302 redirect
             // entity-details API returns 302 redirect, so we use the actual endpoint directly
-            const directUrl = `/api/${entityType}s/${entityId}`;
+            // Map entity types to correct API endpoints (with proper dashes/underscores)
+            const endpointMap = {
+                'trade': `/api/trades/${entityId}`,
+                'trade_plan': `/api/trade-plans/${entityId}`,
+                'alert': `/api/alerts/${entityId}`,
+                'ticker': `/api/tickers/${entityId}`,
+                'trading_account': `/api/trading-accounts/${entityId}`,
+                'execution': `/api/executions/${entityId}`,
+                'cash_flow': `/api/cash-flows/${entityId}`,
+                'note': `/api/notes/${entityId}`,
+                'watch_list': `/api/watch-lists/${entityId}`,
+                'import_session': `/api/user-data-import/session/${entityId}`
+            };
+            
+            const directUrl = endpointMap[entityType] || `/api/${entityType}s/${entityId}`;
             
             const response = await fetch(directUrl, {
                 method: 'DELETE',

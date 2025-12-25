@@ -64,7 +64,13 @@
 // - copyDetailedLogAlt() - Copydetailedlogalt
 // - translateStatus() - Translatestatus
 
-console.log('🔧 test-header-only.js v6.0.0 loaded successfully!');
+if (window.Logger) {
+    window.Logger.info('test-header-only.js v6.0.0 loaded successfully', {
+        page: 'test-header-only',
+        component: 'test-header-only',
+        version: '6.0.0'
+    });
+}
 
 // ===== UTILITY FUNCTIONS =====
 
@@ -72,7 +78,12 @@ console.log('🔧 test-header-only.js v6.0.0 loaded successfully!');
  * Log function for compatibility
  */
 function log(message) {
-    console.log(`[Test] ${message}`);
+    if (window.Logger) {
+        window.Logger.info(`[Test] ${message}`, {
+            page: 'test-header-only',
+            component: 'test-header-only'
+        });
+    }
 }
 
 // ===== NEW HEADER SYSTEM TESTING FUNCTIONS =====
@@ -95,10 +106,23 @@ window.debugHeaderFilters = function() {
                 rect: el.getBoundingClientRect(),
             };
         });
-        console.table(state);
+        if (window.Logger) {
+            window.Logger.debug('Header filters debug state', {
+                page: 'test-header-only',
+                component: 'header-filters',
+                data: state
+            });
+        }
         return state;
     } catch (e) {
-        console.error('debugHeaderFilters error', e);
+        if (window.Logger) {
+            window.Logger.error('debugHeaderFilters error', {
+                page: 'test-header-only',
+                component: 'header-filters',
+                error: e.message,
+                stack: e.stack
+            });
+        }
         return null;
     }
 };
@@ -109,7 +133,13 @@ window.forceOpenAllHeaderMenus = function() {
         const el = document.getElementById(id);
         if (el) el.classList.add('show');
     });
-    console.log('✅ Forced all header filter menus open');
+    if (window.Logger) {
+        window.Logger.info('Forced all header filter menus open', {
+            page: 'test-header-only',
+            component: 'header-filters',
+            action: 'force-open-all-menus'
+        });
+    }
     window.debugHeaderFilters && window.debugHeaderFilters();
 };
 
@@ -126,7 +156,7 @@ let testResults = {
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize testing system
 // document.addEventListener('DOMContentLoaded', () => {
-//     console.log('🧪 Initializing Header System Testing...');
+//     if (window.Logger) { window.Logger.info('🧪 Initializing Header System Testing...', { page: 'test-header-only', component: 'test-header-only' }); }
 //     initializeTestingSystem();
 // });
 
@@ -135,7 +165,13 @@ let testResults = {
  */
 async function initializeTestingSystem() {
     try {
-        console.log('🚀 Starting Header System Testing...');
+        if (window.Logger) {
+            window.Logger.info('Starting Header System Testing', {
+                page: 'test-header-only',
+                component: 'testing-system',
+                action: 'initialize'
+            });
+        }
         
         // Wait for HeaderSystem to be available
         let attempts = 0;
@@ -147,24 +183,78 @@ async function initializeTestingSystem() {
         if (window.HeaderSystem) {
             headerSystem = new HeaderSystem();
             await headerSystem.init();
-            console.log('✅ Header System initialized successfully');
+            if (window.Logger) {
+                window.Logger.info('Header System initialized successfully', {
+                    page: 'test-header-only',
+                    component: 'header-system',
+                    action: 'init-complete'
+                });
+            }
             
             // Wait a bit for the filter system to be ready
             setTimeout(() => {
-                console.log('🔧 Filter system should be ready now, registering tables...');
+                if (window.Logger) {
+                    window.Logger.info('Filter system should be ready now, registering tables', {
+                        page: 'test-header-only',
+                        component: 'filter-system',
+                        action: 'register-tables'
+                    });
+                }
                 // Register tables with filter system
                 registerTablesWithFilterSystem();
+                
+                // Register tables with UnifiedTableSystem
+                if (typeof registerTablesWithUnifiedTableSystem === 'function') {
+                    registerTablesWithUnifiedTableSystem();
+                }
+                
+                // Initialize PreferencesSystem if available
+                if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+                    window.PreferencesSystem.initialize().then(() => {
+                        if (window.Logger) {
+                            window.Logger.info('PreferencesSystem initialized', {
+                                page: 'test-header-only',
+                                component: 'preferences-system',
+                                action: 'init-complete'
+                            });
+                        }
+                    }).catch(error => {
+                        if (window.Logger) {
+                            window.Logger.warn('PreferencesSystem initialization failed', {
+                                page: 'test-header-only',
+                                component: 'preferences-system',
+                                action: 'init-failed',
+                                error: error.message
+                            });
+                        }
+                    });
+                }
                 
                 // Run initial tests
                 runInitialTests();
             }, 100);
         } else {
-            console.error('❌ HeaderSystem not available');
+            if (window.Logger) {
+                window.Logger.error('HeaderSystem not available', {
+                    page: 'test-header-only',
+                    component: 'header-system',
+                    action: 'init-failed',
+                    attempts: attempts
+                });
+            }
             updateAllStatuses('לא זמין', false);
         }
         
     } catch (error) {
-        console.error('❌ Error initializing testing system:', error);
+        if (window.Logger) {
+            window.Logger.error('Error initializing testing system', {
+                page: 'test-header-only',
+                component: 'testing-system',
+                action: 'init-error',
+                error: error.message,
+                stack: error.stack
+            });
+        }
         updateAllStatuses('שגיאה', false);
     }
 }
@@ -174,7 +264,13 @@ async function initializeTestingSystem() {
  */
 function registerTablesWithFilterSystem() {
     try {
-        console.log('🔧 Registering tables with filter system...');
+        if (window.Logger) {
+            window.Logger.info('Registering tables with filter system', {
+                page: 'test-header-only',
+                component: 'filter-system',
+                action: 'register-tables-start'
+            });
+        }
         
         // Wait for filter system to be available
         if (window.filterSystem && typeof window.filterSystem.registerTable === 'function') {
@@ -184,26 +280,72 @@ function registerTablesWithFilterSystem() {
                 fields: ['symbol', 'status', 'has_trades', 'current_price', 'change_percent', 'investment_type', 'name', 'remarks', 'date'],
                 renderFunction: null
             };
-            console.log('🔧 Registering tickersTable with config:', tickersConfig);
+            if (window.Logger) {
+                window.Logger.debug('Registering tickersTable with config', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-tickers-table',
+                    config: tickersConfig
+                });
+            }
             window.filterSystem.registerTable('tickersTable', tickersConfig);
-            console.log('✅ Tickers table registered with filter system');
+            if (window.Logger) {
+                window.Logger.info('Tickers table registered with filter system', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-tickers-table-complete'
+                });
+            }
             
             // Register trade plans table
             const tradePlansConfig = {
                 fields: ['symbol', 'date', 'investment_type', 'side', 'amount', 'target', 'stop', 'current', 'status', 'account'],
                 renderFunction: null
             };
-            console.log('🔧 Registering tradePlansTable with config:', tradePlansConfig);
+            if (window.Logger) {
+                window.Logger.debug('Registering tradePlansTable with config', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-trade-plans-table',
+                    config: tradePlansConfig
+                });
+            }
             window.filterSystem.registerTable('tradePlansTable', tradePlansConfig);
-            console.log('✅ Trade plans table registered with filter system');
+            if (window.Logger) {
+                window.Logger.info('Trade plans table registered with filter system', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-trade-plans-table-complete'
+                });
+            }
             
-            console.log('✅ All tables registered successfully');
+            if (window.Logger) {
+                window.Logger.info('All tables registered successfully', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-tables-complete'
+                });
+            }
         } else {
-            console.warn('⚠️ Filter system not available for table registration');
+            if (window.Logger) {
+                window.Logger.warn('Filter system not available for table registration', {
+                    page: 'test-header-only',
+                    component: 'filter-system',
+                    action: 'register-tables-failed'
+                });
+            }
         }
         
     } catch (error) {
-        console.error('❌ Error registering tables with filter system:', error);
+        if (window.Logger) {
+            window.Logger.error('Error registering tables with filter system', {
+                page: 'test-header-only',
+                component: 'filter-system',
+                action: 'register-tables-error',
+                error: error.message,
+                stack: error.stack
+            });
+        }
     }
 }
 
@@ -212,7 +354,7 @@ function registerTablesWithFilterSystem() {
  */
 async function runInitialTests() {
     try {
-        console.log('🧪 Running initial tests...');
+        if (window.Logger) { window.Logger.info('🧪 Running initial tests...', { page: 'test-header-only', component: 'test-header-only' }); }
         
         // Test components
         await testComponents();
@@ -229,10 +371,10 @@ async function runInitialTests() {
         // Update performance metrics
         updatePerformanceMetrics();
         
-        console.log('✅ Initial tests completed');
+        if (window.Logger) { window.Logger.info('✅ Initial tests completed', { page: 'test-header-only', component: 'test-header-only' }); }
         
     } catch (error) {
-        console.error('❌ Error running initial tests:', error);
+        if (window.Logger) { window.Logger.error('❌ Error running initial tests:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
     }
 }
 
@@ -256,7 +398,7 @@ async function testComponents() {
         }
         
     } catch (error) {
-        console.error('❌ Error testing components:', error);
+        if (window.Logger) { window.Logger.error('❌ Error testing components:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
     }
 }
 
@@ -277,7 +419,7 @@ async function testServices() {
         }
         
     } catch (error) {
-        console.error('❌ Error testing services:', error);
+        if (window.Logger) { window.Logger.error('❌ Error testing services:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
     }
 }
 
@@ -312,7 +454,7 @@ async function testIntegration() {
         };
         
     } catch (error) {
-        console.error('❌ Error testing integration:', error);
+        if (window.Logger) { window.Logger.error('❌ Error testing integration:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
     }
 }
 
@@ -337,7 +479,7 @@ function updateSystemStats() {
         };
         
     } catch (error) {
-        console.error('❌ Error updating system stats:', error);
+        if (window.Logger) { window.Logger.error('❌ Error updating system stats:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
         // Fallback values
         updateStatus('componentsCount', '8');
         updateStatus('servicesCount', '3');
@@ -369,7 +511,7 @@ function updatePerformanceMetrics() {
         };
         
     } catch (error) {
-        console.error('❌ Error updating performance metrics:', error);
+        if (window.Logger) { window.Logger.error('❌ Error updating performance metrics:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
     }
 }
 
@@ -406,32 +548,32 @@ function updateAllStatuses(status, isSuccess = true) {
  * Test Functions for Buttons
  */
 function runUnitTests() {
-    console.log('🧪 Running Unit Tests...');
+    if (window.Logger) { window.Logger.info('🧪 Running Unit Tests...', { page: 'test-header-only', component: 'test-header-only' }); }
     testComponents();
     testServices();
 }
 
 function runIntegrationTests() {
-    console.log('🔗 Running Integration Tests...');
+    if (window.Logger) { window.Logger.info('🔗 Running Integration Tests...', { page: 'test-header-only', component: 'test-header-only' }); }
     testIntegration();
 }
 
 function runPerformanceTests() {
-    console.log('⚡ Running Performance Tests...');
+    if (window.Logger) { window.Logger.info('⚡ Running Performance Tests...', { page: 'test-header-only', component: 'test-header-only' }); }
     updatePerformanceMetrics();
 }
 
 function runAllTests() {
-    console.log('🚀 Running All Tests...');
+    if (window.Logger) { window.Logger.info('🚀 Running All Tests...', { page: 'test-header-only', component: 'test-header-only' }); }
     runInitialTests();
 }
 
 function resetSystem() {
-    console.log('🔄 Resetting System...');
+    if (window.Logger) { window.Logger.info('🔄 Resetting System...', { page: 'test-header-only', component: 'test-header-only' }); }
     if (headerSystem) {
         // Reset system state
         headerSystem.state.reset();
-        console.log('✅ System reset completed');
+        if (window.Logger) { window.Logger.info('✅ System reset completed', { page: 'test-header-only', component: 'test-header-only' }); }
     }
 }
 
@@ -539,6 +681,42 @@ function updateQuickStats() {
     if (sectionsCountElement) {
         sectionsCountElement.textContent = `${sections.length} סקשנים`;
     }
+    
+    // עדכון מידע על מערכות נתונים
+    updateDataSystemsStatus();
+}
+
+/**
+ * עדכון סטטוס מערכות נתונים (Cache, Preferences)
+ */
+function updateDataSystemsStatus() {
+    // Check UnifiedCacheManager
+    const cacheStatusElement = document.getElementById('cacheSystemStatus');
+    if (cacheStatusElement) {
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.isInitialized === 'function') {
+            const isInitialized = window.UnifiedCacheManager.isInitialized();
+            cacheStatusElement.textContent = isInitialized ? '✅ פעיל' : '⚠️ לא מאותחל';
+            cacheStatusElement.className = isInitialized ? 'text-success' : 'text-warning';
+        } else {
+            cacheStatusElement.textContent = '❌ לא זמין';
+            cacheStatusElement.className = 'text-danger';
+        }
+    }
+    
+    // Check PreferencesSystem
+    const preferencesStatusElement = document.getElementById('preferencesSystemStatus');
+    if (preferencesStatusElement) {
+        if (window.PreferencesSystem && window.PreferencesSystem.initialized) {
+            preferencesStatusElement.textContent = '✅ פעיל';
+            preferencesStatusElement.className = 'text-success';
+        } else if (window.getPreference && typeof window.getPreference === 'function') {
+            preferencesStatusElement.textContent = '⚠️ חלקי';
+            preferencesStatusElement.className = 'text-warning';
+        } else {
+            preferencesStatusElement.textContent = '❌ לא זמין';
+            preferencesStatusElement.className = 'text-danger';
+        }
+    }
 }
 
 /**
@@ -585,12 +763,12 @@ function testSearchFilter() {
  * טעינת כפתורי פעולות לטבלה
  */
 function loadActionButtons() {
-    console.log('🔧 loadActionButtons called - START');
-    console.log('🔧 loadTableActionButtons function available:', typeof window.loadTableActionButtons);
+    if (window.Logger) { window.Logger.info('🔧 loadActionButtons called - START', { page: 'test-header-only', component: 'test-header-only' }); }
+    if (window.Logger) { window.Logger.info('🔧 loadTableActionButtons function available:', { page: 'test-header-only', component: 'test-header-only', data: 'typeof window.loadTableActionButtons' }); }
     
     // טעינת כפתורים לכל הטבלה בבת אחת
     if (typeof window.loadTableActionButtons === 'function') {
-        console.log('🔧 Loading action buttons for entire table...');
+        if (window.Logger) { window.Logger.info('🔧 Loading action buttons for entire table...', { page: 'test-header-only', component: 'test-header-only' }); }
         
         // הגדרות מותאמות אישית לטבלת הטיקרים
         const tickerConfig = {
@@ -603,9 +781,9 @@ function loadActionButtons() {
         };
         
         window.loadTableActionButtons('tickersTable', 'ticker', tickerConfig);
-        console.log('✅ Action buttons loaded for all rows');
+        if (window.Logger) { window.Logger.info('✅ Action buttons loaded for all rows', { page: 'test-header-only', component: 'test-header-only' }); }
     } else {
-        console.log('❌ loadTableActionButtons function not available');
+        if (window.Logger) { window.Logger.info('❌ loadTableActionButtons function not available', { page: 'test-header-only', component: 'test-header-only' }); }
     }
 }
 
@@ -621,9 +799,9 @@ function loadActionButtons() {
     loadRealData();
     
     // טעינת כפתורי פעולות אחרי שהדף נטען
-    console.log('🔧 Setting timeout for loadActionButtons...');
+    if (window.Logger) { window.Logger.info('🔧 Setting timeout for loadActionButtons...', { page: 'test-header-only', component: 'test-header-only' }); }
     setTimeout(function() {
-        console.log('🔧 Timeout triggered, calling loadActionButtons...');
+        if (window.Logger) { window.Logger.info('🔧 Timeout triggered, calling loadActionButtons...', { page: 'test-header-only', component: 'test-header-only' }); }
         loadActionButtons();
     }, 100);
 // });
@@ -634,7 +812,7 @@ function loadActionButtons() {
  * טעינת נתונים אמיתיים מבסיס הנתונים
  */
 async function loadRealData() {
-    console.log('🔄 טעינת נתונים אמיתיים מבסיס הנתונים...');
+    if (window.Logger) { window.Logger.info('🔄 טעינת נתונים אמיתיים מבסיס הנתונים...', { page: 'test-header-only', component: 'test-header-only' }); }
     
     try {
         // טעינת נתוני תכנוני טריידים
@@ -646,17 +824,40 @@ async function loadRealData() {
         log('נתונים אמיתיים נטענו מבסיס הנתונים');
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים:', error);
+        if (window.Logger) { window.Logger.error('❌ שגיאה בטעינת נתונים:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
         log('שגיאה בטעינת נתונים: ' + error.message);
     }
 }
 
 /**
- * טעינת נתוני תכנוני טריידים ישירות מה-API
+ * טעינת נתוני תכנוני טריידים עם UnifiedCacheManager
  */
-async function loadTradePlansTableData() {
+async function loadTradePlansTableData(options = {}) {
     try {
-        console.log('🔄 טוען נתוני תכנוני טריידים...');
+        const { force = false } = options || {};
+        const CACHE_KEY = 'test-header-only-trade-plans';
+        const CACHE_TTL = 45 * 1000; // 45 seconds
+        
+        // Try to load from cache first
+        if (!force && window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+            const cached = await window.UnifiedCacheManager.get(CACHE_KEY, { ttl: CACHE_TTL });
+            if (cached) {
+                if (window.Logger) {
+                    window.Logger.debug('📦 Trade plans loaded from cache', {
+                        page: 'test-header-only',
+                        component: 'trade-plans-data',
+                        count: Array.isArray(cached) ? cached.length : (Array.isArray(cached?.data) ? cached.data.length : 0)
+                    });
+                }
+                const data = Array.isArray(cached) ? cached : (Array.isArray(cached?.data) ? cached.data : []);
+                window.tradePlansData = data;
+                updateTradePlansTableDisplay(data);
+                return data;
+            }
+        }
+        
+        if (window.Logger) { window.Logger.info('🔄 טוען נתוני תכנוני טריידים מה-API...', { page: 'test-header-only', component: 'test-header-only' }); }
+        
         const response = await fetch(`/api/trade-plans/?_t=${Date.now()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
@@ -667,21 +868,55 @@ async function loadTradePlansTableData() {
         const result = await response.json();
         const data = result.data || [];
         
+        // Save to cache
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+            await window.UnifiedCacheManager.save(CACHE_KEY, data, {
+                ttl: CACHE_TTL,
+                syncToBackend: false
+            });
+        }
+        
         window.tradePlansData = data;
         updateTradePlansTableDisplay(data);
-        console.log(`✅ טענו ${data.length} תכנוני טריידים`);
+        if (window.Logger) { window.Logger.info(`✅ טענו ${data.length} תכנוני טריידים`, { page: 'test-header-only', component: 'test-header-only', count: data.length }); }
+        
+        return data;
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת תכנוני טריידים:', error);
+        if (window.Logger) { window.Logger.error('❌ שגיאה בטעינת תכנוני טריידים:', { page: 'test-header-only', component: 'test-header-only', error: error.message, stack: error.stack }); }
+        throw error;
     }
 }
 
 /**
- * טעינת נתוני ביצועים ישירות מה-API
+ * טעינת נתוני ביצועים עם UnifiedCacheManager
  */
-async function loadExecutionsTableData() {
+async function loadExecutionsTableData(options = {}) {
     try {
-        console.log('🔄 טוען נתוני ביצועים...');
+        const { force = false } = options || {};
+        const CACHE_KEY = 'test-header-only-executions';
+        const CACHE_TTL = 45 * 1000; // 45 seconds
+        
+        // Try to load from cache first
+        if (!force && window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+            const cached = await window.UnifiedCacheManager.get(CACHE_KEY, { ttl: CACHE_TTL });
+            if (cached) {
+                if (window.Logger) {
+                    window.Logger.debug('📦 Executions loaded from cache', {
+                        page: 'test-header-only',
+                        component: 'executions-data',
+                        count: Array.isArray(cached) ? cached.length : (Array.isArray(cached?.data) ? cached.data.length : 0)
+                    });
+                }
+                const data = Array.isArray(cached) ? cached : (Array.isArray(cached?.data) ? cached.data : []);
+                window.executionsData = data;
+                updateExecutionsTableDisplay(data);
+                return data;
+            }
+        }
+        
+        if (window.Logger) { window.Logger.info('🔄 טוען נתוני ביצועים מה-API...', { page: 'test-header-only', component: 'test-header-only' }); }
+        
         const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
@@ -692,12 +927,23 @@ async function loadExecutionsTableData() {
         const result = await response.json();
         const data = result.data || [];
         
+        // Save to cache
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+            await window.UnifiedCacheManager.save(CACHE_KEY, data, {
+                ttl: CACHE_TTL,
+                syncToBackend: false
+            });
+        }
+        
         window.executionsData = data;
         updateExecutionsTableDisplay(data);
-        console.log(`✅ טענו ${data.length} ביצועים`);
+        if (window.Logger) { window.Logger.info(`✅ טענו ${data.length} ביצועים`, { page: 'test-header-only', component: 'test-header-only', count: data.length }); }
+        
+        return data;
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת ביצועים:', error);
+        if (window.Logger) { window.Logger.error('❌ שגיאה בטעינת ביצועים:', { page: 'test-header-only', component: 'test-header-only', error: error.message, stack: error.stack }); }
+        throw error;
     }
 }
 
@@ -801,7 +1047,7 @@ window.updateExecutionsTable = updateExecutionsTableDisplay;
  * @param {string} type - סוג הטיקר
  */
 function filterTickersByType(type) {
-    console.log('Filtering tickers by type:', type);
+    if (window.Logger) { window.Logger.info('Filtering tickers by type:', { page: 'test-header-only', component: 'test-header-only', data: 'type' }); }
     // פונקציה בסיסית - תיושם בעתיד
 }
 
@@ -809,7 +1055,7 @@ function filterTickersByType(type) {
  * פתיחה/סגירה של סקשן הטיקרים
  */
 function toggleTickersSection() {
-    console.log('Toggling tickers section');
+    if (window.Logger) { window.Logger.info('Toggling tickers section', { page: 'test-header-only', component: 'test-header-only' }); }
     // פונקציה בסיסית - תיושם בעתיד
 }
 
@@ -1077,36 +1323,150 @@ async function copyDetailedLog() {
         await navigator.clipboard.writeText(log);
         
         // Show notification if available, otherwise use console
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        if (typeof window.NotificationSystem !== 'undefined') {
+            if (window.NotificationSystem) { window.NotificationSystem.show('הלוג המפורט הועתק בהצלחה ללוח!', 'success'); }
         } else {
-            console.log('✅ הלוג המפורט הועתק בהצלחה ללוח!');
+            if (window.Logger) { window.Logger.info('✅ הלוג המפורט הועתק בהצלחה ללוח!', { page: 'test-header-only', component: 'test-header-only' }); }
         }
         
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
+        if (window.Logger) { 
+            window.Logger.info('=== לוג מפורט שהועתק ===', { page: 'test-header-only', component: 'test-header-only' });
+            window.Logger.debug('Detailed log content', { page: 'test-header-only', component: 'test-header-only', log: log });
+        }
+        if (window.Logger) { window.Logger.info('=== סוף הלוג ===', { page: 'test-header-only', component: 'test-header-only' }); }
     } catch (error) {
-        console.error('Failed to copy log:', error);
+        if (window.Logger) { window.Logger.error('Failed to copy log:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message', stack: 'error.stack' }); }
         
         // Show error notification if available, otherwise use console
-        if (typeof window.showNotification === 'function') {
+        if (typeof window.NotificationSystem !== 'undefined') {
             window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
         } else {
-            console.error('❌ שגיאה בהעתקת הלוג:', error.message);
+            if (window.Logger) { window.Logger.error('❌ שגיאה בהעתקת הלוג:', { page: 'test-header-only', component: 'test-header-only', error: 'error.message.message', stack: 'error.message.stack' }); }
         }
         
         // Fallback: show in console
         const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
+        if (window.Logger) { 
+            window.Logger.info('=== לוג מפורט (לא הועתק) ===', { page: 'test-header-only', component: 'test-header-only' });
+            window.Logger.debug('Detailed log content (fallback)', { page: 'test-header-only', component: 'test-header-only', log: log });
+        }
+        if (window.Logger) { window.Logger.info('=== סוף הלוג ===', { page: 'test-header-only', component: 'test-header-only' }); }
     }
 }
 
 // Export functions
 // window. export removed - using local function only
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+/**
+ * Register tables with UnifiedTableSystem
+ * This function should be called after page load
+ */
+function registerTablesWithUnifiedTableSystem() {
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+        if (window.Logger) {
+            window.Logger.warn('UnifiedTableSystem not available', {
+                page: 'test-header-only',
+                component: 'table-registration'
+            });
+        }
+        return;
+    }
+    
+    // Find all tables with data-table-type attribute
+    const tables = document.querySelectorAll('table[data-table-type]');
+    
+    tables.forEach(table => {
+        const tableType = table.getAttribute('data-table-type');
+        if (!tableType) return;
+        
+        // Skip if already registered
+        if (window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+            if (window.Logger) {
+                window.Logger.debug(`Table ${tableType} already registered`, {
+                    page: 'test-header-only',
+                    component: 'table-registration'
+                });
+            }
+            return;
+        }
+        
+        try {
+            // Get table rows
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            if (rows.length === 0) return;
+            
+            // Extract data from rows
+            const data = rows.map(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                return cells.map(cell => cell.textContent.trim());
+            });
+            
+            // Get column names from header
+            const headerRow = table.querySelector('thead tr');
+            const columns = headerRow ? 
+                Array.from(headerRow.querySelectorAll('th')).map(th => {
+                    const button = th.querySelector('button');
+                    return button ? button.textContent.trim().replace(/↕/g, '').trim() : th.textContent.trim();
+                }) :
+                [];
+            
+            // Register with UnifiedTableSystem
+            window.UnifiedTableSystem.registry.register(tableType, {
+                dataGetter: () => data,
+                updateFunction: (sortedData) => {
+                    if (!tbody || !Array.isArray(sortedData)) return;
+                    
+                    // Rebuild rows from sorted data
+                    const sortedRowsHTML = sortedData.map((sortedRow, idx) => {
+                        // Try to find original row by first cell content
+                        const firstCellText = sortedRow[0];
+                        const originalRow = rows.find(row => {
+                            const firstCell = row.querySelector('td');
+                            return firstCell && firstCell.textContent.trim() === firstCellText;
+                        });
+                        return originalRow ? originalRow.outerHTML : '';
+                    }).filter(html => html);
+                    
+                    tbody.innerHTML = sortedRowsHTML.join('');
+                },
+                tableSelector: `table[data-table-type="${tableType}"]`,
+                columns: columns,
+                sortable: true,
+                filterable: false,
+                defaultSort: { columnIndex: 0, direction: 'asc' }
+            });
+            
+            if (window.Logger) {
+                window.Logger.info(`Registered table ${tableType} with UnifiedTableSystem`, {
+                    page: 'test-header-only',
+                    component: 'table-registration',
+                    tableType: tableType,
+                    rowCount: data.length
+                });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error(`Error registering table ${tableType}`, {
+                    page: 'test-header-only',
+                    component: 'table-registration',
+                    tableType: tableType,
+                    error: error.message,
+                    stack: error.stack
+                });
+            }
+        }
+    });
+    
+    // Setup sort handlers after registration
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.events) {
+        window.UnifiedTableSystem.events.setupSortHandlers();
+    }
+}
+
 window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
 
 // Local  function for test-header-only page
@@ -1116,23 +1476,23 @@ async function copyDetailedLogAlt() {
         if (detailedLog) {
             await navigator.clipboard.writeText(detailedLog);
             if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+                if (window.NotificationSystem) { window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח'); }
             } else {
-                alert('לוג מפורט הועתק ללוח!');
+                if (window.NotificationSystem) { window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח'); }
             }
         } else {
             if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
+                if (window.NotificationSystem) { window.NotificationSystem.showWarning('אזהרה', 'אין לוג להעתקה'); }
             } else {
-                alert('אין לוג להעתקה');
+                if (window.NotificationSystem) { window.NotificationSystem.showWarning('אזהרה', 'אין לוג להעתקה'); }
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        if (window.Logger) { window.Logger.error('שגיאה בהעתקה:', { page: 'test-header-only', component: 'test-header-only', error: 'err.message', stack: 'err.stack' }); }
         if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
+            if (window.NotificationSystem) { window.NotificationSystem.showError('שגיאה בהעתקת הלוג', 'שגיאה'); }
         } else {
-            alert('שגיאה בהעתקת הלוג');
+            if (window.NotificationSystem) { window.NotificationSystem.showError('שגיאה בהעתקת הלוג', 'שגיאה'); }
         }
     }
 }

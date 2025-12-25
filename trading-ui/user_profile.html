@@ -25,7 +25,7 @@
     <div class="background-wrapper">
         <div class="page-body">
             <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Main Content Container (DO NOT MODIFY) -->
-            <div class="main-content" data-section="user-profile">
+            <main class="main-content" data-section="user-profile">
 
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
@@ -47,7 +47,7 @@
                                     <div class="card">
                                         <div class="card-body text-center">
                                             <div class="mb-3">
-                                                <img src="/trading-ui/images/icons/tabler/user-circle.svg" width="80" height="80" alt="User Avatar" class="rounded-circle bg-light p-2">
+                                                <img src="/trading-ui/images/icons/tabler/user.svg" width="80" height="80" alt="User Avatar" class="rounded-circle bg-light p-2">
                                             </div>
                                             <h5 id="userDisplayName">משתמש TikTrack</h5>
                                             <p class="text-muted" id="userEmail">user@tiktrack.com</p>
@@ -105,7 +105,7 @@
                     </div>
                 </div>
 
-            </div> <!-- .main-content -->
+            </main> <!-- .main-content -->
         </div> <!-- .page-body -->
     </div> <!-- .background-wrapper -->
 
@@ -123,11 +123,47 @@
     <script src="scripts/button-system-init.js?v=1.0.0" defer></script>
     <script src="scripts/icon-system.js?v=1.0.0" defer></script>
     <script src="scripts/notification-system.js?v=1.0.0" defer></script>
-    <script src="scripts/core-systems.js?v=1.0.0" defer></script>
+    <!-- Preferences Package -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script>
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script>
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script>
+    <!-- Package Manifest and Page Configs - Required before core-systems.js -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script>
     <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script>
     <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script>
-    <script src="scripts/ui-basic.js?v=1.0.0" defer></script>
-    <script src="scripts/init-system.js?v=1.0.0" defer></script>
+    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script>
+    
+    <!-- Services Package - Load in order according to package-manifest.js -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script>
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script>
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script>
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script>
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script>
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script>
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script>
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script>
+    <script src="scripts/services/linked-items-service.js?v=1.0.0" defer></script>
+    
+    <!-- Page-specific scripts -->
+    <script src="scripts/user-profile.js?v=1.0.0" defer></script>
+    <script src="scripts/user-profile-ai-analysis.js?v=1.0.0" defer></script>
 
     <!-- Page-specific script -->
     <script>

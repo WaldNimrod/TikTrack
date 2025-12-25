@@ -270,7 +270,7 @@
                         tbody.innerHTML = sortedRowsHTML.join('');
                     },
                     tableSelector: `table[data-table-type="${tableType}"]`,
-                    columns: ['filename', 'hebrew_name', 'description', 'category', 'subcategory', 'auth_status', 'has_crud', 'access', 'actions'],
+                    columns: ['filename', 'hebrew_name', 'category', 'subcategory', 'auth_status', 'has_crud', 'access', 'actions'],
                     sortable: true,
                     filterable: false,
                     defaultSort: { columnIndex: 0, direction: 'asc', key: 'filename' }
@@ -430,17 +430,24 @@
             return;
         }
 
-        // Toggle visibility
-        const isCollapsed = body.classList.contains('d-none');
-        body.classList.toggle('d-none');
+        // Check current state using style.display (consistent with toggleAllSections)
+        const isCollapsed = body.style.display === 'none' || window.getComputedStyle(body).display === 'none';
+        
+        // Toggle visibility using style.display (consistent with toggleAllSections)
+        if (isCollapsed) {
+            body.style.display = 'block';
+            section.classList.remove('collapsed');
+            section.classList.add('expanded');
+        } else {
+            body.style.display = 'none';
+            section.classList.add('collapsed');
+            section.classList.remove('expanded');
+        }
 
-        // Update button icon
-        const toggleBtn = section.querySelector('[data-onclick*="toggleSection"]');
+        // Update button icon (icon is the button text itself, not a child element)
+        const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
         if (toggleBtn) {
-            const icon = toggleBtn.querySelector('.icon');
-            if (icon) {
-                icon.textContent = isCollapsed ? '▲' : '▼';
-            }
+            toggleBtn.textContent = isCollapsed ? '▲' : '▼';
         }
 
         // Update state

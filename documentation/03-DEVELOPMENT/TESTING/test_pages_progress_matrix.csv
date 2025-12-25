@@ -1,0 +1,19 @@
+﻿עמוד בדיקה,צוות,סריקת קוד,ניתוח צרכים,בדיקת אינטגרציה,עדכון Logger,עדכון UI Systems,עדכון Data Systems,בדיקות Selenium,בדיקות QA,תיעוד,סטטוס כללי
+test-header-only.html,Team A,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,🔄 בתהליך
+test-monitoring.html,Team A,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,🔄 בתהליך
+test-frontend-wrappers.html,Team B,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-bootstrap-popover-comparison.html,Team B,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-nested-modal-rich-text.html,Team B,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-overlay-debug.html,Team B,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-phase1-recovery.html,Team E,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-phase3-1-comprehensive.html,Team E,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-quill.html,Team B,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-unified-widget.html,Team C,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-unified-widget-integration.html,Team C,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-unified-widget-comprehensive.html,Team C,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-recent-items-widget.html,Team C,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-ticker-widgets-performance.html,Team C,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+test-user-ticker-integration.html,Team D,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+scripts/test-user-ticker-frontend.html,Team D,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+conditions-test.html,Team D,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל
+external_data_dashboard.html,Team D,✅,✅,✅,⬜,⬜,⬜,⬜,⬜,⬜,⬜ לא התחיל

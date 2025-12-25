@@ -265,12 +265,109 @@
 
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
-                            <div class="row g-3 align-items-start">
-                                <div class="col-12 col-lg-4">
-                                    <div class="connector-section">
-    <!-- =============================================================== -->
-                                </div> <!-- End connector-section - content loaded dynamically by import-user-data.js -->
-                            </div> <!-- End row -->
+                            <div class="connector-section">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <label for="connectorSelect">בחר ספק נתונים:</label>
+                                    <button data-button-type="SECONDARY" data-text="איפוס תהליך"
+                                            data-onclick="confirmResetImportSession()" id="resetImportSessionBtn"></button>
+                                </div>
+                                <select id="connectorSelect" class="form-select">
+                                    <option value="">בחר ספק נתונים...</option>
+                                    <option value="ibkr">Interactive Brokers (IBKR)</option>
+                                    <option value="demo">Demo Data</option>
+                                </select>
+                                <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
+                            </div>
+
+                            <div class="summary-card active-session-card d-none" id="activeSessionIndicator">
+                                <h4>
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    סשן ייבוא פעיל
+                                </h4>
+                                <div class="summary-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">מזהה סשן:</span>
+                                        <span class="detail-value" id="activeSessionIdValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">מצב:</span>
+                                        <span class="detail-value" id="activeSessionStatusValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">קובץ:</span>
+                                        <span class="detail-value" id="activeSessionFileValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">חשבון:</span>
+                                        <span class="detail-value" id="activeSessionAccountValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">ספק:</span>
+                                        <span class="detail-value" id="activeSessionProviderValue"></span>
+                                    </div>
+                                </div>
+                                <div class="summary-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">סה"כ רשומות:</span>
+                                        <span class="detail-value" id="activeSessionTotalRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">לייבוא:</span>
+                                        <span class="detail-value" id="activeSessionReadyRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">להשמטה:</span>
+                                        <span class="detail-value" id="activeSessionSkipRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">טיקרים חסרים:</span>
+                                        <span class="detail-value" id="activeSessionMissingTickers">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">כפילויות:</span>
+                                        <span class="detail-value" id="activeSessionDuplicateRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">רשומות קיימות:</span>
+                                        <span class="detail-value" id="activeSessionExistingRecords">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="upload-section">
+                                <div class="file-drop-zone" id="dropZone">
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    <p>גרור קובץ CSV או לחץ לבחירה</p>
+                                    <input type="file" id="fileInput" accept=".csv" hidden>
+                                </div>
+                                <div class="file-info d-none" id="fileInfo">
+                                    <div class="file-details">
+                                        <span class="file-name" id="fileName"></span>
+                                        <span class="file-size" id="fileSize"></span>
+                                    </div>
+                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" data-onclick="resetFile()"></button>
+                                </div>
+                            </div>
+                            
+                            <div class="account-section">
+                                <label>בחר חשבון מסחר:</label>
+                                <select id="tradingAccountSelect" class="form-select">
+                                    <option value="">בחר חשבון מסחר...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="data-type-section">
+                                <label for="importDataTypeSelect">בחר סוג נתונים לייבוא:</label>
+                                <select id="importDataTypeSelect" class="form-select">
+                                    <option value="">בחר סוג נתונים...</option>
+                                </select>
+                                <small class="form-text text-muted">בחר את סוג הנתונים שברצונך לייבא מהקובץ</small>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
+                                        data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                            </div>
                         </div> <!-- End step-content -->
                     </div> <!-- End step-upload -->
                     
@@ -345,7 +442,7 @@
     <!-- [17] Load Order: 17 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
     <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <script src="scripts/vendor/floating-ui.dom.min.js?v=1.0.0" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
     <!-- [19] Load Order: 19 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
     <!-- [20] Load Order: 20 | Strategy: defer -->

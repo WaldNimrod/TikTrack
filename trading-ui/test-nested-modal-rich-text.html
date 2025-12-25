@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test: Nested Modal Rich Text Editor</title>
     
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
+    <!-- System CSS - After Bootstrap to override it -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <!-- Quill.js CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
@@ -38,6 +43,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <div class="container mt-5">
         <h1>Test: Nested Modal Rich Text Editor</h1>
         <p>בדיקת אתחול Rich Text Editor במודלים מקוננים</p>
@@ -88,13 +95,50 @@
         </div>
     </div>
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    
+    <!-- Unified Cache Manager -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    
+    <!-- Header System -->
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Quill.js -->
     <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
     
+    <!-- Button System -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    
     <script>
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-nested-modal-rich-text',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-nested-modal-rich-text',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         // Test logging system
         const testLog = document.getElementById('testLog');
         let logEntries = [];
@@ -110,7 +154,7 @@
             testLog.appendChild(logElement);
             testLog.scrollTop = testLog.scrollHeight;
             
-            console.log(`[TEST] ${message}`);
+            if (window.Logger) { window.Logger.info(`[TEST] ${message}`, { page: 'test-nested-modal-rich-text', component: 'test-nested-modal-rich-text', templateVars: ['message'] }); }
         }
         
         function clearLog() {
@@ -213,12 +257,16 @@
                     if (bootstrap?.Modal) {
                         const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
                         modal.show();
-                        markEnd('parent-modal-open');
-                        log('✅ Parent modal shown (Bootstrap fallback)', 'success');
+                        document.getElementById('linkedItemsModal').addEventListener('shown.bs.modal', () => {
+                            markEnd('parent-modal-open');
+                            log('✅ Parent modal shown (Bootstrap fallback)', 'success');
+                        }, { once: true });
                     }
                 });
             } else if (bootstrap?.Modal) {
+                // Fallback to Bootstrap
                 const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
+                modal.show();
                 
                 document.getElementById('linkedItemsModal').addEventListener('shown.bs.modal', () => {
                     markEnd('parent-modal-open');
@@ -227,8 +275,6 @@
                     const visibility = checkModalVisibility('linkedItemsModal');
                     log(`📊 Parent modal visibility: ${JSON.stringify(visibility, null, 2)}`, 'info');
                 }, { once: true });
-                
-                modal.show();
             }
         }
         
@@ -246,18 +292,15 @@
                     window.Logger?.error('Error showing notes modal via ModalManagerV2', { error, modalId: 'notesModal', page: 'test-nested-modal-rich-text' });
                     // Fallback to Bootstrap
                     if (bootstrap?.Modal) {
-                        const modal = new bootstrap.Modal(nestedModal, {
-                            backdrop: false
-                        });
+                        const modal = new bootstrap.Modal(nestedModal, { backdrop: false });
                         modal.show();
                         markEnd('nested-modal-open');
                         log('✅ Nested modal shown (Bootstrap fallback)', 'success');
                     }
                 });
             } else if (bootstrap?.Modal) {
-                const modal = new bootstrap.Modal(nestedModal, {
-                    backdrop: false
-                });
+                // Fallback to Bootstrap
+                const modal = new bootstrap.Modal(nestedModal, { backdrop: false });
                 modal.show();
                 markEnd('nested-modal-open');
                 log('✅ Nested modal shown (Bootstrap fallback)', 'success');
@@ -382,7 +425,9 @@
         
         // Log page load
         log('📄 Test page loaded', 'info');
-        log(`✅ Quill.js available: ${typeof window.Quill !== 'undefined'}`, typeof window.Quill !== 'undefined' ? 'success' : 'error');
+        const quillAvailable = typeof window.Quill !== 'undefined';
+        log(`✅ Quill.js available: ${quillAvailable}`, quillAvailable ? 'success' : 'error');
+        }
     </script>
 </body>
 </html>

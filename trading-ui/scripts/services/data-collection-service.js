@@ -40,19 +40,24 @@ class DataCollectionService {
      * });
      */
     static collectFormData(fieldMap) {
+        
         const data = {};
         
         for (const [key, config] of Object.entries(fieldMap)) {
-            const element = document.getElementById(config.id);
+            
+            // Remove # prefix if present (getElementById doesn't need it)
+            const elementId = config.id.startsWith('#') ? config.id.substring(1) : config.id;
+            const element = document.getElementById(elementId);
             
             if (!element) {
-                console.warn(`⚠️ שדה ${config.id} לא נמצא בטופס`);
+                console.warn(`⚠️ שדה ${config.id} (${elementId}) לא נמצא בטופס`);
                 // אם יש ברירת מחדל, השתמש בה
                 if (config.hasOwnProperty('default')) {
                     data[key] = config.default;
                 }
                 continue;
             }
+            
             
             if (config.type === 'tags') {
                 let selectedTags = [];
@@ -70,8 +75,10 @@ class DataCollectionService {
             // טיפול מיוחד ב-rich-text editor - לא משתמש ב-value
             if (config.type === 'rich-text') {
                 if (window.RichTextEditorService) {
-                    const htmlContent = window.RichTextEditorService.getContent(config.id);
-                    window.Logger?.debug(`📝 [DataCollectionService] Rich-text content for ${config.id}`, {
+                    // Remove # prefix if present for RichTextEditorService
+                    const editorId = config.id.startsWith('#') ? config.id.substring(1) : config.id;
+                    const htmlContent = window.RichTextEditorService.getContent(editorId);
+                    window.Logger?.debug(`📝 [DataCollectionService] Rich-text content for ${config.id} (${editorId})`, {
                         htmlContentLength: htmlContent?.length || 0,
                         hasContent: !!htmlContent,
                         page: 'data-collection'
@@ -80,14 +87,16 @@ class DataCollectionService {
                     // בדיקה אם התוכן ריק (אחרי הסרת תגי HTML)
                     const textContent = htmlContent.replace(/<[^>]*>/g, '').trim();
                     if (!textContent) {
-                        window.Logger?.warn(`⚠️ [DataCollectionService] Empty rich-text content for ${config.id}`, {
+                        // Empty rich-text content is expected when field is not filled - log at debug level
+                        window.Logger?.debug(`Empty rich-text content for ${config.id} (${editorId}) - using default`, {
                             htmlContentLength: htmlContent?.length || 0,
-                            page: 'data-collection'
+                            page: 'data-collection',
+                            note: 'This is expected when rich-text field is not filled'
                         });
                         data[key] = config.hasOwnProperty('default') ? config.default : '';
                     } else {
                         data[key] = htmlContent;
-                        window.Logger?.debug(`✅ [DataCollectionService] Rich-text content collected for ${config.id}`, {
+                        window.Logger?.debug(`✅ [DataCollectionService] Rich-text content collected for ${config.id} (${editorId})`, {
                             htmlContentLength: htmlContent?.length || 0,
                             textContentLength: textContent?.length || 0,
                             page: 'data-collection'
@@ -171,7 +180,9 @@ class DataCollectionService {
             }
             
             data[key] = value;
+            
         }
+        
         
         return data;
     }
@@ -216,12 +227,22 @@ class DataCollectionService {
      * }, { trade_id: 123, price: 45.67 });
      */
     static setFormData(fieldMap, values) {
+        
+        
+        const missingFields = [];
+        const setFields = [];
+        
         for (const [key, config] of Object.entries(fieldMap)) {
-            const element = document.getElementById(config.id);
+            
+            // Remove # prefix if present (getElementById doesn't need it)
+            const elementId = config.id.startsWith('#') ? config.id.substring(1) : config.id;
+            const element = document.getElementById(elementId);
             if (!element) {
-                console.warn(`⚠️ שדה ${config.id} לא נמצא בטופס`);
+                console.warn(`⚠️ שדה ${config.id} (${elementId}) לא נמצא בטופס`);
+                missingFields.push({fieldId: config.id, elementId: elementId, fieldName: key, fieldType: config.type});
                 continue;
             }
+            
             
             const value = values[key];
             if (value === undefined || value === null) {
@@ -239,33 +260,143 @@ class DataCollectionService {
                         option.selected = valuesSet.has(option.value);
                     });
                 }
+                setFields.push({fieldName: key, fieldId: config.id, value: tagValues, type: 'tags'});
                 continue;
             }
 
+            let setValue = value;
             if (config.type === 'bool' || config.type === 'boolean' || config.type === 'checkbox') {
                 element.checked = Boolean(value);
+                setValue = Boolean(value);
             } else if (config.type === 'date' || config.type === 'dateOnly') {
                 // המרת תאריך לפורמט input
                 try {
-                    const date = new Date(value);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    
-                    if (config.type === 'date') {
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        element.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    // Handle both date strings (yyyy-MM-dd or yyyy-MM-ddThh:mm) and Date objects
+                    let dateValue;
+                    if (typeof value === 'string') {
+                        // If value is already in yyyy-MM-dd format, use it directly
+                        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                            dateValue = value;
+                        } else {
+                            // Otherwise, parse it as a date and convert to yyyy-MM-dd
+                            const date = new Date(value);
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            dateValue = `${year}-${month}-${day}`;
+                        }
+                    } else if (value instanceof Date) {
+                        const year = value.getFullYear();
+                        const month = String(value.getMonth() + 1).padStart(2, '0');
+                        const day = String(value.getDate()).padStart(2, '0');
+                        dateValue = `${year}-${month}-${day}`;
                     } else {
-                        element.value = `${year}-${month}-${day}`;
+                        // Fallback: try to parse as date
+                        const date = new Date(value);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        dateValue = `${year}-${month}-${day}`;
                     }
+                    
+                    // Both 'date' and 'dateOnly' use yyyy-MM-dd format (date input type)
+                    setValue = dateValue;
+                    element.value = setValue;
                 } catch (e) {
                     console.warn(`⚠️ שגיאה בהמרת תאריך עבור ${config.id}`);
                 }
+            } else if (element.tagName === 'SELECT') {
+                // טיפול מיוחד ב-select elements - צריך לוודא שהערך קיים ב-options
+                
+                // Try to set value directly first
+                element.value = value;
+                
+                
+                // Check if value was set correctly (handle type mismatches)
+                // Also check if value matches case-insensitively but not exactly (for Capitalized enum values)
+                const valueSetCorrectly = element.value === String(value) || element.value === value;
+                const valueMatchesCaseInsensitive = typeof value === 'string' && 
+                    element.value && 
+                    String(element.value).toLowerCase() === String(value).toLowerCase() &&
+                    element.value !== value;
+                
+                
+                if (!valueSetCorrectly || valueMatchesCaseInsensitive) {
+                    // Value didn't set - try to find matching option
+                    const options = Array.from(element.options);
+                    // First try exact match (case-sensitive)
+                    let match = options.find(opt => 
+                        opt.value === String(value) ||
+                        opt.value === value ||
+                        String(opt.value) === String(value)
+                    );
+                    
+                    // If no exact match, try case-insensitive match for text values
+                    // BUT prefer the original value if it's a valid Capitalized enum value
+                    if (!match && typeof value === 'string') {
+                        const valueLower = value.toLowerCase();
+                        const valueCapitalized = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+                        
+                        // Try to find exact capitalized match first (for enum values like 'Long', 'Short', 'Swing')
+                        match = options.find(opt => 
+                            String(opt.value) === valueCapitalized ||
+                            String(opt.value).toLowerCase() === valueLower
+                        );
+                        
+                        // If found via case-insensitive match, use the original value if it matches the capitalized form
+                        if (match && String(match.value).toLowerCase() === valueLower) {
+                            // Check if original value is Capitalized (enum format)
+                            if (value === valueCapitalized) {
+                                // Use original value (Capitalized) instead of option value
+                                element.value = value;
+                                setValue = value;
+                            } else {
+                                // Use match value (lowercase from options)
+                                element.value = match.value;
+                                setValue = match.value;
+                            }
+                        } else if (match) {
+                            // Match found but value doesn't match lowercase - use match value
+                            element.value = match.value;
+                            setValue = match.value;
+                        } else {
+                            // Try numeric match for int types
+                            if (config.type === 'int') {
+                                match = options.find(opt => 
+                                    parseInt(opt.value) === parseInt(value) ||
+                                    parseInt(opt.value) === value
+                                );
+                            }
+                            
+                            if (match) {
+                                element.value = match.value;
+                                setValue = match.value;
+                            } else {
+                                console.warn(`⚠️ ערך ${value} לא נמצא ב-options של ${config.id}`);
+                            }
+                        }
+                    } else if (match) {
+                        element.value = match.value;
+                        setValue = match.value;
+                    } else {
+                        console.warn(`⚠️ ערך ${value} לא נמצא ב-options של ${config.id}`);
+                    }
+                } else {
+                    setValue = element.value;
+                }
+                
+                // Trigger change event to update any listeners
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+                element.dispatchEvent(new Event('input', { bubbles: true }));
             } else {
                 element.value = value;
+                setValue = value;
             }
+            
+            setFields.push({fieldName: key, fieldId: config.id, value: setValue, type: config.type});
         }
+        
+        return { missingFields, setFields };
     }
 
     /**

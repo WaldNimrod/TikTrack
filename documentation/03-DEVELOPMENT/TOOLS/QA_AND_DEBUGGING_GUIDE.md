@@ -344,6 +344,150 @@ python3 scripts/test_pages_console_simple.py
 
 ---
 
+## עמודי בדיקה (Test Pages)
+
+### סקירה כללית
+
+המערכת כוללת 18 עמודי בדיקה קיימים ו-8 עמודי בדיקה מוצעים לבדיקת מערכות כלליות.
+
+**קישור למדריך מלא:** [מדריך עמודי בדיקה](../TESTING/TEST_PAGES_GUIDE.md)
+
+### עמודי בדיקה קיימים (18 עמודים)
+
+#### בדיקות מערכות ליבה (Core Systems)
+
+1. **test-header-only.html** - בדיקת Header System ופילטרים
+   - מיקום: `trading-ui/test-header-only.html`
+   - מטרה: בדיקת Header System, פילטרים, אינטגרציה עם טבלאות
+   - שימוש: `http://localhost:8080/test-header-only`
+
+2. **test-monitoring.html** - בדיקת מערכת ניטור
+   - מיקום: `trading-ui/test-monitoring.html`
+   - מטרה: בדיקת מערכת ניטור, DataCollectionService, UnifiedCacheManager, NotificationSystem, Logger Service
+   - שימוש: `http://localhost:8080/test-monitoring`
+
+3. **test-frontend-wrappers.html** - בדיקת Business Logic API Wrappers
+   - מיקום: `trading-ui/test-frontend-wrappers.html`
+   - מטרה: בדיקת TradesData, ExecutionsData, AlertsData wrappers ו-UI Utils functions
+   - שימוש: `http://localhost:8080/test-frontend-wrappers`
+
+#### בדיקות UI Components
+
+4. **test-bootstrap-popover-comparison.html** - השוואת Bootstrap Popover vs WidgetOverlayService
+   - מיקום: `trading-ui/test-bootstrap-popover-comparison.html`
+   - מטרה: השוואת ביצועים ותכונות
+   - שימוש: `http://localhost:8080/test-bootstrap-popover-comparison`
+
+5. **test-nested-modal-rich-text.html** - בדיקת Rich Text Editor במודלים מקוננים
+   - מיקום: `trading-ui/test-nested-modal-rich-text.html`
+   - מטרה: בדיקת Quill.js initialization במודלים מקוננים
+   - שימוש: `http://localhost:8080/test-nested-modal-rich-text`
+
+6. **test-overlay-debug.html** - בדיקת WidgetOverlayService
+   - מיקום: `trading-ui/test-overlay-debug.html`
+   - מטרה: בדיקת positioning ו-debug
+   - שימוש: `http://localhost:8080/test-overlay-debug`
+
+7. **test-quill.html** - בדיקת Quill.js
+   - מיקום: `trading-ui/test-quill.html`
+   - מטרה: בדיקת Rich Text Editor ו-dynamic loading
+   - שימוש: `http://localhost:8080/test-quill`
+
+#### בדיקות ווידג'טים
+
+8. **test-unified-widget.html** - בדיקת Unified Pending Actions Widget בסיסי
+   - מיקום: `trading-ui/test-unified-widget.html`
+   - מטרה: בדיקת widget initialization ו-functionality
+   - שימוש: `http://localhost:8080/test-unified-widget`
+
+9. **test-unified-widget-integration.html** - בדיקת אינטגרציה של Unified Widget
+   - מיקום: `trading-ui/test-unified-widget-integration.html`
+   - מטרה: בדיקת אינטגרציה עם מערכות אחרות
+   - שימוש: `http://localhost:8080/test-unified-widget-integration`
+   - **הערה:** מומלץ לאחד עם `test-unified-widget.html`
+
+10. **test-unified-widget-comprehensive.html** - בדיקות מקיפות של Unified Widget
+    - מיקום: `trading-ui/test-unified-widget-comprehensive.html`
+    - מטרה: בדיקת כל התכונות
+    - שימוש: `http://localhost:8080/test-unified-widget-comprehensive`
+
+11. **test-recent-items-widget.html** - בדיקת Recent Items Widget
+    - מיקום: `trading-ui/test-recent-items-widget.html`
+    - מטרה: בדיקת widget functionality
+    - שימוש: `http://localhost:8080/test-recent-items-widget`
+
+12. **test-ticker-widgets-performance.html** - בדיקת ביצועי Ticker Widgets
+    - מיקום: `trading-ui/test-ticker-widgets-performance.html`
+    - מטרה: בדיקת performance
+    - שימוש: `http://localhost:8080/test-ticker-widgets-performance`
+
+#### בדיקות אינטגרציה
+
+13. **test-user-ticker-integration.html** - בדיקת אינטגרציה של User Ticker
+    - מיקום: `trading-ui/test-user-ticker-integration.html`
+    - מטרה: בדיקת אינטגרציה עם מערכות אחרות
+    - שימוש: `http://localhost:8080/test-user-ticker-integration`
+
+14. **scripts/test-user-ticker-frontend.html** - בדיקת User Ticker Frontend
+    - מיקום: `trading-ui/scripts/test-user-ticker-frontend.html`
+    - מטרה: בדיקת frontend functionality
+    - שימוש: `http://localhost:8080/scripts/test-user-ticker-frontend.html`
+
+15. **conditions-test.html** - בדיקת מערכת Conditions
+    - מיקום: `trading-ui/conditions-test.html`
+    - מטרה: בדיקת תנאי מסחר ו-CRUD operations
+    - שימוש: `http://localhost:8080/conditions-test`
+
+16. **external_data_dashboard.html** - דשבורד נתונים חיצוניים
+    - מיקום: `trading-ui/external_data_dashboard.html`
+    - מטרה: ניהול מקורות נתונים חיצוניים
+    - שימוש: `http://localhost:8080/external_data_dashboard`
+
+#### בדיקות מיושנות (לבדיקת רלוונטיות)
+
+17. **test-phase1-recovery.html** - בדיקת שחזור Phase 1
+    - מיקום: `trading-ui/test-phase1-recovery.html`
+    - מטרה: בדיקת מערכת ניטור, Logger Service, Cache Systems
+    - שימוש: `http://localhost:8080/test-phase1-recovery`
+    - **הערה:** לבדוק רלוונטיות - האם Phase 1 עדיין רלוונטי?
+
+18. **test-phase3-1-comprehensive.html** - בדיקות מקיפות של Phase 3.1
+    - מיקום: `trading-ui/test-phase3-1-comprehensive.html`
+    - מטרה: בדיקת UnifiedAppInitializer, Preferences, Cache System
+    - שימוש: `http://localhost:8080/test-phase3-1-comprehensive`
+    - **הערה:** לבדוק רלוונטיות - האם Phase 3.1 עדיין רלוונטי?
+
+### עמודי בדיקה מוצעים (8 עמודים - עדיפות גבוהה)
+
+1. **test-cache-system.html** - בדיקת UnifiedCacheManager (4 שכבות)
+2. **test-preferences-system.html** - בדיקת PreferencesSystem
+3. **test-data-services.html** - בדיקת כל Data Services (12 ישויות)
+4. **test-table-system.html** - בדיקת UnifiedTableSystem
+5. **test-modal-system.html** - בדיקת ModalManagerV2
+6. **test-notification-system.html** - בדיקת NotificationSystem
+7. **test-button-system.html** - בדיקת ButtonSystem
+8. **test-initialization-system.html** - בדיקת Unified Initialization System
+
+### בעיות עיקריות בעמודי בדיקה קיימים
+
+1. **Logger Service:** 14 עמודים לא משתמשים כלל, 4 עמודים משתמשים חלקית
+2. **מערכות UI:** רוב העמודים לא משתמשים במערכות כלליות
+3. **מערכות נתונים:** רוב העמודים לא משתמשים במערכות כלליות
+4. **כפילויות:** 3 קבוצות של כפילויות מזוהות
+
+### קישורים לדוחות מפורטים
+
+- [מדריך עמודי בדיקה מלא](../TESTING/TEST_PAGES_GUIDE.md)
+- [דוח ניתוח מפורט](../TESTING/TEST_PAGES_ANALYSIS_REPORT.md)
+- [מטריצת מיפוי מערכות ↔ עמודי בדיקה](../TESTING/SYSTEMS_TO_TEST_PAGES_MAPPING.md)
+- [דוח בעיות אינטגרציה](../TESTING/INTEGRATION_ISSUES_REPORT.md)
+- [דוח זיהוי כפילויות](../TESTING/DUPLICATES_IDENTIFICATION_REPORT.md)
+- [דוח מערכות ללא עמוד בדיקה](../TESTING/MISSING_TEST_PAGES_REPORT.md)
+- [רשימת עמודי בדיקה מוצעים](../TESTING/PROPOSED_NEW_TEST_PAGES.md)
+- [מטריצת התקדמות](../TESTING/TEST_PAGES_PROGRESS_MATRIX.md)
+
+---
+
 ## כלי ניטור תהליכים
 
 ### 1. Server Lock Manager

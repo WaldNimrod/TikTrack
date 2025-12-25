@@ -554,7 +554,7 @@
 
 #### 📁 מבנה הקבצים החדש
 
-1. **`preferences-core-new.js`** - לוגיקה עסקית (ללא צבעים)
+1. **`preferences-core.js`** - לוגיקה עסקית (ללא צבעים)
 2. **`preferences-colors.js`** - מערכת צבעים ייעודית (60+ העדפות)
 3. **`preferences-lazy-loader.js`** - lazy loading חכם
 4. **`preferences-validation.js`** - validation קפדני

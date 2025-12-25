@@ -1485,6 +1485,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 10
       },
       {
+        file: 'trading-journal-page.js',
+        globalCheck: 'window.handleAddEntry',
+        description: 'Trading journal page script (page-specific)',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.2
+      },
+      {
         file: 'calendar/calendar-date-utils.js',
         globalCheck: 'window.CalendarDateUtils',
         description: 'Calendar date utilities for trading journal',

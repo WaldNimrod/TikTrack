@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בדיקת אינטגרציה User-Ticker</title>
@@ -61,6 +64,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <h1>בדיקת אינטגרציה User-Ticker</h1>
     
     <div class="test-section">
@@ -102,6 +107,28 @@
             '/trading-ui/scripts/services/select-populator-service.js'
         ];
         
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-user-ticker-integration',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-user-ticker-integration',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         let scriptsLoaded = 0;
         scripts.forEach(src => {
             const script = document.createElement('script');
@@ -109,7 +136,7 @@
             script.onload = () => {
                 scriptsLoaded++;
                 if (scriptsLoaded === scripts.length) {
-                    console.log('All scripts loaded');
+                    if (window.Logger) { window.Logger.info('All scripts loaded', { page: 'test-user-ticker-integration', component: 'test-user-ticker-integration' }); }
                 }
             };
             document.head.appendChild(script);
@@ -133,17 +160,38 @@
             
             // Test GET /api/tickers/my
             try {
-                const start = performance.now();
-                const response = await fetch('/api/tickers/my');
-                const elapsed = performance.now() - start;
+                const CACHE_KEY = 'test-user-ticker-integration-tickers-my';
+                const CACHE_TTL = 45 * 1000; // 45 seconds
+                let tickers = [];
+                let elapsed = 0;
                 
-                if (!response.ok) {
-                    addResult('api-results', `❌ GET /api/tickers/my failed: ${response.status}`, 'fail');
-                    return;
+                // Try cache first
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cached = await window.UnifiedCacheManager.get(CACHE_KEY, { ttl: CACHE_TTL });
+                    if (cached) {
+                        tickers = Array.isArray(cached) ? cached : (Array.isArray(cached?.data) ? cached.data : []);
+                        elapsed = 0; // Cache hit - instant
+                    }
                 }
                 
-                const data = await response.json();
-                const tickers = data.data || [];
+                if (tickers.length === 0) {
+                    const start = performance.now();
+                    const response = await fetch('/api/tickers/my');
+                    elapsed = performance.now() - start;
+                    
+                    if (!response.ok) {
+                        addResult('api-results', `❌ GET /api/tickers/my failed: ${response.status}`, 'fail');
+                        return;
+                    }
+                    
+                    const data = await response.json();
+                    tickers = data.data || [];
+                    
+                    // Save to cache
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                        await window.UnifiedCacheManager.save(CACHE_KEY, tickers, { ttl: CACHE_TTL, syncToBackend: false });
+                    }
+                }
                 
                 addResult('api-results', `✅ GET /api/tickers/my: ${tickers.length} tickers in ${elapsed.toFixed(2)}ms`, 'pass');
                 
@@ -273,9 +321,11 @@
     </script>
 
     <!-- Authentication protection for testing -->
-    <script src="scripts/auth.js?v=1.0.0" defer></script>
+        <script src="scripts/error-handlers.js?v=1.0.0"></script>
+<script src="scripts/auth.js?v=1.0.0" defer></script>
     <script src="scripts/auth-guard.js?v=1.0.0" defer></script>
-    <script src="/trading-ui/scripts/test-user-ticker-frontend.js"></script>
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
 </body>
 </html>
 

@@ -10,12 +10,14 @@
     
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
     
 </head>
 <body class="test-page">
+    <div id="unified-header"></div>
     <div class="container mt-4">
         <h1>Phase 1 Recovery Test</h1>
         <p>בדיקת שחזור שלב 1 - מערכת ניטור וסקריפטים חדשים</p>
@@ -87,7 +89,8 @@
     </div>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+        <script src="scripts/error-handlers.js?v=1.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
     
     <!-- Base Package Scripts -->
     <script src="scripts/global-favicon.js?v=0da3519a_20251102_104906"></script>
@@ -163,6 +166,28 @@
             } catch (error) {
                 resultsDiv.innerHTML = `<div class="alert alert-danger">❌ שגיאה: ${error.message}</div>`;
             }
+        }
+        
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-phase1-recovery',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-phase1-recovery',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
         }
         
         function testUnifiedCacheManager() {

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unified Widget Integration Test</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     <style>
         body {
             padding: 20px;
@@ -60,6 +62,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <div class="test-container">
         <h1 class="mb-4">🧪 Unified Widget Integration Test</h1>
         
@@ -222,17 +226,41 @@
                     '/api/trades/pending-plan/creations'
                 ];
                 
+                const CACHE_TTL = 45 * 1000; // 45 seconds
+                
                 for (const endpoint of endpoints) {
                     try {
-                        const response = await fetch(endpoint + '?limit=1', {
-                            headers: { 'Accept': 'application/json' }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
+                        // Try cache first
+                        const cacheKey = `test-unified-widget-integration-${endpoint.replace(/\//g, '-')}`;
+                        let data = null;
+                        
+                        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                            const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: CACHE_TTL });
+                            if (cached) {
+                                data = cached;
+                            }
+                        }
+                        
+                        if (!data) {
+                            const response = await fetch(endpoint + '?limit=1', {
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            if (response.ok) {
+                                data = await response.json();
+                                
+                                // Save to cache
+                                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                                    await window.UnifiedCacheManager.save(cacheKey, data, { ttl: CACHE_TTL, syncToBackend: false });
+                                }
+                            } else {
+                                addResult('data', `⚠️ ${endpoint}: ${response.status} ${response.statusText}`, 'warning');
+                                continue;
+                            }
+                        }
+                        
+                        if (data) {
                             const count = Array.isArray(data.data) ? data.data.length : 0;
                             addResult('data', `✅ ${endpoint}: OK (${count} items)`, 'success');
-                        } else {
-                            addResult('data', `⚠️ ${endpoint}: ${response.status} ${response.statusText}`, 'warning');
                         }
                     } catch (error) {
                         addResult('data', `❌ ${endpoint}: ${error.message}`, 'error');
@@ -282,7 +310,7 @@
         
         // Run all tests
         async function runAllTests() {
-            console.log('🧪 Starting comprehensive widget tests...');
+            if (window.Logger) { window.Logger.info('🧪 Starting comprehensive widget tests...', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
             
             // Wait for page to fully load
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -302,34 +330,56 @@
             
             await runInteractionTest();
             
-            console.log('✅ All tests completed');
+            if (window.Logger) { window.Logger.info('✅ All tests completed', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
             addResult('system', '✅ All tests completed', 'success');
+        }
+        
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-unified-widget-integration',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-unified-widget-integration',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
         }
         
         // Initialize widget when page loads
         window.addEventListener('DOMContentLoaded', async () => {
-            console.log('📄 DOM Content Loaded');
+            if (window.Logger) { window.Logger.info('📄 DOM Content Loaded', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
             
             // Wait for all scripts to load
             await new Promise(resolve => setTimeout(resolve, 3000));
             
             // Initialize widget
             if (window.UnifiedPendingActionsWidget) {
-                console.log('🚀 Initializing UnifiedPendingActionsWidget...');
+                if (window.Logger) { window.Logger.info('🚀 Initializing UnifiedPendingActionsWidget...', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
                 try {
                     await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
                         defaultItemsLimit: 4,
                         defaultAction: 'assign',
                         defaultEntity: 'plans'
                     });
-                    console.log('✅ Widget initialized successfully');
+                    if (window.Logger) { window.Logger.info('✅ Widget initialized successfully', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
                     addResult('widget', '✅ Widget initialized successfully', 'success');
                 } catch (error) {
-                    console.error('❌ Widget initialization failed:', error);
+                    if (window.Logger) { window.Logger.error('❌ Widget initialization failed:', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration', error: 'error.message', stack: 'error.stack' }); }
                     addResult('widget', `❌ Widget initialization failed: ${error.message}`, 'error');
                 }
             } else {
-                console.error('❌ UnifiedPendingActionsWidget not available');
+                if (window.Logger) { window.Logger.error('❌ UnifiedPendingActionsWidget not available', { page: 'test-unified-widget-integration', component: 'test-unified-widget-integration' }); }
                 addResult('widget', '❌ UnifiedPendingActionsWidget not available', 'error');
             }
             
@@ -339,8 +389,11 @@
     </script>
     
     <!-- Load all required scripts -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+        <script src="scripts/error-handlers.js?v=1.0.0"></script>
+<script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <!-- Add other required scripts here as needed -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
 </body>
 </html>
 

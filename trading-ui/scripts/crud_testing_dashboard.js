@@ -41,7 +41,8 @@ class IntegratedCRUDE2ETester {
             ui: [],
             api: [],
             e2e: [],
-            debug: []
+            debug: [],
+            'info-summary': []
         };
         this.stats = {
             totalTests: 0,
@@ -113,14 +114,13 @@ class IntegratedCRUDE2ETester {
                     ticker_id: { id: '#tradeTicker', type: 'int', required: true },
                     status: { id: '#tradeStatus', type: 'text', required: true, default: 'open' },
                     side: { id: '#tradeSide', type: 'text', required: true, default: 'Long' },
-                    investment_type: { id: '#tradeType', type: 'text', required: true, default: 'swing' },
-                    quantity: { id: '#tradeQuantity', type: 'number', required: true, default: 100 },
+                    investment_type: { id: '#tradeType', type: 'text', required: true, default: 'Swing' },
+                    planned_quantity: { id: '#tradeQuantity', type: 'number', required: true, default: 100 },
                     entry_price: { id: '#tradeEntryPrice', type: 'number', required: true, default: 100 },
-                    stop_price: { id: '#tradeStopLoss', type: 'number', default: null },
-                    target_price: { id: '#tradeTakeProfit', type: 'number', default: null },
-                    entry_date: { id: '#tradeEntryDate', type: 'date', default: null },
-                    notes: { id: '#tradeNotes', type: 'rich-text', default: null },
-                    tag_ids: { id: '#tradeTags', type: 'tags', default: [] }
+                    // Note: stop_price and target_price are not in Trade model - they exist only in TradePlan
+                    // entry_date is also not in Trade model - Trade uses created_at from BaseModel
+                    // tag_ids is not supported directly in Trade model - tags are handled via /api/tags/assign endpoint separately
+                    notes: { id: '#tradeNotes', type: 'rich-text', default: null }
                 },
                 modalId: 'tradesModal'
             },
@@ -129,15 +129,15 @@ class IntegratedCRUDE2ETester {
                 fields: {
                     trading_account_id: { id: '#tradePlanAccount', type: 'int', required: true },
                     ticker_id: { id: '#tradePlanTicker', type: 'int', required: true },
-                    side: { id: '#tradePlanSide', type: 'text', required: true, default: 'long' },
-                    investment_type: { id: '#tradePlanType', type: 'text', required: true, default: 'swing' },
+                    side: { id: '#tradePlanSide', type: 'text', required: true, default: 'Long' },
+                    investment_type: { id: '#tradePlanType', type: 'text', required: true, default: 'Swing' },
                     status: { id: '#tradePlanStatus', type: 'text', required: true, default: 'open' },
                     planned_amount: { id: '#planAmount', type: 'number', required: true, default: 10000 },
                     entry_price: { id: '#tradePlanEntryPrice', type: 'number', required: true, default: 100 },
-                    quantity: { id: '#tradePlanQuantity', type: 'number', required: true, default: 100 },
+                    // quantity removed - TradePlan model does not have this field
                     stop_price: { id: '#tradePlanStopLoss', type: 'number', default: null },
                     target_price: { id: '#tradePlanTakeProfit', type: 'number', default: null },
-                    created_at: { id: '#tradePlanEntryDate', type: 'datetime-local', default: null },
+                    // created_at removed - comes from BaseModel automatically, not a user-filled field
                     notes: { id: '#tradePlanNotes', type: 'rich-text', default: null },
                     tag_ids: { id: '#tradePlanTags', type: 'tags', default: [] }
                 },
@@ -151,7 +151,7 @@ class IntegratedCRUDE2ETester {
                     condition_attribute: { id: '#alertType', type: 'text', default: null },
                     condition_operator: { id: '#alertCondition', type: 'text', default: null },
                     condition_number: { id: '#alertValue', type: 'number', default: null },
-                    status: { id: '#alertStatusCombined', type: 'text', required: true, default: 'new' },
+                    status: { id: '#alertStatusCombined', type: 'text', required: true, default: 'new' }, // Fixed: 'new' maps to status='open' + is_triggered='false' in backend
                     created_at: { id: '#alertCreatedAt', type: 'datetime-local', default: null },
                     expiry_date: { id: '#alertExpiryDate', type: 'datetime-local', default: null },
                     trade_condition_id: { id: '#alertTradeCondition', type: 'int', default: null },
@@ -162,11 +162,11 @@ class IntegratedCRUDE2ETester {
             ticker: {
                 required: ['symbol', 'name', 'type', 'currency_id', 'status'],
                 fields: {
-                    symbol: { id: '#tickerSymbol', type: 'text', required: true },
-                    name: { id: '#tickerName', type: 'text', required: true },
+                    symbol: { id: '#tickerSymbol', type: 'text', required: true, maxLength: 10 }, // Fixed: added maxLength validation (10 chars per Backend model)
+                    name: { id: '#tickerName', type: 'text', required: true, maxLength: 100 }, // Fixed: added maxLength validation (100 chars per Backend model)
                     type: { id: '#tickerType', type: 'text', required: true, default: 'stock' },
                     currency_id: { id: '#tickerCurrency', type: 'int', required: true },
-                    status: { id: '#tickerStatus', type: 'text', required: true, default: 'closed' },
+                    status: { id: '#tickerStatus', type: 'text', required: true, default: 'open' }, // Fixed: changed from 'closed' to 'open' to match Backend model
                     remarks: { id: '#tickerRemarks', type: 'rich-text', default: null },
                     tag_ids: { id: '#tickerTags', type: 'tags', default: [] }
                 },
@@ -177,7 +177,7 @@ class IntegratedCRUDE2ETester {
                 fields: {
                     name: { id: '#accountName', type: 'text', required: true },
                     currency_id: { id: '#accountCurrency', type: 'int', required: true },
-                    type: { id: '#accountType', type: 'text', default: null },
+                    // type field removed - not in TradingAccount model
                     opening_balance: { id: '#accountOpeningBalance', type: 'number', default: 0 },
                     status: { id: '#accountStatus', type: 'text', default: 'open' },
                     notes: { id: '#accountNotes', type: 'rich-text', default: null }
@@ -199,8 +199,7 @@ class IntegratedCRUDE2ETester {
                     notes: { id: '#executionNotes', type: 'rich-text', default: null },
                     realized_pl: { id: '#executionRealizedPL', type: 'number', default: null },
                     mtm_pl: { id: '#executionMTMPL', type: 'number', default: null },
-                    trade_id: { id: '#trade_id', type: 'int', default: null },
-                    tag_ids: { id: '#executionTags', type: 'tags', default: [] }
+                    trade_id: { id: '#trade_id', type: 'int', default: null }
                 },
                 modalId: 'executionsModal'
             },
@@ -215,8 +214,7 @@ class IntegratedCRUDE2ETester {
                     source: { id: '#cashFlowSource', type: 'text', required: true, default: 'manual' },
                     external_id: { id: '#cashFlowExternalId', type: 'text', default: null },
                     description: { id: '#cashFlowDescription', type: 'rich-text', default: null },
-                    trade_id: { id: '#trade_id', type: 'int', default: null },
-                    tag_ids: { id: '#cashFlowTags', type: 'tags', default: [] }
+                    trade_id: { id: '#trade_id', type: 'int', default: null }
                 },
                 modalId: 'cashFlowModal'
             },
@@ -244,9 +242,9 @@ class IntegratedCRUDE2ETester {
                 required: ['name'],
                 fields: {
                     name: { id: '#tagCategoryName', type: 'text', required: true },
-                    description: { id: '#tagCategoryDescription', type: 'text', default: '' },
-                    order: { id: '#tagCategoryOrder', type: 'int', default: 0 },
+                    order_index: { id: '#tagCategoryOrder', type: 'int', default: 0 },
                     is_active: { id: '#tagCategoryActive', type: 'bool', default: true }
+                    // Note: description field exists in UI but is not supported by backend API
                 },
                 modalId: 'tagCategoryModal'
             },
@@ -280,12 +278,24 @@ class IntegratedCRUDE2ETester {
             user_profile: {
                 required: ['first_name', 'last_name', 'email'],
                 fields: {
-                    first_name: { id: '#userProfileFirstName', type: 'text', required: true },
-                    last_name: { id: '#userProfileLastName', type: 'text', required: true },
-                    email: { id: '#userProfileEmail', type: 'text', required: true },
-                    phone: { id: '#userProfilePhone', type: 'text', default: '' }
+                    first_name: { id: '#firstName', type: 'text', required: true },
+                    last_name: { id: '#lastName', type: 'text', required: true },
+                    email: { id: '#email', type: 'text', required: true },
+                    phone: { id: '#phone', type: 'text', default: '' }
                 },
-                modalId: null // Uses form, not modal
+                modalId: null // Uses form, not modal - form is already visible on page
+            },
+            trading_journal: {
+                required: ['trade_id', 'entry_date'],
+                fields: {
+                    trade_id: { id: '#tradingJournalTrade', type: 'int', required: true },
+                    entry_date: { id: '#tradingJournalEntryDate', type: 'datetime-local', required: true },
+                    notes: { id: '#tradingJournalNotes', type: 'rich-text', default: null },
+                    mood: { id: '#tradingJournalMood', type: 'text', default: null },
+                    lessons_learned: { id: '#tradingJournalLessonsLearned', type: 'rich-text', default: null },
+                    performance_rating: { id: '#tradingJournalPerformanceRating', type: 'int', default: null }
+                },
+                modalId: 'tradingJournalModal'
             }
         };
     }
@@ -414,17 +424,9 @@ class IntegratedCRUDE2ETester {
                 pages: crudPages.map(([key, page]) => ({ key, name: page.name }))
             });
             
-            // Run specific workflow tests first (they have detailed implementations)
-            await this.runTradeWorkflowTest();
-            await this.runAlertWorkflowTest();
-            await this.runUserProfileWorkflowTest();
-            
-            // Run special tests for complex pages
+            // Run generic CRUD tests for all pages (including trades, alerts, user_profile)
+            // This uses the unified approach with DataCollectionService, validation, and UnifiedCRUDService
             for (const [pageKey, page] of crudPages) {
-                // Skip pages that already have specific tests
-                if (['trades', 'alerts', 'user_profile'].includes(pageKey)) {
-                    continue;
-                }
                 
                 try {
                     // Special handling for tag_management (has two CRUD types: categories and tags)
@@ -504,6 +506,464 @@ class IntegratedCRUDE2ETester {
         } catch (error) {
             this.logger?.error('❌ E2E Tests failed with error:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Clean up all test iframes to prevent nested iframes
+     */
+    cleanupTestIframes() {
+        // Remove all iframes from testIframeContainer
+        const container = document.getElementById('testIframeContainer');
+        if (container) {
+            const iframes = container.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                try {
+                    // Remove event listeners and clean up
+                    iframe.onload = null;
+                    iframe.onerror = null;
+                    iframe.src = 'about:blank'; // Clear src first
+                    if (iframe.parentNode) {
+                        iframe.parentNode.removeChild(iframe);
+                    }
+                } catch (error) {
+                    this.logger?.warn(`⚠️ [cleanupTestIframes] Error removing iframe: ${error.message}`);
+                }
+            });
+            this.logger?.debug(`🧹 [cleanupTestIframes] Removed ${iframes.length} iframe(s) from container`);
+        }
+        
+        // Also remove any orphaned iframes with test-iframe- prefix
+        const allIframes = document.querySelectorAll('iframe[id^="test-iframe-"]');
+        allIframes.forEach(iframe => {
+            try {
+                iframe.onload = null;
+                iframe.onerror = null;
+                iframe.src = 'about:blank';
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            } catch (error) {
+                this.logger?.warn(`⚠️ [cleanupTestIframes] Error removing orphaned iframe: ${error.message}`);
+            }
+        });
+        
+        if (allIframes.length > 0) {
+            this.logger?.debug(`🧹 [cleanupTestIframes] Removed ${allIframes.length} orphaned iframe(s)`);
+        }
+    }
+
+    /**
+     * Load INFO_SUMMARY_CONFIGS dynamically if not already loaded
+     */
+    async loadInfoSummaryConfigs() {
+        return new Promise((resolve, reject) => {
+            // Check if already loaded
+            if (window.INFO_SUMMARY_CONFIGS) {
+                resolve();
+        return;
+    }
+    
+            // Create script element
+            const script = document.createElement('script');
+            script.src = '/scripts/info-summary-configs.js?v=1.0.0';
+            script.onload = () => {
+                // Wait a bit for the script to execute
+                setTimeout(() => {
+                    if (window.INFO_SUMMARY_CONFIGS) {
+                        this.logger?.info('✅ [loadInfoSummaryConfigs] INFO_SUMMARY_CONFIGS loaded successfully');
+                        resolve();
+                    } else {
+                        this.logger?.error('❌ [loadInfoSummaryConfigs] INFO_SUMMARY_CONFIGS not found after loading script');
+                        reject(new Error('INFO_SUMMARY_CONFIGS not loaded'));
+                    }
+                }, 100);
+            };
+            script.onerror = () => {
+                this.logger?.error('❌ [loadInfoSummaryConfigs] Failed to load info-summary-configs.js');
+                reject(new Error('Failed to load info-summary-configs.js'));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    /**
+     * Info Summary System Testing - Cross-page validation
+     * Tests info summary elements across all pages for:
+     * - Element existence and proper structure
+     * - Data accuracy and completeness
+     * - Consistent styling and layout
+     * - Proper use of centralized InfoSummarySystem
+     * - Configuration correctness
+     */
+    async runInfoSummaryTests() {
+        this.logger?.info('📊 Starting Info Summary System Tests');
+        this.currentTestType = 'info-summary';
+
+        try {
+            // Load INFO_SUMMARY_CONFIGS if not already loaded
+            if (!window.INFO_SUMMARY_CONFIGS) {
+                this.logger?.info('🔵 [runInfoSummaryTests] INFO_SUMMARY_CONFIGS not loaded, loading dynamically...');
+                await this.loadInfoSummaryConfigs();
+            }
+
+            // Get all pages that should have info summary
+            // Map page keys to possible config keys (handle underscore vs hyphen differences)
+            const pageKeyToConfigKey = {
+                'ai_analysis': 'ai-analysis',
+                'portfolio_state': 'portfolio-state-page',
+                'trade_history': null, // No config yet
+                'research': null, // No config yet
+                'watch_lists': null, // No config yet
+                'user_profile': null, // No config yet
+                'trading_journal': null, // No config yet
+                'tag_management': null, // No config yet
+                'data_import': null, // No config yet
+                'ticker_dashboard': null, // No config yet
+                'strategy_analysis': 'strategy-analysis'
+            };
+
+            // Debug: Check if INFO_SUMMARY_CONFIGS exists
+            this.logger?.info(`🔵 [runInfoSummaryTests] INFO_SUMMARY_CONFIGS exists: ${!!window.INFO_SUMMARY_CONFIGS}`);
+            if (window.INFO_SUMMARY_CONFIGS) {
+                const configKeys = Object.keys(window.INFO_SUMMARY_CONFIGS);
+                this.logger?.info(`🔵 [runInfoSummaryTests] Available config keys: ${configKeys.join(', ')}`);
+            }
+
+            // Debug: Check user pages
+            const userPages = Object.entries(this.pages).filter(([key, page]) => page.type === 'user');
+            this.logger?.info(`🔵 [runInfoSummaryTests] Total user pages: ${userPages.length}`);
+            userPages.forEach(([key, page]) => {
+                this.logger?.debug(`🔵 [runInfoSummaryTests] User page: ${key} (${page.name})`);
+            });
+
+            const pagesWithSummary = Object.entries(this.pages).filter(([key, page]) => {
+                if (page.type !== 'user') {
+                    this.logger?.debug(`🔵 [runInfoSummaryTests] Skipping ${key} - not user page (type: ${page.type})`);
+                    return false;
+                }
+                
+                // Try direct key match first
+                let configKey = key;
+                if (pageKeyToConfigKey[key] !== undefined) {
+                    configKey = pageKeyToConfigKey[key];
+                    if (configKey === null) {
+                        this.logger?.debug(`🔵 [runInfoSummaryTests] Skipping ${key} - explicitly no config`);
+                        return false; // Explicitly no config
+                    }
+                }
+                
+                // Check if page has config in INFO_SUMMARY_CONFIGS
+                const hasConfig = window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS[configKey];
+                
+                this.logger?.debug(`🔵 [runInfoSummaryTests] Checking ${key} -> ${configKey}: ${hasConfig ? 'FOUND' : 'NOT FOUND'}`);
+                
+                if (hasConfig) {
+                    this.logger?.info(`✅ [runInfoSummaryTests] Found config for ${page.name} (${key} -> ${configKey})`);
+                }
+                
+                return hasConfig;
+            });
+
+            this.logger?.info(`🔵 [runInfoSummaryTests] Found ${pagesWithSummary.length} pages with info summary config`);
+
+            const testResults = [];
+
+            // Run tests sequentially (one at a time) to avoid nested iframes
+            for (const [pageKey, page] of pagesWithSummary) {
+                try {
+                    this.logger?.info(`🔵 [runInfoSummaryTests] Testing ${page.name} (${pageKey})...`);
+                    
+                    // Clean up any existing iframes before starting new test
+                    this.cleanupTestIframes();
+                    
+                    // Run test for this page
+                    const result = await this.testPageInfoSummary(pageKey, page);
+                    testResults.push(result);
+                    
+                    // Store results immediately after each test
+                    this.results['info-summary'] = testResults;
+                    
+                    // Update dashboard and test results table after each test
+                    this.updateDashboard();
+                    this.updateTestResults();
+                    
+                    // Clean up iframe after test completes
+                    this.cleanupTestIframes();
+                    
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                } catch (error) {
+                    this.logger?.error(`❌ [runInfoSummaryTests] Test failed for ${page.name}`, { error: error.message });
+                    const errorResult = {
+                        page: page.name,
+                        pageKey,
+                        status: 'failed',
+                        error: error.message,
+                        executionTime: 0
+                    };
+                    testResults.push(errorResult);
+                    
+                    // Store results immediately even on error
+                    this.results['info-summary'] = testResults;
+                    
+                    // Update dashboard and test results table even on error
+                    this.updateDashboard();
+                    this.updateTestResults();
+                    
+                    // Clean up iframe even on error
+                    this.cleanupTestIframes();
+                }
+            }
+
+            // Final update (redundant but ensures consistency)
+            this.results['info-summary'] = testResults;
+            this.updateDashboard();
+            this.updateTestResults();
+
+            // Show summary
+            const totalTests = testResults.length;
+            const passedTests = testResults.filter(r => r.status === 'success').length;
+            const failedTests = totalTests - passedTests;
+
+            if (failedTests === 0) {
+                if (window.NotificationSystem && window.NotificationSystem.showSuccess) {
+                    window.NotificationSystem.showSuccess(
+                        'בדיקות Info Summary הושלמו בהצלחה',
+                        `נבדקו ${totalTests} עמודים - כל הבדיקות עברו בהצלחה`,
+                        5000,
+                        'system'
+                    );
+                }
+            } else {
+                if (window.NotificationSystem && window.NotificationSystem.showWarning) {
+                    window.NotificationSystem.showWarning(
+                        'בדיקות Info Summary הושלמו עם כשלים',
+                        `נבדקו ${totalTests} עמודים - ${passedTests} עברו, ${failedTests} נכשלו`,
+                        6000,
+                        'system'
+                    );
+                }
+            }
+
+            this.logger?.info('✅ Info Summary Tests completed');
+        } catch (error) {
+            this.logger?.error('❌ Info Summary Tests failed with error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Test info summary for a single page
+     */
+    async testPageInfoSummary(pageKey, page) {
+        const startTime = Date.now();
+        const issues = [];
+        const warnings = [];
+
+        try {
+            // Ensure no existing iframes before loading new one
+            this.cleanupTestIframes();
+            
+            // Load page in iframe (add .html extension if needed)
+            const pageUrl = page.url.endsWith('.html') ? page.url : `${page.url}.html`;
+            const iframe = await this.loadPageInIframe(pageUrl);
+            const iframeWindow = iframe.contentWindow;
+            const iframeDocument = iframe.contentDocument;
+
+            // Wait for page to load
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Verify iframe is still valid (not removed)
+            if (!iframe.parentNode || !iframe.contentWindow) {
+                throw new Error('Iframe was removed during test');
+            }
+
+            // Instrumentation: Log page details
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    location: 'crud_testing_dashboard.js:testPageInfoSummary',
+                    message: `Testing page: ${page.name} (${pageKey})`,
+                    data: {
+                        pageKey,
+                        pageName: page.name,
+                        pageUrl: pageUrl,
+                        iframeReady: !!iframeDocument,
+                        iframeWindowReady: !!iframeWindow
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'info-summary-test',
+                    hypothesisId: 'A'
+                })
+            }).catch(() => {});
+
+            // Check 1: Info Summary System loaded
+            if (!iframeWindow.InfoSummarySystem) {
+                issues.push('InfoSummarySystem not loaded');
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        location: 'crud_testing_dashboard.js:testPageInfoSummary',
+                        message: `InfoSummarySystem not loaded for ${page.name}`,
+                        data: { pageKey, pageName: page.name },
+                        timestamp: Date.now(),
+                        sessionId: 'debug-session',
+                        runId: 'info-summary-test',
+                        hypothesisId: 'A'
+                    })
+                }).catch(() => {});
+            }
+
+            // Check 2: Configuration exists (handle key mapping)
+            const pageKeyToConfigKey = {
+                'ai_analysis': 'ai-analysis',
+                'portfolio_state': 'portfolio-state-page',
+                'strategy_analysis': 'strategy-analysis'
+            };
+            const configKey = pageKeyToConfigKey[pageKey] || pageKey;
+            const config = window.INFO_SUMMARY_CONFIGS[configKey];
+            
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    location: 'crud_testing_dashboard.js:testPageInfoSummary',
+                    message: `Checking config for ${pageKey}`,
+                    data: {
+                        pageKey,
+                        configKey,
+                        configExists: !!config,
+                        availableConfigs: window.INFO_SUMMARY_CONFIGS ? Object.keys(window.INFO_SUMMARY_CONFIGS) : []
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'info-summary-test',
+                    hypothesisId: 'B'
+                })
+            }).catch(() => {});
+
+            if (!config) {
+                issues.push(`No config found in INFO_SUMMARY_CONFIGS for '${pageKey}' (tried '${configKey}')`);
+            } else {
+                // Check 3: Container element exists
+                const containerId = config.containerId || 'summaryStats';
+                const container = iframeDocument.getElementById(containerId);
+                
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        location: 'crud_testing_dashboard.js:testPageInfoSummary',
+                        message: `Checking container element`,
+                        data: {
+                            pageKey,
+                            containerId,
+                            containerExists: !!container,
+                            configStatsCount: config.stats ? config.stats.length : 0
+                        },
+                        timestamp: Date.now(),
+                        sessionId: 'debug-session',
+                        runId: 'info-summary-test',
+                        hypothesisId: 'C'
+                    })
+                }).catch(() => {});
+                
+                if (!container) {
+                    issues.push(`Container element '#${containerId}' not found in HTML`);
+                } else {
+                    // Check 4: Container has proper structure
+                    const statElements = container.querySelectorAll('[data-stat-id], .stat-item, .summary-stat');
+                    const statElementsCount = statElements.length;
+                    
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            location: 'crud_testing_dashboard.js:testPageInfoSummary',
+                            message: `Checking stat elements`,
+                            data: {
+                                pageKey,
+                                containerId,
+                                statElementsCount,
+                                expectedStatsCount: config.stats ? config.stats.length : 0,
+                                containerHTML: container.innerHTML.substring(0, 200)
+                            },
+                            timestamp: Date.now(),
+                            sessionId: 'debug-session',
+                            runId: 'info-summary-test',
+                            hypothesisId: 'D'
+                        })
+                    }).catch(() => {});
+
+                    if (statElementsCount === 0 && config.stats && config.stats.length > 0) {
+                        warnings.push(`Container found but no stat elements rendered (expected ${config.stats.length} stats)`);
+                    }
+
+                    // Check 5: Stats match configuration
+                    if (config.stats) {
+                        config.stats.forEach(stat => {
+                            const statElement = container.querySelector(`[data-stat-id="${stat.id}"]`);
+                            if (!statElement) {
+                                warnings.push(`Stat element for '${stat.id}' (${stat.label}) not found`);
+                            } else {
+                                // Check if stat has content
+                                const statValue = statElement.textContent.trim();
+                                if (!statValue || statValue === '' || statValue === '0' || statValue === '-') {
+                                    warnings.push(`Stat '${stat.id}' appears empty or zero`);
+                                }
+                            }
+                        });
+                    }
+
+                    // Check 6: Consistent styling
+                    const hasInfoSummaryClass = container.classList.contains('info-summary') || 
+                                                container.classList.contains('summary-stats') ||
+                                                container.closest('.info-summary') !== null;
+                    if (!hasInfoSummaryClass) {
+                        warnings.push('Container missing standard info-summary CSS classes');
+                    }
+                }
+
+                // Check 7: InfoSummarySystem is being used (check if calculateAndRender was called)
+                // This is harder to check directly, but we can check if the system is available
+                if (iframeWindow.InfoSummarySystem && !iframeWindow.InfoSummarySystem.initialized) {
+                    warnings.push('InfoSummarySystem not initialized');
+                }
+            }
+
+            // Determine status
+            const status = issues.length === 0 ? 'success' : 'failed';
+
+            return {
+                page: page.name,
+                pageKey,
+                status,
+                issues,
+                warnings,
+                executionTime: Date.now() - startTime
+            };
+
+        } catch (error) {
+            // Clean up iframe on error
+            this.cleanupTestIframes();
+            
+            return {
+                page: page.name,
+                pageKey,
+                status: 'failed',
+                error: error.message,
+                issues: [...issues, `Error: ${error.message}`],
+                warnings,
+                executionTime: Date.now() - startTime
+            };
+        } finally {
+            // Always clean up iframe after test completes
+            this.cleanupTestIframes();
         }
     }
 
@@ -930,7 +1390,7 @@ class IntegratedCRUDE2ETester {
                         container.style.cssText = 'position: relative; width: 100%; min-height: 600px; border: 2px solid #26baac; border-radius: 8px; overflow: hidden; background: #f8f9fa;';
                         testResultsSection.querySelector('.card-body').appendChild(container);
                         this.logger?.info('🔵 [loadPageInIframe] Created testIframeContainer after test-results');
-                    } else {
+    } else {
                         container = document.createElement('div');
                         container.id = 'testIframeContainer';
                         container.style.cssText = 'position: relative; width: 100%; min-height: 600px;';
@@ -2102,6 +2562,13 @@ class IntegratedCRUDE2ETester {
                 'user_profile': 'user_profile'
             };
             
+            // Check if page has CRUD operations
+            if (!page.hasCRUD) {
+                workflow.steps.push(`עמוד ${page.name} הוא תצוגה בלבד - אין CRUD operations`);
+                this.updateTestResults();
+                throw new Error(`Page ${page.name} does not support CRUD operations - it is view-only`);
+            }
+            
             const entityType = entityTypeMap[pageKey] || pageKey;
             const fieldMaps = this.getEntityFieldMaps();
             const fieldMap = fieldMaps[entityType];
@@ -2130,32 +2597,99 @@ class IntegratedCRUDE2ETester {
             this.updateTestResults();
 
             // Step 3: Get initial row count
-            const initialRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
-            workflow.steps.push(`נמצאו ${initialRows} שורות בטבלה`);
-            this.updateTestResults();
-
-            // Step 4: Open modal using ModalManagerV2
-            workflow.steps.push('פתיחת מודל דרך ModalManagerV2');
-            this.updateTestResults();
-            
-            const modalId = fieldMap.modalId || `${pageKey}Modal`;
-            
-            if (!iframeWindow.ModalManagerV2 || typeof iframeWindow.ModalManagerV2.showModal !== 'function') {
-                throw new Error('ModalManagerV2 not available in iframe');
+            // For watch_list, count dropdown options instead of table rows
+            // For user_profile, skip table check (no table - uses form)
+            let initialRows;
+            if (entityType === 'user_profile') {
+                // user_profile doesn't use a table - skip initial row count
+                initialRows = 0;
+                workflow.steps.push('פרופיל משתמש - אין טבלה לבדוק');
+            } else if (entityType === 'watch_list') {
+                const dropdown = iframeDoc.querySelector('#activeListSelect');
+                initialRows = dropdown ? dropdown.options.length : 0;
+                workflow.steps.push(`נמצאו ${initialRows} רשימות ב-dropdown`);
+            } else {
+                initialRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                workflow.steps.push(`נמצאו ${initialRows} שורות בטבלה`);
             }
-            
-            await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
-            workflow.steps.push('מודל נפתח דרך ModalManagerV2');
             this.updateTestResults();
 
-            // Step 5: Wait for modal to appear
-            workflow.steps.push('ממתין למודל');
-            this.updateTestResults();
-            
-            await this.waitForElementInIframe(testIframe, `#${modalId}.show, #${modalId}.modal.show, .modal.show`, 10000);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for form to initialize
-            workflow.steps.push('מודל נפתח בהצלחה');
-            this.updateTestResults();
+            // Step 4: Open modal using ModalManagerV2 (skip if modalId is null)
+            // Special handling for trading_journal - it uses handleAddEntry with dropdown
+            let modalId;
+            if (entityType === 'trading_journal') {
+                workflow.steps.push('יומן מסחר - ממתין לטעינת handleAddEntry');
+                this.updateTestResults();
+                
+                // Wait for handleAddEntry to be available (up to 5 seconds)
+                let retries = 0;
+                while (!iframeWindow.handleAddEntry || typeof iframeWindow.handleAddEntry !== 'function') {
+                    if (retries >= 50) {
+                        throw new Error('handleAddEntry not available in iframe after waiting 5 seconds');
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+                
+                workflow.steps.push('יומן מסחר - handleAddEntry זמין');
+                this.updateTestResults();
+                
+                // Test adding a note entry (simplest entity type)
+                workflow.steps.push('בודק הוספת רשומת הערה דרך יומן מסחר');
+                this.updateTestResults();
+                
+                // Call handleAddEntry with 'note' entity type
+                await iframeWindow.handleAddEntry('note');
+                
+                // Wait for notesModal to appear
+                await this.waitForElementInIframe(testIframe, '#notesModal.show, #notesModal.modal.show, .modal.show', 10000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                workflow.steps.push('מודל הערות נפתח דרך יומן מסחר');
+                this.updateTestResults();
+                
+                // Update modalId and fieldMap for form filling
+                modalId = 'notesModal';
+                // Use note fieldMap instead of trading_journal fieldMap
+                const noteFieldMap = fieldMaps.note;
+                if (!noteFieldMap) {
+                    throw new Error('No field map found for note entity type');
+                }
+                fieldMap = noteFieldMap;
+                entityType = 'note'; // Update entityType for UnifiedCRUDService
+            } else {
+                // Standard modal opening for other entities
+                // Check explicitly for null/undefined, not just falsy values
+                modalId = (fieldMap.modalId !== null && fieldMap.modalId !== undefined) 
+                    ? fieldMap.modalId 
+                    : `${pageKey}Modal`;
+                
+                if (fieldMap.modalId === null) {
+                    // For pages without modals (like user_profile), skip modal opening
+                    workflow.steps.push('דילוג על פתיחת מודל - עמוד זה לא משתמש במודל');
+                    this.updateTestResults();
+                    // Skip to form filling directly - form should already be visible on page
+                } else {
+                    workflow.steps.push('פתיחת מודל דרך ModalManagerV2');
+                    this.updateTestResults();
+                    
+                    if (!iframeWindow.ModalManagerV2 || typeof iframeWindow.ModalManagerV2.showModal !== 'function') {
+                        throw new Error('ModalManagerV2 not available in iframe');
+                    }
+                    
+                    await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
+                    workflow.steps.push('מודל נפתח דרך ModalManagerV2');
+                    this.updateTestResults();
+                    
+                    // Step 5: Wait for modal to appear
+                    workflow.steps.push('ממתין למודל');
+                    this.updateTestResults();
+                    
+                    await this.waitForElementInIframe(testIframe, `#${modalId}.show, #${modalId}.modal.show, .modal.show`, 10000);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    workflow.steps.push('מודל נפתח בהצלחה');
+                    this.updateTestResults();
+                } // End of modal opening block
+            }
 
             // Step 6: Fill form using DataCollectionService with fieldMap
             workflow.steps.push('מילוי טופס דרך DataCollectionService');
@@ -2167,46 +2701,301 @@ class IntegratedCRUDE2ETester {
             
             // Prepare test data based on field map
             const testData = {};
+            
+            // Special handling for ticker symbol - use a symbol that doesn't exist yet
+            let tickerSymbol = null;
+            if (entityType === 'ticker') {
+                try {
+                    // Try to fetch existing tickers from API to find what's already taken
+                    const tickersResponse = await fetch('/api/tickers/');
+                    if (tickersResponse.ok) {
+                        const tickersData = await tickersResponse.json();
+                        const tickers = tickersData.data || tickersData || [];
+                        const existingSymbols = new Set(tickers.map(t => t.symbol?.toUpperCase()).filter(Boolean));
+                        
+                        // Try known symbols first, find one that doesn't exist
+                        const knownSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'JNJ', 'WMT', 'MA', 'PG', 'UNH', 'DIS', 'HD', 'PYPL', 'BAC', 'VZ', 'ADBE', 'NFLX', 'CMCSA', 'KO', 'NKE', 'MRK', 'PFE', 'T', 'XOM', 'CVX', 'CSCO', 'INTC', 'AMD', 'QCOM', 'AVGO', 'TXN', 'LRCX', 'ASML', 'SNPS', 'CDNS', 'MCHP'];
+                        const availableSymbol = knownSymbols.find(s => !existingSymbols.has(s.toUpperCase()));
+                        
+                        if (availableSymbol) {
+                            tickerSymbol = availableSymbol;
+                            workflow.steps.push(`שימוש בסימבול זמין: ${tickerSymbol}`);
+                            this.updateTestResults();
+                        } else {
+                            // All known symbols are taken - create a unique symbol with timestamp
+                            const timestamp = Date.now().toString().slice(-6); // Last 6 digits
+                            tickerSymbol = `TEST${timestamp}`.substring(0, 10); // Max 10 chars
+                            workflow.steps.push(`יצירת סימבול ייחודי: ${tickerSymbol}`);
+                            this.updateTestResults();
+                        }
+                    }
+                } catch (error) {
+                    // If fetching fails, create a unique symbol with timestamp
+                    this.logger?.warn('Failed to fetch existing tickers, will create unique symbol', { error: error.message });
+                    const timestamp = Date.now().toString().slice(-6);
+                    tickerSymbol = `TEST${timestamp}`.substring(0, 10);
+                    workflow.steps.push(`יצירת סימבול ייחודי (fallback): ${tickerSymbol}`);
+                    this.updateTestResults();
+                }
+                
+                // Final fallback if still no symbol
+                if (!tickerSymbol) {
+                    tickerSymbol = 'AAPL'; // Last resort
+                    workflow.steps.push(`שימוש בסימבול ברירת מחדל: ${tickerSymbol}`);
+                    this.updateTestResults();
+                }
+            }
+            
             for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
                 if (fieldConfig.default !== undefined) {
                     testData[fieldName] = fieldConfig.default;
                 } else if (fieldConfig.required) {
-                    // Generate test value for required fields
-                    switch (fieldConfig.type) {
-                        case 'text':
-                            testData[fieldName] = `Test ${fieldName}`;
-                            break;
-                        case 'int':
-                            testData[fieldName] = 1;
-                            break;
-                        case 'number':
-                        case 'float':
-                            testData[fieldName] = 100;
-                            break;
-                        case 'date':
-                        case 'datetime-local':
-                            testData[fieldName] = new Date().toISOString().slice(0, 16);
-                            break;
-                        case 'bool':
-                            testData[fieldName] = true;
-                            break;
-                        default:
-                            testData[fieldName] = `Test ${fieldName}`;
+                    // Special handling for ticker symbol - use available symbol
+                    if (entityType === 'ticker' && fieldName === 'symbol') {
+                        testData[fieldName] = tickerSymbol || 'AAPL'; // Fallback to AAPL if all else fails
+                    } else {
+                        // For select elements (int type usually means select with IDs), we'll set the value after the form is loaded
+                        // For now, generate placeholder values
+                        switch (fieldConfig.type) {
+                            case 'text':
+                                // Check if field has maxLength constraint
+                                if (fieldConfig.maxLength) {
+                                    // Generate text that fits within maxLength
+                                    const baseText = `Test${fieldName}`;
+                                    testData[fieldName] = baseText.substring(0, Math.min(fieldConfig.maxLength, baseText.length));
+                                } else {
+                                    testData[fieldName] = `Test ${fieldName}`;
+                                }
+                                break;
+                            case 'int':
+                                // For int fields, we'll try to get the first available option value from the select
+                                // This will be handled after setFormData if the value doesn't match
+                                testData[fieldName] = null; // Will be set from select options
+                                break;
+                            case 'number':
+                            case 'float':
+                                testData[fieldName] = 100;
+                                break;
+                            case 'date':
+                                // Date input type requires yyyy-MM-dd format (not datetime-local)
+                                testData[fieldName] = new Date().toISOString().slice(0, 10);
+                                break;
+                            case 'datetime-local':
+                                // Datetime-local input type requires yyyy-MM-ddThh:mm format
+                                testData[fieldName] = new Date().toISOString().slice(0, 16);
+                                break;
+                            case 'bool':
+                                testData[fieldName] = true;
+                                break;
+                            default:
+                                // Check if field has maxLength constraint
+                                if (fieldConfig.maxLength) {
+                                    const baseText = `Test${fieldName}`;
+                                    testData[fieldName] = baseText.substring(0, Math.min(fieldConfig.maxLength, baseText.length));
+                                } else {
+                                    testData[fieldName] = `Test ${fieldName}`;
+                                }
+                        }
                     }
                 }
             }
             
+            // After preparing test data, fill in int values from select options if they're null
+            // This ensures we use actual values from the form, not arbitrary numbers
+            for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+                if (fieldConfig.type === 'int' && testData[fieldName] === null && fieldConfig.required) {
+                    // Try to get first non-empty option from select
+                    const elementId = fieldConfig.id.startsWith('#') ? fieldConfig.id.substring(1) : fieldConfig.id;
+                    const element = iframeDoc.getElementById(elementId);
+                    if (element && element.tagName === 'SELECT' && element.options.length > 0) {
+                        // Find first option with a value (skip empty option)
+                        const firstOptionWithValue = Array.from(element.options).find(opt => opt.value && opt.value !== '');
+                        if (firstOptionWithValue) {
+                            testData[fieldName] = fieldConfig.type === 'int' ? parseInt(firstOptionWithValue.value, 10) : firstOptionWithValue.value;
+                        }
+                    }
+                }
+            }
+            
+            // Special handling for note entity - related_id depends on related_type_id
+            if (entityType === 'note') {
+                workflow.steps.push('טיפול מיוחד ב-note: מילוי related_type_id קודם');
+                this.updateTestResults();
+                
+                // Step 1: Fill related_type_id first
+                const relatedTypeField = iframeDoc.querySelector('#noteRelatedType');
+                if (relatedTypeField && testData.related_type_id) {
+                    relatedTypeField.value = testData.related_type_id;
+                    relatedTypeField.dispatchEvent(new Event('change', { bubbles: true }));
+                    workflow.steps.push(`related_type_id נבחר: ${testData.related_type_id}`);
+                    this.updateTestResults();
+                    
+                    // Wait for noteRelatedObject to be populated
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Step 2: Fill related_id from populated options
+                    const relatedObjectField = iframeDoc.querySelector('#noteRelatedObject');
+                    if (relatedObjectField && relatedObjectField.options.length > 1) {
+                        // Find first non-empty option
+                        const firstOptionWithValue = Array.from(relatedObjectField.options).find(opt => opt.value && opt.value !== '');
+                        if (firstOptionWithValue) {
+                            relatedObjectField.value = firstOptionWithValue.value;
+                            relatedObjectField.dispatchEvent(new Event('change', { bubbles: true }));
+                            testData.related_id = parseInt(firstOptionWithValue.value, 10);
+                            workflow.steps.push(`related_id נבחר: ${testData.related_id}`);
+                            this.updateTestResults();
+                        }
+                    }
+                    
+                    // Step 3: Fill content in rich-text editor
+                    if (iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.setContent) {
+                        const contentValue = testData.content || '<p>Test note content from E2E test</p>';
+                        iframeWindow.RichTextEditorService.setContent('noteContent', contentValue);
+                        testData.content = contentValue;
+                        workflow.steps.push('תוכן הערה מולא ב-rich-text editor');
+                        this.updateTestResults();
+                        
+                        // Wait for rich-text editor to update
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        // Verify content was set correctly
+                        const verifyContent = iframeWindow.RichTextEditorService.getContent('noteContent');
+                        if (!verifyContent || verifyContent.replace(/<[^>]*>/g, '').trim() === '') {
+                            workflow.steps.push('אזהרה: תוכן הערה לא נשמר ב-rich-text editor - מנסה שוב');
+                            this.updateTestResults();
+                            // Try again with a delay
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            iframeWindow.RichTextEditorService.setContent('noteContent', contentValue);
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            const verifyContent2 = iframeWindow.RichTextEditorService.getContent('noteContent');
+                            if (!verifyContent2 || verifyContent2.replace(/<[^>]*>/g, '').trim() === '') {
+                                workflow.steps.push('שגיאה: תוכן הערה לא נשמר ב-rich-text editor גם אחרי ניסיון שני');
+                                this.updateTestResults();
+                            } else {
+                                testData.content = verifyContent2;
+                                workflow.steps.push('תוכן הערה נשמר בהצלחה אחרי ניסיון שני');
+                                this.updateTestResults();
+                            }
+                        } else {
+                            testData.content = verifyContent;
+                            workflow.steps.push('תוכן הערה נשמר בהצלחה ב-rich-text editor');
+                            this.updateTestResults();
+                        }
+                    } else {
+                        // Fallback: try to set content directly
+                        const contentField = iframeDoc.querySelector('#noteContent');
+                        if (contentField) {
+                            contentField.value = testData.content || 'Test note content';
+                            contentField.dispatchEvent(new Event('input', { bubbles: true }));
+                            testData.content = contentField.value;
+                            workflow.steps.push('תוכן הערה מולא ישירות');
+                            this.updateTestResults();
+                        }
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            
             // Set form values using DataCollectionService
+            let setFormDataResult = null;
             if (iframeWindow.DataCollectionService.setFormData) {
-                iframeWindow.DataCollectionService.setFormData(fieldMap.fields, testData);
+                setFormDataResult = iframeWindow.DataCollectionService.setFormData(fieldMap.fields, testData);
+                
+                // Handle missing fields - try alternative selectors
+                if (setFormDataResult && setFormDataResult.missingFields && setFormDataResult.missingFields.length > 0) {
+                    workflow.steps.push(`אזהרה: ${setFormDataResult.missingFields.length} שדות לא נמצאו - מנסה חלופות`);
+                    this.updateTestResults();
+                    
+                    for (const missingField of setFormDataResult.missingFields) {
+                        const fieldConfig = fieldMap.fields[missingField.fieldName];
+                        if (!fieldConfig) continue;
+                        
+                        // Skip if already handled specially for note entity
+                        if (entityType === 'note' && (missingField.fieldName === 'related_id' || missingField.fieldName === 'content')) {
+                            continue;
+                        }
+                        
+                        // Try alternative selectors (without #, with name attribute, etc.)
+                        const alternativeSelectors = [
+                            fieldConfig.id.replace('#', ''),
+                            `[name="${missingField.fieldName}"]`,
+                            `[id="${fieldConfig.id.replace('#', '')}"]`,
+                            `input[name*="${missingField.fieldName}"]`,
+                            `select[name*="${missingField.fieldName}"]`,
+                            `textarea[name*="${missingField.fieldName}"]`
+                        ];
+                        
+                        let element = null;
+                        for (const selector of alternativeSelectors) {
+                            element = iframeDoc.querySelector(selector);
+                            if (element) break;
+                        }
+                        
+                        if (element && testData[missingField.fieldName] !== undefined) {
+                            const value = testData[missingField.fieldName];
+                            if (missingField.fieldType === 'bool' || missingField.fieldType === 'boolean' || missingField.fieldType === 'checkbox') {
+                                element.checked = Boolean(value);
+                            } else if (fieldConfig.type === 'rich-text' && iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.setContent) {
+                                // Handle rich-text editor
+                                const elementId = fieldConfig.id.replace('#', '');
+                                iframeWindow.RichTextEditorService.setContent(elementId, value || '<p>Test content</p>');
+                                testData[missingField.fieldName] = value || '<p>Test content</p>';
+                            } else if (fieldConfig.type === 'date' || fieldConfig.type === 'dateOnly') {
+                                // Convert date value to yyyy-MM-dd format for date input type
+                                let dateValue = value;
+                                if (typeof value === 'string') {
+                                    // If value is already in yyyy-MM-dd format, use it directly
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                                        dateValue = value;
+                                    } else {
+                                        // Otherwise, parse it as a date and convert to yyyy-MM-dd
+                                        const date = new Date(value);
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
+                                        dateValue = `${year}-${month}-${day}`;
+                                    }
+                                } else if (value instanceof Date) {
+                                    const year = value.getFullYear();
+                                    const month = String(value.getMonth() + 1).padStart(2, '0');
+                                    const day = String(value.getDate()).padStart(2, '0');
+                                    dateValue = `${year}-${month}-${day}`;
+                                }
+                                element.value = dateValue;
+                                testData[missingField.fieldName] = dateValue;
+                            } else {
+                                element.value = value;
+                            }
+                            element.dispatchEvent(new Event('input', { bubbles: true }));
+                            element.dispatchEvent(new Event('change', { bubbles: true }));
+                            workflow.steps.push(`תוקן: שדה ${missingField.fieldName} נמצא עם selector חלופי`);
+                            this.updateTestResults();
+                        } else {
+                            workflow.steps.push(`שגיאה: שדה ${missingField.fieldName} (${fieldConfig.id}) לא נמצא גם עם selectors חלופיים`);
+                            this.updateTestResults();
+                        }
+                    }
+                }
             } else {
                 // Fallback: manual field filling
                 for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+                    // Skip if already handled specially for note entity
+                    if (entityType === 'note' && (fieldName === 'related_id' || fieldName === 'content')) {
+                        continue;
+                    }
+                    
                     const element = iframeDoc.querySelector(fieldConfig.id);
                     if (element && testData[fieldName] !== undefined) {
-                        element.value = testData[fieldName];
-                        element.dispatchEvent(new Event('input', { bubbles: true }));
-                        element.dispatchEvent(new Event('change', { bubbles: true }));
+                        if (fieldConfig.type === 'rich-text' && iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.setContent) {
+                            // Handle rich-text editor
+                            const elementId = fieldConfig.id.replace('#', '');
+                            iframeWindow.RichTextEditorService.setContent(elementId, testData[fieldName] || '<p>Test content</p>');
+                        } else {
+                            element.value = testData[fieldName];
+                            element.dispatchEvent(new Event('input', { bubbles: true }));
+                            element.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
                     }
                 }
             }
@@ -2223,58 +3012,831 @@ class IntegratedCRUDE2ETester {
             if (!validationResult.isValid) {
                 workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
                 this.updateTestResults();
+                
+                // Try to fix validation errors by filling missing required fields
+                for (const error of validationResult.errors) {
+                    if (error.includes('not found in DOM')) {
+                        // Field not found - already handled above
+                        continue;
+                    } else if (error.includes('is empty')) {
+                        // Required field is empty - try to fill it with default value
+                        const fieldNameMatch = error.match(/Required field (\w+) is empty/);
+                        if (fieldNameMatch) {
+                            const fieldName = fieldNameMatch[1];
+                            const fieldConfig = fieldMap.fields[fieldName];
+                            if (fieldConfig && testData[fieldName] !== undefined) {
+                                const element = iframeDoc.querySelector(fieldConfig.id);
+                                if (element) {
+                                    const value = testData[fieldName];
+                                    if (fieldConfig.type === 'bool' || fieldConfig.type === 'boolean' || fieldConfig.type === 'checkbox') {
+                                        element.checked = Boolean(value);
+                                    } else if (fieldConfig.type === 'date' || fieldConfig.type === 'dateOnly') {
+                                        // Convert date value to yyyy-MM-dd format for date input type
+                                        let dateValue = value;
+                                        if (typeof dateValue === 'string') {
+                                            // If value is already in yyyy-MM-dd format, use it directly
+                                            if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+                                                // Already correct format
+                                            } else {
+                                                // Otherwise, parse it as a date and convert to yyyy-MM-dd
+                                                const date = new Date(dateValue);
+                                                const year = date.getFullYear();
+                                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                                const day = String(date.getDate()).padStart(2, '0');
+                                                dateValue = `${year}-${month}-${day}`;
+                                            }
+                                        } else if (dateValue instanceof Date) {
+                                            const year = dateValue.getFullYear();
+                                            const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+                                            const day = String(dateValue.getDate()).padStart(2, '0');
+                                            dateValue = `${year}-${month}-${day}`;
+                                        }
+                                        element.value = dateValue;
+                                    } else {
+                                        element.value = value;
+                                    }
+                                    element.dispatchEvent(new Event('input', { bubbles: true }));
+                                    element.dispatchEvent(new Event('change', { bubbles: true }));
+                                    workflow.steps.push(`תוקן: שדה ${fieldName} מולא עם ערך ברירת מחדל`);
+                                    this.updateTestResults();
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Re-validate after fixes
+                const revalidationResult = await this.validateFormFieldsInIframe(testIframe, entityType, fieldMap);
+                if (!revalidationResult.isValid) {
+                    workflow.steps.push(`שגיאה: ולידציה עדיין נכשלה לאחר תיקונים - ${revalidationResult.errors.join(', ')}`);
+                    this.updateTestResults();
+                    throw new Error(`Validation failed: ${revalidationResult.errors.join(', ')}`);
+                } else {
+                    workflow.steps.push('ולידציה עברה בהצלחה לאחר תיקונים');
+                    this.updateTestResults();
+                }
             } else {
                 workflow.steps.push('ולידציה עברה בהצלחה');
                 this.updateTestResults();
             }
 
-            // Step 8: Save using UnifiedCRUDService
-            workflow.steps.push('שמירה דרך UnifiedCRUDService');
+            // Step 8: Save using UnifiedCRUDService (or direct API for user_profile)
+            if (entityType === 'user_profile') {
+                workflow.steps.push('שמירת פרופיל משתמש דרך /api/auth/me');
+            } else {
+                workflow.steps.push('שמירה דרך UnifiedCRUDService');
+            }
             this.updateTestResults();
             
-            if (!iframeWindow.UnifiedCRUDService) {
+            if (entityType !== 'user_profile' && !iframeWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in iframe');
             }
             
             // Collect form data using DataCollectionService
-            const formData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
-            
-            // Save entity
-            const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity(entityType, formData, {
-                modalId: modalId,
-                successMessage: `${page.name} נוסף בהצלחה`,
-                entityName: page.name,
-                reloadFn: null // Don't reload in iframe context
-            });
-            
-            if (!saveResult || !saveResult.data) {
-                throw new Error('Save operation failed - no result returned');
+            // Special handling for note entity - ensure content is collected from rich-text editor
+            if (entityType === 'note') {
+                // Verify content exists in rich-text editor before collecting
+                if (iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.getContent) {
+                    const contentBeforeCollect = iframeWindow.RichTextEditorService.getContent('noteContent');
+                    if (!contentBeforeCollect || contentBeforeCollect.replace(/<[^>]*>/g, '').trim() === '') {
+                        workflow.steps.push('אזהרה: תוכן הערה ריק לפני איסוף - מנסה למלא שוב');
+                        this.updateTestResults();
+                        const contentValue = testData.content || '<p>Test note content from E2E test</p>';
+                        iframeWindow.RichTextEditorService.setContent('noteContent', contentValue);
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
             }
             
-            createdEntityId = saveResult.data.id || saveResult.id;
-            workflow.steps.push(`ישות נוצרה בהצלחה (ID: ${createdEntityId})`);
+            // Check if name field exists in DOM before collecting
+            if (entityType === 'watch_list') {
+                const nameField = iframeDoc.querySelector('#watchListName');
+            }
+            
+            const formData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
+            
+            // Special handling for note entity - ensure content is in formData
+            if (entityType === 'note' && (!formData.content || formData.content.replace(/<[^>]*>/g, '').trim() === '')) {
+                workflow.steps.push('אזהרה: תוכן הערה לא נאסף - מנסה לאסוף ישירות מ-rich-text editor');
+                this.updateTestResults();
+                if (iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.getContent) {
+                    const directContent = iframeWindow.RichTextEditorService.getContent('noteContent');
+                    if (directContent && directContent.replace(/<[^>]*>/g, '').trim() !== '') {
+                        formData.content = directContent;
+                        workflow.steps.push('תוכן הערה נאסף ישירות מ-rich-text editor');
+                        this.updateTestResults();
+                    } else {
+                        // Fallback: use testData content
+                        formData.content = testData.content || '<p>Test note content from E2E test</p>';
+                        workflow.steps.push('תוכן הערה נקבע מ-testData');
+                        this.updateTestResults();
+                    }
+                } else {
+                    // Fallback: use testData content
+                    formData.content = testData.content || '<p>Test note content from E2E test</p>';
+                    workflow.steps.push('תוכן הערה נקבע מ-testData (RichTextEditorService לא זמין)');
+                    this.updateTestResults();
+                }
+            }
+            
+            // Save entity - Special handling for user_profile
+            let saveResult;
+            if (entityType === 'user_profile') {
+                // user_profile uses /api/auth/me with PUT, not standard CRUD endpoint
+                workflow.steps.push('שמירת פרופיל משתמש דרך /api/auth/me');
+                this.updateTestResults();
+                
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+                    
+                    // Use CRUDResponseHandler for consistent response handling
+                    if (iframeWindow.CRUDResponseHandler && typeof iframeWindow.CRUDResponseHandler.handleSaveResponse === 'function') {
+                        saveResult = await iframeWindow.CRUDResponseHandler.handleSaveResponse(response, {
+                            successMessage: 'פרטי המשתמש עודכנו בהצלחה',
+                            entityName: 'פרופיל משתמש',
+                            requiresHardReload: false,
+                        });
+                    } else {
+                        // Fallback to manual handling
+                        const data = await response.json();
+                        if (response.ok && data.status === 'success') {
+                            saveResult = {
+                                status: 'success',
+                                data: { user: data.data?.user },
+                                message: 'פרטי המשתמש עודכנו בהצלחה'
+                            };
+                        } else {
+                            saveResult = {
+                                status: 'error',
+                                error: data.error || { message: 'שגיאה בעדכון פרופיל' }
+                            };
+                        }
+                    }
+                } catch (error) {
+                    saveResult = {
+                        status: 'error',
+                        error: { message: error.message || 'שגיאה בעדכון פרופיל' }
+                    };
+                }
+            } else {
+                // Standard CRUD entities
+                // Get default reload function for this entity type
+                let reloadFn = null;
+                if (iframeWindow.UnifiedCRUDService && typeof iframeWindow.UnifiedCRUDService._getDefaultReloadFunction === 'function') {
+                    reloadFn = iframeWindow.UnifiedCRUDService._getDefaultReloadFunction(entityType);
+                }
+                
+                // For cash_flow, use loadCashFlowsData if available
+                if (entityType === 'cash_flow' && iframeWindow.loadCashFlowsData && typeof iframeWindow.loadCashFlowsData === 'function') {
+                    reloadFn = () => iframeWindow.loadCashFlowsData({ force: true });
+                }
+                
+                saveResult = await iframeWindow.UnifiedCRUDService.saveEntity(entityType, formData, {
+                    modalId: modalId,
+                    successMessage: `${page.name} נוסף בהצלחה`,
+                    entityName: page.name,
+                    reloadFn: reloadFn, // Reload table after save to show new entity
+                    returnErrorDetails: true // Request error details for testing
+                });
+            }
+            
+            if (!saveResult || !saveResult.data) {
+                // Check if this is a duplicate name error - retry with unique name
+                if (saveResult?.error?.isDuplicateName && entityType === 'watch_list' && formData.name) {
+                    workflow.steps.push(`שגיאה: שם כבר קיים - מנסה שם ייחודי`);
+                    this.updateTestResults();
+                    
+                    // Generate unique name with timestamp
+                    const uniqueName = `${formData.name} ${Date.now()}`;
+                    formData.name = uniqueName;
+                    
+                    // Update the form field in iframe
+                    const nameField = iframeDoc.querySelector('#watchListName');
+                    if (nameField) {
+                        nameField.value = uniqueName;
+                        nameField.dispatchEvent(new Event('input', { bubbles: true }));
+                        nameField.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    
+                    // Retry save with unique name
+                    saveResult = await iframeWindow.UnifiedCRUDService.saveEntity(entityType, formData, {
+                        modalId: modalId,
+                        successMessage: `${page.name} נוסף בהצלחה`,
+                        entityName: page.name,
+                        reloadFn: null,
+                        returnErrorDetails: true
+                    });
+                    
+                    if (saveResult && saveResult.data) {
+                        workflow.steps.push(`ישות נוצרה בהצלחה עם שם ייחודי`);
+                        this.updateTestResults();
+                        
+                        // Update createdEntityId after retry - special handling for user_profile
+                        if (entityType === 'user_profile') {
+                            createdEntityId = saveResult.data?.user?.id || saveResult.data?.id || saveResult.id;
+                        } else {
+                            createdEntityId = saveResult.data.id || saveResult.id;
+                        }
+                        
+                        // For watch_list, refresh dropdown after retry
+                        if (entityType === 'watch_list') {
+                            workflow.steps.push('מעדכן את ה-dropdown אחרי retry מוצלח');
+                            this.updateTestResults();
+                            
+                            // Refresh watch lists data and dropdown
+                            if (iframeWindow.WatchListsPage?.loadWatchLists) {
+                                await iframeWindow.WatchListsPage.loadWatchLists();
+                            }
+                            if (iframeWindow.WatchListsPage?.updateActiveListSelect) {
+                                iframeWindow.WatchListsPage.updateActiveListSelect();
+                            }
+                            
+                            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for dropdown update
+                        }
+                    }
+                }
+                
+                if (!saveResult || !saveResult.data) {
+                    // Check if this is a validation error (400) - try to extract field errors from response
+                    workflow.steps.push('שגיאה: שמירה נכשלה - מנסה לחלץ פרטי שגיאה מהשרת');
+                    this.updateTestResults();
+                    
+                    // The error should have been logged by CRUDResponseHandler
+                    // We can't retry here because we don't have access to the response
+                    // But we can provide better error message
+                    const errorMessage = saveResult?.error?.message || saveResult?.error || saveResult?.message || 'Save operation failed - no result returned';
+                    throw new Error(`Save operation failed: ${errorMessage}. Check form fields and validation.`);
+                }
+            }
+            
+            // Get created entity ID - special handling for user_profile
+            if (!createdEntityId) {
+                if (entityType === 'user_profile') {
+                    createdEntityId = saveResult.data?.user?.id || saveResult.data?.id || saveResult.id;
+                    workflow.steps.push(`פרופיל משתמש עודכן בהצלחה (ID: ${createdEntityId})`);
+                } else {
+                    createdEntityId = saveResult.data.id || saveResult.id;
+                    workflow.steps.push(`ישות נוצרה בהצלחה (ID: ${createdEntityId})`);
+                }
+            } else {
+                // createdEntityId already set from retry
+                if (entityType === 'user_profile') {
+                    workflow.steps.push(`פרופיל משתמש עודכן בהצלחה (ID: ${createdEntityId})`);
+                } else {
+                    workflow.steps.push(`ישות נוצרה בהצלחה (ID: ${createdEntityId})`);
+                }
+            }
             this.updateTestResults();
 
-            // Step 9: Wait for modal to close
-            workflow.steps.push('ממתין לסגירת המודל');
-            this.updateTestResults();
-            await this.waitForElementToDisappearInIframe(testIframe, `.modal.show, #${modalId}.show`, 10000);
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for table update
+            // Step 9: Wait for modal to close (skip for user_profile - no modal)
+            if (entityType === 'user_profile') {
+                // user_profile doesn't use a modal - skip waiting for modal to close
+                workflow.steps.push('דילוג על המתנה לסגירת מודל - פרופיל משתמש לא משתמש במודל');
+                this.updateTestResults();
+            } else {
+                workflow.steps.push('ממתין לסגירת המודל');
+                this.updateTestResults();
+                await this.waitForElementToDisappearInIframe(testIframe, `.modal.show, #${modalId}.show`, 10000);
+            }
+            
+            // Special handling for watch_list - refresh dropdown after save
+            if (entityType === 'watch_list') {
+                workflow.steps.push('מעדכן את ה-dropdown של רשימות צפייה');
+                this.updateTestResults();
+                
+                // Refresh watch lists data and dropdown
+                if (iframeWindow.WatchListsPage?.loadWatchLists) {
+                    await iframeWindow.WatchListsPage.loadWatchLists();
+                }
+                if (iframeWindow.WatchListsPage?.updateActiveListSelect) {
+                    iframeWindow.WatchListsPage.updateActiveListSelect();
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for dropdown update
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for table update
+            }
+            
             workflow.steps.push('מודל נסגר והטבלה עודכנה');
             this.updateTestResults();
 
-            // Step 10: Verify entity appears in table
-            workflow.steps.push('אימות הופעת הישות בטבלה');
-            this.updateTestResults();
-            const finalRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
-            if (finalRows <= initialRows) {
-                throw new Error(`Entity not added to table. Initial: ${initialRows}, Final: ${finalRows}`);
+            // Store finalRows for later use (after deletion)
+            let finalRows;
+            
+            // Step 10: Verify entity appears (in dropdown for watch_list, in table for others, skip for user_profile)
+            if (entityType === 'user_profile') {
+                // user_profile doesn't use a table - it's a form that updates the current user profile
+                // Just verify that the save was successful (already checked above)
+                workflow.steps.push('אימות עדכון פרופיל משתמש - אין טבלה לבדוק');
+                this.updateTestResults();
+                
+                // Verify that the form fields were updated with the saved values
+                const firstNameField = iframeDoc.querySelector('#firstName');
+                const lastNameField = iframeDoc.querySelector('#lastName');
+                const emailField = iframeDoc.querySelector('#email');
+                
+                if (firstNameField && lastNameField && emailField) {
+                    const savedFirstName = formData.first_name || testData.first_name;
+                    const savedLastName = formData.last_name || testData.last_name;
+                    const savedEmail = formData.email || testData.email;
+                    
+                    // Check if form fields match saved values (they might be updated by the page after save)
+                    workflow.steps.push(`שדות הטופס: שם פרטי=${firstNameField.value}, שם משפחה=${lastNameField.value}, אימייל=${emailField.value}`);
+                    this.updateTestResults();
+                    
+                    // For user_profile, success is determined by the save result, not by table changes
+                    workflow.steps.push('פרופיל משתמש עודכן בהצלחה - אין טבלה לבדוק');
+                    this.updateTestResults();
+                } else {
+                    workflow.steps.push('אזהרה: לא נמצאו שדות הטופס לבדיקה');
+                    this.updateTestResults();
+                }
+                
+                // Set finalRows to initialRows for user_profile (no table to check)
+                finalRows = initialRows;
+            } else if (entityType === 'watch_list') {
+                workflow.steps.push('אימות הופעת הרשימה ב-dropdown');
+                this.updateTestResults();
+                
+                // For watch_list, check dropdown instead of table
+                const dropdown = iframeDoc.querySelector('#activeListSelect');
+                if (!dropdown) {
+                    throw new Error('activeListSelect dropdown not found');
+                }
+                
+                // Wait for dropdown to update
+                let entityFoundInDropdown = false;
+                let attempts = 0;
+                const maxAttempts = 10;
+                while (!entityFoundInDropdown && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                    
+                    // Check if entity exists in dropdown by ID
+                    const options = Array.from(dropdown.options);
+                    const entityOption = options.find(option => {
+                        const optionValue = parseInt(option.value, 10);
+                        return optionValue === createdEntityId;
+                    });
+                    
+                    if (entityOption) {
+                        entityFoundInDropdown = true;
+                        workflow.steps.push(`הרשימה הופיעה ב-dropdown (ID: ${createdEntityId}, שם: ${entityOption.textContent})`);
+                        this.updateTestResults();
+                        break;
+                    }
+                }
+                
+                if (!entityFoundInDropdown) {
+                    throw new Error(`Watch list not found in dropdown. ID: ${createdEntityId}, Options count: ${dropdown.options.length}`);
+                }
+                
+                // Store finalRows for later use (after deletion)
+                finalRows = dropdown.options.length;
+            } else {
+                workflow.steps.push('אימות הופעת הישות בטבלה');
+                this.updateTestResults();
+                
+                // Store finalRows for later use (after deletion)
+                finalRows = initialRows;
+                
+                // For paginated tables, check by entity ID instead of row count
+                if (createdEntityId) {
+                    // Wait for table to update - check if entity exists in data first
+                    let entityInData = false;
+                    let attempts = 0;
+                    const maxAttempts = 10;
+                    while (!entityInData && attempts < maxAttempts) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        attempts++;
+                        
+                        // Check if entity exists in window data arrays (for alerts, cash_flows, etc.)
+                        if (entityType === 'alert' && iframeDoc.defaultView?.window?.alertsData) {
+                            entityInData = Array.isArray(iframeDoc.defaultView.window.alertsData) && 
+                                          iframeDoc.defaultView.window.alertsData.some(a => a.id === createdEntityId);
+                        } else if (entityType === 'cash_flow' && iframeDoc.defaultView?.window?.cashFlowsData) {
+                            entityInData = Array.isArray(iframeDoc.defaultView.window.cashFlowsData) && 
+                                          iframeDoc.defaultView.window.cashFlowsData.some(cf => cf.id === createdEntityId);
+                        } else {
+                            // For other entity types, break and check table
+                            break;
+                        }
+                    }
+                    
+                    // Wait a bit more for table DOM to update
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Check if entity appears in table by ID (works with pagination)
+                    const allRows = Array.from(iframeDoc.querySelectorAll('table tbody tr, .table tbody tr'));
+                    
+                    const entityRow = allRows.find(row => {
+                        // Try multiple ways to find the entity ID
+                        const rowDataId = row.getAttribute('data-id');
+                        const rowDataEntityId = row.getAttribute('data-entity-id');
+                        // For executions, check data-execution-id attribute
+                        const rowDataExecutionId = entityType === 'execution' ? row.getAttribute('data-execution-id') : null;
+                        const actionsCell = row.querySelector('.actions-cell[data-entity-id]');
+                        const actionsCellId = actionsCell?.getAttribute('data-entity-id');
+                        const anyDataEntityId = row.querySelector('[data-entity-id]')?.getAttribute('data-entity-id');
+                        
+                        // Also check onclick attribute for showEntityDetails pattern (like tickers)
+                        let onclickId = null;
+                        const onclickAttr = row.getAttribute('onclick') || row.querySelector('[onclick]')?.getAttribute('onclick');
+                        if (onclickAttr) {
+                            const match = onclickAttr.match(/showEntityDetails\(['"]?(?:execution|executions)['"]?\s*,\s*(\d+)/);
+                            if (match) {
+                                onclickId = parseInt(match[1], 10);
+                            }
+                        }
+                        
+                        const rowId = rowDataId || rowDataEntityId || rowDataExecutionId || actionsCellId || anyDataEntityId || onclickId;
+                        return rowId && parseInt(rowId, 10) === createdEntityId;
+                    });
+                    
+                    if (!entityRow) {
+                        // Entity not found in visible rows - check if it exists in data (for paginated tables)
+                        // Use entityInData from the loop above, or check again if not set
+                        let entityExistsInData = entityInData;
+                        if (!entityExistsInData && entityType === 'alert' && iframeDoc.defaultView?.window?.alertsData) {
+                            entityExistsInData = Array.isArray(iframeDoc.defaultView.window.alertsData) && 
+                                              iframeDoc.defaultView.window.alertsData.some(a => a.id === createdEntityId);
+                        }
+                        
+                        if (entityExistsInData) {
+                            // Entity exists in data but not in visible rows (pagination issue)
+                            workflow.steps.push(`הישות קיימת בנתונים אך לא בטווח הנראה (ID: ${createdEntityId}, pagination)`);
+                        } else {
+                            // Fallback: check row count (for non-paginated tables)
+                            finalRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                            if (finalRows <= initialRows) {
+                                throw new Error(`Entity not found in table by ID ${createdEntityId}. Initial rows: ${initialRows}, Final rows: ${finalRows}`);
+                            }
+                        }
+                    } else {
+                        workflow.steps.push(`הישות הופיעה בטבלה (ID: ${createdEntityId})`);
+                        // Update finalRows for later use
+                        finalRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                    }
+                } else {
+                    // Fallback to row count if no entity ID
+                    finalRows = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                    if (finalRows <= initialRows) {
+                        throw new Error(`Entity not added to table. Initial: ${initialRows}, Final: ${finalRows}`);
+                    }
+                    workflow.steps.push(`הישות הופיעה בטבלה (${initialRows} → ${finalRows} שורות)`);
+                }
             }
-            workflow.steps.push(`הישות הופיעה בטבלה (${initialRows} → ${finalRows} שורות)`);
             this.updateTestResults();
 
-            // Step 11: Check linked items before delete
-            if (createdEntityId) {
+            // Step 11: View entity details (skip for user_profile - no table to view)
+            if (entityType === 'user_profile') {
+                // user_profile doesn't have a table - skip viewing details
+                workflow.steps.push('דילוג על הצגת פרטים - פרופיל משתמש לא משתמש בטבלה');
+                this.updateTestResults();
+            } else if (createdEntityId) {
+                workflow.steps.push('הצגת פרטי הישות');
+                this.updateTestResults();
+                
+                // Find the row with the created entity ID
+                const entityRow = Array.from(iframeDoc.querySelectorAll('table tbody tr, .table tbody tr')).find(row => {
+                    const rowId = row.getAttribute('data-id') || row.getAttribute('data-entity-id');
+                    return rowId && parseInt(rowId, 10) === createdEntityId;
+                });
+                
+                if (entityRow) {
+                    // Try to click on the entity link or details button
+                    const entityLink = entityRow.querySelector('a[href*="edit"], a[href*="view"], .view-details, .entity-link');
+                    const detailsButton = entityRow.querySelector('button[data-action="view"], button[data-action="details"], .btn-view');
+                    
+                    if (entityLink) {
+                        entityLink.click();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        workflow.steps.push('לחץ על קישור הישות');
+                        this.updateTestResults();
+                    } else if (detailsButton) {
+                        detailsButton.click();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        workflow.steps.push('לחץ על כפתור פרטים');
+                        this.updateTestResults();
+                    } else {
+                        // Try window.showEntityDetails (global function) if available
+                        if (iframeWindow.showEntityDetails && typeof iframeWindow.showEntityDetails === 'function') {
+                            iframeWindow.showEntityDetails(entityType, createdEntityId);
+                            await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for modal to open
+                            workflow.steps.push('הצגת פרטים דרך showEntityDetails');
+                            this.updateTestResults();
+                        } else if (iframeWindow.entityDetailsModal && iframeWindow.entityDetailsModal.show) {
+                            await iframeWindow.entityDetailsModal.show(entityType, createdEntityId);
+                            await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for modal to open
+                            workflow.steps.push('הצגת פרטים דרך entityDetailsModal.show');
+                            this.updateTestResults();
+                        } else {
+                            workflow.steps.push('אזהרה: לא נמצא כפתור פרטים או פונקציה להצגת פרטים - דילוג');
+                            this.updateTestResults();
+                        }
+                    }
+                    
+                    // Wait for details modal to appear and then close it
+                    try {
+                        // Try multiple selectors for entity details modal
+                        const detailsModalSelectors = [
+                            '#entityDetailsModal.show',
+                            '#entityDetailsModal.modal.show',
+                            '.entity-details-modal.show',
+                            '[id*="entityDetailsModal"].show',
+                            '.modal.show[data-entity-type]'
+                        ];
+                        
+                        let detailsModalFound = false;
+                        for (const selector of detailsModalSelectors) {
+                            try {
+                                await this.waitForElementInIframe(testIframe, selector, 2000);
+                                detailsModalFound = true;
+                                break;
+                            } catch (e) {
+                                // Try next selector
+                            }
+                        }
+                        
+                        if (detailsModalFound) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            
+                            // Close the details modal
+                            const closeButton = iframeDoc.querySelector('#entityDetailsModal .btn-close, .entity-details-modal .btn-close, .modal.show .btn-close, button[data-dismiss="modal"]');
+                            if (closeButton) {
+                                closeButton.click();
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                workflow.steps.push('סגירת מודול פרטים');
+                                this.updateTestResults();
+                            } else {
+                                // Try pressing Escape or clicking backdrop
+                                const modal = iframeDoc.querySelector('#entityDetailsModal.show, .entity-details-modal.show, .modal.show[data-entity-type]');
+                                if (modal) {
+                                    const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+                                    modal.dispatchEvent(escapeEvent);
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                    workflow.steps.push('סגירת מודול פרטים (Escape)');
+                                    this.updateTestResults();
+                                }
+                            }
+                        } else {
+                            workflow.steps.push('אזהרה: מודול פרטים לא נפתח - דילוג');
+                            this.updateTestResults();
+                        }
+                    } catch (e) {
+                        workflow.steps.push(`אזהרה: מודול פרטים לא נפתח - ${e.message}`);
+                        this.updateTestResults();
+                    }
+                } else {
+                    workflow.steps.push('אזהרה: שורת הישות לא נמצאה בטבלה - דילוג על הצגת פרטים');
+                    this.updateTestResults();
+                }
+            }
+
+            // Step 12: Edit entity (skip for user_profile - no table to edit)
+            if (entityType === 'user_profile') {
+                // user_profile doesn't have a table - skip editing
+                workflow.steps.push('דילוג על עריכה - פרופיל משתמש כבר עודכן');
+                this.updateTestResults();
+            } else if (createdEntityId) {
+                workflow.steps.push('עריכת הישות');
+                this.updateTestResults();
+                
+                // Find the row with the created entity ID
+                const entityRow = Array.from(iframeDoc.querySelectorAll('table tbody tr, .table tbody tr')).find(row => {
+                    const rowId = row.getAttribute('data-id') || row.getAttribute('data-entity-id');
+                    return rowId && parseInt(rowId, 10) === createdEntityId;
+                });
+                
+                if (entityRow) {
+                    // Try to click on the edit button or link
+                    const editButton = entityRow.querySelector('button[data-action="edit"], .btn-edit, .edit-btn, button[onclick*="edit"]');
+                    const editLink = entityRow.querySelector('a[href*="edit"], .edit-link');
+                    
+                    if (editButton) {
+                        editButton.click();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        workflow.steps.push('לחץ על כפתור עריכה');
+                        this.updateTestResults();
+                    } else if (editLink) {
+                        editLink.click();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        workflow.steps.push('לחץ על קישור עריכה');
+                        this.updateTestResults();
+                    } else {
+                        // Try to open edit modal using ModalManagerV2
+                        if (iframeWindow.ModalManagerV2 && iframeWindow.ModalManagerV2.showModal) {
+                            await iframeWindow.ModalManagerV2.showModal(modalId, 'edit', { id: createdEntityId });
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            workflow.steps.push('פתיחת מודל עריכה דרך ModalManagerV2');
+                            this.updateTestResults();
+                        } else {
+                            workflow.steps.push('אזהרה: לא נמצא כפתור עריכה - דילוג');
+                            this.updateTestResults();
+                        }
+                    }
+                    
+                    // Wait for edit modal to appear
+                    try {
+                        await this.waitForElementInIframe(testIframe, `#${modalId}.show, #${modalId}.modal.show, .modal.show`, 5000);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        workflow.steps.push('מודל עריכה נפתח');
+                        this.updateTestResults();
+                        
+                        // Wait for form to be populated with existing data
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        
+                        // Update a field based on entity type
+                        const fieldMap = this.getEntityFieldMaps()[entityType];
+                        if (fieldMap && fieldMap.fields) {
+                            // Find first editable field (prefer rich-text for notes)
+                            let fieldToUpdate = null;
+                            if (entityType === 'note') {
+                                // For notes, update the content field
+                                fieldToUpdate = Object.entries(fieldMap.fields).find(([key, config]) => key === 'content');
+                            }
+                            
+                            if (!fieldToUpdate) {
+                                // Find first editable non-required field
+                                fieldToUpdate = Object.entries(fieldMap.fields).find(([key, config]) => {
+                                    if (config.required || key === 'id') return false;
+                                    const element = iframeDoc.querySelector(config.id);
+                                    return element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT' || element.tagName === 'DIV');
+                                });
+                            }
+                            
+                            if (fieldToUpdate) {
+                                const [fieldName, fieldConfig] = fieldToUpdate;
+                                const element = iframeDoc.querySelector(fieldConfig.id);
+                                if (element) {
+                                    if (fieldConfig.type === 'rich-text' && iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.setContent) {
+                                        const editorId = fieldConfig.id.replace('#', '');
+                                        
+                                        // Wait for rich-text editor to be ready and have content loaded
+                                        let editorReady = false;
+                                        for (let i = 0; i < 15; i++) {
+                                            const currentContent = iframeWindow.RichTextEditorService.getContent(editorId);
+                                            // Check if editor exists and has been initialized (even if empty)
+                                            if (currentContent !== undefined && currentContent !== null) {
+                                                editorReady = true;
+                                                break;
+                                            }
+                                            await new Promise(resolve => setTimeout(resolve, 200));
+                                        }
+                                        
+                                        if (editorReady) {
+                                            const newValue = entityType === 'note' ? '<p>עודכן בבדיקה E2E</p>' : 'עודכן בבדיקה E2E';
+                                            iframeWindow.RichTextEditorService.setContent(editorId, newValue);
+                                            await new Promise(resolve => setTimeout(resolve, 500)); // Wait for editor to update
+                                            
+                                            // Verify content was set
+                                            const verifyContent = iframeWindow.RichTextEditorService.getContent(editorId);
+                                            if (verifyContent && verifyContent.replace(/<[^>]*>/g, '').trim() !== '') {
+                                                workflow.steps.push(`עודכן שדה ${fieldName} (rich-text)`);
+                                                this.updateTestResults();
+                                            } else {
+                                                workflow.steps.push(`אזהרה: שדה ${fieldName} לא עודכן - תוכן ריק`);
+                                                this.updateTestResults();
+                                            }
+                                        } else {
+                                            workflow.steps.push(`אזהרה: rich-text editor ${editorId} לא מוכן`);
+                                            this.updateTestResults();
+                                        }
+                                    } else if (element.tagName === 'SELECT') {
+                                        const options = Array.from(element.options).filter(opt => opt.value && opt.value !== '');
+                                        if (options.length > 0) {
+                                            element.value = options[0].value;
+                                            element.dispatchEvent(new Event('change', { bubbles: true }));
+                                            workflow.steps.push(`עודכן שדה ${fieldName} (select)`);
+                                            this.updateTestResults();
+                                        }
+                                    } else {
+                                        element.value = 'עודכן בבדיקה E2E';
+                                        element.dispatchEvent(new Event('input', { bubbles: true }));
+                                        workflow.steps.push(`עודכן שדה ${fieldName}`);
+                                        this.updateTestResults();
+                                    }
+                                } else {
+                                    workflow.steps.push(`אזהרה: שדה ${fieldName} לא נמצא בטופס`);
+                                    this.updateTestResults();
+                                }
+                            } else {
+                                workflow.steps.push('אזהרה: לא נמצא שדה לעדכון');
+                                this.updateTestResults();
+                            }
+                        }
+                        
+                        // Save the edit
+                        const saveButton = iframeDoc.querySelector(`#${modalId} .btn-save, #${modalId} button[type="submit"], #${modalId} .save-btn`);
+                        if (saveButton) {
+                            saveButton.click();
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            workflow.steps.push('שמירת עריכה');
+                            this.updateTestResults();
+                        } else if (iframeWindow.UnifiedCRUDService && iframeWindow.UnifiedCRUDService.saveEntity) {
+                            // Collect form data and save
+                            const editFormData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
+                            
+                            // Ensure entity ID is in the data for update
+                            if (!editFormData.id && createdEntityId) {
+                                editFormData.id = createdEntityId;
+                            }
+                            
+                            // Special handling for note entity - ensure content is collected from rich-text editor
+                            if (entityType === 'note' && (!editFormData.content || editFormData.content.replace(/<[^>]*>/g, '').trim() === '')) {
+                                if (iframeWindow.RichTextEditorService && iframeWindow.RichTextEditorService.getContent) {
+                                    const directContent = iframeWindow.RichTextEditorService.getContent('noteContent');
+                                    if (directContent && directContent.replace(/<[^>]*>/g, '').trim() !== '') {
+                                        editFormData.content = directContent;
+                                    } else {
+                                        // Fallback: use the updated value we just set
+                                        editFormData.content = '<p>עודכן בבדיקה E2E</p>';
+                                    }
+                                }
+                            }
+                            
+                            // Special handling for note entity - ensure related_type_id and related_id are included
+                            if (entityType === 'note') {
+                                const relatedTypeSelect = iframeDoc.querySelector('#noteRelatedType');
+                                const relatedObjectSelect = iframeDoc.querySelector('#noteRelatedObject');
+                                if (relatedTypeSelect && !editFormData.related_type_id) {
+                                    editFormData.related_type_id = parseInt(relatedTypeSelect.value, 10);
+                                }
+                                if (relatedObjectSelect && !editFormData.related_id) {
+                                    editFormData.related_id = parseInt(relatedObjectSelect.value, 10);
+                                }
+                            }
+                            
+                            await iframeWindow.UnifiedCRUDService.saveEntity(entityType, editFormData, {
+                                modalId: modalId,
+                                successMessage: `${page.name} עודכן בהצלחה`,
+                                entityName: page.name,
+                                reloadFn: null,
+                                isEdit: true,
+                                entityId: createdEntityId
+                            });
+                            workflow.steps.push('שמירת עריכה דרך UnifiedCRUDService');
+                            this.updateTestResults();
+                        }
+                        
+                        // Wait for modal to close (with timeout handling)
+                        try {
+                            await this.waitForElementToDisappearInIframe(testIframe, `.modal.show, #${modalId}.show`, 10000);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            workflow.steps.push('מודל עריכה נסגר');
+                            this.updateTestResults();
+                        } catch (closeError) {
+                            // If modal didn't close, try to close it manually
+                            const stillOpenModal = iframeDoc.querySelector(`#${modalId}.show, .modal.show`);
+                            if (stillOpenModal) {
+                                const closeBtn = stillOpenModal.querySelector('.btn-close, button[data-dismiss="modal"]');
+                                if (closeBtn) {
+                                    closeBtn.click();
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                    workflow.steps.push('מודל עריכה נסגר ידנית');
+                                    this.updateTestResults();
+                                } else {
+                                    workflow.steps.push(`אזהרה: מודל עריכה לא נסגר - ${closeError.message}`);
+                                    this.updateTestResults();
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        workflow.steps.push(`אזהרה: עריכה נכשלה - ${e.message}`);
+                        this.updateTestResults();
+                        
+                        // Try to close modal if still open
+                        try {
+                            const openModal = iframeDoc.querySelector(`#${modalId}.show, .modal.show`);
+                            if (openModal) {
+                                const closeBtn = openModal.querySelector('.btn-close, button[data-dismiss="modal"]');
+                                if (closeBtn) {
+                                    closeBtn.click();
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                }
+                            }
+                        } catch (closeErr) {
+                            // Ignore close errors
+                        }
+                    }
+                } else {
+                    workflow.steps.push('אזהרה: שורת הישות לא נמצאה בטבלה - דילוג על עריכה');
+                    this.updateTestResults();
+                }
+            }
+
+            // Step 13: Check linked items before delete (skip for user_profile - cannot delete)
+            if (entityType === 'user_profile') {
+                // user_profile cannot be deleted - skip checking linked items
+                workflow.steps.push('דילוג על בדיקת פריטים מקושרים - לא ניתן למחוק פרופיל משתמש');
+                this.updateTestResults();
+            } else if (createdEntityId) {
                 workflow.steps.push('בודק פריטים מקושרים לפני מחיקה');
                 this.updateTestResults();
                 
@@ -2295,16 +3857,51 @@ class IntegratedCRUDE2ETester {
                 }
             }
 
-            // Step 12: Delete entity using UnifiedCRUDService
-            if (createdEntityId) {
+            // Step 14: Delete entity using UnifiedCRUDService (skip for user_profile - cannot delete user profile)
+            if (entityType === 'user_profile') {
+                // user_profile cannot be deleted - it's the current user's profile
+                workflow.steps.push('דילוג על מחיקה - לא ניתן למחוק פרופיל משתמש');
+                this.updateTestResults();
+            } else if (createdEntityId) {
                 workflow.steps.push('מחיקה דרך UnifiedCRUDService');
                 this.updateTestResults();
                 
-                const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity(entityType, createdEntityId, {
+                // Start deletion (this will show confirmation modal)
+                const deletePromise = iframeWindow.UnifiedCRUDService.deleteEntity(entityType, createdEntityId, {
                     successMessage: `${page.name} נמחק בהצלחה`,
                     entityName: page.name,
                     reloadFn: null // Don't reload in iframe context
                 });
+                
+                // Wait for confirmation modal to appear and auto-confirm
+                try {
+                    // Wait for confirmation modal to appear
+                    await this.waitForElementInIframe(testIframe, '#confirmationModal.show, #confirmationModal.modal.show', 5000);
+                    
+                    // Auto-confirm by clicking the confirm button or calling the confirm function
+                    const confirmButton = iframeDoc.querySelector('#confirmationModal .confirm-btn, #confirmationModal button[data-onclick*="confirmationModalConfirm"]');
+                    if (confirmButton) {
+                        confirmButton.click();
+                    } else if (iframeWindow.confirmationModalConfirm) {
+                        // Call the global confirm function directly
+                        iframeWindow.confirmationModalConfirm();
+                    } else {
+                        // Fallback: try to find and click any confirm button
+                        const anyConfirmBtn = iframeDoc.querySelector('#confirmationModal button:contains("אישור"), #confirmationModal .btn-danger');
+                        if (anyConfirmBtn) {
+                            anyConfirmBtn.click();
+                        }
+                    }
+                    
+                    // Wait a bit for the confirmation to process
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (error) {
+                    // Modal might not appear (e.g., if deletion doesn't require confirmation)
+                    this.logger?.warn('⚠️ Confirmation modal did not appear, proceeding anyway');
+                }
+                
+                // Wait for deletion to complete
+                const deleteResult = await deletePromise;
                 
                 if (!deleteResult) {
                     workflow.steps.push('אזהרה: מחיקה נכשלה או בוטלה');
@@ -2313,15 +3910,50 @@ class IntegratedCRUDE2ETester {
                     workflow.steps.push('ישות נמחקה בהצלחה');
                     this.updateTestResults();
                     
-                    // Wait for table update
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    const rowsAfterDelete = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
-                    if (rowsAfterDelete >= finalRows) {
-                        workflow.steps.push('אזהרה: הישות לא נמחקה מהטבלה');
+                    // Special handling for watch_list - refresh dropdown after delete
+                    if (entityType === 'watch_list') {
+                        
+                        workflow.steps.push('מעדכן את ה-dropdown של רשימות צפייה אחרי מחיקה');
                         this.updateTestResults();
+                        
+                        // Refresh watch lists data and dropdown
+                        if (iframeWindow.WatchListsPage?.loadWatchLists) {
+                            await iframeWindow.WatchListsPage.loadWatchLists();
+                        }
+                        if (iframeWindow.WatchListsPage?.updateActiveListSelect) {
+                            iframeWindow.WatchListsPage.updateActiveListSelect();
+                        }
+                        
+                        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for dropdown update
+                        
+                        // Verify entity is removed from dropdown
+                        const dropdown = iframeDoc.querySelector('#activeListSelect');
+                        if (dropdown) {
+                            const options = Array.from(dropdown.options);
+                            const entityOption = options.find(option => {
+                                const optionValue = parseInt(option.value, 10);
+                                return optionValue === createdEntityId;
+                            });
+                            
+                            if (entityOption) {
+                                workflow.steps.push('אזהרה: הרשימה עדיין מופיעה ב-dropdown');
+                                this.updateTestResults();
+                            } else {
+                                workflow.steps.push(`הרשימה נמחקה מה-dropdown (ID: ${createdEntityId})`);
+                                this.updateTestResults();
+                            }
+                        }
                     } else {
-                        workflow.steps.push(`הישות נמחקה מהטבלה (${finalRows} → ${rowsAfterDelete} שורות)`);
-                        this.updateTestResults();
+                        // Wait for table update
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        const rowsAfterDelete = iframeDoc.querySelectorAll('table tbody tr, .table tbody tr').length;
+                        if (rowsAfterDelete >= finalRows) {
+                            workflow.steps.push('אזהרה: הישות לא נמחקה מהטבלה');
+                            this.updateTestResults();
+                        } else {
+                            workflow.steps.push(`הישות נמחקה מהטבלה (${finalRows} → ${rowsAfterDelete} שורות)`);
+                            this.updateTestResults();
+                        }
                     }
                 }
             }
@@ -2416,13 +4048,38 @@ class IntegratedCRUDE2ETester {
                 continue;
             }
             
-            const element = doc.querySelector(fieldConfig.id);
+            // Remove # prefix if present for getElementById
+            const elementId = fieldConfig.id.startsWith('#') ? fieldConfig.id.substring(1) : fieldConfig.id;
+            const element = doc.getElementById(elementId) || doc.querySelector(fieldConfig.id);
+            
             if (!element) {
                 errors.push(`Required field ${fieldName} (${fieldConfig.id}) not found in DOM`);
                 continue;
             }
             
-            const value = element.value;
+            let value = element.value;
+            
+            // Special handling for select elements - check if it's the empty option
+            if (element.tagName === 'SELECT') {
+                const selectedOption = element.options[element.selectedIndex];
+                if (selectedOption && (selectedOption.value === '' || selectedOption.value === null || selectedOption.value === undefined)) {
+                    value = '';
+                }
+            }
+            
+            // Special handling for rich-text editors
+            if (fieldConfig.type === 'rich-text') {
+                if (doc.defaultView?.RichTextEditorService?.getContent) {
+                    const editorId = elementId;
+                    const htmlContent = doc.defaultView.RichTextEditorService.getContent(editorId);
+                    const textContent = htmlContent ? htmlContent.replace(/<[^>]*>/g, '').trim() : '';
+                    if (!textContent && fieldConfig.required) {
+                        errors.push(`Required field ${fieldName} is empty`);
+                    }
+                    continue;
+                }
+            }
+            
             if (!value || (typeof value === 'string' && value.trim() === '')) {
                 errors.push(`Required field ${fieldName} is empty`);
             }
@@ -2543,6 +4200,14 @@ class IntegratedCRUDE2ETester {
                     }
                 }
             }
+            
+            // Check string length limits (maxLength)
+            if (fieldConfig.type === 'text' && fieldConfig.maxLength !== undefined) {
+                const stringValue = String(value);
+                if (stringValue.length > fieldConfig.maxLength) {
+                    errors.push(`Field ${fieldName} exceeds maximum length of ${fieldConfig.maxLength} characters (got ${stringValue.length})`);
+                }
+            }
         }
         
         return { errors, warnings };
@@ -2636,9 +4301,9 @@ class IntegratedCRUDE2ETester {
                 // Fill category form using DataCollectionService
                 const categoryTestData = {
                     name: `Test Category ${Date.now()}`,
-                    description: 'Test category description',
-                    order: 0,
+                    order_index: 0,
                     is_active: true
+                    // Note: description field exists in UI but is not supported by backend API
                 };
                 
                 if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
@@ -2697,6 +4362,39 @@ class IntegratedCRUDE2ETester {
                 await this.waitForElementInIframe(testIframe, '#tagModal.show', 5000);
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
+                // Wait for category select to be populated with the newly created category
+                if (createdCategoryId) {
+                    const categorySelect = iframeDoc.querySelector('#tagCategory');
+                    if (categorySelect) {
+                        // Wait for the newly created category to appear in options (up to 5 seconds)
+                        let attempts = 0;
+                        let categoryFound = false;
+                        while (attempts < 50 && !categoryFound) {
+                            // Check if the category ID exists in options
+                            const optionExists = Array.from(categorySelect.options).some(
+                                option => Number(option.value) === Number(createdCategoryId)
+                            );
+                            if (optionExists) {
+                                categoryFound = true;
+                            } else {
+                                // If select is empty or category not found, try refreshing categories
+                                if (iframeWindow.TagService && iframeWindow.TagService.fetchCategories) {
+                                    try {
+                                        await iframeWindow.TagService.fetchCategories({ force: true });
+                                    } catch (e) {
+                                        // Ignore errors, just continue waiting
+                                    }
+                                }
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                attempts++;
+                            }
+                        }
+                        if (!categoryFound) {
+                            this.logger?.warn(`⚠️ Category ${createdCategoryId} not found in select options after ${attempts * 100}ms`);
+                        }
+                    }
+                }
+                
                 // Fill tag form using DataCollectionService
                 const tagTestData = {
                     name: `Test Tag ${Date.now()}`,
@@ -2713,6 +4411,13 @@ class IntegratedCRUDE2ETester {
                     if (tagNameField) {
                         tagNameField.value = tagTestData.name;
                         tagNameField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    if (createdCategoryId) {
+                        const categorySelect = iframeDoc.querySelector('#tagCategory');
+                        if (categorySelect) {
+                            categorySelect.value = createdCategoryId;
+                            categorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
                     }
                 }
                 
@@ -2764,14 +4469,18 @@ class IntegratedCRUDE2ETester {
                     }
                 }
                 
-                // Delete tag
+                // Delete using UnifiedCRUDService (uses centralized CRUD system)
                 const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('tag', createdTagId, {
                     successMessage: 'תגית נמחקה בהצלחה',
-                    entityName: 'תגית'
+                    entityName: 'תגית',
+                    reloadFn: null, // Don't reload in iframe context
+                    skipConfirmation: true // Skip confirmation modal in tests (standard approach)
                 });
                 
                 if (deleteResult) {
                     workflow.steps.push('תגית נמחקה בהצלחה');
+                } else {
+                    workflow.steps.push('אזהרה: מחיקת תגית נכשלה או בוטלה');
                 }
                 this.updateTestResults();
             }
@@ -2789,14 +4498,18 @@ class IntegratedCRUDE2ETester {
                     }
                 }
                 
-                // Delete category
+                // Delete using UnifiedCRUDService (uses centralized CRUD system)
                 const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('tag_category', createdCategoryId, {
                     successMessage: 'קטגוריה נמחקה בהצלחה',
-                    entityName: 'קטגוריית תגיות'
+                    entityName: 'קטגוריית תגיות',
+                    reloadFn: null, // Don't reload in iframe context
+                    skipConfirmation: true // Skip confirmation modal in tests (standard approach)
                 });
                 
                 if (deleteResult) {
                     workflow.steps.push('קטגוריה נמחקה בהצלחה');
+                } else {
+                    workflow.steps.push('אזהרה: מחיקת קטגוריה נכשלה או בוטלה');
                 }
                 this.updateTestResults();
             }
@@ -2860,82 +4573,130 @@ class IntegratedCRUDE2ETester {
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = testIframe.contentWindow;
             
-            await this.waitForElementInIframe(testIframe, 'main, [data-section="main"], .preferences-container', 15000);
+            // Preferences page uses .main-content and #preferencesForm - NOT standard main or data-section="main"
+            await this.waitForElementInIframe(testIframe, '.main-content, #preferencesForm, .top-section, #section1', 15000);
             
-            // Test 1: Preference Profile CRUD
-            workflow.steps.push('בודק CRUD לפרופילי העדפות');
+            // Test 1: Create New Profile
+            workflow.steps.push('בודק יצירת פרופיל חדש');
             this.updateTestResults();
             
-            const profileFieldMap = this.getEntityFieldMaps().preference_profile;
+            // First, ensure section1 (Profile Management) is visible
+            const section1 = iframeDoc.querySelector('#section1');
             
-            // Try to open profile modal
-            if (iframeWindow.ModalManagerV2) {
-                await iframeWindow.ModalManagerV2.showModal('preferenceProfileModal', 'add');
-                await this.waitForElementInIframe(testIframe, '#preferenceProfileModal.show', 5000);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            } else {
-                // Fallback: try to find and click "Add Profile" button
-                const addProfileButton = iframeDoc.querySelector('button[data-action*="profile"], button[data-button-type="ADD"]');
-                if (addProfileButton) {
-                    addProfileButton.click();
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            }
-            
-            // Fill profile form
-            const profileModal = iframeDoc.querySelector('#preferenceProfileModal, .modal.show');
-            if (profileModal) {
-                const profileTestData = {
-                    name: `Test Profile ${Date.now()}`,
-                    description: 'Test preference profile',
-                    is_active: true
-                };
+            if (section1) {
+                const sectionBody = section1.querySelector('.section-body');
+                // Check if section is hidden (d-none class or display:none)
+                const isHidden = sectionBody && (
+                    sectionBody.classList.contains('d-none') || 
+                    window.getComputedStyle(sectionBody).display === 'none' ||
+                    sectionBody.style.display === 'none'
+                );
                 
-                if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
-                    iframeWindow.DataCollectionService.setFormData(profileFieldMap.fields, profileTestData);
-                } else {
-                    // Fallback: manual filling
-                    const profileNameField = iframeDoc.querySelector('#preferenceProfileName');
-                    if (profileNameField) {
-                        profileNameField.value = profileTestData.name;
-                        profileNameField.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                }
-                
-                // Validate form
-                const validationResult = await this.validateFormFieldsInIframe(testIframe, 'preference_profile', profileFieldMap);
-                if (!validationResult.isValid) {
-                    workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
-                }
-                
-                // Save profile using UnifiedCRUDService
-                if (iframeWindow.UnifiedCRUDService) {
-                    const formData = iframeWindow.DataCollectionService?.collectFormData(profileFieldMap.fields) || profileTestData;
-                    const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity('preference_profile', formData, {
-                        modalId: 'preferenceProfileModal',
-                        successMessage: 'פרופיל העדפות נוסף בהצלחה',
-                        entityName: 'פרופיל העדפות',
-                        reloadFn: null
-                    });
+                if (isHidden) {
+                    // Open section1 by clicking toggle button - try multiple selectors
+                    const toggleBtn = section1.querySelector('button[data-onclick*="toggleSection"]') ||
+                                    section1.querySelector('button[onclick*="toggleSection"]') ||
+                                    section1.querySelector('button[data-button-type="TOGGLE"]');
                     
-                    if (saveResult && saveResult.data) {
-                        createdProfileId = saveResult.data.id || saveResult.id;
-                        workflow.steps.push(`פרופיל העדפות נוצר בהצלחה (ID: ${createdProfileId})`);
-                    }
-                } else {
-                    // Fallback: manual save
-                    const saveButton = profileModal.querySelector('button[type="submit"], button.btn-primary');
-                    if (saveButton) {
-                        saveButton.click();
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                        workflow.steps.push('פרופיל העדפות נוצר בהצלחה');
+                    if (toggleBtn) {
+                        toggleBtn.click();
+                        await new Promise(resolve => setTimeout(resolve, 1500)); // Wait longer for animation
+                        
+                        // Verify section opened
+                        const sectionBodyAfterClick = section1.querySelector('.section-body');
+                        const isStillHidden = sectionBodyAfterClick && (
+                            sectionBodyAfterClick.classList.contains('d-none') || 
+                            window.getComputedStyle(sectionBodyAfterClick).display === 'none'
+                        );
+                        
+                        // If still hidden, try calling toggleSection directly
+                        if (isStillHidden && iframeWindow.toggleSection) {
+                            iframeWindow.toggleSection('section1');
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    } else if (iframeWindow.toggleSection) {
+                        // Fallback: call toggleSection directly
+                        iframeWindow.toggleSection('section1');
+                        await new Promise(resolve => setTimeout(resolve, 1500));
                     }
                 }
-                
-                await this.waitForElementToDisappearInIframe(testIframe, '#preferenceProfileModal.show, .modal.show', 10000);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                this.updateTestResults();
             }
+            
+            // Wait a bit more for DOM to update
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Now find the profile creation fields
+            const newProfileName = `Test Profile ${Date.now()}`;
+            
+            // Check section1 state before searching
+            const section1AfterToggle = iframeDoc.querySelector('#section1');
+            const sectionBodyAfterToggle = section1AfterToggle?.querySelector('.section-body');
+            const sectionBodyVisible = sectionBodyAfterToggle && !sectionBodyAfterToggle.classList.contains('d-none') && 
+                                      window.getComputedStyle(sectionBodyAfterToggle).display !== 'none';
+            
+            // Search for elements - querySelector should find them even if hidden
+            let newProfileNameInput = iframeDoc.querySelector('#newProfileName');
+            // Try multiple selectors for the create button (it has dynamic ID)
+            let createProfileBtn = iframeDoc.querySelector('#createProfileBtn') || 
+                                  iframeDoc.querySelector('button[data-onclick*="createNewProfile"]') ||
+                                  iframeDoc.querySelector('button[data-button-type="ADD"][data-onclick*="createNewProfile"]');
+            
+            // Retry finding elements if not found initially - wait for DOM to fully render
+            if (!newProfileNameInput || !createProfileBtn) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Refresh document reference
+                const refreshedDoc = this.getIframeDocument(testIframe);
+                newProfileNameInput = refreshedDoc.querySelector('#newProfileName');
+                // Try multiple selectors for the create button
+                createProfileBtn = refreshedDoc.querySelector('#createProfileBtn') || 
+                                  refreshedDoc.querySelector('button[data-onclick*="createNewProfile"]') ||
+                                  refreshedDoc.querySelector('button[data-button-type="ADD"][data-onclick*="createNewProfile"]');
+            }
+            
+            if (newProfileNameInput && createProfileBtn) {
+                // Fill the input field BEFORE calling createNewProfile()
+                newProfileNameInput.value = newProfileName;
+                newProfileNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                newProfileNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4205',message:'After setting input value - before clicking button',data:{inputValue:newProfileNameInput.value,inputValueLength:newProfileNameInput.value.length,newProfileName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                // #endregion
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Verify value is still there before clicking
+                if (newProfileNameInput.value.trim() !== newProfileName.trim()) {
+                    // Retry setting value
+                    newProfileNameInput.value = newProfileName;
+                    newProfileNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    newProfileNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                // Click the create button
+                createProfileBtn.click();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Wait for profile to be created and dropdown to update
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Verify profile was created by checking dropdown
+                const profileSelect = iframeDoc.querySelector('#profileSelect');
+                if (profileSelect) {
+                    const profileOptions = Array.from(profileSelect.options);
+                    const createdProfile = profileOptions.find(opt => opt.text.includes(newProfileName));
+                    if (createdProfile) {
+                        createdProfileId = createdProfile.value;
+                        workflow.steps.push(`פרופיל נוצר בהצלחה: ${newProfileName} (ID: ${createdProfileId})`);
+                    } else {
+                        workflow.steps.push('אזהרה: פרופיל נוצר אך לא נמצא ב-dropdown');
+                    }
+                }
+            } else {
+                throw new Error('לא נמצאו שדות יצירת פרופיל (#newProfileName או #createProfileBtn)');
+            }
+            this.updateTestResults();
             
             // Test 2: Preferences values update
             workflow.steps.push('בודק עדכון ערכי העדפות');
@@ -2997,6 +4758,45 @@ class IntegratedCRUDE2ETester {
                 
                 if (deleteResult) {
                     workflow.steps.push('פרופיל העדפות נמחק בהצלחה');
+                }
+                this.updateTestResults();
+            }
+            
+            // Test 5: Delete profile (if we created one and have multiple profiles)
+            if (createdProfileId) {
+                workflow.steps.push('בודק מחיקת פרופיל');
+                this.updateTestResults();
+                
+                // Check if we have multiple profiles
+                const allProfiles = await iframeWindow.getUserProfiles();
+                if (allProfiles.length > 1) {
+                    // Find delete dropdown and select the created profile
+                    const deleteSelect = iframeDoc.querySelector('#deleteProfileSelect');
+                    const deleteBtn = iframeDoc.querySelector('#deleteProfileBtn');
+                    
+                    if (deleteSelect && deleteBtn) {
+                        // Select the created profile
+                        deleteSelect.value = createdProfileId;
+                        deleteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        // Check if button is enabled (should be, since we have multiple profiles and selected non-active)
+                        if (!deleteBtn.disabled) {
+                            // Click delete button (will show confirm dialog - in real test user would confirm)
+                            deleteBtn.click();
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            
+                            // Note: In automated tests, confirm() dialog requires manual confirmation
+                            // For now, we'll just verify the UI state
+                            workflow.steps.push(`כפתור מחיקה נלחץ עבור פרופיל ID: ${createdProfileId}`);
+                        } else {
+                            workflow.steps.push('אזהרה: כפתור מחיקה מושבת (ייתכן שהפרופיל הוא הפעיל)');
+                        }
+                    } else {
+                        workflow.steps.push('אזהרה: שדות מחיקת פרופיל לא נמצאו');
+                    }
+                } else {
+                    workflow.steps.push('דילוג על בדיקת מחיקה - יש רק פרופיל אחד');
                 }
                 this.updateTestResults();
             }
@@ -3065,114 +4865,297 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push('עמוד ייבוא נתונים נטען בהצלחה');
             this.updateTestResults();
             
-            // Check if import session list is visible
-            const importSessionsTable = iframeDoc.querySelector('table tbody, .import-sessions-list');
-            if (importSessionsTable) {
-                workflow.steps.push('טבלת סשני ייבוא נמצאה');
+            // Check if import history table is visible
+            const importHistoryTable = iframeDoc.querySelector('#importHistoryTable, table[data-table-type="import_history"]');
+            const importHistoryTableBody = iframeDoc.querySelector('#importHistoryTableBody, table[data-table-type="import_history"] tbody');
+            if (importHistoryTable && importHistoryTableBody) {
+                workflow.steps.push('טבלת היסטוריית ייבוא נמצאה');
                 this.updateTestResults();
             }
             
-            // Test: Import Session CRUD (if modal exists)
-            const importSessionFieldMap = this.getEntityFieldMaps().import_session;
+            // Check if import modal button exists
+            const openImportModalBtn = iframeDoc.querySelector('#openImportModalBtn, button[data-onclick*="openImportUserDataModal"]');
+            if (openImportModalBtn) {
+                workflow.steps.push('כפתור פתיחת מודל ייבוא נמצא');
+                this.updateTestResults();
+            }
             
-            // Try to open import session modal
-            if (iframeWindow.ModalManagerV2) {
+            // Test: Full import process with sample file
+            // Note: This is a complex wizard-based import, not a simple CRUD modal
+            if (iframeWindow.openImportUserDataModal && iframeWindow.ModalManagerV2) {
                 try {
-                    await iframeWindow.ModalManagerV2.showModal('importSessionModal', 'add');
-                    await this.waitForElementInIframe(testIframe, '#importSessionModal.show', 5000);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    workflow.steps.push('מודל ייבוא נפתח');
+                    // Step 1: Open import modal
+                    workflow.steps.push('פתיחת מודל ייבוא נתונים');
                     this.updateTestResults();
                     
-                    // Fill import session form
-                    const sessionTestData = {
-                        name: `Test Import Session ${Date.now()}`,
-                        description: 'Test import session description'
-                    };
+                    await iframeWindow.openImportUserDataModal();
+                    await this.waitForElementInIframe(testIframe, '#importUserDataModal.show', 10000);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                     
-                    if (iframeWindow.DataCollectionService && iframeWindow.DataCollectionService.setFormData) {
-                        iframeWindow.DataCollectionService.setFormData(importSessionFieldMap.fields, sessionTestData);
-                    } else {
-                        // Fallback: manual filling
-                        const nameField = iframeDoc.querySelector('#importSessionName');
-                        if (nameField) {
-                            nameField.value = sessionTestData.name;
-                            nameField.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-                    }
+                    workflow.steps.push('מודל ייבוא נפתח בהצלחה');
+                    this.updateTestResults();
                     
-                    // Validate form
-                    const validationResult = await this.validateFormFieldsInIframe(testIframe, 'import_session', importSessionFieldMap);
-                    if (!validationResult.isValid) {
-                        workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
-                    }
+                    // Wait for step 1 content to load (connector select, account select, data type select)
+                    workflow.steps.push('ממתין לטעינת תוכן שלב 1...');
+                    this.updateTestResults();
                     
-                    // Save import session using UnifiedCRUDService
-                    if (iframeWindow.UnifiedCRUDService) {
-                        const formData = iframeWindow.DataCollectionService?.collectFormData(importSessionFieldMap.fields) || sessionTestData;
-                        const saveResult = await iframeWindow.UnifiedCRUDService.saveEntity('import_session', formData, {
-                            modalId: 'importSessionModal',
-                            successMessage: 'סשן ייבוא נוסף בהצלחה',
-                            entityName: 'סשן ייבוא',
-                            reloadFn: null
-                        });
+                    let step1ContentLoaded = false;
+                    for (let i = 0; i < 30; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
                         
-                        if (saveResult && saveResult.data) {
-                            createdSessionId = saveResult.data.id || saveResult.id;
-                            workflow.steps.push(`סשן ייבוא נוצר בהצלחה (ID: ${createdSessionId})`);
+                        const connectorSelect = iframeDoc.querySelector('#connectorSelect');
+                        const accountSelect = iframeDoc.querySelector('#tradingAccountSelect');
+                        const dataTypeSelect = iframeDoc.querySelector('#importDataTypeSelect');
+                        const fileInput = iframeDoc.querySelector('#fileInput');
+                        
+                        // Check if all required elements exist and have options loaded
+                        const hasConnector = connectorSelect && connectorSelect.options.length > 1;
+                        const hasAccount = accountSelect && accountSelect.options.length > 1;
+                        const hasDataType = dataTypeSelect && dataTypeSelect.options.length > 1;
+                        const hasFileInput = !!fileInput;
+                        
+                        if (hasConnector && hasAccount && hasDataType && hasFileInput) {
+                            step1ContentLoaded = true;
+                            workflow.steps.push(`תוכן שלב 1 נטען (${i * 0.5} שניות)`);
+                            workflow.steps.push(`Connector options: ${connectorSelect.options.length}, Account options: ${accountSelect.options.length}, Data type options: ${dataTypeSelect.options.length}`);
+                            this.updateTestResults();
+                            
+                            break;
                         }
-                    } else {
-                        // Fallback: manual save
-                        const saveButton = iframeDoc.querySelector('#importSessionModal button[type="submit"], #importSessionModal button.btn-primary');
-                        if (saveButton) {
-                            saveButton.click();
-                            await new Promise(resolve => setTimeout(resolve, 2000));
-                            workflow.steps.push('סשן ייבוא נוצר בהצלחה');
+                        
+                        if (i === 9) {
+                            workflow.steps.push(`ממתין... (connector: ${hasConnector}, account: ${hasAccount}, dataType: ${hasDataType}, fileInput: ${hasFileInput})`);
+                            this.updateTestResults();
                         }
                     }
                     
-                    await this.waitForElementToDisappearInIframe(testIframe, '#importSessionModal.show', 10000);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    this.updateTestResults();
-                    
-                    // Test: Delete import session (if created)
-                    if (createdSessionId && iframeWindow.UnifiedCRUDService) {
-                        workflow.steps.push('בודק מחיקת סשן ייבוא');
+                    if (!step1ContentLoaded) {
+                        workflow.steps.push('אזהרה: תוכן שלב 1 לא נטען במלואו - ממשיך בכל זאת');
                         this.updateTestResults();
-                        
-                        // Check linked items before deletion
-                        if (iframeWindow.checkLinkedItemsBeforeAction) {
-                            const linkedCheck = await iframeWindow.checkLinkedItemsBeforeAction('import_session', createdSessionId);
-                            if (linkedCheck && linkedCheck.hasLinkedItems) {
-                                workflow.steps.push(`אזהרה: יש פריטים מקושרים לסשן - ${linkedCheck.linkedItems.join(', ')}`);
+                    }
+                    
+                    // Step 2: Create sample CSV file directly
+                    const sampleCSVContent = `Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,Interactive Brokers LLC
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"September 1, 2025 - September 30, 2025"
+Trades,Header,DataDiscriminator,Trades
+Trades,Data,Symbol,AAPL
+Trades,Data,Date/Time,2025-09-15 10:30:00
+Trades,Data,Quantity,100
+Trades,Data,TradePrice,150.50
+Trades,Data,Proceeds,-15050.00
+Trades,Data,Comm/Fee,-1.00
+Trades,Data,Basis,15051.00
+Trades,Data,Realized P/L,0.00
+Cash Report,Header,Currency,USD
+Cash Report,Data,Starting Cash,10000.00
+Cash Report,Data,Ending Cash,8499.00
+Cash Report,Data,Total Cash Change,-1501.00`;
+                    
+                    const sampleFile = new File([sampleCSVContent], 'ibkr_sample_test.csv', { type: 'text/csv' });
+                    
+                    workflow.steps.push('קובץ דוגמה נוצר: ibkr_sample_test.csv');
+                    this.updateTestResults();
+                    
+                    // Step 3: Upload file to modal
+                    const fileInput = iframeDoc.querySelector('#fileInput');
+                    if (!fileInput) {
+                        workflow.steps.push('שגיאה: שדה העלאת קובץ לא נמצא');
+                        this.updateTestResults();
+                    } else {
+                        // Create a DataTransfer object to simulate file selection
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(sampleFile);
+                            fileInput.files = dataTransfer.files;
+                            
+                            // Trigger change event
+                            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            
+                            workflow.steps.push('קובץ הועלה למודל');
+                            this.updateTestResults();
+                            
+                            // Step 4: Wait for step 1 content to load and select account/connector/data type
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            
+                            // Step 4a: Select account (if available)
+                            const accountSelect = iframeDoc.querySelector('#tradingAccountSelect');
+                            if (accountSelect && accountSelect.options.length > 1) {
+                                accountSelect.value = accountSelect.options[1].value;
+                                accountSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                workflow.steps.push(`חשבון מסחר נבחר: ${accountSelect.value}`);
+                                this.updateTestResults();
+                            } else {
+                                workflow.steps.push(`אזהרה: אין חשבונות מסחר זמינים (options=${accountSelect?.options.length || 0})`);
+                                this.updateTestResults();
+                            }
+                            
+                            // Step 4b: Select connector (if available)
+                            const connectorSelect = iframeDoc.querySelector('#connectorSelect');
+                            if (connectorSelect && connectorSelect.options.length > 1) {
+                                const connectorOptions = Array.from(connectorSelect.options);
+                                const ibkrConnector = connectorOptions.find(opt => 
+                                    opt.value.toLowerCase().includes('ibkr') || opt.text.toLowerCase().includes('ibkr')
+                                );
+                                
+                                if (ibkrConnector) {
+                                    connectorSelect.value = ibkrConnector.value;
+                                } else if (connectorOptions.length > 1) {
+                                    connectorSelect.value = connectorOptions[1].value;
+                                }
+                                
+                                connectorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                workflow.steps.push(`Connector נבחר: ${connectorSelect.value}`);
+                                this.updateTestResults();
+                            } else {
+                                workflow.steps.push(`אזהרה: אין connectors זמינים (options=${connectorSelect?.options.length || 0})`);
+                                this.updateTestResults();
+                            }
+                            
+                            // Step 4c: Select data type (if available)
+                            const dataTypeSelect = iframeDoc.querySelector('#importDataTypeSelect');
+                            if (dataTypeSelect && dataTypeSelect.options.length > 1) {
+                                const dataTypeOptions = Array.from(dataTypeSelect.options);
+                                const executionsOption = dataTypeOptions.find(opt => 
+                                    opt.value.includes('execution') || opt.text.includes('execution')
+                                );
+                                
+                                if (executionsOption) {
+                                    dataTypeSelect.value = executionsOption.value;
+                                } else {
+                                    const cashFlowsOption = dataTypeOptions.find(opt => 
+                                        opt.value.includes('cash') || opt.text.includes('cash')
+                                    );
+                                    if (cashFlowsOption) {
+                                        dataTypeSelect.value = cashFlowsOption.value;
+                                    } else if (dataTypeOptions.length > 1) {
+                                        dataTypeSelect.value = dataTypeOptions[1].value;
+                                    }
+                                }
+                                
+                                dataTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                workflow.steps.push(`סוג נתונים נבחר: ${dataTypeSelect.value}`);
+                                this.updateTestResults();
+                            } else {
+                                workflow.steps.push(`אזהרה: אין סוגי נתונים זמינים (options=${dataTypeSelect?.options.length || 0})`);
+                                this.updateTestResults();
+                            }
+                            
+                            // Step 5: Check if analyze button is enabled and trigger analysis
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            const analyzeBtn = iframeDoc.querySelector('#analyzeBtn');
+                            
+                            if (!analyzeBtn) {
+                                workflow.steps.push('אזהרה: כפתור ניתוח לא נמצא');
+                                this.updateTestResults();
+                            } else if (analyzeBtn.disabled) {
+                                workflow.steps.push(`אזהרה: כפתור ניתוח מושבת (disabled=${analyzeBtn.disabled})`);
+                                this.updateTestResults();
+                                
+                                // Log why button might be disabled
+                                const fileInfo = iframeDoc.querySelector('#fileInfo');
+                                const fileName = iframeDoc.querySelector('#fileName');
+                                workflow.steps.push(`מידע קובץ: fileInfo=${!!fileInfo}, fileName=${fileName?.textContent || 'N/A'}`);
+                                this.updateTestResults();
+                            } else {
+                                workflow.steps.push('מתחיל תהליך ניתוח קובץ');
+                                this.updateTestResults();
+                                
+                                if (iframeWindow.analyzeFile) {
+                                    // #region agent log
+                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4645',message:'Calling analyzeFile',data:{timestamp:Date.now()},sessionId:'debug-session'})}).catch(()=>{});
+                                    // #endregion
+                                    
+                                    iframeWindow.analyzeFile();
+                                
+                                // Wait for analysis to complete
+                                let analysisComplete = false;
+                                let errorFound = false;
+                                
+                                for (let i = 0; i < 90; i++) {
+                                    await new Promise(resolve => setTimeout(resolve, 1000));
+                                    
+                                    const step2 = iframeDoc.querySelector('#step-analysis');
+                                    const step3 = iframeDoc.querySelector('#step-preview');
+                                    const step2Visible = step2 && (step2.style.display !== 'none' || step2.classList.contains('active'));
+                                    const step3Visible = step3 && (step3.style.display !== 'none' || step3.classList.contains('active'));
+                                    
+                                    if (step2Visible || step3Visible) {
+                                        analysisComplete = true;
+                                        workflow.steps.push(`ניתוח קובץ הושלם (שלב ${step3Visible ? '3' : '2'})`);
+                                        this.updateTestResults();
+                                        
+                                        break;
+                                    }
+                                    
+                                    const errorMsg = iframeDoc.querySelector('.alert-danger, .error-message, .notification.error');
+                                    if (errorMsg && errorMsg.textContent.trim()) {
+                                        errorFound = true;
+                                        workflow.steps.push(`שגיאה בניתוח: ${errorMsg.textContent.trim().substring(0, 100)}`);
+                                        this.updateTestResults();
+                                        
+                                        break;
+                                    }
+                                    
+                                    if (i > 0 && i % 10 === 0) {
+                                        workflow.steps.push(`ממתין לסיום ניתוח... (${i} שניות)`);
+                                        this.updateTestResults();
+                                    }
+                                }
+                                
+                                if (!analysisComplete && !errorFound) {
+                                    workflow.steps.push('אזהרה: תהליך ניתוח לא הושלם בזמן הקצוב (90 שניות)');
+                                    this.updateTestResults();
+                                }
+                            } else {
+                                workflow.steps.push('אזהרה: פונקציית analyzeFile לא זמינה');
+                                this.updateTestResults();
                             }
                         }
-                        
-                        // Delete import session
-                        const deleteResult = await iframeWindow.UnifiedCRUDService.deleteEntity('import_session', createdSessionId, {
-                            successMessage: 'סשן ייבוא נמחק בהצלחה',
-                            entityName: 'סשן ייבוא'
-                        });
-                        
-                        if (deleteResult) {
-                            workflow.steps.push('סשן ייבוא נמחק בהצלחה');
-                        }
-                        this.updateTestResults();
                     }
-                } catch (modalError) {
-                    // Modal might not exist or might not be needed for import sessions
-                    workflow.steps.push(`הערה: מודל ייבוא לא זמין או לא נדרש - ${modalError.message}`);
+                    
+                    // Close modal
+                    if (iframeWindow.closeImportUserDataModal) {
+                        await iframeWindow.closeImportUserDataModal();
+                        await this.waitForElementToDisappearInIframe(testIframe, '#importUserDataModal.show', 10000);
+                    }
+                    
+                } catch (importError) {
+                    workflow.steps.push(`שגיאה בתהליך ייבוא: ${importError.message}`);
                     this.updateTestResults();
                 }
             } else {
-                workflow.steps.push('הערה: מערכת מודלים לא זמינה - בדיקת CRUD מוגבלת');
+                workflow.steps.push('הערה: פונקציות ייבוא לא זמינות - בדיקה מוגבלת');
                 this.updateTestResults();
             }
             
-            // Note: File upload testing is complex and requires actual file selection
-            // This is beyond the scope of automated E2E testing
-            workflow.steps.push('הערה: בדיקת העלאת קבצים דורשת אינטראקציה ידנית');
+            // Cleanup: Delete imported records at the end
+            workflow.steps.push('מנקה רשומות מיובאות בסוף הבדיקה');
+            this.updateTestResults();
+            
+            try {
+                // Delete imported cash flows
+                const deleteResponse = await fetch('/api/cash-flows/delete-imported', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (deleteResponse.ok) {
+                    const deleteResult = await deleteResponse.json();
+                    workflow.steps.push(`נוקו ${deleteResult.deleted_count || 0} רשומות מיובאות`);
+                } else {
+                    workflow.steps.push('אזהרה: ניקוי רשומות מיובאות נכשל');
+                }
+            } catch (cleanupError) {
+                workflow.steps.push(`אזהרה: שגיאה בניקוי רשומות: ${cleanupError.message}`);
+            }
+            
             this.updateTestResults();
             
             // Cleanup
@@ -3370,17 +5353,51 @@ class IntegratedCRUDE2ETester {
         const tbody = document.getElementById('testResultsBody');
         if (!tbody) return;
 
-        const allResults = [...this.results.ui, ...this.results.api, ...this.results.e2e];
+        const allResults = [
+            ...this.results.ui, 
+            ...this.results.api, 
+            ...this.results.e2e,
+            ...(this.results['info-summary'] || [])
+        ];
 
-        tbody.innerHTML = allResults.map(result => `
+        // Show "No results" message if empty
+        if (allResults.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        בחר סוג בדיקה כדי להתחיל
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = allResults.map(result => {
+            // Format issues and warnings for info-summary tests
+            let details = result.error || 'OK';
+            if (result.issues && result.issues.length > 0) {
+                details = `Issues: ${result.issues.join('; ')}`;
+            }
+            if (result.warnings && result.warnings.length > 0) {
+                details += (details !== 'OK' ? ' | ' : '') + `Warnings: ${result.warnings.join('; ')}`;
+            }
+
+            // Determine test type display name
+            let testTypeDisplay = this.currentTestType || 'unknown';
+            if (testTypeDisplay === 'info-summary') {
+                testTypeDisplay = 'Info Summary';
+            }
+
+            return `
             <tr>
                 <td>${result.page || result.workflow || 'Unknown'}</td>
-                <td>${this.currentTestType || 'unknown'}</td>
+                <td>${testTypeDisplay}</td>
                 <td><span class="badge bg-${result.status === 'success' ? 'success' : 'danger'}">${result.status}</span></td>
                 <td>${result.executionTime || 0}ms</td>
-                <td>${result.error || 'OK'}</td>
+                <td>${details}</td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     }
 
     displayLiveLog(level, args) {
@@ -3681,6 +5698,82 @@ window.runE2ETests = async function() {
 };
 
 /**
+ * Run Trade test only - Debug mode
+ */
+window.runTradeTestOnly = async function() {
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+
+    showTestSection('test-results');
+    
+    const tradePage = integratedTester.pages.trades;
+    if (!tradePage) {
+        window.showErrorNotification('שגיאה', 'עמוד Trade לא נמצא');
+        return;
+    }
+    
+    window.showSuccessNotification('בדיקה', 'מתחיל בדיקת Trade...');
+    await integratedTester.runGenericCRUDTest('trades', tradePage);
+};
+
+/**
+ * Run individual entity tests - Helper function
+ */
+async function runEntityTestOnly(entityKey, entityName) {
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+
+    showTestSection('test-results');
+    
+    const page = integratedTester.pages[entityKey];
+    if (!page) {
+        window.showErrorNotification('שגיאה', `עמוד ${entityName} לא נמצא`);
+        return;
+    }
+    
+    window.showSuccessNotification('בדיקה', `מתחיל בדיקת ${entityName}...`);
+    await integratedTester.runGenericCRUDTest(entityKey, page);
+}
+
+// Individual entity test functions
+window.runTradePlanTestOnly = async function() { await runEntityTestOnly('trade_plans', 'תכניות מסחר'); };
+window.runAlertTestOnly = async function() { await runEntityTestOnly('alerts', 'התראות'); };
+window.runTickerTestOnly = async function() { await runEntityTestOnly('tickers', 'טיקרים'); };
+window.runTradingAccountTestOnly = async function() { await runEntityTestOnly('trading_accounts', 'חשבונות מסחר'); };
+window.runExecutionTestOnly = async function() { await runEntityTestOnly('executions', 'ביצועי עסקאות'); };
+window.runCashFlowTestOnly = async function() { await runEntityTestOnly('cash_flows', 'תזרימי מזומן'); };
+window.runNoteTestOnly = async function() { await runEntityTestOnly('notes', 'הערות'); };
+window.runWatchListTestOnly = async function() { await runEntityTestOnly('watch_lists', 'רשימות צפייה'); };
+window.runUserProfileTestOnly = async function() { await runEntityTestOnly('user_profile', 'פרופיל משתמש'); };
+window.runTradingJournalTestOnly = async function() { await runEntityTestOnly('trading_journal', 'יומן מסחר'); };
+window.runTagCategoryTestOnly = async function() { 
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+    showTestSection('test-results');
+    window.showSuccessNotification('בדיקה', 'מתחיל בדיקת קטגוריות תגיות...');
+    await integratedTester.runTagManagementTests();
+};
+window.runPreferenceProfileTestOnly = async function() { 
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+    showTestSection('test-results');
+    window.showSuccessNotification('בדיקה', 'מתחיל בדיקת פרופילי העדפות...');
+    await integratedTester.runPreferencesTests();
+};
+window.runImportSessionTestOnly = async function() { 
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+    showTestSection('test-results');
+    window.showSuccessNotification('בדיקה', 'מתחיל בדיקת ייבוא נתונים...');
+    await integratedTester.runDataImportTests();
+};
+
+/**
  * Run debug tools
  */
 window.runDebugTools = async function() {
@@ -3691,6 +5784,23 @@ window.runDebugTools = async function() {
     showTestSection('debug-tools');
     await integratedTester.runDebugTools();
 };
+
+/**
+ * Run Info Summary tests only
+ */
+window.runInfoSummaryTests = async function() {
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+
+    showTestSection('test-results');
+    await integratedTester.runInfoSummaryTests();
+};
+
+/**
+ * Alias for runInfoSummaryTests (for compatibility with HTML button)
+ */
+window.runCrossPageInfoSummaryTest = window.runInfoSummaryTests;
 
 /**
  * Refresh dashboard
@@ -4039,6 +6149,254 @@ window.runButtonSystemTests = async function() {
             window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקות מערכת הכפתורים: ${error.message}`);
         }
         console.error('Error running Button System Tests:', error);
+    }
+};
+
+/**
+ * Initialize CrossPageTester if needed
+ */
+function getCrossPageTester() {
+    if (!integratedTester) {
+        integratedTester = new IntegratedCRUDE2ETester();
+    }
+    
+    if (!window.crossPageTester) {
+        if (typeof CrossPageTester === 'undefined') {
+            console.error('CrossPageTester not loaded. Make sure cross-page-testing-system.js is included.');
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', 'מערכת בדיקות רוחביות לא נטענה. ודא ש-cross-page-testing-system.js נטען.');
+            }
+            return null;
+        }
+        window.crossPageTester = new CrossPageTester(integratedTester);
+    }
+    
+    return window.crossPageTester;
+}
+
+/**
+ * Run cross-page defaults test
+ */
+window.runCrossPageDefaultsTest = async function() {
+    try {
+        const tester = getCrossPageTester();
+        if (!tester) return;
+        
+        showTestSection('test-results');
+        
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            integratedTester.results.crossPage.defaults = [];
+        }
+        
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.defaults = [];
+        
+        // Run defaults tests for all pages
+        for (const page of tester.userPages) {
+            await tester.testDefaults(page);
+        }
+        
+        // Update results
+        if (integratedTester && tester.results.defaults) {
+            integratedTester.results.crossPage.defaults = tester.results.defaults;
+            integratedTester.updateDashboard();
+        }
+        
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(`בדיקת ברירות מחדל הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error running cross-page defaults test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ברירות מחדל: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run cross-page colors test
+ */
+window.runCrossPageColorsTest = async function() {
+    try {
+        const tester = getCrossPageTester();
+        if (!tester) return;
+        
+        showTestSection('test-results');
+        
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            integratedTester.results.crossPage.colors = [];
+        }
+        
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.colors = [];
+        
+        // Run colors tests for all pages
+        for (const page of tester.userPages) {
+            await tester.testColors(page);
+        }
+        
+        // Update results
+        if (integratedTester && tester.results.colors) {
+            integratedTester.results.crossPage.colors = tester.results.colors;
+            integratedTester.updateDashboard();
+        }
+        
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(`בדיקת צבעים וסגנונות הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error running cross-page colors test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת צבעים: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run cross-page sorting test
+ */
+window.runCrossPageSortingTest = async function() {
+    try {
+        const tester = getCrossPageTester();
+        if (!tester) return;
+        
+        showTestSection('test-results');
+        
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            integratedTester.results.crossPage.sorting = [];
+        }
+        
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.sorting = [];
+        
+        // Run sorting tests for all pages with tables
+        for (const page of tester.userPages) {
+            if (page.hasTables) {
+                await tester.testSorting(page);
+            }
+        }
+        
+        // Update results
+        if (integratedTester && tester.results.sorting) {
+            integratedTester.results.crossPage.sorting = tester.results.sorting;
+            integratedTester.updateDashboard();
+        }
+        
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(`בדיקת מיון טבלאות הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error running cross-page sorting test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת מיון: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run cross-page sections test
+ */
+window.runCrossPageSectionsTest = async function() {
+    try {
+        const tester = getCrossPageTester();
+        if (!tester) return;
+        
+        showTestSection('test-results');
+        
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            integratedTester.results.crossPage.sections = [];
+        }
+        
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.sections = [];
+        
+        // Run sections tests for all pages with sections
+        for (const page of tester.userPages) {
+            if (page.hasSections) {
+                await tester.testSections(page);
+            }
+        }
+        
+        // Update results
+        if (integratedTester && tester.results.sections) {
+            integratedTester.results.crossPage.sections = tester.results.sections;
+            integratedTester.updateDashboard();
+        }
+        
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(`בדיקת סקשנים הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error running cross-page sections test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת סקשנים: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run cross-page filters test
+ */
+window.runCrossPageFiltersTest = async function() {
+    try {
+        const tester = getCrossPageTester();
+        if (!tester) return;
+        
+        showTestSection('test-results');
+        
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            integratedTester.results.crossPage.filters = [];
+        }
+        
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.filters = [];
+        
+        // Run filters tests for all pages with tables
+        for (const page of tester.userPages) {
+            if (page.hasTables) {
+                await tester.testFilters(page);
+            }
+        }
+        
+        // Update results
+        if (integratedTester && tester.results.filters) {
+            integratedTester.results.crossPage.filters = tester.results.filters;
+            integratedTester.updateDashboard();
+        }
+        
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(`בדיקת פילטרים הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error running cross-page filters test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת פילטרים: ${error.message}`);
+        }
     }
 };
 

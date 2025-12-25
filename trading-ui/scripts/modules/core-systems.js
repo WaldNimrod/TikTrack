@@ -1142,6 +1142,66 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               // Ignore localStorage errors
             }
             
+            // For tag-management page, wait for auth-guard to complete authentication
+            // This prevents 401 errors when header system tries to load accounts before auth is ready
+            const isTagManagementPage = window.location.pathname.includes('tag_management');
+            if (isTagManagementPage) {
+              // Wait for auth-guard to complete (it sets window.currentUser when done)
+              // Also verify that token is available for api-fetch-wrapper
+              let authWaitCount = 0;
+              let authReady = false;
+              while (authWaitCount < 50 && !authReady) {
+                // Check if auth-guard has completed by checking for currentUser
+                const hasUser = !!window.currentUser;
+                let hasToken = false;
+                
+                // Check if token is available for api-fetch-wrapper
+                if (window.UnifiedCacheManager?.initialized) {
+                  try {
+                    const token = await window.UnifiedCacheManager.get('authToken', { 
+                      layer: 'sessionStorage', 
+                      includeUserId: false 
+                    });
+                    hasToken = !!token;
+                  } catch (e) {
+                    // Continue checking
+                  }
+                }
+                if (!hasToken && typeof sessionStorage !== 'undefined') {
+                  hasToken = !!sessionStorage.getItem('dev_authToken');
+                }
+                
+                // Verify authentication with TikTrackAuth
+                if (hasUser && hasToken && window.TikTrackAuth?.checkAuthentication) {
+                  try {
+                    const authResult = await window.TikTrackAuth.checkAuthentication();
+                    if (authResult?.authenticated && authResult?.user) {
+                      window.currentUser = authResult.user;
+                      authReady = true;
+                      break;
+                    }
+                  } catch (e) {
+                    // Continue waiting
+                  }
+                } else if (hasUser && hasToken) {
+                  // If we have user and token but TikTrackAuth not available, proceed
+                  authReady = true;
+                  break;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                authWaitCount++;
+              }
+              if (window.Logger?.debug) {
+                window.Logger.debug('Waited for auth-guard completion', {
+                  authWaitCount,
+                  hasCurrentUser: !!window.currentUser,
+                  authReady,
+                  page: 'core-systems'
+                });
+              }
+            }
+            
             try {
               window.initializeHeaderSystem();
             } catch (error) {
@@ -1422,6 +1482,22 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.Logger.debug('Stage 4: Finalizing', {}, { page: 'core-systems' });
       }
       const stageStart = Date.now();
+      
+      // Validate required globals
+      if (config.requiredGlobals && config.requiredGlobals.length > 0) {
+        const missingGlobals = [];
+        const availableGlobals = [];
+        config.requiredGlobals.forEach(globalName => {
+          const isAvailable = globalName.startsWith('window.') 
+            ? eval(`typeof ${globalName} !== 'undefined'`) 
+            : typeof window[globalName] !== 'undefined';
+          if (isAvailable) {
+            availableGlobals.push(globalName);
+          } else {
+            missingGlobals.push(globalName);
+          }
+        });
+      }
 
       // Restore page state
       if (typeof window.loadPageState === 'function') {
@@ -5170,16 +5246,18 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
       requiresValidation: true,
       requiresTables: false,
       customInitializers: [
-        // Preferences-specific initialization - NEW v2.0 Architecture
+        // Preferences-specific initialization - v3.0 Architecture (Backend-first)
         async pageConfig => {
-          console.log('⚙️ Initializing Preferences (v2.0 - OOP Architecture)...');
+          console.log('⚙️ Initializing Preferences (v3.0 - Backend-first Architecture)...');
 
-          // NEW: Single initialization call to PreferencesSystem
-          if (window.PreferencesSystem) {
-            await window.PreferencesSystem.initialize();
-            console.log('✅ Preferences v2.0 initialization complete');
+          // NEW: Single initialization call to PreferencesCore (v3.0 architecture)
+          // Note: PreferencesCore is initialized via initializePreferencesForPage() in UnifiedAppInitializer
+          // This code is legacy and kept for backward compatibility only
+          if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+            await window.PreferencesCore.initializeWithLazyLoading();
+            console.log('✅ Preferences v3.0 initialization complete');
           } else {
-            console.error('❌ PreferencesSystem not found! preferences-core.js not loaded?');
+            console.warn('⚠️ PreferencesCore not found! preferences-core.js not loaded?');
           }
 
           // Initialize validation for preferences form

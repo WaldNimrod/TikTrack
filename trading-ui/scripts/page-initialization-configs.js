@@ -1525,6 +1525,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+    // Alias for ticker_dashboard.html (underscore instead of hyphen)
+    // 'ticker_dashboard': PAGE_CONFIGS['ticker-dashboard'], // Moved to after PAGE_CONFIGS is defined
 
     notes: {
       name: 'Notes',
@@ -1646,6 +1648,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -1729,6 +1732,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -1794,6 +1798,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'external-data',
@@ -1881,6 +1886,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'logs',
@@ -2086,6 +2092,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'init-system',
@@ -2234,7 +2241,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     // CRUD Testing Dashboard
     'crud-testing-dashboard': {
       name: 'CRUD Testing Dashboard',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
@@ -2700,6 +2707,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -2758,6 +2766,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -2815,6 +2824,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -2873,6 +2883,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences',
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -3897,7 +3908,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           });
         },
       ],
-    },    'trading-journal': {
+    },
+    'trading_journal': {
       name: 'יומן מסחר',
       description: 'עמוד יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה',
       lastModified: '2025-01-12',
@@ -3929,6 +3941,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.DataCollectionService",
         "window.CRUDResponseHandler",
         "window.TradingJournalData", // Trading Journal Data Service
+        "window.handleAddEntry", // Trading Journal Page - handleAddEntry function
+        "window.tradingJournalPage", // Trading Journal Page object
         "window.TradingViewChartAdapter", // TradingView chart adapter for activity chart
         "window.LightweightCharts" // TradingView Lightweight Charts library
       ],
@@ -4353,6 +4367,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   window.pageInitializationConfigs = PAGE_CONFIGS;
   // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
   window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
+  
+  // CRITICAL: Add aliases AFTER PAGE_CONFIGS is fully defined to avoid "Cannot access before initialization" error
+  // Alias for ai_analysis.html (underscore instead of hyphen)
+  if (PAGE_CONFIGS['ai-analysis']) {
+    PAGE_CONFIGS['ai_analysis'] = PAGE_CONFIGS['ai-analysis'];
+  }
+  // Alias for user_profile.html (underscore instead of hyphen)
+  if (PAGE_CONFIGS['user-profile']) {
+    PAGE_CONFIGS['user_profile'] = PAGE_CONFIGS['user-profile'];
+  }
+  // Alias for ticker_dashboard.html (underscore instead of hyphen)
+  if (PAGE_CONFIGS['ticker-dashboard']) {
+    PAGE_CONFIGS['ticker_dashboard'] = PAGE_CONFIGS['ticker-dashboard'];
+  }
 
 // #endregion
 
@@ -4363,7 +4391,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 if (!PAGE_CONFIGS['dev_tools']) {
   PAGE_CONFIGS['dev_tools'] = {
     name: 'Development Tools',
-    packages: ['base', 'header', 'services', 'crud', 'dev-tools', 'init-system'],
+    packages: ['base', 'header', 'services', 'crud', 'preferences', 'dev-tools', 'init-system'],
     requiredGlobals: [
       'window.UnifiedAppInitializer', // Unified Init System
       'window.PAGE_CONFIGS', // Unified Init System

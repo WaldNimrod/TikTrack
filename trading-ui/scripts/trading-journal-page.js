@@ -64,15 +64,30 @@
 'use strict';
 
 // Only run on trading-journal page
-if (!window.location.pathname.includes('trading-journal')) {
+// Check for both 'trading-journal' (with dash) and 'trading_journal' (with underscore)
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:68',message:'Script loaded - checking page path',data:{pathname:window.location.pathname,includesTradingJournal:window.location.pathname.includes('trading-journal'),includesTrading_journal:window.location.pathname.includes('trading_journal')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
+const isTradingJournalPage = window.location.pathname.includes('trading-journal') || 
+                              window.location.pathname.includes('trading_journal');
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:71',message:'Page check result',data:{isTradingJournalPage},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
+if (!isTradingJournalPage) {
   if (window.Logger) {
     window.Logger.info('Trading journal page script skipped - not on trading journal page', {
       currentPath: window.location.pathname
     });
   }
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:78',message:'Script exiting early - not trading journal page',data:{pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   // Exit early without executing the rest of the script
   // This prevents loading calendar/trading journal code on other pages
 } else {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:82',message:'Script continuing - is trading journal page',data:{pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
 
 // Current month and year for calendar navigation
 let currentMonth = new Date().getMonth();
@@ -253,6 +268,9 @@ const initializeHeader = async function() {
    * @param {string} entityType - Entity type to add
    */
   const handleAddEntry = async entityType => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:270',message:'handleAddEntry function defined',data:{entityType},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     if (window.Logger) {
       window.Logger.info('Add entry clicked', { entityType, page: 'trading-journal-page' });
     }
@@ -339,7 +357,196 @@ const initializeHeader = async function() {
   };
 
   /**
+   * Get CSS variable value
+   * @param {string} variableName - CSS variable name (e.g., '--entity-note-color')
+   * @param {string} defaultValue - Default value if variable not found
+   * @returns {string} CSS variable value or default
+   */
+  const getCSSVariableValue = (variableName, defaultValue = '') => {
+    if (typeof window === 'undefined' || !document.documentElement) {
+      return defaultValue;
+    }
+    const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+    return value || defaultValue;
+  };
 
+  /**
+   * Create dropdown menu for "Add Entry" button
+   */
+  const createAddEntryDropdown = () => {
+    // Try multiple selectors to find the button
+    const addButton = document.getElementById('add-entry-btn') ||
+                       document.getElementById('add-entry-button') ||
+                       document.querySelector('button[data-button-type="ADD"][id*="add-entry"]') ||
+                       document.querySelector('button[data-button-type="ADD"][data-text="הוסף רשומה"]') ||
+                       document.querySelector('button[data-button-type="ADD"]');
+
+    if (!addButton) {
+      if (window.Logger) {
+        window.Logger.warn('Add entry button not found', { page: 'trading-journal-page' });
+      }
+      return;
+    }
+
+    // Check if dropdown already exists
+    if (addButton.closest('.add-entry-dropdown-wrapper')) {
+      return; // Already initialized
+    }
+
+    // Entity types for journal entries (ordered as requested)
+    const entityTypes = [
+      { type: 'note', label: 'הערות', icon: 'note' },
+      { type: 'alert', label: 'התראות', icon: 'bell' },
+      { type: 'execution', label: 'ביצועים', icon: 'activity' },
+      { type: 'cash_flow', label: 'תזרימי מזומן', icon: 'cash' },
+      { type: 'trade_plan', label: 'תוכנית', icon: 'file-text' },
+      { type: 'trade', label: 'טרייד', icon: 'trending-up' },
+    ];
+
+    // Create wrapper for dropdown
+    const wrapper = document.createElement('div');
+    wrapper.className = 'add-entry-dropdown-wrapper';
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-block';
+
+    // Create dropdown menu
+    const dropdown = document.createElement('div');
+    dropdown.className = 'add-entry-dropdown-menu';
+    dropdown.style.cssText = `
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 200px;
+            padding: 8px;
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        `;
+
+    // Create menu items
+    entityTypes.forEach(({ type, label, icon }) => {
+      const menuItem = document.createElement('button');
+      menuItem.className = 'add-entry-menu-item';
+      menuItem.setAttribute('data-entity-type', type);
+      menuItem.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 8px 12px;
+                border: none;
+                background: none;
+                text-align: right;
+                cursor: pointer;
+                font-size: 14px;
+                border-radius: 4px;
+                transition: background-color 0.2s;
+            `;
+
+      // Add entity color dynamically
+      menuItem.style.setProperty('--entity-type', type);
+
+      // Create icon placeholder (will be replaced by IconSystem)
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'menu-item-icon';
+      iconSpan.setAttribute('data-icon-type', 'entity');
+      iconSpan.setAttribute('data-icon-name', type);
+      iconSpan.style.width = '16px';
+      iconSpan.style.height = '16px';
+      iconSpan.style.display = 'inline-block';
+
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+
+      menuItem.appendChild(iconSpan);
+      menuItem.appendChild(labelSpan);
+
+      // Add click handler
+      menuItem.addEventListener('click', e => {
+        e.stopPropagation();
+        handleAddEntry(type);
+        hideDropdown();
+      });
+
+      // Add hover effect
+      menuItem.addEventListener('mouseenter', () => {
+        const entityColor = getCSSVariableValue(`--entity-${type.replace('_', '-')}-color`, '#007bff');
+        const entityBg = getCSSVariableValue(`--entity-${type.replace('_', '-')}-bg`, 'rgba(0, 123, 255, 0.1)');
+        menuItem.style.backgroundColor = entityBg;
+        menuItem.style.color = entityColor;
+      });
+
+      menuItem.addEventListener('mouseleave', () => {
+        menuItem.style.backgroundColor = '';
+        menuItem.style.color = '';
+      });
+
+      dropdown.appendChild(menuItem);
+    });
+
+    // Insert wrapper before button
+    addButton.parentNode.insertBefore(wrapper, addButton);
+    wrapper.appendChild(addButton);
+    wrapper.appendChild(dropdown);
+
+    // Setup hover behavior
+    let hoverTimeout = null;
+    let hideTimeout = null;
+
+    const hideDropdown = () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+      }
+      hideTimeout = setTimeout(() => {
+        dropdown.style.opacity = '0';
+        dropdown.style.visibility = 'hidden';
+        setTimeout(() => {
+          dropdown.style.display = 'none';
+        }, 200);
+      }, 150);
+    };
+
+    const showDropdown = () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+      hoverTimeout = setTimeout(() => {
+        dropdown.style.display = 'block';
+        setTimeout(() => {
+          dropdown.style.opacity = '1';
+          dropdown.style.visibility = 'visible';
+        }, 10);
+      }, 150);
+    };
+
+    wrapper.addEventListener('mouseenter', showDropdown);
+    wrapper.addEventListener('mouseleave', hideDropdown);
+    dropdown.addEventListener('mouseenter', () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+    });
+    dropdown.addEventListener('mouseleave', hideDropdown);
+
+    // Render icons in menu items
+    setTimeout(() => renderMenuIcons(), 500);
+  };
 
   /**
      * Load and render calendar with data
@@ -696,7 +903,43 @@ const initializeHeader = async function() {
    * @param {string} entityType - Entity type
    * @param {number|string} entityId - Entity ID
    */
-  await loadAndRenderJournalEntries();
+  const handleEntryClickById = async function(entityType, entityId) {
+    if (!entityType || !entityId) {
+      if (window.Logger) {
+        window.Logger.warn('Invalid parameters for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
+      }
+      return;
+    }
+
+    // Find entry from stored entries (check both main entries and day zoom entries)
+    const entries = window.tradingJournalEntries || window.tradingJournalDayZoomEntries || [];
+    const entry = entries.find(e => e.entity_type === entityType && e.entity_id === entityId);
+
+    if (entry) {
+      await handleEntryClick(entry);
+    } else {
+      if (window.Logger) {
+        window.Logger.warn('Entry not found for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
+      }
+      // Fallback: try to open entity details directly
+      if (window.showEntityDetails && typeof window.showEntityDetails === 'function') {
+        try {
+          await window.showEntityDetails(entityType, entityId, {
+            mode: 'view',
+            sourceInfo: {
+              sourceModal: 'trading-journal',
+              sourceType: 'journal_entry',
+            },
+          });
+        } catch (error) {
+          if (window.Logger) {
+            window.Logger.error('Error opening entity details (fallback)', { page: PAGE_NAME, error, entityType, entityId });
+          }
+        }
+      }
+    }
+  };
+
   /**
    * Save page state to PageStateManager
    */
@@ -720,12 +963,6 @@ const initializeHeader = async function() {
       }
     }
   };
-
-  /**
-   * Load page state from PageStateManager
-   */
-  await savePageState();
-};
 
 /**
      * Navigate to previous or next month
@@ -1446,52 +1683,6 @@ const switchViewMode = async mode => {
   }
 };
 
-/**
-     * Load and render journal entries for current month
-     */
-const handleEntryClickById = async function(entityType, entityId) {
-  if (!entityType || !entityId) {
-    if (window.Logger) {
-      window.Logger.warn('Invalid parameters for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
-    }
-    return;
-  }
-
-  // Find entry from stored entries (check both main entries and day zoom entries)
-  const entries = window.tradingJournalEntries || window.tradingJournalDayZoomEntries || [];
-  const entry = entries.find(e => e.entity_type === entityType && e.entity_id === entityId);
-
-  if (!entry) {
-    if (window.Logger) {
-      window.Logger.warn('Entry not found for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
-    }
-    // Fallback: open entity details directly
-    try {
-      if (window.showEntityDetails && typeof window.showEntityDetails === 'function') {
-        await window.showEntityDetails(entityType, entityId, {
-          mode: 'view',
-          sourceInfo: {
-            sourceModal: 'trading-journal',
-            sourceType: 'journal_entry',
-            sourceId: entityId,
-          },
-        });
-      }
-    } catch (error) {
-      if (window.Logger) {
-        window.Logger.error('Error opening entity details', { page: PAGE_NAME, error, entityType, entityId });
-      }
-      if (window.NotificationSystem) {
-        window.NotificationSystem.showError('שגיאה', 'לא ניתן לפתוח פרטי רשומה: ' + (error?.message || 'שגיאה לא ידועה'));
-      }
-    }
-    return;
-  }
-
-  // Use existing handleEntryClick function
-  await handleEntryClick(entry);
-};
-
 // Zoom to specific day - show entries for that day in a modal
 const zoomToDay = async function(day, month, year) {
   if (window.Logger) {
@@ -2152,9 +2343,15 @@ window.tradingJournalPage = {
 };
 
 // Make functions available globally (for HTML onclick)
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2333',message:'Before setting window.handleAddEntry',data:{handleAddEntryExists:typeof handleAddEntry,handleAddEntryType:typeof handleAddEntry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+// #endregion
 window.filterJournalByEntityType = filterJournalByEntityType;
 window.filterJournalByTicker = filterJournalByTicker;
 window.handleAddEntry = handleAddEntry;
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2336',message:'After setting window.handleAddEntry',data:{windowHandleAddEntryExists:typeof window.handleAddEntry,windowHandleAddEntryType:typeof window.handleAddEntry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+// #endregion
 
 /**
    * Render icons in dropdown menu items
@@ -2215,8 +2412,15 @@ const initializePage = async function() {
   if (!window.currentEntityFilter) {
     window.currentEntityFilter = 'all';
   }
-  updateMonthDisplay();
-  initializeMonthYearSelectors();
+  // Update month display if CalendarDateUtils is available
+  if (window.CalendarDateUtils && typeof window.CalendarDateUtils.formatMonthDisplay === 'function') {
+    const monthDisplay = document.getElementById('current-month-display');
+    if (monthDisplay) {
+      monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
+    }
+  }
+  // Initialize month/year selectors if needed (functions may not be defined)
+  // initializeMonthYearSelectors(); // Commented out - function not defined
 
   // Wait for IconSystem and DOM to be ready
   const initAfterLoad = async () => {
@@ -2235,6 +2439,9 @@ const initializePage = async function() {
     if (retries >= maxRetries && window.Logger) {
       window.Logger.warn('Button System not available after timeout', { page: PAGE_NAME });
     }
+
+    // Create add entry dropdown menu (must be after Button System processes buttons)
+    createAddEntryDropdown();
 
     // Generate entity type filter buttons
     await generateJournalEntityTypeFilterButtons();
@@ -2265,5 +2472,45 @@ const initializePage = async function() {
   }
 }
 
-} // End of trading-journal page check
+// Call initializePage when DOM is ready (after function definition)
+  if (document.readyState === 'loading') {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2457',message:'DOM loading - adding DOMContentLoaded listener',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
+  document.addEventListener('DOMContentLoaded', () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2460',message:'DOMContentLoaded fired - calling initializePage',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    initializePage().catch(error => {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2463',message:'Error in initializePage',data:{error:error?.message||error,stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+      if (window.Logger) {
+        window.Logger.error('Error initializing trading journal page', {
+          page: PAGE_NAME,
+          error: error?.message || error,
+        });
+      }
+    });
+  });
+} else {
+  // DOM already loaded
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2472',message:'DOM already loaded - calling initializePage immediately',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
+  initializePage().catch(error => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2475',message:'Error in initializePage (immediate)',data:{error:error?.message||error,stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    if (window.Logger) {
+      window.Logger.error('Error initializing trading journal page', {
+        page: PAGE_NAME,
+        error: error?.message || error,
+      });
+    }
+  });
+}
 
+// End of else block for trading-journal page check
+}
+}

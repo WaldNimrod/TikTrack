@@ -203,6 +203,17 @@ def upload_file():
     import traceback
     import sys
     
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if not user_id:
+        logger.warning("❌ [UPLOAD] User not authenticated - user_id not found in Flask context")
+        return jsonify({
+            'success': False,
+            'error': 'User authentication required'
+        }), 401
+    
+    logger.info(f"👤 [UPLOAD] User ID: {user_id}")
+    
     # Log start - this should always work
     try:
         logger.info("🚀 [UPLOAD] Starting file upload process")

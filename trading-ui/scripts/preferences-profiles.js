@@ -196,15 +196,12 @@ class ProfileManager {
         window.Logger.info('✅ Backend cache invalidated via CacheSyncManager', { page: 'preferences-profiles' });
       }
 
-      // Reload profiles dropdown
+      // Reload profiles dropdown (with force to bypass cache)
       if (typeof window.loadProfilesToDropdown === 'function') {
-        await window.loadProfilesToDropdown();
+        await window.loadProfilesToDropdown(userId);
       }
 
-      // Show success notification
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification(`פרופיל "${profileName}" נוצר בהצלחה`);
-      }
+      // Don't show notification here - let createNewProfile handle it after switching
 
       return profileId;
 

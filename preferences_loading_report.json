@@ -1,0 +1,686 @@
+{
+  "timestamp": "2025-12-24T00:53:00.915656",
+  "summary": {
+    "total": 32,
+    "successful": 29,
+    "failed": 3,
+    "success_rate": 90.625
+  },
+  "results": [
+    {
+      "page_name": "דף הבית",
+      "page_url": "/",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:49:34 AM] ERROR: ❌ [API Fetch Wrapper] Fetch error\" Object",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:49:34 AM] ERROR: ❌ [API Fetch Wrapper] Fetch error\" Object",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:49:35 AM] ERROR: ❌ [API Fetch Wrapper] Fetch error\" Object"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 8
+      }
+    },
+    {
+      "page_name": "טריידים",
+      "page_url": "/trades.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "תכניות מסחר",
+      "page_url": "/trade_plans.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "התראות",
+      "page_url": "/alerts.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:49:55 AM] ERROR: ❌ Failed to load EOD alerts data:\" TypeError: Cannot read properties of undefined (reading 'loadEODAlerts')\n    at loadEODAlertsData (http://localhost:8080/scripts/alerts.js?v=1.0.0:4737:61)\n    at http://localhost:8080/scripts/alerts.js?v=1.0.0:185:31\n    at async window.loadAlertsData (http://localhost:8080/scripts/alerts.js?v=1.0.0:285:10)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 2
+      }
+    },
+    {
+      "page_name": "טיקרים",
+      "page_url": "/tickers.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 5,
+        "test_preference_available": false,
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "דשבורד טיקר",
+      "page_url": "/ticker_dashboard.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/core-systems.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/ticker_dashboard.html - Refused to execute script from 'http://localhost:8080/scripts/core-systems.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/ui-basic.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/ticker_dashboard.html - Refused to execute script from 'http://localhost:8080/scripts/ui-basic.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled."
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 7
+      }
+    },
+    {
+      "page_name": "חשבונות מסחר",
+      "page_url": "/trading_accounts.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "ביצועים",
+      "page_url": "/executions.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "ייבוא נתונים",
+      "page_url": "/data_import.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "תזרימי מזומן",
+      "page_url": "/cash_flows.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "הערות",
+      "page_url": "/notes.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "מחקר",
+      "page_url": "/research.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "ניתוח AI",
+      "page_url": "/ai_analysis.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/trading-ui/images/icons/tabler/brain.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/core-systems.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/ai_analysis.html - Refused to execute script from 'http://localhost:8080/scripts/core-systems.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/ui-basic.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 8
+      }
+    },
+    {
+      "page_name": "העדפות",
+      "page_url": "/preferences.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "Console error: http://localhost:8080/scripts/preferences-refresh-controls.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/preferences.html - Refused to execute script from 'http://localhost:8080/scripts/preferences-refresh-controls.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/preferences.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/preferences.html - Refused to execute script from 'http://localhost:8080/scripts/preferences.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled."
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": true,
+        "preferences_count": 130,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 5
+      }
+    },
+    {
+      "page_name": "פרופיל משתמש",
+      "page_url": "/user_profile.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/trading-ui/images/icons/tabler/user-circle.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/scripts/core-systems.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/user_profile.html - Refused to execute script from 'http://localhost:8080/scripts/core-systems.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/init-system.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 8
+      }
+    },
+    {
+      "page_name": "תצוגת בסיס נתונים",
+      "page_url": "/db_display.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/trading-ui/images/icons/entities/db_display.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/data/trading_accounts - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/api/data/trades - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/api/data/tickers - Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 13
+      }
+    },
+    {
+      "page_name": "נתונים נוספים",
+      "page_url": "/db_extradata.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/data/constraints - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/api/data/currencies - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/api/data/preference_groups - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/api/data/system_setting_groups - Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 9
+      }
+    },
+    {
+      "page_name": "אילוצי מערכת",
+      "page_url": "/constraints.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "משימות רקע",
+      "page_url": "/background-tasks.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:51:36 AM] ERROR: ❌ Failed to get u2:dashboard-data:\" Error: טעינת חשבונות מסחר נכשלה (401)\n    at fetchJsonList (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:34:13)\n    at async Promise.all (index 2)\n    at async Object.loadDashboardData [as load] (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:72:51)\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:101:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:593:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:113:20)\n    at async executeLoad (http://localhost:8080/scripts/index.js?v=1.0.0:1249:35)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 7
+      }
+    },
+    {
+      "page_name": "ניטור שרת",
+      "page_url": "/server-monitor.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/preferences-cache.js?v=1.0.0 0:0 Uncaught SyntaxError: Identifier 'PreferencesCache' has already been declared",
+        "Console error: http://localhost:8080/scripts/preferences-events.js?v=1.0.0 0:0 Uncaught SyntaxError: Identifier 'PreferencesEvents' has already been declared",
+        "Console error: http://localhost:8080/scripts/preferences-core.js?v=1.0.0 0:0 Uncaught SyntaxError: Identifier 'APIError' has already been declared",
+        "Console error: http://localhost:8080/scripts/preferences-ui-layer.js?v=1.0.0 0:0 Uncaught SyntaxError: Identifier 'PreferencesUILayer' has already been declared",
+        "Console error: http://localhost:8080/scripts/preferences-colors.js?v=1.0.0 0:0 Uncaught SyntaxError: Identifier 'ColorManager' has already been declared"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 17
+      }
+    },
+    {
+      "page_name": "ניהול מערכת",
+      "page_url": "/system-management.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:51:49 AM] ERROR: ❌ Failed to get u2:dashboard-data:\" Error: טעינת חשבונות מסחר נכשלה (401)\n    at fetchJsonList (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:34:13)\n    at async Promise.all (index 2)\n    at async Object.loadDashboardData [as load] (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:72:51)\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:101:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:593:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:113:20)\n    at async executeLoad (http://localhost:8080/scripts/index.js?v=1.0.0:1249:35)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 6
+      }
+    },
+    {
+      "page_name": "מרכז התראות",
+      "page_url": "/notifications-center.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:51:50 AM] ERROR: EOD data completely unavailable - no fallback used\" Object",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:51:50 AM] ERROR: ❌ שגיאה בטעינת נתוני ניהול EOD jobs:\" Error: נתוני job-history היסטוריים לא זמינים. לא ניתן לטעון נתונים אמיתיים מהשרת. אנא פנה למנהל המערכת או נסה שוב מאוחר יותר. (פרטים: {\"dataType\":\"job-history\",\"userId\":null,\"filters\":{\"limit\":20},\"lastError\":\"CacheTTLGuard.get is not a function\",\"attempts\":3})\n    at loadEODDataStrict (http://localhost:8080/scripts/services/eod-integration-helper.js?v=1.0.0:591:15)\n    at async SystemManagement.loadEODJobManagementData (http://localhost:8080/scripts/system-management.js?v=1.0.0:2033:26)\n    at async SystemManagement.loadSystemData (http://localhost:8080/scripts/system-management.js?v=1.0.0:1097:7)",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 8
+      }
+    },
+    {
+      "page_name": "ניהול CSS",
+      "page_url": "/css-management.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:52:02 AM] ERROR: ❌ Failed to get u2:dashboard-data:\" Error: טעינת חשבונות מסחר נכשלה (401)\n    at fetchJsonList (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:34:13)\n    at async Promise.all (index 2)\n    at async Object.loadDashboardData [as load] (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:72:51)\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:101:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:593:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:113:20)\n    at async executeLoad (http://localhost:8080/scripts/index.js?v=1.0.0:1249:35)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 6
+      }
+    },
+    {
+      "page_name": "תצוגת צבעים",
+      "page_url": "/dynamic-colors-display.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+        "Console error: http://localhost:8080/scripts/logger-service.js?v=1.0.0 975:24 \"[12:52:09 AM] ERROR: ❌ Failed to get u2:dashboard-data:\" Error: טעינת חשבונות מסחר נכשלה (401)\n    at fetchJsonList (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:34:13)\n    at async Promise.all (index 2)\n    at async Object.loadDashboardData [as load] (http://localhost:8080/scripts/services/dashboard-data.js?v=1.0.0:72:51)\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:101:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:593:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:113:20)\n    at async executeLoad (http://localhost:8080/scripts/index.js?v=1.0.0:1249:35)",
+        "Console error: http://localhost:8080/api/trading-accounts/ - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 6
+      }
+    },
+    {
+      "page_name": "עיצובים",
+      "page_url": "/designs.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": true,
+        "test_preference_value": "14.0",
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "דשבורד נתונים חיצוניים",
+      "page_url": "/external_data_dashboard.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/trading-ui/images/icons/tabler/cloud-download.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/scripts/core-systems.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/external_data_dashboard.html - Refused to execute script from 'http://localhost:8080/scripts/core-systems.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/ui-basic.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/external_data_dashboard.html - Refused to execute script from 'http://localhost:8080/scripts/ui-basic.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled."
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 8
+      }
+    },
+    {
+      "page_name": "ניהול גרפים",
+      "page_url": "/chart_management.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/core-systems.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/chart_management.html - Refused to execute script from 'http://localhost:8080/scripts/core-systems.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/ui-basic.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+        "Console error: http://localhost:8080/chart_management.html - Refused to execute script from 'http://localhost:8080/scripts/ui-basic.js?v=1.0.0' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+        "Console error: http://localhost:8080/scripts/init-system.js?v=1.0.0 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 7
+      }
+    },
+    {
+      "page_name": "דשבורד בדיקות CRUD",
+      "page_url": "/crud_testing_dashboard.html",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 1
+      }
+    },
+    {
+      "page_name": "הרשמה למערכת",
+      "page_url": "/register.html",
+      "success": false,
+      "errors": [],
+      "warnings": [
+        "PreferencesCore not found",
+        "initializeWithLazyLoading method not found",
+        "Preferences not initialized",
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available"
+      ],
+      "checks": {
+        "preferences_core_exists": false,
+        "init_method_exists": null,
+        "preferences_initialized": null,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 0
+      }
+    },
+    {
+      "page_name": "שחזור סיסמה",
+      "page_url": "/forgot-password.html",
+      "success": false,
+      "errors": [],
+      "warnings": [
+        "PreferencesCore not found",
+        "initializeWithLazyLoading method not found",
+        "Preferences not initialized",
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available"
+      ],
+      "checks": {
+        "preferences_core_exists": false,
+        "init_method_exists": null,
+        "preferences_initialized": null,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 0
+      }
+    },
+    {
+      "page_name": "איפוס סיסמה",
+      "page_url": "/reset-password.html",
+      "success": false,
+      "errors": [],
+      "warnings": [
+        "PreferencesCore not found",
+        "initializeWithLazyLoading method not found",
+        "Preferences not initialized",
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available"
+      ],
+      "checks": {
+        "preferences_core_exists": false,
+        "init_method_exists": null,
+        "preferences_initialized": null,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 0
+      }
+    },
+    {
+      "page_name": "כלי פיתוח ראשי",
+      "page_url": "/dev_tools",
+      "success": true,
+      "errors": [],
+      "warnings": [
+        "window.currentPreferences not found",
+        "Test preference 'atr_period' not available",
+        "Console error: http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 606:19 Uncaught ReferenceError: Cannot access 'PAGE_CONFIGS' before initialization"
+      ],
+      "checks": {
+        "preferences_core_exists": true,
+        "init_method_exists": true,
+        "preferences_initialized": true,
+        "current_preferences_exists": false,
+        "test_preference_available": false,
+        "console_errors_count": 1
+      }
+    }
+  ]
+}

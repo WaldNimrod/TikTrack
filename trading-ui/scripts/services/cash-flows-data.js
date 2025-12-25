@@ -323,23 +323,9 @@
         signal,
       });
 
-      if (response.ok) {
-        const result = await response.json().catch(() => ({}));
-        // Determine action based on method
-        if (window.CacheSyncManager?.invalidateByAction) {
-          const action = method === 'POST' ? 'cash-flow-created' :
-                        method === 'PUT' ? 'cash-flow-updated' :
-                        method === 'DELETE' ? 'cash-flow-deleted' : 'cash-flow-updated';
-          try {
-            await window.CacheSyncManager.invalidateByAction(action);
-          } catch (error) {
-            // Fallback to direct invalidation
-            await invalidateCache();
-          }
-        } else {
-          await invalidateCache();
-        }
-      }
+      // Don't read response body here - let CRUDResponseHandler handle it
+      // Cache invalidation will be handled by CRUDResponseHandler or UnifiedCRUDService
+      // Return response as-is so it can be read by the caller
 
       return response;
     } catch (error) {

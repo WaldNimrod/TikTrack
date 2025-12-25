@@ -495,8 +495,9 @@ class FieldRendererService {
             'sell': 'מכירה',
         };
         
-        const typeLower = type.toLowerCase();
-        const typeHebrew = typeTranslations[typeLower] || type;
+        // Normalize: trim whitespace and convert to lowercase
+        const typeNormalized = String(type).trim().toLowerCase();
+        const typeHebrew = typeTranslations[typeNormalized] || (typeNormalized === 'unknown' || typeNormalized === '' ? '-' : type);
         
         // קביעת צבע לפי amount אם סופק
         let colorClass = '';
@@ -518,14 +519,14 @@ class FieldRendererService {
                 'other_negative',
                 'currency_exchange_from'
             ]);
-            if (positiveTypes.has(typeLower)) {
+            if (positiveTypes.has(typeNormalized)) {
                 colorClass = ' text-success';
-            } else if (negativeTypes.has(typeLower)) {
+            } else if (negativeTypes.has(typeNormalized)) {
                 colorClass = ' text-danger';
             }
         }
         
-        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeLower}">${typeHebrew}</span>`;
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeNormalized}">${typeHebrew}</span>`;
     }
 
     /**

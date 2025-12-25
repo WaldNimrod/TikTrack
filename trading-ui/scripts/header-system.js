@@ -56,11 +56,68 @@ window.FilterManager = class FilterManager {
   async init() {
     await this.loadFilters();
     this.setupHoverBehavior();
-    // Load accounts after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      this.loadAccountsForFilter();
-    }, 500);
+    // For tag-management page, wait for authentication to complete before loading accounts
+    // This prevents 401 errors when api-fetch-wrapper hasn't added token to headers yet
+    const isTagManagementPage = window.location.pathname.includes('tag_management');
+    if (isTagManagementPage) {
+      // Wait for authentication to complete (auth-guard sets window.currentUser when done)
+      // Also verify that api-fetch-wrapper can get the token
+      let authWaitCount = 0;
+      let authReady = false;
+      while (authWaitCount < 50 && !authReady) {
+        // Check if auth-guard has completed by checking for currentUser
+        const hasUser = !!window.currentUser;
+        let hasToken = false;
+        
+        // Check if token is available for api-fetch-wrapper
+        if (window.UnifiedCacheManager?.initialized) {
+          try {
+            const token = await window.UnifiedCacheManager.get('authToken', { 
+              layer: 'sessionStorage', 
+              includeUserId: false 
+            });
+            hasToken = !!token;
+          } catch (e) {
+            // Continue checking
+          }
+        }
+        if (!hasToken && typeof sessionStorage !== 'undefined') {
+          hasToken = !!sessionStorage.getItem('dev_authToken');
+        }
+        
+        // Verify authentication with TikTrackAuth
+        if (hasUser && hasToken && window.TikTrackAuth?.checkAuthentication) {
+          try {
+            const authResult = await window.TikTrackAuth.checkAuthentication();
+            if (authResult?.authenticated && authResult?.user) {
+              authReady = true;
+              break;
+            }
+          } catch (e) {
+            // Continue waiting
+          }
+        } else if (hasUser && hasToken) {
+          // If we have user and token but TikTrackAuth not available, proceed
+          authReady = true;
+          break;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        authWaitCount++;
+      }
+      if (window.Logger?.debug) {
+        window.Logger.debug('HeaderSystem: Waited for auth completion', {
+          authWaitCount,
+          hasCurrentUser: !!window.currentUser,
+          authReady,
+          page: 'header-system'
+        });
+      }
+    }
+    // Load accounts after authentication is confirmed (or immediately for other pages)
+    this.loadAccountsForFilter();
   }
+
 
   async loadFilters() {
     if (window.PageStateManager && window.PageStateManager.initialized) {
@@ -672,17 +729,39 @@ window.FilterManager = class FilterManager {
     if (!accounts || accounts.length === 0) {
       try {
         const response = await fetch('/api/trading-accounts/');
-        const data = await response.json();
-        accounts = data.data || data || [];
+        // Handle 401/403 errors gracefully (expected in iframe context before auth completes)
+        if (response.status === 401 || response.status === 403) {
+          window.Logger?.debug?.('🔒 Trading accounts API returned 401/403 (expected in iframe context)', { 
+            page: 'header-system',
+            status: response.status 
+          });
+          accounts = [];
+        } else if (response.ok) {
+          const data = await response.json();
+          accounts = data.data || data || [];
+        } else {
+          window.Logger?.debug?.('⚠️ Trading accounts API returned non-OK status', { 
+            page: 'header-system',
+            status: response.status 
+          });
+          accounts = [];
+        }
       } catch (error) {
-        window.Logger?.warn?.('⚠️ Failed to load accounts via API', error, { page: 'header-system' });
+        window.Logger?.debug?.('⚠️ Failed to load accounts via API (expected in iframe context)', { 
+          page: 'header-system',
+          error: error.message 
+        });
+        accounts = [];
       }
     }
 
     // Ensure accounts is an array
     if (!Array.isArray(accounts)) {
       accounts = [];
-      window.Logger?.warn?.('⚠️ accounts is not an array, resetting to empty array', { page: 'header-system', accountsType: typeof accounts });
+      window.Logger?.debug?.('⚠️ accounts is not an array, resetting to empty array (expected in iframe context)', { 
+        page: 'header-system', 
+        accountsType: typeof accounts 
+      });
     }
 
     const openAccounts = accounts.filter(account => account.status === 'open');
@@ -1282,7 +1361,7 @@ class HeaderSystem {
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
-                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
+                      <a href="/dev_tools" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
                         <span class="nav-text">פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>

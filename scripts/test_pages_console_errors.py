@@ -121,6 +121,24 @@ ALL_PAGES = [
     # עמודים נוספים
     {"name": "תצוגת ווידג'טים TradingView", "url": "/tradingview-widgets-showcase.html", "category": "additional", "priority": "low"},
     {"name": "טריידים מעוצבים", "url": "/trades_formatted.html", "category": "additional", "priority": "low"},
+    
+    # עמודי בדיקה (Test Pages) - עדכון 2025-01-15
+    {"name": "בדיקת Header System", "url": "/test-header-only.html", "category": "test", "priority": "high"},
+    {"name": "בדיקת ניטור", "url": "/test-monitoring.html", "category": "test", "priority": "high"},
+    {"name": "בדיקת Frontend Wrappers", "url": "/test-frontend-wrappers.html", "category": "test", "priority": "medium"},
+    {"name": "השוואת Bootstrap Popover", "url": "/test-bootstrap-popover-comparison.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Quill Editor", "url": "/test-quill.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת מודלים מקוננים", "url": "/test-nested-modal-rich-text.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Overlay Debug", "url": "/test-overlay-debug.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Phase 1 Recovery", "url": "/test-phase1-recovery.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Phase 3.1 Comprehensive", "url": "/test-phase3-1-comprehensive.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Unified Widget", "url": "/test-unified-widget.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Unified Widget Integration", "url": "/test-unified-widget-integration.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Unified Widget Comprehensive", "url": "/test-unified-widget-comprehensive.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Recent Items Widget", "url": "/test-recent-items-widget.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Ticker Widgets Performance", "url": "/test-ticker-widgets-performance.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת User Ticker Integration", "url": "/test-user-ticker-integration.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת User Ticker Frontend", "url": "/scripts/test-user-ticker-frontend.html", "category": "test", "priority": "medium"},
 ]
 
 class RateLimitTracker:
@@ -417,6 +435,23 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         "timestamp": datetime.now().isoformat(),
         "login_modal_present": False,
         "login_modal_visible": False,
+        "css_loaded": {
+            "bootstrap": False,
+            "master": False,
+            "header_styles": False
+        },
+        "js_loaded": {
+            "error_handlers": False,
+            "logger_service": False,
+            "header_system": False,
+            "unified_cache_manager": False
+        },
+        "systems_initialized": {
+            "HeaderSystem": False,
+            "Logger": False,
+            "UnifiedCacheManager": False,
+            "PreferencesSystem": False
+        },
     }
     
     try:
@@ -607,6 +642,49 @@ def test_page_console(driver, page_info, retry_count: int = 0):
                     result["conditions_readiness_column_present"] = readiness_check
             except Exception as e:
                 result["conditions_check_error"] = str(e)
+        
+        # Check CSS files loading
+        try:
+            css_check = driver.execute_script("""
+                const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+                return {
+                    bootstrap: links.some(link => link.href.includes('bootstrap') && link.href.includes('.css')),
+                    master: links.some(link => link.href.includes('master.css')),
+                    header_styles: links.some(link => link.href.includes('header-styles.css'))
+                };
+            """)
+            result["css_loaded"] = css_check
+        except Exception as e:
+            result["css_check_error"] = str(e)
+        
+        # Check JavaScript files loading
+        try:
+            js_check = driver.execute_script("""
+                const scripts = Array.from(document.querySelectorAll('script[src]'));
+                return {
+                    error_handlers: scripts.some(script => script.src.includes('error-handlers.js')),
+                    logger_service: scripts.some(script => script.src.includes('logger-service.js')),
+                    header_system: scripts.some(script => script.src.includes('header-system.js')),
+                    unified_cache_manager: scripts.some(script => script.src.includes('unified-cache-manager.js'))
+                };
+            """)
+            result["js_loaded"] = js_check
+        except Exception as e:
+            result["js_check_error"] = str(e)
+        
+        # Check systems initialization
+        try:
+            systems_check = driver.execute_script("""
+                return {
+                    HeaderSystem: !!(window.HeaderSystem && typeof window.HeaderSystem === 'object'),
+                    Logger: !!(window.Logger && typeof window.Logger === 'object'),
+                    UnifiedCacheManager: !!(window.UnifiedCacheManager && typeof window.UnifiedCacheManager === 'object'),
+                    PreferencesSystem: !!(window.PreferencesSystem && typeof window.PreferencesSystem === 'object')
+                };
+            """)
+            result["systems_initialized"] = systems_check
+        except Exception as e:
+            result["systems_check_error"] = str(e)
         
         # Check for critical errors
         critical_errors = [

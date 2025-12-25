@@ -36,9 +36,8 @@ def get_open_trading_accounts():
         db: Session = g.db
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
-        logger.info(f"🔍 [get_open_trading_accounts] user_id={user_id}, g.user_id={getattr(g, 'user_id', None)}")
         trading_accounts = TradingAccountService.get_open_trading_accounts(db, user_id=user_id)
-        logger.info(f"🔍 [get_open_trading_accounts] Found {len(trading_accounts)} accounts for user_id={user_id}")
+        logger.debug(f"[get_open_trading_accounts] Found {len(trading_accounts)} accounts for user_id={user_id}")
         return jsonify({
             "status": "success",
             "data": [trading_account.to_dict() for trading_account in trading_accounts],

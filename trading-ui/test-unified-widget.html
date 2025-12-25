@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test - Unified Pending Actions Widget</title>
     
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
+    <!-- System CSS - After Bootstrap to override it -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <!-- Widget CSS -->
     <link rel="stylesheet" href="styles-new/06-components/_unified-pending-actions-widget.css">
@@ -47,6 +52,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <div class="test-container">
         <h1>🧪 Test - Unified Pending Actions Widget</h1>
         
@@ -189,19 +196,28 @@
     
     <!-- Mock Dependencies -->
     <script>
+        // Test Log Functions - Must be defined before use
+        function addLog(type, message, data) {
+            const logContent = document.getElementById('testLogContent');
+            if (!logContent) return;
+            const item = document.createElement('div');
+            item.className = `test-log-item ${type}`;
+            const time = new Date().toLocaleTimeString();
+            item.textContent = `[${time}] [${type.toUpperCase()}] ${message}${data ? ' ' + JSON.stringify(data) : ''}`;
+            logContent.appendChild(item);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
         // Mock Logger
         window.Logger = {
             info: function(msg, data) {
                 addLog('info', msg, data);
-                console.log('[INFO]', msg, data || '');
             },
             error: function(msg, data) {
                 addLog('error', msg, data);
-                console.error('[ERROR]', msg, data || '');
             },
             warn: function(msg, data) {
                 addLog('warn', msg, data);
-                console.warn('[WARN]', msg, data || '');
             },
             debug: function(msg, data) {
                 addLog('debug', msg, data);
@@ -247,15 +263,15 @@
         
         // Mock NotificationSystem
         window.NotificationSystem = {
-            showInfo: function(msg) { console.log('[NOTIFICATION]', msg); },
-            showSuccess: function(msg) { console.log('[SUCCESS]', msg); },
-            showError: function(msg) { console.error('[ERROR]', msg); }
+            showInfo: function(msg) { if (window.Logger) { window.Logger.info('[NOTIFICATION]', { page: 'test-unified-widget', component: 'test-unified-widget', data: 'msg' }); } },
+            showSuccess: function(msg) { if (window.Logger) { window.Logger.info('[SUCCESS]', { page: 'test-unified-widget', component: 'test-unified-widget', data: 'msg' }); } },
+            showError: function(msg) { if (window.Logger) { window.Logger.error('[ERROR]', { page: 'test-unified-widget', component: 'test-unified-widget', error: 'msg.message', stack: 'msg.stack' }); } }
         };
         
         // Mock ModalManagerV2
         window.ModalManagerV2 = {
             openModal: function(config) {
-                console.log('[MODAL]', config);
+                if (window.Logger) { window.Logger.info('[MODAL]', { page: 'test-unified-widget', component: 'test-unified-widget', data: 'config' }); }
             }
         };
         
@@ -265,17 +281,6 @@
                 return { success: true };
             }
         };
-        
-        // Test Log Functions
-        function addLog(type, message, data) {
-            const logContent = document.getElementById('testLogContent');
-            const item = document.createElement('div');
-            item.className = `test-log-item ${type}`;
-            const time = new Date().toLocaleTimeString();
-            item.textContent = `[${time}] [${type.toUpperCase()}] ${message}${data ? ' ' + JSON.stringify(data) : ''}`;
-            logContent.appendChild(item);
-            logContent.scrollTop = logContent.scrollHeight;
-        }
         
         function clearLog() {
             document.getElementById('testLogContent').innerHTML = '';
@@ -357,16 +362,40 @@
                 '/api/executions/pending-assignment/trade-creation-clusters'
             ];
             
+            const CACHE_TTL = 45 * 1000; // 45 seconds
+            
             for (const endpoint of endpoints) {
                 try {
-                    const response = await fetch(endpoint + '?limit=1', {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
+                    // Try cache first
+                    const cacheKey = `test-unified-widget-${endpoint.replace(/\//g, '-')}`;
+                    let data = null;
+                    
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                        const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: CACHE_TTL });
+                        if (cached) {
+                            data = cached;
+                        }
+                    }
+                    
+                    if (!data) {
+                        const response = await fetch(endpoint + '?limit=1', {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (response.ok) {
+                            data = await response.json();
+                            
+                            // Save to cache
+                            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                                await window.UnifiedCacheManager.save(cacheKey, data, { ttl: CACHE_TTL, syncToBackend: false });
+                            }
+                        } else {
+                            addLog('warn', `⚠️ ${endpoint}: ${response.status} ${response.statusText}`);
+                            continue;
+                        }
+                    }
+                    
+                    if (data) {
                         addLog('success', `✅ ${endpoint}: OK (${Array.isArray(data) ? data.length : 'object'} items)`);
-                    } else {
-                        addLog('warn', `⚠️ ${endpoint}: ${response.status} ${response.statusText}`);
                     }
                 } catch (error) {
                     addLog('error', `❌ ${endpoint}: ${error.message}`);
@@ -442,6 +471,28 @@
     
     <!-- Auto-run tests on load -->
     <script>
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-unified-widget',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-unified-widget',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         window.addEventListener('DOMContentLoaded', function() {
             addLog('info', '📄 Page loaded, widget should be available');
             setTimeout(() => {
@@ -454,6 +505,21 @@
             }, 1000);
         });
     </script>
+    
+    <!-- Error Handlers (Must load first) -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    
+    <!-- Unified Cache Manager -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    
+    <!-- Header System -->
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Button System -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
 </body>
 </html>
 

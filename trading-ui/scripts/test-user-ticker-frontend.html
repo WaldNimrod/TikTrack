@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    <link rel="stylesheet" href="../styles-new/master.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="../styles-new/header-styles.css?v=0da3519a_20251102_104906">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בדיקת אינטגרציה User-Ticker - Frontend</title>
@@ -97,6 +100,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <h1>בדיקת אינטגרציה User-Ticker - Frontend</h1>
     
     <div class="test-section">
@@ -182,20 +187,45 @@
                     addResult('loadTickers', `❌ window.tickersData.getUserTickers לא זמין`, 'fail');
                 }
                 
-                // Test 2: Direct API call
-                const apiStart = performance.now();
-                const response = await fetch('/api/tickers/my');
-                const apiElapsed = performance.now() - apiStart;
+                // Test 2: Direct API call with cache
+                const CACHE_KEY = 'test-user-ticker-frontend-tickers-my';
+                const CACHE_TTL = 45 * 1000; // 45 seconds
+                let tickers = [];
+                let apiElapsed = 0;
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.status === 'success' && Array.isArray(data.data)) {
-                        addResult('loadTickers', `✅ API /api/tickers/my: ${data.data.length} טיקרים ב-${apiElapsed.toFixed(2)}ms`, 'pass');
-                    } else {
-                        addResult('loadTickers', `⚠️ API החזיר פורמט לא צפוי`, 'warn');
+                // Try cache first
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cached = await window.UnifiedCacheManager.get(CACHE_KEY, { ttl: CACHE_TTL });
+                    if (cached) {
+                        tickers = Array.isArray(cached) ? cached : (Array.isArray(cached?.data) ? cached.data : []);
+                        apiElapsed = 0; // Cache hit - instant
                     }
-                } else {
-                    addResult('loadTickers', `❌ API error: ${response.status} ${response.statusText}`, 'fail');
+                }
+                
+                if (tickers.length === 0) {
+                    const apiStart = performance.now();
+                    const response = await fetch('/api/tickers/my');
+                    apiElapsed = performance.now() - apiStart;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status === 'success' && Array.isArray(data.data)) {
+                            tickers = data.data;
+                            
+                            // Save to cache
+                            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                                await window.UnifiedCacheManager.save(CACHE_KEY, tickers, { ttl: CACHE_TTL, syncToBackend: false });
+                            }
+                        } else {
+                            addResult('loadTickers', `⚠️ API החזיר פורמט לא צפוי`, 'warn');
+                        }
+                    } else {
+                        addResult('loadTickers', `❌ API error: ${response.status} ${response.statusText}`, 'fail');
+                    }
+                }
+                
+                if (tickers.length > 0) {
+                    addResult('loadTickers', `✅ API /api/tickers/my: ${tickers.length} טיקרים ב-${apiElapsed.toFixed(2)}ms`, 'pass');
                 }
                 
             } catch (error) {
@@ -331,11 +361,34 @@
                     addResult('performance', `📊 getUserTickers: ממוצע ${avg.toFixed(2)}ms (${min.toFixed(2)}-${max.toFixed(2)}ms) - ${ratingText}`, rating === 'too-slow' ? 'fail' : rating === 'slow' ? 'warn' : 'pass');
                 }
                 
-                // Test 2: API performance
+                // Test 2: API performance (with cache)
+                const CACHE_KEY_PERF = 'test-user-ticker-frontend-tickers-my-perf';
+                const CACHE_TTL = 45 * 1000; // 45 seconds
                 const apiTimes = [];
                 for (let i = 0; i < 5; i++) {
                     const start = performance.now();
-                    await fetch('/api/tickers/my');
+                    
+                    // Try cache first
+                    let data = null;
+                    if (i === 0 && window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                        const cached = await window.UnifiedCacheManager.get(CACHE_KEY_PERF, { ttl: CACHE_TTL });
+                        if (cached) {
+                            data = cached;
+                        }
+                    }
+                    
+                    if (!data) {
+                        const response = await fetch('/api/tickers/my');
+                        if (response.ok) {
+                            data = await response.json();
+                            
+                            // Save to cache (only first time)
+                            if (i === 0 && window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                                await window.UnifiedCacheManager.save(CACHE_KEY_PERF, data, { ttl: CACHE_TTL, syncToBackend: false });
+                            }
+                        }
+                    }
+                    
                     apiTimes.push(performance.now() - start);
                 }
                 const apiAvg = apiTimes.reduce((a, b) => a + b, 0) / apiTimes.length;
@@ -390,23 +443,67 @@
             addResult('apiEndpoints', '🔄 בודק API Endpoints...', 'warn');
             
             try {
-                // Test GET /api/tickers/my
-                const myResponse = await fetch('/api/tickers/my');
-                if (myResponse.ok) {
-                    const myData = await myResponse.json();
+                const CACHE_TTL = 45 * 1000; // 45 seconds
+                
+                // Test GET /api/tickers/my with cache
+                const myCacheKey = 'test-user-ticker-frontend-tickers-my-endpoints';
+                let myData = null;
+                
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cached = await window.UnifiedCacheManager.get(myCacheKey, { ttl: CACHE_TTL });
+                    if (cached) {
+                        myData = cached;
+                    }
+                }
+                
+                if (!myData) {
+                    const myResponse = await fetch('/api/tickers/my');
+                    if (myResponse.ok) {
+                        myData = await myResponse.json();
+                        
+                        // Save to cache
+                        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                            await window.UnifiedCacheManager.save(myCacheKey, myData, { ttl: CACHE_TTL, syncToBackend: false });
+                        }
+                    } else {
+                        addResult('apiEndpoints', `❌ GET /api/tickers/my: ${myResponse.status}`, 'fail');
+                    }
+                }
+                
+                if (myData) {
                     if (myData.status === 'success' && Array.isArray(myData.data)) {
                         addResult('apiEndpoints', `✅ GET /api/tickers/my: ${myData.data.length} טיקרים`, 'pass');
                     } else {
                         addResult('apiEndpoints', `⚠️ GET /api/tickers/my: פורמט לא צפוי`, 'warn');
                     }
-                } else {
-                    addResult('apiEndpoints', `❌ GET /api/tickers/my: ${myResponse.status}`, 'fail');
                 }
                 
-                // Test GET /api/tickers/ (should also return user tickers)
-                const allResponse = await fetch('/api/tickers/');
-                if (allResponse.ok) {
-                    const allData = await allResponse.json();
+                // Test GET /api/tickers/ (should also return user tickers) with cache
+                const allCacheKey = 'test-user-ticker-frontend-tickers-all-endpoints';
+                let allData = null;
+                
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cached = await window.UnifiedCacheManager.get(allCacheKey, { ttl: CACHE_TTL });
+                    if (cached) {
+                        allData = cached;
+                    }
+                }
+                
+                if (!allData) {
+                    const allResponse = await fetch('/api/tickers/');
+                    if (allResponse.ok) {
+                        allData = await allResponse.json();
+                        
+                        // Save to cache
+                        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                            await window.UnifiedCacheManager.save(allCacheKey, allData, { ttl: CACHE_TTL, syncToBackend: false });
+                        }
+                    } else {
+                        addResult('apiEndpoints', `❌ GET /api/tickers/: ${allResponse.status}`, 'fail');
+                    }
+                }
+                
+                if (allData) {
                     if (allData.status === 'success' && Array.isArray(allData.data)) {
                         addResult('apiEndpoints', `✅ GET /api/tickers/: ${allData.data.length} טיקרים`, 'pass');
                     } else {
@@ -474,18 +571,43 @@
             }
         }
         
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-user-ticker-frontend',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-user-ticker-frontend',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         // Auto-run on load
         window.addEventListener('load', () => {
             setTimeout(() => {
-                console.log('Running initial tests...');
+                if (window.Logger) { window.Logger.info('Running initial tests...', { page: 'test-user-ticker-frontend', component: 'test-user-ticker-frontend' }); }
                 testLoadTickers();
             }, 1000);
         });
     </script>
     
     <!-- Authentication protection for testing -->
-    <script src="../scripts/auth.js?v=1.0.0" defer></script>
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script>
+        <script src="../scripts/error-handlers.js?v=1.0.0"></script>
+<script src="../scripts/auth.js?v=1.0.0" defer></script>
+    <script src="../scripts/auth-guard.js?v=1.0.0" defer></script>
+    <script src="../scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <script src="../scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
 </body>
 </html>
 

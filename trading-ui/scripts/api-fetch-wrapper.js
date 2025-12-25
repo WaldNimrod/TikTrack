@@ -42,6 +42,11 @@
     }
   }
 
+  function isInstrumentationEndpoint(url) {
+    // Check if URL is for instrumentation/debug logging (port 7243)
+    return (url || '').includes('127.0.0.1:7243') || (url || '').includes(':7243/ingest');
+  }
+
   async function getAuthToken() {
     try {
       // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
@@ -100,7 +105,8 @@
   }
 
   window.fetch = async function (url, options = {}) {
-    if (isStaticFile(url) || isPublicEndpoint(url)) {
+    // Skip auth injection for static files, public endpoints, and instrumentation endpoints
+    if (isStaticFile(url) || isPublicEndpoint(url) || isInstrumentationEndpoint(url)) {
       return originalFetch(url, options);
     }
 

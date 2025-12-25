@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בדיקת Recent Items Widget</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
+    <!-- System CSS - After Bootstrap to override it -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
     <style>
         body { padding: 2rem; }
         .debug-section { margin: 2rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px; }
@@ -16,6 +24,8 @@
     </style>
 </head>
 <body>
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
     <h1>בדיקת Recent Items Widget</h1>
     
     <div class="row">
@@ -80,7 +90,7 @@
     <script src="scripts/logger-service.js?v=1.0.0"></script>
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
     <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
-    <script src="scripts/services/date-utils.js?v=1.0.0"></script>
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
     
     <!-- SERVICES PACKAGE -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
@@ -150,15 +160,49 @@
 
         async function loadTestData() {
             try {
-                // Load trades
-                const tradesRes = await fetch('/api/trades/', { headers: { Accept: 'application/json' } });
-                const tradesData = await tradesRes.json();
-                const trades = Array.isArray(tradesData.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
+                const CACHE_TTL = 45 * 1000; // 45 seconds
                 
-                // Load trade plans
-                const plansRes = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
-                const plansData = await plansRes.json();
-                const plans = Array.isArray(plansData.data) ? plansData.data : (Array.isArray(plansData) ? plansData : []);
+                // Load trades with cache
+                let trades = [];
+                const tradesCacheKey = 'test-recent-items-widget-trades';
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cachedTrades = await window.UnifiedCacheManager.get(tradesCacheKey, { ttl: CACHE_TTL });
+                    if (cachedTrades) {
+                        trades = Array.isArray(cachedTrades) ? cachedTrades : (Array.isArray(cachedTrades?.data) ? cachedTrades.data : []);
+                    }
+                }
+                
+                if (trades.length === 0) {
+                    const tradesRes = await fetch('/api/trades/', { headers: { Accept: 'application/json' } });
+                    const tradesData = await tradesRes.json();
+                    trades = Array.isArray(tradesData.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
+                    
+                    // Save to cache
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                        await window.UnifiedCacheManager.save(tradesCacheKey, trades, { ttl: CACHE_TTL, syncToBackend: false });
+                    }
+                }
+                
+                // Load trade plans with cache
+                let plans = [];
+                const plansCacheKey = 'test-recent-items-widget-trade-plans';
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
+                    const cachedPlans = await window.UnifiedCacheManager.get(plansCacheKey, { ttl: CACHE_TTL });
+                    if (cachedPlans) {
+                        plans = Array.isArray(cachedPlans) ? cachedPlans : (Array.isArray(cachedPlans?.data) ? cachedPlans.data : []);
+                    }
+                }
+                
+                if (plans.length === 0) {
+                    const plansRes = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
+                    const plansData = await plansRes.json();
+                    plans = Array.isArray(plansData.data) ? plansData.data : (Array.isArray(plansData) ? plansData : []);
+                    
+                    // Save to cache
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
+                        await window.UnifiedCacheManager.save(plansCacheKey, plans, { ttl: CACHE_TTL, syncToBackend: false });
+                    }
+                }
 
                 addLog('success', 'נתונים נטענו', { trades: trades.length, plans: plans.length });
 
@@ -177,6 +221,28 @@
             }
         }
 
+        // Initialize PreferencesSystem if available
+        if (window.PreferencesSystem && typeof window.PreferencesSystem.initialize === 'function') {
+            window.PreferencesSystem.initialize().then(() => {
+                if (window.Logger) {
+                    window.Logger.info('PreferencesSystem initialized', {
+                        page: 'test-recent-items-widget',
+                        component: 'preferences-system',
+                        action: 'init-complete'
+                    });
+                }
+            }).catch(error => {
+                if (window.Logger) {
+                    window.Logger.warn('PreferencesSystem initialization failed', {
+                        page: 'test-recent-items-widget',
+                        component: 'preferences-system',
+                        action: 'init-failed',
+                        error: error.message
+                    });
+                }
+            });
+        }
+        
         // Wait for scripts to load
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -193,6 +259,12 @@
     <!-- Authentication protection for testing -->
     <script src="scripts/auth.js?v=1.0.0" defer></script>
     <script src="scripts/auth-guard.js?v=1.0.0" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Header System -->
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
 </body>
 </html>
 

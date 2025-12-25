@@ -293,68 +293,62 @@ const TABLE_COLUMN_MAPPINGS = {
   'dev-tools-primary-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
   'dev-tools-technical-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
   'dev-tools-dev-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
   'dev-tools-auth-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
   'dev-tools-test-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
   'dev-tools-mockup-pages': [
     'filename',        // 0 - שם קובץ
     'hebrew_name',     // 1 - שם עברית
-    'description',     // 2 - תיאור
-    'category',        // 3 - קטגוריה
-    'subcategory',     // 4 - קטגוריה פנימית
-    'auth_status',     // 5 - מצב אוטנטיקציה
-    'has_crud',        // 6 - CRUD
-    'access',          // 7 - גישה
-    'actions'          // 8 - פעולות
+    'category',        // 2 - קטגוריה
+    'subcategory',     // 3 - קטגוריה פנימית
+    'auth_status',     // 4 - מצב אוטנטיקציה
+    'has_crud',        // 5 - CRUD
+    'access',          // 6 - גישה
+    'actions'          // 7 - פעולות
   ],
 
   'lint_monitor_issues': [

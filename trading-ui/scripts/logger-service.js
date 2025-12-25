@@ -71,9 +71,9 @@ class Logger {
                                hostname.startsWith('192.168.') ||
                                hostname.startsWith('10.0.');
             
-            // Check port (development ports)
+            // Check port (development ports only - NOT testing port 5001)
+            // Port 5001 is testing environment - should behave like production
             const isDevPort = port === '8080' || 
-                             port === '5001' || // Testing environment
                              port === '3000' ||
                              port === '5173' || // Vite default
                              port === '';
@@ -84,13 +84,16 @@ class Logger {
                                  search.includes('development=true');
             
             // Check if running in development mode (check for common dev indicators)
-            const isDevMode = href.includes('/development/') ||
-                             href.includes('/dev/') ||
-                             href.includes('localhost') ||
-                             href.includes('127.0.0.1');
+            // Exclude testing environment indicators
+            const isDevMode = (href.includes('/development/') ||
+                             href.includes('/dev/')) &&
+                             !href.includes('/testing/') &&
+                             !href.includes('/test/');
             
-            // Development = localhost OR dev port OR debug params OR dev URL
-            Logger._debugMode = isLocalhost || isDevPort || hasDebugParam || isDevMode;
+            // Development = localhost (but NOT on testing port 5001) OR dev port OR debug params OR dev URL
+            // Testing environment (port 5001) should behave like production - user preferences apply
+            const isTestingPort = port === '5001';
+            Logger._debugMode = !isTestingPort && (isLocalhost || isDevPort || hasDebugParam || isDevMode);
             
             // Force DEBUG mode if explicitly set in window object
             if (window.FORCE_DEBUG_MODE === true) {

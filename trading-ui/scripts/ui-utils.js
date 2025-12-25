@@ -2144,7 +2144,7 @@ function toggleAllSections() {
   allSections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const sectionBody = section.querySelector('.section-body, .section-content');
-    const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
+    const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[onclick*="toggleAllSections"], .filter-toggle-btn, [onclick*="toggle"]');
     const icon = section.querySelector('.section-toggle-icon, .filter-icon');
     
     if (window.Logger) { window.Logger.debug(`🔧 Processing section ${index + 1}/${allSections.length}: ID="${sectionId}"`, { page: "ui-utils" }); }
@@ -2155,14 +2155,24 @@ function toggleAllSections() {
         sectionBody.style.display = 'block';
         section.classList.remove('collapsed');
         section.classList.add('expanded');
-        if (icon) icon.textContent = '▼';
+        // Update icon if exists, otherwise update button text directly
+        if (icon) {
+          icon.textContent = '▼';
+        } else if (toggleBtn && toggleBtn.textContent.match(/[▼▲▶]/)) {
+          toggleBtn.textContent = toggleBtn.textContent.replace(/[▼▲▶]/, '▼');
+        }
         if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" EXPANDED`, { page: "ui-utils" }); }
       } else {
         // Collapse all
         sectionBody.style.display = 'none';
         section.classList.add('collapsed');
         section.classList.remove('expanded');
-        if (icon) icon.textContent = '▶';
+        // Update icon if exists, otherwise update button text directly
+        if (icon) {
+          icon.textContent = '▶';
+        } else if (toggleBtn && toggleBtn.textContent.match(/[▼▲▶]/)) {
+          toggleBtn.textContent = toggleBtn.textContent.replace(/[▼▲▶]/, '▶');
+        }
         if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
       }
       
@@ -2196,6 +2206,16 @@ function toggleAllSections() {
       if (window.Logger) { window.Logger.debug(`⚠️ No section body found for section "${sectionId}"`, { page: "ui-utils" }); }
     }
   });
+  
+  // Update the main toggle button (if exists) - usually in the top section header
+  const mainToggleBtn = document.querySelector('button[onclick*="toggleAllSections"]');
+  if (mainToggleBtn) {
+    if (allCollapsed) {
+      mainToggleBtn.textContent = mainToggleBtn.textContent.replace(/[▼▲▶]/, '▼');
+    } else {
+      mainToggleBtn.textContent = mainToggleBtn.textContent.replace(/[▼▲▶]/, '▶');
+    }
+  }
   
   console.log(`✅ toggleAllSections (generic) completed - processed ${allSections.length} sections`);
   if (window.Logger) { window.Logger.debug(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`, { page: "ui-utils" }); }

@@ -471,6 +471,11 @@ async function createNewProfile() {
     } else {
       window.Logger.warn('⚠️ loadProfilesToDropdown function not available', { page: 'preferences-page' });
     }
+    
+    // Also reload delete profile dropdown
+    if (typeof window.loadDeleteProfileDropdown === 'function') {
+      await window.loadDeleteProfileDropdown();
+    }
 
     // CRITICAL: Enable interface since we switched to a user profile (not default)
     if (typeof window.enableAllPreferencesInterface === 'function') {
@@ -1067,8 +1072,158 @@ function initializePreferencesPage() {
  * Make functions globally available immediately (not in init function)
  * This ensures they are available for the monitoring system
  */
+/**
+ * Delete selected profile
+ * Can only delete if:
+ * - User has more than one profile
+ * - Selected profile is NOT the active profile
+ */
+async function deleteSelectedProfile() {
+  try {
+    window.Logger.info('🔄 Starting profile deletion...', { page: 'preferences-page' });
+
+    const deleteSelect = document.getElementById('deleteProfileSelect');
+    if (!deleteSelect) {
+      throw new Error('Delete profile select not found');
+    }
+
+    const profileIdToDelete = parseInt(deleteSelect.value);
+    if (!profileIdToDelete) {
+      throw new Error('Please select a profile to delete');
+    }
+
+    // Get current active profile ID
+    const currentProfileId = window.PreferencesUI?.currentProfileId || 
+                             window.PreferencesCore?.currentProfileId || 
+                             window.ProfileManager?.currentProfileId;
+
+    // Check if trying to delete active profile
+    if (profileIdToDelete === currentProfileId) {
+      throw new Error('Cannot delete the active profile. Please switch to another profile first.');
+    }
+
+    // Get all profiles to check count
+    const profiles = await window.getUserProfiles();
+    if (profiles.length <= 1) {
+      throw new Error('Cannot delete profile. At least one profile is required.');
+    }
+
+    // Confirm deletion
+    const profileToDelete = profiles.find(p => p.id === profileIdToDelete);
+    if (!profileToDelete) {
+      throw new Error('Selected profile not found');
+    }
+
+    const confirmMessage = `האם אתה בטוח שברצונך למחוק את הפרופיל "${profileToDelete.name}"?\n\nפעולה זו לא ניתנת לביטול.`;
+    if (!confirm(confirmMessage)) {
+      window.Logger.info('Profile deletion cancelled by user', { page: 'preferences-page' });
+      return;
+    }
+
+    // Delete profile using ProfileManager
+    const deleteSuccess = await window.deleteProfile(profileIdToDelete, 1);
+
+    if (!deleteSuccess) {
+      throw new Error('Failed to delete profile');
+    }
+
+    window.Logger.info(`✅ Profile deleted successfully: ${profileToDelete.name} (ID: ${profileIdToDelete})`, { 
+      page: 'preferences-page',
+      deletedProfileId: profileIdToDelete
+    });
+
+    // Reload profiles dropdowns
+    if (typeof window.loadProfilesToDropdown === 'function') {
+      const currentUserId = window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1;
+      await window.loadProfilesToDropdown(currentUserId);
+    }
+
+    // Reload delete profile dropdown
+    await loadDeleteProfileDropdown();
+
+    // Show success notification
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification(`פרופיל "${profileToDelete.name}" נמחק בהצלחה`);
+    }
+
+    // Clear selection
+    deleteSelect.value = '';
+    updateDeleteProfileButtonState();
+
+  } catch (error) {
+    window.Logger.error('❌ Error deleting profile:', error, { page: 'preferences-page' });
+
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification(`שגיאה במחיקת פרופיל: ${error.message}`);
+    }
+  }
+}
+
+/**
+ * Load profiles into delete dropdown (excluding active profile)
+ */
+async function loadDeleteProfileDropdown() {
+  try {
+    const deleteSelect = document.getElementById('deleteProfileSelect');
+    if (!deleteSelect) return;
+
+    const currentProfileId = window.PreferencesUI?.currentProfileId || 
+                             window.PreferencesCore?.currentProfileId || 
+                             window.ProfileManager?.currentProfileId;
+
+    const profiles = await window.getUserProfiles();
+    
+    // Clear existing options (keep first empty option)
+    deleteSelect.innerHTML = '<option value="">בחר פרופיל למחיקה...</option>';
+
+    // Add profiles (excluding active profile)
+    for (const profile of profiles) {
+      if (profile.id !== currentProfileId) {
+        const option = document.createElement('option');
+        option.value = profile.id;
+        option.textContent = profile.name;
+        deleteSelect.appendChild(option);
+      }
+    }
+
+    // Update button state
+    updateDeleteProfileButtonState();
+    
+    // Add event listener to update button state when selection changes
+    deleteSelect.addEventListener('change', updateDeleteProfileButtonState);
+
+  } catch (error) {
+    window.Logger.error('❌ Error loading delete profile dropdown:', error, { page: 'preferences-page' });
+  }
+}
+
+/**
+ * Update delete profile button state based on selection and profile count
+ */
+async function updateDeleteProfileButtonState() {
+  try {
+    const deleteSelect = document.getElementById('deleteProfileSelect');
+    const deleteBtn = document.getElementById('deleteProfileBtn');
+    
+    if (!deleteSelect || !deleteBtn) return;
+
+    const profiles = await window.getUserProfiles();
+    const hasMultipleProfiles = profiles.length > 1;
+    const hasSelection = deleteSelect.value && deleteSelect.value !== '';
+
+    // Disable if only one profile or no selection
+    deleteBtn.disabled = !hasMultipleProfiles || !hasSelection;
+
+  } catch (error) {
+    window.Logger.error('❌ Error updating delete button state:', error, { page: 'preferences-page' });
+  }
+}
+
 window.switchActiveProfile = switchActiveProfile;
 window.createNewProfile = createNewProfile;
+window.deleteSelectedProfile = deleteSelectedProfile;
+window.loadDeleteProfileDropdown = loadDeleteProfileDropdown;
+window.updateDeleteProfileButtonState = updateDeleteProfileButtonState;
 window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.initializePreferencesPage = initializePreferencesPage;
 window.copyDetailedLogLocal = copyDetailedLogLocal;

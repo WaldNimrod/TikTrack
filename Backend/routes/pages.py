@@ -196,9 +196,9 @@ def styles_files(filename: str) -> Any:
 def styles_new_files(filename: str) -> Any:
     """New CSS architecture files"""
     import os
-    # Hardcoded path to trading-ui/styles-new
-    styles_dir = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/styles-new"
-    response = send_from_directory(styles_dir, filename)
+    # Use UI_DIR from config instead of hardcoded path
+    styles_dir = UI_DIR / "styles-new"
+    response = send_from_directory(str(styles_dir), filename)
 
     # Set correct MIME types
     if filename.endswith('.css'):

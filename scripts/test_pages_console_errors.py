@@ -2,6 +2,12 @@
 """
 Comprehensive script to test console errors on ALL pages
 This script uses Selenium to check JavaScript console errors
+
+✅ FIXED 2025-12-25: Corrected page URLs to match actual file names:
+- Changed URLs with hyphens (-) to underscores (_) to match actual HTML files
+- Fixed: ticker-dashboard, ai-analysis, user-profile, external-data-dashboard,
+  chart-management, crud-testing-dashboard, tag-management, trade-history,
+  trading-journal, watch-list, portfolio-state
 """
 
 import json
@@ -58,16 +64,17 @@ ALL_PAGES = [
     {"name": "תכניות מסחר", "url": "/trade_plans.html", "category": "main", "priority": "high"},
     {"name": "התראות", "url": "/alerts.html", "category": "main", "priority": "high"},
     {"name": "טיקרים", "url": "/tickers.html", "category": "main", "priority": "high"},
-    {"name": "דשבורד טיקר", "url": "/ticker-dashboard.html", "category": "main", "priority": "medium"},
+    {"name": "דשבורד טיקר", "url": "/ticker_dashboard.html", "category": "main", "priority": "medium"},
     {"name": "חשבונות מסחר", "url": "/trading_accounts.html", "category": "main", "priority": "high"},
     {"name": "ביצועים", "url": "/executions.html", "category": "main", "priority": "high"},
     {"name": "ייבוא נתונים", "url": "/data_import.html", "category": "main", "priority": "medium"},
     {"name": "תזרימי מזומן", "url": "/cash_flows.html", "category": "main", "priority": "high"},
     {"name": "הערות", "url": "/notes.html", "category": "main", "priority": "high"},
+    {"name": "ניהול תגיות", "url": "/tag_management", "category": "main", "priority": "medium"},
     {"name": "מחקר", "url": "/research.html", "category": "main", "priority": "medium"},
-    {"name": "ניתוח AI", "url": "/ai-analysis.html", "category": "main", "priority": "medium"},
+    {"name": "ניתוח AI", "url": "/ai_analysis.html", "category": "main", "priority": "medium"},
     {"name": "העדפות", "url": "/preferences.html", "category": "main", "priority": "high"},
-    {"name": "פרופיל משתמש", "url": "/user-profile.html", "category": "main", "priority": "medium"},
+    {"name": "פרופיל משתמש", "url": "/user_profile.html", "category": "main", "priority": "medium"},
     
     # עמודים טכניים (Technical Pages)
     {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical", "priority": "low"},
@@ -82,9 +89,9 @@ ALL_PAGES = [
     {"name": "עיצובים", "url": "/designs.html", "category": "technical", "priority": "low"},
     
     # עמודים משניים (Secondary Pages)
-    {"name": "דשבורד נתונים חיצוניים", "url": "/external-data-dashboard.html", "category": "secondary", "priority": "low"},
-    {"name": "ניהול גרפים", "url": "/chart-management.html", "category": "secondary", "priority": "low"},
-    {"name": "דשבורד בדיקות CRUD", "url": "/crud-testing-dashboard.html", "category": "secondary", "priority": "low"},
+    {"name": "דשבורד נתונים חיצוניים", "url": "/external_data_dashboard.html", "category": "secondary", "priority": "low"},
+    {"name": "ניהול גרפים", "url": "/chart_management.html", "category": "secondary", "priority": "low"},
+    {"name": "דשבורד בדיקות CRUD", "url": "/crud_testing_dashboard.html", "category": "secondary", "priority": "low"},
     
     # עמודי אימות (Auth Pages) - login is via modal on base pages
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
@@ -99,20 +106,20 @@ ALL_PAGES = [
     {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button-color-mapping-simple.html", "category": "dev", "priority": "low"},
     {"name": "מודלים של תנאים", "url": "/conditions-modals.html", "category": "dev", "priority": "low"},
     {"name": "ניהול קבוצות העדפות", "url": "/preferences-groups-management.html", "category": "dev", "priority": "low"},
-    {"name": "ניהול תגיות", "url": "/tag-management.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול תגיות", "url": "/tag_management.html", "category": "dev", "priority": "low"},
     {"name": "ניהול מטמון", "url": "/cache-management.html", "category": "dev", "priority": "low"},
     {"name": "דשבורד איכות קוד", "url": "/code-quality-dashboard.html", "category": "dev", "priority": "low"},
     {"name": "ניהול מערכת אתחול", "url": "/init-system-management.html", "category": "dev", "priority": "low"},
     {"name": "בדיקת תנאים", "url": "/conditions-test.html", "category": "dev", "priority": "low"},
     
     # עמודי רשימות מעקב (Watch Lists)
-    {"name": "ניהול רשימות צפייה", "url": "/watch-list.html", "category": "watchlists", "priority": "high"},
+    {"name": "ניהול רשימות צפייה", "url": "/watch_list.html", "category": "watchlists", "priority": "high"},
     {"name": "ניהול רשימות צפייה (מוקאפ)", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
     
     # עמודי מחקר (Research Pages) - משולבים
-    {"name": "היסטוריית טרייד", "url": "/trade-history", "category": "main", "priority": "high"},
-    {"name": "מצב תיק היסטורי", "url": "/portfolio-state.html", "category": "main", "priority": "high"},
-    {"name": "יומן מסחר", "url": "/trading-journal.html", "category": "main", "priority": "high"},
+    {"name": "היסטוריית טרייד", "url": "/trade_history.html", "category": "main", "priority": "high"},
+    {"name": "מצב תיק היסטורי", "url": "/portfolio_state.html", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר", "url": "/trading_journal.html", "category": "main", "priority": "high"},
     {"name": "ניתוח אסטרטגיות", "url": "/strategy-analysis", "category": "main", "priority": "high"},
     {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},

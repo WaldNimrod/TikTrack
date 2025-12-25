@@ -46,6 +46,9 @@
 
     <!-- [1] Load Order: 1 | Strategy: defer -->
     <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [1.5] Load Order: 1.5 | Strategy: defer -->
+    <!-- ✅ FIXED 2025-12-25: Added api-fetch-wrapper.js to prevent 401 Unauthorized errors in header-system.js -->
+    <script src="scripts/api-fetch-wrapper.js?v=1.0.0" defer></script> <!-- Global fetch wrapper for Authorization injection and 401 handling -->
     <!-- [2] Load Order: 2 | Strategy: defer -->
     <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
     <!-- [3] Load Order: 3 | Strategy: defer -->

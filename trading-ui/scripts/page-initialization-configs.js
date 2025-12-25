@@ -413,7 +413,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    'tag-management': {
+    'tag_management': {
       name: 'Tag Management',
       packages: [
         'base',
@@ -483,7 +483,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'preferences',
         'validation',
         // REMOVED: 'entity-details' - Not needed for preferences page
-        // REMOVED: 'info-summary' - Not needed for preferences page
+        'info-summary', // Required for Info Summary tests (has config in INFO_SUMMARY_CONFIGS)
         // REMOVED: 'dashboard-widgets' - Not needed for preferences page
         // REMOVED: 'conditions' - Not needed for preferences page
         'init-system',
@@ -496,7 +496,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.PreferencesUIV4',
-        // REMOVED: 'window.InfoSummarySystem' - Not needed for preferences page
+        'window.InfoSummarySystem', // Required for Info Summary tests (has config in INFO_SUMMARY_CONFIGS)
         // REMOVED: 'window.conditionsInitializer' - Not needed for preferences page
         // REMOVED: 'window.ConditionsUIManager' - Not needed for preferences page
         'window.LinkedItemsService', // Linked Items Service
@@ -3915,17 +3915,21 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       lastModified: '2025-01-12',
       pageType: 'main',
       packages: [
-        "base",
-        "services",
-        "ui-advanced",
-        "modules",
-        "crud",
-        "preferences",
-        "tradingview-charts", // Required for TradingView activity chart
-        "entity-services",
-        "entity-details",
-        "info-summary",
-        "init-system"
+        'base',
+        'auth', // Authentication loaded FIRST to provide dependencies
+        'header', // Header system loaded after auth
+        'core-ui', // Core UI systems loaded after header
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'preferences',
+        'validation',
+        'tradingview-charts', // Required for TradingView activity chart
+        'entity-services',
+        'entity-details',
+        'info-summary',
+        'init-system'
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System

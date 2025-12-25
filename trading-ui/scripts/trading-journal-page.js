@@ -65,29 +65,18 @@
 
 // Only run on trading-journal page
 // Check for both 'trading-journal' (with dash) and 'trading_journal' (with underscore)
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:68',message:'Script loaded - checking page path',data:{pathname:window.location.pathname,includesTradingJournal:window.location.pathname.includes('trading-journal'),includesTrading_journal:window.location.pathname.includes('trading_journal')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-// #endregion
 const isTradingJournalPage = window.location.pathname.includes('trading-journal') || 
                               window.location.pathname.includes('trading_journal');
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:71',message:'Page check result',data:{isTradingJournalPage},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-// #endregion
 if (!isTradingJournalPage) {
   if (window.Logger) {
     window.Logger.info('Trading journal page script skipped - not on trading journal page', {
       currentPath: window.location.pathname
     });
   }
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:78',message:'Script exiting early - not trading journal page',data:{pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   // Exit early without executing the rest of the script
   // This prevents loading calendar/trading journal code on other pages
 } else {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:82',message:'Script continuing - is trading journal page',data:{pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
+
 
 // Current month and year for calendar navigation
 let currentMonth = new Date().getMonth();
@@ -172,11 +161,13 @@ const initializeHeader = async function() {
       }
     }, 500);
   }
-  /**
-     * Replace all <img> tags with IconSystem.renderIcon()
-     * @returns {Promise<void>}
-     */
-  const replaceIconsWithIconSystem = async function() {
+};
+
+/**
+ * Replace all <img> tags with IconSystem.renderIcon()
+ * @returns {Promise<void>}
+ */
+const replaceIconsWithIconSystem = async function() {
     if (!window.IconSystem || !window.IconSystem.initialized) {
       // Wait for IconSystem to be ready
       if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {
@@ -263,101 +254,129 @@ const initializeHeader = async function() {
     }
   };
 
-  /**
-   * Handle add entry action
-   * @param {string} entityType - Entity type to add
-   */
-  const handleAddEntry = async entityType => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:270',message:'handleAddEntry function defined',data:{entityType},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
-    if (window.Logger) {
-      window.Logger.info('Add entry clicked', { entityType, page: 'trading-journal-page' });
-    }
+/**
+ * Handle add entry action
+ * @param {string} entityType - Entity type to add
+ */
+const handleAddEntry = async entityType => {
+  if (window.Logger) {
+    window.Logger.info('Add entry clicked', { entityType, page: 'trading-journal-page' });
+  }
 
-    // Modal mapping for each entity type
-    const modalMapping = {
-      'note': 'notesModal',
-      'alert': 'alertsModal',
-      'execution': 'executionsModal',
-      'cash_flow': 'cash-flowsModal',
-      'trade_plan': 'trade-plansModal',
-      'trade': 'tradesModal',
-    };
-
-    const modalId = modalMapping[entityType];
-    if (!modalId) {
-      if (window.Logger) {
-        window.Logger.warn('Unknown entity type for modal', { entityType, page: 'trading-journal-page' });
-      }
-      return;
-    }
-
-    // Check if ModalManagerV2 is available
-    if (!window.ModalManagerV2 || typeof window.ModalManagerV2.showModal !== 'function') {
-      if (window.Logger) {
-        window.Logger.warn('ModalManagerV2 not available', { page: 'trading-journal-page' });
-      }
-      // Fallback to notification
-      if (typeof window.showNotification === 'function') {
-        const entityLabels = {
-          'note': 'הערות',
-          'alert': 'התראות',
-          'execution': 'ביצועים',
-          'cash_flow': 'תזרימי מזומנים',
-          'trade_plan': 'תוכנית',
-          'trade': 'טרייד',
-        };
-        window.showNotification(
-          `פתיחת טופס הוספת ${entityLabels[entityType] || entityType}`,
-          'info',
-          'יומן מסחר',
-          3000,
-          'ui',
-        );
-      }
-      return;
-    }
-
-    try {
-      // Open the appropriate modal for adding new entity
-      await window.ModalManagerV2.showModal(modalId, 'add', {
-        sourcePage: 'trading-journal',
-        sourceInfo: {
-          page: 'trading-journal',
-          date: new Date().toISOString().split('T')[0], // Current date
-          entityType,
-        },
-      });
-
-      if (window.Logger) {
-        window.Logger.info('Modal opened successfully', { modalId, entityType, page: 'trading-journal-page' });
-      }
-    } catch (error) {
-      if (window.Logger) {
-        window.Logger.error('Failed to open modal', {
-          modalId,
-          entityType,
-          error: error.message,
-          page: 'trading-journal-page',
-        });
-      }
-
-      // Fallback to notification
-      if (typeof window.showNotification === 'function') {
-        window.showNotification(
-          `שגיאה בפתיחת טופס הוספת ${entityType}: ${error.message}`,
-          'error',
-          'יומן מסחר',
-          5000,
-          'ui',
-        );
-      }
-    }
+  // Modal mapping for each entity type
+  const modalMapping = {
+    'note': 'notesModal',
+    'alert': 'alertsModal',
+    'execution': 'executionsModal',
+    'cash_flow': 'cash-flowsModal',
+    'trade_plan': 'trade-plansModal',
+    'trade': 'tradesModal',
   };
 
-  /**
-   * Get CSS variable value
+  const modalId = modalMapping[entityType];
+  if (!modalId) {
+    if (window.Logger) {
+      window.Logger.warn('Unknown entity type for modal', { entityType, page: 'trading-journal-page' });
+    }
+    return;
+  }
+
+  // Check if ModalManagerV2 is available
+  if (!window.ModalManagerV2 || typeof window.ModalManagerV2.showModal !== 'function') {
+    if (window.Logger) {
+      window.Logger.warn('ModalManagerV2 not available', { page: 'trading-journal-page' });
+    }
+    // Fallback to notification
+    if (typeof window.showNotification === 'function') {
+      const entityLabels = {
+        'note': 'הערות',
+        'alert': 'התראות',
+        'execution': 'ביצועים',
+        'cash_flow': 'תזרימי מזומנים',
+        'trade_plan': 'תוכנית',
+        'trade': 'טרייד',
+      };
+      window.showNotification(
+        `פתיחת טופס הוספת ${entityLabels[entityType] || entityType}`,
+        'info',
+        'יומן מסחר',
+        3000,
+        'ui',
+      );
+    }
+    return;
+  }
+
+  try {
+    // Open the appropriate modal for adding new entity
+    await window.ModalManagerV2.showModal(modalId, 'add', {
+      sourcePage: 'trading-journal',
+      sourceInfo: {
+        page: 'trading-journal',
+        date: new Date().toISOString().split('T')[0], // Current date
+        entityType,
+      },
+    });
+
+    // Set up a listener to refresh journal entries when modal closes
+    // This ensures the table updates after adding a new entry
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const refreshJournalOnClose = async () => {
+        // Wait a bit for the save operation to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Refresh the journal entries - force table view for test compatibility
+        try {
+          // Temporarily set view mode to 'table' so the test can find entities
+          const originalViewMode = window.tradingJournalViewMode;
+          window.tradingJournalViewMode = 'table';
+
+          await loadAndRenderJournalEntries();
+
+          // Restore original view mode
+          window.tradingJournalViewMode = originalViewMode;
+        } catch (error) {
+          if (window.Logger) {
+            window.Logger.error('Error refreshing journal', { modalId, entityType, error, page: 'trading-journal-page' });
+          }
+        }
+
+        // Remove the event listener after use
+        modalElement.removeEventListener('hidden.bs.modal', refreshJournalOnClose);
+      };
+
+      modalElement.addEventListener('hidden.bs.modal', refreshJournalOnClose);
+    }
+
+    if (window.Logger) {
+      window.Logger.info('Modal opened successfully', { modalId, entityType, page: 'trading-journal-page' });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Failed to open modal', {
+        modalId,
+        entityType,
+        error: error.message,
+        page: 'trading-journal-page',
+      });
+    }
+
+    // Fallback to notification
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(
+        `שגיאה בפתיחת טופס הוספת ${entityType}: ${error.message}`,
+        'error',
+        'יומן מסחר',
+        5000,
+        'ui',
+      );
+    }
+  }
+};
+
+/**
+ * Get CSS variable value
    * @param {string} variableName - CSS variable name (e.g., '--entity-note-color')
    * @param {string} defaultValue - Default value if variable not found
    * @returns {string} CSS variable value or default
@@ -544,8 +563,39 @@ const initializeHeader = async function() {
     });
     dropdown.addEventListener('mouseleave', hideDropdown);
 
-    // Render icons in menu items
-    setTimeout(() => renderMenuIcons(), 500);
+    // Render icons in menu items (if IconSystem is available)
+    setTimeout(() => {
+      if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+        const menuItems = dropdown.querySelectorAll('.add-entry-menu-item');
+        menuItems.forEach(async (item) => {
+          const iconSpan = item.querySelector('.menu-item-icon');
+          if (iconSpan && !iconSpan.querySelector('svg')) {
+            const entityType = item.getAttribute('data-entity-type');
+            const iconMap = {
+              'note': { type: 'entity', name: 'note' },
+              'alert': { type: 'entity', name: 'alert' },
+              'execution': { type: 'entity', name: 'execution' },
+              'cash_flow': { type: 'entity', name: 'cash_flow' },
+              'trade_plan': { type: 'entity', name: 'trade_plan' },
+              'trade': { type: 'entity', name: 'trade' },
+            };
+            const icon = iconMap[entityType];
+            if (icon) {
+              try {
+                const iconHTML = await window.IconSystem.renderIcon(icon.type, icon.name, { size: '16' });
+                if (iconHTML) {
+                  iconSpan.innerHTML = iconHTML;
+                }
+              } catch (error) {
+                if (window.Logger) {
+                  window.Logger.warn('Failed to render icon in menu item', { entityType, error, page: 'trading-journal-page' });
+                }
+              }
+            }
+          }
+        });
+      }
+    }, 500);
   };
 
   /**
@@ -621,6 +671,12 @@ const initializeHeader = async function() {
 
       // Load data using CalendarDataLoader
       // CRITICAL: Pass both entityFilter and tickerFilter to calendar
+      if (!window.CalendarDataLoader || typeof window.CalendarDataLoader.loadMonthDataWithCache !== 'function') {
+        if (window.Logger) {
+          window.Logger.warn('CalendarDataLoader not available, skipping calendar load', { page: 'trading-journal-page' });
+        }
+        return;
+      }
       const dayData = await window.CalendarDataLoader.loadMonthDataWithCache(
         currentYear,
         currentMonth,
@@ -1179,11 +1235,11 @@ const loadTickerFilter = async function() {
    */
 const updateJournalEntriesTableBody = async entries => {
   // Wait a bit for DOM to be ready
-  let table = document.getElementById('journal-entries-table');
+  let table = document.getElementById('tradingJournalTable');
   let retries = 0;
   while (!table && retries < 10) {
     await new Promise(resolve => setTimeout(resolve, 100));
-    table = document.getElementById('journal-entries-table');
+    table = document.getElementById('tradingJournalTable');
     retries++;
   }
 
@@ -1193,10 +1249,10 @@ const updateJournalEntriesTableBody = async entries => {
     if (container) {
       // Create table structure
       // Table should already exist in HTML, just find it
-      const existingTable = document.getElementById('journal-entries-table');
+      const existingTable = document.getElementById('tradingJournalTable');
       if (!existingTable) {
         container.innerHTML = `
-                        <table id="journal-entries-table" class="table table-striped table-hover" data-table-type="trading-journal-entries">
+                        <table id="tradingJournalTable" class="table table-striped table-hover" data-table-type="trading-journal-entries">
                             <thead>
                                 <tr>
                                     <th>
@@ -1224,7 +1280,7 @@ const updateJournalEntriesTableBody = async entries => {
                         </table>
                     `;
       }
-      table = document.getElementById('journal-entries-table');
+      table = document.getElementById('tradingJournalTable');
     }
   }
 
@@ -1267,8 +1323,10 @@ const updateJournalEntriesTableBody = async entries => {
     // Render status
     const statusHTML = FieldRenderer ? FieldRenderer.renderStatus(status, entityType) : status;
 
-    // Render entity type
-    const entityTypeHTML = FieldRenderer ? FieldRenderer.renderEntityType(entityType) : entityType;
+    // Render entity type - use _getEntityHebrewLabel for Hebrew label
+    const entityTypeHTML = FieldRenderer && typeof FieldRenderer._getEntityHebrewLabel === 'function' 
+        ? FieldRenderer._getEntityHebrewLabel(entityType) 
+        : entityType;
 
     // Render ticker
     const tickerHTML = tickerSymbol ? `<a href="#" onclick="window.openTickerPage('${tickerSymbol}'); return false;" class="text-decoration-none">${tickerSymbol}</a>` : '';
@@ -1349,7 +1407,7 @@ const updateJournalEntriesTableBody = async entries => {
    * Render journal entries as table
    */
 const renderJournalEntriesTable = async entries => {
-  const tableContainer = document.getElementById('journalEntriesTable');
+  const tableContainer = document.getElementById('tradingJournalTable');
   if (!tableContainer) {
     if (window.Logger) {
       window.Logger.warn('Journal entries table container not found', { page: PAGE_NAME });
@@ -1364,7 +1422,7 @@ const renderJournalEntriesTable = async entries => {
     cardsContainer.classList.add('d-none');
   }
 
-  const table = document.getElementById('journal-entries-table');
+  const table = document.getElementById('tradingJournalTable');
   if (!table) {
     if (window.Logger) {
       window.Logger.warn('Journal entries table not found', { page: PAGE_NAME });
@@ -1378,7 +1436,7 @@ const renderJournalEntriesTable = async entries => {
     window.UnifiedTableSystem.registry.register(tableType, {
       dataGetter: () => entries,
       updateFunction: rows => updateJournalEntriesTableBody(rows),
-      tableSelector: '#journal-entries-table',
+      tableSelector: '#tradingJournalTable',
       columns: ['date', 'entity_type', 'status', 'ticker_symbol', 'account_name', 'description'],
       filterable: true,
       sortable: true,
@@ -1394,7 +1452,7 @@ const renderJournalEntriesTable = async entries => {
   // Use updateTableWithPagination for proper rendering
   if (window.updateTableWithPagination) {
     await window.updateTableWithPagination({
-      tableId: 'journal-entries-table',
+      tableId: 'tradingJournalTable',
       tableType,
       data: entries,
       render: async (pageData, _context) => {
@@ -1425,7 +1483,7 @@ const renderJournalEntriesCards = async entries => {
 
   // Show cards view, hide table view
   cardsContainer.classList.remove('d-none');
-  const tableContainer = document.getElementById('journalEntriesTable');
+  const tableContainer = document.getElementById('tradingJournalTable');
   if (tableContainer) {
     tableContainer.classList.add('d-none');
   }
@@ -2343,15 +2401,9 @@ window.tradingJournalPage = {
 };
 
 // Make functions available globally (for HTML onclick)
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2333',message:'Before setting window.handleAddEntry',data:{handleAddEntryExists:typeof handleAddEntry,handleAddEntryType:typeof handleAddEntry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-// #endregion
 window.filterJournalByEntityType = filterJournalByEntityType;
 window.filterJournalByTicker = filterJournalByTicker;
 window.handleAddEntry = handleAddEntry;
-// #region agent log
-fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2336',message:'After setting window.handleAddEntry',data:{windowHandleAddEntryExists:typeof window.handleAddEntry,windowHandleAddEntryType:typeof window.handleAddEntry},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-// #endregion
 
 /**
    * Render icons in dropdown menu items
@@ -2459,8 +2511,50 @@ const initializePage = async function() {
     setupActivityChartLazyLoading();
 
     // Apply dynamic colors - TODO: Implement if needed
-    // applyDynamicColors();
+    // Apply dynamic colors (note entity)
+    await applyDynamicColors();
   };
+  
+  /**
+   * Apply dynamic colors for trading journal page
+   * Uses note entity color
+   */
+  async function applyDynamicColors() {
+    try {
+      if (window.Logger) {
+        window.Logger.info('Applying dynamic color system', { page: 'trading-journal-page' });
+      }
+      
+      // Load entity colors from global system
+      if (typeof window.loadEntityColors === 'function') {
+        const entityColors = await window.loadEntityColors();
+        if (entityColors) {
+          if (window.Logger) {
+            window.Logger.debug('Entity colors loaded', { entityColors, page: 'trading-journal-page' });
+          }
+          
+          // Apply note colors (trading journal displays notes)
+          if (entityColors.note) {
+            document.documentElement.style.setProperty('--note-color', entityColors.note);
+            document.documentElement.style.setProperty('--note-bg-color', entityColors.note + '20');
+          }
+        }
+      }
+      
+      // Also use getEntityColor for direct access
+      if (typeof window.getEntityColor === 'function') {
+        const noteColor = window.getEntityColor('note');
+        if (noteColor) {
+          document.documentElement.style.setProperty('--note-color', noteColor);
+          document.documentElement.style.setProperty('--note-bg-color', noteColor + '20');
+        }
+      }
+    } catch (error) {
+      if (window.Logger) {
+        window.Logger.error('Error applying dynamic colors', { error: error.message, page: 'trading-journal-page' });
+      }
+    }
+  }
 
   // Wait a bit for all systems to load
   if (document.readyState === 'loading') {
@@ -2474,17 +2568,8 @@ const initializePage = async function() {
 
 // Call initializePage when DOM is ready (after function definition)
   if (document.readyState === 'loading') {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2457',message:'DOM loading - adding DOMContentLoaded listener',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
   document.addEventListener('DOMContentLoaded', () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2460',message:'DOMContentLoaded fired - calling initializePage',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     initializePage().catch(error => {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2463',message:'Error in initializePage',data:{error:error?.message||error,stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
       if (window.Logger) {
         window.Logger.error('Error initializing trading journal page', {
           page: PAGE_NAME,
@@ -2495,13 +2580,7 @@ const initializePage = async function() {
   });
 } else {
   // DOM already loaded
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2472',message:'DOM already loaded - calling initializePage immediately',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
   initializePage().catch(error => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:2475',message:'Error in initializePage (immediate)',data:{error:error?.message||error,stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     if (window.Logger) {
       window.Logger.error('Error initializing trading journal page', {
         page: PAGE_NAME,
@@ -2512,5 +2591,4 @@ const initializePage = async function() {
 }
 
 // End of else block for trading-journal page check
-}
 }

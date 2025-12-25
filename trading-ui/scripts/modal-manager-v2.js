@@ -1322,6 +1322,19 @@ class ModalManagerV2 {
             
             console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode, isDynamic: modalInfo.isDynamic });
             
+            // Apply dynamic colors for modals with headerType: 'dynamic'
+            if (modalInfo.config && modalInfo.config.headerType === 'dynamic') {
+                const entityType = modalInfo.config.entityType;
+                if (entityType && window.setCurrentEntityColorForEntity) {
+                    try {
+                        await window.setCurrentEntityColorForEntity(entityType);
+                        console.log(`🎨 Applied dynamic colors for modal ${modalId} with entity type: ${entityType}`);
+                    } catch (colorError) {
+                        console.warn(`⚠️ Failed to apply dynamic colors for modal ${modalId}:`, colorError);
+                    }
+                }
+            }
+
             // אם זה מודל דינמי (ללא config), נשתמש בטיפול מינימלי
             if (modalInfo.isDynamic) {
                 // למודלים דינמיים - פשוט פתיחה דרך Bootstrap
@@ -4779,19 +4792,49 @@ class ModalManagerV2 {
                 // Skip if field already has a value
                 if (fieldElement.value) continue;
                 
-                // For select fields with defaultFromPreferences, let SelectPopulatorService handle it
-                // BUT we still need to handle other select fields (like executionCommission which is an INPUT)
+                // For select fields with defaultFromPreferences, we need to handle them AFTER SelectPopulatorService populates options
+                // SelectPopulatorService only populates options, it doesn't always set the default value
+                // So we need to apply the preference value ourselves
                 if (fieldElement.tagName === 'SELECT') {
-                    // Skip if this is an account or currency field handled by SelectPopulatorService
-                    // BUT only if it doesn't have defaultFromPreferences in config
-                    if (field.defaultFromPreferences) {
-                        console.log(`⏭️ Skipping ${field.id} - will be handled by SelectPopulatorService`);
+                    // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService with defaultFromPreferences)
+                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
                         continue;
                     }
                     
-                    // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService)
-                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
-                        continue;
+                    // For SELECT fields with defaultFromPreferences, apply preference value AFTER options are populated
+                    if (field.defaultFromPreferences) {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4803',message:'Checking defaultFromPreferences for SELECT',data:{fieldId:field.id,fieldValueBefore:fieldElement.value,optionsCount:fieldElement.options.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'M'})}).catch(()=>{});
+                        // #endregion
+                        if (window.getPreferenceFromMemory) {
+                            const prefName = this._getPreferenceNameForField(field.id);
+                            // #region agent log
+                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4806',message:'Preference name mapped for SELECT',data:{fieldId:field.id,prefName,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'N'})}).catch(()=>{});
+                            // #endregion
+                            if (prefName) {
+                                const prefValue = await window.getPreferenceFromMemory(prefName);
+                                // #region agent log
+                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4809',message:'Preference value retrieved for SELECT',data:{fieldId:field.id,prefName,prefValue,fieldValueBefore:fieldElement.value,hasOption:!!fieldElement.querySelector(`option[value="${prefValue}"]`)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'O'})}).catch(()=>{});
+                                // #endregion
+                                if (prefValue !== null && prefValue !== undefined) {
+                                    // Check if the option exists in the select
+                                    const optionExists = fieldElement.querySelector(`option[value="${prefValue}"]`);
+                                    if (optionExists) {
+                                        fieldElement.value = String(prefValue);
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4814',message:'Preference applied to SELECT field',data:{fieldId:field.id,prefName,prefValue,fieldValueAfter:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'P'})}).catch(()=>{});
+                                        // #endregion
+                                        console.log(`✅ Applied preference default for SELECT ${field.id} (${prefName}):`, prefValue);
+                                        continue;
+                                    } else {
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4819',message:'Option not found in SELECT',data:{fieldId:field.id,prefName,prefValue,optionsCount:fieldElement.options.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'Q'})}).catch(()=>{});
+                                        // #endregion
+                                        console.log(`⚠️ Option ${prefValue} not found in SELECT ${field.id}`);
+                                    }
+                                }
+                            }
+                        }
                     }
                     
                     // Apply defaultValue for other select fields (e.g., source)
@@ -4816,26 +4859,47 @@ class ModalManagerV2 {
                     continue;
                 }
                 
-                // Apply defaultFromPreferences first (before defaultValue)
+                // Apply defaultFromPreferences first (before defaultValue) for non-SELECT fields
                 if (field.defaultFromPreferences) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4833',message:'Checking defaultFromPreferences',data:{fieldId:field.id,hasGetPreferenceFromMemory:!!window.getPreferenceFromMemory},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                    // #endregion
                     console.log(`🔍 Checking defaultFromPreferences for field: ${field.id}`);
                     if (window.getPreferenceFromMemory) {
                         const prefName = this._getPreferenceNameForField(field.id);
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4837',message:'Preference name mapped',data:{fieldId:field.id,prefName,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+                        // #endregion
                         console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
                         if (prefName) {
                             const prefValue = await window.getPreferenceFromMemory(prefName);
+                            // #region agent log
+                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4840',message:'Preference value retrieved',data:{fieldId:field.id,prefName,prefValue,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                            // #endregion
                             console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
                             if (prefValue !== null && prefValue !== undefined) {
                                 fieldElement.value = prefValue;
+                                // #region agent log
+                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4842',message:'Preference applied to field',data:{fieldId:field.id,prefName,prefValue,fieldValueAfter:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+                                // #endregion
                                 console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
                                 continue;
                             } else {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4846',message:'No preference value found',data:{fieldId:field.id,prefName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+                                // #endregion
                                 console.log(`⚠️ No preference value found for ${prefName}`);
                             }
                         } else {
+                            // #region agent log
+                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4849',message:'No preference mapping found',data:{fieldId:field.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'K'})}).catch(()=>{});
+                            // #endregion
                             console.log(`⚠️ No preference name mapping found for field: ${field.id}`);
                         }
                     } else {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4852',message:'getPreferenceFromMemory not available',data:{fieldId:field.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'L'})}).catch(()=>{});
+                        // #endregion
                         console.log(`⚠️ getPreferenceFromMemory not available`);
                     }
                 }
@@ -6341,14 +6405,23 @@ class ModalManagerV2 {
 
                 let assignedValue = null;
 
-                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
-                    assignedValue = window.DefaultValueSetter.setCurrentDate(entryDateInput.id);
+                // CRITICAL FIX: Check field type - datetime-local needs time component
+                const includeTime = (entryDateInput.type || '').toLowerCase() === 'datetime-local';
+                if (window.DefaultValueSetter) {
+                    if (includeTime && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+                        assignedValue = window.DefaultValueSetter.setCurrentDateTime(entryDateInput.id);
+                    } else if (typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                        assignedValue = window.DefaultValueSetter.setCurrentDate(entryDateInput.id);
+                    }
                 }
 
                 if (!assignedValue) {
                     const today = new Date();
                     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-                    assignedValue = today.toISOString().slice(0, 10);
+                    // CRITICAL FIX: Use correct format based on field type
+                    assignedValue = includeTime
+                        ? today.toISOString().slice(0, 16)  // datetime-local: yyyy-MM-ddThh:mm
+                        : today.toISOString().slice(0, 10);  // date: yyyy-MM-dd
                     entryDateInput.value = assignedValue;
                 } else {
                     entryDateInput.value = assignedValue;

@@ -766,8 +766,15 @@ class IntegratedCRUDE2ETester {
             // Ensure no existing iframes before loading new one
             this.cleanupTestIframes();
             
-            // Load page in iframe (add .html extension if needed)
-            const pageUrl = page.url.endsWith('.html') ? page.url : `${page.url}.html`;
+            // Load page in iframe (handle special cases like index page)
+            let pageUrl = page.url;
+            if (pageKey === 'index') {
+                // Index page is served at root, use /index.html
+                pageUrl = '/index.html';
+            } else if (!pageUrl.endsWith('.html')) {
+                pageUrl = `${pageUrl}.html`;
+            }
+            
             const iframe = await this.loadPageInIframe(pageUrl);
             const iframeWindow = iframe.contentWindow;
             const iframeDocument = iframe.contentDocument;
@@ -1220,14 +1227,20 @@ class IntegratedCRUDE2ETester {
                 timestamp: Date.now()
             };
 
-            // Store in iframe's sessionStorage
+            // Store in iframe's sessionStorage - CRITICAL: Use dev_authToken (not auth_token) for compatibility
             if (iframeWindow.sessionStorage) {
+                // Store with dev_authToken key (required by api-fetch-wrapper.js and auth.js)
+                iframeWindow.sessionStorage.setItem('dev_authToken', authData.token);
+                iframeWindow.sessionStorage.setItem('dev_currentUser', JSON.stringify(authData.user));
+                // Also store with auth_token for backward compatibility
                 iframeWindow.sessionStorage.setItem('auth_token', authData.token);
                 iframeWindow.sessionStorage.setItem('user_data', JSON.stringify(authData.user));
                 iframeWindow.sessionStorage.setItem('recent_login_timestamp', authData.timestamp.toString());
                 this.logger?.debug('🔐 [authenticateIframe] SessionStorage set', {
-                    tokenSet: !!iframeWindow.sessionStorage.getItem('auth_token'),
-                    userSet: !!iframeWindow.sessionStorage.getItem('user_data'),
+                    dev_authTokenSet: !!iframeWindow.sessionStorage.getItem('dev_authToken'),
+                    dev_currentUserSet: !!iframeWindow.sessionStorage.getItem('dev_currentUser'),
+                    auth_tokenSet: !!iframeWindow.sessionStorage.getItem('auth_token'),
+                    userDataSet: !!iframeWindow.sessionStorage.getItem('user_data'),
                     page: 'crud_testing_dashboard',
                     hypothesisId: 'A'
                 });
@@ -2571,7 +2584,7 @@ class IntegratedCRUDE2ETester {
             
             const entityType = entityTypeMap[pageKey] || pageKey;
             const fieldMaps = this.getEntityFieldMaps();
-            const fieldMap = fieldMaps[entityType];
+            let fieldMap = fieldMaps[entityType];
             
             if (!fieldMap) {
                 throw new Error(`No field map found for entity type: ${entityType}`);
@@ -5341,11 +5354,16 @@ Cash Report,Data,Total Cash Change,-1501.00`;
     }
 
     updateDashboard() {
-        // Update main dashboard statistics
-        document.getElementById('totalTestsCount').textContent = this.stats.totalTests;
-        document.getElementById('passedTestsCount').textContent = this.stats.passed;
-        document.getElementById('failedTestsCount').textContent = this.stats.failed;
-        document.getElementById('executionTime').textContent = `${this.stats.executionTime}ms`;
+        // Update main dashboard statistics (only if elements exist)
+        const totalTestsEl = document.getElementById('totalTestsCount');
+        const passedTestsEl = document.getElementById('passedTestsCount');
+        const failedTestsEl = document.getElementById('failedTestsCount');
+        const executionTimeEl = document.getElementById('executionTime');
+        
+        if (totalTestsEl) totalTestsEl.textContent = this.stats.totalTests;
+        if (passedTestsEl) passedTestsEl.textContent = this.stats.passed;
+        if (failedTestsEl) failedTestsEl.textContent = this.stats.failed;
+        if (executionTimeEl) executionTimeEl.textContent = `${this.stats.executionTime}ms`;
     }
 
     updateTestResults() {

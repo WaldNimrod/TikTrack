@@ -80,10 +80,53 @@ class InfoSummarySystem {
       
       // Sum a numeric field
       sumField: (data, params) => {
-        return data.reduce((sum, item) => {
+        const result = data.reduce((sum, item) => {
           const value = parseFloat(item[params.field]);
-          return sum + (isNaN(value) ? 0 : value);
+          const isValid = !isNaN(value);
+          if (!isValid) {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                sessionId: 'debug-session',
+                runId: 'zero-values-investigation',
+                hypothesisId: 'SUM_CALCULATION',
+                location: 'info-summary-system.js:sumField-invalid-value',
+                message: 'sumField found invalid value',
+                data: {
+                  field: params.field,
+                  itemValue: item[params.field],
+                  itemType: typeof item[params.field],
+                  parsedValue: value,
+                  isNaN: isNaN(value),
+                  itemKeys: Object.keys(item).slice(0, 10)
+                },
+                timestamp: Date.now()
+              })
+            }).catch(() => {});
+          }
+          return sum + (isValid ? value : 0);
         }, 0);
+
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'zero-values-investigation',
+            hypothesisId: 'SUM_CALCULATION',
+            location: 'info-summary-system.js:sumField-result',
+            message: 'sumField calculation result',
+            data: {
+              field: params.field,
+              dataLength: data.length,
+              result: result,
+              containerId: document.querySelector('[id]')?.id || 'unknown' // Try to get current page context
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+        // #endregion
+
+        return result;
       },
       
       // Average of a field
@@ -521,8 +564,29 @@ class InfoSummarySystem {
    * @returns {Promise<void>}
    */
   async calculateAndRender(data, config) {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'zero-values-investigation',
+        hypothesisId: 'DATA_CALCULATION',
+        location: 'info-summary-system.js:calculateAndRender-entry',
+        message: 'calculateAndRender called with data analysis',
+        data: {
+          containerId: config?.containerId,
+          providedDataLength: Array.isArray(data) ? data.length : 'not-array',
+          providedDataType: typeof data,
+          firstDataItem: Array.isArray(data) && data.length > 0 ? Object.keys(data[0]).slice(0, 5) : 'no-data',
+          statsCount: config?.stats?.length,
+          tableType: config?.tableType
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+
     const dataset = this._resolveDataSource(data, config);
-    
+
     // Use Logger.debug instead of console.log to avoid cluttering console
     if (window.Logger && window.Logger.debug) {
       window.Logger.debug('InfoSummarySystem.calculateAndRender called', {
@@ -552,10 +616,10 @@ class InfoSummarySystem {
     try {
       // Calculate statistics (now async to support async calculators)
       const stats = await this.calculateStatsFromData(dataset, config.stats);
-      
+
       // Render the summary
       this.renderInfoSummary(config.containerId, stats, config);
-      
+
     } catch (error) {
       if (window.Logger && window.Logger.error) {
         window.Logger.error('Error in InfoSummarySystem.calculateAndRender:', error, { page: 'info-summary-system' });

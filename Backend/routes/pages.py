@@ -127,10 +127,10 @@ def ai_analysis_old() -> Any:
     from flask import redirect
     return redirect('/ai-analysis', code=301)
 
-@pages_bp.route('/tag-management')
+@pages_bp.route('/tag_management')
 def tag_management() -> Any:
     """Tag management page"""
-    return send_from_directory(UI_DIR, "tag-management.html")
+    return send_from_directory(UI_DIR, "tag_management.html")
 
 @pages_bp.route('/preferences-new')
 def preferences_new() -> Any:

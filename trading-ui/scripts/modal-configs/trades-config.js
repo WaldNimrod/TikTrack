@@ -248,7 +248,7 @@ function initializeTradesModal() {
             window.Logger?.debug?.('✅ Trades modal created successfully', { page: 'trades-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Trades modal:', error);
+            window.Logger?.error?.('❌ Error creating Trades modal:', error, { page: 'trades-config' });
             return false;
         }
     }
@@ -264,7 +264,7 @@ if (window.ModalManagerV2) {
                 if (!initializeTradesModal()) {
                     setTimeout(() => {
                         if (!initializeTradesModal()) {
-                            console.warn('⚠️ ModalManagerV2 not available for Trades modal after retries');
+                            window.Logger?.debug?.('⚠️ ModalManagerV2 not available for Trades modal after retries', { page: 'trades-config' });
                         }
                     }, 500);
                 }

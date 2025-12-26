@@ -114,7 +114,7 @@ class IntegratedCRUDE2ETester {
                     ticker_id: { id: '#tradeTicker', type: 'int', required: true },
                     status: { id: '#tradeStatus', type: 'text', required: true, default: 'open' },
                     side: { id: '#tradeSide', type: 'text', required: true, default: 'Long' },
-                    investment_type: { id: '#tradeType', type: 'text', required: true, default: 'Swing' },
+                    investment_type: { id: '#tradeType', type: 'text', required: true, default: 'swing' },
                     planned_quantity: { id: '#tradeQuantity', type: 'number', required: true, default: 100 },
                     entry_price: { id: '#tradeEntryPrice', type: 'number', required: true, default: 100 },
                     // Note: stop_price and target_price are not in Trade model - they exist only in TradePlan
@@ -125,12 +125,12 @@ class IntegratedCRUDE2ETester {
                 modalId: 'tradesModal'
             },
             trade_plan: {
-                required: ['trading_account_id', 'ticker_id', 'side', 'investment_type', 'status'],
+                required: ['trading_account_id', 'ticker_id', 'side', 'investment_type', 'status', 'entry_price'],
                 fields: {
                     trading_account_id: { id: '#tradePlanAccount', type: 'int', required: true },
                     ticker_id: { id: '#tradePlanTicker', type: 'int', required: true },
                     side: { id: '#tradePlanSide', type: 'text', required: true, default: 'Long' },
-                    investment_type: { id: '#tradePlanType', type: 'text', required: true, default: 'Swing' },
+                    investment_type: { id: '#tradePlanType', type: 'text', required: true, default: 'swing' },
                     status: { id: '#tradePlanStatus', type: 'text', required: true, default: 'open' },
                     planned_amount: { id: '#planAmount', type: 'number', required: true, default: 10000 },
                     entry_price: { id: '#tradePlanEntryPrice', type: 'number', required: true, default: 100 },
@@ -427,6 +427,13 @@ class IntegratedCRUDE2ETester {
             // Run generic CRUD tests for all pages (including trades, alerts, user_profile)
             // This uses the unified approach with DataCollectionService, validation, and UnifiedCRUDService
             for (const [pageKey, page] of crudPages) {
+                // #endregion
+                
+                // Clean up any existing iframes before starting new test
+                this.cleanupTestIframes();
+                
+                const iframesBeforeTest = document.querySelectorAll('iframe[id^="test-iframe-"]').length;
+                // #endregion
                 
                 try {
                     // Special handling for tag_management (has two CRUD types: categories and tags)
@@ -452,8 +459,11 @@ class IntegratedCRUDE2ETester {
                     
                     // Generic CRUD test for all other pages
                     this.logger?.info(`🔵 [runE2ETests] Running generic CRUD test for ${page.name}`);
+                    // #endregion
                     await this.runGenericCRUDTest(pageKey, page);
+                    // #endregion
                 } catch (error) {
+                    // #endregion
                     this.logger?.error(`❌ [runE2ETests] Test failed for ${page.name}`, { error: error.message });
                     this.results.e2e.push({
                         workflow: `${page.name} CRUD`,
@@ -461,6 +471,14 @@ class IntegratedCRUDE2ETester {
                         error: error.message,
                         executionTime: 0
                     });
+                } finally {
+                    // Clean up iframes after each test
+                    this.cleanupTestIframes();
+                    const iframesAfterTest = document.querySelectorAll('iframe[id^="test-iframe-"]').length;
+                    // #endregion
+                    
+                    // Small delay between tests to allow cleanup to complete
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
 
@@ -956,9 +974,6 @@ class IntegratedCRUDE2ETester {
                 }
             }
 
-            // Wait for page to load with instrumentation
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -977,8 +992,6 @@ class IntegratedCRUDE2ETester {
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             // Check if scripts are loaded after initial wait
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1001,8 +1014,6 @@ class IntegratedCRUDE2ETester {
             
             // If InfoSummarySystem not loaded, wait longer with polling
             if (!iframeWindow.InfoSummarySystem) {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1021,8 +1032,6 @@ class IntegratedCRUDE2ETester {
                 for (let i = 0; i < 10; i++) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     if (iframeWindow.InfoSummarySystem) {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1047,7 +1056,6 @@ class IntegratedCRUDE2ETester {
             }
 
             // Instrumentation: Log page details
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1068,8 +1076,6 @@ class IntegratedCRUDE2ETester {
             }).catch(() => {});
 
             // Check 1: Info Summary System loaded
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1094,8 +1100,6 @@ class IntegratedCRUDE2ETester {
             
             if (!iframeWindow.InfoSummarySystem) {
                 issues.push('InfoSummarySystem not loaded');
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1127,7 +1131,6 @@ class IntegratedCRUDE2ETester {
             // Use iframe's INFO_SUMMARY_CONFIGS, not parent window's
             const config = iframeWindow.INFO_SUMMARY_CONFIGS?.[configKey] || window.INFO_SUMMARY_CONFIGS?.[configKey];
             
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1153,8 +1156,6 @@ class IntegratedCRUDE2ETester {
                 const containerId = config.containerId || 'summaryStats';
                 const container = iframeDocument.getElementById(containerId);
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1214,7 +1215,7 @@ class IntegratedCRUDE2ETester {
                                 // Ignore errors - page might already be initialized
                             }
                         }
-                        
+
                         if (pageKey === 'portfolio_state' && typeof iframeWindow.loadPortfolioState === 'function') {
                             try {
                                 // Trigger portfolio state loading
@@ -1229,13 +1230,37 @@ class IntegratedCRUDE2ETester {
                             await new Promise(resolve => setTimeout(resolve, 500));
                             statElements = container.querySelectorAll(statSelectors.join(', '));
                             statElementsCount = statElements.length;
+
+                            if (i === 0 || i === 7 || i === 15 || statElementsCount > 0) { // Log first, middle, last, and when found
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        location: 'crud_testing_dashboard.js:testPageInfoSummary-polling',
+                                        message: `Polling iteration ${i + 1}/16`,
+                                        data: {
+                                            pageKey,
+                                            iteration: i + 1,
+                                            statElementsCount,
+                                            expectedStatsCount,
+                                            containerExists: !!container,
+                                            containerChildrenCount: container ? container.children.length : 0,
+                                            containerInnerHTML: container ? (container.innerHTML.length > 200 ? container.innerHTML.substring(0, 200) + '...' : container.innerHTML) : 'no-container'
+                                        },
+                                        timestamp: Date.now(),
+                                        sessionId: 'debug-session',
+                                        runId: 'info-summary-test',
+                                        hypothesisId: 'A,D'
+                                    })
+                                }).catch(() => {});
+                            }
+                            // #endregion
+
                             if (statElementsCount > 0) {
                                 break; // Found stat elements, stop polling
                             }
                         }
                     }
                     
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1256,8 +1281,6 @@ class IntegratedCRUDE2ETester {
                         })
                     }).catch(() => {});
 
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1294,8 +1317,6 @@ class IntegratedCRUDE2ETester {
                                               container.querySelector(`[data-stat-id="${stat.id}"]`);
                             if (!statElement) {
                                 warnings.push(`Stat element for '${stat.id}' (${stat.label}) not found`);
-                                // #region agent log
-                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
@@ -1921,14 +1942,12 @@ class IntegratedCRUDE2ETester {
                 const element = doc.querySelector(selector);
                 const elementExists = !!element;
                 
-                // Check if API calls are being made (hypothesis C)
                 if (attemptCount === 1) {
                     // Check if there are any API calls in progress or completed
                     const apiCallsMade = window.performance?.getEntriesByType('resource')
                         .filter(r => r.name.includes('/api/') && (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest'))
                         .length || 0;
                     
-                    // Check iframe services (hypothesis E)
                     const iframeWindow = iframe.contentWindow;
                     const servicesAvailable = {
                         UnifiedCRUDService: !!iframeWindow?.UnifiedCRUDService,
@@ -1995,11 +2014,9 @@ class IntegratedCRUDE2ETester {
             const doc = this.getIframeDocument(iframe);
             const element = doc?.querySelector(selector);
             
-            // Check for JavaScript errors in iframe (hypothesis D)
             const iframeWindow = iframe.contentWindow;
             const hasErrors = iframeWindow?.console?.error?.toString().includes('error') || false;
             
-            // Check if services are available (hypothesis E)
             const servicesAvailable = {
                 UnifiedCRUDService: !!iframeWindow?.UnifiedCRUDService,
                 DataCollectionService: !!iframeWindow?.DataCollectionService,
@@ -2014,7 +2031,6 @@ class IntegratedCRUDE2ETester {
                 .filter(r => r.name.includes('/api/') && (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest'))
                 .map(r => ({ url: r.name, status: r.responseStatus || 'pending', duration: r.duration })) || [];
             
-            // Check iframe document structure (hypothesis B)
             const domStructure = {
                 hasBody: !!doc?.body,
                 bodyChildren: doc?.body?.children?.length || 0,
@@ -3007,10 +3023,21 @@ class IntegratedCRUDE2ETester {
             
             let entityType = entityTypeMap[pageKey] || pageKey;
             const fieldMaps = this.getEntityFieldMaps();
-            let fieldMap = fieldMaps[entityType];
             
+            // Special handling for trading_journal - it's an interface, not an entity
+            // It uses note entity type for CRUD operations
+            let fieldMap;
+            if (entityType === 'trading_journal') {
+                // trading_journal is an interface page - use note fieldMap
+                fieldMap = fieldMaps.note;
+                if (!fieldMap) {
+                    throw new Error('No field map found for note entity type (required for trading_journal)');
+                }
+            } else {
+                fieldMap = fieldMaps[entityType];
             if (!fieldMap) {
                 throw new Error(`No field map found for entity type: ${entityType}`);
+                }
             }
             
             // Step 1: Load page in iframe
@@ -3109,6 +3136,7 @@ class IntegratedCRUDE2ETester {
                     this.updateTestResults();
             
             if (!iframeWindow.ModalManagerV2 || typeof iframeWindow.ModalManagerV2.showModal !== 'function') {
+                // #endregion
                 throw new Error('ModalManagerV2 not available in iframe');
             }
             
@@ -3149,8 +3177,9 @@ class IntegratedCRUDE2ETester {
                         const tickers = tickersData.data || tickersData || [];
                         const existingSymbols = new Set(tickers.map(t => t.symbol?.toUpperCase()).filter(Boolean));
                         
-                        // Try known symbols first, find one that doesn't exist
-                        const knownSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'JNJ', 'WMT', 'MA', 'PG', 'UNH', 'DIS', 'HD', 'PYPL', 'BAC', 'VZ', 'ADBE', 'NFLX', 'CMCSA', 'KO', 'NKE', 'MRK', 'PFE', 'T', 'XOM', 'CVX', 'CSCO', 'INTC', 'AMD', 'QCOM', 'AVGO', 'TXN', 'LRCX', 'ASML', 'SNPS', 'CDNS', 'MCHP'];
+                        // Try known symbols first, find one that doesn't exist and returns external data
+                        // These symbols are known to return data from external providers
+                        const knownSymbols = ['NVDA', 'TSLA', 'AMD', 'INTC', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NFLX', 'PYPL', 'ADBE', 'CRM', 'ORCL', 'CSCO', 'QCOM', 'TXN', 'AVGO', 'LRCX', 'ASML', 'SNPS', 'CDNS', 'MCHP', 'MU', 'MRVL', 'KLAC', 'AMAT', 'TER', 'ON', 'MPWR', 'SWKS', 'QRVO', 'CRUS', 'SYNA', 'ENTG'];
                         const availableSymbol = knownSymbols.find(s => !existingSymbols.has(s.toUpperCase()));
                         
                         if (availableSymbol) {
@@ -3189,13 +3218,16 @@ class IntegratedCRUDE2ETester {
                     // Special handling for ticker symbol - use available symbol
                     if (entityType === 'ticker' && fieldName === 'symbol') {
                         testData[fieldName] = tickerSymbol || 'AAPL'; // Fallback to AAPL if all else fails
+                        console.log(`📊 DEBUG: Set ticker symbol in testData: ${testData[fieldName]} (tickerSymbol was: ${tickerSymbol})`);
                     } else {
                         // For select elements (int type usually means select with IDs), we'll set the value after the form is loaded
                         // For now, generate placeholder values
                         switch (fieldConfig.type) {
                             case 'text':
-                                // Check if field has maxLength constraint
-                                if (fieldConfig.maxLength) {
+                                // Special handling for investment_type - use lowercase values that match SELECT options
+                                if (fieldName === 'investment_type') {
+                                    testData[fieldName] = 'swing'; // Use lowercase to match SELECT option values
+                                } else if (fieldConfig.maxLength) {
                                     // Generate text that fits within maxLength
                                     const baseText = `Test${fieldName}`;
                                     testData[fieldName] = baseText.substring(0, Math.min(fieldConfig.maxLength, baseText.length));
@@ -3341,8 +3373,62 @@ class IntegratedCRUDE2ETester {
             // Set form values using DataCollectionService
             let setFormDataResult = null;
             if (iframeWindow.DataCollectionService.setFormData) {
+                // #endregion
+                // Additional debug for ticker symbol
+                if (entityType === 'ticker') {
+                    console.log(`🎯 DEBUG: Ticker testData.symbol = ${testData.symbol}`);
+                    // Check if the form field exists and gets populated
+                    const symbolElement = iframeDoc.querySelector('#tickerSymbol');
+                    if (symbolElement) {
+                        console.log(`🎯 DEBUG: Found tickerSymbol element, current value: "${symbolElement.value}"`);
+                    } else {
+                        console.log(`🎯 DEBUG: tickerSymbol element NOT found in DOM`);
+                    }
+                }
                 setFormDataResult = iframeWindow.DataCollectionService.setFormData(fieldMap.fields, testData);
-                
+                // #endregion
+
+                // Additional direct setting for problematic fields
+                for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+                    if (fieldConfig.default !== undefined || testData[fieldName] !== undefined) {
+                        const element = iframeDoc.querySelector(fieldConfig.id);
+                        if (element) {
+                            const valueToSet = fieldConfig.default !== undefined ? fieldConfig.default : testData[fieldName];
+                            if (valueToSet !== undefined && valueToSet !== null) {
+                                if (fieldConfig.type === 'bool' || fieldConfig.type === 'boolean' || fieldConfig.type === 'checkbox') {
+                                    element.checked = Boolean(valueToSet);
+                                } else {
+                                    element.value = valueToSet;
+                                }
+                                element.dispatchEvent(new Event('input', { bubbles: true }));
+                                element.dispatchEvent(new Event('change', { bubbles: true }));
+                                console.log(`🔧 DEBUG: Directly set ${fieldName} to "${valueToSet}", element value now: "${element.value}"`);
+                            }
+                        } else {
+                            console.log(`🔧 DEBUG: Element ${fieldConfig.id} not found for field ${fieldName}`);
+                        }
+                    }
+                }
+
+                // Special handling for trade_plan: Wait for automatic price fetching to complete, then re-set entry_price
+                if (entityType === 'trade_plan') {
+                    // #endregion
+                    console.log(`⏳ Waiting for automatic price fetching to complete for trade_plan...`);
+
+                    // Wait for InvestmentCalculationService and ticker loading to complete
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Re-set entry_price after automatic processes complete
+                    const entryPriceElement = iframeDoc.querySelector('#tradePlanEntryPrice');
+                    if (entryPriceElement && testData.entry_price !== undefined) {
+                        entryPriceElement.value = testData.entry_price;
+                        entryPriceElement.dispatchEvent(new Event('input', { bubbles: true }));
+                        entryPriceElement.dispatchEvent(new Event('change', { bubbles: true }));
+                        // #endregion
+                        console.log(`✅ Re-set entry_price to "${testData.entry_price}" after automatic processes`);
+                    }
+                }
+
                 // Handle missing fields - try alternative selectors
                 if (setFormDataResult && setFormDataResult.missingFields && setFormDataResult.missingFields.length > 0) {
                     workflow.steps.push(`אזהרה: ${setFormDataResult.missingFields.length} שדות לא נמצאו - מנסה חלופות`);
@@ -3449,7 +3535,11 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push('בודק ולידציה של שדות');
             this.updateTestResults();
             
+            // #endregion
+            
             const validationResult = await this.validateFormFieldsInIframe(testIframe, entityType, fieldMap);
+            
+            // #endregion
             
             if (!validationResult.isValid) {
                 workflow.steps.push(`אזהרה: ולידציה נכשלה - ${validationResult.errors.join(', ')}`);
@@ -3461,15 +3551,22 @@ class IntegratedCRUDE2ETester {
                         // Field not found - already handled above
                         continue;
                     } else if (error.includes('is empty')) {
-                        // Required field is empty - try to fill it with default value
+                        // Required field is empty - try to fill it with default value or testData value
                         const fieldNameMatch = error.match(/Required field (\w+) is empty/);
                         if (fieldNameMatch) {
                             const fieldName = fieldNameMatch[1];
                             const fieldConfig = fieldMap.fields[fieldName];
-                            if (fieldConfig && testData[fieldName] !== undefined) {
+                            // Use default value if available, otherwise use testData value
+                            let valueToSet = fieldConfig?.default !== undefined ? fieldConfig.default : testData[fieldName];
+                            // Special handling for investment_type - ensure correct case
+                            if (fieldName === 'investment_type' && valueToSet) {
+                                valueToSet = valueToSet.toLowerCase(); // Ensure lowercase for SELECT option matching
+                            }
+                            if (fieldConfig && valueToSet !== undefined && valueToSet !== null) {
                                 const element = iframeDoc.querySelector(fieldConfig.id);
                                 if (element) {
-                                    const value = testData[fieldName];
+                                    // #endregion
+                                    const value = valueToSet;
                                     if (fieldConfig.type === 'bool' || fieldConfig.type === 'boolean' || fieldConfig.type === 'checkbox') {
                                         element.checked = Boolean(value);
                                     } else if (fieldConfig.type === 'date' || fieldConfig.type === 'dateOnly') {
@@ -3496,10 +3593,21 @@ class IntegratedCRUDE2ETester {
                                         element.value = dateValue;
                                     } else {
                                         element.value = value;
+                                        // Special handling for SELECT elements - ensure option is selected
+                                        if (element.tagName === 'SELECT') {
+                                            // Find the option with the matching value and select it
+                                            const options = Array.from(element.options);
+                                            const matchingOption = options.find(opt => opt.value === value);
+                                            if (matchingOption) {
+                                                element.selectedIndex = options.indexOf(matchingOption);
+                                            }
+                                        }
                                     }
                                     element.dispatchEvent(new Event('input', { bubbles: true }));
                                     element.dispatchEvent(new Event('change', { bubbles: true }));
-                                    workflow.steps.push(`תוקן: שדה ${fieldName} מולא עם ערך ברירת מחדל`);
+
+                                    // #endregion
+                                    workflow.steps.push(`תוקן: שדה ${fieldName} מולא עם ערך: ${valueToSet}`);
                                     this.updateTestResults();
                                 }
                             }
@@ -3554,7 +3662,15 @@ class IntegratedCRUDE2ETester {
             if (entityType === 'watch_list') {
                 const nameField = iframeDoc.querySelector('#watchListName');
             }
-            
+
+            // Special debug for trade_plan entry_price before collection
+            if (entityType === 'trade_plan') {
+                const entryPriceElement = iframeDoc.querySelector('#tradePlanEntryPrice');
+                // #endregion
+                console.log(`🔍 DEBUG: Before collectFormData - entryPriceElement.value: "${entryPriceElement?.value}"`);
+                console.log(`🔍 DEBUG: Before collectFormData - testData.entry_price: "${testData.entry_price}"`);
+            }
+
             const formData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
             
             // Special handling for note entity - ensure content is in formData
@@ -4599,6 +4715,7 @@ class IntegratedCRUDE2ETester {
             // Special handling for select elements - check if it's the empty option
             if (element.tagName === 'SELECT') {
                 const selectedOption = element.options[element.selectedIndex];
+                // #endregion
                 if (selectedOption && (selectedOption.value === '' || selectedOption.value === null || selectedOption.value === undefined)) {
                     value = '';
                 }
@@ -6984,6 +7101,67 @@ window.runCrossPageDefaultsTest = async function() {
         console.error('❌ Error running cross-page defaults test', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ברירות מחדל: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run defaults test for executions page only
+ */
+window.runExecutionsDefaultsTest = async function() {
+    try {
+        // #endregion
+
+        const tester = getCrossPageTester();
+        if (!tester) {
+            // #endregion
+            return;
+        }
+
+        showTestSection('test-results');
+
+        if (integratedTester) {
+            integratedTester.currentTestType = 'crossPage';
+            integratedTester.results.crossPage = integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [], infoSummary: [] };
+            integratedTester.results.crossPage.defaults = [];
+        }
+
+        // Reset stats for this test
+        tester.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: 0, executionTime: 0 };
+        tester.results.defaults = [];
+
+        // Find executions page
+        const executionsPage = tester.userPages.find(p => p.key === 'executions');
+        if (!executionsPage) {
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', 'עמוד ביצועים לא נמצא ברשימת העמודים');
+            }
+            return;
+        }
+
+        // Run defaults test for executions page only
+        await tester.testDefaults(executionsPage);
+
+        // Update results
+        if (integratedTester && tester.results.defaults) {
+            integratedTester.results.crossPage.defaults = tester.results.defaults;
+            // Update dashboard and test results table
+            integratedTester.updateDashboard();
+            integratedTester.updateTestResults();
+        }
+
+        const stats = tester.stats;
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification(
+                `בדיקת ברירות מחדל - ביצועים הושלמה`,
+                `${stats.passed} עברו, ${stats.failed} נכשלו`
+            );
+        }
+
+    } catch (error) {
+        console.error('❌ Error running executions defaults test', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ברירות מחדל - ביצועים: ${error.message}`);
         }
     }
 };

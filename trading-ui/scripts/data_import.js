@@ -216,11 +216,49 @@
      * @function initializeDataImportPage
      * @returns {Promise<void>}
      */
+    /**
+     * Apply dynamic colors for data import page
+     * Uses execution entity color
+     */
+    async function applyDynamicColors() {
+        try {
+            Logger.info('Applying dynamic color system', { page: PAGE_NAME });
+            
+            // Load entity colors from global system
+            if (typeof window.loadEntityColors === 'function') {
+                const entityColors = await window.loadEntityColors();
+                if (entityColors) {
+                    Logger.debug('Entity colors loaded', { entityColors, page: PAGE_NAME });
+                    
+                    // Apply execution colors (data import displays executions)
+                    if (entityColors.execution) {
+                        document.documentElement.style.setProperty('--execution-color', entityColors.execution);
+                        document.documentElement.style.setProperty('--execution-bg-color', entityColors.execution + '20');
+                    }
+                }
+            }
+            
+            // Also use getEntityColor for direct access
+            if (typeof window.getEntityColor === 'function') {
+                const executionColor = window.getEntityColor('execution');
+                if (executionColor) {
+                    document.documentElement.style.setProperty('--execution-color', executionColor);
+                    document.documentElement.style.setProperty('--execution-bg-color', executionColor + '20');
+                }
+            }
+        } catch (error) {
+            Logger.error('Error applying dynamic colors', { error: error.message, page: PAGE_NAME });
+        }
+    }
+
     async function initializeDataImportPage() {
         Logger.info('🚀 Initializing Data Import page', { page: PAGE_NAME });
 
         try {
             setLoadingState(true);
+            
+            // Apply dynamic colors (execution entity)
+            await applyDynamicColors();
 
             if (typeof window.initializeImportUserDataModal === 'function') {
                 await window.initializeImportUserDataModal();

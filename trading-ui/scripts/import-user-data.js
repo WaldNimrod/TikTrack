@@ -4646,9 +4646,6 @@ function showStepContent(step) {
  * No session-related logic - just initialize the form
  */
 async function loadStep1Content() {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:4648',message:'loadStep1Content called',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     // Check if step 1 HTML elements exist
     const step1Container = document.getElementById('step-upload');
@@ -4658,15 +4655,9 @@ async function loadStep1Content() {
     const accountSelect = document.getElementById('tradingAccountSelect');
     const dataTypeSelect = document.getElementById('importDataTypeSelect');
     
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:4658',message:'Checking step 1 elements',data:{step1Container:!!step1Container,dropZone:!!dropZone,fileInput:!!fileInput,connectorSelect:!!connectorSelect,accountSelect:!!accountSelect,dataTypeSelect:!!dataTypeSelect,timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     if (!step1Container) {
         window.Logger.error('[Import Modal] Step 1 container not found', { page: 'import-user-data' });
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:4663',message:'ERROR: Step 1 container not found',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         return;
     }
     
@@ -4676,9 +4667,6 @@ async function loadStep1Content() {
             fileInput: !!fileInput,
             page: 'import-user-data' 
         });
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:4672',message:'ERROR: File upload elements not found',data:{dropZone:!!dropZone,fileInput:!!fileInput,timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
     }
     
     // The HTML content is already in the DOM, just need to load accounts
@@ -4686,9 +4674,6 @@ async function loadStep1Content() {
     initializeDataTypeSelector();
     await loadAccounts();
     
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:4681',message:'loadStep1Content completed',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     // Ensure "Continue to Analysis" button is enabled
     updateAnalyzeButton();
@@ -5834,21 +5819,12 @@ function analyzeFile() {
         return response.json();
     })
     .then(data => {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5836',message:'Analysis response received',data:{hasData:!!data,success:data?.success,status:data?.status,hasSessionId:!!data?.session_id,hasAnalysisResults:!!data?.analysis_results,error:data?.error,timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         
         console.log('📡 [ANALYZE_FILE] Response data:', data);
         setAnalysisLoadingState(true, 'מעבד את הנתונים שהתקבלו...', 55);
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5841',message:'Checking account linking blocking response',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         
         if (handleAccountLinkingBlockingResponse(data, 'upload')) {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5844',message:'Account linking blocking response - stopping',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             
             currentSessionId = data.session_id || currentSessionId;
             window.currentSessionId = currentSessionId;
@@ -5857,14 +5833,8 @@ function analyzeFile() {
             return;
         }
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5853',message:'Checking if analysis succeeded',data:{success:data?.success,status:data?.status,willProceed:!!(data?.success || data?.status === 'success'),timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         
         if (data.success || data.status === 'success') {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5856',message:'Analysis succeeded - processing results',data:{sessionId:data?.session_id,hasAnalysisResults:!!data?.analysis_results,timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             console.log('✅ [ANALYZE_FILE] Analysis completed successfully');
             console.log('📊 [ANALYZE_FILE] Analysis results:', {
                 sessionId: data.session_id,
@@ -5912,22 +5882,13 @@ function analyzeFile() {
             // Go to next step immediately (no artificial delay)
             console.log('🔄 [ANALYZE_FILE] Navigating to step 2');
             
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5892',message:'Navigating to step 2',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             
             goToStep(2);
             
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5896',message:'Step 2 navigation completed',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             
             console.log('✅ [ANALYZE_FILE] Step 2 navigation completed');
             console.groupEnd();
     } else {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5927',message:'Analysis failed - not success',data:{success:data?.success,status:data?.status,error:data?.error,hasSessionId:!!data?.session_id,hasAnalysisResults:!!data?.analysis_results,dataKeys:Object.keys(data||{}),timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             
             console.error('❌ [ANALYZE_FILE] Analysis failed:', data.error);
             console.error('❌ [ANALYZE_FILE] Response data structure:', {
@@ -5944,9 +5905,6 @@ function analyzeFile() {
         }
     })
     .catch(error => {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'import-user-data.js:5939',message:'Analysis fetch error',data:{error:error?.message,errorName:error?.name,errorStack:error?.stack?.substring(0,200),timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         
         console.error('❌ [ANALYZE_FILE] Fetch error:', error);
         console.error('❌ [ANALYZE_FILE] Error details:', {

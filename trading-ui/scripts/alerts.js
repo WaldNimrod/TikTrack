@@ -4731,6 +4731,14 @@ window.registerAlertsTables = function() {
 // === EOD INTEGRATION: Load EOD alerts data ===
 async function loadEODAlertsData() {
     try {
+        // Check if EODIntegrationHelper is available
+        if (!window.EODIntegrationHelper || typeof window.EODIntegrationHelper.loadEODAlerts !== 'function') {
+            window.Logger?.debug('⚠️ EODIntegrationHelper not available, skipping EOD alerts load', {
+                page: 'alerts'
+            });
+            return { data: [], status: 'skipped', message: 'EODIntegrationHelper not available' };
+        }
+
         window.Logger?.debug('🔍 Alerts Page - טוען התראות EOD');
 
         // Load EOD alerts from the API

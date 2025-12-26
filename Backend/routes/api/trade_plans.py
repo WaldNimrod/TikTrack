@@ -79,9 +79,36 @@ def create_trade_plan():
         user_id = getattr(g, 'user_id', None)
         
         data = request.get_json() or {}
-        
+
+        print(f"DEBUG: create_trade_plan received data: {data}")
+        print(f"DEBUG: entry_price in data: {'entry_price' in data}")
+        print(f"DEBUG: entry_price value: {data.get('entry_price')}")
+        print(f"DEBUG: entry_price type: {type(data.get('entry_price'))}")
+        print(f"DEBUG: data keys: {list(data.keys())}")
+        print(f"DEBUG: all data items: {[(k, v, type(v)) for k, v in data.items()]}")
+
         # Validate required field: entry_price
-        if 'entry_price' not in data or data['entry_price'] is None:
+        entry_price = data.get('entry_price')
+        if 'entry_price' not in data or entry_price is None or entry_price == '' or str(entry_price).strip() == '':
+            print(f"DEBUG: entry_price validation failed - key exists: {'entry_price' in data}, value: {entry_price}, type: {type(entry_price)}")
+            # For debugging, let's be more lenient and accept any non-empty entry_price
+            if entry_price is not None and str(entry_price).strip() != '':
+                print(f"DEBUG: entry_price would pass with more lenient check: {entry_price}")
+                # Temporarily accept this to see if the rest of the logic works
+                pass
+            else:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "entry_price is required"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 400
+        else:
+            print(f"DEBUG: entry_price validation passed - value: {entry_price}")
+
+        # Keep the original validation but make it more lenient for debugging
+        if 'entry_price' not in data or data['entry_price'] is None or data['entry_price'] == '' or str(data['entry_price']).strip() == '':
             normalizer = _get_date_normalizer()
             return jsonify({
                 "status": "error",

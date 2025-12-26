@@ -48,7 +48,7 @@ class DataCollectionService {
             // Remove # prefix if present (getElementById doesn't need it)
             const elementId = config.id.startsWith('#') ? config.id.substring(1) : config.id;
             const element = document.getElementById(elementId);
-            
+
             if (!element) {
                 console.warn(`⚠️ שדה ${config.id} (${elementId}) לא נמצא בטופס`);
                 // אם יש ברירת מחדל, השתמש בה
@@ -57,8 +57,24 @@ class DataCollectionService {
                 }
                 continue;
             }
-            
-            
+
+            // Special debug for tickerSymbol
+            if (elementId === 'tickerSymbol') {
+                console.log(`🎯 DEBUG: collectFormData found tickerSymbol element:`, element);
+                console.log(`🎯 DEBUG: tickerSymbol element.value: "${element.value}"`);
+                console.log(`🎯 DEBUG: tickerSymbol element.tagName: ${element.tagName}`);
+            }
+
+            // #endregion
+
+            // Special debug for trade plan entry_price
+            if (elementId === 'tradePlanEntryPrice') {
+                console.log(`💰 DEBUG: collectFormData processing tradePlanEntryPrice:`, element);
+                console.log(`💰 DEBUG: tradePlanEntryPrice element.value: "${element?.value}"`);
+                console.log(`💰 DEBUG: tradePlanEntryPrice config:`, config);
+                console.log(`💰 DEBUG: tradePlanEntryPrice key: "${key}"`);
+            }
+
             if (config.type === 'tags') {
                 let selectedTags = [];
                 if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
@@ -178,12 +194,20 @@ class DataCollectionService {
                     // For other types (like datetime-local, number, etc.), keep as-is
                     break;
             }
-            
+
             data[key] = value;
-            
+
+            // Debug for entry_price assignment
+            if (key === 'entry_price') {
+                console.log(`💰 DEBUG: Assigned entry_price to data: key="${key}", value="${value}", typeof value: ${typeof value}`);
+            }
+
         }
-        
-        
+
+        console.log(`💰 DEBUG: collectFormData final data keys:`, Object.keys(data));
+        console.log(`💰 DEBUG: entry_price in final data:`, data.entry_price);
+        console.log(`💰 DEBUG: entry_price type:`, typeof data.entry_price);
+
         return data;
     }
 

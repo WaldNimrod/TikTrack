@@ -5001,6 +5001,11 @@
         };
 
         const renderComparisonStatus = async (row) => {
+            // Use FieldRendererService for consistent status rendering
+            if (window.FieldRendererService?.renderStatus) {
+                return window.FieldRendererService.renderStatus(row.status, 'trade');
+            }
+            // Fallback: create badge manually if FieldRendererService not available
             const statusBadgeClass = `status-badge status-${row.status}`;
             const statusIcon = row.statusIcon || 'info-circle';
             let iconHTML = `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
@@ -5141,8 +5146,29 @@
 
         planVsExecutionData = comparisonData;
         const rowsHTML = await Promise.all(comparisonData.map(async row => {
-            const statusBadgeClass = `status-badge status-${row.status}`;
-            const statusIcon = row.statusIcon || 'info-circle';
+            // Use FieldRendererService for consistent status rendering
+            let statusDisplay = '';
+            if (window.FieldRendererService?.renderStatus) {
+                statusDisplay = window.FieldRendererService.renderStatus(row.status, 'trade');
+            } else {
+                // Fallback: create badge manually if FieldRendererService not available
+                const statusBadgeClass = `status-badge status-${row.status}`;
+                const statusIcon = row.statusIcon || 'info-circle';
+                let iconHTML = `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        iconHTML = await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                statusDisplay = `
+                    <span class="${statusBadgeClass}">
+                        ${iconHTML}
+                        ${row.statusText || ''}
+                    </span>
+                `;
+            }
 
             return `
                 <tr>
@@ -5170,19 +5196,7 @@
                         </div>
                     </td>
                     <td>
-                        <span class="${statusBadgeClass}">
-                            ${await (async () => {
-                                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-                                    try {
-                                        return await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class: 'icon' });
-                                    } catch (error) {
-                                        return `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
-                                    }
-                                }
-                                return `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
-                            })()}
-                            ${row.statusText || ''}
-                        </span>
+                        ${statusDisplay}
                     </td>
                 </tr>
             `;

@@ -143,7 +143,7 @@ function initializeNotesModal() {
             window.Logger?.debug?.('✅ Notes modal created successfully', { page: 'notes-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Notes modal:', error);
+            window.Logger?.error?.('❌ Error creating Notes modal:', error, { page: 'notes-config' });
             return false;
         }
     }
@@ -159,7 +159,7 @@ if (window.ModalManagerV2) {
                 if (!initializeNotesModal()) {
                     setTimeout(() => {
                         if (!initializeNotesModal()) {
-                            console.warn('⚠️ ModalManagerV2 not available for Notes modal after retries');
+                            window.Logger?.debug?.('⚠️ ModalManagerV2 not available for Notes modal after retries', { page: 'notes-config' });
                         }
                     }, 500);
                 }

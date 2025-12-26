@@ -164,7 +164,7 @@ function initializeTradingAccountsModal() {
             window.Logger?.debug?.('✅ Trading Accounts modal created successfully', { page: 'trading-accounts-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Trading Accounts modal:', error);
+            window.Logger?.error?.('❌ Error creating Trading Accounts modal:', error, { page: 'trading-accounts-config' });
             return false;
         }
     }
@@ -177,10 +177,10 @@ if (window.ModalManagerV2) {
     if (initializeTradingAccountsModal()) {
         window.Logger?.debug?.('✅ Trading Accounts modal initialized successfully', { page: 'trading-accounts-config' });
     } else {
-        console.warn('⚠️ Failed to initialize Trading Accounts modal');
+        window.Logger?.warn?.('⚠️ Failed to initialize Trading Accounts modal', { page: 'trading-accounts-config' });
     }
 } else {
-    console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+    window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available, waiting...', { page: 'trading-accounts-config' });
     // Wait for ModalManagerV2 to be available
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
@@ -205,10 +205,10 @@ function waitForModalManager() {
             if (initializeTradingAccountsModal()) {
                 window.Logger?.debug?.('✅ Trading Accounts modal initialized successfully', { page: 'trading-accounts-config' });
             } else {
-                console.warn('⚠️ Failed to initialize Trading Accounts modal');
+                window.Logger?.warn?.('⚠️ Failed to initialize Trading Accounts modal', { page: 'trading-accounts-config' });
             }
         } else if (attempts >= maxAttempts) {
-            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+            window.Logger?.warn?.(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`, { page: 'trading-accounts-config' });
             clearInterval(checkInterval);
         }
     }, interval);

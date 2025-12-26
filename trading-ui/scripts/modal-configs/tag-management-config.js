@@ -128,7 +128,7 @@ function initializeTagManagementModals() {
         window.ModalManagerV2.createCRUDModal(tagModalConfig);
         return true;
     } catch (error) {
-        console.error('❌ Failed to initialize tag management modals', error);
+        window.Logger?.error?.('❌ Failed to initialize tag management modals', error, { page: 'tag-management-config' });
         return false;
     }
 }

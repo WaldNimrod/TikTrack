@@ -114,6 +114,7 @@ class UnifiedCRUDService {
                     throw new Error('DataCollectionService not available');
                 }
                 data = window.DataCollectionService.collectFormData(options.fieldMap);
+                console.log(`🔍 DEBUG: Collected formData for ${entityType}:`, data);
                 window.Logger?.debug('Collected form data', { data, page: 'unified-crud-service' });
             } else if (!data && options.formId) {
                 // Fallback: try to collect from form directly
@@ -199,9 +200,10 @@ class UnifiedCRUDService {
                 // For update operations, check service signature
                 // Watch lists services expect (listId, payload, options) signature
                 // Note services expect (noteId, { payload: ... }) signature
+                // Alert services expect (alertId, payload, options) signature
                 let serviceResult;
-                if (entityType === 'watch_list') {
-                    // Watch lists services expect (listId, payload, options) signature
+                if (entityType === 'watch_list' || entityType === 'alert') {
+                    // Watch lists and alert services expect (id, payload, options) signature
                     serviceResult = await useService(entityId, payload, {});
                 } else if (entityType === 'note') {
                     // Note services expect (noteId, { payload: ... }) signature
@@ -221,10 +223,11 @@ class UnifiedCRUDService {
             } else if (useService && !entityId) {
                 // For create operations, check service signature
                 // Some services (like NotesData.createNote) expect { payload: ... } instead of direct payload
-                // But watch_list, execution, and cash_flow services expect (payload, options) signature
+                // But watch_list, execution, cash_flow, and alert services expect (payload, options) signature
                 let serviceResult;
-                if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow') {
-                    // Watch lists, execution, and cash_flow services expect (payload, options) signature
+                if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow' || entityType === 'alert' || entityType === 'trading_account' || entityType === 'ticker') {
+                    // Watch lists, execution, cash_flow, alert, trading_account, and ticker services expect (payload, options) signature
+                    console.log('🔍 DEBUG: Calling service with payload:', payload, 'entityType:', entityType);
                     serviceResult = await useService(payload, {});
                 } else {
                     // Other services might expect { payload: ... } format

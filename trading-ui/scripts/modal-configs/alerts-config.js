@@ -241,7 +241,7 @@ function initializeAlertsModal() {
             window.Logger?.debug?.('✅ Alerts modal created successfully', { page: 'alerts-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Alerts modal:', error);
+            window.Logger?.error?.('❌ Error creating Alerts modal:', error, { page: 'alerts-config' });
             return false;
         }
     }
@@ -257,7 +257,7 @@ if (window.ModalManagerV2) {
                 if (!initializeAlertsModal()) {
                     setTimeout(() => {
                         if (!initializeAlertsModal()) {
-                            console.warn('⚠️ ModalManagerV2 not available for Alerts modal after retries');
+                            window.Logger?.debug?.('⚠️ ModalManagerV2 not available for Alerts modal after retries', { page: 'alerts-config' });
                         }
                     }, 500);
                 }

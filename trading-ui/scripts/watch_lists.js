@@ -95,6 +95,40 @@
 
     // ===== PAGE INITIALIZATION =====
 
+    /**
+     * Apply dynamic colors for watch lists page
+     * Uses ticker entity color
+     */
+    async function applyDynamicColors() {
+        try {
+            window.Logger?.info?.('Applying dynamic color system', { page: PAGE_NAME });
+            
+            // Load entity colors from global system
+            if (typeof window.loadEntityColors === 'function') {
+                const entityColors = await window.loadEntityColors();
+                if (entityColors) {
+                    window.Logger?.debug?.('Entity colors loaded', { entityColors, page: PAGE_NAME });
+                    
+                    // Apply ticker colors (watch lists display tickers)
+                    if (entityColors.ticker) {
+                        document.documentElement.style.setProperty('--ticker-color', entityColors.ticker);
+                        document.documentElement.style.setProperty('--ticker-bg-color', entityColors.ticker + '20');
+                    }
+                }
+            }
+            
+            // Also use getEntityColor for direct access
+            if (typeof window.getEntityColor === 'function') {
+                const tickerColor = window.getEntityColor('ticker');
+                if (tickerColor) {
+                    document.documentElement.style.setProperty('--ticker-color', tickerColor);
+                    document.documentElement.style.setProperty('--ticker-bg-color', tickerColor + '20');
+                }
+            }
+        } catch (error) {
+            window.Logger?.error?.('Error applying dynamic colors', { error: error.message, page: PAGE_NAME });
+        }
+    }
 
     /**
      * Initialize Watch Lists Page
@@ -147,6 +181,9 @@
             // Register modals with ModalManagerV2
             // Register tables
             registerWatchListsTables();
+            
+            // Apply dynamic colors (ticker entity)
+            await applyDynamicColors();
 
             // Load watch lists data from API
             await loadWatchListsData();

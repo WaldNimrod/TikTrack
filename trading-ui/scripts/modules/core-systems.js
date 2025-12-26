@@ -795,6 +795,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         }, { page: 'core-systems' });
       }
 
+      // Try exact match first
       if (
         typeof window.pageInitializationConfigs !== 'undefined' &&
         window.pageInitializationConfigs[this.pageInfo.name]
@@ -803,22 +804,35 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         if (window.Logger?.debug) {
           window.Logger.debug(`Found page config in pageInitializationConfigs for ${this.pageInfo.name}`, { page: 'core-systems' });
         }
-      } else if (
-        typeof window.PAGE_CONFIGS !== 'undefined' &&
-        window.PAGE_CONFIGS[this.pageInfo.name]
-      ) {
-        // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
-        pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-        if (window.Logger?.debug) {
-          window.Logger.debug(`Found page config in PAGE_CONFIGS for ${this.pageInfo.name}`, { page: 'core-systems' });
-        }
       } else {
-        // Only log warning if page config is critical
-        if (window.Logger) {
-          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { 
-            page: 'core-systems',
-            availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [])
-          });
+        // Try with hyphen instead of underscore (e.g., tag_management -> tag-management)
+        const hyphenName = this.pageInfo.name.replace(/_/g, '-');
+        if (
+          typeof window.pageInitializationConfigs !== 'undefined' &&
+          window.pageInitializationConfigs[hyphenName]
+        ) {
+          pageConfig = window.pageInitializationConfigs[hyphenName];
+          if (window.Logger?.debug) {
+            window.Logger.debug(`Found page config in pageInitializationConfigs for ${hyphenName} (mapped from ${this.pageInfo.name})`, { page: 'core-systems' });
+          }
+        } else if (
+          typeof window.PAGE_CONFIGS !== 'undefined' &&
+          window.PAGE_CONFIGS[this.pageInfo.name]
+        ) {
+          // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
+          pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+          if (window.Logger?.debug) {
+            window.Logger.debug(`Found page config in PAGE_CONFIGS for ${this.pageInfo.name}`, { page: 'core-systems' });
+          }
+        } else {
+          // Only log warning if page config is critical
+          if (window.Logger) {
+            window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { 
+              page: 'core-systems',
+              triedHyphen: hyphenName,
+              availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [])
+            });
+          }
         }
       }
 

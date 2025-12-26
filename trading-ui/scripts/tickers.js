@@ -898,6 +898,8 @@ async function saveTicker() {
     remarks: { id: 'tickerRemarks', type: 'text' },
     tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
+  console.log('🎯 DEBUG: saveTicker collected tickerData:', tickerData);
+  console.log('🎯 DEBUG: tickerSymbol element value:', document.getElementById('tickerSymbol')?.value);
   const tagIds = Array.isArray(tickerData.tag_ids) ? tickerData.tag_ids : [];
   delete tickerData.tag_ids;
 
@@ -2113,7 +2115,8 @@ async function ensureHistoricalDataForTickers(tickers, options = {}) {
 
   if (showProgress && window.UnifiedProgressManager) {
     // Create overlay first with config
-    window.UnifiedProgressManager.createOverlay(overlayId, {
+    const progressManager = new window.UnifiedProgressManager();
+    progressManager.createOverlay(overlayId, {
       title: 'טוען נתונים היסטוריים',
       totalSteps: totalSteps,
       stepLabels: Array(totalSteps).fill(''),
@@ -2243,7 +2246,8 @@ async function enrichTickersWithFullData(tickers, options = {}) {
 
   if (showProgress && window.UnifiedProgressManager) {
     // Create overlay first with config
-    window.UnifiedProgressManager.createOverlay(overlayId, {
+    const progressManager = new window.UnifiedProgressManager();
+    progressManager.createOverlay(overlayId, {
       title: 'מעשיר נתוני טיקרים',
       totalSteps: totalSteps,
       stepLabels: Array(totalSteps).fill(''),
@@ -2428,7 +2432,8 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
 
     if (showProgress && window.UnifiedProgressManager) {
       // Create overlay first with config
-      window.UnifiedProgressManager.createOverlay(overlayId, {
+      const progressManager = new window.UnifiedProgressManager();
+      progressManager.createOverlay(overlayId, {
         title: 'מרענן נתונים חסרים',
         totalSteps: totalSteps,
         stepLabels: Array(totalSteps).fill(''),

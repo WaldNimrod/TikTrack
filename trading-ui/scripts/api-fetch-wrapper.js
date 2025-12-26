@@ -51,13 +51,13 @@
     try {
       // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-        const token = await window.UnifiedCacheManager.get('authToken', { 
-          layer: 'sessionStorage', 
-          includeUserId: false 
+        const token = await window.UnifiedCacheManager.get('authToken', {
+          layer: 'sessionStorage',
+          includeUserId: false
         });
         if (token) return token;
       }
-      
+
       // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
       if (typeof sessionStorage !== 'undefined') {
         const fallback = sessionStorage.getItem('dev_authToken');
@@ -105,6 +105,7 @@
   }
 
   window.fetch = async function (url, options = {}) {
+
     // Skip auth injection for static files, public endpoints, and instrumentation endpoints
     if (isStaticFile(url) || isPublicEndpoint(url) || isInstrumentationEndpoint(url)) {
       return originalFetch(url, options);

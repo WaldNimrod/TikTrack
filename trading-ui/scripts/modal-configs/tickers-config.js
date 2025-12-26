@@ -248,10 +248,7 @@
                 }
                 return true;
             } catch (error) {
-                console.error('❌ Error creating Tickers modal:', error);
-                if (window.Logger) {
-                    window.Logger.error('Error creating Tickers modal', { error: error.message, page: 'tickers' });
-                }
+                window.Logger?.error?.('❌ Error creating Tickers modal:', error, { page: 'tickers-config' });
                 return false;
             }
         }
@@ -262,12 +259,12 @@
     if (window.ModalManagerV2) {
         window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Tickers modal...', { page: 'tickers-config' });
         if (initializeTickersModal()) {
-            console.log('✅ Tickers modal initialized successfully');
+            window.Logger?.debug?.('✅ Tickers modal initialized successfully', { page: 'tickers-config' });
         } else {
-            console.warn('⚠️ Failed to initialize Tickers modal');
+            window.Logger?.warn?.('⚠️ Failed to initialize Tickers modal', { page: 'tickers-config' });
         }
     } else {
-        console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+        window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available, waiting...', { page: 'tickers-config' });
         // Wait for ModalManagerV2 to be available
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
@@ -292,10 +289,10 @@
                 if (initializeTickersModal()) {
                     window.Logger?.debug?.('✅ Tickers modal initialized successfully', { page: 'tickers-config' });
                 } else {
-                    console.warn('⚠️ Failed to initialize Tickers modal');
+                    window.Logger?.warn?.('⚠️ Failed to initialize Tickers modal', { page: 'tickers-config' });
                 }
             } else if (attempts >= maxAttempts) {
-                console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+                window.Logger?.warn?.(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`, { page: 'tickers-config' });
                 clearInterval(checkInterval);
             }
         }, interval);

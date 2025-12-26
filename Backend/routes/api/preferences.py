@@ -1002,6 +1002,56 @@ def check_preference_type() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@preferences_bp.route('/defaults/colors', methods=['GET'])
+def get_color_defaults() -> Any:
+    """
+    קבלת ערכי ברירת מחדל של צבעי ישויות (Public - לא דורש הרשאות)
+
+    משמש לבדיקות צבעים ב-iframe ללא אימות משתמש
+    """
+    try:
+        # Import color defaults directly from models
+        from models.preferences import COLOR_DEFAULTS
+
+        # Filter only entity colors (exclude chart colors)
+        entity_colors = {
+            key: value for key, value in COLOR_DEFAULTS.items()
+            if key.startswith('entity') and not any(suffix in key.lower() for suffix in ['light', 'dark', 'text', 'border', 'bg'])
+        }
+
+        # Add standard entity color mappings
+        standard_entity_colors = {
+            'trade': entity_colors.get('entityTradeColor', '#26baac'),
+            'trade_plan': entity_colors.get('entityTradePlanColor', '#0056b3'),
+            'alert': entity_colors.get('entityAlertColor', '#dc3545'),
+            'ticker': entity_colors.get('entityTickerColor', '#dc3545'),
+            'trading_account': entity_colors.get('entityTradingAccountColor', '#28a745'),
+            'execution': entity_colors.get('entityExecutionColor', '#17a2b8'),
+            'cash_flow': entity_colors.get('entityCashFlowColor', '#ffc107'),
+            'note': entity_colors.get('entityNoteColor', '#6f42c1'),
+            'preference': entity_colors.get('entityPreferenceColor', '#6c757d'),
+            'research': entity_colors.get('entityResearchColor', '#20c997'),
+            'tag': entity_colors.get('entityTagColor', '#e83e8c'),
+        }
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "entity_colors": standard_entity_colors,
+                "count": len(standard_entity_colors)
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error getting color defaults: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+
 @preferences_bp.route('/types', methods=['GET'])
 def get_preference_types() -> Any:
     """

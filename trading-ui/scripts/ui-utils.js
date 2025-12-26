@@ -2487,10 +2487,38 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
     }
 
     const summaryData = Array.isArray(dataToUse) ? dataToUse : [];
-    
+
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'zero-values-investigation',
+        hypothesisId: 'DATA_ANALYSIS',
+        location: 'ui-utils.js:updatePageSummaryStats-data',
+        message: 'updatePageSummaryStats data analysis',
+        data: {
+          pageName,
+          summaryDataLength: summaryData.length,
+          summaryDataType: typeof summaryData,
+          hasInfoSummarySystem: !!window.InfoSummarySystem,
+          hasInfoSummaryConfigs: !!window.INFO_SUMMARY_CONFIGS,
+          firstItemKeys: summaryData.length > 0 ? Object.keys(summaryData[0]).slice(0, 10) : []
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-      const config = window.INFO_SUMMARY_CONFIGS[pageName];
+      // Handle key mapping (e.g., 'ai_analysis' -> 'ai-analysis')
+      const pageKeyToConfigKey = {
+        'ai_analysis': 'ai-analysis',
+        'portfolio_state': 'portfolio-state-page',
+        'strategy_analysis': 'strategy-analysis'
+      };
+      const configKey = pageKeyToConfigKey[pageName] || pageName;
+      const config = window.INFO_SUMMARY_CONFIGS[configKey];
       if (config) {
         window.InfoSummarySystem.calculateAndRender(summaryData, config);
         

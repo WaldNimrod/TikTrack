@@ -1412,6 +1412,27 @@ class ModalManagerV2 {
             // Note: populateSelects already handles defaultFromPreferences
             // Pass mode to ensure defaultFromPreferences is false in edit mode
             await this.populateSelects(modalElement, modalInfo.config, mode);
+
+            // CRITICAL FIX: For executions modal, ensure account field gets default value immediately
+            // This must happen BEFORE modal.show() to prevent race conditions in tests
+            if (modalId === 'executionsModal' && mode === 'add') {
+                const executionAccountSelect = modalElement.querySelector('#executionAccount');
+                if (executionAccountSelect && (!executionAccountSelect.value || executionAccountSelect.value === '')) {
+                    // Try to get default account preference
+                    if (window.getPreferenceFromMemory) {
+                        try {
+                            const defaultAccount = await window.getPreferenceFromMemory('default_trading_account');
+                            if (defaultAccount) {
+                                executionAccountSelect.value = defaultAccount;
+                                // #endregion
+                                console.log(`✅ Execution account set immediately to ${defaultAccount}`);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to get default trading account preference:', error);
+                        }
+                    }
+                }
+            }
             
             
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
@@ -2260,7 +2281,7 @@ class ModalManagerV2 {
                 
                 // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
                 if (!isVisible && hasShowClass) {
-                    window.Logger?.warn(`Modal ${modalId} has 'show' class but visibility check failed, attempting initialization anyway`, {
+                    window.Logger?.debug(`Modal ${modalId} has 'show' class but visibility check failed, attempting initialization anyway`, {
                         modalId,
                         page: 'modal-manager-v2'
                     });
@@ -2991,7 +3012,7 @@ class ModalManagerV2 {
             }
             
             if (!window.TagUIManager) {
-                window.Logger?.warn('⚠️ TagUIManager not available after waiting', {
+                window.Logger?.debug('TagUIManager not available after waiting, modal will work without tag fields', {
                     modalId: modalElement.id,
                     retries,
                     page: 'modal-manager-v2'
@@ -4757,7 +4778,9 @@ class ModalManagerV2 {
      */
     async applyRemainingDefaults(form) {
         if (!form) return;
-        
+
+        // #endregion
+
         // Get modal config
         const modalElement = form.closest('.modal');
         const modalInfo = this.modals.get(modalElement?.id);
@@ -4796,39 +4819,71 @@ class ModalManagerV2 {
                 // SelectPopulatorService only populates options, it doesn't always set the default value
                 // So we need to apply the preference value ourselves
                 if (fieldElement.tagName === 'SELECT') {
+                    // #endregion
+
                     // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService with defaultFromPreferences)
+                    // But include executionAccount for executions modal
                     if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
+                        // #endregion
                         continue;
                     }
                     
                     // For SELECT fields with defaultFromPreferences, apply preference value AFTER options are populated
                     if (field.defaultFromPreferences) {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4803',message:'Checking defaultFromPreferences for SELECT',data:{fieldId:field.id,fieldValueBefore:fieldElement.value,optionsCount:fieldElement.options.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'M'})}).catch(()=>{});
                         // #endregion
                         if (window.getPreferenceFromMemory) {
                             const prefName = this._getPreferenceNameForField(field.id);
-                            // #region agent log
-                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4806',message:'Preference name mapped for SELECT',data:{fieldId:field.id,prefName,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'N'})}).catch(()=>{});
                             // #endregion
-                            if (prefName) {
-                                const prefValue = await window.getPreferenceFromMemory(prefName);
-                                // #region agent log
-                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4809',message:'Preference value retrieved for SELECT',data:{fieldId:field.id,prefName,prefValue,fieldValueBefore:fieldElement.value,hasOption:!!fieldElement.querySelector(`option[value="${prefValue}"]`)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'O'})}).catch(()=>{});
-                                // #endregion
-                                if (prefValue !== null && prefValue !== undefined) {
+                        if (prefName) {
+                            // Use the same robust preference retrieval as cross-page testing
+                            let prefValue = null;
+
+                            // Method 1: PreferencesCore.getPreference() - PRIMARY METHOD
+                            if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                                try {
+                                    prefValue = await window.PreferencesCore.getPreference(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 2: window.getPreference() - Global wrapper function
+                            if (prefValue === null && window.getPreference && typeof window.getPreference === 'function') {
+                                try {
+                                    prefValue = await window.getPreference(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 3: window.getPreferenceFromMemory() - Fallback
+                            if (prefValue === null && window.getPreferenceFromMemory && typeof window.getPreferenceFromMemory === 'function') {
+                                try {
+                                    prefValue = await window.getPreferenceFromMemory(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 4: Check global preference objects directly
+                            if (prefValue === null) {
+                                const globalPrefs = window.currentPreferences || window.preferences || (window.PreferencesCore && window.PreferencesCore.currentPreferences);
+                                if (globalPrefs && globalPrefs[prefName] !== undefined) {
+                                    prefValue = globalPrefs[prefName];
+                                }
+                            }
+
+                            // #endregion
+
+                            if (prefValue !== null && prefValue !== undefined) {
                                     // Check if the option exists in the select
                                     const optionExists = fieldElement.querySelector(`option[value="${prefValue}"]`);
                                     if (optionExists) {
                                         fieldElement.value = String(prefValue);
-                                        // #region agent log
-                                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4814',message:'Preference applied to SELECT field',data:{fieldId:field.id,prefName,prefValue,fieldValueAfter:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'P'})}).catch(()=>{});
                                         // #endregion
                                         console.log(`✅ Applied preference default for SELECT ${field.id} (${prefName}):`, prefValue);
                                         continue;
                                     } else {
-                                        // #region agent log
-                                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4819',message:'Option not found in SELECT',data:{fieldId:field.id,prefName,prefValue,optionsCount:fieldElement.options.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'Q'})}).catch(()=>{});
                                         // #endregion
                                         console.log(`⚠️ Option ${prefValue} not found in SELECT ${field.id}`);
                                     }
@@ -4861,44 +4916,67 @@ class ModalManagerV2 {
                 
                 // Apply defaultFromPreferences first (before defaultValue) for non-SELECT fields
                 if (field.defaultFromPreferences) {
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4833',message:'Checking defaultFromPreferences',data:{fieldId:field.id,hasGetPreferenceFromMemory:!!window.getPreferenceFromMemory},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
                     // #endregion
                     console.log(`🔍 Checking defaultFromPreferences for field: ${field.id}`);
                     if (window.getPreferenceFromMemory) {
                         const prefName = this._getPreferenceNameForField(field.id);
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4837',message:'Preference name mapped',data:{fieldId:field.id,prefName,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
                         // #endregion
                         console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
                         if (prefName) {
-                            const prefValue = await window.getPreferenceFromMemory(prefName);
-                            // #region agent log
-                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4840',message:'Preference value retrieved',data:{fieldId:field.id,prefName,prefValue,fieldValueBefore:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                            // Use the same robust preference retrieval as cross-page testing
+                            let prefValue = null;
+
+                            // Method 1: PreferencesCore.getPreference() - PRIMARY METHOD
+                            if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                                try {
+                                    prefValue = await window.PreferencesCore.getPreference(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 2: window.getPreference() - Global wrapper function
+                            if (prefValue === null && window.getPreference && typeof window.getPreference === 'function') {
+                                try {
+                                    prefValue = await window.getPreference(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 3: window.getPreferenceFromMemory() - Fallback
+                            if (prefValue === null && window.getPreferenceFromMemory && typeof window.getPreferenceFromMemory === 'function') {
+                                try {
+                                    prefValue = await window.getPreferenceFromMemory(prefName);
+                                } catch (e) {
+                                    // Continue to fallbacks
+                                }
+                            }
+
+                            // Method 4: Check global preference objects directly
+                            if (prefValue === null) {
+                                const globalPrefs = window.currentPreferences || window.preferences || (window.PreferencesCore && window.PreferencesCore.currentPreferences);
+                                if (globalPrefs && globalPrefs[prefName] !== undefined) {
+                                    prefValue = globalPrefs[prefName];
+                                }
+                            }
+
                             // #endregion
                             console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
                             if (prefValue !== null && prefValue !== undefined) {
                                 fieldElement.value = prefValue;
-                                // #region agent log
-                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4842',message:'Preference applied to field',data:{fieldId:field.id,prefName,prefValue,fieldValueAfter:fieldElement.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
                                 // #endregion
                                 console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
                                 continue;
                             } else {
-                                // #region agent log
-                                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4846',message:'No preference value found',data:{fieldId:field.id,prefName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
                                 // #endregion
                                 console.log(`⚠️ No preference value found for ${prefName}`);
                             }
                         } else {
-                            // #region agent log
-                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4849',message:'No preference mapping found',data:{fieldId:field.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'K'})}).catch(()=>{});
                             // #endregion
                             console.log(`⚠️ No preference name mapping found for field: ${field.id}`);
                         }
                     } else {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:4852',message:'getPreferenceFromMemory not available',data:{fieldId:field.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'L'})}).catch(()=>{});
                         // #endregion
                         console.log(`⚠️ getPreferenceFromMemory not available`);
                     }
@@ -6217,6 +6295,13 @@ class ModalManagerV2 {
         
         // For Executions modal - handle ticker and account selection
         if (modalId === 'executionsModal') {
+            // CRITICAL: Preserve account field value before any cloning/repopulation
+            const executionAccountSelect = modalElement.querySelector('#executionAccount');
+            if (executionAccountSelect && executionAccountSelect.value) {
+                executionAccountSelect.dataset.preservedValue = executionAccountSelect.value;
+                console.log(`💾 [initializeSpecialHandlers] Preserved executionAccount value: ${executionAccountSelect.value}`);
+            }
+
             // Handle ticker selection - clone and re-populate to ensure value is preserved
             // This is the working solution - not elegant but works
             const tickerSelect = modalElement.querySelector('#executionTicker');
@@ -6248,7 +6333,7 @@ class ModalManagerV2 {
                         }
                     })();
                 }
-                
+
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
                     const tickerId = e.target.value;
@@ -6259,17 +6344,47 @@ class ModalManagerV2 {
             }
             
             // Handle account selection - preserve value after any potential cloning
-            const accountSelect = modalElement.querySelector('#executionAccount');
-            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
-                // If account select gets cloned elsewhere, ensure value is preserved
-                // This is a safeguard - the select might not be cloned here, but could be elsewhere
-                const currentValue = accountSelect.value;
-                setTimeout(() => {
-                    if (accountSelect.value !== currentValue && currentValue) {
-                        accountSelect.value = currentValue;
-                        console.log(`✅ Restored executionAccount value: ${currentValue}`);
+            if (executionAccountSelect) {
+                const currentValue = executionAccountSelect.value;
+                const preservedValue = executionAccountSelect.dataset.preservedValue;
+
+                console.log(`🔍 [initializeSpecialHandlers] executionAccount - currentValue: ${currentValue}, preservedValue: ${preservedValue}`);
+
+                // Use preserved value if available and current value is empty, OR restore current value after any potential changes
+                const valueToPreserve = preservedValue || (currentValue && currentValue !== '' ? currentValue : null);
+
+                if (valueToPreserve) {
+                    // Check if the value is still a valid option
+                    const optionExists = executionAccountSelect.querySelector(`option[value="${valueToPreserve}"]`);
+                    if (optionExists) {
+                        // Set immediately
+                        executionAccountSelect.value = valueToPreserve;
+                        // #endregion
+                        console.log(`✅ [initializeSpecialHandlers] Set executionAccount value immediately: ${valueToPreserve}`);
+
+                        // Also set after a delay in case something clears it
+                        setTimeout(() => {
+                            if (executionAccountSelect.value !== valueToPreserve) {
+                                executionAccountSelect.value = valueToPreserve;
+                                console.log(`🔄 [initializeSpecialHandlers] Restored executionAccount value after delay: ${valueToPreserve}`);
+                            } else {
+                                console.log(`✅ [initializeSpecialHandlers] executionAccount value still correct: ${valueToPreserve}`);
+                            }
+                        }, 200);
+
+                        // And again after a longer delay
+                        setTimeout(() => {
+                            if (executionAccountSelect.value !== valueToPreserve) {
+                                executionAccountSelect.value = valueToPreserve;
+                                console.log(`🔄 [initializeSpecialHandlers] Restored executionAccount value after long delay: ${valueToPreserve}`);
+                            }
+                        }, 1000);
+                    } else {
+                        console.warn(`⚠️ [initializeSpecialHandlers] executionAccount value ${valueToPreserve} is not a valid option`);
                     }
-                }, 100);
+                } else {
+                    console.log(`ℹ️ [initializeSpecialHandlers] No executionAccount value to preserve`);
+                }
             }
             
             // Handle source field - enable/disable external_id field based on source value
@@ -6462,14 +6577,14 @@ class ModalManagerV2 {
             }
             
             // Handle account selection - preserve value after any potential cloning
-            const accountSelect = modalElement.querySelector('#tradePlanAccount');
-            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
+            const tradePlanAccountSelect = modalElement.querySelector('#tradePlanAccount');
+            if (tradePlanAccountSelect && tradePlanAccountSelect.value && tradePlanAccountSelect.value !== '') {
                 // If account select gets cloned elsewhere, ensure value is preserved
                 // This is a safeguard - the select might not be cloned here, but could be elsewhere
-                const currentValue = accountSelect.value;
+                const currentValue = tradePlanAccountSelect.value;
                 setTimeout(() => {
-                    if (accountSelect.value !== currentValue && currentValue) {
-                        accountSelect.value = currentValue;
+                    if (tradePlanAccountSelect.value !== currentValue && currentValue) {
+                        tradePlanAccountSelect.value = currentValue;
                         console.log(`✅ Restored tradePlanAccount value: ${currentValue}`);
                     }
                 }, 100);
@@ -6670,14 +6785,14 @@ class ModalManagerV2 {
             }
             
             // Handle account selection - preserve value after any potential cloning
-            const accountSelect = modalElement.querySelector('#tradeAccount');
-            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
+            const tradeAccountSelect = modalElement.querySelector('#tradeAccount');
+            if (tradeAccountSelect && tradeAccountSelect.value && tradeAccountSelect.value !== '') {
                 // If account select gets cloned elsewhere, ensure value is preserved
                 // This is a safeguard - the select might not be cloned here, but could be elsewhere
-                const currentValue = accountSelect.value;
+                const currentValue = tradeAccountSelect.value;
                 setTimeout(() => {
-                    if (accountSelect.value !== currentValue && currentValue) {
-                        accountSelect.value = currentValue;
+                    if (tradeAccountSelect.value !== currentValue && currentValue) {
+                        tradeAccountSelect.value = currentValue;
                         console.log(`✅ Restored tradeAccount value: ${currentValue}`);
                     }
                 }, 100);

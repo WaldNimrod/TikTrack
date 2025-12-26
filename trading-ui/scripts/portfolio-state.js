@@ -2515,6 +2515,26 @@ async function updateTradesSummary(trades) {
             return;
         }
         
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'portfolio-state-investigation',
+            hypothesisId: 'PORTFOLIO_RENDERING',
+            location: 'portfolio-state.js:updateTradesSummary-calculateAndRender',
+            message: 'Calling InfoSummarySystem.calculateAndRender for portfolio state',
+            data: {
+              tradesLength: trades ? trades.length : 0,
+              configStatsCount: config.stats ? config.stats.length : 0,
+              configStats: config.stats,
+              containerId: config.containerId,
+              containerExists: document.getElementById(config.containerId) ? true : false
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+        // #endregion
+
         await window.InfoSummarySystem.calculateAndRender(trades, config);
     } catch (error) {
         if (window.Logger) {
@@ -3735,7 +3755,6 @@ async function initPortfolioPerformanceChart() {
                 // Formula: Performance % = (Current P/L - Base P/L) / Base Portfolio Value * 100
                 // This shows how much P/L changed relative to the initial portfolio value
                 
-                // DEBUG: Log raw series data
                 if (window.Logger && series?.snapshots) {
                     window.Logger.info('📊 Raw series data for performance chart', { 
                         snapshotsCount: series.snapshots.length,
@@ -3837,7 +3856,6 @@ async function initPortfolioPerformanceChart() {
                            isFinite(item.value);
                 }) : []; // Filter out null values
                 
-                // DEBUG: Log filtered data
                 if (window.Logger) {
                     window.Logger.info('📊 Filtered performance data', { 
                         originalCount: series?.snapshots?.length || 0,
@@ -5991,12 +6009,50 @@ async function waitForScripts() {
     /**
      * Initialize page
      */
+    /**
+     * Apply dynamic colors for portfolio state page
+     * Uses trading_account entity color
+     */
+    async function applyDynamicColors() {
+        try {
+            window.Logger?.info?.('Applying dynamic color system', { page: 'portfolio-state-page' });
+            
+            // Load entity colors from global system
+            if (typeof window.loadEntityColors === 'function') {
+                const entityColors = await window.loadEntityColors();
+                if (entityColors) {
+                    window.Logger?.debug?.('Entity colors loaded', { entityColors, page: 'portfolio-state-page' });
+                    
+                    // Apply trading_account colors (portfolio state displays trading accounts)
+                    if (entityColors.trading_account) {
+                        document.documentElement.style.setProperty('--trading-account-color', entityColors.trading_account);
+                        document.documentElement.style.setProperty('--trading-account-bg-color', entityColors.trading_account + '20');
+                    }
+                }
+            }
+            
+            // Also use getEntityColor for direct access
+            if (typeof window.getEntityColor === 'function') {
+                const tradingAccountColor = window.getEntityColor('trading_account');
+                if (tradingAccountColor) {
+                    document.documentElement.style.setProperty('--trading-account-color', tradingAccountColor);
+                    document.documentElement.style.setProperty('--trading-account-bg-color', tradingAccountColor + '20');
+                }
+            }
+        } catch (error) {
+            window.Logger?.error?.('Error applying dynamic colors', { error: error.message, page: 'portfolio-state-page' });
+        }
+    }
+
     async function initializePage() {
         // Initialize Header System first
         initializeHeader();
         
         // Wait for all scripts to load first
         await waitForScripts();
+        
+        // Apply dynamic colors (trading_account entity)
+        await applyDynamicColors();
 
         // Verify critical globals are available
         const requiredGlobals = [

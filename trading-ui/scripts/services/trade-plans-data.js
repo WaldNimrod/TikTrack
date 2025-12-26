@@ -154,6 +154,9 @@ async function saveTradePlan(planData) {
     // Remove tag_ids field - Tags are handled separately via TagService, not as part of TradePlan model
     delete normalizedData.tag_ids;
     
+    console.log('🔍 DEBUG: About to send trade plan data to API:', normalizedData);
+    console.log('🔍 DEBUG: entry_price in normalizedData:', normalizedData.entry_price, typeof normalizedData.entry_price);
+
     const response = await fetch('/api/trade-plans/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

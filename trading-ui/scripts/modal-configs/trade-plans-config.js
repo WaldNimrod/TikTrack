@@ -75,11 +75,11 @@ const tradePlansModalConfig = {
             required: true,
             fieldName: 'investment_type', // Map to database column name
             options: [
-                { value: 'Swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
-                { value: 'Investment', label: 'השקעה - השקעה ארוכת טווח' },
-                { value: 'Passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
+                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'Swing',
+            defaultValue: 'swing',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
@@ -306,7 +306,7 @@ function initializeTradePlansModal() {
             window.Logger?.debug?.('✅ Trade Plans modal created successfully', { page: 'trade-plans-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Trade Plans modal:', error);
+            window.Logger?.error?.('❌ Error creating Trade Plans modal:', error, { page: 'trade-plans-config' });
             return false;
         }
     }
@@ -324,11 +324,11 @@ if (window.ModalManagerV2) {
             // Retry with delay to allow ModalManagerV2 initialization
             setTimeout(() => {
                 if (!initializeTradePlansModal()) {
-                    console.warn('⚠️ ModalManagerV2 not available after DOMContentLoaded - will retry');
+                    window.Logger?.debug?.('⚠️ ModalManagerV2 not available after DOMContentLoaded - will retry', { page: 'trade-plans-config' });
                     // Final retry after additional delay
                     setTimeout(() => {
                         if (!initializeTradePlansModal()) {
-                            console.warn('⚠️ ModalManagerV2 not available for Trade Plans modal after retries');
+                            window.Logger?.debug?.('⚠️ ModalManagerV2 not available for Trade Plans modal after retries', { page: 'trade-plans-config' });
                         }
                     }, 500);
                 }

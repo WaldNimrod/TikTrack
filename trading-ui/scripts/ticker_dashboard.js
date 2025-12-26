@@ -406,12 +406,15 @@
                 steps.push('מסיים טעינה');
                 descriptions.push('מסיים את התהליך...');
                 
-                window.unifiedProgressManager.createOverlay(overlayId, {
-                    title: `טעינת נתונים עבור ${tickerSymbol}`,
-                    totalSteps: steps.length,
-                    stepLabels: steps,
-                    stepDescriptions: descriptions
-                });
+                if (window.UnifiedProgressManager) {
+                    const progressManager = new window.UnifiedProgressManager();
+                    progressManager.createOverlay(overlayId, {
+                        title: `טעינת נתונים עבור ${tickerSymbol}`,
+                        totalSteps: steps.length,
+                        stepLabels: steps,
+                        stepDescriptions: descriptions
+                    });
+                }
             }
 
             // Step 1: Use ExternalDataService to refresh only missing data

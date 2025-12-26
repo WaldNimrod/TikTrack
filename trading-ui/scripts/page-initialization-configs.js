@@ -206,7 +206,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         // 'entity-services', // Temporarily removed to fix script loading issues
         'entity-details',
         'info-summary',
-        'dashboard-widgets',
+        'watch-lists', // Required for dashboard-widgets
+        'dashboard-widgets', // Dashboard widgets including WatchListsWidget
         'tradingview-widgets', // Required for TickerChartWidget mini charts
         'conditions', // Conditions System
         'init-system',
@@ -3519,6 +3520,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.FieldRendererService',
         'window.ModalManagerV2',
         'window.CRUDResponseHandler',
+        'window.InfoSummarySystem', // Required for Info Summary tests
         'window.notesModalConfig' // Required for Save as Note feature
         // Note: window.NotesData is optional - ai-notes-integration.js has fallback
       ],

@@ -813,11 +813,158 @@
         }
     }
 
+    /**
+     * Initialize icons using IconSystem
+     * @returns {Promise<void>}
+     */
+    async function initializeIcons() {
+        // Wait for IconSystem to be available
+        if (typeof window.IconSystem === 'undefined') {
+            // Retry after a short delay (max 10 retries = 1 second)
+            if (typeof window._tagIconInitRetries === 'undefined') {
+                window._tagIconInitRetries = 0;
+            }
+            if (window._tagIconInitRetries < 10) {
+                window._tagIconInitRetries++;
+                setTimeout(initializeIcons, 100);
+            }
+            return;
+        }
+
+        // Wait for IconSystem to be initialized
+        if (!window.IconSystem.initialized) {
+            try {
+                await window.IconSystem.initialize();
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to initialize IconSystem', {
+                        error: error?.message || error,
+                        page: 'tag-management'
+                    });
+                }
+                return; // Don't continue if initialization failed
+            }
+        }
+
+        // Verify IconSystem is ready
+        if (!window.IconSystem || !window.IconSystem.initialized) {
+            return;
+        }
+
+        // Find all icon placeholders
+        const placeholders = document.querySelectorAll('.icon-placeholder[data-icon]');
+        
+        if (placeholders.length === 0) {
+            return; // No icons to initialize
+        }
+
+        // Process each placeholder
+        for (const placeholder of placeholders) {
+            // Check if placeholder is still in DOM
+            if (!placeholder.parentNode || !document.contains(placeholder)) {
+                continue;
+            }
+
+            const iconName = placeholder.getAttribute('data-icon');
+            const size = placeholder.getAttribute('data-size') || '16';
+            const alt = placeholder.getAttribute('data-alt') || iconName;
+            const className = placeholder.className.replace('icon-placeholder', '').trim() || 'icon';
+
+            if (!iconName) {
+                continue;
+            }
+
+            try {
+                // Determine icon type (default to 'button' for Tabler icons)
+                const iconType = 'button';
+
+                // Render icon using IconSystem
+                const iconHTML = await window.IconSystem.renderIcon(iconType, iconName, {
+                    size: size,
+                    alt: alt,
+                    class: className
+                });
+
+                // Validate iconHTML before replacing
+                if (!iconHTML || typeof iconHTML !== 'string' || iconHTML.trim() === '') {
+                    throw new Error('Invalid icon HTML returned');
+                }
+
+                // Check for parser errors in the HTML
+                if (iconHTML.includes('parsererror')) {
+                    throw new Error('Parser error in icon HTML');
+                }
+
+                // Replace placeholder with rendered icon
+                if (placeholder.parentNode && document.contains(placeholder)) {
+                    placeholder.outerHTML = iconHTML;
+                }
+            } catch (error) {
+                // Fallback: use img tag with absolute path
+                if (placeholder.parentNode && document.contains(placeholder)) {
+                    const fallbackPath = `/trading-ui/images/icons/tabler/${iconName}.svg`;
+                    placeholder.outerHTML = `<img src="${fallbackPath}" width="${size}" height="${size}" alt="${alt}" class="${className}" onerror="this.style.display='none'">`;
+                }
+
+                // Log error if Logger is available
+                if (window.Logger) {
+                    window.Logger.warn('Failed to render icon, using fallback', {
+                        icon: iconName,
+                        error: error?.message || error,
+                        page: 'tag-management'
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply dynamic colors for tag management page
+     * Uses preference entity color
+     */
+    async function applyDynamicColors() {
+        try {
+            log('Applying dynamic color system');
+            
+            // Load entity colors from global system
+            if (typeof window.loadEntityColors === 'function') {
+                const entityColors = await window.loadEntityColors();
+                if (entityColors) {
+                    log('Entity colors loaded', { entityColors });
+                    
+                    // Apply preference colors (tag management is part of preferences)
+                    if (entityColors.preference) {
+                        document.documentElement.style.setProperty('--preference-color', entityColors.preference);
+                        document.documentElement.style.setProperty('--preference-bg-color', entityColors.preference + '20');
+                    }
+                }
+            }
+            
+            // Also use getEntityColor for direct access
+            if (typeof window.getEntityColor === 'function') {
+                const preferenceColor = window.getEntityColor('preference');
+                if (preferenceColor) {
+                    document.documentElement.style.setProperty('--preference-color', preferenceColor);
+                    document.documentElement.style.setProperty('--preference-bg-color', preferenceColor + '20');
+                }
+            }
+        } catch (error) {
+            showError('Error applying dynamic colors', error);
+        }
+    }
+
     async function initialize() {
         if (initialized) {
             return;
         }
         initialized = true;
+        
+        // Initialize icons first
+        await initializeIcons();
+        
+        // Apply dynamic colors (preference entity)
+        await applyDynamicColors();
+        
         registerTables();
         attachEventListeners();
         await refreshAll();

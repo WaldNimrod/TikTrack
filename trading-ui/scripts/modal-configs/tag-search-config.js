@@ -99,7 +99,7 @@ function initializeTagSearchDrawer() {
     try {
         window.ModalManagerV2.createCRUDModal(tagSearchDrawerConfig);
     } catch (error) {
-        console.error('❌ Failed to initialize tag search drawer', error);
+        window.Logger?.error?.('❌ Failed to initialize tag search drawer', error, { page: 'tag-search-config' });
     }
 }
 

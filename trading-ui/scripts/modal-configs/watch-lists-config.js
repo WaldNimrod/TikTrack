@@ -333,7 +333,7 @@ if (document.readyState === 'loading') {
                 waitForModalManager();
             }
         } else {
-            window.Logger?.info?.('⚠️ ModalManagerV2 not yet available on DOMContentLoaded, waiting...');
+            window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available on DOMContentLoaded, waiting...', { page: 'watch-lists-config' });
             waitForModalManager();
         }
     });
@@ -342,19 +342,19 @@ if (document.readyState === 'loading') {
     if (window.ModalManagerV2) {
         window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Watch Lists modals...', { page: 'watch-lists-config' });
         if (initializeWatchListModal()) {
-            window.Logger?.info?.('✅ Watch List modal initialized successfully');
+            window.Logger?.debug?.('✅ Watch List modal initialized successfully', { page: 'watch-lists-config' });
         } else {
-            window.Logger?.warn?.('⚠️ Failed to initialize Watch List modal');
+            window.Logger?.warn?.('⚠️ Failed to initialize Watch List modal', { page: 'watch-lists-config' });
             waitForModalManager();
         }
         if (initializeAddTickerModal()) {
-            window.Logger?.info?.('✅ Add Ticker modal initialized successfully');
+            window.Logger?.debug?.('✅ Add Ticker modal initialized successfully', { page: 'watch-lists-config' });
         } else {
-            window.Logger?.warn?.('⚠️ Failed to initialize Add Ticker modal');
+            window.Logger?.warn?.('⚠️ Failed to initialize Add Ticker modal', { page: 'watch-lists-config' });
             waitForModalManager();
         }
     } else {
-        window.Logger?.info?.('⚠️ ModalManagerV2 not yet available, waiting...');
+        window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available, waiting...', { page: 'watch-lists-config' });
         waitForModalManager();
     }
 }

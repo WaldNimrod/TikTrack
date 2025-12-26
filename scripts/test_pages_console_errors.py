@@ -8,6 +8,8 @@ This script uses Selenium to check JavaScript console errors
 - Fixed: ticker-dashboard, ai-analysis, user-profile, external-data-dashboard,
   chart-management, crud-testing-dashboard, tag-management, trade-history,
   trading-journal, watch-list, portfolio-state
+
+EXECUTIONS DEFAULTS TEST: Test that trading account field gets correct default value
 """
 
 import json
@@ -94,6 +96,7 @@ ALL_PAGES = [
     {"name": "דשבורד בדיקות CRUD", "url": "/crud_testing_dashboard.html", "category": "secondary", "priority": "low"},
     
     # עמודי אימות (Auth Pages) - login is via modal on base pages
+    {"name": "התחברות למערכת", "url": "/login.html", "category": "auth", "priority": "medium"},
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
     {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
     {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
@@ -824,6 +827,7 @@ def main():
     parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
     parser.add_argument('--all', action='store_true', help='Test all pages (default without flag = quick 3-page smoke)')
     parser.add_argument('--comprehensive', action='store_true', help='Run comprehensive CRUD tests in addition to console errors')
+    parser.add_argument('--no-login', action='store_true', help='Skip login process (for pages that don\'t require authentication)')
     args = parser.parse_args()
     
     # Filter pages if --page is specified, or use quick test pages
@@ -863,12 +867,16 @@ def main():
         return
     
     # Login as admin before testing pages (CRITICAL: Always use admin/admin123)
-    login_success = login(driver)
-    time.sleep(2)  # Wait for login to complete
-    if not login_success:
-        print("❌ Login failed - aborting tests to avoid false results.")
-        driver.quit()
-        return
+    # Skip login if --no-login flag is used
+    if not args.no_login:
+        login_success = login(driver)
+        time.sleep(2)  # Wait for login to complete
+        if not login_success:
+            print("❌ Login failed - aborting tests to avoid false results.")
+            driver.quit()
+            return
+    else:
+        print("⏭️ Skipping login (--no-login flag used)")
     
     results = []
     

@@ -812,11 +812,7 @@
 
     function updateSummary(context) {
         if (!context || !context.summaryElement) {
-            window.Logger?.warn('⚠️ updateSummary: context or summaryElement is missing', {
-                hasContext: !!context,
-                hasSummaryElement: !!context?.summaryElement,
-                source: 'InvestmentCalculationService'
-            });
+            // Silently skip if no summary element - this is normal for some modals
             return;
         }
 

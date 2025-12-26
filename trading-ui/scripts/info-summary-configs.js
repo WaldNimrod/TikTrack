@@ -104,21 +104,21 @@ const INFO_SUMMARY_CONFIGS = {
         id: 'totalInvestment',
         label: 'סה"כ השקעה',
         calculator: 'sumField',
-        params: { field: 'investment_amount' },
+        params: { field: 'planned_amount' },
         formatter: 'currency'
       },
       {
         id: 'avgInvestment',
         label: 'השקעה ממוצעת',
         calculator: 'avgField',
-        params: { field: 'investment_amount' },
+        params: { field: 'planned_amount' },
         formatter: 'currency'
       },
       {
         id: 'totalProfit',
         label: 'רווח כולל',
         calculator: 'sumField',
-        params: { field: 'expected_profit' },
+        params: { field: 'target_price' },
         formatter: 'currency'
       }
     ]
@@ -174,7 +174,7 @@ const INFO_SUMMARY_CONFIGS = {
         id: 'activeAlerts',
         label: 'התראות פעילות',
         calculator: 'countByStatus',
-        params: { status: 'active' }
+        params: { status: 'open' }
       },
       {
         id: 'triggeredAlerts',
@@ -204,21 +204,25 @@ const INFO_SUMMARY_CONFIGS = {
       {
         id: 'recentNotes',
         label: 'הערות חדשות',
-        calculator: 'countByConditions',
-        params: {
-          conditions: [
-            { field: 'created_at', operator: '>', value: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-          ]
+        calculator: 'custom',
+        customCalculator: (data) => {
+          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          return data.filter(item => {
+            const itemDate = item.created_at instanceof Date
+              ? item.created_at
+              : (item.created_at ? new Date(item.created_at) : null);
+            return itemDate && itemDate > sevenDaysAgo;
+          }).length;
         }
       },
       {
         id: 'notesWithAttachments',
         label: 'הערות עם קבצים',
-        calculator: 'countByConditions',
-        params: {
-          conditions: [
-            { field: 'attachment', operator: '!==', value: null }
-          ]
+        calculator: 'custom',
+        customCalculator: (data) => {
+          return data.filter(item => {
+            return item.attachment && item.attachment.trim() !== '';
+          }).length;
         }
       },
       {
@@ -248,7 +252,7 @@ const INFO_SUMMARY_CONFIGS = {
         id: 'activeTickers',
         label: 'טיקרים פעילים',
         calculator: 'countByStatus',
-        params: { status: 'active' }
+        params: { status: 'open' }
       },
       {
         id: 'stockTickers',

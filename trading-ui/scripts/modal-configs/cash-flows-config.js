@@ -422,16 +422,12 @@ window.cashFlowModalConfig = cashFlowModalConfig;
         try {
             window.ModalManagerV2.createCRUDModal(cashFlowModalConfig);
             if (window.Logger) {
-                window.Logger.info('✅ Cash Flow Modal created successfully', { page: 'cash-flows-config' });
-            } else {
-                console.log('✅ Cash Flow Modal created successfully');
+                window.Logger.debug('✅ Cash Flow Modal created successfully', { page: 'cash-flows-config' });
             }
             return; // הצלחנו, אין צורך לנסות שוב
         } catch (error) {
             if (window.Logger) {
                 window.Logger.error('❌ Error creating Cash Flow Modal:', error, { page: 'cash-flows-config' });
-            } else {
-                console.error('❌ Error creating Cash Flow Modal:', error);
             }
         }
     }
@@ -452,8 +448,6 @@ window.cashFlowModalConfig = cashFlowModalConfig;
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.error('❌ Error creating Cash Flow Modal (retry):', error, { page: 'cash-flows-config', attempts });
-                } else {
-                    console.error(`❌ Error creating Cash Flow Modal (attempt ${attempts}):`, error);
                 }
             }
         } else if (attempts >= maxAttempts) {

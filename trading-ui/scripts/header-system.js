@@ -54,6 +54,7 @@ window.FilterManager = class FilterManager {
   }
 
   async init() {
+    
     await this.loadFilters();
     this.setupHoverBehavior();
     // For tag-management page, wait for authentication to complete before loading accounts
@@ -68,13 +69,13 @@ window.FilterManager = class FilterManager {
         // Check if auth-guard has completed by checking for currentUser
         const hasUser = !!window.currentUser;
         let hasToken = false;
-        
+
         // Check if token is available for api-fetch-wrapper
         if (window.UnifiedCacheManager?.initialized) {
           try {
-            const token = await window.UnifiedCacheManager.get('authToken', { 
-              layer: 'sessionStorage', 
-              includeUserId: false 
+            const token = await window.UnifiedCacheManager.get('authToken', {
+              layer: 'sessionStorage',
+              includeUserId: false
             });
             hasToken = !!token;
           } catch (e) {
@@ -84,7 +85,7 @@ window.FilterManager = class FilterManager {
         if (!hasToken && typeof sessionStorage !== 'undefined') {
           hasToken = !!sessionStorage.getItem('dev_authToken');
         }
-        
+
         // Verify authentication with TikTrackAuth
         if (hasUser && hasToken && window.TikTrackAuth?.checkAuthentication) {
           try {
@@ -101,10 +102,11 @@ window.FilterManager = class FilterManager {
           authReady = true;
           break;
         }
-        
+
         await new Promise(resolve => setTimeout(resolve, 100));
         authWaitCount++;
       }
+
       if (window.Logger?.debug) {
         window.Logger.debug('HeaderSystem: Waited for auth completion', {
           authWaitCount,
@@ -729,29 +731,10 @@ window.FilterManager = class FilterManager {
     if (!accounts || accounts.length === 0) {
       try {
         const response = await fetch('/api/trading-accounts/');
-        // Handle 401/403 errors gracefully (expected in iframe context before auth completes)
-        if (response.status === 401 || response.status === 403) {
-          window.Logger?.debug?.('🔒 Trading accounts API returned 401/403 (expected in iframe context)', { 
-            page: 'header-system',
-            status: response.status 
-          });
-          accounts = [];
-        } else if (response.ok) {
-          const data = await response.json();
-          accounts = data.data || data || [];
-        } else {
-          window.Logger?.debug?.('⚠️ Trading accounts API returned non-OK status', { 
-            page: 'header-system',
-            status: response.status 
-          });
-          accounts = [];
-        }
+        const data = await response.json();
+        accounts = data.data || data || [];
       } catch (error) {
-        window.Logger?.debug?.('⚠️ Failed to load accounts via API (expected in iframe context)', { 
-          page: 'header-system',
-          error: error.message 
-        });
-        accounts = [];
+        window.Logger?.warn?.('⚠️ Failed to load accounts via API', error, { page: 'header-system' });
       }
     }
 
@@ -1301,10 +1284,14 @@ class HeaderSystem {
                         <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only" data-icon-replace="entity:home">
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trade_plans" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trade_plans">
                         <span class="nav-text">תכנון</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/ai_analysis">אנליזת AI</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
@@ -1323,7 +1310,6 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/ai_analysis">אנליזת AI</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>

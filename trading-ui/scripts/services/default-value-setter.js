@@ -35,6 +35,13 @@ class DefaultValueSetter {
             return null;
         }
         
+        // CRITICAL FIX: Check field type - datetime-local needs time component
+        const fieldType = (element.type || '').toLowerCase();
+        if (fieldType === 'datetime-local') {
+            // For datetime-local fields, use setCurrentDateTime instead
+            return this.setCurrentDateTime(fieldId);
+        }
+        
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');

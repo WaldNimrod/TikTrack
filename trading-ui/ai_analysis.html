@@ -40,6 +40,9 @@
                     <!-- Content -->
                     <div class="content-section" data-section="ai-analysis-content">
                         <div class="section-body">
+                            <!-- Info Summary Statistics -->
+                            <div id="summaryStats" class="info-summary"></div>
+                            
                             <div class="card">
                                 <div class="card-body">
                                     <div class="alert alert-info">
@@ -125,7 +128,10 @@
     <!-- Package Manifest and Page Configs - Required before core-systems.js -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <script src="scripts/core-systems.js?v=1.0.0" defer></script>
+    <!-- Info Summary Package - Required for Info Summary tests -->
+    <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system -->
     <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script>
     <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script>
     <script src="scripts/ui-basic.js?v=1.0.0" defer></script>
@@ -152,5 +158,6 @@
             console.log('🎯 AI Analysis page loaded');
         });
     </script>
+  <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
 </body>
 </html>

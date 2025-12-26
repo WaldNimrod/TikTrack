@@ -314,7 +314,7 @@ function initializeExecutionsModal() {
             window.Logger?.debug?.('✅ Executions modal created successfully', { page: 'executions-config' });
             return true;
         } catch (error) {
-            console.error('❌ Error creating Executions modal:', error);
+            window.Logger?.error?.('❌ Error creating Executions modal:', error, { page: 'executions-config' });
             return false;
         }
     }
@@ -327,16 +327,16 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         // Try immediately if ModalManagerV2 is available
         if (window.ModalManagerV2) {
-            console.log('✅ ModalManagerV2 available on DOMContentLoaded, initializing Executions modal...');
+            window.Logger?.debug?.('✅ ModalManagerV2 available on DOMContentLoaded, initializing Executions modal...', { page: 'executions-config' });
             if (initializeExecutionsModal()) {
                 window.Logger?.debug?.('✅ Executions modal initialized successfully', { page: 'executions-config' });
             } else {
-                console.warn('⚠️ Failed to initialize Executions modal');
+                window.Logger?.warn?.('⚠️ Failed to initialize Executions modal', { page: 'executions-config' });
                 // Fallback: wait for ModalManagerV2
                 waitForModalManager();
             }
         } else {
-            console.log('⚠️ ModalManagerV2 not yet available on DOMContentLoaded, waiting...');
+            window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available on DOMContentLoaded, waiting...', { page: 'executions-config' });
             waitForModalManager();
         }
     });
@@ -345,13 +345,13 @@ if (document.readyState === 'loading') {
     if (window.ModalManagerV2) {
         window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Executions modal...', { page: 'executions-config' });
         if (initializeExecutionsModal()) {
-            console.log('✅ Executions modal initialized successfully');
+            window.Logger?.debug?.('✅ Executions modal initialized successfully', { page: 'executions-config' });
         } else {
-            console.warn('⚠️ Failed to initialize Executions modal');
+            window.Logger?.warn?.('⚠️ Failed to initialize Executions modal', { page: 'executions-config' });
             waitForModalManager();
         }
     } else {
-        console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+        window.Logger?.debug?.('⚠️ ModalManagerV2 not yet available, waiting...', { page: 'executions-config' });
         waitForModalManager();
     }
 }
@@ -370,10 +370,10 @@ function waitForModalManager() {
             if (initializeExecutionsModal()) {
                 window.Logger?.debug?.('✅ Executions modal initialized successfully', { page: 'executions-config' });
             } else {
-                console.warn('⚠️ Failed to initialize Executions modal');
+                window.Logger?.warn?.('⚠️ Failed to initialize Executions modal', { page: 'executions-config' });
             }
         } else if (attempts >= maxAttempts) {
-            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts (${maxAttempts * interval / 1000}s)`);
+            window.Logger?.warn?.(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts (${maxAttempts * interval / 1000}s)`, { page: 'executions-config' });
             clearInterval(checkInterval);
         }
     }, interval);
@@ -381,3 +381,11 @@ function waitForModalManager() {
 
 // ייצוא לקונסול (לצורך debug)
 window.executionsModalConfig = executionsModalConfig;
+
+// Debug log for executions config
+if (window.Logger) {
+    window.Logger.debug('Executions modal config loaded', {
+        page: 'executions-config',
+        fieldsWithDefaultFromPreferences: executionsModalConfig.fields.filter(f => f.defaultFromPreferences).map(f => ({id: f.id, label: f.label}))
+    });
+}

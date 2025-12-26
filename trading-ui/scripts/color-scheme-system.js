@@ -836,8 +836,10 @@ async function setCurrentEntityColorFromPage() {
           }
         }
       } else {
-        // Don't warn for test pages - they don't need color scheme mapping
-        if (!pageClass.includes('test') && !pageClass.includes('Test') && window.Logger) {
+        // Don't warn for test pages or auth pages - they don't need color scheme mapping
+        if (!pageClass.includes('test') && !pageClass.includes('Test') &&
+            !pageClass.includes('login') && !pageClass.includes('register') &&
+            !pageClass.includes('forgot') && !pageClass.includes('reset') && window.Logger) {
           window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" });
         }
       }
@@ -916,7 +918,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'designs-page': 'design',
   'constraints-page': 'constraint',
   'tag-management-page': 'preference', // Tag management page - uses preference colors
-  'ai-analysis-page': 'research', // AI Analysis page - uses research colors
+  'ai-analysis-page': 'trade_plan', // AI Analysis page - uses trade plan colors
   'watch-list-page': 'ticker', // Watch List page - uses ticker colors (similar entity type)
   'watch-lists-page': 'ticker', // Watch Lists page - uses ticker colors (alias for consistency)
   'trade-history-page': 'trade', // Trade History page - uses trade colors
@@ -1606,8 +1608,72 @@ window.setCurrentEntityColorForEntity = setCurrentEntityColorForEntity;
 window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 
+// Load entity colors with defaults fallback for testing (no auth required)
+async function loadEntityColors() {
+  try {
+    // First try to get user preferences (if authenticated)
+    if (window.loadColorPreferences && typeof window.loadColorPreferences === 'function') {
+      try {
+        const userPrefs = await window.loadColorPreferences();
+        if (userPrefs && userPrefs.colorScheme && userPrefs.colorScheme.entities) {
+          return userPrefs.colorScheme.entities;
+        }
+      } catch (error) {
+        // User preferences not available, continue to defaults
+        if (window.Logger) {
+          window.Logger.debug('User preferences not available, using defaults', { page: 'color-scheme' });
+        }
+      }
+    }
+
+    // Fallback to API defaults (no authentication required)
+    const response = await fetch('/api/preferences/defaults/colors');
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.data && data.data.entity_colors) {
+        return data.data.entity_colors;
+      }
+    }
+
+    // Last resort: hardcoded defaults
+    return {
+      'trade': '#26baac',
+      'trade_plan': '#0056b3',
+      'alert': '#dc3545',
+      'ticker': '#dc3545',
+      'trading_account': '#28a745',
+      'execution': '#17a2b8',
+      'cash_flow': '#ffc107',
+      'note': '#6f42c1',
+      'preference': '#6c757d',
+      'research': '#20c997',
+      'tag': '#e83e8c'
+    };
+
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error loading entity colors:', error, { page: 'color-scheme' });
+    }
+    // Return hardcoded defaults on error
+    return {
+      'trade': '#26baac',
+      'trade_plan': '#0056b3',
+      'alert': '#dc3545',
+      'ticker': '#dc3545',
+      'trading_account': '#28a745',
+      'execution': '#17a2b8',
+      'cash_flow': '#ffc107',
+      'note': '#6f42c1',
+      'preference': '#6c757d',
+      'research': '#20c997',
+      'tag': '#e83e8c'
+    };
+  }
+}
+
 // Export preference integration functions
 window.loadEntityColorsFromPreferences = loadEntityColorsFromPreferences;
+window.loadEntityColors = loadEntityColors;
 window.generateAndApplyEntityCSS = generateAndApplyEntityCSS;
 window.updateCSSVariablesFromPreferences = updateCSSVariablesFromPreferences;
 window.loadColorPreferences = loadColorPreferences;

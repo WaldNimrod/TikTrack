@@ -79,7 +79,7 @@
                             this.setupNavigationListener();
                         } else if (retries >= maxRetries) {
                             clearInterval(checkInterval);
-                            window.Logger?.warn('ModalNavigationService not available after retries, z-index updates will be manual', {
+                            window.Logger?.debug('ModalNavigationService not available after retries, z-index updates will be manual', {
                                 page: 'modal-z-index-manager'
                             });
                         }

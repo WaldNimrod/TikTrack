@@ -55,7 +55,7 @@ USING_SQLITE = False
 # Flask settings
 DEBUG = False
 HOST = "127.0.0.1"
-PORT = 5001 if IS_PRODUCTION else 8080
+PORT = int(os.getenv("PORT", 5001 if IS_PRODUCTION else 8080))
 
 # Development/Production settings
 if IS_PRODUCTION:

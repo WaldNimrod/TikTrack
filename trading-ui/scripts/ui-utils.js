@@ -1072,15 +1072,13 @@ function createPageStateManager(pageName) {
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
-window.toggleAllSections = toggleAllSections;
+// toggleAllSections defined in background-tasks.js
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
-window.toggleTopSection = toggleTopSection;
-window.loadSectionStates = loadSectionStates;
+// toggleTopSection defined in test-header-only.js
+// loadSectionStates defined in ui-basic.js
 // updatePageSummaryStats removed - functionality moved to InfoSummarySystem
-window.loadScriptOnce = loadScriptOnce;
-window.loadScriptsOnce = loadScriptsOnce;
-window.renderUpdatedCell = renderUpdatedCell;
+// loadScriptOnce, loadScriptsOnce, renderUpdatedCell - functions not defined in this file
 
 // Export mockups standardization helpers
 window.createCacheKey = createCacheKey;

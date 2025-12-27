@@ -4489,63 +4489,45 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
         }
 
         // Define global function for executions defaults test
+        // #region agent log
         window.runExecutionsDefaultsTest = async function() {
           try {
-            const tester = new window.CrossPageTester(window.crudTester);
+            console.log('DEBUG: runExecutionsDefaultsTest started', {
+                crudTesterExists: !!window.crudTester,
+                CrossPageTesterExists: !!window.CrossPageTester
+            });
 
-            // Show the test section (will be handled by updateTestResults)
+            // Call runCrossPageTestForGroup directly instead of creating tester manually
+            await window.runCrossPageTestForGroup('user', 'defaults', 'ביצועי עסקאות');
 
-            // Initialize results if needed in main crudTester
-            if (window.crudTester) {
-              window.crudTester.currentTestType = 'crossPage';
-              // crossPage is already initialized in crudTester constructor
-            }
-
-            // Find the 'executions' page specifically
-            const executionsPage = tester.userPages.find(page => page.key === 'executions');
-
-            if (executionsPage) {
-              await tester.testDefaults(executionsPage);
-
-              // Update results in main crudTester
-              if (window.crudTester && tester.results.defaults) {
-                window.crudTester.results.crossPage.defaults = tester.results.defaults;
-                // Update dashboard and test results table
-                if (window.crudTester.updateDashboard) {
-                  window.crudTester.updateDashboard();
-                }
-                if (window.crudTester.updateTestResults) {
-                  window.crudTester.updateTestResults();
-                }
-              }
-
-              // Display defaults summary
-              if (window.showDefaultsSummary) {
-                window.showDefaultsSummary(tester);
-              }
-
-              const stats = tester.stats;
-              if (window.showSuccessNotification) {
-                window.showSuccessNotification(`בדיקת ברירות מחדל לביצועים הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
-              }
-
-            } else {
-              if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'עמוד "ביצועי עסקאות" לא נמצא ברשימת העמודים לבדיקה.');
-              }
-            }
+            console.log('DEBUG: runExecutionsDefaultsTest completed successfully');
 
           } catch (error) {
-            console.error('❌ Error running executions defaults test', error);
+            console.error('Error in runExecutionsDefaultsTest:', error);
             if (window.showErrorNotification) {
-              window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ברירות מחדל לביצועים: ${error.message}`);
+              window.showErrorNotification('שגיאה', `שגיאה בבדיקת ברירות מחדל לביצועים: ${error.message}`);
             }
           }
         };
 
         // Define global function for cross-page testing by group
+        // #region agent log
         window.runCrossPageTestForGroup = async function(groupType, testType, displayName) {
           try {
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    location: 'page-initialization-configs.js:runCrossPageTestForGroup',
+                    message: 'runCrossPageTestForGroup called',
+                    data: { groupType, testType, displayName },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'debug-run',
+                    hypothesisId: 'B'
+                })
+            }).catch(() => {});
+
             // Check if crudTester is initialized
             if (!window.crudTester) {
                 // Wait for crudTester to be initialized

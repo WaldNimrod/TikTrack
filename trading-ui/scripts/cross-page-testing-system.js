@@ -3326,8 +3326,7 @@ class CrossPageTester {
             executionTime: 0
         };
 
-        try {
-            // #region agent log - HYPOTHESIS 1: Iframe loading issues
+        // #region agent log - HYPOTHESIS 1: Iframe loading issues
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3735,7 +3734,8 @@ class CrossPageTester {
         }).catch(()=>{});
         // #endregion
 
-        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+        try {
+            if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
             // Ensure sorting array exists
             if (!this.crudTester.results.crossPage.sorting) {
                 this.crudTester.results.crossPage.sorting = [];

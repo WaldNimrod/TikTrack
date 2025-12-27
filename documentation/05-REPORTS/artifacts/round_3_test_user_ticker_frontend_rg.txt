@@ -1,0 +1,2 @@
+32:| scripts/test-user-ticker-frontend.html | ✅ | ✅ | ✅ | ❌ | ⬜ | ⚠️ חלקי |
+100:### scripts/test-user-ticker-frontend.html

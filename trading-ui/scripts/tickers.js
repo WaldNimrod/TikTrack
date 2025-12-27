@@ -2123,7 +2123,7 @@ async function ensureHistoricalDataForTickers(tickers, options = {}) {
       stepDescriptions: Array(totalSteps).fill('')
     });
     // Show initial progress
-    window.UnifiedProgressManager.showProgress(overlayId, 1, 'בודק טיקרים', `בודק ${tickers.length} טיקרים...`);
+    window.unifiedProgressManager.showProgress(overlayId, 1, 'בודק טיקרים', `בודק ${tickers.length} טיקרים...`);
   }
 
   const tickersWithData = [];
@@ -2254,7 +2254,7 @@ async function enrichTickersWithFullData(tickers, options = {}) {
       stepDescriptions: Array(totalSteps).fill('')
     });
     // Show initial progress
-    window.UnifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `טוען נתונים מלאים עבור ${tickers.length} טיקרים...`);
+    window.unifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `טוען נתונים מלאים עבור ${tickers.length} טיקרים...`);
   }
 
   // Helper function to enrich a single ticker
@@ -2440,7 +2440,7 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
         stepDescriptions: Array(totalSteps).fill('')
       });
       // Show initial progress
-      window.UnifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `מרענן ${tickersToRefresh.length} טיקרים...`);
+      window.unifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `מרענן ${tickersToRefresh.length} טיקרים...`);
     }
 
     const results = {
@@ -3945,7 +3945,7 @@ async function refreshTickerExternalData(tickerId, tickerSymbol = '') {
     
     // Show progress overlay
     if (window.UnifiedProgressManager) {
-      window.UnifiedProgressManager.showProgress(overlayId, {
+      window.unifiedProgressManager.showProgress(overlayId, {
         title: `מרענן נתונים עבור ${tickerSymbol || `טיקר #${tickerId}`}`,
         message: 'מתחבר לספק נתונים...',
         showCancel: false
@@ -4108,7 +4108,7 @@ async function refreshAllTickersData() {
     
     // Show progress overlay
     if (window.UnifiedProgressManager) {
-      window.UnifiedProgressManager.showProgress(overlayId, {
+      window.unifiedProgressManager.showProgress(overlayId, {
         title: `מרענן נתונים עבור ${window.tickersData.length} טיקרים`,
         message: 'מתחבר לספק נתונים...',
         showCancel: false

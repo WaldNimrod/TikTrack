@@ -795,13 +795,13 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
       const configKey = pageKeyToConfigKey[pageName] || pageName;
       const config = window.INFO_SUMMARY_CONFIGS[configKey];
       if (config) {
-        window.InfoSummarySystem.calculateAndRender(summaryData, config);
-        
+        window.InfoSummarySystem.calculateAndRender(data, config);
+
         // עדכון מספר הרשומות בטבלה (אם סופק ID)
         if (countElementId) {
           const countElement = document.getElementById(countElementId);
           if (countElement && typeof countElement === 'object' && 'textContent' in countElement) {
-            countElement.textContent = `${summaryData.length} רשומות`;
+            countElement.textContent = `${data.length} רשומות`;
           }
         }
       } else {

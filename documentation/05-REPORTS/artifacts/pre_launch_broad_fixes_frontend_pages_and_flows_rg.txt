@@ -1,0 +1,3 @@
+27:- **Data Import** – Fully ready with Business Logic.
+28:- **Research** – UI present; business services need strengthening.
+59:  trading_accounts, executions, cash_flows, notes, ai-analysis, watch-list, trading-journal, data_import.

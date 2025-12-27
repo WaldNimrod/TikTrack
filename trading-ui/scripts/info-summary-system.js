@@ -84,6 +84,7 @@ class InfoSummarySystem {
           const value = parseFloat(item[params.field]);
           const isValid = !isNaN(value);
           if (!isValid) {
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({
@@ -107,6 +108,7 @@ class InfoSummarySystem {
           return sum + (isValid ? value : 0);
         }, 0);
 
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -564,7 +566,8 @@ class InfoSummarySystem {
    * @returns {Promise<void>}
    */
   async calculateAndRender(data, config) {
-      method: 'POST',
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         sessionId: 'debug-session',

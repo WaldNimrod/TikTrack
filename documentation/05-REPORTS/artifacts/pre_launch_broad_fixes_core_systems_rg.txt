@@ -1,0 +1,6 @@
+1810:     * - 'development' - עמודי פיתוח (system-management, crud_testing_dashboard, וכו')
+1824:        ['system-management', 'crud_testing_dashboard', 'code-quality-dashboard'].includes(pageName)
+2165:      'crud_testing_dashboard',
+2206:    'crud_testing_dashboard',
+2224:    'crud_testing_dashboard',
+5609:    'crud_testing_dashboard': {

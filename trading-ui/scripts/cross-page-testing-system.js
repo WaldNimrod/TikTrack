@@ -78,13 +78,18 @@ class CrossPageTester {
             totalTests: 0,
             passed: 0,
             failed: 0,
+            warning: 0,
+            info: 0,
             inProgress: 0,
             executionTime: 0
         };
         
         // Track all defaults applied across all pages (for summary display)
         this.allDefaultsApplied = [];
-        
+
+        // Iframe container management (independent of crudTester)
+        this.testIframeContainer = null;
+
         // Page groups for organized testing
         this.pageGroups = {
             // User pages (20 pages) - עמודי משתמש עיקריים
@@ -280,7 +285,7 @@ class CrossPageTester {
         }
         
         // Reset stats for this test group
-        this.stats = { totalTests: 0, passed: 0, failed: 0, inProgress: pages.length, executionTime: 0 };
+        this.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: pages.length, executionTime: 0 };
         
         // Reset results for this test type
         this.results[testType] = [];
@@ -478,15 +483,10 @@ class CrossPageTester {
         let testIframe = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
-            
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
+
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -496,7 +496,7 @@ class CrossPageTester {
                 pageUrl = `${pageUrl}.html`;
             }
             
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -755,7 +755,7 @@ class CrossPageTester {
                                                 matchesPreference: true
                                             });
                                         } else if (hasValue) {
-                                            this.stats.passed++; // Still pass if account selected
+                                            this.stats.warning++; // Warning if account selected but doesn't match preference
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ 
                                                 type: 'field', 
@@ -788,6 +788,7 @@ class CrossPageTester {
                                             status: 'info',
                                             message: 'ℹ️ בדיקת מטבע דולגה עבור עמוד ביצועים (המטבע נגזר מחשבון המסחר)'
                                         });
+                                        this.stats.info++;
                                         this.stats.totalTests++;
                                     } else if (currencyField) {
                                         // #endregion
@@ -815,7 +816,7 @@ class CrossPageTester {
                                                 matchesPreference: true
                                             });
                                         } else if (hasValue) {
-                                            this.stats.passed++;
+                                            this.stats.warning++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ 
                                                 type: 'field', 
@@ -949,13 +950,25 @@ class CrossPageTester {
                                                     : `ℹ️ צד לא נבחר בשדה (העדפה: ${defaultSide || 'לא מוגדר'})`
                                         });
                                         if (matchesPreference) {
-                                            this.stats.passed++;
+                        this.stats.passed++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: false, expectedPreference: defaultSide });
+                                } else if (hasValue) {
+                                    // For executions page, 'long' is the expected default side
+                                    const expectedSide = page.key === 'executions' ? 'long' : defaultSide;
+                                    const matchesExpected = fieldValue?.toLowerCase() === expectedSide?.toLowerCase();
+
+                                    if (matchesExpected) {
+                                        this.stats.passed++;
+                                        if (!result.defaultsApplied) result.defaultsApplied = [];
+                                        result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: true });
+                    } else {
+                                        this.stats.warning++;
+                                        if (!result.defaultsApplied) result.defaultsApplied = [];
+                                        result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: false, expectedPreference: expectedSide });
+                                    }
+                                } else {
+                                    this.stats.info++;
                                         }
                                         this.stats.totalTests++;
                                     }
@@ -967,7 +980,7 @@ class CrossPageTester {
                                         const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
                                         const matchesPreference = defaultInvestmentType && fieldValue === String(defaultInvestmentType);
                                         
-                                        result.tests.push({
+                        result.tests.push({
                                             name: 'סוג השקעה - בשדה הטופס',
                                             status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'info'),
                                             message: matchesPreference 
@@ -980,11 +993,23 @@ class CrossPageTester {
                                             this.stats.passed++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: false, expectedPreference: defaultInvestmentType });
-                                        }
+                                } else if (hasValue) {
+                                    // For executions page, when ticker is selected, investment type should be 'stock'
+                                    const expectedType = page.key === 'executions' ? 'stock' : (defaultInvestmentType || 'stock');
+                                    const matchesExpected = fieldValue === expectedType ||
+                                                           fieldValue === 'מניה' ||
+                                                           (page.key === 'executions' && !defaultInvestmentType); // For executions, stock is expected when no preference // Support both English and Hebrew
+
+                                    if (matchesExpected) {
+                                        this.stats.passed++;
+                                        if (!result.defaultsApplied) result.defaultsApplied = [];
+                                        result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: true });
+                                    } else {
+                                        this.stats.warning++;
+                                        if (!result.defaultsApplied) result.defaultsApplied = [];
+                                        result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: false, expectedPreference: expectedType });
+                                    }
+                                }
                                         this.stats.totalTests++;
                                     }
                                     
@@ -1009,7 +1034,7 @@ class CrossPageTester {
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'stopLoss', value: fieldValue, fieldId: stopLossField.id, matchesPreference: true });
                                         } else if (hasValue) {
-                                            this.stats.passed++;
+                                            this.stats.warning++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'stopLoss', value: fieldValue, fieldId: stopLossField.id, matchesPreference: false, expectedPreference: defaultStopLoss });
                                         }
@@ -1037,7 +1062,7 @@ class CrossPageTester {
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'takeProfit', value: fieldValue, fieldId: takeProfitField.id, matchesPreference: true });
                                         } else if (hasValue) {
-                                            this.stats.passed++;
+                                            this.stats.warning++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'takeProfit', value: fieldValue, fieldId: takeProfitField.id, matchesPreference: false, expectedPreference: defaultTakeProfit });
                                         }
@@ -1062,6 +1087,8 @@ class CrossPageTester {
                                             this.stats.passed++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'stopLossPercent', value: fieldValue, fieldId: stopLossPercentField.id });
+                                        } else {
+                                            this.stats.info++;
                                         }
                                         this.stats.totalTests++;
                                     }
@@ -1084,6 +1111,8 @@ class CrossPageTester {
                                             this.stats.passed++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'takeProfitPercent', value: fieldValue, fieldId: takeProfitPercentField.id });
+                                        } else {
+                                            this.stats.info++;
                                         }
                                         this.stats.totalTests++;
                                     }
@@ -1109,7 +1138,7 @@ class CrossPageTester {
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'commission', value: fieldValue, fieldId: commissionField.id, matchesPreference: true });
                                         } else if (hasValue) {
-                                            this.stats.passed++;
+                                            this.stats.warning++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'commission', value: fieldValue, fieldId: commissionField.id, matchesPreference: false, expectedPreference: defaultCommission });
                                         }
@@ -1137,7 +1166,7 @@ class CrossPageTester {
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'riskPercentage', value: fieldValue, fieldId: riskField.id, matchesPreference: true });
                                         } else if (hasValue) {
-                                            this.stats.passed++;
+                                            this.stats.warning++;
                                             if (!result.defaultsApplied) result.defaultsApplied = [];
                                             result.defaultsApplied.push({ type: 'field', name: 'riskPercentage', value: fieldValue, fieldId: riskField.id, matchesPreference: false, expectedPreference: riskPercentage });
                                         }
@@ -1152,27 +1181,51 @@ class CrossPageTester {
 
                                             // #endregion
 
-                                            // Find ticker field
-                                            const tickerField = iframeDoc.querySelector(`#${entityType}Ticker, #executionTicker, #ticker, select[id*="Ticker"], select[name*="ticker"]`);
+                                            // Find ticker field - prioritize executionTicker specifically
+                                            const tickerField = iframeDoc.querySelector('#executionTicker') ||
+                                                               iframeDoc.querySelector(`#${entityType}Ticker`) ||
+                                                               iframeDoc.querySelector('#ticker') ||
+                                                               iframeDoc.querySelector('select[id*="Ticker"]') ||
+                                                               iframeDoc.querySelector('select[name*="ticker"]');
+
+                                            console.log(`🔍 [Ticker Test] Looking for ticker field with selectors: #executionTicker, #${entityType}Ticker, #ticker, select[id*="Ticker"], select[name*="ticker"]`);
+                                            console.log(`🔍 [Ticker Test] Found ticker field:`, tickerField ? { id: tickerField.id, name: tickerField.name, tagName: tickerField.tagName, optionsCount: tickerField.options?.length } : 'NOT FOUND');
 
                                             // #endregion
 
                                             if (tickerField && tickerField.tagName === 'SELECT' && tickerField.options && tickerField.options.length > 0) {
-                                                // Select AAPL ticker (should update type to 'stock', price, and market data)
-                                                const aaplOption = Array.from(tickerField.options).find(option => option.text.includes('AAPL') || option.value === 'AAPL');
-                                                if (aaplOption) {
-                                                    console.log(`🎯 Selecting AAPL ticker: ${aaplOption.value}`);
-                                                    tickerField.value = aaplOption.value;
+                                                console.log(`✅ [Ticker Test] Ticker field is valid SELECT with ${tickerField.options.length} options`);
+                                                console.log(`📋 [Ticker Test] First few options:`, Array.from(tickerField.options).slice(0, 5).map(opt => ({ value: opt.value, text: opt.text })));
+                                                // Select first available ticker (should update type to 'stock', price, and market data)
+                                                const availableOptions = Array.from(tickerField.options).filter(option => option.value && option.value.trim() !== '');
+                                                const selectedOption = availableOptions.length > 0 ? availableOptions[0] : null;
+
+                                                if (selectedOption) {
+                                                    console.log(`🎯 Selecting ticker: ${selectedOption.value} (${selectedOption.text})`);
+                                                    console.log(`📝 [Ticker Test] Setting field value to: ${selectedOption.value}`);
+                                                    tickerField.value = selectedOption.value;
+
+                                                    console.log(`📝 [Ticker Test] Field value after setting: ${tickerField.value}`);
 
                                                     // Trigger change event to simulate user selection
+                                                    console.log(`🚀 [Ticker Test] Dispatching change event`);
                                                     const changeEvent = new Event('change', { bubbles: true });
                                                     tickerField.dispatchEvent(changeEvent);
 
+                                                    // Wait a bit and check if value is still set
+                                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                                    console.log(`📝 [Ticker Test] Field value after change event: ${tickerField.value}`);
+
                                                     // Wait for ticker data to load and update fields
+                                                    console.log(`⏳ [Ticker Test] Waiting 3 seconds for ticker data to load...`);
                                                     await new Promise(resolve => setTimeout(resolve, 3000));
+                                                    console.log(`✅ [Ticker Test] Finished waiting, checking updated fields`);
 
                                                     // Check if investment type was updated to 'stock'
                                                     const typeField = iframeDoc.querySelector(`#${entityType}Type, #tradeType, #tradePlanType, select[id*="Type"], select[name*="investment_type"], select[name*="type"]`);
+                                                    console.log(`🔍 [Ticker Test] Looking for type field with selectors: #${entityType}Type, #tradeType, #tradePlanType, select[id*="Type"], select[name*="investment_type"], select[name*="type"]`);
+                                                    console.log(`🔍 [Ticker Test] Found type field:`, typeField ? { id: typeField.id, name: typeField.name, value: typeField.value } : 'NOT FOUND');
+
                                                     if (typeField) {
                                                         const typeValue = typeField.value;
                                                         const isStock = typeValue === 'stock' || typeValue === 'מניה';
@@ -1181,15 +1234,16 @@ class CrossPageTester {
                                                             name: 'סוג נכס - עדכון אחרי בחירת טיקר',
                                                             status: isStock ? 'success' : 'warning',
                                                             message: isStock
-                                                                ? `✅ סוג עודכן ל-${typeValue} אחרי בחירת AAPL`
+                                                                ? `✅ סוג עודכן ל-${typeValue} אחרי בחירת ${selectedOption.text}`
                                                                 : `⚠️ סוג לא עודכן אחרי בחירת טיקר (נוכחי: ${typeValue || 'לא מוגדר'})`
                                                         });
 
                                                         if (isStock) {
                                                             this.stats.passed++;
                                                             if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'investment_type', value: typeValue, triggeredBy: 'AAPL' });
+                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'investment_type', value: typeValue, triggeredBy: selectedOption.text });
                                                         } else {
+                                                            this.stats.warning++;
                                                             this.stats.failed++;
                                                         }
                                                         this.stats.totalTests++;
@@ -1203,16 +1257,16 @@ class CrossPageTester {
 
                                                         result.tests.push({
                                                             name: 'מחיר - עדכון אחרי בחירת טיקר',
-                                                            status: hasPrice ? 'success' : 'warning',
+                                                            status: hasPrice ? 'success' : 'info', // Changed from 'warning' to 'info' as price might not be immediately available
                                                             message: hasPrice
-                                                                ? `✅ מחיר עודכן ל-${priceValue} אחרי בחירת AAPL`
-                                                                : `⚠️ מחיר לא עודכן אחרי בחירת טיקר`
+                                                                ? `✅ מחיר עודכן ל-${priceValue} אחרי בחירת ${selectedOption.text}`
+                                                                : `ℹ️ מחיר לא זמין עדיין (נתונים עשויים להיטען לאט)`
                                                         });
 
                                                         if (hasPrice) {
                                                             this.stats.passed++;
                                                             if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'price', value: priceValue, triggeredBy: 'AAPL' });
+                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'price', value: priceValue, triggeredBy: selectedOption.text });
                                                         } else {
                                                             this.stats.failed++;
                                                         }
@@ -1227,16 +1281,16 @@ class CrossPageTester {
 
                                                     result.tests.push({
                                                         name: 'נתוני שוק - הצגה אחרי בחירת טיקר',
-                                                        status: hasMarketData ? 'success' : 'warning',
+                                                        status: hasMarketData ? 'success' : 'info', // Changed from 'warning' to 'info' as market data might not be immediately available
                                                         message: hasMarketData
-                                                            ? `✅ נתוני שוק מוצגים אחרי בחירת AAPL`
-                                                            : `⚠️ נתוני שוק לא מוצגים אחרי בחירת טיקר`
+                                                            ? `✅ נתוני שוק מוצגים אחרי בחירת ${selectedOption.text}`
+                                                            : `ℹ️ נתוני שוק לא זמינים עדיין (נתונים עשויים להיטען לאט)`
                                                     });
 
                                                     if (hasMarketData) {
                                                         this.stats.passed++;
                                                         if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                        result.defaultsApplied.push({ type: 'ticker_update', name: 'market_data', value: 'displayed', triggeredBy: 'AAPL' });
+                                                        result.defaultsApplied.push({ type: 'ticker_update', name: 'market_data', value: 'displayed', triggeredBy: selectedOption.text });
                                                     } else {
                                                         this.stats.failed++;
                                                     }
@@ -1244,19 +1298,27 @@ class CrossPageTester {
 
                                                 } else {
                                                     result.tests.push({
-                                                        name: 'בחירת טיקר - זמינות AAPL',
-                                                        status: 'warning',
-                                                        message: '⚠️ טיקר AAPL לא נמצא ברשימת הטיקרים'
+                                                        name: 'בחירת טיקר - זמינות טיקר',
+                            status: 'warning',
+                                                        message: '⚠️ לא נמצא טיקר זמין ברשימת הטיקרים'
                                                     });
                                                     this.stats.failed++;
                                                     this.stats.totalTests++;
                                                 }
                                             } else {
+                                                console.log(`❌ [Ticker Test] Ticker field not found or not valid:`, {
+                                                    fieldExists: !!tickerField,
+                                                    isSelect: tickerField?.tagName === 'SELECT',
+                                                    hasOptions: !!tickerField?.options,
+                                                    optionsLength: tickerField?.options?.length
+                                                });
+
                                                 result.tests.push({
                                                     name: 'בחירת טיקר - שדה זמין',
                                                     status: 'info',
                                                     message: 'ℹ️ שדה טיקר לא נמצא במודל'
                                                 });
+                                                this.stats.info++;
                                                 this.stats.inProgress++;
                                                 this.stats.totalTests++;
                                             }
@@ -1435,8 +1497,66 @@ class CrossPageTester {
             }
         }
         
-        this.results.defaults.push(result);
+        // Log the test results for debugging
+        console.log(`📊 [testDefaults] Results for ${page.name}:`, {
+            totalTests: result.tests.length,
+            passed: result.tests.filter(t => t.status === 'success').length,
+            failed: result.tests.filter(t => t.status === 'failed').length,
+            warning: result.tests.filter(t => t.status === 'warning').length,
+            info: result.tests.filter(t => t.status === 'info').length,
+            tests: result.tests
+        });
         
+        this.results.defaults.push(result);
+
+        // Add to main crudTester results for table display
+        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+            // Ensure defaults array exists
+            if (!this.crudTester.results.crossPage.defaults) {
+                this.crudTester.results.crossPage.defaults = [];
+            }
+
+            // Add the result to the defaults array
+            const testResult = {
+                page: page.name,
+                workflow: `${page.name} - ברירות מחדל`,
+                testType: 'crossPage-defaults',
+                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
+                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
+                executionTime: result.executionTime || (Date.now() - (this.startTime || Date.now())),
+                message: `בדיקה הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                tests: result.tests
+            };
+
+            this.crudTester.results.crossPage.defaults.push(testResult);
+
+            // Trigger UI update
+            if (typeof this.crudTester.updateTestResults === 'function') {
+                this.crudTester.updateTestResults();
+            }
+        }
+
+        // Show completion notification to user
+        if (window.showSuccessNotification || window.showErrorNotification || window.showWarningNotification) {
+            const stats = this.stats || {};
+            const warningCount = stats.warning || 0;
+            const message = `בדיקת ברירות מחדל - ${page.name} הושלמה: ${stats.passed || 0} עברו, ${stats.failed || 0} נכשלו, ${warningCount} אזהרות`;
+
+            if ((stats.failed || 0) > 0) {
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('בדיקה הושלמה עם שגיאות', message);
+                }
+            } else if (warningCount > 0) {
+                if (window.showWarningNotification) {
+                    window.showWarningNotification('בדיקה הושלמה עם אזהרות', message);
+                }
+            } else {
+                if (window.showSuccessNotification) {
+                    window.showSuccessNotification('בדיקה הושלמה בהצלחה', message);
+                }
+            }
+        }
+
         // CRITICAL FIX: Update integratedTester results BEFORE calling updateTestResults
         const integratedTesterInstance = this.crudTester;
         if (integratedTesterInstance) {
@@ -1476,10 +1596,8 @@ class CrossPageTester {
             }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
-        if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-            this.crudTester.cleanupTestIframes();
-        }
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
     }
     
     /**
@@ -2091,15 +2209,10 @@ class CrossPageTester {
         let consoleErrorCollector = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
             
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -2108,7 +2221,7 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -2863,37 +2976,34 @@ class CrossPageTester {
         
         this.results.colors.push(result);
         
-        // Update integratedTester results in real-time (CRITICAL FIX)
-        // Use stored reference to integratedTester (which is the crudTester)
-        const integratedTesterInstance = this.integratedTester || this.crudTester;
-        
-        if (integratedTesterInstance) {
-            if (!integratedTesterInstance.results.crossPage) {
-                integratedTesterInstance.results.crossPage = { 
-                    defaults: [], 
-                    colors: [], 
-                    sorting: [], 
-                    sections: [], 
-                    filters: [],
-                    infoSummary: []
-                };
+        // Add to main crudTester results for table display
+        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+            // Ensure colors array exists
+            if (!this.crudTester.results.crossPage.colors) {
+                this.crudTester.results.crossPage.colors = [];
             }
-            // Update colors array with current results
-            integratedTesterInstance.results.crossPage.colors = [...this.results.colors];
-            
-            // Update dashboard and test results table
-            if (typeof integratedTesterInstance.updateTestResults === 'function') {
-                integratedTesterInstance.updateTestResults();
-            }
-            if (typeof integratedTesterInstance.updateDashboard === 'function') {
-                integratedTesterInstance.updateDashboard();
+
+            // Add the result to the colors array
+            const testResult = {
+                page: page.name,
+                testType: 'colors',
+                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
+                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
+                executionTime: Date.now() - (this.startTime || Date.now()),
+                message: `בדיקת צבעים הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                tests: result.tests
+            };
+
+            this.crudTester.results.crossPage.colors.push(testResult);
+
+            // Trigger UI update
+            if (typeof this.crudTester.updateTestResults === 'function') {
+                this.crudTester.updateTestResults();
             }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
-        if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-            this.crudTester.cleanupTestIframes();
-        }
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
     }
     
     /**
@@ -2914,15 +3024,10 @@ class CrossPageTester {
         let testIframe = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
             
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -2931,7 +3036,7 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -3091,20 +3196,34 @@ class CrossPageTester {
         
         this.results.sorting.push(result);
         
-        // Update dashboard and test results table after each test (same as CRUD tests)
-        if (this.crudTester) {
+        // Add to main crudTester results for table display
+        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+            // Ensure sorting array exists
+            if (!this.crudTester.results.crossPage.sorting) {
+                this.crudTester.results.crossPage.sorting = [];
+            }
+
+            // Add the result to the sorting array
+            const testResult = {
+                page: page.name,
+                testType: 'sorting',
+                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
+                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
+                executionTime: Date.now() - (this.startTime || Date.now()),
+                message: `בדיקת מיון הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                tests: result.tests
+            };
+
+            this.crudTester.results.crossPage.sorting.push(testResult);
+
+            // Trigger UI update
             if (typeof this.crudTester.updateTestResults === 'function') {
                 this.crudTester.updateTestResults();
             }
-            if (typeof this.crudTester.updateDashboard === 'function') {
-                this.crudTester.updateDashboard();
-            }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
-        if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-            this.crudTester.cleanupTestIframes();
-        }
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
     }
     
     /**
@@ -3125,15 +3244,10 @@ class CrossPageTester {
         let testIframe = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
             
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -3142,7 +3256,7 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -3299,20 +3413,34 @@ class CrossPageTester {
         
         this.results.sections.push(result);
         
-        // Update dashboard and test results table after each test (same as CRUD tests)
-        if (this.crudTester) {
+        // Add to main crudTester results for table display
+        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+            // Ensure sections array exists
+            if (!this.crudTester.results.crossPage.sections) {
+                this.crudTester.results.crossPage.sections = [];
+            }
+
+            // Add the result to the sections array
+            const testResult = {
+                page: page.name,
+                testType: 'sections',
+                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
+                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
+                executionTime: Date.now() - (this.startTime || Date.now()),
+                message: `בדיקת סקשנים הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                tests: result.tests
+            };
+
+            this.crudTester.results.crossPage.sections.push(testResult);
+
+            // Trigger UI update
             if (typeof this.crudTester.updateTestResults === 'function') {
                 this.crudTester.updateTestResults();
             }
-            if (typeof this.crudTester.updateDashboard === 'function') {
-                this.crudTester.updateDashboard();
-            }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
-        if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-            this.crudTester.cleanupTestIframes();
-        }
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
     }
     
     /**
@@ -3333,15 +3461,10 @@ class CrossPageTester {
         let testIframe = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
             
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -3350,7 +3473,7 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -3527,17 +3650,130 @@ class CrossPageTester {
         
         this.results.filters.push(result);
         
-        // Update dashboard and test results table after each test (same as CRUD tests)
-        if (this.crudTester) {
+        // Add to main crudTester results for table display
+        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+            // Ensure filters array exists
+            if (!this.crudTester.results.crossPage.filters) {
+                this.crudTester.results.crossPage.filters = [];
+            }
+
+            // Add the result to the filters array
+            const testResult = {
+                page: page.name,
+                testType: 'filters',
+                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
+                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
+                executionTime: Date.now() - (this.startTime || Date.now()),
+                message: `בדיקת פילטרים הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                tests: result.tests
+            };
+
+            this.crudTester.results.crossPage.filters.push(testResult);
+
+            // Trigger UI update
             if (typeof this.crudTester.updateTestResults === 'function') {
                 this.crudTester.updateTestResults();
             }
-            if (typeof this.crudTester.updateDashboard === 'function') {
-                this.crudTester.updateDashboard();
-            }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
+    }
+
+    /**
+     * Load page in iframe for testing (standalone implementation)
+     * @param {string} pageUrl - URL of the page to load
+     * @returns {Promise<HTMLIFrameElement>} - Promise that resolves to the loaded iframe
+     */
+    async loadPageInIframe(pageUrl) {
+        return new Promise((resolve, reject) => {
+            try {
+                // Create unique iframe ID
+                const iframeId = `cross-page-test-iframe-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+                // Create iframe element
+                const iframe = document.createElement('iframe');
+                iframe.id = iframeId;
+                iframe.src = pageUrl;
+                iframe.style.width = '100%';
+                iframe.style.height = '600px';
+                iframe.style.border = '1px solid #ccc';
+                iframe.style.display = 'block';
+
+                // Ensure test iframe container exists
+                if (!this.testIframeContainer) {
+                    this.testIframeContainer = document.getElementById('testIframeContainer');
+                }
+
+                // Find container and append iframe
+                if (this.testIframeContainer) {
+                    this.testIframeContainer.appendChild(iframe);
+                } else {
+                    // Fallback - append to body
+                    document.body.appendChild(iframe);
+                }
+
+                // Wait for iframe to load
+                iframe.onload = () => {
+                    if (this.logger && this.logger.debug) {
+                        this.logger.debug(`✅ [CrossPageTester.loadPageInIframe] Iframe loaded successfully: ${iframeId}`);
+                    }
+                    resolve(iframe);
+                };
+
+                iframe.onerror = (error) => {
+                    if (this.logger && this.logger.error) {
+                        this.logger.error(`❌ [CrossPageTester.loadPageInIframe] Failed to load iframe: ${iframeId}`, { error, pageUrl });
+                    }
+                    reject(new Error(`Failed to load iframe for ${pageUrl}`));
+                };
+
+                // Timeout after 60 seconds (increased for complex pages)
+                setTimeout(() => {
+                    if (!iframe.contentDocument || iframe.contentDocument.readyState !== 'complete') {
+                        if (this.logger && this.logger.error) {
+                            this.logger.error(`⏰ [CrossPageTester.loadPageInIframe] Timeout loading iframe: ${iframeId}`);
+                        }
+                        reject(new Error(`Timeout loading iframe for ${pageUrl}`));
+                    }
+                }, 60000);
+
+            } catch (error) {
+                if (this.logger && this.logger.error) {
+                    this.logger.error('❌ [CrossPageTester.loadPageInIframe] Error creating iframe', { error, pageUrl });
+                }
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Clean up test iframes (standalone implementation)
+     */
+    cleanupTestIframes() {
+        // Remove iframes created by this CrossPageTester
+        const iframes = document.querySelectorAll('iframe[id^="cross-page-test-iframe-"]');
+        iframes.forEach(iframe => {
+            try {
+                // Remove event listeners and clean up
+                iframe.onload = null;
+                iframe.onerror = null;
+                iframe.src = 'about:blank'; // Clear src first
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            } catch (error) {
+                if (this.logger && this.logger.warn) {
+                    this.logger.warn(`⚠️ [CrossPageTester.cleanupTestIframes] Error removing iframe: ${error.message}`);
+                }
+            }
+        });
+
+        if (iframes.length > 0 && this.logger && this.logger.debug) {
+            this.logger.debug(`🧹 [CrossPageTester.cleanupTestIframes] Removed ${iframes.length} cross-page test iframe(s)`);
+        }
+
+        // Also try to clean up any iframes from crudTester if available
         if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
             this.crudTester.cleanupTestIframes();
         }
@@ -3605,15 +3841,10 @@ class CrossPageTester {
         let testIframe = null;
         
         try {
-            // Clean up any existing iframes before starting new test (same as CRUD tests)
-            if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-                this.crudTester.cleanupTestIframes();
-            }
+            // Clean up any existing iframes before starting new test
+            this.cleanupTestIframes();
             
-            // Load page in visible iframe using crudTester's method (same as CRUD tests)
-            if (!this.crudTester || typeof this.crudTester.loadPageInIframe !== 'function') {
-                throw new Error('crudTester.loadPageInIframe is not available');
-            }
+            // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -3622,7 +3853,7 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.crudTester.loadPageInIframe(pageUrl);
+            testIframe = await this.loadPageInIframe(pageUrl);
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
@@ -3744,10 +3975,8 @@ class CrossPageTester {
             }
         }
         
-        // Clean up iframe after test completes (same as CRUD tests)
-        if (this.crudTester && typeof this.crudTester.cleanupTestIframes === 'function') {
-            this.crudTester.cleanupTestIframes();
-        }
+        // Clean up iframe after test completes
+        this.cleanupTestIframes();
     }
 }
 

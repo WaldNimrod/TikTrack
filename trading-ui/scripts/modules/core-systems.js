@@ -1807,7 +1807,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * @method determinePageType
      * @description קובע את סוג העמוד על בסיס שם העמוד:
      * - 'trading' - עמודי מסחר (trades, executions, alerts)
-     * - 'development' - עמודי פיתוח (system-management, crud-testing-dashboard, וכו')
+     * - 'development' - עמודי פיתוח (system-management, crud_testing_dashboard, וכו')
      * - 'preferences' - עמוד העדפות
      * - 'dashboard' - דשבורד ראשי
      * - 'general' - עמוד כללי (ברירת מחדל)
@@ -1821,7 +1821,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     determinePageType(pageName) {
       if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
       if (
-        ['system-management', 'crud-testing-dashboard', 'code-quality-dashboard'].includes(pageName)
+        ['system-management', 'crud_testing_dashboard', 'code-quality-dashboard'].includes(pageName)
       )
         return 'development';
       if (['preferences'].includes(pageName)) return 'preferences';
@@ -2162,7 +2162,7 @@ function determinePageType(pageName) {
   if (
     [
       'system-management',
-      'crud-testing-dashboard',
+      'crud_testing_dashboard',
       'code-quality-dashboard',
       'cache-management',
     ].includes(pageName)
@@ -2203,7 +2203,7 @@ function requiresValidation(pageName) {
     'alerts',
     'trading_accounts',
     'notes',
-    'crud-testing-dashboard',
+    'crud_testing_dashboard',
   ];
   return validationPages.includes(pageName) || document.querySelectorAll('form').length > 0;
 }
@@ -2221,7 +2221,7 @@ function requiresTables(pageName) {
     'cash_flows',
     'tickers',
     'db_display',
-    'crud-testing-dashboard',
+    'crud_testing_dashboard',
     'external-data-dashboard',
   ];
   return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
@@ -5606,7 +5606,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
       ],
     },
 
-    'crud-testing-dashboard': {
+    'crud_testing_dashboard': {
       name: 'CRUD Testing',
       requiresFilters: false,
       requiresValidation: true,

@@ -24,7 +24,8 @@
 - **Preferences (v3/v4)** – profile-based settings, validation, lazy loading, color schemes.
 - **User Profile** – profile update/reset password.
 - **Trading Journal** – historical log with table + chart, filters, zoom per day.
-- **Data Import / Research** – UI present; business services need strengthening.
+- **Data Import** – Fully ready with Business Logic.
+- **Research** – UI present; business services need strengthening.
 
 ## Technical/Admin Pages
 
@@ -55,8 +56,8 @@
 ## Page Status Signals (from PAGES_LIST)
 
 - Fully ready with Business Logic: trades, trade_plans, alerts, tickers, ticker-dashboard,
-  trading_accounts, executions, cash_flows, notes, ai-analysis, watch-list, trading-journal.
-- Ready UI, BL to strengthen: index, data_import, research.
+  trading_accounts, executions, cash_flows, notes, ai-analysis, watch-list, trading-journal, data_import.
+- Ready UI, BL to strengthen: index, research.
 - Mockups ready for integration: daily snapshots set, watch-list modals, tradingview test page.
 
 

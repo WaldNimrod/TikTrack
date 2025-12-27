@@ -4490,35 +4490,96 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
 
         // Define global function for executions defaults test
         window.runExecutionsDefaultsTest = async function() {
-          await window.runCrossPageTestForGroup('user', 'defaults', 'ביצועים');
+          try {
+            const tester = new window.CrossPageTester(window.crudTester);
+
+            // Show the test section (will be handled by updateTestResults)
+
+            // Initialize results if needed in main crudTester
+            if (window.crudTester) {
+              window.crudTester.currentTestType = 'crossPage';
+              // crossPage is already initialized in crudTester constructor
+            }
+
+            // Find the 'executions' page specifically
+            const executionsPage = tester.userPages.find(page => page.key === 'executions');
+
+            if (executionsPage) {
+              await tester.testDefaults(executionsPage);
+
+              // Update results in main crudTester
+              if (window.crudTester && tester.results.defaults) {
+                window.crudTester.results.crossPage.defaults = tester.results.defaults;
+                // Update dashboard and test results table
+                if (window.crudTester.updateDashboard) {
+                  window.crudTester.updateDashboard();
+                }
+                if (window.crudTester.updateTestResults) {
+                  window.crudTester.updateTestResults();
+                }
+              }
+
+              // Display defaults summary
+              if (window.showDefaultsSummary) {
+                window.showDefaultsSummary(tester);
+              }
+
+              const stats = tester.stats;
+              if (window.showSuccessNotification) {
+                window.showSuccessNotification(`בדיקת ברירות מחדל לביצועים הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+              }
+
+            } else {
+              if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', 'עמוד "ביצועי עסקאות" לא נמצא ברשימת העמודים לבדיקה.');
+              }
+            }
+
+          } catch (error) {
+            console.error('❌ Error running executions defaults test', error);
+            if (window.showErrorNotification) {
+              window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ברירות מחדל לביצועים: ${error.message}`);
+            }
+          }
         };
 
         // Define global function for cross-page testing by group
         window.runCrossPageTestForGroup = async function(groupType, testType, displayName) {
           try {
+            // Check if crudTester is initialized
+            if (!window.crudTester) {
+                // Wait for crudTester to be initialized
+                let attempts = 0;
+                while (!window.crudTester && attempts < 50) { // Wait up to 5 seconds
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.crudTester) {
+                    throw new Error('crudTester not initialized after waiting');
+                }
+            }
+
             // Create CrossPageTester instance
             const crossPageTester = new window.CrossPageTester(window.crudTester);
 
-            // Show the test section
-            if (window.showTestSection) {
-              window.showTestSection('test-results');
-            }
+            // Show the test section (will be handled by updateTestResults)
 
-            // Initialize results if needed
-            if (window.integratedTester) {
-              window.integratedTester.currentTestType = 'crossPage';
-              window.integratedTester.results.crossPage = window.integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            // Initialize results if needed in main crudTester
+            if (window.crudTester) {
+              window.crudTester.currentTestType = 'crossPage';
+              // crossPage is already initialized in crudTester constructor
             }
 
             // Run tests for the specified group
             await crossPageTester.runTestsForGroup(groupType, testType);
 
             // Update dashboard
-            if (window.integratedTester && typeof window.integratedTester.updateDashboard === 'function') {
-              window.integratedTester.updateDashboard();
+            if (window.crudTester && typeof window.crudTester.updateDashboard === 'function') {
+              window.crudTester.updateDashboard();
             }
-            if (window.integratedTester && typeof window.integratedTester.updateTestResults === 'function') {
-              window.integratedTester.updateTestResults();
+            if (window.crudTester && typeof window.crudTester.updateTestResults === 'function') {
+              window.crudTester.updateTestResults();
             }
 
             // Show success notification
@@ -4598,19 +4659,19 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
 
         window.runTagCategoryTestOnly = async function() {
           if (window.crudTester) {
-            await window.crudTester.runSingleEntityTest('tag_category');
+            await window.crudTester.runSingleEntityTest('tag');
           }
         };
 
         window.runUserProfileTestOnly = async function() {
           if (window.crudTester) {
-            await window.crudTester.runSingleEntityTest('user_profile');
+            await window.crudTester.runSingleEntityTest('user');
           }
         };
 
         window.runPreferenceProfileTestOnly = async function() {
           if (window.crudTester) {
-            await window.crudTester.runSingleEntityTest('preference_profile');
+            await window.crudTester.runSingleEntityTest('preference');
           }
         };
 

@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דשבורד בדיקות CRUD 2.0 - TikTrack</title>
 
+    <!--
+    ========================================================================================
+    CRUD TESTING DASHBOARD - MATRIX ORGANIZATION
+    ========================================================================================
+
+    ארגון הכפתורים במטריצות היררכיות ברורות:
+
+    עמודה 1 (🎯): בדיקות יחידות - UI/API/E2E/Debug/Info/Table Sorting
+                  - אלו בדיקות כלליות שרצות על כל המערכת
+
+    עמודה 2 (📊): מטריצת בדיקות קבוצות (5×5) - 5 קבוצות עמודים × 5 סוגי בדיקות
+                  - משתמש: 16 עמודים עם טבלאות
+                  - ניהול משתמש: 4 עמודים עם טבלאות
+                  - כלי פיתוח: 12 עמודים עם טבלאות
+                  - עמודי בדיקה: 14 עמודים עם טבלאות
+                  - עמודים טכניים: 10 עמודים עם טבלאות
+
+                  סוגי בדיקות: defaults/colors/sorting/sections/filters
+
+    עמודה 3 (🎯): בדיקות ישויות ספציפיות - טריידים, התראות, טיקרים וכו'
+                  - בדיקות על ישויות מוגדרות במערכת
+
+    עמודה 4 (🌐): בדיקות כלליות - מצב יישום
+                  - ירוק: מיושם ונבדק
+                  - כחול: מיושם חדש
+                  - צהוב: מיושם, צריך בדיקה
+                  - אפור: לא מיושם
+
+    מצב כפתורים:
+    - ✓ = מחובר לפונקציה קיימת ונבדק
+    - 🚧 = מחובר לפונקציה אך טרם נבדק
+    - ✗ = לא רלוונטי לקבוצה זו
+
+    ========================================================================================
+    -->
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -38,7 +74,7 @@
                             דשבורד בדיקות CRUD 2.0
                         </div>
                         <div class="table-actions">
-                            <button data-button-type="REFRESH" data-onclick="refreshDashboard()" data-text="רענן" title="רענן את הדשבורד">
+                            <button data-button-type="REFRESH" data-onclick="refreshDashboard()" data-text="רענן" title="רענן את הדשבורד" disabled style="opacity: 0.5;">
                             </button>
                         </div>
                     </div>
@@ -121,137 +157,90 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Column 2: בדיקות רוחביות -->
+                                    <!-- Column 2: מטריצת בדיקות קבוצות (5x5) -->
                                     <div class="col-md-4">
                                         <div class="card h-100 border-success">
                                             <div class="card-header bg-success text-white">
-                                                <h6 class="mb-0 text-center">📊 בדיקות רוחביות</h6>
+                                                <h6 class="mb-0 text-center">📊 מטריצת בדיקות קבוצות (5×5)</h6>
+                                                <small class="text-white-50">5 קבוצות עמודים × 5 סוגי בדיקות</small>
                                             </div>
                                             <div class="card-body" style="max-height: 600px; overflow-y: auto;">
                                                 <div class="d-grid gap-2">
-                                                    <!-- עמודי משתמש -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">👤 עמודי משתמש</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageTestForGroup('user', 'defaults', 'עמודי משתמש')" title="ברירות מחדל">
-                                                                <i class="fas fa-calendar-check"></i> ברירות מחדל
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('user', 'colors', 'עמודי משתמש')" title="צבעים וסגנונות">
-                                                                <i class="fas fa-palette"></i> צבעים
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('user', 'sorting', 'עמודי משתמש')" title="מיון טבלאות">
-                                                                <i class="fas fa-sort"></i> מיון
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('user', 'sections', 'עמודי משתמש')" title="סקשנים">
-                                                                <i class="fas fa-folder-open"></i> סקשנים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('user', 'filters', 'עמודי משתמש')" title="פילטרים">
-                                                                <i class="fas fa-filter"></i> פילטרים
-                                                            </button>
-                                                        </div>
+                                                    <!-- מטריצה עם כותרות -->
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-borderless">
+                                                            <thead>
+                                                                <tr class="text-center">
+                                                                    <th style="width: 20%;">קבוצה</th>
+                                                                    <th style="width: 16%;"><i class="fas fa-calendar-check text-primary"></i></th>
+                                                                    <th style="width: 16%;"><i class="fas fa-palette text-success"></i></th>
+                                                                    <th style="width: 16%;"><i class="fas fa-sort text-info"></i></th>
+                                                                    <th style="width: 16%;"><i class="fas fa-folder-open text-warning"></i></th>
+                                                                    <th style="width: 16%;"><i class="fas fa-filter text-secondary"></i></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <!-- 👤 עמודי משתמש -->
+                                                                <tr>
+                                                                    <td class="fw-bold text-primary">👤 משתמש<br><small class="text-muted">(16 טבלאות)</small></td>
+                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'defaults', 'עמודי משתמש')" title="ברירות מחדל - 16 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'colors', 'עמודי משתמש')" title="צבעים - 16 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sorting', 'עמודי משתמש')" title="מיון - 16 טבלאות"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-warning btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sections', 'עמודי משתמש')" title="סקשנים - 2 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'filters', 'עמודי משתמש')" title="פילטרים - 16 טבלאות"><small>✓</small></button></td>
+                                                                </tr>
+
+                                                                <!-- 🔐 ניהול משתמש -->
+                                                                <tr>
+                                                                    <td class="fw-bold text-danger">🔐 ניהול<br><small class="text-muted">(4 טבלאות)</small></td>
+                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'defaults', 'ניהול משתמש')" title="ברירות מחדל - 4 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים - 4 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון - 4 טבלאות"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים - 4 טבלאות"><small>✓</small></button></td>
+                                                                </tr>
+
+                                                                <!-- 🛠️ כלי פיתוח -->
+                                                                <tr>
+                                                                    <td class="fw-bold text-info">🛠️ פיתוח<br><small class="text-muted">(12 טבלאות)</small></td>
+                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'defaults', 'כלי פיתוח')" title="ברירות מחדל - 12 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים - 12 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון - 12 טבלאות"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                                </tr>
+
+                                                                <!-- 🧪 עמודי בדיקה -->
+                                                                <tr>
+                                                                    <td class="fw-bold text-warning">🧪 בדיקה<br><small class="text-muted">(14 טבלאות)</small></td>
+                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'defaults', 'עמודי בדיקה')" title="ברירות מחדל - 14 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים - 14 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון - 14 טבלאות"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                                </tr>
+
+                                                                <!-- ⚙️ עמודים טכניים -->
+                                                                <tr>
+                                                                    <td class="fw-bold text-secondary">⚙️ טכניים<br><small class="text-muted">(10 טבלאות)</small></td>
+                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'defaults', 'עמודים טכניים')" title="ברירות מחדל - 10 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים - 10 עמודים"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון - 10 טבלאות"><small>✓</small></button></td>
+                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
-                                                    <hr class="my-2">
-                                                    
-                                                    <!-- ניהול משתמש -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">🔐 ניהול משתמש</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'defaults', 'ניהול משתמש')" title="ברירות מחדל">
-                                                                <i class="fas fa-calendar-check"></i> ברירות מחדל
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים וסגנונות">
-                                                                <i class="fas fa-palette"></i> צבעים
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון טבלאות">
-                                                                <i class="fas fa-sort"></i> מיון
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'sections', 'ניהול משתמש')" title="סקשנים">
-                                                                <i class="fas fa-folder-open"></i> סקשנים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים">
-                                                                <i class="fas fa-filter"></i> פילטרים
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-                                                    
-                                                    <!-- כלי פיתוח -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">🛠️ כלי פיתוח</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'defaults', 'כלי פיתוח')" title="ברירות מחדל">
-                                                                <i class="fas fa-calendar-check"></i> ברירות מחדל
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים וסגנונות">
-                                                                <i class="fas fa-palette"></i> צבעים
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון טבלאות">
-                                                                <i class="fas fa-sort"></i> מיון
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'sections', 'כלי פיתוח')" title="סקשנים">
-                                                                <i class="fas fa-folder-open"></i> סקשנים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'filters', 'כלי פיתוח')" title="פילטרים">
-                                                                <i class="fas fa-filter"></i> פילטרים
-                                                            </button>
-                                                        </div>
-                                                    </div>
+
                                                     <hr class="my-2">
 
-                                                    <!-- עמודי בדיקה -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">🧪 עמודי בדיקה</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageTestForGroup('testing', 'defaults', 'עמודי בדיקה')" title="ברירות מחדל">
-                                                                <i class="fas fa-calendar-check"></i> ברירות מחדל
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים וסגנונות">
-                                                                <i class="fas fa-palette"></i> צבעים
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון טבלאות">
-                                                                <i class="fas fa-sort"></i> מיון
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('testing', 'sections', 'עמודי בדיקה')" title="סקשנים">
-                                                                <i class="fas fa-folder-open"></i> סקשנים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('testing', 'filters', 'עמודי בדיקה')" title="פילטרים">
-                                                                <i class="fas fa-filter"></i> פילטרים
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-
-                                                    <!-- עמודים טכניים -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">⚙️ עמודים טכניים</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageTestForGroup('technical', 'defaults', 'עמודים טכניים')" title="ברירות מחדל">
-                                                                <i class="fas fa-calendar-check"></i> ברירות מחדל
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים וסגנונות">
-                                                                <i class="fas fa-palette"></i> צבעים
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון טבלאות">
-                                                                <i class="fas fa-sort"></i> מיון
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('technical', 'sections', 'עמודים טכניים')" title="סקשנים">
-                                                                <i class="fas fa-folder-open"></i> סקשנים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('technical', 'filters', 'עמודים טכניים')" title="פילטרים">
-                                                                <i class="fas fa-filter"></i> פילטרים
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-
-                                                    <!-- בדיקה מקיפה - כל הטבלאות -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">🎯 בדיקה מקיפה</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-danger btn-sm" onclick="runAllTableSortingTests()" title="בדיקת מיון לכל הטבלאות במערכת">
-                                                                <i class="fas fa-table"></i> מיון כל הטבלאות
-                                                            </button>
-                                                        </div>
+                                                    <!-- סיכום מטריצה -->
+                                                    <div class="alert alert-success py-2">
+                                                        <small class="fw-bold">📊 סיכום מטריצה:</small><br>
+                                                        <small>• 25 כפתורים מתוך 25 אפשריים</small><br>
+                                                        <small>• 4 כפתורים לא רלוונטיים (✗)</small><br>
+                                                        <small>• 2 כפתורים טרם מוטמעים (🚧)</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -346,34 +335,35 @@
                                         </div>
                                     </div>
 
-                                    <!-- Column 4: בדיקות כלליות -->
+                                    <!-- Column 4: בדיקות כלליות - מצב יישום -->
                                     <div class="col-md-3">
                                         <div class="card h-100 border-primary">
                                             <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0 text-center">🌐 בדיקות כלליות</h6>
+                                                <small class="text-white-50">מצב יישום וקישור לפונקציות</small>
                                             </div>
                                             <div class="card-body" style="max-height: 600px; overflow-y: auto;">
                                                 <div class="d-grid gap-2">
                                                     <!-- בדיקות כלליות קיימות -->
                                                     <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">✅ קיימות</small>
+                                                        <small class="text-muted d-block mb-1 fw-bold">✅ מיושמות (מחוברות לפונקציות)</small>
                                                         <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runUITests()" title="בדיקות ממשק משתמש לכל העמודים">
+                                                            <button class="btn btn-success btn-sm" onclick="runUITests()" title="✅ מיושם - בדיקות ממשק משתמש לכל העמודים">
                                                                 <i class="fas fa-desktop"></i> UI Tests
                                                             </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runAPITests()" title="בדיקות API לכל הישויות">
+                                                            <button class="btn btn-success btn-sm" onclick="runAPITests()" title="✅ מיושם - בדיקות API לכל הישויות">
                                                                 <i class="fas fa-exchange-alt"></i> API Tests
                                                             </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runE2ETests()" title="בדיקות מקצה לקצה לישויות">
+                                                            <button class="btn btn-success btn-sm" onclick="runE2ETests()" title="✅ מיושם - בדיקות מקצה לקצה לישויות">
                                                                 <i class="fas fa-route"></i> E2E Tests
                                                             </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runDebugTools()" title="כלי דיבוג וניטור">
+                                                            <button class="btn btn-success btn-sm" onclick="runDebugTools()" title="✅ מיושם - כלי דיבוג וניטור">
                                                                 <i class="fas fa-tools"></i> Debug Tools
                                                             </button>
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageInfoSummaryTest()" title="סיכום מידע בכל העמודים">
+                                                            <button class="btn btn-success btn-sm" onclick="runCrossPageInfoSummaryTest()" title="✅ מיושם - סיכום מידע בכל העמודים">
                                                                 <i class="fas fa-chart-bar"></i> Info Summary
                                                             </button>
-                                                            <button class="btn btn-outline-dark btn-sm" onclick="runAllTableSortingTests()" title="מיון לכל הטבלאות במערכת">
+                                                            <button class="btn btn-success btn-sm" onclick="runAllTableSortingTests()" title="✅ מיושם - מיון לכל הטבלאות במערכת">
                                                                 <i class="fas fa-table"></i> Table Sorting
                                                             </button>
                                                         </div>
@@ -382,21 +372,31 @@
 
                                                     <!-- בדיקות כלליות חדשות -->
                                                     <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">✨ חדשות</small>
+                                                        <small class="text-muted d-block mb-1 fw-bold">🆕 חדשות (מיושמות אך טרם נבדקו)</small>
                                                         <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runAllColorsTests()" title="צבעים לכל העמודים">
-                                                                <i class="fas fa-palette"></i> All Colors
+                                                            <button class="btn btn-info btn-sm" onclick="runAllColorsTests()" title="🆕 מיושם - צבעים לכל 60 העמודים">
+                                                                <i class="fas fa-palette"></i> All Colors<br><small class="text-muted">60 עמודים</small>
                                                             </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runAllSectionsTests()" title="סקשנים לכל העמודים עם סקשנים">
-                                                                <i class="fas fa-folder-open"></i> All Sections
+                                                            <button class="btn btn-info btn-sm" onclick="runAllSectionsTests()" title="🆕 מיושם - סקשנים לכל העמודים עם sections">
+                                                                <i class="fas fa-folder-open"></i> All Sections<br><small class="text-muted">2 עמודים</small>
                                                             </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runAllFiltersTests()" title="פילטרים לכל הטבלאות">
-                                                                <i class="fas fa-filter"></i> All Filters
+                                                            <button class="btn btn-warning btn-sm" onclick="runAllFiltersTests()" title="🆕 מיושם - פילטרים לכל 56 הטבלאות">
+                                                                <i class="fas fa-filter"></i> All Filters<br><small class="text-muted">56 טבלאות</small>
                                                             </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runAllDefaultsTests()" title="ברירות מחדל לכל העמודים">
-                                                                <i class="fas fa-calendar-check"></i> All Defaults
+                                                            <button class="btn btn-warning btn-sm" onclick="runAllDefaultsTests()" title="🆕 מיושם - ברירות מחדל לכל 60 העמודים">
+                                                                <i class="fas fa-calendar-check"></i> All Defaults<br><small class="text-muted">60 עמודים</small>
                                                             </button>
                                                         </div>
+                                                    </div>
+                                                    <hr class="my-2">
+
+                                                    <!-- הערות על מצב -->
+                                                    <div class="alert alert-info py-2">
+                                                        <small class="fw-bold">💡 הערות:</small><br>
+                                                        <small>• <strong>ירוק</strong> = מיושם ונבדק</small><br>
+                                                        <small>• <strong>כחול</strong> = מיושם חדש</small><br>
+                                                        <small>• <strong>צהוב</strong> = מיושם, צריך בדיקה</small><br>
+                                                        <small>• <strong>אפור</strong> = לא מיושם</small>
                                                     </div>
                                                 </div>
                                             </div>

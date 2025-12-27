@@ -162,6 +162,15 @@
                                                             <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים וסגנונות">
                                                                 <i class="fas fa-palette"></i> צבעים
                                                             </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון טבלאות">
+                                                                <i class="fas fa-sort"></i> מיון
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'sections', 'ניהול משתמש')" title="סקשנים">
+                                                                <i class="fas fa-folder-open"></i> סקשנים
+                                                            </button>
+                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים">
+                                                                <i class="fas fa-filter"></i> פילטרים
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <hr class="my-2">
@@ -176,10 +185,19 @@
                                                             <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים וסגנונות">
                                                                 <i class="fas fa-palette"></i> צבעים
                                                             </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון טבלאות">
+                                                                <i class="fas fa-sort"></i> מיון
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'sections', 'כלי פיתוח')" title="סקשנים">
+                                                                <i class="fas fa-folder-open"></i> סקשנים
+                                                            </button>
+                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('developmentTools', 'filters', 'כלי פיתוח')" title="פילטרים">
+                                                                <i class="fas fa-filter"></i> פילטרים
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <hr class="my-2">
-                                                    
+
                                                     <!-- עמודי בדיקה -->
                                                     <div class="mb-2">
                                                         <small class="text-muted d-block mb-1 fw-bold">🧪 עמודי בדיקה</small>
@@ -190,10 +208,19 @@
                                                             <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים וסגנונות">
                                                                 <i class="fas fa-palette"></i> צבעים
                                                             </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון טבלאות">
+                                                                <i class="fas fa-sort"></i> מיון
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('testing', 'sections', 'עמודי בדיקה')" title="סקשנים">
+                                                                <i class="fas fa-folder-open"></i> סקשנים
+                                                            </button>
+                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('testing', 'filters', 'עמודי בדיקה')" title="פילטרים">
+                                                                <i class="fas fa-filter"></i> פילטרים
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <hr class="my-2">
-                                                    
+
                                                     <!-- עמודים טכניים -->
                                                     <div class="mb-2">
                                                         <small class="text-muted d-block mb-1 fw-bold">⚙️ עמודים טכניים</small>
@@ -203,6 +230,26 @@
                                                             </button>
                                                             <button class="btn btn-outline-success btn-sm" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים וסגנונות">
                                                                 <i class="fas fa-palette"></i> צבעים
+                                                            </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון טבלאות">
+                                                                <i class="fas fa-sort"></i> מיון
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runCrossPageTestForGroup('technical', 'sections', 'עמודים טכניים')" title="סקשנים">
+                                                                <i class="fas fa-folder-open"></i> סקשנים
+                                                            </button>
+                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageTestForGroup('technical', 'filters', 'עמודים טכניים')" title="פילטרים">
+                                                                <i class="fas fa-filter"></i> פילטרים
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-2">
+
+                                                    <!-- בדיקה מקיפה - כל הטבלאות -->
+                                                    <div class="mb-2">
+                                                        <small class="text-muted d-block mb-1 fw-bold">🎯 בדיקה מקיפה</small>
+                                                        <div class="d-grid gap-1">
+                                                            <button class="btn btn-outline-danger btn-sm" onclick="runAllTableSortingTests()" title="בדיקת מיון לכל הטבלאות במערכת">
+                                                                <i class="fas fa-table"></i> מיון כל הטבלאות
                                                             </button>
                                                         </div>
                                                     </div>
@@ -298,6 +345,63 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Column 4: בדיקות כלליות -->
+                                    <div class="col-md-3">
+                                        <div class="card h-100 border-primary">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0 text-center">🌐 בדיקות כלליות</h6>
+                                            </div>
+                                            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                                                <div class="d-grid gap-2">
+                                                    <!-- בדיקות כלליות קיימות -->
+                                                    <div class="mb-2">
+                                                        <small class="text-muted d-block mb-1 fw-bold">✅ קיימות</small>
+                                                        <div class="d-grid gap-1">
+                                                            <button class="btn btn-outline-success btn-sm" onclick="runUITests()" title="בדיקות ממשק משתמש לכל העמודים">
+                                                                <i class="fas fa-desktop"></i> UI Tests
+                                                            </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runAPITests()" title="בדיקות API לכל הישויות">
+                                                                <i class="fas fa-exchange-alt"></i> API Tests
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runE2ETests()" title="בדיקות מקצה לקצה לישויות">
+                                                                <i class="fas fa-route"></i> E2E Tests
+                                                            </button>
+                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runDebugTools()" title="כלי דיבוג וניטור">
+                                                                <i class="fas fa-tools"></i> Debug Tools
+                                                            </button>
+                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCrossPageInfoSummaryTest()" title="סיכום מידע בכל העמודים">
+                                                                <i class="fas fa-chart-bar"></i> Info Summary
+                                                            </button>
+                                                            <button class="btn btn-outline-dark btn-sm" onclick="runAllTableSortingTests()" title="מיון לכל הטבלאות במערכת">
+                                                                <i class="fas fa-table"></i> Table Sorting
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-2">
+
+                                                    <!-- בדיקות כלליות חדשות -->
+                                                    <div class="mb-2">
+                                                        <small class="text-muted d-block mb-1 fw-bold">✨ חדשות</small>
+                                                        <div class="d-grid gap-1">
+                                                            <button class="btn btn-outline-primary btn-sm" onclick="runAllColorsTests()" title="צבעים לכל העמודים">
+                                                                <i class="fas fa-palette"></i> All Colors
+                                                            </button>
+                                                            <button class="btn btn-outline-success btn-sm" onclick="runAllSectionsTests()" title="סקשנים לכל העמודים עם סקשנים">
+                                                                <i class="fas fa-folder-open"></i> All Sections
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" onclick="runAllFiltersTests()" title="פילטרים לכל הטבלאות">
+                                                                <i class="fas fa-filter"></i> All Filters
+                                                            </button>
+                                                            <button class="btn btn-outline-info btn-sm" onclick="runAllDefaultsTests()" title="ברירות מחדל לכל העמודים">
+                                                                <i class="fas fa-calendar-check"></i> All Defaults
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -373,6 +477,7 @@
                                     <table class="table table-sm table-hover" id="testResultsTable">
                                         <thead class="table-dark">
                                             <tr>
+                                                <th style="width: 50px;">#</th>
                                                 <th>עמוד</th>
                                                 <th>סוג</th>
                                                 <th>סטטוס</th>
@@ -382,7 +487,7 @@
                                         </thead>
                                         <tbody id="testResultsBody">
                                             <tr>
-                                                <td colspan="5" class="text-center text-muted">
+                                                <td colspan="6" class="text-center text-muted">
                                                     בחר סוג בדיקה כדי להתחיל
                                                 </td>
                                             </tr>

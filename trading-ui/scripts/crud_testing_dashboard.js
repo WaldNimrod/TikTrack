@@ -848,61 +848,30 @@ class IntegratedCRUDE2ETester {
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performCreateTest',message:'Starting create test',data:{entityType,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,unifiedCRUDKeys:iframeWindow.UnifiedCRUDService ? Object.keys(iframeWindow.UnifiedCRUDService) : null,hasModalManager:!!iframeWindow.ModalManagerV2},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
             // #endregion
 
-            // Open create modal
-            if (iframeWindow.ModalManagerV2) {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:showModal',message:'About to call ModalManagerV2.showModal',data:{modalId:fieldMap.modalId,iframeWindowType:typeof iframeWindow,iframeDocType:typeof iframeDoc,iframeBodyExists:!!iframeDoc?.body,iframeBodyChildren:iframeDoc?.body?.children?.length,mainBodyChildren:document.body?.children?.length,iframeHasModalManager:!!iframeWindow.ModalManagerV2,iframeModalManagerInitialized:iframeWindow.ModalManagerV2?.isInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
-                // #endregion
-
-                try {
-                    await iframeWindow.ModalManagerV2.showModal(fieldMap.modalId);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:afterShowModal',message:'Modal showModal completed successfully',data:{modalId:fieldMap.modalId,modalExistsInIframe:!!iframeDoc.getElementById(fieldMap.modalId),modalExistsInMain:!!document.getElementById(fieldMap.modalId),iframeModalManagerModals:iframeWindow.ModalManagerV2?.modals?.size,iframeModalManagerHasModal:iframeWindow.ModalManagerV2?.modals?.has(fieldMap.modalId)},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
-                    // #endregion
-                } catch (modalError) {
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:showModalError',message:'Modal showModal failed',data:{modalId:fieldMap.modalId,error:modalError.message,modalExistsInIframe:!!iframeDoc.getElementById(fieldMap.modalId),modalExistsInMain:!!document.getElementById(fieldMap.modalId),iframeModalManagerModals:iframeWindow.ModalManagerV2?.modals?.size,iframeModalManagerHasModal:iframeWindow.ModalManagerV2?.modals?.has(fieldMap.modalId)},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
-                    // #endregion
-                    throw modalError;
-                }
-    } else {
-                throw new Error('ModalManagerV2 not available in iframe');
-            }
-
-            // Prepare test data
+            // Generate test data
             const testData = this.generateTestData(entityType, fieldMap);
+            console.log(`🔄 DEBUG: Generated test data for ${entityType}:`, testData);
 
-            // Fill form using DataCollectionService
-            if (!iframeWindow.DataCollectionService) {
-                throw new Error('DataCollectionService not available in iframe');
+            // Test the CRUD service directly instead of using modals
+            console.log(`🔄 DEBUG: Testing UnifiedCRUDService.create directly`);
+
+            if (!iframeWindow.UnifiedCRUDService || typeof iframeWindow.UnifiedCRUDService.create !== 'function') {
+                throw new Error('UnifiedCRUDService.create is not available');
             }
 
-            // Set form values
-            const setFormDataResult = iframeWindow.DataCollectionService.setFormData(fieldMap.fields, testData);
-            console.log(`🔧 DEBUG: setFormData result for ${entityType}:`, setFormDataResult);
+            // Call the CRUD service directly
+            const result = await iframeWindow.UnifiedCRUDService.create(entityType, testData);
 
-            // Additional direct setting for problematic fields
-            this.setFormFieldsDirectly(iframeDoc, fieldMap.fields, testData);
-
-            // Special handling for trade_plan entry_price
-            if (entityType === 'trade-plan') {
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for automatic price fetching
-                this.reSetEntryPrice(iframeDoc, fieldMap.fields, testData);
+            if (!result || !result.success) {
+                throw new Error(`CRUD create failed: ${result?.error || 'Unknown error'}`);
             }
 
-            // Collect and validate form data
-            const formData = iframeWindow.DataCollectionService.collectFormData(fieldMap.fields);
-            console.log(`📝 DEBUG: Collected form data for ${entityType}:`, formData);
+            console.log(`✅ DEBUG: CRUD create succeeded, record ID: ${result.data?.id || result.id}`);
 
-            // Submit form
-            const submitResult = await this.submitForm(iframeWindow, iframeDoc, entityType, formData);
-            if (!submitResult.success) {
-                return { success: false, error: submitResult.error };
-            }
-
-            return { success: true, recordId: submitResult.recordId };
+            return {
+                success: true,
+                recordId: result.data?.id || result.id
+            };
 
         } catch (error) {
             console.error(`❌ DEBUG: CREATE test failed for ${entityType}:`, error);
@@ -2589,25 +2558,209 @@ window.runAllTableSortingTests = async function() {
 
     console.log(`🚀 Starting comprehensive table sorting test on ${groupsWithTables.length} groups`);
 
+    // #region agent log - HYPOTHESIS: Comprehensive test start
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            location:'crud_testing_dashboard.js:runAllTableSortingTests:start',
+            message:`Starting comprehensive sorting test on ${groupsWithTables.length} groups`,
+            data:{
+                groupsWithTables:groupsWithTables,
+                crudTesterExists:!!window.crudTester,
+                crossPageTesterExists:!!window.crossPageTester
+            },
+            timestamp:Date.now(),
+            sessionId:'debug-session',
+            runId:'comprehensive-sorting-test',
+            hypothesisId:'COMPREHENSIVE_TEST_START'
+        })
+    }).catch(()=>{});
+    // #endregion
+
     // Run tests sequentially with small delay between groups
-    for (const groupName of groupsWithTables) {
+    for (let i = 0; i < groupsWithTables.length; i++) {
+        const groupName = groupsWithTables[i];
         try {
-            console.log(`📋 Testing group: ${groupName}`);
+            console.log(`📋 Testing group ${i+1}/${groupsWithTables.length}: ${groupName}`);
+
+            // #region agent log - HYPOTHESIS: Group test start
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-start',
+                    message:`Starting test for group: ${groupName}`,
+                    data:{
+                        groupName:groupName,
+                        groupIndex:i,
+                        totalGroups:groupsWithTables.length,
+                        sortingResultsBefore:this.results?.crossPage?.sorting?.length || 0
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'comprehensive-sorting-test',
+                    hypothesisId:'GROUP_TEST_START'
+                })
+            }).catch(()=>{});
+            // #endregion
+
             await runCrossPageTestForGroup(groupName, 'sorting', `${groupName} - מיון`);
+
+            // #region agent log - HYPOTHESIS: Group test end
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-end',
+                    message:`Completed test for group: ${groupName}`,
+                    data:{
+                        groupName:groupName,
+                        groupIndex:i,
+                        sortingResultsAfter:this.results?.crossPage?.sorting?.length || 0,
+                        lastResults:this.results?.crossPage?.sorting?.slice(-3) || []
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'comprehensive-sorting-test',
+                    hypothesisId:'GROUP_TEST_END'
+                })
+            }).catch(()=>{});
+            // #endregion
 
             // Small delay between groups to prevent overwhelming the system
             await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
             console.error(`❌ Error testing group ${groupName}:`, error);
+
+            // #region agent log - HYPOTHESIS: Group test error
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-error',
+                    message:`Error testing group: ${groupName}`,
+                    data:{
+                        groupName:groupName,
+                        error:error.message,
+                        sortingResultsCount:this.results?.crossPage?.sorting?.length || 0
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'comprehensive-sorting-test',
+                    hypothesisId:'GROUP_TEST_ERROR'
+                })
+            }).catch(()=>{});
+            // #endregion
         }
     }
 
     console.log('✅ Comprehensive table sorting test completed');
+
+    // Show final comprehensive summary
+    showComprehensiveTestSummary('sorting', groupsWithTables.length);
+
+    // #region agent log - HYPOTHESIS: Comprehensive test end
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            location:'crud_testing_dashboard.js:runAllTableSortingTests:end',
+            message:`Comprehensive sorting test completed`,
+            data:{
+                totalGroups:groupsWithTables.length,
+                finalSortingResultsCount:this.results?.crossPage?.sorting?.length || 0,
+                allResultsCount:this.results ? Object.keys(this.results).reduce((sum, key) => sum + (Array.isArray(this.results[key]) ? this.results[key].length : 0), 0) : 0
+            },
+            timestamp:Date.now(),
+            sessionId:'debug-session',
+            runId:'comprehensive-sorting-test',
+            hypothesisId:'COMPREHENSIVE_TEST_END'
+        })
+    }).catch(()=>{});
+    // #endregion
+};
+
+// Function to show comprehensive test summary after all groups are tested
+window.showComprehensiveTestSummary = function(testType, groupsTested) {
+    const finalReportCard = document.getElementById('finalReportCard');
+    if (finalReportCard) {
+        // Calculate comprehensive summary statistics
+        const allResults = window.crudTester?.results?.crossPage?.[testType] || [];
+        const totalTests = allResults.length;
+        const passedTests = allResults.filter(r => r.status === 'success').length;
+        const failedTests = allResults.filter(r => r.status === 'failed').length;
+        const warningTests = allResults.filter(r => r.status === 'warning').length;
+
+        // Update final report card with comprehensive data
+        const overallScore = document.getElementById('overallScore');
+        const passedCount = document.getElementById('passedCount');
+        const problematicCount = document.getElementById('problematicCount');
+        const criticalCount = document.getElementById('criticalCount');
+        const totalTime = document.getElementById('totalTime');
+        const entitiesTested = document.getElementById('entitiesTested');
+
+        const successRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+        if (overallScore) overallScore.textContent = `${successRate}/100`;
+        if (passedCount) passedCount.textContent = passedTests;
+        if (problematicCount) problematicCount.textContent = warningTests;
+        if (criticalCount) criticalCount.textContent = failedTests;
+        if (totalTime) totalTime.textContent = '--'; // Could calculate actual total time
+        if (entitiesTested) entitiesTested.textContent = totalTests;
+
+        // Update card header to reflect comprehensive test
+        const cardHeader = finalReportCard.querySelector('.card-header h6');
+        if (cardHeader) {
+            cardHeader.innerHTML = `<i class="fas fa-chart-line"></i> דוח סופי - בדיקת מיון מקיפה הושלמה`;
+        }
+
+        // Add summary message
+        const cardBody = finalReportCard.querySelector('.card-body');
+        if (cardBody) {
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'alert alert-info mt-3';
+            summaryDiv.innerHTML = `
+                <strong>סיכום בדיקה מקיפה:</strong><br>
+                נבדקו ${groupsTested} קבוצות עמודים<br>
+                סה"כ ${totalTests} עמודים נבדקו<br>
+                ${passedTests} עברו בהצלחה, ${failedTests} נכשלו, ${warningTests} עם אזהרות
+            `;
+            cardBody.appendChild(summaryDiv);
+        }
+
+        // Show the card
+        finalReportCard.style.display = 'block';
+
+        console.log(`📊 Comprehensive test summary displayed: ${passedTests}/${totalTests} passed`);
+    }
 };
 
 window.runCrossPageTestForGroup = async function(groupName, testType, groupDisplayName) {
     try {
         console.log(`🚀 Starting cross-page test: ${groupName} -> ${testType}`);
+
+        // #region agent log - HYPOTHESIS: Function entry
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runCrossPageTestForGroup:entry',
+                message:`runCrossPageTestForGroup called: ${groupName}, ${testType}, ${groupDisplayName}`,
+                data:{
+                    groupName:groupName,
+                    testType:testType,
+                    groupDisplayName:groupDisplayName,
+                    crudTesterExists:!!window.crudTester,
+                    crossPageTesterExists:!!window.crossPageTester,
+                    sortingResultsBefore:window.crudTester?.results?.crossPage?.sorting?.length || 0
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'cross-page-test',
+                hypothesisId:'FUNCTION_ENTRY'
+            })
+        }).catch(()=>{});
+        // #endregion
 
         // #region agent log - HYPOTHESIS 3: Function called correctly
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -2840,8 +2993,50 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
 
         console.log(`✅ Cross-page test completed: ${groupName} -> ${testType}`);
 
+        // #region agent log - HYPOTHESIS: Function exit success
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runCrossPageTestForGroup:exit-success',
+                message:`runCrossPageTestForGroup completed successfully: ${groupName}, ${testType}`,
+                data:{
+                    groupName:groupName,
+                    testType:testType,
+                    sortingResultsAfter:window.crudTester?.results?.crossPage?.sorting?.length || 0,
+                    totalResultsCount:window.crudTester ? Object.keys(window.crudTester.results).reduce((sum, key) => sum + (Array.isArray(window.crudTester.results[key]) ? window.crudTester.results[key].length : 0), 0) : 0
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'cross-page-test',
+                hypothesisId:'FUNCTION_EXIT_SUCCESS'
+            })
+        }).catch(()=>{});
+        // #endregion
+
     } catch (error) {
         console.error('❌ Error in runCrossPageTestForGroup:', error);
+
+        // #region agent log - HYPOTHESIS: Function exit error
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runCrossPageTestForGroup:exit-error',
+                message:`runCrossPageTestForGroup failed: ${groupName}, ${testType}`,
+                data:{
+                    groupName:groupName,
+                    testType:testType,
+                    error:error.message,
+                    sortingResultsCount:window.crudTester?.results?.crossPage?.sorting?.length || 0
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'cross-page-test',
+                hypothesisId:'FUNCTION_EXIT_ERROR'
+            })
+        }).catch(()=>{});
+        // #endregion
 
         // Show error notification
         if (window.NotificationSystem && window.NotificationSystem.showError) {
@@ -2864,11 +3059,163 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
     }
 };
 
+/**
+ * Run colors tests on all pages in the system
+ */
+window.runAllColorsTests = async function() {
+    console.log('🎨 Starting comprehensive colors test on all pages');
+
+    if (!window.crudTester) {
+        throw new Error('crudTester not initialized');
+    }
+
+    // Reset stats
+    window.crudTester.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: 1, executionTime: 0 };
+    window.crudTester.results = { crossPage: {} };
+
+    const startTime = Date.now();
+
+    try {
+        // Test colors for all groups
+        const allGroups = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+
+        for (const groupName of allGroups) {
+            await window.runCrossPageTestForGroup(groupName, 'colors', `צבעים - ${groupName}`);
+        }
+
+        window.crudTester.stats.executionTime = Date.now() - startTime;
+        window.crudTester.updateTestResults();
+
+        console.log('✅ All colors tests completed');
+
+    } catch (error) {
+        console.error('❌ Error in runAllColorsTests:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בבדיקת צבעים כללית: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run sections tests on all pages with sections
+ */
+window.runAllSectionsTests = async function() {
+    console.log('📁 Starting comprehensive sections test on all pages with sections');
+
+    if (!window.crudTester) {
+        throw new Error('crudTester not initialized');
+    }
+
+    // Reset stats
+    window.crudTester.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: 1, executionTime: 0 };
+    window.crudTester.results = { crossPage: {} };
+
+    const startTime = Date.now();
+
+    try {
+        // Test sections only for groups that have pages with sections
+        const groupsWithSections = ['user']; // Only user group has pages with sections
+
+        for (const groupName of groupsWithSections) {
+            await window.runCrossPageTestForGroup(groupName, 'sections', `סקשנים - ${groupName}`);
+        }
+
+        window.crudTester.stats.executionTime = Date.now() - startTime;
+        window.crudTester.updateTestResults();
+
+        console.log('✅ All sections tests completed');
+
+    } catch (error) {
+        console.error('❌ Error in runAllSectionsTests:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בבדיקת סקשנים כללית: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run filters tests on all pages with tables
+ */
+window.runAllFiltersTests = async function() {
+    console.log('🔍 Starting comprehensive filters test on all pages with tables');
+
+    if (!window.crudTester) {
+        throw new Error('crudTester not initialized');
+    }
+
+    // Reset stats
+    window.crudTester.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: 1, executionTime: 0 };
+    window.crudTester.results = { crossPage: {} };
+
+    const startTime = Date.now();
+
+    try {
+        // Test filters for all groups with tables
+        const groupsWithTables = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+
+        for (const groupName of groupsWithTables) {
+            await window.runCrossPageTestForGroup(groupName, 'filters', `פילטרים - ${groupName}`);
+        }
+
+        window.crudTester.stats.executionTime = Date.now() - startTime;
+        window.crudTester.updateTestResults();
+
+        console.log('✅ All filters tests completed');
+
+    } catch (error) {
+        console.error('❌ Error in runAllFiltersTests:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בבדיקת פילטרים כללית: ${error.message}`);
+        }
+    }
+};
+
+/**
+ * Run defaults tests on all pages
+ */
+window.runAllDefaultsTests = async function() {
+    console.log('📅 Starting comprehensive defaults test on all pages');
+
+    if (!window.crudTester) {
+        throw new Error('crudTester not initialized');
+    }
+
+    // Reset stats
+    window.crudTester.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: 1, executionTime: 0 };
+    window.crudTester.results = { crossPage: {} };
+
+    const startTime = Date.now();
+
+    try {
+        // Test defaults for all groups
+        const allGroups = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+
+        for (const groupName of allGroups) {
+            await window.runCrossPageTestForGroup(groupName, 'defaults', `ברירות מחדל - ${groupName}`);
+        }
+
+        window.crudTester.stats.executionTime = Date.now() - startTime;
+        window.crudTester.updateTestResults();
+
+        console.log('✅ All defaults tests completed');
+
+    } catch (error) {
+        console.error('❌ Error in runAllDefaultsTests:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בבדיקת ברירות מחדל כללית: ${error.message}`);
+        }
+    }
+};
+
 // Log that button system tests function is available
 window.Logger?.debug('crud_testing_dashboard.js loaded', {
     page: 'crud-testing-dashboard',
     runButtonSystemTests: typeof window.runButtonSystemTests,
     testButtonSystemDirect: typeof window.testButtonSystemDirect,
-    runCrossPageTestForGroup: typeof window.runCrossPageTestForGroup
+    runCrossPageTestForGroup: typeof window.runCrossPageTestForGroup,
+    runAllColorsTests: typeof window.runAllColorsTests,
+    runAllSectionsTests: typeof window.runAllSectionsTests,
+    runAllFiltersTests: typeof window.runAllFiltersTests,
+    runAllDefaultsTests: typeof window.runAllDefaultsTests
 });
 

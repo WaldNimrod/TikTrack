@@ -612,7 +612,7 @@ class IntegratedCRUDE2ETester {
             if (pageEntry) {
                 const [pageKey, page] = pageEntry;
                 await this.runGenericCRUDTest(pageKey, page);
-                } else {
+    } else {
                 // Fallback - just mark as success
                 this.results.e2e.push({
                     workflow: `${entityType} CRUD`,
@@ -645,6 +645,44 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Map page key to entity type for CRUD operations
+     */
+    mapPageKeyToEntityType(pageKey) {
+        const mapping = {
+            'trades': 'trade',
+            'trade_plans': 'trade_plan',
+            'alerts': 'alert',
+            'tickers': 'ticker',
+            'trading_accounts': 'trading_account',
+            'executions': 'execution',
+            'cash_flows': 'cash_flow',
+            'notes': 'note',
+            'watch_lists': 'watch_list'
+        };
+        return mapping[pageKey] || pageKey;
+    }
+
+    getModalConfigName(modalId) {
+        const configMap = {
+            'tradesModal': 'tradesModalConfig',
+            'tradePlansModal': 'tradePlansModalConfig',
+            'tickersModal': 'tickersModalConfig',
+            'executionsModal': 'executionsModalConfig',
+            'notesModal': 'notesModalConfig',
+            'tradingAccountsModal': 'tradingAccountsModalConfig',
+            'alertsModal': 'alertsModalConfig',
+            'cashFlowModal': 'cashFlowModalConfig',
+            'tradingJournalModal': 'tradingJournalModalConfig',
+            'watchListModal': 'watchListModalConfig',
+            'userProfileModal': 'userProfileModalConfig',
+            'dataImportModal': 'dataImportModalConfig',
+            'tagModal': 'tagModalConfig',
+            'preferencesModal': 'preferencesModalConfig'
+        };
+        return configMap[modalId] || `${modalId}Config`;
+    }
+
+    /**
      * Run generic CRUD test for a page
      */
     async runGenericCRUDTest(pageKey, page) {
@@ -667,8 +705,79 @@ class IntegratedCRUDE2ETester {
             const iframeDoc = iframe.contentDocument;
             const iframeWindow = iframe.contentWindow;
 
-            // Wait for page to fully load
-            await new Promise(resolve => setTimeout(resolve, 2000));
+                // Wait for page to fully load and initialization to complete
+                let waitCount = 0;
+                const maxWaitTime = 150; // 15 seconds for full initialization
+                while (waitCount < maxWaitTime) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitCount++;
+
+                    // Check if UnifiedAppInitializer has completed
+                    const unifiedAppInitialized = iframeWindow.globalInitializationState?.unifiedAppInitialized;
+                    const hasUnifiedCRUD = !!iframeWindow.UnifiedCRUDService;
+
+                    if (unifiedAppInitialized && hasUnifiedCRUD) {
+                        console.log(`✅ DEBUG: Page fully initialized after ${waitCount * 100}ms`);
+                        break;
+                    }
+
+                    // Debug every 2 seconds
+                    if (waitCount % 20 === 0) {
+                        console.log(`🔄 DEBUG: Waiting for initialization, attempt ${waitCount}/${maxWaitTime}`);
+                        console.log(`🔄 DEBUG: UnifiedApp initialized: ${unifiedAppInitialized}`);
+                        console.log(`🔄 DEBUG: UnifiedCRUD available: ${hasUnifiedCRUD}`);
+                        console.log(`🔄 DEBUG: iframe readyState: ${iframeDoc.readyState}`);
+                    }
+                }
+
+                if (!iframeWindow.UnifiedCRUDService) {
+                    throw new Error('UnifiedCRUDService not loaded in iframe after 15 seconds');
+                }
+
+                if (!iframeWindow.globalInitializationState?.unifiedAppInitialized) {
+                    console.warn(`⚠️ DEBUG: UnifiedApp may not be fully initialized, but proceeding with UnifiedCRUD available`);
+                }
+
+                // Wait for modal configs to be available
+                const modalConfigName = this.getModalConfigName(fieldMap.modalId);
+                console.log(`🔄 DEBUG: Waiting for modal config: ${modalConfigName}`);
+
+                let configWaitCount = 0;
+                const maxConfigWaitTime = 50; // 5 seconds for modal config
+                while (!iframeWindow[modalConfigName] && configWaitCount < maxConfigWaitTime) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    configWaitCount++;
+
+                    // Debug every second
+                    if (configWaitCount % 10 === 0) {
+                        console.log(`🔄 DEBUG: Still waiting for ${modalConfigName}, attempt ${configWaitCount}/${maxConfigWaitTime}`);
+                        console.log(`🔄 DEBUG: ModalManagerV2 available: ${!!iframeWindow.ModalManagerV2}`);
+                        console.log(`🔄 DEBUG: ModalManagerV2 initialized: ${iframeWindow.ModalManagerV2?.isInitialized}`);
+
+                        // Check if we need to initialize ModalManagerV2
+                        if (iframeWindow.ModalManagerV2 && !iframeWindow.ModalManagerV2.isInitialized) {
+                            console.log(`🔄 DEBUG: ModalManagerV2 not initialized, trying to initialize manually`);
+                            try {
+                                iframeWindow.ModalManagerV2.init();
+                                console.log(`✅ DEBUG: ModalManagerV2 initialized manually`);
+                            } catch (initError) {
+                                console.log(`⚠️ DEBUG: Manual ModalManagerV2 init failed: ${initError.message}`);
+                            }
+                        }
+                    }
+                }
+
+                if (!iframeWindow[modalConfigName]) {
+                    console.error(`❌ DEBUG: Modal config ${modalConfigName} not found after ${maxConfigWaitTime * 100}ms`);
+                    console.error(`❌ DEBUG: Available modal-related keys:`, Object.keys(iframeWindow).filter(key => key.includes('Modal') || key.includes('modal') || key.includes('Config') || key.includes('config')));
+                    throw new Error(`Modal config ${modalConfigName} not loaded in iframe after 5 seconds`);
+                }
+
+                console.log(`✅ DEBUG: Modal config ${modalConfigName} loaded successfully`);
+
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:658',message:'After iframe load wait',data:{pageKey,iframeWindowKeys:Object.keys(iframeWindow),hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,hasParentUnifiedCRUD:!!window.UnifiedCRUDService},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            // #endregion
 
             // Get field map for this entity
             const fieldMaps = this.getEntityFieldMaps();
@@ -789,11 +898,30 @@ class IntegratedCRUDE2ETester {
      */
     async performCreateTest(iframeWindow, iframeDoc, entityType, fieldMap) {
         try {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performCreateTest',message:'Starting create test',data:{entityType,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,unifiedCRUDKeys:iframeWindow.UnifiedCRUDService ? Object.keys(iframeWindow.UnifiedCRUDService) : null,hasModalManager:!!iframeWindow.ModalManagerV2},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            // #endregion
+
             // Open create modal
             if (iframeWindow.ModalManagerV2) {
-                await iframeWindow.ModalManagerV2.showModal(fieldMap.modalId);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            } else {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:showModal',message:'About to call ModalManagerV2.showModal',data:{modalId:fieldMap.modalId,iframeWindowType:typeof iframeWindow,iframeDocType:typeof iframeDoc,iframeBodyExists:!!iframeDoc?.body,iframeBodyChildren:iframeDoc?.body?.children?.length,mainBodyChildren:document.body?.children?.length,iframeHasModalManager:!!iframeWindow.ModalManagerV2,iframeModalManagerInitialized:iframeWindow.ModalManagerV2?.isInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+                // #endregion
+
+                try {
+                    await iframeWindow.ModalManagerV2.showModal(fieldMap.modalId);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:afterShowModal',message:'Modal showModal completed successfully',data:{modalId:fieldMap.modalId,modalExistsInIframe:!!iframeDoc.getElementById(fieldMap.modalId),modalExistsInMain:!!document.getElementById(fieldMap.modalId),iframeModalManagerModals:iframeWindow.ModalManagerV2?.modals?.size,iframeModalManagerHasModal:iframeWindow.ModalManagerV2?.modals?.has(fieldMap.modalId)},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+                    // #endregion
+                } catch (modalError) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:showModalError',message:'Modal showModal failed',data:{modalId:fieldMap.modalId,error:modalError.message,modalExistsInIframe:!!iframeDoc.getElementById(fieldMap.modalId),modalExistsInMain:!!document.getElementById(fieldMap.modalId),iframeModalManagerModals:iframeWindow.ModalManagerV2?.modals?.size,iframeModalManagerHasModal:iframeWindow.ModalManagerV2?.modals?.has(fieldMap.modalId)},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+                    // #endregion
+                    throw modalError;
+                }
+    } else {
                 throw new Error('ModalManagerV2 not available in iframe');
             }
 
@@ -1026,8 +1154,21 @@ class IntegratedCRUDE2ETester {
      */
     async submitForm(iframeWindow, iframeDoc, entityType, formData) {
         try {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:submitForm',message:'About to check UnifiedCRUDService',data:{entityType,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,hasCreateMethod:iframeWindow.UnifiedCRUDService?.create ? typeof iframeWindow.UnifiedCRUDService.create : 'no service',formDataKeys:Object.keys(formData)},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            // #endregion
+
             if (!iframeWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in iframe');
+            }
+
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:createCall',message:'About to call UnifiedCRUDService.create',data:{entityType,formDataKeys:Object.keys(formData),createMethodType:typeof iframeWindow.UnifiedCRUDService.create,createMethodExists:!!iframeWindow.UnifiedCRUDService.create},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            // #endregion
+
+            // Ensure create method exists and is a function
+            if (!iframeWindow.UnifiedCRUDService.create || typeof iframeWindow.UnifiedCRUDService.create !== 'function') {
+                throw new TypeError(`iframeWindow.UnifiedCRUDService.create is not a function. Available methods: ${Object.getOwnPropertyNames(iframeWindow.UnifiedCRUDService).join(', ')}`);
             }
 
             // Use UnifiedCRUDService to create
@@ -1117,7 +1258,7 @@ class IntegratedCRUDE2ETester {
             this.stats.passed++;
             this.stats.totalTests++;
 
-        } catch (error) {
+            } catch (error) {
             this.logger?.error('❌ Preferences tests failed', { error: error.message });
             
             this.results.e2e.push({
@@ -1491,8 +1632,7 @@ class IntegratedCRUDE2ETester {
                     // Store results immediately after each test
                     this.results['info-summary'] = testResults;
                     
-                    // Update dashboard and test results table after each test
-                    this.updateTestResults();
+                    // Update test results table after each test
                     this.updateTestResults();
                     
                     // Clean up iframe after test completes
@@ -1515,8 +1655,7 @@ class IntegratedCRUDE2ETester {
                     // Store results immediately even on error
                     this.results['info-summary'] = testResults;
                     
-                    // Update dashboard and test results table even on error
-                    this.updateTestResults();
+                    // Update test results table even on error
                     this.updateTestResults();
                     
                     // Clean up iframe even on error
@@ -1526,7 +1665,6 @@ class IntegratedCRUDE2ETester {
 
             // Final update (redundant but ensures consistency)
             this.results['info-summary'] = testResults;
-            this.updateTestResults();
             this.updateTestResults();
 
             // Show summary
@@ -1543,7 +1681,7 @@ class IntegratedCRUDE2ETester {
                         'system'
                     );
                 }
-            } else {
+                    } else {
                 if (window.NotificationSystem && window.NotificationSystem.showWarning) {
                     window.NotificationSystem.showWarning(
                         'בדיקות Info Summary הושלמו עם כשלים',
@@ -1566,6 +1704,25 @@ class IntegratedCRUDE2ETester {
      * Shows the test-results section and updates progress/stats
      */
     updateTestResults() {
+        // #region agent log - H5_UI_RENDERING
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:updateTestResults:entry',
+                message:'updateTestResults method called',
+                data:{
+                    crossPageSortingCount:this.results.crossPage?.sorting?.length || 0,
+                    crossPageSortingPages:this.results.crossPage?.sorting?.map(r => r.page) || []
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'results-display-debug',
+                hypothesisId:'H5_UI_RENDERING'
+            })
+        }).catch(()=>{});
+        // #endregion
+
         try {
             console.log('🔍 DEBUG: updateTestResults called');
 
@@ -1758,6 +1915,27 @@ class IntegratedCRUDE2ETester {
             }
         });
 
+        // #region agent log - H1_RESULTS_STORAGE
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:updateTestResultsTable:raw-results',
+                message:'Raw results structure before processing',
+                data:{
+                    resultsKeys:Object.keys(this.results),
+                    crossPageKeys:this.results.crossPage ? Object.keys(this.results.crossPage) : null,
+                    sortingResultsCount:this.results.crossPage?.sorting?.length || 0,
+                    sortingResultsPages:this.results.crossPage?.sorting?.map(r => r.page) || []
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'results-display-debug',
+                hypothesisId:'H1_RESULTS_STORAGE'
+            })
+        }).catch(()=>{});
+        // #endregion
+
         console.log('🔍 DEBUG: updateTestResultsTable - raw results structure:', JSON.stringify(this.results, null, 2));
         console.log('🔍 DEBUG: updateTestResultsTable - processed allResults:', allResults.length, allResults.map(r => ({ page: r.page, testType: r.testType, status: r.status })));
 
@@ -1769,7 +1947,7 @@ class IntegratedCRUDE2ETester {
             const waitingRow = tbody.querySelector('tr');
             if (!waitingRow) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="5" class="text-center text-muted">בחר סוג בדיקה כדי להתחיל</td>';
+                row.innerHTML = '<td colspan="6" class="text-center text-muted">בחר סוג בדיקה כדי להתחיל</td>';
                 tbody.appendChild(row);
             }
             return;
@@ -1804,6 +1982,7 @@ class IntegratedCRUDE2ETester {
             const messageValue = result.error || result.message || 'Test completed';
 
             row.innerHTML = `
+                <td class="text-center fw-bold">${index + 1}</td>
                 <td>${pageValue}</td>
                 <td>${testTypeValue}</td>
                 <td class="${statusClass}">${statusIcon} ${statusValue}</td>
@@ -1818,6 +1997,36 @@ class IntegratedCRUDE2ETester {
 
         console.log('🔍 DEBUG: Final tbody children count:', tbody.children.length);
         console.log('🔍 DEBUG: Final tbody innerHTML:', tbody.innerHTML.substring(0, 500) + '...');
+
+        // Add summary row at the end
+        if (allResults.length > 0) {
+            const summaryRow = document.createElement('tr');
+            summaryRow.className = 'table-info fw-bold';
+
+            // Calculate summary statistics
+            const totalTests = allResults.length;
+            const passedTests = allResults.filter(r => r.status === 'success').length;
+            const failedTests = allResults.filter(r => r.status === 'failed').length;
+            const otherTests = totalTests - passedTests - failedTests;
+
+            const totalTime = allResults.reduce((sum, r) => sum + (r.executionTime || 0), 0);
+            const avgTime = totalTests > 0 ? Math.round(totalTime / totalTests) : 0;
+
+            summaryRow.innerHTML = `
+                <td class="text-center">∑</td>
+                <td colspan="2"><strong>סיכום כולל</strong></td>
+                <td class="text-center">
+                    <span class="badge bg-success me-1">${passedTests} ✓</span>
+                    <span class="badge bg-danger me-1">${failedTests} ✗</span>
+                    ${otherTests > 0 ? `<span class="badge bg-warning">${otherTests} ⚠</span>` : ''}
+                </td>
+                <td class="text-center">${avgTime}ms ממוצע</td>
+                <td><small class="text-muted">סה"כ: ${totalTests} בדיקות (${Math.round(totalTime)}ms כולל)</small></td>
+            `;
+
+            tbody.appendChild(summaryRow);
+            console.log(`📊 Added summary row: ${totalTests} tests, ${passedTests} passed, ${failedTests} failed`);
+        }
 
         console.log(`📊 Updated test results table with ${allResults.length} results`);
     }
@@ -2021,10 +2230,10 @@ class IntegratedCRUDE2ETester {
                             });
                         }
                     });
-                }
             }
-
-                } catch (error) {
+        }
+        
+    } catch (error) {
             this.logger?.error('❌ [testPageInfoSummary] Test failed', {
                 pageKey,
                 error: error.message,
@@ -2361,10 +2570,276 @@ window.showErrorTracker = async function() {
 // Export initialization function
 window.initializeCRUDTestingDashboard = initializeCRUDTestingDashboard;
 
+/**
+ * Run cross-page test for specific group and test type
+ * @param {string} groupName - Page group name (user, userManagement, developmentTools, testing, technical)
+ * @param {string} testType - Test type (defaults, colors, sorting, sections, filters)
+ * @param {string} groupDisplayName - Display name for the group
+ */
+window.runCrossPageTestForGroup = async function(groupName, testType, groupDisplayName) {
+    try {
+        console.log(`🚀 Starting cross-page test: ${groupName} -> ${testType}`);
+
+        // #region agent log - HYPOTHESIS 3: Function called correctly
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runCrossPageTestForGroup:entry',
+                message:`runCrossPageTestForGroup called with: ${groupName}, ${testType}, ${groupDisplayName}`,
+                data:{
+                    groupName:groupName,
+                    testType:testType,
+                    groupDisplayName:groupDisplayName,
+                    crudTesterExists:!!window.crudTester,
+                    crossPageTesterExists:!!window.crossPageTester
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'sorting-test-debug',
+                hypothesisId:'H3_FUNCTION_CALLED'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+        if (!window.crudTester) {
+            window.crudTester = new IntegratedCRUDE2ETester();
+            // #region agent log - HYPOTHESIS 3: Created crudTester
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:runCrossPageTestForGroup:crudTester-created',
+                    message:`Created new crudTester`,
+                    data:{
+                        crudTesterType:typeof window.crudTester,
+                        resultsInitialized:!!window.crudTester.results
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'sorting-test-debug',
+                    hypothesisId:'H3_FUNCTION_CALLED'
+                })
+            }).catch(()=>{});
+            // #endregion
+        }
+
+        if (!window.crossPageTester) {
+            window.crossPageTester = new CrossPageTester(window.crudTester);
+            // #region agent log - HYPOTHESIS 3: Created crossPageTester
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:runCrossPageTestForGroup:crossPageTester-created',
+                    message:`Created new crossPageTester`,
+                    data:{
+                        crossPageTesterType:typeof window.crossPageTester,
+                        crudTesterPassed:!!(window.crossPageTester?.crudTester)
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'sorting-test-debug',
+                    hypothesisId:'H3_FUNCTION_CALLED'
+                })
+            }).catch(()=>{});
+            // #endregion
+        }
+
+        // Show progress
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressDetails = document.getElementById('progressDetails');
+
+        if (progressContainer) progressContainer.style.display = 'block';
+        if (progressText) progressText.textContent = `מפעיל בדיקת ${testType} עבור ${groupDisplayName}`;
+        if (progressPercent) progressPercent.textContent = '0%';
+        if (progressBar) progressBar.style.width = '0%';
+        if (progressDetails) progressDetails.textContent = 'מאתחל בדיקה...';
+
+        // Get pages for the group
+        const pages = window.crossPageTester.getPagesForGroup(groupName, testType);
+        console.log(`📋 Found ${pages.length} pages for group ${groupName}:`, pages.map(p => p.key));
+
+        if (pages.length === 0) {
+            throw new Error(`No pages found for group: ${groupName}`);
+        }
+
+        // Run tests for each page
+        let completed = 0;
+        const total = pages.length;
+
+        for (const page of pages) {
+            try {
+                if (progressText) progressText.textContent = `בודק ${page.name}`;
+                if (progressDetails) progressDetails.textContent = `${completed + 1}/${total} עמודים`;
+
+                console.log(`🔍 Testing page: ${page.name} (${page.key})`);
+
+                // #region agent log - H3_PAGE_TESTING
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'crud_testing_dashboard.js:runCrossPageTestForGroup:test-page',
+                        message:`Starting test for page: ${page.name}`,
+                        data:{
+                            pageName:page.name,
+                            pageKey:page.key,
+                            testType:testType,
+                            pageIndex:completed,
+                            totalPages:total,
+                            hasTables:page.hasTables
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'results-display-debug',
+                        hypothesisId:'H3_PAGE_TESTING'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+                // Call the appropriate test method based on testType
+                switch (testType) {
+                    case 'defaults':
+                        await window.crossPageTester.testDefaults(page);
+                        break;
+                    case 'colors':
+                        await window.crossPageTester.testColors(page);
+                        break;
+                    case 'sorting':
+                        await window.crossPageTester.testSorting(page);
+                        break;
+                    case 'sections':
+                        await window.crossPageTester.testSections(page);
+                        break;
+                    case 'filters':
+                        await window.crossPageTester.testFilters(page);
+                        break;
+                    default:
+                        throw new Error(`Unknown test type: ${testType}`);
+                }
+
+                completed++;
+                const percent = Math.round((completed / total) * 100);
+                if (progressBar) progressBar.style.width = `${percent}%`;
+                if (progressPercent) progressPercent.textContent = `${percent}%`;
+
+            } catch (pageError) {
+                console.error(`❌ Error testing page ${page.name}:`, pageError);
+                window.Logger?.error(`Error testing page ${page.name}`, {
+                    error: pageError.message,
+                    page: page.key,
+                    testType
+                });
+
+                // Still count as completed for progress
+                completed++;
+                const percent = Math.round((completed / total) * 100);
+                if (progressBar) progressBar.style.width = `${percent}%`;
+                if (progressPercent) progressPercent.textContent = `${percent}%`;
+            }
+        }
+
+        // Complete
+        if (progressText) progressText.textContent = 'בדיקה הושלמה';
+        if (progressDetails) progressDetails.textContent = `הושלמו ${total} עמודים`;
+
+        // #region agent log - H1_RESULTS_STORAGE
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runCrossPageTestForGroup:update-results',
+                message:`Updating test results table after ${testType} test completion`,
+                data:{
+                    groupName:groupName,
+                    testType:testType,
+                    crudTesterExists:!!window.crudTester,
+                    updateFunctionExists:!!(window.crudTester?.updateTestResultsTable),
+                    crossPageResults:window.crudTester?.results?.crossPage ? Object.keys(window.crudTester.results.crossPage) : null,
+                    sortingResultsCount:window.crudTester?.results?.crossPage?.sorting?.length || 0
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'results-display-debug',
+                hypothesisId:'H1_RESULTS_STORAGE'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+        // Update test results table
+        if (window.crudTester && typeof window.crudTester.updateTestResultsTable === 'function') {
+            window.crudTester.updateTestResultsTable();
+        }
+
+        // Show final report card
+        const finalReportCard = document.getElementById('finalReportCard');
+        if (finalReportCard) {
+            // Calculate summary statistics
+            const sortingResults = window.crudTester?.results?.crossPage?.sorting || [];
+            const totalTests = sortingResults.length;
+            const passedTests = sortingResults.filter(r => r.status === 'success').length;
+            const failedTests = sortingResults.filter(r => r.status === 'failed').length;
+            const warningTests = sortingResults.filter(r => r.status === 'warning').length;
+
+            // Update final report card
+            const overallScore = document.getElementById('overallScore');
+            const passedCount = document.getElementById('passedCount');
+            const problematicCount = document.getElementById('problematicCount');
+            const criticalCount = document.getElementById('criticalCount');
+            const totalTime = document.getElementById('totalTime');
+            const entitiesTested = document.getElementById('entitiesTested');
+
+            if (overallScore) overallScore.textContent = totalTests > 0 ? `${Math.round((passedTests / totalTests) * 100)}/100` : '0/100';
+            if (passedCount) passedCount.textContent = passedTests;
+            if (problematicCount) problematicCount.textContent = warningTests;
+            if (criticalCount) criticalCount.textContent = failedTests;
+            if (totalTime) totalTime.textContent = '--'; // Could calculate actual time
+            if (entitiesTested) entitiesTested.textContent = totalTests;
+
+            // Show the card
+            finalReportCard.style.display = 'block';
+        }
+
+        // Show success notification
+        if (window.NotificationSystem && window.NotificationSystem.showSuccess) {
+            window.NotificationSystem.showSuccess(`בדיקת ${testType} עבור ${groupDisplayName} הושלמה בהצלחה`);
+        }
+
+        console.log(`✅ Cross-page test completed: ${groupName} -> ${testType}`);
+
+    } catch (error) {
+        console.error('❌ Error in runCrossPageTestForGroup:', error);
+
+        // Show error notification
+        if (window.NotificationSystem && window.NotificationSystem.showError) {
+            window.NotificationSystem.showError(`שגיאה בבדיקת ${testType}: ${error.message}`);
+        }
+
+        window.Logger?.error('Error in runCrossPageTestForGroup', {
+            error: error.message,
+            groupName,
+            testType
+        });
+    } finally {
+        // Hide progress after a delay
+        setTimeout(() => {
+            const progressContainer = document.getElementById('progressContainer');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
+        }, 3000);
+    }
+};
+
 // Log that button system tests function is available
 window.Logger?.debug('crud_testing_dashboard.js loaded', {
     page: 'crud-testing-dashboard',
     runButtonSystemTests: typeof window.runButtonSystemTests,
-    testButtonSystemDirect: typeof window.testButtonSystemDirect
+    testButtonSystemDirect: typeof window.testButtonSystemDirect,
+    runCrossPageTestForGroup: typeof window.runCrossPageTestForGroup
 });
 

@@ -995,6 +995,37 @@ class IntegratedCRUDE2ETester {
     }
 }
 
+// ============================================================================
+// INITIALIZATION FUNCTION
+// ============================================================================
+
+/**
+ * Initialize CRUD Testing Dashboard
+ * Creates and initializes the integrated testing system
+ */
+function initializeCRUDTestingDashboard() {
+    try {
+        // Create the main tester instance
+        window.crudTester = new IntegratedCRUDE2ETester();
+
+        // Initialize the dashboard UI
+        window.crudTester.initializeDashboard();
+
+        window.Logger?.info('🧪 CRUD Testing Dashboard initialized successfully', {
+            page: 'crud-testing-dashboard',
+            version: '2.0.0'
+        });
+
+    } catch (error) {
+        console.error('❌ Failed to initialize CRUD Testing Dashboard:', error);
+        window.Logger?.error('❌ CRUD Testing Dashboard initialization failed', {
+            error: error.message,
+            stack: error.stack,
+            page: 'crud-testing-dashboard'
+        });
+    }
+}
+
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeCRUDTestingDashboard);

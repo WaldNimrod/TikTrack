@@ -662,25 +662,6 @@ class IntegratedCRUDE2ETester {
         return mapping[pageKey] || pageKey;
     }
 
-    getModalConfigName(modalId) {
-        const configMap = {
-            'tradesModal': 'tradesModalConfig',
-            'tradePlansModal': 'tradePlansModalConfig',
-            'tickersModal': 'tickersModalConfig',
-            'executionsModal': 'executionsModalConfig',
-            'notesModal': 'notesModalConfig',
-            'tradingAccountsModal': 'tradingAccountsModalConfig',
-            'alertsModal': 'alertsModalConfig',
-            'cashFlowModal': 'cashFlowModalConfig',
-            'tradingJournalModal': 'tradingJournalModalConfig',
-            'watchListModal': 'watchListModalConfig',
-            'userProfileModal': 'userProfileModalConfig',
-            'dataImportModal': 'dataImportModalConfig',
-            'tagModal': 'tagModalConfig',
-            'preferencesModal': 'preferencesModalConfig'
-        };
-        return configMap[modalId] || `${modalId}Config`;
-    }
 
     /**
      * Run generic CRUD test for a page
@@ -738,42 +719,7 @@ class IntegratedCRUDE2ETester {
                     console.warn(`⚠️ DEBUG: UnifiedApp may not be fully initialized, but proceeding with UnifiedCRUD available`);
                 }
 
-                // Wait for modal configs to be available
-                const modalConfigName = this.getModalConfigName(fieldMap.modalId);
-                console.log(`🔄 DEBUG: Waiting for modal config: ${modalConfigName}`);
 
-                let configWaitCount = 0;
-                const maxConfigWaitTime = 50; // 5 seconds for modal config
-                while (!iframeWindow[modalConfigName] && configWaitCount < maxConfigWaitTime) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    configWaitCount++;
-
-                    // Debug every second
-                    if (configWaitCount % 10 === 0) {
-                        console.log(`🔄 DEBUG: Still waiting for ${modalConfigName}, attempt ${configWaitCount}/${maxConfigWaitTime}`);
-                        console.log(`🔄 DEBUG: ModalManagerV2 available: ${!!iframeWindow.ModalManagerV2}`);
-                        console.log(`🔄 DEBUG: ModalManagerV2 initialized: ${iframeWindow.ModalManagerV2?.isInitialized}`);
-
-                        // Check if we need to initialize ModalManagerV2
-                        if (iframeWindow.ModalManagerV2 && !iframeWindow.ModalManagerV2.isInitialized) {
-                            console.log(`🔄 DEBUG: ModalManagerV2 not initialized, trying to initialize manually`);
-                            try {
-                                iframeWindow.ModalManagerV2.init();
-                                console.log(`✅ DEBUG: ModalManagerV2 initialized manually`);
-                            } catch (initError) {
-                                console.log(`⚠️ DEBUG: Manual ModalManagerV2 init failed: ${initError.message}`);
-                            }
-                        }
-                    }
-                }
-
-                if (!iframeWindow[modalConfigName]) {
-                    console.error(`❌ DEBUG: Modal config ${modalConfigName} not found after ${maxConfigWaitTime * 100}ms`);
-                    console.error(`❌ DEBUG: Available modal-related keys:`, Object.keys(iframeWindow).filter(key => key.includes('Modal') || key.includes('modal') || key.includes('Config') || key.includes('config')));
-                    throw new Error(`Modal config ${modalConfigName} not loaded in iframe after 5 seconds`);
-                }
-
-                console.log(`✅ DEBUG: Modal config ${modalConfigName} loaded successfully`);
 
             // #region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:658',message:'After iframe load wait',data:{pageKey,iframeWindowKeys:Object.keys(iframeWindow),hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,hasParentUnifiedCRUD:!!window.UnifiedCRUDService},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
@@ -1004,6 +950,11 @@ class IntegratedCRUDE2ETester {
             const updateData = this.generateTestData(entityType, fieldMap, true); // true for update mode
             updateData.id = recordId;
 
+            // Ensure we have the required fields for update
+            if (!updateData.id) {
+                updateData.id = recordId;
+            }
+
             // Use UnifiedCRUDService to update
             if (!iframeWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in iframe');
@@ -1053,31 +1004,69 @@ class IntegratedCRUDE2ETester {
     generateTestData(entityType, fieldMap, isUpdate = false) {
         const testData = {};
 
-        // Generate data based on field map
-        for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
-            if (fieldConfig.default !== undefined) {
-                testData[fieldName] = fieldConfig.default;
-            } else if (fieldConfig.required) {
-                // Generate appropriate test values for required fields
-                testData[fieldName] = this.generateTestValue(fieldName, fieldConfig.type);
-            }
-        }
-
-        // Entity-specific customizations
+        // Entity-specific test data generation
         switch (entityType) {
             case 'ticker':
                 testData.symbol = `TEST${Date.now().toString().slice(-6)}`; // Unique symbol
+                testData.name = `Test Ticker ${Date.now()}`;
+                testData.exchange = 'NASDAQ';
                 break;
             case 'trade':
+                testData.trading_account_id = 1; // Assume account exists
+                testData.ticker_id = 1; // Assume ticker exists
+                testData.status = 'open';
+                testData.side = 'Long';
+                testData.investment_type = 'swing';
+                testData.planned_quantity = 100;
+                testData.entry_price = 100;
                 testData.notes = `Test trade ${Date.now()}`;
                 break;
-            case 'trade-plan':
+            case 'trade_plan':
+                testData.trading_account_id = 1; // Assume account exists
+                testData.ticker_id = 1; // Assume ticker exists
+                testData.side = 'Long';
+                testData.investment_type = 'swing';
+                testData.status = 'open';
+                testData.planned_amount = 10000;
+                testData.entry_price = 100;
                 testData.notes = `Test trade plan ${Date.now()}`;
                 break;
             case 'alert':
+                testData.related_type_id = 4; // Trade type
+                testData.related_id = 1; // Assume related record exists
                 testData.condition_attribute = 'price';
                 testData.condition_operator = 'above';
                 testData.condition_number = 100;
+                testData.status = 'new';
+                break;
+            case 'execution':
+                testData.trade_id = 1; // Assume trade exists
+                testData.quantity = 100;
+                testData.price = 100;
+                break;
+            case 'note':
+                testData.title = `Test Note ${Date.now()}`;
+                testData.content = 'Test note content';
+                break;
+            case 'trading_account':
+                testData.name = `Test Account ${Date.now()}`;
+                testData.account_type = 'stock';
+                break;
+            case 'cash_flow':
+                testData.amount = 1000;
+                testData.flow_type = 'deposit';
+                break;
+            case 'watch_list':
+                testData.name = `Test Watch List ${Date.now()}`;
+                break;
+            case 'user_profile':
+                testData.first_name = 'Test';
+                testData.last_name = 'User';
+                break;
+            case 'data_import':
+            case 'tag_management':
+            case 'preferences':
+                // These might not need test data or have minimal requirements
                 break;
         }
 
@@ -1086,8 +1075,26 @@ class IntegratedCRUDE2ETester {
             if (testData.notes) {
                 testData.notes += ' (updated)';
             }
-            if (entityType === 'trade-plan' && testData.entry_price) {
-                testData.entry_price = parseFloat(testData.entry_price) + 10; // Increase price
+            if (testData.name) {
+                testData.name += ' (updated)';
+            }
+            if (testData.title) {
+                testData.title += ' (updated)';
+            }
+            if (testData.content) {
+                testData.content += ' (updated)';
+            }
+            if (entityType === 'trade' && testData.planned_quantity) {
+                testData.planned_quantity = parseInt(testData.planned_quantity) + 50;
+            }
+            if (entityType === 'trade_plan' && testData.planned_amount) {
+                testData.planned_amount = parseFloat(testData.planned_amount) + 5000;
+            }
+            if (testData.entry_price && entityType !== 'ticker') {
+                testData.entry_price = parseFloat(testData.entry_price) + 5;
+            }
+            if (testData.condition_number) {
+                testData.condition_number = parseFloat(testData.condition_number) + 10;
             }
         }
 
@@ -2576,6 +2583,28 @@ window.initializeCRUDTestingDashboard = initializeCRUDTestingDashboard;
  * @param {string} testType - Test type (defaults, colors, sorting, sections, filters)
  * @param {string} groupDisplayName - Display name for the group
  */
+// Function to run sorting tests on all groups with tables
+window.runAllTableSortingTests = async function() {
+    const groupsWithTables = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+
+    console.log(`🚀 Starting comprehensive table sorting test on ${groupsWithTables.length} groups`);
+
+    // Run tests sequentially with small delay between groups
+    for (const groupName of groupsWithTables) {
+        try {
+            console.log(`📋 Testing group: ${groupName}`);
+            await runCrossPageTestForGroup(groupName, 'sorting', `${groupName} - מיון`);
+
+            // Small delay between groups to prevent overwhelming the system
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+            console.error(`❌ Error testing group ${groupName}:`, error);
+        }
+    }
+
+    console.log('✅ Comprehensive table sorting test completed');
+};
+
 window.runCrossPageTestForGroup = async function(groupName, testType, groupDisplayName) {
     try {
         console.log(`🚀 Starting cross-page test: ${groupName} -> ${testType}`);
@@ -2624,7 +2653,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
             // #endregion
         }
 
-        if (!window.crossPageTester) {
+        if (!window.crossPageTester && typeof CrossPageTester !== 'undefined') {
             window.crossPageTester = new CrossPageTester(window.crudTester);
             // #region agent log - HYPOTHESIS 3: Created crossPageTester
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{

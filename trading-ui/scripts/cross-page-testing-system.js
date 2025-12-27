@@ -3856,6 +3856,7 @@ class CrossPageTester {
             }).catch(()=>{});
             // #endregion
         }
+        }
         catch (error) {
             result.status = 'error';
             result.errors.push(error.message);

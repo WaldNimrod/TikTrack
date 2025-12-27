@@ -4450,7 +4450,9 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
       'window.runIntegratedTests',
       'window.runUITests',
       'window.runAPITests',
-      'window.runDebugTools'
+      'window.runDebugTools',
+      'window.runExecutionsDefaultsTest',
+      'window.runCrossPageTestForGroup'
     ],
     description: 'Advanced testing dashboard for CRUD operations with UI, API, and E2E testing',
     lastModified: '2025-12-23',
@@ -4471,6 +4473,138 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
         if (window.initializeCRUDTestingDashboard) {
           await window.initializeCRUDTestingDashboard();
         }
+
+        // Define global function for executions defaults test
+        window.runExecutionsDefaultsTest = async function() {
+          await window.runCrossPageTestForGroup('user', 'defaults', 'ביצועים');
+        };
+
+        // Define global function for cross-page testing by group
+        window.runCrossPageTestForGroup = async function(groupType, testType, displayName) {
+          try {
+            // Create CrossPageTester instance
+            const crossPageTester = new window.CrossPageTester(window.crudTester);
+
+            // Show the test section
+            if (window.showTestSection) {
+              window.showTestSection('test-results');
+            }
+
+            // Initialize results if needed
+            if (window.integratedTester) {
+              window.integratedTester.currentTestType = 'crossPage';
+              window.integratedTester.results.crossPage = window.integratedTester.results.crossPage || { defaults: [], colors: [], sorting: [], sections: [], filters: [] };
+            }
+
+            // Run tests for the specified group
+            await crossPageTester.runTestsForGroup(groupType, testType);
+
+            // Update dashboard
+            if (window.integratedTester && typeof window.integratedTester.updateDashboard === 'function') {
+              window.integratedTester.updateDashboard();
+            }
+            if (window.integratedTester && typeof window.integratedTester.updateTestResults === 'function') {
+              window.integratedTester.updateTestResults();
+            }
+
+            // Show success notification
+            if (window.showSuccessNotification) {
+              const stats = crossPageTester.stats;
+              window.showSuccessNotification(`בדיקת ${displayName} - ${testType} הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+            }
+
+          } catch (error) {
+            console.error('❌ Error running cross-page test', error);
+            if (window.showErrorNotification) {
+              window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ${displayName}: ${error.message}`);
+            }
+          }
+        };
+
+        // Define individual entity test functions
+        window.runExecutionTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('execution');
+          }
+        };
+
+        window.runTradeTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('trade');
+          }
+        };
+
+        window.runTradePlanTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('trade_plan');
+          }
+        };
+
+        window.runAlertTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('alert');
+          }
+        };
+
+        window.runTickerTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('ticker');
+          }
+        };
+
+        window.runTradingAccountTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('trading_account');
+          }
+        };
+
+        window.runCashFlowTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('cash_flow');
+          }
+        };
+
+        window.runNoteTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('note');
+          }
+        };
+
+        window.runWatchListTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('watch_list');
+          }
+        };
+
+        window.runTradingJournalTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('trading_journal');
+          }
+        };
+
+        window.runTagCategoryTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('tag_category');
+          }
+        };
+
+        window.runUserProfileTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('user_profile');
+          }
+        };
+
+        window.runPreferenceProfileTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('preference_profile');
+          }
+        };
+
+        window.runImportSessionTestOnly = async function() {
+          if (window.crudTester) {
+            await window.crudTester.runSingleEntityTest('import_session');
+          }
+        };
       },
     ],
   };

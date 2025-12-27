@@ -579,8 +579,8 @@ class IntegratedCRUDE2ETester {
             // Check if already loaded
             if (window.INFO_SUMMARY_CONFIGS) {
                 resolve();
-                return;
-            }
+        return;
+    }
     
             // Create script element
             const script = document.createElement('script');
@@ -797,7 +797,7 @@ class IntegratedCRUDE2ETester {
             const iframe = await this.loadPageInIframe(pageUrl);
             const iframeWindow = iframe.contentWindow;
             const iframeDocument = iframe.contentDocument;
-            
+
             // Capture console errors from iframe
             if (iframeWindow) {
                 const originalError = iframeWindow.console.error;
@@ -860,7 +860,7 @@ class IntegratedCRUDE2ETester {
                         if (typeof arg === 'object') {
                             try {
                                 return JSON.stringify(arg);
-                            } catch (e) {
+                } catch (e) {
                                 return String(arg);
                             }
                         }
@@ -974,13 +974,13 @@ class IntegratedCRUDE2ETester {
                 }
             }
 
-        } catch (error) {
+                } catch (error) {
             this.logger?.error('❌ [testPageInfoSummary] Test failed', {
                 pageKey,
                 error: error.message,
                 page: page.name
             });
-            return {
+        return {
                 page: page.name,
                 pageKey,
                 status: 'failed',
@@ -1008,8 +1008,8 @@ function initializeCRUDTestingDashboard() {
         // Create the main tester instance
         window.crudTester = new IntegratedCRUDE2ETester();
 
-        // Initialize the dashboard UI
-        window.crudTester.initializeDashboard();
+        // The dashboard UI is initialized through HTML and doesn't need additional setup
+        // All event handlers are attached directly in the HTML onclick attributes
 
         window.Logger?.info('🧪 CRUD Testing Dashboard initialized successfully', {
             page: 'crud-testing-dashboard',
@@ -1021,8 +1021,8 @@ function initializeCRUDTestingDashboard() {
         window.Logger?.error('❌ CRUD Testing Dashboard initialization failed', {
             error: error.message,
             stack: error.stack,
-            page: 'crud-testing-dashboard'
-        });
+                page: 'crud-testing-dashboard'
+            });
     }
 }
 

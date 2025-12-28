@@ -1,48 +1,12 @@
 #!/usr/bin/env python3
 """
 TikTrack Production Server - Main server file
-================================================
+===============================================
 
-⚠️  Important: This is the main server file only!
+WARNING: Important: This is the main server file only!
 
 No connection to testing system!
 
-🎯 Purpose: Run TikTrack server with all API endpoints
-📍 Location: Backend/app.py
-🔗 Testing system: Backend/testing_suite/
-
-✅ Very stable - recommended for production
-✅ Tested and proven
-✅ No authentication (for development)
-✅ Simple single file
-
-🔧 Execution:
-    python3 run_stable.py        # Recommended (stable)
-    python3 dev_server.py        # Development with auto-reload
-    python3 run_waitress_fixed.py # Production (Waitress)
-    python3 app.py               # Flask development
-    ./start_server.sh            # With monitor
-
-📊 Routes:
-    /api/health              # Health check
-    /api/trading-accounts    # Trading Accounts
-    /api/trades              # Trades
-    /api/tickers             # Tickers
-    /api/trade-plans         # Plans
-    /api/alerts              # Alerts
-    /api/cash-flows          # Cash flows
-    /api/notes               # Notes
-    /api/executions          # Executions
-    /api/tests/run        # Run tests (testing system)
-
-📝 Logs:
-    server_detailed.log
-
-📖 Guides:
-    Backend/SERVER_CONFIGURATIONS.md    # Server configurations
-    Backend/testing_suite/README.md     # Testing system
-
-================================================
 """
 
 from flask import Flask, jsonify, request, send_from_directory, g, Request
@@ -108,7 +72,7 @@ try:
     EXTERNAL_DATA_AVAILABLE = True
     logger_temp = logging.getLogger(__name__) if 'logger' in globals() else None
     if logger_temp:
-        logger_temp.info("✅ External data integration available - DataRefreshScheduler imported successfully")
+        logger_temp.info(" External data integration available - DataRefreshScheduler imported successfully")
 except ImportError as e:
     import traceback
     error_msg = f"Warning: External data integration not available: {e}"
@@ -118,7 +82,7 @@ except ImportError as e:
     try:
         logger_temp = logging.getLogger(__name__) if 'logger' in globals() else None
         if logger_temp:
-            logger_temp.warning(f"⚠️ {error_msg}")
+            logger_temp.warning(f" {error_msg}")
             logger_temp.debug(f"Import error details: {traceback.format_exc()}")
     except:
         pass
@@ -133,7 +97,7 @@ except Exception as e:
     try:
         logger_temp = logging.getLogger(__name__) if 'logger' in globals() else None
         if logger_temp:
-            logger_temp.error(f"❌ {error_msg}")
+            logger_temp.error(f" {error_msg}")
             logger_temp.debug(f"Error details: {traceback.format_exc()}")
     except:
         pass
@@ -337,9 +301,9 @@ if EXTERNAL_DATA_AVAILABLE and DataRefreshScheduler:
         # Create a database session for the scheduler
         from config.database import SessionLocal
         data_refresh_scheduler = DataRefreshScheduler(SessionLocal)
-        print("✅ Data Refresh Scheduler initialized successfully")
+        print(" Data Refresh Scheduler initialized successfully")
     except Exception as e:
-        print(f"❌ Failed to initialize Data Refresh Scheduler: {e}")
+        print(f" Failed to initialize Data Refresh Scheduler: {e}")
         data_refresh_scheduler = None
 
 # Set the background task manager instance in the API routes
@@ -355,47 +319,47 @@ logger = setup_logging()
 app.logger = logger
 
 # Add detailed logging for server startup
-logger.info("🚀 Starting TikTrack server...")
-logger.info("📁 Current working directory: %s", os.getcwd())
-logger.info("🐍 Python version: %s", sys.version)
+logger.info(" Starting TikTrack server...")
+logger.info(" Current working directory: %s", os.getcwd())
+logger.info(" Python version: %s", sys.version)
 try:
     import flask
-    logger.info("📦 Flask version: %s", flask.__version__)
+    logger.info(" Flask version: %s", flask.__version__)
 except:
-    logger.info("📦 Flask version: unknown")
+    logger.info(" Flask version: unknown")
 
 # Log effective database binding
 try:
     # database_config is already used by LegacyDBProxy; engine binds to the active DB
     effective_db_url = str(database_config.engine.url)
-    logger.info("🗄️ Effective DATABASE_URL: %s", effective_db_url)
+    logger.info(" Effective DATABASE_URL: %s", effective_db_url)
 except Exception as _log_db_err:
-    logger.warning("⚠️ Could not log database URL: %s", _log_db_err)
+    logger.warning(" Could not log database URL: %s", _log_db_err)
 
 try:
-    logger.info("🗄️ Initializing database...")
+    logger.info(" Initializing database...")
     with PerformanceTracker("Database initialization"):
         init_db()
-    logger.info("✅ Database initialized successfully")
+    logger.info(" Database initialized successfully")
 
     # Log initial system metrics
     log_system_metrics()
-    logger.info("✅ Database initialized successfully")
+    logger.info(" Database initialized successfully")
 except Exception as e:
-    logger.error("❌ Database initialization failed: %s", str(e))
-    logger.error("🔍 Full error details: %s", e.__class__.__name__)
+    logger.error(" Database initialization failed: %s", str(e))
+    logger.error(" Full error details: %s", e.__class__.__name__)
     import traceback
-    logger.error("📋 Traceback: %s", traceback.format_exc())
+    logger.error(" Traceback: %s", traceback.format_exc())
     sys.exit(1)
 
-logger.info("✅ Server initialization completed")
+logger.info(" Server initialization completed")
 
 # -----------------------------------------------------------------------------
 # Authentication Middleware
 # -----------------------------------------------------------------------------
 from middleware.auth_middleware import setup_auth_middleware
 setup_auth_middleware(app)
-logger.info("✅ Authentication middleware initialized")
+logger.info(" Authentication middleware initialized")
 
 # -----------------------------------------------------------------------------
 # Legacy testing compatibility (Flask app + SQLAlchemy-style DB proxy)
@@ -644,33 +608,33 @@ def logs_batch():
 try:
     from services.condition_evaluation_task import register_condition_evaluation_task
     register_condition_evaluation_task(background_task_manager)
-    logger.info("✅ Condition evaluation task registered successfully")
+    logger.info(" Condition evaluation task registered successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to register condition evaluation task: {e}")
+    logger.error(f" Failed to register condition evaluation task: {e}")
 
 # Register import sessions cleanup task
 try:
     from services.import_sessions_cleanup_task import register_import_sessions_cleanup_task
     register_import_sessions_cleanup_task(background_task_manager)
-    logger.info("✅ Import sessions cleanup task registered successfully")
+    logger.info(" Import sessions cleanup task registered successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to register import sessions cleanup task: {e}")
+    logger.error(f" Failed to register import sessions cleanup task: {e}")
 
 # Register alert expiry task
 try:
     from services.alert_expiry_task import register_alert_expiry_task
     register_alert_expiry_task(background_task_manager)
-    logger.info("✅ Alert expiry task registered successfully")
+    logger.info(" Alert expiry task registered successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to register alert expiry task: {e}")
+    logger.error(f" Failed to register alert expiry task: {e}")
 
 # Start background task scheduler automatically
 try:
-    logger.info("🚀 Starting background task scheduler...")
+    logger.info(" Starting background task scheduler...")
     background_task_manager.start_scheduler()
-    logger.info("✅ Background task scheduler started successfully")
+    logger.info(" Background task scheduler started successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to start background task scheduler: {e}")
+    logger.error(f" Failed to start background task scheduler: {e}")
 
 # Start Data Refresh Scheduler for external data (respect system setting)
 if data_refresh_scheduler:
@@ -680,30 +644,30 @@ if data_refresh_scheduler:
         try:
             settings = SystemSettingsService(_db)
             enabled = settings.get_setting('externalDataSchedulerEnabled', True)
-            logger.info(f"📋 External data scheduler setting: {enabled} (default: True if not set)")
+            logger.info(f" External data scheduler setting: {enabled} (default: True if not set)")
         except Exception as settings_error:
-            logger.warning(f"⚠️ Could not read scheduler setting, using default (True): {settings_error}")
+            logger.warning(f" Could not read scheduler setting, using default (True): {settings_error}")
             enabled = True  # Default to enabled if setting read fails
         finally:
             _db.close()
         
         if enabled:
-            logger.info("🚀 Starting external data refresh scheduler (enabled by setting)...")
+            logger.info(" Starting external data refresh scheduler (enabled by setting)...")
             try:
                 data_refresh_scheduler.start()
                 # Verify scheduler is actually running
                 if hasattr(data_refresh_scheduler, 'running') and data_refresh_scheduler.running:
-                    logger.info("✅ External data refresh scheduler started successfully and is running")
+                    logger.info(" External data refresh scheduler started successfully and is running")
                 else:
-                    logger.warning("⚠️ Scheduler start() called but scheduler.running is False - scheduler may not be active")
+                    logger.warning(" Scheduler start() called but scheduler.running is False - scheduler may not be active")
             except Exception as start_error:
-                logger.error(f"❌ Failed to start external data refresh scheduler: {start_error}", exc_info=True)
+                logger.error(f" Failed to start external data refresh scheduler: {start_error}", exc_info=True)
         else:
-            logger.info("⏸️ External data refresh scheduler disabled by system setting")
+            logger.info(" External data refresh scheduler disabled by system setting")
     except Exception as e:
-        logger.error(f"❌ Failed to initialize external data refresh scheduler: {e}", exc_info=True)
+        logger.error(f" Failed to initialize external data refresh scheduler: {e}", exc_info=True)
 else:
-    logger.info("ℹ️ External data refresh scheduler not available - skipping")
+    logger.info(" External data refresh scheduler not available - skipping")
 
 # Register advanced error handlers
 ErrorHandler.register_error_handlers(app)
@@ -836,11 +800,11 @@ def system_info() -> Any:
 
         # Format uptime string
         if uptime_days > 0:
-            uptime = f"{uptime_days} ימים, {uptime_hours} שעות, {uptime_minutes} דקות"
+            uptime = f"{uptime_days} , {uptime_hours} , {uptime_minutes} "
         elif uptime_hours > 0:
-            uptime = f"{uptime_hours} שעות, {uptime_minutes} דקות"
+            uptime = f"{uptime_hours} , {uptime_minutes} "
         else:
-            uptime = f"{uptime_minutes} דקות"
+            uptime = f"{uptime_minutes} "
 
         system_info_data = {
             "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -1377,12 +1341,12 @@ def refresh_all_external_data() -> Any:
         from models.external_data import ExternalDataProvider
         from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
 
-        logger.info("🔄 Starting refresh_all_external_data - Step 1: Initialization")
+        logger.info(" Starting refresh_all_external_data - Step 1: Initialization")
         session = SessionLocal()
 
         # Step 1: Get all open tickers
         tickers = session.query(Ticker).filter(Ticker.status == 'open').all()
-        logger.info(f"📊 Found {len(tickers)} open tickers")
+        logger.info(f" Found {len(tickers)} open tickers")
         
         # Step 2: Check what data is missing for each ticker
         from services.external_data.missing_data_checker import MissingDataChecker
@@ -1395,7 +1359,7 @@ def refresh_all_external_data() -> Any:
         skipped_tickers: List[Dict[str, Any]] = []
         ticker_details: Dict[str, Ticker] = {}
         
-        logger.info(f"🔍 Step 2: Checking missing data for {len(tickers)} tickers")
+        logger.info(f" Step 2: Checking missing data for {len(tickers)} tickers")
         for ticker in tickers:
             symbol = (ticker.symbol or '').strip()
             if not symbol:
@@ -1403,7 +1367,7 @@ def refresh_all_external_data() -> Any:
                     'id': ticker.id,
                     'reason': 'missing_symbol'
                 })
-                logger.warning(f"⚠️ Skipping ticker ID {ticker.id}: missing symbol")
+                logger.warning(f" Skipping ticker ID {ticker.id}: missing symbol")
                 continue
             
             ticker_details[symbol] = ticker
@@ -1432,10 +1396,10 @@ def refresh_all_external_data() -> Any:
                     'indicators': missing_data.get('should_refresh_indicators', [])
                 })
         
-        logger.info(f"✅ Step 2 completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
+        logger.info(f" Step 2 completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
         
         if not tickers_needing_quote and not tickers_needing_historical and not tickers_needing_indicators:
-            logger.info("ℹ️ All tickers have fresh data, no refresh needed")
+            logger.info(" All tickers have fresh data, no refresh needed")
             return jsonify({
                 "status": "success",
                 "message": "All tickers have fresh data, no refresh needed",
@@ -1454,14 +1418,14 @@ def refresh_all_external_data() -> Any:
         ).first()
 
         if not provider:
-            logger.error("❌ Yahoo Finance provider not configured for manual refresh")
+            logger.error(" Yahoo Finance provider not configured for manual refresh")
             return jsonify({
                 "status": "error",
                 "error": "Yahoo Finance provider is not configured",
                 "timestamp": datetime.now().isoformat()
             }), 500
 
-        logger.info(f"✅ Step 3 completed: Provider found (ID: {provider.id}, Name: {provider.name})")
+        logger.info(f" Step 3 completed: Provider found (ID: {provider.id}, Name: {provider.name})")
 
         # Step 4: Fetch current quotes (only for tickers that need it)
         successful_symbols: set = set()
@@ -1471,7 +1435,7 @@ def refresh_all_external_data() -> Any:
         
         if tickers_needing_quote:
             symbols_to_fetch = [ticker.symbol for ticker in tickers_needing_quote]
-            logger.info(f"🔄 Step 4: Fetching current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
+            logger.info(f" Step 4: Fetching current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
             adapter = YahooFinanceAdapter(session, provider.id)
             
             # Process in batches of 25 (optimal batch size)
@@ -1483,19 +1447,19 @@ def refresh_all_external_data() -> Any:
                     successful_symbols.update({quote.symbol for quote in quotes})
                     quotes_loaded += len(quotes)
                 except Exception as batch_error:
-                    logger.error(f"❌ Error fetching batch {i//batch_size + 1}: {batch_error}")
+                    logger.error(f" Error fetching batch {i//batch_size + 1}: {batch_error}")
                     failed_symbols.extend(batch)
             
             failed_symbols.extend([s for s in symbols_to_fetch if s not in successful_symbols])
             quotes_skipped = len(tickers) - len(tickers_needing_quote)
             
-            logger.info(f"✅ Step 4 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
+            logger.info(f" Step 4 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
         else:
-            logger.info(f"⏭️ Step 4 skipped: All quotes are fresh")
+            logger.info(f" Step 4 skipped: All quotes are fresh")
             quotes_skipped = len(tickers)
 
         # Step 5: Load historical data (only for tickers that need it)
-        logger.info(f"🔄 Step 5: Loading historical data for {len(tickers_needing_historical)} tickers")
+        logger.info(f" Step 5: Loading historical data for {len(tickers_needing_historical)} tickers")
         historical_loaded = 0
         historical_skipped = 0
         indicators_calculated = 0
@@ -1510,23 +1474,23 @@ def refresh_all_external_data() -> Any:
         for ticker in tickers_to_process:
             ticker = ticker_details.get(symbol)
             if not ticker:
-                logger.warning(f"⚠️ Ticker not found for symbol {symbol}")
+                logger.warning(f" Ticker not found for symbol {symbol}")
                 continue
                 
             try:
                 # Load historical data (150 days for MA 150 calculation)
-                logger.debug(f"📊 Loading historical data for {ticker.symbol} (ID: {ticker.id})")
+                logger.debug(f" Loading historical data for {ticker.symbol} (ID: {ticker.id})")
                 historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=150)
                 
                 if historical_count > 0:
                     historical_loaded += 1
-                    logger.debug(f"✅ Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
+                    logger.debug(f" Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
                     
                     # Validate we have enough quotes
                     if historical_count < 120:
-                        logger.warning(f"⚠️ Only {historical_count} quotes loaded for {ticker.symbol}, expected at least 120 for MA 150")
+                        logger.warning(f" Only {historical_count} quotes loaded for {ticker.symbol}, expected at least 120 for MA 150")
                 else:
-                    logger.warning(f"⚠️ No historical quotes loaded for {ticker.symbol}")
+                    logger.warning(f" No historical quotes loaded for {ticker.symbol}")
                     ticker_errors.append({
                         'ticker_id': ticker.id,
                         'symbol': ticker.symbol,
@@ -1557,9 +1521,9 @@ def refresh_all_external_data() -> Any:
                                     advanced_cache_service.set(volatility_cache_key, volatility, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_indicators.append('volatility_30')
-                                    logger.debug(f"✅ Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
+                                    logger.debug(f" Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
                             except Exception as vol_error:
-                                logger.warning(f"⚠️ Error pre-calculating volatility for {ticker.symbol}: {vol_error}")
+                                logger.warning(f" Error pre-calculating volatility for {ticker.symbol}: {vol_error}")
                         
                         # Pre-calculate MA 20 (needs 20+ days) - only if missing
                         if 'ma_20' in indicators_to_calculate and historical_count >= 20:
@@ -1570,9 +1534,9 @@ def refresh_all_external_data() -> Any:
                                     advanced_cache_service.set(ma20_cache_key, sma_20, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_indicators.append('ma_20')
-                                    logger.debug(f"✅ Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
+                                    logger.debug(f" Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
                             except Exception as ma20_error:
-                                logger.warning(f"⚠️ Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}")
+                                logger.warning(f" Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}")
                         
                         # Pre-calculate MA 150 (needs 120+ quotes) - only if missing
                         if 'ma_150' in indicators_to_calculate and historical_count >= 120:
@@ -1583,9 +1547,9 @@ def refresh_all_external_data() -> Any:
                                     advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_indicators.append('ma_150')
-                                    logger.debug(f"✅ Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
+                                    logger.debug(f" Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
                             except Exception as ma150_error:
-                                logger.warning(f"⚠️ Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}")
+                                logger.warning(f" Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}")
                         
                         # Pre-calculate 52W range (needs 10+ days) - only if missing
                         if 'week52' in indicators_to_calculate and historical_count >= 10:
@@ -1601,15 +1565,15 @@ def refresh_all_external_data() -> Any:
                                     advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_indicators.append('week52')
-                                    logger.debug(f"✅ Pre-calculated 52W range for {ticker.symbol}")
+                                    logger.debug(f" Pre-calculated 52W range for {ticker.symbol}")
                             except Exception as week52_error:
-                                logger.warning(f"⚠️ Error pre-calculating 52W range for {ticker.symbol}: {week52_error}")
+                                logger.warning(f" Error pre-calculating 52W range for {ticker.symbol}: {week52_error}")
                         
                         if ticker_indicators:
-                            logger.debug(f"✅ Calculated {len(ticker_indicators)} indicators for {ticker.symbol}: {', '.join(ticker_indicators)}")
+                            logger.debug(f" Calculated {len(ticker_indicators)} indicators for {ticker.symbol}: {', '.join(ticker_indicators)}")
                                 
                     except Exception as calc_error:
-                        logger.warning(f"⚠️ Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
+                        logger.warning(f" Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
                         ticker_errors.append({
                             'ticker_id': ticker.id,
                             'symbol': ticker.symbol,
@@ -1620,7 +1584,7 @@ def refresh_all_external_data() -> Any:
                     historical_skipped += 1
                         
             except Exception as hist_error:
-                logger.error(f"❌ Error loading historical data for {ticker.symbol}: {hist_error}", exc_info=True)
+                logger.error(f" Error loading historical data for {ticker.symbol}: {hist_error}", exc_info=True)
                 ticker_errors.append({
                     'ticker_id': ticker.id,
                     'symbol': ticker.symbol,
@@ -1629,10 +1593,10 @@ def refresh_all_external_data() -> Any:
                 })
         
         historical_skipped = len(tickers) - len(tickers_needing_historical) - historical_loaded
-        logger.info(f"✅ Step 5 completed: {historical_loaded} tickers with historical data loaded, {historical_skipped} skipped (fresh), {indicators_calculated} indicators calculated")
+        logger.info(f" Step 5 completed: {historical_loaded} tickers with historical data loaded, {historical_skipped} skipped (fresh), {indicators_calculated} indicators calculated")
 
         # Step 5: Invalidate cache
-        logger.info("🔄 Step 5: Invalidating cache")
+        logger.info(" Step 5: Invalidating cache")
         if successful_symbols:
             for dependency in ['tickers', 'dashboard', 'external_data']:
                 advanced_cache_service.invalidate_by_dependency(dependency)
@@ -1645,9 +1609,9 @@ def refresh_all_external_data() -> Any:
                     advanced_cache_service.invalidate(f"ticker_{ticker.id}_ma_20")
                     advanced_cache_service.invalidate(f"ticker_{ticker.id}_ma_150")
                 except Exception as cache_error:
-                    logger.warning(f"⚠️ Error invalidating cache for ticker {ticker.id}: {cache_error}")
+                    logger.warning(f" Error invalidating cache for ticker {ticker.id}: {cache_error}")
         
-        logger.info("✅ Step 5 completed: Cache invalidated")
+        logger.info(" Step 5 completed: Cache invalidated")
         
         # Prepare response
         end_time = datetime.now()
@@ -1661,7 +1625,7 @@ def refresh_all_external_data() -> Any:
             message = "External data refresh completed with partial failures"
             http_status = 207
 
-        logger.info(f"✅ refresh_all_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
+        logger.info(f" refresh_all_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
 
         response_data = {
             "status": status,
@@ -1741,7 +1705,7 @@ def refresh_full_external_data() -> Any:
         tickers_needing_indicators: List[Dict[str, Any]] = []
         tickers_skipped_fresh: List[Dict[str, Any]] = []
         
-        logger.info(f"🔍 Checking missing data for {len(tickers)} tickers")
+        logger.info(f" Checking missing data for {len(tickers)} tickers")
         for ticker in tickers:
             symbol = (ticker.symbol or '').strip()
             if not symbol:
@@ -1777,10 +1741,10 @@ def refresh_full_external_data() -> Any:
                     'indicators': missing_data.get('should_refresh_indicators', [])
                 })
         
-        logger.info(f"✅ Check completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
+        logger.info(f" Check completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
         
         if not tickers_needing_quote and not tickers_needing_historical and not tickers_needing_indicators:
-            logger.info("ℹ️ All tickers have fresh data, no refresh needed")
+            logger.info(" All tickers have fresh data, no refresh needed")
             return jsonify({
                 "status": "success",
                 "message": "All tickers have fresh data, no refresh needed",
@@ -1815,7 +1779,7 @@ def refresh_full_external_data() -> Any:
         
         if tickers_needing_quote:
             symbols_to_fetch = [ticker.symbol for ticker in tickers_needing_quote]
-            logger.info(f"🔄 Step 1: Loading current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
+            logger.info(f" Step 1: Loading current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
             
             # Process in batches of 25 (optimal batch size)
             batch_size = 25
@@ -1826,15 +1790,15 @@ def refresh_full_external_data() -> Any:
                     successful_symbols.update({quote.symbol for quote in quotes})
                     quotes_loaded += len(quotes)
                 except Exception as batch_error:
-                    logger.error(f"❌ Error fetching batch {i//batch_size + 1}: {batch_error}")
+                    logger.error(f" Error fetching batch {i//batch_size + 1}: {batch_error}")
                     failed_symbols.extend(batch)
             
             failed_symbols.extend([s for s in symbols_to_fetch if s not in successful_symbols])
             quotes_skipped = len(tickers) - len(tickers_needing_quote)
             
-            logger.info(f"✅ Step 1 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
+            logger.info(f" Step 1 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
         else:
-            logger.info(f"⏭️ Step 1 skipped: All quotes are fresh")
+            logger.info(f" Step 1 skipped: All quotes are fresh")
             quotes_skipped = len(tickers)
             # Add all tickers to successful_symbols for historical processing
             successful_symbols = {ticker.symbol for ticker in tickers if ticker.symbol}
@@ -1853,12 +1817,12 @@ def refresh_full_external_data() -> Any:
             if ticker.symbol in successful_symbols or not tickers_needing_quote:
                 tickers_to_process.add(ticker)
         
-        logger.info(f"🔄 Step 2: Loading historical data and pre-calculating indicators for {len(tickers_to_process)} tickers")
+        logger.info(f" Step 2: Loading historical data and pre-calculating indicators for {len(tickers_to_process)} tickers")
         
         for ticker in tickers_to_process:
             ticker = ticker_map.get(symbol)
             if not ticker:
-                logger.warning(f"⚠️ Ticker not found for symbol {symbol}")
+                logger.warning(f" Ticker not found for symbol {symbol}")
                 continue
                 
             ticker_detail = {
@@ -1871,21 +1835,21 @@ def refresh_full_external_data() -> Any:
             
             try:
                 # Load historical data (150 days for MA 150 calculation)
-                logger.debug(f"📊 Loading historical data for {ticker.symbol} (ID: {ticker.id})")
+                logger.debug(f" Loading historical data for {ticker.symbol} (ID: {ticker.id})")
                 historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=150)
                 
                 if historical_count > 0:
                     historical_loaded += 1
                     total_historical_quotes += historical_count
                     ticker_detail['historical_quotes_count'] = historical_count
-                    logger.info(f"✅ Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
+                    logger.info(f" Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
                     
                     # Validate we have enough quotes
                     if historical_count < 120:
-                        logger.warning(f"⚠️ Only {historical_count} quotes loaded for {ticker.symbol}, expected at least 120 for MA 150")
+                        logger.warning(f" Only {historical_count} quotes loaded for {ticker.symbol}, expected at least 120 for MA 150")
                         ticker_detail['warning'] = f'Only {historical_count} quotes loaded, expected 150'
                 else:
-                    logger.warning(f"⚠️ No historical quotes loaded for {ticker.symbol}")
+                    logger.warning(f" No historical quotes loaded for {ticker.symbol}")
                     ticker_detail['warning'] = 'No historical data loaded'
                     ticker_errors.append({
                         'ticker_id': ticker.id,
@@ -1916,7 +1880,7 @@ def refresh_full_external_data() -> Any:
                                     advanced_cache_service.set(volatility_cache_key, volatility, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_detail['indicators_calculated'].append('volatility_30')
-                                    logger.debug(f"✅ Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
+                                    logger.debug(f" Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
                             except Exception as vol_error:
                                 logger.warning(f"Error pre-calculating volatility for {ticker.symbol}: {vol_error}")
                         
@@ -1929,7 +1893,7 @@ def refresh_full_external_data() -> Any:
                                     advanced_cache_service.set(ma20_cache_key, sma_20, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_detail['indicators_calculated'].append('ma_20')
-                                    logger.debug(f"✅ Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
+                                    logger.debug(f" Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
                             except Exception as ma20_error:
                                 logger.warning(f"Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}")
                         
@@ -1942,7 +1906,7 @@ def refresh_full_external_data() -> Any:
                                     advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_detail['indicators_calculated'].append('ma_150')
-                                    logger.debug(f"✅ Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
+                                    logger.debug(f" Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
                             except Exception as ma150_error:
                                 logger.warning(f"Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}")
                         
@@ -1960,7 +1924,7 @@ def refresh_full_external_data() -> Any:
                                     advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
                                     indicators_calculated += 1
                                     ticker_detail['indicators_calculated'].append('week52')
-                                    logger.debug(f"✅ Pre-calculated 52W range for {ticker.symbol}")
+                                    logger.debug(f" Pre-calculated 52W range for {ticker.symbol}")
                             except Exception as week52_error:
                                 logger.warning(f"Error pre-calculating 52W range for {ticker.symbol}: {week52_error}")
                                 
@@ -1974,11 +1938,11 @@ def refresh_full_external_data() -> Any:
             
             ticker_details.append(ticker_detail)
 
-        logger.info(f"✅ Step 2 completed: {historical_loaded} tickers with historical data, {indicators_calculated} indicators calculated")
+        logger.info(f" Step 2 completed: {historical_loaded} tickers with historical data, {indicators_calculated} indicators calculated")
 
         # Step 3: Invalidate cache
         if successful_symbols:
-            logger.info("🔄 Step 3: Invalidating cache")
+            logger.info(" Step 3: Invalidating cache")
             for dependency in ['tickers', 'dashboard', 'external_data']:
                 advanced_cache_service.invalidate_by_dependency(dependency)
             
@@ -1991,7 +1955,7 @@ def refresh_full_external_data() -> Any:
                     advanced_cache_service.invalidate(f"ticker_{ticker.id}_ma_150")
                 except Exception:
                     pass
-            logger.info("✅ Step 3 completed: Cache invalidated")
+            logger.info(" Step 3 completed: Cache invalidated")
 
         # Calculate duration
         end_time = datetime.now()
@@ -1999,7 +1963,7 @@ def refresh_full_external_data() -> Any:
 
         # Prepare response
         historical_skipped = len(tickers) - len(tickers_needing_historical) - historical_loaded
-        logger.info(f"✅ refresh_full_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
+        logger.info(f" refresh_full_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
         
         message = "Full external data refresh completed successfully"
         status = "success"
@@ -2229,10 +2193,10 @@ def get_yahoo_quotes() -> Any:
                             "currency": quote_data.currency,
                             "source": quote_data.source
                         }
-                        logger.info(f"✅ Fetched and cached enhanced quote for {symbol}: ${quote_data.price} (change: {quote_data.change_pct:.2f}%)" if quote_data.change_pct else f"✅ Fetched quote for {symbol}: ${quote_data.price}")
+                        logger.info(f" Fetched and cached enhanced quote for {symbol}: ${quote_data.price} (change: {quote_data.change_pct:.2f}%)" if quote_data.change_pct else f" Fetched quote for {symbol}: ${quote_data.price}")
                     else:
                         results[symbol.upper()] = {"error": "No data available"}
-                        logger.warning(f"⚠️ No enhanced data available for {symbol}")
+                        logger.warning(f" No enhanced data available for {symbol}")
                 except Exception as e:
                     logger.warning(f"Failed to fetch enhanced data for {symbol}: {e}")
                     results[symbol.upper()] = {"error": str(e)}
@@ -2335,22 +2299,22 @@ if not UI_DIR.exists():
 
 @app.route('/api/run-crud-tests', methods=['POST'])
 def run_crud_tests():
-    """הרצת בדיקות CRUD מקיפות"""
+    """  CRUD """
     try:
         data = request.get_json() or {}
         test_type = data.get('test_type', 'comprehensive')
         pages = data.get('pages', [])
         
-        # הפעלת הסקריפט
+        #  
         script_path = Path(__file__).parent.parent / 'crud-tester.py'
         
         if not script_path.exists():
             return jsonify({
-                'error': 'סקריפט בדיקות CRUD לא נמצא',
+                'error': '  CRUD  ',
                 'path': str(script_path)
             }), 404
         
-        # הרצת הסקריפט
+        #  
         result = subprocess.run([
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
@@ -2367,24 +2331,24 @@ def run_crud_tests():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בהרצת בדיקות CRUD: {str(e)}',
+            'error': f'   CRUD: {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/run-functional-tests', methods=['POST'])
 def run_functional_tests():
-    """הרצת בדיקות פונקציונליות"""
+    """  """
     try:
-        # הפעלת הסקריפט
+        #  
         script_path = Path(__file__).parent.parent / 'functional-crud-tester.py'
         
         if not script_path.exists():
             return jsonify({
-                'error': 'סקריפט בדיקות פונקציונליות לא נמצא',
+                'error': '    ',
                 'path': str(script_path)
             }), 404
         
-        # הרצת הסקריפט
+        #  
         result = subprocess.run([
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
@@ -2399,46 +2363,46 @@ def run_functional_tests():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בהרצת בדיקות פונקציונליות: {str(e)}',
+            'error': f'   : {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/run-button-tests', methods=['POST'])
 def run_button_tests():
-    """הרצת בדיקות כפתורים"""
+    """  """
     try:
-        # הפעלת הסקריפט
+        #  
         script_path = Path(__file__).parent.parent / 'scripts' / 'button_system_tests.py'
         
         if not script_path.exists():
             return jsonify({
-                'error': 'סקריפט בדיקות כפתורים לא נמצא',
+                'error': '    ',
                 'path': str(script_path)
             }), 404
         
-        # הרצת הסקריפט
+        #  
         result = subprocess.run([
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
         
-        # פרסור תוצאות
+        #  
         output_lines = result.stdout.split('\n')
         total_tests = 0
         passed_tests = 0
         failed_tests = 0
         
         for line in output_lines:
-            if 'סה"כ בדיקות:' in line:
+            if '" :' in line:
                 try:
                     total_tests = int(line.split(':')[1].strip())
                 except:
                     pass
-            elif 'עברו:' in line:
+            elif ':' in line:
                 try:
                     passed_tests = int(line.split(':')[1].strip())
                 except:
                     pass
-            elif 'נכשלו:' in line:
+            elif ':' in line:
                 try:
                     failed_tests = int(line.split(':')[1].strip())
                 except:
@@ -2457,29 +2421,29 @@ def run_button_tests():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בהרצת בדיקות כפתורים: {str(e)}',
+            'error': f'   : {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/run-executions-crud-tests', methods=['POST'])
 def run_executions_crud_tests():
-    """הרצת בדיקות CRUD ל-Executions"""
+    """  CRUD -Executions"""
     try:
-        # הפעלת הסקריפט
+        #  
         script_path = Path(__file__).parent.parent / 'test_executions_crud.py'
         
         if not script_path.exists():
             return jsonify({
-                'error': 'סקריפט בדיקות Executions CRUD לא נמצא',
+                'error': '  Executions CRUD  ',
                 'path': str(script_path)
             }), 404
         
-        # הרצת הסקריפט
+        #  
         result = subprocess.run([
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
         
-        # פרסור תוצאות
+        #  
         output_lines = result.stdout.split('\n')
         total_tests = 0
         passed_tests = 0
@@ -2488,9 +2452,9 @@ def run_executions_crud_tests():
         for line in output_lines:
             if 'TEST' in line and ':' in line:
                 total_tests += 1
-            elif '✅' in line or 'PASS' in line:
+            elif '' in line or 'PASS' in line:
                 passed_tests += 1
-            elif '❌' in line or 'FAIL' in line:
+            elif '' in line or 'FAIL' in line:
                 failed_tests += 1
         
         return jsonify({
@@ -2506,24 +2470,24 @@ def run_executions_crud_tests():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בהרצת בדיקות Executions CRUD: {str(e)}',
+            'error': f'   Executions CRUD: {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/run-improved-analysis', methods=['POST'])
 def run_improved_analysis():
-    """הרצת ניתוח משופר"""
+    """  """
     try:
-        # הפעלת הסקריפט
+        #  
         script_path = Path(__file__).parent.parent / 'improved-crud-checker.py'
         
         if not script_path.exists():
             return jsonify({
-                'error': 'סקריפט ניתוח משופר לא נמצא',
+                'error': '    ',
                 'path': str(script_path)
             }), 404
         
-        # הרצת הסקריפט
+        #  
         result = subprocess.run([
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
@@ -2538,15 +2502,15 @@ def run_improved_analysis():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בהרצת ניתוח משופר: {str(e)}',
+            'error': f'   : {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/crud-test-status', methods=['GET'])
 def get_crud_test_status():
-    """קבלת סטטוס בדיקות CRUD"""
+    """   CRUD"""
     try:
-        # בדיקת קיום הסקריפטים
+        #   
         scripts = {
             'crud-tester.py': Path(__file__).parent.parent / 'crud-tester.py',
             'functional-crud-tester.py': Path(__file__).parent.parent / 'functional-crud-tester.py',
@@ -2570,7 +2534,7 @@ def get_crud_test_status():
         
     except Exception as e:
         return jsonify({
-            'error': f'שגיאה בבדיקת סטטוס: {str(e)}',
+            'error': f'  : {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 
@@ -2811,10 +2775,10 @@ def update_system_setting(setting_key):
         db.close()
 
 if __name__ == "__main__":
-    # 🎯 **Flask Development Server**
-    # ✅ **Configuration:** Standard Flask server (SocketIO removed due to compatibility issues)
+    #  **Flask Development Server**
+    #  **Configuration:** Standard Flask server (SocketIO removed due to compatibility issues)
     # 
-    # 🚀 **Startup:**
+    #  **Startup:**
     # ```bash
     # # Quick startup (recommended)
     # ./start_dev.sh
@@ -2823,14 +2787,14 @@ if __name__ == "__main__":
     # python3 app.py
     # ```
     #
-    # 📊 **Features:**
+    #  **Features:**
     # - Background task management (cleanup, maintenance, etc.)
     # - Data refresh scheduler (external data)
     # - Advanced cache system
     # - All API endpoints
     # - Performance monitoring
     # 
-    # 📁 **Notes:**
+    #  **Notes:**
     # - SocketIO was removed due to compatibility and maintenance issues
     # - Background task feedback available via API polling
     # - Notification system works without WebSockets
@@ -2842,11 +2806,11 @@ if __name__ == "__main__":
         env_name = "TESTING"
     else:
         env_name = "DEVELOPMENT"
-    print("🚀 Starting TikTrack Server...")
-    print(f"🌍 Environment: {env_name}")
-    print(f"📡 Server running on port {PORT}")
-    print(f"🔗 URL: http://{HOST}:{PORT}")
-    print("✅ All systems operational")
+    print(" Starting TikTrack Server...")
+    print(f" Environment: {env_name}")
+    print(f" Server running on port {PORT}")
+    print(f" URL: http://{HOST}:{PORT}")
+    print(" All systems operational")
     
     # Run with standard Flask
     app.run(

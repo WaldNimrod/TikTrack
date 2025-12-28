@@ -48,7 +48,7 @@ def test_watch_lists_api():
 
                     spy_found = False
                     for item in items:
-                        symbol = item.get('symbol', '')
+                        symbol = item.get('ticker', {}).get('symbol', '') if item.get('ticker') else item.get('external_symbol', '')
                         if symbol == 'SPY':
                             spy_found = True
                             print(f"  ✅ SPY found: {item}")

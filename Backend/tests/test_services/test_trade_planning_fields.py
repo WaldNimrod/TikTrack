@@ -43,7 +43,7 @@ def db_session():
 def sample_ticker(db_session: Session):
     """Create a sample ticker for testing"""
     import uuid
-    unique_symbol = f'TEST_{uuid.uuid4().hex[:8]}'
+    unique_symbol = f'T_{uuid.uuid4().hex[:3]}'
     
     # Check if ticker already exists
     existing = db_session.query(Ticker).filter(Ticker.symbol == unique_symbol).first()
@@ -54,6 +54,7 @@ def sample_ticker(db_session: Session):
         symbol=unique_symbol,
         name='Test Ticker',
         type='stock',
+        currency_id=1,  # USD
         status='active'
     )
     db_session.add(ticker)
@@ -75,6 +76,8 @@ def sample_account(db_session: Session):
     
     account = TradingAccount(
         name=unique_name,
+        user_id=2,  # admin user
+        currency_id=1,  # USD
         status='active'
     )
     db_session.add(account)
@@ -100,6 +103,7 @@ class TestTradePlanningFields:
         trade_data = {
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
+            'user_id': 2,  # admin user
             'status': 'open',
             'investment_type': 'swing',
             'side': 'Long',

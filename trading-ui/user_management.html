@@ -158,11 +158,11 @@
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="8" class="loading">טוען משתמשים...</td>
-                                                </tr>
-                                            </tbody>
+                                                   <tbody>
+                                                       <tr>
+                                                           <td colspan="8" class="loading">טוען משתמשים - בדיקה...</td>
+                                                       </tr>
+                                                   </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -360,6 +360,29 @@
 
     <!-- User Management Page Script -->
     <script src="scripts/user-management.js?v=1.0.0" defer></script>
+
+    <!-- Manual initialization of UserManagementPage -->
+    <script>
+      // Initialize UserManagementPage after all scripts are loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔍 [user_management.html] DOMContentLoaded, checking for UserManagementPage...');
+        if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {
+          console.log('✅ [user_management.html] UserManagementPage found, initializing...');
+          window.UserManagementPage.init();
+        } else {
+          console.log('❌ [user_management.html] UserManagementPage not found, will retry...');
+          // Retry after a short delay
+          setTimeout(function() {
+            if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {
+              console.log('✅ [user_management.html] UserManagementPage found on retry, initializing...');
+              window.UserManagementPage.init();
+            } else {
+              console.log('❌ [user_management.html] UserManagementPage still not found');
+            }
+          }, 1000);
+        }
+      });
+    </script>
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

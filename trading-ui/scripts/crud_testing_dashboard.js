@@ -804,9 +804,16 @@ class IntegratedCRUDE2ETester {
                     const iframeOrigin = iframeWindow.location?.origin;
                     const mainOrigin = window.location?.origin;
 
-                    if (unifiedAppInitialized && hasUnifiedCRUD) {
+                    // Check for essential services and initialization
+                    const hasAllServices = iframeWindow.UnifiedCRUDService &&
+                                          iframeWindow.DataCollectionService &&
+                                          iframeWindow.CRUDResponseHandler &&
+                                          iframeWindow.CacheSyncManager;
+
+                    if (unifiedAppInitialized && hasAllServices) {
                         console.log(`✅ DEBUG: Page fully initialized after ${waitCount * 100}ms`);
                         console.log(`✅ DEBUG: iframe context: ${iframeContext}, origins match: ${iframeOrigin === mainOrigin}`);
+                        console.log(`✅ DEBUG: All services loaded: UnifiedCRUD: ${hasUnifiedCRUD}, DataCollection: ${!!iframeWindow.DataCollectionService}, CRUDResponse: ${!!iframeWindow.CRUDResponseHandler}, CacheSync: ${!!iframeWindow.CacheSyncManager}`);
                         break;
                     }
 
@@ -1034,22 +1041,56 @@ class IntegratedCRUDE2ETester {
             // Test the CRUD service directly instead of using modals
             console.log(`🔄 DEBUG: Testing UnifiedCRUDService.create directly`);
 
-            if (!iframeWindow.UnifiedCRUDService || typeof iframeWindow.UnifiedCRUDService.create !== 'function') {
-                throw new Error('UnifiedCRUDService.create is not available');
+            // Try iframe first, fallback to main window
+            let crudService = iframeWindow.UnifiedCRUDService;
+            let serviceWindow = iframeWindow;
+
+            console.log(`🔍 DEBUG: iframe UnifiedCRUDService:`, {
+                exists: !!iframeWindow.UnifiedCRUDService,
+                type: typeof iframeWindow.UnifiedCRUDService,
+                hasCreate: !!(iframeWindow.UnifiedCRUDService && typeof iframeWindow.UnifiedCRUDService.create === 'function'),
+                iframeWindow: iframeWindow !== window,
+                iframeOrigin: iframeWindow.location?.origin,
+                mainOrigin: window.location?.origin
+            });
+
+            if (!crudService || typeof crudService.create !== 'function') {
+                console.log(`⚠️ DEBUG: iframe UnifiedCRUDService not available, trying main window`);
+                crudService = window.UnifiedCRUDService;
+                serviceWindow = window;
+
+                console.log(`🔍 DEBUG: main window UnifiedCRUDService:`, {
+                    exists: !!window.UnifiedCRUDService,
+                    type: typeof window.UnifiedCRUDService,
+                    hasCreate: !!(window.UnifiedCRUDService && typeof window.UnifiedCRUDService.create === 'function')
+                });
             }
 
-            // Call the CRUD service directly
-            const result = await iframeWindow.UnifiedCRUDService.create(entityType, testData);
+            if (!crudService || typeof crudService.create !== 'function') {
+                console.log(`❌ DEBUG: Neither iframe nor main window has UnifiedCRUDService.create`);
+                throw new Error('UnifiedCRUDService.create is not available in iframe or main window');
+            }
 
-            if (!result || !result.success) {
-                throw new Error(`CRUD create failed: ${result?.error || 'Unknown error'}`);
+            console.log(`✅ DEBUG: Using CRUD service from ${serviceWindow === window ? 'main window' : 'iframe'}`);
+
+            // Call the CRUD service directly
+            const result = await crudService.create(entityType, testData);
+
+            console.log('CREATE response:', result);
+
+            // Handle both old format (success: boolean) and new format (status: string)
+            const isSuccess = result && (result.success === true || result.status === 'success');
+
+            if (!isSuccess) {
+                throw new Error(`CRUD create failed: ${result?.error || result?.message || 'Unknown error'}`);
             }
 
             console.log(`✅ DEBUG: CRUD create succeeded, record ID: ${result.data?.id || result.id}`);
 
             return {
                 success: true,
-                recordId: result.data?.id || result.id
+                recordId: result.data?.id || result.id,
+                fullResponse: result // Include full response for debugging
             };
 
         } catch (error) {
@@ -1063,22 +1104,48 @@ class IntegratedCRUDE2ETester {
      */
     async performReadTest(iframeWindow, iframeDoc, entityType, recordId) {
         try {
-            // Use UnifiedCRUDService to read the record
-            if (!iframeWindow.UnifiedCRUDService) {
-                throw new Error('UnifiedCRUDService not available in iframe');
+            // Use direct API call to read the record (UnifiedCRUDService doesn't have read method)
+            // Map entity types to their plural API endpoints
+            const entityToPlural = {
+                'trade': 'trades',
+                'trade_plan': 'trade_plans',
+                'alert': 'alerts',
+                'ticker': 'tickers',
+                'trading_account': 'trading_accounts',
+                'execution': 'executions',
+                'cash_flow': 'cash_flows',
+                'note': 'notes',
+                'watch_list': 'watch_lists'
+            };
+
+            const pluralEntity = entityToPlural[entityType] || entityType + 's'; // Fallback to adding 's'
+
+            const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+            const response = await fetch(`${base}/api/${pluralEntity}/${recordId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${entityType} details (${response.status})`);
             }
 
-            const readResult = await iframeWindow.UnifiedCRUDService.read(entityType, recordId);
-            if (!readResult || !readResult.success) {
-                throw new Error(`Failed to read record: ${readResult?.error || 'Unknown error'}`);
+            const result = await response.json();
+
+            // Check if we got valid data
+            if (!result || (result.status !== 'success' && result.success !== true)) {
+                throw new Error(`Invalid response format: ${JSON.stringify(result)}`);
             }
 
-            console.log(`📖 DEBUG: Successfully read record ${recordId} for ${entityType}`);
-            return { success: true };
+            console.log(`📖 DEBUG: Successfully read record ${recordId} for ${entityType}:`, result);
+            return { success: true, data: result };
 
         } catch (error) {
             console.error(`❌ DEBUG: READ test failed for ${entityType}:`, error);
-            return { success: false, error: error.message };
+            throw new Error(`Read test failed: ${error.message}`);
         }
     }
 

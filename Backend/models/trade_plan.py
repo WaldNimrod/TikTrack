@@ -17,7 +17,7 @@ class TradePlan(BaseModel):
     side = Column(String(10), default='Long', nullable=False)  # NOT NULL per constraints
     status = Column(String(20), default='open', nullable=False)  # NOT NULL per constraints
     planned_amount = Column(Float, default=1000, nullable=False)  # NOT NULL, default 1000 per constraints
-    entry_price = Column(Float, nullable=False)  # NOT NULL - planned entry price for the trade
+    entry_price = Column(Float, nullable=True)  # NULL allowed - planned entry price for the trade
     entry_conditions = Column(String(500), nullable=True)
     stop_price = Column(Float, default=0.1, nullable=True)
     target_price = Column(Float, default=2000, nullable=True)

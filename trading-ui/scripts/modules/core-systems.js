@@ -793,6 +793,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       let pageConfig = null;
       
       // Debug: Check what's available
+      console.log('🔍 [UnifiedAppInitializer] Looking for page config for:', this.pageInfo.name);
+      console.log('🔍 [UnifiedAppInitializer] hasPageInitializationConfigs:', typeof window.pageInitializationConfigs !== 'undefined');
+      console.log('🔍 [UnifiedAppInitializer] hasPAGE_CONFIGS:', typeof window.PAGE_CONFIGS !== 'undefined');
+      if (window.pageInitializationConfigs) {
+        console.log('🔍 [UnifiedAppInitializer] pageInitializationConfigs keys:', Object.keys(window.pageInitializationConfigs));
+      }
+      if (window.PAGE_CONFIGS) {
+        console.log('🔍 [UnifiedAppInitializer] PAGE_CONFIGS keys:', Object.keys(window.PAGE_CONFIGS));
+      }
+
       if (window.Logger?.debug) {
         window.Logger.debug('Looking for page config', {
           pageName: this.pageInfo.name,

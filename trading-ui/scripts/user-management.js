@@ -18,6 +18,8 @@
 (function() {
   'use strict';
 
+  console.log('🔍 [UserManagementPage] Script loaded, initializing...');
+
   /**
    * User Management Page Manager
    * מנהל עמוד ניהול משתמשים
@@ -33,16 +35,19 @@
      * אתחול עמוד ניהול משתמשים
      */
     async init() {
+      console.log('🚀 [UserManagementPage] init() called');
       if (this.initialized) {
         window.Logger?.warn('UserManagementPage already initialized', { page: 'user-management' });
         return;
       }
 
       try {
+        console.log('🔍 [UserManagementPage] Starting initialization...');
         window.Logger?.info('🚀 Initializing User Management Page...', { page: 'user-management' });
 
         // Wait for required systems to load
         await this.waitForSystems();
+        console.log('✅ [UserManagementPage] Systems loaded');
 
         // Check authentication
         if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
@@ -130,7 +135,16 @@
         }
 
         const usersData = await usersResponse.json();
-        this.users = usersData.data || [];
+
+        // Check if response has data array
+        if (usersData && Array.isArray(usersData.data)) {
+          this.users = usersData.data;
+        } else if (Array.isArray(usersData)) {
+          // Fallback: if response is directly an array
+          this.users = usersData;
+        } else {
+          this.users = [];
+        }
 
         // Update statistics
         this.updateStatistics();

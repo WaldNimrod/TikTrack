@@ -107,9 +107,11 @@ def get_watch_lists():
         normalizer = _get_watch_lists_normalizer()
         WatchListService.ensure_default_watch_list(db, user_id)
         lists = WatchListService.get_watch_lists(db, user_id)
-        
+
         # Convert to dict and normalize dates
-        lists_data = [list_obj.to_dict(db, user_id) for list_obj in lists]
+        lists_data = []
+        for list_obj in lists:
+            lists_data.append(list_obj.to_dict(db, user_id))
         lists_data = normalizer.normalize_output(lists_data)
         
         return jsonify({

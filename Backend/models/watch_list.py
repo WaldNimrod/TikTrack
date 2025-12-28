@@ -153,7 +153,9 @@ class WatchList(BaseModel):
         # Add items and item count if items are loaded
         if hasattr(self, 'items') and self.items is not None:
             data['item_count'] = len(self.items)
-            data['items'] = [item.to_dict(db, user_id) for item in self.items]
+            data['items'] = []
+            for item in self.items:
+                data['items'].append(item.to_dict(db, user_id))
         
         return data
 
@@ -229,14 +231,14 @@ class WatchListItem(BaseModel):
     def to_dict(self, db: Optional[Session] = None, user_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Convert watch list item to JSON dictionary
-        
+
         Args:
             db: Optional database session to check flag lists
             user_id: Optional user ID to check flag lists
-        
+
         Returns:
             Dict[str, Any]: Dictionary with all watch list item fields
-            
+
         Example:
             >>> item.to_dict()
             {
@@ -251,7 +253,7 @@ class WatchListItem(BaseModel):
                 'notes': 'Tech stock to watch',
                 'created_at': '2025-01-28T10:00:00Z',
                 'updated_at': '2025-01-28T12:30:00Z'
-            }
+        }
         """
         data = {
             'id': self.id,

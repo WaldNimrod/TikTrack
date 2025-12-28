@@ -58,8 +58,10 @@ class WatchListService:
             List of WatchList objects
         """
         logger.debug("Fetching watch lists for user_id=%s", user_id)
+        from sqlalchemy.orm import joinedload
         return (
             db.query(WatchList)
+            .options(joinedload(WatchList.items).joinedload(WatchListItem.ticker))
             .filter(WatchList.user_id == user_id)
             .order_by(WatchList.display_order.asc(), WatchList.name.asc())
             .all()

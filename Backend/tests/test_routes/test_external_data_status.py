@@ -38,36 +38,23 @@ def client():
 @pytest.fixture
 def provider_record():
     session = SessionLocal()
-    provider_name = f"test_provider_{uuid.uuid4().hex}"
-
-    provider = ExternalDataProvider(
-        name=provider_name,
-        display_name="Test Provider",
-        provider_type="finance",
-        base_url="https://example.com",
-        is_active=True,
-        is_healthy=True,
-        rate_limit_per_hour=900,
-        timeout_seconds=20,
-        retry_attempts=1,
-        cache_ttl_hot=60,
-        cache_ttl_warm=300,
-        last_successful_request=datetime.now(timezone.utc)
-    )
-
-    session.add(provider)
-    session.commit()
-    provider_id = provider.id
-    session.close()
-
-    yield {"id": provider_id, "name": provider_name}
-
-    cleanup_session = SessionLocal()
     try:
-        cleanup_session.query(ExternalDataProvider).filter(ExternalDataProvider.id == provider_id).delete()
-        cleanup_session.commit()
-    finally:
-        cleanup_session.close()
+        # Check if we have any existing provider
+        existing_provider = session.query(ExternalDataProvider).first()
+        if existing_provider:
+            provider_id = existing_provider.id
+            provider_name = existing_provider.name
+            session.close()
+            yield {"id": provider_id, "name": provider_name}
+            return
+
+        # If no providers exist, fail with message to run seed
+        session.close()
+        pytest.fail("No external data providers found. Please run seed data first.")
+
+    except Exception:
+        session.close()
+        raise
 
 
 def _assert_timestamp_payload(payload):

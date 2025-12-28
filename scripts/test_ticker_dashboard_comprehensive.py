@@ -97,7 +97,7 @@ def test_page_load(driver, ticker_id):
     """Test basic page loading"""
     print(f"\n📄 Testing page load for ticker ID {ticker_id}...")
     
-    url = f"{BASE_URL}/ticker-dashboard.html?tickerId={ticker_id}"
+    url = f"{BASE_URL}/ticker_dashboard.html?tickerId={ticker_id}"
     driver.get(url)
     
     # Wait for page to load and systems to initialize

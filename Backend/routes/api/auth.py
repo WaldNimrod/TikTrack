@@ -407,7 +407,7 @@ def update_current_user():
         user_service = UserService()
         
         # Update user (only allowed fields)
-        allowed_fields = ['email', 'first_name', 'last_name']
+        allowed_fields = ['email', 'first_name', 'last_name', 'icon']
         update_data = {k: v for k, v in data.items() if k in allowed_fields}
         
         if not update_data:
@@ -639,4 +639,3 @@ def reset_password():
             'status': 'error',
             'error': {'message': f'Password reset failed: {str(e)}'}
         }), 500
-

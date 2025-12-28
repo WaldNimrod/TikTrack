@@ -19,10 +19,10 @@ TRADING_UI = PROJECT_ROOT / "trading-ui"
 # Pages to update (from PAGES_LIST.md main pages)
 MAIN_PAGES = [
     'index.html', 'trades.html', 'trade_plans.html', 'alerts.html',
-    'tickers.html', 'ticker-dashboard.html', 'trading_accounts.html',
+    'tickers.html', 'ticker_dashboard.html', 'trading_accounts.html',
     'executions.html', 'data_import.html', 'cash_flows.html', 'notes.html',
-    'research.html', 'ai-analysis.html', 'watch-list.html', 'preferences.html',
-    'user-profile.html'
+    'research.html', 'ai_analysis.html', 'watch_list.html', 'preferences.html',
+    'user_profile.html'
 ]
 
 def update_page_html(page_file):

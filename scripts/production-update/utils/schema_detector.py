@@ -6,7 +6,7 @@ Schema & Data Detector
 Detects schema and data changes between development and production databases.
 Handles schema comparison, reference data comparison, preferences, and groups.
 
-Note: Uses SQLAlchemy to support PostgreSQL databases (SQLite support removed).
+Note: Uses SQLAlchemy to support PostgreSQL databases.
 """
 
 import json
@@ -473,4 +473,3 @@ def detect_changes(project_root: Optional[Path] = None) -> Dict:
 if __name__ == '__main__':
     report = detect_changes()
     print(json.dumps(report, indent=2, default=str))
-

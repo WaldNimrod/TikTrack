@@ -565,8 +565,10 @@ class ExecutionClusteringService:
             user_id=user_id,
             limit=limit_executions
         )
-        print(f"[CLUSTERING DEBUG] Found {len(pending_executions)} pending executions")
-        logger.warning(f"[CLUSTERING] Found {len(pending_executions)} pending executions")
+        # Filter out executions without ticker_id to avoid invalid clustering
+        pending_executions = [e for e in pending_executions if e.ticker_id]
+        print(f"[CLUSTERING DEBUG] Found {len(pending_executions)} pending executions (filtered)")
+        logger.warning(f"[CLUSTERING] Found {len(pending_executions)} pending executions (filtered for ticker_id)")
         
         # Log TIUP executions specifically
         tiup_executions = [e for e in pending_executions if e.ticker_id == 50]

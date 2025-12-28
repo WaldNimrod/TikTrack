@@ -20,6 +20,9 @@
     });
 
     function initializeLoginPage() {
+        // Force cleanup of any lingering modals/backdrops from previous pages
+        forceModalCleanup();
+
         const form = document.getElementById('loginForm');
         if (!form) {
             console.error('[login.js] Login form not found');
@@ -38,6 +41,58 @@
         // Log initialization
         if (window.Logger?.info) {
             window.Logger.info('[login.js] Login page initialized successfully', { page: 'login' });
+        }
+    }
+
+    // Force cleanup function for lingering modals
+    function forceModalCleanup() {
+        console.log('[login.js] Checking for lingering modals on login page load');
+
+        const openModals = document.querySelectorAll('.modal.show');
+        const allBackdrops = document.querySelectorAll('.modal-backdrop');
+        const hasModalOpenClass = document.body.classList.contains('modal-open');
+
+        console.log('[login.js] Modal check:', {
+            openModalsCount: openModals.length,
+            openModalIds: Array.from(openModals).map(m => m.id),
+            backdropsCount: allBackdrops.length,
+            bodyHasModalOpen: hasModalOpenClass,
+            page: window.location.pathname
+        });
+
+        let cleanupPerformed = false;
+
+        // Hide all visible modals
+        openModals.forEach(modal => {
+            console.log('[login.js] Force hiding modal:', modal.id);
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            cleanupPerformed = true;
+        });
+
+        // Remove all backdrops
+        allBackdrops.forEach(backdrop => {
+            console.log('[login.js] Force removing backdrop');
+            if (backdrop.parentNode) {
+                backdrop.parentNode.removeChild(backdrop);
+            }
+            cleanupPerformed = true;
+        });
+
+        // Clean up body classes and styles
+        if (hasModalOpenClass) {
+            document.body.classList.remove('modal-open');
+            cleanupPerformed = true;
+        }
+
+        if (document.body.style.overflow === 'hidden') {
+            document.body.style.overflow = '';
+            cleanupPerformed = true;
+        }
+
+        if (cleanupPerformed) {
+            console.log('[login.js] Modal cleanup completed on login page');
         }
     }
 
@@ -128,8 +183,40 @@
             // Clear redirect URL
             sessionStorage.removeItem('login_redirect_url');
 
+            // Debug modal state before redirect
+            const openModals = document.querySelectorAll('.modal.show');
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            console.log('[login.js] Before redirect - checking for lingering modals:', {
+                openModalsCount: openModals.length,
+                openModalIds: Array.from(openModals).map(m => m.id),
+                backdropsCount: allBackdrops.length,
+                bodyHasModalOpen: document.body.classList.contains('modal-open'),
+                page: window.location.pathname
+            });
+
+            // Force cleanup of any lingering modals/backdrops
+            openModals.forEach(modal => {
+                console.log('[login.js] Force hiding modal:', modal.id);
+                const bsModal = bootstrap?.Modal?.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+
+            allBackdrops.forEach(backdrop => {
+                console.log('[login.js] Force removing backdrop:', backdrop.id || 'unnamed');
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+            });
+
+            // Ensure body is clean
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+
             // Redirect after short delay
             setTimeout(() => {
+                console.log('[login.js] Redirecting to:', redirectUrl);
                 window.location.href = redirectUrl;
             }, 1500);
 

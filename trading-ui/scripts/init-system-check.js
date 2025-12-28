@@ -158,7 +158,7 @@ class InitSystemCheck {
             pageName = pageName.replace('.html', '');
         }
         
-        // Handle tag-management specifically (URL might be /tag-management without .html)
+        // Handle tag-management specifically (URL might be /tag_management without .html)
         if (path.includes('tag-management')) {
             pageName = 'tag-management';
         }

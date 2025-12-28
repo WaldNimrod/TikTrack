@@ -29,7 +29,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BASE_URL="${BASE_URL:-http://localhost:8080}"
-PAGE_URL="${BASE_URL}/trading-ui/ai-analysis.html"
+PAGE_URL="${BASE_URL}/trading-ui/ai_analysis.html"
 TEST_MODE="${1:---all}"
 
 # Functions
@@ -125,7 +125,7 @@ run_playwright_tests() {
     fi
     
     # Check if test file exists
-    TEST_FILE="trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js"
+    TEST_FILE="trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js"
     if [ ! -f "$TEST_FILE" ]; then
         echo -e "${RED}❌ Test file not found: ${TEST_FILE}${NC}"
         return 1
@@ -161,12 +161,12 @@ show_test_instructions() {
     echo "   - Console: window.runAIAnalysisPerformanceTests()"
     echo ""
     echo "3. Playwright Tests:"
-    echo "   - Run: npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js"
+    echo "   - Run: npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js"
     echo ""
     echo "Test files:"
-    echo "  - trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js"
-    echo "  - trading-ui/scripts/testing/automated/ai-analysis-browser-test.js"
-    echo "  - trading-ui/scripts/testing/automated/ai-analysis-performance-test.js"
+    echo "  - trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js"
+    echo "  - trading-ui/scripts/testing/automated/ai_analysis-browser-test.js"
+    echo "  - trading-ui/scripts/testing/automated/ai_analysis-performance-test.js"
     echo ""
 }
 

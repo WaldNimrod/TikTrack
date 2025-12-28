@@ -70,36 +70,36 @@ HIGH_PRIORITY_PAGES = [
     {"name": "הערות", "url": "/notes.html", "category": "main"},
     {"name": "העדפות", "url": "/preferences.html", "category": "main"},
     # Note: login.html removed - login is now handled via modal module (auth.js)
-    {"name": "ניהול רשימות צפייה", "url": "/watch-list.html", "category": "watchlists"},
-    {"name": "היסטוריית טרייד", "url": "/mockups/daily-snapshots/trade-history-page.html", "category": "main"},
-    {"name": "מצב תיק היסטורי", "url": "/mockups/daily-snapshots/portfolio-state-page.html", "category": "main"},
-    {"name": "יומן מסחר", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main"}
+    {"name": "ניהול רשימות צפייה", "url": "/watch_list.html", "category": "watchlists"},
+    {"name": "היסטוריית טרייד", "url": "/mockups/daily-snapshots/trade_history_page.html", "category": "main"},
+    {"name": "מצב תיק היסטורי", "url": "/mockups/daily-snapshots/portfolio_state_page.html", "category": "main"},
+    {"name": "יומן מסחר", "url": "/mockups/daily-snapshots/trading_journal_page.html", "category": "main"}
 ]
 
 MEDIUM_PRIORITY_PAGES = [
-    {"name": "דשבורד טיקר", "url": "/ticker-dashboard.html", "category": "main"},
+    {"name": "דשבורד טיקר", "url": "/ticker_dashboard.html", "category": "main"},
     {"name": "ייבוא נתונים", "url": "/data_import.html", "category": "main"},
     {"name": "מחקר", "url": "/research.html", "category": "main"},
-    {"name": "ניתוח AI", "url": "/ai-analysis.html", "category": "main"},
-    {"name": "פרופיל משתמש", "url": "/user-profile.html", "category": "main"},
+    {"name": "ניתוח AI", "url": "/ai_analysis.html", "category": "main"},
+    {"name": "פרופיל משתמש", "url": "/user_profile.html", "category": "main"},
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth"},
-    {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth"},
-    {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth"}
+    {"name": "שחזור סיסמה", "url": "/forgot_password.html", "category": "auth"},
+    {"name": "איפוס סיסמה", "url": "/reset_password.html", "category": "auth"}
 ]
 
 LOW_PRIORITY_PAGES = [
     {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical"},
     {"name": "נתונים נוספים", "url": "/db_extradata.html", "category": "technical"},
     {"name": "אילוצי מערכת", "url": "/constraints.html", "category": "technical"},
-    {"name": "משימות רקע", "url": "/background-tasks.html", "category": "technical"},
-    {"name": "ניטור שרת", "url": "/server-monitor.html", "category": "technical"},
-    {"name": "ניהול מערכת", "url": "/system-management.html", "category": "technical"},
-    {"name": "מרכז התראות", "url": "/notifications-center.html", "category": "technical"},
-    {"name": "ניהול CSS", "url": "/css-management.html", "category": "technical"},
-    {"name": "תצוגת צבעים", "url": "/dynamic-colors-display.html", "category": "technical"},
+    {"name": "משימות רקע", "url": "/background_tasks.html", "category": "technical"},
+    {"name": "ניטור שרת", "url": "/server_monitor.html", "category": "technical"},
+    {"name": "ניהול מערכת", "url": "/system_management.html", "category": "technical"},
+    {"name": "מרכז התראות", "url": "/notifications_center.html", "category": "technical"},
+    {"name": "ניהול CSS", "url": "/css_management.html", "category": "technical"},
+    {"name": "תצוגת צבעים", "url": "/dynamic_colors_display.html", "category": "technical"},
     {"name": "עיצובים", "url": "/designs.html", "category": "technical"},
-    {"name": "דשבורד נתונים חיצוניים", "url": "/external-data-dashboard.html", "category": "secondary"},
-    {"name": "דשבורד בדיקות CRUD", "url": "/crud-testing-dashboard.html", "category": "secondary"}
+    {"name": "דשבורד נתונים חיצוניים", "url": "/external_data_dashboard.html", "category": "secondary"},
+    {"name": "דשבורד בדיקות CRUD", "url": "/crud_testing_dashboard.html", "category": "secondary"}
 ]
 
 ALL_PAGES_BY_PRIORITY = HIGH_PRIORITY_PAGES + MEDIUM_PRIORITY_PAGES + LOW_PRIORITY_PAGES

@@ -2851,7 +2851,7 @@ function applyUserPreferences(preferences) {
     }
 
     // החלת העדפת מטבע ברירת מחדל
-    const defaultCurrency = preferences.default_currency || 'USD';
+    const defaultCurrency = preferences.primaryCurrency || 'USD';
     if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
       window.DataCollectionService.setValue('cashFlowCurrency', defaultCurrency, 'text');
     } else {

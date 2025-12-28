@@ -23,7 +23,7 @@ const BASE_DIR = '.';
 
 // Filter out non-existent files
 function shouldTestPage(pagePath) {
-  const nonExistent = ["trading-ui/tradingview-test-page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
+  const nonExistent = ["trading-ui/tradingview_test_page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
   return !nonExistent.some(nonEx => pagePath.includes(nonEx));
 }
 
@@ -167,7 +167,7 @@ function shouldTestPage(pagePath) {
         '/archive/',
         '/external_data_integration_client/',
         '/scripts/',
-        '/mockups/daily-snapshots/tradingview-test-page.html' // This is a mockup, not a main page
+        '/mockups/daily-snapshots/tradingview_test_page.html' // This is a mockup, not a main page
     ];
     return !excludePatterns.some(pattern => pagePath.includes(pattern));
 }
@@ -178,7 +178,7 @@ async function checkPageConfig(pageName) {
         const content = await fsPromises.readFile(configPath, 'utf8');
         
         // Extract page name from path (e.g., trading-ui/alerts.html -> alerts)
-        // Handle both background-tasks.html and background_tasks
+        // Handle both background_tasks.html and background_tasks
         let pageKey = pageName.replace('trading-ui/', '').replace('.html', '').replace(/-/g, '_');
         
         // Also try with dashes

@@ -5,10 +5,10 @@ Trade History API Routes - TikTrack
 This module provides API endpoints for retrieving trade history data.
 
 Endpoints:
-    GET /api/trade-history/ - Get trade history with filters
-    GET /api/trade-history/statistics - Get trade statistics
-    GET /api/trade-history/plan-vs-execution - Get plan vs execution analysis
-    GET /api/trade-history/aggregated - Get aggregated trade history
+    GET /api/trade_history/ - Get trade history with filters
+    GET /api/trade_history/statistics - Get trade statistics
+    GET /api/trade_history/plan-vs-execution - Get plan vs execution analysis
+    GET /api/trade_history/aggregated - Get aggregated trade history
 
 Author: TikTrack Development Team
 Version: 1.0.0
@@ -32,7 +32,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-history')
+trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade_history')
 user_service = UserService()
 
 

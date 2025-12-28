@@ -6,7 +6,7 @@
  * Runs directly in browser console
  * 
  * Usage:
- *   1. Open ai-analysis.html in browser
+ *   1. Open ai_analysis.html in browser
  *   2. Open console (F12)
  *   3. Run: window.runAllAIAnalysisTests()
  * 

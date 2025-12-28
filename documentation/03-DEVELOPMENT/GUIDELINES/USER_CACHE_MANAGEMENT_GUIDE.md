@@ -258,7 +258,7 @@ Console: "✅ הטבלה עודכנה"
 
 ### עמוד "כלי פיתוח → ניהול מערכת"
 
-**מיקום:** http://localhost:8080/system-management
+**מיקום:** http://localhost:8080/system_management
 
 **אותם כפתורים** כמו cache-test
 

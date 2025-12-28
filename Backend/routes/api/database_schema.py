@@ -32,9 +32,14 @@ def get_all_tables():
         db: Session = next(get_db())
         
         # Get all table names
-        result = db.execute(text(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
-        ))
+        result = db.execute(
+            text(
+                "SELECT table_name "
+                "FROM information_schema.tables "
+                "WHERE table_schema = 'public' AND table_type = 'BASE TABLE' "
+                "ORDER BY table_name"
+            )
+        )
         
         tables = [{'name': row[0]} for row in result]
         
@@ -77,18 +82,40 @@ def get_table_schema(table_name: str):
                 "version": "1.0"
             }), 400
         
-        # Get table structure using PRAGMA table_info
-        result = db.execute(text(f"PRAGMA table_info({table_name})"))
-        
+        pk_rows = db.execute(
+            text(
+                "SELECT kcu.column_name "
+                "FROM information_schema.table_constraints tc "
+                "JOIN information_schema.key_column_usage kcu "
+                "ON tc.constraint_name = kcu.constraint_name "
+                "AND tc.table_schema = kcu.table_schema "
+                "WHERE tc.table_schema = 'public' "
+                "AND tc.table_name = :table_name "
+                "AND tc.constraint_type = 'PRIMARY KEY'"
+            ),
+            {"table_name": table_name},
+        )
+        pk_columns = {row[0] for row in pk_rows}
+
+        result = db.execute(
+            text(
+                "SELECT column_name, data_type, is_nullable, column_default, ordinal_position "
+                "FROM information_schema.columns "
+                "WHERE table_schema = 'public' AND table_name = :table_name "
+                "ORDER BY ordinal_position"
+            ),
+            {"table_name": table_name},
+        )
+
         columns = []
         for row in result:
             columns.append({
-                'cid': row[0],              # Column ID (order in table)
-                'name': row[1],             # Column name
-                'type': row[2],             # Data type
-                'notnull': bool(row[3]),    # NOT NULL constraint
-                'dflt_value': row[4],       # Default value
-                'pk': bool(row[5])          # Primary key
+                'cid': row[4],              # Column order in table
+                'name': row[0],             # Column name
+                'type': row[1],             # Data type
+                'notnull': row[2] == "NO",  # NOT NULL constraint
+                'dflt_value': row[3],       # Default value
+                'pk': row[0] in pk_columns  # Primary key
             })
         
         # Sort columns by their physical order (cid)
@@ -176,4 +203,3 @@ def get_table_data_with_schema(table_name: str):
         }), 500
     finally:
         db.close()
-

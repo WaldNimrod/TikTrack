@@ -48,6 +48,8 @@ class User(BaseModel):
                        comment="User first name")
     last_name = Column(String(50), nullable=True, 
                       comment="User last name")
+    # icon = Column(String(100), nullable=True,  # TODO: Enable after icon column migration is completed
+    #           comment="User icon name")
     is_active = Column(Boolean, default=True, nullable=False,
                       comment="Whether user is active")
     is_default = Column(Boolean, default=False, nullable=False,
@@ -210,4 +212,3 @@ class User(BaseModel):
         except Exception:
             return False
     
-

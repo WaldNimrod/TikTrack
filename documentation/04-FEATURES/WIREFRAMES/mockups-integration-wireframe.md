@@ -30,7 +30,7 @@
 │ │      │        │      │       │[דשבורד]  │         │ │
 │ └──────┴────────┴──────┴────────┴──────────┴─────────┘ │
 │                                                         │
-│ כפתור "דשבורד" → ticker-dashboard.html?tickerId=123  │
+│ כפתור "דשבורד" → ticker_dashboard.html?tickerId=123  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -83,7 +83,7 @@
 │ │      │        │      │          │[היסטוריה]│          │
 │ └──────┴────────┴──────┴──────────┴─────────┘          │
 │                                                         │
-│ כפתור "היסטוריה" → trade-history-page.html?tradeId=123│
+│ כפתור "היסטוריה" → trade_history_page.html?tradeId=123│
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -91,7 +91,7 @@
 
 - הוספת כפתור "היסטוריה" בעמודת הפעולות
 - כפתור עם `data-onclick="navigateToTradeHistory(tradeId)"`
-- ניווט ל-`trade-history-page.html` עם פילטר
+- ניווט ל-`trade_history_page.html` עם פילטר
 
 ---
 
@@ -111,7 +111,7 @@
 │ │ 1    │        │      │          │[ניתוח]  │          │
 │ └──────┴────────┴──────┴──────────┴─────────┘          │
 │                                                         │
-│ כפתור "ניתוח" → strategy-analysis-page.html?planId=123 │
+│ כפתור "ניתוח" → strategy_analysis_page.html?planId=123 │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -119,7 +119,7 @@
 
 - הוספת כפתור "ניתוח" בעמודת הפעולות
 - כפתור עם `data-onclick="navigateToStrategyAnalysis(planId)"`
-- ניווט ל-`strategy-analysis-page.html` עם פילטר
+- ניווט ל-`strategy_analysis_page.html` עם פילטר
 
 ---
 
@@ -137,7 +137,7 @@
 │                                                         │
 │ [צפה במצב תיק היסטורי]                                 │
 │                                                         │
-│ כפתור → portfolio-state-page.html                      │
+│ כפתור → portfolio_state_page.html                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -145,7 +145,7 @@
 
 - הוספת כפתור "צפה במצב תיק היסטורי" בסעיף סיכום
 - כפתור עם `data-onclick="navigateToPortfolioState()"`
-- ניווט ל-`portfolio-state-page.html`
+- ניווט ל-`portfolio_state_page.html`
 
 ---
 
@@ -187,7 +187,7 @@
 **טכנולוגיה:** Button System או קישור טקסט
 
 ```html
-<a href="portfolio-state-page.html" 
+<a href="portfolio_state_page.html" 
    data-onclick="navigateToPortfolioState()"
    class="btn btn-link">
     צפה במצב תיק היסטורי
@@ -207,7 +207,7 @@ function navigateToTickerDashboard(tickerId) {
         return;
     }
     
-    const url = `/ticker-dashboard.html?tickerId=${tickerId}`;
+    const url = `/ticker_dashboard.html?tickerId=${tickerId}`;
     window.location.href = url;
 }
 ```
@@ -221,7 +221,7 @@ function navigateToTradeHistory(tradeId) {
         return;
     }
     
-    const url = `/mockups/daily-snapshots/trade-history-page.html?tradeId=${tradeId}`;
+    const url = `/mockups/daily-snapshots/trade_history_page.html?tradeId=${tradeId}`;
     window.location.href = url;
 }
 ```
@@ -235,7 +235,7 @@ function navigateToStrategyAnalysis(planId) {
         return;
     }
     
-    const url = `/mockups/daily-snapshots/strategy-analysis-page.html?planId=${planId}`;
+    const url = `/mockups/daily-snapshots/strategy_analysis_page.html?planId=${planId}`;
     window.location.href = url;
 }
 ```
@@ -244,7 +244,7 @@ function navigateToStrategyAnalysis(planId) {
 
 ```javascript
 function navigateToPortfolioState() {
-    const url = `/mockups/daily-snapshots/portfolio-state-page.html`;
+    const url = `/mockups/daily-snapshots/portfolio_state_page.html`;
     window.location.href = url;
 }
 ```

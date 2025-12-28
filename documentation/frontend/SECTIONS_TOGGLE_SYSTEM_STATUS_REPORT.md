@@ -117,131 +117,131 @@
     - נוספו `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-15. ✅ **background-tasks.html**
+15. ✅ **background_tasks.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-3 sections
     - תקין לחלוטין
 
-16. ✅ **server-monitor.html**
+16. ✅ **server_monitor.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes (5 sections)
     - תקין לחלוטין
 
-17. ✅ **system-management.html**
+17. ✅ **system_management.html**
     - משתמש במערכת הכללית
     - תקין לחלוטין
 
-18. ✅ **notifications-center.html/js**
+18. ✅ **notifications_center.html/js**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-3 sections
     - ✅ **תוקן:** הוסרה custom toggle function
     - תקין לחלוטין
 
-19. ✅ **css-management.html**
+19. ✅ **css_management.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-5 sections
     - תקין לחלוטין
 
 ### עמודי כלי פיתוח (9)
 
-20. ✅ **cache-management.html**
+20. ✅ **cache_management.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes
     - תקין לחלוטין
 
-21. ✅ **code-quality-dashboard.html**
+21. ✅ **code_quality_dashboard.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-11 sections
     - תקין לחלוטין
 
-22. ✅ **tag-management.html**
+22. ✅ **tag_management.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes
     - תקין לחלוטין
 
-23. ✅ **init-system-management.html**
+23. ✅ **init_system_management.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes + id attributes ל-9 sections
     - תקין לחלוטין
 
-24. ✅ **conditions-test.html**
+24. ✅ **conditions_test.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-25. ✅ **test-header-only.html**
+25. ✅ **test_header_only.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-2 sections
     - תקין לחלוטין
 
-26. ✅ **external-data-dashboard.html**
+26. ✅ **external_data_dashboard.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-6 sections
     - תקין לחלוטין
 
-27. ✅ **chart-management.html**
+27. ✅ **chart_management.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-3 sections
     - תקין לחלוטין
 
-28. ✅ **crud-testing-dashboard.html**
+28. ✅ **crud_testing_dashboard.html**
     - משתמש במערכת הכללית
     - נוספו `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
 ### עמודי מוקאפ (11)
 
-29. ✅ **trade-history-page.html**
+29. ✅ **trade_history_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-5 sections
     - תקין לחלוטין
 
-30. ✅ **portfolio-state-page.html**
+30. ✅ **portfolio_state_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-31. ✅ **price-history-page.html**
+31. ✅ **price_history_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-32. ✅ **comparative-analysis-page.html**
+32. ✅ **comparative_analysis_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-7 sections
     - תקין לחלוטין
 
-33. ✅ **trading-journal-page.html**
+33. ✅ **trading_journal_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-3 sections
     - תקין לחלוטין
 
-34. ✅ **strategy-analysis-page.html**
+34. ✅ **strategy_analysis_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-8 sections
     - תקין לחלוטין
 
-35. ✅ **economic-calendar-page.html**
+35. ✅ **economic_calendar_page.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-36. ✅ **history-widget.html**
+36. ✅ **history_widget.html**
     - משתמש במערכת הכללית
     - ✅ **תוקן:** נוסף `data-section="history_widget_top_section"`
     - תקין לחלוטין
 
-37. ✅ **emotional-tracking-widget.html**
+37. ✅ **emotional_tracking_widget.html**
     - משתמש במערכת הכללית
     - ✅ **תוקן:** נוסף `data-section="emotional_tracking_widget_top_section"`
     - תקין לחלוטין
 
-38. ✅ **date-comparison-modal.html**
+38. ✅ **date_comparison_modal.html**
     - משתמש במערכת הכללית
     - יש `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-39. ✅ **tradingview-test-page.html**
+39. ✅ **tradingview_test_page.html**
     - אין sections (עמוד בדיקה בלבד)
     - תקין לחלוטין
 
@@ -284,8 +284,8 @@
 
 ### שלב 4: תיקון עמודי מוקאפ ✅
 
-- ✅ **history-widget.html** - נוסף `data-section="history_widget_top_section"`
-- ✅ **emotional-tracking-widget.html** - נוסף `data-section="emotional_tracking_widget_top_section"`
+- ✅ **history_widget.html** - נוסף `data-section="history_widget_top_section"`
+- ✅ **emotional_tracking_widget.html** - נוסף `data-section="emotional_tracking_widget_top_section"`
 
 ---
 
@@ -369,7 +369,7 @@ window.toggleSection('section-id');
 </div>
 ```
 
-### trade-history-page.html (מוקאפ)
+### trade_history_page.html (מוקאפ)
 
 ```html
 <div class="top-section" data-section="trade-history-top-section">
@@ -405,25 +405,25 @@ window.toggleSection('section-id');
 9. ✅ `trading-ui/db_display.html` - נוספו data-section attributes (8 sections)
 10. ✅ `trading-ui/db_extradata.html` - נוספו data-section attributes (9 sections)
 11. ✅ `trading-ui/constraints.html` - נוספו data-section attributes (4 sections)
-12. ✅ `trading-ui/background-tasks.html` - נוספו data-section attributes (3 sections)
-13. ✅ `trading-ui/server-monitor.html` - נוספו data-section attributes
-14. ✅ `trading-ui/css-management.html` - נוספו data-section attributes (5 sections)
-15. ✅ `trading-ui/notifications-center.html` - נוספו data-section attributes (3 sections)
-16. ✅ `trading-ui/code-quality-dashboard.html` - נוספו data-section attributes (11 sections)
-17. ✅ `trading-ui/tag-management.html` - נוספו data-section attributes
-18. ✅ `trading-ui/init-system-management.html` - נוספו data-section + id attributes (9 sections)
-19. ✅ `trading-ui/conditions-test.html` - נוספו data-section attributes (4 sections)
-20. ✅ `trading-ui/test-header-only.html` - נוספו data-section attributes (2 sections)
-21. ✅ `trading-ui/external-data-dashboard.html` - נוספו data-section attributes (6 sections)
-22. ✅ `trading-ui/chart-management.html` - נוספו data-section attributes (3 sections)
-23. ✅ `trading-ui/crud-testing-dashboard.html` - נוספו data-section attributes (4 sections)
-24. ✅ `trading-ui/dynamic-colors-display.html` - נוספו data-section attributes (4 sections)
+12. ✅ `trading-ui/background_tasks.html` - נוספו data-section attributes (3 sections)
+13. ✅ `trading-ui/server_monitor.html` - נוספו data-section attributes
+14. ✅ `trading-ui/css_management.html` - נוספו data-section attributes (5 sections)
+15. ✅ `trading-ui/notifications_center.html` - נוספו data-section attributes (3 sections)
+16. ✅ `trading-ui/code_quality_dashboard.html` - נוספו data-section attributes (11 sections)
+17. ✅ `trading-ui/tag_management.html` - נוספו data-section attributes
+18. ✅ `trading-ui/init_system_management.html` - נוספו data-section + id attributes (9 sections)
+19. ✅ `trading-ui/conditions_test.html` - נוספו data-section attributes (4 sections)
+20. ✅ `trading-ui/test_header_only.html` - נוספו data-section attributes (2 sections)
+21. ✅ `trading-ui/external_data_dashboard.html` - נוספו data-section attributes (6 sections)
+22. ✅ `trading-ui/chart_management.html` - נוספו data-section attributes (3 sections)
+23. ✅ `trading-ui/crud_testing_dashboard.html` - נוספו data-section attributes (4 sections)
+24. ✅ `trading-ui/dynamic_colors_display.html` - נוספו data-section attributes (4 sections)
 25. ✅ `trading-ui/designs.html` - נוספו data-section attributes (4 sections)
 
 ### קבצי HTML - עמודי מוקאפ
 
-26. ✅ `trading-ui/mockups/daily-snapshots/history-widget.html` - נוסף data-section
-27. ✅ `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html` - נוסף data-section
+26. ✅ `trading-ui/mockups/daily-snapshots/history_widget.html` - נוסף data-section
+27. ✅ `trading-ui/mockups/daily-snapshots/emotional_tracking_widget.html` - נוסף data-section
 
 **סה"כ:** 5 קבצי JavaScript + 27 קבצי HTML = **32 קבצים** נערכו
 

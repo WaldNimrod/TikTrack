@@ -27,7 +27,7 @@
 
 ## דוח פרטני לכל עמוד
 
-### comparative-analysis-page.html
+### comparative_analysis_page.html
 
 ❌ **סה"כ בעיות:** 47
 **מספר סקריפטים:** 27
@@ -177,7 +177,7 @@
 
 ---
 
-### date-comparison-modal.html
+### date_comparison_modal.html
 
 ❌ **סה"כ בעיות:** 19
 **מספר סקריפטים:** 24
@@ -245,7 +245,7 @@
 
 ---
 
-### economic-calendar-page.html
+### economic_calendar_page.html
 
 ❌ **סה"כ בעיות:** 6
 **מספר סקריפטים:** 20
@@ -272,7 +272,7 @@
 
 ---
 
-### emotional-tracking-widget.html
+### emotional_tracking_widget.html
 
 ⚠️ **סה"כ בעיות:** 3
 **מספר סקריפטים:** 19
@@ -290,7 +290,7 @@
 
 ---
 
-### heatmap-visual-example.html
+### heatmap_visual_example.html
 
 ⚠️ **סה"כ בעיות:** 4
 **מספר סקריפטים:** 1
@@ -310,7 +310,7 @@
 
 ---
 
-### history-widget.html
+### history_widget.html
 
 ❌ **סה"כ בעיות:** 15
 **מספר סקריפטים:** 21
@@ -364,7 +364,7 @@
 
 ---
 
-### portfolio-state-page.html
+### portfolio_state_page.html
 
 ❌ **סה"כ בעיות:** 37
 **מספר סקריפטים:** 25
@@ -487,7 +487,7 @@
 
 ---
 
-### price-history-page.html
+### price_history_page.html
 
 ❌ **סה"כ בעיות:** 5
 **מספר סקריפטים:** 23
@@ -513,7 +513,7 @@
 
 ---
 
-### strategy-analysis-page.html
+### strategy_analysis_page.html
 
 ❌ **סה"כ בעיות:** 41
 **מספר סקריפטים:** 24
@@ -645,7 +645,7 @@
 
 ---
 
-### trade-history-page.html
+### trade_history_page.html
 
 ❌ **סה"כ בעיות:** 18
 **מספר סקריפטים:** 27
@@ -713,7 +713,7 @@
 
 ---
 
-### trading-journal-page.html
+### trading_journal_page.html
 
 ❌ **סה"כ בעיות:** 15
 **מספר סקריפטים:** 70
@@ -771,7 +771,7 @@
 
 ---
 
-### tradingview-test-page.html
+### tradingview_test_page.html
 
 ⚠️ **סה"כ בעיות:** 2
 **מספר סקריפטים:** 18

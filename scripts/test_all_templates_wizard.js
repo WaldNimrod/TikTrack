@@ -2,7 +2,7 @@
  * Comprehensive Test for All 4 AI Analysis Templates via Wizard
  * Tests the full wizard flow: selection, validation, generation, and note creation
  * 
- * Run this in browser console on ai-analysis.html page after wizard is loaded
+ * Run this in browser console on ai_analysis.html page after wizard is loaded
  */
 
 const WIZARD_COMPREHENSIVE_TEST = {

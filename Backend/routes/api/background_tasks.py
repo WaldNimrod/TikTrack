@@ -39,7 +39,7 @@ def set_background_task_manager(manager):
     background_task_manager = manager
 
 # Create blueprint
-background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/background-tasks')
+background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/background_tasks')
 
 # Initialize base API (background tasks is complex, so we'll use it selectively)
 
@@ -601,15 +601,15 @@ def not_found(error):
     return jsonify({
         'error': 'Background tasks API endpoint not found',
         'available_endpoints': [
-            'GET /api/background-tasks/',
-            'GET /api/background-tasks/tasks',
-            'GET /api/background-tasks/tasks/<task_name>',
-            'POST /api/background-tasks/tasks/<task_name>/execute',
-            'POST /api/background-tasks/tasks/<task_name>/toggle',
-            'POST /api/background-tasks/scheduler/start',
-            'POST /api/background-tasks/scheduler/stop',
-            'GET /api/background-tasks/history',
-            'GET /api/background-tasks/analytics'
+            'GET /api/background_tasks/',
+            'GET /api/background_tasks/tasks',
+            'GET /api/background_tasks/tasks/<task_name>',
+            'POST /api/background_tasks/tasks/<task_name>/execute',
+            'POST /api/background_tasks/tasks/<task_name>/toggle',
+            'POST /api/background_tasks/scheduler/start',
+            'POST /api/background_tasks/scheduler/stop',
+            'GET /api/background_tasks/history',
+            'GET /api/background_tasks/analytics'
         ]
     }), 404
 

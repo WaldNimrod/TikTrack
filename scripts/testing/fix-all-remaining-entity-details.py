@@ -120,18 +120,18 @@ def main():
     
     # Pages that need fixing (from the deviations report)
     pages_to_fix = [
-        "mockups/daily-snapshots/portfolio-state-page.html",
-        "mockups/daily-snapshots/trade-history-page.html",
-        "mockups/daily-snapshots/price-history-page.html",
-        "mockups/daily-snapshots/comparative-analysis-page.html",
-        "mockups/daily-snapshots/strategy-analysis-page.html",
-        "mockups/daily-snapshots/economic-calendar-page.html",
-        "mockups/daily-snapshots/history-widget.html",
-        "mockups/daily-snapshots/emotional-tracking-widget.html",
-        "mockups/daily-snapshots/date-comparison-modal.html",
-        "mockups/daily-snapshots/tradingview-test-page.html",
+        "mockups/daily-snapshots/portfolio_state_page.html",
+        "mockups/daily-snapshots/trade_history_page.html",
+        "mockups/daily-snapshots/price_history_page.html",
+        "mockups/daily-snapshots/comparative_analysis_page.html",
+        "mockups/daily-snapshots/strategy_analysis_page.html",
+        "mockups/daily-snapshots/economic_calendar_page.html",
+        "mockups/daily-snapshots/history_widget.html",
+        "mockups/daily-snapshots/emotional_tracking_widget.html",
+        "mockups/daily-snapshots/date_comparison_modal.html",
+        "mockups/daily-snapshots/tradingview_test_page.html",
         "cache-test.html",
-        "tradingview-test-page.html",
+        "tradingview_test_page.html",
     ]
     
     fixed_count = 0

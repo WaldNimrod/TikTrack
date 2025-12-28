@@ -71,8 +71,8 @@
 
 ### קבצים התייחסות
 
-- `trading-ui/test-header-only.html` - תבנית מושלמת
-- `trading-ui/background-tasks.html` - תבנית טובה
+- `trading-ui/test_header_only.html` - תבנית מושלמת
+- `trading-ui/background_tasks.html` - תבנית טובה
 - `trading-ui/scripts/init-system/dev-tools/page-template-generator.js` - תבנית אוטומטית
 
 ---
@@ -154,7 +154,7 @@
 
 ### קבצים התייחסות
 
-- `trading-ui/mockups/daily-snapshots/trade-history-page.html` - דוגמה טובה
+- `trading-ui/mockups/daily-snapshots/trade_history_page.html` - דוגמה טובה
 - `trading-ui/scripts/header-system.js` - מערכת Header
 
 ---
@@ -182,24 +182,24 @@ node scripts/mockups-standardization-checker.js
 
 ### עמודי daily-snapshots (11 עמודים)
 
-1. `comparative-analysis-page.html`
-2. `date-comparison-modal.html`
-3. `economic-calendar-page.html`
-4. `emotional-tracking-widget.html`
-5. `history-widget.html`
-6. `portfolio-state-page.html`
-7. `price-history-page.html`
-8. `strategy-analysis-page.html`
-9. `trade-history-page.html`
-10. `trading-journal-page.html`
-11. `tradingview-test-page.html`
+1. `comparative_analysis_page.html`
+2. `date_comparison_modal.html`
+3. `economic_calendar_page.html`
+4. `emotional_tracking_widget.html`
+5. `history_widget.html`
+6. `portfolio_state_page.html`
+7. `price_history_page.html`
+8. `strategy_analysis_page.html`
+9. `trade_history_page.html`
+10. `trading_journal_page.html`
+11. `tradingview_test_page.html`
 
 ### עמודי מוקאפ נוספים
 
-12. `../add-ticker-modal.html` - Modal קטן
-13. `../flag-quick-action.html` - Modal קטן
-14. `../watch-list-modal.html` - Modal קטן
-15. `../watch-lists-page.html` - Full page
+12. `../add_ticker_modal.html` - Modal קטן
+13. `../flag_quick_action.html` - Modal קטן
+14. `../watch_list_modal.html` - Modal קטן
+15. `../watch_lists_page.html` - Full page
 
 ---
 
@@ -216,4 +216,3 @@ node scripts/mockups-standardization-checker.js
 
 **תאריך:** 27 בנובמבר 2025  
 **סטטוס:** ✅ הושלם - כל 15 עמודי המוקאפ עברו סטנדרטיזציה
-

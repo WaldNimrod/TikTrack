@@ -13,11 +13,11 @@ const BASE_DIR = path.resolve(__dirname, '..');
 // רשימת עמודי מוקאפ עם תמונות חסרות
 const PAGES_TO_FIX = [
     {
-        file: path.join(BASE_DIR, 'trading-ui', 'mockups', 'daily-snapshots', 'portfolio-state-page.html'),
+        file: path.join(BASE_DIR, 'trading-ui', 'mockups', 'daily-snapshots', 'portfolio_state_page.html'),
         images: ['chevron-down']
     },
     {
-        file: path.join(BASE_DIR, 'trading-ui', 'mockups', 'watch-lists-page.html'),
+        file: path.join(BASE_DIR, 'trading-ui', 'mockups', 'watch_lists_page.html'),
         images: ['flame', 'coins', 'table', 'cards', 'flag-filled', 'flag']
     }
 ];

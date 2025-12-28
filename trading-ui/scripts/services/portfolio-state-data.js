@@ -76,7 +76,7 @@
       if (include_closed) params.append('include_closed', 'true');
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/portfolio-state/snapshot?${params.toString()}`;
+      const url = `${base}/api/portfolio_state/snapshot?${params.toString()}`;
       
       const response = await fetch(url, {
         credentials: 'include' // Include cookies for session-based auth
@@ -175,7 +175,7 @@
       if (accountId) params.append('account_id', accountId);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/portfolio-state/series?${params.toString()}`;
+      const url = `${base}/api/portfolio_state/series?${params.toString()}`;
       
       const response = await fetch(url, {
         credentials: 'include' // Include cookies for session-based auth
@@ -276,7 +276,7 @@
       if (accountId) params.append('account_id', accountId);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/portfolio-state/performance?${params.toString()}`;
+      const url = `${base}/api/portfolio_state/performance?${params.toString()}`;
       
       const response = await fetch(url, {
         credentials: 'include' // Include cookies for session-based auth
@@ -348,7 +348,7 @@
       if (accountId) params.append('account_id', accountId);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/portfolio-state/comparison?${params.toString()}`;
+      const url = `${base}/api/portfolio_state/comparison?${params.toString()}`;
       
       const response = await fetch(url, {
         credentials: 'include' // Include cookies for session-based auth

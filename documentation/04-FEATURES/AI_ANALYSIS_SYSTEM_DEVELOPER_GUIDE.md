@@ -42,19 +42,19 @@
 
 **חשוב:** המערכת משתמשת במיפוי כתובות ללא `.html` וללא `/trading-ui/`:
 
-- ✅ **נכון:** `http://localhost:8080/ai-analysis`
-- ❌ **לא נכון:** `http://localhost:8080/trading-ui/ai-analysis.html`
-- ❌ **לא נכון:** `http://localhost:8080/ai-analysis.html`
+- ✅ **נכון:** `http://localhost:8080/ai_analysis`
+- ❌ **לא נכון:** `http://localhost:8080/trading-ui/ai_analysis.html`
+- ❌ **לא נכון:** `http://localhost:8080/ai_analysis`
 
 ### Route Registration
 
 העמוד רשום ב-`Backend/routes/pages.py`:
 
 ```python
-@pages_bp.route('/ai-analysis')
+@pages_bp.route('/ai_analysis')
 def ai_analysis() -> Any:
     """AI Analysis page"""
-    return send_from_directory(UI_DIR, "ai-analysis.html")
+    return send_from_directory(UI_DIR, "ai_analysis.html")
 ```
 
 **קישור לתיעוד מלא:** [PAGE_URL_MAPPING.md](../../03-DEVELOPMENT/SETUP/PAGE_URL_MAPPING.md)
@@ -78,11 +78,11 @@ def ai_analysis() -> Any:
 - `ai-analysis-wizard.js` - הלוגיקה המלאה של ה-Wizard
 - Modal ID: `aiAnalysisWizardModal` (מוגדר ב-HTML)
 
-#### Legacy Functions (לשמירה על תאימות)
+#### Deprecated Wrappers (להסרה לפני פרודקשן)
 
-- `openTemplateSelectionModal()` - עכשיו רק פותח את ה-Wizard
-- `handleTemplateSelectionFromModal()` - עכשיו רק פותח את ה-Wizard
-- `renderVariablesFormModal()` - עדיין בשימוש על ידי ה-Wizard (ל-step 2)
+- `openTemplateSelectionModal()` - Wrapper זמני; להסיר אחרי מעבר מלא לוויזארד
+- `handleTemplateSelectionFromModal()` - Wrapper זמני; להסיר אחרי מעבר מלא לוויזארד
+- `renderVariablesFormModal()` - נדרש רק אם נשאר שימוש חיצוני; להסיר אם לא בשימוש
 
 ---
 
@@ -109,7 +109,7 @@ Backend/
 
 ```
 trading-ui/
-├── ai-analysis.html                # Main page (includes Wizard modal)
+├── ai_analysis.html                # Main page (HTML/URL underscore)
 └── scripts/
     ├── services/
     │   └── ai-analysis-data.js     # Data service
@@ -168,7 +168,7 @@ trading-ui/
 ### 1. יצירת ניתוח (v2.0)
 
 ```
-User → Frontend (ai-analysis.html)
+User → Frontend (ai_analysis.html)
   → AIAnalysisManager.handleGenerateAnalysis()
   → בניית מבנה v2.0:
      - prompt_variables (נשלח ל-LLM)
@@ -960,4 +960,3 @@ card.setAttribute('data-onclick', `window.AITemplateSelector.selectTemplate(${te
 
 **תאריך עדכון אחרון:** 28 בינואר 2025  
 **גרסה:** 1.0.0
-

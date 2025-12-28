@@ -329,29 +329,31 @@ class QueryAnalytics:
         """
         try:
             # Get table sizes
-            result = db.execute(text("""
-                SELECT 
-                    name as table_name,
-                    sqlite_compileoption_used('ENABLE_FTS3') as fts_enabled,
-                    sqlite_compileoption_used('ENABLE_FTS4') as fts4_enabled,
-                    sqlite_compileoption_used('ENABLE_FTS5') as fts5_enabled
-                FROM sqlite_master 
-                WHERE type='table'
-            """))
-            
-            tables_info = [dict(row) for row in result]
+            result = db.execute(
+                text(
+                    "SELECT table_name "
+                    "FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_type = 'BASE TABLE'"
+                )
+            )
+
+            tables_info = [{"table_name": row[0]} for row in result]
             
             # Get index information
-            result = db.execute(text("""
-                SELECT 
-                    name as index_name,
-                    tbl_name as table_name,
-                    sql as index_sql
-                FROM sqlite_master 
-                WHERE type='index'
-            """))
-            
-            indexes_info = [dict(row) for row in result]
+            result = db.execute(
+                text(
+                    "SELECT i.relname as index_name, "
+                    "t.relname as table_name, "
+                    "pg_get_indexdef(i.oid) as index_sql "
+                    "FROM pg_class t "
+                    "JOIN pg_index ix ON t.oid = ix.indrelid "
+                    "JOIN pg_class i ON i.oid = ix.indexrelid "
+                    "JOIN pg_namespace n ON n.oid = t.relnamespace "
+                    "WHERE n.nspname = 'public'"
+                )
+            )
+
+            indexes_info = [dict(row._mapping) for row in result]
             
             return {
                 "tables": tables_info,

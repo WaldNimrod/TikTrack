@@ -82,7 +82,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ### TradeHistoryData
 
-**מיקום:** `trading-ui/scripts/services/trade-history-data.js`
+**מיקום:** `trading-ui/scripts/services/trade_history-data.js`
 
 **תפקיד:** טעינת היסטוריית טריידים עם פילטרים
 
@@ -140,7 +140,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ### PortfolioStateData
 
-**מיקום:** `trading-ui/scripts/services/portfolio-state-data.js`
+**מיקום:** `trading-ui/scripts/services/portfolio_state-data.js`
 
 **תפקיד:** טעינת מצב תיק היסטורי
 
@@ -171,7 +171,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ### TradingJournalData
 
-**מיקום:** `trading-ui/scripts/services/trading-journal-data.js`
+**מיקום:** `trading-ui/scripts/services/trading_journal-data.js`
 
 **תפקיד:** טעינת יומן מסחר
 
@@ -450,9 +450,9 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 
 ### Frontend
 
-- `trading-ui/scripts/services/trade-history-data.js` - Trade History Data Service
-- `trading-ui/scripts/services/portfolio-state-data.js` - Portfolio State Data Service
-- `trading-ui/scripts/services/trading-journal-data.js` - Trading Journal Data Service
+- `trading-ui/scripts/services/trade_history-data.js` - Trade History Data Service
+- `trading-ui/scripts/services/portfolio_state-data.js` - Portfolio State Data Service
+- `trading-ui/scripts/services/trading_journal-data.js` - Trading Journal Data Service
 - `trading-ui/scripts/unified-cache-manager.js` - Unified Cache Manager
 - `trading-ui/scripts/cache-ttl-guard.js` - Cache TTL Guard
 

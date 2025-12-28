@@ -32,8 +32,8 @@ try:
     time.sleep(3)
     
     # Go to watch lists page
-    print('📄 Navigating to watch-list.html...')
-    driver.get('http://localhost:8080/watch-list.html')
+    print('📄 Navigating to watch_list.html...')
+    driver.get('http://localhost:8080/watch_list.html')
     time.sleep(10)
     
     print('\n' + '='*80)

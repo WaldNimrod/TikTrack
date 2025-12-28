@@ -38,7 +38,7 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    Frontend (UI)                         │
-│  user-profile.html → user-profile-smtp.js               │
+│  user_profile.html → user-profile-smtp.js               │
 └────────────────────┬────────────────────────────────────┘
                      │
                      │ API Calls
@@ -188,7 +188,7 @@ result = smtp_service.update_smtp_settings(
 - `smtp_use_tls` - שימוש ב-TLS
 - `smtp_enabled` - מופעל/כבוי
 
-### 4. Frontend UI (`trading-ui/user-profile.html` + `user-profile-smtp.js`)
+### 4. Frontend UI (`trading-ui/user_profile.html` + `user-profile-smtp.js`)
 
 **תפקיד**: ממשק ניהול הגדרות SMTP
 
@@ -207,7 +207,7 @@ result = smtp_service.update_smtp_settings(
 
 **דרך הממשק** (מומלץ):
 
-1. פתח `http://localhost:8080/user-profile.html`
+1. פתח `http://localhost:8080/user_profile`
 2. גלול לסקשן "הגדרות SMTP"
 3. עדכן את הפרטים:
    - Host: `smtp.sendgrid.net` (לדוגמה)
@@ -395,4 +395,3 @@ print(key.decode())  # העתק את זה למשתנה סביבה
 
 **עדכון אחרון**: 28 בינואר 2025  
 **גרסה**: 1.0.0
-

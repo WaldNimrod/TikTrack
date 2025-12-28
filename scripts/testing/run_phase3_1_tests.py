@@ -83,7 +83,7 @@ def generate_test_report():
             'total_tests': 4,
             'ready': 4,
             'pending_execution': 4,
-            'note': 'Test scripts are ready. Manual browser execution required at http://127.0.0.1:8080/test-phase3-1-comprehensive.html'
+            'note': 'Test scripts are ready. Manual browser execution required at http://127.0.0.1:8080/test_phase3_1_comprehensive.html'
         }
     }
     
@@ -228,7 +228,7 @@ def main():
     
     # Create HTML test page info
     print("\n📄 Test Page Created:")
-    print("   http://127.0.0.1:8080/test-phase3-1-comprehensive.html")
+    print("   http://127.0.0.1:8080/test_phase3_1_comprehensive.html")
     print("\n   This page allows manual execution of all Phase 3.1 tests in the browser.")
     print("   All test scripts are loaded and ready to run.")
     

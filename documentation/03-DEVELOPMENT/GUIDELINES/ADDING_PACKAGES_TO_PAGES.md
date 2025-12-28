@@ -33,7 +33,7 @@
 ### שלב 2: הוספה ל-page-initialization-configs.js
 
 ```javascript
-'my-page': {
+'trade_plans': {
   // ... existing config
   packages: [
     // ... existing packages
@@ -99,7 +99,7 @@ console.log('Systems status:', {
 
 ```bash
 # בדוק אם הסקריפט נטען
-grep "my-package.js" trading-ui/my-page.html
+grep "my-package.js" trading-ui/trade_plans.html
 
 # אם לא נמצא, הוסף:
 # <script src="../../scripts/my-package.js?v=1.0.0" defer></script>
@@ -120,7 +120,7 @@ grep "my-package.js" trading-ui/my-page.html
 packages: ["info-summary"],
 requiredGlobals: ["window.InfoSummarySystem"]
 
-// 3. portfolio-state.html - script tags נכונים
+// 3. portfolio_state.html - script tags נכונים
 <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
 ```
 
@@ -134,7 +134,7 @@ requiredGlobals: ["window.InfoSummarySystem"]
 packages: ["my-package"],
 requiredGlobals: ["window.MyPackage"]
 
-// my-page.html - חסרים script tags!
+// trade_plans.html - חסרים script tags!
 // ❌ שום script tag למערכת הזו
 ```
 

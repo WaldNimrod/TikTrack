@@ -373,9 +373,30 @@ class InfoSummarySystem {
    * @returns {Promise<Object>|Object} Calculated statistics (Promise if async calculators are used)
    */
   async calculateStatsFromData(data, stats) {
+    // #region agent log - calculateStatsFromData entry
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'stats-calculation',
+          hypothesisId: 'H1,H2,H3,H4',
+          location: 'info-summary-system.js:calculateStatsFromData-entry',
+          message: 'Starting stats calculation',
+          data: {
+            dataLength: Array.isArray(data) ? data.length : typeof data,
+            statsCount: stats?.length || 0,
+            statsIds: stats?.map(s => s.id) || [],
+            page: window.location?.pathname || 'unknown'
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    // #endregion
+
     const results = {};
     const asyncCalculations = [];
-    
+
     stats.forEach((stat, index) => {
       try {
         const calculator = this.calculators[stat.calculator];
@@ -396,6 +417,29 @@ class InfoSummarySystem {
           results[stat.id] = null; // Will be filled after async completes
         } else {
           results[stat.id] = calculatorResult;
+
+          // #region agent log - individual stat calculation result
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                sessionId: 'debug-session',
+                runId: 'stats-calculation',
+                hypothesisId: 'H2,H3',
+                location: 'info-summary-system.js:stat-calculation-result',
+                message: `Stat ${stat.id} calculated successfully`,
+                data: {
+                  statId: stat.id,
+                  calculator: stat.calculator,
+                  result: calculatorResult,
+                  resultType: typeof calculatorResult,
+                  isZero: calculatorResult === 0,
+                  page: window.location?.pathname || 'unknown'
+                },
+                timestamp: Date.now()
+              })
+            }).catch(() => {});
+          // #endregion
         }
         
         // Handle sub-stats (like buy/sell breakdown)
@@ -431,7 +475,28 @@ class InfoSummarySystem {
         results[item.statId] = asyncResults[index];
       });
     }
-    
+
+    // #region agent log - calculateStatsFromData final results
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'stats-calculation',
+          hypothesisId: 'H1,H2,H3',
+          location: 'info-summary-system.js:calculateStatsFromData-final',
+          message: 'Stats calculation completed with final results',
+          data: {
+            resultsKeys: Object.keys(results),
+            resultsSummary: Object.entries(results).map(([k, v]) => `${k}:${v}`).join(', '),
+            zeroValues: Object.entries(results).filter(([k, v]) => v === 0).map(([k, v]) => k),
+            page: window.location?.pathname || 'unknown'
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    // #endregion
+
     return results;
   }
 
@@ -466,9 +531,48 @@ class InfoSummarySystem {
    * @param {Array} config - Stat configurations
    */
   renderInfoSummary(containerId, stats, config) {
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'info-summary-render-test',
+          hypothesisId: 'RENDER_TEST',
+          location: 'info-summary-system.js:renderInfoSummary-entry',
+          message: 'renderInfoSummary called',
+          data: {
+            containerId: containerId,
+            statsKeys: Object.keys(stats || {}),
+            configStatsCount: config?.stats?.length,
+            page: window.location?.pathname || 'unknown'
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    // #endregion
+
     const container = document.getElementById(containerId);
     if (!container) {
       // Silent fail - container might be optional for some pages
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'info-summary-render-test',
+            hypothesisId: 'RENDER_TEST',
+            location: 'info-summary-system.js:renderInfoSummary-container-not-found',
+            message: 'Container not found for info summary render',
+            data: {
+              containerId: containerId,
+              availableIds: Array.from(document.querySelectorAll('[id]')).map(el => el.id).slice(0, 10),
+              page: window.location?.pathname || 'unknown'
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+      // #endregion
+
       if (window.Logger) {
         window.Logger.debug(`Container '${containerId}' not found - skipping render`, { containerId });
       }
@@ -618,7 +722,46 @@ class InfoSummarySystem {
     
     try {
       // Calculate statistics (now async to support async calculators)
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'info-summary-calculation-test',
+            hypothesisId: 'CALCULATION_TEST',
+            location: 'info-summary-system.js:calculateAndRender-before-calculation',
+            message: 'About to calculate stats from data',
+            data: {
+              datasetLength: Array.isArray(dataset) ? dataset.length : 'not-array',
+              configStatsCount: config.stats?.length,
+              containerId: config.containerId,
+              page: window.location?.pathname || 'unknown'
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+      // #endregion
+
       const stats = await this.calculateStatsFromData(dataset, config.stats);
+
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'info-summary-calculation-test',
+            hypothesisId: 'CALCULATION_TEST',
+            location: 'info-summary-system.js:calculateAndRender-after-calculation',
+            message: 'Stats calculation completed',
+            data: {
+              statsKeys: Object.keys(stats || {}),
+              statsValues: Object.entries(stats || {}).map(([k, v]) => `${k}:${typeof v}`).slice(0, 5),
+              page: window.location?.pathname || 'unknown'
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+      // #endregion
 
       // Render the summary
       this.renderInfoSummary(config.containerId, stats, config);

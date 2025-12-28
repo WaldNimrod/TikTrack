@@ -11,7 +11,7 @@ from datetime import datetime
 
 PAGES_DIR = Path("trading-ui")
 REPORTS_DIR = Path("documentation/05-REPORTS")
-PAGE_NAME = "user-profile.html"
+PAGE_NAME = "user_profile.html"
 PAGE_PATH = PAGES_DIR / PAGE_NAME
 
 def check_file_exists():

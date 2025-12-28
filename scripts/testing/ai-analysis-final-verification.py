@@ -15,12 +15,12 @@ REPORTS_DIR = Path("documentation/05-REPORTS")
 
 # מודולים שצריך לבדוק
 AI_ANALYSIS_MODULES = [
-    "scripts/ai-analysis-manager.js",
+    "scripts/ai_analysis-manager.js",
     "scripts/ai-template-selector.js",
     "scripts/ai-result-renderer.js",
     "scripts/ai-export-service.js",
     "scripts/ai-notes-integration.js",
-    "scripts/services/ai-analysis-data.js"
+    "scripts/services/ai_analysis-data.js"
 ]
 
 def check_file_exists(file_path: Path) -> bool:
@@ -164,9 +164,9 @@ def main():
     print("="*80)
     print()
     
-    page_path = PAGES_DIR / "ai-analysis.html"
+    page_path = PAGES_DIR / "ai_analysis.html"
     report = {
-        "page": "ai-analysis.html",
+        "page": "ai_analysis.html",
         "timestamp": datetime.now().isoformat(),
         "checks": {}
     }

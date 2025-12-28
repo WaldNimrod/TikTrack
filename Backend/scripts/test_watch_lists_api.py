@@ -4,16 +4,16 @@ Watch Lists API Testing Script
 ==============================
 
 Comprehensive testing of Watch Lists API endpoints:
-- GET /api/watch-lists - Get all lists
-- POST /api/watch-lists - Create list
-- GET /api/watch-lists/<id> - Get single list
-- PUT /api/watch-lists/<id> - Update list
-- DELETE /api/watch-lists/<id> - Delete list
-- GET /api/watch-lists/<id>/items - Get items
-- POST /api/watch-lists/<id>/items - Add ticker
-- PUT /api/watch-lists/items/<item_id> - Update item
-- DELETE /api/watch-lists/items/<item_id> - Remove item
-- POST /api/watch-lists/<id>/items/reorder - Reorder items
+- GET /api/watch_lists - Get all lists
+- POST /api/watch_lists - Create list
+- GET /api/watch_lists/<id> - Get single list
+- PUT /api/watch_lists/<id> - Update list
+- DELETE /api/watch_lists/<id> - Delete list
+- GET /api/watch_lists/<id>/items - Get items
+- POST /api/watch_lists/<id>/items - Add ticker
+- PUT /api/watch_lists/items/<item_id> - Update item
+- DELETE /api/watch_lists/items/<item_id> - Remove item
+- POST /api/watch_lists/<id>/items/reorder - Reorder items
 
 Author: TikTrack Development Team
 Date: January 2025
@@ -38,7 +38,7 @@ if not os.getenv('POSTGRES_HOST'):
     os.environ['POSTGRES_PASSWORD'] = 'BigMeZoo1974!?'
 
 BASE_URL = 'http://127.0.0.1:8080'
-API_BASE = f'{BASE_URL}/api/watch-lists'
+API_BASE = f'{BASE_URL}/api/watch_lists'
 
 # Test results
 test_results = {
@@ -62,8 +62,8 @@ def print_test(name, status, message=''):
             test_results['errors'].append(f"{name}: {message}")
 
 def test_get_all_lists():
-    """Test GET /api/watch-lists"""
-    print("\n📋 Testing GET /api/watch-lists...")
+    """Test GET /api/watch_lists"""
+    print("\n📋 Testing GET /api/watch_lists...")
     try:
         response = requests.get(API_BASE)
         if response.status_code == 200:
@@ -78,8 +78,8 @@ def test_get_all_lists():
         return []
 
 def test_create_list():
-    """Test POST /api/watch-lists"""
-    print("\n📋 Testing POST /api/watch-lists...")
+    """Test POST /api/watch_lists"""
+    print("\n📋 Testing POST /api/watch_lists...")
     try:
         payload = {
             "name": f"Test Tech Stocks {int(time.time())}",
@@ -105,8 +105,8 @@ def test_create_list():
         return None
 
 def test_get_single_list(list_id):
-    """Test GET /api/watch-lists/<id>"""
-    print(f"\n📋 Testing GET /api/watch-lists/{list_id}...")
+    """Test GET /api/watch_lists/<id>"""
+    print(f"\n📋 Testing GET /api/watch_lists/{list_id}...")
     try:
         response = requests.get(f"{API_BASE}/{list_id}")
         if response.status_code == 200:
@@ -122,8 +122,8 @@ def test_get_single_list(list_id):
         return None
 
 def test_update_list(list_id):
-    """Test PUT /api/watch-lists/<id>"""
-    print(f"\n📋 Testing PUT /api/watch-lists/{list_id}...")
+    """Test PUT /api/watch_lists/<id>"""
+    print(f"\n📋 Testing PUT /api/watch_lists/{list_id}...")
     try:
         payload = {
             "name": "Updated Tech Stocks",
@@ -145,8 +145,8 @@ def test_update_list(list_id):
         return False
 
 def test_get_items(list_id):
-    """Test GET /api/watch-lists/<id>/items"""
-    print(f"\n📋 Testing GET /api/watch-lists/{list_id}/items...")
+    """Test GET /api/watch_lists/<id>/items"""
+    print(f"\n📋 Testing GET /api/watch_lists/{list_id}/items...")
     try:
         response = requests.get(f"{API_BASE}/{list_id}/items")
         if response.status_code == 200:
@@ -162,8 +162,8 @@ def test_get_items(list_id):
         return []
 
 def test_add_ticker_to_list(list_id, use_external=False):
-    """Test POST /api/watch-lists/<id>/items"""
-    print(f"\n📋 Testing POST /api/watch-lists/{list_id}/items...")
+    """Test POST /api/watch_lists/<id>/items"""
+    print(f"\n📋 Testing POST /api/watch_lists/{list_id}/items...")
     try:
         if use_external:
             payload = {
@@ -212,8 +212,8 @@ def test_add_ticker_to_list(list_id, use_external=False):
         return None
 
 def test_update_item(item_id):
-    """Test PUT /api/watch-lists/items/<item_id>"""
-    print(f"\n📋 Testing PUT /api/watch-lists/items/{item_id}...")
+    """Test PUT /api/watch_lists/items/<item_id>"""
+    print(f"\n📋 Testing PUT /api/watch_lists/items/{item_id}...")
     try:
         payload = {
             "flag_color": "#fc5a06",
@@ -234,8 +234,8 @@ def test_update_item(item_id):
         return False
 
 def test_reorder_items(list_id, item_ids):
-    """Test POST /api/watch-lists/<id>/items/reorder"""
-    print(f"\n📋 Testing POST /api/watch-lists/{list_id}/items/reorder...")
+    """Test POST /api/watch_lists/<id>/items/reorder"""
+    print(f"\n📋 Testing POST /api/watch_lists/{list_id}/items/reorder...")
     try:
         items_order = [{"id": item_id, "display_order": idx} for idx, item_id in enumerate(item_ids)]
         payload = {"items": items_order}
@@ -252,8 +252,8 @@ def test_reorder_items(list_id, item_ids):
         return False
 
 def test_delete_item(item_id):
-    """Test DELETE /api/watch-lists/items/<item_id>"""
-    print(f"\n📋 Testing DELETE /api/watch-lists/items/{item_id}...")
+    """Test DELETE /api/watch_lists/items/<item_id>"""
+    print(f"\n📋 Testing DELETE /api/watch_lists/items/{item_id}...")
     try:
         response = requests.delete(f"{API_BASE}/items/{item_id}")
         if response.status_code == 200:
@@ -267,8 +267,8 @@ def test_delete_item(item_id):
         return False
 
 def test_delete_list(list_id):
-    """Test DELETE /api/watch-lists/<id>"""
-    print(f"\n📋 Testing DELETE /api/watch-lists/{list_id}...")
+    """Test DELETE /api/watch_lists/<id>"""
+    print(f"\n📋 Testing DELETE /api/watch_lists/{list_id}...")
     try:
         response = requests.delete(f"{API_BASE}/{list_id}")
         if response.status_code == 200:
@@ -324,7 +324,7 @@ def main():
     
     # Check if server is running
     try:
-        response = requests.get(f"{BASE_URL}/api/watch-lists", timeout=5)
+        response = requests.get(f"{BASE_URL}/api/watch_lists", timeout=5)
         # If we get any response (even 401/500), server is running
         print(f"✅ Server is running (status: {response.status_code})")
     except requests.exceptions.RequestException as e:

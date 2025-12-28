@@ -278,7 +278,7 @@ index: {
 2. **הוסף את החבילה ל-`packages`:**
 
    ```javascript
-   'my-page': {
+   'trade_plans': {
      name: 'My Page',
      packages: ['base', 'services', 'my-package'], // הוסף כאן
      requiredGlobals: [
@@ -304,7 +304,7 @@ index: {
 
 ### שלב 4: עדכון HTML
 
-**קובץ:** `trading-ui/my-page.html`
+**קובץ:** `trading-ui/trade_plans.html`
 
 1. **הוסף את תג ה-`<script>`:**
 
@@ -582,13 +582,13 @@ npm run test:bundles -- --package=base
 
 ```bash
 # 1. גיבוי
-cp trading-ui/my-page.html trading-ui/my-page.html.backup
+cp trading-ui/trade_plans.html trading-ui/trade_plans.html.backup
 
 # 2. יצירת HTML עם bundles
-node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_my-page.html
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_trade_plans.html
 
 # 3. החלפה
-mv temp_my-page.html trading-ui/my-page.html
+mv temp_trade_plans.html trading-ui/trade_plans.html
 ```
 
 #### 4. בדיקות

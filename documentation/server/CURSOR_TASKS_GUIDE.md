@@ -254,13 +254,13 @@
 
 - **תפקיד:** פתיחת דף ניהול מערכת כללי
 - **שימוש:** ניהול מתקדם של המערכת
-- **פלט:** פתיחת דפדפן ל-http://localhost:8080/system-management
+- **פלט:** פתיחת דפדפן ל-http://localhost:8080/system_management
 
 #### **🔧 Open Server Monitor**
 
 - **תפקיד:** פתיחת דף ניטור שרת
 - **שימוש:** ניטור מפורט של השרת
-- **פלט:** פתיחת דפדפן ל-http://localhost:8080/server-monitor
+- **פלט:** פתיחת דפדפן ל-http://localhost:8080/server_monitor
 
 #### **🔧 Open External Data Dashboard**
 
@@ -282,7 +282,7 @@
 
 - **תפקיד:** התחלת שרת + פתיחת דשבורד ניטור
 - **שימוש:** התחלה מהירה עם דשבורד ניטור
-- **פלט:** שרת + דפדפן ל-http://localhost:8080/server-monitor
+- **פלט:** שרת + דפדפן ל-http://localhost:8080/server_monitor
 
 #### **🚀 Quick: Full System Check**
 
@@ -294,7 +294,7 @@
 
 - **תפקיד:** הגדרת מצב פיתוח + דשבורד ניטור
 - **שימוש:** התחלת פיתוח מהירה
-- **פלט:** שרת פיתוח + דפדפן ל-http://localhost:8080/server-monitor
+- **פלט:** שרת פיתוח + דפדפן ל-http://localhost:8080/server_monitor
 
 ---
 
@@ -446,7 +446,7 @@
 - `.vscode/tasks.json` - קובץ הגדרות Tasks
 - `Backend/dev_server.py` - שרת פיתוח
 - `Backend/app.py` - שרת ראשי
-- `http://localhost:8080/server-monitor` - דף ניטור שרת
+- `http://localhost:8080/server_monitor` - דף ניטור שרת
 
 ### **פקודות שימושיות:**
 
@@ -470,7 +470,7 @@ curl http://localhost:8080/api/system/health
 
 ### **🎮 אינטגרציה עם דשבורדים**
 
-#### **עמוד ניטור שרת (server-monitor.html)**
+#### **עמוד ניטור שרת (server_monitor.html)**
 
 - **סקשן חדש:** "Cursor Tasks Management"
 - **כפתורים חדשים:**
@@ -480,7 +480,7 @@ curl http://localhost:8080/api/system/health
   - 🚀 כל הדשבורדים
 - **תצוגת מצב נוכחי:** מצב מטמון, סטטוס שרת, זמן פעילות
 
-#### **עמוד ניהול מערכת (system-management.html)**
+#### **עמוד ניהול מערכת (system_management.html)**
 
 - **סקשן חדש:** "Cursor Tasks Integration"
 - **כפתורים חדשים:**

@@ -44,20 +44,20 @@ PAGES = {
         "db_display.html",
         "db_extradata.html",
         "constraints.html",
-        "background-tasks.html",
-        "server-monitor.html",
-        "system-management.html",
+        "background_tasks.html",
+        "server_monitor.html",
+        "system_management.html",
         "cache-test.html",
         "linter-realtime-monitor.html",
-        "notifications-center.html",
-        "css-management.html",
-        "mockups/daily-snapshots/tradingview-test-page.html",  # Full path
-        "dynamic-colors-display.html",
+        "notifications_center.html",
+        "css_management.html",
+        "mockups/daily-snapshots/tradingview_test_page.html",  # Full path
+        "dynamic_colors_display.html",
         "designs.html",
-        "code-quality-dashboard.html",
-        "conditions-test.html",
-        "crud-testing-dashboard.html",
-        "external-data-dashboard.html"
+        "code_quality_dashboard.html",
+        "conditions_test.html",
+        "crud_testing_dashboard.html",
+        "external_data_dashboard.html"
     ]
 }
 

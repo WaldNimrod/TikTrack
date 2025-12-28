@@ -51,14 +51,14 @@ CATEGORIES = {
         'index.html', 'trades.html', 'trade_plans.html', 'alerts.html',
         'tickers.html', 'trading_accounts.html', 'executions.html',
         'cash_flows.html', 'notes.html', 'research.html', 'preferences.html',
-        'data_import.html', 'db_display.html', 'notifications-center.html',
+        'data_import.html', 'db_display.html', 'notifications_center.html',
     ],
     'mockups': list((TRADING_UI_DIR / 'mockups').rglob('*.html')),
     'scripts': list((TRADING_UI_DIR / 'scripts').rglob('*.js')),
     'system_pages': [
-        'system-management.html', 'server-monitor.html', 'background-tasks.html',
-        'cache-management.html', 'css-management.html', 'constraints.html',
-        'tag-management.html', 'code-quality-dashboard.html',
+        'system_management.html', 'server_monitor.html', 'background_tasks.html',
+        'cache_management.html', 'css_management.html', 'constraints.html',
+        'tag_management.html', 'code_quality_dashboard.html',
     ],
 }
 

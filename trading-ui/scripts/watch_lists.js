@@ -363,7 +363,7 @@
                     if (list.item_count > 0) {
                         // Verify it actually has items by checking API
                         try {
-                            const itemsResponse = await fetch(`/api/watch-lists/${list.id}/items?_ts=${Date.now()}`);
+                            const itemsResponse = await fetch(`/api/watch_lists/${list.id}/items?_ts=${Date.now()}`);
                             if (itemsResponse.ok) {
                                 const itemsData = await itemsResponse.json();
                                 const actualItemCount = itemsData.data?.length || 0;
@@ -1670,7 +1670,7 @@
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: color });
             } else {
                 // Last resort: Direct API call
-            const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
+            const response = await fetch(`/api/watch_lists/${activeListId}/items/${itemId}`, {
                     method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ flag_color: color })
@@ -1743,7 +1743,7 @@
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: null });
         } else {
                 // Last resort: Direct API call
-                const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
+                const response = await fetch(`/api/watch_lists/${activeListId}/items/${itemId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ flag_color: null })

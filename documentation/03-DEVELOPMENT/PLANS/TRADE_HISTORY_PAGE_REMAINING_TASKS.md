@@ -65,7 +65,7 @@
 
 #### 8.1 הוספת סדרת מחיר נכס (Candlestick)
 
-- **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
+- **מיקום:** `trading-ui/trade_history.html` - פונקציה `initTimelineChart()`
 - **נתונים:** `chartData.market_prices` (כבר נטען)
 - **סוג:** Candlestick Chart (OHLC) או Line Chart (אם אין OHLC)
 - **מיקום:** Price Scale (Right או Left)
@@ -143,7 +143,7 @@ const avgPriceSeries = window.TradingViewChartAdapter.addLineSeries(timelineChar
 
 #### 8.6 עדכון Tooltips
 
-- **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
+- **מיקום:** `trading-ui/trade_history.html` - פונקציה `initTimelineChart()`
 - **תוכן:** כל הנתונים לכל נקודת זמן:
   - תאריך ושעה
   - מחיר נכס (Open, High, Low, Close)
@@ -173,7 +173,7 @@ timelineChart.subscribeCrosshairMove(param => {
 
 #### 8.7 שימוש בנתונים מ-Backend
 
-- **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
+- **מיקום:** `trading-ui/trade_history.html` - פונקציה `initTimelineChart()`
 - **שינוי:** להשתמש ב-`unrealizedPL` מ-timeline data (כבר מחושב ב-Backend)
 - **שינוי:** להשתמש ב-`averagePrice` מ-timeline data
 - **שינוי:** להשתמש ב-`positionValue` מ-timeline data (אם קיים) או לחשב
@@ -283,8 +283,8 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 
 ### קבצים עיקריים
 
-- `trading-ui/trade-history.html` - פונקציה `initTimelineChart()` (שורות ~705-1200)
-- `trading-ui/scripts/trade-history-page.js` - טעינת נתונים לגרף (אם נדרש)
+- `trading-ui/trade_history.html` - פונקציה `initTimelineChart()` (שורות ~705-1200)
+- `trading-ui/scripts/trade_history-page.js` - טעינת נתונים לגרף (אם נדרש)
 
 ### קבצי תעוד
 

@@ -46,7 +46,7 @@
    - Business Metrics
    - Cache Metrics
 
-3. **Code Quality Dashboard** (`trading-ui/code-quality-dashboard.html`)
+3. **Code Quality Dashboard** (`trading-ui/code_quality_dashboard.html`)
    - Error Handling Coverage
    - JSDoc Coverage
    - Naming Conventions

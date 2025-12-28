@@ -34,7 +34,7 @@ except ImportError:
     sys.exit(1)
 
 BASE_URL = "http://localhost:8080"
-PAGE_URL = f"{BASE_URL}/portfolio-state.html"
+PAGE_URL = f"{BASE_URL}/portfolio_state.html"
 
 # Test users
 TEST_USERS = [

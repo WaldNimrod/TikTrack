@@ -21,7 +21,7 @@ const { test, expect } = require('@playwright/test');
 const { authenticateUser, waitForAuthentication, verifyAuthentication } = require('./playwright-auth-helper');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
-const PAGE_URL = `${BASE_URL}/trading-ui/ai-analysis.html`;
+const PAGE_URL = `${BASE_URL}/trading-ui/ai_analysis.html`;
 
 // Test user credentials
 const TEST_USER = {
@@ -838,7 +838,7 @@ test.describe('AI Analysis System - E2E Tests', () => {
     
     // Get history to find a failed analysis
     const historyResponse = await page.evaluate(async () => {
-      const response = await fetch('/api/ai-analysis/history', {
+      const response = await fetch('/api/ai_analysis/history', {
         method: 'GET', });
       return response.json();
     });
@@ -854,7 +854,7 @@ test.describe('AI Analysis System - E2E Tests', () => {
     
     // Test retry endpoint
     const retryResponse = await page.evaluate(async (requestId) => {
-      const response = await fetch(`/api/ai-analysis/history/${requestId}/retry`, {
+      const response = await fetch(`/api/ai_analysis/history/${requestId}/retry`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -887,7 +887,7 @@ test.describe('AI Analysis - User Profile Integration', () => {
   });
   
   test('User profile page has AI Analysis section', async ({ page }) => {
-    await page.goto(`${BASE_URL}/trading-ui/user-profile.html`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/trading-ui/user_profile.html`, { waitUntil: 'networkidle' });
     
     // Wait for page to load
     await page.waitForLoadState('networkidle');
@@ -905,7 +905,7 @@ test.describe('AI Analysis - User Profile Integration', () => {
   });
 
   test('User profile AI Analysis manager loads', async ({ page }) => {
-    await page.goto(`${BASE_URL}/trading-ui/user-profile.html`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/trading-ui/user_profile.html`, { waitUntil: 'domcontentloaded' });
     
     // Wait for page to load
     await page.waitForLoadState('domcontentloaded');

@@ -1963,7 +1963,7 @@ const PACKAGE_MANIFEST = {
     loadingStrategy: 'defer', // Critical package - info summary, has dependencies on base and services
 
     // CRITICAL LESSON: Always verify script loading in HTML!
-    // This package was missing from portfolio-state.html causing "Missing required globals" errors
+    // This package was missing from portfolio_state.html causing "Missing required globals" errors
     // Remember: package-manifest.js defines WHAT to load, but HTML defines WHERE to load it
     // Always check both when adding new packages to pages!
 
@@ -2146,6 +2146,13 @@ const PACKAGE_MANIFEST = {
         description: 'Package manifest',
         required: true,
         loadOrder: 1
+      },
+      {
+        file: 'sorting-testing-system.js',
+        globalCheck: 'window.SortingTestingSystem',
+        description: 'Sorting testing system for individual page testing',
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'page-initialization-configs.js',

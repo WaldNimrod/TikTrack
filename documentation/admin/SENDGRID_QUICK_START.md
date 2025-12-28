@@ -88,7 +88,7 @@
 
 ### א. פתיחת ממשק SMTP
 
-1. פתח בדפדפן: `http://localhost:8080/user-profile.html`
+1. פתח בדפדפן: `http://localhost:8080/user_profile`
 2. גלול למטה לסקשן **"הגדרות SMTP"**
 3. לחץ על **"הצג/הסתר"** אם הסקשן סגור
 

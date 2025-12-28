@@ -130,8 +130,8 @@ curl "http://localhost:8080/api/logs/raw/app/tail?lines=100"
 
 #### דפי ניטור
 
-- **Server Monitor**: `http://localhost:8080/server-monitor`
-- **System Management**: `http://localhost:8080/system-management`
+- **Server Monitor**: `http://localhost:8080/server_monitor`
+- **System Management**: `http://localhost:8080/system_management`
 
 #### Unified Log Display
 

@@ -45,10 +45,9 @@ def upgrade():
 
 
 def downgrade():
-    """SQLite does not support DROP COLUMN safely; no-op downgrade."""
+    """Downgrade is a no-op to avoid destructive column drops."""
     return """
     -- Downgrade not supported for planning snapshot fields on trades.
     -- To remove these columns, a manual table recreation would be required.
     """
-
 

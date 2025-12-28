@@ -19,12 +19,6 @@ class TagCategory(BaseModel):
     """Two-level hierarchy container for user tags."""
 
     __tablename__ = "tag_categories"
-    __table_args__ = (
-        {
-            "sqlite_autoincrement": True,
-        },
-    )
-
     user_id = Column(Integer, nullable=False, index=True)
     name = Column(String(100), nullable=False)
     color_hex = Column(String(7), nullable=True)
@@ -58,7 +52,6 @@ class TagCategory(BaseModel):
             "updated_at": self.updated_at,
             "tag_count": len(self.tags) if self.tags else 0,
         }
-
 
 
 

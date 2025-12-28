@@ -7,7 +7,7 @@
  */
 
 // This script should be run in browser console, not as standalone Node script
-// Run this in the browser console on ai-analysis.html page
+// Run this in the browser console on ai_analysis.html page
 
 const FULL_PROCESS_TEST = {
   templates: [

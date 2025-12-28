@@ -62,6 +62,13 @@ class PositionPortfolioService:
             if not quote:
                 return None
             
+            # Guard against missing open_price in data fixtures
+            open_price = quote.open_price
+            if open_price is None:
+                # Use last_price as fallback if open_price is missing
+                open_price = quote.price
+                logger.warning(f"Missing open_price for ticker {ticker_id}, using last_price as fallback: {open_price}")
+
             return {
                 'price': float(quote.price),
                 'is_stale': quote.is_stale,
@@ -69,8 +76,8 @@ class PositionPortfolioService:
                 'asof_utc': quote.asof_utc,
                 'change_pct_day': quote.change_pct_day,
                 'change_amount_day': quote.change_amount_day,
-                # Open price data
-                'open_price': quote.open_price,
+                # Open price data with fallback
+                'open_price': open_price,
                 'change_pct_from_open': quote.change_pct_from_open,
                 'change_amount_from_open': quote.change_amount_from_open
             }

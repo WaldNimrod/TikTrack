@@ -12,11 +12,11 @@ const MOCKUPS_DIR = path.join(BASE_DIR, 'trading-ui', 'mockups');
 const DAILY_SNAPSHOTS_DIR = path.join(MOCKUPS_DIR, 'daily-snapshots');
 
 const MOCKUP_PAGES = [
-    DAILY_SNAPSHOTS_DIR + '/economic-calendar-page.html',
-    DAILY_SNAPSHOTS_DIR + '/trading-journal-page.html',
-    DAILY_SNAPSHOTS_DIR + '/strategy-analysis-page.html',
-    DAILY_SNAPSHOTS_DIR + '/price-history-page.html',
-    DAILY_SNAPSHOTS_DIR + '/history-widget.html',
+    DAILY_SNAPSHOTS_DIR + '/economic_calendar_page.html',
+    DAILY_SNAPSHOTS_DIR + '/trading_journal_page.html',
+    DAILY_SNAPSHOTS_DIR + '/strategy_analysis_page.html',
+    DAILY_SNAPSHOTS_DIR + '/price_history_page.html',
+    DAILY_SNAPSHOTS_DIR + '/history_widget.html',
 ];
 
 // Common style replacements

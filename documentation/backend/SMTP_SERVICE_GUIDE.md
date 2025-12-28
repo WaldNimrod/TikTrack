@@ -172,7 +172,7 @@ html_content = render_template(
     'password_reset',
     {
         'username': 'user123',
-        'reset_url': 'http://localhost:8080/reset-password.html?token=abc123'
+        'reset_url': 'http://localhost:8080/reset_password.html?token=abc123'
     }
 )
 

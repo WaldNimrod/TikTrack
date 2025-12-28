@@ -47,7 +47,6 @@ const EXCLUDE_PATTERNS = [
   /\.backup/i,
   /\.bak$/i,
   /\.log$/i,
-  /\.sqlite$/i,
   /\.db$/i,
   /\.png$/i,
   /\.jpg$/i,
@@ -246,5 +245,4 @@ if (require.main === module) {
     process.exit(1);
   }
 }
-
 

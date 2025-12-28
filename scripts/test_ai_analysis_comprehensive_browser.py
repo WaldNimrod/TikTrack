@@ -90,7 +90,7 @@ class AIAnalysisBrowserTester:
     def navigate_to_ai_analysis(self):
         """נווט לדף AI Analysis"""
         try:
-            self.driver.get(f"{self.base_url}/ai-analysis")
+            self.driver.get(f"{self.base_url}/ai_analysis")
             time.sleep(3)
             
             # בדוק שהדף נטען

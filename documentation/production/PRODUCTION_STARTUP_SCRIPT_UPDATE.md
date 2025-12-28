@@ -103,8 +103,6 @@ if [ "$ENVIRONMENT" = "production" ] && [ -n "$POSTGRES_HOST" ]; then
     log_info "  Host: ${POSTGRES_HOST}"
     log_info "  Database: ${POSTGRES_DB}"
     log_info "  User: ${POSTGRES_USER}"
-elif [ -n "$DB_PATH" ]; then
-    log_info "Database: SQLite ($(basename "$DB_PATH"))"
 fi
 ```
 
@@ -150,17 +148,6 @@ fi
 
 ---
 
-## 🔄 **Rollback**
-
-אם צריך לחזור ל-SQLite:
-
-1. הסר את הקריאות ל-`setup_postgresql_env()` ו-`check_postgresql_container()`
-2. הסר את משתני הסביבה של PostgreSQL
-3. השרת יחזור להשתמש ב-SQLite
-
----
-
 **תאריך עדכון אחרון:** נובמבר 2025  
 **גרסה:** 1.0
-
 

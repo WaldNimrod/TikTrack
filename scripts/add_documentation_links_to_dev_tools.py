@@ -8,24 +8,24 @@ from pathlib import Path
 
 # Mapping of test page filenames to their section numbers in TEST_PAGES_GUIDE.md
 TEST_PAGES_MAPPING = {
-    'test-header-only.html': 1,
-    'test-monitoring.html': 2,
-    'test-frontend-wrappers.html': 3,
-    'test-bootstrap-popover-comparison.html': 4,
-    'test-nested-modal-rich-text.html': 5,
-    'test-overlay-debug.html': 6,
-    'test-quill.html': 7,
-    'test-unified-widget.html': 8,
-    'test-unified-widget-integration.html': 9,
-    'test-unified-widget-comprehensive.html': 10,
-    'test-recent-items-widget.html': 11,
-    'test-ticker-widgets-performance.html': 12,
-    'test-user-ticker-integration.html': 13,
+    'test_header_only.html': 1,
+    'test_monitoring.html': 2,
+    'test_frontend_wrappers.html': 3,
+    'test_bootstrap_popover_comparison.html': 4,
+    'test_nested_modal_rich_text.html': 5,
+    'test_overlay_debug.html': 6,
+    'test_quill.html': 7,
+    'test_unified_widget.html': 8,
+    'test_unified_widget_integration.html': 9,
+    'test_unified_widget_comprehensive.html': 10,
+    'test_recent_items_widget.html': 11,
+    'test_ticker_widgets_performance.html': 12,
+    'test_user_ticker_integration.html': 13,
     'scripts/test-user-ticker-frontend.html': 14,
-    'conditions-test.html': 15,
+    'conditions_test.html': 15,
     'external_data_dashboard.html': 16,
-    'test-phase1-recovery.html': 17,
-    'test-phase3-1-comprehensive.html': 18,
+    'test_phase1_recovery.html': 17,
+    'test_phase3_1_comprehensive.html': 18,
 }
 
 def generate_anchor(filename, section_num):
@@ -62,7 +62,7 @@ def main():
         new_content = re.sub(pattern, add_link, content, flags=re.DOTALL)
         
         # For special cases that already have a documentation link, add our link after it
-        if filename in ['conditions-test.html', 'external_data_dashboard.html']:
+        if filename in ['conditions_test.html', 'external_data_dashboard.html']:
             # Find rows that already have a documentation link and add our link
             pattern_with_existing = rf'(<td><strong>{re.escape(filename)}</strong></td>.*?<a href="documentation/[^"]*" target="_blank" class="btn btn-sm btn-outline-secondary ms-1">📖 תעוד</a>)(?!\s*<a href="documentation/03-DEVELOPMENT/TESTING)'
             

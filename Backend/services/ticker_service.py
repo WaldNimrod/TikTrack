@@ -110,7 +110,7 @@ class TickerService:
             except Exception as db_error:
                 logger.warning("Failed to load ticker type enum values via session: %s", db_error)
 
-        # Fallback to constraint service (direct SQLite) if needed
+        # Fallback to constraint service if needed
         if not types:
             try:
                 enum_values = cls._constraint_service.get_enum_values('tickers', 'type')

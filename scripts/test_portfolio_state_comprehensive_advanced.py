@@ -54,7 +54,7 @@ except ImportError:
 
 # Configuration
 BASE_URL = "http://localhost:8080"
-PAGE_URL = f"{BASE_URL}/portfolio-state"
+PAGE_URL = f"{BASE_URL}/portfolio_state"
 TEST_USERS = [
     {"username": "admin", "password": "admin123", "name": "Admin"},
     {"username": "user", "password": "user123", "name": "User"}

@@ -566,6 +566,7 @@ function isPageAvailable(pageName) {
     'trades', 'accounts', 'alerts', 'tickers', 'cash_flows',
     'notes', 'trade_plans', 'designs', 'executions', 'research',
     'preferences', 'constraints', 'db_display', 'db_extradata',
+    'tag_management',
   ];
 
   return availablePages.includes(pageName);
@@ -599,6 +600,7 @@ function getPageInfo(pageName) {
     executions: { url: '/executions', title: 'Executions', icon: '⚡' },
     research: { url: '/research', title: 'Research', icon: '🔬' },
     preferences: { url: '/preferences', title: 'Preferences', icon: '⚙️' },
+    tag_management: { url: '/tag_management', title: 'Tag Management', icon: '🏷️' },
     constraints: { url: '/constraints', title: 'Constraints', icon: '🔒' },
     db_display: { url: '/db_display', title: 'Database Display', icon: '🗄️' },
     db_extradata: { url: '/db_extradata', title: 'Database Extra Data', icon: '📊' },

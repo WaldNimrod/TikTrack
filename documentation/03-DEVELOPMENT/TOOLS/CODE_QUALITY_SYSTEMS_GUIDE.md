@@ -21,7 +21,7 @@
 - **Function Index Validator חי:** `POST /api/quality-check/function-index` הושלם ב-`Backend/routes/api/quality_check.py`. הפונקציה `build_function_index_report()` סורקת את `trading-ui/scripts` (ללא ספריות ארכיון/מודולרי) ומחזירה מטריקות חדשות: `filesWithIndex`, `filesWithoutIndex`, `coveragePercentage`, פירוט עמודים וחותמת `generatedAt`.
 - **כרטיס Timespan מחייב:** בדשבורד נוסף Alert עם תיעוד של מגבלת 30 הימים לדוחות Function Index. הרחבת timespan תחייב עדכון API, מסדי נתונים וקובצי report.
 - **Fallback "unavailable":** אם ה-API מושבת או עדיין לא נפרס, `code-quality-dashboard.js` מציג כרטיס מידע עם הודעה מוסברת ותאריך עדכון אחרון ולא עוצר את שאר הבדיקות.
-- **Lint Monitor מוטמע:** `linter-realtime-monitor.js` נטען רשמית בעמוד (`code-quality-dashboard.html`) וכל סקשני הסטטוס קיבלו מזהי section+toggle תואמים למערכת השמירה (PageStateManager).
+- **Lint Monitor מוטמע:** `linter-realtime-monitor.js` נטען רשמית בעמוד (`code_quality_dashboard.html`) וכל סקשני הסטטוס קיבלו מזהי section+toggle תואמים למערכת השמירה (PageStateManager).
 - **מודול שגיאה מפורט:** כשל ב-`npm run lint:collect` מפעיל את `showLintFailureModal()` (Notification System). המודול מציג סיכומים, משימות כושלות, סוגיות מובילות, CLI output והמסלולים `reports/linter/latest.json` + `reports/linter/history.json`.
 - **שיתוף מידע מהיר:** נוסף כפתור `data-action="copy-lint-failure-table"` במודול עצמו, יחד עם כפתורי "העתק דוח JSON" ו"הורד דוח" בראש הסקשן. שני הכפתורים משתמשים בשירותים `copyLatestReportToClipboard()` ו-`downloadLatestReport()` ומדווחים דרך ה-Notification System.
 - **אפס שגיאות לינט:** הקבצים המרכזיים (`code-quality-dashboard.js`, `linter-realtime-monitor.js`, `lint-status-service.js`, HTML/CSS נלווים) עברו יישור ESLint/HTMLHint/Prettier כדי למנוע עצירת הרצת `lint:collect`.
@@ -45,7 +45,7 @@
 
 ### רפרנסים מהירים
 
-- Frontend: `trading-ui/scripts/code-quality-dashboard.js`, `trading-ui/scripts/linter-realtime-monitor.js`, `trading-ui/code-quality-dashboard.html`
+- Frontend: `trading-ui/scripts/code-quality-dashboard.js`, `trading-ui/scripts/linter-realtime-monitor.js`, `trading-ui/code_quality_dashboard.html`
 - Backend: `Backend/routes/api/quality_check.py` (`build_function_index_report`, `run_script` helpers), `Backend/routes/api/quality_lint.py`
 - תיעוד משלים: `documentation/frontend/LINTER_REALTIME_MONITOR.md` (UI וזרימות מודול השגיאות)
 
@@ -99,9 +99,9 @@
 
 ### **1. עמוד איכות הקוד המרכזי**
 
-- **מיקום**: `trading-ui/code-quality-dashboard.html`
+- **מיקום**: `trading-ui/code_quality_dashboard.html`
 - **סקריפט**: `trading-ui/scripts/code-quality-dashboard.js`
-- **גישה**: `http://localhost:8080/code-quality-dashboard`
+- **גישה**: `http://localhost:8080/code_quality_dashboard`
 - **תכונות**:
   - Error Handling Coverage monitoring
   - JSDoc Coverage monitoring  
@@ -123,9 +123,9 @@
 
 ### **2. מערכת בדיקות CRUD מתקדמת**
 
-- **מיקום**: `archive/smart-pages/crud-testing-dashboard-smart.html`
+- **מיקום**: `trading-ui/crud_testing_dashboard.html`
 - **סקריפט**: `trading-ui/scripts/crud-testing-enhanced.js`
-- **גישה**: `http://localhost:8080/crud-testing-dashboard-smart`
+- **גישה**: `http://localhost:8080/crud_testing_dashboard`
 - **תכונות**:
   - בדיקות API מהירות עם ציון כמותי 0-100
   - CRUD workflow אוטומטי עם נתוני דמו
@@ -288,7 +288,7 @@ npm run markdownlint:report
 
 ### **10. מערכת ניטור לינטר**
 
-- **מיקום**: `scripts/linter-realtime-monitor.js` (מוטמע בתוך `code-quality-dashboard.html`)
+- **מיקום**: `scripts/linter-realtime-monitor.js` (מוטמע בתוך `code_quality_dashboard.html`)
 - **תכונות**:
   - טעינת דוח `npm run lint:collect` ותרגומו לכרטיסי סטטוס, טבלת סוגיות והיסטוריה
   - כפתורי פעולה מובנים (רענון, הרצת דוח מלא, הורדת JSON, העתקת לוג)
@@ -886,9 +886,9 @@ node scripts/monitors/error-handling-monitor.js
 
 #### **2. במהלך הפיתוח**
 
-- השתמש בעמוד איכות הקוד: `http://localhost:8080/code-quality-dashboard`
-- הרץ בדיקות CRUD: `http://localhost:8080/crud-testing-dashboard-smart`
-- בדוק ניטור שרת: `http://localhost:8080/system-management`
+- השתמש בעמוד איכות הקוד: `http://localhost:8080/code_quality_dashboard`
+- הרץ בדיקות CRUD: `http://localhost:8080/crud_testing_dashboard`
+- בדוק ניטור שרת: `http://localhost:8080/system_management`
 
 #### **3. לפני commit**
 
@@ -1087,9 +1087,9 @@ Coverage:            60.19%
 
 ### **עמודים מרכזיים**
 
-- [עמוד איכות הקוד](http://localhost:8080/code-quality-dashboard)
-- [דשבורד בדיקות CRUD](http://localhost:8080/crud-testing-dashboard-smart)
-- [ניהול מערכת](http://localhost:8080/system-management)
+- [עמוד איכות הקוד](http://localhost:8080/code_quality_dashboard)
+- [דשבורד בדיקות CRUD](http://localhost:8080/crud_testing_dashboard)
+- [ניהול מערכת](http://localhost:8080/system_management)
 
 ### **תיעוד נוסף**
 

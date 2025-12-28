@@ -62,8 +62,8 @@
 const PUBLIC_PAGES = [
   'login.html',
   'register.html',
-  'reset-password.html',  // ✅ הוסף
-  'forgot-password.html'  // ✅ הוסף
+  'reset_password.html',  // ✅ הוסף
+  'forgot_password.html'  // ✅ הוסף
 ];
 ```
 
@@ -131,8 +131,8 @@ const PUBLIC_PAGES = [
 
 - ✅ `login.html`
 - ✅ `register.html`
-- ✅ `reset-password.html`
-- ✅ `forgot-password.html`
+- ✅ `reset_password.html`
+- ✅ `forgot_password.html`
 
 #### עמודים שצריכים אימות (75 עמודים)
 
@@ -294,8 +294,8 @@ const PUBLIC_PAGES = [
 const PUBLIC_PAGES = [
   'login.html',
   'register.html',
-  'reset-password.html',  // ✅ נוסף
-  'forgot-password.html'  // ✅ נוסף
+  'reset_password.html',  // ✅ נוסף
+  'forgot_password.html'  // ✅ נוסף
 ];
 ```
 
@@ -365,8 +365,8 @@ const PUBLIC_PAGES = [
 
 - ✅ `login.html`
 - ✅ `register.html`
-- ✅ `reset-password.html`
-- ✅ `forgot-password.html`
+- ✅ `reset_password.html`
+- ✅ `forgot_password.html`
 
 ---
 

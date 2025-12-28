@@ -113,20 +113,20 @@
 | **Preferences** | ✅ `preferences.html` | ✅ `preferences-core-new.js` | ⏳ מורכב |
 | **DB Display** | ✅ `db_display.html` | ✅ `db_display.js` | ✅ מוכן |
 | **Constraints** | ✅ `constraints.html` | ✅ `constraints.js` | ✅ מוכן |
-| **System Management** | ✅ `system-management.html` | ✅ `system-management.js` | ✅ מוכן |
-| **Server Monitor** | ✅ `server-monitor.html` | ✅ `server-monitor.js` | ✅ מוכן |
-| **Code Quality Dashboard** | ✅ `code-quality-dashboard.html` | ✅ `code-quality-dashboard.js` | ✅ מוכן |
-| **Notifications Center** | ✅ `notifications-center.html` | ✅ `notifications-center.js` | ✅ מוכן |
-| **CSS Management** | ✅ `css-management.html` | ✅ `css-management.js` | ✅ מוכן |
-| **Chart Management** | ✅ `chart-management.html` | ✅ `chart-management.js` | ✅ מוכן |
-| **Dynamic Colors Display** | ✅ `dynamic-colors-display.html` | ✅ `dynamic-colors-display.js` | ✅ מוכן |
+| **System Management** | ✅ `system_management.html` | ✅ `system-management.js` | ✅ מוכן |
+| **Server Monitor** | ✅ `server_monitor.html` | ✅ `server-monitor.js` | ✅ מוכן |
+| **Code Quality Dashboard** | ✅ `code_quality_dashboard.html` | ✅ `code-quality-dashboard.js` | ✅ מוכן |
+| **Notifications Center** | ✅ `notifications_center.html` | ✅ `notifications-center.js` | ✅ מוכן |
+| **CSS Management** | ✅ `css_management.html` | ✅ `css-management.js` | ✅ מוכן |
+| **Chart Management** | ✅ `chart_management.html` | ✅ `chart-management.js` | ✅ מוכן |
+| **Dynamic Colors Display** | ✅ `dynamic_colors_display.html` | ✅ `dynamic-colors-display.js` | ✅ מוכן |
 | **Designs** | ✅ `designs.html` | ✅ `designs.js` | ✅ מוכן |
-| **TradingView Test Page** | ✅ `tradingview-test-page.html` | ✅ `tradingview-test-page.js` | ✅ מוכן |
-| **Init System Management** | ✅ `init-system-management.html` | ✅ `init-system-management.js` | ✅ מוכן |
+| **TradingView Test Page** | ✅ `tradingview_test_page.html` | ✅ `tradingview-test-page.js` | ✅ מוכן |
+| **Init System Management** | ✅ `init_system_management.html` | ✅ `init-system-management.js` | ✅ מוכן |
 | **Entity Details Test** | ✅ `entity-details-test.html` | ✅ `entity-details-test.js` | ✅ מוכן |
-| **Tag Management** | ✅ `tag-management.html` | ✅ `tag-management.js` | ✅ מוכן |
+| **Tag Management** | ✅ `tag_management.html` | ✅ `tag_management.js` | ✅ מוכן |
 | **Import User Data** | ✅ `import-user-data.html` | ✅ `import-user-data.js` | ✅ מוכן |
-| **Portfolio State** | ✅ `portfolio-state-page.html` | ✅ `portfolio-state-page.js` | ✅ מוכן |
+| **Portfolio State** | ✅ `portfolio_state_page.html` | ✅ `portfolio-state-page.js` | ✅ מוכן |
 
 **סה"כ עמודים:** 28 עמודים (11 מרכזיים + 17 טכניים)
 

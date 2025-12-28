@@ -56,7 +56,7 @@ class TestTradeHistoryAPI:
     """Test suite for Trade History API endpoints."""
     
     def test_get_trade_history_success(self, client, mock_user_id):
-        """Test GET /api/trade-history/ with valid filters."""
+        """Test GET /api/trade_history/ with valid filters."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trade_history.HistoricalDataBusinessService') as mock_service:
@@ -72,7 +72,7 @@ class TestTradeHistoryAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trade-history/?account_id=1&start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trade_history/?account_id=1&start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -83,7 +83,7 @@ class TestTradeHistoryAPI:
                 p.stop()
     
     def test_get_trade_history_statistics_success(self, client, mock_user_id):
-        """Test GET /api/trade-history/statistics with valid filters."""
+        """Test GET /api/trade_history/statistics with valid filters."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trade_history.HistoricalDataBusinessService') as mock_service:
@@ -101,7 +101,7 @@ class TestTradeHistoryAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trade-history/statistics?account_id=1&start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trade_history/statistics?account_id=1&start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -112,7 +112,7 @@ class TestTradeHistoryAPI:
                 p.stop()
     
     def test_get_trade_history_plan_vs_execution_success(self, client, mock_user_id):
-        """Test GET /api/trade-history/plan-vs-execution with valid date range."""
+        """Test GET /api/trade_history/plan-vs-execution with valid date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trade_history.HistoricalDataBusinessService') as mock_service:
@@ -127,7 +127,7 @@ class TestTradeHistoryAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trade-history/plan-vs-execution?start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trade_history/plan-vs-execution?start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -138,7 +138,7 @@ class TestTradeHistoryAPI:
                 p.stop()
     
     def test_get_trade_history_aggregated_success(self, client, mock_user_id):
-        """Test GET /api/trade-history/aggregated with valid group_by."""
+        """Test GET /api/trade_history/aggregated with valid group_by."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trade_history.HistoricalDataBusinessService') as mock_service:
@@ -155,7 +155,7 @@ class TestTradeHistoryAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trade-history/aggregated?group_by=period&start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trade_history/aggregated?group_by=period&start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -170,7 +170,7 @@ class TestPortfolioStateAPI:
     """Test suite for Portfolio State API endpoints."""
     
     def test_get_portfolio_state_snapshot_success(self, client, mock_user_id):
-        """Test GET /api/portfolio-state/snapshot with valid date."""
+        """Test GET /api/portfolio_state/snapshot with valid date."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.portfolio_state.HistoricalDataBusinessService') as mock_service:
@@ -190,7 +190,7 @@ class TestPortfolioStateAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/portfolio-state/snapshot?date=2025-01-15')
+                response = client.get('/api/portfolio_state/snapshot?date=2025-01-15')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -202,7 +202,7 @@ class TestPortfolioStateAPI:
                 p.stop()
     
     def test_get_portfolio_state_series_success(self, client, mock_user_id):
-        """Test GET /api/portfolio-state/series with valid date range."""
+        """Test GET /api/portfolio_state/series with valid date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.portfolio_state.HistoricalDataBusinessService') as mock_service:
@@ -218,7 +218,7 @@ class TestPortfolioStateAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/portfolio-state/series?start_date=2025-01-01&end_date=2025-01-31&interval=day')
+                response = client.get('/api/portfolio_state/series?start_date=2025-01-01&end_date=2025-01-31&interval=day')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -229,7 +229,7 @@ class TestPortfolioStateAPI:
                 p.stop()
     
     def test_get_portfolio_state_performance_success(self, client, mock_user_id):
-        """Test GET /api/portfolio-state/performance with valid date range."""
+        """Test GET /api/portfolio_state/performance with valid date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.portfolio_state.HistoricalDataBusinessService') as mock_service:
@@ -250,7 +250,7 @@ class TestPortfolioStateAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/portfolio-state/performance?start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/portfolio_state/performance?start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -261,7 +261,7 @@ class TestPortfolioStateAPI:
                 p.stop()
     
     def test_get_portfolio_state_comparison_success(self, client, mock_user_id):
-        """Test GET /api/portfolio-state/comparison with valid dates."""
+        """Test GET /api/portfolio_state/comparison with valid dates."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.portfolio_state.HistoricalDataBusinessService') as mock_service:
@@ -300,7 +300,7 @@ class TestPortfolioStateAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/portfolio-state/comparison?date1=2025-01-01&date2=2025-01-31')
+                response = client.get('/api/portfolio_state/comparison?date1=2025-01-01&date2=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -318,7 +318,7 @@ class TestTradingJournalAPI:
     """Test suite for Trading Journal API endpoints."""
     
     def test_get_trading_journal_entries_success(self, client, mock_user_id):
-        """Test GET /api/trading-journal/entries with valid date range."""
+        """Test GET /api/trading_journal/entries with valid date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trading_journal.HistoricalDataBusinessService') as mock_service:
@@ -334,7 +334,7 @@ class TestTradingJournalAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trading-journal/entries?start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trading_journal/entries?start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -345,7 +345,7 @@ class TestTradingJournalAPI:
                 p.stop()
     
     def test_get_trading_journal_statistics_success(self, client, mock_user_id):
-        """Test GET /api/trading-journal/statistics with valid date range."""
+        """Test GET /api/trading_journal/statistics with valid date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trading_journal.HistoricalDataBusinessService') as mock_service:
@@ -361,7 +361,7 @@ class TestTradingJournalAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trading-journal/statistics?start_date=2025-01-01&end_date=2025-01-31')
+                response = client.get('/api/trading_journal/statistics?start_date=2025-01-01&end_date=2025-01-31')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -372,7 +372,7 @@ class TestTradingJournalAPI:
                 p.stop()
     
     def test_get_trading_journal_calendar_success(self, client, mock_user_id):
-        """Test GET /api/trading-journal/calendar with valid month/year."""
+        """Test GET /api/trading_journal/calendar with valid month/year."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trading_journal.HistoricalDataBusinessService') as mock_service:
@@ -388,7 +388,7 @@ class TestTradingJournalAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trading-journal/calendar?month=1&year=2025')
+                response = client.get('/api/trading_journal/calendar?month=1&year=2025')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -398,7 +398,7 @@ class TestTradingJournalAPI:
                 p.stop()
     
     def test_get_trading_journal_by_entity_success(self, client, mock_user_id):
-        """Test GET /api/trading-journal/by-entity with valid entity type and ID."""
+        """Test GET /api/trading_journal/by-entity with valid entity type and ID."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
             with patch('routes.api.trading_journal.HistoricalDataBusinessService') as mock_service:
@@ -414,7 +414,7 @@ class TestTradingJournalAPI:
                 }
                 mock_service.return_value = mock_service_instance
                 
-                response = client.get('/api/trading-journal/by-entity?entity_type=trade&entity_id=123')
+                response = client.get('/api/trading_journal/by-entity?entity_type=trade&entity_id=123')
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -432,7 +432,7 @@ class TestHistoricalDataAPIErrorHandling:
         """Test Trade History API with missing required parameters."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
-            response = client.get('/api/trade-history/')
+            response = client.get('/api/trade_history/')
             # Should still return 200 (empty result) or 400 (validation error)
             assert response.status_code in [200, 400]
         finally:
@@ -443,7 +443,7 @@ class TestHistoricalDataAPIErrorHandling:
         """Test Portfolio State API with missing date parameter."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
-            response = client.get('/api/portfolio-state/snapshot')
+            response = client.get('/api/portfolio_state/snapshot')
             # Should return 400 (validation error) or 200 (empty result)
             assert response.status_code in [200, 400]
         finally:
@@ -454,7 +454,7 @@ class TestHistoricalDataAPIErrorHandling:
         """Test Trading Journal API with missing date range."""
         patches = patch_getattr_for_routes(mock_user_id)
         try:
-            response = client.get('/api/trading-journal/entries')
+            response = client.get('/api/trading_journal/entries')
             # Should return 400 (validation error) or 200 (empty result)
             assert response.status_code in [200, 400]
         finally:

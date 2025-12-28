@@ -16,7 +16,7 @@
 
 - **סטטוס:** הושלם
 - **תיקונים:**
-  - הוספת `<div id="unified-header"></div>` לכל העמודים (כולל `heatmap-visual-example.html`)
+  - הוספת `<div id="unified-header"></div>` לכל העמודים (כולל `heatmap_visual_example.html`)
   - וידוא טעינת `header-system.js` בכל העמודים
   - הוספת סקריפט אתחול אוטומטי ל-HeaderSystem
 
@@ -26,7 +26,7 @@
 - **תיקונים:**
   - הוספת `<div class="notification-container" id="notification-container"></div>` לכל העמודים
   - הוספת `<div id="toast-container"></div>` לכל העמודים
-  - **עמודים שתוקנו:** 10 עמודים (כל העמודים מלבד `trading-journal-page.html` שכבר היה לו)
+  - **עמודים שתוקנו:** 10 עמודים (כל העמודים מלבד `trading_journal_page.html` שכבר היה לו)
 
 #### ✅ 3. מערכת איקונים (Icon System)
 
@@ -86,18 +86,18 @@
 
 ### קבצים ששונו
 
-1. `trading-ui/mockups/daily-snapshots/heatmap-visual-example.html` - הוספת unified-header, notification containers, מבנה HTML
-2. `trading-ui/mockups/daily-snapshots/trade-history-page.html` - הוספת notification containers, mockups-icon-initializer
-3. `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
-4. `trading-ui/mockups/daily-snapshots/price-history-page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
-5. `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html` - החלפת איקונים, הוספת notification containers, mockups-icon-initializer, data-section attributes
-6. `trading-ui/mockups/daily-snapshots/strategy-analysis-page.html` - החלפת איקונים, הוספת notification containers, mockups-icon-initializer, data-section attributes
-7. `trading-ui/mockups/daily-snapshots/economic-calendar-page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
-8. `trading-ui/mockups/daily-snapshots/date-comparison-modal.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
-9. `trading-ui/mockups/daily-snapshots/history-widget.html` - הוספת notification containers, mockups-icon-initializer
-10. `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html` - הוספת notification containers, mockups-icon-initializer
-11. `trading-ui/mockups/daily-snapshots/tradingview-test-page.html` - הוספת notification containers, mockups-icon-initializer
-12. `trading-ui/mockups/daily-snapshots/trading-journal-page.html` - הוספת mockups-icon-initializer, data-section attributes
+1. `trading-ui/mockups/daily-snapshots/heatmap_visual_example.html` - הוספת unified-header, notification containers, מבנה HTML
+2. `trading-ui/mockups/daily-snapshots/trade_history_page.html` - הוספת notification containers, mockups-icon-initializer
+3. `trading-ui/mockups/daily-snapshots/portfolio_state_page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
+4. `trading-ui/mockups/daily-snapshots/price_history_page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
+5. `trading-ui/mockups/daily-snapshots/comparative_analysis_page.html` - החלפת איקונים, הוספת notification containers, mockups-icon-initializer, data-section attributes
+6. `trading-ui/mockups/daily-snapshots/strategy_analysis_page.html` - החלפת איקונים, הוספת notification containers, mockups-icon-initializer, data-section attributes
+7. `trading-ui/mockups/daily-snapshots/economic_calendar_page.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
+8. `trading-ui/mockups/daily-snapshots/date_comparison_modal.html` - הוספת notification containers, mockups-icon-initializer, data-section attributes
+9. `trading-ui/mockups/daily-snapshots/history_widget.html` - הוספת notification containers, mockups-icon-initializer
+10. `trading-ui/mockups/daily-snapshots/emotional_tracking_widget.html` - הוספת notification containers, mockups-icon-initializer
+11. `trading-ui/mockups/daily-snapshots/tradingview_test_page.html` - הוספת notification containers, mockups-icon-initializer
+12. `trading-ui/mockups/daily-snapshots/trading_journal_page.html` - הוספת mockups-icon-initializer, data-section attributes
 
 ---
 

@@ -24,7 +24,7 @@ async function createAIAnalysisCacheEntries() {
 
   // Get all completed analyses
   try {
-    const response = await fetch('/api/ai-analysis/history', { });
+    const response = await fetch('/api/ai_analysis/history', { });
     
     if (!response.ok) {
       console.error('❌ Failed to fetch history');

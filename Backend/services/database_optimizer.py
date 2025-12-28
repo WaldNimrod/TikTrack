@@ -50,34 +50,37 @@ class DatabaseOptimizer:
             db: Session = next(get_db())
             
             # Get all tables
-            result = db.execute(text("""
-                SELECT 
-                    name as table_name,
-                    sql as table_sql,
-                    type as object_type
-                FROM sqlite_master 
-                WHERE type='table'
-                ORDER BY name
-            """))
+            result = db.execute(
+                text(
+                    "SELECT table_name "
+                    "FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_type = 'BASE TABLE' "
+                    "ORDER BY table_name"
+                )
+            )
             tables = []
             for row in result:
                 tables.append({
                     'table_name': row[0],
-                    'table_sql': row[1],
-                    'object_type': row[2]
+                    'table_sql': None,
+                    'object_type': 'table'
                 })
             
             # Get all indexes
-            result = db.execute(text("""
-                SELECT 
-                    name as index_name,
-                    tbl_name as table_name,
-                    sql as index_sql,
-                    CASE WHEN sql LIKE '%UNIQUE%' THEN 1 ELSE 0 END as is_unique
-                FROM sqlite_master 
-                WHERE type='index'
-                ORDER BY tbl_name, name
-            """))
+            result = db.execute(
+                text(
+                    "SELECT i.relname as index_name, "
+                    "t.relname as table_name, "
+                    "pg_get_indexdef(i.oid) as index_sql, "
+                    "ix.indisunique as is_unique "
+                    "FROM pg_class t "
+                    "JOIN pg_index ix ON t.oid = ix.indrelid "
+                    "JOIN pg_class i ON i.oid = ix.indexrelid "
+                    "JOIN pg_namespace n ON n.oid = t.relnamespace "
+                    "WHERE n.nspname = 'public' "
+                    "ORDER BY t.relname, i.relname"
+                )
+            )
             indexes = []
             for row in result:
                 indexes.append({
@@ -91,79 +94,87 @@ class DatabaseOptimizer:
             table_stats = {}
             for table in tables:
                 table_name = table['table_name']
-                if table_name != 'sqlite_sequence':
-                    try:
-                        # Record count
-                        result = db.execute(text(f"SELECT COUNT(*) as count FROM {table_name}"))
-                        record_count = result.fetchone()[0]
-                        
-                        # Table size
-                        result = db.execute(text(f"""
-                            SELECT 
-                                SUM(length(hex(length(quote(t.*)))) + length(quote(t.*))) as size
-                            FROM {table_name} t
-                        """))
-                        table_size = result.fetchone()[0] or 0
-                        
-                        # Indexes for this table
-                        table_indexes = [idx for idx in indexes if idx['table_name'] == table_name]
-                        
-                        table_stats[table_name] = {
-                            'record_count': record_count,
-                            'size_bytes': table_size,
-                            'index_count': len(table_indexes),
-                            'indexes': table_indexes
-                        }
-                    except Exception as e:
-                        table_stats[table_name] = {
-                            'error': str(e),
-                            'record_count': 0,
-                            'size_bytes': 0,
-                            'index_count': 0,
-                            'indexes': []
-                        }
+                try:
+                    result = db.execute(text(f"SELECT COUNT(*) as count FROM {table_name}"))
+                    record_count = result.fetchone()[0]
+
+                    result = db.execute(
+                        text("SELECT pg_total_relation_size(:table_name)"),
+                        {"table_name": table_name},
+                    )
+                    table_size = result.fetchone()[0] or 0
+
+                    table_indexes = [idx for idx in indexes if idx['table_name'] == table_name]
+
+                    table_stats[table_name] = {
+                        'record_count': record_count,
+                        'size_bytes': table_size,
+                        'index_count': len(table_indexes),
+                        'indexes': table_indexes
+                    }
+                except Exception as e:
+                    table_stats[table_name] = {
+                        'error': str(e),
+                        'record_count': 0,
+                        'size_bytes': 0,
+                        'index_count': 0,
+                        'indexes': []
+                    }
             
-            # Get foreign key constraints
-            result = db.execute(text("PRAGMA foreign_key_list"))
+            result = db.execute(
+                text(
+                    "SELECT kcu.table_name, kcu.column_name, "
+                    "ccu.table_name AS foreign_table_name, "
+                    "ccu.column_name AS foreign_column_name, "
+                    "rc.update_rule, rc.delete_rule "
+                    "FROM information_schema.table_constraints tc "
+                    "JOIN information_schema.key_column_usage kcu "
+                    "ON tc.constraint_name = kcu.constraint_name "
+                    "AND tc.table_schema = kcu.table_schema "
+                    "JOIN information_schema.constraint_column_usage ccu "
+                    "ON ccu.constraint_name = tc.constraint_name "
+                    "AND ccu.table_schema = tc.table_schema "
+                    "JOIN information_schema.referential_constraints rc "
+                    "ON rc.constraint_name = tc.constraint_name "
+                    "AND rc.constraint_schema = tc.table_schema "
+                    "WHERE tc.table_schema = 'public' "
+                    "AND tc.constraint_type = 'FOREIGN KEY'"
+                )
+            )
             foreign_keys = []
             for row in result:
                 foreign_keys.append({
-                    'id': row[0],
-                    'seq': row[1],
-                    'table': row[2],
-                    'from': row[3],
-                    'to': row[4],
-                    'on_update': row[5],
-                    'on_delete': row[6],
-                    'match': row[7]
+                    'table': row[0],
+                    'from': row[1],
+                    'to_table': row[2],
+                    'to_column': row[3],
+                    'on_update': row[4],
+                    'on_delete': row[5]
                 })
             
             # Get check constraints
             check_constraints = []
             for table in tables:
                 table_name = table['table_name']
-                if table_name != 'sqlite_sequence':
-                    try:
-                        result = db.execute(text(f"PRAGMA table_info({table_name})"))
-                        columns = []
-                        for row in result:
-                            columns.append({
-                                'cid': row[0],
-                                'name': row[1],
-                                'type': row[2],
-                                'notnull': row[3],
-                                'dflt_value': row[4],
-                                'pk': row[5]
-                            })
-                        for column in columns:
-                            if column.get('notnull') == 1:
-                                check_constraints.append({
-                                    'table': table_name,
-                                    'column': column['name'],
-                                    'constraint': 'NOT NULL'
-                                })
-                    except Exception:
-                        pass
+                try:
+                    result = db.execute(
+                        text(
+                            "SELECT column_name "
+                            "FROM information_schema.columns "
+                            "WHERE table_schema = 'public' "
+                            "AND table_name = :table_name "
+                            "AND is_nullable = 'NO'"
+                        ),
+                        {"table_name": table_name},
+                    )
+                    for row in result:
+                        check_constraints.append({
+                            'table': table_name,
+                            'column': row[0],
+                            'constraint': 'NOT NULL'
+                        })
+                except Exception:
+                    pass
             
             db.close()
             
@@ -243,7 +254,7 @@ class DatabaseOptimizer:
                 fk_tables.add(fk['table'])
             
             for table_name in schema_analysis['schema']['table_stats'].keys():
-                if table_name not in fk_tables and table_name not in ['sqlite_sequence']:
+                if table_name not in fk_tables:
                     recommendations.append({
                         'type': 'missing_foreign_key',
                         'priority': 'low',
@@ -325,16 +336,20 @@ class DatabaseOptimizer:
             db: Session = next(get_db())
             
             # Analyze current indexes
-            result = db.execute(text("""
-                SELECT 
-                    name as index_name,
-                    tbl_name as table_name,
-                    sql as index_sql
-                FROM sqlite_master 
-                WHERE type='index'
-                ORDER BY tbl_name, name
-            """))
-            current_indexes = [dict(row) for row in result]
+            result = db.execute(
+                text(
+                    "SELECT i.relname as index_name, "
+                    "t.relname as table_name, "
+                    "pg_get_indexdef(i.oid) as index_sql "
+                    "FROM pg_class t "
+                    "JOIN pg_index ix ON t.oid = ix.indrelid "
+                    "JOIN pg_class i ON i.oid = ix.indexrelid "
+                    "JOIN pg_namespace n ON n.oid = t.relnamespace "
+                    "WHERE n.nspname = 'public' "
+                    "ORDER BY t.relname, i.relname"
+                )
+            )
+            current_indexes = [dict(row._mapping) for row in result]
             
             # Get table statistics
             table_stats = {}
@@ -408,54 +423,51 @@ class DatabaseOptimizer:
         try:
             db: Session = next(get_db())
             
-            # Check foreign key constraints
-            result = db.execute(text("PRAGMA foreign_key_check"))
             fk_violations = []
-            for row in result:
-                fk_violations.append({
-                    'table': row[0],
-                    'rowid': row[1],
-                    'parent': row[2],
-                    'fkid': row[3]
-                })
             
             # Check NOT NULL constraints
             not_null_violations = []
             
             # Get all tables
-            result = db.execute(text("SELECT name FROM sqlite_master WHERE type='table'"))
+            result = db.execute(
+                text(
+                    "SELECT table_name "
+                    "FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_type = 'BASE TABLE'"
+                )
+            )
             tables = [row[0] for row in result]
             
             for table_name in tables:
-                if table_name != 'sqlite_sequence':
-                    try:
-                        # Get table info
-                        result = db.execute(text(f"PRAGMA table_info({table_name})"))
-                        columns = []
-                        for row in result:
-                            columns.append({
-                                'cid': row[0],
-                                'name': row[1],
-                                'type': row[2],
-                                'notnull': row[3],
-                                'dflt_value': row[4],
-                                'pk': row[5]
+                try:
+                    result = db.execute(
+                        text(
+                            "SELECT column_name "
+                            "FROM information_schema.columns "
+                            "WHERE table_schema = 'public' "
+                            "AND table_name = :table_name "
+                            "AND is_nullable = 'NO'"
+                        ),
+                        {"table_name": table_name},
+                    )
+                    columns = [row[0] for row in result]
+
+                    for column_name in columns:
+                        result = db.execute(
+                            text(
+                                f"SELECT COUNT(*) FROM {table_name} WHERE {column_name} IS NULL"
+                            )
+                        )
+                        null_count = result.fetchone()[0]
+
+                        if null_count > 0:
+                            not_null_violations.append({
+                                'table': table_name,
+                                'column': column_name,
+                                'null_count': null_count
                             })
-                        
-                        for column in columns:
-                            if column.get('notnull') == 1:
-                                # Check for NULL values
-                                result = db.execute(text(f"SELECT COUNT(*) FROM {table_name} WHERE {column['name']} IS NULL"))
-                                null_count = result.fetchone()[0]
-                                
-                                if null_count > 0:
-                                    not_null_violations.append({
-                                        'table': table_name,
-                                        'column': column['name'],
-                                        'null_count': null_count
-                                    })
-                    except Exception:
-                        pass
+                except Exception:
+                    pass
             
             db.close()
             

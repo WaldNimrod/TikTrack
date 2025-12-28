@@ -45,7 +45,7 @@ def _ensure_conditions_tables(db_session) -> None:
         existing_tables: List[str] = inspector.get_table_names()
         statements_executed = False
 
-        # Core tables definitions (CREATE TABLE IF NOT EXISTS is idempotent in SQLite)
+        # Core tables definitions (CREATE TABLE IF NOT EXISTS is idempotent)
         table_statements = {
             'trading_methods': text("""
                 CREATE TABLE IF NOT EXISTS trading_methods (
@@ -233,7 +233,7 @@ def get_plan_conditions(plan_id):
             user_id = getattr(g, 'user_id', None)
             
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
-            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            # _ensure_conditions_tables is deprecated - PostgreSQL uses migrations
 
             # Check if trade plan exists and belongs to user
             query = db_session.query(TradePlan).filter(TradePlan.id == plan_id)
@@ -308,7 +308,7 @@ def create_plan_condition(plan_id):
         
         try:
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
-            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            # _ensure_conditions_tables is deprecated - PostgreSQL uses migrations
             normalizer = _get_date_normalizer()
             
             # Get user_id from Flask context (set by auth middleware)
@@ -422,7 +422,7 @@ def get_plan_condition(condition_id):
         
         try:
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
-            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            # _ensure_conditions_tables is deprecated - PostgreSQL uses migrations
             
             # Get user_id from Flask context (set by auth middleware)
             from flask import g
@@ -495,7 +495,7 @@ def update_plan_condition(condition_id):
         
         try:
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
-            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            # _ensure_conditions_tables is deprecated - PostgreSQL uses migrations
             
             # Get user_id from Flask context (set by auth middleware)
             from flask import g
@@ -628,7 +628,7 @@ def delete_plan_condition(condition_id):
         
         try:
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
-            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            # _ensure_conditions_tables is deprecated - PostgreSQL uses migrations
             
             # Get user_id from Flask context (set by auth middleware)
             from flask import g

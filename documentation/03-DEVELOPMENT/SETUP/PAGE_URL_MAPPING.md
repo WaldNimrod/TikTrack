@@ -15,19 +15,19 @@
 
 ### פורמט נכון
 
-✅ **נכון:**
+✅ **נכון (as-made):**
 
 ```
-http://localhost:8080/ai-analysis
+http://localhost:8080/ai_analysis
 http://localhost:8080/trades
 http://localhost:8080/preferences
 ```
 
-❌ **לא נכון:**
+❌ **לא נכון (legacy/לא מומלץ):**
 
 ```
-http://localhost:8080/trading-ui/ai-analysis.html
-http://localhost:8080/ai-analysis.html
+http://localhost:8080/trading-ui/ai_analysis.html
+http://localhost:8080/ai_analysis
 http://localhost:8080/trading-ui/trades.html
 ```
 
@@ -42,10 +42,10 @@ http://localhost:8080/trading-ui/trades.html
 כל עמוד יכול להיות רשום עם route ספציפי:
 
 ```python
-@pages_bp.route('/ai-analysis')
+@pages_bp.route('/ai_analysis')
 def ai_analysis() -> Any:
     """AI Analysis page"""
-    return send_from_directory(UI_DIR, "ai-analysis.html")
+    return send_from_directory(UI_DIR, "ai_analysis.html")
 ```
 
 **יתרונות:**
@@ -73,10 +73,10 @@ def static_files(filename: str) -> Any:
 
 **איך זה עובד:**
 
-1. המשתמש נכנס ל-`/my-page`
+1. המשתמש נכנס ל-`/trade_plans`
 2. המערכת בודקת אם יש route ספציפי
 3. אם לא, ה-catch-all route מוסיף `.html` אוטומטית
-4. המערכת מחפשת `my-page.html` ב-`trading-ui/`
+4. המערכת מחפשת `trade_plans.html` ב-`trading-ui/`
 5. אם הקובץ קיים, הוא נשלח
 
 ---
@@ -88,7 +88,7 @@ def static_files(filename: str) -> Any:
 צור את הקובץ ב-`trading-ui/`:
 
 ```bash
-trading-ui/my-new-page.html
+trading-ui/trade_plans.html
 ```
 
 ### שלב 2: הוסף Route (מומלץ)
@@ -98,10 +98,10 @@ trading-ui/my-new-page.html
 הוסף לפני ה-catch-all route:
 
 ```python
-@pages_bp.route('/my-new-page')
+@pages_bp.route('/trade_plans')
 def my_new_page() -> Any:
     """My new page description"""
-    return send_from_directory(UI_DIR, "my-new-page.html")
+    return send_from_directory(UI_DIR, "trade_plans.html")
 ```
 
 **מיקום:** הוסף אחרי ה-routes הקיימים, לפני ה-catch-all route (שורה 196).
@@ -111,39 +111,47 @@ def my_new_page() -> Any:
 העמוד יהיה נגיש ב:
 
 ```
-http://localhost:8080/my-new-page
+http://localhost:8080/trade_plans
 ```
 
 ---
 
 ## 📋 רשימת Routes קיימים
 
-### עמודים מרכזיים
+### עמודים מרכזיים (as-made)
 
 - `/` → `index.html` (דשבורד)
 - `/trades` → `trades.html`
 - `/trade_plans` → `trade_plans.html`
+- `/accounts` → `trading_accounts.html`
 - `/alerts` → `alerts.html`
 - `/notes` → `notes.html`
 - `/tickers` → `tickers.html`
 - `/executions` → `executions.html`
 - `/preferences` → `preferences.html`
-- `/ai-analysis` → `ai-analysis.html` ✅ **חדש! ינואר 2025**
-- `/watch-list` → `watch-list.html` ✅ **חדש! דצמבר 2025**
+- `/ai_analysis` → `ai_analysis.html`
+- `/watch_lists` → `watch_lists.html`
+- `/user_profile` → `user_profile.html`
+- `/ticker_dashboard` → `ticker_dashboard.html`
+- `/trading_journal` → `trading_journal.html`
+- `/trade_history` → `trade_history.html`
+- `/portfolio_state` → `portfolio_state.html`
+- `/data_import` → `data_import.html`
+- `/tag_management` → `tag_management.html`
 
-### עמודים טכניים
+### עמודים טכניים (נפוצים)
 
 - `/db_display` → `db_display.html`
 - `/db_extradata` → `db_extradata.html`
 - `/designs` → `designs.html`
 - `/constraints` → `constraints.html`
-- `/external-data-dashboard` → `external-data-dashboard.html`
-- `/chart-management` → `chart-management.html`
+- `/external_data_dashboard` → `external_data_dashboard.html`
+- `/chart_management` → `chart_management.html`
 
 ### עמודים נוספים
 
-- `/tag-management` → `tag-management.html`
-- `/test-header-only` → `test-header-only.html`
+- `/strategy-analysis` → `strategy_analysis.html`
+- `/trade_plans` → `trade_plans.html`
 
 ---
 
@@ -152,7 +160,7 @@ http://localhost:8080/my-new-page
 ### דרך 1: חיפוש בקוד
 
 ```bash
-grep -r "my-page.html" Backend/routes/pages.py
+rg -n "trade_plans.html" Backend/routes/pages.py
 ```
 
 ### דרך 2: בדיקת Catch-all
@@ -160,10 +168,10 @@ grep -r "my-page.html" Backend/routes/pages.py
 אם אין route ספציפי, העמוד נגיש דרך catch-all:
 
 ```
-http://localhost:8080/my-page
+http://localhost:8080/trade_plans
 ```
 
-המערכת תחפש אוטומטית `my-page.html` ב-`trading-ui/`.
+המערכת תחפש אוטומטית `trade_plans.html` ב-`trading-ui/`.
 
 ---
 
@@ -177,9 +185,9 @@ http://localhost:8080/my-page
 
 ### 2. שמות קבצים
 
-- השתמש ב-`kebab-case` לשמות קבצים: `ai-analysis.html`
-- הימנע מ-`snake_case`: `ai_analysis.html` (לא מומלץ)
+- השתמש ב-`snake_case` לשמות קבצים וכתובות דפדפן: `ai_analysis.html`, `user_profile.html`
 - הימנע מ-`camelCase`: `aiAnalysis.html` (לא מומלץ)
+- קיימים קבצי legacy ב-`kebab-case` (למשל `trade_history.html`) ויש להמירם במסגרת מיגרציית שמות ייעודית
 
 ### 3. Routes חסומים
 
@@ -206,28 +214,22 @@ if filename in ['linter-dashboard-demo', 'create_linter_dashboard']:
 
 ```python
 # Backend/routes/pages.py
-@pages_bp.route('/ai-analysis')
+@pages_bp.route('/ai_analysis')
 def ai_analysis() -> Any:
     """AI Analysis page"""
-    return send_from_directory(UI_DIR, "ai-analysis.html")
+    return send_from_directory(UI_DIR, "ai_analysis.html")
 ```
 
-**גישה:** `http://localhost:8080/ai-analysis`
+**גישה:** `http://localhost:8080/ai_analysis`
 
 ### דוגמה 2: עמוד דרך Catch-all
 
-אם יש קובץ `trading-ui/my-page.html` אבל אין route ספציפי:
+אם יש קובץ `trading-ui/trade_plans.html` אבל אין route ספציפי:
 
-**גישה:** `http://localhost:8080/my-page`
+**גישה:** `http://localhost:8080/trade_plans`
 
 המערכת תמצא את הקובץ אוטומטית.
 
 ---
 
 **עודכן:** 28 בינואר 2025
-
-
-
-
-
-

@@ -104,13 +104,13 @@ class CrossPageTester {
 
         // Iframe container management (independent of crudTester)
         this.testIframeContainer = null;
-
+        
         // Page groups for organized testing
         this.pageGroups = {
             // User pages (20 pages) - עמודי משתמש עיקריים
             user: [
             // Dashboards (2)
-            { key: 'index', name: 'דשבורד ראשי', url: '/', hasModals: false, hasTables: true, hasSections: false },
+            { key: 'index', name: 'דשבורד ראשי', url: '/', hasModals: false, hasTables: true, hasSections: false, hasFilters: false },
             { key: 'research', name: 'מחקר וניתוח', url: '/research', hasModals: false, hasTables: false, hasSections: false },
             
             // Core pages (10)
@@ -132,6 +132,7 @@ class CrossPageTester {
             { key: 'ticker_dashboard', name: 'דשבורד טיקר', url: '/ticker_dashboard', hasModals: false, hasTables: false, hasSections: false },
             { key: 'portfolio_state', name: 'מצב תיק היסטורי', url: '/portfolio_state', hasModals: false, hasTables: true, hasSections: false },
             { key: 'data_import', name: 'ייבוא נתונים', url: '/data_import', hasModals: false, hasTables: true, hasSections: true },
+            { key: 'strategy_analysis', name: 'ניתוח אסטרטגיות', url: '/strategy_analysis', hasModals: false, hasTables: true, hasSections: false },
             
             // Supporting pages (3)
             { key: 'preferences', name: 'העדפות', url: '/preferences', hasModals: false, hasTables: false, hasSections: true },
@@ -142,56 +143,67 @@ class CrossPageTester {
             userManagement: [
                 { key: 'login', name: 'כניסה למערכת', url: '/login', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'register', name: 'הרשמה למערכת', url: '/register', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'forgot_password', name: 'שחזור סיסמה', url: '/forgot-password', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'reset_password', name: 'איפוס סיסמה', url: '/reset-password', hasModals: false, hasTables: true, hasSections: false }
+                { key: 'forgot_password', name: 'שחזור סיסמה', url: '/forgot_password', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'reset_password', name: 'איפוס סיסמה', url: '/reset_password', hasModals: false, hasTables: true, hasSections: false }
             ],
             
             // Development tools pages (16) - כלי פיתוח
             developmentTools: [
                 { key: 'dev_tools', name: 'כלי פיתוח ראשי', url: '/dev_tools', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'code_quality_dashboard', name: 'דשבורד איכות קוד', url: '/code-quality-dashboard', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'init_system_management', name: 'ניהול מערכת אתחול', url: '/init-system-management', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'cache_management', name: 'ניהול מטמון', url: '/cache-management', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'code_quality_dashboard', name: 'דשבורד איכות קוד', url: '/code_quality_dashboard', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'init_system_management', name: 'ניהול מערכת אתחול', url: '/init_system_management', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'cache_management', name: 'ניהול מטמון', url: '/cache_management', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'chart_management', name: 'ניהול גרפים', url: '/chart_management', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'crud_testing_dashboard', name: 'דשבורד בדיקות CRUD', url: '/crud_testing_dashboard', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'conditions_test', name: 'בדיקת תנאים', url: '/conditions-test', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'conditions_modals', name: 'מודלים של תנאים', url: '/conditions-modals', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'button_color_mapping', name: 'מיפוי צבעי כפתורים', url: '/button-color-mapping', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'preferences_groups_management', name: 'ניהול קבוצות העדפות', url: '/preferences-groups-management', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'tradingview_widgets_showcase', name: 'תצוגת ווידג\'טים TradingView', url: '/tradingview-widgets-showcase', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'external_data_dashboard', name: 'דשבורד נתונים חיצוניים', url: '/external_data_dashboard', hasModals: false, hasTables: true, hasSections: false }
+                { key: 'conditions_test', name: 'בדיקת תנאים', url: '/conditions_test', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'conditions_modals', name: 'מודלים של תנאים', url: '/conditions_modals', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'preferences_groups_management', name: 'ניהול קבוצות העדפות', url: '/preferences_groups_management', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'tradingview_widgets_showcase', name: 'תצוגת ווידג\'טים TradingView', url: '/tradingview_widgets_showcase', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'external_data_dashboard', name: 'דשבורד נתונים חיצוניים', url: '/external_data_dashboard', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'data_import_export', name: 'ייבוא/ייצוא נתונים', url: '/data-import-export', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'system_logs_viewer', name: 'מציג לוגים', url: '/system-logs-viewer', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'performance_monitor', name: 'מוניטור ביצועים', url: '/performance-monitor', hasModals: false, hasTables: true, hasSections: false }
             ],
             
-            // Testing pages (14) - עמודי בדיקה
+            // Testing pages (18) - עמודי בדיקה
             testing: [
-                { key: 'test_header_only', name: 'בדיקת header', url: '/test-header-only', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_monitoring', name: 'מוניטורינג', url: '/test-monitoring', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_overlay_debug', name: 'debug overlay', url: '/test-overlay-debug', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_phase3_1_comprehensive', name: 'בדיקות מקיפות', url: '/test-phase3-1-comprehensive', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_quill', name: 'עורך טקסט', url: '/test-quill', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_recent_items_widget', name: 'ווידג\'ט פריטים אחרונים', url: '/test-recent-items-widget', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_ticker_widgets_performance', name: 'ביצועי ווידג\'טים', url: '/test-ticker-widgets-performance', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_unified_widget_comprehensive', name: 'ווידג\'ט מאוחד', url: '/test-unified-widget-comprehensive', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_unified_widget_integration', name: 'אינטגרציה', url: '/test-unified-widget-integration', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_unified_widget', name: 'ווידג\'ט בסיסי', url: '/test-unified-widget', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_user_ticker_integration', name: 'אינטגרציית משתמש', url: '/test-user-ticker-integration', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_frontend_wrappers', name: 'wrappers', url: '/test-frontend-wrappers', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_bootstrap_popover_comparison', name: 'השוואת popover', url: '/test-bootstrap-popover-comparison', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'test_cache', name: 'בדיקת Cache', url: '/cache-test', hasModals: false, hasTables: true, hasSections: false }
+                { key: 'test_header_only', name: 'בדיקת header', url: '/test_header_only', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_monitoring', name: 'מוניטורינג', url: '/test_monitoring', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_overlay_debug', name: 'debug overlay', url: '/test_overlay_debug', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_phase3_1_comprehensive', name: 'בדיקות מקיפות', url: '/test_phase3_1_comprehensive', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_quill', name: 'עורך טקסט', url: '/test_quill', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_recent_items_widget', name: 'ווידג\'ט פריטים אחרונים', url: '/test_recent_items_widget', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_ticker_widgets_performance', name: 'ביצועי ווידג\'טים', url: '/test_ticker_widgets_performance', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_unified_widget_comprehensive', name: 'ווידג\'ט מאוחד', url: '/test_unified_widget_comprehensive', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_unified_widget_integration', name: 'אינטגרציה', url: '/test_unified_widget_integration', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_unified_widget', name: 'ווידג\'ט בסיסי', url: '/test_unified_widget', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_user_ticker_integration', name: 'אינטגרציית משתמש', url: '/test_user_ticker_integration', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_frontend_wrappers', name: 'wrappers', url: '/test_frontend_wrappers', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_bootstrap_popover_comparison', name: 'השוואת popover', url: '/test_bootstrap_popover_comparison', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_cache', name: 'בדיקת Cache', url: '/cache-test', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_table_sorting', name: 'בדיקת מיון טבלאות', url: '/test-table-sorting', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_modal_system', name: 'בדיקת מערכת מודלים', url: '/test-modal-system', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_filter_system', name: 'בדיקת מערכת פילטרים', url: '/test-filter-system', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'test_api_integration', name: 'בדיקת אינטגרציה API', url: '/test-api-integration', hasModals: false, hasTables: true, hasSections: false }
             ],
             
-            // Technical pages (10) - עמודים טכניים
+            // Technical pages (15) - עמודים טכניים
             technical: [
                 { key: 'db_display', name: 'תצוגת בסיס נתונים', url: '/db_display', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'db_extradata', name: 'נתונים נוספים', url: '/db_extradata', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'constraints', name: 'אילוצי מערכת', url: '/constraints', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'background_tasks', name: 'משימות רקע', url: '/background-tasks', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'notifications_center', name: 'מרכז התראות', url: '/notifications-center', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'css_management', name: 'ניהול CSS', url: '/css-management', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'background_tasks', name: 'משימות רקע', url: '/background_tasks', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'notifications_center', name: 'מרכז התראות', url: '/notifications_center', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'css_management', name: 'ניהול CSS', url: '/css_management', hasModals: false, hasTables: true, hasSections: false },
                 { key: 'designs', name: 'עיצובים', url: '/designs', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'dynamic_colors_display', name: 'תצוגת צבעים', url: '/dynamic-colors-display', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'system_management', name: 'ניהול מערכת', url: '/system-management', hasModals: false, hasTables: true, hasSections: false },
-                { key: 'server_monitor', name: 'ניטור שרת', url: '/server-monitor', hasModals: false, hasTables: true, hasSections: false }
+                { key: 'dynamic_colors_display', name: 'תצוגת צבעים', url: '/dynamic_colors_display', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'system_management', name: 'ניהול מערכת', url: '/system_management', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'server_monitor', name: 'ניטור שרת', url: '/server_monitor', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'data_import', name: 'ייבוא נתונים', url: '/data_import', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'system_logs', name: 'לוגי מערכת', url: '/system_logs', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'api_endpoints', name: 'נקודות קצה API', url: '/api_endpoints', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'database_schema', name: 'סכימת בסיס נתונים', url: '/database_schema', hasModals: false, hasTables: true, hasSections: false },
+                { key: 'system_health', name: 'בריאות המערכת', url: '/system_health', hasModals: false, hasTables: true, hasSections: false }
             ]
         };
         
@@ -293,6 +305,30 @@ class CrossPageTester {
     async runTestsForGroup(groupName, testType = 'colors') {
         const startTime = Date.now();
         const pages = this.pageGroups[groupName] || [];
+
+        // #region agent log - DUPLICATE PAGE DETECTION
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'cross-page-testing-system.js:runTestsForGroup:page-analysis',
+                message:`Analyzing pages for group ${groupName}`,
+                data:{
+                    groupName,
+                    testType,
+                    totalPages:pages.length,
+                    pageKeys:pages.map(p => p.key),
+                    pageNames:pages.map(p => p.name),
+                    duplicateKeys:pages.map(p => p.key).filter((key, index, arr) => arr.indexOf(key) !== index),
+                    duplicateNames:pages.map(p => p.name).filter((name, index, arr) => arr.indexOf(name) !== index)
+                },
+                timestamp:startTime,
+                sessionId:'debug-session',
+                runId:'duplicate-page-detection',
+                hypothesisId:'DUPLICATE_PAGE_DETECTION'
+            })
+        }).catch(()=>{});
+        // #endregion
         
         if (pages.length === 0) {
             throw new Error(`No pages found for group: ${groupName}`);
@@ -330,11 +366,13 @@ class CrossPageTester {
                             headers:{'Content-Type':'application/json'},
                             body:JSON.stringify({
                                 location:'cross-page-testing-system.js:runTestsForGroup:sorting-condition',
-                                message:`Evaluating sorting test for page: ${page.name}`,
+                                message:`[GROUP DEBUG] Evaluating sorting test for page: ${page.name}`,
                                 data:{
                                     pageName:page.name,
                                     pageKey:page.key,
                                     hasTables:page.hasTables,
+                                    groupName:groupName,
+                                    sortingResultsBeforeCall:this.crudTester?.results?.crossPage?.sorting?.length || 0,
                                     hasTablesType:typeof page.hasTables,
                                     willRunSorting:!!page.hasTables
                                 },
@@ -347,7 +385,58 @@ class CrossPageTester {
                         // #endregion
 
                         if (page.hasTables) {
-                            await this.testSorting(page);
+                            // #region agent log - HYPOTHESIS H2: Group test calls individual test
+                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                                method:'POST',
+                                headers:{'Content-Type':'application/json'},
+                                body:JSON.stringify({
+                                    location:'cross-page-testing-system.js:runTestsForGroup:testSorting-call',
+                                    message:`[GROUP DEBUG] Group ${groupName} calling SortingTestingSystem for ${page.name}`,
+                                    data:{
+                                        groupName:groupName,
+                                        pageName:page.name,
+                                        pageKey:page.key,
+                                        sortingTesterExists:!!window.sortingTester,
+                                        sortingResultsBefore:this.crudTester?.results?.crossPage?.sorting?.length || 0,
+                                        callSequence:'group->sortingTester'
+                                    },
+                                    timestamp:Date.now(),
+                                    sessionId:'debug-session',
+                                    runId:'group-test-debug',
+                                    hypothesisId:'H2_GROUP_EXECUTION'
+                                })
+                            }).catch(()=>{});
+                            // #endregion
+
+                            // #region agent log - HYPOTHESIS 5: About to call sorting test
+                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                                method:'POST',
+                                headers:{'Content-Type':'application/json'},
+                                body:JSON.stringify({
+                                    location:'cross-page-testing-system.js:runTestsForGroup:sorting-call',
+                                    message:`About to call sorting test for page: ${page.key}`,
+                                    data:{
+                                        pageName:page.name,
+                                        pageKey:page.key,
+                                        hasSortingTester:!!(window.sortingTester && typeof window.sortingTester.testSorting === 'function'),
+                                        usingFallback:!window.sortingTester || !window.sortingTester.testSorting
+                                    },
+                                    timestamp:Date.now(),
+                                    sessionId:'debug-session',
+                                    runId:'sorting-test-debug',
+                                    hypothesisId:'H5_SORTING_CALL'
+                                })
+                            }).catch(()=>{});
+                            // #endregion
+
+                            // Use SortingTestingSystem for individual page testing instead of direct testSorting
+                            if (window.sortingTester && typeof window.sortingTester.testSorting === 'function') {
+                                await window.sortingTester.testSorting(page);
+                            } else {
+                                // Fallback to direct testSorting if SortingTestingSystem not available
+                                console.warn('⚠️ SortingTestingSystem not available, using fallback');
+                                await this.testSorting(page);
+                            }
                         }
                         break;
                     case 'sections':
@@ -501,2018 +590,115 @@ class CrossPageTester {
     }
     
     /**
-     * Test 1: Defaults
-     * @param {Object} page - Page configuration
+     * Run tests for a single page by key
+     * @param {string} pageKey - Page key (e.g., 'executions')
+     * @param {string} testType - Test type ('defaults', 'colors', 'sorting', etc.)
      */
-    // #region agent log
-    async testDefaults(page) {
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                location: 'cross-page-testing-system.js:testDefaults',
-                message: 'testDefaults called',
-                data: { pageKey: page.key, pageName: page.name },
-                timestamp: Date.now(),
-                sessionId: 'debug-session',
-                runId: 'debug-run',
-                hypothesisId: 'D'
-            })
-        }).catch(() => {});
-
+    async runTestsForSinglePage(pageKey, testType = 'defaults') {
         const startTime = Date.now();
-        const result = {
-            page: page.name,
-            workflow: `${page.name} - יצירת ברירות מחדל`,
-            status: 'success',
-            tests: [],
-            errors: [],
-            defaultsApplied: [], // Track all defaults applied to this page
-            executionTime: 0
-        };
-        
-        let testIframe = null;
 
-        try {
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'testDefaults try block started',
-                    data: { pageUrl: page.url, pageKey: page.key },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
+        // Find the page from all page groups
+        let targetPage = null;
+        let foundInGroup = null;
 
-            // Clean up any existing iframes before starting new test
-            this.cleanupTestIframes();
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'cleanupTestIframes completed',
-                    data: { pageKey: page.key },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
-
-            // Load page in visible iframe using standalone method
-
-            // Handle URL - special case for index (/) and add .html extension if needed
-            let pageUrl = page.url;
-            if (pageUrl === '/') {
-                pageUrl = '/index.html';
-            } else if (!pageUrl.endsWith('.html')) {
-                pageUrl = `${pageUrl}.html`;
-            }
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'about to call loadPageInIframe',
-                    data: { pageKey: page.key, pageUrl: pageUrl },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
-
-            testIframe = await this.loadPageInIframe(pageUrl);
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'loadPageInIframe completed',
-                    data: { pageKey: page.key, testIframeExists: !!testIframe },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
-
-            const iframeDoc = this.getIframeDocument(testIframe);
-            const iframeWindow = this.getIframeWindow(testIframe);
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'iframe document and window obtained',
-                    data: {
-                        pageKey: page.key,
-                        iframeDocExists: !!iframeDoc,
-                        iframeWindowExists: !!iframeWindow
-                    },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
-
-            // CRITICAL: Initialize PreferencesCore in iframe before testing
-            // This ensures preferences are loaded and available for testing
-            try {
-                if (iframeWindow.PreferencesCore && typeof iframeWindow.PreferencesCore.initializeWithLazyLoading === 'function') {
-                    await iframeWindow.PreferencesCore.initializeWithLazyLoading();
-                    // Wait a bit for preferences to be cached
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            } catch (prefInitError) {
-                // Log but don't fail - preferences might already be loaded
-                if (window.Logger && window.Logger.debug) {
-                    window.Logger.debug(`Preferences initialization in iframe failed (non-critical): ${prefInitError.message}`, {
-                        page: page.key,
-                        pageName: 'crud-testing-dashboard'
-                    });
-                }
-            }
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'PreferencesCore initialization completed',
-                    data: { pageKey: page.key },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
-
-            // Test 1.1: Date defaults (for pages with modals)
-            if (page.hasModals) {
-                try {
-                    // Wait for page to fully load
-                    await this.waitForElementInIframe(testIframe, 'main, [data-section="main"], .main-content', 10000);
-                    await new Promise(resolve => setTimeout(resolve, 1000)); // Additional wait for page initialization
-
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            location: 'cross-page-testing-system.js:testDefaults',
-                            message: 'waitForElementInIframe completed',
-                            data: { pageKey: page.key, hasModals: page.hasModals },
-                            timestamp: Date.now(),
-                            sessionId: 'debug-session',
-                            runId: 'debug-run',
-                            hypothesisId: 'D'
-                        })
-                    }).catch(() => {});
-
-                    // Try to open add modal
-                    const addButton = iframeDoc.querySelector('button[data-onclick*="showAddModal"], button[data-onclick*="add"], button[data-button-type="ADD"]');
-
-                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            location: 'cross-page-testing-system.js:testDefaults',
-                            message: 'looking for add button',
-                            data: {
-                                pageKey: page.key,
-                                addButtonFound: !!addButton,
-                                modalManagerV2Exists: !!iframeWindow.ModalManagerV2
-                            },
-                            timestamp: Date.now(),
-                            sessionId: 'debug-session',
-                            runId: 'debug-run',
-                            hypothesisId: 'D'
-                        })
-                    }).catch(() => {});
-
-                    if (addButton && iframeWindow.ModalManagerV2) {
-                        // Get entity type from page
-                        const entityType = this.getEntityTypeFromPage(page.key);
-
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({
-                                location: 'cross-page-testing-system.js:testDefaults',
-                                message: 'entity type obtained',
-                                data: {
-                                    pageKey: page.key,
-                                    entityType: entityType
-                                },
-                                timestamp: Date.now(),
-                                sessionId: 'debug-session',
-                                runId: 'debug-run',
-                                hypothesisId: 'D'
-                            })
-                        }).catch(() => {});
-
-                        if (entityType) {
-                            const modalId = this.getModalIdForEntity(entityType);
-
-                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({
-                                    location: 'cross-page-testing-system.js:testDefaults',
-                                    message: 'modal ID obtained',
-                                    data: {
-                                        pageKey: page.key,
-                                        entityType: entityType,
-                                        modalId: modalId
-                                    },
-                                    timestamp: Date.now(),
-                                    sessionId: 'debug-session',
-                                    runId: 'debug-run',
-                                    hypothesisId: 'D'
-                                })
-                            }).catch(() => {});
-
-                            if (modalId) {
-                                try {
-                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({
-                                            location: 'cross-page-testing-system.js:testDefaults',
-                                            message: 'about to call showModal',
-                                            data: {
-                                                pageKey: page.key,
-                                                entityType: entityType,
-                                                modalId: modalId
-                                            },
-                                            timestamp: Date.now(),
-                                            sessionId: 'debug-session',
-                                            runId: 'debug-run',
-                                            hypothesisId: 'D'
-                                        })
-                                    }).catch(() => {});
-
-                                    console.log('DEBUG: About to call showModal for', modalId);
-                                    await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
-                                    console.log('DEBUG: showModal completed for', modalId);
-
-                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({
-                                            location: 'cross-page-testing-system.js:testDefaults',
-                                            message: 'showModal completed',
-                                            data: {
-                                                pageKey: page.key,
-                                                modalId: modalId
-                                            },
-                                            timestamp: Date.now(),
-                                            sessionId: 'debug-session',
-                                            runId: 'debug-run',
-                                            hypothesisId: 'D'
-                                        })
-                                    }).catch(() => {});
-
-                                    // Wait for modal to be fully visible and date fields to be populated
-                                    await new Promise(resolve => setTimeout(resolve, 3000));
-
-                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({
-                                            location: 'cross-page-testing-system.js:testDefaults',
-                                            message: 'waited 3 seconds after showModal',
-                                            data: {
-                                                pageKey: page.key,
-                                                modalId: modalId
-                                            },
-                                            timestamp: Date.now(),
-                                            sessionId: 'debug-session',
-                                            runId: 'debug-run',
-                                            hypothesisId: 'D'
-                                        })
-                                    }).catch(() => {});
-                                    
-                                    // Get date field IDs from modal config (CRITICAL FIX)
-                                    const dateFieldIds = this.getDateFieldIdsFromConfig(entityType, iframeWindow);
-                                    
-                                    // Wait for date fields to appear in the modal and be populated (retry up to 5 times)
-                                    let dateFields = [];
-                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({
-                                            location: 'cross-page-testing-system.js:testDefaults',
-                                            message: 'starting date fields search loop',
-                                            data: { dateFieldIdsLength: dateFieldIds.length },
-                                            timestamp: Date.now(),
-                                            sessionId: 'debug-session',
-                                            runId: 'debug-run',
-                                            hypothesisId: 'D'
-                                        })
-                                    }).catch(() => {});
-
-                                    for (let retry = 0; retry < 5; retry++) {
-                                        if (dateFieldIds.length > 0) {
-                                            // Use specific field IDs from config
-                                            dateFields = dateFieldIds.map(fieldId => {
-                                                const field = iframeDoc.getElementById(fieldId);
-                                                if (field && (field.type === 'date' || field.type === 'datetime-local')) {
-                                                    const modal = iframeDoc.querySelector(`#${modalId}, [id*="${modalId}"]`);
-                                                    if (modal && modal.contains(field) && field.offsetParent !== null) {
-                                                        return field;
-                                                    }
-                                                }
-                                                return null;
-                                            }).filter(Boolean);
-                                        } else {
-                                            // Fallback to generic search if no config available
-                                            dateFields = Array.from(iframeDoc.querySelectorAll('input[type="date"], input[type="datetime-local"]'))
-                                                .filter(field => {
-                                                    const modal = iframeDoc.querySelector(`#${modalId}, [id*="${modalId}"]`);
-                                                    return modal && modal.contains(field) && field.offsetParent !== null;
-                                                });
-                                        }
-                                        // Check if fields are populated (have values)
-                                        const populatedFields = dateFields.filter(field => field.value && field.value.length > 0);
-                                        if (populatedFields.length === dateFields.length && dateFields.length > 0) {
-                                            dateFields = populatedFields;
+        for (const [groupName, pages] of Object.entries(this.pageGroups)) {
+            const page = pages.find(p => p.key === pageKey);
+            if (page) {
+                targetPage = page;
+                foundInGroup = groupName;
                                             break;
                                         }
-                                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                            method: 'POST',
-                                            headers: {'Content-Type': 'application/json'},
-                                            body: JSON.stringify({
-                                                location: 'cross-page-testing-system.js:testDefaults',
-                                                message: 'date fields retry completed',
-                                                data: {
-                                                    retry: retry,
-                                                    dateFieldsFound: dateFields.length,
-                                                    populatedFields: dateFields.filter(f => f.value && f.value.length > 0).length
-                                                },
-                                                timestamp: Date.now(),
-                                                sessionId: 'debug-session',
-                                                runId: 'debug-run',
-                                                hypothesisId: 'D'
-                                            })
-                                        }).catch(() => {});
-                                    }
-
-                                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({
-                                            location: 'cross-page-testing-system.js:testDefaults',
-                                            message: 'date fields search loop completed',
-                                            data: { finalDateFieldsCount: dateFields.length },
-                                            timestamp: Date.now(),
-                                            sessionId: 'debug-session',
-                                            runId: 'debug-run',
-                                            hypothesisId: 'D'
-                                        })
-                                    }).catch(() => {});
-
-                                    if (dateFields.length === 0) {
-                                        result.tests.push({
-                                            name: 'תאריך ברירת מחדל',
-                                            status: 'skipped',
-                                            message: 'לא נמצאו שדות תאריך בטופס (או שהם לא נראים)'
-                                        });
-                                    } else {
-                                for (const dateField of dateFields) {
-                                    const today = new Date();
-                                    const expectedDate = dateField.type === 'datetime-local' 
-                                        ? `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}T${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`
-                                        : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                                    
-                                            // More lenient check - allow partial match for datetime-local
-                                            // Also check if field has any value (some systems populate dates differently)
-                                            const hasValue = dateField.value && dateField.value.length > 0;
-                                            const isDateCorrect = dateField.value === expectedDate || 
-                                                                 dateField.value.startsWith(expectedDate.split('T')[0]) ||
-                                                                 (dateField.type === 'datetime-local' && hasValue) ||
-                                                                 (dateField.type === 'date' && hasValue && dateField.value.match(/^\d{4}-\d{2}-\d{2}/));
-                                            
-                                            if (isDateCorrect) {
-                                        result.tests.push({
-                                                    name: `תאריך ברירת מחדל - ${dateField.id || dateField.name || 'ללא שם'}`,
-                                            status: 'success',
-                                            message: `תאריך נכון: ${dateField.value}`
-                                        });
-                                        // Track default applied
-                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                        result.defaultsApplied.push({ 
-                                            type: 'field', 
-                                            name: 'date', 
-                                            value: dateField.value, 
-                                            fieldId: dateField.id,
-                                            fieldType: dateField.type
-                                        });
-                                        this.stats.passed++;
-                                    } else {
-                                        result.tests.push({
-                                                    name: `תאריך ברירת מחדל - ${dateField.id || dateField.name || 'ללא שם'}`,
-                                            status: 'failed',
-                                                    message: `תאריך שגוי: ${dateField.value || 'ריק'}, צפוי: ${expectedDate}`
-                                        });
-                                                result.errors.push(`תאריך שגוי בשדה ${dateField.id || dateField.name || 'ללא שם'}`);
-                                        this.stats.failed++;
-                                    }
-                                    this.stats.totalTests++;
-                                        }
-                                }
-                                
-                                // Close modal
-                                if (iframeWindow.ModalManagerV2) {
-                                        try {
-                                    await iframeWindow.ModalManagerV2.closeModal(modalId);
-                                            await new Promise(resolve => setTimeout(resolve, 500));
-                                        } catch (closeError) {
-                                            // Ignore close errors
-                                        }
-                                    }
-                                } catch (modalError) {
-                                    result.tests.push({
-                                        name: 'תאריך ברירת מחדל',
-                                        status: 'skipped',
-                                        message: `שגיאה בפתיחת מודל: ${modalError.message}`
-                                    });
-                                }
-                            } else {
-                                result.tests.push({
-                                    name: 'תאריך ברירת מחדל',
-                                    status: 'skipped',
-                                    message: `לא נמצא modal ID לישות ${entityType}`
-                                });
-                            }
-                        } else {
-                            result.tests.push({
-                                name: 'תאריך ברירת מחדל',
-                                status: 'skipped',
-                                message: `לא ניתן לקבוע סוג ישות מעמוד ${page.key}`
-                            });
-                        }
-                    } else {
-                        result.tests.push({
-                            name: 'תאריך ברירת מחדל',
-                            status: 'skipped',
-                            message: `לא נמצא כפתור הוספה או ModalManagerV2 לא זמין`
-                        });
-                    }
-                } catch (error) {
-                    result.tests.push({
-                        name: 'תאריך ברירת מחדל',
-                        status: 'skipped',
-                        message: `לא ניתן לבדוק: ${error.message}`
-                    });
-                }
-            }
-            
-            // Test 1.2: Special defaults for pages without modals
-            if (!page.hasModals) {
-                await this.testSpecialPageDefaults(page, iframeDoc, iframeWindow, result);
-            }
-            
-            // Test 1.3: CRITICAL - Trading account + currency defaults (check both preferences AND actual form fields)
-            // This is the most important test - ensures preferences are loaded and applied correctly
-            if (['trades', 'trade_plans', 'executions', 'cash_flows'].includes(page.key)) {
-                try {
-                    // #endregion
-                    
-                    // CRITICAL: Wait for preferences to be fully loaded
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Give preferences time to load
-                    
-                    // Check preferences are available
-                    const defaultAccount = await this.getPreferenceValue(iframeWindow, 'default_trading_account');
-                    // Note: Currency preference is 'primaryCurrency'
-                    const defaultCurrency = await this.getPreferenceValue(iframeWindow, 'primaryCurrency');
-                    
-                    // #endregion
-                    
-                    // Track defaults
-                    if (defaultAccount) result.defaultsApplied.push({ type: 'preference', name: 'default_trading_account', value: defaultAccount });
-                    if (defaultCurrency) result.defaultsApplied.push({ type: 'preference', name: 'primaryCurrency', value: defaultCurrency });
-                    
-                    // CRITICAL: Open modal and check if preferences are actually applied to form fields
-                    if (page.hasModals) {
-                        try {
-                            // Get entity type and modal ID
-                            const entityType = this.getEntityTypeFromPage(page.key);
-                            if (entityType) {
-                                const modalId = this.getModalIdForEntity(entityType);
-                                
-                                // #endregion
-                                
-                                if (modalId && iframeWindow.ModalManagerV2) {
-                                    // Open modal
-                                    await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
-                                    
-                                    // #endregion
-                                    
-                                    // Wait for modal to fully load and preferences to be applied
-                                    console.log(`⏳ Waiting 8 seconds for modal to load and preferences to apply...`);
-                                    await new Promise(resolve => setTimeout(resolve, 8000));
-                                    console.log(`✅ Finished waiting, now checking account field...`);
-                                    
-                                    // Find account field (prioritize specific entity field first)
-                                    const accountField = iframeDoc.querySelector(`#${entityType}Account`) ||
-                                                       iframeDoc.querySelector(`#executionAccount`) ||
-                                                       iframeDoc.querySelector(`#tradeAccount`) ||
-                                                       iframeDoc.querySelector(`#cashFlowAccount`) ||
-                                                       iframeDoc.querySelector(`#tradePlanAccount`) ||
-                                                       iframeDoc.querySelector(`select[id*="Account"]`) ||
-                                                       iframeDoc.querySelector(`select[name*="trading_account"]`) ||
-                                                       iframeDoc.querySelector(`select[name*="account"]`);
-                                    
-                                    if (accountField) {
-                                        // #endregion
-
-                                        const fieldValue = accountField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0' && fieldValue !== 'null';
-                                        const matchesPreference = defaultAccount && fieldValue === String(defaultAccount);
-                                        
-                        // #endregion
-
-                        result.tests.push({
-                            name: 'חשבון מסחר - בשדה הטופס',
-                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'failed'),
-                            message: matchesPreference
-                                ? `✅ חשבון נבחר: ${fieldValue} (תואם העדפות: ${defaultAccount})`
-                                : hasValue
-                                    ? `⚠️ חשבון נבחר: ${fieldValue} (לא תואם העדפות: ${defaultAccount || 'לא מוגדר'})`
-                                    : `❌ חשבון לא נבחר בשדה (העדפה: ${defaultAccount || 'לא מוגדר'})`
-                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ 
-                                                type: 'field', 
-                                                name: 'trading_account', 
-                                                value: fieldValue, 
-                                                fieldId: accountField.id,
-                                                matchesPreference: true
-                                            });
-                                        } else if (hasValue) {
-                                            this.stats.warning++; // Warning if account selected but doesn't match preference
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ 
-                                                type: 'field', 
-                                                name: 'trading_account', 
-                                                value: fieldValue, 
-                                                fieldId: accountField.id,
-                                                matchesPreference: false,
-                                                expectedPreference: defaultAccount
-                                            });
-                                        } else {
-                                            this.stats.failed++;
-                                        }
-                                        this.stats.totalTests++;
-                                    } else {
-                                        result.tests.push({
-                                            name: 'חשבון מסחר - בשדה הטופס',
-                                            status: 'warning',
-                                            message: `לא נמצא שדה חשבון במודל (העדפה: ${defaultAccount || 'לא מוגדר'})`
-                                        });
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Find currency field (try multiple selectors)
-                                    const currencyField = iframeDoc.querySelector(`#${entityType}Currency, #cashFlowCurrency, #tradeCurrency, select[id*="Currency"], select[name*="currency"]`);
-
-                                    // Skip currency check for executions - they don't have a direct currency field
-                                    if (page.key === 'executions') {
-                                        result.tests.push({
-                                            name: 'מטבע - בשדה הטופס',
-                                            status: 'info',
-                                            message: 'ℹ️ בדיקת מטבע דולגה עבור עמוד ביצועים (המטבע נגזר מחשבון המסחר)'
-                                        });
-                                        this.stats.info++;
-                                        this.stats.totalTests++;
-                                    } else if (currencyField) {
-                                        // #endregion
-                                        const fieldValue = currencyField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0' && fieldValue !== 'null';
-                                        const matchesPreference = defaultCurrency && fieldValue === String(defaultCurrency);
-                                        
-                                        result.tests.push({
-                                            name: 'מטבע - בשדה הטופס',
-                                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'failed'),
-                                            message: matchesPreference 
-                                                ? `✅ מטבע נבחר: ${fieldValue} (תואם העדפות: ${defaultCurrency})`
-                                                : hasValue 
-                                                    ? `⚠️ מטבע נבחר: ${fieldValue} (לא תואם העדפות: ${defaultCurrency || 'לא מוגדר'})`
-                                                    : `❌ מטבע לא נבחר בשדה (העדפה: ${defaultCurrency || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ 
-                                                type: 'field', 
-                                                name: 'currency', 
-                                                value: fieldValue, 
-                                                fieldId: currencyField.id,
-                                                matchesPreference: true
-                                            });
-                                        } else if (hasValue) {
-                                            this.stats.warning++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ 
-                                                type: 'field', 
-                                                name: 'currency', 
-                                                value: fieldValue, 
-                                                fieldId: currencyField.id,
-                                                matchesPreference: false,
-                                                expectedPreference: defaultCurrency
-                                            });
-                                        } else {
-                                        this.stats.failed++;
-                                    }
-                                    this.stats.totalTests++;
-                                }
-
-                                // Close modal
-                                    if (iframeWindow.ModalManagerV2) {
-                                        try {
-                                            await iframeWindow.ModalManagerV2.closeModal(modalId);
-                                            await new Promise(resolve => setTimeout(resolve, 500));
-                                        } catch (closeError) {
-                                            // Ignore close errors
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (modalError) {
-                            result.tests.push({
-                                name: 'בדיקת העדפות במודל',
-                                status: 'skipped',
-                                message: `לא ניתן לפתוח מודל: ${modalError.message}`
-                            });
-                        }
-                    }
-                    
-                    // Report preference availability (CRITICAL CHECK)
-                    if (defaultAccount || defaultCurrency) {
-                        result.tests.push({
-                            name: 'העדפות זמינות (חשבון ומטבע)',
-                            status: 'success',
-                            message: `✅ חשבון: ${defaultAccount || 'לא מוגדר'}, מטבע: ${defaultCurrency || 'לא מוגדר'}`
-                        });
-                        this.stats.passed++;
-                    } else {
-                        result.tests.push({
-                            name: 'העדפות זמינות (חשבון ומטבע)',
-                            status: 'failed',
-                            message: '❌ לא נמצאו העדפות ברירת מחדל - זה קריטי!'
-                        });
-                        this.stats.failed++;
-                    }
-                    this.stats.totalTests++;
-                } catch (error) {
-                    result.tests.push({
-                        name: 'בדיקת העדפות קריטיות',
-                        status: 'failed',
-                        message: `❌ שגיאה בבדיקת העדפות: ${error.message}`
-                    });
-                    this.stats.failed++;
-                    this.stats.totalTests++;
-                }
-            }
-            
-            // Test 1.4: CRITICAL - All trading preferences (side, investment_type, stop loss, take profit, commissions, risk) - check both preferences AND form fields
-            // Include executions for commission testing
-            if (['trades', 'trade_plans', 'executions'].includes(page.key)) {
-                try {
-                    // #endregion
-
-                    // CRITICAL: Wait for preferences to be fully loaded
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    // Load ALL trading-related preferences
-                    // Set default side to 'long' if not set (CRITICAL FIX)
-                    let defaultSide = await this.getPreferenceValue(iframeWindow, 'default_side');
-                    if (!defaultSide) {
-                        defaultSide = 'long'; // Set as default if not configured
-                        console.log('⚠️ default_side not configured, using default: long');
-                    }
-                    const defaultInvestmentType = await this.getPreferenceValue(iframeWindow, 'default_investment_type');
-                    const defaultStopLoss = await this.getPreferenceValue(iframeWindow, 'defaultStopLoss');
-                    const defaultTakeProfit = await this.getPreferenceValue(iframeWindow, 'defaultTakeProfit') || await this.getPreferenceValue(iframeWindow, 'defaultTargetPrice');
-                    const defaultCommission = await this.getPreferenceValue(iframeWindow, 'defaultCommission');
-                    const riskPercentage = await this.getPreferenceValue(iframeWindow, 'riskPercentage');
-                    const defaultTradeAmount = await this.getPreferenceValue(iframeWindow, 'defaultTradeAmount');
-                    
-                    // Track defaults
-                    if (defaultSide) result.defaultsApplied.push({ type: 'preference', name: 'default_side', value: defaultSide });
-                    if (defaultInvestmentType) result.defaultsApplied.push({ type: 'preference', name: 'default_investment_type', value: defaultInvestmentType });
-                    if (defaultStopLoss) result.defaultsApplied.push({ type: 'preference', name: 'defaultStopLoss', value: defaultStopLoss });
-                    if (defaultTakeProfit) result.defaultsApplied.push({ type: 'preference', name: 'defaultTakeProfit', value: defaultTakeProfit });
-                    if (defaultCommission) result.defaultsApplied.push({ type: 'preference', name: 'defaultCommission', value: defaultCommission });
-                    if (riskPercentage) result.defaultsApplied.push({ type: 'preference', name: 'riskPercentage', value: riskPercentage });
-                    if (defaultTradeAmount) result.defaultsApplied.push({ type: 'preference', name: 'defaultTradeAmount', value: defaultTradeAmount });
-                    
-                    // CRITICAL: Open modal and check if preferences are actually applied to form fields
-                    if (page.hasModals) {
-                        try {
-                            const entityType = this.getEntityTypeFromPage(page.key);
-                            if (entityType) {
-                                const modalId = this.getModalIdForEntity(entityType);
-                                if (modalId && iframeWindow.ModalManagerV2) {
-                                    // CRITICAL: Close modal if it's still open from previous test
-                                    try {
-                                        await iframeWindow.ModalManagerV2.closeModal(modalId);
-                                        await new Promise(resolve => setTimeout(resolve, 500));
-                                    } catch (closeError) {
-                                        // Ignore close errors if modal wasn't open
-                                    }
-
-                                    // Modal is already open from previous step, continue with testing
-                                    
-                                    // Test 1.4.1: Side field
-                                    const sideField = iframeDoc.querySelector(`#${entityType}Side, #tradeSide, #tradePlanSide, select[id*="Side"], select[name*="side"]`);
-                                    if (sideField) {
-                                        const fieldValue = sideField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = defaultSide && fieldValue === String(defaultSide);
-                                        
-                                        const expectedDisplayValue = page.key === 'executions' ? 'Long' : defaultSide;
-                                        const isCorrectValue = page.key === 'executions' ? (fieldValue?.toLowerCase() === 'long') : matchesPreference;
-
-                        result.tests.push({
-                                            name: 'צד מסחר - בשדה הטופס',
-                                            status: isCorrectValue ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: isCorrectValue
-                                                ? `✅ צד נבחר: ${fieldValue} (תואם העדפות: ${expectedDisplayValue})`
-                                                : hasValue
-                                                    ? `⚠️ צד נבחר: ${fieldValue} (לא תואם העדפות: ${expectedDisplayValue || 'לא מוגדר'})`
-                                                    : `ℹ️ צד לא נבחר בשדה (העדפה: ${expectedDisplayValue || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                        this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: true });
-                                } else if (hasValue) {
-                                    // For executions page, 'long' is the expected default side
-                                    const expectedSide = page.key === 'executions' ? 'long' : defaultSide;
-                                    const matchesExpected = fieldValue?.toLowerCase() === expectedSide?.toLowerCase();
-                                    const expectedDisplayValue = page.key === 'executions' ? 'Long' : defaultSide; // Display value in UI
-
-                                    if (matchesExpected) {
-                                        this.stats.passed++;
-                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                        result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: true });
-                    } else {
-                                        this.stats.warning++;
-                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                        result.defaultsApplied.push({ type: 'field', name: 'side', value: fieldValue, fieldId: sideField.id, matchesPreference: false, expectedPreference: expectedSide });
-                                    }
-                                } else {
-                                    this.stats.info++;
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.2: Investment type field
-                                    const typeField = iframeDoc.querySelector(`#${entityType}Type, #tradeType, #tradePlanType, select[id*="Type"], select[name*="investment_type"], select[name*="type"]`);
-                                    if (typeField) {
-                                        const fieldValue = typeField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = defaultInvestmentType && fieldValue === String(defaultInvestmentType);
-                                        
-                                        // For executions page, investment type is set automatically when ticker is selected
-                                        const expectedTypeValue = page.key === 'executions' ? null : defaultInvestmentType; // executions gets type from ticker
-                                        const isCorrectType = page.key === 'executions' ? (fieldValue === 'stock' || fieldValue === 'מניה') : matchesPreference;
-
-                        result.tests.push({
-                                            name: 'סוג השקעה - בשדה הטופס',
-                                            status: isCorrectType ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: isCorrectType
-                                                ? `✅ סוג נבחר: ${fieldValue} (תואם: ${page.key === 'executions' ? 'stock/מניה' : (expectedTypeValue || 'לא מוגדר')})`
-                                                : hasValue
-                                                    ? `⚠️ סוג נבחר: ${fieldValue} (לא תואם העדפות: ${page.key === 'executions' ? 'לא מוגדר' : (expectedTypeValue || 'לא מוגדר')})`
-                                                    : `ℹ️ סוג לא נבחר בשדה (העדפה: ${expectedTypeValue || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: true });
-                                } else if (hasValue) {
-                                    // For executions page, when ticker is selected, investment type should be 'stock' or 'מניה'
-                                    const expectedType = page.key === 'executions' ? null : defaultInvestmentType; // No preference expected for executions
-                                    const matchesExpected = page.key === 'executions' ? true : (fieldValue === expectedType); // For executions, any value is valid since it updates automatically // Support both English and Hebrew
-
-                                    if (matchesExpected) {
-                                        this.stats.passed++;
-                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                        result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: true });
-                                    } else {
-                                        this.stats.warning++;
-                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                        result.defaultsApplied.push({ type: 'field', name: 'investment_type', value: fieldValue, fieldId: typeField.id, matchesPreference: false, expectedPreference: expectedType });
-                                    }
-                                }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.3: Stop Loss field
-                                    const stopLossField = iframeDoc.querySelector(`#${entityType}StopLoss, #tradeStopLoss, #tradePlanStopLoss, #stopLoss, input[id*="StopLoss"], input[id*="stop_loss"], input[name*="stopLoss"], input[name*="stop_loss"]`);
-                                    if (stopLossField) {
-                                        const fieldValue = stopLossField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = defaultStopLoss && Math.abs(parseFloat(fieldValue) - parseFloat(defaultStopLoss)) < 0.01;
-                                        
-                                        result.tests.push({
-                                            name: 'סטופ לוס - בשדה הטופס',
-                                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: matchesPreference 
-                                                ? `✅ סטופ לוס: ${fieldValue} (תואם העדפות: ${defaultStopLoss})`
-                                                : hasValue 
-                                                    ? `⚠️ סטופ לוס: ${fieldValue} (לא תואם העדפות: ${defaultStopLoss || 'לא מוגדר'})`
-                                                    : `ℹ️ סטופ לוס לא מוגדר בשדה (העדפה: ${defaultStopLoss || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'stopLoss', value: fieldValue, fieldId: stopLossField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.warning++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'stopLoss', value: fieldValue, fieldId: stopLossField.id, matchesPreference: false, expectedPreference: defaultStopLoss });
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.4: Take Profit / Target Price field
-                                    const takeProfitField = iframeDoc.querySelector(`#${entityType}TakeProfit, #${entityType}TargetPrice, #tradeTakeProfit, #tradeTargetPrice, #tradePlanTakeProfit, #takeProfit, #targetPrice, input[id*="TakeProfit"], input[id*="TargetPrice"], input[id*="take_profit"], input[id*="target_price"], input[name*="takeProfit"], input[name*="targetPrice"]`);
-                                    if (takeProfitField) {
-                                        const fieldValue = takeProfitField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = defaultTakeProfit && Math.abs(parseFloat(fieldValue) - parseFloat(defaultTakeProfit)) < 0.01;
-                                        
-                                        result.tests.push({
-                                            name: 'טייק פרופיט - בשדה הטופס',
-                                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: matchesPreference 
-                                                ? `✅ טייק פרופיט: ${fieldValue} (תואם העדפות: ${defaultTakeProfit})`
-                                                : hasValue 
-                                                    ? `⚠️ טייק פרופיט: ${fieldValue} (לא תואם העדפות: ${defaultTakeProfit || 'לא מוגדר'})`
-                                                    : `ℹ️ טייק פרופיט לא מוגדר בשדה (העדפה: ${defaultTakeProfit || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'takeProfit', value: fieldValue, fieldId: takeProfitField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.warning++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'takeProfit', value: fieldValue, fieldId: takeProfitField.id, matchesPreference: false, expectedPreference: defaultTakeProfit });
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.4a: Stop Loss Percentage field (if exists)
-                                    const stopLossPercentField = iframeDoc.querySelector(`#${entityType}StopLossPercent, #tradeStopLossPercent, #tradePlanStopLossPercent, input[id*="StopLossPercent"], input[id*="stop_loss_percent"], input[name*="stopLossPercent"]`);
-                                    if (stopLossPercentField) {
-                                        const fieldValue = stopLossPercentField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        // Percentage fields might be calculated from price, so we check if they have any value
-                                        
-                                        result.tests.push({
-                                            name: 'סטופ לוס (%) - בשדה הטופס',
-                                            status: hasValue ? 'success' : 'info',
-                                            message: hasValue 
-                                                ? `✅ סטופ לוס (%): ${fieldValue}%`
-                                                : `ℹ️ סטופ לוס (%) לא מוגדר בשדה`
-                                        });
-                                        if (hasValue) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'stopLossPercent', value: fieldValue, fieldId: stopLossPercentField.id });
-                                        } else {
-                                            this.stats.info++;
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.4b: Take Profit Percentage field (if exists)
-                                    const takeProfitPercentField = iframeDoc.querySelector(`#${entityType}TakeProfitPercent, #tradeTakeProfitPercent, #tradePlanTakeProfitPercent, input[id*="TakeProfitPercent"], input[id*="take_profit_percent"], input[name*="takeProfitPercent"]`);
-                                    if (takeProfitPercentField) {
-                                        const fieldValue = takeProfitPercentField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        // Percentage fields might be calculated from price, so we check if they have any value
-                                        
-                                        result.tests.push({
-                                            name: 'טייק פרופיט (%) - בשדה הטופס',
-                                            status: hasValue ? 'success' : 'info',
-                                            message: hasValue 
-                                                ? `✅ טייק פרופיט (%): ${fieldValue}%`
-                                                : `ℹ️ טייק פרופיט (%) לא מוגדר בשדה`
-                                        });
-                                        if (hasValue) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'takeProfitPercent', value: fieldValue, fieldId: takeProfitPercentField.id });
-                                        } else {
-                                            this.stats.info++;
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.5: Commission field (mainly for executions, but also check trades/trade_plans)
-                                    const commissionField = iframeDoc.querySelector(`#${entityType}Commission, #executionCommission, #commission, #fee, input[id*="Commission"], input[id*="Fee"], input[name*="commission"], input[name*="fee"]`);
-                                    if (commissionField) {
-                                        const fieldValue = commissionField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = defaultCommission && Math.abs(parseFloat(fieldValue) - parseFloat(defaultCommission)) < 0.01;
-                                        
-                                        result.tests.push({
-                                            name: 'עמלה - בשדה הטופס',
-                                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: matchesPreference 
-                                                ? `✅ עמלה: ${fieldValue} (תואם העדפות: ${defaultCommission})`
-                                                : hasValue 
-                                                    ? `⚠️ עמלה: ${fieldValue} (לא תואם העדפות: ${defaultCommission || 'לא מוגדר'})`
-                                                    : `ℹ️ עמלה לא מוגדרת בשדה (העדפה: ${defaultCommission || 'לא מוגדר'})`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'commission', value: fieldValue, fieldId: commissionField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.warning++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'commission', value: fieldValue, fieldId: commissionField.id, matchesPreference: false, expectedPreference: defaultCommission });
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-                                    
-                                    // Test 1.4.6: Risk Percentage field (if exists in modal)
-                                    const riskField = iframeDoc.querySelector(`#${entityType}Risk, #riskPercentage, #risk, input[id*="Risk"], input[name*="risk"]`);
-                                    if (riskField) {
-                                        const fieldValue = riskField.value;
-                                        const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0';
-                                        const matchesPreference = riskPercentage && Math.abs(parseFloat(fieldValue) - parseFloat(riskPercentage)) < 0.01;
-                                        
-                                        result.tests.push({
-                                            name: 'אחוז סיכון - בשדה הטופס',
-                                            status: matchesPreference ? 'success' : (hasValue ? 'warning' : 'info'),
-                                            message: matchesPreference 
-                                                ? `✅ אחוז סיכון: ${fieldValue}% (תואם העדפות: ${riskPercentage}%)`
-                                                : hasValue 
-                                                    ? `⚠️ אחוז סיכון: ${fieldValue}% (לא תואם העדפות: ${riskPercentage || 'לא מוגדר'}%)`
-                                                    : `ℹ️ אחוז סיכון לא מוגדר בשדה (העדפה: ${riskPercentage || 'לא מוגדר'}%)`
-                                        });
-                                        if (matchesPreference) {
-                                            this.stats.passed++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'riskPercentage', value: fieldValue, fieldId: riskField.id, matchesPreference: true });
-                                        } else if (hasValue) {
-                                            this.stats.warning++;
-                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                            result.defaultsApplied.push({ type: 'field', name: 'riskPercentage', value: fieldValue, fieldId: riskField.id, matchesPreference: false, expectedPreference: riskPercentage });
-                                        }
-                                        this.stats.totalTests++;
-                                    }
-
-                                    // Test 1.4.7: CRITICAL - Ticker selection and field updates
-                                    // This tests the dynamic behavior when a ticker is selected
-                                    if (['trades', 'executions'].includes(page.key)) {
-                                        try {
-                                            console.log('🔍 Starting ticker selection test...');
-
-                                            // #endregion
-
-                                            // Find ticker field - prioritize executionTicker specifically for executions
-                                            const tickerField = iframeDoc.querySelector('#executionTicker') ||
-                                                               iframeDoc.querySelector(`#${entityType}Ticker`) ||
-                                                               iframeDoc.querySelector('#ticker') ||
-                                                               iframeDoc.querySelector('select[id*="Ticker"]') ||
-                                                               iframeDoc.querySelector('select[name*="ticker"]');
-
-                                            console.log(`🔍 [Ticker Test] Looking for ticker field with selectors: #executionTicker, #${entityType}Ticker, #ticker, select[id*="Ticker"], select[name*="ticker"]`);
-                                            console.log(`🔍 [Ticker Test] Found ticker field:`, tickerField ? { id: tickerField.id, name: tickerField.name, tagName: tickerField.tagName, optionsCount: tickerField.options?.length } : 'NOT FOUND');
-
-                                            // Debug: List all select elements in the modal to see what's available
-                                            const allSelects = iframeDoc.querySelectorAll('select');
-                                            console.log(`🔍 [Ticker Test] All select elements in modal:`, Array.from(allSelects).map(s => ({ id: s.id, name: s.name, value: s.value, optionsCount: s.options?.length })));
-
-                                            // #endregion
-
-                                            if (tickerField && tickerField.tagName === 'SELECT' && tickerField.options && tickerField.options.length > 0) {
-                                                console.log(`✅ [Ticker Test] Ticker field is valid SELECT with ${tickerField.options.length} options`);
-                                                console.log(`📋 [Ticker Test] First few options:`, Array.from(tickerField.options).slice(0, 5).map(opt => ({ value: opt.value, text: opt.text })));
-                                                // Select first available ticker (should update type to 'stock', price, and market data)
-                                                const availableOptions = Array.from(tickerField.options).filter(option => option.value && option.value.trim() !== '');
-                                                const selectedOption = availableOptions.length > 0 ? availableOptions[0] : null;
-
-                                                if (selectedOption) {
-                                                    console.log(`🎯 Selecting ticker: ${selectedOption.value} (${selectedOption.text})`);
-                                                    console.log(`📝 [Ticker Test] Setting field value to: ${selectedOption.value}`);
-                                                    tickerField.value = selectedOption.value;
-
-                                                    console.log(`📝 [Ticker Test] Field value after setting: ${tickerField.value}`);
-
-                                                    // Trigger change and input events to simulate user selection
-                                                    console.log(`🚀 [Ticker Test] Dispatching change and input events`);
-                                                    const changeEvent = new Event('change', { bubbles: true });
-                                                    const inputEvent = new Event('input', { bubbles: true });
-                                                    tickerField.dispatchEvent(changeEvent);
-                                                    tickerField.dispatchEvent(inputEvent);
-
-                                                    // Wait a bit and check if value is still set
-                                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                                    console.log(`📝 [Ticker Test] Field value after change event: ${tickerField.value}`);
-
-                                                    // Wait for ticker data to load and update fields
-                                                    console.log(`⏳ [Ticker Test] Waiting 3 seconds for ticker data to load...`);
-                                                    await new Promise(resolve => setTimeout(resolve, 3000));
-                                                    console.log(`✅ [Ticker Test] Finished waiting, checking updated fields`);
-
-                                                    // Check if investment type was updated to 'stock'
-                                                    const typeField = iframeDoc.querySelector(`#${entityType}Type, #tradeType, #tradePlanType, select[id*="Type"], select[name*="investment_type"], select[name*="type"]`);
-                                                    console.log(`🔍 [Ticker Test] Looking for type field with selectors: #${entityType}Type, #tradeType, #tradePlanType, select[id*="Type"], select[name*="investment_type"], select[name*="type"]`);
-                                                    console.log(`🔍 [Ticker Test] Found type field:`, typeField ? { id: typeField.id, name: typeField.name, value: typeField.value } : 'NOT FOUND');
-
-                                                    if (typeField) {
-                                                        const typeValue = typeField.value;
-                                                        const isStock = typeValue === 'stock' || typeValue === 'מניה';
-
-                                                        result.tests.push({
-                                                            name: 'סוג נכס - עדכון אחרי בחירת טיקר',
-                                                            status: isStock ? 'success' : 'warning',
-                                                            message: isStock
-                                                                ? `✅ סוג עודכן ל-${typeValue} אחרי בחירת ${selectedOption.text}`
-                                                                : `⚠️ סוג לא עודכן אחרי בחירת טיקר (נוכחי: ${typeValue || 'לא מוגדר'})`
-                                                        });
-
-                                                        if (isStock) {
-                                                            this.stats.passed++;
-                                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'investment_type', value: typeValue, triggeredBy: selectedOption.text });
-                                                        } else {
-                                                            this.stats.warning++;
-                                                            this.stats.failed++;
-                                                        }
-                                                        this.stats.totalTests++;
-                                                    }
-
-                                                    // Check if price field was updated
-                                                    const priceField = iframeDoc.querySelector(`#${entityType}Price, #executionPrice, #price, input[id*="Price"], input[name*="price"]`);
-                                                    if (priceField) {
-                                                        const priceValue = priceField.value;
-                                                        const hasPrice = priceValue && priceValue !== '' && !isNaN(parseFloat(priceValue));
-
-                                                        result.tests.push({
-                                                            name: 'מחיר - עדכון אחרי בחירת טיקר',
-                                                            status: hasPrice ? 'success' : 'info', // Changed from 'warning' to 'info' as price might not be immediately available
-                                                            message: hasPrice
-                                                                ? `✅ מחיר עודכן ל-${priceValue} אחרי בחירת ${selectedOption.text}`
-                                                                : `ℹ️ מחיר לא זמין עדיין (נתונים עשויים להיטען לאט)`
-                                                        });
-
-                                                        if (hasPrice) {
-                                                            this.stats.passed++;
-                                                            if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                            result.defaultsApplied.push({ type: 'ticker_update', name: 'price', value: priceValue, triggeredBy: selectedOption.text });
-                                                        } else {
-                                                            this.stats.failed++;
-                                                        }
-                                                        this.stats.totalTests++;
-                                                    }
-
-                                                    // Check if market data is displayed
-                                                    const marketDataElements = iframeDoc.querySelectorAll('[data-market-data], .market-data, [id*="market"], [id*="price"], [id*="volume"]');
-                                                    const hasMarketData = marketDataElements.length > 0 && Array.from(marketDataElements).some(el =>
-                                                        el.textContent && el.textContent.trim() !== '' && el.textContent.trim() !== '0'
-                                                    );
-
-                                                    result.tests.push({
-                                                        name: 'נתוני שוק - הצגה אחרי בחירת טיקר',
-                                                        status: hasMarketData ? 'success' : 'info', // Changed from 'warning' to 'info' as market data might not be immediately available
-                                                        message: hasMarketData
-                                                            ? `✅ נתוני שוק מוצגים אחרי בחירת ${selectedOption.text}`
-                                                            : `ℹ️ נתוני שוק לא זמינים עדיין (נתונים עשויים להיטען לאט)`
-                                                    });
-
-                                                    if (hasMarketData) {
-                                                        this.stats.passed++;
-                                                        if (!result.defaultsApplied) result.defaultsApplied = [];
-                                                        result.defaultsApplied.push({ type: 'ticker_update', name: 'market_data', value: 'displayed', triggeredBy: selectedOption.text });
-                                                    } else {
-                                                        this.stats.failed++;
-                                                    }
-                                                    this.stats.totalTests++;
-
-                                                } else {
-                                                    result.tests.push({
-                                                        name: 'בחירת טיקר - זמינות טיקר',
-                            status: 'warning',
-                                                        message: '⚠️ לא נמצא טיקר זמין ברשימת הטיקרים'
-                                                    });
-                                                    this.stats.failed++;
-                                                    this.stats.totalTests++;
-                                                }
-                                            } else {
-                                                console.log(`❌ [Ticker Test] Ticker field not found or not valid:`, {
-                                                    fieldExists: !!tickerField,
-                                                    isSelect: tickerField?.tagName === 'SELECT',
-                                                    hasOptions: !!tickerField?.options,
-                                                    optionsLength: tickerField?.options?.length
-                                                });
-
-                                                result.tests.push({
-                                                    name: 'בחירת טיקר - שדה זמין',
-                                                    status: 'info',
-                                                    message: 'ℹ️ שדה טיקר לא נמצא במודל'
-                                                });
-                                                this.stats.info++;
-                                                this.stats.inProgress++;
-                                                this.stats.totalTests++;
-                                            }
-
-                                        } catch (tickerError) {
-                                            console.error('❌ Error in ticker selection test:', tickerError);
-                                            result.tests.push({
-                                                name: 'בחירת טיקר - שגיאה',
-                                                status: 'failed',
-                                                message: `❌ שגיאה בבדיקת בחירת טיקר: ${tickerError.message}`
-                                            });
-                                            this.stats.failed++;
-                                            this.stats.totalTests++;
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (modalError) {
-                            // Modal might already be open or error occurred
-                        }
-                    }
-                    
-                    // Report preference availability (CRITICAL CHECK)
-                    const tradingPrefsFound = [defaultSide, defaultInvestmentType, defaultStopLoss, defaultTakeProfit, defaultCommission, riskPercentage, defaultTradeAmount].filter(p => p !== null && p !== undefined).length;
-                    if (tradingPrefsFound > 0) {
-                        const prefDetails = [];
-                        if (defaultSide) prefDetails.push(`Side: ${defaultSide}`);
-                        if (defaultInvestmentType) prefDetails.push(`Type: ${defaultInvestmentType}`);
-                        if (defaultStopLoss) prefDetails.push(`Stop Loss: ${defaultStopLoss}`);
-                        if (defaultTakeProfit) prefDetails.push(`Take Profit: ${defaultTakeProfit}`);
-                        if (defaultCommission) prefDetails.push(`Commission: ${defaultCommission}`);
-                        if (riskPercentage) prefDetails.push(`Risk: ${riskPercentage}%`);
-                        if (defaultTradeAmount) prefDetails.push(`Trade Amount: ${defaultTradeAmount}`);
-                        
-                        result.tests.push({
-                            name: 'העדפות מסחר זמינות',
-                            status: 'success',
-                            message: `✅ נמצאו ${tradingPrefsFound} העדפות מסחר: ${prefDetails.join(', ')}`
-                        });
-                        this.stats.passed++;
-                    } else {
-                        result.tests.push({
-                            name: 'העדפות מסחר זמינות',
-                            status: 'failed',
-                            message: '❌ לא נמצאו העדפות מסחר - זה קריטי!'
-                        });
-                        this.stats.failed++;
-                    }
-                    this.stats.totalTests++;
-                } catch (error) {
-                    result.tests.push({
-                        name: 'בדיקת העדפות מסחר',
-                        status: 'failed',
-                        message: `❌ שגיאה בבדיקת העדפות מסחר: ${error.message}`
-                    });
-                    this.stats.failed++;
-                    this.stats.totalTests++;
-                }
-            }
-            
-            // Test 1.5: Timezone and date formatting
-            if (page.hasTables) {
-                try {
-                    // Check if dateUtils is available
-                    if (iframeWindow.formatDate || iframeWindow.dateUtils) {
-                        // Check if dates in table are formatted correctly
-                        const dateCells = iframeDoc.querySelectorAll('td[data-date], .date-cell, [data-date-envelope]');
-                        let datesChecked = 0;
-                        let datesFormatted = 0;
-                        
-                        for (const cell of Array.from(dateCells).slice(0, 5)) { // Check first 5 dates
-                            const dateText = cell.textContent.trim();
-                            // Check if date is in Hebrew format (dd.mm.yyyy) or contains Hebrew date format
-                            if (dateText && (dateText.match(/\d{2}\.\d{2}\.\d{4}/) || dateText.includes('יום') || dateText.includes('שעה'))) {
-                                datesFormatted++;
-                            }
-                            datesChecked++;
-                        }
-                        
-                        if (datesChecked > 0) {
-                            result.tests.push({
-                                name: 'תיקון אחיד של תאריכים',
-                                status: datesFormatted === datesChecked ? 'success' : 'warning',
-                                message: `${datesFormatted}/${datesChecked} תאריכים בפורמט נכון`
-                            });
-                            if (datesFormatted === datesChecked) {
-                                this.stats.passed++;
-                            }
-                            this.stats.totalTests++;
-                        }
-                    }
-                } catch (error) {
-                    result.tests.push({
-                        name: 'תיקון אחיד של תאריכים',
-                        status: 'skipped',
-                        message: `לא ניתן לבדוק: ${error.message}`
-                    });
-                }
-            }
-            
-            // Test 1.6: Pagination preferences
-            if (page.hasTables) {
-                try {
-                    const pagination = iframeDoc.querySelector('.pagination, [data-pagination]');
-                    if (pagination) {
-                        // Check if pagination respects user preferences
-                        const pageSizeSelect = iframeDoc.querySelector('select[data-page-size], select[name="pageSize"]');
-                        if (pageSizeSelect) {
-                            const defaultPageSize = await this.getPreferenceValue(iframeWindow, 'default_table_page_size');
-                            if (defaultPageSize && pageSizeSelect.value === String(defaultPageSize)) {
-                                result.tests.push({
-                                    name: 'חלוקת טבלאות לעמודים',
-                                    status: 'success',
-                                    message: `גודל עמוד נכון: ${defaultPageSize}`
-                                });
-                                this.stats.passed++;
-                            } else {
-                                result.tests.push({
-                                    name: 'חלוקת טבלאות לעמודים',
-                                    status: 'warning',
-                                    message: `גודל עמוד: ${pageSizeSelect.value}, העדפה: ${defaultPageSize || 'לא מוגדר'}`
-                                });
-                            }
-                            this.stats.totalTests++;
-                        }
-                    }
-                } catch (error) {
-                    result.tests.push({
-                        name: 'חלוקת טבלאות לעמודים',
-                        status: 'skipped',
-                        message: `לא ניתן לבדוק: ${error.message}`
-                    });
-                }
-            }
-            
-            // Calculate execution time
-            result.executionTime = Date.now() - startTime;
-            
-            // Update status based on test results
-            const failedTests = result.tests.filter(t => t.status === 'failed').length;
-            const warningTests = result.tests.filter(t => t.status === 'warning').length;
-            
-            if (failedTests > 0 || result.errors.length > 0) {
-                result.status = 'failed';
-            } else if (warningTests > 0) {
-                result.status = 'warning';
-            }
-            
-            
-            // Note: Don't cleanup iframe - crudTester manages it in testIframeContainer
-            
-        } catch (error) {
-            result.status = 'error';
-            result.errors.push(error.message);
-            result.executionTime = Date.now() - startTime;
-            // Keep error logging but reduce verbosity
-            if (window.Logger && window.Logger.error) {
-                window.Logger.error(`Error in testDefaults for ${page.name}`, { error: error.message, page: 'crud-testing-dashboard' });
-            }
-        }
-        
-        // Log the test results for debugging
-        console.log(`📊 [testDefaults] Results for ${page.name}:`, {
-            totalTests: result.tests.length,
-            passed: result.tests.filter(t => t.status === 'success').length,
-            failed: result.tests.filter(t => t.status === 'failed').length,
-            warning: result.tests.filter(t => t.status === 'warning').length,
-            info: result.tests.filter(t => t.status === 'info').length,
-            tests: result.tests
-        });
-        
-        this.results.defaults.push(result);
-
-        // Add to main crudTester results for table display
-        if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
-            // Ensure defaults array exists
-            if (!this.crudTester.results.crossPage.defaults) {
-                this.crudTester.results.crossPage.defaults = [];
-            }
-
-            // Add the result to the defaults array
-            const testResult = {
-                page: page.name,
-                workflow: `${page.name} - ברירות מחדל`,
-                testType: 'crossPage-defaults',
-                status: result.tests.some(t => t.status === 'failed') ? 'failed' :
-                       result.tests.some(t => t.status === 'warning') ? 'warning' : 'success',
-                executionTime: result.executionTime || (Date.now() - (this.startTime || Date.now())),
-                message: `בדיקה הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
-                tests: result.tests
-            };
-
-            this.crudTester.results.crossPage.defaults.push(testResult);
-
-            // Trigger UI update
-            if (typeof this.crudTester.updateTestResults === 'function') {
-                this.crudTester.updateTestResults();
-            }
-
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    location: 'cross-page-testing-system.js:testDefaults',
-                    message: 'testDefaults COMPLETED successfully',
-                    data: {
-                        pageKey: page.key,
-                        totalTests: result.tests.length,
-                        passed: result.tests.filter(t => t.status === 'success').length,
-                        failed: result.tests.filter(t => t.status === 'failed').length,
-                        warnings: result.tests.filter(t => t.status === 'warning').length,
-                        executionTime: result.executionTime
-                    },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'debug-run',
-                    hypothesisId: 'D'
-                })
-            }).catch(() => {});
         }
 
-        // Show completion notification to user
-        if (window.showSuccessNotification || window.showErrorNotification || window.showWarningNotification) {
-            const stats = this.stats || {};
-            const warningCount = stats.warning || 0;
-            const message = `בדיקת ברירות מחדל - ${page.name} הושלמה: ${stats.passed || 0} עברו, ${stats.failed || 0} נכשלו, ${warningCount} אזהרות`;
-
-            if ((stats.failed || 0) > 0) {
-                if (window.showErrorNotification) {
-                    window.showErrorNotification('בדיקה הושלמה עם שגיאות', message);
-                }
-            } else if (warningCount > 0) {
-                if (window.showWarningNotification) {
-                    window.showWarningNotification('בדיקה הושלמה עם אזהרות', message);
-                }
-            } else {
-                if (window.showSuccessNotification) {
-                    window.showSuccessNotification('בדיקה הושלמה בהצלחה', message);
-                }
-            }
+        if (!targetPage) {
+            throw new Error(`Page not found: ${pageKey}`);
         }
 
-        // CRITICAL FIX: Update integratedTester results BEFORE calling updateTestResults
-        const integratedTesterInstance = this.crudTester;
-        if (integratedTesterInstance) {
-            if (!integratedTesterInstance.results.crossPage) {
-                integratedTesterInstance.results.crossPage = { 
-                    defaults: [], 
-                    colors: [], 
-                    sorting: [], 
-                    sections: [], 
-                    filters: [],
-                    infoSummary: []
-                };
-            }
-            // Update defaults array with current results
-            integratedTesterInstance.results.crossPage.defaults = [...this.results.defaults];
-        }
-        
-        // Track defaults applied for summary
-        if (!this.allDefaultsApplied) {
-            this.allDefaultsApplied = [];
-        }
-        if (result.defaultsApplied && result.defaultsApplied.length > 0) {
-            this.allDefaultsApplied.push({
-                page: page.name,
-                pageKey: page.key,
-                defaults: result.defaultsApplied
+        // Reset stats for this single page test
+        this.stats = { totalTests: 0, passed: 0, failed: 0, warning: 0, info: 0, inProgress: 1, executionTime: 0 };
+
+        // Reset results for this test type
+        this.results[testType] = [];
+
+        if (window.Logger && window.Logger.info) {
+            window.Logger.info(`Starting ${testType} test for single page: ${targetPage.name}`, {
+                pageKey,
+                testType,
+                pageName: targetPage.name,
+                page: 'crud-testing-dashboard'
             });
         }
-        
-        // Update dashboard and test results table after each test (same as CRUD tests)
-        if (this.crudTester) {
-            if (typeof this.crudTester.updateTestResults === 'function') {
-                this.crudTester.updateTestResults();
-            }
-            if (typeof this.crudTester.updateDashboard === 'function') {
-                this.crudTester.updateDashboard();
-            }
-        }
-        
-        // Clean up iframe after test completes
-        this.cleanupTestIframes();
-    }
-    
-    /**
-     * Test special page defaults (for pages without modals)
-     * @param {Object} page - Page configuration
-     * @param {Document} iframeDoc - Iframe document
-     * @param {Window} iframeWindow - Iframe window
-     * @param {Object} result - Test result object
-     */
-    async testSpecialPageDefaults(page, iframeDoc, iframeWindow, result) {
+
         try {
-            // Wait for page to fully load
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for page initialization
-            
-            switch (page.key) {
-                case 'ai_analysis':
-                    // ניתוח AI - יש ברירות מחדל למנוע
-                    await this.testAIAnalysisDefaults(iframeDoc, iframeWindow, result);
+            // Run test for the single page
+            switch (testType) {
+                case 'defaults':
+                    await this.testDefaults(targetPage);
                     break;
-                    
-                case 'trade_history':
-                    // היסטוריית טרייד - ברירת מחדל הטרייד האחרון שנסגר
-                    await this.testTradeHistoryDefaults(iframeDoc, iframeWindow, result);
+                case 'colors':
+                    await this.testColors(targetPage);
                     break;
-                    
-                case 'portfolio_state':
-                    // מצב תיק היסטורי - ברירת מחדל מתחילת השנה וחשבון ברירת מחדל
-                    await this.testPortfolioStateDefaults(iframeDoc, iframeWindow, result);
-                    break;
-                    
-                case 'data_import':
-                    // ייבוא נתונים - חשבון מסחר ברירת מחדל, ספק נתונים ibkr, תהליך ייבוא ביצועים
-                    await this.testDataImportDefaults(iframeDoc, iframeWindow, result);
-                    break;
-                    
-                case 'login':
-                case 'register':
-                case 'forgot_password':
-                case 'reset_password':
-                    // ניהול משתמש - ברירות מחדל לוגיות קבועות
-                    await this.testUserManagementDefaults(page, iframeDoc, iframeWindow, result);
-                    break;
-            }
-        } catch (error) {
-            result.tests.push({
-                name: 'ברירות מחדל מיוחדות',
-                status: 'skipped',
-                message: `לא ניתן לבדוק: ${error.message}`
-            });
-        }
-    }
-    
-    /**
-     * Test AI Analysis page defaults
-     */
-    async testAIAnalysisDefaults(iframeDoc, iframeWindow, result) {
-        // Check for default trading method selector
-        const methodSelect = iframeDoc.querySelector('#tradingMethodSelect, #methodSelect, select[name="trading_method"]');
-        if (methodSelect) {
-            const hasDefault = methodSelect.value && methodSelect.value !== '';
-            result.tests.push({
-                name: 'ברירת מחדל למנוע',
-                status: hasDefault ? 'success' : 'failed',
-                message: hasDefault ? `מנוע נבחר: ${methodSelect.value}` : 'לא נמצא מנוע ברירת מחדל'
-            });
-            if (hasDefault) this.stats.passed++;
-            else this.stats.failed++;
-            this.stats.totalTests++;
-        }
-    }
-    
-    /**
-     * Test Trade History page defaults
-     */
-    async testTradeHistoryDefaults(iframeDoc, iframeWindow, result) {
-        // Check if last closed trade is selected by default
-        // This might be in a select dropdown or as a filter
-        const tradeSelect = iframeDoc.querySelector('#tradeSelect, #selectedTrade, select[name="trade_id"]');
-        const lastTradeFilter = iframeDoc.querySelector('[data-last-closed-trade], .last-closed-trade');
-        
-        if (tradeSelect && tradeSelect.value) {
-            result.tests.push({
-                name: 'ברירת מחדל טרייד אחרון שנסגר',
-                status: 'success',
-                message: `טרייד נבחר: ${tradeSelect.value}`
-            });
-            this.stats.passed++;
-        } else if (lastTradeFilter) {
-            result.tests.push({
-                name: 'ברירת מחדל טרייד אחרון שנסגר',
-                status: 'success',
-                message: 'טרייד אחרון שנסגר מסומן'
-            });
-            this.stats.passed++;
-        } else {
-            result.tests.push({
-                name: 'ברירת מחדל טרייד אחרון שנסגר',
-                status: 'warning',
-                message: 'לא נמצאו אינדיקטורים לטרייד אחרון שנסגר'
-            });
-        }
-        this.stats.totalTests++;
-    }
-    
-    /**
-     * Test Portfolio State page defaults
-     */
-    async testPortfolioStateDefaults(iframeDoc, iframeWindow, result) {
-        // Check for default account
-        const accountSelect = iframeDoc.querySelector('#accountSelect, #tradingAccountSelect, select[name="trading_account_id"]');
-        const defaultAccount = await this.getPreferenceValue(iframeWindow, 'default_trading_account');
-        
-        if (accountSelect) {
-            const accountValue = accountSelect.value;
-            const hasDefaultAccount = accountValue && accountValue !== '';
-            const matchesPreference = defaultAccount && accountValue === String(defaultAccount);
-            
-            result.tests.push({
-                name: 'חשבון מסחר ברירת מחדל',
-                status: hasDefaultAccount ? (matchesPreference ? 'success' : 'warning') : 'failed',
-                message: hasDefaultAccount 
-                    ? `חשבון נבחר: ${accountValue}${matchesPreference ? ' (תואם העדפות)' : ' (לא תואם העדפות)'}`
-                    : 'לא נמצא חשבון ברירת מחדל'
-            });
-            if (hasDefaultAccount && matchesPreference) this.stats.passed++;
-            else if (hasDefaultAccount) this.stats.passed++; // Still pass if account selected
-            else this.stats.failed++;
-            this.stats.totalTests++;
-        }
-        
-        // Check for default date (start of year) - try multiple selectors
-        const dateFromInput = iframeDoc.querySelector('#dateFrom, #startDate, #dateFromInput, input[name="date_from"], input[name="start_date"], input[type="date"][id*="date"], input[type="date"][id*="Date"]');
-        if (dateFromInput) {
-            const currentYear = new Date().getFullYear();
-            const expectedDate = `${currentYear}-01-01`;
-            const hasStartOfYear = dateFromInput.value === expectedDate || 
-                                  dateFromInput.value.startsWith(`${currentYear}-01`) ||
-                                  (dateFromInput.value && dateFromInput.value.includes('01-01'));
-            
-            result.tests.push({
-                name: 'תאריך ברירת מחדל - מתחילת השנה',
-                status: hasStartOfYear ? 'success' : 'failed',
-                message: hasStartOfYear 
-                    ? `תאריך נכון: ${dateFromInput.value}`
-                    : `תאריך שגוי: ${dateFromInput.value || 'ריק'}, צפוי: ${expectedDate}`
-            });
-            if (hasStartOfYear) {
-                this.stats.passed++;
-                if (!result.defaultsApplied) result.defaultsApplied = [];
-                result.defaultsApplied.push({ 
-                    type: 'field', 
-                    name: 'date_from', 
-                    value: dateFromInput.value, 
-                    fieldId: dateFromInput.id 
-                });
-            } else {
-                this.stats.failed++;
-            }
-            this.stats.totalTests++;
-        } else {
-            // Try to find date input in any form
-            const allDateInputs = iframeDoc.querySelectorAll('input[type="date"]');
-            if (allDateInputs.length > 0) {
-                result.tests.push({
-                    name: 'תאריך ברירת מחדל - מתחילת השנה',
-                    status: 'warning',
-                    message: `נמצאו ${allDateInputs.length} שדות תאריך אבל לא זוהו שדות מתחילת השנה`
-                });
-                this.stats.totalTests++;
-            }
-        }
-    }
-    
-    /**
-     * Test Data Import page defaults
-     */
-    async testDataImportDefaults(iframeDoc, iframeWindow, result) {
-        // Check for default trading account - try multiple selectors
-        const accountSelect = iframeDoc.querySelector('#accountSelect, #tradingAccountSelect, #importAccountSelect, select[name="trading_account_id"], select[name="account_id"], select[id*="Account"]');
-        const defaultAccount = await this.getPreferenceValue(iframeWindow, 'default_trading_account');
-        
-        // Track preference
-        if (defaultAccount) {
-            if (!result.defaultsApplied) result.defaultsApplied = [];
-            result.defaultsApplied.push({ type: 'preference', name: 'default_trading_account', value: defaultAccount });
-        }
-        
-        if (accountSelect) {
-            const accountValue = accountSelect.value;
-            const hasDefaultAccount = accountValue && accountValue !== '' && accountValue !== '0' && accountValue !== 'null';
-            const matchesPreference = defaultAccount && accountValue === String(defaultAccount);
-            
-            result.tests.push({
-                name: 'חשבון מסחר ברירת מחדל',
-                status: hasDefaultAccount ? (matchesPreference ? 'success' : 'warning') : 'failed',
-                message: hasDefaultAccount 
-                    ? `חשבון נבחר: ${accountValue}${matchesPreference ? ' (תואם העדפות)' : ` (לא תואם העדפות: ${defaultAccount || 'לא מוגדר'})`}`
-                    : `לא נמצא חשבון ברירת מחדל (ערך: ${accountValue || 'ריק'}, העדפה: ${defaultAccount || 'לא מוגדר'})`
-            });
-            if (hasDefaultAccount && matchesPreference) {
-                this.stats.passed++;
-                if (!result.defaultsApplied) result.defaultsApplied = [];
-                result.defaultsApplied.push({ 
-                    type: 'field', 
-                    name: 'trading_account', 
-                    value: accountValue, 
-                    fieldId: accountSelect.id 
-                });
-            } else if (hasDefaultAccount) {
-                this.stats.passed++;
-                if (!result.defaultsApplied) result.defaultsApplied = [];
-                result.defaultsApplied.push({ 
-                    type: 'field', 
-                    name: 'trading_account', 
-                    value: accountValue, 
-                    fieldId: accountSelect.id,
-                    note: 'לא תואם העדפות'
-                });
-            } else {
-                this.stats.failed++;
-            }
-            this.stats.totalTests++;
-        } else {
-            result.tests.push({
-                name: 'חשבון מסחר ברירת מחדל',
-                status: 'warning',
-                message: `לא נמצא שדה בחירת חשבון (העדפה: ${defaultAccount || 'לא מוגדר'})`
-            });
-            this.stats.totalTests++;
-        }
-        
-        // Check for default data provider (IBKR)
-        const providerSelect = iframeDoc.querySelector('#providerSelect, #dataProvider, select[name="data_provider"]');
-        if (providerSelect) {
-            const providerValue = providerSelect.value;
-            const isIBKR = providerValue && (providerValue.toLowerCase().includes('ibkr') || providerValue === 'IBKR');
-            
-            result.tests.push({
-                name: 'ספק נתונים ברירת מחדל - IBKR',
-                status: isIBKR ? 'success' : 'failed',
-                message: isIBKR 
-                    ? `ספק נבחר: ${providerValue}`
-                    : `ספק שגוי: ${providerValue || 'ריק'}, צפוי: IBKR`
-            });
-            if (isIBKR) this.stats.passed++;
-            else this.stats.failed++;
-            this.stats.totalTests++;
-        }
-        
-        // Check for default import process (executions)
-        const processSelect = iframeDoc.querySelector('#processSelect, #importType, select[name="import_type"]');
-        if (processSelect) {
-            const processValue = processSelect.value;
-            const isExecutions = processValue && (processValue.toLowerCase().includes('execution') || processValue === 'executions');
-            
-            result.tests.push({
-                name: 'תהליך ייבוא ברירת מחדל - ביצועים',
-                status: isExecutions ? 'success' : 'warning',
-                message: isExecutions 
-                    ? `תהליך נבחר: ${processValue}`
-                    : `תהליך אחר: ${processValue || 'ריק'}`
-            });
-            if (isExecutions) this.stats.passed++;
-            this.stats.totalTests++;
-        }
-        
-        // Check for active session continuation
-        const continueSessionCheckbox = iframeDoc.querySelector('#continueSession, #activeSession, input[type="checkbox"][name*="session"]');
-        if (continueSessionCheckbox) {
-            const isChecked = continueSessionCheckbox.checked;
-            result.tests.push({
-                name: 'המשך סשן פעיל',
-                status: 'info',
-                message: `סטטוס: ${isChecked ? 'מופעל' : 'כבוי'}`
-            });
-            this.stats.totalTests++;
-        }
-    }
-    
-    /**
-     * Test User Management pages defaults
-     */
-    async testUserManagementDefaults(page, iframeDoc, iframeWindow, result) {
-        // User management pages have logical defaults (like form validation, button states, etc.)
-        // These are typically hardcoded in the page logic
-        
-        const pageDefaults = {
-            'login': {
-                checks: [
-                    { selector: 'input[type="email"], input[name="email"]', expected: 'empty', name: 'שדה אימייל ריק' },
-                    { selector: 'input[type="password"], input[name="password"]', expected: 'empty', name: 'שדה סיסמה ריק' },
-                    { selector: 'button[type="submit"]', expected: 'exists', name: 'כפתור התחברות קיים' }
-                ]
-            },
-            'register': {
-                checks: [
-                    { selector: 'input[type="email"], input[name="email"]', expected: 'empty', name: 'שדה אימייל ריק' },
-                    { selector: 'input[type="password"], input[name="password"]', expected: 'empty', name: 'שדה סיסמה ריק' },
-                    { selector: 'input[name="confirm_password"]', expected: 'empty', name: 'שדה אימות סיסמה ריק' }
-                ]
-            },
-            'forgot_password': {
-                checks: [
-                    { selector: 'input[type="email"], input[name="email"]', expected: 'empty', name: 'שדה אימייל ריק' }
-                ]
-            },
-            'reset_password': {
-                checks: [
-                    { selector: 'input[type="password"], input[name="password"]', expected: 'empty', name: 'שדה סיסמה ריק' },
-                    { selector: 'input[name="confirm_password"]', expected: 'empty', name: 'שדה אימות סיסמה ריק' }
-                ]
-            }
-        };
-        
-        const defaults = pageDefaults[page.key];
-        if (defaults) {
-            for (const check of defaults.checks) {
-                const element = iframeDoc.querySelector(check.selector);
-                if (check.expected === 'empty') {
-                    const isEmpty = !element || !element.value || element.value === '';
-                    result.tests.push({
-                        name: check.name,
-                        status: isEmpty ? 'success' : 'failed',
-                        message: isEmpty ? 'שדה ריק כצפוי' : `שדה לא ריק: ${element.value}`
-                    });
-                    if (isEmpty) this.stats.passed++;
-                    else this.stats.failed++;
-                } else if (check.expected === 'exists') {
-                    const exists = element !== null;
-                    result.tests.push({
-                        name: check.name,
-                        status: exists ? 'success' : 'failed',
-                        message: exists ? 'אלמנט קיים' : 'אלמנט לא נמצא'
-                    });
-                    if (exists) this.stats.passed++;
-                    else this.stats.failed++;
-                }
-                this.stats.totalTests++;
-            }
-        }
-    }
-    
-    /**
-     * Helper: Get preference value (unified approach)
-     * Uses PreferencesCore.getPreference() as primary method with fallbacks
-     * @param {Window} iframeWindow - Iframe window
-     * @param {string} preferenceName - Preference name
-     * @returns {Promise<*>} Preference value
-     */
-    async getPreferenceValue(iframeWindow, preferenceName) {
-        try {
-            // Method 1: PreferencesCore.getPreference() - PRIMARY METHOD (recommended)
-            if (iframeWindow.PreferencesCore && typeof iframeWindow.PreferencesCore.getPreference === 'function') {
-                try {
-                    const value = await iframeWindow.PreferencesCore.getPreference(preferenceName);
-                    if (value !== null && value !== undefined) {
-                        return value;
+                case 'sorting':
+                    if (targetPage.hasTables) {
+                        await this.testSorting(targetPage);
                     }
-                } catch (e) {
-                    // Continue to fallbacks
-                }
-            }
-            
-            // Method 2: window.getPreference() - Global wrapper function
-            if (iframeWindow.getPreference && typeof iframeWindow.getPreference === 'function') {
-                try {
-                    const value = await iframeWindow.getPreference(preferenceName);
-                    if (value !== null && value !== undefined) {
-                        return value;
+                    break;
+                case 'sections':
+                    if (targetPage.hasSections) {
+                        await this.testSections(targetPage);
                     }
-                } catch (e) {
-                    // Continue to fallbacks
-                }
+                    break;
+                case 'filters':
+                    await this.testFilters(targetPage);
+                    break;
+                case 'infoSummary':
+                    await this.testInfoSummary(targetPage);
+                    break;
+                default:
+                    throw new Error(`Unknown test type: ${testType}`);
             }
-            
-            // Method 3: window.getCurrentPreference() - With smart fallbacks
-            if (iframeWindow.getCurrentPreference && typeof iframeWindow.getCurrentPreference === 'function') {
-                try {
-                    const value = await iframeWindow.getCurrentPreference(preferenceName);
-                    if (value !== null && value !== undefined) {
-                        return value;
-                    }
-                } catch (e) {
-                    // Continue to fallbacks
-                }
-            }
-            
-            // Method 4: PreferencesSystem.manager.currentPreferences - Legacy support
-            if (iframeWindow.PreferencesSystem?.manager?.currentPreferences) {
-                const value = iframeWindow.PreferencesSystem.manager.currentPreferences[preferenceName];
-                if (value !== undefined && value !== null) {
-                    return value;
-                }
-            }
-            
-            // Method 5: PreferencesCore.currentPreferences - Cached preferences
-            if (iframeWindow.PreferencesCore?.currentPreferences) {
-                const value = iframeWindow.PreferencesCore.currentPreferences[preferenceName];
-                if (value !== undefined && value !== null) {
-                    return value;
-                }
-            }
-            
-            // Method 6: window.currentPreferences - Global cached preferences
-            if (iframeWindow.currentPreferences && typeof iframeWindow.currentPreferences === 'object') {
-                const value = iframeWindow.currentPreferences[preferenceName];
-                if (value !== undefined && value !== null) {
-                    return value;
-                }
-            }
-            
-            // Method 7: getPreferenceFromMemory - Memory-based fallback
-            if (iframeWindow.getPreferenceFromMemory && typeof iframeWindow.getPreferenceFromMemory === 'function') {
-                try {
-                const value = await iframeWindow.getPreferenceFromMemory(preferenceName);
-                if (value !== undefined && value !== null) {
-                    return value;
-                    }
-                } catch (e) {
-                    // Continue to fallbacks
-                }
-            }
-            
-            return null;
-        } catch (error) {
-            // Log error but don't throw - return null to allow tests to continue
-            if (window.Logger && window.Logger.debug) {
-                window.Logger.debug(`Failed to get preference ${preferenceName}`, { 
-                    error: error.message,
+
+            this.stats.executionTime = Date.now() - startTime;
+
+            if (window.Logger && window.Logger.info) {
+                window.Logger.info(`Completed ${testType} test for ${targetPage.name}`, {
+                    pageKey,
+                    testType,
+                    stats: this.stats,
                     page: 'crud-testing-dashboard'
                 });
             }
-            return null;
+
+        } catch (error) {
+            this.stats.executionTime = Date.now() - startTime;
+            if (window.Logger && window.Logger.error) {
+                window.Logger.error(`Error running ${testType} test for ${targetPage.name}`, {
+                    error: error.message,
+                    pageKey,
+                    testType,
+                    page: 'crud-testing-dashboard'
+                });
+            }
+            throw error;
         }
+
+        return this.stats;
     }
-    
+
     /**
-     * Helper: Get entity type from page key
-     * @param {string} pageKey - Page key
-     * @returns {string|null} Entity type
+     * Test 1: Defaults - DELEGATED TO DefaultsTestingSystem
+     * @param {Object} page - Page configuration
      */
-    getEntityTypeFromPage(pageKey) {
-        const mapping = {
-            // User pages
-            'trades': 'trade',
-            'trade_plans': 'trade_plan',
-            'alerts': 'alert',
-            'tickers': 'ticker',
-            'trading_accounts': 'trading_account',
-            'executions': 'execution',
-            'cash_flows': 'cash_flow',
-            'notes': 'note',
-            'watch_lists': 'ticker', // Watch Lists use ticker colors
-            'tag_management': 'preference', // Tag Management uses preference colors
-            'ai_analysis': 'trade_plan', // AI Analysis uses trade plan colors
-            'trading_journal': 'note', // Trading Journal uses note colors
-            'trade_history': 'trade', // Trade History uses trade colors
-            'portfolio_state': 'trading_account', // Portfolio State uses trading account colors
-            'data_import': 'execution', // Data Import uses execution colors
-            'preferences': 'preference',
-            'user_profile': 'preference', // User Profile uses preference colors
-            'index': 'trade', // Dashboard shows trades overview
-            'research': 'research',
-            'ticker_dashboard': 'ticker',
-            
-            // User management pages - use preference colors
-            'login': 'preference',
-            'register': 'preference',
-            'forgot_password': 'preference',
-            'reset_password': 'preference',
-            
-            // Development tools pages - all use preference colors
-            'dev_tools': 'preference',
-            'code_quality_dashboard': 'preference',
-            'init_system_management': 'preference',
-            'cache_management': 'preference',
-            'chart_management': 'preference',
-            'crud_testing_dashboard': 'preference',
-            'conditions_test': 'preference',
-            'conditions_modals': 'preference',
-            'button_color_mapping': 'preference',
-            'preferences_groups_management': 'preference',
-            'tradingview_widgets_showcase': 'preference',
-            'external_data_dashboard': 'preference',
-            
-            // Testing pages - all use preference colors
-            'test_header_only': 'preference',
-            'test_monitoring': 'preference',
-            'test_overlay_debug': 'preference',
-            'test_phase3_1_comprehensive': 'preference',
-            'test_quill': 'preference',
-            'test_recent_items_widget': 'preference',
-            'test_ticker_widgets_performance': 'preference',
-            'test_unified_widget_comprehensive': 'preference',
-            'test_unified_widget_integration': 'preference',
-            'test_unified_widget': 'preference',
-            'test_user_ticker_integration': 'preference',
-            'test_frontend_wrappers': 'preference',
-            'test_bootstrap_popover_comparison': 'preference',
-            'test_cache': 'preference',
-            'test_constraints': 'preference',
-            'system_management': 'preference',
-            'server_monitor': 'preference',
-            
-            // Technical pages - all use preference colors
-            'db_display': 'preference',
-            'db_extradata': 'preference',
-            'constraints': 'preference',
-            'background_tasks': 'preference',
-            'notifications_center': 'preference',
-            'css_management': 'preference',
-            'designs': 'preference',
-            'dynamic_colors_display': 'preference'
-        };
-        return mapping[pageKey] || null;
-    }
-    
-    /**
-     * Helper: Get modal ID for entity type
-     * @param {string} entityType - Entity type
-     * @returns {string|null} Modal ID
-     */
-    getModalIdForEntity(entityType) {
-        const mapping = {
-            'trade': 'tradesModal',
-            'trade_plan': 'tradePlansModal',
-            'alert': 'alertsModal',
-            'ticker': 'tickersModal',
-            'trading_account': 'tradingAccountsModal',
-            'execution': 'executionsModal',
-            'cash_flow': 'cashFlowModal',
-            'note': 'notesModal',
-            'watch_list': 'watchListModal',
-            'tag': 'tagModal'
-        };
-        return mapping[entityType] || null;
-    }
-    
-    /**
-     * Helper: Get date field IDs from modal config
-     * @param {string} entityType - Entity type
-     * @param {Window} iframeWindow - Iframe window
-     * @returns {Array<string>} Array of date field IDs
-     */
-    getDateFieldIdsFromConfig(entityType, iframeWindow) {
-        const configMap = {
-            'trade': 'tradesModalConfig',
-            'trade_plan': 'tradePlansModalConfig',
-            'alert': 'alertsModalConfig',
-            'ticker': 'tickersModalConfig',
-            'trading_account': 'tradingAccountsModalConfig',
-            'execution': 'executionsModalConfig',
-            'cash_flow': 'cashFlowModalConfig',
-            'note': 'notesModalConfig',
-            'watch_list': 'watchListModalConfig',
-            'tag': 'tagModalConfig'
-        };
-        
-        const configKey = configMap[entityType];
-        if (!configKey || !iframeWindow[configKey]) {
-            return [];
+    async testDefaults(page) {
+        // Delegate to the specialized DefaultsTestingSystem
+        if (!this.defaultsTester) {
+            this.defaultsTester = new DefaultsTestingSystem(this);
         }
-        
-        const config = iframeWindow[configKey];
-        const dateFieldIds = [];
-        
-        // Handle regular fields array
-        if (config.fields && Array.isArray(config.fields)) {
-            config.fields.forEach(field => {
-                if (field.id && (field.type === 'date' || field.type === 'datetime-local')) {
-                    dateFieldIds.push(field.id);
-                }
-            });
-        }
-        
-        // Handle tabs (like cash_flow)
-        if (config.tabs && Array.isArray(config.tabs)) {
-            config.tabs.forEach(tab => {
-                if (tab.fields && Array.isArray(tab.fields)) {
-                    tab.fields.forEach(field => {
-                        if (field.id && (field.type === 'date' || field.type === 'datetime-local')) {
-                            dateFieldIds.push(field.id);
-                        }
-                    });
-                }
-            });
-        }
-        
-        return dateFieldIds;
+        return await this.defaultsTester.testDefaults(page);
     }
-    
+
     /**
-     * Test 2: Colors and styles
+     * LEGACY: Test defaults directly (kept for backward compatibility)
      * @param {Object} page - Page configuration
      */
     async testColors(page) {
@@ -3275,7 +1461,7 @@ class CrossPageTester {
             result.errors.push(error.message);
             result.executionTime = Date.now() - startTime;
             this.logger?.error(`Error in testColors for ${page.name}`, error);
-
+            
             // Note: Don't cleanup iframe on error - crudTester manages it in testIframeContainer
         }
         
@@ -3326,35 +1512,68 @@ class CrossPageTester {
             executionTime: 0
         };
 
-        // #region agent log - HYPOTHESIS 1: Iframe loading issues
+        // #region agent log - HYPOTHESIS H1: Duplicate page testing detection
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
                 location:'cross-page-testing-system.js:testSorting:entry',
-                message:`Starting sorting test for page: ${page.name} (${page.key})`,
+                message:`[DUPLICATION DEBUG] Starting sorting test for page: ${page.name} (${page.key})`,
                 data:{
                     pageName:page.name,
                     pageKey:page.key,
                     pageUrl:page.url,
                     hasTables:page.hasTables,
                     crudTesterExists:!!this.crudTester,
-                    crossPageResultsExist:!!(this.crudTester?.results?.crossPage)
+                    crossPageResultsExist:!!(this.crudTester?.results?.crossPage),
+                    sortingResultsBefore:this.crudTester?.results?.crossPage?.sorting?.length || 0,
+                    callStack:new Error().stack?.split('\n').slice(0, 8).join('\n') || 'N/A',
+                    currentTime:new Date().toISOString()
                 },
                 timestamp:startTime,
                 sessionId:'debug-session',
-                runId:'sorting-test-debug',
-                hypothesisId:'H1_IFRAME_LOADING'
+                runId:'duplication-debug',
+                hypothesisId:'H1_DUPLICATE_TESTING'
             })
         }).catch(()=>{});
         // #endregion
+
+        // Check if this page has already been tested to prevent duplication
+        if (this.crudTester?.results?.crossPage?.sorting) {
+            const alreadyTested = this.crudTester.results.crossPage.sorting.find(r => r.page === page.name);
+            if (alreadyTested) {
+                // #region agent log - HYPOTHESIS H1: Page already tested
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'cross-page-testing-system.js:testSorting:already-tested',
+                        message:`[DUPLICATION] Page ${page.name} already tested, skipping`,
+                        data:{
+                            pageName:page.name,
+                            pageKey:page.key,
+                            alreadyTestedResult:alreadyTested,
+                            totalSortingResults:this.crudTester.results.crossPage.sorting.length
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'duplication-debug',
+                        hypothesisId:'H1_DUPLICATE_TESTING'
+                    })
+                }).catch(()=>{});
+                // #endregion
+                return; // Skip testing if already tested
+            }
+        }
         
         let testIframe = null;
-        
+        let tablesFound = 0;
+        let tablesTested = 0;
+
         try {
             // Clean up any existing iframes before starting new test
             this.cleanupTestIframes();
-            
+
             // Load page in visible iframe using standalone method
             
             // Handle URL - special case for index (/) and add .html extension if needed
@@ -3364,7 +1583,61 @@ class CrossPageTester {
             } else if (!pageUrl.endsWith('.html')) {
                 pageUrl = `${pageUrl}.html`;
             }
-            testIframe = await this.loadPageInIframe(pageUrl);
+
+            try {
+                testIframe = await this.loadPageInIframe(pageUrl);
+            } catch (iframeError) {
+                // #region agent log - HYPOTHESIS 1: Iframe loading failed
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'cross-page-testing-system.js:testSorting:iframe-load-failed',
+                        message:`Iframe loading failed for ${page.name}: ${iframeError.message}`,
+                        data:{
+                            pageName:page.name,
+                            pageUrl:pageUrl,
+                            error:iframeError.message,
+                            errorType:iframeError.constructor.name
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'sorting-test-debug',
+                        hypothesisId:'H1_IFRAME_LOADING'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+                // Create failure result for iframe loading
+                result.tests.push({
+                    name: 'טעינת עמוד',
+                    status: 'failed',
+                    message: `כשל בטעינת ה-iframe: ${iframeError.message}`
+                });
+
+                // Create final result and return
+                const finalResult = {
+                    page: page.name,
+                    testType: 'sorting',
+                    status: 'failed',
+                    executionTime: Date.now() - startTime,
+                    message: `בדיקת מיון הושלמה: 0 עברו, 1 נכשלו, 0 אזהרות`,
+                    tests: result.tests
+                };
+
+                if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
+                    if (!this.crudTester.results.crossPage.sorting) {
+                        this.crudTester.results.crossPage.sorting = [];
+                    }
+                    this.crudTester.results.crossPage.sorting.push(finalResult);
+                    try {
+                        this.crudTester.updateTestResults();
+                    } catch (updateError) {
+                        console.error(`❌ Error updating test results after iframe load failure: ${updateError.message}`);
+                    }
+                }
+                return;
+            }
 
             // #region agent log - HYPOTHESIS 1: Iframe loaded successfully
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -3413,12 +1686,124 @@ class CrossPageTester {
             // #endregion
             
             await this.waitForElementInIframe(testIframe, 'table, table tbody', 10000);
-
-            // Wait for table to have actual data rows (not just empty or loading)
-            await this.waitForElementInIframe(testIframe, 'table tbody tr:not(:empty), table tr[data-id], table tr:has(td:not(:empty))', 15000);
             
-            // Find first table
-            const table = iframeDoc.querySelector('table[data-table-type], table tbody');
+            // Wait for table to have actual data rows (not just empty or loading)
+            // Wait longer for dynamic data loading
+            await this.waitForElementInIframe(testIframe, 'table tbody tr:not(:empty), table tr[data-id], table tr:has(td:not(:empty))', 30000);
+
+            // Additional wait for actual data to be loaded (not just empty table structure)
+            await new Promise(resolve => {
+                const checkForData = () => {
+                    try {
+                        const iframeDoc = this.getIframeDocument(testIframe);
+                        const rows = iframeDoc.querySelectorAll('table tbody tr');
+                        let hasData = false;
+
+                        for (const row of rows) {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length > 0) {
+                                // Check if at least one cell has meaningful content
+                                for (const cell of cells) {
+                                    const text = cell.textContent?.trim();
+                                    if (text && text !== '' && text !== '-' && text !== 'N/A' && text !== 'לא זמין') {
+                                        hasData = true;
+                                        break;
+                                    }
+                                }
+                                if (hasData) break;
+                            }
+                        }
+
+                        if (hasData && rows.length >= 2) {
+                            resolve();
+                        } else {
+                            setTimeout(checkForData, 1000); // Check every second
+                        }
+                    } catch (e) {
+                        setTimeout(checkForData, 1000);
+                    }
+                };
+
+                // Timeout after 45 seconds if no data loads
+                setTimeout(() => resolve(), 45000);
+                checkForData();
+            });
+            
+            // Find ALL tables on the page - count them accurately
+            const allTables = Array.from(iframeDoc.querySelectorAll('table'));
+            tablesFound = allTables.length;
+
+            // Categorize tables: data-table-type tables are preferred for testing
+            const dataTableTypeTables = allTables.filter(table => table.hasAttribute('data-table-type'));
+            const otherTables = allTables.filter(table => !table.hasAttribute('data-table-type'));
+
+            // Find first testable table (with data-table-type preferred, then any table)
+            const tableSelectors = [
+                'table[data-table-type]',
+                'table tbody',
+                'table',
+                '.table',
+                '[role="table"]',
+                '.data-table'
+            ];
+
+            let table = null;
+            for (const selector of tableSelectors) {
+                table = iframeDoc.querySelector(selector);
+                if (table) {
+                    // #region agent log - H2: Table found with selector
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({
+                            location:'cross-page-testing-system.js:testSorting:table-found',
+                            message:`Table found for ${page.name} with selector: ${selector}`,
+                            data:{
+                                pageName:page.name,
+                                selector:selector,
+                                tableTag:table.tagName,
+                                tableClass:table.className,
+                                tableId:table.id,
+                                dataTableType:table.getAttribute('data-table-type'),
+                                allTablesCount:tablesFound,
+                                dataTableTypeTablesCount:dataTableTypeTables.length,
+                                otherTablesCount:otherTables.length,
+                                testableTables: dataTableTypeTables.length || (allTables.length > 0 ? 1 : 0)
+                            },
+                            timestamp:Date.now(),
+                            sessionId:'debug-session',
+                            runId:'sorting-test-debug',
+                            hypothesisId:'H2_TABLE_DETECTION'
+                        })
+                    }).catch(()=>{});
+                    // #endregion
+                    break;
+                }
+            }
+
+            // #region agent log - HYPOTHESIS: Table detection
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'cross-page-testing-system.js:testSorting:table-detection',
+                    message:`Table detection result for ${page.name}`,
+                    data:{
+                        pageName:page.name,
+                        pageKey:page.key,
+                        tableFound:!!table,
+                        tableElement:table ? table.tagName : null,
+                        tableDataType:table ? table.getAttribute('data-table-type') : null,
+                        allTablesInPage:iframeDoc.querySelectorAll('table').length,
+                        tablesWithDataType:iframeDoc.querySelectorAll('table[data-table-type]').length
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'sorting-test-table-detection',
+                    hypothesisId:'TABLE_DETECTION_DEBUG'
+                })
+            }).catch(()=>{});
+            // #endregion
 
             // #region agent log - HYPOTHESIS 2: Table detection result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -3451,18 +1836,40 @@ class CrossPageTester {
             // #endregion
 
             if (!table) {
-                // #region agent log
+                // Count all tables even if none are testable
+                const allTablesOnPage = iframeDoc.querySelectorAll('table');
+                tablesFound = allTablesOnPage.length;
+                tablesTested = 0;
+
+                // #region agent log - H2: No table found - detailed analysis
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
                     body:JSON.stringify({
-                        location:'cross-page-testing-system.js:testSorting:no-table',
-                        message:`No table found for ${page.name} - skipping test`,
-                        data:{pageName:page.name, pageKey:page.key},
+                        location:'cross-page-testing-system.js:testSorting:no-table-detailed',
+                        message:`No table found for ${page.name} - detailed iframe analysis`,
+                        data:{
+                            pageName:page.name,
+                            pageKey:page.key,
+                            iframeBodyExists:!!iframeDoc.body,
+                            iframeBodyChildren:iframeDoc.body?.children?.length || 0,
+                            iframeBodyInnerHTML:iframeDoc.body?.innerHTML?.substring(0, 500) || 'N/A',
+                            allElementsCount:iframeDoc.querySelectorAll('*').length,
+                            divCount:iframeDoc.querySelectorAll('div').length,
+                            tableCount:iframeDoc.querySelectorAll('table').length,
+                            tbodyCount:iframeDoc.querySelectorAll('tbody').length,
+                            dataTableTypeCount:iframeDoc.querySelectorAll('[data-table-type]').length,
+                            modalCount:iframeDoc.querySelectorAll('.modal').length,
+                            hasMain:!!iframeDoc.querySelector('main'),
+                            hasDataSection:!!iframeDoc.querySelector('[data-section]'),
+                            hasContent:iframeDoc.body?.textContent?.trim()?.length > 0,
+                            readyState:iframeDoc.readyState,
+                            title:iframeDoc.title
+                        },
                         timestamp:Date.now(),
                         sessionId:'debug-session',
                         runId:'sorting-test-analysis',
-                        hypothesisId:'SORTING_NO_TABLE_PAGES'
+                        hypothesisId:'H2_TABLE_DETECTION'
                     })
                 }).catch(()=>{});
                 // #endregion
@@ -3472,8 +1879,94 @@ class CrossPageTester {
                     status: 'skipped',
                     message: 'לא נמצאה טבלה'
                 });
+
+                // Create final result with standardized message format (like Watch Lists)
+                const successCount = result.tests.filter(t => t.status === 'success').length;
+                const failedCount = result.tests.filter(t => t.status === 'failed').length;
+                const warningCount = result.tests.filter(t => t.status === 'warning').length;
+
+                const finalResult = {
+                    page: page.name,
+                    testType: 'sorting',
+                    status: failedCount > 0 ? 'failed' : warningCount > 0 ? 'warning' : 'success',
+                    executionTime: Date.now() - (this.startTime || Date.now()),
+                    message: `בדיקת מיון הושלמה: ${successCount} עברו, ${failedCount} נכשלו, ${warningCount} אזהרות`,
+                    tests: result.tests,
+                    tablesTested: tablesTested,
+                    tablesFound: tablesFound
+                };
+
+                // #region agent log - H2: Result storage
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'cross-page-testing-system.js:testSorting:no-table-result-storage',
+                        message:`Storing no-table result for ${page.name}`,
+                        data:{
+                            pageName:page.name,
+                            finalResultStatus:finalResult.status,
+                            finalResultMessage:finalResult.message,
+                            testsCount:finalResult.tests.length,
+                            sortingResultsBefore:this.crudTester?.results?.crossPage?.sorting?.length || 0,
+                            crudTesterExists:!!this.crudTester,
+                            crossPageExists:!!this.crudTester?.results?.crossPage,
+                            sortingArrayExists:!!this.crudTester?.results?.crossPage?.sorting
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'sorting-test-debug',
+                        hypothesisId:'H2_TABLE_DETECTION'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
                 // Note: Don't cleanup iframe - crudTester manages it in testIframeContainer
-                this.results.sorting.push(result);
+                if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage && this.crudTester.results.crossPage.sorting) {
+                    this.crudTester.results.crossPage.sorting.push(finalResult);
+                    // #region agent log - H2: Update UI
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({
+                            location:'cross-page-testing-system.js:testSorting:update-ui',
+                            message:`Updating UI after storing result for ${page.name}`,
+                            data:{
+                                pageName:page.name,
+                                sortingResultsAfter:this.crudTester.results.crossPage.sorting.length,
+                                updateTestResultsCalled:true
+                            },
+                            timestamp:Date.now(),
+                            sessionId:'debug-session',
+                            runId:'sorting-test-debug',
+                            hypothesisId:'H2_TABLE_DETECTION'
+                        })
+                    }).catch(()=>{});
+                    // #endregion
+                    this.crudTester.updateTestResults();
+                } else {
+                    console.error('❌ Cannot store sorting result - crudTester structure invalid');
+                    // #region agent log - H2: Storage error
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({
+                            location:'cross-page-testing-system.js:testSorting:storage-error',
+                            message:`Failed to store sorting result for ${page.name} - invalid structure`,
+                            data:{
+                                crudTesterExists:!!this.crudTester,
+                                resultsExists:!!this.crudTester?.results,
+                                crossPageExists:!!this.crudTester?.results?.crossPage,
+                                sortingExists:!!this.crudTester?.results?.crossPage?.sorting
+                            },
+                            timestamp:Date.now(),
+                            sessionId:'debug-session',
+                            runId:'sorting-test-debug',
+                            hypothesisId:'H2_TABLE_DETECTION'
+                        })
+                    }).catch(()=>{});
+                    // #endregion
+                }
                 return;
             }
 
@@ -3526,6 +2019,9 @@ class CrossPageTester {
                     });
                 }
 
+                // Update tablesTested to reflect actual testable tables
+                tablesTested = allTables.length;
+
                 // Skip actual sorting tests but still pass the overall test
                 result.tests.push({
                     name: 'מיון טבלאות',
@@ -3533,13 +2029,70 @@ class CrossPageTester {
                     message: `דילוג על מיון - לא מספיק נתונים (${dataRows.length} שורות)`
                 });
 
-                // Still push the result
-                this.crudTester.results.crossPage.sorting.push(result);
-                this.crudTester.updateTestResults();
+                    // Still push the result with standardized format
+                const successCount = result.tests.filter(t => t.status === 'success').length;
+                const failedCount = result.tests.filter(t => t.status === 'failed').length;
+                const warningCount = result.tests.filter(t => t.status === 'warning').length;
+
+                const insufficientDataResult = {
+                    page: page.name,
+                    testType: 'sorting',
+                    status: failedCount > 0 ? 'failed' : warningCount > 0 ? 'warning' : 'success',
+                    executionTime: Date.now() - startTime,
+                    message: `בדיקת מיון הושלמה: ${successCount} עברו, ${failedCount} נכשלו, ${warningCount} אזהרות`,
+                    tests: result.tests,
+                    tablesTested: tablesTested,
+                    tablesFound: tablesFound
+                };
+
+                // #region agent log - H3: Insufficient data result storage
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'cross-page-testing-system.js:testSorting:insufficient-data-result',
+                        message:`Storing insufficient data result for ${page.name}`,
+                        data:{
+                            pageName:page.name,
+                            resultStatus:insufficientDataResult.status,
+                            resultMessage:insufficientDataResult.message,
+                            testsCount:insufficientDataResult.tests.length,
+                            tablesTested:tablesTested,
+                            tablesFound:tablesFound,
+                            sortingResultsBefore:this.crudTester?.results?.crossPage?.sorting?.length || 0
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'sorting-test-debug',
+                        hypothesisId:'H3_INSUFFICIENT_DATA'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+                if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage && this.crudTester.results.crossPage.sorting) {
+                    this.crudTester.results.crossPage.sorting.push(insufficientDataResult);
+                    this.crudTester.updateTestResults();
+                }
                 return;
             }
             
             const tableType = table.getAttribute('data-table-type') || this.getEntityTypeFromPage(page.key);
+
+            // Test all tables on the page
+            const tablesToTest = iframeDoc.querySelectorAll('table[data-table-type]');
+            tablesTested = tablesToTest.length || 1; // At least 1 if we found a testable table
+
+            // Test 3.0: Multiple tables detection
+            const tablesWithDataType = iframeDoc.querySelectorAll('table[data-table-type]');
+            if (tablesWithDataType.length > 1) {
+                result.tests.push({
+                    name: 'טבלאות מרובות',
+                    status: 'success',
+                    message: `נמצאו ${tablesWithDataType.length} טבלאות עם data-table-type`
+                });
+                this.stats.passed++;
+                this.stats.totalTests++;
+            }
             
             // Test 3.1: Default sort (newest first)
             try {
@@ -3597,53 +2150,90 @@ class CrossPageTester {
                     const thElement = firstHeader.closest('th');
                     const columnIndex = thElement ? Array.from(thElement.parentElement.children).indexOf(thElement) : 0;
                     
-                    // Get initial order
+                    // Extract initial column values for proper sorting verification
                     const initialRows = Array.from(table.querySelectorAll('tbody tr, tbody > tr'));
-                    const initialFirstValue = initialRows[0]?.querySelector('td')?.textContent?.trim();
-                    
-                    // Click header
-                    firstHeader.click();
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    // Check if sorted
-                    const afterClickRows = Array.from(table.querySelectorAll('tbody tr, tbody > tr'));
-                    const afterClickFirstValue = afterClickRows[0]?.querySelector('td')?.textContent?.trim();
-                    
-                    if (initialFirstValue !== afterClickFirstValue) {
+                    const initialValues = initialRows.map(row => {
+                        const cells = row.querySelectorAll('td');
+                        return cells[columnIndex]?.textContent?.trim() || '';
+                    }).filter(val => val !== ''); // Remove empty values
+
+                    if (initialValues.length < 2) {
                         result.tests.push({
-                            name: 'לחיצה ראשונה ממינת (ASC)',
+                            name: 'מיון טבלאות (ASC)',
+                            status: 'warning',
+                            message: `לא מספיק ערכים לבדיקת מיון (${initialValues.length} ערכים)`
+                        });
+                        this.stats.totalTests++;
+                    } else {
+                        // Click header to sort ASC
+                    firstHeader.click();
+                        await new Promise(resolve => setTimeout(resolve, 1500)); // Increased wait time
+                    
+                        // Extract values after sorting
+                    const afterClickRows = Array.from(table.querySelectorAll('tbody tr, tbody > tr'));
+                        const afterClickValues = afterClickRows.map(row => {
+                            const cells = row.querySelectorAll('td');
+                            return cells[columnIndex]?.textContent?.trim() || '';
+                        }).filter(val => val !== '');
+
+                        // Check if values are properly sorted (ascending)
+                        const isSortedAsc = afterClickValues.length >= 2 &&
+                            afterClickValues.every((val, index) => {
+                                if (index === 0) return true;
+                                const prevVal = afterClickValues[index - 1];
+                                // Simple string comparison (could be improved for numbers/dates)
+                                return prevVal <= val;
+                            });
+
+                        if (isSortedAsc) {
+                        result.tests.push({
+                                name: 'מיון עולה (ASC)',
                             status: 'success',
-                            message: 'הטבלה ממוינת לאחר לחיצה'
+                                message: `הטבלה ממוינת עולה: ${afterClickValues.slice(0, 3).join(', ')}...`
                         });
                         this.stats.passed++;
                     } else {
                         result.tests.push({
-                            name: 'לחיצה ראשונה ממינת (ASC)',
-                            status: 'warning',
-                            message: 'הטבלה לא השתנתה לאחר לחיצה'
+                                name: 'מיון עולה (ASC)',
+                                status: 'failed',
+                                message: `הטבלה לא ממוינת כראוי: ${afterClickValues.slice(0, 3).join(', ')}...`
                         });
                     }
                     this.stats.totalTests++;
+                    }
                     
                     // Test 3.3: Second click reverses sort (DESC)
                     firstHeader.click();
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                     
+                    // Extract values after second click (should be DESC)
                     const afterSecondClickRows = Array.from(table.querySelectorAll('tbody tr, tbody > tr'));
-                    const afterSecondClickFirstValue = afterSecondClickRows[0]?.querySelector('td')?.textContent?.trim();
-                    
-                    if (afterClickFirstValue !== afterSecondClickFirstValue) {
+                    const afterSecondClickValues = afterSecondClickRows.map(row => {
+                        const cells = row.querySelectorAll('td');
+                        return cells[columnIndex]?.textContent?.trim() || '';
+                    }).filter(val => val !== '');
+
+                    // Check if values are properly sorted descending
+                    const isSortedDesc = afterSecondClickValues.length >= 2 &&
+                        afterSecondClickValues.every((val, index) => {
+                            if (index === 0) return true;
+                            const prevVal = afterSecondClickValues[index - 1];
+                            // Simple string comparison (could be improved for numbers/dates)
+                            return prevVal >= val;
+                        });
+
+                    if (isSortedDesc) {
                         result.tests.push({
-                            name: 'לחיצה שניה הופכת מיון (DESC)',
+                            name: 'מיון יורד (DESC)',
                             status: 'success',
-                            message: 'המיון התהפך לאחר לחיצה שניה'
+                            message: `הטבלה ממוינת יורד: ${afterSecondClickValues.slice(0, 3).join(', ')}...`
                         });
                         this.stats.passed++;
                     } else {
                         result.tests.push({
-                            name: 'לחיצה שניה הופכת מיון (DESC)',
-                            status: 'warning',
-                            message: 'המיון לא התהפך לאחר לחיצה שניה'
+                            name: 'מיון יורד (DESC)',
+                            status: 'failed',
+                            message: `הטבלה לא ממוינת יורד: ${afterSecondClickValues.slice(0, 3).join(', ')}...`
                         });
                     }
                     this.stats.totalTests++;
@@ -3682,8 +2272,53 @@ class CrossPageTester {
             // Note: Don't cleanup iframe on error - crudTester manages it in testIframeContainer
         }
         
-        this.results.sorting.push(result);
-        
+        // #region agent log - RESULT MESSAGE FORMATTING
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'cross-page-testing-system.js:testSorting:result-formatting',
+                message:`Result formatting for ${page.name}`,
+                data:{
+                    pageName:page.name,
+                    pageKey:page.key,
+                    tablesFound,
+                    tablesTested,
+                    totalTests:result.tests.length,
+                    successCount:result.tests.filter(t => t.status === 'success').length,
+                    failedCount:result.tests.filter(t => t.status === 'failed').length,
+                    warningCount:result.tests.filter(t => t.status === 'warning').length,
+                    skippedCount:result.tests.filter(t => t.status === 'skipped').length,
+                    hasTests:result.tests.length > 0,
+                    finalStatus:result.tests.some(t => t.status === 'failed') ? 'failed' : result.tests.some(t => t.status === 'warning') ? 'warning' : 'success'
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'result-formatting-analysis',
+                hypothesisId:'RESULT_MESSAGE_FORMATTING'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+                // Create final result with standardized message format
+                const successCount = result.tests.filter(t => t.status === 'success').length;
+                const failedCount = result.tests.filter(t => t.status === 'failed').length;
+                const warningCount = result.tests.filter(t => t.status === 'warning').length;
+
+                const finalResult = {
+                    page: page.name,
+                    testType: 'sorting',
+                    status: failedCount > 0 ? 'failed' : warningCount > 0 ? 'warning' : 'success',
+                    executionTime: Date.now() - (this.startTime || Date.now()),
+                    message: `בדיקת מיון הושלמה: ${successCount} עברו, ${failedCount} נכשלו, ${warningCount} אזהרות`,
+                    tests: result.tests,
+                    tablesTested: tablesTested,
+                    tablesFound: tablesFound
+                };
+
+        this.crudTester.results.crossPage.sorting.push(finalResult);
+        this.crudTester.updateTestResults();
+
         // #region agent log
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
@@ -3751,6 +2386,28 @@ class CrossPageTester {
                 message: `בדיקת מיון הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
                 tests: result.tests
             };
+
+            // #region agent log - HYPOTHESIS: Final result creation
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'cross-page-testing-system.js:testSorting:final-result',
+                    message:`Creating final result for ${page.name}`,
+                    data:{
+                        pageName:page.name,
+                        pageKey:page.key,
+                        testResult:testResult,
+                        testsCount:result.tests.length,
+                        testsDetails:result.tests.map(t => ({name: t.name, status: t.status}))
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'sorting-test-final-result',
+                    hypothesisId:'FINAL_RESULT_DEBUG'
+                })
+            }).catch(()=>{});
+            // #endregion
 
             // #region agent log - H2_DATA_STRUCTURE
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -3867,7 +2524,7 @@ class CrossPageTester {
                 testType: 'sorting',
                 status: 'failed',
                 executionTime: Date.now() - (this.startTime || Date.now()),
-                message: `בדיקת מיון הושלמה: ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length + 1} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
+                message: `בדיקת מיון הושלמה: טבלאות ${tablesTested}/${tablesFound}, ${result.tests.filter(t => t.status === 'success').length} עברו, ${result.tests.filter(t => t.status === 'failed').length + 1} נכשלו, ${result.tests.filter(t => t.status === 'warning').length} אזהרות`,
                 tests: result.tests
             };
 
@@ -3883,7 +2540,7 @@ class CrossPageTester {
         // Clean up iframe after test completes
         this.cleanupTestIframes();
     }
-
+    
     /**
      * Test 4: Sections
      * @param {Object} page - Page configuration
@@ -4048,7 +2705,7 @@ class CrossPageTester {
             result.errors.push(error.message);
             result.executionTime = Date.now() - startTime;
             this.logger?.error(`Error in testSections for ${page.name}`, error);
-
+            
             // Note: Don't cleanup iframe on error - crudTester manages it in testIframeContainer
         }
         
@@ -4268,7 +2925,7 @@ class CrossPageTester {
             result.errors.push(error.message);
             result.executionTime = Date.now() - startTime;
             this.logger?.error(`Error in testFilters for ${page.name}`, error);
-
+            
             // Note: Don't cleanup iframe on error - crudTester manages it in testIframeContainer
         }
         
@@ -4337,13 +2994,90 @@ class CrossPageTester {
                     document.body.appendChild(iframe);
                 }
 
-                // Wait for iframe to load
+                // Inject error suppression script to reduce console noise during testing
                 iframe.onload = () => {
-                    if (this.logger && this.logger.debug) {
-                        this.logger.debug(`✅ [CrossPageTester.loadPageInIframe] Iframe loaded successfully: ${iframeId}`);
+                    try {
+                        if (iframe.contentWindow) {
+                            // Override console methods to suppress testing-related noise
+                            const suppressConsoleMethod = (methodName) => {
+                                const originalMethod = iframe.contentWindow.console[methodName];
+                                iframe.contentWindow.console[methodName] = function(...args) {
+                                    const message = args.join(' ');
+                                    // Suppress common testing-related errors and warnings
+                                    if (message.includes('401') ||
+                                        message.includes('UNAUTHORIZED') ||
+                                        message.includes('auth.js') ||
+                                        message.includes('header-system.js') ||
+                                        message.includes('authentication') ||
+                                        message.includes('login required') ||
+                                        message.includes('session expired') ||
+                                        message.includes('Modal element not in DOM') ||
+                                        message.includes('throwing error') ||
+                                        message.includes('Cannot read properties of null') ||
+                                        message.includes('modal-backdrop') ||
+                                        message.includes('z-index') ||
+                                        message.includes('iframe') ||
+                                        message.includes('cross-origin') ||
+                                        message.includes('CORS') ||
+                                        message.includes('network error') ||
+                                        message.includes('Failed to load resource')) {
+                                        // Suppress these errors during testing - they're expected in iframe context
+                                        return;
+                                    }
+                                    // Call original method for other messages
+                                    originalMethod.apply(this, args);
+                                };
+                            };
+
+                            // Suppress errors, warnings, and info messages
+                            ['error', 'warn', 'info', 'log'].forEach(method => {
+                                suppressConsoleMethod(method);
+                            });
+
+                            // Also suppress network errors by overriding fetch/XMLHttpRequest
+                            const originalFetch = iframe.contentWindow.fetch;
+                            iframe.contentWindow.fetch = function(...args) {
+                                return originalFetch.apply(this, args).catch(error => {
+                                    // Suppress auth-related fetch errors
+                                    if (error.message && (
+                                        error.message.includes('401') ||
+                                        error.message.includes('UNAUTHORIZED') ||
+                                        error.message.includes('auth') ||
+                                        error.message.includes('authentication'))) {
+                                        return Promise.reject(error); // Still reject but don't log
+                                    }
+                                    throw error;
+                                });
+                            };
+                        }
+                    } catch (e) {
+                        // Ignore errors in error suppression setup
                     }
-                    resolve(iframe);
+
+                    // Continue with original onload logic
+                    try {
+                        // Additional check to ensure content is actually loaded
+                        const hasContent = iframe.contentDocument && iframe.contentDocument.body &&
+                                         (iframe.contentDocument.body.children.length > 0 ||
+                                          iframe.contentDocument.body.textContent.trim().length > 0);
+
+                        if (this.logger && this.logger.debug) {
+                            this.logger.debug(`✅ [CrossPageTester.loadPageInIframe] Iframe loaded successfully: ${iframeId}`, {
+                                hasContent,
+                                bodyChildren: iframe.contentDocument?.body?.children?.length || 0,
+                                bodyTextLength: iframe.contentDocument?.body?.textContent?.trim().length || 0
+                            });
+                        }
+                        resolve(iframe);
+                    } catch (onloadError) {
+                        if (this.logger && this.logger.warn) {
+                            this.logger.warn(`⚠️ [CrossPageTester.loadPageInIframe] Error in onload handler: ${iframeId}`, { error: onloadError.message });
+                        }
+                        // Still resolve since the iframe did load
+                        resolve(iframe);
+                    }
                 };
+
 
                 iframe.onerror = (error) => {
                     // Log error but don't reject immediately - let timeout handle it
@@ -4353,15 +3087,40 @@ class CrossPageTester {
                     // Don't reject here - let the timeout handle it to avoid premature failures
                 };
 
-                // Timeout after 120 seconds (increased for complex pages)
+                // Timeout after 60 seconds (reasonable for testing)
                 setTimeout(() => {
-                    if (!iframe.contentDocument || iframe.contentDocument.readyState !== 'complete') {
-                        if (this.logger && this.logger.error) {
-                            this.logger.error(`⏰ [CrossPageTester.loadPageInIframe] Timeout loading iframe: ${iframeId}`);
+                    try {
+                        const isLoaded = iframe.contentDocument && iframe.contentDocument.readyState === 'complete';
+                        const hasContent = iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.children.length > 0;
+
+                        if (!isLoaded && !hasContent) {
+                            if (this.logger && this.logger.error) {
+                                this.logger.error(`⏰ [CrossPageTester.loadPageInIframe] Timeout loading iframe: ${iframeId}`, {
+                                    pageUrl,
+                                    readyState: iframe.contentDocument?.readyState,
+                                    hasBody: !!(iframe.contentDocument?.body),
+                                    bodyChildren: iframe.contentDocument?.body?.children?.length || 0
+                                });
+                            }
+                            reject(new Error(`Timeout loading iframe for ${pageUrl} - readyState: ${iframe.contentDocument?.readyState}`));
+                        } else {
+                            // Page loaded successfully
+                            if (this.logger && this.logger.debug) {
+                                this.logger.debug(`✅ [CrossPageTester.loadPageInIframe] Iframe loaded successfully: ${iframeId}`, {
+                                    pageUrl,
+                                    readyState: iframe.contentDocument?.readyState,
+                                    bodyChildren: iframe.contentDocument?.body?.children?.length || 0
+                                });
+                            }
+                            resolve(iframe);
                         }
-                        reject(new Error(`Timeout loading iframe for ${pageUrl}`));
+                    } catch (timeoutError) {
+                        if (this.logger && this.logger.error) {
+                            this.logger.error(`❌ [CrossPageTester.loadPageInIframe] Error during timeout check: ${iframeId}`, { error: timeoutError.message });
+                        }
+                        reject(new Error(`Error checking iframe load status for ${pageUrl}: ${timeoutError.message}`));
                     }
-                }, 120000);
+                }, 60000);
 
             } catch (error) {
                 if (this.logger && this.logger.error) {

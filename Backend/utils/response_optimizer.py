@@ -235,7 +235,7 @@ class ResponseOptimizer:
                 '/api/notes',
                 '/api/executions',
                 '/api/alerts',
-                '/api/background-tasks',
+                '/api/background_tasks',
                 '/api/external-data/status',
                 '/api/external-data/quotes'
             ]

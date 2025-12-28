@@ -13,8 +13,8 @@
 ### 1. הוספת עמוד חדש
 
 ```javascript
-// trading-ui/watch-lists.html
-// שימוש בתבנית סטנדרטית (tag-management.html כדוגמה)
+// trading-ui/watch_lists.html (HTML/URL underscore)
+// שימוש בתבנית סטנדרטית (tag_management.html כדוגמה)
 ```
 
 ### 2. הוספת Package
@@ -24,9 +24,9 @@
 {
   name: 'watch-lists',
   scripts: [
-    'services/watch-lists-data.js',
-    'services/watch-lists-ui-service.js',
-    'watch-lists.js'
+    'services/watch_lists-data.js',
+    'services/watch_lists-ui-service.js',
+    'watch_lists.js'
   ],
   dependencies: ['base', 'services', 'ui-advanced', 'crud']
 }
@@ -165,12 +165,12 @@ Backend/
     └── watch_list_service.py   # Business logic
 
 trading-ui/
-├── watch-lists.html            # Main page (Production)
+├── watch_lists.html            # Main page (HTML/URL underscore)
 ├── scripts/
 │   ├── services/
 │   │   ├── watch-lists-data.js      # Data service
 │   │   └── watch-lists-ui-service.js # UI service
-│   └── watch-lists-page.js    # Page-specific logic
+│   └── watch_lists.js         # Page-specific logic
 
 documentation/04-FEATURES/WATCH_LIST/
 ├── WATCHLIST_SPEC.md           # Main specification
@@ -193,14 +193,14 @@ documentation/04-FEATURES/WATCH_LIST/
 
 **תיקון:**
 
-- ✅ הוספת `validation` package ל-`watch-list` page configuration ב-`page-initialization-configs.js`
+- ✅ הוספת `validation` package ל-`watch_lists` page configuration ב-`page-initialization-configs.js`
 - ✅ וידוא ש-validation package נטען לפני modules package (loadOrder: 2.4 vs 2.5)
 - ✅ שימוש ב-`window.validateTextField` ב-`ui-basic.js` עם fallback
 
 **קבצים שנערכו:**
 
 - `trading-ui/scripts/page-initialization-configs.js` - הוספת validation package
-- `trading-ui/watch-list.html` - validation package נטען לפני modules
+- `trading-ui/watch_lists.html` - validation package נטען לפני modules
 
 #### 2. בעיית aria-hidden Warning
 
@@ -273,11 +273,6 @@ python3 scripts/test_watch_lists_selenium.py
 ---
 
 **ראו:** מסמכי התיעוד הנוספים לפרטים מלאים.
-
-
-
-
-
 
 
 

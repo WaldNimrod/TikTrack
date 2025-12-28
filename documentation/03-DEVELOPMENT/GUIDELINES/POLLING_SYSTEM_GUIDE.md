@@ -34,7 +34,7 @@ Frontend (polling-manager.js)
     ↓
 Backend (cache_changes.py)
     ↓
-cache_change_log table (SQLite)
+cache_change_log table
     ↓
     Returns: {changes: [...], count: 5}
     ↓
@@ -415,10 +415,8 @@ curl http://localhost:8080/api/cache/changes
 
 ```bash
 # Check if migration ran:
-sqlite3 Backend/db/simpleTrade_new.db "SELECT * FROM cache_change_log LIMIT 1;"
 
 # If error → run migration:
-sqlite3 Backend/db/simpleTrade_new.db < Backend/migrations/add_cache_change_log_table.sql
 ```
 
 ---
@@ -520,4 +518,3 @@ window.PollingManager.start(30000);  // 30 seconds
 **תאריך:** 13 ינואר 2025  
 **גרסה:** 1.0  
 **סטטוס:** ✅ פעיל ומתועד
-

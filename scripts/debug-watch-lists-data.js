@@ -5,7 +5,7 @@
  * to debug why ticker data is not showing.
  * 
  * Usage:
- * 1. Open watch-list.html
+ * 1. Open watch_list.html
  * 2. Select a list with items
  * 3. Run this script in console
  */

@@ -29,45 +29,45 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 
 # Alternative paths for pages that might be in subdirectories
 PAGE_ALTERNATIVES = {
-    'portfolio-state-page.html': 'mockups/daily-snapshots/portfolio-state-page.html',
-    'trade-history-page.html': 'mockups/daily-snapshots/trade-history-page.html',
-    'tradingview-test-page.html': 'mockups/daily-snapshots/tradingview-test-page.html'
+    'portfolio_state_page.html': 'mockups/daily-snapshots/portfolio_state_page.html',
+    'trade_history_page.html': 'mockups/daily-snapshots/trade_history_page.html',
+    'tradingview_test_page.html': 'mockups/daily-snapshots/tradingview_test_page.html'
 }
 
 # All pages from PAGES_LIST.md
 MAIN_PAGES = [
     'index.html', 'trades.html', 'trade_plans.html', 'alerts.html',
-    'tickers.html', 'ticker-dashboard.html', 'trading_accounts.html',
+    'tickers.html', 'ticker_dashboard.html', 'trading_accounts.html',
     'executions.html', 'data_import.html', 'cash_flows.html', 'notes.html',
-    'research.html', 'portfolio-state-page.html', 'trade-history-page.html',
-    'trading-journal.html', 'ai-analysis.html', 'watch-list.html',
-    'preferences.html', 'user-profile.html'
+    'research.html', 'portfolio_state_page.html', 'trade_history_page.html',
+    'trading_journal.html', 'ai_analysis.html', 'watch_list.html',
+    'preferences.html', 'user_profile.html'
 ]
 
 TECHNICAL_PAGES = [
     'db_display.html', 'db_extradata.html', 'constraints.html',
-    'background-tasks.html', 'server-monitor.html', 'system-management.html',
-    'notifications-center.html', 'css-management.html', 'tradingview-test-page.html',
-    'dynamic-colors-display.html', 'designs.html'
+    'background_tasks.html', 'server_monitor.html', 'system_management.html',
+    'notifications_center.html', 'css_management.html', 'tradingview_test_page.html',
+    'dynamic_colors_display.html', 'designs.html'
 ]
 
 SECONDARY_PAGES = [
-    'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html'
+    'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html'
 ]
 
 AUTH_PAGES = [
-    'register.html', 'forgot-password.html', 'reset-password.html'
+    'register.html', 'forgot_password.html', 'reset_password.html'
 ]
 
 DEV_TOOLS_PAGES = [
-    'button-color-mapping.html', 'button-color-mapping-simple.html',
-    'preferences-groups-management.html', 'tag-management.html',
-    'cache-management.html', 'code-quality-dashboard.html', 'init-system-management.html'
+    'button_color_mapping.html', 'button_color_mapping_simple.html',
+    'preferences_groups_management.html', 'tag_management.html',
+    'cache_management.html', 'code_quality_dashboard.html', 'init_system_management.html'
 ]
 
 MOCKUP_PAGES = [
-    'conditions-modals.html', 'conditions-test.html',
-    'tradingview-widgets-showcase.html', 'trades_formatted.html'
+    'conditions_modals.html', 'conditions_test.html',
+    'tradingview_widgets_showcase.html', 'trades_formatted.html'
 ]
 
 # External pages (optional)

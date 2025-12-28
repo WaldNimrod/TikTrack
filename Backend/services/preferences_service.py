@@ -2,7 +2,7 @@
 """
 Preferences Service – PostgreSQL implementation.
 
-This version removes the sqlite3 dependency and relies entirely on SQLAlchemy
+This version relies entirely on SQLAlchemy
 models so it can run both in Dockerized environments and on AWS RDS.
 """
 
@@ -18,7 +18,6 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
 from config.database import SessionLocal
-from config.settings import DB_PATH
 from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES, COLOR_DEFAULTS
 from models.user import User
 from services.constraint_service import ConstraintService
@@ -58,8 +57,6 @@ class PreferencesService:
         self.cache: Dict[str, Any] = {}
         self.cache_timestamps: Dict[str, float] = {}
         self.constraint_service = ConstraintService()
-        # Legacy compatibility for scripts/tests still touching the sqlite path directly
-        self.db_path = str(DB_PATH)
         # Import cache settings to respect CACHE_ENABLED in development
         from config.settings import CACHE_ENABLED
         self._cache_enabled = CACHE_ENABLED
@@ -786,4 +783,3 @@ class PreferencesService:
 
 # Module-level singleton used by legacy imports
 preferences_service = PreferencesService()
-

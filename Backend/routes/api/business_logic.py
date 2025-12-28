@@ -1369,7 +1369,7 @@ def validate_tag_category():
 # AI Analysis Business Logic Endpoints
 # ============================================================================
 
-@business_logic_bp.route('/ai-analysis/validate', methods=['POST'])
+@business_logic_bp.route('/ai_analysis/validate', methods=['POST'])
 @monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
 @handle_database_session(auto_commit=False, auto_close=True)
 def validate_ai_analysis():
@@ -1428,7 +1428,7 @@ def validate_ai_analysis():
         }), 500
 
 
-@business_logic_bp.route('/ai-analysis/validate-variables', methods=['POST'])
+@business_logic_bp.route('/ai_analysis/validate-variables', methods=['POST'])
 def validate_ai_analysis_variables():
     """Validate AI analysis variables dictionary."""
     try:

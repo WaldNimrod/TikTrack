@@ -186,7 +186,7 @@ curl -s "$BASE_URL/api/executions" | jq 'length'
 curl -s "$BASE_URL/api/alerts" | jq 'length'
 
 # Watch Lists (אם קיים)
-curl -s "$BASE_URL/api/watch-lists" | jq 'length'
+curl -s "$BASE_URL/api/watch-listss" | jq 'length'
 ```
 
 **תוצאה צפויה:**
@@ -204,7 +204,7 @@ curl -I http://localhost:5001/
 curl -I http://localhost:5001/trades
 curl -I http://localhost:5001/executions
 curl -I http://localhost:5001/alerts
-curl -I http://localhost:5001/watch-lists
+curl -I http://localhost:5001/watch_lists
 ```
 
 **תוצאה צפויה:**

@@ -11,7 +11,7 @@
 
 ### 1. עמוד ראשי
 
-**קובץ:** `trading-ui/mockups/watch-lists-page.html`
+**קובץ:** `trading-ui/mockups/watch_lists_page.html`
 
 **תכונות:**
 
@@ -37,7 +37,7 @@
 
 ### 2. Modal - Add/Edit Watch List
 
-**קובץ:** `trading-ui/mockups/watch-list-modal.html`
+**קובץ:** `trading-ui/mockups/watch_list_modal.html`
 
 **תכונות:**
 
@@ -52,7 +52,7 @@
 
 ### 3. Modal - Add Ticker
 
-**קובץ:** `trading-ui/mockups/add-ticker-modal.html`
+**קובץ:** `trading-ui/mockups/add_ticker_modal.html`
 
 **תכונות:**
 
@@ -66,7 +66,7 @@
 
 ### 4. Quick Action - Flag Palette
 
-**קובץ:** `trading-ui/mockups/flag-quick-action.html`
+**קובץ:** `trading-ui/mockups/flag_quick_action.html`
 
 **תכונות:**
 
@@ -142,7 +142,7 @@
 
 ### JavaScript Needed
 
-- Page logic: `watch-lists.js`
+- Page logic: `watch_lists.js`
 - Data service: `watch-lists-data.js`
 - UI service: `watch-lists-ui-service.js`
 
@@ -156,7 +156,6 @@
 ---
 
 **סיכום:** כל המוקאפים מוכנים לבדיקה עם דוגמאות נתונים ואינטגרציות בסיסיות.
-
 
 
 

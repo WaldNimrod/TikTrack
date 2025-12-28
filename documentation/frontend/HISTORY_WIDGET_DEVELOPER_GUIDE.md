@@ -19,7 +19,7 @@ History Widget הוא ווידג'ט מהיר לדשבורד המציג:
 
 **מיקום קבצים:**
 
-- HTML: `trading-ui/mockups/daily-snapshots/history-widget.html`
+- HTML: `trading-ui/mockups/daily-snapshots/history_widget.html`
 - JavaScript: `trading-ui/scripts/history-widget.js`
 - קונפיגורציה: `trading-ui/scripts/page-initialization-configs.js`
 
@@ -185,7 +185,7 @@ window.IconSystem.renderIcon('tabler', 'clock', { width: 16, height: 16 });
 
 ### 1. מיני-גרף P/L שבועי
 
-**מיקום:** `history-widget.html` שורות 129-138
+**מיקום:** `history_widget.html` שורות 129-138
 
 **תיאור:**
 גרף קטן (extra-small) המציג P/L שבועי (7 ימים) עם TradingView Lightweight Charts.
@@ -235,7 +235,7 @@ async function loadWeeklyPLData() {
 
 ### 2. סטטיסטיקות מהירות
 
-**מיקום:** `history-widget.html` שורות 142-160
+**מיקום:** `history_widget.html` שורות 142-160
 
 **תיאור:**
 3 סטטיסטיקות מהירות:
@@ -284,14 +284,14 @@ async function loadQuickStats() {
 
 ### 3. קישורים מהירים
 
-**מיקום:** `history-widget.html` שורות 111-126
+**מיקום:** `history_widget.html` שורות 111-126
 
 **תיאור:**
 3 קישורים מהירים לעמודי היסטוריה:
 
-- מצב תיק אתמול → `portfolio-state-page.html`
-- טריידים פעילים → `trade-history-page.html`
-- שינויי מחיר היום → `price-history-page.html`
+- מצב תיק אתמול → `portfolio_state_page.html`
+- טריידים פעילים → `trade_history_page.html`
+- שינויי מחיר היום → `price_history_page.html`
 
 **פונקציה:** `setupQuickLinks()`
 
@@ -318,7 +318,7 @@ if (newLink) {
 
 ### 4. כפתור רענון
 
-**מיקום:** `history-widget.html` שורה 105
+**מיקום:** `history_widget.html` שורה 105
 
 **תיאור:**
 כפתור רענון המרענן את כל הווידג'טים.
@@ -664,7 +664,7 @@ try {
 ### בדיקות ידניות
 
 1. **טעינת עמוד:**
-   - פתח `http://localhost:8080/mockups/daily-snapshots/history-widget.html`
+   - פתח `http://localhost:8080/mockups/daily-snapshots/history_widget.html`
    - בדוק שאין שגיאות ב-console
    - בדוק שכל הווידג'טים מוצגים
 

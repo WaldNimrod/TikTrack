@@ -430,8 +430,8 @@ applyDefaultValues(form) {
     
     // ברירת מחדל למטבע
     const currencyField = form.querySelector('[id*="Currency"], [name*="currency"]');
-    if (currencyField && preferences.defaultCurrency) {
-        currencyField.value = preferences.defaultCurrency;
+    if (currencyField && preferences.primaryCurrency) {
+        currencyField.value = preferences.primaryCurrency;
     }
     
     // ברירת מחדל לתאריך - היום

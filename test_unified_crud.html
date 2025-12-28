@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Unified CRUD Service</title>
+</head>
+<body>
+    <h1>Testing UnifiedCRUDService Availability</h1>
+    <div id="results"></div>
+
+    <!-- Load the same scripts as trades.html -->
+    <script src="trading-ui/scripts/services/unified-crud-service.js?v=1.0.0" defer></script>
+
+    <script>
+        function checkUnifiedCRUD() {
+            const results = document.getElementById('results');
+
+            setTimeout(() => {
+                const hasService = !!window.UnifiedCRUDService;
+                const serviceType = typeof window.UnifiedCRUDService;
+                const hasCreate = !!window.UnifiedCRUDService?.create;
+                const createType = typeof window.UnifiedCRUDService?.create;
+
+                results.innerHTML = `
+                    <p>UnifiedCRUDService exists: ${hasService}</p>
+                    <p>Service type: ${serviceType}</p>
+                    <p>Create method exists: ${hasCreate}</p>
+                    <p>Create method type: ${createType}</p>
+                `;
+
+                if (window.UnifiedCRUDService) {
+                    const methods = Object.getOwnPropertyNames(window.UnifiedCRUDService);
+                    results.innerHTML += `<p>Available methods: ${methods.join(', ')}</p>`;
+                }
+            }, 1000);
+        }
+
+        // Check immediately and after defer scripts load
+        checkUnifiedCRUD();
+        window.addEventListener('load', checkUnifiedCRUD);
+    </script>
+</body>
+</html>

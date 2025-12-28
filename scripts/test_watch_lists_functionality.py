@@ -28,7 +28,7 @@ class WatchListsFunctionalityTester:
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         self.wait = WebDriverWait(self.driver, 15)
         self.base_url = 'http://localhost:8080'
-        self.page_url = '/watch-list.html'
+        self.page_url = '/watch_list.html'
         self.results = []
         
     def log_result(self, test_name, success, message='', details=None):

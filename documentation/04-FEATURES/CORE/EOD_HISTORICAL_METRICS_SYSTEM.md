@@ -66,12 +66,12 @@
 
 ### ✅ Phase 1: עמודי עדיפות גבוהה
 
-1. **Portfolio State Page** (`/portfolio-state.html`)
+1. **Portfolio State Page** (`/portfolio_state.html`)
    - EOD portfolio metrics (NAV, cash, positions)
    - Historical P&L calculations
    - Date comparison functionality
 
-2. **Trade History Page** (`/trade-history.html`)
+2. **Trade History Page** (`/trade_history.html`)
    - EOD trade analysis statistics
    - Volatility calculations
    - Performance metrics
@@ -86,12 +86,12 @@
    - EOD execution metrics
    - Performance tracking
 
-5. **Server Monitor** (`/server-monitor.html`)
+5. **Server Monitor** (`/server_monitor.html`)
    - EOD monitoring dashboard
    - Performance statistics
    - Job status tracking
 
-6. **System Management** (`/system-management.html`)
+6. **System Management** (`/system_management.html`)
    - EOD job management interface
    - Alert system integration
    - Recompute functionality
@@ -110,7 +110,7 @@
    - EOD tables integration
    - Raw data access
 
-10. **Background Tasks** (`/background-tasks.html`)
+10. **Background Tasks** (`/background_tasks.html`)
     - EOD job status monitoring
     - Alert management interface
 
@@ -308,13 +308,13 @@ window.EODIntegrationHelper = {
 
 ### אינטגרציה בעמודים
 
-#### דשבורד טיקר (ticker-dashboard.html)
+#### דשבורד טיקר (ticker_dashboard.html)
 
 - נשאר מקור המנגנון החסרים/Retry
 - משתמש ב-EODMetricsDataService להצגה
 - מציע "רענון כללי" לכל העמודים
 
-#### יומן מסחר (trading-journal.html)
+#### יומן מסחר (trading_journal.html)
 
 - KPI יומי/גרף פעילות מה-EOD שמור
 - כפתור רענון מפעיל RecomputeService
@@ -327,8 +327,8 @@ window.EODIntegrationHelper = {
 
 #### עמודי מוקאפ
 
-- trade-history-page.html: EOD per date/תיק
-- portfolio-state-page.html: חתכי NAV/פוזיציות/יתרות EOD
+- trade_history_page.html: EOD per date/תיק
+- portfolio_state_page.html: חתכי NAV/פוזיציות/יתרות EOD
 
 ### ולידציה ו-Runtime Calculations
 

@@ -19,7 +19,7 @@ Emotional Tracking Widget הוא ווידג'ט לתיעוד רגשי המציג:
 
 **מיקום קבצים:**
 
-- HTML: `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html`
+- HTML: `trading-ui/mockups/daily-snapshots/emotional_tracking_widget.html`
 - JavaScript: `trading-ui/scripts/emotional-tracking-widget.js`
 - קונפיגורציה: `trading-ui/scripts/page-initialization-configs.js`
 
@@ -214,7 +214,7 @@ window.dateUtils.toDateObject({ epochMs: timestamp });
 
 ### 1. גרף דפוסים רגשיים
 
-**מיקום:** `emotional-tracking-widget.html` שורות 156-167
+**מיקום:** `emotional_tracking_widget.html` שורות 156-167
 
 **תיאור:**
 גרף Bar Chart המציג התפלגות רגשות לאורך זמן (7 ימים) עם TradingView Lightweight Charts.
@@ -263,7 +263,7 @@ async function loadEmotionalPatternsData() {
 
 ### 2. רשימת תיעודים אחרונים
 
-**מיקום:** `emotional-tracking-widget.html` שורות 169-206
+**מיקום:** `emotional_tracking_widget.html` שורות 169-206
 
 **תיאור:**
 רשימה של 10-20 תיעודים אחרונים עם תאריך, רגש, וקישור לטרייד (אם קיים).
@@ -310,7 +310,7 @@ async function loadRecentEntries() {
 
 ### 3. תובנות
 
-**מיקום:** `emotional-tracking-widget.html` שורות 208-221
+**מיקום:** `emotional_tracking_widget.html` שורות 208-221
 
 **תיאור:**
 2-3 תובנות (info + warning) על דפוסים רגשיים.
@@ -360,7 +360,7 @@ async function loadInsights() {
 
 ### 4. טופס תיעוד מהיר
 
-**מיקום:** `emotional-tracking-widget.html` שורות 110-154
+**מיקום:** `emotional_tracking_widget.html` שורות 110-154
 
 **תיאור:**
 טופס מהיר ליצירת תיעוד רגשי חדש עם:

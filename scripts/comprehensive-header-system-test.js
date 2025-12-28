@@ -28,22 +28,22 @@ const PAGES = [
   'db_display.html',
   'db_extradata.html',
   'constraints.html',
-  'background-tasks.html',
-  'server-monitor.html',
-  'notifications-center.html',
-  'css-management.html',
-  'system-management.html',
+  'background_tasks.html',
+  'server_monitor.html',
+  'notifications_center.html',
+  'css_management.html',
+  'system_management.html',
   
   // Dev tools pages
-  'code-quality-dashboard.html',
-  'tag-management.html',
-  'init-system-management.html',
-  'conditions-test.html',
-  'test-header-only.html',
-  'external-data-dashboard.html',
-  'chart-management.html',
-  'crud-testing-dashboard.html',
-  'dynamic-colors-display.html',
+  'code_quality_dashboard.html',
+  'tag_management.html',
+  'init_system_management.html',
+  'conditions_test.html',
+  'test_header_only.html',
+  'external_data_dashboard.html',
+  'chart_management.html',
+  'crud_testing_dashboard.html',
+  'dynamic_colors_display.html',
 ];
 
 async function testPage(browser, pagePath) {
@@ -170,8 +170,8 @@ async function main() {
 | קטגוריה | סה"כ | עברו | נכשלו | אחוז הצלחה |
 |----------|------|------|--------|-------------|
 | עמודים מרכזיים | ${PAGES.filter(p => ['index.html', 'trades.html', 'trade_plans.html', 'alerts.html', 'tickers.html', 'trading_accounts.html', 'executions.html', 'cash_flows.html', 'notes.html', 'research.html', 'preferences.html'].includes(p)).length} | ${allResults.filter((r, i) => ['index.html', 'trades.html', 'trade_plans.html', 'alerts.html', 'tickers.html', 'trading_accounts.html', 'executions.html', 'cash_flows.html', 'notes.html', 'research.html', 'preferences.html'].includes(PAGES[i]) && r.passed).length} | ${allResults.filter((r, i) => ['index.html', 'trades.html', 'trade_plans.html', 'alerts.html', 'tickers.html', 'trading_accounts.html', 'executions.html', 'cash_flows.html', 'notes.html', 'research.html', 'preferences.html'].includes(PAGES[i]) && !r.passed).length} | ${Math.round((allResults.filter((r, i) => ['index.html', 'trades.html', 'trade_plans.html', 'alerts.html', 'tickers.html', 'trading_accounts.html', 'executions.html', 'cash_flows.html', 'notes.html', 'research.html', 'preferences.html'].includes(PAGES[i]) && r.passed).length / PAGES.filter(p => ['index.html', 'trades.html', 'trade_plans.html', 'alerts.html', 'tickers.html', 'trading_accounts.html', 'executions.html', 'cash_flows.html', 'notes.html', 'research.html', 'preferences.html'].includes(p)).length) * 100)}% |
-| עמודים טכניים | ${PAGES.filter(p => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background-tasks.html', 'server-monitor.html', 'notifications-center.html', 'css-management.html', 'system-management.html'].includes(p)).length} | ${allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background-tasks.html', 'server-monitor.html', 'notifications-center.html', 'css-management.html', 'system-management.html'].includes(PAGES[i]) && r.passed).length} | ${allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background-tasks.html', 'server-monitor.html', 'notifications-center.html', 'css-management.html', 'system-management.html'].includes(PAGES[i]) && !r.passed).length} | ${Math.round((allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background-tasks.html', 'server-monitor.html', 'notifications-center.html', 'css-management.html', 'system-management.html'].includes(PAGES[i]) && r.passed).length / PAGES.filter(p => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background-tasks.html', 'server-monitor.html', 'notifications-center.html', 'css-management.html', 'system-management.html'].includes(p)).length) * 100)}% |
-| כלי פיתוח | ${PAGES.filter(p => ['code-quality-dashboard.html', 'tag-management.html', 'init-system-management.html', 'conditions-test.html', 'test-header-only.html', 'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html', 'dynamic-colors-display.html'].includes(p)).length} | ${allResults.filter((r, i) => ['code-quality-dashboard.html', 'tag-management.html', 'init-system-management.html', 'conditions-test.html', 'test-header-only.html', 'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html', 'dynamic-colors-display.html'].includes(PAGES[i]) && r.passed).length} | ${allResults.filter((r, i) => ['code-quality-dashboard.html', 'tag-management.html', 'init-system-management.html', 'conditions-test.html', 'test-header-only.html', 'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html', 'dynamic-colors-display.html'].includes(PAGES[i]) && !r.passed).length} | ${Math.round((allResults.filter((r, i) => ['code-quality-dashboard.html', 'tag-management.html', 'init-system-management.html', 'conditions-test.html', 'test-header-only.html', 'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html', 'dynamic-colors-display.html'].includes(PAGES[i]) && r.passed).length / PAGES.filter(p => ['code-quality-dashboard.html', 'tag-management.html', 'init-system-management.html', 'conditions-test.html', 'test-header-only.html', 'external-data-dashboard.html', 'chart-management.html', 'crud-testing-dashboard.html', 'dynamic-colors-display.html'].includes(p)).length) * 100)}% |
+| עמודים טכניים | ${PAGES.filter(p => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background_tasks.html', 'server_monitor.html', 'notifications_center.html', 'css_management.html', 'system_management.html'].includes(p)).length} | ${allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background_tasks.html', 'server_monitor.html', 'notifications_center.html', 'css_management.html', 'system_management.html'].includes(PAGES[i]) && r.passed).length} | ${allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background_tasks.html', 'server_monitor.html', 'notifications_center.html', 'css_management.html', 'system_management.html'].includes(PAGES[i]) && !r.passed).length} | ${Math.round((allResults.filter((r, i) => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background_tasks.html', 'server_monitor.html', 'notifications_center.html', 'css_management.html', 'system_management.html'].includes(PAGES[i]) && r.passed).length / PAGES.filter(p => ['db_display.html', 'db_extradata.html', 'constraints.html', 'background_tasks.html', 'server_monitor.html', 'notifications_center.html', 'css_management.html', 'system_management.html'].includes(p)).length) * 100)}% |
+| כלי פיתוח | ${PAGES.filter(p => ['code_quality_dashboard.html', 'tag_management.html', 'init_system_management.html', 'conditions_test.html', 'test_header_only.html', 'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html', 'dynamic_colors_display.html'].includes(p)).length} | ${allResults.filter((r, i) => ['code_quality_dashboard.html', 'tag_management.html', 'init_system_management.html', 'conditions_test.html', 'test_header_only.html', 'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html', 'dynamic_colors_display.html'].includes(PAGES[i]) && r.passed).length} | ${allResults.filter((r, i) => ['code_quality_dashboard.html', 'tag_management.html', 'init_system_management.html', 'conditions_test.html', 'test_header_only.html', 'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html', 'dynamic_colors_display.html'].includes(PAGES[i]) && !r.passed).length} | ${Math.round((allResults.filter((r, i) => ['code_quality_dashboard.html', 'tag_management.html', 'init_system_management.html', 'conditions_test.html', 'test_header_only.html', 'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html', 'dynamic_colors_display.html'].includes(PAGES[i]) && r.passed).length / PAGES.filter(p => ['code_quality_dashboard.html', 'tag_management.html', 'init_system_management.html', 'conditions_test.html', 'test_header_only.html', 'external_data_dashboard.html', 'chart_management.html', 'crud_testing_dashboard.html', 'dynamic_colors_display.html'].includes(p)).length) * 100)}% |
 
 ---
 
@@ -181,7 +181,7 @@ ${allResults.map((result, index) => {
   const status = result.passed ? '✅' : '❌';
   return `### ${status} ${result.page}
 
-**קטגוריה:** ${PAGES[index] === 'index.html' || PAGES[index] === 'trades.html' || PAGES[index] === 'trade_plans.html' || PAGES[index] === 'alerts.html' || PAGES[index] === 'tickers.html' || PAGES[index] === 'trading_accounts.html' || PAGES[index] === 'executions.html' || PAGES[index] === 'cash_flows.html' || PAGES[index] === 'notes.html' || PAGES[index] === 'research.html' || PAGES[index] === 'preferences.html' ? 'עמודים מרכזיים' : PAGES[index] === 'db_display.html' || PAGES[index] === 'db_extradata.html' || PAGES[index] === 'constraints.html' || PAGES[index] === 'background-tasks.html' || PAGES[index] === 'server-monitor.html' || PAGES[index] === 'notifications-center.html' || PAGES[index] === 'css-management.html' || PAGES[index] === 'system-management.html' ? 'עמודים טכניים' : 'כלי פיתוח'}  
+**קטגוריה:** ${PAGES[index] === 'index.html' || PAGES[index] === 'trades.html' || PAGES[index] === 'trade_plans.html' || PAGES[index] === 'alerts.html' || PAGES[index] === 'tickers.html' || PAGES[index] === 'trading_accounts.html' || PAGES[index] === 'executions.html' || PAGES[index] === 'cash_flows.html' || PAGES[index] === 'notes.html' || PAGES[index] === 'research.html' || PAGES[index] === 'preferences.html' ? 'עמודים מרכזיים' : PAGES[index] === 'db_display.html' || PAGES[index] === 'db_extradata.html' || PAGES[index] === 'constraints.html' || PAGES[index] === 'background_tasks.html' || PAGES[index] === 'server_monitor.html' || PAGES[index] === 'notifications_center.html' || PAGES[index] === 'css_management.html' || PAGES[index] === 'system_management.html' ? 'עמודים טכניים' : 'כלי פיתוח'}  
 **סטטוס כללי:** ${result.passed ? 'עבר' : 'נכשל'}
 
 #### בדיקות:

@@ -1790,7 +1790,7 @@ async function loadTradesData(options = {}) {
                 allTrades = data.trades || [];
             } else {
                 // Fallback to direct API call
-                const response = await fetch(`/api/trade-history/?account_id=${accountId || ''}&start_date=${startDate}&end_date=${endDate}`, {
+                const response = await fetch(`/api/trade_history/?account_id=${accountId || ''}&start_date=${startDate}&end_date=${endDate}`, {
                     credentials: 'include', // Include cookies for session-based auth
                 });
                 if (!response.ok) {
@@ -2514,7 +2514,9 @@ async function updateTradesSummary(trades) {
             }
             return;
         }
-        
+
+        // #region agent log - PORTFOLIO_RENDERING
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({

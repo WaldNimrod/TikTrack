@@ -94,8 +94,8 @@
 ### Frontend
 
 - `trading-ui/scripts/external-data-service.js` - Frontend service
-- `trading-ui/scripts/external-data-dashboard.js` - Dashboard logic
-- `trading-ui/scripts/ticker-dashboard.js` - Ticker dashboard
+- `trading-ui/scripts/external_data_dashboard.js` - Dashboard logic
+- `trading-ui/scripts/ticker_dashboard.js` - Ticker dashboard
 - `trading-ui/scripts/tickers.js` - Tickers page
 
 ---

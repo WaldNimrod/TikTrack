@@ -1456,6 +1456,12 @@ class ImportOrchestrator:
             # They are stored as 'other_positive'/'other_negative' to distinguish them from real interest.
             storage_type = 'other_positive' if is_positive else 'other_negative'
             mapping_note = 'Interest accrual (accounting entry, not actual cash)'
+        elif raw_type == 'currency_exchange_from':
+            storage_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
+            mapping_note = 'Currency exchange (outgoing)'
+        elif raw_type == 'currency_exchange_to':
+            storage_type = CashFlowHelperService.EXCHANGE_TO_TYPE
+            mapping_note = 'Currency exchange (incoming)'
         elif raw_type == 'tax':
             storage_type = 'tax'
         elif raw_type == 'fee':
@@ -3250,13 +3256,18 @@ class ImportOrchestrator:
             user_id = 1
         provider_name = import_session.provider or import_session.connector_type or "Unknown"
         # Normalize provider name (e.g., "ibkr" -> "IBKR", "IBKRConnector" -> "IBKR")
-        if provider_name.lower() == "ibkr" or "ibkr" in provider_name.lower():
-            provider_name = "IBKR"
-        elif provider_name.lower() == "demo":
-            provider_name = "Demo"
+        # Handle Mock objects in tests (check if string first)
+        if isinstance(provider_name, str):
+            if provider_name.lower() == "ibkr" or "ibkr" in provider_name.lower():
+                provider_name = "IBKR"
+            elif provider_name.lower() == "demo":
+                provider_name = "Demo"
+            else:
+                # Capitalize first letter
+                provider_name = provider_name.capitalize()
         else:
-            # Capitalize first letter
-            provider_name = provider_name.capitalize()
+            # For Mock objects or non-string types, use as-is or fallback
+            provider_name = str(provider_name) if provider_name else "Unknown"
         
         # Get import category (tags should be created manually via create_import_tags.py)
         import_category_id = self._get_import_category(user_id, provider_name)

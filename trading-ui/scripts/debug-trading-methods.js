@@ -134,7 +134,7 @@ async function debugTradingMethodsModal() {
   // 7. Check variable definition
   console.log('\n7️⃣ Checking template variable definition...');
   try {
-    const templatesResponse = await fetch('/api/ai-analysis/templates');
+    const templatesResponse = await fetch('/api/ai_analysis/templates');
     if (templatesResponse.ok) {
       const templatesData = await templatesResponse.json();
       const technicalTemplate = templatesData.data?.find(t => t.name === 'Technical Analysis Deep Dive');

@@ -224,6 +224,26 @@ class TradeService:
                 'entry_price': 150  # Overrides plan's entry_price
             })
         """
+        # #region agent log
+        import json
+        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({
+                "location": "trade_service.py:create:entry",
+                "message": "TradeService.create called",
+                "data": {
+                    "data_keys": list(data.keys()) if isinstance(data, dict) else None,
+                    "data_type": str(type(data)),
+                    "user_id": user_id,
+                    "has_payload": 'payload' in data if isinstance(data, dict) else False,
+                    "payload_keys": list(data.get('payload', {}).keys()) if isinstance(data, dict) and 'payload' in data else None
+                },
+                "timestamp": __import__('time').time() * 1000,
+                "sessionId": "debug-session",
+                "runId": "server-crash-debug",
+                "hypothesisId": "H1,H2,H3,H4,H5"
+            }) + '\n')
+        # #endregion
+
         # Snapshot planning data when a trade_plan_id is provided
         # This implements the "snapshot" pattern: Trade Plan is the source of truth by default
         # When creating a trade from a plan, we copy planning fields as a snapshot at trade creation time
@@ -283,7 +303,26 @@ class TradeService:
         logger.info(f"ValidationService returned: is_valid={is_valid}, errors={errors}")
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
-        
+
+        # #region agent log
+        import json
+        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({
+                "location": "trade_service.py:create:before_trade_constructor",
+                "message": "About to create Trade object",
+                "data": {
+                    "data_keys": list(data.keys()),
+                    "data_types": {k: str(type(v)) for k, v in data.items()},
+                    "has_payload": 'payload' in data,
+                    "payload_type": str(type(data.get('payload'))) if 'payload' in data else None
+                },
+                "timestamp": __import__('time').time() * 1000,
+                "sessionId": "debug-session",
+                "runId": "server-crash-debug",
+                "hypothesisId": "H1,H2,H3,H4,H5"
+            }) + '\n')
+        # #endregion
+
         trade = Trade(**data)
         db.add(trade)
         db.commit()

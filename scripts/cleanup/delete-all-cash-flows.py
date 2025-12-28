@@ -14,21 +14,14 @@ sys.path.insert(0, str(backend_dir))
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from config.settings import DB_PATH
+from config.settings import DATABASE_URL
 
 def delete_all_cash_flows():
     """Delete all cash flows from database"""
     
-    # Database path
-    db_path = Path(DB_PATH)
-    
-    if not db_path.exists():
-        print(f"❌ Database not found at: {db_path}")
-        return False
-    
     try:
         # Create engine and session
-        engine = create_engine(f'sqlite:///{db_path}')
+        engine = create_engine(DATABASE_URL)
         Session = sessionmaker(bind=engine)
         db_session = Session()
         
@@ -65,7 +58,6 @@ def delete_all_cash_flows():
 if __name__ == "__main__":
     success = delete_all_cash_flows()
     sys.exit(0 if success else 1)
-
 
 
 

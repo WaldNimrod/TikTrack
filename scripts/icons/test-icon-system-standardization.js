@@ -37,23 +37,23 @@ const TECHNICAL_PAGES = [
   'db_display.html',
   'db_extradata.html',
   'constraints.html',
-  'background-tasks.html',
-  'server-monitor.html',
-  'notifications-center.html',
-  'css-management.html',
-  'system-management.html'
+  'background_tasks.html',
+  'server_monitor.html',
+  'notifications_center.html',
+  'css_management.html',
+  'system_management.html'
 ];
 
 const DEV_TOOLS_PAGES = [
-  'code-quality-dashboard.html',
-  'tag-management.html',
-  'init-system-management.html',
-  'conditions-test.html',
-  'test-header-only.html',
-  'external-data-dashboard.html',
-  'chart-management.html',
-  'crud-testing-dashboard.html',
-  'dynamic-colors-display.html'
+  'code_quality_dashboard.html',
+  'tag_management.html',
+  'init_system_management.html',
+  'conditions_test.html',
+  'test_header_only.html',
+  'external_data_dashboard.html',
+  'chart_management.html',
+  'crud_testing_dashboard.html',
+  'dynamic_colors_display.html'
 ];
 
 // Test results

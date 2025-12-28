@@ -1,0 +1,146 @@
+[
+  {
+    "name": "דשבורד ראשי",
+    "key": "index",
+    "tables": 1,
+    "url": "/index.html"
+  },
+  {
+    "name": "טריידים",
+    "key": "trades",
+    "tables": 1,
+    "url": "/trades.html"
+  },
+  {
+    "name": "ביצועי עסקאות",
+    "key": "executions",
+    "tables": 4,
+    "url": "/executions.html"
+  },
+  {
+    "name": "התראות",
+    "key": "alerts",
+    "tables": 1,
+    "url": "/alerts.html"
+  },
+  {
+    "name": "תכניות מסחר",
+    "key": "trade_plans",
+    "tables": 1,
+    "url": "/trade_plans.html"
+  },
+  {
+    "name": "טיקרים",
+    "key": "tickers",
+    "tables": 1,
+    "url": "/tickers.html"
+  },
+  {
+    "name": "חשבונות מסחר",
+    "key": "trading_accounts",
+    "tables": 3,
+    "url": "/trading_accounts.html"
+  },
+  {
+    "name": "הערות",
+    "key": "notes",
+    "tables": 1,
+    "url": "/notes.html"
+  },
+  {
+    "name": "תזרימי מזומן",
+    "key": "cash_flows",
+    "tables": 2,
+    "url": "/cash_flows.html"
+  },
+  {
+    "name": "היסטוריית טרייד",
+    "key": "trade_history",
+    "tables": 2,
+    "url": "/trade_history.html"
+  },
+  {
+    "name": "יומן מסחר",
+    "key": "trading_journal",
+    "tables": 1,
+    "url": "/trading_journal.html"
+  },
+  {
+    "name": "רשימות צפייה",
+    "key": "watch_lists",
+    "tables": 1,
+    "url": "/watch_lists.html"
+  },
+  {
+    "name": "מצב תיק",
+    "key": "portfolio_state",
+    "tables": 4,
+    "url": "/portfolio_state.html"
+  },
+  {
+    "name": "ניתוח AI",
+    "key": "ai_analysis",
+    "tables": 0,
+    "url": "/ai_analysis.html"
+  },
+  {
+    "name": "ניתוח אסטרטגיות",
+    "key": "strategy_analysis",
+    "tables": "שגיאה",
+    "url": "/strategy-analysis.html"
+  },
+  {
+    "name": "ייבוא נתונים",
+    "key": "data_import",
+    "tables": 1,
+    "url": "/data_import.html"
+  },
+  {
+    "name": "תגיות",
+    "key": "tag_management",
+    "tables": 3,
+    "url": "/tag_management.html"
+  },
+  {
+    "name": "כניסה",
+    "key": "login",
+    "tables": 0,
+    "url": "/login.html"
+  },
+  {
+    "name": "הרשמה",
+    "key": "register",
+    "tables": 0,
+    "url": "/register.html"
+  },
+  {
+    "name": "שחזור סיסמה",
+    "key": "forgot_password",
+    "tables": "שגיאה",
+    "url": "/forgot-password.html"
+  },
+  {
+    "name": "איפוס סיסמה",
+    "key": "reset_password",
+    "tables": "שגיאה",
+    "url": "/reset-password.html"
+  },
+  {
+    "name": "כלי פיתוח",
+    "key": "dev_tools",
+    "tables": 6,
+    "url": "/dev_tools.html"
+  },
+  {
+    "name": "דשבורד CRUD",
+    "key": "crud_testing_dashboard",
+    "tables": 4,
+    "url": "/crud_testing_dashboard.html"
+  },
+  {
+    "name": "איכות קוד",
+    "key": "code_quality_dashboard",
+    "tables": "שגיאה",
+    "url": "/code-quality-dashboard.html"
+  }
+]

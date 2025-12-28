@@ -23,7 +23,7 @@ from typing import Dict, List, Any
 
 PAGES_DIR = Path("trading-ui")
 REPORTS_DIR = Path("documentation/05-REPORTS")
-PAGE_NAME = "user-profile.html"
+PAGE_NAME = "user_profile.html"
 PAGE_PATH = PAGES_DIR / PAGE_NAME
 BASE_URL = "http://127.0.0.1:8080"
 

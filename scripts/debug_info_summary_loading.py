@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 BASE_URL = "http://localhost:8080"
-PAGE_URL = f"{BASE_URL}/portfolio-state"
+PAGE_URL = f"{BASE_URL}/portfolio_state"
 
 def setup_driver():
     chrome_options = Options()

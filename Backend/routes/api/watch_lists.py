@@ -1,22 +1,20 @@
 """
-# pyright: reportGeneralTypeIssues=false
 API Routes for Watch Lists Management - TikTrack
-================================================
 
 This module contains all API endpoints for managing watch lists in the system.
 Includes CRUD operations for watch lists and watch list items.
 
 Endpoints:
-    GET /api/watch-lists - Get all watch lists for user
-    POST /api/watch-lists - Create new watch list
-    GET /api/watch-lists/<id> - Get watch list by ID
-    PUT /api/watch-lists/<id> - Update watch list
-    DELETE /api/watch-lists/<id> - Delete watch list
-    GET /api/watch-lists/<id>/items - Get items in watch list
-    POST /api/watch-lists/<id>/items - Add ticker to watch list
-    PUT /api/watch-lists/items/<item_id> - Update watch list item
-    DELETE /api/watch-lists/items/<item_id> - Remove item from watch list
-    POST /api/watch-lists/<id>/items/reorder - Update item order
+    GET /api/watch_lists - Get all watch lists for user
+    POST /api/watch_lists - Create new watch list
+    GET /api/watch_lists/<id> - Get watch list by ID
+    PUT /api/watch_lists/<id> - Update watch list
+    DELETE /api/watch_lists/<id> - Delete watch list
+    GET /api/watch_lists/<id>/items - Get items in watch list
+    POST /api/watch_lists/<id>/items - Add ticker to watch list
+    PUT /api/watch_lists/items/<item_id> - Update watch list item
+    DELETE /api/watch_lists/items/<item_id> - Remove item from watch list
+    POST /api/watch_lists/<id>/items/reorder - Update item order
 
 Author: TikTrack Development Team
 Version: 1.0.0
@@ -24,7 +22,8 @@ Date: January 2025
 """
 
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
+from models.watch_list import WatchList, WatchListItem
 from services.watch_list_service import WatchListService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
@@ -36,7 +35,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-watch_lists_bp = Blueprint('watch_lists', __name__, url_prefix='/api/watch-lists')
+watch_lists_bp = Blueprint('watch_lists', __name__, url_prefix='/api/watch_lists')
 
 # Initialize services
 preferences_service = PreferencesService()
@@ -94,7 +93,7 @@ def _get_watch_lists_normalizer() -> DateNormalizationService:
 def get_watch_lists():
     """
     Get all watch lists for the current user.
-    
+
     Returns:
         JSON response with list of watch lists
     """
@@ -103,13 +102,14 @@ def get_watch_lists():
         user_id = _resolve_user_id()
     except ValueError as e:
         return _handle_auth_error(e)
-    
+
     try:
         normalizer = _get_watch_lists_normalizer()
+        WatchListService.ensure_default_watch_list(db, user_id)
         lists = WatchListService.get_watch_lists(db, user_id)
         
         # Convert to dict and normalize dates
-        lists_data = [list_obj.to_dict() for list_obj in lists]
+        lists_data = [list_obj.to_dict(db, user_id) for list_obj in lists]
         lists_data = normalizer.normalize_output(lists_data)
         
         return jsonify({
@@ -882,4 +882,3 @@ def sync_single_flag_list(entity_type: str):
             "error": {"message": f"Failed to sync flag list: {str(e)}"},
             "version": "1.0"
         }), 500
-

@@ -10,7 +10,7 @@ Features:
 - Get parent entities (entities that this entity references)
 - Support for all entity types: trades, accounts, tickers, alerts, etc.
 - Comprehensive relationship mapping
-- SQLite-specific optimizations with proper type handling
+- Optimizations with proper type handling
 
 Database Schema:
 - Uses related_type_id (integer) instead of related_type (string)
@@ -26,7 +26,7 @@ Last Updated: August 26, 2025
 Version: 2.0
 
 Recent Updates:
-- Fixed SQLite compatibility (CONCAT -> ||)
+- Updated string concatenation handling
 - Updated to use related_type_id instead of related_type
 - Enhanced error handling and logging
 - Improved performance with optimized queries

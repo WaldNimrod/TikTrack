@@ -156,7 +156,7 @@
             clearResults('test3-results');
             
             if (typeof window.AuthGuard !== 'undefined' && typeof window.AuthGuard.isPublicPage === 'function') {
-                const publicPages = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'];
+                const publicPages = ['login.html', 'register.html', 'reset_password.html', 'forgot_password.html'];
                 publicPages.forEach(page => {
                     // Simulate page name
                     const originalPathname = window.location.pathname;
@@ -184,7 +184,7 @@
             
             // Test 4.1: Check if current page would be protected
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-            const isPublic = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'].includes(currentPage);
+            const isPublic = ['login.html', 'register.html', 'reset_password.html', 'forgot_password.html'].includes(currentPage);
             
             if (isPublic) {
                 addResult('test4-results', `Current page (${currentPage}) is public - auth guard should skip`, 'pass');

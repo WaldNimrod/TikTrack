@@ -8,20 +8,20 @@
 echo "🔍 Quick Package Loading Check"
 echo "================================"
 
-# Check portfolio-state.html for info-summary
-echo "📄 Checking portfolio-state.html for info-summary scripts..."
+# Check portfolio_state.html for info-summary
+echo "📄 Checking portfolio_state.html for info-summary scripts..."
 
-if grep -q "info-summary-system.js" trading-ui/portfolio-state.html; then
-    echo "✅ info-summary-system.js found in portfolio-state.html"
+if grep -q "info-summary-system.js" trading-ui/portfolio_state.html; then
+    echo "✅ info-summary-system.js found in portfolio_state.html"
 else
-    echo "❌ MISSING: info-summary-system.js not found in portfolio-state.html"
+    echo "❌ MISSING: info-summary-system.js not found in portfolio_state.html"
     echo "   💡 Add: <script src=\"../../scripts/info-summary-system.js?v=1.0.0\" defer></script>"
 fi
 
-if grep -q "info-summary-configs.js" trading-ui/portfolio-state.html; then
-    echo "✅ info-summary-configs.js found in portfolio-state.html"
+if grep -q "info-summary-configs.js" trading-ui/portfolio_state.html; then
+    echo "✅ info-summary-configs.js found in portfolio_state.html"
 else
-    echo "❌ MISSING: info-summary-configs.js not found in portfolio-state.html"
+    echo "❌ MISSING: info-summary-configs.js not found in portfolio_state.html"
     echo "   💡 Add: <script src=\"../../scripts/info-summary-configs.js?v=1.0.0\" defer></script>"
 fi
 
@@ -42,11 +42,11 @@ echo "==========="
 
 MISSING_COUNT=0
 
-if ! grep -q "info-summary-system.js" trading-ui/portfolio-state.html; then
+if ! grep -q "info-summary-system.js" trading-ui/portfolio_state.html; then
     ((MISSING_COUNT++))
 fi
 
-if ! grep -q "info-summary-configs.js" trading-ui/portfolio-state.html; then
+if ! grep -q "info-summary-configs.js" trading-ui/portfolio_state.html; then
     ((MISSING_COUNT++))
 fi
 

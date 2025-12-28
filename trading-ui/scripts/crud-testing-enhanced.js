@@ -348,7 +348,7 @@ class CRUDEnhancedTester {
       'ai-analysis': {
         type: 'user_page',
         displayName: 'ניתוח AI',
-        apiUrl: '/api/ai-analysis/templates',
+        apiUrl: '/api/ai_analysis/templates',
         pageUrl: '/ai_analysis',
         hasCRUD: false, // AI analysis has special workflow
         testData: null,
@@ -361,7 +361,7 @@ class CRUDEnhancedTester {
       'watch-list': {
         type: 'user_page',
         displayName: 'רשימות צפייה',
-        apiUrl: '/api/watch-lists/',
+        apiUrl: '/api/watch_lists/',
         pageUrl: '/watch_lists',
         hasCRUD: true,
         testData: {
@@ -403,7 +403,7 @@ class CRUDEnhancedTester {
       'trading-journal': {
         type: 'user_page',
         displayName: 'יומן מסחר',
-        apiUrl: '/api/trading-journal/statistics?start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z',
+        apiUrl: '/api/trading_journal/statistics?start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z',
         pageUrl: '/trading_journal',
         hasCRUD: false, // Historical view
         testData: null,
@@ -453,6 +453,28 @@ class CRUDEnhancedTester {
         priority: 3,
       },
 
+      tag_management: {
+        type: 'user_page',
+        displayName: 'ניהול תגיות',
+        apiUrl: '/api/tags/categories',
+        pageUrl: '/tag_management',
+        hasCRUD: true,
+        testData: null,
+        getTestData: async function() {
+          const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+          return {
+            name: `CRUD Test Category ${stamp}`,
+            description: 'CRUD Test Tag Category - Safe to delete',
+            order_index: 0,
+            is_active: true,
+          };
+        },
+        expectedButtons: ['קטגוריה חדשה', 'תגית חדשה'],
+        tableSelector: '#tagCategoriesTable',
+        modalSelector: '#tagCategoryModal',
+        priority: 3,
+      },
+
       db_display: {
         type: 'user_page',
         displayName: 'תצוגת בסיס נתונים',
@@ -484,7 +506,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'ניהול מערכת',
         apiUrl: null,
-        pageUrl: '/system-management',
+        pageUrl: '/system_management',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -497,7 +519,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'ניטור שרת',
         apiUrl: null,
-        pageUrl: '/server-monitor',
+        pageUrl: '/server_monitor',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -510,7 +532,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'משימות ברקע',
         apiUrl: null,
-        pageUrl: '/background-tasks',
+        pageUrl: '/background_tasks',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -536,7 +558,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'מרכז התראות',
         apiUrl: null,
-        pageUrl: '/notifications-center',
+        pageUrl: '/notifications_center',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -549,7 +571,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'דשבורד איכות קוד',
         apiUrl: null,
-        pageUrl: '/code-quality-dashboard',
+        pageUrl: '/code_quality_dashboard',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -575,7 +597,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'ניהול CSS',
         apiUrl: null,
-        pageUrl: '/css-management',
+        pageUrl: '/css_management',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -601,7 +623,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'ניהול מטמון',
         apiUrl: null,
-        pageUrl: '/cache-management',
+        pageUrl: '/cache_management',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -627,7 +649,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'תצוגת צבעים',
         apiUrl: null,
-        pageUrl: '/dynamic-colors-display',
+        pageUrl: '/dynamic_colors_display',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -640,7 +662,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'בדיקת כותרת',
         apiUrl: null,
-        pageUrl: '/test-header-only',
+        pageUrl: '/test_header_only',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],

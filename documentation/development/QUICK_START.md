@@ -11,7 +11,7 @@ This guide will help you get up and running with the TikTrack Trading Management
 - **Python 3.8+**: Latest stable version
 - **Node.js 16+**: For frontend development
 - **Git**: Version control system
-- **SQLite**: Database (included with Python)
+- **PostgreSQL**: Database
 - **VS Code**: Recommended IDE (or your preferred editor)
 
 ### **System Requirements**
@@ -89,8 +89,9 @@ python Backend/dev_server.py
 
 ### **Local Environment Layout**
 
-- **Primary development instance**: `/Users/nimrod/Documents/TikTrack/TikTRACKAPP` (serves on port `8080`).
-- **Test/staging instance**: `/Users/nimrod/Documents/TikTrack/TikTrackApp-Production` (serves on port `5001`).
+- **Primary development instance**: `/Users/nimrod/Documents/TikTrack/TikTrackApp` (serves on port `8080`).
+- **Production worktree**: `/Users/nimrod/Documents/TikTrack/TikTrackApp-Production` (serves on port `5001`, branch `production`).
+- **Note:** There is no `production/` folder inside `TikTrackApp`.
 - Ensure you run commands in the correct folder for the environment you intend to test.
 
 ### **Accessing the code review workplan**
@@ -165,7 +166,7 @@ flake8 Backend/
 ### **Database Location**
 
 - **File**: `Backend/db/simpleTrade_new.db`
-- **Type**: SQLite database
+- **Type**: PostgreSQL database
 - **Backup**: Automatic backups in `backups/` directory
 
 ### **Common Database Operations**
@@ -174,8 +175,6 @@ flake8 Backend/
 # Reset database to fresh state
 python Backend/create_fresh_database.py
 
-# View database (using SQLite browser)
-sqlite3 Backend/db/simpleTrade_new.db
 
 # Backup database
 cp Backend/db/simpleTrade_new.db backups/backup_$(date +%Y%m%d_%H%M%S).db
@@ -321,7 +320,6 @@ tail -f logs/dev.log
 ps aux | grep python
 
 # Database operations
-sqlite3 Backend/db/simpleTrade_new.db ".tables"
 ```
 
 ### **Git Commands**

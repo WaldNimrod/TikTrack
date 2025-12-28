@@ -129,13 +129,13 @@ def fix_file(filepath):
 def main():
     """Main function"""
     files_to_fix = [
-        'comparative-analysis-page.html',
-        'trading-journal-page.html',
-        'strategy-analysis-page.html',
-        'economic-calendar-page.html',
-        'history-widget.html',
-        'emotional-tracking-widget.html',
-        'date-comparison-modal.html',
+        'comparative_analysis_page.html',
+        'trading_journal_page.html',
+        'strategy_analysis_page.html',
+        'economic_calendar_page.html',
+        'history_widget.html',
+        'emotional_tracking_widget.html',
+        'date_comparison_modal.html',
         'journal-entry-modal.html'
     ]
     

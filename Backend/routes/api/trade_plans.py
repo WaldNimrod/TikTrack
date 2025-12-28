@@ -77,8 +77,28 @@ def create_trade_plan():
     try:
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
-        
+
         data = request.get_json() or {}
+
+        # #region agent log
+        import json
+        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({
+                "location": "trade_plans.py:create_trade_plan",
+                "message": "Backend create_trade_plan called",
+                "data": {
+                    "user_id": user_id,
+                    "data_keys": list(data.keys()),
+                    "data_types": {k: str(type(v)) for k, v in data.items()},
+                    "entry_price": data.get('entry_price'),
+                    "has_entry_price": 'entry_price' in data
+                },
+                "timestamp": __import__('time').time() * 1000,
+                "sessionId": "debug-session",
+                "runId": "server-crash-debug",
+                "hypothesisId": "H1,H2,H3,H4,H5"
+            }) + '\n')
+        # #endregion
 
         print(f"DEBUG: create_trade_plan received data: {data}")
         print(f"DEBUG: entry_price in data: {'entry_price' in data}")

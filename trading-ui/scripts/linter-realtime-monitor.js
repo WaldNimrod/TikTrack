@@ -1353,7 +1353,7 @@ async function scanSingleFile(fileName) {
         'background-tasks-fixed.html',
         'apple-style-menu-example.html',
         'settings.py',
-        'background-tasks.html',
+        'background_tasks.html',
         'ARCHITECTURE_DOCUMENTATION.html',
         'test_models.html',
         'test_external_data.html',
@@ -1363,7 +1363,7 @@ async function scanSingleFile(fileName) {
         'color-scheme-examples.html',
         'crud_testing_dashboard.html',
         'designs.html',
-        'dynamic-colors-display.html',
+        'dynamic_colors_display.html',
         'page-scripts-matrix-BACKUP-20250918_213951.html',
         'page-scripts-matrix-UPDATED-20250918_214127.html',
         'page-scripts-matrix.html',
@@ -1375,7 +1375,7 @@ async function scanSingleFile(fileName) {
         'test-header-only-new.html',
         'test-header-only-restored.html',
         'test-header-yesterday.html',
-        'test-header-only.html'
+        'test_header_only.html'
     ];
     
     // Skip files that are known to be problematic

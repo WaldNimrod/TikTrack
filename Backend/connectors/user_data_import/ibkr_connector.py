@@ -385,15 +385,17 @@ class IBKRConnector(BaseConnector):
             amount, _ = self._extract_amount_and_currency(row, section_key)
             return 'deposit' if amount and amount > 0 else 'withdrawal'
         
-        # Special case 2: interest -> all interest records in Interest section should be imported
-        # Note: SYEP interest records in the Interest section are monthly summaries and should be included
-        # The separate "Stock Yield Enhancement Program Securities Lent Interest Details" section is filtered out separately
-        # IMPORTANT: Skip "Borrow Fees" records from Interest section - they are summaries and we import detailed
-        # records from "Borrow Fee Details" section separately
+        # Special case 2: interest -> filter out specific types from Interest section
+        # Skip "Borrow Fees" records - they are summaries and we import detailed records from "Borrow Fee Details" section
+        # Skip SYEP interest records - they are monthly summaries and should be skipped to avoid duplicates
         if section_key == 'interest':
             description = (row.get('Description') or row.get('Activity Description') or '').lower()
+            memo = (row.get('Memo') or '').lower()
+
             if 'borrow fees' in description:
-                return None  # Skip Borrow Fees summary (detailed records imported from Borrow Fee Details section)
+                return None  # Skip Borrow Fees summary
+            if 'stock yield enhancement program' in description or 'syep' in description or 'syep' in memo:
+                return None  # Skip SYEP interest summaries (detailed records from separate SYEP section if needed)
             return 'interest'
         
         # Special case 3: transfer -> keep as 'transfer' (amount sign indicates direction)

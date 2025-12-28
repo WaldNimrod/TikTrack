@@ -227,7 +227,7 @@ if (!hasRequiredData) {
 **מיקום בקוד:**
 
 - `trading-ui/scripts/services/unified-progress-manager.js` - שירות Progress Manager
-- `trading-ui/scripts/ticker-dashboard.js` - שימוש ב-`UnifiedProgressManager`
+- `trading-ui/scripts/ticker_dashboard.js` - שימוש ב-`UnifiedProgressManager`
 
 ---
 
@@ -251,7 +251,7 @@ if (!hasRequiredData) {
 
 **מיקום בקוד:**
 
-- `trading-ui/scripts/ticker-dashboard.js` - פונקציה `fetchDataFromProvider()`
+- `trading-ui/scripts/ticker_dashboard.js` - פונקציה `fetchDataFromProvider()`
 
 ---
 

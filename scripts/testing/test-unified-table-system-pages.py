@@ -37,17 +37,17 @@ PAGES_WITH_TABLES = [
     "trading-ui/db_display.html",
     "trading-ui/db_extradata.html",
     "trading-ui/constraints.html",
-    "trading-ui/background-tasks.html",
-    "trading-ui/css-management.html",
+    "trading-ui/background_tasks.html",
+    "trading-ui/css_management.html",
     "trading-ui/designs.html",
     
     # Mockup pages
-    "trading-ui/mockups/daily-snapshots/portfolio-state-page.html",
-    "trading-ui/mockups/daily-snapshots/trade-history-page.html",
-    "trading-ui/mockups/daily-snapshots/history-widget.html",
-    "trading-ui/mockups/daily-snapshots/date-comparison-modal.html",
-    "trading-ui/mockups/daily-snapshots/comparative-analysis-page.html",
-    "trading-ui/mockups/daily-snapshots/strategy-analysis-page.html",
+    "trading-ui/mockups/daily-snapshots/portfolio_state_page.html",
+    "trading-ui/mockups/daily-snapshots/trade_history_page.html",
+    "trading-ui/mockups/daily-snapshots/history_widget.html",
+    "trading-ui/mockups/daily-snapshots/date_comparison_modal.html",
+    "trading-ui/mockups/daily-snapshots/comparative_analysis_page.html",
+    "trading-ui/mockups/daily-snapshots/strategy_analysis_page.html",
 ]
 
 

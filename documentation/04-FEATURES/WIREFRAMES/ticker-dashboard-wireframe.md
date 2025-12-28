@@ -262,14 +262,14 @@
 
 **קישורים נדרשים:**
 
-- מעמוד `tickers.html` → `ticker-dashboard.html?tickerId={id}`
+- מעמוד `tickers.html` → `ticker_dashboard.html?tickerId={id}`
 - מ-`EntityDetailsModal` → כפתור "צפה בדשבורד מורחב"
 - חזרה ל-`tickers.html` או `EntityDetailsModal`
 
 **URL Structure:**
 
-- `/ticker-dashboard.html?tickerId=123`
-- `/ticker-dashboard.html?tickerSymbol=TSLA`
+- `/ticker_dashboard.html?tickerId=123`
+- `/ticker_dashboard.html?tickerSymbol=TSLA`
 
 ---
 

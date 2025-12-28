@@ -63,12 +63,12 @@ ALL_PAGES = [
     {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical", "priority": "low"},
     {"name": "נתונים נוספים", "url": "/db_extradata.html", "category": "technical", "priority": "low"},
     {"name": "אילוצי מערכת", "url": "/constraints.html", "category": "technical", "priority": "low"},
-    {"name": "משימות רקע", "url": "/background-tasks.html", "category": "technical", "priority": "low"},
-    {"name": "ניטור שרת", "url": "/server-monitor.html", "category": "technical", "priority": "low"},
-    {"name": "ניהול מערכת", "url": "/system-management.html", "category": "technical", "priority": "low"},
-    {"name": "מרכז התראות", "url": "/notifications-center.html", "category": "technical", "priority": "low"},
-    {"name": "ניהול CSS", "url": "/css-management.html", "category": "technical", "priority": "low"},
-    {"name": "תצוגת צבעים", "url": "/dynamic-colors-display.html", "category": "technical", "priority": "low"},
+    {"name": "משימות רקע", "url": "/background_tasks.html", "category": "technical", "priority": "low"},
+    {"name": "ניטור שרת", "url": "/server_monitor.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול מערכת", "url": "/system_management.html", "category": "technical", "priority": "low"},
+    {"name": "מרכז התראות", "url": "/notifications_center.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול CSS", "url": "/css_management.html", "category": "technical", "priority": "low"},
+    {"name": "תצוגת צבעים", "url": "/dynamic_colors_display.html", "category": "technical", "priority": "low"},
     {"name": "עיצובים", "url": "/designs.html", "category": "technical", "priority": "low"},
     
     # עמודים משניים (Secondary Pages)
@@ -78,8 +78,8 @@ ALL_PAGES = [
     
     # עמודי אימות (Auth Pages)
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
-    {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
-    {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
+    {"name": "שחזור סיסמה", "url": "/forgot_password.html", "category": "auth", "priority": "medium"},
+    {"name": "איפוס סיסמה", "url": "/reset_password.html", "category": "auth", "priority": "medium"},
     
     # עמודי כלי פיתוח ראשי (Dev Tools Main)
     {"name": "כלי פיתוח ראשי", "url": "/dev_tools", "category": "dev", "priority": "high"},

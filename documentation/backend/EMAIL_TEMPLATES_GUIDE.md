@@ -176,7 +176,7 @@
 ```python
 render_template('password_reset', {
     'username': 'user123',
-    'reset_url': 'http://localhost:8080/reset-password.html?token=abc123'
+    'reset_url': 'http://localhost:8080/reset_password.html?token=abc123'
 })
 ```
 
@@ -196,7 +196,7 @@ render_template('password_reset', {
 render_template('system_notification', {
     'title': 'עדכון מערכת',
     'message': 'המערכת עודכנה בהצלחה',
-    'action_url': 'http://localhost:8080/system-updates.html'
+    'action_url': 'http://localhost:8080/system_management'
 })
 ```
 
@@ -216,7 +216,7 @@ render_template('system_notification', {
 render_template('business_notification', {
     'title': 'טרייד חדש',
     'message': 'טרייד חדש נוצר במערכת',
-    'action_url': 'http://localhost:8080/trades.html'
+    'action_url': 'http://localhost:8080/trades'
 })
 ```
 
@@ -324,7 +324,7 @@ from services.email_service import EmailService
 # עיבוד template
 html_content = render_template('password_reset', {
     'username': 'user123',
-    'reset_url': 'http://localhost:8080/reset-password.html?token=abc123'
+    'reset_url': 'http://localhost:8080/reset_password.html?token=abc123'
 })
 
 # שליחה
@@ -401,4 +401,3 @@ def create_email_with_button(button_text, button_url):
 
 **עדכון אחרון**: 28 בינואר 2025  
 **גרסה**: 1.0.0
-

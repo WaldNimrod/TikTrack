@@ -118,9 +118,9 @@ class AIAnalysisWorkflowTester:
         try:
             # נסה מספר אפשרויות של URL
             urls_to_try = [
-                f"{self.base_url}/ai-analysis.html",
-                f"{self.base_url}/ai-analysis",
-                f"{self.base_url}/trading-ui/ai-analysis.html"
+                f"{self.base_url}/ai_analysis.html",
+                f"{self.base_url}/ai_analysis",
+                f"{self.base_url}/trading-ui/ai_analysis.html"
             ]
             
             for url in urls_to_try:
@@ -618,7 +618,7 @@ def get_analyses_from_backend(user_id: int = None) -> List[Dict[str, Any]]:
         from datetime import datetime, timedelta
         
         # קבלת ניתוחים שנוצרו ב-10 דקות האחרונות
-        url = f"{BASE_URL}/api/ai-analysis/history"
+        url = f"{BASE_URL}/api/ai_analysis/history"
         response = requests.get(url, cookies=tester.driver.get_cookies() if hasattr(tester, 'driver') and tester.driver else None)
         
         if response.status_code == 200:

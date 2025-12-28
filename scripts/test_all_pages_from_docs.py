@@ -17,17 +17,17 @@ MAIN_PAGES = [
     'trade_plans.html',
     'alerts.html',
     'tickers.html',
-    'ticker-dashboard.html',
+    'ticker_dashboard.html',
     'trading_accounts.html',
     'executions.html',
     'data_import.html',
     'cash_flows.html',
     'notes.html',
     'research.html',
-    'ai-analysis.html',
-    'watch-list.html',
+    'ai_analysis.html',
+    'watch_list.html',
     'preferences.html',
-    'user-profile.html',
+    'user_profile.html',
 ]
 
 # Technical pages
@@ -35,12 +35,12 @@ TECHNICAL_PAGES = [
     'db_display.html',
     'db_extradata.html',
     'constraints.html',
-    'background-tasks.html',
-    'server-monitor.html',
-    'system-management.html',
-    'notifications-center.html',
-    'css-management.html',
-    'dynamic-colors-display.html',
+    'background_tasks.html',
+    'server_monitor.html',
+    'system_management.html',
+    'notifications_center.html',
+    'css_management.html',
+    'dynamic_colors_display.html',
     'designs.html',
 ]
 
@@ -48,8 +48,8 @@ TECHNICAL_PAGES = [
 AUTH_PAGES = [
     'login.html',
     'register.html',
-    'forgot-password.html',
-    'reset-password.html',
+    'forgot_password.html',
+    'reset_password.html',
 ]
 
 ALL_PAGES = MAIN_PAGES + TECHNICAL_PAGES + AUTH_PAGES

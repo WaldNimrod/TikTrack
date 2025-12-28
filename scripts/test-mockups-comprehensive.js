@@ -20,51 +20,51 @@ const BASE_DIR = path.resolve(__dirname, '..');
 const MOCKUP_PAGES = [
     { 
         name: 'comparative-analysis-page',
-        path: '/mockups/daily-snapshots/comparative-analysis-page.html'
+        path: '/mockups/daily-snapshots/comparative_analysis_page.html'
     },
     { 
         name: 'date-comparison-modal',
-        path: '/mockups/daily-snapshots/date-comparison-modal.html'
+        path: '/mockups/daily-snapshots/date_comparison_modal.html'
     },
     { 
         name: 'economic-calendar-page',
-        path: '/mockups/daily-snapshots/economic-calendar-page.html'
+        path: '/mockups/daily-snapshots/economic_calendar_page.html'
     },
     { 
         name: 'emotional-tracking-widget',
-        path: '/mockups/daily-snapshots/emotional-tracking-widget.html'
+        path: '/mockups/daily-snapshots/emotional_tracking_widget.html'
     },
     { 
         name: 'history-widget',
-        path: '/mockups/daily-snapshots/history-widget.html'
+        path: '/mockups/daily-snapshots/history_widget.html'
     },
     { 
         name: 'portfolio-state-page',
-        path: '/mockups/daily-snapshots/portfolio-state-page.html'
+        path: '/mockups/daily-snapshots/portfolio_state_page.html'
     },
     { 
         name: 'price-history-page',
-        path: '/mockups/daily-snapshots/price-history-page.html'
+        path: '/mockups/daily-snapshots/price_history_page.html'
     },
     { 
         name: 'strategy-analysis-page',
-        path: '/mockups/daily-snapshots/strategy-analysis-page.html'
+        path: '/mockups/daily-snapshots/strategy_analysis_page.html'
     },
     { 
         name: 'trade-history-page',
-        path: '/mockups/daily-snapshots/trade-history-page.html'
+        path: '/mockups/daily-snapshots/trade_history_page.html'
     },
     { 
         name: 'trading-journal-page',
-        path: '/mockups/daily-snapshots/trading-journal-page.html'
+        path: '/mockups/daily-snapshots/trading_journal_page.html'
     },
     { 
         name: 'tradingview-test-page',
-        path: '/mockups/daily-snapshots/tradingview-test-page.html'
+        path: '/mockups/daily-snapshots/tradingview_test_page.html'
     },
     { 
         name: 'watch-lists-page',
-        path: '/mockups/watch-lists-page.html'
+        path: '/mockups/watch_lists-page.html'
     },
 ];
 

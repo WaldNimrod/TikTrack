@@ -30,7 +30,7 @@ def upgrade():
     WHERE entry_price IS NULL;
     
     -- After populating data, make column NOT NULL
-    -- Note: SQLite doesn't support ALTER COLUMN, so we'll need to recreate the table
+    -- Note: column type changes may require table recreation
     -- For now, we'll keep it nullable and enforce NOT NULL at application level
     -- In production, consider recreating table with NOT NULL constraint
     """
@@ -40,4 +40,3 @@ def downgrade():
     return """
     ALTER TABLE trade_plans DROP COLUMN entry_price;
     """
-

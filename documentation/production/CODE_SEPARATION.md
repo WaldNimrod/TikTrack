@@ -4,6 +4,10 @@
 **גרסה:** 1.0.0  
 **מטרה:** מדריך מפורט להפרדת קוד פרודקשן מסביבת הפיתוח
 
+**חשוב:** פרודקשן מנוהל בענף ייעודי (production) באותו ריפו.  
+העבודה נעשית ב‑worktree נפרד (`TikTrackApp-Production`) במקביל לתיקיית הפיתוח.  
+אין תיקיית `production/` בתוך `TikTrackApp` (פיתוח); התיקייה הפנימית הועברה לארכיון.
+
 ---
 
 ## 🚀 עדכון פרודקשן - תהליך מהיר
@@ -199,9 +203,8 @@ engine = create_engine(DATABASE_URL)
 ```
 
 ```python
-# ❌ שגוי - שימוש ב-SQLite או נתיב קשיח
-import sqlite3
-conn = sqlite3.connect("tiktrack.db")  # לא נתמך יותר!
+# ❌ שגוי - שימוש בנתיב קשיח או חיבור ידני
+raise RuntimeError("Use DATABASE_URL from config.settings")
 ```
 
 הסקריפט `scripts/fix_production_paths.py` מתקן אוטומטית נתיבים קשיחים.
@@ -336,4 +339,3 @@ cd production
 
 **עודכן:** 2025-11-08  
 **גרסה:** 1.0.0
-

@@ -681,7 +681,7 @@
             const ol = document.createElement('ol');
             const li1 = document.createElement('li');
             const a1 = document.createElement('a');
-            a1.href = '/user-profile#ai-analysis';
+            a1.href = '/user_profile#ai-analysis';
             a1.target = '_blank';
             a1.className = 'alert-link';
             const strong3 = document.createElement('strong');
@@ -1917,8 +1917,8 @@
 
         // Build API URL
         const apiUrl = window.API_BASE_URL 
-          ? (window.API_BASE_URL.endsWith('/') ? window.API_BASE_URL : `${window.API_BASE_URL}/`) + 'api/ai-analysis/generate'
-          : '/api/ai-analysis/generate';
+          ? (window.API_BASE_URL.endsWith('/') ? window.API_BASE_URL : `${window.API_BASE_URL}/`) + 'api/ai_analysis/generate'
+          : '/api/ai_analysis/generate';
 
         // Update loading state - waiting for response
         if (isModal) {
@@ -2732,7 +2732,7 @@
         container.appendChild(loadingDiv);
         
         try {
-          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, { });
+          const response = await fetch(`/api/ai_analysis/history/${analysisResult.id}`, { });
           
           if (response.ok) {
             const data = await response.json();
@@ -3068,7 +3068,7 @@
         });
         
         try {
-          const response = await fetch('/api/ai-analysis/history/availability/batch', {
+          const response = await fetch('/api/ai_analysis/history/availability/batch', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -3174,7 +3174,7 @@
         let analysis = this.history.find(h => h.id === analysisId);
         if (!analysis) {
           // Try to load from API
-          const response = await fetch(`/api/ai-analysis/history/${analysisId}`, { });
+          const response = await fetch(`/api/ai_analysis/history/${analysisId}`, { });
           if (!response.ok) {
             throw new Error('Analysis not found');
           }
@@ -3344,8 +3344,8 @@
 
         // Call generate API
         const apiUrl = window.API_BASE_URL 
-          ? (window.API_BASE_URL.endsWith('/') ? window.API_BASE_URL : `${window.API_BASE_URL}/`) + 'api/ai-analysis/generate'
-          : '/api/ai-analysis/generate';
+          ? (window.API_BASE_URL.endsWith('/') ? window.API_BASE_URL : `${window.API_BASE_URL}/`) + 'api/ai_analysis/generate'
+          : '/api/ai_analysis/generate';
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -3656,7 +3656,7 @@
       
       // Check if saved as note via API
       try {
-        const response = await fetch(`/api/ai-analysis/history/${analysisId}/availability`, { });
+        const response = await fetch(`/api/ai_analysis/history/${analysisId}/availability`, { });
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.data && data.data.has_note) {
@@ -3928,7 +3928,7 @@
           if (!item) {
             window.Logger?.warn('History item not found, loading from API', { page: 'ai-analysis', id: itemId });
             // Try to load from API if not in history
-            const response = await fetch(`/api/ai-analysis/history/${itemId}`, { });
+            const response = await fetch(`/api/ai_analysis/history/${itemId}`, { });
             if (response.ok) {
               const data = await response.json();
               if (data.status === 'success' && data.data) {
@@ -3973,7 +3973,7 @@
 
         // If not in item or cache, try to load from API
         if (!analysisResult || !analysisResult.response_text) {
-          const response = await fetch(`/api/ai-analysis/history/${item.id}`, { });
+          const response = await fetch(`/api/ai_analysis/history/${item.id}`, { });
 
           if (!response.ok) {
             throw new Error('Failed to load analysis');
@@ -4015,7 +4015,7 @@
           let noteId = null;
           let noteExists = false;
           try {
-            const availabilityResponse = await fetch(`/api/ai-analysis/history/${item.id}/availability`, { });
+            const availabilityResponse = await fetch(`/api/ai_analysis/history/${item.id}/availability`, { });
             if (availabilityResponse.ok) {
               const availabilityData = await availabilityResponse.json();
               if (availabilityData.status === 'success' && availabilityData.data) {
@@ -4221,7 +4221,7 @@
           } else {
             // Try to load from API
             try {
-              const response = await fetch(`/api/ai-analysis/history/${this.currentAnalysis.id}`);
+              const response = await fetch(`/api/ai_analysis/history/${this.currentAnalysis.id}`);
               if (response.ok) {
                 const data = await response.json();
                 if (data.status === 'success' && data.data && data.data.response_text) {

@@ -18,15 +18,15 @@ PAGES_TO_TEST = [
     {"name": "תכניות מסחר", "url": "/trade_plans.html", "priority": "high"},
     {"name": "התראות", "url": "/alerts.html", "priority": "high"},
     {"name": "טיקרים", "url": "/tickers.html", "priority": "high"},
-    {"name": "דשבורד טיקר", "url": "/ticker-dashboard.html", "priority": "medium"},
+    {"name": "דשבורד טיקר", "url": "/ticker_dashboard.html", "priority": "medium"},
     {"name": "חשבונות מסחר", "url": "/trading_accounts.html", "priority": "high"},
     {"name": "ביצועים", "url": "/executions.html", "priority": "high"},
     {"name": "תזרימי מזומן", "url": "/cash_flows.html", "priority": "high"},
     {"name": "הערות", "url": "/notes.html", "priority": "high"},
     {"name": "מחקר", "url": "/research.html", "priority": "medium"},
-    {"name": "ניתוח AI", "url": "/ai-analysis.html", "priority": "medium"},
+    {"name": "ניתוח AI", "url": "/ai_analysis.html", "priority": "medium"},
     {"name": "העדפות", "url": "/preferences.html", "priority": "high"},
-    {"name": "פרופיל משתמש", "url": "/user-profile.html", "priority": "medium"},
+    {"name": "פרופיל משתמש", "url": "/user_profile.html", "priority": "medium"},
 ]
 
 def test_page(page_info):

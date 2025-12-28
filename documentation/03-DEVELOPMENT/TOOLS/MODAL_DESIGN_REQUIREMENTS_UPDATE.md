@@ -47,7 +47,7 @@
 ### 1. מטבע
 
 - **מקור**: העדפות המשתמש
-- **משתנה**: `preferences.defaultCurrency`
+- **משתנה**: `preferences.primaryCurrency`
 - **יישום**: מילוי אוטומטי של שדה מטבע
 
 ### 2. תאריך
@@ -162,8 +162,8 @@ applyDefaultValues(form) {
     
     // ברירת מחדל למטבע
     const currencyField = form.querySelector('[id*="Currency"], [name*="currency"]');
-    if (currencyField && preferences.defaultCurrency) {
-        currencyField.value = preferences.defaultCurrency;
+    if (currencyField && preferences.primaryCurrency) {
+        currencyField.value = preferences.primaryCurrency;
     }
     
     // ברירת מחדל לתאריך - היום

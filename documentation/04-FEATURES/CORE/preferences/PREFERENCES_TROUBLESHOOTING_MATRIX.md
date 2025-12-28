@@ -623,6 +623,42 @@ const prefs = await window.PreferencesData.loadPreferencesByNames({
 
 ---
 
+## בעיות בדיקות מקומיות
+
+### בעיה: סקריפט אימות העדפות נכשל עם `DATABASE_URL is not configured`
+
+**תסמינים:**
+- שגיאה על `POSTGRES_HOST`/`DATABASE_URL` חסר
+
+**פתרון:**
+- הרץ עם משתני PostgreSQL מוגדרים
+- או השתמש ב-`start_server.sh` שמגדיר אותם
+
+### בעיה: בדיקת Selenium נכשלת בהורדת WebDriver
+
+**תסמינים:**
+- `Could not reach host. Are you offline?`
+- כישלון בהקמת driver
+
+**פתרון:**
+- ודא גישה לרשת להורדת driver
+- ודא ש-Firefox/Chrome מותקנים
+
+---
+
+### בעיה: `GET /api/preferences/default` מחזיר 404 עבור `default_trading_account` או `primaryCurrency`
+
+**תסמינים:**
+- תשובת API: `Preference 'default_trading_account' not found`
+- תשובת API: `Preference 'primaryCurrency' not found`
+
+**פתרון:**
+- ודא שהשרת רץ עם אותו DB שבו הוספת את ה‑preferences.
+- בצע restart לשרת עם `start_server.sh` כדי לטעון את ה‑DB העדכני.
+- אמת שההעדפות קיימות ב־`preference_types` עם `is_active = true`.
+
+---
+
 ## סיכום
 
 ### Checklist לפתרון בעיות
@@ -641,4 +677,3 @@ const prefs = await window.PreferencesData.loadPreferencesByNames({
 - `documentation/features/preferences/SOLUTION_DESIGN.md` - עיצוב פתרון אופטימלי
 - `Backend/services/preferences_service.py` - שירות Backend
 - `trading-ui/scripts/preferences-core.js` - מנהל Frontend
-

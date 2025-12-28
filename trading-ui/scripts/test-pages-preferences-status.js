@@ -34,8 +34,8 @@
     { name: 'research', file: 'research.html', description: 'מחקר' },
     { name: 'data_import', file: 'data_import.html', description: 'ייבוא נתונים' },
     { name: 'preferences', file: 'preferences.html', description: 'העדפות' },
-    { name: 'user-profile', file: 'user-profile.html', description: 'פרופיל משתמש' },
-    { name: 'ai-analysis', file: 'ai-analysis.html', description: 'ניתוח AI' }
+    { name: 'user-profile', file: 'user_profile.html', description: 'פרופיל משתמש' },
+    { name: 'ai-analysis', file: 'ai_analysis.html', description: 'ניתוח AI' }
   ];
 
   /**

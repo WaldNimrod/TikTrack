@@ -33,8 +33,8 @@ TEST_USERNAME = "admin"
 TEST_PASSWORD = "admin123"
 
 TEST_PAGES = [
-    {"name": "test-header-only.html", "url": "/test-header-only.html"},
-    {"name": "test-unified-widget.html", "url": "/test-unified-widget.html"},
+    {"name": "test_header_only.html", "url": "/test_header_only.html"},
+    {"name": "test_unified_widget.html", "url": "/test_unified_widget.html"},
 ]
 
 BASE_DIR = Path(__file__).parent.parent.parent

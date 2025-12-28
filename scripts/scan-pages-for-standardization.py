@@ -23,9 +23,9 @@ PAGES = [
     {"name": "notes", "file": "notes.html", "has_crud": True, "category": "Central"},
     {"name": "research", "file": "research.html", "has_crud": False, "category": "Central"},
     {"name": "preferences", "file": "preferences.html", "has_crud": True, "category": "Central"},
-    {"name": "external-data-dashboard", "file": "external-data-dashboard.html", "has_crud": False, "category": "Supporting"},
-    {"name": "chart-management", "file": "chart-management.html", "has_crud": False, "category": "Supporting"},
-    {"name": "crud-testing-dashboard", "file": "crud-testing-dashboard.html", "has_crud": False, "category": "Supporting"},
+    {"name": "external-data-dashboard", "file": "external_data_dashboard.html", "has_crud": False, "category": "Supporting"},
+    {"name": "chart-management", "file": "chart_management.html", "has_crud": False, "category": "Supporting"},
+    {"name": "crud-testing-dashboard", "file": "crud_testing_dashboard.html", "has_crud": False, "category": "Supporting"},
     {"name": "db_display", "file": "db_display.html", "has_crud": False, "category": "Technical"},
     {"name": "db_extradata", "file": "db_extradata.html", "has_crud": False, "category": "Technical"},
 ]

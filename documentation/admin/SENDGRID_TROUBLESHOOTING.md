@@ -51,7 +51,7 @@
 
 ### בדיקה 3: הגדרות ב-TikTrack
 
-פתח `http://localhost:8080/user-profile.html` → סקשן "הגדרות SMTP":
+פתח `http://localhost:8080/user_profile` → סקשן "הגדרות SMTP":
 
 - ✅ Host: `smtp.sendgrid.net`
 - ✅ Port: `587`

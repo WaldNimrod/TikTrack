@@ -370,7 +370,7 @@ async function testPreferenceValues() {
         console.log('🧪 Testing preference values...');
         
         // נסה לטעון ברירת מחדל למטבע (אם קיימת)
-        const currency = await window.DefaultValueSetter.setPreferenceValue('testDefaultStatus', 'default_currency');
+        const currency = await window.DefaultValueSetter.setPreferenceValue('testDefaultStatus', 'primaryCurrency');
         
         console.log('✅ Preference value loaded:', currency);
         window.showInfoNotification('מידע', `ברירת מחדל: ${currency || 'לא הוגדר'}`);

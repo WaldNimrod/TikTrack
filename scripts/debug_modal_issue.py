@@ -22,7 +22,7 @@ try:
     driver.execute_script('document.getElementById("username").value = "admin"; document.getElementById("password").value = "admin123"; document.querySelector("button[type=\\"submit\\"]").click();')
     time.sleep(3)
     
-    driver.get('http://localhost:8080/watch-list.html')
+    driver.get('http://localhost:8080/watch_list.html')
     time.sleep(10)
     
     print('=== Checking Modal Configuration ===')

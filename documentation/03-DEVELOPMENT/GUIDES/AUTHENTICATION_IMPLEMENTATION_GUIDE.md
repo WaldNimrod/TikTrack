@@ -58,8 +58,8 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 
 - `login.html`
 - `register.html`
-- `reset-password.html`
-- `forgot-password.html`
+- `reset_password.html`
+- `forgot_password.html`
 
 **איך זה עובד:**
 

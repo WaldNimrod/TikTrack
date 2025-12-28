@@ -206,9 +206,9 @@ git merge main
 ```bash
 # בדיקת הגדרות
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION; \
     print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
+    print(f'DB: {DATABASE_URL}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -217,7 +217,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 
 ```
 UI: /path/to/production/trading-ui
-DB: PostgreSQL (TikTrack-db-production)
+DB: postgresql+psycopg2://...
 Port: 5001
 Production: True
 ```
@@ -436,4 +436,3 @@ python3 scripts/production-update/document_server_changes.py
 
 **עודכן:** 2025-01-21  
 **גרסה:** 1.0.0
-

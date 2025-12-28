@@ -119,7 +119,7 @@ def test_page_loading(driver):
     print("="*60)
     
     try:
-        driver.get(f"{BASE_URL}/mockups/daily-snapshots/trade-history-page.html")
+        driver.get(f"{BASE_URL}/mockups/daily-snapshots/trade_history_page.html")
         time.sleep(3)
         
         # Check if page loaded
@@ -376,7 +376,7 @@ def test_menu_link(driver):
             # Try multiple selectors
             selectors = [
                 "a[href*='trade-history']",
-                "a[href='/trade-history']",
+                "a[href='/trade_history']",
                 "//a[contains(text(), 'היסטוריית טרייד')]"
             ]
             

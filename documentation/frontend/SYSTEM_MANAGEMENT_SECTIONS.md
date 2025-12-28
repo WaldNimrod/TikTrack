@@ -189,7 +189,7 @@
 
 **קישור מהיר:**
 
-- "דשבורד מלא" → `/external-data-dashboard`
+- "דשבורד מלא" → `/external_data_dashboard`
 
 ---
 

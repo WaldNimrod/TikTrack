@@ -229,7 +229,7 @@ devctl logs clear [service] # ניקוי לוגים
 
 #### **מיקום:**
 
-`trading-ui/server-management.html`
+`trading-ui/system_management.html`
 
 ### **4. API Endpoints - נקודות API**
 
@@ -411,7 +411,7 @@ POST /api/logs/clear            # ניקוי לוגים
 - **מערכת הפעלה**: macOS 10.15+
 - **Python**: 3.9+
 - **Node.js**: 14+
-- **SQLite**: 3
+- **PostgreSQL connections**: 3
 - **Cursor IDE**: 0.40+
 
 ### **דרישות סביבה:**
@@ -526,8 +526,6 @@ POST /api/logs/clear            # ניקוי לוגים
 **תאריך עדכון אחרון:** 28 בספטמבר 2025  
 **גרסה:** 1.0  
 **מפתח:** TikTrack Development Team
-
-
 
 
 

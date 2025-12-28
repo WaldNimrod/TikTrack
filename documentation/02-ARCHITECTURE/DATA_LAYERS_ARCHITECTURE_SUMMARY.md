@@ -101,7 +101,7 @@
                         │
 ┌───────────────────────▼─────────────────────────────────────┐
 │                    DATABASE LAYER                            │
-│  (PostgreSQL/SQLite + SQLAlchemy ORM)                        │
+│  (PostgreSQL + SQLAlchemy ORM)                               │
 │  - Models (Trade, Account, Ticker, etc.)                     │
 │  - Relationships (Foreign Keys)                              │
 │  - Constraints (NOT NULL, UNIQUE, ENUM)                      │
@@ -117,7 +117,7 @@
 **אפיון:**
 
 - **מטרה:** אחסון נתונים persistent
-- **טכנולוגיה:** PostgreSQL (production) / SQLite (development)
+- **טכנולוגיה:** PostgreSQL (production + development)
 - **ORM:** SQLAlchemy
 - **תכונות:**
   - Models עם BaseModel משותף
@@ -456,7 +456,7 @@ window.{EntityName}Data = {
 
 | שכבה | אפיון | קוד בפועל | סטטוס |
 |------|-------|-----------|-------|
-| **Database Layer** | PostgreSQL/SQLite + SQLAlchemy | ✅ Models עם BaseModel, Relationships, Constraints | ✅ **100%** |
+| **Database Layer** | PostgreSQL + SQLAlchemy | ✅ Models עם BaseModel, Relationships, Constraints | ✅ **100%** |
 | **API Layer** | Flask Blueprints, RESTful | ✅ Blueprints לכל entity, Base classes, Decorators | ✅ **100%** |
 | **Cache Layer** | 4 שכבות (Memory, localStorage, IndexedDB, Backend) | ✅ UnifiedCacheManager עם 4 שכבות | ✅ **100%** |
 | **Data Services** | ממשק אחיד, Cache-first | ✅ 12 services עם ממשק אחיד | ✅ **100%** |
@@ -630,4 +630,3 @@ window.{EntityName}Data = {
 **תאריך עדכון אחרון:** 22 נובמבר 2025  
 **גרסה:** 1.0.0  
 **מחבר:** TikTrack Development Team
-

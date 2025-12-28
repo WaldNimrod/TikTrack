@@ -297,7 +297,7 @@ node scripts/monitors/advanced-duplicate-detector.js
 **קישורים:**
 
 - [Duplicate Prevention Standards](../GUIDELINES/DUPLICATE_PREVENTION_STANDARDS.md)
-- [Code Quality Dashboard](../../../trading-ui/code-quality-dashboard.html)
+- [Code Quality Dashboard](../../../trading-ui/code_quality_dashboard.html)
 
 ---
 
@@ -356,87 +356,87 @@ python3 scripts/test_pages_console_simple.py
 
 #### בדיקות מערכות ליבה (Core Systems)
 
-1. **test-header-only.html** - בדיקת Header System ופילטרים
-   - מיקום: `trading-ui/test-header-only.html`
+1. **test_header_only.html** - בדיקת Header System ופילטרים
+   - מיקום: `trading-ui/test_header_only.html`
    - מטרה: בדיקת Header System, פילטרים, אינטגרציה עם טבלאות
-   - שימוש: `http://localhost:8080/test-header-only`
+   - שימוש: `http://localhost:8080/test_header_only`
 
-2. **test-monitoring.html** - בדיקת מערכת ניטור
-   - מיקום: `trading-ui/test-monitoring.html`
+2. **test_monitoring.html** - בדיקת מערכת ניטור
+   - מיקום: `trading-ui/test_monitoring.html`
    - מטרה: בדיקת מערכת ניטור, DataCollectionService, UnifiedCacheManager, NotificationSystem, Logger Service
-   - שימוש: `http://localhost:8080/test-monitoring`
+   - שימוש: `http://localhost:8080/test_monitoring`
 
-3. **test-frontend-wrappers.html** - בדיקת Business Logic API Wrappers
-   - מיקום: `trading-ui/test-frontend-wrappers.html`
+3. **test_frontend_wrappers.html** - בדיקת Business Logic API Wrappers
+   - מיקום: `trading-ui/test_frontend_wrappers.html`
    - מטרה: בדיקת TradesData, ExecutionsData, AlertsData wrappers ו-UI Utils functions
-   - שימוש: `http://localhost:8080/test-frontend-wrappers`
+   - שימוש: `http://localhost:8080/test_frontend_wrappers`
 
 #### בדיקות UI Components
 
-4. **test-bootstrap-popover-comparison.html** - השוואת Bootstrap Popover vs WidgetOverlayService
-   - מיקום: `trading-ui/test-bootstrap-popover-comparison.html`
+4. **test_bootstrap_popover_comparison.html** - השוואת Bootstrap Popover vs WidgetOverlayService
+   - מיקום: `trading-ui/test_bootstrap_popover_comparison.html`
    - מטרה: השוואת ביצועים ותכונות
-   - שימוש: `http://localhost:8080/test-bootstrap-popover-comparison`
+   - שימוש: `http://localhost:8080/test_bootstrap_popover_comparison`
 
-5. **test-nested-modal-rich-text.html** - בדיקת Rich Text Editor במודלים מקוננים
-   - מיקום: `trading-ui/test-nested-modal-rich-text.html`
+5. **test_nested_modal_rich_text.html** - בדיקת Rich Text Editor במודלים מקוננים
+   - מיקום: `trading-ui/test_nested_modal_rich_text.html`
    - מטרה: בדיקת Quill.js initialization במודלים מקוננים
-   - שימוש: `http://localhost:8080/test-nested-modal-rich-text`
+   - שימוש: `http://localhost:8080/test_nested_modal_rich_text`
 
-6. **test-overlay-debug.html** - בדיקת WidgetOverlayService
-   - מיקום: `trading-ui/test-overlay-debug.html`
+6. **test_overlay_debug.html** - בדיקת WidgetOverlayService
+   - מיקום: `trading-ui/test_overlay_debug.html`
    - מטרה: בדיקת positioning ו-debug
-   - שימוש: `http://localhost:8080/test-overlay-debug`
+   - שימוש: `http://localhost:8080/test_overlay_debug`
 
-7. **test-quill.html** - בדיקת Quill.js
-   - מיקום: `trading-ui/test-quill.html`
+7. **test_quill.html** - בדיקת Quill.js
+   - מיקום: `trading-ui/test_quill.html`
    - מטרה: בדיקת Rich Text Editor ו-dynamic loading
-   - שימוש: `http://localhost:8080/test-quill`
+   - שימוש: `http://localhost:8080/test_quill`
 
 #### בדיקות ווידג'טים
 
-8. **test-unified-widget.html** - בדיקת Unified Pending Actions Widget בסיסי
-   - מיקום: `trading-ui/test-unified-widget.html`
+8. **test_unified_widget.html** - בדיקת Unified Pending Actions Widget בסיסי
+   - מיקום: `trading-ui/test_unified_widget.html`
    - מטרה: בדיקת widget initialization ו-functionality
-   - שימוש: `http://localhost:8080/test-unified-widget`
+   - שימוש: `http://localhost:8080/test_unified_widget`
 
-9. **test-unified-widget-integration.html** - בדיקת אינטגרציה של Unified Widget
-   - מיקום: `trading-ui/test-unified-widget-integration.html`
+9. **test_unified_widget_integration.html** - בדיקת אינטגרציה של Unified Widget
+   - מיקום: `trading-ui/test_unified_widget_integration.html`
    - מטרה: בדיקת אינטגרציה עם מערכות אחרות
-   - שימוש: `http://localhost:8080/test-unified-widget-integration`
-   - **הערה:** מומלץ לאחד עם `test-unified-widget.html`
+   - שימוש: `http://localhost:8080/test_unified_widget-integration`
+   - **הערה:** מומלץ לאחד עם `test_unified_widget.html`
 
-10. **test-unified-widget-comprehensive.html** - בדיקות מקיפות של Unified Widget
-    - מיקום: `trading-ui/test-unified-widget-comprehensive.html`
+10. **test_unified_widget_comprehensive.html** - בדיקות מקיפות של Unified Widget
+    - מיקום: `trading-ui/test_unified_widget_comprehensive.html`
     - מטרה: בדיקת כל התכונות
-    - שימוש: `http://localhost:8080/test-unified-widget-comprehensive`
+    - שימוש: `http://localhost:8080/test_unified_widget-comprehensive`
 
-11. **test-recent-items-widget.html** - בדיקת Recent Items Widget
-    - מיקום: `trading-ui/test-recent-items-widget.html`
+11. **test_recent_items_widget.html** - בדיקת Recent Items Widget
+    - מיקום: `trading-ui/test_recent_items_widget.html`
     - מטרה: בדיקת widget functionality
-    - שימוש: `http://localhost:8080/test-recent-items-widget`
+    - שימוש: `http://localhost:8080/test_recent_items_widget`
 
-12. **test-ticker-widgets-performance.html** - בדיקת ביצועי Ticker Widgets
-    - מיקום: `trading-ui/test-ticker-widgets-performance.html`
+12. **test_ticker_widgets_performance.html** - בדיקת ביצועי Ticker Widgets
+    - מיקום: `trading-ui/test_ticker_widgets_performance.html`
     - מטרה: בדיקת performance
-    - שימוש: `http://localhost:8080/test-ticker-widgets-performance`
+    - שימוש: `http://localhost:8080/test_ticker_widgets_performance`
 
 #### בדיקות אינטגרציה
 
-13. **test-user-ticker-integration.html** - בדיקת אינטגרציה של User Ticker
-    - מיקום: `trading-ui/test-user-ticker-integration.html`
+13. **test_user_ticker_integration.html** - בדיקת אינטגרציה של User Ticker
+    - מיקום: `trading-ui/test_user_ticker_integration.html`
     - מטרה: בדיקת אינטגרציה עם מערכות אחרות
-    - שימוש: `http://localhost:8080/test-user-ticker-integration`
+    - שימוש: `http://localhost:8080/test_user_ticker_integration`
 
 14. **scripts/test-user-ticker-frontend.html** - בדיקת User Ticker Frontend
     - מיקום: `trading-ui/scripts/test-user-ticker-frontend.html`
     - מטרה: בדיקת frontend functionality
     - שימוש: `http://localhost:8080/scripts/test-user-ticker-frontend.html`
 
-15. **conditions-test.html** - בדיקת מערכת Conditions
-    - מיקום: `trading-ui/conditions-test.html`
+15. **conditions_test.html** - בדיקת מערכת Conditions
+    - מיקום: `trading-ui/conditions_test.html`
     - מטרה: בדיקת תנאי מסחר ו-CRUD operations
-    - שימוש: `http://localhost:8080/conditions-test`
+    - שימוש: `http://localhost:8080/conditions_test`
 
 16. **external_data_dashboard.html** - דשבורד נתונים חיצוניים
     - מיקום: `trading-ui/external_data_dashboard.html`
@@ -445,16 +445,16 @@ python3 scripts/test_pages_console_simple.py
 
 #### בדיקות מיושנות (לבדיקת רלוונטיות)
 
-17. **test-phase1-recovery.html** - בדיקת שחזור Phase 1
-    - מיקום: `trading-ui/test-phase1-recovery.html`
+17. **test_phase1_recovery.html** - בדיקת שחזור Phase 1
+    - מיקום: `trading-ui/test_phase1_recovery.html`
     - מטרה: בדיקת מערכת ניטור, Logger Service, Cache Systems
-    - שימוש: `http://localhost:8080/test-phase1-recovery`
+    - שימוש: `http://localhost:8080/test_phase1_recovery`
     - **הערה:** לבדוק רלוונטיות - האם Phase 1 עדיין רלוונטי?
 
-18. **test-phase3-1-comprehensive.html** - בדיקות מקיפות של Phase 3.1
-    - מיקום: `trading-ui/test-phase3-1-comprehensive.html`
+18. **test_phase3_1_comprehensive.html** - בדיקות מקיפות של Phase 3.1
+    - מיקום: `trading-ui/test_phase3_1_comprehensive.html`
     - מטרה: בדיקת UnifiedAppInitializer, Preferences, Cache System
-    - שימוש: `http://localhost:8080/test-phase3-1-comprehensive`
+    - שימוש: `http://localhost:8080/test_phase3_1_comprehensive`
     - **הערה:** לבדוק רלוונטיות - האם Phase 3.1 עדיין רלוונטי?
 
 ### עמודי בדיקה מוצעים (8 עמודים - עדיפות גבוהה)

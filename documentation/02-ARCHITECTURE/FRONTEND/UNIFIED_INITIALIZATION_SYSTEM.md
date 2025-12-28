@@ -321,7 +321,7 @@ class UnifiedAppInitializer {
 - `services/field-renderer-service.js` - רינדור שדות
 - `services/crud-response-handler.js` - טיפול בתגובות CRUD
 - `https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js` - **jsPDF library** (נדרש ל-AI analysis PDF export)
-- `services/ai-analysis-data.js` - **AI Analysis data service** (נדרש לעמודי AI analysis)
+- `services/ai_analysis-data.js` - **AI Analysis data service** (נדרש לעמודי AI analysis)
 - `services/preferences-data.js` - שירות העדפות
 - `services/statistics-calculator.js` - מחשבון סטטיסטיקות
 
@@ -897,7 +897,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 
 ### כלי ניטור
 
-**מיקום:** `trading-ui/init-system-management.html`
+**מיקום:** `trading-ui/init_system_management.html`
 
 **תפקיד:** בדיקת תקינות טעינה ואיתחול
 
@@ -995,7 +995,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 
 ### כלי בדיקה
 
-- `trading-ui/init-system-management.html` - ממשק ניטור
+- `trading-ui/init_system_management.html` - ממשק ניטור
 - `trading-ui/scripts/init-system/all-pages-monitoring-test.js` - בדיקת כל העמודים
 - `trading-ui/scripts/init-system/comprehensive-initialization-test.js` - בדיקה מקיפה
 

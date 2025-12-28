@@ -53,12 +53,10 @@ class TestImportEndToEnd:
         session = Mock(spec=ImportSession)
         session.id = 1
         session.get_summary_data = Mock(return_value={
-            'preview_data': {
-                'records_to_import': [],
-                'selected_types': ['dividend', 'fee']
-            }
+            'records_to_import': [],
+            'selected_types': ['dividend', 'fee']
         })
-        
+
         # Verify selected_types can be loaded
         preview_data = session.get_summary_data('preview_data')
         assert preview_data.get('selected_types') == ['dividend', 'fee']

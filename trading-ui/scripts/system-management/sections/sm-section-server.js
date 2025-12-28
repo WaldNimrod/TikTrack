@@ -178,7 +178,7 @@ class SMServerSection extends SMBaseSection {
         <div class="row mb-3">
           <div class="col-12">
             <div class="d-flex justify-content-end">
-              <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
+              <a href="/server_monitor" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-external-link-alt me-1"></i> ניטור שרת מלא
               </a>
             </div>

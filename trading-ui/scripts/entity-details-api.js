@@ -1783,7 +1783,7 @@ class EntityDetailsAPI {
                 'execution': `/api/executions/${entityId}`,
                 'cash_flow': `/api/cash-flows/${entityId}`,
                 'note': `/api/notes/${entityId}`,
-                'watch_list': `/api/watch-lists/${entityId}`,
+                'watch_list': `/api/watch_lists/${entityId}`,
                 'import_session': `/api/user-data-import/session/${entityId}`
             };
             

@@ -159,7 +159,7 @@ ENTITIES = [
     },
     {
         "name": "watch_lists",
-        "api_base": "/api/watch-lists",
+        "api_base": "/api/watch_lists",
         "test_data_template": {
             "name": None  # Will be set with unique timestamp
         },

@@ -16,7 +16,7 @@
 ### דרך URL
 
 ```
-http://localhost:8080/trade-history?tradeId=2512
+http://localhost:8080/trade_history?tradeId=2512
 ```
 
 ### דרך תפריט

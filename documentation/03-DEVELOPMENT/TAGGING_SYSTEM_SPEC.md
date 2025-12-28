@@ -47,7 +47,7 @@
 | Backend Services | `TagService` | CRUD, assignment, suggestions, analytics counters |
 | API Layer | `routes/api/tags.py` | REST endpoints (categories, tags, links, suggestions) built on `BaseEntityAPI` |
 | Frontend Services | `tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetching, caching, UI coordination, analytics dispatch |
-| UI | `tag-management.html/.js` | Management dashboard leveraging ModalManagerV2 and UnifiedTableSystem |
+| UI | `tag_management.html/.js` (HTML/URL underscore) | Management dashboard leveraging ModalManagerV2 and UnifiedTableSystem |
 | Integration | Entity scripts (8 files) | Tag picker, table column, filter, details integration |
 
 ## 5. Backend Design
@@ -144,8 +144,5 @@
 ---
 
 *Prepared: November 2025 – TikTrack Development Team.*
-
-
-
 
 

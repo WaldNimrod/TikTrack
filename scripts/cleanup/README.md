@@ -6,7 +6,7 @@ This folder stores maintenance utilities that can impact production data. Run th
 
 - `delete-all-cash-flows.py` – removes all cash flow entries via direct DB access.
 - `delete-all-cash-flows-http.html` – invokes the HTTP endpoint to purge cash flows.
-- `delete-cash-flows-simple.py` – SQLite-based variant of the deletion script.
+- `delete-cash-flows-simple.py` – removed (legacy).
 - `clean-cache-test.sh` – clears cache layers used in QA diagnostics.
 - `clear-localStorage.html` – helper page for wiping browser storage during QA sessions.
 
@@ -19,4 +19,3 @@ This folder stores maintenance utilities that can impact production data. Run th
 5. Update the maintenance log or relevant documentation with the execution result.
 
 > Files moved here may still be referenced by historical reports. Always point stakeholders to this folder when providing scripts for emergency use.
-

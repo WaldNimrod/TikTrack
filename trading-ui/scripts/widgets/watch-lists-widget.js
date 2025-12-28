@@ -565,7 +565,7 @@
         return lists || [];
       } else {
         // Fallback to direct API call
-        const response = await fetchWithRetry('/api/watch-lists', { method: 'GET' });
+        const response = await fetchWithRetry('/api/watch_lists', { method: 'GET' });
         if (!response.ok) {
           throw new Error(`Failed to load watch lists: ${response.status}`);
         }
@@ -593,7 +593,7 @@
         return items || [];
       } else {
         // Fallback to direct API call
-        const response = await fetchWithRetry(`/api/watch-lists/${listId}/items?includeExternalData=true`, { method: 'GET' });
+        const response = await fetchWithRetry(`/api/watch_lists/${listId}/items?includeExternalData=true`, { method: 'GET' });
         if (!response.ok) {
           throw new Error(`Failed to load watch list items: ${response.status}`);
         }

@@ -341,7 +341,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 4. **`trading-ui/scripts/test-user-ticker-frontend.js`**
    - בדיקות Frontend (להרצה בדפדפן)
 
-5. **`trading-ui/test-user-ticker-integration.html`**
+5. **`trading-ui/test_user_ticker_integration.html`**
    - דף בדיקה אינטראקטיבי
 
 ### תוצאות בדיקות
@@ -368,8 +368,8 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 - `trading-ui/scripts/services/select-populator-service.js` - עדכון `populateTickersSelect`
 - `trading-ui/scripts/ticker-service.js` - עדכון `loadTickersForTradePlan`
 - `trading-ui/scripts/tickers.js` - הצגת שדות מותאמים
-- `trading-ui/scripts/ticker-dashboard.js` - בחירת טיקר מרשימת המשתמש
-- `trading-ui/scripts/ai-analysis-manager.js` - עדכון `populateTickersSelect`
+- `trading-ui/scripts/ticker_dashboard.js` - בחירת טיקר מרשימת המשתמש
+- `trading-ui/scripts/ai_analysis-manager.js` - עדכון `populateTickersSelect`
 
 ### Database
 

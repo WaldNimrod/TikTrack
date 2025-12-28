@@ -56,6 +56,9 @@
         // Load user profile data
         await this.loadUserProfile();
 
+        // Load AI Analysis settings
+        await this.loadAIAnalysisSettings();
+
         // Setup form handlers
         this.setupFormHandlers();
 
@@ -176,11 +179,13 @@
         const emailEl = document.getElementById('profileEmail');
         const firstNameEl = document.getElementById('profileFirstName');
         const lastNameEl = document.getElementById('profileLastName');
+        const iconEl = document.getElementById('profileIcon');
 
         if (usernameEl) usernameEl.value = user.username || '';
         if (emailEl) emailEl.value = user.email || '';
         if (firstNameEl) firstNameEl.value = user.first_name || '';
         if (lastNameEl) lastNameEl.value = user.last_name || '';
+        if (iconEl) iconEl.value = user.icon || '';
 
         window.Logger?.info('Profile form populated successfully', { page: 'user-profile' });
       } catch (error) {
@@ -210,6 +215,26 @@
           this.handlePasswordChange(e);
         });
       }
+
+      // AI Analysis settings form
+      const aiAnalysisForm = document.getElementById('aiAnalysisSettingsForm');
+      if (aiAnalysisForm) {
+        aiAnalysisForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleAIAnalysisSettingsUpdate(e);
+        });
+      }
+
+      // API Key visibility toggles
+      const toggleGeminiBtn = document.getElementById('toggleGeminiKeyBtn');
+      if (toggleGeminiBtn) {
+        toggleGeminiBtn.addEventListener('click', () => this.toggleApiKeyVisibility('geminiApiKey'));
+      }
+
+      const togglePerplexityBtn = document.getElementById('togglePerplexityKeyBtn');
+      if (togglePerplexityBtn) {
+        togglePerplexityBtn.addEventListener('click', () => this.toggleApiKeyVisibility('perplexityApiKey'));
+      }
     },
 
     /**
@@ -225,14 +250,16 @@
         formData = window.DataCollectionService.collectFormData({
           email: { id: 'profileEmail', type: 'text', default: null },
           first_name: { id: 'profileFirstName', type: 'text', default: null },
-          last_name: { id: 'profileLastName', type: 'text', default: null }
+          last_name: { id: 'profileLastName', type: 'text', default: null },
+          icon: { id: 'profileIcon', type: 'text', default: null }
         });
       } else {
         // Fallback to manual collection
         formData = {
           email: document.getElementById('profileEmail')?.value || null,
           first_name: document.getElementById('profileFirstName')?.value || null,
-          last_name: document.getElementById('profileLastName')?.value || null
+          last_name: document.getElementById('profileLastName')?.value || null,
+          icon: document.getElementById('profileIcon')?.value || null
         };
       }
 
@@ -477,6 +504,303 @@
     },
 
     /**
+     * Load AI Analysis settings
+     * טעינת הגדרות AI Analysis
+     */
+    async loadAIAnalysisSettings() {
+      try {
+        window.Logger?.info('Loading AI Analysis settings...', { page: 'user-profile' });
+
+        const response = await fetch('/api/ai_analysis/llm-provider', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data) {
+            this.populateAIAnalysisForm(data.data);
+            window.Logger?.info('AI Analysis settings loaded successfully', { page: 'user-profile' });
+          }
+        } else if (response.status === 401) {
+          // User not authenticated - this is expected behavior
+          window.Logger?.debug('User not authenticated for AI Analysis settings', { page: 'user-profile' });
+        }
+      } catch (error) {
+        window.Logger?.warn('Error loading AI Analysis settings', { error: error.message, page: 'user-profile' });
+        // Don't show error to user - this is optional functionality
+      }
+    },
+
+    /**
+     * Populate AI Analysis form with settings
+     * מילוי טופס AI Analysis עם הגדרות
+     */
+    populateAIAnalysisForm(settings) {
+      try {
+        const defaultProviderEl = document.getElementById('aiDefaultProvider');
+        const geminiApiKeyEl = document.getElementById('geminiApiKey');
+        const perplexityApiKeyEl = document.getElementById('perplexityApiKey');
+
+        if (defaultProviderEl && settings.default_provider) {
+          defaultProviderEl.value = settings.default_provider;
+        }
+
+        if (geminiApiKeyEl && settings.gemini_api_key) {
+          geminiApiKeyEl.value = settings.gemini_api_key;
+        }
+
+        if (perplexityApiKeyEl && settings.perplexity_api_key) {
+          perplexityApiKeyEl.value = settings.perplexity_api_key;
+        }
+
+        // Update status displays
+        this.updateApiKeyStatus('gemini', settings.gemini_configured);
+        this.updateApiKeyStatus('perplexity', settings.perplexity_configured);
+
+        window.Logger?.info('AI Analysis form populated successfully', { page: 'user-profile' });
+      } catch (error) {
+        window.Logger?.error('Error populating AI Analysis form', error, { page: 'user-profile' });
+      }
+    },
+
+    /**
+     * Update API key status display
+     * עדכון תצוגת סטטוס מפתח API
+     */
+    updateApiKeyStatus(provider, isConfigured) {
+      const statusEl = document.getElementById(`${provider}KeyStatus`);
+      if (statusEl) {
+        if (isConfigured) {
+          statusEl.innerHTML = '<span class="text-success">✓ מוגדר</span>';
+        } else {
+          statusEl.innerHTML = '<span class="text-muted">לא מוגדר</span>';
+        }
+      }
+    },
+
+    /**
+     * Handle AI Analysis settings update
+     * טיפול בעדכון הגדרות AI Analysis
+     */
+    async handleAIAnalysisSettingsUpdate(event) {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = {
+        default_provider: document.getElementById('aiDefaultProvider')?.value || 'gemini',
+        gemini_api_key: document.getElementById('geminiApiKey')?.value || null,
+        perplexity_api_key: document.getElementById('perplexityApiKey')?.value || null
+      };
+
+      // Set loading state
+      this.setLoadingState(true, 'saveAiAnalysisBtn', 'saveAiAnalysisBtnText', 'saveAiAnalysisBtnSpinner');
+
+      try {
+        window.Logger?.info('Updating AI Analysis settings...', { page: 'user-profile' });
+
+        // Save default provider
+        if (formData.default_provider) {
+          await this.updateDefaultProvider(formData.default_provider);
+        }
+
+        // Save API keys
+        const updatePromises = [];
+
+        if (formData.gemini_api_key) {
+          updatePromises.push(this.updateApiKey('gemini', formData.gemini_api_key));
+        }
+
+        if (formData.perplexity_api_key) {
+          updatePromises.push(this.updateApiKey('perplexity', formData.perplexity_api_key));
+        }
+
+        if (updatePromises.length > 0) {
+          await Promise.all(updatePromises);
+        }
+
+        // Reload settings to get updated status
+        await this.loadAIAnalysisSettings();
+
+        // Show success message
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showSuccess('הגדרות AI Analysis נשמרו בהצלחה', 'business');
+        }
+
+        const statusEl = document.getElementById('aiAnalysisStatus');
+        if (statusEl) {
+          statusEl.innerHTML = '<div class="alert alert-success">הגדרות נשמרו בהצלחה!</div>';
+          setTimeout(() => {
+            statusEl.innerHTML = '';
+          }, 3000);
+        }
+
+      } catch (error) {
+        window.Logger?.error('Error updating AI Analysis settings', error, { page: 'user-profile' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('שגיאה בשמירת הגדרות AI Analysis', 'system');
+        }
+
+        const statusEl = document.getElementById('aiAnalysisStatus');
+        if (statusEl) {
+          statusEl.innerHTML = '<div class="alert alert-danger">שגיאה בשמירת הגדרות</div>';
+        }
+      } finally {
+        this.setLoadingState(false, 'saveAiAnalysisBtn', 'saveAiAnalysisBtnText', 'saveAiAnalysisBtnSpinner');
+      }
+    },
+
+    /**
+     * Update default provider
+     * עדכון מנוע ברירת מחדל
+     */
+    async updateDefaultProvider(provider) {
+      const response = await fetch('/api/ai_analysis/llm-provider', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          default_provider: provider
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to update default provider');
+      }
+    },
+
+    /**
+     * Update API key for provider
+     * עדכון מפתח API לספק
+     */
+    async updateApiKey(provider, apiKey) {
+      const response = await fetch('/api/ai_analysis/llm-provider', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider: provider,
+          api_key: apiKey,
+          validate: true
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || `Failed to update ${provider} API key`);
+      }
+
+      return response.json();
+    },
+
+    /**
+     * Toggle API key visibility
+     * החלפת נראות מפתח API
+     */
+    toggleApiKeyVisibility(fieldId) {
+      const input = document.getElementById(fieldId);
+      const button = document.getElementById(`toggle${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)}Btn`);
+      const icon = document.getElementById(`toggle${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)}Icon`);
+
+      if (input && button && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.textContent = '👁️‍🗨️'; // Hide icon
+          button.title = 'הסתר מפתח';
+        } else {
+          input.type = 'password';
+          icon.textContent = '👁️'; // Show icon
+          button.title = 'הצג מפתח';
+        }
+      }
+    },
+
+    /**
+     * Validate Gemini API key
+     * בדיקת מפתח Gemini API
+     */
+    async validateGeminiKey() {
+      await this.validateApiKey('gemini');
+    },
+
+    /**
+     * Validate Perplexity API key
+     * בדיקת מפתח Perplexity API
+     */
+    async validatePerplexityKey() {
+      await this.validateApiKey('perplexity');
+    },
+
+    /**
+     * Validate API key for provider
+     * בדיקת מפתח API לספק
+     */
+    async validateApiKey(provider) {
+      const input = document.getElementById(`${provider}ApiKey`);
+      const button = document.getElementById(`validate${provider.charAt(0).toUpperCase() + provider.slice(1)}Btn`);
+      const btnText = document.getElementById(`validate${provider.charAt(0).toUpperCase() + provider.slice(1)}BtnText`);
+      const btnSpinner = document.getElementById(`validate${provider.charAt(0).toUpperCase() + provider.slice(1)}BtnSpinner`);
+      const statusEl = document.getElementById(`${provider}KeyStatus`);
+
+      if (!input || !input.value) {
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="text-warning">הכנס מפתח API תחילה</span>';
+        }
+        return;
+      }
+
+      // Set loading state
+      if (button) button.disabled = true;
+      if (btnText) btnText.classList.add('d-none');
+      if (btnSpinner) btnSpinner.classList.remove('d-none');
+
+      try {
+        window.Logger?.info(`Validating ${provider} API key...`, { page: 'user-profile' });
+
+        const response = await fetch('/api/ai_analysis/llm-provider', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            provider: provider,
+            api_key: input.value,
+            validate: true
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+          if (statusEl) {
+            statusEl.innerHTML = '<span class="text-success">✓ מפתח תקין</span>';
+          }
+          window.Logger?.info(`${provider} API key validated successfully`, { page: 'user-profile' });
+        } else {
+          if (statusEl) {
+            statusEl.innerHTML = '<span class="text-danger">✗ מפתח לא תקין</span>';
+          }
+          window.Logger?.warn(`${provider} API key validation failed`, { message: data.message, page: 'user-profile' });
+        }
+      } catch (error) {
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="text-danger">✗ שגיאה בבדיקה</span>';
+        }
+        window.Logger?.error(`Error validating ${provider} API key`, error, { page: 'user-profile' });
+      } finally {
+        // Reset loading state
+        if (button) button.disabled = false;
+        if (btnText) btnText.classList.remove('d-none');
+        if (btnSpinner) btnSpinner.classList.add('d-none');
+      }
+    },
+
+    /**
      * Set loading state for buttons
      * הגדרת מצב טעינה לכפתורים
      */
@@ -512,6 +836,11 @@
   // Export to global scope
   window.UserProfilePage = UserProfilePage;
 
+  // Export AI Analysis functions to global scope for button onclick handlers
+  window.AIAnalysisManager = {
+    validateGeminiKey: () => UserProfilePage.validateGeminiKey(),
+    validatePerplexityKey: () => UserProfilePage.validatePerplexityKey()
+  };
+
   window.Logger?.info('✅ UserProfilePage loaded successfully', { page: 'user-profile' });
 })();
-

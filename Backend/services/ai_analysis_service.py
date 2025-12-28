@@ -926,6 +926,44 @@ class AIAnalysisService:
             'validated': validate,
             'message': f'{provider.capitalize()} API key saved successfully'
         }
+
+    def set_llm_default_provider(
+        self,
+        db: Session,
+        user_id: int,
+        default_provider: str
+    ) -> Dict[str, Any]:
+        """
+        Update user's default LLM provider.
+        """
+        if not user_id:
+            logger.error("❌ set_llm_default_provider: user_id is None or invalid")
+            return {
+                'success': False,
+                'message': 'User ID is required'
+            }
+
+        if default_provider not in ('gemini', 'perplexity'):
+            return {
+                'success': False,
+                'message': 'default_provider must be gemini or perplexity'
+            }
+
+        user_provider = db.query(UserLLMProvider).filter(
+            UserLLMProvider.user_id == user_id
+        ).first()
+
+        if not user_provider:
+            user_provider = UserLLMProvider(user_id=user_id)
+            db.add(user_provider)
+
+        user_provider.default_provider = default_provider
+        db.commit()
+
+        return {
+            'success': True,
+            'message': 'Default provider updated successfully'
+        }
     
     def get_llm_provider_settings(
         self,
@@ -1129,4 +1167,3 @@ class AIAnalysisService:
         logger.error(f"❌ Retry attempt {request.retry_count} failed for analysis {request_id} with all providers [{error_code}]")
         db.commit()
         return request
-

@@ -2,19 +2,22 @@
 
 **תאריך:** 2025-11-25  
 **גרסה:** 1.4.1  
-**מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
+**מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git (ענף production באותו ריפו)
 
 **⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
 
 **🆕 עדכון 1.4.1:** הוספת תמיכה בדילוג על פעולות בסיס הנתונים (גיבוי ומיגרציות) עם `--skip-db` flag
 
-**🆕 עדכון 1.4.0:** המערכת משתמשת ב-PostgreSQL בלבד (ללא SQLite). כל התיעוד והסקריפטים עודכנו בהתאם.
+**🆕 עדכון 1.4.0:** המערכת משתמשת ב-PostgreSQL בלבד. כל התיעוד והסקריפטים עודכנו בהתאם.
 
 **🆕 עדכון 1.3.7.0:** מערכת עדכון מלאה עם ניהול שרת, זיהוי מיגרציות אוטומטי, תמיכה מלאה ב-PostgreSQL, ובדיקות E2E בדפדפן
 
 **🆕 עדכון 1.3.0:** שינוי מ-whitelist ל-blacklist - כל הקבצים מתעדכנים אוטומטית למעט חריגים ספציפיים (tests, archive, backups, documentation, legacy). הוספת verification מקיף אחרי sync.
 
 **🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
+
+**חשוב:** המסמך מניח עבודה מתוך worktree הפרודקשן (`TikTrackApp-Production`).  
+אין תיקיית `production/` בתוך `TikTrackApp` (פיתוח). כל נתיב שמופיע כאן תחת `production/` מתייחס ל‑root של ה‑worktree.
 
 ---
 
@@ -920,7 +923,7 @@ python3 -c "from config.settings import DATABASE_URL, UI_DIR, PORT, IS_PRODUCTIO
 # ודא ש-IS_PRODUCTION = True (hardcoded)
 # ודא ש-PORT = 5001 (hardcoded)
 # ודא ש-UI_DIR מצביע על production/trading-ui
-# ודא ש-DATABASE_URL מצביע על PostgreSQL (לא SQLite)
+# ודא ש-DATABASE_URL מצביע על PostgreSQL
 ```
 
 ### בעיה: הגדרות production לא נכונות אחרי sync
@@ -1149,7 +1152,7 @@ echo "🎉 Production update completed successfully!"
 
 ## 📝 שינויים בגרסה 1.4.0
 
-- ✅ **PostgreSQL בלבד:** המערכת משתמשת ב-PostgreSQL בלבד (ללא SQLite)
+- ✅ **PostgreSQL בלבד:** המערכת משתמשת ב-PostgreSQL בלבד
 - ✅ **בדיקת מיגרציות:** זיהוי אוטומטי של מיגרציות נדרשות
 - ✅ **עדכון בדיקות הגדרות:** שימוש ב-`DATABASE_URL` עם PostgreSQL
 
@@ -1174,5 +1177,3 @@ echo "🎉 Production update completed successfully!"
 - ✅ עדכון פתרון בעיות עם תיקון הגדרות אחרי sync
 - ✅ עדכון checklist עם בדיקת הגדרות hardcoded
 - ✅ הוספת מידע על מיגרציות וסקריפטים חדשים
-
-

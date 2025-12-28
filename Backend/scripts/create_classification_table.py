@@ -34,7 +34,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    # PostgreSQL only - no SQLite support
+    # PostgreSQL only
     return kwargs
 
 def create_classification_table(file_path: str):
@@ -324,4 +324,3 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         sys.exit(1)
-

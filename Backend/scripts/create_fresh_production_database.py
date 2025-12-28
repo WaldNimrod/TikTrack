@@ -205,7 +205,7 @@ def truncate_all_user_data_tables(db: Session, verbose: bool = False) -> bool:
         print("=" * 70)
     
     try:
-        # Disable foreign key checks temporarily (PostgreSQL doesn't need this, but SQLite does)
+        # PostgreSQL does not require disabling foreign key checks here
         # For PostgreSQL, TRUNCATE CASCADE handles foreign keys automatically
         
         truncated_count = 0
@@ -1011,4 +1011,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-

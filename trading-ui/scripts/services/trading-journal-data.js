@@ -74,7 +74,7 @@
       if (filters.ticker_symbol) params.append('ticker_symbol', filters.ticker_symbol);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trading-journal/entries?${params.toString()}`;
+      const url = `${base}/api/trading_journal/entries?${params.toString()}`;
       
       const response = await fetch(url, { // Include cookies for session-based auth
       });
@@ -147,7 +147,7 @@
       // Note: entity_type is not passed to activity-stats (graph shows all entity types)
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trading-journal/activity-stats?${params.toString()}`;
+      const url = `${base}/api/trading_journal/activity-stats?${params.toString()}`;
       
       const response = await fetch(url, { // Include cookies for session-based auth
       });
@@ -225,7 +225,7 @@
       }
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trading-journal/calendar?${params.toString()}`;
+      const url = `${base}/api/trading_journal/calendar?${params.toString()}`;
       
       const response = await fetch(url, { // Include cookies for session-based auth
       });
@@ -299,7 +299,7 @@
       if (end_date) params.append('end_date', end_date);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trading-journal/by-entity?${params.toString()}`;
+      const url = `${base}/api/trading_journal/by-entity?${params.toString()}`;
       
       const response = await fetch(url, { // Include cookies for session-based auth
       });

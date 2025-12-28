@@ -3,8 +3,9 @@
 ## Environments & Startup
 
 - Always start via `./start_server.sh` (or `./start_pg_server.sh`): auto-detects environment by folder
-  name (`TikTrackApp` → Dev port 8080, `TikTrackApp-Production` → Prod port 5001), sets PostgreSQL
-  env vars, prevents duplicate servers.
+  name (`TikTrackApp` → Dev port 8080, `TikTrackApp-Production` → Prod port 5001, worktree for branch `production`),
+  sets PostgreSQL env vars, prevents duplicate servers.
+- There is no `production/` folder inside `TikTrackApp`; production runs from the separate worktree.
 - Check Postgres container health before start
   (`docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev` if needed).
 - Use `./start_server.sh --check-only` to detect port/process conflicts.
@@ -44,6 +45,5 @@
   weaker).
 - Keep using general systems; avoid page-local logic for rendering/status/badges/forms.
 - Markdown changes must pass `npm run markdownlint:check` prior to commit/push.
-
 
 

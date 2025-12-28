@@ -36,9 +36,6 @@ class TagLink(BaseModel):
         UniqueConstraint("tag_id", "entity_type", "entity_id", name="uq_tag_entity"),
         Index("ix_tag_links_entity", "entity_type", "entity_id"),
         Index("ix_tag_links_tag_id", "tag_id"),
-        {
-            "sqlite_autoincrement": True,
-        },
     )
 
     tag_id = Column(Integer, ForeignKey("tags.id", ondelete="CASCADE"), nullable=False)
@@ -65,7 +62,6 @@ class TagLink(BaseModel):
             "created_at": self.created_at,
             "created_by": self.created_by,
         }
-
 
 
 

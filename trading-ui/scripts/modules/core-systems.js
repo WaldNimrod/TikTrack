@@ -711,13 +711,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Main initialization function - Single Point of Entry
      */
     async initialize() {
+      const isInIframe = window !== window.top;
+      console.log(`🏁 [UnifiedAppInitializer] Starting initialization`, { isInIframe });
+
       if (this.initialized) {
-        // console.log('✅ Application already initialized');
+        console.log('✅ [UnifiedAppInitializer] Application already initialized');
         return this.getStatus();
       }
 
       if (this.initializationInProgress) {
-        // Removed debug log - initialization state is tracked internally
+        console.log('⏳ [UnifiedAppInitializer] Initialization already in progress');
         return this.getStatus();
       }
 
@@ -744,6 +747,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
         this.initialized = true;
         this.logSuccess();
+
+        console.log(`🎉 [UnifiedAppInitializer] Initialization completed successfully`, {
+          isInIframe: window !== window.top,
+          initialized: this.initialized
+        });
 
         return this.getStatus();
       } catch (error) {
@@ -2406,14 +2414,23 @@ window.globalInitializationState = {
  */
 const initializeUnifiedAppWhenReady = async () => {
   // Use Logger for initialization logs
+  const isInIframe = window !== window.top;
   if (window.Logger && Logger.DEBUG_MODE) {
     window.Logger.debug('Starting Unified App Initialization', {
       url: window.location.href,
       pathname: window.location.pathname,
       readyState: document.readyState,
+      isInIframe,
       page: 'core-systems'
     });
   }
+
+  // Debug log for iframe context
+  console.log(`🚀 [core-systems] initializeUnifiedAppWhenReady called`, {
+    isInIframe,
+    readyState: document.readyState,
+    location: window.location.href
+  });
 
   // Initialize globalInitializationState if not exists
   if (!window.globalInitializationState) {
@@ -2451,6 +2468,13 @@ const initializeUnifiedAppWhenReady = async () => {
         window.globalInitializationState.unifiedAppInitialized = true;
         window.globalInitializationState.unifiedAppInitializing = false;
       }
+
+      const isInIframe = window !== window.top;
+      console.log(`✅ [core-systems] Unified App Initialization completed`, {
+        isInIframe,
+        initialized: window.globalInitializationState?.unifiedAppInitialized
+      });
+
       if (window.Logger && Logger.DEBUG_MODE) {
         window.Logger.debug('Unified App Initialization completed', { page: 'core-systems' });
       }
@@ -5896,7 +5920,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
         },
       ],
     },
-    'notifications-center.html': {
+    'notifications_center.html': {
       name: 'Notifications Center HTML',
       requiresFilters: false,
       requiresValidation: false,

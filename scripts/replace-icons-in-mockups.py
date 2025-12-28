@@ -71,18 +71,18 @@ def process_file(file_path):
 def main():
     """Main function"""
     mockup_files = [
-        "trading-journal-page.html",
-        "trade-history-page.html",
-        "portfolio-state-page.html",
-        "price-history-page.html",
-        "comparative-analysis-page.html",
-        "strategy-analysis-page.html",
-        "economic-calendar-page.html",
-        "date-comparison-modal.html",
-        "history-widget.html",
-        "emotional-tracking-widget.html",
-        "tradingview-test-page.html",
-        "heatmap-visual-example.html"
+        "trading_journal_page.html",
+        "trade_history_page.html",
+        "portfolio_state_page.html",
+        "price_history_page.html",
+        "comparative_analysis_page.html",
+        "strategy_analysis_page.html",
+        "economic_calendar_page.html",
+        "date_comparison_modal.html",
+        "history_widget.html",
+        "emotional_tracking_widget.html",
+        "tradingview_test_page.html",
+        "heatmap_visual_example.html"
     ]
     
     total_replaced = 0

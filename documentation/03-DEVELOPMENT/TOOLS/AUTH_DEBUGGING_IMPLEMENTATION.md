@@ -41,7 +41,7 @@
 3. **Modal & Z-Index**  
    - לפתוח עמוד מוגן ללא טוקן → modal מוצג, מעל backdrop, אין "Modal not found in stack".
 4. **Auth/Cache**  
-   - אחרי login: `UnifiedCacheManager.get('authToken', {layer: 'sessionStorage', includeUserId:false})` קיים; בטאב נוסף אין 401 מוקדמים ל-tickers/watch-list/preferences.
+   - אחרי login: `UnifiedCacheManager.get('authToken', {layer: 'sessionStorage', includeUserId:false})` קיים; בטאב נוסף אין 401 מוקדמים ל-tickers/watch_lists/preferences.
    - Bootstrap: `sessionStorage.getItem('dev_authToken')` זמין לפני UnifiedCacheManager מאותחל.
    - Sync: אחרי אתחול, auth tokens מסתנכרנים ל-SessionStorageLayer אוטומטית.
 5. **Preferences**  
@@ -87,7 +87,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ## 7) נקודות כשל נפוצות
 
 - מודל מאחורי backdrop → לרשום למנהל הניווט ואז `ModalZIndexManager.forceUpdate(modalElement)`.
-- 401 ב-tickers/watch-list → לבדוק `TikTrackAuth.getCurrentUser()` לפני קריאות, ולאשר טוקן ב-UC.
+- 401 ב-tickers/watch_lists → לבדוק `TikTrackAuth.getCurrentUser()` לפני קריאות, ולאשר טוקן ב-UC.
 - 429 ב-trade-plans → להפחית page size, להגדיל דיליי, להשתמש ב-cache.
 
 ---

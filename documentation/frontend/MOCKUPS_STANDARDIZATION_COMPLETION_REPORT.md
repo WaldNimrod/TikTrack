@@ -34,7 +34,7 @@
 - **תיקונים:**
   - ✅ החלפת 135 שימושים של `<img src="../../images/icons/tabler/...">` ב-placeholders עם `data-icon` attributes
   - ✅ יצירת `mockups-icon-initializer.js` שמחליף את ה-placeholders ב-IconSystem.renderIcon() בזמן ריצה
-  - ✅ הוספת `mockups-icon-initializer.js` לכל 11 העמודים (כולל heatmap-visual-example.html)
+  - ✅ הוספת `mockups-icon-initializer.js` לכל 11 העמודים (כולל heatmap_visual_example.html)
   - ✅ **עמודים שתוקנו:** 9 עמודים עם החלפת איקונים
 
 #### 4. מערכת כפתורים (Button System) ✅
@@ -57,8 +57,8 @@
 
 - **סטטוס:** הושלם 100%
 - **תיקונים:**
-  - ✅ הוספת `background-wrapper` → `page-body` → `main-content` ל-`date-comparison-modal.html`
-  - ✅ הוספת `background-wrapper` → `page-body` → `main-content` ל-`tradingview-test-page.html`
+  - ✅ הוספת `background-wrapper` → `page-body` → `main-content` ל-`date_comparison_modal.html`
+  - ✅ הוספת `background-wrapper` → `page-body` → `main-content` ל-`tradingview_test_page.html`
   - ✅ וידוא שכל העמודים האחרים כבר יש להם את המבנה הנכון
 
 ---
@@ -97,18 +97,18 @@
 
 ### קבצים ששונו (12 עמודים)
 
-1. ✅ `trading-ui/mockups/daily-snapshots/heatmap-visual-example.html`
-2. ✅ `trading-ui/mockups/daily-snapshots/trade-history-page.html`
-3. ✅ `trading-ui/mockups/daily-snapshots/portfolio-state-page.html`
-4. ✅ `trading-ui/mockups/daily-snapshots/price-history-page.html`
-5. ✅ `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html`
-6. ✅ `trading-ui/mockups/daily-snapshots/strategy-analysis-page.html`
-7. ✅ `trading-ui/mockups/daily-snapshots/economic-calendar-page.html`
-8. ✅ `trading-ui/mockups/daily-snapshots/date-comparison-modal.html`
-9. ✅ `trading-ui/mockups/daily-snapshots/history-widget.html`
-10. ✅ `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html`
-11. ✅ `trading-ui/mockups/daily-snapshots/tradingview-test-page.html`
-12. ✅ `trading-ui/mockups/daily-snapshots/trading-journal-page.html`
+1. ✅ `trading-ui/mockups/daily-snapshots/heatmap_visual_example.html`
+2. ✅ `trading-ui/mockups/daily-snapshots/trade_history_page.html`
+3. ✅ `trading-ui/mockups/daily-snapshots/portfolio_state_page.html`
+4. ✅ `trading-ui/mockups/daily-snapshots/price_history_page.html`
+5. ✅ `trading-ui/mockups/daily-snapshots/comparative_analysis_page.html`
+6. ✅ `trading-ui/mockups/daily-snapshots/strategy_analysis_page.html`
+7. ✅ `trading-ui/mockups/daily-snapshots/economic_calendar_page.html`
+8. ✅ `trading-ui/mockups/daily-snapshots/date_comparison_modal.html`
+9. ✅ `trading-ui/mockups/daily-snapshots/history_widget.html`
+10. ✅ `trading-ui/mockups/daily-snapshots/emotional_tracking_widget.html`
+11. ✅ `trading-ui/mockups/daily-snapshots/tradingview_test_page.html`
+12. ✅ `trading-ui/mockups/daily-snapshots/trading_journal_page.html`
 
 ---
 

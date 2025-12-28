@@ -15,6 +15,7 @@ EXECUTIONS DEFAULTS TEST: Test that trading account field gets correct default v
 import json
 import time
 import argparse
+import os
 from datetime import datetime
 from pathlib import Path
 from collections import deque
@@ -23,10 +24,10 @@ import requests
 
 try:
     from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service as FirefoxService
+    from selenium.webdriver.chrome.service import Service as ChromeService
     from selenium.webdriver.chrome.options import Options as ChromeOptions
+    from selenium.webdriver.firefox.service import Service as FirefoxService
+    from selenium.webdriver.firefox.options import Options as FirefoxOptions
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
@@ -38,7 +39,7 @@ except ImportError:
     print("   Install with: pip install selenium webdriver-manager")
     exit(1)
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080")
 
 # Test credentials (admin) - CRITICAL: Always use admin/admin123 for tests
 TEST_USERNAME = "admin"
@@ -77,17 +78,18 @@ ALL_PAGES = [
     {"name": "ניתוח AI", "url": "/ai_analysis.html", "category": "main", "priority": "medium"},
     {"name": "העדפות", "url": "/preferences.html", "category": "main", "priority": "high"},
     {"name": "פרופיל משתמש", "url": "/user_profile.html", "category": "main", "priority": "medium"},
+    {"name": "ניהול משתמשים", "url": "/user_management.html", "category": "main", "priority": "medium"},
     
     # עמודים טכניים (Technical Pages)
     {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical", "priority": "low"},
     {"name": "נתונים נוספים", "url": "/db_extradata.html", "category": "technical", "priority": "low"},
     {"name": "אילוצי מערכת", "url": "/constraints.html", "category": "technical", "priority": "low"},
-    {"name": "משימות רקע", "url": "/background-tasks.html", "category": "technical", "priority": "low"},
-    {"name": "ניטור שרת", "url": "/server-monitor.html", "category": "technical", "priority": "low"},
-    {"name": "ניהול מערכת", "url": "/system-management.html", "category": "technical", "priority": "low"},
-    {"name": "מרכז התראות", "url": "/notifications-center.html", "category": "technical", "priority": "low"},
-    {"name": "ניהול CSS", "url": "/css-management.html", "category": "technical", "priority": "low"},
-    {"name": "תצוגת צבעים", "url": "/dynamic-colors-display.html", "category": "technical", "priority": "low"},
+    {"name": "משימות רקע", "url": "/background_tasks.html", "category": "technical", "priority": "low"},
+    {"name": "ניטור שרת", "url": "/server_monitor.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול מערכת", "url": "/system_management.html", "category": "technical", "priority": "low"},
+    {"name": "מרכז התראות", "url": "/notifications_center.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול CSS", "url": "/css_management.html", "category": "technical", "priority": "low"},
+    {"name": "תצוגת צבעים", "url": "/dynamic_colors_display.html", "category": "technical", "priority": "low"},
     {"name": "עיצובים", "url": "/designs.html", "category": "technical", "priority": "low"},
     
     # עמודים משניים (Secondary Pages)
@@ -98,56 +100,56 @@ ALL_PAGES = [
     # עמודי אימות (Auth Pages) - login is via modal on base pages
     {"name": "התחברות למערכת", "url": "/login.html", "category": "auth", "priority": "medium"},
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
-    {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
-    {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
+    {"name": "שחזור סיסמה", "url": "/forgot_password.html", "category": "auth", "priority": "medium"},
+    {"name": "איפוס סיסמה", "url": "/reset_password.html", "category": "auth", "priority": "medium"},
     
     # עמודי כלי פיתוח ראשי (Dev Tools Main)
     {"name": "כלי פיתוח ראשי", "url": "/dev_tools", "category": "dev", "priority": "high"},
 
     # עמודי כלים לפיתוח (Dev Tools)
-    {"name": "מיפוי צבעי כפתורים", "url": "/button-color-mapping.html", "category": "dev", "priority": "low"},
-    {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button-color-mapping-simple.html", "category": "dev", "priority": "low"},
-    {"name": "מודלים של תנאים", "url": "/conditions-modals.html", "category": "dev", "priority": "low"},
-    {"name": "ניהול קבוצות העדפות", "url": "/preferences-groups-management.html", "category": "dev", "priority": "low"},
+    {"name": "מיפוי צבעי כפתורים", "url": "/button_color_mapping.html", "category": "dev", "priority": "low"},
+    {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button_color_mapping_simple.html", "category": "dev", "priority": "low"},
+    {"name": "מודלים של תנאים", "url": "/conditions_modals.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול קבוצות העדפות", "url": "/preferences_groups_management.html", "category": "dev", "priority": "low"},
     {"name": "ניהול תגיות", "url": "/tag_management.html", "category": "dev", "priority": "low"},
-    {"name": "ניהול מטמון", "url": "/cache-management.html", "category": "dev", "priority": "low"},
-    {"name": "דשבורד איכות קוד", "url": "/code-quality-dashboard.html", "category": "dev", "priority": "low"},
-    {"name": "ניהול מערכת אתחול", "url": "/init-system-management.html", "category": "dev", "priority": "low"},
-    {"name": "בדיקת תנאים", "url": "/conditions-test.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול מטמון", "url": "/cache_management.html", "category": "dev", "priority": "low"},
+    {"name": "דשבורד איכות קוד", "url": "/code_quality_dashboard.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול מערכת אתחול", "url": "/init_system_management.html", "category": "dev", "priority": "low"},
+    {"name": "בדיקת תנאים", "url": "/conditions_test.html", "category": "dev", "priority": "low"},
     
     # עמודי רשימות מעקב (Watch Lists)
     {"name": "ניהול רשימות צפייה", "url": "/watch_list.html", "category": "watchlists", "priority": "high"},
-    {"name": "ניהול רשימות צפייה (מוקאפ)", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
+    {"name": "ניהול רשימות צפייה (מוקאפ)", "url": "/mockups/watch_lists-page.html", "category": "watchlists", "priority": "medium"},
     
     # עמודי מחקר (Research Pages) - משולבים
     {"name": "היסטוריית טרייד", "url": "/trade_history.html", "category": "main", "priority": "high"},
     {"name": "מצב תיק היסטורי", "url": "/portfolio_state.html", "category": "main", "priority": "high"},
     {"name": "יומן מסחר", "url": "/trading_journal.html", "category": "main", "priority": "high"},
-    {"name": "ניתוח אסטרטגיות", "url": "/strategy-analysis", "category": "main", "priority": "high"},
-    {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
-    {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
-    {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
+    {"name": "ניתוח אסטרטגיות", "url": "/strategy_analysis", "category": "main", "priority": "high"},
+    {"name": "מודל רשימת צפייה", "url": "/mockups/watch_list_modal.html", "category": "watchlists", "priority": "medium"},
+    {"name": "מודל הוספת טיקר", "url": "/mockups/add_ticker_modal.html", "category": "watchlists", "priority": "medium"},
+    {"name": "פעולה מהירה דגלים", "url": "/mockups/flag_quick_action.html", "category": "watchlists", "priority": "medium"},
     
     # עמודים נוספים
-    {"name": "תצוגת ווידג'טים TradingView", "url": "/tradingview-widgets-showcase.html", "category": "additional", "priority": "low"},
+    {"name": "תצוגת ווידג'טים TradingView", "url": "/tradingview_widgets_showcase.html", "category": "additional", "priority": "low"},
     {"name": "טריידים מעוצבים", "url": "/trades_formatted.html", "category": "additional", "priority": "low"},
     
     # עמודי בדיקה (Test Pages) - עדכון 2025-01-15
-    {"name": "בדיקת Header System", "url": "/test-header-only.html", "category": "test", "priority": "high"},
-    {"name": "בדיקת ניטור", "url": "/test-monitoring.html", "category": "test", "priority": "high"},
-    {"name": "בדיקת Frontend Wrappers", "url": "/test-frontend-wrappers.html", "category": "test", "priority": "medium"},
-    {"name": "השוואת Bootstrap Popover", "url": "/test-bootstrap-popover-comparison.html", "category": "test", "priority": "low"},
-    {"name": "בדיקת Quill Editor", "url": "/test-quill.html", "category": "test", "priority": "low"},
-    {"name": "בדיקת מודלים מקוננים", "url": "/test-nested-modal-rich-text.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת Overlay Debug", "url": "/test-overlay-debug.html", "category": "test", "priority": "low"},
-    {"name": "בדיקת Phase 1 Recovery", "url": "/test-phase1-recovery.html", "category": "test", "priority": "low"},
-    {"name": "בדיקת Phase 3.1 Comprehensive", "url": "/test-phase3-1-comprehensive.html", "category": "test", "priority": "low"},
-    {"name": "בדיקת Unified Widget", "url": "/test-unified-widget.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת Unified Widget Integration", "url": "/test-unified-widget-integration.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת Unified Widget Comprehensive", "url": "/test-unified-widget-comprehensive.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת Recent Items Widget", "url": "/test-recent-items-widget.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת Ticker Widgets Performance", "url": "/test-ticker-widgets-performance.html", "category": "test", "priority": "medium"},
-    {"name": "בדיקת User Ticker Integration", "url": "/test-user-ticker-integration.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Header System", "url": "/test_header_only.html", "category": "test", "priority": "high"},
+    {"name": "בדיקת ניטור", "url": "/test_monitoring.html", "category": "test", "priority": "high"},
+    {"name": "בדיקת Frontend Wrappers", "url": "/test_frontend_wrappers.html", "category": "test", "priority": "medium"},
+    {"name": "השוואת Bootstrap Popover", "url": "/test_bootstrap_popover_comparison.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Quill Editor", "url": "/test_quill.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת מודלים מקוננים", "url": "/test_nested_modal_rich_text.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Overlay Debug", "url": "/test_overlay_debug.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Phase 1 Recovery", "url": "/test_phase1_recovery.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Phase 3.1 Comprehensive", "url": "/test_phase3_1_comprehensive.html", "category": "test", "priority": "low"},
+    {"name": "בדיקת Unified Widget", "url": "/test_unified_widget.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Unified Widget Integration", "url": "/test_unified_widget_integration.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Unified Widget Comprehensive", "url": "/test_unified_widget_comprehensive.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Recent Items Widget", "url": "/test_recent_items_widget.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת Ticker Widgets Performance", "url": "/test_ticker_widgets_performance.html", "category": "test", "priority": "medium"},
+    {"name": "בדיקת User Ticker Integration", "url": "/test_user_ticker_integration.html", "category": "test", "priority": "medium"},
     {"name": "בדיקת User Ticker Frontend", "url": "/scripts/test-user-ticker-frontend.html", "category": "test", "priority": "medium"},
 ]
 
@@ -231,14 +233,52 @@ def setup_driver(prefer_chrome: bool = False):
     """
     last_error = None
 
+    def _pick_latest(paths):
+        existing = [p for p in paths if p.is_file()]
+        if not existing:
+            return None
+        return max(existing, key=lambda p: p.stat().st_mtime)
+
+    def _resolve_driver_path(env_var, glob_patterns):
+        env_path = os.environ.get(env_var)
+        if env_path:
+            path = Path(env_path).expanduser()
+            if path.is_file():
+                return path
+        matches = []
+        for pattern in glob_patterns:
+            matches.extend(Path.home().glob(pattern))
+        return _pick_latest(matches)
+
     def create_firefox():
-        firefox_options = Options()
+        firefox_options = FirefoxOptions()
         firefox_options.set_preference('devtools.console.stdout.content', True)
         firefox_options.add_argument('--no-sandbox')
         firefox_options.add_argument('--disable-dev-shm-usage')
         firefox_options.add_argument('--width=1920')
         firefox_options.add_argument('--height=1080')
-        service = Service(GeckoDriverManager().install())
+        firefox_binary = os.environ.get("FIREFOX_BINARY")
+        if not firefox_binary:
+            for candidate in [
+                "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox",
+                "/Applications/Firefox.app/Contents/MacOS/firefox",
+            ]:
+                if Path(candidate).exists():
+                    firefox_binary = candidate
+                    break
+        if firefox_binary:
+            firefox_options.binary_location = firefox_binary
+        gecko_path = _resolve_driver_path(
+            "GECKODRIVER_PATH",
+            [
+                ".wdm/drivers/geckodriver/**/geckodriver",
+                ".cache/selenium/geckodriver/**/geckodriver",
+            ],
+        )
+        if gecko_path:
+            service = FirefoxService(str(gecko_path))
+        else:
+            service = FirefoxService(GeckoDriverManager().install())
         driver = webdriver.Firefox(service=service, options=firefox_options)
         driver.set_script_timeout(60)
         return driver
@@ -249,12 +289,27 @@ def setup_driver(prefer_chrome: bool = False):
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
-        service = Service(ChromeDriverManager().install())
+        chrome_path = _resolve_driver_path(
+            "CHROMEDRIVER_PATH",
+            [
+                ".wdm/drivers/chromedriver/**/chromedriver",
+                ".cache/selenium/chromedriver/**/chromedriver",
+            ],
+        )
+        if chrome_path:
+            service = ChromeService(str(chrome_path))
+        else:
+            service = ChromeService(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_script_timeout(60)
         return driver
 
     try:
+        forced = os.environ.get("SELENIUM_BROWSER", "").lower()
+        if forced == "chrome":
+            return create_chrome()
+        if forced == "firefox":
+            return create_firefox()
         if prefer_chrome:
             return create_chrome()
         # Try Firefox first
@@ -824,7 +879,7 @@ def test_page_crud(driver, page):
 def main():
     """Main test function"""
     parser = argparse.ArgumentParser(description='Test console errors on pages')
-    parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
+    parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch_list.html)')
     parser.add_argument('--all', action='store_true', help='Test all pages (default without flag = quick 3-page smoke)')
     parser.add_argument('--comprehensive', action='store_true', help='Run comprehensive CRUD tests in addition to console errors')
     parser.add_argument('--no-login', action='store_true', help='Skip login process (for pages that don\'t require authentication)')
@@ -995,4 +1050,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

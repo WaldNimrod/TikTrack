@@ -62,7 +62,7 @@ const logSystem = {
 };
 
 // API endpoints
-const API_BASE = '/api/background-tasks';
+const API_BASE = '/api/background_tasks';
 const API_ENDPOINTS = {
   status: `${API_BASE}/`,
   tasks: `${API_BASE}/tasks`,

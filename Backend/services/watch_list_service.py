@@ -38,6 +38,8 @@ class WatchListService:
 
     # Maximum number of lists per user
     MAX_LISTS_PER_USER = 20
+    DEFAULT_LIST_NAME = "My Watch List"
+    DEFAULT_TICKER_SYMBOL = "SPY"
 
     # --------------------------------------------------------------------- #
     # Watch List Operations
@@ -62,6 +64,114 @@ class WatchListService:
             .order_by(WatchList.display_order.asc(), WatchList.name.asc())
             .all()
         )
+
+    @staticmethod
+    def ensure_default_watch_list(db: Session, user_id: int) -> Optional[WatchList]:
+        """
+        Ensure a default watch list exists with a SPY ticker.
+
+        Creates a single non-flag list when the user has no regular lists.
+        If regular lists exist but none is marked as default, marks the first one as default.
+        """
+        logger.info(f"ensure_default_watch_list called for user_id={user_id}")
+        # First check if there's already a default list
+        existing_default = db.query(WatchList).filter(
+            WatchList.user_id == user_id,
+            WatchList.is_flag_list == 0,
+            WatchList.is_default == 1
+        ).first()
+
+        logger.info(f"existing_default for user {user_id}: {existing_default.id if existing_default else None}")
+
+        if existing_default:
+            return existing_default
+
+        # Check for any regular list that could be marked as default
+        existing_regular = db.query(WatchList).filter(
+            WatchList.user_id == user_id,
+            WatchList.is_flag_list == 0
+        ).order_by(WatchList.created_at).first()
+
+        logger.info(f"existing_regular for user {user_id}: {existing_regular.id if existing_regular else None}")
+
+        if existing_regular:
+            # Mark the existing list as default
+            logger.info(f"Marking existing watch list {existing_regular.id} as default for user {user_id}")
+            existing_regular.is_default = 1
+            db.commit()
+            db.refresh(existing_regular)
+            logger.info(f"Successfully marked watch list {existing_regular.id} as default")
+
+            # Add SPY ticker to the default list (prefer system ticker, fallback to external symbol)
+            ticker = db.query(Ticker).filter(
+                func.lower(Ticker.symbol) == WatchListService.DEFAULT_TICKER_SYMBOL.lower()
+            ).first()
+
+            try:
+                if ticker:
+                    WatchListService.add_ticker_to_list(
+                        db=db,
+                        list_id=existing_regular.id,
+                        user_id=user_id,
+                        ticker_id=ticker.id
+                    )
+                else:
+                    WatchListService.add_ticker_to_list(
+                        db=db,
+                        list_id=existing_regular.id,
+                        user_id=user_id,
+                        external_symbol=WatchListService.DEFAULT_TICKER_SYMBOL,
+                        external_name=WatchListService.DEFAULT_TICKER_SYMBOL
+                    )
+            except ValueError:
+                # Ignore duplicate item or missing ticker edge cases
+                logger.warning(
+                    "Default SPY ticker could not be added to existing watch list %s for user %s",
+                    existing_regular.id,
+                    user_id
+                )
+
+            return existing_regular
+
+        # Create a default list
+        watch_list = WatchListService.create_watch_list(
+            db=db,
+            user_id=user_id,
+            name=WatchListService.DEFAULT_LIST_NAME,
+            view_mode='table',
+            is_default=True
+        )
+
+        # Add SPY ticker (prefer system ticker, fallback to external symbol)
+        ticker = db.query(Ticker).filter(
+            func.lower(Ticker.symbol) == WatchListService.DEFAULT_TICKER_SYMBOL.lower()
+        ).first()
+
+        try:
+            if ticker:
+                WatchListService.add_ticker_to_list(
+                    db=db,
+                    list_id=watch_list.id,
+                    user_id=user_id,
+                    ticker_id=ticker.id
+                )
+            else:
+                WatchListService.add_ticker_to_list(
+                    db=db,
+                    list_id=watch_list.id,
+                    user_id=user_id,
+                    external_symbol=WatchListService.DEFAULT_TICKER_SYMBOL,
+                    external_name=WatchListService.DEFAULT_TICKER_SYMBOL
+                )
+        except ValueError:
+            # Ignore duplicate item or missing ticker edge cases
+            logger.warning(
+                "Default SPY ticker could not be added to watch list %s for user %s",
+                watch_list.id,
+                user_id
+            )
+
+        return watch_list
 
     @staticmethod
     def get_watch_list_by_id(db: Session, list_id: int, user_id: int) -> Optional[WatchList]:
@@ -92,7 +202,8 @@ class WatchListService:
         color_hex: Optional[str] = None,
         view_mode: str = 'table',
         default_sort_column: Optional[str] = None,
-        default_sort_direction: str = 'asc'
+        default_sort_direction: str = 'asc',
+        is_default: bool = False
     ) -> WatchList:
         """
         Create a new watch list.
@@ -106,6 +217,7 @@ class WatchListService:
             view_mode: View mode ('table', 'cards', 'compact')
             default_sort_column: Default sort column (optional)
             default_sort_direction: Sort direction ('asc' or 'desc')
+            is_default: Whether this is the user's default watch list
 
         Returns:
             Created WatchList object
@@ -160,7 +272,8 @@ class WatchListService:
             display_order=max_order + 1,
             view_mode=view_mode,
             default_sort_column=default_sort_column,
-            default_sort_direction=default_sort_direction
+            default_sort_direction=default_sort_direction,
+            is_default=1 if is_default else 0
         )
 
         db.add(watch_list)
@@ -653,7 +766,6 @@ class WatchListService:
         # The get_watch_list_items method already handles dynamic flag lists
         logger.debug("Flag list %s is dynamic - no sync needed", list_id)
         return True
-
 
 
 

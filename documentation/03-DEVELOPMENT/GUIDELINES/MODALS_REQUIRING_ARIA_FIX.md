@@ -39,7 +39,7 @@
 ### **קובץ 1: server-monitor.js**
 
 **מיקום:** `trading-ui/scripts/server-monitor.js`  
-**עמוד:** `server-monitor.html`  
+**עמוד:** `server_monitor.html`  
 **שימוש:** מוניטור שרת - כלי פיתוח  
 **קריטיות:** 🟡 בינונית
 
@@ -57,7 +57,7 @@ grep -n "new bootstrap.Modal" trading-ui/scripts/server-monitor.js
 ### **קובץ 2: system-management.js**
 
 **מיקום:** `trading-ui/scripts/system-management.js`  
-**עמוד:** `system-management.html`  
+**עמוד:** `system_management.html`  
 **שימוש:** ניהול מערכת - כלי פיתוח  
 **קריטיות:** 🟡 בינונית
 

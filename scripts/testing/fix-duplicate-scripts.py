@@ -10,12 +10,12 @@ from pathlib import Path
 MOCKUPS_DIR = Path("trading-ui/mockups/daily-snapshots")
 
 PAGES_TO_FIX = [
-    "strategy-analysis-page.html",
-    "economic-calendar-page.html",
-    "history-widget.html",
-    "emotional-tracking-widget.html",
-    "date-comparison-modal.html",
-    "tradingview-test-page.html"
+    "strategy_analysis_page.html",
+    "economic_calendar_page.html",
+    "history_widget.html",
+    "emotional_tracking_widget.html",
+    "date_comparison_modal.html",
+    "tradingview_test_page.html"
 ]
 
 def fix_duplicates(page_path):

@@ -622,7 +622,7 @@ await window.CacheRegistry.clearAll();
 #### **ממשק:**
 
 - **cache-test.html:** 4 כרטיסים + טבלה + בדיקות
-- **system-management.html:** 4 כפתורים
+- **system_management.html:** 4 כפתורים
 - **תפריט ראשי:** כפתור 🧹 → Medium
 
 #### **בדיקות:**

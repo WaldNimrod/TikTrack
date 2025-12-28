@@ -104,7 +104,7 @@ class SMExternalDataSection extends SMBaseSection {
           <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
             <h3 class="mb-0">מערכת נתונים חיצוניים</h3>
             <div class="d-flex flex-wrap gap-2 align-items-center">
-              <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary me-2">
+              <a href="/external_data_dashboard" class="btn btn-sm btn-outline-primary me-2">
                 <i class="fas fa-external-link-alt me-1"></i> דשבורד מלא
               </a>
               <div id="smExtActions">

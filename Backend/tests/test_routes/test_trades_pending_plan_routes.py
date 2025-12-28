@@ -11,7 +11,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from flask import Flask
+from flask import Flask, g
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
@@ -39,6 +39,10 @@ class TestTradesPendingPlanRoutes(unittest.TestCase):
         self.app.config['TESTING'] = True
         self.app.register_blueprint(trades_bp)
         self.mock_session = MagicMock()
+        self.app.before_request(self._mock_auth)
+
+    def _mock_auth(self):
+        g.user_id = 1
 
     def _patch_db(self):
         patcher = patch('routes.api.trades.get_db')
@@ -131,4 +135,3 @@ class TestTradesPendingPlanRoutes(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

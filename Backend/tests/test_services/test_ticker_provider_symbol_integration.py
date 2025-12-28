@@ -13,41 +13,11 @@ from unittest.mock import Mock, patch, MagicMock
 backend_dir = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from models.ticker import Ticker, TickerProviderSymbol
 from models.external_data import ExternalDataProvider
 from services.ticker_symbol_mapping_service import TickerSymbolMappingService
 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
 from services.user_data_import.import_orchestrator import ImportOrchestrator
-from config.settings import DATABASE_URL
-
-# Create test database engine
-test_engine = create_engine(DATABASE_URL.replace('tiktrack', 'tiktrack_test') if 'tiktrack' in DATABASE_URL else DATABASE_URL)
-TestSession = sessionmaker(bind=test_engine)
-
-
-@pytest.fixture
-def db_session():
-    """Create a test database session"""
-    # Create tables
-    from models.base import Base
-    from models.currency import Currency
-    from models.ticker import Ticker, TickerProviderSymbol
-    from models.external_data import ExternalDataProvider
-    
-    Base.metadata.create_all(test_engine)
-    
-    session = TestSession()
-    try:
-        yield session
-    finally:
-        session.rollback()
-        session.close()
-        # Clean up tables
-        Base.metadata.drop_all(test_engine)
 
 @pytest.fixture
 def test_currency(db_session):

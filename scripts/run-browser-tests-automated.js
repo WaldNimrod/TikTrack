@@ -11,7 +11,7 @@
 const { chromium } = require('playwright');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
-const PAGE_URL = `${BASE_URL}/trading-ui/ai-analysis.html`;
+const PAGE_URL = `${BASE_URL}/trading-ui/ai_analysis.html`;
 
 async function runBrowserTests() {
   console.log('🌐 Starting automated browser tests...\n');
@@ -56,7 +56,7 @@ async function runBrowserTests() {
       // Try to inject the browser test script
       const fs = require('fs');
       const path = require('path');
-      const browserTestPath = path.join(__dirname, '../trading-ui/scripts/testing/automated/ai-analysis-browser-test.js');
+      const browserTestPath = path.join(__dirname, '../trading-ui/scripts/testing/automated/ai_analysis-browser-test.js');
       
       if (fs.existsSync(browserTestPath)) {
         const browserTestContent = fs.readFileSync(browserTestPath, 'utf8');
@@ -83,7 +83,7 @@ async function runBrowserTests() {
       // Try to inject the performance test script
       const fs = require('fs');
       const path = require('path');
-      const perfTestPath = path.join(__dirname, '../trading-ui/scripts/testing/automated/ai-analysis-performance-test.js');
+      const perfTestPath = path.join(__dirname, '../trading-ui/scripts/testing/automated/ai_analysis-performance-test.js');
       
       if (fs.existsSync(perfTestPath)) {
         const perfTestContent = fs.readFileSync(perfTestPath, 'utf8');

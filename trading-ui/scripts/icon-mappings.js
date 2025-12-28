@@ -138,7 +138,7 @@ const IconMappings = {
 
     /**
      * Chart Icons - מיפוי ל-Tabler Icons
-     * להחלפת chart-*.svg ב-price-history-page.html
+     * להחלפת chart-*.svg ב-price_history_page.html
      */
     charts: {
         'type-line': 'chart-line',
@@ -195,24 +195,24 @@ const IconMappings = {
         'trades.html': 'chart-line',
         'alerts.html': 'bell',
         'accounts.html': 'user',
-        'system-management.html': 'settings',
-        'notifications-center.html': 'inbox',
+        'system_management.html': 'settings',
+        'notifications_center.html': 'inbox',
         'preferences.html': 'settings',
-        'user-profile.html': 'user',
+        'user_profile.html': 'user',
         'tickers.html': 'currency-dollar',
         'executions.html': 'bolt',
         'cash_flows.html': 'currency-dollar',
-        'trading-journal-page.html': 'notebook', // notebook icon for trading journal
+        'trading_journal_page.html': 'notebook', // notebook icon for trading journal
         'notes.html': 'note',
         'research.html': 'search',
         'trade_plans.html': 'clipboard-list',
         'db_display.html': 'database',
         'db_extradata.html': 'database',
-        'cache-management.html': 'database',
+        'cache_management.html': 'database',
         'crud_testing_dashboard.html': 'flask',
         'external_data_dashboard.html': 'world',
-        'server-monitor.html': 'server',
-        'css-management.html': 'palette',
+        'server_monitor.html': 'server',
+        'css_management.html': 'palette',
         'constraints.html': 'lock'
     }
 };

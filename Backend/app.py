@@ -172,7 +172,6 @@ from routes.api import (
     system_overview_bp,
     css_management_bp,
     preferences_bp,
-    wal_bp,
     system_settings_bp,
     watch_lists_bp,
     trade_history_bp,
@@ -221,7 +220,7 @@ class LegacyDBProxy:
 
     The historical test-suite expects `db.session`, `db.create_all()`, and friends.
     This proxy reuses the project's SQLAlchemy configuration while allowing tests to
-    override the connection URI (e.g., to use an in-memory SQLite database).
+    override the connection URI for isolated test databases.
     """
 
     def __init__(self, flask_app: Flask):
@@ -238,8 +237,7 @@ class LegacyDBProxy:
         return database_config.DATABASE_URL
 
     def _reconfigure(self, uri: str) -> None:
-        connect_args = {"check_same_thread": False} if uri.startswith("sqlite") else {}
-        new_engine = create_engine(uri, connect_args=connect_args)
+        new_engine = create_engine(uri)
         new_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=new_engine)
 
         self._scoped_session.remove()
@@ -320,7 +318,7 @@ def _cleanup_scoped_session(exception: Optional[BaseException] = None) -> None:
 
 def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     """
-    Factory used by integration tests to override configuration (e.g. in-memory SQLite).
+    Factory used by integration tests to override configuration (e.g. dedicated test DB).
     Reuses the existing application instance and rebinds the SQLAlchemy engine/session
     when the database URI changes.
     """
@@ -371,14 +369,6 @@ try:
     # database_config is already used by LegacyDBProxy; engine binds to the active DB
     effective_db_url = str(database_config.engine.url)
     logger.info("🗄️ Effective DATABASE_URL: %s", effective_db_url)
-    if effective_db_url.startswith("sqlite"):
-        # For sqlite, also log resolved file path when possible
-        try:
-            # sqlite:////absolute/path or sqlite:///relative
-            path_part = effective_db_url.split("sqlite:///")[-1]
-            logger.info("📂 SQLite file path: %s", os.path.abspath(path_part))
-        except Exception:
-            pass
 except Exception as _log_db_err:
     logger.warning("⚠️ Could not log database URL: %s", _log_db_err)
 
@@ -417,7 +407,7 @@ class LegacyDBProxy:
     Lightweight compatibility layer that mimics the minimal Flask-SQLAlchemy API
     expected by the legacy test-suite (`db.session`, `db.create_all()`, etc.).
     It reuses the project's SQLAlchemy models and updates the global database
-    engine/session factory when tests switch to an in-memory database.
+    engine/session factory when tests switch to a different database.
     """
 
     def __init__(self, flask_app: Flask):
@@ -434,8 +424,7 @@ class LegacyDBProxy:
         return database_config.DATABASE_URL
 
     def _reconfigure(self, uri: str) -> None:
-        connect_args = {"check_same_thread": False} if uri.startswith("sqlite") else {}
-        new_engine = create_engine(uri, connect_args=connect_args)
+        new_engine = create_engine(uri)
         new_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=new_engine)
 
         # Replace scoped session
@@ -493,7 +482,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     Factory used by the legacy test-suite.
 
     The existing application instance is reused, but configuration overrides
-    (like in-memory SQLite URIs) trigger a rebind of the Session/engine so
+    (like test database URIs) trigger a rebind of the Session/engine so
     tests operate on isolated databases.
     """
     if test_config:
@@ -556,7 +545,6 @@ app.register_blueprint(query_optimization_bp)
 app.register_blueprint(server_management_bp)
 app.register_blueprint(system_overview_bp)
 app.register_blueprint(css_management_bp)
-app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
 app.register_blueprint(email_logs_bp)
 app.register_blueprint(server_logs_bp)
@@ -2643,7 +2631,9 @@ def serve_ui_files(filename):
     """Serve static UI files explicitly under /trading-ui/* with correct MIME types"""
     import mimetypes
     full_path = os.path.join(UI_DIR, filename)
+    print(f"DEBUG: Serving file: {filename}, full_path: {full_path}, exists: {os.path.exists(full_path)}")
     if not os.path.exists(full_path):
+        print(f"DEBUG: File not found: {filename}")
         return "File not found", 404
     # Guess mimetype and set explicitly to avoid JSON default
     guessed, _ = mimetypes.guess_type(full_path)

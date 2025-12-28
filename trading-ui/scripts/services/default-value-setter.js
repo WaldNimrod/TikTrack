@@ -84,11 +84,11 @@ class DefaultValueSetter {
      * הגדרת ערך מהעדפות משתמש
      * 
      * @param {string} fieldId - ID של השדה
-     * @param {string} preferenceName - שם ההעדפה (default_currency, default_trading_account, etc.)
+     * @param {string} preferenceName - שם ההעדפה (primaryCurrency, default_trading_account, etc.)
      * @returns {Promise<*>} - הערך שהוגדר או null
      * 
      * @example
-     * await DefaultValueSetter.setPreferenceValue('currencySelect', 'default_currency');
+     * await DefaultValueSetter.setPreferenceValue('currencySelect', 'primaryCurrency');
      */
     static async setPreferenceValue(fieldId, preferenceName) {
         const element = document.getElementById(fieldId);
@@ -184,7 +184,7 @@ class DefaultValueSetter {
      *     { fieldId: 'executionDate', includeTime: true }
      *   ],
      *   preferences: [
-     *     { fieldId: 'currencySelect', preferenceName: 'default_currency' },
+     *     { fieldId: 'currencySelect', preferenceName: 'primaryCurrency' },
      *     { fieldId: 'accountSelect', preferenceName: 'default_trading_account' }
      *   ],
      *   logical: [
@@ -235,7 +235,7 @@ class DefaultValueSetter {
      *   includeTime: false,
      *   preferenceFields: {
      *     'accountSelect': 'default_trading_account',
-     *     'currencySelect': 'default_currency'
+     *     'currencySelect': 'primaryCurrency'
      *   },
      *   logicalDefaults: {
      *     'tradeStatus': 'open',

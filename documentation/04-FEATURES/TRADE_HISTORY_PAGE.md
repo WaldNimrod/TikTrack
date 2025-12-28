@@ -22,9 +22,9 @@
 
 ### Frontend
 
-- `trading-ui/trade-history.html` - מבנה HTML וגרף
-- `trading-ui/scripts/trade-history-page.js` - לוגיקת העמוד
-- `trading-ui/scripts/services/trade-history-data.js` - שירות טעינת נתונים
+- `trading-ui/trade_history.html` - מבנה HTML וגרף
+- `trading-ui/scripts/trade_history-page.js` - לוגיקת העמוד
+- `trading-ui/scripts/services/trade_history-data.js` - שירות טעינת נתונים
 
 ### Backend
 

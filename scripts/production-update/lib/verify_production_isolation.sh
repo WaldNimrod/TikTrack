@@ -102,13 +102,6 @@ fi
 info ""
 info "3. Checking code isolation (no hardcoded dev paths)..."
 
-# Check for hardcoded dev database paths
-# Check for hardcoded SQLite references (system uses PostgreSQL only)
-if grep -r "sqlite://\|sqlite3\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | grep -v "comment" > /dev/null; then
-    warn "Hardcoded DB Path" "Found references to SQLite/legacy DB paths (should use config.settings.DATABASE_URL with PostgreSQL)"
-    grep -r "sqlite://\|sqlite3\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | grep -v "comment" | head -5
-fi
-
 # Check for hardcoded dev port
 if grep -r ":8080" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "#" > /dev/null; then
     warn "Hardcoded Dev Port" "Found references to port 8080 (should use config.settings PORT)"
@@ -242,7 +235,7 @@ legacy_refs=$(grep -R -n \
     --exclude='*.zip' \
     --exclude='.cursorrules*' \
     --exclude=verify_production_isolation.sh \
-    # PostgreSQL only - no SQLite file checks
+    # PostgreSQL only - no legacy DB file checks
     true)
 
 legacy_prod_refs=$(grep -R -n \
@@ -293,5 +286,3 @@ else
     echo "Please fix the errors above to ensure complete isolation."
     exit 1
 fi
-
-

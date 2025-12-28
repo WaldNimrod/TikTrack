@@ -100,7 +100,7 @@
       if (filters.group_by) params.append('group_by', filters.group_by);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/?${params.toString()}`;
+      const url = `${base}/api/trade_history/?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -170,7 +170,7 @@
       if (filters.period) params.append('period', filters.period);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/statistics?${params.toString()}`;
+      const url = `${base}/api/trade_history/statistics?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -228,7 +228,7 @@
       if (filters.end_date) params.append('end_date', filters.end_date);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/aggregated?${params.toString()}`;
+      const url = `${base}/api/trade_history/aggregated?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -283,7 +283,7 @@
       params.append('end_date', dateRange.end_date);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/plan-vs-execution?${params.toString()}`;
+      const url = `${base}/api/trade_history/plan-vs-execution?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -339,7 +339,7 @@
       }
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/${tradeId}/timeline?${params.toString()}`;
+      const url = `${base}/api/trade_history/${tradeId}/timeline?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -395,7 +395,7 @@
       params.append('days_after', days_after.toString());
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/${tradeId}/chart-data?${params.toString()}`;
+      const url = `${base}/api/trade_history/${tradeId}/chart-data?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -444,7 +444,7 @@
       window.Logger?.debug?.('🔄 Loading trade statistics from API...', { ...PAGE_LOG_CONTEXT, tradeId });
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/${tradeId}/statistics`;
+      const url = `${base}/api/trade_history/${tradeId}/statistics`;
       
       const response = await fetch(url, { });
       if (!response.ok) {
@@ -503,7 +503,7 @@
       params.append('include_durations', include_durations.toString());
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trade-history/${tradeId}/full-analysis?${params.toString()}`;
+      const url = `${base}/api/trade_history/${tradeId}/full-analysis?${params.toString()}`;
       
       const response = await fetch(url, { });
       if (!response.ok) {

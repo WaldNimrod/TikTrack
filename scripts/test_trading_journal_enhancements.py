@@ -78,7 +78,7 @@ def test_page_loads(driver):
     """Test that the page loads without errors"""
     print("\n📄 Testing page load...")
     try:
-        driver.get(f"{BASE_URL}/trading-journal.html")
+        driver.get(f"{BASE_URL}/trading_journal.html")
         time.sleep(5)  # Wait for page to load
         
         # Check for console errors

@@ -95,7 +95,7 @@
 ### 1.6 GLOBAL_UI_IMPROVEMENTS_TASKS – פריסת שדרוגים רוחביים
 
 - ⚙️ **אחר (נדרש פתרון שמירת View State):** הוספת עמודת "עודכן" אחרי עמודת הערות בכל אחד מהעמודים:
-  - `trades.html`, `accounts.html`, `alerts.html`, `cash-flows.html`, `notes.html`, `trade-plans.html`, `executions.html`.
+  - `trades.html`, `accounts.html`, `alerts.html`, `cash_flows.html`, `notes.html`, `trade_plans.html`, `executions.html`.
 - ✅ **בוצע (11.2025):** עדכון CSS להבטחת רוחב טבלאות 100% ויישור כותרות למרכז.
 - ✅ **בוצע (11.2025):** יישום פונקציית `getTimeDuration` להצגת זמן שעבר מעדכון אחרון.
 - ✅ **בוצע (11.2025):** תיקון race condition במחלקות צבע כותרות באמצעות `color-scheme-system.js`.
@@ -109,7 +109,7 @@
 ### 1.7 DEVELOPMENT_TOOLS_STANDARDIZATION_TASKS – סטנדרטיזציה לעמודי כלי פיתוח
 
 - ⚙️ **אחר (מאוחד בפרויקט עמודי כלי פיתוח):** המעקב מתבצע כעת במסמך הפרויקט הייעודי, אך הסעיפים נשמרים כאן לעיון.
-- לכל אחד מהעמודים (`background-tasks.html`, `cache-test.html`, `db_display.html`, `db_extradata.html`, `linter-realtime-monitor.html`, `notifications-center.html`, `server-monitor.html`, `system-management.html`):
+- לכל אחד מהעמודים (`background_tasks.html`, `cache-test.html`, `db_display.html`, `db_extradata.html`, `linter-realtime-monitor.html`, `notifications_center.html`, `server_monitor.html`, `system_management.html`):
   - ניקוי CSS מיותר.
   - שיוך לכל קבצי ה-CSS המאוחדים (apple-theme, bootstrap, styles, header-system, typography, table, notification-system).
   - שימוש עקבי במחלקות Bootstrap.
@@ -167,7 +167,7 @@
   - Task Queue עם עדיפויות.
   - Worker system וניהול התקדמות.
   - Error handling ו-API לניהול משימות.
-  - UI לנהל משימות (`background-tasks.html`, CSS, JS).
+  - UI לנהל משימות (`background_tasks.html`, CSS, JS).
 - ✅ **בוצע:** מערכת Real-time Notifications:
   - אינטגרציית Flask-SocketIO.
   - ניהול חדרים אישיים, שידור אירועים, הרשאות.

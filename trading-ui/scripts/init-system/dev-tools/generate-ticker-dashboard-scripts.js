@@ -1,7 +1,7 @@
 /**
  * Generate Script Tags for ticker-dashboard page
  * 
- * This script generates the correct script loading order for ticker-dashboard.html
+ * This script generates the correct script loading order for ticker_dashboard.html
  * based on the package manifest and page-initialization-configs.js
  * 
  * Usage: Load this script in browser console, then run:
@@ -97,7 +97,7 @@
     html += '    <!-- =============================================================== -->\n\n';
     
     const pageScripts = [
-      'services/ticker-dashboard-data.js',
+      'services/ticker_dashboard-data.js',
       'ticker-dashboard.js'
     ];
 

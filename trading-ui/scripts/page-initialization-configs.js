@@ -125,7 +125,7 @@
  * 📖 DETAILED DOCUMENTATION:
  * ==========================
  * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
- * - Management Interface: /init-system-management
+ * - Management Interface: /init_system_management
  *
  * 🔍 MONITORING SYSTEM ROLE:
  * ==========================
@@ -604,7 +604,70 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
-    
+
+    'user-management': {
+      name: 'User Management',
+      description: 'ניהול משתמשים - CRUD, סטטיסטיקות וטבלת משתמשים',
+      lastModified: '2025-12-28',
+      pageType: 'management',
+      packages: [
+        'base',
+        'auth', // Authentication loaded FIRST to provide dependencies
+        'header', // Header system loaded after auth
+        'core-ui', // Core UI systems loaded after header
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'preferences',
+        'entity-details',
+        'info-summary',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'DataUtils',
+        'window.Logger',
+        'window.ModalManagerV2',
+        'window.ModalNavigationManager',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.TableSortValueAdapter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.createActionsMenu',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+        'window.showEntityDetails',
+        'window.TikTrackAuth',
+        'window.UserManagementPage'
+      ],
+      pageSpecificScripts: [
+        'scripts/user-management.js',
+      ],
+      preloadAssets: ['user-management-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('👥 Initializing User Management Page...', { page: 'page-initialization-configs' });
+
+          // Initialize User Management Page
+          if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {
+            await window.UserManagementPage.init();
+          }
+        },
+      ],
+    },
+
     // Legacy entry (kept for compatibility)
     // Trading Pages
     trades: {
@@ -1938,7 +2001,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
-    'notifications-center.html': {
+    'notifications_center.html': {
       name: 'Notifications Center HTML',
       packages: ['base', 'crud', 'logs', 'init-system'],
       requiredGlobals: [
@@ -2254,6 +2317,22 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.runCRUDTests',
         'window.runAPITests',
         'window.runUITests',
+
+        'DefaultsTestingSystem',
+
+        // Individual entity defaults testing functions
+        'window.runExecutionsDefaultsTest',
+        'window.runTradesDefaultsTest',
+        'window.runAlertsDefaultsTest',
+        'window.runTradePlansDefaultsTest',
+        'window.runTickersDefaultsTest',
+        'window.runTradingAccountsDefaultsTest',
+        'window.runNotesDefaultsTest',
+        'window.runCashFlowsDefaultsTest',
+        'window.runTradeHistoryDefaultsTest',
+        'window.runTradingJournalDefaultsTest',
+        'window.runWatchListsDefaultsTest',
+        'window.runTagManagementDefaultsTest',
       ],
       pageSpecificScripts: ['scripts/crud-testing-enhanced.js', 'scripts/crud-automated-test-runner.js'],
       description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
@@ -4383,6 +4462,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   if (PAGE_CONFIGS['user-profile']) {
     PAGE_CONFIGS['user_profile'] = PAGE_CONFIGS['user-profile'];
   }
+  // Alias for user_management.html (underscore instead of hyphen)
+  if (PAGE_CONFIGS['user-management']) {
+    PAGE_CONFIGS['user_management'] = PAGE_CONFIGS['user-management'];
+  }
   // Alias for ticker_dashboard.html (underscore instead of hyphen)
   if (PAGE_CONFIGS['ticker-dashboard']) {
     PAGE_CONFIGS['ticker_dashboard'] = PAGE_CONFIGS['ticker-dashboard'];
@@ -4453,6 +4536,7 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
       'window.runDebugTools',
       'window.runExecutionsDefaultsTest',
       'window.runCrossPageTestForGroup',
+      'window.runTestsForSinglePage',
       'window.runExecutionTestOnly',
       'window.runTradeTestOnly',
       'window.runTradePlanTestOnly',
@@ -4492,15 +4576,56 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
         // #region agent log
         window.runExecutionsDefaultsTest = async function() {
           try {
-            console.log('DEBUG: runExecutionsDefaultsTest started', {
+            console.log('DEBUG: runExecutionsDefaultsTest started - running ONLY for executions page', {
                 crudTesterExists: !!window.crudTester,
                 CrossPageTesterExists: !!window.CrossPageTester
             });
 
-            // Call runCrossPageTestForGroup directly instead of creating tester manually
-            await window.runCrossPageTestForGroup('user', 'defaults', 'ביצועי עסקאות');
+            // Check if crudTester is initialized
+            if (!window.crudTester) {
+                // Wait for crudTester to be initialized
+                let attempts = 0;
+                while (!window.crudTester && attempts < 50) { // Wait up to 5 seconds
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
-            console.log('DEBUG: runExecutionsDefaultsTest completed successfully');
+                if (!window.crudTester) {
+                    throw new Error('crudTester not initialized after waiting');
+                }
+            }
+
+            // Create CrossPageTester instance
+            const crossPageTester = new window.CrossPageTester(window.crudTester);
+
+            // Show the test section (will be handled by updateTestResults)
+
+            // Initialize results if needed in main crudTester
+            if (window.crudTester) {
+              window.crudTester.currentTestType = 'crossPage';
+              // crossPage is already initialized in crudTester constructor
+            }
+
+            // Run test for ONLY the executions page
+            console.log('🔍 DEBUG: About to call crossPageTester.runTestsForSinglePage for executions page');
+            await crossPageTester.runTestsForSinglePage('executions', 'defaults');
+            console.log('🔍 DEBUG: crossPageTester.runTestsForSinglePage completed for executions page');
+
+            // Update dashboard
+            if (window.crudTester && typeof window.crudTester.updateDashboard === 'function') {
+              window.crudTester.updateDashboard();
+            }
+            if (window.crudTester && typeof window.crudTester.updateTestResults === 'function') {
+              window.crudTester.updateTestResults();
+            }
+
+            // Show success notification
+            if (window.showSuccessNotification) {
+              const stats = crossPageTester.stats;
+              window.showSuccessNotification(`בדיקת ברירות מחדל - ביצועים הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+            }
+
+            console.log('DEBUG: runExecutionsDefaultsTest completed successfully - ran ONLY for executions page');
 
           } catch (error) {
             console.error('Error in runExecutionsDefaultsTest:', error);
@@ -4510,9 +4635,25 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
           }
         };
 
-        // Define global function for cross-page testing by group
+        // Define global function for cross-page testing by group (deprecated - use crud_testing_dashboard version)
         // #region agent log
-        window.runCrossPageTestForGroup = async function(groupType, testType, displayName) {
+        window.runCrossPageTestForGroup_old = async function(groupType, testType, displayName) {
+          console.log('🔍 DEBUG: runCrossPageTestForGroup called with:', groupType, testType, displayName);
+
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                  location: 'page-initialization-configs.js:runCrossPageTestForGroup',
+                  message: 'runCrossPageTestForGroup called',
+                  data: { groupType, testType, displayName },
+                  timestamp: Date.now(),
+                  sessionId: 'debug-session',
+                  runId: 'debug-run',
+                  hypothesisId: 'D'
+              })
+          }).catch(() => {});
+
           try {
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
@@ -4553,8 +4694,12 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
               // crossPage is already initialized in crudTester constructor
             }
 
+            console.log('🔍 DEBUG: About to call crossPageTester.runTestsForGroup with:', groupType, testType);
+
             // Run tests for the specified group
             await crossPageTester.runTestsForGroup(groupType, testType);
+
+            console.log('🔍 DEBUG: crossPageTester.runTestsForGroup completed for:', groupType, testType);
 
             // Update dashboard
             if (window.crudTester && typeof window.crudTester.updateDashboard === 'function') {
@@ -4574,6 +4719,209 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
             console.error('❌ Error running cross-page test', error);
             if (window.showErrorNotification) {
               window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ${displayName}: ${error.message}`);
+            }
+          }
+        };
+
+        // Define global function for single page tests
+        window.runTestsForSinglePage = async function(pageKey, testType) {
+          console.log('🔍 DEBUG: runTestsForSinglePage called with:', pageKey, testType);
+
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                  location: 'page-initialization-configs.js:runTestsForSinglePage',
+                  message: 'runTestsForSinglePage called',
+                  data: { pageKey, testType },
+                  timestamp: Date.now(),
+                  sessionId: 'debug-session',
+                  runId: 'debug-run',
+                  hypothesisId: 'D'
+              })
+          }).catch(() => {});
+
+          try {
+            // Check if crudTester is initialized
+            if (!window.crudTester) {
+                console.log('🔄 crudTester not found, initializing...');
+                // Try to initialize crudTester
+                if (window.initializeCRUDTestingDashboard) {
+                  window.initializeCRUDTestingDashboard();
+                } else if (window.IntegratedCRUDE2ETester) {
+                  window.crudTester = new window.IntegratedCRUDE2ETester();
+                  console.log('✅ crudTester initialized successfully');
+                } else {
+                  throw new Error('IntegratedCRUDE2ETester class not available');
+                }
+            }
+
+            // Create CrossPageTester instance
+            const crossPageTester = new window.CrossPageTester(window.crudTester);
+
+            // Initialize results if needed in main crudTester
+            if (window.crudTester) {
+              window.crudTester.currentTestType = 'crossPage';
+              // crossPage is already initialized in crudTester constructor
+            }
+
+            // Run test for the single page
+            console.log('🔍 DEBUG: About to call crossPageTester.runTestsForSinglePage');
+            await crossPageTester.runTestsForSinglePage(pageKey, testType);
+            console.log('🔍 DEBUG: crossPageTester.runTestsForSinglePage completed');
+
+            // Update dashboard
+            if (window.crudTester && typeof window.crudTester.updateDashboard === 'function') {
+              window.crudTester.updateDashboard();
+            }
+            if (window.crudTester && typeof window.crudTester.updateTestResults === 'function') {
+              window.crudTester.updateTestResults();
+            }
+
+            // Show success notification
+            if (window.showSuccessNotification) {
+              const stats = crossPageTester.stats;
+              window.showSuccessNotification(`בדיקת ${testType} - ${pageKey} הושלמה: ${stats.passed} עברו, ${stats.failed} נכשלו`);
+            }
+
+          } catch (error) {
+            console.error('❌ Error running single page test', error);
+            if (window.showErrorNotification) {
+              window.showErrorNotification('שגיאה', `שגיאה בהרצת בדיקת ${testType} ל${pageKey}: ${error.message}`);
+            }
+          }
+        };
+
+        // Individual entity defaults testing functions
+        window.runExecutionsDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runExecutionsDefaultsTest called');
+          await window.runTestsForSinglePage('executions', 'defaults');
+        };
+
+        window.runTradesDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTradesDefaultsTest called');
+          await window.runTestsForSinglePage('trades', 'defaults');
+        };
+
+        window.runAlertsDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runAlertsDefaultsTest called');
+          await window.runTestsForSinglePage('alerts', 'defaults');
+        };
+
+        window.runTradePlansDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTradePlansDefaultsTest called');
+          await window.runTestsForSinglePage('trade_plans', 'defaults');
+        };
+
+        window.runTickersDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTickersDefaultsTest called');
+          await window.runTestsForSinglePage('tickers', 'defaults');
+        };
+
+        window.runTradingAccountsDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTradingAccountsDefaultsTest called');
+          await window.runTestsForSinglePage('trading_accounts', 'defaults');
+        };
+
+        window.runNotesDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runNotesDefaultsTest called');
+          await window.runTestsForSinglePage('notes', 'defaults');
+        };
+
+        window.runCashFlowsDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runCashFlowsDefaultsTest called');
+          await window.runTestsForSinglePage('cash_flows', 'defaults');
+        };
+
+        window.runTradeHistoryDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTradeHistoryDefaultsTest called');
+          await window.runTestsForSinglePage('trade_history', 'defaults');
+        };
+
+        window.runTradingJournalDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTradingJournalDefaultsTest called');
+          await window.runTestsForSinglePage('trading_journal', 'defaults');
+        };
+
+        window.runWatchListsDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runWatchListsDefaultsTest called');
+          await window.runTestsForSinglePage('watch_lists', 'defaults');
+        };
+
+        window.runTagManagementDefaultsTest = async function() {
+          console.log('🔍 DEBUG: runTagManagementDefaultsTest called');
+          await window.runTestsForSinglePage('tag_management', 'defaults');
+        };
+
+        // General defaults test runner - runs all individual tests in sequence
+        window.runAllDefaultsTests = async function() {
+          console.log('🔍 DEBUG: runAllDefaultsTests called - running all entity defaults tests in sequence');
+
+          // Ensure crudTester is initialized
+          if (!window.crudTester) {
+            console.log('🔄 Initializing crudTester in runAllDefaultsTests...');
+            if (window.initializeCRUDTestingDashboard) {
+              window.initializeCRUDTestingDashboard();
+            } else {
+              window.crudTester = new window.IntegratedCRUDE2ETester();
+            }
+          }
+
+          const testFunctions = [
+            { name: 'ביצועי עסקאות', func: window.runExecutionsDefaultsTest },
+            { name: 'טריידים', func: window.runTradesDefaultsTest },
+            { name: 'התראות', func: window.runAlertsDefaultsTest },
+            { name: 'תכניות מסחר', func: window.runTradePlansDefaultsTest },
+            { name: 'טיקרים', func: window.runTickersDefaultsTest },
+            { name: 'חשבונות מסחר', func: window.runTradingAccountsDefaultsTest },
+            { name: 'הערות', func: window.runNotesDefaultsTest },
+            { name: 'תזרימי מזומן', func: window.runCashFlowsDefaultsTest },
+            { name: 'היסטוריית טרייד', func: window.runTradeHistoryDefaultsTest },
+            { name: 'יומן מסחר', func: window.runTradingJournalDefaultsTest },
+            { name: 'רשימות צפייה', func: window.runWatchListsDefaultsTest },
+            { name: 'תגיות', func: window.runTagManagementDefaultsTest }
+          ];
+
+          let totalPassed = 0, totalFailed = 0, totalWarning = 0;
+
+          try {
+            for (const test of testFunctions) {
+              console.log(`🔍 DEBUG: Running ${test.name} defaults test...`);
+              await test.func();
+              // Give a small delay between tests to prevent interference
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Calculate summary from all tests
+            if (window.crudTester && window.crudTester.results && window.crudTester.results.crossPage && window.crudTester.results.crossPage.defaults) {
+              const allResults = window.crudTester.results.crossPage.defaults;
+              totalPassed = allResults.filter(r => r.status === 'success').length;
+              totalFailed = allResults.filter(r => r.status === 'failed').length;
+              totalWarning = allResults.filter(r => r.status === 'warning').length;
+            }
+
+            // Show final summary notification
+            const message = `בדיקת ברירות מחדל כללית הושלמה: ${totalPassed} עברו, ${totalFailed} נכשלו, ${totalWarning} אזהרות`;
+            if (totalFailed > 0) {
+              if (window.showErrorNotification) {
+                window.showErrorNotification('בדיקה כללית הושלמה עם שגיאות', message);
+              }
+            } else if (totalWarning > 0) {
+              if (window.showWarningNotification) {
+                window.showWarningNotification('בדיקה כללית הושלמה עם אזהרות', message);
+              }
+            } else {
+              if (window.showSuccessNotification) {
+                window.showSuccessNotification('בדיקה כללית הושלמה בהצלחה', message);
+              }
+            }
+
+            console.log('🔍 DEBUG: runAllDefaultsTests completed successfully');
+
+          } catch (error) {
+            console.error('❌ Error in runAllDefaultsTests:', error);
+            if (window.showErrorNotification) {
+              window.showErrorNotification('שגיאה בבדיקה כללית', `שגיאה בהרצת בדיקות ברירות מחדל: ${error.message}`);
             }
           }
         };

@@ -95,7 +95,7 @@ def set_sendgrid_api_key(api_key: str, from_email: str = None):
             print("📋 מה הלאה:")
             print("1. ודא שכתובת האימייל אומתה ב-SendGrid")
             print("   (Settings → Sender Authentication → Verify a Single Sender)")
-            print("2. פתח TikTrack: http://localhost:8080/user-profile.html")
+            print("2. פתח TikTrack: http://localhost:8080/user_profile.html")
             print("3. גלול לסקשן 'הגדרות SMTP'")
             print("4. לחץ 'בדיקת חיבור' לוודא שהכל עובד")
             print("5. לחץ 'שליחת מייל בדיקה' לבדיקה")

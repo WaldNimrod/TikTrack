@@ -20,7 +20,7 @@
 
 | פעולה | סקריפט | מה הוא עושה |
 | --- | --- | --- |
-| גיבוי DB | `python scripts/release/create_db_backup.py --label <label>` | גיבוי באמצעות SQLite backup API, כולל `PRAGMA integrity_check` וקובץ מטא-דאטה |
+| גיבוי DB | `python scripts/release/create_db_backup.py --label <label>` | גיבוי PostgreSQL כולל בדיקות תקינות וקובץ מטא-דאטה |
 | צ'ק-ליסט מקדים | `python scripts/release/run_release_checklist.py` | גיבוי → אימות סכמה → `verify_production_isolation.sh` → `verify_production.sh` |
 | שמירת סכמה | `python scripts/release/verify_schema.py` | משווה לטבלת האמת `_Tmp/simpleTrade_new.db`, מוודא מטבעות וחשבון `ibkr-int` |
 | בדיקות לאחר עדכון | `python scripts/release/post_update_validation.py --health-url ...` | אימות סכמה, בדיקות הפרדה, בדיקת API אופציונלית |
@@ -114,5 +114,4 @@ python scripts/release/verify_schema.py
 3. **חבילת "Clean DB Builder"** – הפיכת הסקריפטים הקיימים לחבילה אחת שניתנת להוראה ע"י Task יחיד.
 
 > הצעות לשיפור? עדכנו את המסמך והוסיפו לינק לדיון ב-`documentation/INDEX.md`.
-
 

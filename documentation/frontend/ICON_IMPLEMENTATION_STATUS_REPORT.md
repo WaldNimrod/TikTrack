@@ -33,7 +33,7 @@
 **קבצים:**
 
 - `trading-ui/research.html` - 2 CDN links (Bootstrap Icons + FontAwesome)
-- `trading-ui/mockups/daily-snapshots/tradingview-test-page.html` - 1 CDN link
+- `trading-ui/mockups/daily-snapshots/tradingview_test_page.html` - 1 CDN link
 
 **פעולה:** הסר CDN links והשתמש ב-IconSystem
 
@@ -42,13 +42,13 @@
 **עמודים ראשיים:**
 
 - ❌ `trading-ui/research.html` - משתמש ב-CDN, ללא IconSystem
-- ❌ `trading-ui/notifications-center.html` - משתמש ב-FontAwesome (21 occurrences)
-- ❌ `trading-ui/server-monitor.html` - ללא IconSystem
-- ❌ `trading-ui/code-quality-dashboard.html` - ללא IconSystem
+- ❌ `trading-ui/notifications_center.html` - משתמש ב-FontAwesome (21 occurrences)
+- ❌ `trading-ui/server_monitor.html` - ללא IconSystem
+- ❌ `trading-ui/code_quality_dashboard.html` - ללא IconSystem
 
 **עמודים טכניים:**
 
-- ❌ `trading-ui/mockups/daily-snapshots/tradingview-test-page.html` - CDN link
+- ❌ `trading-ui/mockups/daily-snapshots/tradingview_test_page.html` - CDN link
 
 **פעולה:** הוסף IconSystem לכל העמודים
 
@@ -60,12 +60,12 @@
 
 #### עמודים
 
-- `trading-ui/tag-management.html` - 12 occurrences (`bi-tags-fill`, etc.)
+- `trading-ui/tag_management.html` - 12 occurrences (`bi-tags-fill`, etc.)
 - `trading-ui/preferences-ui.js` - 9 occurrences
 
 #### מוקאפים
 
-- `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - 7 occurrences (`bi-chevron-down`)
+- `trading-ui/mockups/daily-snapshots/portfolio_state_page.html` - 7 occurrences (`bi-chevron-down`)
 
 **פעולה:** החלף ב-Tabler Icons דרך IconSystem
 
@@ -75,10 +75,10 @@
 
 #### עמודים
 
-- `trading-ui/notifications-center.html` - 21 occurrences (`fas fa-chart-bar`)
+- `trading-ui/notifications_center.html` - 21 occurrences (`fas fa-chart-bar`)
 - `trading-ui/constraints.html` - 18 occurrences (`fas fa-sort`)
-- `trading-ui/server-monitor.html` - 36 occurrences
-- `trading-ui/background-tasks.html` - 2 occurrences
+- `trading-ui/server_monitor.html` - 36 occurrences
+- `trading-ui/background_tasks.html` - 2 occurrences
 
 #### סקריפטים
 
@@ -93,8 +93,8 @@
 **קבצים:**
 
 - `trading-ui/db_display.html` - `images/icons/db_display.svg` (ללא entities/)
-- `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html` - 27 occurrences
-- `trading-ui/mockups/daily-snapshots/trading-journal-page.html` - 8 occurrences
+- `trading-ui/mockups/daily-snapshots/comparative_analysis_page.html` - 27 occurrences
+- `trading-ui/mockups/daily-snapshots/trading_journal_page.html` - 8 occurrences
 
 **פעולה:** עדכן נתיבים ל-`/trading-ui/images/icons/entities/` או `tabler/`
 
@@ -110,9 +110,9 @@
 
 - `trading-ui/index.html` - `data-icon="🔍"` (line 174)
 - `trading-ui/preferences.html` - `⚙️` בכותרת (line 13)
-- `trading-ui/tag-management.html` - `data-icon="➕"`, `🔄` (lines 123, 136, 154)
+- `trading-ui/tag_management.html` - `data-icon="➕"`, `🔄` (lines 123, 136, 154)
 - `trading-ui/constraints.html` - `📊`, `📋` בכותרת (lines 110, 130)
-- `trading-ui/code-quality-dashboard.html` - `📊`, `📚`, `🔍` בכותרת
+- `trading-ui/code_quality_dashboard.html` - `📊`, `📚`, `🔍` בכותרת
 - `trading-ui/research.html` - `🔍` בכותרת (line 32)
 
 **פעולה:** החלף Emojis באיקוני Tabler דרך IconSystem
@@ -149,30 +149,30 @@
 | `preferences.html` | ✅ | ❌ | ❌ | 🟡 (10) | ❌ | **טוב** - Emojis בכותרת |
 | `data_import.html` | ✅ | ❌ | ❌ | 🟡 (48) | ❌ | **טוב** - רק Emojis בתגובות |
 | `db_display.html` | ✅ | ❌ | ❌ | 🟡 (6) | ❌ | **טוב** - 1 old path |
-| `notifications-center.html` | ❌ | ❌ | 🔴 **21** | 🟡 (8) | ❌ | **דרוש תיקון** |
+| `notifications_center.html` | ❌ | ❌ | 🔴 **21** | 🟡 (8) | ❌ | **דרוש תיקון** |
 
 ### עמודים טכניים (System Pages)
 
 | עמוד | IconSystem | Bootstrap | FontAwesome | Emojis | CDN | סטטוס |
 |------|-----------|-----------|-------------|--------|-----|--------|
-| `system-management.html` | ✅ | ❌ | ❌ | 🟡 (12) | ❌ | **טוב** - רק Emojis בתגובות |
-| `server-monitor.html` | ❌ | ❌ | 🔴 **36** | 🟡 (3) | ❌ | **דרוש תיקון** |
-| `background-tasks.html` | ✅ | ❌ | 🟡 (2) | 🟡 (8) | ❌ | **טוב** - כמה FontAwesome |
-| `cache-management.html` | ✅ | ❌ | ❌ | 🟡 (10) | ❌ | **טוב** - רק Emojis בתגובות |
-| `css-management.html` | ✅ | ❌ | ❌ | 🟡 (3) | ❌ | **טוב** - רק Emojis בתגובות |
+| `system_management.html` | ✅ | ❌ | ❌ | 🟡 (12) | ❌ | **טוב** - רק Emojis בתגובות |
+| `server_monitor.html` | ❌ | ❌ | 🔴 **36** | 🟡 (3) | ❌ | **דרוש תיקון** |
+| `background_tasks.html` | ✅ | ❌ | 🟡 (2) | 🟡 (8) | ❌ | **טוב** - כמה FontAwesome |
+| `cache_management.html` | ✅ | ❌ | ❌ | 🟡 (10) | ❌ | **טוב** - רק Emojis בתגובות |
+| `css_management.html` | ✅ | ❌ | ❌ | 🟡 (3) | ❌ | **טוב** - רק Emojis בתגובות |
 | `constraints.html` | ✅ | ❌ | 🔴 **18** | 🟡 (10) | ❌ | **דרוש תיקון** - FontAwesome |
-| `tag-management.html` | ✅ | 🔴 **12** | ❌ | 🟡 (10) | ❌ | **דרוש תיקון** - Bootstrap |
-| `code-quality-dashboard.html` | ❌ | ❌ | ❌ | 🟡 (9) | ❌ | **טוב** - רק Emojis |
+| `tag_management.html` | ✅ | 🔴 **12** | ❌ | 🟡 (10) | ❌ | **דרוש תיקון** - Bootstrap |
+| `code_quality_dashboard.html` | ❌ | ❌ | ❌ | 🟡 (9) | ❌ | **טוב** - רק Emojis |
 
 ### מוקאפים (Mockups)
 
 | עמוד | IconSystem | Bootstrap | FontAwesome | Old Paths | CDN | סטטוס |
 |------|-----------|-----------|-------------|-----------|-----|--------|
-| `comparative-analysis-page.html` | ✅ | ❌ | ❌ | 🔴 **27** | ❌ | **דרוש תיקון** - Old paths |
-| `trading-journal-page.html` | ✅ | ❌ | ❌ | 🔴 **8** | ❌ | **דרוש תיקון** - Old paths |
-| `portfolio-state-page.html` | ✅ | 🔴 **7** | ❌ | ❌ | ❌ | **דרוש תיקון** - Bootstrap |
-| `price-history-page.html` | ✅ | ❌ | ❌ | ❌ | ❌ | **טוב** ✅ |
-| `tradingview-test-page.html` | ❌ | ❌ | ❌ | ❌ | 🔴 **1 CDN** | **דרוש תיקון** |
+| `comparative_analysis_page.html` | ✅ | ❌ | ❌ | 🔴 **27** | ❌ | **דרוש תיקון** - Old paths |
+| `trading_journal_page.html` | ✅ | ❌ | ❌ | 🔴 **8** | ❌ | **דרוש תיקון** - Old paths |
+| `portfolio_state_page.html` | ✅ | 🔴 **7** | ❌ | ❌ | ❌ | **דרוש תיקון** - Bootstrap |
+| `price_history_page.html` | ✅ | ❌ | ❌ | ❌ | ❌ | **טוב** ✅ |
+| `tradingview_test_page.html` | ❌ | ❌ | ❌ | ❌ | 🔴 **1 CDN** | **דרוש תיקון** |
 
 ### סקריפטים (Scripts) - חלקי
 
@@ -194,20 +194,20 @@
 
 1. **הסר CDN links:**
    - `trading-ui/research.html`
-   - `trading-ui/mockups/daily-snapshots/tradingview-test-page.html`
+   - `trading-ui/mockups/daily-snapshots/tradingview_test_page.html`
    - השתמש ב-`remove-icon-cdns.py` script
 
 2. **הוסף IconSystem לעמודים:**
    - `trading-ui/research.html`
-   - `trading-ui/notifications-center.html`
-   - `trading-ui/server-monitor.html`
-   - `trading-ui/code-quality-dashboard.html`
+   - `trading-ui/notifications_center.html`
+   - `trading-ui/server_monitor.html`
+   - `trading-ui/code_quality_dashboard.html`
 
 ### שלב 2: החלפת Bootstrap Icons
 
 1. **עמודים:**
-   - `trading-ui/tag-management.html` - 12 occurrences
-   - `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - 7 occurrences
+   - `trading-ui/tag_management.html` - 12 occurrences
+   - `trading-ui/mockups/daily-snapshots/portfolio_state_page.html` - 7 occurrences
 
 2. **סקריפטים:**
    - `trading-ui/scripts/preferences-ui.js` - 9 occurrences
@@ -217,9 +217,9 @@
 ### שלב 3: החלפת FontAwesome
 
 1. **עמודים:**
-   - `trading-ui/notifications-center.html` - 21 occurrences
+   - `trading-ui/notifications_center.html` - 21 occurrences
    - `trading-ui/constraints.html` - 18 occurrences
-   - `trading-ui/server-monitor.html` - 36 occurrences
+   - `trading-ui/server_monitor.html` - 36 occurrences
 
 2. **סקריפטים:**
    - `trading-ui/scripts/notifications-center.js` - 40 occurrences
@@ -230,8 +230,8 @@
 ### שלב 4: תיקון נתיבי איקונים ישנים
 
 1. **מוקאפים:**
-   - `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html` - 27 occurrences
-   - `trading-ui/mockups/daily-snapshots/trading-journal-page.html` - 8 occurrences
+   - `trading-ui/mockups/daily-snapshots/comparative_analysis_page.html` - 27 occurrences
+   - `trading-ui/mockups/daily-snapshots/trading_journal_page.html` - 8 occurrences
 
 2. **עמודים:**
    - `trading-ui/db_display.html` - 1 occurrence
@@ -243,7 +243,7 @@
 1. **Emojis ב-HTML (לא בתגובות):**
    - `trading-ui/index.html` - `data-icon="🔍"`
    - `trading-ui/preferences.html` - `⚙️` בכותרת
-   - `trading-ui/tag-management.html` - `➕`, `🔄`
+   - `trading-ui/tag_management.html` - `➕`, `🔄`
    - `trading-ui/constraints.html` - `📊`, `📋` בכותרת
 
 2. **פעולה:** החלף ב-Tabler Icons דרך IconSystem
@@ -260,9 +260,9 @@
 
 מספר עמודים משתמשים ב-IconSystem **אבל עדיין יש בהם** Bootstrap Icons או FontAwesome:
 
-- `trading-ui/tag-management.html` - משתמש ב-IconSystem, אבל 12 Bootstrap Icons
+- `trading-ui/tag_management.html` - משתמש ב-IconSystem, אבל 12 Bootstrap Icons
 - `trading-ui/constraints.html` - משתמש ב-IconSystem, אבל 18 FontAwesome
-- `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - משתמש ב-IconSystem, אבל 7 Bootstrap Icons
+- `trading-ui/mockups/daily-snapshots/portfolio_state_page.html` - משתמש ב-IconSystem, אבל 7 Bootstrap Icons
 
 **פעולה:** החלף את הנותרים ב-Tabler Icons
 

@@ -178,7 +178,7 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
    - Scheduler monitoring section with alerts
    - Ticker-specific data loading with dropdown
    - Missing data tickers section with recommendations
-   - Location: `trading-ui/external-data-dashboard.html`, `trading-ui/scripts/external-data-dashboard.js`
+   - Location: `trading-ui/external_data_dashboard.html`, `trading-ui/scripts/external_data_dashboard.js`
 
 #### **🔧 Technical Fixes (December 2025)**
 

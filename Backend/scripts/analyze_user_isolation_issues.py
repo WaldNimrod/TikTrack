@@ -30,7 +30,7 @@ PUBLIC_ENDPOINTS = [
     '/api/auth/login',
     '/api/auth/register',
     '/api/health',
-    '/api/ai-analysis/templates',
+    '/api/ai_analysis/templates',
 ]
 
 class RouteAnalyzer:

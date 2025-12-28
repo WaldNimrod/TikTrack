@@ -1851,12 +1851,8 @@ class EntityDetailsModal {
                 // בדיקה ראשונה - window.getPreference (כמו בעמוד התנועות)
                 if (typeof window.getPreference === 'function') {
                     try {
-                        // נסה עם default_trading_account (כמו בעמוד התנועות)
+                        // נסה עם default_trading_account (canonical name)
                         let prefValue = await window.getPreference('default_trading_account');
-                        if (!prefValue) {
-                            // נסה עם defaultAccountFilter
-                            prefValue = await window.getPreference('defaultAccountFilter');
-                        }
                         
                         if (prefValue && prefValue !== 'all' && prefValue !== null && prefValue !== undefined) {
                             // Try to parse as integer ID first
@@ -1886,16 +1882,13 @@ class EntityDetailsModal {
                 // בדיקה שנייה - getCurrentPreference (מטמון/API)
                 if (isDefault === null && typeof window.getCurrentPreference === 'function') {
                     try {
-                        let defaultAccountFilter = await window.getCurrentPreference('default_trading_account');
-                        if (!defaultAccountFilter) {
-                            defaultAccountFilter = await window.getCurrentPreference('defaultAccountFilter');
-                        }
-                        if (defaultAccountFilter && defaultAccountFilter !== 'all' && defaultAccountFilter !== null && defaultAccountFilter !== undefined) {
-                            const parsed = parseInt(defaultAccountFilter);
+                        let defaultAccountValue = await window.getCurrentPreference('default_trading_account');
+                        if (defaultAccountValue && defaultAccountValue !== 'all' && defaultAccountValue !== null && defaultAccountValue !== undefined) {
+                            const parsed = parseInt(defaultAccountValue);
                             if (!isNaN(parsed)) {
                                 defaultAccountId = parsed;
                                 isDefault = (defaultAccountId === parseInt(accountId));
-                                window.Logger.debug(`✅ Got default account from getCurrentPreference: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                                window.Logger.debug(`✅ Got default account from getCurrentPreference: ${defaultAccountValue}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
                             }
                         }
                     } catch (prefError) {
@@ -1906,16 +1899,13 @@ class EntityDetailsModal {
                 // בדיקה שלישית - PreferencesCore ישירות
                 if (isDefault === null && window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
                     try {
-                        let defaultAccountFilter = await window.PreferencesCore.getPreference('default_trading_account');
-                        if (!defaultAccountFilter || defaultAccountFilter === 'all') {
-                            defaultAccountFilter = await window.PreferencesCore.getPreference('defaultAccountFilter');
-                        }
-                        if (defaultAccountFilter && defaultAccountFilter !== 'all' && defaultAccountFilter !== null && defaultAccountFilter !== undefined) {
-                            const parsed = parseInt(defaultAccountFilter);
+                        let defaultAccountValue = await window.PreferencesCore.getPreference('default_trading_account');
+                        if (defaultAccountValue && defaultAccountValue !== 'all' && defaultAccountValue !== null && defaultAccountValue !== undefined) {
+                            const parsed = parseInt(defaultAccountValue);
                             if (!isNaN(parsed)) {
                                 defaultAccountId = parsed;
                                 isDefault = (defaultAccountId === parseInt(accountId));
-                                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountValue}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
                             }
                         }
                     } catch (coreError) {
@@ -1932,25 +1922,18 @@ class EntityDetailsModal {
                             isDefault = (defaultAccountId === parseInt(accountId));
                             window.Logger.debug(`✅ Got default_trading_account from currentPreferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
                         }
-                    } else if (window.currentPreferences.defaultAccountFilter && window.currentPreferences.defaultAccountFilter !== 'all') {
-                        const parsed = parseInt(window.currentPreferences.defaultAccountFilter);
-                        if (!isNaN(parsed)) {
-                            defaultAccountId = parsed;
-                            isDefault = (defaultAccountId === parseInt(accountId));
-                            window.Logger.debug(`✅ Got defaultAccountFilter from currentPreferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
-                        }
                     }
                 }
                 
                 // בדיקה חמישית - preferences.preferences.trading_settings
                 if (isDefault === null && window.preferences && window.preferences.preferences && window.preferences.preferences.trading_settings) {
-                    const defaultAccountFilter = window.preferences.preferences.trading_settings.defaultAccountFilter;
-                    if (defaultAccountFilter && defaultAccountFilter !== 'all') {
-                        const parsed = parseInt(defaultAccountFilter);
+                    const defaultAccountValue = window.preferences.preferences.trading_settings.default_trading_account;
+                    if (defaultAccountValue && defaultAccountValue !== 'all') {
+                        const parsed = parseInt(defaultAccountValue);
                         if (!isNaN(parsed)) {
                             defaultAccountId = parsed;
                             isDefault = (defaultAccountId === parseInt(accountId));
-                            window.Logger.debug(`✅ Got defaultAccountFilter from preferences.trading_settings: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                            window.Logger.debug(`✅ Got default_trading_account from preferences.trading_settings: ${defaultAccountValue}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
                         }
                     }
                 }
@@ -1963,14 +1946,6 @@ class EntityDetailsModal {
                             defaultAccountId = parsed;
                             isDefault = (defaultAccountId === parseInt(accountId));
                             window.Logger.debug(`✅ Got default_trading_account from preferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
-                        }
-                    } else if (window.preferences.preferences.defaultAccountFilter && window.preferences.preferences.defaultAccountFilter !== 'all') {
-                        const defaultAccountFilter = window.preferences.preferences.defaultAccountFilter;
-                        const parsed = parseInt(defaultAccountFilter);
-                        if (!isNaN(parsed)) {
-                            defaultAccountId = parsed;
-                            isDefault = (defaultAccountId === parseInt(accountId));
-                            window.Logger.debug(`✅ Got defaultAccountFilter from preferences: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
                         }
                     }
                 }

@@ -26,7 +26,6 @@ from .system_settings import system_settings_bp
 from .trade_plans import trade_plans_bp
 from .trades import trades_bp
 from .users import users_bp
-from .wal_management import wal_bp
 from .quality_check import bp as quality_check_bp
 from .quality_lint import bp as quality_lint_bp
 from .account_activity import account_activity_bp
@@ -78,7 +77,6 @@ __all__ = [
     'trade_plans_bp',
     'trades_bp',
     'users_bp',
-    'wal_bp',
     'quality_check_bp',
     'quality_lint_bp',
     'positions_bp',

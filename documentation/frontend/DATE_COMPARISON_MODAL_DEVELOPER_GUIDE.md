@@ -23,7 +23,7 @@
 
 ## סקירה כללית
 
-עמוד השוואת תאריכים (`date-comparison-modal.html`) הוא מוקאפ המאפשר השוואה בין שני תאריכים של מצב תיק ההשקעות. העמוד מציג:
+עמוד השוואת תאריכים (`date_comparison_modal.html`) הוא מוקאפ המאפשר השוואה בין שני תאריכים של מצב תיק ההשקעות. העמוד מציג:
 
 - **בחירת תאריכים** - שני שדות תאריך להשוואה
 - **טבלת השוואה** - השוואה בין מדדים שונים (יתרות, שווי תיק, P/L, וכו')
@@ -40,7 +40,7 @@
 
 ### קבצים
 
-- **HTML:** `trading-ui/mockups/daily-snapshots/date-comparison-modal.html`
+- **HTML:** `trading-ui/mockups/daily-snapshots/date_comparison_modal.html`
 - **JavaScript:** `trading-ui/scripts/date-comparison-modal.js`
 - **קונפיגורציה:** `trading-ui/scripts/page-initialization-configs.js`
 - **InfoSummary:** `trading-ui/scripts/info-summary-configs.js`

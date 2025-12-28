@@ -619,7 +619,7 @@
 
         navigateToTagManagement() {
             if (typeof window.navigateToPage === 'function') {
-                window.navigateToPage('tag-management', { preserveState: true });
+                window.navigateToPage('tag_management', { preserveState: true });
             } else {
                 window.location.href = 'tag_management.html';
             }
@@ -679,4 +679,3 @@
     window.TagSearchController = controller;
     document.addEventListener('DOMContentLoaded', () => controller.init());
 })();
-

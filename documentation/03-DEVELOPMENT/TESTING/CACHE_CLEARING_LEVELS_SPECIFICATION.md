@@ -665,7 +665,7 @@ sessionStorage.clear();  // אם משתמשים
 
 ## 🎨 **עיצוב ממשק**
 
-### **כרטיסי הרמות (cache-test.html + system-management.html)**
+### **כרטיסי הרמות (cache-test.html + system_management.html)**
 
 #### **Light Card - ירוק**
 
@@ -911,7 +911,7 @@ async function testClearingLevels() {
 
 - [ ] showClearCacheConfirmation() modal
 - [ ] cache-test.html: 4 level cards
-- [ ] system-management.html: 4 level buttons
+- [ ] system_management.html: 4 level buttons
 - [ ] Comparison table
 - [ ] Future features section (disabled)
 

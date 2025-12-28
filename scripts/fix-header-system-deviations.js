@@ -24,11 +24,11 @@ const PAGES_TO_FIX = [
   
   // Technical pages
   { html: 'trading-ui/constraints.html', js: 'trading-ui/scripts/constraints.js', issues: ['manual-filter-application'] },
-  { html: 'trading-ui/background-tasks.html', js: 'trading-ui/scripts/background-tasks.js', issues: ['manual-filter-application'] },
-  { html: 'trading-ui/server-monitor.html', js: 'trading-ui/scripts/server-monitor.js', issues: ['manual-filter-application'] },
-  { html: 'trading-ui/notifications-center.html', js: 'trading-ui/scripts/notifications-center.js', issues: ['manual-filter-application'] },
-  { html: 'trading-ui/css-management.html', js: 'trading-ui/scripts/css-management.js', issues: ['manual-filter-application'] },
-  { html: 'trading-ui/system-management.html', js: 'trading-ui/scripts/system-management.js', issues: ['manual-filter-application'] },
+  { html: 'trading-ui/background_tasks.html', js: 'trading-ui/scripts/background_tasks.js', issues: ['manual-filter-application'] },
+  { html: 'trading-ui/server_monitor.html', js: 'trading-ui/scripts/server_monitor.js', issues: ['manual-filter-application'] },
+  { html: 'trading-ui/notifications_center.html', js: 'trading-ui/scripts/notifications_center.js', issues: ['manual-filter-application'] },
+  { html: 'trading-ui/css_management.html', js: 'trading-ui/scripts/css_management.js', issues: ['manual-filter-application'] },
+  { html: 'trading-ui/system_management.html', js: 'trading-ui/scripts/system_management.js', issues: ['manual-filter-application'] },
 ];
 
 function fixDirectDOMManipulation(filePath) {

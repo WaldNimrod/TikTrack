@@ -50,6 +50,130 @@ const MAIN_PAGES = [
   'ticker-dashboard'
 ];
 
+const ENTITY_ALIASES = {
+  ai_analysis: 'ai-analysis',
+  watch_lists: 'watch-list',
+  user_profile: 'user-profile',
+  ticker_dashboard: 'ticker-dashboard',
+  trading_journal: 'trading-journal',
+};
+
+function normalizeEntityName(pageName) {
+  return ENTITY_ALIASES[pageName] || pageName;
+}
+
+async function testWatchListsSpecial() {
+  const issues = [];
+  const select = document.getElementById('activeListSelect');
+  const addButton = document.querySelector('[data-onclick*="openAddListModal"]');
+  const deleteButton = document.querySelector('[data-onclick*="deleteCurrentList"]');
+
+  if (!select) {
+    issues.push('activeListSelect not found');
+  }
+  if (!addButton) {
+    issues.push('Add watch list control not found');
+  }
+  if (!deleteButton) {
+    issues.push('Delete watch list control not found');
+  }
+
+  let optionsCount = 0;
+  if (select) {
+    if (window.WatchListsPage?.loadWatchListsData) {
+      try {
+        await window.WatchListsPage.loadWatchListsData();
+      } catch (error) {
+        issues.push(`loadWatchListsData failed: ${error.message}`);
+      }
+    }
+
+    if (window.WatchListsPage?.loadWatchLists) {
+      try {
+        await window.WatchListsPage.loadWatchLists();
+      } catch (error) {
+        issues.push(`loadWatchLists failed: ${error.message}`);
+      }
+    } else if (window.WatchListsPage?.init) {
+      try {
+        await window.WatchListsPage.init();
+      } catch (error) {
+        issues.push(`WatchListsPage init failed: ${error.message}`);
+      }
+    }
+
+    for (let i = 0; i < 16; i++) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      optionsCount = Array.from(select.options || []).filter(option => option.value).length;
+      if (optionsCount > 0) break;
+    }
+    if (optionsCount === 0) {
+      issues.push('activeListSelect has no loaded options');
+    }
+  }
+
+  let apiOk = true;
+  try {
+    const response = await fetch('/api/watch_lists/');
+    if (!response.ok) {
+      apiOk = false;
+      issues.push(`watch-lists API returned ${response.status}`);
+    }
+  } catch (error) {
+    apiOk = false;
+    issues.push(`watch-lists API error: ${error.message}`);
+  }
+
+  return {
+    page: 'watch_lists',
+    crud: issues.length === 0 ? 'PASSED' : 'FAILED',
+    error: issues.length ? issues.join('; ') : null,
+    issues,
+    details: {
+      optionsCount,
+      apiOk,
+    },
+  };
+}
+
+async function testUserProfileSpecial() {
+  const issues = [];
+  const requiredFields = ['firstName', 'lastName', 'email'];
+  requiredFields.forEach(fieldId => {
+    if (!document.getElementById(fieldId)) {
+      issues.push(`Missing profile field: ${fieldId}`);
+    }
+  });
+
+  const preferencesAvailable = !!(window.PreferencesManager || window.PreferencesUI || window.PreferencesCore);
+  if (!preferencesAvailable) {
+    issues.push('Preferences system not detected on user profile page');
+  }
+
+  let profileApiOk = true;
+  try {
+    const response = await fetch('/api/auth/me');
+    if (!response.ok) {
+      profileApiOk = false;
+      issues.push(`user profile API returned ${response.status}`);
+    }
+  } catch (error) {
+    profileApiOk = false;
+    issues.push(`user profile API error: ${error.message}`);
+  }
+
+  return {
+    page: 'user_profile',
+    crud: issues.length === 0 ? 'PASSED' : 'FAILED',
+    error: issues.length ? issues.join('; ') : null,
+    issues,
+    details: {
+      profileApiOk,
+      preferencesAvailable,
+    },
+  };
+}
+
 /**
  * בדיקת סדר טעינה של עמוד
  */
@@ -95,11 +219,19 @@ async function checkPageLoadingOrder(pageName) {
 async function testPageCRUD(pageName) {
 
   try {
+    if (pageName === 'watch_lists') {
+      return await testWatchListsSpecial();
+    }
+    if (pageName === 'user_profile') {
+      return await testUserProfileSpecial();
+    }
+
+    const entityName = normalizeEntityName(pageName);
     // בדיקה שהמערכת זמינה
     if (!window.CRUDEnhancedTester) {
 
       return {
-        page: pageName,
+        page: entityName,
         crud: 'ERROR',
         error: 'CRUDEnhancedTester not available'
       };
@@ -111,10 +243,10 @@ async function testPageCRUD(pageName) {
     }
     
     // הרצת בדיקה
-    const result = await window.crudEnhancedTester.smartEntityTest(pageName);
+    const result = await window.crudEnhancedTester.smartEntityTest(entityName);
     
     return {
-      page: pageName,
+      page: entityName,
       crud: result.score >= 80 ? 'PASSED' : 'FAILED',
       score: result.score,
       issues: result.issues,
@@ -242,5 +374,3 @@ ${MAIN_PAGES.map((p, i) => `   ${i + 1}. ${p}`).join('\n')}
 
 💾 Results will be saved to localStorage as 'comprehensive_crud_test_report'
 `);
-
-

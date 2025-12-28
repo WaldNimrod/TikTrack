@@ -116,7 +116,7 @@ document.getElementById('cashFlowDate').value = todayStr;
 
 ```javascript
 // קבלת העדפת מטבע ברירת מחדל
-const defaultCurrency = await window.getPreference('default_currency');
+const defaultCurrency = await window.getPreference('primaryCurrency');
 if (defaultCurrency) {
   document.getElementById('cashFlowCurrencyId').value = defaultCurrency;
 }
@@ -509,7 +509,7 @@ async function loadCurrenciesForCashFlow() {
       select.innerHTML = '<option value="">בחר מטבע...</option>';
       
       // קבלת מטבע ברירת מחדל מהעדפות
-      const defaultCurrency = await window.getPreference('default_currency');
+      const defaultCurrency = await window.getPreference('primaryCurrency');
       
       currencies.forEach((currency, index) => {
         const option = document.createElement('option');

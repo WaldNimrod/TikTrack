@@ -282,7 +282,7 @@ Cache מתנקה אוטומטית:
 
 **מיקום בקוד:**
 
-- `trading-ui/scripts/ticker-dashboard.js` - פונקציה `fetchDataFromProvider()`
+- `trading-ui/scripts/ticker_dashboard.js` - פונקציה `fetchDataFromProvider()`
 
 ---
 
@@ -306,7 +306,7 @@ Cache מתנקה אוטומטית:
 **מיקום בקוד:**
 
 - `trading-ui/scripts/services/unified-progress-manager.js` - שירות Progress Manager
-- `trading-ui/scripts/ticker-dashboard.js` - שימוש ב-`UnifiedProgressManager`
+- `trading-ui/scripts/ticker_dashboard.js` - שימוש ב-`UnifiedProgressManager`
 
 ---
 
@@ -370,7 +370,7 @@ const completeness = checkTickerDataCompleteness(ticker);
 ### מיקום בקוד
 
 - `trading-ui/scripts/tickers.js` - `enrichTickersWithFullData()`, `checkTickerDataCompleteness()`
-- `trading-ui/scripts/ticker-dashboard.js` - `checkMissingData()` (גרסה מקורית)
+- `trading-ui/scripts/ticker_dashboard.js` - `checkMissingData()` (גרסה מקורית)
 
 ---
 

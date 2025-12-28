@@ -119,13 +119,13 @@
 
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
-| SMTP Service | `Backend/services/email_service.py`<br>`Backend/services/email_templates.py`<br>`Backend/services/smtp_settings_service.py`<br>`trading-ui/scripts/user-profile-smtp.js` | [SMTP_SERVICE_GUIDE.md](../backend/SMTP_SERVICE_GUIDE.md)<br>[EMAIL_TEMPLATES_GUIDE.md](../backend/EMAIL_TEMPLATES_GUIDE.md)<br>[SMTP_MANAGEMENT_GUIDE.md](../admin/SMTP_MANAGEMENT_GUIDE.md)<br>[SMTP_USER_GUIDE.md](../05-USER-GUIDES/SMTP_USER_GUIDE.md) | שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות, ולוגים. תמיכה מלאה ב-RTL ועברית עם header ו-footer קבועים ✅ **חדש! ינואר 2025** |
+| SMTP Service | `Backend/services/email_service.py`<br>`Backend/services/email_templates.py`<br>`Backend/services/smtp_settings_service.py`<br>`trading-ui/scripts/user_profile-smtp.js` | [SMTP_SERVICE_GUIDE.md](../backend/SMTP_SERVICE_GUIDE.md)<br>[EMAIL_TEMPLATES_GUIDE.md](../backend/EMAIL_TEMPLATES_GUIDE.md)<br>[SMTP_MANAGEMENT_GUIDE.md](../admin/SMTP_MANAGEMENT_GUIDE.md)<br>[SMTP_USER_GUIDE.md](../05-USER-GUIDES/SMTP_USER_GUIDE.md) | שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות, ולוגים. תמיכה מלאה ב-RTL ועברית עם header ו-footer קבועים ✅ **חדש! ינואר 2025** |
 
 ### 🤖 מערכות AI וניתוח
 
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
-| AI Analysis System | `trading-ui/scripts/services/ai-analysis-data.js`<br>`trading-ui/scripts/ai-analysis-manager.js`<br>`trading-ui/scripts/ai-result-renderer.js`<br>`trading-ui/scripts/ai-template-selector.js`<br>`trading-ui/scripts/ai-notes-integration.js`<br>`trading-ui/scripts/ai-export-service.js`<br>`Backend/services/ai_analysis_service.py`<br>`Backend/services/llm_providers/*.py` | [AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md)<br>[AI_ANALYSIS_SYSTEM_USER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md)<br>[AI_ANALYSIS_API.md](../backend/AI_ANALYSIS_API.md) | מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM (Gemini/Perplexity), ניהול API keys אישיים, שמירה כהערה, וייצוא תוצאות ✅ **חדש! ינואר 2025** |
+| AI Analysis System | `trading-ui/scripts/services/ai_analysis-data.js`<br>`trading-ui/scripts/ai_analysis-manager.js`<br>`trading-ui/scripts/ai-result-renderer.js`<br>`trading-ui/scripts/ai-template-selector.js`<br>`trading-ui/scripts/ai-notes-integration.js`<br>`trading-ui/scripts/ai-export-service.js`<br>`Backend/services/ai_analysis_service.py`<br>`Backend/services/llm_providers/*.py` | [AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md)<br>[AI_ANALYSIS_SYSTEM_USER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md)<br>[AI_ANALYSIS_API.md](../backend/AI_ANALYSIS_API.md) | מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM (Gemini/Perplexity), ניהול API keys אישיים, שמירה כהערה, וייצוא תוצאות ✅ **חדש! ינואר 2025** |
 
 ### ♻️ מטמון, ביצועים וסנכרון
 
@@ -142,7 +142,7 @@
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Lint Status Service | `trading-ui/scripts/services/lint-status-service.js` | [LINTER_MONITOR_REBUILD_PLAN.md](../02-ARCHITECTURE/FRONTEND/LINTER_MONITOR_REBUILD_PLAN.md) | שליפת דוחות lint מאוחדים (ESLint/Stylelint/HTMLHint/Prettier) והמרתם למודל תצוגה |
-| Lint Monitor Dashboard | `trading-ui/scripts/linter-realtime-monitor.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | מוטמע בתוך `code-quality-dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות והיסטוריה |
+| Lint Monitor Dashboard | `trading-ui/scripts/linter-realtime-monitor.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | מוטמע בתוך `code_quality_dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות והיסטוריה |
 
 ### 🗄️ מערכות שהועברו לארכיון (לא בשימוש פעיל)
 

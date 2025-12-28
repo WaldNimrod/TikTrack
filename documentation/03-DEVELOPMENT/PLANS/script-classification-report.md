@@ -162,7 +162,7 @@
 - **אסטרטגיה:** defer
 - **סיבה:** קריטי - ניהול תגיות, תלוי במספר packages
 - **סקריפטים:** 1 script
-- **דוגמאות:** tag-management.js
+- **דוגמאות:** tag_management.js
 
 ### Cache Package
 

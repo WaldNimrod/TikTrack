@@ -19,7 +19,7 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
-ai_analysis_bp = Blueprint('ai_analysis', __name__, url_prefix='/api/ai-analysis')
+ai_analysis_bp = Blueprint('ai_analysis', __name__, url_prefix='/api/ai_analysis')
 
 # Initialize services
 ai_analysis_service = AIAnalysisService()
@@ -671,7 +671,24 @@ def manage_llm_provider():
             provider = data.get('provider')
             api_key = data.get('api_key')
             validate = data.get('validate', True)
-            
+            default_provider = data.get('default_provider')
+
+            if default_provider and not provider and not api_key:
+                result = ai_analysis_service.set_llm_default_provider(
+                    db=db,
+                    user_id=user_id,
+                    default_provider=default_provider
+                )
+                if not result['success']:
+                    return jsonify({
+                        'status': 'error',
+                        'message': result['message']
+                    }), 400
+                return jsonify({
+                    'status': 'success',
+                    'data': result
+                }), 200
+
             if not provider:
                 return jsonify({
                     'status': 'error',
@@ -697,6 +714,19 @@ def manage_llm_provider():
                     'status': 'error',
                     'message': result['message']
                 }), 400
+
+            if default_provider:
+                default_result = ai_analysis_service.set_llm_default_provider(
+                    db=db,
+                    user_id=user_id,
+                    default_provider=default_provider
+                )
+                if not default_result['success']:
+                    return jsonify({
+                        'status': 'error',
+                        'message': default_result['message']
+                    }), 400
+                result['default_provider_updated'] = True
             
             return jsonify({
                 'status': 'success',
@@ -786,4 +816,3 @@ def retry_failed_analysis(request_id: int):
         }), 500
     finally:
         db.close()
-

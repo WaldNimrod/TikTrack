@@ -319,7 +319,7 @@ On logout, the following are cleared:
 
 - **Mechanism**: `auth-guard.js` checks authentication on page load
 - **Loading**: Loaded as part of `BASE` package in `package-manifest.js`
-- **Public Pages**: `login.html`, `register.html`, `reset-password.html`, `forgot-password.html`
+- **Public Pages**: `login.html`, `register.html`, `reset_password.html`, `forgot_password.html`
 - **Action**: Redirects unauthenticated users to `login.html`
 
 **Key Files:**

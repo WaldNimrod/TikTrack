@@ -485,9 +485,9 @@ onclick="window.clearAllCache({ level: 'medium' })"
 
 ---
 
-### נקודה 3: system-management.html - 4 כפתורים
+### נקודה 3: system_management.html - 4 כפתורים
 
-**מיקום:** `system-management.html` שורות 180, 185, 190, 195
+**מיקום:** `system_management.html` שורות 180, 185, 190, 195
 
 **אותם כפתורים** כמו cache-test, **אותה בדיקה**.
 

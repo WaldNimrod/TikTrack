@@ -152,8 +152,8 @@ def get_custom_data():
 const PUBLIC_PAGES = [
   'login.html',
   'register.html',
-  'reset-password.html',
-  'forgot-password.html'
+  'reset_password.html',
+  'forgot_password.html'
 ];
 ```
 
@@ -260,8 +260,8 @@ if (data.data?.user) {
 const PUBLIC_PAGES = [
   'login.html',
   'register.html',
-  'reset-password.html',
-  'forgot-password.html',
+  'reset_password.html',
+  'forgot_password.html',
   'my-new-public-page.html'  // ✅ הוסף כאן
 ];
 ```

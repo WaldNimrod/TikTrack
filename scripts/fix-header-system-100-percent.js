@@ -34,7 +34,7 @@ const KNOWN_ISSUES = {
 
 // Files that don't exist - should be excluded from tests
 const NON_EXISTENT_FILES = [
-  'trading-ui/tradingview-test-page.html',
+  'trading-ui/tradingview_test_page.html',
   'trading-ui/test_external_data.html',
   'trading-ui/test_models.html'
 ];

@@ -24,7 +24,6 @@ import time
 import psutil
 import platform
 import sys
-import sqlite3
 from services.health_service import health_service
 from services.metrics_collector import metrics_collector
 from services.advanced_cache_service import advanced_cache_service
@@ -639,17 +638,19 @@ def get_database_overview() -> Dict[str, Any]:
         db: Session = next(get_db())
         
         # Get table information
-        result = db.execute(text("""
-            SELECT name, type, sql 
-            FROM sqlite_master 
-            WHERE type='table' AND name NOT LIKE 'sqlite_%'
-        """))
+        result = db.execute(
+            text(
+                "SELECT table_name "
+                "FROM information_schema.tables "
+                "WHERE table_schema = 'public' AND table_type = 'BASE TABLE'"
+            )
+        )
         tables = []
         for row in result:
             tables.append({
                 'name': row[0],
-                'type': row[1], 
-                'sql': row[2]
+                'type': 'table',
+                'sql': None
             })
         
         # Get record counts
@@ -664,11 +665,11 @@ def get_database_overview() -> Dict[str, Any]:
                 record_counts[table_name] = 0
         
         # Get database size
-        result = db.execute(text("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()"))
+        result = db.execute(text("SELECT pg_database_size(current_database()) as size"))
         db_size = result.fetchone()[0]
         
         # Get index information
-        result = db.execute(text("SELECT COUNT(*) as index_count FROM sqlite_master WHERE type='index'"))
+        result = db.execute(text("SELECT COUNT(*) as index_count FROM pg_indexes WHERE schemaname = 'public'"))
         index_count = result.fetchone()[0]
         
         db.close()

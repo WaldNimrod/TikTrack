@@ -39,15 +39,15 @@ FOCUSED_PAGES = [
     
     # עמודי כלי פיתוח (Dev Tools)
     {"name": "כלי פיתוח ראשי", "url": "/dev_tools", "category": "dev"},
-    {"name": "מיפוי צבעי כפתורים", "url": "/button-color-mapping.html", "category": "dev"},
-    {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button-color-mapping-simple.html", "category": "dev"},
-    {"name": "מודלים של תנאים", "url": "/conditions-modals.html", "category": "dev"},
-    {"name": "ניהול קבוצות העדפות", "url": "/preferences-groups-management.html", "category": "dev"},
+    {"name": "מיפוי צבעי כפתורים", "url": "/button_color_mapping.html", "category": "dev"},
+    {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button_color_mapping_simple.html", "category": "dev"},
+    {"name": "מודלים של תנאים", "url": "/conditions_modals.html", "category": "dev"},
+    {"name": "ניהול קבוצות העדפות", "url": "/preferences_groups_management.html", "category": "dev"},
     {"name": "ניהול תגיות", "url": "/tag_management.html", "category": "dev"},
-    {"name": "ניהול מטמון", "url": "/cache-management.html", "category": "dev"},
-    {"name": "דשבורד איכות קוד", "url": "/code-quality-dashboard.html", "category": "dev"},
-    {"name": "ניהול מערכת אתחול", "url": "/init-system-management.html", "category": "dev"},
-    {"name": "בדיקת תנאים", "url": "/conditions-test.html", "category": "dev"},
+    {"name": "ניהול מטמון", "url": "/cache_management.html", "category": "dev"},
+    {"name": "דשבורד איכות קוד", "url": "/code_quality_dashboard.html", "category": "dev"},
+    {"name": "ניהול מערכת אתחול", "url": "/init_system_management.html", "category": "dev"},
+    {"name": "בדיקת תנאים", "url": "/conditions_test.html", "category": "dev"},
     
     # עמודים תומכים (Supporting Pages)
     {"name": "דשבורד נתונים חיצוניים", "url": "/external_data_dashboard.html", "category": "secondary"},
@@ -56,12 +56,12 @@ FOCUSED_PAGES = [
     {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical"},
     {"name": "נתונים נוספים", "url": "/db_extradata.html", "category": "technical"},
     {"name": "אילוצי מערכת", "url": "/constraints.html", "category": "technical"},
-    {"name": "משימות רקע", "url": "/background-tasks.html", "category": "technical"},
-    {"name": "ניטור שרת", "url": "/server-monitor.html", "category": "technical"},
-    {"name": "ניהול מערכת", "url": "/system-management.html", "category": "technical"},
-    {"name": "מרכז התראות", "url": "/notifications-center.html", "category": "technical"},
-    {"name": "ניהול CSS", "url": "/css-management.html", "category": "technical"},
-    {"name": "תצוגת צבעים", "url": "/dynamic-colors-display.html", "category": "technical"},
+    {"name": "משימות רקע", "url": "/background_tasks.html", "category": "technical"},
+    {"name": "ניטור שרת", "url": "/server_monitor.html", "category": "technical"},
+    {"name": "ניהול מערכת", "url": "/system_management.html", "category": "technical"},
+    {"name": "מרכז התראות", "url": "/notifications_center.html", "category": "technical"},
+    {"name": "ניהול CSS", "url": "/css_management.html", "category": "technical"},
+    {"name": "תצוגת צבעים", "url": "/dynamic_colors_display.html", "category": "technical"},
     {"name": "עיצובים", "url": "/designs.html", "category": "technical"},
 ]
 

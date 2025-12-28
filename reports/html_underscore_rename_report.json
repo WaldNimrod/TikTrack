@@ -1,0 +1,341 @@
+{
+  "renamed": [
+    {
+      "from": "trading-ui/background-tasks.html",
+      "to": "trading-ui/background_tasks.html"
+    },
+    {
+      "from": "trading-ui/button-color-mapping-simple.html",
+      "to": "trading-ui/button_color_mapping_simple.html"
+    },
+    {
+      "from": "trading-ui/button-color-mapping.html",
+      "to": "trading-ui/button_color_mapping.html"
+    },
+    {
+      "from": "trading-ui/cache-management.html",
+      "to": "trading-ui/cache_management.html"
+    },
+    {
+      "from": "trading-ui/code-quality-dashboard.html",
+      "to": "trading-ui/code_quality_dashboard.html"
+    },
+    {
+      "from": "trading-ui/conditions-modals.html",
+      "to": "trading-ui/conditions_modals.html"
+    },
+    {
+      "from": "trading-ui/conditions-test.html",
+      "to": "trading-ui/conditions_test.html"
+    },
+    {
+      "from": "trading-ui/css-management.html",
+      "to": "trading-ui/css_management.html"
+    },
+    {
+      "from": "trading-ui/dynamic-colors-display.html",
+      "to": "trading-ui/dynamic_colors_display.html"
+    },
+    {
+      "from": "trading-ui/forgot-password.html",
+      "to": "trading-ui/forgot_password.html"
+    },
+    {
+      "from": "trading-ui/init-system-management.html",
+      "to": "trading-ui/init_system_management.html"
+    },
+    {
+      "from": "trading-ui/notifications-center.html",
+      "to": "trading-ui/notifications_center.html"
+    },
+    {
+      "from": "trading-ui/preferences-groups-management.html",
+      "to": "trading-ui/preferences_groups_management.html"
+    },
+    {
+      "from": "trading-ui/reset-password.html",
+      "to": "trading-ui/reset_password.html"
+    },
+    {
+      "from": "trading-ui/server-monitor.html",
+      "to": "trading-ui/server_monitor.html"
+    },
+    {
+      "from": "trading-ui/strategy-analysis.html",
+      "to": "trading-ui/strategy_analysis.html"
+    },
+    {
+      "from": "trading-ui/system-management.html",
+      "to": "trading-ui/system_management.html"
+    },
+    {
+      "from": "trading-ui/test-bootstrap-popover-comparison.html",
+      "to": "trading-ui/test_bootstrap_popover_comparison.html"
+    },
+    {
+      "from": "trading-ui/test-frontend-wrappers.html",
+      "to": "trading-ui/test_frontend_wrappers.html"
+    },
+    {
+      "from": "trading-ui/test-header-only.html",
+      "to": "trading-ui/test_header_only.html"
+    },
+    {
+      "from": "trading-ui/test-monitoring.html",
+      "to": "trading-ui/test_monitoring.html"
+    },
+    {
+      "from": "trading-ui/test-nested-modal-rich-text.html",
+      "to": "trading-ui/test_nested_modal_rich_text.html"
+    },
+    {
+      "from": "trading-ui/test-overlay-debug.html",
+      "to": "trading-ui/test_overlay_debug.html"
+    },
+    {
+      "from": "trading-ui/test-phase1-recovery.html",
+      "to": "trading-ui/test_phase1_recovery.html"
+    },
+    {
+      "from": "trading-ui/test-phase3-1-comprehensive.html",
+      "to": "trading-ui/test_phase3_1_comprehensive.html"
+    },
+    {
+      "from": "trading-ui/test-quill.html",
+      "to": "trading-ui/test_quill.html"
+    },
+    {
+      "from": "trading-ui/test-recent-items-widget.html",
+      "to": "trading-ui/test_recent_items_widget.html"
+    },
+    {
+      "from": "trading-ui/test-ticker-widgets-performance.html",
+      "to": "trading-ui/test_ticker_widgets_performance.html"
+    },
+    {
+      "from": "trading-ui/test-unified-widget-comprehensive.html",
+      "to": "trading-ui/test_unified_widget_comprehensive.html"
+    },
+    {
+      "from": "trading-ui/test-unified-widget-integration.html",
+      "to": "trading-ui/test_unified_widget_integration.html"
+    },
+    {
+      "from": "trading-ui/test-unified-widget.html",
+      "to": "trading-ui/test_unified_widget.html"
+    },
+    {
+      "from": "trading-ui/test-user-ticker-integration.html",
+      "to": "trading-ui/test_user_ticker_integration.html"
+    },
+    {
+      "from": "trading-ui/tradingview-widgets-showcase.html",
+      "to": "trading-ui/tradingview_widgets_showcase.html"
+    },
+    {
+      "from": "production/trading-ui/ai-analysis.html",
+      "to": "production/trading-ui/ai_analysis.html"
+    },
+    {
+      "from": "production/trading-ui/background-tasks.html",
+      "to": "production/trading-ui/background_tasks.html"
+    },
+    {
+      "from": "production/trading-ui/button-color-mapping-simple.html",
+      "to": "production/trading-ui/button_color_mapping_simple.html"
+    },
+    {
+      "from": "production/trading-ui/button-color-mapping.html",
+      "to": "production/trading-ui/button_color_mapping.html"
+    },
+    {
+      "from": "production/trading-ui/cache-management.html",
+      "to": "production/trading-ui/cache_management.html"
+    },
+    {
+      "from": "production/trading-ui/chart-management.html",
+      "to": "production/trading-ui/chart_management.html"
+    },
+    {
+      "from": "production/trading-ui/code-quality-dashboard.html",
+      "to": "production/trading-ui/code_quality_dashboard.html"
+    },
+    {
+      "from": "production/trading-ui/conditions-modals.html",
+      "to": "production/trading-ui/conditions_modals.html"
+    },
+    {
+      "from": "production/trading-ui/conditions-test.html",
+      "to": "production/trading-ui/conditions_test.html"
+    },
+    {
+      "from": "production/trading-ui/crud-testing-dashboard.html",
+      "to": "production/trading-ui/crud_testing_dashboard.html"
+    },
+    {
+      "from": "production/trading-ui/css-management.html",
+      "to": "production/trading-ui/css_management.html"
+    },
+    {
+      "from": "production/trading-ui/dynamic-colors-display.html",
+      "to": "production/trading-ui/dynamic_colors_display.html"
+    },
+    {
+      "from": "production/trading-ui/external-data-dashboard.html",
+      "to": "production/trading-ui/external_data_dashboard.html"
+    },
+    {
+      "from": "production/trading-ui/forgot-password.html",
+      "to": "production/trading-ui/forgot_password.html"
+    },
+    {
+      "from": "production/trading-ui/init-system-management.html",
+      "to": "production/trading-ui/init_system_management.html"
+    },
+    {
+      "from": "production/trading-ui/notifications-center.html",
+      "to": "production/trading-ui/notifications_center.html"
+    },
+    {
+      "from": "production/trading-ui/portfolio-state.html",
+      "to": "production/trading-ui/portfolio_state.html"
+    },
+    {
+      "from": "production/trading-ui/preferences-groups-management.html",
+      "to": "production/trading-ui/preferences_groups_management.html"
+    },
+    {
+      "from": "production/trading-ui/reset-password.html",
+      "to": "production/trading-ui/reset_password.html"
+    },
+    {
+      "from": "production/trading-ui/server-monitor.html",
+      "to": "production/trading-ui/server_monitor.html"
+    },
+    {
+      "from": "production/trading-ui/strategy-analysis.html",
+      "to": "production/trading-ui/strategy_analysis.html"
+    },
+    {
+      "from": "production/trading-ui/system-management.html",
+      "to": "production/trading-ui/system_management.html"
+    },
+    {
+      "from": "production/trading-ui/tag-management.html",
+      "to": "production/trading-ui/tag_management.html"
+    },
+    {
+      "from": "production/trading-ui/test-bootstrap-popover-comparison.html",
+      "to": "production/trading-ui/test_bootstrap_popover_comparison.html"
+    },
+    {
+      "from": "production/trading-ui/test-frontend-wrappers.html",
+      "to": "production/trading-ui/test_frontend_wrappers.html"
+    },
+    {
+      "from": "production/trading-ui/test-header-only.html",
+      "to": "production/trading-ui/test_header_only.html"
+    },
+    {
+      "from": "production/trading-ui/test-monitoring.html",
+      "to": "production/trading-ui/test_monitoring.html"
+    },
+    {
+      "from": "production/trading-ui/test-nested-modal-rich-text.html",
+      "to": "production/trading-ui/test_nested_modal_rich_text.html"
+    },
+    {
+      "from": "production/trading-ui/test-overlay-debug.html",
+      "to": "production/trading-ui/test_overlay_debug.html"
+    },
+    {
+      "from": "production/trading-ui/test-quill.html",
+      "to": "production/trading-ui/test_quill.html"
+    },
+    {
+      "from": "production/trading-ui/test-recent-items-widget.html",
+      "to": "production/trading-ui/test_recent_items_widget.html"
+    },
+    {
+      "from": "production/trading-ui/test-ticker-widgets-performance.html",
+      "to": "production/trading-ui/test_ticker_widgets_performance.html"
+    },
+    {
+      "from": "production/trading-ui/test-unified-widget-comprehensive.html",
+      "to": "production/trading-ui/test_unified_widget_comprehensive.html"
+    },
+    {
+      "from": "production/trading-ui/test-unified-widget-integration.html",
+      "to": "production/trading-ui/test_unified_widget_integration.html"
+    },
+    {
+      "from": "production/trading-ui/test-unified-widget.html",
+      "to": "production/trading-ui/test_unified_widget.html"
+    },
+    {
+      "from": "production/trading-ui/test-user-ticker-integration.html",
+      "to": "production/trading-ui/test_user_ticker_integration.html"
+    },
+    {
+      "from": "production/trading-ui/ticker-dashboard.html",
+      "to": "production/trading-ui/ticker_dashboard.html"
+    },
+    {
+      "from": "production/trading-ui/trade-history.html",
+      "to": "production/trading-ui/trade_history.html"
+    },
+    {
+      "from": "production/trading-ui/trading-journal.html",
+      "to": "production/trading-ui/trading_journal.html"
+    },
+    {
+      "from": "production/trading-ui/tradingview-widgets-showcase.html",
+      "to": "production/trading-ui/tradingview_widgets_showcase.html"
+    },
+    {
+      "from": "production/trading-ui/user-profile.html",
+      "to": "production/trading-ui/user_profile.html"
+    },
+    {
+      "from": "production/trading-ui/watch-list.html",
+      "to": "production/trading-ui/watch_list.html"
+    },
+    {
+      "from": "production/trading-ui/watch-lists.html",
+      "to": "production/trading-ui/watch_lists.html"
+    },
+    {
+      "from": "trading-ui/mockups/add-ticker-modal.html",
+      "to": "trading-ui/mockups/add_ticker_modal.html"
+    },
+    {
+      "from": "trading-ui/mockups/flag-quick-action.html",
+      "to": "trading-ui/mockups/flag_quick_action.html"
+    },
+    {
+      "from": "trading-ui/mockups/watch-list-modal.html",
+      "to": "trading-ui/mockups/watch_list_modal.html"
+    },
+    {
+      "from": "trading-ui/mockups/watch-lists-page.html",
+      "to": "trading-ui/mockups/watch_lists_page.html"
+    },
+    {
+      "from": "production/trading-ui/mockups/add-ticker-modal.html",
+      "to": "production/trading-ui/mockups/add_ticker_modal.html"
+    },
+    {
+      "from": "production/trading-ui/mockups/flag-quick-action.html",
+      "to": "production/trading-ui/mockups/flag_quick_action.html"
+    },
+    {
+      "from": "production/trading-ui/mockups/watch-list-modal.html",
+      "to": "production/trading-ui/mockups/watch_list_modal.html"
+    },
+    {
+      "from": "production/trading-ui/mockups/watch-lists-page.html",
+      "to": "production/trading-ui/mockups/watch_lists_page.html"
+    }
+  ],
+  "conflicts": []
+}

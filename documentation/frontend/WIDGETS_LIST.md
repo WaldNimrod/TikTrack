@@ -58,8 +58,8 @@
 
 | שם ווידג'ט | קובץ(ים) עיקריים | דוקומנטציה | עמוד | סטטוס | הערות |
 |------------|-------------------|-------------|------|-------|-------|
-| **History Widget** | `trading-ui/scripts/history-widget.js` | [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md) | `history-widget.html` | ✅ פעיל | ווידג'ט היסטוריה עם גרפים וסטטיסטיקות |
-| **Emotional Tracking Widget** | `trading-ui/scripts/emotional-tracking-widget.js` | [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md) | `emotional-tracking-widget.html` | ✅ פעיל (Mockup) | ווידג'ט תיעוד רגשי |
+| **History Widget** | `trading-ui/scripts/history-widget.js` | [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md) | `history_widget.html` | ✅ פעיל | ווידג'ט היסטוריה עם גרפים וסטטיסטיקות |
+| **Emotional Tracking Widget** | `trading-ui/scripts/emotional-tracking-widget.js` | [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md) | `emotional_tracking_widget.html` | ✅ פעיל (Mockup) | ווידג'ט תיעוד רגשי |
 
 ---
 

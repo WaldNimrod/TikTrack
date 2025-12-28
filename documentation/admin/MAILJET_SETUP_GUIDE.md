@@ -89,7 +89,7 @@ python3 Backend/scripts/set_mailjet_api_keys.py \
 
 ### דרך הממשק
 
-1. פתח `http://localhost:8080/user-profile.html`
+1. פתח `http://localhost:8080/user_profile`
 2. גלול לסקשן **"הגדרות SMTP"**
 3. הכנס את הפרטים הבאים:
    - **Host**: `in-v3.mailjet.com`
@@ -128,7 +128,7 @@ python3 Backend/scripts/test_mailjet_connection.py
 
 ### בדיקה דרך הממשק
 
-1. פתח `http://localhost:8080/user-profile.html`
+1. פתח `http://localhost:8080/user_profile`
 2. גלול לסקשן **"הגדרות SMTP"**
 3. לחץ **"בדיקת חיבור"**
 4. אם הכל תקין, תראה: ✅ **"חיבור SMTP תקין!"**

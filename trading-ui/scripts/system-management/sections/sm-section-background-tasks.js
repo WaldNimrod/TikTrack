@@ -14,9 +14,9 @@ class SMBackgroundTasksSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoints = {
-      tasks: '/api/background-tasks/',
-      history: '/api/background-tasks/history',
-      status: '/api/background-tasks/' // Use main endpoint for status
+      tasks: '/api/background_tasks/',
+      history: '/api/background_tasks/history',
+      status: '/api/background_tasks/' // Use main endpoint for status
     };
   }
 
@@ -735,7 +735,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     try {
       console.log('▶️ Starting scheduler...');
       
-      const response = await fetch('/api/background-tasks/start', {
+      const response = await fetch('/api/background_tasks/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -782,7 +782,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     try {
       console.log('⏹️ Stopping scheduler...');
       
-      const response = await fetch('/api/background-tasks/stop', {
+      const response = await fetch('/api/background_tasks/stop', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -856,7 +856,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     try {
       console.log(`▶️ Running task ${taskId}...`);
       
-      const response = await fetch(`/api/background-tasks/${taskId}/run`, {
+      const response = await fetch(`/api/background_tasks/${taskId}/run`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -903,7 +903,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     try {
       console.log(`⏹️ Stopping task ${taskId}...`);
       
-      const response = await fetch(`/api/background-tasks/${taskId}/stop`, {
+      const response = await fetch(`/api/background_tasks/${taskId}/stop`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

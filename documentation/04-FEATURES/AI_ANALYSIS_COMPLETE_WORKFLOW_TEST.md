@@ -28,7 +28,7 @@
    ```
 
 2. **API Keys מוגדרים**
-   - גש ל: `http://localhost:8080/trading-ui/user-profile.html`
+   - גש ל: `http://localhost:8080/user_profile`
    - הגדר API keys ל-Gemini או Perplexity
 
 3. **נתוני בדיקה**
@@ -44,7 +44,7 @@
 ### שלבים
 
 1. **פתיחת עמוד AI Analysis**
-   - גש ל: `http://localhost:8080/trading-ui/ai-analysis.html`
+   - גש ל: `http://localhost:8080/ai_analysis`
    - ודא שהעמוד נטען ללא שגיאות
 
 2. **בחירת תבנית**
@@ -226,7 +226,7 @@
 
 ### בדיקה ידנית
 
-1. פתח: `http://localhost:8080/trading-ui/ai-analysis.html`
+1. פתח: `http://localhost:8080/ai_analysis`
 2. בצע את כל התהליכים לפי הרשימה למעלה
 3. ודא שכל הבדיקות עוברות
 
@@ -234,7 +234,7 @@
 
 ```bash
 # הרצת Playwright tests
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js --headed
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js --headed
 ```
 
 ---

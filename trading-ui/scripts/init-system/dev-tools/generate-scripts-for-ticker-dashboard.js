@@ -1,13 +1,13 @@
 /**
  * Generate Script Tags for ticker-dashboard page
  * 
- * This script generates the correct script loading order for ticker-dashboard.html
+ * This script generates the correct script loading order for ticker_dashboard.html
  * based on the package manifest and page-initialization-configs.js
  * 
  * Usage: 
  *   node generate-scripts-for-ticker-dashboard.js
  * 
- * This will output the script tags HTML that should be inserted into ticker-dashboard.html
+ * This will output the script tags HTML that should be inserted into ticker_dashboard.html
  */
 
 const fs = require('fs');
@@ -47,10 +47,10 @@ console.log('   use PageTemplateGenerator.generateScriptTagsForPage() in browser
 
 // Output instructions
 console.log('📝 Instructions:');
-console.log('1. Open ticker-dashboard.html in browser');
+console.log('1. Open ticker_dashboard.html in browser');
 console.log('2. Load package-manifest.js and page-initialization-configs.js');
 console.log('3. Run: PageTemplateGenerator.generateScriptTagsForPage("ticker-dashboard")');
-console.log('4. Copy the output and replace the script section in ticker-dashboard.html\n');
+console.log('4. Copy the output and replace the script section in ticker_dashboard.html\n');
 
 console.log('📋 Packages to load:');
 packages.forEach((pkg, index) => {

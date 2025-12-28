@@ -18,7 +18,6 @@
 # Database: PostgreSQL (default for development since November 2025)
 # - Automatically sets PostgreSQL environment variables if not already set
 # - Checks PostgreSQL Docker container before starting
-# - Falls back to SQLite only if explicitly configured
 #
 # Features:
 # - Process conflict detection
@@ -39,7 +38,6 @@ SERVER_DIR="Backend"
 SERVER_FILE="$SERVER_DIR/app.py"
 LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
 SERVER_PORT=8080
-DB_PATH="$SERVER_DIR/db/tiktrack.db"
 ATTACH_LOGS=false
 FORCE_START=false
 CHECK_ONLY=false
@@ -207,14 +205,6 @@ check_files() {
         exit 1
     fi
 
-    if [ -n "$DB_PATH" ] && [ ! -f "$DB_PATH" ]; then
-        log_warning "Database file not found: $DB_PATH"
-        if [ "$ENVIRONMENT" = "production" ]; then
-            log_warning "Please run: cd $SERVER_DIR && python3 scripts/create_production_db.py"
-            exit 1
-        fi
-    fi
-
     log_info "All required files found"
 }
 
@@ -289,8 +279,6 @@ start_server() {
         log_info "  Host: ${POSTGRES_HOST}"
         log_info "  Database: ${POSTGRES_DB}"
         log_info "  User: ${POSTGRES_USER}"
-    elif [ -n "$DB_PATH" ]; then
-        log_info "Database: SQLite ($(basename "$DB_PATH"))"
     fi
 
     pushd "$SERVER_ABS_DIR" >/dev/null
@@ -451,7 +439,6 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=5001
-            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             log_info "Environment: TESTING → Port: 5001"
             ;;
         production|prod|PRODUCTION|Prod)
@@ -462,7 +449,6 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=5001
-            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             log_info "Environment: TESTING (from production) → Port: 5001"
             ;;
         online|ONLINE|Online)
@@ -471,7 +457,6 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=80
-            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             log_info "Environment: ONLINE → Port: 80/443"
             ;;
         development|dev|DEVELOPMENT|Dev|"")
@@ -480,7 +465,6 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=8080
-            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             log_info "Environment: DEVELOPMENT → Port: 8080"
             ;;
         *)
@@ -529,4 +513,3 @@ main() {
 }
 
 main "$@"
-

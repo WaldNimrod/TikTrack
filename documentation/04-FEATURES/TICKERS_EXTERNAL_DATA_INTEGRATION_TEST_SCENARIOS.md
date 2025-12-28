@@ -40,7 +40,7 @@
 ### צעדים
 
 1. **פתיחת עמוד טיקרים**
-   - נווט ל: `http://127.0.0.1:8080/trading-ui/tickers.html`
+   - נווט ל: `http://127.0.0.1:8080/tickers`
    - המתן לטעינה מלאה (3-5 שניות)
 
 2. **בדיקת טעינת JavaScript**
@@ -659,7 +659,7 @@
 ### צעדים
 
 1. **פתיחת External Data Dashboard**
-   - נווט ל: `http://127.0.0.1:8080/trading-ui/external-data-dashboard.html`
+   - נווט ל: `http://127.0.0.1:8080/external_data_dashboard.html`
    - המתן לטעינה מלאה
 
 2. **בדיקת טבלת "טיקרים עם נתונים חסרים"**

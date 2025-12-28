@@ -32,7 +32,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    # PostgreSQL only - no SQLite support
+    # PostgreSQL only
     return kwargs
 
 def analyze_cashflow_classification():
@@ -148,4 +148,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Script failed: {e}", file=sys.stderr)
         sys.exit(1)
-

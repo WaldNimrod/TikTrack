@@ -26,7 +26,7 @@ PUBLIC_ENDPOINTS = [
     '/api/auth/login',
     '/api/auth/register',
     '/api/health',
-    '/api/ai-analysis/templates',
+    '/api/ai_analysis/templates',
 ]
 
 # System/admin endpoints that might not need user_id (but should still check authentication)
@@ -38,7 +38,6 @@ SYSTEM_ENDPOINTS = [
     'query_optimization',
     'file_scanner',
     'css_management',
-    'wal_management',
     'server_management',
     'server_logs',
     'cache_management',
@@ -513,4 +512,3 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
-

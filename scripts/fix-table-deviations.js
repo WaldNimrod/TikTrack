@@ -44,10 +44,10 @@ const TABLE_TYPE_MAPPINGS = {
   'importTable': 'import_history',
   'skipTable': 'skip_history',
   
-  // background-tasks.html
+  // background_tasks.html
   'tasks-table': 'background_tasks',
   
-  // css-management.html
+  // css_management.html
   'cssFilesTable': 'css_files',
   
   // preferences.html
@@ -94,17 +94,17 @@ function fixTableAttributes(htmlPath) {
 
 // Fix HTML files
 const HTML_FILES_TO_FIX = [
-  'trading-ui/mockups/daily-snapshots/portfolio-state-page.html',
-  'trading-ui/mockups/daily-snapshots/trade-history-page.html',
-  'trading-ui/mockups/daily-snapshots/price-history-page.html',
-  'trading-ui/mockups/daily-snapshots/comparative-analysis-page.html',
-  'trading-ui/mockups/daily-snapshots/trading-journal-page.html',
-  'trading-ui/mockups/daily-snapshots/strategy-analysis-page.html',
-  'trading-ui/mockups/daily-snapshots/economic-calendar-page.html',
-  'trading-ui/mockups/daily-snapshots/history-widget.html',
-  'trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html',
-  'trading-ui/mockups/daily-snapshots/date-comparison-modal.html',
-  'trading-ui/external-data-dashboard.html',
+  'trading-ui/mockups/daily-snapshots/portfolio_state_page.html',
+  'trading-ui/mockups/daily-snapshots/trade_history_page.html',
+  'trading-ui/mockups/daily-snapshots/price_history_page.html',
+  'trading-ui/mockups/daily-snapshots/comparative_analysis_page.html',
+  'trading-ui/mockups/daily-snapshots/trading_journal_page.html',
+  'trading-ui/mockups/daily-snapshots/strategy_analysis_page.html',
+  'trading-ui/mockups/daily-snapshots/economic_calendar_page.html',
+  'trading-ui/mockups/daily-snapshots/history_widget.html',
+  'trading-ui/mockups/daily-snapshots/emotional_tracking_widget.html',
+  'trading-ui/mockups/daily-snapshots/date_comparison_modal.html',
+  'trading-ui/external_data_dashboard.html',
 ];
 
 console.log('📄 Fixing HTML files...\n');

@@ -120,9 +120,9 @@
 
 ### עמודי כלי פיתוח (9 עמודים)
 
-#### code-quality-dashboard.html + code-quality-dashboard.js
+#### code_quality_dashboard.html + code-quality-dashboard.js
 
-- [ ] **header-fix-dev-1**: תיקון code-quality-dashboard.html + code-quality-dashboard.js - הסרת custom filter HTML, החלפת manual filter application
+- [ ] **header-fix-dev-1**: תיקון code_quality_dashboard.html + code-quality-dashboard.js - הסרת custom filter HTML, החלפת manual filter application
   - בעיות: custom-filter-html, manual-filter-application
   - שורה: 1170
 
@@ -144,9 +144,9 @@
   - בעיות: manual-filter-application
   - שורה: 1082
 
-#### external-data-dashboard.html + external-data-dashboard.js
+#### external_data_dashboard.html + external-data-dashboard.js
 
-- [ ] **header-fix-dev-5**: תיקון external-data-dashboard.html + external-data-dashboard.js - הסרת custom filter HTML, החלפת manual filter application
+- [ ] **header-fix-dev-5**: תיקון external_data_dashboard.html + external-data-dashboard.js - הסרת custom filter HTML, החלפת manual filter application
   - בעיות: custom-filter-html, manual-filter-application
   - שורה: 3449
 
@@ -170,15 +170,15 @@
 
 ### עמודי מוקאפ (11 עמודים)
 
-#### portfolio-state-page.html + portfolio-state-page.js
+#### portfolio_state_page.html + portfolio-state-page.js
 
-- [ ] **header-fix-mockup-1**: תיקון portfolio-state-page.html + portfolio-state-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation
+- [ ] **header-fix-mockup-1**: תיקון portfolio_state_page.html + portfolio-state-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation
   - בעיות: custom-filter-html (2), direct-event-listener, direct-dom-manipulation (2)
   - שורה: 3326
 
-#### trade-history-page.html
+#### trade_history_page.html
 
-- [ ] **header-fix-mockup-2**: תיקון trade-history-page.html - הסרת custom filter HTML
+- [ ] **header-fix-mockup-2**: תיקון trade_history_page.html - הסרת custom filter HTML
   - בעיות: custom-filter-html
 
 #### price-history-page.js
@@ -187,33 +187,33 @@
   - בעיות: manual-filter-application
   - שורה: 277
 
-#### comparative-analysis-page.html + comparative-analysis-page.js
+#### comparative_analysis_page.html + comparative-analysis-page.js
 
-- [ ] **header-fix-mockup-4**: תיקון comparative-analysis-page.html + comparative-analysis-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation, החלפת manual filter application
+- [ ] **header-fix-mockup-4**: תיקון comparative_analysis_page.html + comparative-analysis-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation, החלפת manual filter application
   - בעיות: custom-filter-html (2), direct-event-listener, direct-dom-manipulation (2), manual-filter-application
   - שורה: 3736
 
-#### trading-journal-page.html + trading-journal-page.js
+#### trading_journal_page.html + trading-journal-page.js
 
-- [ ] **header-fix-mockup-5**: תיקון trading-journal-page.html + trading-journal-page.js - הסרת custom filter HTML, החלפת manual filter application
+- [ ] **header-fix-mockup-5**: תיקון trading_journal_page.html + trading-journal-page.js - הסרת custom filter HTML, החלפת manual filter application
   - בעיות: custom-filter-html (2), manual-filter-application
   - שורה: 709
 
-#### strategy-analysis-page.html + strategy-analysis-page.js
+#### strategy_analysis_page.html + strategy-analysis-page.js
 
-- [ ] **header-fix-mockup-6**: תיקון strategy-analysis-page.html + strategy-analysis-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation, החלפת manual filter application
+- [ ] **header-fix-mockup-6**: תיקון strategy_analysis_page.html + strategy-analysis-page.js - הסרת custom filter HTML, החלפת direct event listeners ו-DOM manipulation, החלפת manual filter application
   - בעיות: custom-filter-html (2), direct-event-listener, direct-dom-manipulation (2), manual-filter-application
   - שורה: 2826
 
-#### economic-calendar-page.html + economic-calendar-page.js
+#### economic_calendar_page.html + economic-calendar-page.js
 
-- [ ] **header-fix-mockup-7**: תיקון economic-calendar-page.html + economic-calendar-page.js - הסרת custom filter HTML, החלפת manual filter application
+- [ ] **header-fix-mockup-7**: תיקון economic_calendar_page.html + economic-calendar-page.js - הסרת custom filter HTML, החלפת manual filter application
   - בעיות: custom-filter-html, manual-filter-application
   - שורה: 1051
 
-#### history-widget.html + history-widget.js
+#### history_widget.html + history-widget.js
 
-- [ ] **header-fix-mockup-8**: תיקון history-widget.html + history-widget.js - הסרת custom filter HTML, החלפת manual filter application
+- [ ] **header-fix-mockup-8**: תיקון history_widget.html + history-widget.js - הסרת custom filter HTML, החלפת manual filter application
   - בעיות: custom-filter-html, manual-filter-application
   - שורה: 959
 
@@ -223,9 +223,9 @@
   - בעיות: manual-filter-application
   - שורה: 694
 
-#### date-comparison-modal.html + date-comparison-modal.js
+#### date_comparison_modal.html + date-comparison-modal.js
 
-- [ ] **header-fix-mockup-10**: תיקון date-comparison-modal.html + date-comparison-modal.js - הסרת custom filter HTML, החלפת DOM manipulation, החלפת manual filter application
+- [ ] **header-fix-mockup-10**: תיקון date_comparison_modal.html + date-comparison-modal.js - הסרת custom filter HTML, החלפת DOM manipulation, החלפת manual filter application
   - בעיות: custom-filter-html, direct-dom-manipulation, manual-filter-application
   - שורה: 1806
 
@@ -337,7 +337,7 @@
    - executions.html
    - db_display.html
    - db_extradata.html
-   - tag-management.html
+   - tag_management.html
 
 2. **עמודים עם פילטרים מקומיים (לא של Header System):**
    - עמודי המוקאפ מכילים פילטרים מקומיים שמיועדים לשימוש ספציפי בעמוד

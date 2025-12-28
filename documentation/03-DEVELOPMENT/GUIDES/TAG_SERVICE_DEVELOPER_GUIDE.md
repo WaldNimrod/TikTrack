@@ -14,7 +14,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 | Backend Service | `Backend/services/tag_service.py` | Business logic, validation and analytics |
 | API | `Backend/routes/api/tags.py` | REST endpoints based on `BaseEntityAPI` |
 | Frontend Services | `trading-ui/scripts/services/tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetch, caching, UI orchestration |
-| UI | `trading-ui/tag-management.html`, `scripts/tag-management.js`, `scripts/modal-configs/tag*.js` | Management page & modals |
+| UI | `trading-ui/tag_management.html` (HTML/URL underscore), `scripts/tag_management.js`, `scripts/modal-configs/tag*.js` | Management page & modals |
 | Entity Integrations | `trading-ui/scripts/{entity}.js` | Each of 8 entities includes tag picker + display |
 | Tests | `tests/backend/test_tag_service.py`, `tests/unit/tag-service.test.js` | Automated suites |
 
@@ -54,7 +54,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 
 - **Backend:** `pytest tests/backend/test_tag_service.py -q` plus entity-specific tests.
 - **Frontend:** `npm run test -- tag-service` (unit) and `npm run test:integration -- tagging`.
-- **Accessibility:** execute `npm run test:a11y -- tag-management` to verify ARIA, focus handling, contrast.
+- **Accessibility:** execute `npm run test:a11y -- tag_management` to verify ARIA, focus handling, contrast.
 - **Smoke:** after deployment, run `scripts/tagging/smoke_test.py` (creates sample tags, assigns to trade, verifies retrieval).
 
 ---
@@ -81,8 +81,5 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 
 Maintained by: TikTrack Engineering  
 Last Updated: November 2025
-
-
-
 
 

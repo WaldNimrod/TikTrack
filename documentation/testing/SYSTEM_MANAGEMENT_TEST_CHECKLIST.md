@@ -34,7 +34,7 @@
 
 - [ ] "ניהול מטמון מלא" → `/cache-management`
 - [ ] "ניטור שרת מלא" → `/server-monitor`
-- [ ] "דשבורד נתונים חיצוניים" → `/external-data-dashboard`
+- [ ] "דשבורד נתונים חיצוניים" → `/external_data_dashboard`
 
 ### רכיבי מערכת
 
@@ -147,7 +147,7 @@
 
 ### קישור מהיר
 
-- [ ] "דשבורד מלא" → `/external-data-dashboard`
+- [ ] "דשבורד מלא" → `/external_data_dashboard`
 
 ## 6. Alerts Section (sm-alerts)
 

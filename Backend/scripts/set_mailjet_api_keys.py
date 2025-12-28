@@ -107,7 +107,7 @@ def set_mailjet_api_keys(api_key: str, secret_key: str, from_email: str = None):
             print("📋 מה הלאה:")
             print("1. ודא שכתובת האימייל מאומתת ב-Mailjet")
             print("   (Sender & Domains → Sender Addresses)")
-            print("2. פתח TikTrack: http://localhost:8080/user-profile.html")
+            print("2. פתח TikTrack: http://localhost:8080/user_profile.html")
             print("3. גלול לסקשן 'הגדרות SMTP'")
             print("4. לחץ 'בדיקת חיבור' לוודא שהכל עובד")
             print("5. לחץ 'שליחת מייל בדיקה' לבדיקה")

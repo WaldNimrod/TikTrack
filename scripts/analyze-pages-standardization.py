@@ -102,9 +102,9 @@ def find_page_files(page_name: str) -> tuple:
     if page_name == "index":
         js_file = SCRIPTS_DIR / "index.js"
     elif page_name == "cache-test":
-        html_file = TRADING_UI / "cache-management.html"
+        html_file = TRADING_UI / "cache_management.html"
     elif page_name == "tag-management":
-        html_file = TRADING_UI / "tag-management.html"
+        html_file = TRADING_UI / "tag_management.html"
     
     html_path = str(html_file) if html_file.exists() else None
     js_path = str(js_file) if js_file.exists() else None

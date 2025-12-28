@@ -511,7 +511,7 @@ try {
 
 - **תיעוד ארכיטקטורה:** `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_SYSTEM.md`
 - **תוכנית מימוש:** `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_IMPLEMENTATION_PLAN.md`
-- **דוגמאות:** `trading-ui/tradingview-widgets-showcase.html`
+- **דוגמאות:** `trading-ui/tradingview_widgets_showcase.html`
 
 ---
 

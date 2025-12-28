@@ -59,7 +59,7 @@
 
 לאחר יצירת API Key חדש:
 
-1. פתח: `http://localhost:8080/user-profile.html`
+1. פתח: `http://localhost:8080/user_profile`
 2. גלול לסקשן "הגדרות SMTP"
 3. עדכן:
    - **Password**: ה-API Key החדש (החל מ-`SG.`)

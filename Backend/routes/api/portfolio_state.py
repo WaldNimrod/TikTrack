@@ -5,10 +5,10 @@ Portfolio State API Routes - TikTrack
 This module provides API endpoints for retrieving portfolio state data.
 
 Endpoints:
-    GET /api/portfolio-state/snapshot - Get portfolio snapshot at specific date
-    GET /api/portfolio-state/series - Get portfolio series for charts
-    GET /api/portfolio-state/performance - Get portfolio performance over date range
-    GET /api/portfolio-state/comparison - Get portfolio comparison between dates
+    GET /api/portfolio_state/snapshot - Get portfolio snapshot at specific date
+    GET /api/portfolio_state/series - Get portfolio series for charts
+    GET /api/portfolio_state/performance - Get portfolio performance over date range
+    GET /api/portfolio_state/comparison - Get portfolio comparison between dates
 
 Author: TikTrack Development Team
 Version: 1.0.0
@@ -31,7 +31,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-portfolio_state_bp = Blueprint('portfolio_state', __name__, url_prefix='/api/portfolio-state')
+portfolio_state_bp = Blueprint('portfolio_state', __name__, url_prefix='/api/portfolio_state')
 
 
 @portfolio_state_bp.route('/snapshot', methods=['GET'])

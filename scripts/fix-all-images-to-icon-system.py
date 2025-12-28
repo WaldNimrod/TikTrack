@@ -10,8 +10,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent.parent
 
 PAGES_TO_FIX = [
-    BASE_DIR / "trading-ui" / "mockups" / "daily-snapshots" / "portfolio-state-page.html",
-    BASE_DIR / "trading-ui" / "mockups" / "watch-lists-page.html",
+    BASE_DIR / "trading-ui" / "mockups" / "daily-snapshots" / "portfolio_state_page.html",
+    BASE_DIR / "trading-ui" / "mockups" / "watch_lists_page.html",
 ]
 
 def extract_icon_name_from_path(img_tag):

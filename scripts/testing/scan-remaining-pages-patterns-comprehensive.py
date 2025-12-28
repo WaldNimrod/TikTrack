@@ -19,18 +19,18 @@ REMAINING_PAGES = [
     "db_display.html",
     "db_extradata.html",
     "constraints.html",
-    "background-tasks.html",
-    "server-monitor.html",
-    "system-management.html",
-    "init-system-management.html",
-    "notifications-center.html",
-    "css-management.html",
-    "dynamic-colors-display.html",
+    "background_tasks.html",
+    "server_monitor.html",
+    "system_management.html",
+    "init_system_management.html",
+    "notifications_center.html",
+    "css_management.html",
+    "dynamic_colors_display.html",
     "designs.html",
-    "tradingview-widgets-showcase.html",
+    "tradingview_widgets_showcase.html",
     # עמודים משניים
-    "external-data-dashboard.html",
-    "chart-management.html"
+    "external_data_dashboard.html",
+    "chart_management.html"
 ]
 
 def check_bootstrap_css(content):

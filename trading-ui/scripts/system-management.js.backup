@@ -1017,7 +1017,7 @@ class SystemManagement {
     }
 
     // Set page title (only for system-management page)
-    if (window.location.pathname === '/system-management.html' || window.location.pathname.includes('system-management')) {
+    if (window.location.pathname === '/system_management.html' || window.location.pathname.includes('system_management')) {
       document.title = 'מנהל מערכת - TikTrack';
     } else {
       // Don't override other pages' titles

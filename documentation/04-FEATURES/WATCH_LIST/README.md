@@ -46,8 +46,9 @@
 
 ### עמודים Production
 
-- **[watch-lists.html](../../trading-ui/watch-lists.html)** - עמוד ראשי מלא (Production) ✅
-  - **גישה:** `http://localhost:8080/watch-lists`
+- **[watch_lists.html](../../trading-ui/watch_lists.html)** - עמוד ראשי מלא (HTML/URL underscore) ✅
+  - **גישה:** `http://localhost:8080/watch_lists`
+  - **Legacy placeholder:** `trading-ui/watch_list.html`
 - **[index.html](../../trading-ui/index.html)** - וויג'ט דשבורד (Production) ✅
   - **גישה:** `http://localhost:8080/` (וויג'ט רשימות צפייה)
   - **API:** `/api/watch-lists/*`
@@ -73,10 +74,10 @@
 
 ### מוקאפים (להתייחסות)
 
-- **[watch-lists-page.html](../../trading-ui/mockups/watch-lists-page.html)** - מוקאפ מקורי (לא בשימוש)
-- **[watch-list-modal.html](../../trading-ui/mockups/watch-list-modal.html)** - מוקאפ מודל רשימת צפייה
-- **[add-ticker-modal.html](../../trading-ui/mockups/add-ticker-modal.html)** - מוקאפ מודל הוספת טיקר
-- **[flag-quick-action.html](../../trading-ui/mockups/flag-quick-action.html)** - Flag Palette
+- **[watch_lists_page.html](../../trading-ui/mockups/watch_lists_page.html)** - מוקאפ מקורי (לא בשימוש)
+- **[watch_list_modal.html](../../trading-ui/mockups/watch_list_modal.html)** - מוקאפ מודל רשימת צפייה
+- **[add_ticker_modal.html](../../trading-ui/mockups/add_ticker_modal.html)** - מוקאפ מודל הוספת טיקר
+- **[flag_quick_action.html](../../trading-ui/mockups/flag_quick_action.html)** - Flag Palette
 
 ### תיעוד מוקאפים
 
@@ -156,10 +157,6 @@
 ---
 
 **כל המשימות הושלמו בהצלחה!** המערכת מוכנה למימוש מלא.
-
-
-
-
 
 
 

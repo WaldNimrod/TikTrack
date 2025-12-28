@@ -35,7 +35,7 @@
 - **שימוש**: בדיקות מקומיות, עבודה עם PostgreSQL (Docker container)
 - **זיהוי סביבה אוטומטי**: הסקריפט מזהה את הסביבה לפי שם תיקיית העבודה:
   - `TikTrackApp` → Development (פורט 8080)
-  - `TikTrackApp-Production` → Production (פורט 5001)
+  - `TikTrackApp-Production` → Production (פורט 5001, worktree לענף `production`)
 - **דרישות מוקדמות**:
   - PostgreSQL Docker container חייב לרוץ: `docker ps | grep postgres`
   - אם לא רץ: `docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev`
@@ -59,6 +59,8 @@
   ./start_server.sh --force        # הפעלה למרות קונפליקט (לא מומלץ)
   ./start_server.sh --attach       # מעקב אחרי לוגים בזמן אמת
   ```
+
+> **חשוב:** אין תיקיית `production/` בתוך `TikTrackApp`. פרודקשן רץ מתוך worktree נפרד.
 
 - **אלטרנטיבה (wrapper):**
 
@@ -235,7 +237,7 @@ To resolve this issue:
 
 ### **דשבורד ניטור שרת**
 
-**URL:** `http://localhost:8080/server-monitor`
+**URL:** `http://localhost:8080/server_monitor`
 
 **תכונות:**
 
@@ -253,7 +255,7 @@ To resolve this issue:
 
 ### **דשבורד ניהול מערכת**
 
-**URL:** `http://localhost:8080/system-management`
+**URL:** `http://localhost:8080/system_management`
 
 **תכונות:**
 
@@ -407,8 +409,8 @@ curl -X POST http://localhost:8080/api/server/restart
    ```
 
 2. **פתח ידנית:**
-   - Server Monitor: `http://localhost:8080/server-monitor`
-   - System Management: `http://localhost:8080/system-management`
+   - Server Monitor: `http://localhost:8080/server_monitor`
+   - System Management: `http://localhost:8080/system_management`
 
 ---
 
@@ -502,7 +504,6 @@ curl -X POST http://localhost:8080/api/server/restart
 **תאריך עדכון אחרון:** דצמבר 2024  
 **גרסה:** 2.0  
 **מפתח:** TikTrack Development Team
-
 
 
 

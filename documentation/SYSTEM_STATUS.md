@@ -27,19 +27,19 @@
 | עמוד | נתיב | API | Backend Service | סטטוס | הערות |
 |------|------|-----|-----------------|--------|-------|
 | **index.html** | `/` | `/api/dashboard/*` | ❌ חסר | ⚠️ חלקי | דשבורד קיים, חסרים פיצ'רים מסוימים |
-| **trades.html** | `/trades.html` | `/api/trades/*` | ✅ TradeBusinessService | ✅ קיים | מוכן |
-| **trade_plans.html** | `/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ קיים | מוכן |
-| **alerts.html** | `/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ קיים | מוכן |
-| **tickers.html** | `/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ קיים | מוכן |
-| **trading_accounts.html** | `/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ קיים | מוכן |
-| **executions.html** | `/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ קיים | מוכן |
-| **cash_flows.html** | `/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ קיים | מוכן |
-| **notes.html** | `/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ קיים | מוכן |
-| **data_import.html** | `/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⚠️ חלקי | צריך Business Service |
-| **research.html** | `/research.html` | `/api/research/*` | ❌ חסר | ⚠️ חלקי | צריך Business Service |
-| **ai-analysis.html** | `/ai-analysis.html` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ קיים | מוכן |
-| **preferences.html** | `/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ✅ קיים | מוכן (ללא Business Service) |
-| **user-profile.html** | `/user-profile.html` | `/api/auth/me` | ❌ חסר | ✅ קיים | מוכן |
+| **trades.html** | `/trades` | `/api/trades/*` | ✅ TradeBusinessService | ✅ קיים | מוכן |
+| **trade_plans.html** | `/trade_plans` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ קיים | מוכן |
+| **alerts.html** | `/alerts` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ קיים | מוכן |
+| **tickers.html** | `/tickers` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ קיים | מוכן |
+| **trading_accounts.html** | `/trading_accounts` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ קיים | מוכן |
+| **executions.html** | `/executions` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ קיים | מוכן |
+| **cash_flows.html** | `/cash_flows` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ קיים | מוכן |
+| **notes.html** | `/notes` | `/api/notes/*` | ✅ NoteBusinessService | ✅ קיים | מוכן |
+| **data_import.html** | `/data_import` | `/api/user-data-import/*` | ❌ חסר | ⚠️ חלקי | צריך Business Service |
+| **research.html** | `/research` | `/api/research/*` | ❌ חסר | ⚠️ חלקי | צריך Business Service |
+| **ai_analysis.html** | `/ai_analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ קיים | מוכן |
+| **preferences.html** | `/preferences` | `/api/preferences/*` | ❌ חסר (מורכב) | ✅ קיים | מוכן (ללא Business Service) |
+| **user_profile.html** | `/user_profile` | `/api/auth/me` | ❌ חסר | ✅ קיים | מוכן |
 
 ---
 
@@ -47,17 +47,17 @@
 
 | עמוד | נתיב | Backend API | סטטוס | הערות |
 |------|------|-------------|--------|-------|
-| **trade-history-page.html** | `/mockups/daily-snapshots/trade-history-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **portfolio-state-page.html** | `/mockups/daily-snapshots/portfolio-state-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **price-history-page.html** | `/mockups/daily-snapshots/price-history-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **comparative-analysis-page.html** | `/mockups/daily-snapshots/comparative-analysis-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **trading-journal-page.html** | `/mockups/daily-snapshots/trading-journal-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **strategy-analysis-page.html** | `/mockups/daily-snapshots/strategy-analysis-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **economic-calendar-page.html** | `/mockups/daily-snapshots/economic-calendar-page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **history-widget.html** | `/mockups/daily-snapshots/history-widget.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **emotional-tracking-widget.html** | `/mockups/daily-snapshots/emotional-tracking-widget.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **date-comparison-modal.html** | `/mockups/daily-snapshots/date-comparison-modal.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
-| **tradingview-test-page.html** | `/mockups/daily-snapshots/tradingview-test-page.html` | - | ✅ קיים | עמוד בדיקה |
+| **trade_history_page.html** | ❌ לא קיים במאגר | ❌ חסר | ❌ חסר | קובץ מוקאפ לא נמצא |
+| **portfolio_state_page.html** | ❌ לא קיים במאגר | ❌ חסר | ❌ חסר | קובץ מוקאפ לא נמצא |
+| **price_history_page.html** | `/mockups/daily-snapshots/price_history_page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **comparative_analysis_page.html** | `/mockups/daily-snapshots/comparative_analysis_page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **trading_journal_page.html** | ❌ לא קיים במאגר | ❌ חסר | ❌ חסר | קובץ מוקאפ לא נמצא |
+| **strategy_analysis_page.html** | `/mockups/daily-snapshots/strategy_analysis_page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **economic_calendar_page.html** | `/mockups/daily-snapshots/economic_calendar_page.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **history_widget.html** | `/mockups/daily-snapshots/history_widget.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **emotional_tracking_widget.html** | `/mockups/daily-snapshots/emotional_tracking_widget.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **date_comparison_modal.html** | `/mockups/daily-snapshots/date_comparison_modal.html` | ❌ חסר | 🎨 Mockup | אינטגרציה מלאה, חסר Backend |
+| **tradingview_test_page.html** | `/mockups/daily-snapshots/tradingview_test_page.html` | - | ✅ קיים | עמוד בדיקה |
 
 ---
 
@@ -65,10 +65,10 @@
 
 | עמוד | נתיב | Backend API | סטטוס | הערות |
 |------|------|-------------|--------|-------|
-| **watch-lists-page.html** | `/mockups/watch-lists-page.html` | `/api/watch-lists/*` | ✅ קיים | מוכן |
-| **watch-list-modal.html** | `/mockups/watch-list-modal.html` | - | ✅ קיים | מוכן |
-| **add-ticker-modal.html** | `/mockups/add-ticker-modal.html` | - | ✅ קיים | מוכן |
-| **flag-quick-action.html** | `/mockups/flag-quick-action.html` | - | ✅ קיים | מוכן |
+| **watch_lists_page.html** | `/mockups/watch_lists_page.html` | `/api/watch-listss/*` | ✅ קיים | מוכן |
+| **watch_list_modal.html** | `/mockups/watch_list_modal.html` | - | ✅ קיים | מוכן |
+| **add_ticker_modal.html** | `/mockups/add_ticker_modal.html` | - | ✅ קיים | מוכן |
+| **flag_quick_action.html** | `/mockups/flag_quick_action.html` | - | ✅ קיים | מוכן |
 
 ---
 
@@ -76,7 +76,7 @@
 
 | עמוד | נתיב | סטטוס | הערות |
 |------|------|--------|-------|
-| **ticker-dashboard.html** | `/ticker-dashboard.html` | ✅ קיים | עמוד טיקר מורחב - ממומש במלואו, בדיקות הושלמו 30.01.2025 |
+| **ticker_dashboard.html** | `/ticker_dashboard` | ✅ קיים | עמוד טיקר מורחב - ממומש במלואו, בדיקות הושלמו 30.01.2025 |
 
 ---
 
@@ -88,7 +88,7 @@
 |------|-------|--------|---------|--------|-------|
 | **דשבורד מסחר מרכזי** | ✅ מתועד | ❌ חסר | ⚠️ חלקי | ⚠️ חלקי | קיים `index.html`, חסרים פיצ'רים |
 | **Performance Snapshots** | ✅ מתועד | ✅ קיים | ❌ חסר | 🎨 Mockup | 11 Mockups, חסר Backend |
-| **Daily Journal** | ✅ מתועד | ✅ קיים | ❌ חסר | 🎨 Mockup | קיים `trading-journal-page.html`, חסר Backend |
+| **Daily Journal** | ✅ מתועד | ❌ חסר | ❌ חסר | ❌ חסר | אין קובץ מוקאפ במאגר |
 | **Portfolio Allocation** | ✅ מתועד | ❌ חסר | ❌ חסר | ❌ חסר | לא רלוונטי כרגע |
 | **מסכי פנסיה** | ✅ מתועד | ❌ חסר | ❌ חסר | ❌ חסר | לא רלוונטי כרגע |
 
@@ -138,7 +138,7 @@
 | **ExecutionBusinessService** | `/api/executions/*` | ✅ קיים | executions.html |
 | **CashFlowBusinessService** | `/api/cash-flows/*` | ✅ קיים | cash_flows.html |
 | **NoteBusinessService** | `/api/notes/*` | ✅ קיים | notes.html |
-| **AIAnalysisService** | `/api/ai-analysis/*` | ✅ קיים | ai-analysis.html |
+| **AIAnalysisService** | `/api/ai-analysis/*` | ✅ קיים | ai_analysis.html |
 
 ### Services חסרים
 
@@ -156,16 +156,16 @@
 
 **עמודים עם אינטגרציה מלאה, חסר רק Backend:**
 
-1. ✅ **portfolio-state-page.html** - מושלם, חסר Backend
-2. ✅ **trade-history-page.html** - מושלם, חסר Backend
-3. ✅ **price-history-page.html** - מושלם, חסר Backend
-4. ✅ **comparative-analysis-page.html** - מושלם, חסר Backend
-5. ✅ **trading-journal-page.html** - מושלם, חסר Backend
-6. ✅ **strategy-analysis-page.html** - מושלם, חסר Backend
-7. ✅ **economic-calendar-page.html** - מושלם, חסר Backend
-8. ✅ **history-widget.html** - מושלם, חסר Backend
-9. ✅ **emotional-tracking-widget.html** - מושלם, חסר Backend
-10. ✅ **date-comparison-modal.html** - מושלם, חסר Backend
+1. ✅ **portfolio_state_page.html** - מושלם, חסר Backend
+2. ✅ **trade_history_page.html** - מושלם, חסר Backend
+3. ✅ **price_history_page.html** - מושלם, חסר Backend
+4. ✅ **comparative_analysis_page.html** - מושלם, חסר Backend
+5. ✅ **trading_journal_page.html** - מושלם, חסר Backend
+6. ✅ **strategy_analysis_page.html** - מושלם, חסר Backend
+7. ✅ **economic_calendar_page.html** - מושלם, חסר Backend
+8. ✅ **history_widget.html** - מושלם, חסר Backend
+9. ✅ **emotional_tracking_widget.html** - מושלם, חסר Backend
+10. ✅ **date_comparison_modal.html** - מושלם, חסר Backend
 
 **סה"כ:** 10 עמודים מוכנים לפיתוח Backend
 
@@ -173,7 +173,7 @@
 
 **עמודים שהם רעיון UI בלבד:**
 
-1. 🎨 **tradingview-test-page.html** - עמוד בדיקה, לא עמוד Production
+1. 🎨 **tradingview_test_page.html** - עמוד בדיקה, לא עמוד Production
 
 ---
 
@@ -217,4 +217,3 @@
 ---
 
 **תאריך עדכון אחרון:** 28 בינואר 2025
-

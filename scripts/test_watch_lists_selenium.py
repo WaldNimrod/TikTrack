@@ -44,7 +44,7 @@ class WatchListsTester:
         self.driver = None
         self.wait = None
         self.base_url = BASE_URL
-        self.page_url = "/watch-list"
+        self.page_url = "/watch_list"
         
     def setup_driver(self):
         """Setup Chrome WebDriver"""

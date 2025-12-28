@@ -376,7 +376,6 @@ def get_system_info() -> Any:
     try:
         import platform
         import sys
-        import sqlite3
         
         # Server information
         server_info = {
@@ -390,7 +389,6 @@ def get_system_info() -> Any:
         python_info = {
             'version': sys.version,
             'flask': '2.3.3',
-            'sqlite': sqlite3.sqlite_version,
             'platform': platform.platform()
         }
         

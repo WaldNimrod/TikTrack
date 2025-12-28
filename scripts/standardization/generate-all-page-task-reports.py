@@ -22,30 +22,30 @@ INCOMPLETE_PAGES = [
     'cash_flows.html',
     'research.html',
     'preferences.html',
-    'user-profile.html',
+    'user_profile.html',
     'db_display.html',
     'db_extradata.html',
     'constraints.html',
-    'background-tasks.html',
-    'server-monitor.html',
-    'system-management.html',
+    'background_tasks.html',
+    'server_monitor.html',
+    'system_management.html',
     'cache-test.html',
-    'notifications-center.html',
-    'css-management.html',
-    'dynamic-colors-display.html',
+    'notifications_center.html',
+    'css_management.html',
+    'dynamic_colors_display.html',
     'designs.html',
-    'tradingview-test-page.html',
-    'external-data-dashboard.html',
-    'chart-management.html',
-    'portfolio-state-page.html',
-    'trade-history-page.html',
-    'comparative-analysis-page.html',
-    'trading-journal-page.html',
-    'strategy-analysis-page.html',
-    'economic-calendar-page.html',
-    'history-widget.html',
-    'emotional-tracking-widget.html',
-    'date-comparison-modal.html',
+    'tradingview_test_page.html',
+    'external_data_dashboard.html',
+    'chart_management.html',
+    'portfolio_state_page.html',
+    'trade_history_page.html',
+    'comparative_analysis_page.html',
+    'trading_journal_page.html',
+    'strategy_analysis_page.html',
+    'economic_calendar_page.html',
+    'history_widget.html',
+    'emotional_tracking_widget.html',
+    'date_comparison_modal.html',
 ]
 
 def generate_task_report(page_name, audit_data):
@@ -54,16 +54,16 @@ def generate_task_report(page_name, audit_data):
     
     # Determine category
     if page_name in ['index.html', 'tickers.html', 'trading_accounts.html', 'cash_flows.html', 
-                     'research.html', 'preferences.html', 'user-profile.html']:
+                     'research.html', 'preferences.html', 'user_profile.html']:
         category = 'עמוד מרכזי'
         priority = 'גבוהה'
     elif page_name in ['db_display.html', 'db_extradata.html', 'constraints.html', 
-                       'background-tasks.html', 'server-monitor.html', 'system-management.html',
-                       'cache-test.html', 'notifications-center.html', 'css-management.html',
-                       'dynamic-colors-display.html', 'designs.html', 'tradingview-test-page.html']:
+                       'background_tasks.html', 'server_monitor.html', 'system_management.html',
+                       'cache-test.html', 'notifications_center.html', 'css_management.html',
+                       'dynamic_colors_display.html', 'designs.html', 'tradingview_test_page.html']:
         category = 'עמוד טכני'
         priority = 'בינונית'
-    elif page_name in ['external-data-dashboard.html', 'chart-management.html']:
+    elif page_name in ['external_data_dashboard.html', 'chart_management.html']:
         category = 'עמוד משני'
         priority = 'בינונית'
     else:

@@ -937,28 +937,28 @@
             const quickLinksButtons = [
                 { 
                     type: 'VIEW', 
-                    onclick: `window.location.href='portfolio-state-page.html'`, 
+                    onclick: `window.location.href='portfolio_state_page.html'`, 
                     title: 'מצב תיק אתמול',
                     text: 'מצב תיק',
                     icon: '../../images/icons/tabler/chart-line.svg'
                 },
                 { 
                     type: 'VIEW', 
-                    onclick: `window.location.href='trade-history-page.html'`, 
+                    onclick: `window.location.href='trade_history_page.html'`, 
                     title: 'טריידים פעילים',
                     text: 'טריידים',
                     icon: '../../images/icons/tabler/trending-up.svg'
                 },
                 { 
                     type: 'VIEW', 
-                    onclick: `window.location.href='price-history-page.html'`, 
+                    onclick: `window.location.href='price_history_page.html'`, 
                     title: 'שינויי מחיר היום',
                     text: 'שינויי מחיר',
                     icon: '../../images/icons/tabler/trending-up.svg'
                 },
                 { 
                     type: 'VIEW', 
-                    onclick: `window.location.href='comparative-analysis-page.html'`, 
+                    onclick: `window.location.href='comparative_analysis_page.html'`, 
                     title: 'ניתוח השוואתי',
                     text: 'ניתוח',
                     icon: '../../images/icons/tabler/chart-bar.svg'

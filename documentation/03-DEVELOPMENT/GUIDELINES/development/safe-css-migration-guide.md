@@ -169,7 +169,7 @@ python3 css-toggle.py old
 גש לכלי הניהול החדש:
 
 ```
-http://localhost:8080/css-management
+http://localhost:8080/css_management
 ```
 
 תכונות הדשבורד:
@@ -228,7 +228,7 @@ npm run css:check
 
 אם יש בעיות:
 
-1. גש לדשבורד: `/css-management.html`
+1. גש לדשבורד: `/css_management.html`
 2. הרץ בדיקות מהירות
 3. בדוק את הלוג
 4. השתמש בכלי Python

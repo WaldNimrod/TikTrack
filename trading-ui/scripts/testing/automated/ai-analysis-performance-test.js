@@ -6,7 +6,7 @@
  * Tests loading times, API response times, cache performance, etc.
  * 
  * Usage:
- *   1. Open ai-analysis.html in browser
+ *   1. Open ai_analysis.html in browser
  *   2. Open console (F12)
  *   3. Run: window.runAIAnalysisPerformanceTests()
  * 
@@ -447,7 +447,7 @@
         const aiResources = resourceEntries.filter(entry => 
           entry.name.includes('ai-analysis') || 
           entry.name.includes('aiAnalysis') ||
-          entry.name.includes('api/ai-analysis')
+          entry.name.includes('api/ai_analysis')
         );
 
         if (aiResources.length > 0) {

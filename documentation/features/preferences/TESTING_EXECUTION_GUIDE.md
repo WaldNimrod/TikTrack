@@ -21,7 +21,7 @@
 
 **שלב 1: טעינת הסקריפט**
 
-1. פתח את עמוד העדפות: `http://localhost:8080/trading-ui/preferences.html`
+1. פתח את עמוד העדפות: `http://localhost:8080/preferences`
 2. פתח את הקונסול (F12)
 3. ודא שהסקריפט נטען (אמור להופיע: `✅ Automated preference test suite loaded`)
 

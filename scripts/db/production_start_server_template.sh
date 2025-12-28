@@ -90,8 +90,4 @@ if [ "$ENVIRONMENT" = "production" ] && [ -n "$POSTGRES_HOST" ]; then
     log_info "  Host: ${POSTGRES_HOST}"
     log_info "  Database: ${POSTGRES_DB}"
     log_info "  User: ${POSTGRES_USER}"
-elif [ -n "$DB_PATH" ]; then
-    log_info "Database: SQLite ($(basename "$DB_PATH"))"
 fi
-
-

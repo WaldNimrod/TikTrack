@@ -6,7 +6,7 @@
  * 1. פתח כל עמוד בדפדפן
  * 2. פתח את הקונסולה
  * 3. העתק והדבק את הקוד הזה
- * 4. או טען את הקובץ הזה בדף init-system-management.html
+ * 4. או טען את הקובץ הזה בדף init_system_management.html
  */
 
 (function() {

@@ -4,6 +4,8 @@
 **גרסה:** 0.1.0  
 **מטרה:** הקמה והפעלה של סביבת הפרודקשן המקומית בתיקיית Worktree נפרדת `~/Documents/TikTrack/TikTrackApp-Production`, עם תהליך עדכון אחיד וגרסת בסיס (“Production Version 0”).
 
+**חשוב:** אין תיקיית `production/` בתוך `TikTrackApp` (פיתוח). הפרודקשן מנוהל בענף `production` וב‑worktree נפרד.
+
 ---
 
 ## 1. רקע ומטרות
@@ -190,4 +192,3 @@ git push origin production
 **עודכן:** 2025-11-09  
 **תחזוקה:** צוות הפיתוח של TikTrack  
 **סטטוס:** פעיל – חל על כל עדכון Production מגרסה 0 ואילך
-

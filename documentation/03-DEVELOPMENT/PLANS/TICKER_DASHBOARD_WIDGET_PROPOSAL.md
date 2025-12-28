@@ -97,7 +97,7 @@
 - KPI Card מיניאטורי לכל טיקר:
   - **שורה 1:** סמל טיקר + מחיר נוכחי + שינוי יומי (%)
   - **שורה 2:** ATR | נפח | יחס ל-MA 20
-  - **שורה 3:** כפתור "דשבורד מלא" (קישור ל-`/ticker-dashboard.html?tickerId={id}`)
+  - **שורה 3:** כפתור "דשבורד מלא" (קישור ל-`/ticker_dashboard.html?tickerId={id}`)
 
 **אופציונלי:**
 
@@ -257,7 +257,7 @@
   <div class="ticker-dashboard-widget-item-actions">
     <button data-button-type="DASHBOARD"
             data-variant="small"
-            data-onclick="window.location.href='/ticker-dashboard.html?tickerId=422'"
+            data-onclick="window.location.href='/ticker_dashboard.html?tickerId=422'"
             title="דשבורד מלא">
       <img src="images/icons/tabler/gauge.svg" width="16" height="16" alt="דשבורד" class="icon me-1">
       דשבורד מלא
@@ -339,7 +339,7 @@
 'dashboard-widgets': {
   scripts: [
     {
-      file: 'widgets/ticker-dashboard-widget.js',
+      file: 'widgets/ticker_dashboard-widget.js',
       globalCheck: 'window.TickerDashboardWidget',
       description: 'Ticker dashboard widget for home page',
       required: true,
@@ -490,7 +490,7 @@ index: {
 
 ### שלב 2: יצירת קבצים
 
-- [ ] `trading-ui/scripts/widgets/ticker-dashboard-widget.js`
+- [ ] `trading-ui/scripts/widgets/ticker_dashboard-widget.js`
 - [ ] `trading-ui/styles-new/06-components/_ticker-dashboard-widget.css`
 - [ ] עדכון `trading-ui/index.html`
 

@@ -46,7 +46,7 @@
 #### Frontend
 
 - ✅ `trading-ui/scripts/user-profile-smtp.js` - ממשק ניהול SMTP
-- ✅ `trading-ui/user-profile.html` - עדכון עם סקשן SMTP
+- ✅ `trading-ui/user_profile.html` - עדכון עם סקשן SMTP
 
 #### Documentation (17 קבצים)
 

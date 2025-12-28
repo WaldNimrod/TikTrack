@@ -14,11 +14,6 @@ def home() -> Any:
     """Home page"""
     return send_from_directory(UI_DIR, "index.html")
 
-@pages_bp.route('/db_display')
-def db_display() -> Any:
-    """Database display page"""
-    return send_from_directory(UI_DIR, "db_display.html")
-
 @pages_bp.route('/trade_plans')
 def trade_plans() -> Any:
     """Trade plans page"""
@@ -29,15 +24,10 @@ def trades() -> Any:
     """Trades tracking page"""
     return send_from_directory(UI_DIR, "trades.html")
 
-@pages_bp.route('/tracking')
-def tracking() -> Any:
-    """Tracking page - redirect to trades"""
-    return send_from_directory(UI_DIR, "trades.html")
-
-@pages_bp.route('/watch-list')
+@pages_bp.route('/watch_lists')
 def watch_list() -> Any:
     """Watch list management page"""
-    return send_from_directory(UI_DIR, "watch-list.html")
+    return send_from_directory(UI_DIR, "watch_lists.html")
 
 
 
@@ -71,10 +61,10 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
-@pages_bp.route('/strategy-analysis')
+@pages_bp.route('/strategy_analysis')
 def strategy_analysis() -> Any:
     """Strategy Analysis page"""
-    return send_from_directory(UI_DIR, "strategy-analysis.html")
+    return send_from_directory(UI_DIR, "strategy_analysis.html")
 
 
 
@@ -90,87 +80,55 @@ def data_import() -> Any:
 
 
 
-@pages_bp.route('/designs')
-def designs() -> Any:
-    """Designs page"""
-    return send_from_directory(UI_DIR, "designs.html")
-
 @pages_bp.route('/db_extradata')
 def db_extradata() -> Any:
     """Extra data tables page"""
     return send_from_directory(UI_DIR, "db_extradata.html")
-
-@pages_bp.route('/currencies')
-def currencies() -> Any:
-    """Currencies page"""
-    return send_from_directory(UI_DIR, "currencies.html")
 
 @pages_bp.route('/preferences')
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
-@pages_bp.route('/user-profile')
-@pages_bp.route('/user-profile.html')
+@pages_bp.route('/user_profile')
 def user_profile() -> Any:
     """User profile management page"""
-    return send_from_directory(UI_DIR, "user-profile.html")
+    return send_from_directory(UI_DIR, "user_profile.html")
 
-@pages_bp.route('/ai-analysis')
+@pages_bp.route('/ai_analysis')
 def ai_analysis() -> Any:
     """AI Analysis page"""
-    return send_from_directory(UI_DIR, "ai-analysis.html")
-
-@pages_bp.route('/trading-ui/ai-analysis.html')
-def ai_analysis_old() -> Any:
-    """AI Analysis page - redirect from old URL"""
-    from flask import redirect
-    return redirect('/ai-analysis', code=301)
+    return send_from_directory(UI_DIR, "ai_analysis.html")
 
 @pages_bp.route('/tag_management')
 def tag_management() -> Any:
     """Tag management page"""
     return send_from_directory(UI_DIR, "tag_management.html")
 
-@pages_bp.route('/preferences-new')
-def preferences_new() -> Any:
-    """New preferences page"""
-    return send_from_directory(UI_DIR, "preferences-new.html")
-
-@pages_bp.route('/external-data-dashboard')
+@pages_bp.route('/external_data_dashboard')
 def external_data_dashboard() -> Any:
     """External Data Dashboard page"""
-    return send_from_directory(UI_DIR, "external-data-dashboard.html")
+    return send_from_directory(UI_DIR, "external_data_dashboard.html")
 
-@pages_bp.route('/constraints')
-def constraints() -> Any:
-    """Constraints management page"""
-    return send_from_directory(UI_DIR, "constraints.html")
+@pages_bp.route('/system_management')
+def system_management() -> Any:
+    """System management page"""
+    return send_from_directory(UI_DIR, "system_management.html")
 
-@pages_bp.route('/test-header-only')
-def test_header_only() -> Any:
-    """Test header only page"""
-    return send_from_directory(UI_DIR, "test-header-only.html")
-
-@pages_bp.route('/chart-management')
-def chart_management() -> Any:
-    """Chart management page"""
-    return send_from_directory(UI_DIR, "chart-management.html")
-
-@pages_bp.route('/trade-history')
+@pages_bp.route('/trade_history')
 def trade_history() -> Any:
     """Trade history page"""
-    return send_from_directory(UI_DIR, "trade-history.html")
+    return send_from_directory(UI_DIR, "trade_history.html")
 
-@pages_bp.route('/portfolio-state')
+@pages_bp.route('/portfolio_state')
 def portfolio_state() -> Any:
     """Portfolio state page"""
-    return send_from_directory(UI_DIR, "portfolio-state.html")
+    return send_from_directory(UI_DIR, "portfolio_state.html")
 
-@pages_bp.route('/trading-journal')
+@pages_bp.route('/trading_journal')
 def trading_journal() -> Any:
     """Trading journal page"""
-    return send_from_directory(UI_DIR, "trading-journal.html")
+    return send_from_directory(UI_DIR, "trading_journal.html")
 
 
 
@@ -280,5 +238,4 @@ def static_files(filename: str) -> Any:
 # This removes duplication and ensures consistent cache control headers
 # ResponseOptimizer handles /scripts/ and /styles/ paths with no-cache headers
 # See: Backend/utils/response_optimizer.py - determine_cache_type() and CACHE_HEADERS['api']
-
 

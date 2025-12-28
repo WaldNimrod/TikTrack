@@ -38,7 +38,7 @@ def column_exists_postgres(engine, table: str, column: str) -> bool:
 def add_atr_fields():
     """Add ATR fields to market_data_quotes table (PostgreSQL only)."""
     
-    # PostgreSQL only - SQLite is no longer supported
+    # PostgreSQL only
     print(f"➡️  Using database: PostgreSQL")
     engine = create_engine(DATABASE_URL)
     
@@ -74,4 +74,3 @@ def add_atr_fields():
 
 if __name__ == "__main__":
     add_atr_fields()
-

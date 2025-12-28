@@ -39,7 +39,7 @@ def column_exists_postgres(engine, table: str, column: str) -> bool:
 def add_open_price_fields():
     """Add open price fields to market_data_quotes table (PostgreSQL only)."""
     
-    # PostgreSQL only - SQLite is no longer supported
+    # PostgreSQL only
     print(f"➡️  Using database: PostgreSQL")
     engine = create_engine(DATABASE_URL)
     
@@ -83,4 +83,3 @@ def add_open_price_fields():
 
 if __name__ == "__main__":
     add_open_price_fields()
-

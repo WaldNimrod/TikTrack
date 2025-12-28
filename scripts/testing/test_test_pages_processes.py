@@ -37,11 +37,11 @@ TEST_USERNAME = "admin"
 TEST_PASSWORD = "admin123"
 
 TEST_PAGES = [
-    {"name": "test-header-only.html", "url": "/test-header-only.html"},
-    {"name": "test-monitoring.html", "url": "/test-monitoring.html"},
-    {"name": "test-frontend-wrappers.html", "url": "/test-frontend-wrappers.html"},
-    {"name": "test-unified-widget.html", "url": "/test-unified-widget.html"},
-    {"name": "test-recent-items-widget.html", "url": "/test-recent-items-widget.html"},
+    {"name": "test_header_only.html", "url": "/test_header_only.html"},
+    {"name": "test_monitoring.html", "url": "/test_monitoring.html"},
+    {"name": "test_frontend_wrappers.html", "url": "/test_frontend_wrappers.html"},
+    {"name": "test_unified_widget.html", "url": "/test_unified_widget.html"},
+    {"name": "test_recent_items_widget.html", "url": "/test_recent_items_widget.html"},
 ]
 
 BASE_DIR = Path(__file__).parent.parent.parent

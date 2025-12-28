@@ -83,8 +83,8 @@
 
 ### Core Pages
 
-- [x] **ticker-dashboard.html**: Extended existing retry mechanism
-- [x] **trading-journal.html**: Added EOD KPI loading and charts
+- [x] **ticker_dashboard.html**: Extended existing retry mechanism
+- [x] **trading_journal.html**: Added EOD KPI loading and charts
 - [x] **index.html**: Added EOD KPI cards to dashboard
 - [x] **trading_accounts.html**: Added EOD account balance display
 - [x] **cash_flows.html**: Added EOD cash flow aggregation
@@ -93,8 +93,8 @@
 
 ### Mockup Pages
 
-- [x] **trade-history-page.html**: Added EOD package dependencies
-- [x] **portfolio-state-page.html**: Added EOD package dependencies
+- [x] **trade_history_page.html**: Added EOD package dependencies
+- [x] **portfolio_state_page.html**: Added EOD package dependencies
 
 ### Package Manifest Updates
 

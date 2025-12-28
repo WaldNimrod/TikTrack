@@ -17,22 +17,22 @@ const DAILY_SNAPSHOTS_DIR = path.join(MOCKUPS_DIR, 'daily-snapshots');
 // רשימת עמודי מוקאפ
 const MOCKUP_PAGES = [
     // daily-snapshots
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'comparative-analysis-page.html'), name: 'comparative-analysis-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'date-comparison-modal.html'), name: 'date-comparison-modal' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'economic-calendar-page.html'), name: 'economic-calendar-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'emotional-tracking-widget.html'), name: 'emotional-tracking-widget' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'history-widget.html'), name: 'history-widget' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'portfolio-state-page.html'), name: 'portfolio-state-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'price-history-page.html'), name: 'price-history-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'strategy-analysis-page.html'), name: 'strategy-analysis-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'trade-history-page.html'), name: 'trade-history-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'trading-journal-page.html'), name: 'trading-journal-page' },
-    { file: path.join(DAILY_SNAPSHOTS_DIR, 'tradingview-test-page.html'), name: 'tradingview-test-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'comparative_analysis_page.html'), name: 'comparative-analysis-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'date_comparison_modal.html'), name: 'date-comparison-modal' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'economic_calendar_page.html'), name: 'economic-calendar-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'emotional_tracking_widget.html'), name: 'emotional-tracking-widget' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'history_widget.html'), name: 'history-widget' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'portfolio_state_page.html'), name: 'portfolio-state-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'price_history_page.html'), name: 'price-history-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'strategy_analysis_page.html'), name: 'strategy-analysis-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'trade_history_page.html'), name: 'trade-history-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'trading_journal_page.html'), name: 'trading-journal-page' },
+    { file: path.join(DAILY_SNAPSHOTS_DIR, 'tradingview_test_page.html'), name: 'tradingview-test-page' },
     // mockups נוספים
-    { file: path.join(MOCKUPS_DIR, 'add-ticker-modal.html'), name: 'add-ticker-modal' },
-    { file: path.join(MOCKUPS_DIR, 'flag-quick-action.html'), name: 'flag-quick-action' },
-    { file: path.join(MOCKUPS_DIR, 'watch-list-modal.html'), name: 'watch-list-modal' },
-    { file: path.join(MOCKUPS_DIR, 'watch-lists-page.html'), name: 'watch-lists-page' },
+    { file: path.join(MOCKUPS_DIR, 'add_ticker_modal.html'), name: 'add-ticker-modal' },
+    { file: path.join(MOCKUPS_DIR, 'flag_quick_action.html'), name: 'flag-quick-action' },
+    { file: path.join(MOCKUPS_DIR, 'watch_list_modal.html'), name: 'watch-list-modal' },
+    { file: path.join(MOCKUPS_DIR, 'watch_lists_page.html'), name: 'watch-lists-page' },
 ];
 
 /**

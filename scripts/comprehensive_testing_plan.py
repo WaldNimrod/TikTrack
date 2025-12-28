@@ -29,7 +29,7 @@ CRITICAL_ENDPOINTS = [
     "/api/alerts/",
     "/api/notes/",
     "/api/cash-flows/",
-    "/api/watch-lists/",
+    "/api/watch_lists/",
     "/api/tickers/my"
 ]
 
@@ -37,11 +37,11 @@ CRITICAL_ENDPOINTS = [
 CRITICAL_PAGES = [
     "/",
     "/trades.html",
-    "/trade-plans.html",
-    "/trading-accounts.html",
+    "/trade_plans.html",
+    "/trading_accounts.html",
     "/alerts.html",
     "/tickers.html",
-    "/watch-list.html",
+    "/watch_list.html",
     "/preferences.html"
 ]
 

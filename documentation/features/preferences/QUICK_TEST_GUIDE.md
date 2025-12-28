@@ -4,7 +4,7 @@
 
 ### שלב 1: פתיחת עמוד
 
-1. פתח: `http://localhost:8080/trading-ui/preferences.html`
+1. פתח: `http://localhost:8080/preferences`
 2. פתח קונסול (F12)
 
 ### שלב 2: הרצת בדיקות

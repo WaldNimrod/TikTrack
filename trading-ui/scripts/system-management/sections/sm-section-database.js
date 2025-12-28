@@ -726,7 +726,7 @@ class SMDatabaseSection extends SMBaseSection {
    */
   getDatabaseInfo(overview, status, info) {
     return {
-      type: info?.type || status?.type || overview?.database?.type || 'SQLite',
+      type: info?.type || status?.type || overview?.database?.type || 'PostgreSQL',
       version: info?.version || status?.version || overview?.database?.version || 'לא זמין',
       filePath: info?.file_path || status?.file_path || overview?.database?.file_path || 'לא זמין',
       encoding: info?.encoding || status?.encoding || overview?.database?.encoding || 'UTF-8',

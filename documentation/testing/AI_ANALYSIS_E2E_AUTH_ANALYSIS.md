@@ -148,7 +148,7 @@
 
 ### שלב 3: Navigate to Protected Page
 
-1. Navigate לדף המוגן (למשל `/trading-ui/ai-analysis.html`)
+1. Navigate לדף המוגן (למשל `/trading-ui/ai_analysis.html`)
 2. המתן שהדף נטען
 3. וידוא שלא היה redirect ל-login
 

@@ -12,7 +12,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const tradingUiDir = path.join(projectRoot, 'trading-ui');
 
 // Auth pages to skip
-const AUTH_PAGES = ['login.html', 'register.html', 'forgot-password.html', 'reset-password.html'];
+const AUTH_PAGES = ['login.html', 'register.html', 'forgot_password.html', 'reset_password.html'];
 
 function getAllHtmlPages() {
   const pages = [];

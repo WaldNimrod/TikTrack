@@ -41,7 +41,7 @@ python3 scripts/test_atr_threshold_preferences.py
 
 ### הרצת בדיקות Frontend
 
-1. פתח את עמוד העדפות: `http://localhost:8080/trading-ui/preferences.html`
+1. פתח את עמוד העדפות: `http://localhost:8080/preferences`
 2. פתח את קונסול הדפדפן (F12)
 3. הרץ: `window.runATRTests()`
 
@@ -75,7 +75,7 @@ python3 scripts/test_atr_threshold_preferences.py
 
 ### תרחיש 1: הצגת ATR במודול פרטי טיקר
 
-1. פתח עמוד פרטי טיקר (למשל: `http://localhost:8080/trading-ui/ticker-details.html?id=1`)
+1. פתח עמוד פרטי טיקר (למשל: `http://localhost:8080/ticker_dashboard?tickerId=1`)
 2. בדוק ש-ATR מוצג עם רמזור:
    - ירוק אם ATR < 3%
    - צהוב אם 3% ≤ ATR < 5%
@@ -84,7 +84,7 @@ python3 scripts/test_atr_threshold_preferences.py
 
 ### תרחיש 2: עדכון העדפות
 
-1. פתח עמוד העדפות: `http://localhost:8080/trading-ui/preferences.html`
+1. פתח עמוד העדפות: `http://localhost:8080/preferences`
 2. מצא את סקשן "הגדרות מסחר" (section3)
 3. בדוק ש-2 השדות החדשים מוצגים:
    - "גבול ATR גבוה (%)"
@@ -186,4 +186,3 @@ Success Rate: XX.XX%
 - כל הבדיקות צריכות לעבור לפני שחרור לפרודקשן
 - בדיקות ביצועים חשובות במיוחד - רנדור ATR צריך להיות מהיר
 - בדיקות תאימות אחור חשובות - המערכת צריכה לעבוד גם במצבים קיצוניים
-

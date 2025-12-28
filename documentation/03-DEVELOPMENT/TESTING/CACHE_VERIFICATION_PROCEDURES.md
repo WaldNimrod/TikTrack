@@ -20,9 +20,9 @@
 
 ## 📍 **כלים זמינים**
 
-### **1. עמוד ניהול מערכת** (`system-management.html`)
+### **1. עמוד ניהול מערכת** (`system_management.html`)
 
-- **מיקום:** http://localhost:8080/system-management
+- **מיקום:** http://localhost:8080/system_management
 - **כפתורים:**
   - 🔄 רענן נתוני מערכת
   - 🎚️ **רמות ניקוי מטמון (4 כפתורים):**

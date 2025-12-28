@@ -129,7 +129,7 @@ def validate_request(template_id: int, variables: Dict[str, Any], provider: str 
     """Validate analysis request"""
     try:
         response = SESSION.post(
-            f"{BASE_URL}/api/business/ai-analysis/validate",
+            f"{BASE_URL}/api/business/ai_analysis/validate",
             json={
                 "template_id": template_id,
                 "variables": variables,
@@ -161,7 +161,7 @@ def generate_analysis(template_id: int, variables: Dict[str, Any], provider: str
     """Generate analysis"""
     try:
         response = SESSION.post(
-            f"{BASE_URL}/api/ai-analysis/generate",
+            f"{BASE_URL}/api/ai_analysis/generate",
             json={
                 "template_id": template_id,
                 "variables": variables,
@@ -201,7 +201,7 @@ def wait_for_analysis(analysis_id: int, max_wait: int = 120) -> Optional[Dict[st
     while time.time() - start_time < max_wait:
         try:
             response = SESSION.get(
-                f"{BASE_URL}/api/ai-analysis/history/{analysis_id}",
+                f"{BASE_URL}/api/ai_analysis/history/{analysis_id}",
                 headers={"Content-Type": "application/json"}
             )
             

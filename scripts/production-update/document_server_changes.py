@@ -64,7 +64,6 @@ def analyze_config_changes(config_file: Path) -> Dict[str, any]:
             'ENVIRONMENT',
             'IS_PRODUCTION',
             'PORT',
-            'DB_PATH',
             'DEVELOPMENT_MODE',
             'CACHE_DISABLED',
             'LOG_LEVEL',
@@ -210,4 +209,3 @@ def main():
 if __name__ == '__main__':
     success = main()
     sys.exit(0 if success else 1)
-

@@ -60,7 +60,7 @@
    - לעדכן את הסיסמה ב-TikTrack
 
 2. בדוק את החיבור:
-   - פתח `http://localhost:8080/user-profile.html`
+   - פתח `http://localhost:8080/user_profile`
    - סקשן "הגדרות SMTP"
    - לחץ "בדיקת חיבור"
 

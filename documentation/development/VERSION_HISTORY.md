@@ -89,7 +89,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-20T09:25:18+00:00 | 1.1.35.0 | 1.1.34.0 | 831c3e48474ac279a811b6f4243e1640dfbed48e | 94ed4ac878b5388c50b55816866a51ebde95daa3 | patch | Event handler manager updates |
 | 2025-11-20T16:39:05+00:00 | 1.1.36.0 | 1.1.35.0 | 92daa6dbc299f51c8f8cda3c64b498b66a013bb1 | 831c3e48474ac279a811b6f4243e1640dfbed48e | patch | Migrate routes/services to SQLAlchemy, fix DB name references - preparation for PostgreSQL migration |
 | 2025-11-20T17:19:39+00:00 | 1.1.37.0 | 1.1.36.0 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | 92daa6dbc299f51c8f8cda3c64b498b66a013bb1 | patch | Fix yahoo_finance_adapter timezone loading - handle list format from UserService |
-| 2025-11-20T17:20:04+00:00 | 1.1.38.0 | 1.1.37.0 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | patch | Update trade-history-page.html mockup |
+| 2025-11-20T17:20:04+00:00 | 1.1.38.0 | 1.1.37.0 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | patch | Update trade_history_page.html mockup |
 | 2025-11-20T17:22:46+00:00 | 1.1.39.0 | 1.1.38.0 | 81eb68e2ca2fbd3661dee61ffaa345816cc10c81 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | patch | Add documentation updates and backup completeness check script |
 | 2025-11-21T23:02:56+00:00 | 1.1.40.0 | 1.1.39.0 | a000393345e4c471b89fca85a304e636510d719f | 81eb68e2ca2fbd3661dee61ffaa345816cc10c81 | patch | Fix data_import page: standardize date rendering using central code from executions.js |
 | 2025-11-22T11:49:25+00:00 | 1.1.41.0 | 1.1.40.0 | 47b08b26f67076058b084b8172d7b7d88422a5b4 | a000393345e4c471b89fca85a304e636510d719f | patch | Header System: Complete refactoring to prevent duplicates and improve initialization |
@@ -196,7 +196,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 - שיפורים במערכת אימות (auth.js, auth.py)
 - עדכוני icon mappings
 - שיפורי עיצוב (layout.css)
-- עדכוני עמודים (index.html, user-profile.html)
+- עדכוני עמודים (index.html, user_profile.html)
 - שיפורים נוספים במערכת |
 | 2025-11-29T21:14:17+00:00 | 1.3.44.0 | 1.3.43.0 | 3d63fafb46fe4c856588afd3bb78ed46ba1ec497 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | patch | Implement SMTP service and Multi-User system with comprehensive documentation |
 | 2025-11-30T09:57:25+00:00 | 1.3.45.0 | 1.3.44.0 | 8c488739e25d67865f51038ea9de730e3fa1366f | 3d63fafb46fe4c856588afd3bb78ed46ba1ec497 | patch | Implement Option 10 for optimal Hebrew feedback (74%+ Hebrew) in AI Analysis system |
@@ -263,7 +263,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-10T21:20:17+00:00 | 1.3.105.0 | 1.3.104.0 | 95a7692cc5e3e3d61eb190e3cf59316c5b3ab1bc | d79e2768393cd632e6941de52e97f363395a02c4 | patch | System refactoring: Authentication & EOD integration - Fix watch-lists widget loading, Bearer token auth, EOD research integration |
 | 2025-12-10T21:20:34+00:00 | 1.3.106.0 | 1.3.105.0 | 031b9434a773de3a56aa1951015edbc5989bd440 | 95a7692cc5e3e3d61eb190e3cf59316c5b3ab1bc | patch | Additional system refactoring: Research EOD integration, portfolio testing improvements |
 | 2025-12-10T21:41:14+00:00 | 1.3.107.0 | 1.3.106.0 | 764bcaab9a4b7027d6bcfc68b594f12654862f23 | 031b9434a773de3a56aa1951015edbc5989bd440 | patch | Complete watch-lists widget implementation & system improvements |
-| 2025-12-10T21:46:27+00:00 | 1.3.108.0 | 1.3.107.0 | 860116e4345d99173aa98feb494ddda8aceb5397 | 764bcaab9a4b7027d6bcfc68b594f12654862f23 | patch | Fix InfoSummarySystem loading issue - add missing script tags to portfolio-state.html and create comprehensive package validation tools |
+| 2025-12-10T21:46:27+00:00 | 1.3.108.0 | 1.3.107.0 | 860116e4345d99173aa98feb494ddda8aceb5397 | 764bcaab9a4b7027d6bcfc68b594f12654862f23 | patch | Fix InfoSummarySystem loading issue - add missing script tags to portfolio_state.html and create comprehensive package validation tools |
 | 2025-12-10T22:04:15+00:00 | 1.3.109.0 | 1.3.108.0 | c8f9882907ec245c21ffcda2a5fdbba9e43cb5c7 | 860116e4345d99173aa98feb494ddda8aceb5397 | patch | Fix bundle source map references and rebuild all bundles with latest InfoSummarySystem changes |
 | 2025-12-10T22:19:38+00:00 | 1.3.110.0 | 1.3.109.0 | 582c54989f50d6bfb569032615100397f1a85989 | c8f9882907ec245c21ffcda2a5fdbba9e43cb5c7 | patch | Complete PRE_LAUNCH_CODE_TASKS.md sections 2-5 - Executions, Portfolio, Alert, and Import functionality |
 | 2025-12-10T22:28:00+00:00 | 1.3.111.0 | 1.3.110.0 | 436935d4bd29c0e658c8cfa1dfed9baf4dbb70fd | 582c54989f50d6bfb569032615100397f1a85989 | patch | Comprehensive stabilization - reduced errors from 23.1% to 0% across all 52 pages |

@@ -30,7 +30,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    # PostgreSQL only - no SQLite support
+    # PostgreSQL only
     return kwargs
 
 def debug_session_78():
@@ -116,4 +116,3 @@ def debug_session_78():
 
 if __name__ == "__main__":
     debug_session_78()
-

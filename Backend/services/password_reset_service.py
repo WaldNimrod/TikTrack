@@ -136,7 +136,7 @@ class PasswordResetService:
             session.commit()
             
             # Generate reset URL
-            reset_url = f"{base_url}/reset-password.html?token={token}"
+            reset_url = f"{base_url}/reset_password.html?token={token}"
             
             # Load SMTP settings from database
             self.email_service.load_settings_from_db(session)

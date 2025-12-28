@@ -85,6 +85,7 @@ class IntegratedCRUDE2ETester {
             ai_analysis: { name: 'ניתוח AI', type: 'user', url: '/ai_analysis', hasCRUD: false },
             watch_lists: { name: 'רשימות צפייה', type: 'user', url: '/watch_lists', hasCRUD: true },
             user_profile: { name: 'פרופיל משתמש', type: 'user', url: '/user_profile', hasCRUD: true },
+            user_management: { name: 'ניהול משתמשים', type: 'user', url: '/user_management', hasCRUD: true },
             portfolio_state: { name: 'מצב תיק', type: 'user', url: '/portfolio_state', hasCRUD: false },
             trade_history: { name: 'היסטוריית טריידים', type: 'user', url: '/trade_history', hasCRUD: false },
             trading_journal: { name: 'יומן מסחר', type: 'user', url: '/trading_journal', hasCRUD: true },
@@ -96,15 +97,15 @@ class IntegratedCRUDE2ETester {
             db_display: { name: 'תצוגת בסיס נתונים', type: 'technical', url: '/db_display', hasCRUD: false },
             db_extradata: { name: 'נתונים נוספים', type: 'technical', url: '/db_extradata', hasCRUD: false },
             constraints: { name: 'אילוצי מערכת', type: 'technical', url: '/constraints', hasCRUD: false },
-            background_tasks: { name: 'משימות רקע', type: 'technical', url: '/background-tasks', hasCRUD: false },
-            server_monitor: { name: 'ניטור שרת', type: 'technical', url: '/server-monitor', hasCRUD: false },
-            system_management: { name: 'ניהול מערכת', type: 'technical', url: '/system-management', hasCRUD: false },
-            notifications_center: { name: 'מרכז התראות', type: 'technical', url: '/notifications-center', hasCRUD: false },
-            css_management: { name: 'ניהול CSS', type: 'technical', url: '/css-management', hasCRUD: false },
-            dynamic_colors_display: { name: 'תצוגת צבעים', type: 'technical', url: '/dynamic-colors-display', hasCRUD: false },
+            background_tasks: { name: 'משימות רקע', type: 'technical', url: '/background_tasks', hasCRUD: false },
+            server_monitor: { name: 'ניטור שרת', type: 'technical', url: '/server_monitor', hasCRUD: false },
+            system_management: { name: 'ניהול מערכת', type: 'technical', url: '/system_management', hasCRUD: false },
+            notifications_center: { name: 'מרכז התראות', type: 'technical', url: '/notifications_center', hasCRUD: false },
+            css_management: { name: 'ניהול CSS', type: 'technical', url: '/css_management', hasCRUD: false },
+            dynamic_colors_display: { name: 'תצוגת צבעים', type: 'technical', url: '/dynamic_colors_display', hasCRUD: false },
             designs: { name: 'גלרית עיצובים', type: 'technical', url: '/designs', hasCRUD: false },
-            cache_management: { name: 'ניהול מטמון', type: 'technical', url: '/cache-management', hasCRUD: false },
-            code_quality_dashboard: { name: 'דשבורד איכות קוד', type: 'technical', url: '/code-quality-dashboard', hasCRUD: false }
+            cache_management: { name: 'ניהול מטמון', type: 'technical', url: '/cache_management', hasCRUD: false },
+            code_quality_dashboard: { name: 'דשבורד איכות קוד', type: 'technical', url: '/code_quality_dashboard', hasCRUD: false }
         };
     }
 
@@ -292,6 +293,18 @@ class IntegratedCRUDE2ETester {
                 },
                 modalId: null // Uses form, not modal - form is already visible on page
             },
+            user_management: {
+                required: ['username', 'email', 'first_name', 'last_name'],
+                fields: {
+                    username: { id: '#userUsername', type: 'text', required: true },
+                    email: { id: '#userEmail', type: 'text', required: true },
+                    first_name: { id: '#userFirstName', type: 'text', required: true },
+                    last_name: { id: '#userLastName', type: 'text', required: true },
+                    is_active: { id: '#userIsActive', type: 'checkbox', default: true },
+                    is_default: { id: '#userIsDefault', type: 'checkbox', default: false }
+                },
+                modalId: 'usersModal'
+            },
             trading_journal: {
                 required: ['trade_id', 'entry_date'],
                 fields: {
@@ -466,6 +479,96 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Process API test results from crud-testing-enhanced.js
+     * @param {Object} report - The comprehensive test report
+     */
+    processAPIResults(report) {
+        try {
+            this.logger?.info('🔍 Processing API test results', {
+                totalEntities: report.summary?.totalEntities,
+                passedEntities: report.summary?.passedEntities,
+                overallScore: report.summary?.overallScore
+            });
+
+            // Initialize API results array if not exists
+            if (!this.results.api) {
+                this.results.api = [];
+            }
+
+            // Add overall API test result
+            this.results.api.push({
+                workflow: 'API Comprehensive Testing',
+                status: report.summary?.passedEntities === report.summary?.totalEntities ? 'success' : 'failed',
+                executionTime: report.summary?.totalTestTime || 0,
+                score: report.summary?.overallScore,
+                tests: [{
+                    name: 'Comprehensive API Testing',
+                    status: report.summary?.passedEntities === report.summary?.totalEntities ? 'success' : 'failed',
+                    message: `Passed: ${report.summary?.passedEntities}/${report.summary?.totalEntities} entities (Score: ${report.summary?.overallScore}/100)`
+                }]
+            });
+
+            // Update statistics
+            if (report.summary?.passedEntities === report.summary?.totalEntities) {
+                this.stats.passed++;
+            } else {
+                this.stats.failed++;
+            }
+            this.stats.totalTests++;
+
+            // Add individual entity results
+            if (report.allResults && Array.isArray(report.allResults)) {
+                report.allResults.forEach(entityResult => {
+                    this.results.api.push({
+                        workflow: `API ${entityResult.displayName || entityResult.entity}`,
+                        status: entityResult.score >= 80 ? 'success' : 'failed',
+                        executionTime: entityResult.responseTime || 0,
+                        score: entityResult.score,
+                        tests: [{
+                            name: `${entityResult.displayName || entityResult.entity} API Test`,
+                            status: entityResult.score >= 80 ? 'success' : 'failed',
+                            message: `Score: ${entityResult.score}/100, Response: ${entityResult.responseTime}ms`
+                        }]
+                    });
+
+                    // Update stats for individual tests
+                    if (entityResult.score >= 80) {
+                        this.stats.passed++;
+                    } else {
+                        this.stats.failed++;
+                    }
+                    this.stats.totalTests++;
+                });
+            }
+
+            this.logger?.info('✅ API results processed successfully', {
+                totalAPIResults: this.results.api.length,
+                currentStats: this.stats
+            });
+
+        } catch (error) {
+            this.logger?.error('❌ Failed to process API results', error);
+            // Add error result
+            if (!this.results.api) {
+                this.results.api = [];
+            }
+            this.results.api.push({
+                workflow: 'API Testing - Error',
+                status: 'failed',
+                error: error.message,
+                executionTime: 0,
+                tests: [{
+                    name: 'API Results Processing',
+                    status: 'failed',
+                    message: `Failed to process results: ${error.message}`
+                }]
+            });
+            this.stats.failed++;
+            this.stats.totalTests++;
+        }
+    }
+
+    /**
      * E2E Testing - Complete workflows
      */
     async runE2ETests() {
@@ -612,7 +715,7 @@ class IntegratedCRUDE2ETester {
             if (pageEntry) {
                 const [pageKey, page] = pageEntry;
                 await this.runGenericCRUDTest(pageKey, page);
-    } else {
+            } else {
                 // Fallback - just mark as success
                 this.results.e2e.push({
                     workflow: `${entityType} CRUD`,
@@ -688,7 +791,7 @@ class IntegratedCRUDE2ETester {
 
                 // Wait for page to fully load and initialization to complete
                 let waitCount = 0;
-                const maxWaitTime = 150; // 15 seconds for full initialization
+                const maxWaitTime = 300; // 30 seconds for full initialization
                 while (waitCount < maxWaitTime) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     waitCount++;
@@ -696,9 +799,14 @@ class IntegratedCRUDE2ETester {
                     // Check if UnifiedAppInitializer has completed
                     const unifiedAppInitialized = iframeWindow.globalInitializationState?.unifiedAppInitialized;
                     const hasUnifiedCRUD = !!iframeWindow.UnifiedCRUDService;
+                    const hasWindowUnifiedCRUD = !!window.UnifiedCRUDService;
+                    const iframeContext = iframeWindow !== window;
+                    const iframeOrigin = iframeWindow.location?.origin;
+                    const mainOrigin = window.location?.origin;
 
                     if (unifiedAppInitialized && hasUnifiedCRUD) {
                         console.log(`✅ DEBUG: Page fully initialized after ${waitCount * 100}ms`);
+                        console.log(`✅ DEBUG: iframe context: ${iframeContext}, origins match: ${iframeOrigin === mainOrigin}`);
                         break;
                     }
 
@@ -706,13 +814,84 @@ class IntegratedCRUDE2ETester {
                     if (waitCount % 20 === 0) {
                         console.log(`🔄 DEBUG: Waiting for initialization, attempt ${waitCount}/${maxWaitTime}`);
                         console.log(`🔄 DEBUG: UnifiedApp initialized: ${unifiedAppInitialized}`);
-                        console.log(`🔄 DEBUG: UnifiedCRUD available: ${hasUnifiedCRUD}`);
+                        console.log(`🔄 DEBUG: UnifiedCRUD in iframe: ${hasUnifiedCRUD}`);
+                        console.log(`🔄 DEBUG: UnifiedCRUD in main window: ${hasWindowUnifiedCRUD}`);
+                        console.log(`🔄 DEBUG: iframe context: ${iframeContext}`);
                         console.log(`🔄 DEBUG: iframe readyState: ${iframeDoc.readyState}`);
+                        console.log(`🔄 DEBUG: iframe location: ${iframeWindow.location?.href}`);
+                        console.log(`🔄 DEBUG: iframe global objects:`, {
+                            UnifiedCRUDService: typeof iframeWindow.UnifiedCRUDService,
+                            ModalManagerV2: typeof iframeWindow.ModalManagerV2,
+                            window: !!iframeWindow.window
+                        });
+
+                        // #region agent log - HYPOTHESIS: Iframe initialization status
+                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                            method:'POST',
+                            headers:{'Content-Type':'application/json'},
+                            body:JSON.stringify({
+                                location:'crud_testing_dashboard.js:iframe-wait-loop',
+                                message:`Iframe initialization check attempt ${waitCount}`,
+                                data:{
+                                    unifiedAppInitialized,
+                                    hasUnifiedCRUD,
+                                    hasWindowUnifiedCRUD,
+                                    iframeContext,
+                                    iframeOrigin,
+                                    mainOrigin,
+                                    iframeReadyState: iframeDoc.readyState,
+                                    iframeLocation: iframeWindow.location?.href,
+                                    globalObjects: {
+                                        UnifiedCRUDService: typeof iframeWindow.UnifiedCRUDService,
+                                        ModalManagerV2: typeof iframeWindow.ModalManagerV2,
+                                        window: !!iframeWindow.window
+                                    }
+                                },
+                                timestamp:Date.now(),
+                                sessionId:'debug-session',
+                                runId:'iframe-initialization-debug',
+                                hypothesisId:'IFRAME_INIT_STATUS'
+                            })
+                        }).catch(()=>{});
+                        // #endregion
                     }
                 }
 
                 if (!iframeWindow.UnifiedCRUDService) {
-                    throw new Error('UnifiedCRUDService not loaded in iframe after 15 seconds');
+                    // Additional debugging for UnifiedCRUDService availability
+                    console.error(`❌ DEBUG: UnifiedCRUDService not found in iframe after 30 seconds`);
+                    console.error(`❌ DEBUG: iframe window properties:`, Object.keys(iframeWindow).filter(key => key.includes('Unified') || key.includes('CRUD')));
+                    console.error(`❌ DEBUG: iframe global objects:`, {
+                        UnifiedCRUDService: iframeWindow.UnifiedCRUDService,
+                        window: iframeWindow.window,
+                        parent: iframeWindow.parent,
+                        top: iframeWindow.top
+                    });
+
+                    // #region agent log - HYPOTHESIS: UnifiedCRUDService not found in iframe
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({
+                            location:'crud_testing_dashboard.js:unified-crud-not-found',
+                            message:'UnifiedCRUDService not found in iframe after timeout',
+                            data:{
+                                iframeWindowKeys: Object.keys(iframeWindow).filter(key => key.includes('Unified') || key.includes('CRUD')),
+                                hasUnifiedCRUD: !!iframeWindow.UnifiedCRUDService,
+                                iframeLocation: iframeWindow.location?.href,
+                                iframeReadyState: iframeDoc.readyState,
+                                globalInitState: iframeWindow.globalInitializationState,
+                                scriptsLoaded: Array.from(iframeDoc.querySelectorAll('script')).map(s => s.src).filter(src => src.includes('unified-crud'))
+                            },
+                            timestamp:Date.now(),
+                            sessionId:'debug-session',
+                            runId:'unified-crud-missing-debug',
+                            hypothesisId:'UNIFIED_CRUD_MISSING'
+                        })
+                    }).catch(()=>{});
+                    // #endregion
+
+                    throw new Error('UnifiedCRUDService not loaded in iframe after 30 seconds');
                 }
 
                 if (!iframeWindow.globalInitializationState?.unifiedAppInitialized) {
@@ -1168,6 +1347,193 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Run Info Summary tests within an iframe
+     */
+    async runInfoSummaryTestsInIframe(iframeWindow, iframeDocument, pageKey, page) {
+        try {
+            this.logger?.debug('🔍 [runInfoSummaryTestsInIframe] Starting Info Summary tests', { pageKey, pageName: page.name });
+
+            // Get config for this page
+            const configKey = this.getConfigKeyForPage(pageKey);
+            const config = window.INFO_SUMMARY_CONFIGS?.[configKey];
+
+            if (!config) {
+                return {
+                    status: 'failed',
+                    issues: [`לא נמצאה הגדרת Info Summary עבור עמוד ${page.name} (configKey: ${configKey})`],
+                    warnings: []
+                };
+            }
+
+            // Inject test functions into iframe
+            const testFunction = this.createInfoSummaryTestFunction(config);
+            iframeWindow.eval(testFunction);
+
+            // Run the tests
+            const result = await iframeWindow.runInfoSummaryElementTests();
+
+            this.logger?.debug('🔍 [runInfoSummaryTestsInIframe] Test result:', result);
+
+            return {
+                status: result.success ? 'success' : 'failed',
+                issues: result.issues || [],
+                warnings: result.warnings || [],
+                details: {
+                    configKey,
+                    statsTested: result.statsTested || 0,
+                    nonZeroValues: result.nonZeroValues || 0,
+                    totalValues: result.totalValues || 0
+                }
+            };
+
+        } catch (error) {
+            this.logger?.error('❌ [runInfoSummaryTestsInIframe] Test execution failed', {
+                pageKey,
+                error: error.message,
+                page: page.name
+            });
+            return {
+                status: 'failed',
+                issues: [`שגיאה בביצוע בדיקות: ${error.message}`],
+                warnings: []
+            };
+        }
+    }
+
+    /**
+     * Get config key for a page
+     */
+    getConfigKeyForPage(pageKey) {
+        const pageKeyToConfigKey = {
+            'index': 'dashboard',
+            'trades': 'trades',
+            'trade_plans': 'trade_plans',
+            'alerts': 'alerts',
+            'tickers': 'tickers',
+            'ticker_dashboard': 'ticker_dashboard',
+            'trading_accounts': 'trading_accounts',
+            'executions': 'executions',
+            'cash_flows': 'cash_flows'
+        };
+        return pageKeyToConfigKey[pageKey] || pageKey;
+    }
+
+    /**
+     * Create Info Summary test function to inject into iframe
+     */
+    createInfoSummaryTestFunction(config) {
+        return `
+            window.runInfoSummaryElementTests = async function() {
+                try {
+                    const issues = [];
+                    const warnings = [];
+                    let statsTested = 0;
+                    let nonZeroValues = 0;
+                    let totalValues = 0;
+
+                    console.log('🔍 [InfoSummaryTest] Starting tests for config:', '${config.containerId}');
+
+                    // Wait for Info Summary system to be available
+                    let attempts = 0;
+                    while (!window.InfoSummarySystem && attempts < 50) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        attempts++;
+                    }
+
+                    if (!window.InfoSummarySystem) {
+                        return {
+                            success: false,
+                            issues: ['מערכת Info Summary לא זמינה'],
+                            warnings: []
+                        };
+                    }
+
+                    // Check if container exists
+                    const container = document.getElementById('${config.containerId}');
+                    if (!container) {
+                        return {
+                            success: false,
+                            issues: ['קונטיינר Info Summary לא נמצא: ${config.containerId}'],
+                            warnings: []
+                        };
+                    }
+
+                    // Check if stats are configured
+                    if (!${JSON.stringify(config.stats)} || ${JSON.stringify(config.stats)}.length === 0) {
+                        return {
+                            success: false,
+                            issues: ['לא נמצאו הגדרות סטטיסטיקות'],
+                            warnings: []
+                        };
+                    }
+
+                    // Test each stat
+                    const stats = ${JSON.stringify(config.stats)};
+                    for (const stat of stats) {
+                        statsTested++;
+
+                        // Find the stat element
+                        const statElement = container.querySelector('[data-stat-id="' + stat.id + '"]');
+                        if (!statElement) {
+                            issues.push('רכיב סטטיסטיקה לא נמצא: ' + stat.id);
+                            continue;
+                        }
+
+                        // Find the value element (usually .stat-value or similar)
+                        const valueElement = statElement.querySelector('.stat-value, .value, [class*="value"]');
+                        if (!valueElement) {
+                            issues.push('רכיב ערך לא נמצא עבור סטטיסטיקה: ' + stat.id);
+                            continue;
+                        }
+
+                        const rawValue = valueElement.textContent?.trim() || '';
+                        const numericValue = parseFloat(rawValue.replace(/[^0-9.-]/g, ''));
+
+                        totalValues++;
+
+                        // Check if value is a valid number and non-zero
+                        if (isNaN(numericValue)) {
+                            issues.push('ערך לא תקין עבור ' + stat.label + ': "' + rawValue + '"');
+                        } else if (numericValue === 0) {
+                            issues.push('ערך אפס עבור ' + stat.label + ' - חובה שהערך יהיה שונה מ-0');
+                        } else {
+                            nonZeroValues++;
+                        }
+
+                        console.log('🔍 [InfoSummaryTest] Checked stat:', stat.id, '=', rawValue, '(numeric:', numericValue, ')');
+                    }
+
+                    const success = issues.length === 0;
+                    console.log('🔍 [InfoSummaryTest] Test completed:', {
+                        success,
+                        statsTested,
+                        nonZeroValues,
+                        totalValues,
+                        issuesCount: issues.length
+                    });
+
+                    return {
+                        success,
+                        issues,
+                        warnings,
+                        statsTested,
+                        nonZeroValues,
+                        totalValues
+                    };
+
+                } catch (error) {
+                    console.error('❌ [InfoSummaryTest] Test execution failed:', error);
+                    return {
+                        success: false,
+                        issues: ['שגיאה בביצוע הבדיקה: ' + error.message],
+                        warnings: []
+                    };
+                }
+            };
+        `;
+    }
+
+    /**
      * Run tag management tests (categories and tags)
      */
     async runTagManagementTests() {
@@ -1195,7 +1561,7 @@ class IntegratedCRUDE2ETester {
 
         } catch (error) {
             this.logger?.error('❌ Tag management tests failed', { error: error.message });
-            
+
             this.results.e2e.push({
                 workflow: 'Tag Management CRUD',
                 status: 'failed',
@@ -1234,9 +1600,9 @@ class IntegratedCRUDE2ETester {
             this.stats.passed++;
             this.stats.totalTests++;
 
-            } catch (error) {
+        } catch (error) {
             this.logger?.error('❌ Preferences tests failed', { error: error.message });
-            
+
             this.results.e2e.push({
                 workflow: 'Preferences CRUD',
                 status: 'failed',
@@ -1273,7 +1639,7 @@ class IntegratedCRUDE2ETester {
 
         } catch (error) {
             this.logger?.error('❌ Data import tests failed', { error: error.message });
-            
+
             this.results.e2e.push({
                 workflow: 'Data Import CRUD',
                 status: 'failed',
@@ -1467,7 +1833,7 @@ class IntegratedCRUDE2ETester {
                     }
                 }, 120000);
 
-        } catch (error) {
+            } catch (error) {
                 this.logger?.error('❌ [loadPageInIframe] Error creating iframe', { error, pageUrl });
                 reject(error);
             }
@@ -1657,7 +2023,7 @@ class IntegratedCRUDE2ETester {
                         'system'
                     );
                 }
-                    } else {
+            } else {
                 if (window.NotificationSystem && window.NotificationSystem.showWarning) {
                     window.NotificationSystem.showWarning(
                         'בדיקות Info Summary הושלמו עם כשלים',
@@ -1912,6 +2278,28 @@ class IntegratedCRUDE2ETester {
         }).catch(()=>{});
         // #endregion
 
+        // #region agent log - H1: Results processing debug
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:updateTestResultsTable:processing',
+                message:'Processing results for display',
+                data:{
+                    rawResultsKeys:Object.keys(this.results),
+                    crossPageSortingCount:this.results?.crossPage?.sorting?.length || 0,
+                    crossPageSortingPages:this.results?.crossPage?.sorting?.map(r => ({page: r.page, message: r.message?.substring(0, 50)})) || [],
+                    allResultsCount:allResults.length,
+                    allResultsSample:allResults.slice(0, 3).map(r => ({page: r.page, testType: r.testType, status: r.status, message: r.message?.substring(0, 50)}))
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'results-display-debug',
+                hypothesisId:'H1_RESULTS_STORAGE'
+            })
+        }).catch(()=>{});
+        // #endregion
+
         console.log('🔍 DEBUG: updateTestResultsTable - raw results structure:', JSON.stringify(this.results, null, 2));
         console.log('🔍 DEBUG: updateTestResultsTable - processed allResults:', allResults.length, allResults.map(r => ({ page: r.page, testType: r.testType, status: r.status })));
 
@@ -1955,7 +2343,40 @@ class IntegratedCRUDE2ETester {
             const testTypeValue = result.testType || 'entity';
             const statusValue = result.status || 'unknown';
             const timeValue = result.executionTime || 0;
+
+            // #region agent log - MESSAGE FIELD DEBUG
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:updateTestResultsTable:row-processing',
+                    message:`Processing row for ${pageValue}`,
+                    data:{
+                        pageValue,
+                        testTypeValue,
+                        resultKeys:Object.keys(result),
+                        hasError:!!result.error,
+                        hasMessage:!!result.message,
+                        errorValue:result.error?.substring(0, 50),
+                        messageValue:result.message?.substring(0, 50),
+                        finalMessageValue:(result.error || result.message || 'Test completed').substring(0, 50),
+                        fullResult:JSON.stringify(result).substring(0, 200)
+                    },
+                    timestamp:Date.now(),
+                    sessionId:'debug-session',
+                    runId:'table-message-debug',
+                    hypothesisId:'MESSAGE_FIELD_DEBUG'
+                })
+            }).catch(()=>{});
+            // #endregion
+
             const messageValue = result.error || result.message || 'Test completed';
+
+            // Show table count info in details column for sorting tests
+            let detailsValue = messageValue;
+            if (result.testType === 'sorting' && result.tablesTested !== undefined && result.tablesFound !== undefined) {
+                detailsValue = `טבלאות: ${result.tablesTested}/${result.tablesFound} - ${messageValue}`;
+            }
 
             row.innerHTML = `
                 <td class="text-center fw-bold">${index + 1}</td>
@@ -1963,7 +2384,7 @@ class IntegratedCRUDE2ETester {
                 <td>${testTypeValue}</td>
                 <td class="${statusClass}">${statusIcon} ${statusValue}</td>
                 <td>${timeValue}ms</td>
-                <td>${messageValue}</td>
+                <td>${detailsValue}</td>
             `;
 
             console.log(`🔍 DEBUG: Created row HTML:`, row.innerHTML);
@@ -2008,6 +2429,51 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Wait for page to fully load and initialize
+     * @param {Window} iframeWindow - The iframe's window object
+     * @param {Document} iframeDocument - The iframe's document object
+     * @param {number} timeout - Maximum wait time in milliseconds (default: 10000)
+     */
+    async waitForPageLoad(iframeWindow, iframeDocument, timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            let resolved = false;
+
+            const resolveOnce = () => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve();
+                }
+            };
+
+            // Check if document is already ready
+            if (iframeDocument.readyState === 'complete') {
+                // Wait additional 3 seconds for async operations
+                setTimeout(resolveOnce, 3000);
+            } else {
+                // Wait for document to be ready
+                const checkReady = () => {
+                    if (iframeDocument.readyState === 'complete') {
+                        // Wait additional 3 seconds for async operations
+                        setTimeout(resolveOnce, 3000);
+                    } else {
+                        setTimeout(checkReady, 100);
+                    }
+                };
+                checkReady();
+            }
+
+            // Timeout after specified time
+            setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    this.logger?.warn(`⏰ [waitForPageLoad] Timeout waiting for page load (${timeout}ms)`);
+                    resolve(); // Resolve anyway to continue testing
+                }
+            }, timeout);
+        });
+    }
+
+    /**
      * Test info summary for a single page
      */
     async testPageInfoSummary(pageKey, page) {
@@ -2030,7 +2496,7 @@ class IntegratedCRUDE2ETester {
             }
             
             const iframe = await this.loadPageInIframe(pageUrl);
-                    const iframeWindow = iframe.contentWindow;
+            const iframeWindow = iframe.contentWindow;
             const iframeDocument = iframe.contentDocument;
 
             // Capture console errors from iframe
@@ -2045,7 +2511,7 @@ class IntegratedCRUDE2ETester {
                         if (typeof arg === 'object') {
                             try {
                                 return JSON.stringify(arg);
-                } catch (e) {
+                            } catch (e) {
                                 return String(arg);
                             }
                         }
@@ -2206,22 +2672,49 @@ class IntegratedCRUDE2ETester {
                             });
                         }
                     });
+                }
             }
-        }
-        
-    } catch (error) {
+
+            // Wait for page to fully load and initialize
+            if (typeof this.waitForPageLoad !== 'function') {
+                console.error('DEBUG: this.waitForPageLoad is not a function', {
+                    this: this,
+                    hasWaitForPageLoad: 'waitForPageLoad' in this,
+                    thisKeys: Object.keys(this)
+                });
+                throw new Error('waitForPageLoad method is not available');
+            }
+            await this.waitForPageLoad(iframeWindow, iframeDocument, 10000);
+
+            // Inject and run Info Summary tests
+            const testResult = await this.runInfoSummaryTestsInIframe(iframeWindow, iframeDocument, pageKey, page);
+
+            // Return success result with test details
+            return {
+                page: page.name,
+                pageKey,
+                status: testResult.status,
+                issues: testResult.issues || [],
+                warnings: testResult.warnings || [],
+                consoleErrors: consoleErrors,
+                executionTime: Date.now() - startTime,
+                ...testResult.details
+            };
+
+        } catch (error) {
             this.logger?.error('❌ [testPageInfoSummary] Test failed', {
                 pageKey,
                 error: error.message,
                 page: page.name
             });
-        return {
+            return {
                 page: page.name,
                 pageKey,
                 status: 'failed',
                 error: error.message,
                 issues: [`Test error: ${error.message}`],
                 warnings: [],
+                consoleErrors: consoleErrors,
                 executionTime: Date.now() - startTime
             };
         } finally {
@@ -2553,10 +3046,141 @@ window.initializeCRUDTestingDashboard = initializeCRUDTestingDashboard;
  * @param {string} groupDisplayName - Display name for the group
  */
 // Function to run sorting tests on all groups with tables
-window.runAllTableSortingTests = async function() {
-    const groupsWithTables = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+// Individual Sorting Test Functions
+window.runIndexSortingTest = async function() {
+    console.log('🔍 DEBUG: runIndexSortingTest called');
+    await runSortingTestForSinglePage('index');
+};
 
-    console.log(`🚀 Starting comprehensive table sorting test on ${groupsWithTables.length} groups`);
+window.runTradesSortingTest = async function() {
+    console.log('🔍 DEBUG: runTradesSortingTest called');
+    await runSortingTestForSinglePage('trades');
+};
+
+window.runExecutionsSortingTest = async function() {
+    console.log('🔍 DEBUG: runExecutionsSortingTest called');
+    await runSortingTestForSinglePage('executions');
+};
+
+window.runAlertsSortingTest = async function() {
+    console.log('🔍 DEBUG: runAlertsSortingTest called');
+    await runSortingTestForSinglePage('alerts');
+};
+
+window.runTradePlansSortingTest = async function() {
+    console.log('🔍 DEBUG: runTradePlansSortingTest called');
+    await runSortingTestForSinglePage('trade_plans');
+};
+
+window.runTickersSortingTest = async function() {
+    console.log('🔍 DEBUG: runTickersSortingTest called');
+    await runSortingTestForSinglePage('tickers');
+};
+
+window.runTradingAccountsSortingTest = async function() {
+    console.log('🔍 DEBUG: runTradingAccountsSortingTest called');
+    await runSortingTestForSinglePage('trading_accounts');
+};
+
+window.runNotesSortingTest = async function() {
+    console.log('🔍 DEBUG: runNotesSortingTest called');
+    await runSortingTestForSinglePage('notes');
+};
+
+window.runCashFlowsSortingTest = async function() {
+    console.log('🔍 DEBUG: runCashFlowsSortingTest called');
+    await runSortingTestForSinglePage('cash_flows');
+};
+
+window.runTradeHistorySortingTest = async function() {
+    console.log('🔍 DEBUG: runTradeHistorySortingTest called');
+    await runSortingTestForSinglePage('trade_history');
+};
+
+window.runTradingJournalSortingTest = async function() {
+    console.log('🔍 DEBUG: runTradingJournalSortingTest called');
+    await runSortingTestForSinglePage('trading_journal');
+};
+
+window.runWatchListsSortingTest = async function() {
+    console.log('🔍 DEBUG: runWatchListsSortingTest called');
+    await runSortingTestForSinglePage('watch_lists');
+};
+
+window.runPortfolioStateSortingTest = async function() {
+    console.log('🔍 DEBUG: runPortfolioStateSortingTest called');
+    await runSortingTestForSinglePage('portfolio_state');
+};
+
+
+
+window.runDataImportSortingTest = async function() {
+    console.log('🔍 DEBUG: runDataImportSortingTest called');
+    await runSortingTestForSinglePage('data_import');
+};
+
+window.runTagManagementSortingTest = async function() {
+    console.log('🔍 DEBUG: runTagManagementSortingTest called');
+    await runSortingTestForSinglePage('tag_management');
+};
+
+
+
+window.runDevToolsSortingTest = async function() {
+    console.log('🔍 DEBUG: runDevToolsSortingTest called');
+    await runSortingTestForSinglePage('dev_tools');
+};
+
+window.runCrudDashboardSortingTest = async function() {
+    console.log('🔍 DEBUG: runCrudDashboardSortingTest called');
+    await runSortingTestForSinglePage('crud_testing_dashboard');
+};
+
+
+// Helper function for individual sorting tests
+async function runSortingTestForSinglePage(pageKey) {
+    if (!window.sortingTester) {
+        console.error('❌ SortingTestingSystem not available');
+        return;
+    }
+
+    // Find the page configuration
+    const allPages = [
+        ...window.crossPageTester.pageGroups.user,
+        ...window.crossPageTester.pageGroups.userManagement,
+        ...window.crossPageTester.pageGroups.developmentTools,
+        ...window.crossPageTester.pageGroups.testing,
+        ...window.crossPageTester.pageGroups.technical
+    ];
+
+    const page = allPages.find(p => p.key === pageKey);
+    if (!page) {
+        console.error(`❌ Page not found: ${pageKey}`);
+        return;
+    }
+
+    if (!page.hasTables) {
+        console.warn(`⚠️ Page ${page.name} does not have tables`);
+        return;
+    }
+
+    try {
+        await window.sortingTester.testSorting(page);
+        console.log(`✅ Individual sorting test completed for ${page.name}`);
+    } catch (error) {
+        console.error(`❌ Error in individual sorting test for ${page.name}:`, error);
+    }
+}
+
+// Comprehensive sorting test function
+// Comprehensive sorting test function
+window.runAllTableSortingTests = async function() {
+    if (!window.sortingTester) {
+        console.error('❌ SortingTestingSystem not available for comprehensive test');
+        return;
+    }
+
+    console.log('🚀 Starting comprehensive sorting test using individual tests');
 
     // #region agent log - HYPOTHESIS: Comprehensive test start
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -2564,9 +3188,9 @@ window.runAllTableSortingTests = async function() {
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
             location:'crud_testing_dashboard.js:runAllTableSortingTests:start',
-            message:`Starting comprehensive sorting test on ${groupsWithTables.length} groups`,
+            message:'Starting comprehensive sorting test using individual tests',
             data:{
-                groupsWithTables:groupsWithTables,
+                sortingTesterExists:!!window.sortingTester,
                 crudTesterExists:!!window.crudTester,
                 crossPageTesterExists:!!window.crossPageTester
             },
@@ -2578,80 +3202,96 @@ window.runAllTableSortingTests = async function() {
     }).catch(()=>{});
     // #endregion
 
+    try {
+        // Run all individual sorting tests sequentially to avoid duplication
+        const sortingTestFunctions = [
+            window.runIndexSortingTest,
+            window.runTradesSortingTest,
+            window.runExecutionsSortingTest,
+            window.runAlertsSortingTest,
+            window.runTradePlansSortingTest,
+            window.runTickersSortingTest,
+            window.runTradingAccountsSortingTest,
+            window.runNotesSortingTest,
+            window.runCashFlowsSortingTest,
+            window.runTradeHistorySortingTest,
+            window.runTradingJournalSortingTest,
+            window.runWatchListsSortingTest,
+            window.runPortfolioStateSortingTest,
+            window.runDataImportSortingTest,
+            window.runTagManagementSortingTest,
+            window.runDevToolsSortingTest,
+            window.runCrudDashboardSortingTest
+        ];
+
+        for (const testFunc of sortingTestFunctions) {
+            try {
+                await testFunc();
+                // Small delay between tests to prevent overwhelming the system
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                console.error('❌ Error in sorting test function:', error);
+            }
+        }
+
+        console.log('✅ Comprehensive sorting test completed');
+
+        // #region agent log - HYPOTHESIS: Comprehensive test end
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runAllTableSortingTests:end',
+                message:'Comprehensive sorting test completed using individual tests',
+                data:{
+                    totalTestFunctions:sortingTestFunctions.length,
+                    sortingTesterResults:window.sortingTester ? window.sortingTester.testedPages.size : 0
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'comprehensive-sorting-test',
+                hypothesisId:'COMPREHENSIVE_TEST_END'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+    } catch (error) {
+        console.error('❌ Error in comprehensive sorting test:', error);
+
+        // #region agent log - HYPOTHESIS: Comprehensive test error
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:runAllTableSortingTests:error',
+                message:'Error in comprehensive sorting test',
+                data:{
+                    error:error.message,
+                    stack:error.stack?.substring(0, 500)
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'comprehensive-sorting-test',
+                hypothesisId:'COMPREHENSIVE_TEST_ERROR'
+            })
+        }).catch(()=>{});
+        // #endregion
+    }
+
     // Run tests sequentially with small delay between groups
+    const groupsWithTables = ['user', 'userManagement', 'developmentTools', 'testing', 'technical'];
+
     for (let i = 0; i < groupsWithTables.length; i++) {
         const groupName = groupsWithTables[i];
         try {
             console.log(`📋 Testing group ${i+1}/${groupsWithTables.length}: ${groupName}`);
 
-            // #region agent log - HYPOTHESIS: Group test start
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-start',
-                    message:`Starting test for group: ${groupName}`,
-                    data:{
-                        groupName:groupName,
-                        groupIndex:i,
-                        totalGroups:groupsWithTables.length,
-                        sortingResultsBefore:this.results?.crossPage?.sorting?.length || 0
-                    },
-                    timestamp:Date.now(),
-                    sessionId:'debug-session',
-                    runId:'comprehensive-sorting-test',
-                    hypothesisId:'GROUP_TEST_START'
-                })
-            }).catch(()=>{});
-            // #endregion
-
-            await runCrossPageTestForGroup(groupName, 'sorting', `${groupName} - מיון`);
-
-            // #region agent log - HYPOTHESIS: Group test end
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-end',
-                    message:`Completed test for group: ${groupName}`,
-                    data:{
-                        groupName:groupName,
-                        groupIndex:i,
-                        sortingResultsAfter:this.results?.crossPage?.sorting?.length || 0,
-                        lastResults:this.results?.crossPage?.sorting?.slice(-3) || []
-                    },
-                    timestamp:Date.now(),
-                    sessionId:'debug-session',
-                    runId:'comprehensive-sorting-test',
-                    hypothesisId:'GROUP_TEST_END'
-                })
-            }).catch(()=>{});
-            // #endregion
+            await window.runCrossPageTestForGroup(groupName, 'sorting', `${groupName} - מיון`);
 
             // Small delay between groups to prevent overwhelming the system
             await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
             console.error(`❌ Error testing group ${groupName}:`, error);
-
-            // #region agent log - HYPOTHESIS: Group test error
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    location:'crud_testing_dashboard.js:runAllTableSortingTests:group-error',
-                    message:`Error testing group: ${groupName}`,
-                    data:{
-                        groupName:groupName,
-                        error:error.message,
-                        sortingResultsCount:this.results?.crossPage?.sorting?.length || 0
-                    },
-                    timestamp:Date.now(),
-                    sessionId:'debug-session',
-                    runId:'comprehensive-sorting-test',
-                    hypothesisId:'GROUP_TEST_ERROR'
-                })
-            }).catch(()=>{});
-            // #endregion
         }
     }
 
@@ -2659,26 +3299,6 @@ window.runAllTableSortingTests = async function() {
 
     // Show final comprehensive summary
     showComprehensiveTestSummary('sorting', groupsWithTables.length);
-
-    // #region agent log - HYPOTHESIS: Comprehensive test end
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-            location:'crud_testing_dashboard.js:runAllTableSortingTests:end',
-            message:`Comprehensive sorting test completed`,
-            data:{
-                totalGroups:groupsWithTables.length,
-                finalSortingResultsCount:this.results?.crossPage?.sorting?.length || 0,
-                allResultsCount:this.results ? Object.keys(this.results).reduce((sum, key) => sum + (Array.isArray(this.results[key]) ? this.results[key].length : 0), 0) : 0
-            },
-            timestamp:Date.now(),
-            sessionId:'debug-session',
-            runId:'comprehensive-sorting-test',
-            hypothesisId:'COMPREHENSIVE_TEST_END'
-        })
-    }).catch(()=>{});
-    // #endregion
 };
 
 // Function to show comprehensive test summary after all groups are tested
@@ -2826,6 +3446,30 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 })
             }).catch(()=>{});
             // #endregion
+
+            // Initialize SortingTestingSystem after crossPageTester is created
+            if (!window.sortingTester && window.SortingTestingSystem) {
+                window.sortingTester = new window.SortingTestingSystem(window.crossPageTester);
+                console.log('✅ SortingTestingSystem initialized');
+                // #region agent log - HYPOTHESIS 4: SortingTestingSystem initialized
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'crud_testing_dashboard.js:runCrossPageTestForGroup:sortingTester-initialized',
+                        message:`SortingTestingSystem initialized successfully`,
+                        data:{
+                            sortingTesterType:typeof window.sortingTester,
+                            crossPageTesterPassed:!!window.crossPageTester
+                        },
+                        timestamp:Date.now(),
+                        sessionId:'debug-session',
+                        runId:'sorting-test-debug',
+                        hypothesisId:'H4_SORTING_INITIALIZED'
+                    })
+                }).catch(()=>{});
+                // #endregion
+            }
         }
 
         // Show progress
@@ -2892,7 +3536,13 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                         await window.crossPageTester.testColors(page);
                         break;
                     case 'sorting':
-                        await window.crossPageTester.testSorting(page);
+                        // Use SortingTestingSystem instead of direct crossPageTester.testSorting
+                        if (window.sortingTester && typeof window.sortingTester.testSorting === 'function') {
+                            await window.sortingTester.testSorting(page);
+                        } else {
+                            console.warn('⚠️ SortingTestingSystem not available, using fallback');
+                            await window.crossPageTester.testSorting(page);
+                        }
                         break;
                     case 'sections':
                         await window.crossPageTester.testSections(page);
@@ -3207,6 +3857,8 @@ window.runAllDefaultsTests = async function() {
     }
 };
 
+// SortingTestingSystem is now initialized in runCrossPageTestForGroup when needed
+
 // Log that button system tests function is available
 window.Logger?.debug('crud_testing_dashboard.js loaded', {
     page: 'crud-testing-dashboard',
@@ -3216,6 +3868,9 @@ window.Logger?.debug('crud_testing_dashboard.js loaded', {
     runAllColorsTests: typeof window.runAllColorsTests,
     runAllSectionsTests: typeof window.runAllSectionsTests,
     runAllFiltersTests: typeof window.runAllFiltersTests,
-    runAllDefaultsTests: typeof window.runAllDefaultsTests
+    runAllDefaultsTests: typeof window.runAllDefaultsTests,
+    sortingTester: typeof window.sortingTester,
+    runIndexSortingTest: typeof window.runIndexSortingTest,
+    runAllTableSortingTests: typeof window.runAllTableSortingTests
 });
 

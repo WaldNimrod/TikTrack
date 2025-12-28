@@ -160,7 +160,7 @@
 
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists?_ts=${Date.now()}`;
+    const url = `${base}${separator}api/watch_lists?_ts=${Date.now()}`;
     
     const doFetch = async (attempt = 0) => {
       const response = await fetch(url, { 
@@ -231,7 +231,7 @@
     const { forceReload = false, signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}?_ts=${Date.now()}`;
+    const url = `${base}${separator}api/watch_lists/${listId}?_ts=${Date.now()}`;
     
     try {
       const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, });
@@ -257,7 +257,7 @@
     const { signal, maxRetries = 2 } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}/items?_ts=${Date.now()}`;
+    const url = `${base}${separator}api/watch_lists/${listId}/items?_ts=${Date.now()}`;
     
     const doFetch = async (attempt = 0) => {
       try {
@@ -307,7 +307,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists`;
+    const url = `${base}${separator}api/watch_lists`;
     
     try {
       const response = await fetch(url, {
@@ -336,7 +336,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}`;
+    const url = `${base}${separator}api/watch_lists/${listId}`;
     
     try {
       const response = await fetch(url, {
@@ -366,7 +366,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}`;
+    const url = `${base}${separator}api/watch_lists/${listId}`;
     
     try {
       const response = await fetch(url, {
@@ -397,7 +397,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}/items`;
+    const url = `${base}${separator}api/watch_lists/${listId}/items`;
     
     try {
       const response = await fetch(url, {
@@ -432,7 +432,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/items/${itemId}`;
+    const url = `${base}${separator}api/watch_lists/items/${itemId}`;
     
     try {
       window.Logger?.debug?.('🔄 Updating watch list item', {
@@ -494,7 +494,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/items/${itemId}`;
+    const url = `${base}${separator}api/watch_lists/items/${itemId}`;
     
     try {
       const response = await fetch(url, {
@@ -526,7 +526,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/${listId}/items/reorder`;
+    const url = `${base}${separator}api/watch_lists/${listId}/items/reorder`;
     
     try {
       const response = await fetch(url, {
@@ -559,7 +559,7 @@
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/flag-lists/sync`;
+    const url = `${base}${separator}api/watch_lists/flag-lists/sync`;
     
     try {
       const response = await fetch(url, {
@@ -605,7 +605,7 @@
     
     // Use entityType for identification (constant), not color (varies by user)
     const identifier = entityType || flagColor;
-    const url = `${base}${separator}api/watch-lists/flag-lists/${encodeURIComponent(identifier)}/sync`;
+    const url = `${base}${separator}api/watch_lists/flag-lists/${encodeURIComponent(identifier)}/sync`;
     
     try {
       // Send color in body for display purposes (from user preferences)

@@ -19,7 +19,7 @@
 
 ## 1. Watch Lists Data Service
 
-**קובץ:** `trading-ui/scripts/services/watch-lists-data.js`
+**קובץ:** `trading-ui/scripts/services/watch_lists-data.js`
 
 ### מטרה
 
@@ -210,7 +210,7 @@ window.showErrorNotification('שגיאה ביצירת רשימה', errorMessage)
 
 ## 2. Watch Lists UI Service
 
-**קובץ:** `trading-ui/scripts/services/watch-lists-ui-service.js`
+**קובץ:** `trading-ui/scripts/services/watch_lists-ui-service.js`
 
 ### מטרה
 

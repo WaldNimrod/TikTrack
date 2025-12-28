@@ -1598,11 +1598,11 @@ class HistoricalDataBusinessService(BaseBusinessService):
                     Alert.user_id == user_id,
                     or_(
                         Alert.created_at >= start_date,
-                        Alert.triggered_at >= start_date if Alert.triggered_at else False
+                        Alert.triggered_at >= start_date
                     ),
                     or_(
                         Alert.created_at <= end_date,
-                        Alert.triggered_at <= end_date if Alert.triggered_at else False
+                        Alert.triggered_at <= end_date
                     )
                 ).scalar() or 0
                 by_type['alert'] = alert_count
@@ -2476,4 +2476,3 @@ class HistoricalDataBusinessService(BaseBusinessService):
     def log_business_event(self, event_type: str, data: Dict[str, Any]) -> None:
         """Log business event for monitoring."""
         self.logger.debug(f"Business event: {event_type}", extra={'data': data})
-

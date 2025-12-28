@@ -112,6 +112,9 @@ def test_preview_generation_success(client, monkeypatch):
         def __init__(self, db):
             self.db = db
 
+        def get_preview_snapshot(self, session_id):
+            return {'success': True, 'preview_data': {'rows': [1, 2]}}
+
         def generate_preview(self, session_id, task_type=None):
             return {'success': True, 'preview_data': {'rows': [1, 2]}}
 
@@ -279,6 +282,9 @@ def test_preview_generation_success(client, monkeypatch):
     class DummyOrchestrator:
         def __init__(self, db):
             self.db = db
+
+        def get_preview_snapshot(self, session_id):
+            return {'success': True, 'preview_data': {'rows': [1, 2]}}
 
         def generate_preview(self, session_id, task_type=None):
             return {'success': True, 'preview_data': {'rows': [1, 2]}}

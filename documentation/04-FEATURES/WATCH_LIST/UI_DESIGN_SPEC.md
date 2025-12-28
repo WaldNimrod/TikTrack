@@ -10,7 +10,7 @@
 
 ## מבנה עמוד ראשי
 
-**קובץ:** `trading-ui/watch-lists.html`
+**קובץ:** `trading-ui/watch_lists.html` (HTML/URL underscore)
 
 ### Layout Structure
 
@@ -521,9 +521,6 @@
 ---
 
 **סיכום:** הממשק תומך בכל הדרישות עם תמיכה מלאה ב-RTL, Responsive Design, ו-Accessibility.
-
-
-
 
 
 

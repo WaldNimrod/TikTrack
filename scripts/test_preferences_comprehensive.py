@@ -127,7 +127,7 @@ def test_preference_types(driver):
         {"id": "atr_period", "value": "21", "type": "number"},
         {"id": "default_trading_account", "value": "1", "type": "select"},
         # UI settings (string/select)
-        {"id": "default_currency", "value": "USD", "type": "select"},
+        {"id": "primaryCurrency", "value": "USD", "type": "select"},
         # Colors (color picker)
         {"id": "primary_color", "value": "#26baac", "type": "color"},
     ]
@@ -320,7 +320,7 @@ def test_default_values(driver):
     
     try:
         # Check if preferences are loaded (elements have values)
-        test_fields = ["atr_period", "default_currency", "default_trading_account"]
+        test_fields = ["atr_period", "primaryCurrency", "default_trading_account"]
         
         loaded_count = 0
         for field_id in test_fields:

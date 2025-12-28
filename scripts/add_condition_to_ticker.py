@@ -164,7 +164,7 @@ def main():
         print(f"\n✅ Condition created successfully!")
         print(f"   Condition ID: {condition.get('id')}")
         print(f"   Method: {method.get('name_he', 'N/A')}")
-        print(f"\n💡 Now check the dashboard: http://localhost:8080/ticker-dashboard.html?tickerId={ticker_id}")
+        print(f"\n💡 Now check the dashboard: http://localhost:8080/ticker_dashboard.html?tickerId={ticker_id}")
     else:
         print("\n❌ Failed to create condition")
 

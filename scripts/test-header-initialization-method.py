@@ -16,7 +16,7 @@ project_root = Path(__file__).parent.parent
 trading_ui_dir = project_root / 'trading-ui'
 
 # Auth pages to skip
-AUTH_PAGES = ['login.html', 'register.html', 'forgot-password.html', 'reset-password.html']
+AUTH_PAGES = ['login.html', 'register.html', 'forgot_password.html', 'reset_password.html']
 
 def get_all_html_pages():
     """Get all HTML pages except auth pages and test pages"""

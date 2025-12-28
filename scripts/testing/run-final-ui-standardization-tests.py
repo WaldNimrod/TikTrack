@@ -52,32 +52,32 @@ PAGES = {
         {"name": "db_display", "path": "db_display.html", "priority": 3},
         {"name": "db_extradata", "path": "db_extradata.html", "priority": 3},
         {"name": "constraints", "path": "constraints.html", "priority": 3},
-        {"name": "background-tasks", "path": "background-tasks.html", "priority": 3},
-        {"name": "server-monitor", "path": "server-monitor.html", "priority": 3},
-        {"name": "system-management", "path": "system-management.html", "priority": 3},
+        {"name": "background-tasks", "path": "background_tasks.html", "priority": 3},
+        {"name": "server-monitor", "path": "server_monitor.html", "priority": 3},
+        {"name": "system-management", "path": "system_management.html", "priority": 3},
         {"name": "cache-test", "path": "cache-test.html", "priority": 3},
-        {"name": "notifications-center", "path": "notifications-center.html", "priority": 3},
-        {"name": "css-management", "path": "css-management.html", "priority": 3},
-        {"name": "dynamic-colors-display", "path": "dynamic-colors-display.html", "priority": 3},
+        {"name": "notifications-center", "path": "notifications_center.html", "priority": 3},
+        {"name": "css-management", "path": "css_management.html", "priority": 3},
+        {"name": "dynamic-colors-display", "path": "dynamic_colors_display.html", "priority": 3},
         {"name": "designs", "path": "designs.html", "priority": 3},
-        {"name": "tradingview-test-page", "path": "tradingview-test-page.html", "priority": 3}
+        {"name": "tradingview-test-page", "path": "tradingview_test_page.html", "priority": 3}
     ],
     "secondary": [
-        {"name": "external-data-dashboard", "path": "external-data-dashboard.html", "priority": 2},
-        {"name": "chart-management", "path": "chart-management.html", "priority": 2}
+        {"name": "external-data-dashboard", "path": "external_data_dashboard.html", "priority": 2},
+        {"name": "chart-management", "path": "chart_management.html", "priority": 2}
     ],
     "mockup": [
-        {"name": "portfolio-state-page", "path": "portfolio-state-page.html", "priority": 4},
-        {"name": "trade-history-page", "path": "trade-history-page.html", "priority": 4},
-        {"name": "price-history-page", "path": "price-history-page.html", "priority": 4},
-        {"name": "comparative-analysis-page", "path": "comparative-analysis-page.html", "priority": 4},
-        {"name": "trading-journal-page", "path": "trading-journal-page.html", "priority": 4},
-        {"name": "strategy-analysis-page", "path": "strategy-analysis-page.html", "priority": 4},
-        {"name": "economic-calendar-page", "path": "economic-calendar-page.html", "priority": 4},
-        {"name": "history-widget", "path": "history-widget.html", "priority": 4},
-        {"name": "emotional-tracking-widget", "path": "emotional-tracking-widget.html", "priority": 4},
-        {"name": "date-comparison-modal", "path": "date-comparison-modal.html", "priority": 4},
-        {"name": "tradingview-test-page-mockup", "path": "tradingview-test-page.html", "priority": 4}
+        {"name": "portfolio-state-page", "path": "portfolio_state_page.html", "priority": 4},
+        {"name": "trade-history-page", "path": "trade_history_page.html", "priority": 4},
+        {"name": "price-history-page", "path": "price_history_page.html", "priority": 4},
+        {"name": "comparative-analysis-page", "path": "comparative_analysis_page.html", "priority": 4},
+        {"name": "trading-journal-page", "path": "trading_journal_page.html", "priority": 4},
+        {"name": "strategy-analysis-page", "path": "strategy_analysis_page.html", "priority": 4},
+        {"name": "economic-calendar-page", "path": "economic_calendar_page.html", "priority": 4},
+        {"name": "history-widget", "path": "history_widget.html", "priority": 4},
+        {"name": "emotional-tracking-widget", "path": "emotional_tracking_widget.html", "priority": 4},
+        {"name": "date-comparison-modal", "path": "date_comparison_modal.html", "priority": 4},
+        {"name": "tradingview-test-page-mockup", "path": "tradingview_test_page.html", "priority": 4}
     ]
 }
 

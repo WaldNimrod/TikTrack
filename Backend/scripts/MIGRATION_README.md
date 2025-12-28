@@ -13,7 +13,7 @@
 
 ## דרישות מוקדמות
 
-1. **PostgreSQL** - המערכת משתמשת ב-PostgreSQL (לא SQLite)
+1. **PostgreSQL** - המערכת משתמשת ב-PostgreSQL בלבד
 2. **pg_dump** - כלי גיבוי PostgreSQL (חייב להיות מותקן)
 3. **משתני סביבה** - משתני הסביבה של PostgreSQL מוגדרים:
    - `POSTGRES_HOST`
@@ -192,4 +192,3 @@ sudo apt-get install postgresql-client
 1. בדוק את הלוגים בקונסול
 2. בדוק את קובץ הגיבוי
 3. ודא שהשרת לא רץ בזמן המיגרציה
-

@@ -141,7 +141,7 @@ window.runComprehensiveInitializationTest()
 - cash_flows.html
 - tickers.html
 - notes.html
-- tag-management.html
+- tag_management.html
 
 ## כלי בדיקה
 

@@ -61,32 +61,32 @@
                 { name: 'db_display', path: 'db_display.html', category: 'technical', priority: 3 },
                 { name: 'db_extradata', path: 'db_extradata.html', category: 'technical', priority: 3 },
                 { name: 'constraints', path: 'constraints.html', category: 'technical', priority: 3 },
-                { name: 'background-tasks', path: 'background-tasks.html', category: 'technical', priority: 3 },
-                { name: 'server-monitor', path: 'server-monitor.html', category: 'technical', priority: 3 },
-                { name: 'system-management', path: 'system-management.html', category: 'technical', priority: 3 },
+                { name: 'background-tasks', path: 'background_tasks.html', category: 'technical', priority: 3 },
+                { name: 'server-monitor', path: 'server_monitor.html', category: 'technical', priority: 3 },
+                { name: 'system-management', path: 'system_management.html', category: 'technical', priority: 3 },
                 { name: 'cache-test', path: 'cache-test.html', category: 'technical', priority: 3 },
-                { name: 'notifications-center', path: 'notifications-center.html', category: 'technical', priority: 3 },
-                { name: 'css-management', path: 'css-management.html', category: 'technical', priority: 3 },
-                { name: 'dynamic-colors-display', path: 'dynamic-colors-display.html', category: 'technical', priority: 3 },
+                { name: 'notifications-center', path: 'notifications_center.html', category: 'technical', priority: 3 },
+                { name: 'css-management', path: 'css_management.html', category: 'technical', priority: 3 },
+                { name: 'dynamic-colors-display', path: 'dynamic_colors_display.html', category: 'technical', priority: 3 },
                 { name: 'designs', path: 'designs.html', category: 'technical', priority: 3 },
-                { name: 'tradingview-test-page', path: 'tradingview-test-page.html', category: 'technical', priority: 3 },
+                { name: 'tradingview-test-page', path: 'tradingview_test_page.html', category: 'technical', priority: 3 },
                 
                 // Secondary pages (2)
-                { name: 'external-data-dashboard', path: 'external-data-dashboard.html', category: 'secondary', priority: 2 },
-                { name: 'chart-management', path: 'chart-management.html', category: 'secondary', priority: 2 },
+                { name: 'external-data-dashboard', path: 'external_data_dashboard.html', category: 'secondary', priority: 2 },
+                { name: 'chart-management', path: 'chart_management.html', category: 'secondary', priority: 2 },
                 
                 // Mockup pages (11)
-                { name: 'portfolio-state-page', path: 'portfolio-state-page.html', category: 'mockup', priority: 4 },
-                { name: 'trade-history-page', path: 'trade-history-page.html', category: 'mockup', priority: 4 },
-                { name: 'price-history-page', path: 'price-history-page.html', category: 'mockup', priority: 4 },
-                { name: 'comparative-analysis-page', path: 'comparative-analysis-page.html', category: 'mockup', priority: 4 },
-                { name: 'trading-journal-page', path: 'trading-journal-page.html', category: 'mockup', priority: 4 },
-                { name: 'strategy-analysis-page', path: 'strategy-analysis-page.html', category: 'mockup', priority: 4 },
-                { name: 'economic-calendar-page', path: 'economic-calendar-page.html', category: 'mockup', priority: 4 },
-                { name: 'history-widget', path: 'history-widget.html', category: 'mockup', priority: 4 },
-                { name: 'emotional-tracking-widget', path: 'emotional-tracking-widget.html', category: 'mockup', priority: 4 },
-                { name: 'date-comparison-modal', path: 'date-comparison-modal.html', category: 'mockup', priority: 4 },
-                { name: 'tradingview-test-page-mockup', path: 'tradingview-test-page.html', category: 'mockup', priority: 4 }
+                { name: 'portfolio-state-page', path: 'portfolio_state_page.html', category: 'mockup', priority: 4 },
+                { name: 'trade-history-page', path: 'trade_history_page.html', category: 'mockup', priority: 4 },
+                { name: 'price-history-page', path: 'price_history_page.html', category: 'mockup', priority: 4 },
+                { name: 'comparative-analysis-page', path: 'comparative_analysis_page.html', category: 'mockup', priority: 4 },
+                { name: 'trading-journal-page', path: 'trading_journal_page.html', category: 'mockup', priority: 4 },
+                { name: 'strategy-analysis-page', path: 'strategy_analysis_page.html', category: 'mockup', priority: 4 },
+                { name: 'economic-calendar-page', path: 'economic_calendar_page.html', category: 'mockup', priority: 4 },
+                { name: 'history-widget', path: 'history_widget.html', category: 'mockup', priority: 4 },
+                { name: 'emotional-tracking-widget', path: 'emotional_tracking_widget.html', category: 'mockup', priority: 4 },
+                { name: 'date-comparison-modal', path: 'date_comparison_modal.html', category: 'mockup', priority: 4 },
+                { name: 'tradingview-test-page-mockup', path: 'tradingview_test_page.html', category: 'mockup', priority: 4 }
             ];
         }
         

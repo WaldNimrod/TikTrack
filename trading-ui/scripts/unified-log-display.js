@@ -828,8 +828,8 @@ class UnifiedLogDisplay {
             'trades.html': '/trading-ui/images/icons/tabler/chart-line.svg',
             'alerts.html': '/trading-ui/images/icons/tabler/bell.svg',
             'accounts.html': '/trading-ui/images/icons/tabler/user.svg',
-            'system-management.html': '/trading-ui/images/icons/tabler/settings.svg',
-            'notifications-center.html': '/trading-ui/images/icons/tabler/inbox.svg',
+            'system_management.html': '/trading-ui/images/icons/tabler/settings.svg',
+            'notifications_center.html': '/trading-ui/images/icons/tabler/inbox.svg',
             'preferences.html': '/trading-ui/images/icons/tabler/settings.svg',
             'tickers.html': '/trading-ui/images/icons/tabler/currency-dollar.svg',
             'executions.html': '/trading-ui/images/icons/tabler/bolt.svg',
@@ -839,11 +839,11 @@ class UnifiedLogDisplay {
             'trade_plans.html': '/trading-ui/images/icons/tabler/clipboard-list.svg',
             'db_display.html': '/trading-ui/images/icons/tabler/database.svg',
             'db_extradata.html': '/trading-ui/images/icons/tabler/database.svg',
-            'cache-management.html': '/trading-ui/images/icons/tabler/database.svg',
+            'cache_management.html': '/trading-ui/images/icons/tabler/database.svg',
             'crud_testing_dashboard.html': '/trading-ui/images/icons/tabler/flask.svg',
             'external_data_dashboard.html': '/trading-ui/images/icons/tabler/world.svg',
-            'server-monitor.html': '/trading-ui/images/icons/tabler/server.svg',
-            'css-management.html': '/trading-ui/images/icons/tabler/palette.svg',
+            'server_monitor.html': '/trading-ui/images/icons/tabler/server.svg',
+            'css_management.html': '/trading-ui/images/icons/tabler/palette.svg',
             'constraints.html': '/trading-ui/images/icons/tabler/lock.svg'
         };
         

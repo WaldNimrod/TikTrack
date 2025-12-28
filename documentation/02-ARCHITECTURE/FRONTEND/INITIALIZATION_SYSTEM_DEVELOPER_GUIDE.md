@@ -120,7 +120,7 @@ trading-ui/scripts/
 ### שלב 2: הוספת קונפיגורציה ל-`page-initialization-configs.js`
 
 ```javascript
-'my-new-page': {
+'trade_plans': {
   name: 'My New Page',
   packages: ['base', 'services', 'ui-advanced'], // Packages required for this page
   requiredGlobals: [
@@ -225,7 +225,7 @@ trading-ui/scripts/
 אם העמוד צריך את הסקריפט, הוסף את ה-package ל-`packages` array:
 
 ```javascript
-'my-page': {
+'trade_plans': {
   packages: ['base', 'my-package'], // Add my-package
   requiredGlobals: [
     'window.MyNewScript', // Add the global
@@ -399,13 +399,13 @@ npm run test:bundles -- --package=my-package
 
 ```bash
 # 1. גיבוי
-cp trading-ui/my-page.html trading-ui/my-page.html.backup
+cp trading-ui/trade_plans.html trading-ui/trade_plans.html.backup
 
 # 2. יצירת HTML עם bundles
-node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_my-page.html
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_trade_plans.html
 
 # 3. החלפה
-mv temp_my-page.html trading-ui/my-page.html
+mv temp_trade_plans.html trading-ui/trade_plans.html
 ```
 
 ### Troubleshooting Bundles

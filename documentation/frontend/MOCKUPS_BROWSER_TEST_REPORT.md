@@ -23,11 +23,11 @@
 
 #### 2. תיקון איקון notebook חסר ✅
 
-- **בעיה:** `GET http://localhost:8080/trading-ui/images/icons/entities/notebook.svg 404 (NOT FOUND)`
+- **בעיה:** `GET http://localhost:8080/images/icons/entities/notebook.svg 404 (NOT FOUND)`
 - **תיקון:**
   - הורדת `book.svg` מ-Tabler Icons
   - הוספת מיפוי `notebook: 'book'` ב-`icon-mappings.js`
-  - הוספת מיפוי לעמוד `trading-journal-page.html: 'book'`
+  - הוספת מיפוי לעמוד `trading_journal_page.html: 'book'`
 - **סטטוס:** ✅ תוקן
 
 ---

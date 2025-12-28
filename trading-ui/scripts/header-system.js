@@ -1310,10 +1310,10 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy_analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1337,6 +1337,7 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/user_profile">👤 פרופיל משתמש</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/user_management">👥 ניהול משתמשים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
@@ -1355,50 +1356,50 @@ class HeaderSystem {
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
                           <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative_analysis_page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date_comparison_modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic_calendar_page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional_tracking_widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history_widget.html">📜 ווידג'ט היסטוריה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price_history_page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy_analysis_page.html">🎯 ניתוח אסטרטגיות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview_test_page.html">📈 גראפים TV</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions_modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions_test.html">🧪 בדיקות תנאים</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add_ticker_modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag_quick_action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch_list_modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch_lists-page.html">📋 רשימות מעקב</a></li>
                           </ul>
                         </li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server_monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background_tasks">⚙️ ניהול משימות רקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications_center">🔔 מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code_quality_dashboard">📊 איכות קוד ולינטר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache_management">💾 ניהול מטמון</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init_system_management">🚀 ניהול מערכת אתחול</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/conditions-test">🧩 בדיקות תנאים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧩 בדיקות תנאים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 מוניטור אילוצים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test_header_only">🧪 בדיקת ראש הדף</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/css_management">🎨 מנהל CSS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart_management">📊 ניהול גרפים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/dynamic_colors_display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 בדיקת TradingView</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview_test_page.html">📈 בדיקת TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview_widgets_showcase">🎯 ווידג'טים TradingView</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item">

@@ -499,7 +499,7 @@ window.EODValidationService = new EODValidationService();
 
 ## שלב 4: אינטגרציה בעמודים
 
-### 4.1 דשבורד טיקר (ticker-dashboard.html)
+### 4.1 דשבורד טיקר (ticker_dashboard.html)
 
 ```javascript
 // הוסף ל-package-manifest
@@ -551,7 +551,7 @@ class TickerDashboardManager {
 }
 ```
 
-### 4.2 יומן מסחר (trading-journal.html)
+### 4.2 יומן מסחר (trading_journal.html)
 
 ```javascript
 // ב-trading-journal.js
@@ -596,7 +596,7 @@ class DashboardManager {
 }
 ```
 
-### 4.4 עמודי מוקאפ (trade-history-page.html, portfolio-state-page.html)
+### 4.4 עמודי מוקאפ (trade_history_page.html, portfolio_state_page.html)
 
 ```javascript
 // ב-trade-history-page.js

@@ -30,7 +30,7 @@ This directory contains all server-related documentation for the TikTrack system
 
 - **Framework**: Flask (Python) עם שיפורי ביצועים מתקדמים
 - **WSGI Server**: Flask development server עם Connection Pool
-- **Database**: SQLite עם 24 אינדקסים ו-Query Optimization
+- **Database**: PostgreSQL עם אינדקסים ו-Query Optimization
 - **Static Files**: Served directly by Flask
 - **API**: RESTful API with JSON responses ו-Rate Limiting
 - **Performance**: Cache System, Metrics Collection, Health Checks
@@ -84,8 +84,8 @@ Cmd+Shift+P → "Tasks: Run Task" → Select task
 
 #### **🌐 Web Dashboard Management**
 
-- **Server Monitor**: `http://localhost:8080/server-monitor`
-- **System Management**: `http://localhost:8080/system-management`
+- **Server Monitor**: `http://localhost:8080/server_monitor`
+- **System Management**: `http://localhost:8080/system_management`
 
 **Dashboard Features**:
 
@@ -176,17 +176,19 @@ python3 Backend/server_health_check.py
 
 - **FLASK_ENV**: development/production
 - **FLASK_DEBUG**: true/false
-- **DATABASE_URL**: SQLite database path
+- **DATABASE_URL**: PostgreSQL connection string
 
 ### Server Settings
 
 - **Host**: 127.0.0.1 (localhost)
 - **Port**:
   - **Development**: 8080 (workspace: `TikTrackApp`)
-  - **Production**: 5001 (workspace: `TikTrackApp-Production`)
+  - **Production**: 5001 (workspace: `TikTrackApp-Production`, worktree for branch `production`)
 - **Environment Detection**: Automatic by workspace directory name
 - **Threads**: 4 (production)
 - **Timeout**: 30 seconds
+
+**Note:** There is no `production/` folder inside `TikTrackApp`. Production runs from the separate worktree.
 
 ## 🔍 Monitoring and Logging ✅ **ENHANCED**
 
@@ -224,7 +226,7 @@ python3 Backend/server_health_check.py
 
 ### Database Locks
 
-- SQLite database locks can occur
+- Database locks can occur under heavy load
 - Complete restart removes WAL/SHM files
 - Check for long-running transactions
 

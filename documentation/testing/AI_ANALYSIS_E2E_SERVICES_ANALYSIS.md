@@ -17,7 +17,7 @@
 
 ### Script Loading בקבץ HTML
 
-**קובץ:** `trading-ui/ai-analysis.html`
+**קובץ:** `trading-ui/ai_analysis.html`
 
 **סדר טעינה:**
 
@@ -26,7 +26,7 @@
    - **בעיה:** `auth-guard.js` רץ מיד ומפנה לדף התחברות לפני שה-services נטענים
 
 2. **SERVICES PACKAGE** (Load Order: 2)
-   - `services/ai-analysis-data.js` → `window.AIAnalysisData`
+   - `services/ai_analysis-data.js` → `window.AIAnalysisData`
    - Load Order: 31
 
 3. **AI ANALYSIS PACKAGE** (Load Order: 20.5)
@@ -42,7 +42,7 @@
 
 ### 1. AIAnalysisData
 
-**קובץ:** `trading-ui/scripts/services/ai-analysis-data.js`
+**קובץ:** `trading-ui/scripts/services/ai_analysis-data.js`
 
 **חשיפה ל-window:**
 
@@ -73,7 +73,7 @@ window.AIAnalysisData = {
 
 ### 2. AIAnalysisManager
 
-**קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
+**קובץ:** `trading-ui/scripts/ai_analysis-manager.js`
 
 **חשיפה ל-window:**
 
@@ -277,7 +277,7 @@ await page.waitForFunction(() => {
 
 ## Script Loading Order
 
-לפי `trading-ui/ai-analysis.html`:
+לפי `trading-ui/ai_analysis.html`:
 
 1. **BASE PACKAGE** (1-26)
    - כולל auth scripts
@@ -303,9 +303,9 @@ await page.waitForFunction(() => {
 
 ## קבצים רלוונטיים
 
-- `trading-ui/ai-analysis.html` - HTML עם script loading order
-- `trading-ui/scripts/services/ai-analysis-data.js` - AIAnalysisData service
-- `trading-ui/scripts/ai-analysis-manager.js` - AIAnalysisManager
+- `trading-ui/ai_analysis.html` - HTML עם script loading order
+- `trading-ui/scripts/services/ai_analysis-data.js` - AIAnalysisData service
+- `trading-ui/scripts/ai_analysis-manager.js` - AIAnalysisManager
 - `trading-ui/scripts/ai-template-selector.js` - AITemplateSelector
 - `trading-ui/scripts/ai-result-renderer.js` - AIResultRenderer
 - `trading-ui/scripts/ai-notes-integration.js` - AINotesIntegration

@@ -111,38 +111,36 @@ class MetricsCollector:
             db: Session = next(get_db())
             
             # Table sizes
-            result = db.execute(text("""
-                SELECT 
-                    name as table_name,
-                    sqlite_compileoption_used('ENABLE_FTS3') as fts_enabled
-                FROM sqlite_master 
-                WHERE type='table'
-            """))
+            result = db.execute(
+                text(
+                    "SELECT table_name "
+                    "FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_type = 'BASE TABLE'"
+                )
+            )
             tables = []
             for row in result:
                 tables.append({
-                    'table_name': row[0],
-                    'fts_enabled': row[1]
+                    'table_name': row[0]
                 })
             
             # Record counts
             record_counts = {}
             for table in tables:
                 table_name = table['table_name']
-                if table_name != 'sqlite_sequence':
-                    try:
-                        result = db.execute(text(f"SELECT COUNT(*) as count FROM {table_name}"))
-                        count = result.fetchone()[0]
-                        record_counts[table_name] = count
-                    except Exception:
-                        record_counts[table_name] = 0
+                try:
+                    result = db.execute(text(f"SELECT COUNT(*) as count FROM {table_name}"))
+                    count = result.fetchone()[0]
+                    record_counts[table_name] = count
+                except Exception:
+                    record_counts[table_name] = 0
             
             # Database size
-            result = db.execute(text("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()"))
+            result = db.execute(text("SELECT pg_database_size(current_database()) as size"))
             db_size = result.fetchone()[0]
             
             # Index information
-            result = db.execute(text("SELECT COUNT(*) as index_count FROM sqlite_master WHERE type='index'"))
+            result = db.execute(text("SELECT COUNT(*) as index_count FROM pg_indexes WHERE schemaname = 'public'"))
             index_count = result.fetchone()[0]
             
             db.close()

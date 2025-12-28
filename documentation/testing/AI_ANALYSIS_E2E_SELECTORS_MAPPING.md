@@ -203,8 +203,8 @@ expect(count).toBe(1);
 
 ## קבצים רלוונטיים
 
-- `trading-ui/ai-analysis.html` - HTML מלא
-- `trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js` - E2E tests
+- `trading-ui/ai_analysis.html` - HTML מלא
+- `trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js` - E2E tests
 
 ---
 

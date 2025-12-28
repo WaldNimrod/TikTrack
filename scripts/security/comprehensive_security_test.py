@@ -330,7 +330,7 @@ class ComprehensiveSecurityTest:
                     else:
                         filename = os.path.basename(html_file)
                         # Skip public pages
-                        if filename not in ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html']:
+                        if filename not in ['login.html', 'register.html', 'reset_password.html', 'forgot_password.html']:
                             pages_without_auth_guard.append(filename)
             except Exception as e:
                 pass

@@ -18,12 +18,12 @@ CORE_PAGES = [
     "/trades.html",
     "/executions.html",
     "/alerts.html",
-    "/trade-plans.html",
-    "/cash-flows.html",
+    "/trade_plans.html",
+    "/cash_flows.html",
     "/tickers.html",
-    "/trading-accounts.html",
+    "/trading_accounts.html",
     "/notes.html",
-    "/watch-list.html",
+    "/watch_list.html",
     "/preferences.html",
     "/research.html"
 ]

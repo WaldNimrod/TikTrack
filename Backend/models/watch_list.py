@@ -86,6 +86,8 @@ class WatchList(BaseModel):
                                 comment="Default sort column - max 50 chars, optional")
     default_sort_direction = Column(String(4), nullable=False, default='asc',
                                    comment="Default sort direction - 'asc' or 'desc', default 'asc'")
+    is_default = Column(Integer, nullable=False, default=0,
+                        comment="Whether this is the user's default watch list (0=no, 1=yes)")
     is_flag_list = Column(Integer, nullable=False, default=0,
                          comment="Whether this is an automatic flag list (0=no, 1=yes)")
     flag_color = Column(String(7), nullable=True,
@@ -104,7 +106,7 @@ class WatchList(BaseModel):
         """String representation of the watch list"""
         return f"<WatchList(id={self.id}, name='{self.name}', user_id={self.user_id})>"
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self, db: Optional[Session] = None, user_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Convert watch list to JSON dictionary
         
@@ -138,6 +140,7 @@ class WatchList(BaseModel):
             'view_mode': self.view_mode,
             'default_sort_column': self.default_sort_column,
             'default_sort_direction': self.default_sort_direction,
+            'is_default': bool(getattr(self, 'is_default', 0)),
             'is_flag_list': bool(getattr(self, 'is_flag_list', 0)),
             'flag_color': getattr(self, 'flag_color', None),
             'flag_entity_type': getattr(self, 'flag_entity_type', None),
@@ -147,9 +150,10 @@ class WatchList(BaseModel):
         if data['updated_at']:
             data['updated_at'] = data['updated_at'].isoformat()
         
-        # Add item count if items are loaded
+        # Add items and item count if items are loaded
         if hasattr(self, 'items') and self.items is not None:
             data['item_count'] = len(self.items)
+            data['items'] = [item.to_dict(db, user_id) for item in self.items]
         
         return data
 

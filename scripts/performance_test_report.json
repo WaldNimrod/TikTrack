@@ -797,7 +797,7 @@
           },
           {
             "duration": 95.09999999403954,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 158.5,
             "size": 4302,
             "startTime": 63.400000005960464,
@@ -1133,7 +1133,7 @@
           },
           {
             "duration": 69.10000002384186,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 233.30000001192093,
             "size": 4302,
             "startTime": 164.19999998807907,
@@ -2304,7 +2304,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -2534,7 +2534,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -3698,7 +3698,7 @@
           },
           {
             "duration": 310.90000000596046,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 318.69999998807907,
             "size": 37064,
             "startTime": 7.799999982118607,
@@ -3930,7 +3930,7 @@
           },
           {
             "duration": 388.40000000596046,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 396.5,
             "size": 4367,
             "startTime": 8.099999994039536,
@@ -4770,7 +4770,7 @@
           },
           {
             "duration": 132,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 151.19999998807907,
             "size": 4302,
             "startTime": 19.19999998807907,
@@ -5122,7 +5122,7 @@
           },
           {
             "duration": 92.10000002384186,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 252.90000000596046,
             "size": 4302,
             "startTime": 160.7999999821186,
@@ -5724,7 +5724,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -5949,7 +5949,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -6109,7 +6109,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -6249,7 +6249,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -18550,7 +18550,7 @@
           },
           {
             "duration": 252.69999998807907,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 263.5,
             "size": 37064,
             "startTime": 10.800000011920929,
@@ -18782,7 +18782,7 @@
           },
           {
             "duration": 307.80000001192093,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 319,
             "size": 4367,
             "startTime": 11.199999988079071,
@@ -19614,7 +19614,7 @@
           },
           {
             "duration": 93.39999997615814,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 117.69999998807907,
             "size": 4302,
             "startTime": 24.30000001192093,
@@ -19982,7 +19982,7 @@
           },
           {
             "duration": 75.7000000178814,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 195.80000001192093,
             "size": 4302,
             "startTime": 120.09999999403954,
@@ -20596,7 +20596,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -20816,7 +20816,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -21006,7 +21006,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -21136,7 +21136,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -35463,7 +35463,7 @@
           },
           {
             "duration": 265.09999999403954,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 288.30000001192093,
             "size": 37064,
             "startTime": 23.200000017881393,
@@ -35687,7 +35687,7 @@
           },
           {
             "duration": 312.09999999403954,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 336.2000000178814,
             "size": 4367,
             "startTime": 24.100000023841858,
@@ -36543,7 +36543,7 @@
           },
           {
             "duration": 103.09999999403954,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 144.80000001192093,
             "size": 4302,
             "startTime": 41.70000001788139,
@@ -36895,7 +36895,7 @@
           },
           {
             "duration": 71.7000000178814,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 222.10000002384186,
             "size": 4302,
             "startTime": 150.40000000596046,
@@ -37528,7 +37528,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -37748,7 +37748,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -37948,7 +37948,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -38073,7 +38073,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -49618,7 +49618,7 @@
           },
           {
             "duration": 266.69999998807907,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 284.5,
             "size": 37064,
             "startTime": 17.80000001192093,
@@ -49850,7 +49850,7 @@
           },
           {
             "duration": 315.30000001192093,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 333.7000000178814,
             "size": 4367,
             "startTime": 18.400000005960464,
@@ -50722,7 +50722,7 @@
           },
           {
             "duration": 108.39999997615814,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 143.09999999403954,
             "size": 4302,
             "startTime": 34.70000001788139,
@@ -51074,7 +51074,7 @@
           },
           {
             "duration": 73.90000000596046,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 219.7000000178814,
             "size": 4302,
             "startTime": 145.80000001192093,
@@ -51680,7 +51680,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -51900,7 +51900,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -52090,7 +52090,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -52215,7 +52215,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -53405,7 +53405,7 @@
           },
           {
             "duration": 460.2999999821186,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 469.59999999403954,
             "size": 37064,
             "startTime": 9.300000011920929,
@@ -53637,7 +53637,7 @@
           },
           {
             "duration": 550.3999999761581,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 560.0999999940395,
             "size": 4367,
             "startTime": 9.700000017881393,
@@ -54461,7 +54461,7 @@
           },
           {
             "duration": 216.2999999821186,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 241.5,
             "size": 4302,
             "startTime": 25.200000017881393,
@@ -54813,7 +54813,7 @@
           },
           {
             "duration": 112.7999999821186,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 363.59999999403954,
             "size": 4302,
             "startTime": 250.80000001192093,
@@ -55385,7 +55385,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -55610,7 +55610,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -55815,7 +55815,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -55950,7 +55950,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -56669,7 +56669,7 @@
           },
           {
             "duration": 375.40000000596046,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 458,
             "size": 37064,
             "startTime": 82.59999999403954,
@@ -56877,7 +56877,7 @@
           },
           {
             "duration": 512.8999999761581,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 595.8999999761581,
             "size": 4367,
             "startTime": 83,
@@ -57709,7 +57709,7 @@
           },
           {
             "duration": 148.2000000178814,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 255,
             "size": 4302,
             "startTime": 106.7999999821186,
@@ -58069,7 +58069,7 @@
           },
           {
             "duration": 90.5,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 352.7999999821186,
             "size": 4302,
             "startTime": 262.2999999821186,
@@ -80020,7 +80020,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -80250,7 +80250,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -80450,7 +80450,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -80570,7 +80570,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -81278,7 +81278,7 @@
           },
           {
             "duration": 324.59999999403954,
-            "name": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "responseEnd": 336.69999998807907,
             "size": 37064,
             "startTime": 12.099999994039536,
@@ -81510,7 +81510,7 @@
           },
           {
             "duration": 391,
-            "name": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "name": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "responseEnd": 403.59999999403954,
             "size": 4367,
             "startTime": 12.599999994039536,
@@ -82326,7 +82326,7 @@
           },
           {
             "duration": 139.69999998807907,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "responseEnd": 176.7999999821186,
             "size": 4302,
             "startTime": 37.099999994039536,
@@ -82678,7 +82678,7 @@
           },
           {
             "duration": 92.69999998807907,
-            "name": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "name": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "responseEnd": 277.7999999821186,
             "size": 4302,
             "startTime": 185.09999999403954,
@@ -83308,7 +83308,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css?v=1.0.0",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css?v=1.0.0",
             "status": 200,
             "type": "text/css"
           },
@@ -83543,7 +83543,7 @@
             "type": "text/css"
           },
           {
-            "url": "http://localhost:8080/styles-new/07-trumps/chart-management.css",
+            "url": "http://localhost:8080/styles-new/07-trumps/chart_management.css",
             "status": 200,
             "type": "text/css"
           },
@@ -83673,7 +83673,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/services/ai_analysis-data.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },
@@ -83803,7 +83803,7 @@
             "type": "text/javascript"
           },
           {
-            "url": "http://localhost:8080/scripts/modal-configs/tag-management-config.js?v=1.0.0",
+            "url": "http://localhost:8080/scripts/modal-configs/tag_management-config.js?v=1.0.0",
             "status": 200,
             "type": "text/javascript"
           },

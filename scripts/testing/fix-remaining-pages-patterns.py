@@ -13,12 +13,12 @@ STYLES_DIR = Path("trading-ui/styles-new/07-pages")
 
 # דפוסים שצריך לתקן
 FIXES = {
-    'tradingview-widgets-showcase.html': {
+    'tradingview_widgets_showcase.html': {
         'scripts': ['error-handlers.js', 'logger-service.js', 'unified-cache-manager.js'],
         'console': True,
         'style_tag': True
     },
-    'init-system-management.html': {
+    'init_system_management.html': {
         'bootstrap_css': True,
         'style_tag': True
     },

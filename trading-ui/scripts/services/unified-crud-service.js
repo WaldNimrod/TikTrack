@@ -225,8 +225,8 @@ class UnifiedCRUDService {
                 // Some services (like NotesData.createNote) expect { payload: ... } instead of direct payload
                 // But watch_list, execution, cash_flow, and alert services expect (payload, options) signature
                 let serviceResult;
-                if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow' || entityType === 'alert' || entityType === 'trading_account' || entityType === 'ticker') {
-                    // Watch lists, execution, cash_flow, alert, trading_account, and ticker services expect (payload, options) signature
+                if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow' || entityType === 'alert' || entityType === 'trading_account' || entityType === 'ticker' || entityType === 'trade') {
+                    // Watch lists, execution, cash_flow, alert, trading_account, ticker, and trade services expect (payload, options) signature
                     console.log('🔍 DEBUG: Calling service with payload:', payload, 'entityType:', entityType);
                     serviceResult = await useService(payload, {});
                 } else {
@@ -338,6 +338,64 @@ class UnifiedCRUDService {
             
             return null;
         }
+    }
+
+    /**
+     * יצירה כללית
+     *
+     * יוצר ישות חדשה.
+     *
+     * @param {string} entityType - סוג הישות
+     * @param {Object} entityData - נתוני הישות ליצירה
+     * @param {Object} options - אופציות נוספות (כמו saveEntity)
+     * @returns {Promise<Object|null>} - נתוני התגובה או null במקרה של שגיאה
+     *
+     * @example
+     * // Create trade
+     * const result = await UnifiedCRUDService.create('trade', {
+     *   symbol: 'AAPL',
+     *   side: 'buy',
+     *   quantity: 100
+     * }, {
+     *   modalId: 'tradesModal',
+     *   successMessage: 'טרייד נוצר בהצלחה',
+     *   entityName: 'טרייד'
+     * });
+     */
+    static async create(entityType, entityData, options = {}) {
+        // #region agent log - HYPOTHESIS: UnifiedCRUDService.create called
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'unified-crud-service.js:create',
+                message:'UnifiedCRUDService.create called',
+                data:{
+                    entityType,
+                    options,
+                    hasLogger: !!window.Logger,
+                    isInIframe: window !== window.top,
+                    windowUnifiedCRUD: typeof window.UnifiedCRUDService,
+                    iframeUnifiedCRUD: window !== window.top ? typeof window.top.UnifiedCRUDService : 'not-iframe'
+                },
+                timestamp:Date.now(),
+                sessionId:'debug-session',
+                runId:'unified-crud-service-debug',
+                hypothesisId:'CRUD_SERVICE_CREATE_CALL'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+        window.Logger?.debug('UnifiedCRUDService.create called', {
+            entityType,
+            options,
+            page: 'unified-crud-service'
+        });
+
+        return await this.saveEntity(entityType, entityData, {
+            ...options,
+            isEdit: false
+        });
     }
 
     /**
@@ -923,11 +981,11 @@ class UnifiedCRUDService {
             'execution': '/api/executions',
             'cash_flow': '/api/cash-flows',
             'note': '/api/notes',
-            'watch_list': '/api/watch-lists',
+            'watch_list': '/api/watch_lists',
             'import_session': '/api/user-data-import/session',
             'tag': '/api/tags',
             'tag_category': '/api/tags/categories',
-            'trading_journal': '/api/trading-journal',
+            'trading_journal': '/api/trading_journal',
             'preference_profile': '/api/preference-profiles',
             'user_profile': '/api/auth/me' // Special endpoint for user profile - uses PUT to update current user
         };
@@ -1049,7 +1107,7 @@ class UnifiedCRUDService {
     static _getEntityServiceMethod(entityType, operation) {
         const serviceMap = {
             'trade': {
-                create: window.TradesData?.createTrade,
+                create: window.TradesData?.saveTrade,
                 update: window.TradesData?.updateTrade
             },
             'trade_plan': {
@@ -1092,5 +1150,47 @@ class UnifiedCRUDService {
 
 // ===== EXPORT TO GLOBAL SCOPE =====
 
+// #region agent log - HYPOTHESIS: UnifiedCRUDService registration
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+        location:'unified-crud-service.js:registration',
+        message:'UnifiedCRUDService being registered to global scope',
+        data:{
+            isInIframe: window !== window.top,
+            hasExistingUnifiedCRUD: !!window.UnifiedCRUDService,
+            windowLocation: window.location?.href,
+            classMethods: Object.getOwnPropertyNames(UnifiedCRUDService).filter(name => typeof UnifiedCRUDService[name] === 'function')
+        },
+        timestamp:Date.now(),
+        sessionId:'debug-session',
+        runId:'unified-crud-service-registration',
+        hypothesisId:'CRUD_SERVICE_REGISTRATION'
+    })
+}).catch(()=>{});
+// #endregion
+
 window.UnifiedCRUDService = UnifiedCRUDService;
+
+// #region agent log - HYPOTHESIS: UnifiedCRUDService registration complete
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+        location:'unified-crud-service.js:registration-complete',
+        message:'UnifiedCRUDService registered successfully',
+        data:{
+            isInIframe: window !== window.top,
+            hasUnifiedCRUD: !!window.UnifiedCRUDService,
+            createMethod: typeof window.UnifiedCRUDService?.create,
+            windowLocation: window.location?.href
+        },
+        timestamp:Date.now(),
+        sessionId:'debug-session',
+        runId:'unified-crud-service-registration',
+        hypothesisId:'CRUD_SERVICE_REGISTRATION_COMPLETE'
+    })
+}).catch(()=>{});
+// #endregion
 

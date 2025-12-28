@@ -3,7 +3,7 @@
 Run migration script on production database
 
 This script runs a migration file on the production database.
-Supports both PostgreSQL and SQLite databases.
+PostgreSQL only.
 
 Usage: python3 scripts/run_production_migration.py <migration_file>
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 # Add Backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "Backend"))
 
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -31,7 +31,7 @@ def run_migration(migration_file: Path, database_url: str = None):
     
     print(f"🔄 Running migration: {migration_file.name}")
     print(f"📁 Database: {database_url[:50]}...")
-    print(f"📊 Type: {'PostgreSQL' if not USING_SQLITE else 'SQLite'}")
+    print("📊 Type: PostgreSQL")
     print()
     
     # Import migration module

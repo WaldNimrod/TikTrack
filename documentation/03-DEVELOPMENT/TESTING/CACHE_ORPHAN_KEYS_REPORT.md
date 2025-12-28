@@ -190,7 +190,7 @@ window.clearAllCache({ level: 'full' });  // ✅ מנקה orphans!
 - טבלת השוואה
 - כפתור בדיקה אוטומטית
 
-**system-management.html:**
+**system_management.html:**
 
 - 4 כפתורים קומפקטיים
 - tooltips מפורטים

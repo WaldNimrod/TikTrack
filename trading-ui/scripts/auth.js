@@ -76,7 +76,7 @@ const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new Bro
  */
 function isPublicPage() {
   const path = window.location?.pathname || '';
-  const publicPages = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'];
+  const publicPages = ['login.html', 'register.html', 'reset_password.html', 'forgot_password.html'];
   return publicPages.some(page => path.includes(page));
 }
 
@@ -1569,7 +1569,7 @@ function createLoginInterface(containerId, onSuccess = null) {
     </form>
     
     <div style="text-align: center; margin-top: 1rem;">
-      <a href="forgot-password.html" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+      <a href="forgot_password.html" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
     </div>
     
     <div class="demo-credentials">

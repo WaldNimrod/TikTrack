@@ -68,7 +68,7 @@
 
 ### דרך הממשק (מומלץ)
 
-1. פתח `http://localhost:8080/user-profile.html`
+1. פתח `http://localhost:8080/user_profile`
 2. גלול לסקשן **"הגדרות SMTP"**
 3. הכנס את הפרטים הבאים:
    - **Host**: `smtp.sendgrid.net`

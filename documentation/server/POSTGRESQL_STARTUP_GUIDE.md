@@ -12,7 +12,7 @@
 
 ## 📋 **סקירה כללית**
 
-מערכת TikTrack עברה מיגרציה מ-SQLite ל-PostgreSQL (נובמבר 2025).  
+מערכת TikTrack משתמשת ב-PostgreSQL בלבד.  
 **השרת חייב להיות מופעל עם משתני סביבה של PostgreSQL.**
 
 ---
@@ -22,7 +22,7 @@
 ### **❌ מה לא לעשות:**
 
 ```bash
-# ❌ אל תפעיל כך - זה ינסה להשתמש ב-SQLite שכבר לא קיים!
+# ❌ אל תפעיל כך - חסרים משתני סביבה של PostgreSQL
 python3 Backend/app.py
 ```
 
@@ -89,7 +89,6 @@ curl http://localhost:8080/api/system/health
 ### **קבצי בסיס נתונים:**
 
 - **PostgreSQL**: Docker volume `postgres-dev-data`
-- **SQLite (ארכיון)**: `archive/database_backups/tiktrack.db`
 
 ---
 
@@ -186,7 +185,7 @@ kill $(lsof -ti:8080)
 **פתרון:**
 
 1. בדוק שיש נתונים: `docker exec -it tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-development -c "SELECT * FROM preference_profiles;"`
-2. אם אין נתונים, הרץ את סקריפט המיגרציה: `scripts/db/migrate_sqlite_to_pg.py`
+2. אם אין נתונים, טען דאטה התחלתי ממקורות המערכת
 
 ---
 
@@ -205,37 +204,20 @@ POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTra
 import sys
 sys.path.insert(0, 'Backend')
 from config.database import engine
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 
 print(f"DATABASE_URL: {DATABASE_URL}")
-print(f"USING_SQLITE: {USING_SQLITE}")
-
 try:
     with engine.connect() as conn:
         result = conn.execute("SELECT 1")
         print("✅ Database connection successful!")
-        if not USING_SQLITE:
-            result = conn.execute("SELECT current_database(), current_user")
-            row = result.fetchone()
-            print(f"   Database: {row[0]}")
-            print(f"   User: {row[1]}")
+        result = conn.execute("SELECT current_database(), current_user")
+        row = result.fetchone()
+        print(f"   Database: {row[0]}")
+        print(f"   User: {row[1]}")
 except Exception as e:
     print(f"❌ Database connection failed: {e}")
 PYEOF
-```
-
----
-
-## 🔄 **מיגרציה מ-SQLite ל-PostgreSQL**
-
-אם אתה צריך להריץ מיגרציה מחדש:
-
-```bash
-# 1. ודא ש-PostgreSQL רץ
-docker ps | grep postgres
-
-# 2. הרץ את סקריפט המיגרציה
-POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTrakDBAdmin POSTGRES_PASSWORD="BigMeZoo1974!?" python3 scripts/db/migrate_sqlite_to_pg.py
 ```
 
 ---
@@ -269,4 +251,3 @@ POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTra
 **תאריך עדכון אחרון:** נובמבר 2025  
 **גרסה:** 1.0  
 **מפתח:** TikTrack Development Team
-

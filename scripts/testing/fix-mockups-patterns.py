@@ -12,15 +12,15 @@ MOCKUPS_DIR = Path("trading-ui/mockups/daily-snapshots")
 
 # עמודים שצריך לתקן (לא כולל trading-journal-page ו-date-comparison-modal שכבר תקינים)
 PAGES_TO_FIX = [
-    "portfolio-state-page.html",
-    "trade-history-page.html",
-    "price-history-page.html",
-    "comparative-analysis-page.html",
-    "strategy-analysis-page.html",
-    "economic-calendar-page.html",
-    "history-widget.html",
-    "emotional-tracking-widget.html",
-    "tradingview-test-page.html"
+    "portfolio_state_page.html",
+    "trade_history_page.html",
+    "price_history_page.html",
+    "comparative_analysis_page.html",
+    "strategy_analysis_page.html",
+    "economic_calendar_page.html",
+    "history_widget.html",
+    "emotional_tracking_widget.html",
+    "tradingview_test_page.html"
 ]
 
 def add_unified_cache_manager(content):
@@ -88,7 +88,7 @@ def fix_page(page_name):
     content = add_icon_replacement_helper(content)
     
     # תיקון 3: icon-mappings.js ל-tradingview-test-page
-    if page_name == "tradingview-test-page.html":
+    if page_name == "tradingview_test_page.html":
         content = add_icon_mappings_to_tradingview(content)
     
     if content != original_content:

@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import base model metadata for migrations
 from Backend.models.base import Base
+from Backend.config.settings import DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -46,7 +47,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -65,12 +66,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    # Get database configuration from environment
-    if os.getenv('POSTGRES_HOST'):
-        url = f"postgresql://{os.getenv('POSTGRES_USER', 'tiktrakDBAdmin')}:{os.getenv('POSTGRES_PASSWORD', 'BigMeZoo1974!?')}@{os.getenv('POSTGRES_HOST', 'localhost')}:5432/{os.getenv('POSTGRES_DB', 'TikTrack-db-development')}"
-    else:
-        # Fallback to SQLite for development
-        url = f"sqlite:///{os.path.join(os.path.dirname(__file__), '..', 'db', 'tiktrack.db')}"
+    url = DATABASE_URL
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),

@@ -23,7 +23,7 @@ except ImportError:
     exit(1)
 
 BASE_URL = "http://localhost:8080"
-PAGE_URL = f"{BASE_URL}/portfolio-state"
+PAGE_URL = f"{BASE_URL}/portfolio_state"
 
 REPORTS_DIR = Path(__file__).parent.parent / "reports" / "qa"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)

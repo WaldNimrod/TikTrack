@@ -1,0 +1,920 @@
+================================================================================
+NAMING CONSISTENCY REPORT - TikTrack
+================================================================================
+Generated: 2025-12-27 17:54:42
+
+TOTAL FINDINGS: 382
+
+--------------------------------------------------------------------------------
+CATEGORY: OLD_FILTER_NAMES
+Count: 137
+--------------------------------------------------------------------------------
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/migrations/consolidate_preference_groups.py
+   1 matches
+   Line 113: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                     'language': 'basic_settings',
+   >                 '**default_trading_account': 'basic_settings'  # העברה מ-filter**_settings
+                 },
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/migrations/create_preferences_tables.py
+   2 matches
+   Line 172: OLD_FILTER_NAMES:defaultAccountFilter
+                 (3, 'string', 'defaultTypeFilter', 'פילטר סוג ברירת מחדל', '{"options": ["swing", "investment", "passive", "all"]}', 'swing', False),
+   >             (3, 'string', '**defaultAccountFilter**', 'פילטר חשבון ברירת מחדל', '{"options": ["all"]}', 'all', False),
+                 (3, 'string', 'defaultDateRangeFilter', 'פילטר טווח תאריכים ברירת מחדל', '{"options": ["today", "this_week", "this_month", "all"]}', 'this_week', False),
+   Line 172: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                 (3, 'string', 'defaultTypeFilter', 'פילטר סוג ברירת מחדל', '{"options": ["swing", "investment", "passive", "all"]}', 'swing', False),
+   >             (3, 'string', '**defaultAccountFilter**', 'פילטר חשבון ברירת מחדל', '{"options": ["all"]}', 'all', False),
+                 (3, 'string', 'defaultDateRangeFilter', 'פילטר טווח תאריכים ברירת מחדל', '{"options": ["today", "this_week", "this_month", "all"]}', 'this_week', False),
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/migrations/migration_20250903_172852_create_user_preferences_table.json
+   1 matches
+   Line 4: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+       "name": "create_user_preferences_table",
+   >   "sql_up": "\nCREATE TABLE IF NOT EXISTS user_preferences (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    user_id INTEGER NOT NULL UNIQUE,\n    primary_currency VARCHAR(10) **DEFAULT 'USD',\n    timezone VARCHAR(64) DEFAULT 'Asia/Jerusalem',\n    default_stop_loss REAL DEFAULT 5.0,\n    default_target_price REAL DEFAULT 10.0,\n    default_commission REAL DEFAULT 1.0,\n    default_status_filter VARCHAR(20) DEFAULT 'open',\n    default_type_filter VARCHAR(20) DEFAULT 'swing',\n    default_account_filter VARCHAR(20) DEFAULT 'all',\n    default_date_range_filter VARCHAR(20) DEFAULT 'this_week',\n    default_search_filter** VARCHAR(100) DEFAULT '',\n    console_cleanup_interval INTEGER DEFAULT 60000,\n    data_refresh_interval INTEGER DEFAULT 5,\n    primary_data_provider VARCHAR(50) DEFAULT 'yahoo',\n    secondary_data_provider VARCHAR(50) DEFAULT 'google',\n    cache_ttl INTEGER DEFAULT 5,\n    max_batch_size INTEGER DEFAULT 25,\n    request_delay INTEGER DEFAULT 200,\n    retry_attempts INTEGER DEFAULT 2,\n    retry_delay INTEGER DEFAULT 5,\n    auto_refresh BOOLEAN DEFAULT 0,\n    verbose_logging BOOLEAN DEFAULT 0,\n    numeric_value_colors_json TEXT,\n    entity_colors_json TEXT,\n    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n    updated_at DATETIME,\n    FOREIGN KEY (user_id) REFERENCES users (id)\n);\n\nCREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id);\n",
+       "sql_down": "\nDROP TABLE IF EXISTS user_preferences;\n",
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/positions.py
+   2 matches
+   Line 115: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+         Query Parameters:
+   >         account_id (optional): **Filter by specific account ID (default**: all accounts)
+             include_closed (optional): Include closed positions (default: false)
+   Line 240: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+             size (optional): 'minimal' or 'full' (default: 'full')
+   >         account_id (optional): **Filter by specific account ID (default**: all accounts)
+             include_closed (optional): Include closed positions (default: false)
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/add_default_trading_account_preference.py
+   10 matches
+   Line 55: OLD_FILTER_NAMES:defaultAccountFilter
+             
+   >         # 3. בדיקה אם **defaultAccountFilter** קיים ושמירת preference_type_id שלו
+             cursor.execute('''
+   Line 59: OLD_FILTER_NAMES:defaultAccountFilter
+                 WHERE preference_name = ?
+   >         ''', ('**defaultAccountFilter**',))
+             
+   Line 64: OLD_FILTER_NAMES:defaultAccountFilter
+             if old_preference_type_result:
+   >             # קיים **defaultAccountFilter** - מעדכן אותו
+                 preference_type_id = old_preference_type_result[0]
+   Line 81: OLD_FILTER_NAMES:defaultAccountFilter
+                 conn.commit()
+   >             print(f"✅ עודכן preference_type: **defaultAccountFilter** -> default_trading_account (ID: {preference_type_id})")
+             else:
+   Line 118: OLD_FILTER_NAMES:defaultAccountFilter
+             print(f"✅ ההעדפה עודכנה בהצלחה (preference_id: {preference_type_id})")
+   >         print(f"   שם ישן: **defaultAccountFilter**")
+             print(f"   שם חדש: default_trading_account")
+   ... and 5 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/create_clean_database.py
+   2 matches
+   Line 520: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                 default_type_filter VARCHAR(20), 
+   >             **default_account_filter** VARCHAR(20), 
+                 default_date_range_filter VARCHAR(20), 
+   Line 592: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                 default_type_filter VARCHAR(20), 
+   >             **default_account_filter** VARCHAR(20), 
+                 default_date_range_filter VARCHAR(20), 
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/simple_migrate_v1_to_v2.py
+   4 matches
+   Line 89: OLD_FILTER_NAMES:defaultAccountFilter
+             default_type_filter = legacy_data.get('default_type_filter', json_data.get('defaultTypeFilter', 'swing'))
+   >         default_account_filter = legacy_data.get('default_account_filter', json_data.get('**defaultAccountFilter**', 'all'))
+             default_date_range_filter = legacy_data.get('default_date_range_filter', json_data.get('defaultDateRangeFilter', 'this_week'))
+   Line 89: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+             default_type_filter = legacy_data.get('default_type_filter', json_data.get('defaultTypeFilter', 'swing'))
+   >         **default_account_filter = legacy_data.get('default_account_filter', json_data.get('defaultAccountFilter**', 'all'))
+             default_date_range_filter = legacy_data.get('default_date_range_filter', json_data.get('defaultDateRangeFilter', 'this_week'))
+   Line 146: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                     default_stop_loss, default_target_price, default_commission,
+   >                 **default_status_filter, default_type_filter, default_account_filter**,
+                     default_date_range_filter, default_search_filter,
+   Line 172: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                 default_stop_loss, default_target_price, default_commission,
+   >             **default_status_filter, default_type_filter, default_account_filter**,
+                 default_date_range_filter, default_search_filter,
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/03-DEVELOPMENT/TOOLS/MODAL_DESIGN_REQUIREMENTS_UPDATE.md
+   3 matches
+   Line 61: OLD_FILTER_NAMES:defaultTradingAccount
+     - **מקור**: העדפות המשתמש
+   > - **משתנה**: `preferences.**defaultTradingAccount**`
+     - **יישום**: מילוי אוטומטי של שדה חשבון מסחר
+   Line 159: OLD_FILTER_NAMES:defaultTradingAccount
+         const accountField = form.querySelector('[id*="Account"], [name*="account"]');
+   >     if (accountField && preferences.**defaultTradingAccount**) {
+   >         accountField.value = preferences.**defaultTradingAccount**;
+   Line 160: OLD_FILTER_NAMES:defaultTradingAccount
+   >     if (accountField && preferences.**defaultTradingAccount**) {
+   >         accountField.value = preferences.**defaultTradingAccount**;
+         }
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/03-DEVELOPMENT/TOOLS/MODAL_MANAGER_V2_SPECIFICATION.md
+   2 matches
+   Line 427: OLD_FILTER_NAMES:defaultTradingAccount
+         const accountField = form.querySelector('[id*="Account"], [name*="account"]');
+   >     if (accountField && preferences.**defaultTradingAccount**) {
+   >         accountField.value = preferences.**defaultTradingAccount**;
+   Line 428: OLD_FILTER_NAMES:defaultTradingAccount
+   >     if (accountField && preferences.**defaultTradingAccount**) {
+   >         accountField.value = preferences.**defaultTradingAccount**;
+         }
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_COVERAGE_GAPS_REPORT.md
+   4 matches
+   Line 21: OLD_FILTER_NAMES:defaultAccountFilter
+     
+   > - `**defaultAccountFilter**` (missing)
+       - refs: trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911; trading-ui/scripts/bundles/entity-details.bundle.js:10954; trading-ui/scripts/bundles/entity-details.bundle.js:10987; trading-ui/scripts/bundles/entity-details.bundle.js:11007; trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891
+   Line 38: OLD_FILTER_NAMES:defaultAccountFilter
+     
+   > - `**defaultAccountFilter**`
+     - `default_currency`
+   Line 21: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+     
+   > - `**defaultAccountFilter**` (missing)
+       - refs: trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911; trading-ui/scripts/bundles/entity-details.bundle.js:10954; trading-ui/scripts/bundles/entity-details.bundle.js:10987; trading-ui/scripts/bundles/entity-details.bundle.js:11007; trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891
+   Line 38: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+     
+   > - `**defaultAccountFilter**`
+     - `default_currency`
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_GAPS_TABLES.md
+   18 matches
+   Line 25: OLD_FILTER_NAMES:defaultAccountFilter
+     |---|---|---|
+   > | `**defaultAccountFilter**` | no | trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911 |
+     | `defaultCommission` | yes | trading-ui/scripts/executions.js:3378; trading-ui/scripts/executions.js:3378 |
+   Line 108: OLD_FILTER_NAMES:defaultAccountFilter
+     |---|---|
+   > | `**defaultAccountFilter**` | trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911 |
+     | `default_currency` | trading-ui/scripts/services-test.js:373; trading-ui/scripts/services/default-value-setter.js:91; trading-ui/scripts/services/default-value-setter.js:187 |
+   Line 117: OLD_FILTER_NAMES:defaultAccountFilter
+     ### 1) Decide and lock canonical preference names
+   > - `**defaultAccountFilter**` must be replaced by `default_trading_account` everywhere.
+     - `default_currency` must be aligned with `primaryCurrency` or added explicitly.
+   Line 127: OLD_FILTER_NAMES:defaultAccountFilter
+       - confirm `is_active = true`.
+   > - If any old names exist (e.g., `**defaultAccountFilter**`), migrate or rename.
+     
+   Line 156: OLD_FILTER_NAMES:defaultAccountFilter
+       - Purpose: Add critical preferences referenced in code
+   >   - Result: Added 2 preferences: `**defaultAccountFilter**`, `default_currency`
+     
+   ... and 13 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/STANDARDIZATION_AUDIT_TRADING_ACCOUNTS.json
+   2 matches
+   Line 2740: OLD_FILTER_NAMES:defaultTradingAccount
+               "line": 462,
+   >           "content": "window.Logger.error('load**DefaultTradingAccount**s failed', { page: 'trading_accounts', error: error?.m",
+               "pattern": "window\\.Logger",
+   Line 3716: OLD_FILTER_NAMES:defaultTradingAccount
+                 "line": 462,
+   >             "content": "window.Logger.error('load**DefaultTradingAccount**s failed', { page: 'trading_accounts', error: error?.m",
+                 "pattern": "window\\.Logger",
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
+   1 matches
+   Line 377: OLD_FILTER_NAMES:defaultTradingAccount
+     | `window.loadAllTradingAccountsFromServer()` | Load all trading accounts from server |
+   > | `window.load**DefaultTradingAccount**s()` | Load default trading accounts |
+     | `window.loadTradingAccountsData()` | Load trading accounts data |
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/entity-details.bundle.js
+   66 matches
+   Line 10953: OLD_FILTER_NAMES:defaultAccountFilter
+                             if (!prefValue) {
+   >                             // נסה עם **defaultAccountFilter**
+   >                             prefValue = await window.getPreference('**defaultAccountFilter**');
+   Line 10954: OLD_FILTER_NAMES:defaultAccountFilter
+   >                             // נסה עם **defaultAccountFilter**
+   >                             prefValue = await window.getPreference('**defaultAccountFilter**');
+                             }
+   Line 10985: OLD_FILTER_NAMES:defaultAccountFilter
+                         try {
+   >                         let **defaultAccountFilter** = await window.getCurrentPreference('default_trading_account');
+   >                         if (!**defaultAccountFilter**) {
+   Line 10986: OLD_FILTER_NAMES:defaultAccountFilter
+   >                         let **defaultAccountFilter** = await window.getCurrentPreference('default_trading_account');
+   >                         if (!**defaultAccountFilter**) {
+   >                             **defaultAccountFilter** = await window.getCurrentPreference('**defaultAccountFilter**');
+   Line 10987: OLD_FILTER_NAMES:defaultAccountFilter
+   >                         if (!**defaultAccountFilter**) {
+   >                             **defaultAccountFilter** = await window.getCurrentPreference('**defaultAccountFilter**');
+                             }
+   ... and 61 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/preferences.bundle.js
+   1 matches
+   Line 8404: OLD_FILTER_NAMES:defaultTradingAccount
+           // Trading basic
+   >       default_trading_account: ['**defaultTradingAccount**', 'tradingAccountDefault'],
+           default_page_size: ['defaultPageSize', 'pageSizeDefault'],
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/cash_flows.js
+   5 matches
+   Line 2840: OLD_FILTER_NAMES:defaultTradingAccount
+         // החלת העדפת חשבון מסחר ברירת מחדל
+   >     const **defaultTradingAccount** = preferences.default_trading_account || preferences.**defaultTradingAccount**Id;
+   >     if (**defaultTradingAccount**) {
+   Line 2840: OLD_FILTER_NAMES:defaultTradingAccount
+         // החלת העדפת חשבון מסחר ברירת מחדל
+   >     const **defaultTradingAccount** = preferences.default_trading_account || preferences.**defaultTradingAccount**Id;
+   >     if (**defaultTradingAccount**) {
+   Line 2841: OLD_FILTER_NAMES:defaultTradingAccount
+   >     const **defaultTradingAccount** = preferences.default_trading_account || preferences.**defaultTradingAccount**Id;
+   >     if (**defaultTradingAccount**) {
+           if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+   Line 2843: OLD_FILTER_NAMES:defaultTradingAccount
+           if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+   >         window.DataCollectionService.setValue('cashFlowAccount', **defaultTradingAccount**, 'int');
+           } else {
+   Line 2848: OLD_FILTER_NAMES:defaultTradingAccount
+             if (accountElement) {
+   >           accountElement.value = **defaultTradingAccount**;
+             }
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/portfolio-state.js
+   1 matches
+   Line 473: OLD_FILTER_NAMES:filter.*account.*default|default.*account.*filter
+                     if (defaultAccountId) {
+   >                     const **defaultItem = accountMenu.querySelector(`.account-filter**-item[data-value="${defaultAccountId}"]`);
+                         if (defaultItem) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-group-manager.js
+   1 matches
+   Line 65: OLD_FILTER_NAMES:defaultTradingAccount
+           // Trading basic
+   >       default_trading_account: ['**defaultTradingAccount**', 'tradingAccountDefault'],
+           default_page_size: ['defaultPageSize', 'pageSizeDefault'],
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trading_accounts.js
+   11 matches
+   Line 14: OLD_FILTER_NAMES:defaultTradingAccount
+      * - loadAllTradingAccountsFromServer() - loadAllTradingAccountsFromServer function
+   >  * - load**DefaultTradingAccount**s() - * Load all trading accounts from server (for filter)
+      * - legacyFetchTradingAccounts() - legacyFetchTradingAccounts function
+   Line 494: OLD_FILTER_NAMES:defaultTradingAccount
+         }
+   >     load**DefaultTradingAccount**s();
+         return [];
+   Line 525: OLD_FILTER_NAMES:defaultTradingAccount
+      * Load default trading accounts
+   >  * @function load**DefaultTradingAccount**s
+      * @returns {void}
+   Line 528: OLD_FILTER_NAMES:defaultTradingAccount
+      */
+   > function load**DefaultTradingAccount**s() {
+       try {
+   Line 538: OLD_FILTER_NAMES:defaultTradingAccount
+         if (window.Logger && typeof window.Logger.error === 'function') {
+   >       window.Logger.error('load**DefaultTradingAccount**s failed', { page: 'trading_accounts', error: error?.message || error });
+         } else if (window.DEBUG_MODE) {
+   ... and 6 more matches
+
+--------------------------------------------------------------------------------
+CATEGORY: CORRECT_FILTER_NAMES
+Count: 245
+--------------------------------------------------------------------------------
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/config/preferences_defaults.json
+   1 matches
+   Line 21: CORRECT_FILTER_NAMES:default_trading_account
+         },
+   >     "**default_trading_account**": "1"
+       },
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/migrations/consolidate_preference_groups.py
+   5 matches
+   Line 104: CORRECT_FILTER_NAMES:default_trading_account
+             migration_map = {
+   >             # 1. basic_settings (6 העדפות): general + basic_settings + **default_trading_account** + pagination_size_default
+                 'general': {
+   Line 113: CORRECT_FILTER_NAMES:default_trading_account
+                     'language': 'basic_settings',
+   >                 '**default_trading_account**': 'basic_settings'  # העברה מ-filter_settings
+                 },
+   Line 120: CORRECT_FILTER_NAMES:default_trading_account
+                     'defaultSearchFilter': 'filter_settings',
+   >                 '**default_trading_account**': 'basic_settings'  # העברה ל-basic_settings
+                 },
+   Line 130: CORRECT_FILTER_NAMES:default_trading_account
+                 
+   >             # 3. filter_settings (4 העדפות): רק הגדרות פילטרים (ללא צבעים, ללא **default_trading_account**)
+   >             # כבר מעודכן למעלה - **default_trading_account** עובר ל-basic_settings
+   Line 131: CORRECT_FILTER_NAMES:default_trading_account
+   >             # 3. filter_settings (4 העדפות): רק הגדרות פילטרים (ללא צבעים, ללא **default_trading_account**)
+   >             # כבר מעודכן למעלה - **default_trading_account** עובר ל-basic_settings
+                 
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/migrations/create_preferences_tables.py
+   1 matches
+   Line 172: CORRECT_FILTER_NAMES:defaultAccountFilter
+                 (3, 'string', 'defaultTypeFilter', 'פילטר סוג ברירת מחדל', '{"options": ["swing", "investment", "passive", "all"]}', 'swing', False),
+   >             (3, 'string', '**defaultAccountFilter**', 'פילטר חשבון ברירת מחדל', '{"options": ["all"]}', 'all', False),
+                 (3, 'string', 'defaultDateRangeFilter', 'פילטר טווח תאריכים ברירת מחדל', '{"options": ["today", "this_week", "this_month", "all"]}', 'this_week', False),
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/user_data_import.py
+   2 matches
+   Line 83: CORRECT_FILTER_NAMES:default_trading_account
+     
+   > def _resolve_**default_trading_account**(db_session):
+         """Return the first available trading account (preferring open accounts)."""
+   Line 299: CORRECT_FILTER_NAMES:default_trading_account
+                 try:
+   >                 trading_account = matched_account or _resolve_**default_trading_account**(db_session)
+                     if not trading_account:
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/add_default_trading_account.py
+   2 matches
+   Line 13: CORRECT_FILTER_NAMES:default_trading_account
+     
+   > def add_**default_trading_account**():
+         """הוספת חשבון מסחר ברירת מחדל"""
+   Line 76: CORRECT_FILTER_NAMES:default_trading_account
+     if __name__ == "__main__":
+   >     account_id = add_**default_trading_account**()
+         sys.exit(0 if account_id else 1)
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/add_default_trading_account_preference.py
+   15 matches
+   Line 15: CORRECT_FILTER_NAMES:default_trading_account
+     
+   > def add_**default_trading_account**_preference():
+         """הוספת העדפת חשבון מסחר ברירת מחדל + הערך לפרופיל הפעיל"""
+   Line 74: CORRECT_FILTER_NAMES:default_trading_account
+                 ''', (
+   >                 '**default_trading_account**',
+                     'חשבון מסחר ברירת מחדל',
+   Line 81: CORRECT_FILTER_NAMES:default_trading_account
+                 conn.commit()
+   >             print(f"✅ עודכן preference_type: defaultAccountFilter -> **default_trading_account** (ID: {preference_type_id})")
+             else:
+   Line 83: CORRECT_FILTER_NAMES:default_trading_account
+             else:
+   >             # בדיקה אם **default_trading_account** כבר קיים
+                 cursor.execute('''
+   Line 87: CORRECT_FILTER_NAMES:default_trading_account
+                     WHERE preference_name = ?
+   >             ''', ('**default_trading_account**',))
+                 
+   ... and 10 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/create_production_db.py
+   4 matches
+   Line 26: CORRECT_FILTER_NAMES:default_trading_account
+     
+   > def get_**default_trading_account**_id(source_db_path: str) -> int:
+         """
+   Line 37: CORRECT_FILTER_NAMES:default_trading_account
+         try:
+   >         # Try to get **default_trading_account** preference
+             # Join with preference_types to get preference_name
+   Line 43: CORRECT_FILTER_NAMES:default_trading_account
+                 JOIN preference_types pt ON up.preference_id = pt.id
+   >             WHERE pt.preference_name = '**default_trading_account**'
+                 ORDER BY up.id DESC
+   Line 162: CORRECT_FILTER_NAMES:default_trading_account
+             print("Step 1: Finding default trading account...")
+   >         default_account_id = get_**default_trading_account**_id(str(source_db))
+             if default_account_id is None:
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/scripts/simple_migrate_v1_to_v2.py
+   1 matches
+   Line 89: CORRECT_FILTER_NAMES:defaultAccountFilter
+             default_type_filter = legacy_data.get('default_type_filter', json_data.get('defaultTypeFilter', 'swing'))
+   >         default_account_filter = legacy_data.get('default_account_filter', json_data.get('**defaultAccountFilter**', 'all'))
+             default_date_range_filter = legacy_data.get('default_date_range_filter', json_data.get('defaultDateRangeFilter', 'this_week'))
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/03-DEVELOPMENT/GUIDELINES/STANDARD_VALIDATION_GUIDE.md
+   2 matches
+   Line 125: CORRECT_FILTER_NAMES:default_trading_account
+     // קבלת חשבון ברירת מחדל
+   > const defaultAccount = await window.getPreference('**default_trading_account**');
+     if (defaultAccount) {
+   Line 478: CORRECT_FILTER_NAMES:default_trading_account
+             // קבלת חשבון ברירת מחדל מהעדפות
+   >         const defaultAccount = await window.getPreference('**default_trading_account**');
+             
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+   17 matches
+   Line 132: CORRECT_FILTER_NAMES:default_trading_account
+         user_id=1,
+   >     names=['atr_period', '**default_trading_account**', 'primaryColor'],
+         profile_id=0  # פרופיל ברירת מחדל
+   Line 138: CORRECT_FILTER_NAMES:default_trading_account
+     #     'atr_period': 14,  # ערך שמור או ברירת מחדל
+   > #     '**default_trading_account**': 'account1',  # ערך שמור או ברירת מחדל
+     #     'primaryColor': '#26baac'  # ערך שמור או ברירת מחדל
+   Line 300: CORRECT_FILTER_NAMES:default_trading_account
+     const allPrefs = await window.PreferencesCore.getAllPreferences(1, 0);
+   > console.log(allPrefs); // { atr_period: 14, **default_trading_account**: 'account1', ... }
+     
+   Line 337: CORRECT_FILTER_NAMES:default_trading_account
+         atr_period: 20,
+   >     **default_trading_account**: 'account1'
+       },
+   Line 354: CORRECT_FILTER_NAMES:default_trading_account
+     const preferences = await window.PreferencesData.loadPreferencesByNames({
+   >   names: ['atr_period', '**default_trading_account**'],
+       userId: 1,
+   ... and 12 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/04-FEATURES/CORE/preferences/PREFERENCES_TROUBLESHOOTING_MATRIX.md
+   4 matches
+   Line 582: CORRECT_FILTER_NAMES:default_trading_account
+       'atr_period',
+   >   '**default_trading_account**'
+     ]);
+   Line 603: CORRECT_FILTER_NAMES:default_trading_account
+     // השתמש ב-batch loading
+   > const preferenceNames = ['atr_period', '**default_trading_account**', 'primaryColor'];
+     const preferences = await window.PreferencesData.loadPreferencesByNames({
+   Line 613: CORRECT_FILTER_NAMES:default_trading_account
+     const pref1 = await window.PreferencesCore.getPreference('atr_period', 1, 0);
+   > const pref2 = await window.PreferencesCore.getPreference('**default_trading_account**', 1, 0);
+     const pref3 = await window.PreferencesCore.getPreference('primaryColor', 1, 0);
+   Line 618: CORRECT_FILTER_NAMES:default_trading_account
+     const prefs = await window.PreferencesData.loadPreferencesByNames({
+   >   names: ['atr_period', '**default_trading_account**', 'primaryColor'],
+       userId: 1,
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/CONSOLE_CLEANUP_AND_RECURSION_FIX.md
+   5 matches
+   Line 18: CORRECT_FILTER_NAMES:default_trading_account
+     **תיאור הבעיה:**
+   > - `positions-portfolio.js` ו-`account-activity.js` קראו ל-`PreferencesCore.getPreference('**default_trading_account**')`
+   > - אחרי זה, הם קראו ל-`window.getPreference('**default_trading_account**')` כגיבוי
+   Line 19: CORRECT_FILTER_NAMES:default_trading_account
+   > - `positions-portfolio.js` ו-`account-activity.js` קראו ל-`PreferencesCore.getPreference('**default_trading_account**')`
+   > - אחרי זה, הם קראו ל-`window.getPreference('**default_trading_account**')` כגיבוי
+     - `window.getPreference` פשוט קורא ל-`PreferencesCore.getPreference` שוב
+   Line 80: CORRECT_FILTER_NAMES:default_trading_account
+     if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+   >   const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+       // ...
+   Line 86: CORRECT_FILTER_NAMES:default_trading_account
+     if (!defaultAccountId && typeof window.getPreference === 'function') {
+   >   const prefValue = await window.getPreference('**default_trading_account**'); // רקורסיה!
+       // ...
+   Line 96: CORRECT_FILTER_NAMES:default_trading_account
+     if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+   >   const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+       // Handle different value types (object, number, string)
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_COVERAGE_GAPS_REPORT.md
+   2 matches
+   Line 21: CORRECT_FILTER_NAMES:defaultAccountFilter
+     
+   > - `**defaultAccountFilter**` (missing)
+       - refs: trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911; trading-ui/scripts/bundles/entity-details.bundle.js:10954; trading-ui/scripts/bundles/entity-details.bundle.js:10987; trading-ui/scripts/bundles/entity-details.bundle.js:11007; trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891
+   Line 38: CORRECT_FILTER_NAMES:defaultAccountFilter
+     
+   > - `**defaultAccountFilter**`
+     - `default_currency`
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_GAPS_TABLES.md
+   13 matches
+   Line 117: CORRECT_FILTER_NAMES:default_trading_account
+     ### 1) Decide and lock canonical preference names
+   > - `defaultAccountFilter` must be replaced by `**default_trading_account**` everywhere.
+     - `default_currency` must be aligned with `primaryCurrency` or added explicitly.
+   Line 214: CORRECT_FILTER_NAMES:default_trading_account
+     #### ✅ 1. Canonical Names Decided and Implemented
+   > - `defaultAccountFilter` → **RENAMED TO** `**default_trading_account**` everywhere
+     - `default_currency` → **ALIGNED WITH** `primaryCurrency` (removed default_currency)
+   Line 227: CORRECT_FILTER_NAMES:default_trading_account
+     - ✅ Removed `defaultAccountFilter` from `preference_types`
+   > - ✅ Migrated 0 user preferences to `**default_trading_account**`
+     - ✅ Removed `default_currency` from `preference_types`
+   Line 261: CORRECT_FILTER_NAMES:default_trading_account
+     - **Architecture:** Backend-First maintained throughout
+   > - **Canonical Naming:** ✅ Complete - `defaultAccountFilter` → `**default_trading_account**`, `default_currency` → `primaryCurrency`
+     
+   Line 25: CORRECT_FILTER_NAMES:defaultAccountFilter
+     |---|---|---|
+   > | `**defaultAccountFilter**` | no | trading-ui/scripts/entity-details-modal.js:1858; trading-ui/scripts/entity-details-modal.js:1891; trading-ui/scripts/entity-details-modal.js:1911 |
+     | `defaultCommission` | yes | trading-ui/scripts/executions.js:3378; trading-ui/scripts/executions.js:3378 |
+   ... and 8 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_SYSTEM_VERIFICATION_REPORT.md
+   18 matches
+   Line 49: CORRECT_FILTER_NAMES:default_trading_account
+     2. **עמודים עם צבעים** - כל עמוד שמשתמש בצבעים צריך preferences
+   > 3. **עמודים עם פילטרים** - עמודים עם פילטרים שמשתמשים בהעדפות (כמו **default_trading_account**)
+     
+   Line 80: CORRECT_FILTER_NAMES:default_trading_account
+     **פונקציה `_getPreferenceNameForField` מזהה:**
+   > - `cashFlowAccount` → `**default_trading_account**`
+     - `cashFlowCurrency` → `primaryCurrency`
+   Line 82: CORRECT_FILTER_NAMES:default_trading_account
+     - `cashFlowCurrency` → `primaryCurrency`
+   > - `executionAccount` → `**default_trading_account**`
+     - `executionCommission` → `defaultCommission`
+   Line 84: CORRECT_FILTER_NAMES:default_trading_account
+     - `executionCommission` → `defaultCommission`
+   > - `tradingAccount` → `**default_trading_account**`
+     - `currency` → `primaryCurrency`
+   Line 93: CORRECT_FILTER_NAMES:default_trading_account
+     1. **חסרים מיפויים לשדות נוספים:**
+   >    - `tradePlanAccount` / `planAccount` → `**default_trading_account**`
+   >    - `tradeAccount` → `**default_trading_account**`
+   ... and 13 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_TESTING_GUIDE.md
+   3 matches
+   Line 104: CORRECT_FILTER_NAMES:default_trading_account
+     **צעדים:**
+   > 1. מצא את השדה `**default_trading_account**`
+     2. בחר חשבון מהרשימה
+   Line 172: CORRECT_FILTER_NAMES:default_trading_account
+     **תוצאות צפויות:**
+   > - ✅ שדות כמו `default_currency`, `**default_trading_account**` מתמלאים אוטומטית
+     - ✅ הערכים תואמים להעדפות שנשמרו
+   Line 179: CORRECT_FILTER_NAMES:default_trading_account
+     const currency = await window.getPreferenceFromMemory('default_currency');
+   > const account = await window.getPreferenceFromMemory('**default_trading_account**');
+     console.log('Default currency:', currency);
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/05-REPORTS/PREFERENCES_VERIFICATION_REPORT.md
+   1 matches
+   Line 40: CORRECT_FILTER_NAMES:default_trading_account
+     - ✅ **ערכים תקינים:** דוגמאות:
+   >   - `**default_trading_account**`: `'3'`
+       - `pagination_size_default`: `'25'`
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/USER_PAGES_STANDARDIZATION/Preferences-Standardization-Plan-and-Status.md
+   4 matches
+   Line 32: CORRECT_FILTER_NAMES:default_trading_account
+     - prefs-init-sequencing: Fix initialization order so a normalized payload is awaited before populating UI and saving initial state.
+   > - prefs-allow-empty-rules: Define `allowEmpty` validation for legitimately empty fields (e.g., `**default_trading_account**`).
+     - prefs-color-keys: Verify all color preference key↔DOM ID mappings and add bi-directional normalization for color groups.
+   Line 58: CORRECT_FILTER_NAMES:default_trading_account
+       - `trading-ui/scripts/preferences-validation.js`:
+   >     - Added `allowEmpty` semantics and applied to `**default_trading_account**`.
+       - `trading-ui/scripts/preferences-group-manager.js`:
+   Line 87: CORRECT_FILTER_NAMES:default_trading_account
+     - Init sequencing: Completed. Populate now gated after normalized payload and profile context via `PreferencesUI.loadAllPreferences()` flow.
+   > - Allow-empty rules: Completed for `**default_trading_account**` (audit found no additional fields requiring allowEmpty at this phase).
+     - Color keys: Completed. Full bidirectional mapping; `data-color-key` honored; populate/selectors include `[data-color-key]`.
+   Line 123: CORRECT_FILTER_NAMES:default_trading_account
+     - `preferences-validation.js`:
+   >   - `allowEmpty` support; `**default_trading_account**` uses it.
+     - `preferences-group-manager.js`:
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/documentation/production/PRODUCTION_SETUP.md
+   1 matches
+   Line 75: CORRECT_FILTER_NAMES:default_trading_account
+     - מנקה את טבלאות המשתמש (trades, executions, cash_flows, וכו')
+   > - משאיר רק חשבון מסחר אחד (לפי preference `**default_trading_account**`)
+     
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/account-activity.js
+   2 matches
+   Line 274: CORRECT_FILTER_NAMES:default_trading_account
+                 try {
+   >               const prefValue = await window.getCurrentPreference('**default_trading_account**', { fallbackValue: null });
+                   if (prefValue) {
+   Line 302: CORRECT_FILTER_NAMES:default_trading_account
+               try {
+   >             const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                 if (prefValue) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/base.bundle.js
+   3 matches
+   Line 17214: CORRECT_FILTER_NAMES:default_trading_account
+           'defaultTypeFilter',
+   >       '**default_trading_account**',
+         ];
+   Line 17252: CORRECT_FILTER_NAMES:default_trading_account
+           type: window.currentPreferences?.defaultTypeFilter || [],
+   >       account: window.currentPreferences?.**default_trading_account** ? [window.currentPreferences.**default_trading_account**] : [],
+           custom: {},
+   Line 17252: CORRECT_FILTER_NAMES:default_trading_account
+           type: window.currentPreferences?.defaultTypeFilter || [],
+   >       account: window.currentPreferences?.**default_trading_account** ? [window.currentPreferences.**default_trading_account**] : [],
+           custom: {},
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/entity-details.bundle.js
+   61 matches
+   Line 5586: CORRECT_FILTER_NAMES:default_trading_account
+                         preferenceValue = await window.PreferencesCore.getPreference(
+   >                         '**default_trading_account**',
+                             window.PreferencesCore.currentUserId,
+   Line 5598: CORRECT_FILTER_NAMES:default_trading_account
+                         } else {
+   >                         window.Logger.warn(`⚠️ [getDefaultAccountInfo] Preference '**default_trading_account**' not found in PreferencesCore`, { page: "entity-details-renderer" });
+                         }
+   Line 5611: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         preferenceValue = await window.getPreference('**default_trading_account**');
+                             window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+   Line 5620: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         preferenceValue = await window.getCurrentPreference('**default_trading_account**');
+                             window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getCurrentPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+   Line 5628: CORRECT_FILTER_NAMES:default_trading_account
+                     if (preferenceValue === null && window.currentPreferences) {
+   >                     if (window.currentPreferences.**default_trading_account**) {
+   >                         preferenceValue = window.currentPreferences.**default_trading_account**;
+   ... and 56 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/modules.bundle.js
+   5 matches
+   Line 30132: CORRECT_FILTER_NAMES:default_trading_account
+             const preferenceMap = {
+   >             'cashFlowAccount': '**default_trading_account**',
+                 'cashFlowCurrency': 'primaryCurrency',
+   Line 30134: CORRECT_FILTER_NAMES:default_trading_account
+                 'cashFlowCurrency': 'primaryCurrency',
+   >             'executionAccount': '**default_trading_account**',
+                 'executionCommission': 'defaultCommission'
+   Line 30218: CORRECT_FILTER_NAMES:default_trading_account
+             const preferenceMap = {
+   >             'cashFlowAccount': '**default_trading_account**',
+                 'cashFlowCurrency': 'primaryCurrency',
+   Line 30220: CORRECT_FILTER_NAMES:default_trading_account
+                 'cashFlowCurrency': 'primaryCurrency',
+   >             'executionAccount': '**default_trading_account**',
+                 'executionCommission': 'defaultCommission',
+   Line 30222: CORRECT_FILTER_NAMES:default_trading_account
+                 'executionCommission': 'defaultCommission',
+   >             'tradingAccount': '**default_trading_account**',
+                 'currency': 'primaryCurrency'
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/preferences.bundle.js
+   3 matches
+   Line 3785: CORRECT_FILTER_NAMES:default_trading_account
+             // User settings
+   >         '**default_trading_account**',
+             'defaultCommission',
+   Line 5034: CORRECT_FILTER_NAMES:default_trading_account
+         // Integer constraints
+   >     this.constraints.set('**default_trading_account**', {
+           min: 1,
+   Line 8404: CORRECT_FILTER_NAMES:default_trading_account
+           // Trading basic
+   >       **default_trading_account**: ['defaultTradingAccount', 'tradingAccountDefault'],
+           default_page_size: ['defaultPageSize', 'pageSizeDefault'],
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/bundles/services.bundle.js
+   4 matches
+   Line 3020: CORRECT_FILTER_NAMES:default_trading_account
+                     try {
+   >                     const prefValue = await this._getPreferenceFromMemory('**default_trading_account**');
+                         if (prefValue) {
+   Line 5519: CORRECT_FILTER_NAMES:default_trading_account
+          * @param {string} fieldId - ID של השדה
+   >      * @param {string} preferenceName - שם ההעדפה (default_currency, **default_trading_account**, etc.)
+          * @returns {Promise<*>} - הערך שהוגדר או null
+   Line 5599: CORRECT_FILTER_NAMES:default_trading_account
+          *     { fieldId: 'currencySelect', preferenceName: 'default_currency' },
+   >      *     { fieldId: 'accountSelect', preferenceName: '**default_trading_account**' }
+          *   ],
+   Line 5648: CORRECT_FILTER_NAMES:default_trading_account
+          *   preferenceFields: {
+   >      *     'accountSelect': '**default_trading_account**',
+          *     'currencySelect': 'default_currency'
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/cash_flows.js
+   1 matches
+   Line 2840: CORRECT_FILTER_NAMES:default_trading_account
+         // החלת העדפת חשבון מסחר ברירת מחדל
+   >     const defaultTradingAccount = preferences.**default_trading_account** || preferences.defaultTradingAccountId;
+         if (defaultTradingAccount) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/cross-page-testing-system.js
+   5 matches
+   Line 747: CORRECT_FILTER_NAMES:default_trading_account
+                         // Check preferences are available
+   >                     const defaultAccount = await this.getPreferenceValue(iframeWindow, '**default_trading_account**');
+                         // Note: Currency preference is 'primaryCurrency'
+   Line 754: CORRECT_FILTER_NAMES:default_trading_account
+                         // Track defaults
+   >                     if (defaultAccount) result.defaultsApplied.push({ type: 'preference', name: '**default_trading_account**', value: defaultAccount });
+                         if (defaultCurrency) result.defaultsApplied.push({ type: 'preference', name: 'primaryCurrency', value: defaultCurrency });
+   Line 1785: CORRECT_FILTER_NAMES:default_trading_account
+             const accountSelect = iframeDoc.querySelector('#accountSelect, #tradingAccountSelect, select[name="trading_account_id"]');
+   >         const defaultAccount = await this.getPreferenceValue(iframeWindow, '**default_trading_account**');
+             
+   Line 1854: CORRECT_FILTER_NAMES:default_trading_account
+             const accountSelect = iframeDoc.querySelector('#accountSelect, #tradingAccountSelect, #importAccountSelect, select[name="trading_account_id"], select[name="account_id"], select[id*="Account"]');
+   >         const defaultAccount = await this.getPreferenceValue(iframeWindow, '**default_trading_account**');
+             
+   Line 1859: CORRECT_FILTER_NAMES:default_trading_account
+                 if (!result.defaultsApplied) result.defaultsApplied = [];
+   >             result.defaultsApplied.push({ type: 'preference', name: '**default_trading_account**', value: defaultAccount });
+             }
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/entity-details-modal.js
+   12 matches
+   Line 1854: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         // נסה עם **default_trading_account** (canonical name)
+   >                         let prefValue = await window.getPreference('**default_trading_account**');
+   Line 1855: CORRECT_FILTER_NAMES:default_trading_account
+   >                         // נסה עם **default_trading_account** (canonical name)
+   >                         let prefValue = await window.getPreference('**default_trading_account**');
+                             
+   Line 1885: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         let defaultAccountValue = await window.getCurrentPreference('**default_trading_account**');
+                             if (defaultAccountValue && defaultAccountValue !== 'all' && defaultAccountValue !== null && defaultAccountValue !== undefined) {
+   Line 1902: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         let defaultAccountValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                             if (defaultAccountValue && defaultAccountValue !== 'all' && defaultAccountValue !== null && defaultAccountValue !== undefined) {
+   Line 1918: CORRECT_FILTER_NAMES:default_trading_account
+                     if (isDefault === null && window.currentPreferences) {
+   >                     if (window.currentPreferences.**default_trading_account**) {
+   >                         const parsed = parseInt(window.currentPreferences.**default_trading_account**);
+   ... and 7 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/entity-details-renderer.js
+   10 matches
+   Line 3385: CORRECT_FILTER_NAMES:default_trading_account
+                         preferenceValue = await window.PreferencesCore.getPreference(
+   >                         '**default_trading_account**',
+                             window.PreferencesCore.currentUserId,
+   Line 3397: CORRECT_FILTER_NAMES:default_trading_account
+                         } else {
+   >                         window.Logger.warn(`⚠️ [getDefaultAccountInfo] Preference '**default_trading_account**' not found in PreferencesCore`, { page: "entity-details-renderer" });
+                         }
+   Line 3410: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         preferenceValue = await window.getPreference('**default_trading_account**');
+                             window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+   Line 3419: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         preferenceValue = await window.getCurrentPreference('**default_trading_account**');
+                             window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getCurrentPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+   Line 3427: CORRECT_FILTER_NAMES:default_trading_account
+                     if (preferenceValue === null && window.currentPreferences) {
+   >                     if (window.currentPreferences.**default_trading_account**) {
+   >                         preferenceValue = window.currentPreferences.**default_trading_account**;
+   ... and 5 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/header-system.js
+   3 matches
+   Line 1814: CORRECT_FILTER_NAMES:default_trading_account
+           'defaultTypeFilter',
+   >       '**default_trading_account**',
+         ];
+   Line 1852: CORRECT_FILTER_NAMES:default_trading_account
+           type: window.currentPreferences?.defaultTypeFilter || [],
+   >       account: window.currentPreferences?.**default_trading_account** ? [window.currentPreferences.**default_trading_account**] : [],
+           custom: {},
+   Line 1852: CORRECT_FILTER_NAMES:default_trading_account
+           type: window.currentPreferences?.defaultTypeFilter || [],
+   >       account: window.currentPreferences?.**default_trading_account** ? [window.currentPreferences.**default_trading_account**] : [],
+           custom: {},
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modal-manager-v2.js
+   11 matches
+   Line 1470: CORRECT_FILTER_NAMES:default_trading_account
+                             try {
+   >                             const defaultAccount = await window.getPreferenceFromMemory('**default_trading_account**');
+                                 if (defaultAccount) {
+   Line 5099: CORRECT_FILTER_NAMES:default_trading_account
+                 // Account fields
+   >             'cashFlowAccount': '**default_trading_account**',
+   >             'executionAccount': '**default_trading_account**',
+   Line 5100: CORRECT_FILTER_NAMES:default_trading_account
+   >             'cashFlowAccount': '**default_trading_account**',
+   >             'executionAccount': '**default_trading_account**',
+   >             'tradingAccount': '**default_trading_account**',
+   Line 5101: CORRECT_FILTER_NAMES:default_trading_account
+   >             'executionAccount': '**default_trading_account**',
+   >             'tradingAccount': '**default_trading_account**',
+   >             'tradePlanAccount': '**default_trading_account**',
+   Line 5102: CORRECT_FILTER_NAMES:default_trading_account
+   >             'tradingAccount': '**default_trading_account**',
+   >             'tradePlanAccount': '**default_trading_account**',
+   >             'planAccount': '**default_trading_account**',
+   ... and 6 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/portfolio-state.js
+   1 matches
+   Line 444: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                             if (prefValue) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/positions-portfolio.js
+   2 matches
+   Line 552: CORRECT_FILTER_NAMES:default_trading_account
+                             try {
+   >                             const prefValue = await window.getCurrentPreference('**default_trading_account**', { fallbackValue: null });
+                                 if (prefValue) {
+   Line 580: CORRECT_FILTER_NAMES:default_trading_account
+                         try {
+   >                         const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                             if (prefValue) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-group-manager.js
+   1 matches
+   Line 65: CORRECT_FILTER_NAMES:default_trading_account
+           // Trading basic
+   >       **default_trading_account**: ['defaultTradingAccount', 'tradingAccountDefault'],
+           default_page_size: ['defaultPageSize', 'pageSizeDefault'],
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-lazy-loader.js
+   1 matches
+   Line 43: CORRECT_FILTER_NAMES:default_trading_account
+             // User settings
+   >         '**default_trading_account**',
+             'defaultCommission',
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-page.js
+   6 matches
+   Line 54: CORRECT_FILTER_NAMES:default_trading_account
+      * Load trading accounts for default account preference
+   >  * Fetches all trading accounts from API and populates the **default_trading_account** select
+      */
+   Line 87: CORRECT_FILTER_NAMES:default_trading_account
+     
+   >     const accountSelect = document.getElementById('**default_trading_account**');
+         if (!accountSelect) {
+   Line 89: CORRECT_FILTER_NAMES:default_trading_account
+         if (!accountSelect) {
+   >       window.Logger?.error('❌ [Accounts] **default_trading_account** select element not found', {
+             page: 'preferences-page',
+   Line 91: CORRECT_FILTER_NAMES:default_trading_account
+             page: 'preferences-page',
+   >         suggestion: 'Check if the HTML element with id="**default_trading_account**" exists in the preferences page',
+           });
+   Line 108: CORRECT_FILTER_NAMES:default_trading_account
+             const preferenceValue = await window.PreferencesCore.getPreference(
+   >           '**default_trading_account**',
+               finalUserId,
+   ... and 1 more matches
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-ui-v4.js
+   1 matches
+   Line 288: CORRECT_FILTER_NAMES:default_trading_account
+           // Load accounts for default account preference (only if element exists - preferences page only)
+   >       const defaultAccountSelect = document.getElementById('**default_trading_account**') || document.getElementById('defaultAccountSelect') || document.getElementById('defaultAccount');
+           if (defaultAccountSelect && typeof window.loadAccountsForPreferences === 'function') {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences-validation.js
+   1 matches
+   Line 383: CORRECT_FILTER_NAMES:default_trading_account
+         // Integer constraints
+   >     this.constraints.set('**default_trading_account**', {
+           min: 1,
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/default-value-setter.js
+   3 matches
+   Line 87: CORRECT_FILTER_NAMES:default_trading_account
+          * @param {string} fieldId - ID של השדה
+   >      * @param {string} preferenceName - שם ההעדפה (primaryCurrency, **default_trading_account**, etc.)
+          * @returns {Promise<*>} - הערך שהוגדר או null
+   Line 188: CORRECT_FILTER_NAMES:default_trading_account
+          *     { fieldId: 'currencySelect', preferenceName: 'primaryCurrency' },
+   >      *     { fieldId: 'accountSelect', preferenceName: '**default_trading_account**' }
+          *   ],
+   Line 237: CORRECT_FILTER_NAMES:default_trading_account
+          *   preferenceFields: {
+   >      *     'accountSelect': '**default_trading_account**',
+          *     'currencySelect': 'primaryCurrency'
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/select-populator-service.js
+   1 matches
+   Line 409: CORRECT_FILTER_NAMES:default_trading_account
+                     try {
+   >                     const prefValue = await this._getPreferenceFromMemory('**default_trading_account**');
+                         if (prefValue) {
+
+📄 /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/strategy-analysis-page.js
+   7 matches
+   Line 791: CORRECT_FILTER_NAMES:default_trading_account
+                 if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+   >                 const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                     if (prefValue) {
+   Line 795: CORRECT_FILTER_NAMES:default_trading_account
+                     }
+   >             } else if (window.currentPreferences?.**default_trading_account**) {
+   >                 defaultAccountId = parseInt(window.currentPreferences.**default_trading_account**);
+   Line 796: CORRECT_FILTER_NAMES:default_trading_account
+   >             } else if (window.currentPreferences?.**default_trading_account**) {
+   >                 defaultAccountId = parseInt(window.currentPreferences.**default_trading_account**);
+                 }
+   Line 3017: CORRECT_FILTER_NAMES:default_trading_account
+                 if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+   >                 const prefValue = await window.PreferencesCore.getPreference('**default_trading_account**');
+                     if (prefValue) {
+   Line 3021: CORRECT_FILTER_NAMES:default_trading_account
+                     }
+   >             } else if (window.currentPreferences?.**default_trading_account**) {
+   >                 defaultAccountId = parseInt(window.currentPreferences.**default_trading_account**);
+   ... and 2 more matches
+
+================================================================================

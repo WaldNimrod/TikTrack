@@ -105,7 +105,7 @@ class MockupPageDetailedTester {
         try {
             // בדוק אם css-management זמין
             if (typeof window.checkArchitectureCompliance === 'undefined') {
-                await this.loadScript('/trading-ui/scripts/css-management.js');
+                await this.loadScript('/trading-ui/scripts/css_management.js');
             }
             
             if (typeof window.checkArchitectureCompliance === 'undefined') {

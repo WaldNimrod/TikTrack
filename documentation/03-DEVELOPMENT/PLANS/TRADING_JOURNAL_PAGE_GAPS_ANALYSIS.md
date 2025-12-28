@@ -56,7 +56,7 @@
 
 ### 2. Frontend - אין טעינת נתונים אמיתיים
 
-**קובץ:** `trading-ui/scripts/trading-journal-page.js`
+**קובץ:** `trading-ui/scripts/trading_journal-page.js`
 
 **חוסרים:**
 
@@ -68,7 +68,7 @@
 
 ### 3. HTML - Mockup Data סטטי
 
-**קובץ:** `trading-ui/trading-journal.html`
+**קובץ:** `trading-ui/trading_journal.html`
 
 **חוסרים:**
 
@@ -92,8 +92,8 @@
 
 ### השוואת HTML
 
-**מוקאפ:** `trading-ui/mockups/daily-snapshots/trading-journal-page.html`
-**מימוש:** `trading-ui/trading-journal.html`
+**מוקאפ:** `trading-ui/mockups/daily-snapshots/trading_journal_page.html`
+**מימוש:** `trading-ui/trading_journal.html`
 
 **הבדלים:**
 
@@ -145,7 +145,7 @@
 
 ### 2. פונקציות מקומיות שניתן להחליף
 
-**קובץ:** `trading-ui/scripts/trading-journal-page.js`
+**קובץ:** `trading-ui/scripts/trading_journal-page.js`
 
 **כפילויות:**
 
@@ -203,18 +203,18 @@
 
 ### 1. טעינת סקריפט שגויה
 
-**קובץ:** `trading-ui/trading-journal.html` - שורה 345
+**קובץ:** `trading-ui/trading_journal.html` - שורה 345
 
 **בעיה:**
 
 ```html
-<script src="../../scripts/trading-journal.js" defer></script>
+<script src="../../scripts/trading_journal.js" defer></script>
 ```
 
 **צריך:**
 
 ```html
-<script src="../../scripts/trading-journal-page.js" defer></script>
+<script src="../../scripts/trading_journal-page.js" defer></script>
 ```
 
 **הערה:** הקובץ `trading-journal.js` לא קיים, צריך `trading-journal-page.js`
@@ -234,7 +234,7 @@
 
 ### 3. אין רינדור דינמי של רשומות
 
-**קובץ:** `trading-ui/scripts/trading-journal-page.js`
+**קובץ:** `trading-ui/scripts/trading_journal-page.js`
 
 **בעיה:**
 
@@ -263,7 +263,7 @@
 
 ### 5. אין חיפוש ותאריך filter
 
-**קובץ:** `trading-ui/trading-journal.html`
+**קובץ:** `trading-ui/trading_journal.html`
 
 **בעיה:**
 
@@ -277,7 +277,7 @@
 
 ### 6. אין Info Summary
 
-**קובץ:** `trading-ui/trading-journal.html`
+**קובץ:** `trading-ui/trading_journal.html`
 
 **בעיה:**
 

@@ -78,7 +78,7 @@
         window.Logger?.info('Loading AI Analysis settings...', { page: 'user-profile' });
 
         const apiUrl = window.API_BASE_URL || '/api';
-        const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
+        const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
           method: 'GET', });
 
         if (!response.ok) {
@@ -171,6 +171,22 @@
      * הגדרת מטפלי אירועים לטפסים
      */
     setupFormHandlers() {
+      const aiForm = document.getElementById('aiAnalysisSettingsForm');
+      if (aiForm) {
+        aiForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          this.saveSettings();
+        });
+      }
+
+      const saveBtn = document.getElementById('saveAiAnalysisBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          this.saveSettings();
+        });
+      }
+
       // Toggle password visibility for Gemini key
       const toggleGeminiBtn = document.getElementById('toggleGeminiKeyBtn');
       if (toggleGeminiBtn) {
@@ -226,14 +242,11 @@
         const apiUrl = window.API_BASE_URL || '/api';
         const updates = [];
 
-        // Save default provider (if changed)
-        if (this.settings?.default_provider !== defaultProvider) {
-          // Update default provider - we'll do this after saving API keys
-        }
+        const defaultProviderChanged = this.settings?.default_provider !== defaultProvider;
 
         // Save Gemini API key if provided
         if (geminiKey) {
-          const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
+          const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -255,7 +268,7 @@
 
         // Save Perplexity API key if provided
         if (perplexityKey) {
-          const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
+          const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -276,9 +289,23 @@
         }
 
         // Update default provider if needed
-        if (this.settings?.default_provider !== defaultProvider) {
-          // For now, we'll update this in a future enhancement
-          // The default provider is stored in user_llm_providers table
+        if (defaultProviderChanged) {
+          const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              default_provider: defaultProvider
+            }),
+          });
+
+          const data = await response.json();
+          if (response.ok && data.status === 'success') {
+            updates.push('Default provider');
+          } else {
+            throw new Error(data.message || 'שגיאה בעדכון ברירת מחדל');
+          }
         }
 
         if (updates.length > 0) {
@@ -335,7 +362,7 @@
         window.Logger?.info('Validating Gemini API key...', { page: 'user-profile' });
 
         const apiUrl = window.API_BASE_URL || '/api';
-        const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
+        const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -402,7 +429,7 @@
         window.Logger?.info('Validating Perplexity API key...', { page: 'user-profile' });
 
         const apiUrl = window.API_BASE_URL || '/api';
-        const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
+        const response = await fetch(`${apiUrl}/ai_analysis/llm-provider`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -658,4 +685,3 @@
     AIAnalysisManager.init();
   }
 })();
-

@@ -160,7 +160,7 @@
       if (window.CacheTTLGuard?.ensure && !force) {
         return await window.CacheTTLGuard.ensure('ai-analysis-templates', async () => {
           window.Logger?.debug?.('🔄 Loading templates from API...', PAGE_LOG_CONTEXT);
-          const response = await fetch(buildUrl('/api/ai-analysis/templates'));
+          const response = await fetch(buildUrl('/api/ai_analysis/templates'));
 
           if (!response.ok) {
             // Handle 401 authentication errors
@@ -198,7 +198,7 @@
       }
 
       window.Logger?.debug?.('🔄 Loading templates from API...', PAGE_LOG_CONTEXT);
-      const response = await fetch(buildUrl('/api/ai-analysis/templates'));
+      const response = await fetch(buildUrl('/api/ai_analysis/templates'));
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -295,7 +295,7 @@
             data: data,
             data_json: JSON.stringify(data)
           });
-          const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+          const response = await fetch(buildUrl('/api/business/ai_analysis/validate'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -368,7 +368,7 @@
       }
       
       // Fallback if CacheTTLGuard not available
-      const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+      const response = await fetch(buildUrl('/api/business/ai_analysis/validate'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -462,7 +462,7 @@
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure(cacheKey, async () => {
-          const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+          const response = await fetch(buildUrl('/api/business/ai_analysis/validate-variables'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -486,7 +486,7 @@
       }
       
       // Fallback if CacheTTLGuard not available
-      const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+      const response = await fetch(buildUrl('/api/business/ai_analysis/validate-variables'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -553,7 +553,7 @@
         throw new Error('Validation failed: ' + errorMessage);
       }
 
-      const response = await fetch(buildUrl('/api/ai-analysis/generate'), {
+      const response = await fetch(buildUrl('/api/ai_analysis/generate'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -631,7 +631,7 @@
       if (window.CacheTTLGuard?.ensure && !force) {
         return await window.CacheTTLGuard.ensure('ai-analysis-history', async () => {
           window.Logger?.debug?.('🔄 Loading history from API...', PAGE_LOG_CONTEXT);
-          const url = new URL(buildUrl('/api/ai-analysis/history'));
+          const url = new URL(buildUrl('/api/ai_analysis/history'));
           url.searchParams.set('limit', limit);
           url.searchParams.set('offset', offset);
 
@@ -667,7 +667,7 @@
       }
 
       window.Logger?.debug?.('🔄 Loading history from API...', PAGE_LOG_CONTEXT);
-      const url = new URL(buildUrl('/api/ai-analysis/history'));
+      const url = new URL(buildUrl('/api/ai_analysis/history'));
       url.searchParams.set('limit', limit);
       url.searchParams.set('offset', offset);
 
@@ -714,7 +714,7 @@
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure('ai-analysis-providers', async () => {
-          const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), { });
+          const response = await fetch(buildUrl('/api/ai_analysis/llm-provider'), { });
 
           if (!response.ok) {
             // Handle 401 authentication errors - return null instead of throwing
@@ -731,7 +731,7 @@
       }
 
       // Fallback if CacheTTLGuard not available
-      const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), { });
+      const response = await fetch(buildUrl('/api/ai_analysis/llm-provider'), { });
 
       if (!response.ok) {
         // Handle 401 authentication errors - return null instead of throwing
@@ -763,7 +763,7 @@
    */
   async function updateLLMProviderSettings(provider, apiKey, validate = true) {
     try {
-      const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), {
+      const response = await fetch(buildUrl('/api/ai_analysis/llm-provider'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1000,7 +1000,7 @@
     }
 
     try {
-      const url = buildUrl(`/api/ai-analysis/history/${analysisId}`);
+      const url = buildUrl(`/api/ai_analysis/history/${analysisId}`);
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -1073,7 +1073,7 @@
    */
   async function deleteAllAnalyses() {
     try {
-      const apiUrl = buildUrl('/api/ai-analysis/delete-all');
+      const apiUrl = buildUrl('/api/ai_analysis/delete-all');
       
       window.Logger?.info?.('🗑️ Deleting all analyses...', PAGE_LOG_CONTEXT);
       

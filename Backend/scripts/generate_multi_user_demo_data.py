@@ -215,7 +215,7 @@ def _build_engine_kwargs():
         "echo": False,
     }
     
-    # PostgreSQL only - no SQLite support
+    # PostgreSQL only
     return kwargs
 
 def main():
@@ -336,4 +336,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

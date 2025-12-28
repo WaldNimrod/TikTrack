@@ -25,7 +25,7 @@ except ImportError:
     exit(1)
 
 BASE_URL = "http://localhost:8080"
-DASHBOARD_URL = f"{BASE_URL}/crud-testing-dashboard.html"
+DASHBOARD_URL = f"{BASE_URL}/crud_testing_dashboard.html"
 
 # Test credentials
 TEST_USERNAME = "admin"

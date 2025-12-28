@@ -49,9 +49,9 @@ const MAIN_PAGES = [
 
 const TECHNICAL_PAGES = [
     'db_display.html', 'db_extradata.html', 'constraints.html', 
-    'background-tasks.html', 'server-monitor.html', 'system-management.html',
-    'cache-test.html', 'notifications-center.html', 'css-management.html',
-    'dynamic-colors-display.html', 'designs.html', 'tradingview-test-page.html'
+    'background_tasks.html', 'server_monitor.html', 'system_management.html',
+    'cache-test.html', 'notifications_center.html', 'css_management.html',
+    'dynamic_colors_display.html', 'designs.html', 'tradingview_test_page.html'
 ];
 
 const SECONDARY_PAGES = [
@@ -59,11 +59,11 @@ const SECONDARY_PAGES = [
 ];
 
 const MOCKUP_PAGES = [
-    'portfolio-state-page.html', 'trade-history-page.html', 'price-history-page.html',
-    'comparative-analysis-page.html', 'trading-journal-page.html', 
-    'strategy-analysis-page.html', 'economic-calendar-page.html',
-    'history-widget.html', 'emotional-tracking-widget.html', 
-    'date-comparison-modal.html'
+    'portfolio_state_page.html', 'trade_history_page.html', 'price_history_page.html',
+    'comparative_analysis_page.html', 'trading_journal_page.html', 
+    'strategy_analysis_page.html', 'economic_calendar_page.html',
+    'history_widget.html', 'emotional_tracking_widget.html', 
+    'date_comparison_modal.html'
 ];
 
 const ALL_PAGES = [...MAIN_PAGES, ...TECHNICAL_PAGES, ...SECONDARY_PAGES, ...MOCKUP_PAGES];

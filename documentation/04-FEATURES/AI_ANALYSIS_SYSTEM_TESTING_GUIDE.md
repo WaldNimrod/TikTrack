@@ -27,7 +27,7 @@
 
 **שלב 1: טעינת הסקריפט**
 
-1. פתח את עמוד AI Analysis: `http://localhost:8080/trading-ui/ai-analysis.html`
+1. פתח את עמוד AI Analysis: `http://localhost:8080/ai_analysis`
 2. פתח את הקונסול (F12)
 3. ודא שהסקריפט נטען (אמור להופיע: `✅ AI Analysis automated test suite loaded`)
 
@@ -154,19 +154,19 @@ npx playwright install
 
 ```bash
 # הרצת כל הבדיקות
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js
 
 # הרצה עם UI (headed mode)
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js --headed
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js --headed
 
 # הרצה בדפדפן ספציפי
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js --project=chromium
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js --project=chromium
 
 # הרצה עם list reporter (תוצאות מפורטות)
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js --reporter=list
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js --reporter=list
 
 # הרצה עם debug mode
-npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js --debug
+npx playwright test trading-ui/scripts/testing/automated/ai_analysis-e2e.spec.js --debug
 ```
 
 ### וידוא Test Users
@@ -228,7 +228,7 @@ module.exports = {
 ### בדיקות בסיסיות
 
 1. **טעינת עמוד**
-   - פתח: `http://localhost:8080/trading-ui/ai-analysis.html`
+   - פתח: `http://localhost:8080/ai_analysis`
    - ודא שהעמוד נטען ללא שגיאות
    - בדוק שהתבניות מוצגות
 
@@ -255,7 +255,7 @@ module.exports = {
 ### בדיקות User Profile
 
 1. **ניהול API Keys**
-   - פתח: `http://localhost:8080/trading-ui/user-profile.html`
+   - פתח: `http://localhost:8080/user_profile`
    - גלול לסקשן "הגדרות AI Analysis"
    - בדוק שניתן להכניס API keys
    - בדוק שכפתורי הבדיקה עובדים
@@ -401,7 +401,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 
 1. ודא שהשרת רץ על פורט 8080
 2. בדוק את `BASE_URL` ב-`ai-analysis-e2e.spec.js`
-3. ודא שהנתיב נכון: `/trading-ui/ai-analysis.html`
+3. ודא שהנתיב נכון: `/trading-ui/ai_analysis.html`
 
 ### בעיה: Buttons לא נמצאים במודלים
 

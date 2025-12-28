@@ -5,10 +5,10 @@ Trading Journal API Routes - TikTrack
 This module provides API endpoints for retrieving trading journal data.
 
 Endpoints:
-    GET /api/trading-journal/entries - Get journal entries for date range
-    GET /api/trading-journal/statistics - Get journal statistics
-    GET /api/trading-journal/calendar - Get calendar data for specific month
-    GET /api/trading-journal/by-entity - Get entries by entity type and ID
+    GET /api/trading_journal/entries - Get journal entries for date range
+    GET /api/trading_journal/statistics - Get journal statistics
+    GET /api/trading_journal/calendar - Get calendar data for specific month
+    GET /api/trading_journal/by-entity - Get entries by entity type and ID
 
 Author: TikTrack Development Team
 Version: 1.0.0
@@ -31,7 +31,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-trading_journal_bp = Blueprint('trading_journal', __name__, url_prefix='/api/trading-journal')
+trading_journal_bp = Blueprint('trading_journal', __name__, url_prefix='/api/trading_journal')
 
 
 @trading_journal_bp.route('/entries', methods=['GET'])

@@ -38,19 +38,19 @@ BASE_URL = "http://localhost:8080"
 EXTERNAL_DATA_PAGES = [
     {
         "name": "דשבורד נתונים חיצוניים",
-        "url": "/external-data-dashboard.html",
+        "url": "/external_data_dashboard.html",
         "category": "external_data",
         "priority": "high"
     },
     {
         "name": "דשבורד טיקר",
-        "url": "/ticker-dashboard.html",
+        "url": "/ticker_dashboard.html",
         "category": "external_data",
         "priority": "high"
     },
     {
         "name": "ניהול מערכת - נתונים חיצוניים",
-        "url": "/system-management.html",
+        "url": "/system_management.html",
         "category": "external_data",
         "priority": "medium"
     }
@@ -273,7 +273,7 @@ def test_data_loading_process(driver) -> Dict[str, Any]:
     
     try:
         # Step 1: Navigate to external data dashboard
-        driver.get(BASE_URL + "/external-data-dashboard.html")
+        driver.get(BASE_URL + "/external_data_dashboard.html")
         WebDriverWait(driver, 15).until(
             lambda d: d.execute_script('return document.readyState') == 'complete'
         )
@@ -385,7 +385,7 @@ def test_scheduler_controls(driver) -> Dict[str, Any]:
     
     try:
         # Navigate to external data dashboard
-        driver.get(BASE_URL + "/external-data-dashboard.html")
+        driver.get(BASE_URL + "/external_data_dashboard.html")
         WebDriverWait(driver, 15).until(
             lambda d: d.execute_script('return document.readyState') == 'complete'
         )

@@ -3,7 +3,7 @@
  * 
  * Service for loading ticker dashboard data from API
  * 
- * Documentation: See documentation/04-FEATURES/WIREFRAMES/ticker-dashboard-wireframe.md
+ * Documentation: See documentation/04-FEATURES/WIREFRAMES/ticker_dashboard-wireframe.md
  */
 
 

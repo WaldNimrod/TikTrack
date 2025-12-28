@@ -12,7 +12,7 @@ Last Updated: 2025-01-16
 import pytest
 from unittest.mock import Mock, patch
 from services.user_data_import.import_orchestrator import ImportOrchestrator
-from services.cash_flow_service import CashFlowHelperService
+from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from models.import_session import ImportSession
 
 # ============================================================================
@@ -135,4 +135,3 @@ class TestCurrencyExchangeImport:
         # This is tested in test_exchange_pair_structure
         # fee_amount should be passed to create_exchange and only applied to FROM
         pass
-

@@ -3,6 +3,8 @@
 **תאריך:** 2025-01-16  
 **גרסה:** 1.0
 
+**חשוב:** פרודקשן מנוהל בענף `production` באותו ריפו, ומורץ ב‑worktree נפרד (`TikTrackApp-Production`). אין תיקיית `production/` בתוך `TikTrackApp`.
+
 ## 🚀 עדכון פרודקשן - תהליך מהיר
 
 **לעדכון מלא ומפורט, ראה:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
@@ -332,4 +334,3 @@ PRAGMA foreign_keys = ON;
 - `PRODUCTION_FILES_LIST.md` - רשימת קבצים פעילים
 - `Backend/scripts/create_production_db.py` - קוד הסקריפט
 - `Backend/config/settings.py` - הגדרות סביבה
-

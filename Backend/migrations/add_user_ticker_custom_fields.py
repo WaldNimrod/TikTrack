@@ -40,7 +40,7 @@ def column_exists_postgres(engine, table: str, column: str) -> bool:
 def add_user_ticker_custom_fields():
     """Add custom fields and status to user_tickers table (PostgreSQL only)."""
     
-    # PostgreSQL only - SQLite is no longer supported
+    # PostgreSQL only
     print(f"➡️  Using database: PostgreSQL")
     engine = create_engine(DATABASE_URL)
     
@@ -114,5 +114,4 @@ def add_user_ticker_custom_fields():
 
 if __name__ == "__main__":
     add_user_ticker_custom_fields()
-
 

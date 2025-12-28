@@ -25,7 +25,7 @@ ENDPOINTS_TO_TEST = [
     "/api/alerts/",
     "/api/notes/",
     "/api/cash-flows/",
-    "/api/watch-lists/"
+    "/api/watch_lists/"
 ]
 
 def login_and_get_token(username: str, password: str) -> str:

@@ -366,7 +366,7 @@ class SystemManagementMain {
     if (changeModeBtn) {
       changeModeBtn.addEventListener('click', () => {
         // Open cache management page for mode change
-        window.location.href = '/cache-management';
+        window.location.href = '/cache_management';
       });
     }
 
@@ -374,7 +374,7 @@ class SystemManagementMain {
     const openServerMonitorBtn = document.getElementById('openServerMonitorBtn');
     if (openServerMonitorBtn) {
       openServerMonitorBtn.addEventListener('click', () => {
-        window.location.href = '/server-monitor';
+        window.location.href = '/server_monitor';
       });
     }
 

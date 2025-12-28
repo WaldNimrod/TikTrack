@@ -161,7 +161,7 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
       const loadingStrategy = pkg.loadingStrategy || 'defer';
       html += `    <!-- [${scriptCounter}] Package Bundle: ${pkg.id}.bundle.js | Strategy: ${loadingStrategy} -->\n`;
       
-      const bundleSrc = `scripts/bundles/${pkg.id}.bundle.js?v=1.0.0`;
+      const bundleSrc = `/trading-ui/scripts/bundles/${pkg.id}.bundle.js?v=1.0.0`;
       let scriptTag;
 
       // Add initialization guard if specified
@@ -225,9 +225,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
         html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} | Strategy: ${loadingStrategy} -->\n`;
         
         // Handle external URLs (CDN) vs local files
-        const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://') 
-          ? script.file 
-          : `scripts/${script.file}?v=1.0.0`;
+        const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://')
+          ? script.file
+          : `/trading-ui/scripts/${script.file}?v=1.0.0`;
         
         // Generate script tag with loading strategy
         let scriptTag;

@@ -244,7 +244,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 #### שלב 1: גיבוי
 
 ```bash
-cp trading-ui/my-page.html trading-ui/my-page.html.backup
+cp trading-ui/trade_plans.html trading-ui/trade_plans.html.backup
 ```
 
 #### שלב 2: בניית Bundles
@@ -256,13 +256,13 @@ npm run build:bundles
 #### שלב 3: יצירת HTML עם Bundles
 
 ```bash
-node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_my-page.html
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_trade_plans.html
 ```
 
 #### שלב 4: החלפה
 
 ```bash
-mv temp_my-page.html trading-ui/my-page.html
+mv temp_trade_plans.html trading-ui/trade_plans.html
 ```
 
 #### שלב 5: בדיקות
@@ -340,8 +340,8 @@ npm run build:bundles 2>&1 | grep -i error
 3. **נסה development mode:**
 
    ```bash
-   node trading-ui/scripts/generate-script-loading-code.js my-page > temp_my-page.html
-   mv temp_my-page.html trading-ui/my-page.html
+   node trading-ui/scripts/generate-script-loading-code.js my-page > temp_trade_plans.html
+   mv temp_trade_plans.html trading-ui/trade_plans.html
    ```
 
 ### Bundle Size גדול מדי

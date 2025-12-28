@@ -20,7 +20,7 @@ This guide describes the required database changes, verification checkpoints, an
 1. ✅ Confirm Git branch contains the new tagging backend.
 2. ✅ Run automated backend tests locally (`pytest tests/backend/test_tag_service.py`).
 3. ✅ Ensure no pending DB migrations (`alembic current` equals production head).
-4. ✅ Take full SQLite backup (`scripts/backup/backup_database.py --label tagging-pre`).
+4. ✅ Take full database backup (`scripts/backup/backup_database.py --label tagging-pre`).
 5. ✅ Announce maintenance window to team (Slack #devops, minimum 30 minutes).
 
 ---
@@ -104,7 +104,6 @@ If issues arise:
 Prepared by: TikTrack Engineering  
 Date: November 2025  
 Version: 1.0.0
-
 
 
 

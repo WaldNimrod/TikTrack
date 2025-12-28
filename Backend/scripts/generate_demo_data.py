@@ -2417,7 +2417,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    # PostgreSQL only - no SQLite support
+    # PostgreSQL only
     return kwargs
 
 
@@ -2577,4 +2577,3 @@ def clear_user_data(db: Session, username: str, dry_run: bool = False, verbose: 
 
 if __name__ == '__main__':
     main()
-

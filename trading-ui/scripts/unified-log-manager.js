@@ -758,7 +758,7 @@ class UnifiedLogManager {
                 title: 'אתחול מערכת נתונים חיצוניים',
                 message: 'מערכת נתונים חיצוניים אותחלה - מחפש נתונים...',
                 category: 'system',
-                page: 'external-data-dashboard.html',
+                page: 'external_data_dashboard.html',
                 source: 'external_data_system'
             }];
             
@@ -778,7 +778,7 @@ class UnifiedLogManager {
                 title: 'שגיאה במערכת נתונים חיצוניים',
                 message: 'שגיאה בטעינת נתונים חיצוניים: ' + error.message,
                 category: 'system',
-                page: 'external-data-dashboard.html',
+                page: 'external_data_dashboard.html',
                 source: 'error_handler'
             }];
         }

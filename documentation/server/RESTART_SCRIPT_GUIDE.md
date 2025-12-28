@@ -3553,7 +3553,7 @@ Solutions:
 Symptoms: "Level 4/6: Database Connectivity - FAILED"
 Causes: Database not running, connection issues, locks
 Solutions:
-1. Check database process: ps aux | grep sqlite
+1. Check database process: ps aux | grep postgres
 2. Verify database file: ls -la Backend/db/simpleTrade_new.db
 3. Check database locks: lsof Backend/db/simpleTrade_new.db
 4. Restart database if needed

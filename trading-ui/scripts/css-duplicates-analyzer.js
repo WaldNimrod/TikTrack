@@ -29,19 +29,19 @@ class CSSDuplicatesAnalyzer {
             },
             {
                 selector: '.filter-toggle-btn',
-                files: ['styles-new/05-objects/_layout.css', 'styles-new/07-trumps/chart-management.css']
+                files: ['styles-new/05-objects/_layout.css', 'styles-new/07-trumps/chart_management.css']
             },
             {
                 selector: '.section-toggle-icon',
-                files: ['styles-new/05-objects/_layout.css', 'styles-new/07-trumps/chart-management.css']
+                files: ['styles-new/05-objects/_layout.css', 'styles-new/07-trumps/chart_management.css']
             },
             {
                 selector: '.loading',
-                files: ['styles-new/06-components/_bootstrap-overrides.css', 'styles-new/07-trumps/chart-management.css']
+                files: ['styles-new/06-components/_bootstrap-overrides.css', 'styles-new/07-trumps/chart_management.css']
             },
             {
                 selector: '.success-message',
-                files: ['styles-new/06-components/_constraints.css', 'styles-new/07-trumps/chart-management.css']
+                files: ['styles-new/06-components/_constraints.css', 'styles-new/07-trumps/chart_management.css']
             },
             {
                 selector: '.w-25',
@@ -57,7 +57,7 @@ class CSSDuplicatesAnalyzer {
             },
             {
                 selector: '.header-actions',
-                files: ['styles-new/06-components/_system-management.css', 'styles-new/07-trumps/chart-management.css']
+                files: ['styles-new/06-components/_system-management.css', 'styles-new/07-trumps/chart_management.css']
             },
             {
                 selector: '.filters-container',

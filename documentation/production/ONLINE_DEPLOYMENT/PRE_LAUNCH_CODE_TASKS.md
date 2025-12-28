@@ -10,7 +10,7 @@
 
 בזמן בדיקת המערכת לפני העליה לאוויר זיהינו מספר TODO-ים בולטים בקוד שמכריחים טיפול כדי שה־POC יהיה שלם:
 
-### 1. Trading Journal (`trading-ui/scripts/trading-journal-page.js`)
+### 1. Trading Journal (`trading-ui/scripts/trading_journal-page.js`)
 
 - **משימה:** העצמת לחצן "הוסף רשומה" מפעיל כרגע רק הודעה; אין פתיחת מודלים/שמירה לבסיס נתונים.
 - **למה חשוב:** כדי שהמעקב יהיה אמיתי בפרזנטציה חייבים חיבור ל־backend – לכל סוגי הרשומות (notes, alerts, executions, etc.).
@@ -26,7 +26,7 @@
 - **למה חשוב:** דף executions הוא עמוד המרכזי שמציג מידע חי; כל אחד מהמודלים חשוב לניהול עצמי בזמן הפרזנטציה. אין release בלי functionality בסיסית.
 - **מה לבצע:** לחבר את המודלים ל־header/system, לוודא שה־API קיים וכי ניהול הטפסים עובד (שומר/מעדכן/רענון רשימות).
 
-### 3. Portfolio / Account Views (`trading-ui/scripts/portfolio-state*.js`)
+### 3. Portfolio / Account Views (`trading-ui/scripts/portfolio_state*.js`)
 
 - **משימות:** קיימים TODOים שמציינים `TODO: Load from API` ו־"Implement account-level EOD data".
 - **למה חשוב:** תצוגת פורטפוליו ופילוח לפי חשבונות מופיעים בעמודי תיק, והנתונים חייבים להיות אמיתיים ל־demo.

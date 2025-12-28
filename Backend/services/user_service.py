@@ -56,6 +56,7 @@ class UserService:
                 "email": user.email,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
+                # "icon": user.icon,  # TODO: Enable after icon column migration is completed
                 "is_active": user.is_active,
                 "is_default": user.is_default,
                 "full_name": user.full_name,
@@ -139,7 +140,7 @@ class UserService:
             return self._serialize_user(user)
 
     def update_user(self, user_id: int, **kwargs) -> Optional[Dict[str, Any]]:
-        allowed = {"username", "email", "first_name", "last_name", "is_active", "is_default"}
+        allowed = {"username", "email", "first_name", "last_name", "is_active", "is_default"}  # TODO: Add "icon" after migration
         updates = {k: v for k, v in kwargs.items() if k in allowed}
 
         if not updates:
@@ -193,6 +194,5 @@ class UserService:
 
     def activate_user_profile(self, user_id: int, profile_id: int) -> bool:
         return self.preferences_service.activate_profile(user_id, profile_id)
-
 
 

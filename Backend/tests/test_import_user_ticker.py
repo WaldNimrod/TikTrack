@@ -95,25 +95,44 @@ class TestImportUserTicker:
             with patch.object(TickerService, 'create') as mock_create:
                 mock_ticker = Mock(spec=Ticker)
                 mock_ticker.id = 2
-                mock_ticker.symbol = "NEWT"
+                mock_ticker.symbol = "VERY_UNLIKELY_TEST_SYMBOL_12345"
                 mock_create.return_value = mock_ticker
-                
-                # Mock currency
+
+                # Mock currency query chain properly
                 mock_currency = Mock()
                 mock_currency.id = 1
-                self.db_session.query.return_value.filter.return_value.first.return_value = mock_currency
-                
-                records = [{"symbol": "NEWT", "type": "stock", "currency": "USD"}]
+                mock_filter = Mock()
+                mock_filter.first.return_value = mock_currency
+                mock_query = Mock()
+                mock_query.filter.return_value = mock_filter
+
+                # Mock the db.query for Ticker to return None (ticker doesn't exist)
+                mock_ticker_query = Mock()
+                mock_ticker_filter = Mock()
+                mock_ticker_filter.first.return_value = None  # No existing ticker
+                mock_ticker_query.filter.return_value = mock_ticker_filter
+
+                def mock_query_side_effect(model):
+                    if model.__name__ == 'Currency':
+                        return mock_query
+                    elif model.__name__ == 'Ticker':
+                        return mock_ticker_query
+                    else:
+                        return Mock()
+
+                self.db_session.query.side_effect = mock_query_side_effect
+
+                records = [{"symbol": "VERY_UNLIKELY_TEST_SYMBOL_12345", "type": "stock", "currency": "USD"}]
                 user_id = 1
-                
+
                 result = TickerService.enrich_records_with_ticker_ids(
-                    self.db_session, 
-                    records, 
+                    self.db_session,
+                    records,
                     user_id=user_id
                 )
-                
+
                 # Verify ticker was created
-                assert mock_create.called
+                assert mock_create.called, f"Expected TickerService.create to be called, but it wasn't. Result: {result}"
                 # Verify user_ticker was created
                 assert self.db_session.add.called
     

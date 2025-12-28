@@ -107,7 +107,7 @@ class Logger {
         this.initialized = false;
         // במצב DEBUG - מציגים DEBUG ומעלה (כל הלוגים), במצב ייצור - רק WARN ומעלה
         // בסביבת פיתוח - שמירת כל הלוגים לשרת
-        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
+        this.currentLevel = Logger._debugMode ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
         this.pendingLogs = [];
         this.batchSize = 50; // הגדלת batch size להפחתת בקשות
         this.batchTimeout = 10000; // 10 seconds - הפחתת תדירות
@@ -319,7 +319,7 @@ class Logger {
     resetLogLevelToDefault() {
         // בסביבת פיתוח - שמירת כל הלוגים (DEBUG ומעלה)
         // במצב ייצור - רק WARN ומעלה
-        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
+        this.currentLevel = Logger._debugMode ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
     }
 
     normalizeBoolean(value) {

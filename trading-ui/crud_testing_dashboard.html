@@ -108,297 +108,286 @@
                 </div>
                 <!-- UI Content Section Top End -->  
 
-                <!-- Test Type Selection -->
-                <div class="content-section" data-section="test-selection">
+                <!-- 1. בדיקות פרטניות - סקשן נפרד -->
+                <div class="content-section" id="individual-tests-section" data-section="individual-tests">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/development.svg" alt="בדיקות פרטניות" class="section-icon">
+                            🎯 בדיקות פרטניות - CRUD E2E
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('individual-tests')" data-text="הצג/הסתר" title="הצג/הסתר בדיקות פרטניות"></button>
+                        </div>
+                    </div>
                     <div class="section-body">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="mb-0 text-center">בחר סוג בדיקה</h6>
-                            </div>
-                            <div class="card-body">
-                                <!-- 3 Columns Layout -->
-                                <div class="row g-3">
-                                    <!-- Column 1: בדיקות כלליות -->
-                                    <div class="col-md-4">
-                                        <div class="card h-100 border-primary">
-                                            <div class="card-header bg-primary text-white">
-                                                <h6 class="mb-0 text-center">🔧 בדיקות כלליות</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 20%;">קטגוריה</th>
+                                        <th style="width: 50%;">CRUD E2E</th>
+                                        <th style="width: 30%;">ברירות מחדל</th>
+                                    </tr>
+                                </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="fw-bold">מסחר עיקרי</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradeTestOnly()" title="טריידים"><i class="fas fa-handshake"></i> טריידים</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradePlanTestOnly()" title="תכניות מסחר"><i class="fas fa-clipboard-list"></i> תכניות מסחר</button>
+                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runExecutionTestOnly()" title="ביצועי עסקאות"><i class="fas fa-exchange-alt"></i> ביצועי עסקאות</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold">ניהול ופיקוח</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runAlertTestOnly()" title="התראות"><i class="fas fa-bell"></i> התראות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTickerTestOnly()" title="טיקרים"><i class="fas fa-chart-line"></i> טיקרים</button>
+                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runTradingAccountTestOnly()" title="חשבונות מסחר"><i class="fas fa-wallet"></i> חשבונות מסחר</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runCashFlowTestOnly()" title="תזרימי מזומן"><i class="fas fa-money-bill-wave"></i> תזרימי מזומן</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold">תיעוד וניהול</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNoteTestOnly()" title="הערות"><i class="fas fa-sticky-note"></i> הערות</button>
+                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runWatchListTestOnly()" title="רשימות צפייה"><i class="fas fa-list"></i> רשימות צפייה</button>
+                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runTradingJournalTestOnly()" title="יומן מסחר"><i class="fas fa-book"></i> יומן מסחר</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTagCategoryTestOnly()" title="תגיות"><i class="fas fa-tags"></i> תגיות</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold">הגדרות ומערכת</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runUserProfileTestOnly()" title="פרופיל משתמש"><i class="fas fa-user"></i> פרופיל משתמש</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runPreferenceProfileTestOnly()" title="העדפות"><i class="fas fa-cog"></i> העדפות</button>
+                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runImportSessionTestOnly()" title="ייבוא נתונים"><i class="fas fa-file-import"></i> ייבוא נתונים</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-success">🔧 ברירות מחדל - פרטני</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runExecutionsDefaultsTest()" title="ברירות מחדל - ביצועי עסקאות"><i class="fas fa-check-circle"></i> ביצועים</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradesDefaultsTest()" title="ברירות מחדל - טריידים"><i class="fas fa-check-circle"></i> טריידים</button>
+                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runAlertsDefaultsTest()" title="ברירות מחדל - התראות"><i class="fas fa-check-circle"></i> התראות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradePlansDefaultsTest()" title="ברירות מחדל - תכניות מסחר"><i class="fas fa-check-circle"></i> תכניות</button>
+                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runTickersDefaultsTest()" title="ברירות מחדל - טיקרים"><i class="fas fa-check-circle"></i> טיקרים</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradingAccountsDefaultsTest()" title="ברירות מחדל - חשבונות מסחר"><i class="fas fa-check-circle"></i> חשבונות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNotesDefaultsTest()" title="ברירות מחדל - הערות"><i class="fas fa-check-circle"></i> הערות</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runCashFlowsDefaultsTest()" title="ברירות מחדל - תזרימי מזומן"><i class="fas fa-check-circle"></i> מזומנים</button>
+                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runTradeHistoryDefaultsTest()" title="ברירות מחדל - היסטוריית טרייד"><i class="fas fa-check-circle"></i> היסטוריה</button>
+                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runTradingJournalDefaultsTest()" title="ברירות מחדל - יומן מסחר"><i class="fas fa-check-circle"></i> יומן</button>
+                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runWatchListsDefaultsTest()" title="ברירות מחדל - רשימות צפייה"><i class="fas fa-check-circle"></i> רשימות</button>
+                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTagManagementDefaultsTest()" title="ברירות מחדל - תגיות"><i class="fas fa-check-circle"></i> תגיות</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-info">🔧 מיון טבלאות - פרטני</td>
+                                                            <td>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runIndexSortingTest()" title="מיון - דשבורד ראשי"><i class="fas fa-sort"></i> דשבורד</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradesSortingTest()" title="מיון - טריידים"><i class="fas fa-sort"></i> טריידים</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runExecutionsSortingTest()" title="מיון - ביצועי עסקאות"><i class="fas fa-sort"></i> ביצועים</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runAlertsSortingTest()" title="מיון - התראות"><i class="fas fa-sort"></i> התראות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradePlansSortingTest()" title="מיון - תכניות מסחר"><i class="fas fa-sort"></i> תכניות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTickersSortingTest()" title="מיון - טיקרים"><i class="fas fa-sort"></i> טיקרים</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradingAccountsSortingTest()" title="מיון - חשבונות מסחר"><i class="fas fa-sort"></i> חשבונות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNotesSortingTest()" title="מיון - הערות"><i class="fas fa-sort"></i> הערות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCashFlowsSortingTest()" title="מיון - תזרימי מזומן"><i class="fas fa-sort"></i> מזומנים</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradeHistorySortingTest()" title="מיון - היסטוריית טרייד"><i class="fas fa-sort"></i> היסטוריה</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradingJournalSortingTest()" title="מיון - יומן מסחר"><i class="fas fa-sort"></i> יומן</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runWatchListsSortingTest()" title="מיון - רשימות צפייה"><i class="fas fa-sort"></i> רשימות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runPortfolioStateSortingTest()" title="מיון - מצב תיק"><i class="fas fa-sort"></i> תיק</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runAISortingTest()" title="מיון - ניתוח AI"><i class="fas fa-sort"></i> AI</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runDataImportSortingTest()" title="מיון - ייבוא נתונים"><i class="fas fa-sort"></i> ייבוא</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTagManagementSortingTest()" title="מיון - תגיות"><i class="fas fa-sort"></i> תגיות</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runLoginSortingTest()" title="מיון - כניסה"><i class="fas fa-sort"></i> כניסה</button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runRegisterSortingTest()" title="מיון - הרשמה">
+                                                                    <i class="fas fa-sort"></i> הרשמה
+                                                                </button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runForgotPasswordSortingTest()" title="מיון - שחזור סיסמה">
+                                                                    <i class="fas fa-sort"></i> שחזור
+                                                            </button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runResetPasswordSortingTest()" title="מיון - איפוס סיסמה">
+                                                                    <i class="fas fa-sort"></i> איפוס
+                                                            </button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runDevToolsSortingTest()" title="מיון - כלי פיתוח">
+                                                                    <i class="fas fa-sort"></i> כלי פיתוח
+                                                            </button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCrudDashboardSortingTest()" title="מיון - דשבורד CRUD">
+                                                                    <i class="fas fa-sort"></i> CRUD
+                                                            </button>
+                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCodeQualitySortingTest()" title="מיון - איכות קוד">
+                                                                    <i class="fas fa-sort"></i> קוד
+                                                            </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="d-grid gap-2">
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">בדיקות בסיסיות</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runUITests()" title="בדיקות ממשק משתמש">
-                                                                <i class="fas fa-mouse-pointer"></i> UI Tests
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runAPITests()" title="בדיקות בסיס נתונים">
-                                                                <i class="fas fa-server"></i> API Tests
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runE2ETests()" title="זרימות מלאות">
-                                                                <i class="fas fa-route"></i> E2E Tests
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">כלי עזר</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runDebugTools()" title="כלי ניתור ודיבוג">
-                                                                <i class="fas fa-tools"></i> Debug Tools
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runCrossPageInfoSummaryTest()" title="בדיקת סיכום נתונים בכל העמודים">
-                                                                <i class="fas fa-chart-bar"></i> Info Summary
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Column 2: מטריצת בדיקות קבוצות (5x5) -->
-                                    <div class="col-md-4">
-                                        <div class="card h-100 border-success">
+                                <!-- 2. בדיקות קבוצתיות - מטריצה 5×5 -->
+                                                <div class="mb-4">
+                                    <div class="card border-success">
                                             <div class="card-header bg-success text-white">
-                                                <h6 class="mb-0 text-center">📊 מטריצת בדיקות קבוצות (5×5)</h6>
-                                                <small class="text-white-50">5 קבוצות עמודים × 5 סוגי בדיקות</small>
-                                            </div>
-                                            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                                                <div class="d-grid gap-2">
-                                                    <!-- מטריצה עם כותרות -->
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm table-borderless">
-                                                            <thead>
-                                                                <tr class="text-center">
-                                                                    <th style="width: 20%;">קבוצה</th>
-                                                                    <th style="width: 16%;"><i class="fas fa-calendar-check text-primary"></i></th>
-                                                                    <th style="width: 16%;"><i class="fas fa-palette text-success"></i></th>
-                                                                    <th style="width: 16%;"><i class="fas fa-sort text-info"></i></th>
-                                                                    <th style="width: 16%;"><i class="fas fa-folder-open text-warning"></i></th>
-                                                                    <th style="width: 16%;"><i class="fas fa-filter text-secondary"></i></th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <!-- 👤 עמודי משתמש -->
-                                                                <tr>
-                                                                    <td class="fw-bold text-primary">👤 משתמש<br><small class="text-muted">(16 טבלאות)</small></td>
-                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'defaults', 'עמודי משתמש')" title="ברירות מחדל - 16 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'colors', 'עמודי משתמש')" title="צבעים - 16 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sorting', 'עמודי משתמש')" title="מיון - 16 טבלאות"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-warning btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sections', 'עמודי משתמש')" title="סקשנים - 2 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'filters', 'עמודי משתמש')" title="פילטרים - 16 טבלאות"><small>✓</small></button></td>
-                                                                </tr>
-
-                                                                <!-- 🔐 ניהול משתמש -->
-                                                                <tr>
-                                                                    <td class="fw-bold text-danger">🔐 ניהול<br><small class="text-muted">(4 טבלאות)</small></td>
-                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'defaults', 'ניהול משתמש')" title="ברירות מחדל - 4 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים - 4 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון - 4 טבלאות"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
-                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים - 4 טבלאות"><small>✓</small></button></td>
-                                                                </tr>
-
-                                                                <!-- 🛠️ כלי פיתוח -->
-                                                                <tr>
-                                                                    <td class="fw-bold text-info">🛠️ פיתוח<br><small class="text-muted">(12 טבלאות)</small></td>
-                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'defaults', 'כלי פיתוח')" title="ברירות מחדל - 12 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים - 12 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון - 12 טבלאות"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
-                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
-                                                                </tr>
-
-                                                                <!-- 🧪 עמודי בדיקה -->
-                                                                <tr>
-                                                                    <td class="fw-bold text-warning">🧪 בדיקה<br><small class="text-muted">(14 טבלאות)</small></td>
-                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'defaults', 'עמודי בדיקה')" title="ברירות מחדל - 14 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים - 14 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון - 14 טבלאות"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
-                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
-                                                                </tr>
-
-                                                                <!-- ⚙️ עמודים טכניים -->
-                                                                <tr>
-                                                                    <td class="fw-bold text-secondary">⚙️ טכניים<br><small class="text-muted">(10 טבלאות)</small></td>
-                                                                    <td><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'defaults', 'עמודים טכניים')" title="ברירות מחדל - 10 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים - 10 עמודים"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון - 10 טבלאות"><small>✓</small></button></td>
-                                                                    <td><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
-                                                                    <td><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                    <hr class="my-2">
-
-                                                    <!-- סיכום מטריצה -->
-                                                    <div class="alert alert-success py-2">
-                                                        <small class="fw-bold">📊 סיכום מטריצה:</small><br>
-                                                        <small>• 25 כפתורים מתוך 25 אפשריים</small><br>
-                                                        <small>• 4 כפתורים לא רלוונטיים (✗)</small><br>
-                                                        <small>• 2 כפתורים טרם מוטמעים (🚧)</small>
-                                                    </div>
-                                                </div>
+                                            <h6 class="mb-0">📊 בדיקות קבוצתיות - מטריצה (5×5)</h6>
+                                            <small class="text-white-50">5 קבוצות עמודים × 5 סוגי בדיקות</small>
+                                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered">
+                                                    <thead class="table-light">
+                                                        <tr class="text-center">
+                                                            <th style="width: 20%;">קבוצה</th>
+                                                            <th style="width: 16%;"><i class="fas fa-calendar-check text-primary"></i> ברירות מחדל</th>
+                                                            <th style="width: 16%;"><i class="fas fa-palette text-success"></i> צבעים</th>
+                                                            <th style="width: 16%;"><i class="fas fa-sort text-info"></i> מיון</th>
+                                                            <th style="width: 16%;"><i class="fas fa-folder-open text-warning"></i> סקשנים</th>
+                                                            <th style="width: 16%;"><i class="fas fa-filter text-secondary"></i> פילטרים</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="fw-bold text-primary">👤 משתמש<br><small class="text-muted">(16 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runAllDefaultsTests()" title="ברירות מחדל - כל הישויות ברצף"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'colors', 'עמודי משתמש')" title="צבעים - 16 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sorting', 'עמודי משתמש')" title="מיון - 16 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sections', 'עמודי משתמש')" title="סקשנים - 2 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'filters', 'עמודי משתמש')" title="פילטרים - 16 טבלאות"><small>✓</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-danger">🔐 ניהול<br><small class="text-muted">(4 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'defaults', 'ניהול משתמש')" title="ברירות מחדל - 4 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים - 4 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון - 4 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים - 4 טבלאות"><small>✓</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-info">🛠️ פיתוח<br><small class="text-muted">(12 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'defaults', 'כלי פיתוח')" title="ברירות מחדל - 12 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים - 12 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון - 12 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-warning">🧪 בדיקה<br><small class="text-muted">(14 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'defaults', 'עמודי בדיקה')" title="ברירות מחדל - 14 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים - 14 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון - 14 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-secondary">⚙️ טכניים<br><small class="text-muted">(10 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'defaults', 'עמודים טכניים')" title="ברירות מחדל - 10 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים - 10 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון - 10 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot class="table-light">
+                                                        <tr>
+                                                            <td colspan="6" class="text-center">
+                                                                <small class="text-muted">
+                                                                    <strong>סיכום:</strong> 25 כפתורים מתוך 25 אפשריים | 
+                                                                    4 לא רלוונטיים (✗) | 
+                                                                    2 טרם מוטמעים (🚧)
+                                                                </small>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- Column 3: בדיקות פרטניות -->
-                                    <div class="col-md-4">
-                                        <div class="card h-100 border-info">
-                                            <div class="card-header bg-info text-white">
-                                                <h6 class="mb-0 text-center">🎯 בדיקות פרטניות</h6>
-                                            </div>
-                                            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                                                <div class="d-grid gap-2">
-                                                    <!-- ישויות מסחר עיקריות -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">מסחר עיקרי</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runTradeTestOnly()" title="טריידים">
-                                                                <i class="fas fa-handshake"></i> טריידים
-                                                            </button>
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runTradePlanTestOnly()" title="תכניות מסחר">
-                                                                <i class="fas fa-clipboard-list"></i> תכניות מסחר
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runExecutionTestOnly()" title="ביצועי עסקאות">
-                                                                <i class="fas fa-exchange-alt"></i> ביצועי עסקאות
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runExecutionsDefaultsTest()" title="ברירות מחדל - ביצועים">
-                                                                <i class="fas fa-check-circle"></i> ברירות מחדל - ביצועים
-                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <hr class="my-2">
-                                                    
-                                                    <!-- ניהול ופיקוח -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">ניהול ופיקוח</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runAlertTestOnly()" title="התראות">
-                                                                <i class="fas fa-bell"></i> התראות
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runTickerTestOnly()" title="טיקרים">
-                                                                <i class="fas fa-chart-line"></i> טיקרים
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runTradingAccountTestOnly()" title="חשבונות מסחר">
-                                                                <i class="fas fa-wallet"></i> חשבונות מסחר
-                                                            </button>
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runCashFlowTestOnly()" title="תזרימי מזומן">
-                                                                <i class="fas fa-money-bill-wave"></i> תזרימי מזומן
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-                                                    
-                                                    <!-- תיעוד וניהול -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">תיעוד וניהול</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runNoteTestOnly()" title="הערות">
-                                                                <i class="fas fa-sticky-note"></i> הערות
-                                                            </button>
-                                                            <button class="btn btn-outline-warning btn-sm" onclick="runWatchListTestOnly()" title="רשימות צפייה">
-                                                                <i class="fas fa-list"></i> רשימות צפייה
-                                                            </button>
-                                                            <button class="btn btn-outline-success btn-sm" onclick="runTradingJournalTestOnly()" title="יומן מסחר">
-                                                                <i class="fas fa-book"></i> יומן מסחר
-                                                            </button>
-                                                            <button class="btn btn-outline-primary btn-sm" onclick="runTagCategoryTestOnly()" title="תגיות">
-                                                                <i class="fas fa-tags"></i> תגיות
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-                                                    
-                                                    <!-- הגדרות ומערכת -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">הגדרות ומערכת</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runUserProfileTestOnly()" title="פרופיל משתמש">
-                                                                <i class="fas fa-user"></i> פרופיל משתמש
-                                                            </button>
-                                                            <button class="btn btn-outline-info btn-sm" onclick="runPreferenceProfileTestOnly()" title="העדפות">
-                                                                <i class="fas fa-cog"></i> העדפות
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary btn-sm" onclick="runImportSessionTestOnly()" title="ייבוא נתונים">
-                                                                <i class="fas fa-file-import"></i> ייבוא נתונים
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Column 4: בדיקות כלליות - מצב יישום -->
-                                    <div class="col-md-3">
-                                        <div class="card h-100 border-primary">
-                                            <div class="card-header bg-primary text-white">
-                                                <h6 class="mb-0 text-center">🌐 בדיקות כלליות</h6>
-                                                <small class="text-white-50">מצב יישום וקישור לפונקציות</small>
-                                            </div>
-                                            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                                                <div class="d-grid gap-2">
-                                                    <!-- בדיקות כלליות קיימות -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">✅ מיושמות (מחוברות לפונקציות)</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-success btn-sm" onclick="runUITests()" title="✅ מיושם - בדיקות ממשק משתמש לכל העמודים">
-                                                                <i class="fas fa-desktop"></i> UI Tests
-                                                            </button>
-                                                            <button class="btn btn-success btn-sm" onclick="runAPITests()" title="✅ מיושם - בדיקות API לכל הישויות">
-                                                                <i class="fas fa-exchange-alt"></i> API Tests
-                                                            </button>
-                                                            <button class="btn btn-success btn-sm" onclick="runE2ETests()" title="✅ מיושם - בדיקות מקצה לקצה לישויות">
-                                                                <i class="fas fa-route"></i> E2E Tests
-                                                            </button>
-                                                            <button class="btn btn-success btn-sm" onclick="runDebugTools()" title="✅ מיושם - כלי דיבוג וניטור">
-                                                                <i class="fas fa-tools"></i> Debug Tools
-                                                            </button>
-                                                            <button class="btn btn-success btn-sm" onclick="runCrossPageInfoSummaryTest()" title="✅ מיושם - סיכום מידע בכל העמודים">
-                                                                <i class="fas fa-chart-bar"></i> Info Summary
-                                                            </button>
-                                                            <button class="btn btn-success btn-sm" onclick="runAllTableSortingTests()" title="✅ מיושם - מיון לכל הטבלאות במערכת">
-                                                                <i class="fas fa-table"></i> Table Sorting
-                                                            </button>
+                                <!-- 3. בדיקות כלליות - רשימה עם מספר עמודים -->
+                                <div class="mb-4">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0">🌐 בדיקות כלליות</h6>
+                                            <small class="text-white-50">בדיקות מקיפות לכל המערכת</small>
                                                         </div>
-                                                    </div>
-                                                    <hr class="my-2">
-
-                                                    <!-- בדיקות כלליות חדשות -->
-                                                    <div class="mb-2">
-                                                        <small class="text-muted d-block mb-1 fw-bold">🆕 חדשות (מיושמות אך טרם נבדקו)</small>
-                                                        <div class="d-grid gap-1">
-                                                            <button class="btn btn-info btn-sm" onclick="runAllColorsTests()" title="🆕 מיושם - צבעים לכל 60 העמודים">
-                                                                <i class="fas fa-palette"></i> All Colors<br><small class="text-muted">60 עמודים</small>
-                                                            </button>
-                                                            <button class="btn btn-info btn-sm" onclick="runAllSectionsTests()" title="🆕 מיושם - סקשנים לכל העמודים עם sections">
-                                                                <i class="fas fa-folder-open"></i> All Sections<br><small class="text-muted">2 עמודים</small>
-                                                            </button>
-                                                            <button class="btn btn-warning btn-sm" onclick="runAllFiltersTests()" title="🆕 מיושם - פילטרים לכל 56 הטבלאות">
-                                                                <i class="fas fa-filter"></i> All Filters<br><small class="text-muted">56 טבלאות</small>
-                                                            </button>
-                                                            <button class="btn btn-warning btn-sm" onclick="runAllDefaultsTests()" title="🆕 מיושם - ברירות מחדל לכל 60 העמודים">
-                                                                <i class="fas fa-calendar-check"></i> All Defaults<br><small class="text-muted">60 עמודים</small>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="my-2">
-
-                                                    <!-- הערות על מצב -->
-                                                    <div class="alert alert-info py-2">
-                                                        <small class="fw-bold">💡 הערות:</small><br>
-                                                        <small>• <strong>ירוק</strong> = מיושם ונבדק</small><br>
-                                                        <small>• <strong>כחול</strong> = מיושם חדש</small><br>
-                                                        <small>• <strong>צהוב</strong> = מיושם, צריך בדיקה</small><br>
-                                                        <small>• <strong>אפור</strong> = לא מיושם</small>
-                                                    </div>
-                                                </div>
+                                            <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 30%;">בדיקה</th>
+                                                            <th style="width: 15%;">מצב</th>
+                                                            <th style="width: 20%;">כיסוי</th>
+                                                            <th style="width: 35%;">תיאור</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><i class="fas fa-desktop text-primary"></i> UI Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל העמודים</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runUITests()" title="בדיקות ממשק משתמש לכל העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-exchange-alt text-success"></i> API Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל הישויות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runAPITests()" title="בדיקות API לכל הישויות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-route text-info"></i> E2E Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל הישויות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runE2ETests()" title="בדיקות מקצה לקצה לישויות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-tools text-warning"></i> Debug Tools</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל המערכת</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runDebugTools()" title="כלי דיבוג וניטור">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-chart-bar text-secondary"></i> Info Summary</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל העמודים</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runCrossPageInfoSummaryTest()" title="סיכום מידע בכל העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-table text-dark"></i> Table Sorting</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">56 טבלאות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runAllTableSortingTests()" title="מיון לכל הטבלאות במערכת">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-palette text-primary"></i> All Colors</td>
+                                                            <td><span class="badge bg-info">🆕 חדש</span></td>
+                                                            <td><small class="text-muted">60 עמודים</small></td>
+                                                            <td><button class="btn btn-info btn-sm w-100" onclick="runAllColorsTests()" title="צבעים לכל 60 העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-folder-open text-success"></i> All Sections</td>
+                                                            <td><span class="badge bg-info">🆕 חדש</span></td>
+                                                            <td><small class="text-muted">2 עמודים</small></td>
+                                                            <td><button class="btn btn-info btn-sm w-100" onclick="runAllSectionsTests()" title="סקשנים לכל העמודים עם sections">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-filter text-warning"></i> All Filters</td>
+                                                            <td><span class="badge bg-warning">⚠️ צריך בדיקה</span></td>
+                                                            <td><small class="text-muted">56 טבלאות</small></td>
+                                                            <td><button class="btn btn-warning btn-sm w-100" onclick="runAllFiltersTests()" title="פילטרים לכל 56 הטבלאות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-calendar-check text-info"></i> All Defaults</td>
+                                                            <td><span class="badge bg-warning">⚠️ צריך בדיקה</span></td>
+                                                            <td><small class="text-muted">60 עמודים</small></td>
+                                                            <td><button class="btn btn-warning btn-sm w-100" onclick="runAllDefaultsTests()" title="ברירות מחדל לכל 60 העמודים">הרץ</button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -473,6 +462,12 @@
                                 </div>
 
                                 <!-- Results Table -->
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">תוצאות בדיקות</h6>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="copyTestResultsToClipboard()" title="העתק תוצאות ללוח">
+                                        <i class="fas fa-copy"></i> העתק ללוח
+                                    </button>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-hover" id="testResultsTable">
                                         <thead class="table-dark">
@@ -758,6 +753,10 @@
     <script src="scripts/advanced-debug-monitor.js?v=1.0.0" defer></script> <!-- Advanced debug and monitoring system -->
     <!-- [57] Page-specific: cross-page-testing-system.js | Strategy: defer -->
     <script src="scripts/cross-page-testing-system.js?v=1.0.0" defer></script> <!-- Cross-page testing system -->
+    <!-- [58] Page-specific: defaults-testing-system.js | Strategy: defer -->
+    <script src="scripts/defaults-testing-system.js?v=1.0.0" defer></script> <!-- Defaults testing system -->
+    <!-- [59] Page-specific: sorting-testing-system.js | Strategy: blocking -->
+    <script src="scripts/sorting-testing-system.js?v=1.0.0"></script> <!-- Sorting testing system -->
     <!-- [58] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
     <script src="scripts/crud_testing_dashboard.js?v=1.0.30" defer></script> <!-- Main page script -->
 

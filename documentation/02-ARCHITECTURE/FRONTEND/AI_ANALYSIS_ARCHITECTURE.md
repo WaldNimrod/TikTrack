@@ -20,7 +20,7 @@
 ### ארכיטקטורה כללית
 
 ```
-Page Load (ai-analysis.html)
+Page Load (ai_analysis.html)
     ↓
 UnifiedAppInitializer.initialize()
     ↓
@@ -49,7 +49,7 @@ User actions (Save as Note / Export)
 
 ### AIAnalysisManager
 
-**קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
+**קובץ:** `trading-ui/scripts/ai_analysis-manager.js`
 
 **תפקידים:**
 

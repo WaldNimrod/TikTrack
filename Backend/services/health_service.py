@@ -18,7 +18,6 @@ Date: September 2025
 
 import time
 import psutil
-import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from sqlalchemy import text

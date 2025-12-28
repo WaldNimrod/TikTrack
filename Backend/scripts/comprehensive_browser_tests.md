@@ -121,12 +121,12 @@ curl http://localhost:8080/api/health
 
 ### 6. בדיקת עמוד פרופיל משתמש
 
-**URL:** `http://localhost:8080/user-profile.html`
+**URL:** `http://localhost:8080/user_profile.html`
 
 **צעדים:**
 
 1. התחבר למערכת
-2. פתח את העמוד user-profile.html
+2. פתח את העמוד user_profile.html
 3. **תוצאה צפויה:**
    - העמוד נטען
    - פרטי המשתמש מופיעים (username, email, first_name, last_name)
@@ -139,7 +139,7 @@ curl http://localhost:8080/api/health
 
 ### 7. בדיקת עדכון פרטי משתמש
 
-**URL:** `http://localhost:8080/user-profile.html`
+**URL:** `http://localhost:8080/user_profile.html`
 
 **צעדים:**
 
@@ -167,7 +167,7 @@ curl http://localhost:8080/api/health
 
 ### 8. בדיקת עדכון סיסמה
 
-**URL:** `http://localhost:8080/user-profile.html`
+**URL:** `http://localhost:8080/user_profile.html`
 
 **צעדים:**
 

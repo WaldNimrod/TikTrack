@@ -124,22 +124,22 @@
 
 1. index.html
 2. alerts.html
-3. background-tasks.html (תוקן)
+3. background_tasks.html (תוקן)
 4. cash_flows.html
 5. chart_management.html
 6. constraints.html
-7. css-management.html
+7. css_management.html
 8. db_display.html
 9. db_extradata.html
 10. designs.html
 11. executions.html
 12. external_data_dashboard.html
-13. js-map.html (הועבר לארכיון בנובמבר 2025)
+13. js_map.html (הועבר לארכיון בנובמבר 2025)
 14. notes.html
-15. notifications-center.html
+15. notifications_center.html
 16. preferences.html
 17. research.html
-18. system-management.html
+18. system_management.html
 19. tickers.html
 20. trade_plans.html
 21. trades.html

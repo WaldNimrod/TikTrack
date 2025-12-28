@@ -24,15 +24,10 @@ def register_import_sessions_cleanup_task(task_manager: BackgroundTaskManager):
             from sqlalchemy import create_engine, text
             from sqlalchemy.orm import sessionmaker
             
-            # Database path - Use the unified tiktrack.db database file (standardized for dev and production)
-            db_path = backend_dir / "db" / "tiktrack.db"
-            
-            if not db_path.exists():
-                print(f"❌ Database not found at: {db_path}")
-                return False
-            
+            from config.settings import DATABASE_URL
+
             # Create engine and session
-            engine = create_engine(f'sqlite:///{db_path}')
+            engine = create_engine(DATABASE_URL)
             Session = sessionmaker(bind=engine)
             db_session = Session()
             

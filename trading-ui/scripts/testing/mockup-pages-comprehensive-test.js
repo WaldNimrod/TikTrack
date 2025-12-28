@@ -59,22 +59,22 @@
 
             this.mockupPages = [
                 // daily-snapshots
-                { name: 'trade-history-page', path: '/mockups/daily-snapshots/trade-history-page.html', hasCRUD: true },
-                { name: 'portfolio-state-page', path: '/mockups/daily-snapshots/portfolio-state-page.html', hasCRUD: false },
-                { name: 'price-history-page', path: '/mockups/daily-snapshots/price-history-page.html', hasCRUD: false },
-                { name: 'comparative-analysis-page', path: '/mockups/daily-snapshots/comparative-analysis-page.html', hasCRUD: false },
-                { name: 'trading-journal-page', path: '/mockups/daily-snapshots/trading-journal-page.html', hasCRUD: false },
-                { name: 'strategy-analysis-page', path: '/mockups/daily-snapshots/strategy-analysis-page.html', hasCRUD: false },
-                { name: 'economic-calendar-page', path: '/mockups/daily-snapshots/economic-calendar-page.html', hasCRUD: false },
-                { name: 'history-widget', path: '/mockups/daily-snapshots/history-widget.html', hasCRUD: false },
-                { name: 'emotional-tracking-widget', path: '/mockups/daily-snapshots/emotional-tracking-widget.html', hasCRUD: false },
-                { name: 'date-comparison-modal', path: '/mockups/daily-snapshots/date-comparison-modal.html', hasCRUD: false },
-                { name: 'tradingview-test-page', path: '/mockups/daily-snapshots/tradingview-test-page.html', hasCRUD: false },
+                { name: 'trade-history-page', path: '/mockups/daily-snapshots/trade_history_page.html', hasCRUD: true },
+                { name: 'portfolio-state-page', path: '/mockups/daily-snapshots/portfolio_state_page.html', hasCRUD: false },
+                { name: 'price-history-page', path: '/mockups/daily-snapshots/price_history_page.html', hasCRUD: false },
+                { name: 'comparative-analysis-page', path: '/mockups/daily-snapshots/comparative_analysis_page.html', hasCRUD: false },
+                { name: 'trading-journal-page', path: '/mockups/daily-snapshots/trading_journal_page.html', hasCRUD: false },
+                { name: 'strategy-analysis-page', path: '/mockups/daily-snapshots/strategy_analysis_page.html', hasCRUD: false },
+                { name: 'economic-calendar-page', path: '/mockups/daily-snapshots/economic_calendar_page.html', hasCRUD: false },
+                { name: 'history-widget', path: '/mockups/daily-snapshots/history_widget.html', hasCRUD: false },
+                { name: 'emotional-tracking-widget', path: '/mockups/daily-snapshots/emotional_tracking_widget.html', hasCRUD: false },
+                { name: 'date-comparison-modal', path: '/mockups/daily-snapshots/date_comparison_modal.html', hasCRUD: false },
+                { name: 'tradingview-test-page', path: '/mockups/daily-snapshots/tradingview_test_page.html', hasCRUD: false },
                 // Additional pages
-                { name: 'watch-lists-page', path: '/mockups/watch-lists-page.html', hasCRUD: true },
-                { name: 'watch-list-modal', path: '/mockups/watch-list-modal.html', hasCRUD: false },
-                { name: 'add-ticker-modal', path: '/mockups/add-ticker-modal.html', hasCRUD: false },
-                { name: 'flag-quick-action', path: '/mockups/flag-quick-action.html', hasCRUD: false }
+                { name: 'watch-lists-page', path: '/mockups/watch_lists-page.html', hasCRUD: true },
+                { name: 'watch-list-modal', path: '/mockups/watch_list_modal.html', hasCRUD: false },
+                { name: 'add-ticker-modal', path: '/mockups/add_ticker_modal.html', hasCRUD: false },
+                { name: 'flag-quick-action', path: '/mockups/flag_quick_action.html', hasCRUD: false }
             ];
 
             this.consoleErrors = [];

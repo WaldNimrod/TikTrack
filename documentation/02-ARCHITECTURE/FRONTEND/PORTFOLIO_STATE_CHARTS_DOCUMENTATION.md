@@ -126,7 +126,7 @@ total_pl = total_realized_pl + total_unrealized_pl    # רק רווח/הפסד
 
 ### Frontend
 
-**קובץ:** `trading-ui/scripts/portfolio-state.js`
+**קובץ:** `trading-ui/scripts/portfolio_state.js`
 
 **פונקציות:**
 

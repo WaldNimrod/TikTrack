@@ -34,6 +34,9 @@ def test_get_market_price_returns_latest_quote(monkeypatch):
         asof_utc='2025-11-15T00:00:00Z',
         change_pct_day=1.5,
         change_amount_day=1.2,
+        open_price=120.0,  # Add open_price for tests
+        change_pct_from_open=2.8,
+        change_amount_from_open=3.45,
     )
 
     (mock_session.query.return_value
@@ -46,6 +49,7 @@ def test_get_market_price_returns_latest_quote(monkeypatch):
     assert result['is_stale'] is False
     assert result['fetched_at'] == '2025-11-15T00:00:00Z'
     assert result['change_pct_day'] == 1.5
+    assert result['open_price'] == 120.0  # Test open_price is included
 
 
 def test_get_market_price_returns_none_on_exception(monkeypatch):

@@ -18,21 +18,21 @@ DAILY_SNAPSHOTS_DIR = MOCKUPS_DIR / "daily-snapshots"
 
 # List of mockup pages
 MOCKUP_PAGES = [
-    DAILY_SNAPSHOTS_DIR / "comparative-analysis-page.html",
-    DAILY_SNAPSHOTS_DIR / "date-comparison-modal.html",
-    DAILY_SNAPSHOTS_DIR / "economic-calendar-page.html",
-    DAILY_SNAPSHOTS_DIR / "emotional-tracking-widget.html",
-    DAILY_SNAPSHOTS_DIR / "history-widget.html",
-    DAILY_SNAPSHOTS_DIR / "portfolio-state-page.html",
-    DAILY_SNAPSHOTS_DIR / "price-history-page.html",
-    DAILY_SNAPSHOTS_DIR / "strategy-analysis-page.html",
-    DAILY_SNAPSHOTS_DIR / "trade-history-page.html",
-    DAILY_SNAPSHOTS_DIR / "trading-journal-page.html",
-    DAILY_SNAPSHOTS_DIR / "tradingview-test-page.html",
-    MOCKUPS_DIR / "add-ticker-modal.html",
-    MOCKUPS_DIR / "flag-quick-action.html",
-    MOCKUPS_DIR / "watch-list-modal.html",
-    MOCKUPS_DIR / "watch-lists-page.html",
+    DAILY_SNAPSHOTS_DIR / "comparative_analysis_page.html",
+    DAILY_SNAPSHOTS_DIR / "date_comparison_modal.html",
+    DAILY_SNAPSHOTS_DIR / "economic_calendar_page.html",
+    DAILY_SNAPSHOTS_DIR / "emotional_tracking_widget.html",
+    DAILY_SNAPSHOTS_DIR / "history_widget.html",
+    DAILY_SNAPSHOTS_DIR / "portfolio_state_page.html",
+    DAILY_SNAPSHOTS_DIR / "price_history_page.html",
+    DAILY_SNAPSHOTS_DIR / "strategy_analysis_page.html",
+    DAILY_SNAPSHOTS_DIR / "trade_history_page.html",
+    DAILY_SNAPSHOTS_DIR / "trading_journal_page.html",
+    DAILY_SNAPSHOTS_DIR / "tradingview_test_page.html",
+    MOCKUPS_DIR / "add_ticker_modal.html",
+    MOCKUPS_DIR / "flag_quick_action.html",
+    MOCKUPS_DIR / "watch_list_modal.html",
+    MOCKUPS_DIR / "watch_lists_page.html",
 ]
 
 # Header initialization code

@@ -128,7 +128,7 @@ except Exception as e:
 
 ### בעיה #4: Frontend - איסוף משתנים לא עובד נכון ✅ תוקן
 
-**מיקום:** `trading-ui/scripts/ai-analysis-manager.js` - שורה 720-745
+**מיקום:** `trading-ui/scripts/ai_analysis-manager.js` - שורה 720-745
 
 **תיאור:**
 
@@ -155,7 +155,7 @@ variableInputs.forEach((input) => {
 
 ### בעיה #5: Modal לא נפתח נכון ✅ תוקן
 
-**מיקום:** `trading-ui/scripts/ai-analysis-manager.js` - שורה 157-177
+**מיקום:** `trading-ui/scripts/ai_analysis-manager.js` - שורה 157-177
 
 **תיאור:**
 
@@ -192,7 +192,7 @@ async openTemplateSelectionModal() {
 
 ### בעיה #6: Initialization לא עובד נכון ✅ תוקן
 
-**מיקום:** `trading-ui/scripts/ai-analysis-manager.js` - שורה 1113-1162
+**מיקום:** `trading-ui/scripts/ai_analysis-manager.js` - שורה 1113-1162
 
 **תיאור:**
 
@@ -233,7 +233,7 @@ const waitForInit = async () => {
 
 ### בעיה #7: Cache לא מתנקה נכון ✅ נבדק - עובד נכון
 
-**מיקום:** `trading-ui/scripts/services/ai-analysis-data.js` - שורה 87-119
+**מיקום:** `trading-ui/scripts/services/ai_analysis-data.js` - שורה 87-119
 
 **תיאור:**
 
@@ -305,7 +305,7 @@ except Exception as e:
 
 ### תיקון #3: שימוש ב-DataCollectionService
 
-**קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
+**קובץ:** `trading-ui/scripts/ai_analysis-manager.js`
 
 **שינוי:**
 
@@ -331,7 +331,7 @@ const variables = window.DataCollectionService?.collectFormData(fieldMap) || {};
 
 ### תיקון #4: פישוט Initialization
 
-**קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
+**קובץ:** `trading-ui/scripts/ai_analysis-manager.js`
 
 **שינוי:**
 
@@ -343,7 +343,7 @@ const variables = window.DataCollectionService?.collectFormData(fieldMap) || {};
 
 ### תיקון #5: בדיקת Modal Registration
 
-**קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
+**קובץ:** `trading-ui/scripts/ai_analysis-manager.js`
 
 **שינוי:**
 
@@ -484,7 +484,7 @@ async openTemplateSelectionModal() {
 ### שלב 1: תיקון ניטור הטעינה והמניפסט ✅
 
 - עדכון `package-manifest.js` - שינוי `ai-analysis-data.js` ל-`required: true`
-- עדכון קוד הטעינה ב-`ai-analysis.html` עם קוד מעודכן מ-`generate-script-loading-code.js`
+- עדכון קוד הטעינה ב-`ai_analysis.html` עם קוד מעודכן מ-`generate-script-loading-code.js`
 - הסרת Bootstrap הישן שהיה לפני קוד הטעינה
 
 ### שלב 2: בחינה מעמיקה של הארכיטקטורה ✅
@@ -497,9 +497,9 @@ async openTemplateSelectionModal() {
 
 - יצירת `AIAnalysisBusinessService` שיורש מ-`BaseBusinessService`
 - הוספת Business Rules ל-`BusinessRulesRegistry` עבור `ai_analysis`
-- הוספת API endpoints ב-`/api/business/ai-analysis/*`:
-  - `POST /api/business/ai-analysis/validate` - ולידציה של analysis request
-  - `POST /api/business/ai-analysis/validate-variables` - ולידציה של variables
+- הוספת API endpoints ב-`/api/business/ai_analysis/*`:
+  - `POST /api/business/ai_analysis/validate` - ולידציה של analysis request
+  - `POST /api/business/ai_analysis/validate-variables` - ולידציה של variables
 - עדכון `AIAnalysisService` לשימוש ב-Business Logic Layer
 
 ### שלב 4: תיקון Authentication/Session ✅

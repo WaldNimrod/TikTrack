@@ -28,12 +28,6 @@ class Tag(BaseModel):
     """Describes a single tag with metadata and usage counters."""
 
     __tablename__ = "tags"
-    __table_args__ = (
-        {
-            "sqlite_autoincrement": True,
-        },
-    )
-
     user_id = Column(Integer, nullable=False, index=True)
     category_id = Column(Integer, ForeignKey("tag_categories.id"), nullable=True)
     name = Column(String(100), nullable=False)
@@ -80,7 +74,6 @@ class Tag(BaseModel):
                 "color_hex": self.category.color_hex,
             }
         return base
-
 
 
 

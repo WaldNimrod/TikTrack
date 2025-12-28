@@ -3,7 +3,7 @@ Migration: Create Ticker Provider Symbols Table
 Creates the ticker_provider_symbols table for mapping internal ticker symbols
 to provider-specific symbol formats.
 
-Supports both SQLite and PostgreSQL databases.
+PostgreSQL migration.
 
 Date: 2025-01-27
 Author: TikTrack Development Team
@@ -89,7 +89,7 @@ def run_migration(database_url=None):
     if database_url is None:
         database_url = DATABASE_URL
     
-    # PostgreSQL only - SQLite is no longer supported
+    # PostgreSQL only
     print("=" * 70)
     print("Create Ticker Provider Symbols Table Migration")
     print("=" * 70)
@@ -162,4 +162,3 @@ if __name__ == "__main__":
     
     success = run_migration(database_url)
     sys.exit(0 if success else 1)
-

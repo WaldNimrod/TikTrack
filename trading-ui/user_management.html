@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="user-management-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ניהול משתמשים במערכת TikTrack">
+    <meta name="keywords" content="TikTrack, ניהול משתמשים, משתמשים, הגדרות משתמש">
+    <meta name="author" content="TikTrack">
+    <title>ניהול משתמשים - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
+    <!-- ITCSS Layer 1: Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 2: Tools -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 3: Generic -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 4: Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 5: Objects -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 6: Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_actions-menu.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 7: Pages -->
+    <link rel="stylesheet" href="styles-new/07-pages/_user-management.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 8: Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-themes/_high-contrast.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 9: Utilities -->
+    <link rel="stylesheet" href="styles-new/07-utilities/_common-patterns.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
+</head>
+<body class="user-management-page">
+    <!-- 
+        TikTrack Page Template
+        גרסה: 2.0
+        תאריך: 28 בינואר 2025
+        מערכת: 8 מודולי אתחול + ITCSS מלא
+        מטמון: 4 שכבות מאוחדות
+    -->
+    <!-- LOCK: DO NOT MODIFY - Page Structure -->
+    <div class="container-fluid page-container">
+        <header class="row g-0">
+            <div class="col-12">
+                <div id="unified-header"></div>
+            </div>
+        </header>
+
+        <main class="row g-0">
+            <div class="col-12">
+                <div class="background-wrapper">
+                    <div class="page-body">
+                        <div class="main-content">
+                            <div class="content-section" id="user-management-top" data-section="top">
+                                <div class="section-header">
+                                    <div class="table-title">
+                                        <img src="images/icons/entities/user.svg" alt="ניהול משתמשים" class="section-icon">
+                                        <span>ניהול משתמשים</span>
+                                    </div>
+                                    <div class="section-actions">
+                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <!-- User Statistics Summary -->
+                                    <div class="info-summary" id="userStatsSummary">
+                                        <div>סה"כ משתמשים: <strong id="totalUsers">0</strong></div>
+                                        <div>משתמשים פעילים: <strong id="activeUsers">0</strong></div>
+                                        <div>משתמשים לא פעילים: <strong id="inactiveUsers">0</strong></div>
+                                        <div>משתמש ברירת מחדל: <strong id="defaultUser">לא נמצא</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Users Table Section -->
+                            <div class="content-section" id="user-management-table" data-section="table">
+                                <div class="section-header">
+                                    <div class="table-title">
+                                        <img src="images/icons/entities/user.svg" alt="רשימת משתמשים" class="section-icon">
+                                        <span>רשימת משתמשים</span>
+                                    </div>
+                                    <div class="table-count" id="usersCount">טוען...</div>
+                                    <div class="table-actions">
+                                        <button data-button-type="ADD" data-entity-type="user" data-variant="full" data-onclick="window.UserManagementPage?.showAddUserModal()" data-text="הוסף משתמש" title="הוסף משתמש חדש"></button>
+                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('table')" data-text="הצג/הסתר" title="הצג/הסתר טבלת משתמשים"></button>
+                                    </div>
+                                </div>
+
+                                <!-- Users Table -->
+                                <div class="section-body">
+                                    <div class="table-responsive" id="usersTableContainer">
+                                        <table class="table table-hover" id="usersTable" data-table-type="users">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-username">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם משתמש" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('username')" ></button>
+                                                    </th>
+                                                    <th class="col-email">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="אימייל" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('email')" ></button>
+                                                    </th>
+                                                    <th class="col-full-name">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שם מלא" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('full_name')" ></button>
+                                                    </th>
+                                                    <th class="col-status">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('is_active')" ></button>
+                                                    </th>
+                                                    <th class="col-default">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="ברירת מחדל" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('is_default')" ></button>
+                                                    </th>
+                                                    <th class="col-created">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוצר ב" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('created_at')" ></button>
+                                                    </th>
+                                                    <th class="col-updated">
+                                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עודכן" data-classes="btn-link sortable-header" data-onclick="window.UserManagementPage?.sortTable('updated_at')" ></button>
+                                                    </th>
+                                                    <th class="col-actions actions-cell actions-3-items">
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="8" class="loading">טוען משתמשים...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="table-footer">
+                                    <!-- Footer actions will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: user-management | Generated: 2025-12-28T17:00:00.000Z -->
+    <!-- 📦 Packages: base, auth, header, core-ui, core-init, services, ui-advanced, modules, crud, preferences, entity-details, info-summary, dashboard-widgets, conditions, init-system -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/14: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/base.bundle.js?v=1.0.0" defer></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/14: AUTHENTICATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Authentication systems loaded FIRST to provide dependencies for other packages -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [5] Package Bundle: auth.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/auth.bundle.js?v=1.0.0" defer></script> <!-- Authentication Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/14: CORE UI PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.1 | Description: Core UI systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [6] Package Bundle: core-ui.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/core-ui.bundle.js?v=1.0.0" defer></script> <!-- Core UI Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/14: HEADER PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.2 | Description: Header and filter systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [7] Package Bundle: header.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/header.bundle.js?v=1.0.0" defer></script> <!-- Header Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/14: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [8] Package Bundle: services.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/services.bundle.js?v=1.0.0" defer></script> <!-- Services Package bundle -->
+    <!-- [9] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [10] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [11] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/14: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [12] Package Bundle: modules.bundle.js | Strategy: defer -->
+    <script>
+      // Initialization guard for Modules Package
+      (function() {
+        function checkAndLoadModules() {
+          if (window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe) {
+            const script = document.createElement('script');
+            script.src = 'scripts/bundles/modules.bundle.js?v=1.0.0';
+            script.defer = true;
+            document.head.appendChild(script);
+          } else {
+            setTimeout(checkAndLoadModules, 10);
+          }
+        }
+        checkAndLoadModules();
+      })();
+    </script>
+    <!-- Bundle modules will be loaded dynamically after guard check -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/14: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [13] Package Bundle: ui-advanced.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/ui-advanced.bundle.js?v=1.0.0" defer></script> <!-- UI Advanced Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/14: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [14] Package Bundle: crud.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/crud.bundle.js?v=1.0.0" defer></script> <!-- CRUD Operations Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/14: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [15] Package Bundle: preferences.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/preferences.bundle.js?v=1.0.0" defer></script> <!-- Preferences Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/14: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [16] Package Bundle: conditions.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/conditions.bundle.js?v=1.0.0" defer></script> <!-- Conditions Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/14: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: Entity details systems -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [17] Package Bundle: entity-details.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/entity-details.bundle.js?v=1.0.0" defer></script> <!-- Entity Details Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 12/14: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17.5 | Description: Unified data summary system for all pages -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [18] Package Bundle: info-summary.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/info-summary.bundle.js?v=1.0.0" defer></script> <!-- Info Summary Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 13/14: DASHBOARD WIDGETS ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20.6 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details, watch-lists -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [19] Package Bundle: dashboard-widgets.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/dashboard-widgets.bundle.js?v=1.0.0" defer></script> <!-- Dashboard Widgets bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 14/14: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [20] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="/trading-ui/scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- User Management Page Script -->
+    <script src="scripts/user-management.js?v=1.0.0" defer></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 20 | Unique Scripts Loaded: 20 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+
+</body>
+</html>

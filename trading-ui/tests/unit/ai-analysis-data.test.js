@@ -70,7 +70,7 @@ describe('AIAnalysisData', () => {
       // Load the service (would normally be done by the page)
       // For testing, we'll test the function directly
       const validateFunction = async (data) => {
-        const response = await fetch('/api/business/ai-analysis/validate', {
+        const response = await fetch('/api/business/ai_analysis/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -101,7 +101,7 @@ describe('AIAnalysisData', () => {
       expect(result.is_valid).toBe(true);
       expect(result.errors).toEqual([]);
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/business/ai-analysis/validate',
+        '/api/business/ai_analysis/validate',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -124,7 +124,7 @@ describe('AIAnalysisData', () => {
       });
 
       const validateFunction = async (data) => {
-        const response = await fetch('/api/business/ai-analysis/validate', {
+        const response = await fetch('/api/business/ai_analysis/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -162,7 +162,7 @@ describe('AIAnalysisData', () => {
 
       const validateFunction = async (data) => {
         try {
-          const response = await fetch('/api/business/ai-analysis/validate', {
+          const response = await fetch('/api/business/ai_analysis/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -210,7 +210,7 @@ describe('AIAnalysisData', () => {
       });
 
       const validateFunction = async (variables) => {
-        const response = await fetch('/api/business/ai-analysis/validate-variables', {
+        const response = await fetch('/api/business/ai_analysis/validate-variables', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -256,7 +256,7 @@ describe('AIAnalysisData', () => {
       });
 
       const validateFunction = async (variables) => {
-        const response = await fetch('/api/business/ai-analysis/validate-variables', {
+        const response = await fetch('/api/business/ai_analysis/validate-variables', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -309,7 +309,7 @@ describe('AIAnalysisData', () => {
 
       const generateFunction = async (templateId, variables, provider) => {
         // Validate first
-        const validationResponse = await fetch('/api/business/ai-analysis/validate', {
+        const validationResponse = await fetch('/api/business/ai_analysis/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -331,7 +331,7 @@ describe('AIAnalysisData', () => {
         }
 
         // Generate analysis
-        const response = await fetch('/api/ai-analysis/generate', {
+        const response = await fetch('/api/ai_analysis/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -357,13 +357,13 @@ describe('AIAnalysisData', () => {
       // First call should be validation
       expect(global.fetch).toHaveBeenNthCalledWith(
         1,
-        '/api/business/ai-analysis/validate',
+        '/api/business/ai_analysis/validate',
         expect.objectContaining({ method: 'POST' })
       );
       // Second call should be generation
       expect(global.fetch).toHaveBeenNthCalledWith(
         2,
-        '/api/ai-analysis/generate',
+        '/api/ai_analysis/generate',
         expect.objectContaining({ method: 'POST' })
       );
     });
@@ -384,7 +384,7 @@ describe('AIAnalysisData', () => {
 
       const generateFunction = async (templateId, variables, provider) => {
         // Validate first
-        const validationResponse = await fetch('/api/business/ai-analysis/validate', {
+        const validationResponse = await fetch('/api/business/ai_analysis/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -406,7 +406,7 @@ describe('AIAnalysisData', () => {
         }
 
         // Generate analysis (should not reach here)
-        const response = await fetch('/api/ai-analysis/generate', {
+        const response = await fetch('/api/ai_analysis/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -427,7 +427,7 @@ describe('AIAnalysisData', () => {
       // Should only call validation, not generation
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).not.toHaveBeenCalledWith(
-        '/api/ai-analysis/generate',
+        '/api/ai_analysis/generate',
         expect.anything()
       );
     });
@@ -446,7 +446,7 @@ describe('AIAnalysisData', () => {
       });
 
       const loadFunction = async () => {
-        const response = await fetch('/api/ai-analysis/templates');
+        const response = await fetch('/api/ai_analysis/templates');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -475,7 +475,7 @@ describe('AIAnalysisData', () => {
 
       const loadFunction = async (options = {}) => {
         const { limit = 50, offset = 0 } = options;
-        const url = new URL('/api/ai-analysis/history', 'http://localhost:8080');
+        const url = new URL('/api/ai_analysis/history', 'http://localhost:8080');
         url.searchParams.set('limit', limit);
         url.searchParams.set('offset', offset);
 

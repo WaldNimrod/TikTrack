@@ -2,7 +2,6 @@
   "version": "2.0",
   "lastUpdated": "2025-09-05T00:00:00Z",
   "description": "ברירות מחדל למערכת העדפות TikTrack",
-  
   "general": {
     "primaryCurrency": "USD",
     "secondaryCurrency": "ILS",
@@ -18,9 +17,9 @@
     "tradingHours": {
       "start": "09:30",
       "end": "16:00"
-    }
+    },
+    "default_trading_account": "1"
   },
-  
   "defaultFilters": {
     "status": "open",
     "type": "swing",
@@ -29,9 +28,9 @@
     "search": "",
     "profit": "all",
     "minAmount": null,
-    "maxAmount": null
+    "maxAmount": null,
+    "profileSelect": ""
   },
-  
   "ui": {
     "sidebarPosition": "right",
     "defaultPage": "dashboard",
@@ -50,7 +49,6 @@
       "defaultPeriod": "1M"
     }
   },
-  
   "externalData": {
     "providers": {
       "primary": "yahoo",
@@ -73,9 +71,9 @@
       "showVolume": true,
       "showMarketCap": false,
       "show52WeekRange": false
-    }
+    },
+    "market_cap_warning_threshold": 1000000000
   },
-  
   "notifications": {
     "general": {
       "enabled": true,
@@ -110,10 +108,13 @@
       "console_logs_performance_enabled": false,
       "console_logs_ui_components_enabled": false,
       "console_logs_cache_enabled": false,
-      "console_logs_notifications_enabled": false
+      "console_logs_notifications_enabled": false,
+      "modeDebug": "false",
+      "modeDevelopment": "false",
+      "modeWork": "true",
+      "modeSilent": "false"
     }
   },
-  
   "console": {
     "cleanupInterval": 60,
     "autoClear": true,
@@ -121,7 +122,6 @@
     "verboseLogging": false,
     "logLevel": "INFO"
   },
-  
   "advanced": {
     "performance": {
       "enableCaching": true,
@@ -138,7 +138,6 @@
       "generateReports": false
     }
   },
-  
   "colorScheme": {
     "numericValues": {
       "positive": {
@@ -164,6 +163,7 @@
       "trade": "#26baac",
       "tradePlan": "#0056b3",
       "account": "#28a745",
+      "tradingAccount": "#28a745",
       "cashFlow": "#20c997",
       "ticker": "#dc3545",
       "alert": "#ff9c05",
@@ -179,7 +179,8 @@
         "light": "rgba(40, 167, 69, 0.1)",
         "medium": "#28a745",
         "dark": "#155724",
-        "border": "rgba(40, 167, 69, 0.3)"
+        "border": "rgba(40, 167, 69, 0.3)",
+        "color": "#28a745"
       },
       "closed": {
         "light": "rgba(108, 117, 125, 0.1)",
@@ -213,14 +214,13 @@
         "dark": "#4a2c7a",
         "border": "rgba(111, 66, 193, 0.3)"
       }
-    }
+    },
+    "linkColor": "#007bff"
   },
-  
   "opacitySettings": {
     "mainHeader": 100,
     "subHeader": 30
   },
-  
   "refreshOverrides": {
     "activeTickersTradingHours": 5,
     "activeTickersOffHours": 60,
@@ -228,14 +228,16 @@
     "inactiveTickersOffHours": 60,
     "closedTickersOffset": 45
   },
-  
   "dashboardLayout": {
-    "defaultWidgets": ["portfolio", "recentTrades", "marketOverview"],
+    "defaultWidgets": [
+      "portfolio",
+      "recentTrades",
+      "marketOverview"
+    ],
     "widgetPositions": {},
     "autoRefresh": true,
     "refreshInterval": 30
   },
-  
   "keyboardShortcuts": {
     "savePreferences": "Ctrl+S",
     "resetToDefaults": "Ctrl+R",
@@ -244,14 +246,12 @@
     "newProfile": "Ctrl+N",
     "duplicateProfile": "Ctrl+D"
   },
-  
   "advancedAlerts": {
     "priceChangeThreshold": 5.0,
     "volumeSpikeThreshold": 200.0,
     "marketHoursOnly": true,
     "alertCooldown": 300
   },
-  
   "importExportSettings": {
     "defaultFormat": "json",
     "includeSensitiveData": false,

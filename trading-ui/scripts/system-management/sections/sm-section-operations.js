@@ -696,7 +696,7 @@ class SMOperationsSection extends SMBaseSection {
    */
   static openServerMonitor() {
     console.log('🖥️ Opening server monitor');
-    window.open('/server-monitor', '_blank');
+    window.open('/server_monitor', '_blank');
   }
 
   /**
@@ -714,7 +714,7 @@ class SMOperationsSection extends SMBaseSection {
    */
   static openExternalDataDashboard() {
     console.log('📊 Opening external data dashboard');
-    window.open('/external-data-dashboard', '_blank');
+    window.open('/external_data_dashboard', '_blank');
   }
 
   /**

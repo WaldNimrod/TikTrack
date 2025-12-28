@@ -98,7 +98,7 @@ class FileMapper:
         """Check if module is from Backend directory"""
         # Check if it's a standard library or external package
         if module_path.split('.')[0] in ['os', 'sys', 'json', 'datetime', 'typing', 
-                                         'flask', 'sqlite3', 'pathlib', 'logging',
+                                         'flask', 'pathlib', 'logging',
                                          'subprocess', 'time', 'psutil', 'collections',
                                          'traceback', 'shutil', 'sqlalchemy']:
             return False
@@ -280,4 +280,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

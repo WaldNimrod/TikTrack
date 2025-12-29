@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG = {
-    scriptsDir: '../trading-ui/scripts',
+    scriptsDir: path.resolve(process.cwd(), 'trading-ui', 'scripts'),
     outputDir: 'reports',
     corePages: [
         'index.js',

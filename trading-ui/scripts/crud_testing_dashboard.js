@@ -43,6 +43,10 @@ class IntegratedCRUDE2ETester {
             e2e: [],
             debug: [],
             'info-summary': [],
+            registry: {
+                tests: [],
+                summaries: []
+            },
             crossPage: {
                 defaults: [],
                 colors: [],
@@ -63,6 +67,60 @@ class IntegratedCRUDE2ETester {
         this.monitoringActive = false;
 
         console.log('🚀 Integrated CRUD E2E Tester initialized');
+    }
+
+    /**
+     * Run test suite from registry (Test Registry + Orchestrator)
+     */
+    async runRegistrySuite() {
+        if (!window.TestOrchestrator) {
+            this.logger?.warn('TestOrchestrator not available');
+            return;
+        }
+
+        const registry = window.TestRegistry?.TEST_REGISTRY || [];
+        if (!registry.length) {
+            this.logger?.warn('TestRegistry not available or empty');
+            return;
+        }
+
+        this.results.registry.tests = [];
+        this.results.registry.summaries = [];
+        this.stats.inProgress = registry.length;
+        this.updateTestResults();
+
+        const orchestrator = new window.TestOrchestrator({
+            registry,
+            logger: this.logger,
+            onResult: (result) => {
+                this.results.registry.tests.push(result);
+                this.recalculateStatsFromResults();
+                this.updateTestResults();
+            },
+            onComplete: (payload) => {
+                const pageSummaries = window.TestResultsModel?.summarizeByPage(payload.results) || [];
+                this.results.registry.summaries = pageSummaries.map((summary) => ({
+                    page: summary.page,
+                    testType: 'registry-summary',
+                    status: summary.failed > 0 ? 'failed' : summary.warnings > 0 ? 'warning' : 'success',
+                    executionTime: summary.durationMs || 0,
+                    executedCount: summary.total,
+                    message: `עברו ${summary.passed}/${summary.total} | נכשלו ${summary.failed}`,
+                    counters: {
+                        total: summary.total,
+                        passed: summary.passed,
+                        failed: summary.failed,
+                        warnings: summary.warnings
+                    }
+                }));
+
+                this.stats.inProgress = 0;
+                this.recalculateStatsFromResults();
+                this.updateTestResults();
+            }
+        });
+
+        await orchestrator.run();
     }
 
     /**
@@ -2270,6 +2328,47 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Recalculate stats from results
+     */
+    recalculateStatsFromResults() {
+        const allResults = this.collectAllResults();
+        this.stats.totalTests = allResults.length;
+        this.stats.passed = allResults.filter(r => r.status === 'success').length;
+        this.stats.failed = allResults.filter(r => r.status === 'failed').length;
+    }
+
+    /**
+     * Collect all results into a flat array
+     */
+    collectAllResults() {
+        const allResults = [];
+
+        Object.entries(this.results).forEach(([testType, results]) => {
+            if (Array.isArray(results)) {
+                results.forEach(result => {
+                    allResults.push({
+                        ...result,
+                        testType: result.testType || testType
+                    });
+                });
+            } else if (typeof results === 'object' && results !== null) {
+                Object.entries(results).forEach(([subTestType, subResults]) => {
+                    if (Array.isArray(subResults)) {
+                        subResults.forEach(result => {
+                            allResults.push({
+                                ...result,
+                                testType: result.testType || `${testType}-${subTestType}`
+                            });
+                        });
+                    }
+                });
+            }
+        });
+
+        return allResults;
+    }
+
+    /**
      * Update test results table with current test data
      */
     updateTestResultsTable() {
@@ -2292,32 +2391,7 @@ class IntegratedCRUDE2ETester {
         });
 
         // Get current test results from all test types
-        const allResults = [];
-
-        // Add results from different test types
-        Object.entries(this.results).forEach(([testType, results]) => {
-            if (Array.isArray(results)) {
-                // Handle array results (ui, api, e2e, debug, info-summary)
-                results.forEach(result => {
-                    allResults.push({
-                        ...result,
-                        testType: testType
-                    });
-                });
-            } else if (typeof results === 'object' && results !== null) {
-                // Handle nested object results (crossPage)
-                Object.entries(results).forEach(([subTestType, subResults]) => {
-                    if (Array.isArray(subResults)) {
-                        subResults.forEach(result => {
-                            allResults.push({
-                                ...result,
-                                testType: `${testType}-${subTestType}`
-                            });
-                        });
-                    }
-                });
-            }
-        });
+        const allResults = this.collectAllResults();
 
         // #region agent log - H1_RESULTS_STORAGE
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
@@ -2373,7 +2447,7 @@ class IntegratedCRUDE2ETester {
             const waitingRow = tbody.querySelector('tr');
             if (!waitingRow) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="6" class="text-center text-muted">בחר סוג בדיקה כדי להתחיל</td>';
+                row.innerHTML = '<td colspan="7" class="text-center text-muted py-5"><i class="fas fa-play-circle fa-2x mb-3 text-secondary"></i><br><strong>בחר סוג בדיקה כדי להתחיל</strong><br><small class="text-muted">התוצאות יוצגו כאן בזמן אמת</small></td>';
                 tbody.appendChild(row);
             }
             return;
@@ -2440,13 +2514,66 @@ class IntegratedCRUDE2ETester {
                 detailsValue = `טבלאות: ${result.tablesTested}/${result.tablesFound} - ${messageValue}`;
             }
 
+            // Enhanced status badge
+            const statusBadgeClass = result.status === 'success' ? 'pass' :
+                                   result.status === 'failed' ? 'fail' :
+                                   result.status === 'warning' ? 'warn' :
+                                   result.status === 'running' ? 'running' : 'skip';
+
+            // Duration styling
+            const durationMs = result.executionTime || 0;
+            const durationClass = durationMs < 1000 ? 'fast' :
+                                durationMs < 5000 ? 'medium' : 'slow';
+
+            // Count information
+            const countInfo = result.tablesTested !== undefined ?
+                `${result.tablesTested}/${result.tablesFound || 'N/A'}` :
+                (result.executedCount !== undefined
+                    ? result.executedCount
+                    : (result.counters?.total ?? result.count ?? (result.tests ? result.tests.length : 'N/A')));
+
+            // Page/Entity display with icon
+            const entityIconClass = result.page === 'trades' ? 'trades' :
+                                  result.page === 'trade_plans' ? 'trade-plans' :
+                                  result.page === 'executions' ? 'executions' :
+                                  result.page === 'alerts' ? 'alerts' :
+                                  result.page === 'tickers' ? 'tickers' :
+                                  result.page === 'trading_accounts' ? 'accounts' : 'default';
+
+            const pageDisplay = `
+                <div class="page-entity-display">
+                    <div class="page-entity-icon ${entityIconClass}">
+                        <i class="fas fa-${result.page === 'trades' ? 'handshake' :
+                                         result.page === 'trade_plans' ? 'clipboard-list' :
+                                         result.page === 'executions' ? 'exchange-alt' :
+                                         result.page === 'alerts' ? 'bell' :
+                                         result.page === 'tickers' ? 'chart-line' :
+                                         result.page === 'trading_accounts' ? 'wallet' : 'cog'}"></i>
+                    </div>
+                    <div class="page-entity-name">${pageValue}</div>
+                </div>
+            `;
+
+            // Test type badge
+            const testTypeBadgeClass = result.testType === 'crud-e2e' ? 'crud-e2e' :
+                                     result.testType === 'defaults' ? 'defaults' :
+                                     result.testType === 'sorting' ? 'sorting' :
+                                     result.testType === 'colors' ? 'colors' :
+                                     result.testType === 'sections' ? 'sections' :
+                                     result.testType === 'filters' ? 'filters' : 'crud-e2e';
+
+            const testTypeDisplay = `
+                <span class="test-type-badge ${testTypeBadgeClass}">${testTypeValue}</span>
+            `;
+
             row.innerHTML = `
                 <td class="text-center fw-bold">${index + 1}</td>
-                <td>${pageValue}</td>
-                <td>${testTypeValue}</td>
-                <td class="${statusClass}">${statusIcon} ${statusValue}</td>
-                <td>${timeValue}ms</td>
-                <td>${detailsValue}</td>
+                <td>${pageDisplay}</td>
+                <td><div class="test-type-display">${testTypeDisplay}</div></td>
+                <td><span class="status-badge ${statusBadgeClass}"><i class="fas fa-${result.status === 'success' ? 'check' : result.status === 'failed' ? 'times' : result.status === 'warning' ? 'exclamation-triangle' : result.status === 'running' ? 'spinner fa-spin' : 'minus'} status-badge-icon"></i>${statusValue}</span></td>
+                <td><span class="duration-display ${durationClass}">${timeValue}ms</span></td>
+                <td><span class="test-details-count">${countInfo}</span></td>
+                <td class="test-details-cell" title="${detailsValue}">${detailsValue}</td>
             `;
 
             console.log(`🔍 DEBUG: Created row HTML:`, row.innerHTML);
@@ -2472,11 +2599,11 @@ class IntegratedCRUDE2ETester {
             const avgTime = totalTests > 0 ? Math.round(totalTime / totalTests) : 0;
 
             summaryRow.innerHTML = `
-                <td class="text-center">∑</td>
-                <td colspan="2"><strong>סיכום כולל</strong></td>
+                <td class="text-center"><i class="fas fa-chart-bar"></i></td>
+                <td colspan="2"><strong>סיכום כולל - ${totalTests} בדיקות</strong></td>
                 <td class="text-center">
-                    <span class="badge bg-success me-1">${passedTests} ✓</span>
-                    <span class="badge bg-danger me-1">${failedTests} ✗</span>
+                    <span class="status-badge pass">${passedTests} <i class="fas fa-check status-badge-icon"></i></span>
+                    <span class="status-badge fail">${failedTests} <i class="fas fa-times status-badge-icon"></i></span>
                     ${otherTests > 0 ? `<span class="badge bg-warning">${otherTests} ⚠</span>` : ''}
                 </td>
                 <td class="text-center">${avgTime}ms ממוצע</td>
@@ -3029,6 +3156,18 @@ window.runE2ETests = async function() {
     } catch (error) {
         console.error('❌ Error in runE2ETests:', error);
         window.Logger?.error('Error in runE2ETests', { error: error.message });
+    }
+};
+
+window.runRegistrySuite = async function() {
+    try {
+        if (!window.crudTester) {
+            window.crudTester = new IntegratedCRUDE2ETester();
+        }
+        await window.crudTester.runRegistrySuite();
+    } catch (error) {
+        console.error('❌ Error in runRegistrySuite:', error);
+        window.Logger?.error('Error in runRegistrySuite', { error: error.message });
     }
 };
 
@@ -3931,8 +4070,8 @@ window.Logger?.debug('crud_testing_dashboard.js loaded', {
     runAllSectionsTests: typeof window.runAllSectionsTests,
     runAllFiltersTests: typeof window.runAllFiltersTests,
     runAllDefaultsTests: typeof window.runAllDefaultsTests,
+    runRegistrySuite: typeof window.runRegistrySuite,
     sortingTester: typeof window.sortingTester,
     runIndexSortingTest: typeof window.runIndexSortingTest,
     runAllTableSortingTests: typeof window.runAllTableSortingTests
 });
-

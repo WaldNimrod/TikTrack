@@ -115,6 +115,7 @@
      */
     async loadUsersData() {
       try {
+        console.log('🚀 [UserManagementPage] loadUsersData called');
         window.Logger?.info('Loading users data...', { page: 'user-management' });
 
         // Load users from API (using window.fetch for auth token injection)
@@ -157,6 +158,7 @@
           window.Logger?.warn('Failed to get token for manual injection', { page: 'user-management', error: e.message });
         }
 
+        console.log('🌐 [UserManagementPage] Making API call to /api/users/ with headers:', headers);
         const usersResponse = await window.fetch('/api/users/', {
           method: 'GET',
           headers: headers
@@ -185,13 +187,17 @@
         const usersData = await usersResponse.json();
 
         // Check if response has data array
+        console.log('📥 [UserManagementPage] Raw API response:', usersData);
         if (usersData && Array.isArray(usersData.data)) {
           this.users = usersData.data;
+          console.log('✅ [UserManagementPage] Loaded users from data array:', this.users.length);
         } else if (Array.isArray(usersData)) {
           // Fallback: if response is directly an array
           this.users = usersData;
+          console.log('✅ [UserManagementPage] Loaded users from direct array:', this.users.length);
         } else {
           this.users = [];
+          console.log('❌ [UserManagementPage] No users data found');
         }
 
         // Update statistics
@@ -200,6 +206,7 @@
         // Update table
         this.updateUsersTable();
 
+        console.log('🎯 [UserManagementPage] Final users array:', this.users);
         window.Logger?.info(`✅ Loaded ${this.users.length} users`, { page: 'user-management' });
       } catch (error) {
         window.Logger?.error('❌ Error loading users data', error, { page: 'user-management' });

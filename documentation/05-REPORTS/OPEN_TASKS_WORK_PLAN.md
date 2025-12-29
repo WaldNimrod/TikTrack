@@ -491,6 +491,9 @@ T4  | Full test run + final reports
 **Team E (Docs / Legacy) — Completed**
 - ✅ Update documentation for Gate F fixes (AI Analysis, trade planning, import flush).
 - ✅ Add note: `test_external_data_status.py` works only with yahoo_finance + existing ticker.
+- ✅ Create CRUD_TESTING_ADMIN_RUNBOOK.md - Complete admin guide for running all tests.
+- ✅ Create CODE_QUALITY_SYSTEMS_GUIDE.md - Comprehensive code quality standards and scanning systems.
+- ✅ Integrate references to latest scanning reports (error-handling, jsdoc, naming, duplicates).
 
 ---
 
@@ -516,8 +519,10 @@ T4  | Full test run + final reports
 - [x] test_external_data_status.py - החלפתי ליצירת ספק+טיקר קיימים בלבד
 - [x] AI Analysis API: UserLLMProvider setup - הוספתי הצפנת מפתחות API לטסטים (auth/session isolation resolved)
 - [x] Ticker Provider Mapping: סימבולים ייחודיים - שיניתי את כל הטסטים להשתמש בסימבולים ייחודיים + תיקנתי metadata mapping
-- [x] Update/verify service tests - 45 טסטים עוברים + 7/7 טסטים ב-ticker_provider_symbol_integration (סימבולים ייחודיים עם uuid)
+- [x] Update/verify service tests - 56 טסטים עוברים (AlertService:4/4, ExecutionClustering:16/16, PositionPortfolio:4/4, UserDataImport:7/7, TradePlanning:10/10, ExternalData:4/4, TickerMapping:7/7, Performance:4/4)
 - [x] test_ticker_symbol_mapping_performance.py - סימבולים ייחודיים (TEST{i} -> T{i}_{uuid[:4]}) כדי למנוע conflicts
+- [x] מיפוי בדיקות מול עמודים - test-registry.js (70+ בדיקות) + test-relevancy-rules.js (25+ עמודים)
+- [x] טבלת רלוונטיות בדיקה→עמוד - TEST_RELEVANCY_MATRIX.md עם חיסכון 40-60% בזמן ריצה
 
 **Team D**
 - [x] Watch Lists default list with `SPY`
@@ -683,9 +688,44 @@ T4  | Full test run + final reports
 - ✅ `PUT /api/auth/me` updates user data (name/email/icon)
 - ✅ `POST /api/tags/categories` returns 200 (sequence fixed)
 
-### QA Note
-- QA rerun recommended only for final CRUD dashboard pass (trades issue under investigation).
-- ✅ Team D verified: CRUD dashboard trades test now fully passes - CREATE/READ/UPDATE/DELETE all successful with correct entityId parsing.
+### QA Note - FULL SUITE RESULTS (December 29, 2025)
+**QA Run Completed:** Full CRUD test suite executed on all 15 CRUD-enabled pages
+
+**OVERALL RESULTS:**
+- 📄 Pages Tested: 15/15
+- ✅ Pages Passed: 2/15 (13.3%)
+- ❌ Pages Failed: 13/15 (86.7%)
+- 🧪 Tests Executed: 60 (4 per page)
+- ✅ Tests Passed: 8/60 (13.3%)
+- ❌ Tests Failed: 52/60 (86.7%)
+
+**PASSING ENTITIES:**
+1. ✅ **trades** - All 4 CRUD operations successful
+2. ✅ **watch_lists** - All 4 CRUD operations successful
+
+**FAILING ENTITIES (Critical Issues):**
+1. ❌ **trade_plans** - HTTP 500 on CREATE
+2. ❌ **alerts** - Invalid condition_operator validation
+3. ❌ **tickers** - Symbol length validation (>10 chars)
+4. ❌ **trading_accounts** - HTTP 500 on CREATE
+5. ❌ **executions** - Trade not found validation
+6. ❌ **cash_flows** - HTTP 500 on CREATE
+7. ❌ **notes** - Missing related_type_id/related_id validation
+8. ❌ **user_profile** - HTTP 500 on CREATE
+9. ❌ **user_management** - HTTP 500 on CREATE
+10. ❌ **trading_journal** - HTTP 500 on CREATE
+11. ❌ **tag_management** - HTTP 500 on CREATE
+12. ❌ **data_import** - HTTP 500 on CREATE
+13. ❌ **preferences** - HTTP 500 on CREATE
+
+**Root Cause Analysis:**
+- Multiple HTTP 500 errors indicate backend service issues
+- Validation errors show incorrect test data or missing requirements
+- CRUD dashboard entityId parsing fixed, but underlying APIs have critical failures
+
+**Immediate Action Required:**
+- Teams B, C, D, E must address these critical API failures before production
+- Full re-test required after fixes
 
 ---
 

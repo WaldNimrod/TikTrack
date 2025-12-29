@@ -108,7 +108,7 @@
                 </div>
                 <!-- UI Content Section Top End -->  
 
-                <!-- 1. בדיקות פרטניות - סקשן נפרד -->
+                <!-- 1. בדיקות פרטניות - כרטיסים משופרים -->
                 <div class="content-section" id="individual-tests-section" data-section="individual-tests">
                     <div class="section-header">
                         <div class="table-title">
@@ -120,113 +120,277 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 20%;">קטגוריה</th>
-                                        <th style="width: 50%;">CRUD E2E</th>
-                                        <th style="width: 30%;">ברירות מחדל</th>
-                                    </tr>
-                                </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="fw-bold">מסחר עיקרי</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradeTestOnly()" title="טריידים"><i class="fas fa-handshake"></i> טריידים</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradePlanTestOnly()" title="תכניות מסחר"><i class="fas fa-clipboard-list"></i> תכניות מסחר</button>
-                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runExecutionTestOnly()" title="ביצועי עסקאות"><i class="fas fa-exchange-alt"></i> ביצועי עסקאות</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold">ניהול ופיקוח</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runAlertTestOnly()" title="התראות"><i class="fas fa-bell"></i> התראות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTickerTestOnly()" title="טיקרים"><i class="fas fa-chart-line"></i> טיקרים</button>
-                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runTradingAccountTestOnly()" title="חשבונות מסחר"><i class="fas fa-wallet"></i> חשבונות מסחר</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runCashFlowTestOnly()" title="תזרימי מזומן"><i class="fas fa-money-bill-wave"></i> תזרימי מזומן</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold">תיעוד וניהול</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNoteTestOnly()" title="הערות"><i class="fas fa-sticky-note"></i> הערות</button>
-                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runWatchListTestOnly()" title="רשימות צפייה"><i class="fas fa-list"></i> רשימות צפייה</button>
-                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runTradingJournalTestOnly()" title="יומן מסחר"><i class="fas fa-book"></i> יומן מסחר</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTagCategoryTestOnly()" title="תגיות"><i class="fas fa-tags"></i> תגיות</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold">הגדרות ומערכת</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runUserProfileTestOnly()" title="פרופיל משתמש"><i class="fas fa-user"></i> פרופיל משתמש</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runPreferenceProfileTestOnly()" title="העדפות"><i class="fas fa-cog"></i> העדפות</button>
-                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runImportSessionTestOnly()" title="ייבוא נתונים"><i class="fas fa-file-import"></i> ייבוא נתונים</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold text-success">🔧 ברירות מחדל - פרטני</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runExecutionsDefaultsTest()" title="ברירות מחדל - ביצועי עסקאות"><i class="fas fa-check-circle"></i> ביצועים</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradesDefaultsTest()" title="ברירות מחדל - טריידים"><i class="fas fa-check-circle"></i> טריידים</button>
-                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runAlertsDefaultsTest()" title="ברירות מחדל - התראות"><i class="fas fa-check-circle"></i> התראות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradePlansDefaultsTest()" title="ברירות מחדל - תכניות מסחר"><i class="fas fa-check-circle"></i> תכניות</button>
-                                                                <button class="btn btn-outline-secondary btn-sm me-1 mb-1" onclick="runTickersDefaultsTest()" title="ברירות מחדל - טיקרים"><i class="fas fa-check-circle"></i> טיקרים</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTradingAccountsDefaultsTest()" title="ברירות מחדל - חשבונות מסחר"><i class="fas fa-check-circle"></i> חשבונות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNotesDefaultsTest()" title="ברירות מחדל - הערות"><i class="fas fa-check-circle"></i> הערות</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runCashFlowsDefaultsTest()" title="ברירות מחדל - תזרימי מזומן"><i class="fas fa-check-circle"></i> מזומנים</button>
-                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runTradeHistoryDefaultsTest()" title="ברירות מחדל - היסטוריית טרייד"><i class="fas fa-check-circle"></i> היסטוריה</button>
-                                                                <button class="btn btn-outline-success btn-sm me-1 mb-1" onclick="runTradingJournalDefaultsTest()" title="ברירות מחדל - יומן מסחר"><i class="fas fa-check-circle"></i> יומן</button>
-                                                                <button class="btn btn-outline-warning btn-sm me-1 mb-1" onclick="runWatchListsDefaultsTest()" title="ברירות מחדל - רשימות צפייה"><i class="fas fa-check-circle"></i> רשימות</button>
-                                                                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="runTagManagementDefaultsTest()" title="ברירות מחדל - תגיות"><i class="fas fa-check-circle"></i> תגיות</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold text-info">🔧 מיון טבלאות - פרטני</td>
-                                                            <td>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runIndexSortingTest()" title="מיון - דשבורד ראשי"><i class="fas fa-sort"></i> דשבורד</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradesSortingTest()" title="מיון - טריידים"><i class="fas fa-sort"></i> טריידים</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runExecutionsSortingTest()" title="מיון - ביצועי עסקאות"><i class="fas fa-sort"></i> ביצועים</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runAlertsSortingTest()" title="מיון - התראות"><i class="fas fa-sort"></i> התראות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradePlansSortingTest()" title="מיון - תכניות מסחר"><i class="fas fa-sort"></i> תכניות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTickersSortingTest()" title="מיון - טיקרים"><i class="fas fa-sort"></i> טיקרים</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradingAccountsSortingTest()" title="מיון - חשבונות מסחר"><i class="fas fa-sort"></i> חשבונות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runNotesSortingTest()" title="מיון - הערות"><i class="fas fa-sort"></i> הערות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCashFlowsSortingTest()" title="מיון - תזרימי מזומן"><i class="fas fa-sort"></i> מזומנים</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradeHistorySortingTest()" title="מיון - היסטוריית טרייד"><i class="fas fa-sort"></i> היסטוריה</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTradingJournalSortingTest()" title="מיון - יומן מסחר"><i class="fas fa-sort"></i> יומן</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runWatchListsSortingTest()" title="מיון - רשימות צפייה"><i class="fas fa-sort"></i> רשימות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runPortfolioStateSortingTest()" title="מיון - מצב תיק"><i class="fas fa-sort"></i> תיק</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runAISortingTest()" title="מיון - ניתוח AI"><i class="fas fa-sort"></i> AI</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runDataImportSortingTest()" title="מיון - ייבוא נתונים"><i class="fas fa-sort"></i> ייבוא</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runTagManagementSortingTest()" title="מיון - תגיות"><i class="fas fa-sort"></i> תגיות</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runLoginSortingTest()" title="מיון - כניסה"><i class="fas fa-sort"></i> כניסה</button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runRegisterSortingTest()" title="מיון - הרשמה">
-                                                                    <i class="fas fa-sort"></i> הרשמה
-                                                                </button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runForgotPasswordSortingTest()" title="מיון - שחזור סיסמה">
-                                                                    <i class="fas fa-sort"></i> שחזור
-                                                            </button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runResetPasswordSortingTest()" title="מיון - איפוס סיסמה">
-                                                                    <i class="fas fa-sort"></i> איפוס
-                                                            </button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runDevToolsSortingTest()" title="מיון - כלי פיתוח">
-                                                                    <i class="fas fa-sort"></i> כלי פיתוח
-                                                            </button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCrudDashboardSortingTest()" title="מיון - דשבורד CRUD">
-                                                                    <i class="fas fa-sort"></i> CRUD
-                                                            </button>
-                                                                <button class="btn btn-outline-info btn-sm me-1 mb-1" onclick="runCodeQualitySortingTest()" title="מיון - איכות קוד">
-                                                                    <i class="fas fa-sort"></i> קוד
-                                                            </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            </div>
+                        <!-- כרטיסי ישויות CRUD -->
+                        <div class="individual-test-cards">
+                            <!-- מסחר עיקרי -->
+                            <div class="test-entity-card trades">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon trades">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">טריידים</h5>
+                                            <p class="test-entity-description">בדיקות CRUD מלאות לניהול עסקאות</p>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradeTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradesDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradesSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card trade-plans">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon trade-plans">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">תכניות מסחר</h5>
+                                            <p class="test-entity-description">ניהול תכניות מסחר ותכנון עסקאות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradePlanTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradePlansDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradePlansSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card executions">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon executions">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">ביצועי עסקאות</h5>
+                                            <p class="test-entity-description">מעקב אחר ביצוע עסקאות ותוצאות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runExecutionTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runExecutionsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runExecutionsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card alerts">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon alerts">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">התראות</h5>
+                                            <p class="test-entity-description">ניהול התראות ואזעקות במערכת</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runAlertTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runAlertsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runAlertsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ניהול ופיקוח -->
+                            <div class="test-entity-card tickers">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon tickers">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">טיקרים</h5>
+                                            <p class="test-entity-description">ניהול טיקרים ונכסים פיננסיים</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTickerTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTickersDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTickersSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card accounts">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon accounts">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">חשבונות מסחר</h5>
+                                            <p class="test-entity-description">ניהול חשבונות מסחר ופלטפורמות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradingAccountTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradingAccountsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradingAccountsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- תיעוד וניהול -->
+                            <div class="test-entity-card notes">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon notes">
+                                            <i class="fas fa-sticky-note"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">הערות</h5>
+                                            <p class="test-entity-description">ניהול הערות ותיעוד במערכת</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runNoteTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runNotesDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runNotesSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card cash-flows">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon cash-flows">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">תזרימי מזומן</h5>
+                                            <p class="test-entity-description">מעקב אחר תזרימי מזומן והכנסות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runCashFlowTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runCashFlowsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runCashFlowsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                                     
                                 <!-- 2. בדיקות קבוצתיות - מטריצה 5×5 -->
                                                 <div class="mb-4">
@@ -326,6 +490,12 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr>
+                                                            <td><i class="fas fa-sitemap text-primary"></i> Registry Suite</td>
+                                                            <td><span class="badge bg-primary">★ מרכזי</span></td>
+                                                            <td><small class="text-muted">כל הבדיקות לפי רישום</small></td>
+                                                            <td><button class="btn btn-primary btn-sm w-100" onclick="runRegistrySuite()" title="הרצת כל הבדיקות לפי ה-Registry">הרץ</button></td>
+                                                        </tr>
                                                         <tr>
                                                             <td><i class="fas fa-desktop text-primary"></i> UI Tests</td>
                                                             <td><span class="badge bg-success">✓ מיושם</span></td>
@@ -461,29 +631,42 @@
                                     </div>
                                 </div>
 
-                                <!-- Results Table -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">תוצאות בדיקות</h6>
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="copyTestResultsToClipboard()" title="העתק תוצאות ללוח">
-                                        <i class="fas fa-copy"></i> העתק ללוח
-                                    </button>
+                                <!-- Enhanced Results Table -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-table me-2"></i>
+                                        תוצאות בדיקות מפורטות
+                                    </h6>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="copyTestResultsToClipboard()" title="העתק תוצאות ללוח">
+                                            <i class="fas fa-copy me-1"></i>העתק
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="exportTestResults()" title="ייצוא תוצאות לקובץ">
+                                            <i class="fas fa-download me-1"></i>ייצוא
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-hover" id="testResultsTable">
-                                        <thead class="table-dark">
+                                <div class="test-results-table">
+                                    <table class="table" id="testResultsTable">
+                                        <thead>
                                             <tr>
-                                                <th style="width: 50px;">#</th>
-                                                <th>עמוד</th>
-                                                <th>סוג</th>
-                                                <th>סטטוס</th>
-                                                <th>זמן (ms)</th>
-                                                <th>פרטים</th>
+                                                <th style="width: 60px;">#</th>
+                                                <th style="width: 180px;">עמוד/ישות</th>
+                                                <th style="width: 120px;">סוג בדיקה</th>
+                                                <th style="width: 100px;">סטטוס</th>
+                                                <th style="width: 120px;">זמן ביצוע</th>
+                                                <th style="width: 100px;">כמות</th>
+                                                <th>פרטים ותוצאות</th>
                                             </tr>
                                         </thead>
                                         <tbody id="testResultsBody">
                                             <tr>
-                                                <td colspan="6" class="text-center text-muted">
-                                                    בחר סוג בדיקה כדי להתחיל
+                                                <td colspan="7" class="text-center text-muted py-5">
+                                                    <i class="fas fa-play-circle fa-2x mb-3 text-secondary"></i>
+                                                    <br>
+                                                    <strong>בחר סוג בדיקה כדי להתחיל</strong>
+                                                    <br>
+                                                    <small class="text-muted">התוצאות יוצגו כאן בזמן אמת</small>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -757,6 +940,12 @@
     <script src="scripts/defaults-testing-system.js?v=1.0.0" defer></script> <!-- Defaults testing system -->
     <!-- [59] Page-specific: sorting-testing-system.js | Strategy: blocking -->
     <script src="scripts/sorting-testing-system.js?v=1.0.0"></script> <!-- Sorting testing system -->
+    <!-- [60] Page-specific: test-registry.js | Strategy: defer -->
+    <script src="scripts/test-registry.js?v=1.0.0" defer></script> <!-- Test registry (source of truth) -->
+    <!-- [61] Page-specific: test-results-model.js | Strategy: defer -->
+    <script src="scripts/testing/test-results-model.js?v=1.0.0" defer></script> <!-- Unified test results model -->
+    <!-- [62] Page-specific: test-orchestrator.js | Strategy: defer -->
+    <script src="scripts/testing/test-orchestrator.js?v=1.0.0" defer></script> <!-- Test orchestrator -->
     <!-- [58] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
     <script src="scripts/crud_testing_dashboard.js?v=1.0.30" defer></script> <!-- Main page script -->
 

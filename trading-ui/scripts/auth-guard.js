@@ -31,8 +31,7 @@ const PUBLIC_PAGES = [
   'login.html',
   'register.html',
   'reset_password.html',
-  'forgot_password.html',
-  'user_management.html'  // Temporarily added for debugging
+  'forgot_password.html'
 ];
 
 /**

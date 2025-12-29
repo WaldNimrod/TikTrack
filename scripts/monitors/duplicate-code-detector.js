@@ -28,6 +28,7 @@ const CONFIG = {
         'database.js'
     ],
     minSimilarityThreshold: 0.8, // 80% similarity
+    quickSimilarityThreshold: 0.6, // Jaccard pre-filter to reduce Levenshtein calls
     minFunctionLength: 10 // minimum lines to consider
 };
 
@@ -161,6 +162,19 @@ class DuplicateCodeDetector {
     }
 
     /**
+     * Quick token similarity (Jaccard) between normalized token sets
+     */
+    calculateTokenSimilarity(tokens1, tokens2) {
+        if (!tokens1.size || !tokens2.size) return 0;
+        let intersection = 0;
+        for (const token of tokens1) {
+            if (tokens2.has(token)) intersection += 1;
+        }
+        const union = tokens1.size + tokens2.size - intersection;
+        return union === 0 ? 0 : intersection / union;
+    }
+
+    /**
      * Calculate similarity between normalized strings
      */
     calculateSimilarityNormalized(norm1, norm2) {
@@ -214,7 +228,8 @@ class DuplicateCodeDetector {
             return {
                 func,
                 normalized,
-                length: normalized.length
+                length: normalized.length,
+                tokens: new Set(normalized.split(' ').filter(Boolean))
             };
         });
         
@@ -232,6 +247,9 @@ class DuplicateCodeDetector {
                 const lengthDiff = Math.abs(func1.length - func2.length);
                 const maxAllowedDiff = Math.floor((1 - CONFIG.minSimilarityThreshold) * maxLength);
                 if (lengthDiff > maxAllowedDiff) continue;
+
+                const quickSimilarity = this.calculateTokenSimilarity(func1.tokens, func2.tokens);
+                if (quickSimilarity < CONFIG.quickSimilarityThreshold) continue;
                 
                 const similarity = this.calculateSimilarityNormalized(func1.normalized, func2.normalized);
                 

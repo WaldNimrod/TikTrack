@@ -33,12 +33,14 @@
      * אתחול עמוד ניהול משתמשים
      */
     async init() {
+      console.log('🎯 [UserManagementPage] init() STARTED');
       if (this.initialized) {
         window.Logger?.warn('UserManagementPage already initialized', { page: 'user-management' });
         return;
       }
 
       try {
+        console.log('🎯 [UserManagementPage] init() PASSED initialized check');
         window.Logger?.info('🚀 Initializing User Management Page...', { page: 'user-management' });
 
         // Wait for required systems to load
@@ -46,10 +48,12 @@
 
         // Check authentication
         if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
+          console.log('❌ [UserManagementPage] Authentication check FAILED, redirecting to login');
           window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-management' });
-          window.location.href = '/';
+          window.location.href = '/login.html';
           return;
         }
+        console.log('✅ [UserManagementPage] Authentication check PASSED');
 
         // Load users data
         await this.loadUsersData();

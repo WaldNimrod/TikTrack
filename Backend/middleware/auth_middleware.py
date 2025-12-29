@@ -23,6 +23,7 @@ def setup_auth_middleware(app):
         '/api/auth/register',
         '/api/health',
         '/api/ai_analysis/templates',  # Templates are shared and public
+        '/api/users',  # User management API - temporarily public for debugging
     ]
 
     def _get_serializer():

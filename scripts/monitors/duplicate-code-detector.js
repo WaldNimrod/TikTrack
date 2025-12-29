@@ -141,20 +141,29 @@ class DuplicateCodeDetector {
      * Calculate similarity between two functions
      */
     calculateSimilarity(func1, func2) {
-        // Normalize function content (remove whitespace, comments, variable names)
-        const normalize = (content) => {
-            return content
-                .replace(/\/\*[\s\S]*?\*\//g, '') // Remove block comments
-                .replace(/\/\/.*$/gm, '') // Remove line comments
-                .replace(/\s+/g, ' ') // Normalize whitespace
-                .replace(/\b\w+\b/g, 'VAR') // Replace variable names
-                .replace(/\d+/g, 'NUM') // Replace numbers
-                .replace(/['"]/g, 'STR') // Replace strings
-                .trim();
-        };
-        
-        const norm1 = normalize(func1.content);
-        const norm2 = normalize(func2.content);
+        const norm1 = this.normalizeContent(func1.content);
+        const norm2 = this.normalizeContent(func2.content);
+        return this.calculateSimilarityNormalized(norm1, norm2);
+    }
+
+    /**
+     * Normalize function content (remove whitespace, comments, variable names)
+     */
+    normalizeContent(content) {
+        return content
+            .replace(/\/\*[\s\S]*?\*\//g, '') // Remove block comments
+            .replace(/\/\/.*$/gm, '') // Remove line comments
+            .replace(/\s+/g, ' ') // Normalize whitespace
+            .replace(/\b\w+\b/g, 'VAR') // Replace variable names
+            .replace(/\d+/g, 'NUM') // Replace numbers
+            .replace(/['"]/g, 'STR') // Replace strings
+            .trim();
+    }
+
+    /**
+     * Calculate similarity between normalized strings
+     */
+    calculateSimilarityNormalized(norm1, norm2) {
         
         // Simple similarity calculation (Levenshtein distance based)
         const maxLength = Math.max(norm1.length, norm2.length);
@@ -200,23 +209,38 @@ class DuplicateCodeDetector {
      */
     findSimilarFunctions() {
         const allFunctions = Array.from(this.functions.values());
+        const normalizedFunctions = allFunctions.map((func) => {
+            const normalized = this.normalizeContent(func.content);
+            return {
+                func,
+                normalized,
+                length: normalized.length
+            };
+        });
         
-        for (let i = 0; i < allFunctions.length; i++) {
-            for (let j = i + 1; j < allFunctions.length; j++) {
-                const func1 = allFunctions[i];
-                const func2 = allFunctions[j];
+        for (let i = 0; i < normalizedFunctions.length; i++) {
+            for (let j = i + 1; j < normalizedFunctions.length; j++) {
+                const func1 = normalizedFunctions[i];
+                const func2 = normalizedFunctions[j];
                 
                 // Skip if same file
-                if (func1.file === func2.file) continue;
+                if (func1.func.file === func2.func.file) continue;
+
+                const maxLength = Math.max(func1.length, func2.length);
+                if (maxLength === 0) continue;
+
+                const lengthDiff = Math.abs(func1.length - func2.length);
+                const maxAllowedDiff = Math.floor((1 - CONFIG.minSimilarityThreshold) * maxLength);
+                if (lengthDiff > maxAllowedDiff) continue;
                 
-                const similarity = this.calculateSimilarity(func1, func2);
+                const similarity = this.calculateSimilarityNormalized(func1.normalized, func2.normalized);
                 
                 if (similarity >= CONFIG.minSimilarityThreshold) {
                     this.similarFunctions.push({
-                        func1: func1,
-                        func2: func2,
+                        func1: func1.func,
+                        func2: func2.func,
                         similarity: similarity,
-                        type: this.classifySimilarity(func1, func2, similarity)
+                        type: this.classifySimilarity(func1.func, func2.func, similarity)
                     });
                 }
             }

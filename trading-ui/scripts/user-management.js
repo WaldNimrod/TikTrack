@@ -164,6 +164,13 @@
         });
 
         if (!usersResponse.ok) {
+          window.Logger?.error('Users API call failed', {
+            page: 'user-management',
+            status: usersResponse.status,
+            statusText: usersResponse.statusText,
+            url: usersResponse.url
+          });
+
           // If unauthorized, redirect to login
           if (usersResponse.status === 401 || usersResponse.status === 403) {
             window.Logger?.warn('API authentication failed, redirecting to login', {

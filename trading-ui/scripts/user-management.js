@@ -45,15 +45,7 @@
 
         // Wait for required systems to load
         await this.waitForSystems();
-
-        // Check authentication
-        if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
-          console.log('❌ [UserManagementPage] Authentication check FAILED, redirecting to login');
-          window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-management' });
-          window.location.href = '/login.html';
-          return;
-        }
-        console.log('✅ [UserManagementPage] Authentication check PASSED');
+        console.log('✅ [UserManagementPage] Systems loaded, proceeding with initialization');
 
         // Load users data
         await this.loadUsersData();

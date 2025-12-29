@@ -18,8 +18,6 @@
 (function() {
   'use strict';
 
-  console.log('🔍 [UserManagementPage] Script loaded, initializing...');
-
   /**
    * User Management Page Manager
    * מנהל עמוד ניהול משתמשים
@@ -122,8 +120,8 @@
       try {
         window.Logger?.info('Loading users data...', { page: 'user-management' });
 
-        // Load users from API
-        const usersResponse = await fetch('/api/users/', {
+        // Load users from API (using window.fetch for auth token injection)
+        const usersResponse = await window.fetch('/api/users/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'

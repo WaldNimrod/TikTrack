@@ -482,6 +482,7 @@ T4  | Full test run + final reports
 
 **Team E (Docs / Legacy)**
 - Update documentation for any API/schema changes required by Gate F fixes.
+- Note: External data status tests now require **existing provider + existing ticker** (no provider creation in tests).
 
 ---
 

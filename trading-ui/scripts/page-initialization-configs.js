@@ -4452,10 +4452,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   window.pageInitializationConfigs = PAGE_CONFIGS;
   // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
   window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
-
-  console.log('🔍 [page-initialization-configs] PAGE_CONFIGS defined with keys:', Object.keys(PAGE_CONFIGS));
-  console.log('🔍 [page-initialization-configs] Looking for user_management:', PAGE_CONFIGS['user_management']);
-  console.log('🔍 [page-initialization-configs] Looking for user-management:', PAGE_CONFIGS['user-management']);
   
   // CRITICAL: Add aliases AFTER PAGE_CONFIGS is fully defined to avoid "Cannot access before initialization" error
   // Alias for ai_analysis.html (underscore instead of hyphen)

@@ -49,38 +49,35 @@ def authenticated_client(client, mock_user_id):
 class TestAIAnalysisAPI:
     """Test suite for AI Analysis API endpoints."""
     
-    def test_generate_analysis_endpoint_success(self, client, mock_user_id):
-        """Test POST /api/ai-analysis/generate with valid data."""
-        with client.application.app_context():
-            g.user_id = mock_user_id
-            with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
-                # Mock successful analysis generation
-                mock_request = Mock()
-                mock_request.id = 123
-                mock_request.template_id = 1
-                mock_request.provider = 'gemini'
-                mock_request.status = 'completed'
-                mock_request.to_dict.return_value = {
-                    'id': 123,
-                    'template_id': 1,
-                    'provider': 'gemini',
-                    'status': 'completed',
-                    'response_text': 'Test response'
-                }
-                
-                mock_service.generate_analysis.return_value = mock_request
-                
-                response = client.post('/api/ai-analysis/generate', json={
-                    'template_id': 1,
-                    'variables': {'stock_ticker': 'TSLA', 'goal': 'Investment'},
-                    'provider': 'gemini',
-                    'user_id': mock_user_id  # Fallback for require_authentication
-                })
-                
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['id'] == 123
+    def test_generate_analysis_endpoint_success(self, auth_client):
+        """Test POST /api/ai_analysis/generate with valid data."""
+        with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
+            # Mock successful analysis generation
+            mock_request = Mock()
+            mock_request.id = 123
+            mock_request.template_id = 1
+            mock_request.provider = 'gemini'
+            mock_request.status = 'completed'
+            mock_request.to_dict.return_value = {
+                'id': 123,
+                'template_id': 1,
+                'provider': 'gemini',
+                'status': 'completed',
+                'response_text': 'Test response'
+            }
+
+            mock_service.generate_analysis.return_value = mock_request
+
+            response = auth_client.post('/api/ai_analysis/generate', json={
+                'template_id': 1,
+                'variables': {'stock_ticker': 'TSLA', 'goal': 'Investment'},
+                'provider': 'gemini'
+            })
+
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['id'] == 123
     
     def test_generate_analysis_endpoint_validation_error(self, client, mock_user_id):
         """Test POST /api/ai-analysis/generate with validation error."""
@@ -98,8 +95,8 @@ class TestAIAnalysisAPI:
                 })
                 
                 assert response.status_code == 400
-                data = json.loads(response.data)
-                assert data['status'] == 'error'
+            data = json.loads(response.data)
+            assert data['status'] == 'error'
                 # Check for error_code (new format) or error_type (old format)
                 assert 'error_code' in data or 'error_type' in data
     
@@ -218,12 +215,12 @@ class TestAIAnalysisAPI:
                 
                 response = client.get('/api/ai-analysis/history?limit=50&offset=0&user_id=' + str(mock_user_id))
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
                 assert len(data['data']) == 2
-                assert data['extra']['count'] == 2
-                assert data['extra']['total'] == 2
+            assert data['extra']['count'] == 2
+            assert data['extra']['total'] == 2
     
     def test_get_history_endpoint_with_filters(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history with filters."""
@@ -236,7 +233,7 @@ class TestAIAnalysisAPI:
                 
                 response = client.get('/api/ai-analysis/history?template_id=1&provider=gemini&status=completed&user_id=' + str(mock_user_id))
                 
-                assert response.status_code == 200
+            assert response.status_code == 200
                 # Verify filters were passed
                 call_args = mock_service.get_analysis_history.call_args
                 assert call_args[1]['template_id'] == 1
@@ -265,10 +262,10 @@ class TestAIAnalysisAPI:
                 
                 response = client.get('/api/ai-analysis/history/123?user_id=' + str(mock_user_id))
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['id'] == 123
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['id'] == 123
     
     def test_get_analysis_by_id_endpoint_not_found(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history/<id> when not found."""
@@ -280,8 +277,8 @@ class TestAIAnalysisAPI:
                 response = client.get('/api/ai-analysis/history/999?user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 404
-                data = json.loads(response.data)
-                assert data['status'] == 'error'
+            data = json.loads(response.data)
+            assert data['status'] == 'error'
                 assert 'not found' in data['message'].lower()
     
     def test_llm_provider_get_endpoint(self, client, mock_user_id):
@@ -304,11 +301,11 @@ class TestAIAnalysisAPI:
                 
                 response = client.get('/api/ai-analysis/llm-provider?user_id=' + str(mock_user_id))
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['default_provider'] == 'gemini'
-                assert data['data']['gemini_configured'] is True
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['default_provider'] == 'gemini'
+            assert data['data']['gemini_configured'] is True
     
     def test_llm_provider_get_endpoint_not_found(self, client, mock_user_id):
         """Test GET /api/ai-analysis/llm-provider when settings not found."""
@@ -319,12 +316,12 @@ class TestAIAnalysisAPI:
                 
                 response = client.get('/api/ai-analysis/llm-provider?user_id=' + str(mock_user_id))
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
                 # Should return default settings
-                assert data['data']['default_provider'] == 'gemini'
-                assert data['data']['providers_configured'] == []
+            assert data['data']['default_provider'] == 'gemini'
+            assert data['data']['providers_configured'] == []
     
     def test_llm_provider_post_endpoint_success(self, client, mock_user_id):
         """Test POST /api/ai-analysis/llm-provider with valid API key."""
@@ -344,10 +341,10 @@ class TestAIAnalysisAPI:
                     'user_id': mock_user_id
                 })
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['success'] is True
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['success'] is True
                 # validated might be a timestamp dict or boolean
                 validated = data['data'].get('validated')
                 assert validated is not None, "validated field should exist"
@@ -404,8 +401,8 @@ class TestAIAnalysisAPI:
                 })
                 
                 assert response.status_code == 400
-                data = json.loads(response.data)
-                assert data['status'] == 'error'
+            data = json.loads(response.data)
+            assert data['status'] == 'error'
                 assert 'invalid' in data['message'].lower()
 
 
@@ -431,10 +428,10 @@ class TestAIAnalysisBusinessLogicAPI:
                     'provider': 'gemini'
                 })
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['is_valid'] is True
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['is_valid'] is True
     
     def test_business_logic_validate_endpoint_errors(self, client):
         """Test POST /api/business/ai-analysis/validate with validation errors."""
@@ -453,8 +450,8 @@ class TestAIAnalysisBusinessLogicAPI:
                 })
                 
                 assert response.status_code == 400
-                data = json.loads(response.data)
-                assert data['status'] == 'error'
+            data = json.loads(response.data)
+            assert data['status'] == 'error'
                 assert 'errors' in data['error']
                 assert len(data['error']['errors']) == 2
     
@@ -476,10 +473,10 @@ class TestAIAnalysisBusinessLogicAPI:
                     }
                 })
                 
-                assert response.status_code == 200
-                data = json.loads(response.data)
-                assert data['status'] == 'success'
-                assert data['data']['is_valid'] is True
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['status'] == 'success'
+            assert data['data']['is_valid'] is True
     
     def test_business_logic_validate_variables_endpoint_errors(self, client):
         """Test POST /api/business/ai-analysis/validate-variables with validation errors."""
@@ -497,8 +494,8 @@ class TestAIAnalysisBusinessLogicAPI:
                 })
                 
                 assert response.status_code == 400
-                data = json.loads(response.data)
-                assert data['status'] == 'error'
+            data = json.loads(response.data)
+            assert data['status'] == 'error'
                 assert 'errors' in data['error']
                 assert len(data['error']['errors']) == 1
 

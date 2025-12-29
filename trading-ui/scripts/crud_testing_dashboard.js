@@ -1041,42 +1041,33 @@ class IntegratedCRUDE2ETester {
             // Test the CRUD service directly instead of using modals
             console.log(`🔄 DEBUG: Testing UnifiedCRUDService.create directly`);
 
-            // Try iframe first, fallback to main window
-            let crudService = iframeWindow.UnifiedCRUDService;
-            let serviceWindow = iframeWindow;
+            // Use main window for authentication and services
+            let crudService = window.UnifiedCRUDService;
+            let serviceWindow = window;
 
-            console.log(`🔍 DEBUG: iframe UnifiedCRUDService:`, {
-                exists: !!iframeWindow.UnifiedCRUDService,
-                type: typeof iframeWindow.UnifiedCRUDService,
-                hasCreate: !!(iframeWindow.UnifiedCRUDService && typeof iframeWindow.UnifiedCRUDService.create === 'function'),
-                iframeWindow: iframeWindow !== window,
-                iframeOrigin: iframeWindow.location?.origin,
-                mainOrigin: window.location?.origin
+            console.log(`🔍 DEBUG: main window UnifiedCRUDService:`, {
+                exists: !!window.UnifiedCRUDService,
+                type: typeof window.UnifiedCRUDService,
+                hasCreate: !!(window.UnifiedCRUDService && typeof window.UnifiedCRUDService.create === 'function')
             });
-
-            if (!crudService || typeof crudService.create !== 'function') {
-                console.log(`⚠️ DEBUG: iframe UnifiedCRUDService not available, trying main window`);
-                crudService = window.UnifiedCRUDService;
-                serviceWindow = window;
-
-                console.log(`🔍 DEBUG: main window UnifiedCRUDService:`, {
-                    exists: !!window.UnifiedCRUDService,
-                    type: typeof window.UnifiedCRUDService,
-                    hasCreate: !!(window.UnifiedCRUDService && typeof window.UnifiedCRUDService.create === 'function')
-                });
-            }
 
             if (!crudService || typeof crudService.create !== 'function') {
                 console.log(`❌ DEBUG: Neither iframe nor main window has UnifiedCRUDService.create`);
                 throw new Error('UnifiedCRUDService.create is not available in iframe or main window');
             }
 
-            console.log(`✅ DEBUG: Using CRUD service from ${serviceWindow === window ? 'main window' : 'iframe'}`);
 
             // Call the CRUD service directly
             const result = await crudService.create(entityType, testData);
 
-            console.log('CREATE response:', result);
+            console.log('CREATE response:', JSON.stringify(result, null, 2));
+            console.log('CREATE response type:', typeof result);
+            console.log('CREATE response keys:', result ? Object.keys(result) : 'null');
+            console.log('CREATE result.data:', result?.data);
+            console.log('CREATE result.data?.id:', result?.data?.id);
+            console.log('CREATE result.id:', result?.id);
+            console.log('CREATE result.status:', result?.status);
+            console.log('CREATE result.success:', result?.success);
 
             // Handle both old format (success: boolean) and new format (status: string)
             const isSuccess = result && (result.success === true || result.status === 'success');
@@ -1120,8 +1111,13 @@ class IntegratedCRUDE2ETester {
 
             const pluralEntity = entityToPlural[entityType] || entityType + 's'; // Fallback to adding 's'
 
+            console.log(`🔍 DEBUG: READ test mapping: entityType=${entityType} -> pluralEntity=${pluralEntity}`);
+
             const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-            const response = await fetch(`${base}/api/${pluralEntity}/${recordId}`, {
+            const apiUrl = `${base}/api/${pluralEntity}/${recordId}`;
+            console.log(`🔍 DEBUG: READ test API URL: ${apiUrl}`);
+
+            const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -1171,9 +1167,17 @@ class IntegratedCRUDE2ETester {
             }
 
             // Use UnifiedCRUDService to update
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'Checking UnifiedCRUDService availability',data:{hasIframeWindow:!!iframeWindow,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDMethods:iframeWindow.UnifiedCRUDService ? Object.getOwnPropertyNames(iframeWindow.UnifiedCRUDService).filter(name => typeof iframeWindow.UnifiedCRUDService[name] === 'function') : [],entityType,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+            // #endregion
+
             if (!iframeWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in iframe');
             }
+
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'About to call UnifiedCRUDService.update',data:{hasUpdateMethod:!!iframeWindow.UnifiedCRUDService.update,hasUpdateEntityMethod:!!iframeWindow.UnifiedCRUDService.updateEntity,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1'})}).catch(()=>{});
+            // #endregion
 
             const updateResult = await iframeWindow.UnifiedCRUDService.update(entityType, updateData);
             if (!updateResult || !updateResult.success) {

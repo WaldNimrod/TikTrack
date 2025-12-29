@@ -128,9 +128,10 @@ class TestTradePlanningFields:
             'ticker_id': sample_ticker.id,
             'status': 'open',
             'investment_type': 'swing',
-            'side': 'Long'
+            'side': 'Long',
+            'user_id': 1  # Add required user_id
         }
-        
+
         trade = TradeService.create(db_session, trade_data)
         db_session.refresh(trade)
         
@@ -142,6 +143,7 @@ class TestTradePlanningFields:
         """Test snapshot logic: creating trade from plan copies planning fields"""
         # Create a trade plan first
         plan_data = {
+            'user_id': 1,  # Add required user_id
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
             'investment_type': 'swing',
@@ -162,7 +164,8 @@ class TestTradePlanningFields:
             'status': 'open',
             'investment_type': 'swing',
             'side': 'Long',
-            'trade_plan_id': plan.id
+            'trade_plan_id': plan.id,
+            'user_id': 1  # Add required user_id
         }
         
         trade = TradeService.create(db_session, trade_data)
@@ -179,6 +182,7 @@ class TestTradePlanningFields:
         """Test that explicit planning fields override snapshot from plan"""
         # Create a trade plan
         plan_data = {
+            'user_id': 1,  # Add required user_id
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
             'investment_type': 'swing',
@@ -202,7 +206,8 @@ class TestTradePlanningFields:
             'trade_plan_id': plan.id,
             'planned_amount': 8000.0,  # Override plan value
             'entry_price': 80.0,  # Override plan value
-            'planned_quantity': 100.0  # Explicit quantity
+            'planned_quantity': 100.0,  # Explicit quantity
+            'user_id': 1  # Add required user_id
         }
         
         trade = TradeService.create(db_session, trade_data)
@@ -221,7 +226,8 @@ class TestTradePlanningFields:
             'ticker_id': sample_ticker.id,
             'status': 'open',
             'investment_type': 'swing',
-            'side': 'Long'
+            'side': 'Long',
+            'user_id': 1  # Add required user_id
         }
         trade = TradeService.create(db_session, trade_data)
         db_session.refresh(trade)
@@ -250,7 +256,8 @@ class TestTradePlanningFields:
             'side': 'Long',
             'planned_quantity': 200.0,
             'planned_amount': 20000.0,
-            'entry_price': 100.0
+            'entry_price': 100.0,
+            'user_id': 1  # Add required user_id
         }
         trade = TradeService.create(db_session, trade_data)
         db_session.refresh(trade)
@@ -271,7 +278,8 @@ class TestTradePlanningFields:
             'ticker_id': sample_ticker.id,
             'status': 'open',
             'investment_type': 'swing',
-            'side': 'Long'
+            'side': 'Long',
+            'user_id': 1  # Add required user_id
         }
         trade = TradeService.create(db_session, trade_data)
         db_session.refresh(trade)
@@ -290,6 +298,7 @@ class TestTradePlanningFields:
     def test_snapshot_calculates_planned_quantity(self, db_session: Session, sample_ticker, sample_account):
         """Test that snapshot logic calculates planned_quantity from amount/price"""
         plan_data = {
+            'user_id': 1,  # Add required user_id
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
             'investment_type': 'swing',
@@ -310,7 +319,8 @@ class TestTradePlanningFields:
             'status': 'open',
             'investment_type': 'swing',
             'side': 'Long',
-            'trade_plan_id': plan.id
+            'trade_plan_id': plan.id,
+            'user_id': 1  # Add required user_id
         }
         
         trade = TradeService.create(db_session, trade_data)
@@ -325,6 +335,7 @@ class TestTradePlanningFields:
         """Test snapshot when plan has planned_amount but no entry_price"""
         # Create plan without entry_price
         plan_data = {
+            'user_id': 1,  # Add required user_id
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
             'investment_type': 'swing',
@@ -344,7 +355,8 @@ class TestTradePlanningFields:
             'status': 'open',
             'investment_type': 'swing',
             'side': 'Long',
-            'trade_plan_id': plan.id
+            'trade_plan_id': plan.id,
+            'user_id': 1  # Add required user_id
         }
         
         trade = TradeService.create(db_session, trade_data)

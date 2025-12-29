@@ -392,10 +392,16 @@ class UnifiedCRUDService {
             page: 'unified-crud-service'
         });
 
-        return await this.saveEntity(entityType, entityData, {
+        const saveResult = await this.saveEntity(entityType, entityData, {
             ...options,
             isEdit: false
         });
+        console.log('UnifiedCRUDService.create result:', JSON.stringify(saveResult, null, 2));
+        console.log('UnifiedCRUDService.create result type:', typeof saveResult);
+        console.log('UnifiedCRUDService.create result keys:', saveResult ? Object.keys(saveResult) : 'null');
+        console.log('UnifiedCRUDService.create result.data?.id:', saveResult?.data?.id);
+        console.log('UnifiedCRUDService.create result.id:', saveResult?.id);
+        return saveResult;
     }
 
     /**

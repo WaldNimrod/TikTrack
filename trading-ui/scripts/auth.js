@@ -1339,6 +1339,11 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   // Wrap everything in try-catch-finally to ensure promise is resolved
   let finalResult;
   try {
+    window.Logger?.info?.('[auth.js] checkAuthentication: Starting token retrieval', {
+      page: 'auth',
+      currentPath: window.location.pathname
+    });
+
     // Ensure we have a token before hitting the server
     let tokenAvailable = false;
     let effectiveToken = null;
@@ -1416,7 +1421,11 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
 
     if (response.ok) {
       const data = await response.json();
-      console.log('[auth.js] checkAuthentication: Server response data:', data);
+      window.Logger?.info?.('[auth.js] checkAuthentication: Server response OK', {
+        page: 'auth',
+        hasUser: !!data.data?.user,
+        userId: data.data?.user?.id
+      });
       if (data.status === 'success' && data.data?.user) {
         const newUser = data.data.user;
         const wasAuthenticated = !!currentUser;
@@ -1496,7 +1505,12 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   
   // If server said unauthenticated, always clear auth cache and force login
   if (cachedUser) {
-    console.debug('[auth.js] checkAuthentication: Server check failed, clearing cached auth and showing login');
+    window.Logger?.error?.('[auth.js] checkAuthentication: Server check failed, clearing cached auth', {
+      page: 'auth',
+      status: response.status,
+      currentPath: window.location.pathname,
+      timestamp: new Date().toISOString()
+    });
   }
   currentUser = null;
   authToken = null;

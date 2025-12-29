@@ -49,13 +49,29 @@
 
   async function getAuthToken() {
     try {
+      window.Logger?.info?.('[API Fetch Wrapper] getAuthToken called', {
+        page: window.location.pathname,
+        ucmExists: !!window.UnifiedCacheManager,
+        ucmInitialized: window.UnifiedCacheManager?.initialized
+      });
+
       // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         const token = await window.UnifiedCacheManager.get('authToken', {
           layer: 'sessionStorage',
           includeUserId: false
         });
+        window.Logger?.info?.('[API Fetch Wrapper] Token from UnifiedCacheManager', {
+          found: !!token,
+          page: window.location.pathname
+        });
         if (token) return token;
+      } else {
+        window.Logger?.warn?.('[API Fetch Wrapper] UnifiedCacheManager not ready', {
+          exists: !!window.UnifiedCacheManager,
+          initialized: window.UnifiedCacheManager?.initialized,
+          page: window.location.pathname
+        });
       }
 
       // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)

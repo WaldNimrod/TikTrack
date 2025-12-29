@@ -1,0 +1,833 @@
+[
+  {
+    "page": "index",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "preferences",
+      "info-summary",
+      "watch-lists"
+    ],
+    "current_globals": [
+      "window.UnifiedAppInitializer",
+      "DataUtils",
+      "window.Logger",
+      "window.CacheSyncManager",
+      "window.IconSystem",
+      "window.DashboardData",
+      "window.loadDashboardData",
+      "window.RecentItemsWidget",
+      "window.UnifiedPendingActionsWidget",
+      "window.TagWidget",
+      "window.TickerListWidget"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "tickers",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "crud",
+      "preferences",
+      "validation",
+      "external-data",
+      "entity-services",
+      "entity-details",
+      "info-summary",
+      "conditions"
+    ],
+    "current_globals": [
+      "NotificationSystem",
+      "window.IconSystem",
+      "DataUtils",
+      "ExternalDataService",
+      "window.loadTickersData",
+      "window.ModalManagerV2",
+      "window.tickersModalConfig",
+      "window.conditionsInitializer"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "trading_accounts",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "crud",
+      "preferences",
+      "validation",
+      "entity-details",
+      "entity-services",
+      "info-summary",
+      "conditions"
+    ],
+    "current_globals": [
+      "NotificationSystem",
+      "window.IconSystem",
+      "DataUtils",
+      "window.loadTradingAccountsDataForTradingAccountsPage",
+      "window.ModalManagerV2",
+      "window.tradingAccountsModalConfig",
+      "window.TagUIManager",
+      "window.RichTextEditorService",
+      "window.Quill",
+      "window.DOMPurify",
+      "window.conditionsInitializer"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "cash_flows",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "crud",
+      "preferences",
+      "validation",
+      "entity-services",
+      "entity-details",
+      "info-summary",
+      "conditions"
+    ],
+    "current_globals": [
+      "NotificationSystem",
+      "window.IconSystem",
+      "window.ModalManagerV2",
+      "window.cashFlowModalConfig",
+      "window.RichTextEditorService",
+      "window.Quill",
+      "window.DOMPurify",
+      "window.SelectPopulatorService"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "research",
+    "current_packages": [
+      "base",
+      "services",
+      "ui-advanced",
+      "crud",
+      "preferences",
+      "conditions",
+      "init-system"
+    ],
+    "current_globals": [
+      "window.UnifiedAppInitializer",
+      "window.IconSystem",
+      "DataUtils",
+      "window.initializeResearchPage",
+      "window.conditionsInitializer"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "conditions",
+        "missing_dependency": "validation",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'validation' ל-packages (נדרש עבור 'conditions')"
+    ]
+  },
+  {
+    "page": "preferences",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "preferences",
+      "validation"
+    ],
+    "current_globals": [
+      "NotificationSystem",
+      "window.IconSystem",
+      "DataUtils",
+      "window.Logger",
+      "window.CacheSyncManager",
+      "window.PreferencesUIV4",
+      "window.InfoSummarySystem"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "user-profile",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "db_display",
+    "current_packages": [
+      "base",
+      "services",
+      "ui-advanced",
+      "crud",
+      "preferences",
+      "info-summary",
+      "init-system"
+    ],
+    "current_globals": [
+      "NotificationSystem",
+      "window.IconSystem",
+      "DataUtils",
+      "window.loadDatabaseInfo",
+      "window.loadUserPreferences",
+      "window.initSystemCheck"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": []
+  },
+  {
+    "page": "db_extradata",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "crud",
+      "preferences",
+      "dashboard-widgets",
+      "init-system"
+    ],
+    "current_globals": [
+      "window.UnifiedAppInitializer",
+      "window.IconSystem",
+      "DataUtils",
+      "window.initDatabaseExtraData",
+      "window.loadExtraData",
+      "window.loadUserPreferences",
+      "window.initSystemCheck",
+      "window.PendingTradePlanWidget"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "constraints",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "crud",
+      "preferences",
+      "dashboard-widgets",
+      "info-summary",
+      "init-system"
+    ],
+    "current_globals": [
+      "window.UnifiedAppInitializer",
+      "window.IconSystem",
+      "window.loadConstraints",
+      "window.ConstraintManager",
+      "window.createActionsMenu",
+      "window.SelectPopulatorService",
+      "window.DataCollectionService",
+      "window.DefaultValueSetter",
+      "window.TableSortValueAdapter",
+      "window.LinkedItemsService",
+      "window.CRUDResponseHandler",
+      "window.ModalNavigationManager",
+      "window.ModalManagerV2",
+      "window.conditionsInitializer",
+      "window.ConditionsUIManager",
+      "window.PendingTradePlanWidget",
+      "window.InfoSummarySystem",
+      "window.PaginationSystem",
+      "window.ColorSchemeSystem"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')"
+    ]
+  },
+  {
+    "page": "background-tasks",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "server-monitor",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "system-management",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "cache-test",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "notifications-center",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "css-management",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "dynamic-colors-display",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "designs",
+    "current_packages": [
+      "base",
+      "auth",
+      "ui-advanced",
+      "modules",
+      "crud",
+      "preferences",
+      "conditions",
+      "dashboard-widgets",
+      "info-summary",
+      "init-system"
+    ],
+    "current_globals": [
+      "window.UnifiedAppInitializer",
+      "window.IconSystem",
+      "window.loadDesigns",
+      "window.DesignGallery",
+      "window.SelectPopulatorService",
+      "window.DataCollectionService",
+      "window.DefaultValueSetter",
+      "window.LinkedItemsService",
+      "window.CRUDResponseHandler",
+      "window.ModalManagerV2",
+      "window.conditionsInitializer",
+      "window.ConditionsUIManager",
+      "window.PendingTradePlanWidget",
+      "window.InfoSummarySystem",
+      "window.PaginationSystem"
+    ],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [
+      {
+        "package": "modules",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "crud",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "preferences",
+        "missing_dependency": "services",
+        "severity": "high"
+      },
+      {
+        "package": "conditions",
+        "missing_dependency": "validation",
+        "severity": "high"
+      }
+    ],
+    "load_order_issues": [
+      {
+        "package": "base",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      },
+      {
+        "package": "auth",
+        "dependency": "base",
+        "package_order": 1.0,
+        "dep_order": 1.0,
+        "severity": "high"
+      }
+    ],
+    "recommendations": [
+      "הוסף 'services' ל-packages (נדרש עבור 'modules')",
+      "הוסף 'services' ל-packages (נדרש עבור 'crud')",
+      "הוסף 'services' ל-packages (נדרש עבור 'preferences')",
+      "הוסף 'validation' ל-packages (נדרש עבור 'conditions')"
+    ]
+  },
+  {
+    "page": "tradingview-test-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "external-data-dashboard",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "chart-management",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "portfolio-state-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "trade-history-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "price-history-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "comparative-analysis-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "trading-journal-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "strategy-analysis-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "economic-calendar-page",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "history-widget",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "emotional-tracking-widget",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  },
+  {
+    "page": "date-comparison-modal",
+    "current_packages": [],
+    "current_globals": [],
+    "missing_packages": [],
+    "missing_globals": [],
+    "issues": [],
+    "dependency_issues": [],
+    "load_order_issues": [],
+    "recommendations": []
+  }
+]

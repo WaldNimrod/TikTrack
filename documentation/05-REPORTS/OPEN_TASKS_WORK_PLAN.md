@@ -6,6 +6,79 @@
 
 ---
 
+## 0) Current Cycle — CRUD Testing Integration (Active)
+
+**Purpose:** integrate all test systems into the CRUD dashboard, enforce relevancy rules, and drive the UI suite to 100% pass.  
+**Owner:** Team A (Integration Lead) with Team B/C/D/E support.
+
+### Team A — Integration + Quality (Highest Workload)
+**Objectives**
+- Wire registry + relevancy rules into the CRUD dashboard.
+- Ensure per‑page executed counts appear in results table.
+- Stabilize test data for validation rules.
+
+**Key Files**
+- `trading-ui/scripts/test-registry.js`
+- `trading-ui/scripts/test-relevancy-rules.js`
+- `trading-ui/scripts/testing/test-orchestrator.js`
+- `trading-ui/scripts/testing/test-results-model.js`
+- `trading-ui/scripts/crud_testing_dashboard.js`
+- `trading-ui/crud_testing_dashboard.html`
+- `documentation/05-REPORTS/TEST_RELEVANCY_MATRIX.md`
+
+**Implementation Notes + Example**
+```js
+// Example: apply relevancy rules per page
+const relevantTests = window.TestRegistry.getTestsForPage(pageKey);
+const filtered = window.TestRelevancyRules.filterRelevantTests(relevantTests, pageKey);
+await orchestrator.run({ filterFn: test => filtered.some(t => t.id === test.id) });
+```
+
+**Test Data Fixes (required for QA pass)**
+- **tickers**: enforce `symbol.length <= 10` in test data.
+- **alerts**: use a valid `condition_operator` accepted by backend validation.
+- **executions**: create/attach a valid `trade_id` before execution CRUD.
+- **notes**: include `related_type_id` + `related_id`.
+
+**Acceptance**
+- Registry suite runs from CRUD dashboard.
+- Results table shows executed counts per page.
+- No validation errors for test data.
+
+---
+
+### Team B — UX/UI (Support)
+**Objective:** verify the new registry results still render correctly with updated UI.
+**Checks**
+- Table columns show **count** and **details** correctly.
+- New “Registry Suite” button renders and triggers execution.
+
+---
+
+### Team C — Relevancy + Gaps (Support)
+**Objective:** confirm relevancy rules match reality and avoid running irrelevant tests.
+**Deliverables**
+- Update `trading-ui/scripts/test-relevancy-rules.js` if any page logic changed.
+- Keep `documentation/05-REPORTS/TEST_RELEVANCY_MATRIX.md` in sync.
+
+---
+
+### Team D — QA Validation (Support)
+**Objective:** rerun full CRUD dashboard suite on 8080 after Team A fixes.
+**Deliverables**
+- Pass rate report by page + test type.
+- Log any remaining 500s with endpoint + payload.
+
+---
+
+### Team E — Documentation (Support)
+**Objective:** update admin runbook and code‑quality guide for new registry flow.
+**Files**
+- `documentation/03-DEVELOPMENT/TESTING/CRUD_TESTING_ADMIN_RUNBOOK.md`
+- `documentation/03-DEVELOPMENT/GUIDELINES/CODE_QUALITY_SYSTEMS_GUIDE.md`
+
+---
+
 ## 0) Scope Summary
 
 This work plan coordinates parallel teams and defines file-level tasks, code examples, and documentation references to complete all open items:

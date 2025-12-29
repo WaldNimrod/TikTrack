@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-12-29T00:59:15.871Z",
+  "summary": {
+    "totalFunctions": 0,
+    "similarFunctions": 0,
+    "exactDuplicates": 0,
+    "nearDuplicates": 0,
+    "similarPatterns": 0
+  },
+  "similarFunctions": [],
+  "globalSystemCandidates": [],
+  "recommendations": []
+}

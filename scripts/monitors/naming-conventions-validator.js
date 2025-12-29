@@ -19,7 +19,7 @@ const path = require('path');
 // Configuration
 const CONFIG = {
     scriptsDir: '../trading-ui/scripts',
-    outputDir: '../reports',
+    outputDir: 'reports',
     corePages: [
         'index.js',
         'trades.js',

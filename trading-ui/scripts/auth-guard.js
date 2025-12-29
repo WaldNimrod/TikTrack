@@ -179,7 +179,9 @@ async function initAuthGuard() {
   // Increased delay to allow session cookie to be set after page reload
   // This prevents race condition where we check auth before session is ready
   // Increased delay to 1000ms to give session more time to stabilize
+  console.log('[auth-guard] Starting 1 second delay for session stabilization');
   await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('[auth-guard] Delay completed, checking authentication');
   
   // Wait for UnifiedCacheManager to be initialized first
   if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
@@ -222,8 +224,10 @@ async function initAuthGuard() {
   
   let result = { authenticated: false, user: null, error: 'unknown' };
   try {
+    console.log('[auth-guard] About to call checkAuthentication');
     window.Logger?.info?.('🔍 [Auth Guard] Calling checkAuthentication', { page: 'auth-guard' });
     const r = await checkAuthentication();
+    console.log('[auth-guard] checkAuthentication result:', r);
     window.Logger?.info?.('🔍 [Auth Guard] checkAuthentication result', {
       authenticated: r?.authenticated,
       hasUser: !!r?.user,
@@ -232,6 +236,7 @@ async function initAuthGuard() {
     });
     if (r) result = r;
   } catch (e) {
+    console.log('[auth-guard] checkAuthentication threw:', e);
     window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
   }
   

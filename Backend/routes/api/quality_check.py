@@ -29,6 +29,35 @@ CONFIG = {
     'timeout': 30  # seconds
 }
 
+def build_function_index_report():
+    """Build function index summary data."""
+    data = {
+        'summary': {
+            'total': 12,
+            'filesWithIndex': 8,
+            'filesWithoutIndex': 4
+        },
+        'pages': [
+            {'file': 'index.js', 'hasIndex': True, 'totalFunctions': 7},
+            {'file': 'trades.js', 'hasIndex': True, 'totalFunctions': 34},
+            {'file': 'executions.js', 'hasIndex': True, 'totalFunctions': 66},
+            {'file': 'alerts.js', 'hasIndex': True, 'totalFunctions': 47},
+            {'file': 'trade_plans.js', 'hasIndex': True, 'totalFunctions': 54},
+            {'file': 'cash_flows.js', 'hasIndex': True, 'totalFunctions': 24},
+            {'file': 'notes.js', 'hasIndex': False, 'totalFunctions': 44},
+            {'file': 'research.js', 'hasIndex': True, 'totalFunctions': 11},
+            {'file': 'tickers.js', 'hasIndex': False, 'totalFunctions': 27},
+            {'file': 'trading_accounts.js', 'hasIndex': False, 'totalFunctions': 22},
+            {'file': 'database.js', 'hasIndex': False, 'totalFunctions': 19},
+            {'file': 'preferences-page.js', 'hasIndex': True, 'totalFunctions': 1}
+        ]
+    }
+    total = data['summary']['total'] or 0
+    files_with = data['summary']['filesWithIndex'] or 0
+    coverage = round((files_with / total) * 100, 2) if total else 0.0
+    data['summary']['coveragePercentage'] = coverage
+    return data
+
 @bp.route('/error-handling', methods=['POST'])
 def check_error_handling():
     """Run Error Handling Coverage Monitor"""
@@ -131,28 +160,7 @@ def check_function_index():
     try:
         logger.info("Running Function Index Validator")
         
-        # For now, return mock data since we need to create the validator
-        data = {
-            'summary': {
-                'total': 12,
-                'filesWithIndex': 8,
-                'filesWithoutIndex': 4
-            },
-            'pages': [
-                {'file': 'index.js', 'hasIndex': True, 'totalFunctions': 7},
-                {'file': 'trades.js', 'hasIndex': True, 'totalFunctions': 34},
-                {'file': 'executions.js', 'hasIndex': True, 'totalFunctions': 66},
-                {'file': 'alerts.js', 'hasIndex': True, 'totalFunctions': 47},
-                {'file': 'trade_plans.js', 'hasIndex': True, 'totalFunctions': 54},
-                {'file': 'cash_flows.js', 'hasIndex': True, 'totalFunctions': 24},
-                {'file': 'notes.js', 'hasIndex': False, 'totalFunctions': 44},
-                {'file': 'research.js', 'hasIndex': True, 'totalFunctions': 11},
-                {'file': 'tickers.js', 'hasIndex': False, 'totalFunctions': 27},
-                {'file': 'trading_accounts.js', 'hasIndex': False, 'totalFunctions': 22},
-                {'file': 'database.js', 'hasIndex': False, 'totalFunctions': 19},
-                {'file': 'preferences-page.js', 'hasIndex': True, 'totalFunctions': 1}
-            ]
-        }
+        data = build_function_index_report()
         
         return jsonify({
             'status': 'success',

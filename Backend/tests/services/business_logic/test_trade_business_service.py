@@ -170,7 +170,8 @@ class TestTradeBusinessService:
             'quantity': 10.0,
             'side': 'buy',
             'investment_type': 'Investment',
-            'status': 'open'
+            'status': 'open',
+            'user_id': 1
         }
         
         result = self.service.validate(trade_data)
@@ -204,4 +205,3 @@ class TestTradeBusinessService:
         
         assert result['is_valid'] is False
         assert any('price' in error.lower() for error in result['errors'])
-

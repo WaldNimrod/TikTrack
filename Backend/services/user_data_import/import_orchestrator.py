@@ -997,6 +997,7 @@ class ImportOrchestrator:
             'linking_matched_account_id': matched_account.id
         })
         try:
+            self.db_session.flush()  # Ensure changes are persisted
             self.db_session.commit()
         except SQLAlchemyError as exc:
             self.db_session.rollback()

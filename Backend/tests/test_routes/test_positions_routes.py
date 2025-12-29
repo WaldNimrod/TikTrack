@@ -11,6 +11,7 @@ import os
 import sys
 import pytest
 from flask import Flask
+from unittest.mock import Mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
@@ -18,6 +19,15 @@ from routes.api.positions import positions_bp, portfolio_bp
 
 
 class _DummySession:
+    def execute(self, *args, **kwargs):
+        return None
+
+    def expire_all(self):
+        return None
+
+    def query(self, *args, **kwargs):
+        return Mock()
+
     def commit(self):
         return None
 
@@ -91,7 +101,7 @@ def test_get_account_positions_handles_service_error(client, monkeypatch):
 def test_get_portfolio_applies_filters(client, monkeypatch):
     captured = {}
 
-    def fake_summary(db, account_id_filter, include_closed, unify_accounts, side_filter):
+    def fake_summary(db, account_id_filter, include_closed, unify_accounts, side_filter, user_id=None):
         captured.update({
             'account': account_id_filter,
             'include_closed': include_closed,

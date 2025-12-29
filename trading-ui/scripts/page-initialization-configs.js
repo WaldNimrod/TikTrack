@@ -660,9 +660,18 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           window.Logger?.info('👥 Initializing User Management Page...', { page: 'page-initialization-configs' });
 
-          // Initialize User Management Page
+          // Initialize User Management Page - wait if not loaded yet
           if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {
             await window.UserManagementPage.init();
+          } else {
+            // Wait for UserManagementPage to load
+            for (let i = 0; i < 50; i++) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {
+                await window.UserManagementPage.init();
+                break;
+              }
+            }
           }
         },
       ],

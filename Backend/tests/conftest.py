@@ -18,6 +18,7 @@ from Backend.config.settings import DATABASE_URL  # noqa: E402
 from sqlalchemy import create_engine, text  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402
 from models.base import Base  # noqa: E402
+from models.ai_analysis import UserLLMProvider  # noqa: E402
 
 
 @pytest.fixture(scope="session")
@@ -105,6 +106,8 @@ def auth_client(client):
     # Stop patches
     for p in patches:
         p.stop()
+
+
 
 
 @pytest.fixture(autouse=True)

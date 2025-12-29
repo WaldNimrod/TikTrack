@@ -1060,15 +1060,6 @@ class IntegratedCRUDE2ETester {
             // Call the CRUD service directly
             const result = await crudService.create(entityType, testData);
 
-            console.log('CREATE response:', JSON.stringify(result, null, 2));
-            console.log('CREATE response type:', typeof result);
-            console.log('CREATE response keys:', result ? Object.keys(result) : 'null');
-            console.log('CREATE result.data:', result?.data);
-            console.log('CREATE result.data?.id:', result?.data?.id);
-            console.log('CREATE result.id:', result?.id);
-            console.log('CREATE result.status:', result?.status);
-            console.log('CREATE result.success:', result?.success);
-
             // Handle both old format (success: boolean) and new format (status: string)
             const isSuccess = result && (result.success === true || result.status === 'success');
 
@@ -1176,10 +1167,10 @@ class IntegratedCRUDE2ETester {
             }
 
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'About to call UnifiedCRUDService.update',data:{hasUpdateMethod:!!iframeWindow.UnifiedCRUDService.update,hasUpdateEntityMethod:!!iframeWindow.UnifiedCRUDService.updateEntity,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'About to call UnifiedCRUDService.updateEntity',data:{entityType,recordId,updateDataKeys:Object.keys(updateData),hasId:updateData.id},timestamp:Date.now(),sessionId:'debug-session',runId:'update-fix-verification',hypothesisId:'UPDATE_FIX'})}).catch(()=>{});
             // #endregion
 
-            const updateResult = await iframeWindow.UnifiedCRUDService.update(entityType, updateData);
+            const updateResult = await iframeWindow.UnifiedCRUDService.updateEntity(entityType, recordId, updateData);
             if (!updateResult || !updateResult.success) {
                 throw new Error(`Failed to update record: ${updateResult?.error || 'Unknown error'}`);
             }

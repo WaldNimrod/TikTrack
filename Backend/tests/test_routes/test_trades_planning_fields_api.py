@@ -23,6 +23,7 @@ from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.ticker import Ticker
 from models.trading_account import TradingAccount
+from models.currency import Currency
 
 
 @pytest.fixture
@@ -50,16 +51,34 @@ def db_session():
 
 
 @pytest.fixture
-def sample_ticker(db_session):
+def sample_currency(db_session):
+    """Create a sample currency"""
+    currency = db_session.query(Currency).filter(Currency.symbol == 'USD').first()
+    if not currency:
+        currency = Currency(name='US Dollar', symbol='USD', usd_rate=1.0)
+        db_session.add(currency)
+        db_session.commit()
+        db_session.refresh(currency)
+    return currency
+
+
+@pytest.fixture
+def sample_ticker(db_session, sample_currency):
     """Create a sample ticker"""
     import uuid
-    unique_symbol = f'TEST_{uuid.uuid4().hex[:8]}'
+    unique_symbol = f'T{uuid.uuid4().hex[:9]}'
     
     existing = db_session.query(Ticker).filter(Ticker.symbol == unique_symbol).first()
     if existing:
         return existing
     
-    ticker = Ticker(symbol=unique_symbol, name='Test Ticker', type='stock', status='active')
+    ticker = Ticker(
+        symbol=unique_symbol,
+        name='Test Ticker',
+        type='stock',
+        status='active',
+        currency_id=sample_currency.id
+    )
     db_session.add(ticker)
     db_session.commit()
     db_session.refresh(ticker)
@@ -67,7 +86,7 @@ def sample_ticker(db_session):
 
 
 @pytest.fixture
-def sample_account(db_session):
+def sample_account(db_session, sample_currency):
     """Create a sample trading account"""
     import uuid
     unique_name = f'Test Account {uuid.uuid4().hex[:8]}'
@@ -76,7 +95,12 @@ def sample_account(db_session):
     if existing:
         return existing
     
-    account = TradingAccount(name=unique_name, status='active')
+    account = TradingAccount(
+        name=unique_name,
+        status='active',
+        currency_id=sample_currency.id,
+        user_id=1
+    )
     db_session.add(account)
     db_session.commit()
     db_session.refresh(account)
@@ -86,11 +110,12 @@ def sample_account(db_session):
 class TestTradesPlanningFieldsAPI:
     """Test suite for trades API with planning fields"""
 
-    def test_create_trade_with_planning_fields(self, client, sample_ticker, sample_account):
+    def test_create_trade_with_planning_fields(self, auth_client, sample_ticker, sample_account):
         """POST /api/trades should accept planning fields"""
         payload = {
             'trading_account_id': sample_account.id,
             'ticker_id': sample_ticker.id,
+            'user_id': 1,
             'status': 'open',
             'investment_type': 'swing',
             'side': 'Long',
@@ -100,8 +125,8 @@ class TestTradesPlanningFieldsAPI:
             'notes': 'Test trade with planning'
         }
         
-        response = client.post(
-            '/api/trades',
+        response = auth_client.post(
+            '/api/trades/',
             data=json.dumps(payload),
             content_type='application/json'
         )
@@ -118,10 +143,11 @@ class TestTradesPlanningFieldsAPI:
         assert 'planned_amount' in trade_data or trade_data.get('planned_amount') is not None
         assert 'entry_price' in trade_data or trade_data.get('entry_price') is not None
 
-    def test_get_trades_includes_planning_fields(self, client, db_session, sample_ticker, sample_account):
+    def test_get_trades_includes_planning_fields(self, auth_client, db_session, sample_ticker, sample_account):
         """GET /api/trades should return planning fields"""
         # Create a trade with planning fields
         trade = Trade(
+            user_id=1,
             trading_account_id=sample_account.id,
             ticker_id=sample_ticker.id,
             status='open',
@@ -135,7 +161,7 @@ class TestTradesPlanningFieldsAPI:
         db_session.commit()
         db_session.refresh(trade)
         
-        response = client.get('/api/trades')
+        response = auth_client.get('/api/trades/')
         assert response.status_code == 200
         
         data = response.get_json()
@@ -150,10 +176,11 @@ class TestTradesPlanningFieldsAPI:
         assert 'planned_amount' in our_trade
         assert 'entry_price' in our_trade
 
-    def test_update_trade_planning_fields(self, client, db_session, sample_ticker, sample_account):
+    def test_update_trade_planning_fields(self, auth_client, db_session, sample_ticker, sample_account):
         """PUT /api/trades/:id should update planning fields"""
         # Create trade without planning fields
         trade = Trade(
+            user_id=1,
             trading_account_id=sample_account.id,
             ticker_id=sample_ticker.id,
             status='open',
@@ -171,7 +198,7 @@ class TestTradesPlanningFieldsAPI:
             'entry_price': 100.0
         }
         
-        response = client.put(
+        response = auth_client.put(
             f'/api/trades/{trade.id}',
             data=json.dumps(payload),
             content_type='application/json'
@@ -184,4 +211,3 @@ class TestTradesPlanningFieldsAPI:
         assert trade.planned_quantity == 75.0
         assert trade.planned_amount == 7500.0
         assert trade.entry_price == 100.0
-

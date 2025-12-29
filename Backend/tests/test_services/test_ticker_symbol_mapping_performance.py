@@ -38,11 +38,14 @@ def test_currency(db_session):
 
 @pytest.fixture
 def test_tickers(db_session, test_currency):
-    """Create multiple test tickers"""
+    """Create multiple test tickers with unique symbols"""
+    import uuid
     tickers = []
     for i in range(10):
+        # Generate unique symbol to avoid conflicts in same session
+        unique_symbol = f'T{i}_{uuid.uuid4().hex[:4]}'
         ticker = Ticker(
-            symbol=f'TEST{i}',
+            symbol=unique_symbol,
             name=f'Test Ticker {i}',
             type='stock',
             currency_id=test_currency.id,

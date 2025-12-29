@@ -33,19 +33,16 @@
      * אתחול עמוד ניהול משתמשים
      */
     async init() {
-      console.log('🚀 [UserManagementPage] init() called');
       if (this.initialized) {
         window.Logger?.warn('UserManagementPage already initialized', { page: 'user-management' });
         return;
       }
 
       try {
-        console.log('🔍 [UserManagementPage] Starting initialization...');
         window.Logger?.info('🚀 Initializing User Management Page...', { page: 'user-management' });
 
         // Wait for required systems to load
         await this.waitForSystems();
-        console.log('✅ [UserManagementPage] Systems loaded');
 
         // Check authentication
         if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
@@ -121,14 +118,40 @@
         window.Logger?.info('Loading users data...', { page: 'user-management' });
 
         // Load users from API (using window.fetch for auth token injection)
+        let headers = {
+          'Content-Type': 'application/json'
+        };
+
+        // Try to get token manually if API Fetch Wrapper fails
+        try {
+          if (window.UnifiedCacheManager?.initialized) {
+            const token = await window.UnifiedCacheManager.get('authToken', {
+              layer: 'sessionStorage',
+              includeUserId: false
+            });
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`;
+            }
+          }
+        } catch (e) {
+          window.Logger?.warn('Failed to get token for manual injection', { page: 'user-management', error: e.message });
+        }
+
         const usersResponse = await window.fetch('/api/users/', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: headers
         });
 
         if (!usersResponse.ok) {
+          // If unauthorized, redirect to login
+          if (usersResponse.status === 401 || usersResponse.status === 403) {
+            window.Logger?.warn('API authentication failed, redirecting to login', {
+              page: 'user-management',
+              status: usersResponse.status
+            });
+            window.location.href = '/login.html';
+            return;
+          }
           throw new Error(`HTTP error! status: ${usersResponse.status}`);
         }
 

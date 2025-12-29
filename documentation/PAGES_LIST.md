@@ -9,6 +9,7 @@
 ## ✅ מקור אמת (as-made)
 
 **מקורות:**  
+
 1) `production/trading-ui/*.html` (Runtime build)  
 2) `production/Backend/routes/pages.py` (Routes)  
 3) `trading-ui/*.html` (Dev source)  
@@ -42,7 +43,9 @@
 | **strategy_analysis.html** | `/strategy-analysis` | ניתוח אסטרטגיות |
 | **preferences.html** | `/preferences` | העדפות |
 | **tag_management.html** | `/tag_management` | HTML/URL משתמשים ב-underscore |
+
 ### 🔵 עמודי אימות (4)
+
 `login.html`, `register.html`, `forgot_password.html`, `reset_password.html`
 
 ### 🟡 שאר העמודים

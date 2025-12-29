@@ -49,12 +49,18 @@
 
   async function getAuthToken() {
     try {
+      console.log('[API Fetch Wrapper] getAuthToken called');
+      console.log('[API Fetch Wrapper] UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
+      console.log('[API Fetch Wrapper] UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);
+
       // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        console.log('[API Fetch Wrapper] Trying UnifiedCacheManager...');
         const token = await window.UnifiedCacheManager.get('authToken', {
           layer: 'sessionStorage',
           includeUserId: false
         });
+        console.log('[API Fetch Wrapper] Token from UnifiedCacheManager:', !!token);
         if (token) return token;
       }
 

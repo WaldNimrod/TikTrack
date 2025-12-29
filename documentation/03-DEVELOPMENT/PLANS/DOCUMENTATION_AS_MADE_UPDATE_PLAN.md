@@ -17,6 +17,7 @@
 ## 2) שכבות מידע וכיסוי
 
 ### שכבות חובה (לעדכון מלא)
+
 1. **INDEX** – `documentation/INDEX.md`
 2. **Pages List** – `documentation/PAGES_LIST.md`
 3. **Setup / Routing** – `documentation/03-DEVELOPMENT/SETUP/PAGE_URL_MAPPING.md`
@@ -27,6 +28,7 @@
 8. **Admin / Production** – `documentation/admin/**`, `documentation/production/**`
 
 ### מקורות אמת (Code)
+
 - **Routes:** `Backend/routes/pages.py`
 - **Pages:** `trading-ui/*.html`
 - **Packages/Init:** `trading-ui/scripts/init-system/package-manifest.js`, `trading-ui/scripts/page-initialization-configs.js`
@@ -38,44 +40,54 @@
 ## 3) שלבי עבודה
 
 ### שלב A – אינדוקס ומיפוי
+
 - יצירת רשימת מסמכים לפי שכבות.
 - סימון מסמכי ליבה מול דוחות זמניים.
 - זיהוי מסמכים כפולים/חופפים.
 
 **תוצר:**
+
 - טבלת `doc → layer → owner → status`.
 
 ### שלב B – הצלבה מול הקוד
+
 - הצלבת Routes מול קבצי HTML בפועל.
 - הצלבת שמות עמודים ו‑URLs מול `PAGES_LIST.md`.
 - הצלבת שירותים/Modules מול מדריכי מפתחים.
 - הצלבת APIs מול Feature Docs.
 
 **תוצר:**
+
 - רשימת פערים (Mismatch / Missing / Legacy / Duplicate).
 
 ### שלב C – עדכון מסמכים מרכזיים
+
 - INDEX, Pages List, URL Mapping – עדכון מלא ראשון.
 - Features מרכזיים: Watch Lists, Tags, Preferences, Historical Pages.
 - Guides מרכזיים: Bundling, Init, CRUD, Tagging, Preferences.
 
 **תוצר:**
+
 - סט מסמכים מרכזיים מיושר לקוד.
 
 ### שלב D – ניקוי לגסי/כפילויות
+
 - הסרת רפרנסים ל‑legacy routes/filenames.
 - מיזוג מסמכים חופפים.
 - העברת דוחות ישנים לארכיון.
 
 **תוצר:**
+
 - תיקיות נקיות ללא כפילויות/legacy.
 
 ### שלב E – ולידציה סופית
+
 - בדיקת לינקים פנימיים.
 - בדיקת תאימות שמות קבצים/Routes.
 - בדיקת consistency מול page groups (cross-page testing).
 
 **תוצר:**
+
 - דוח סיכום סופי + רשימת חריגים לבדיקה חוזרת.
 
 ---
@@ -120,23 +132,28 @@
 ## 8) Backlog עבודה (קוד + תיעוד)
 
 ### תיעוד
+
 - לסגור כל פער בדוח הסריקה: `documentation/05-REPORTS/DOCUMENTATION_FULL_SCAN_GAPS_REPORT.md`.
 - לוודא שכל URLs ב‑documentation משתמשים ב‑underscore עבור HTML/דפדפן, ו‑kebab עבור API.
   - סטטוס נוכחי: 42 הפניות HTML + 79 Routes דורשים התאמת קוד/שמות.
 
 ### קוד / אחידות שמות
+
 - לעדכן `Backend/routes/pages.py` כך שכל routes ו‑HTML names יהיו ב‑underscore.
 - לאחד שמות HTML ב‑`production/trading-ui` ל‑underscore (ולעדכן build).
 - להוסיף redirects מ‑kebab-case ל‑underscore (כל עוד קיימות הפניות ישנות).
   - נדרשת פעולת rename גורפת לכל קבצי HTML עם `-` ב‑`trading-ui/` וב‑`production/trading-ui/`.
 
 ### לגסי ותמיכה לאחור
+
 - מיפוי מלא של legacy routes/HTML/JS להסרה (frontend + backend).
 - הסרה בפועל של רפרנסים ל‑legacy במערכת לאחר אישור.
 
 ### פונקציונליות חסרה
+
 - Watch Lists: מדיניות רשימת ברירת מחדל + empty-state עקבי.
 - User Profile: החלטה על CRUD מול `/api/auth/me` + `/api/auth/me/password` ומימוש בפועל.
 
 ### ניקוי וארכיון
+
 - מעבר שיטתי על דוחות ישנים והעברה לארכיון (שמירה על 7 ימים אחרונים).

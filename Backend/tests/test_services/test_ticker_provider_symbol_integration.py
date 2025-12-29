@@ -19,6 +19,8 @@ from services.ticker_symbol_mapping_service import TickerSymbolMappingService
 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
 from services.user_data_import.import_orchestrator import ImportOrchestrator
 
+
+
 @pytest.fixture
 def test_currency(db_session):
     """Create a test currency"""
@@ -61,9 +63,9 @@ class TestYahooFinanceAdapterIntegration:
 
     def test_yahoo_adapter_uses_mapping(self, db_session, yahoo_provider, test_currency):
         """Test that YahooFinanceAdapter uses provider symbol mapping"""
-        # Create ticker
+        # Create ticker with unique symbol
         ticker = Ticker(
-            symbol='500X',
+            symbol='500X_TEST1',
             name='iShares Core S&P 500 UCITS ETF',
             type='etf',
             currency_id=test_currency.id,
@@ -72,7 +74,7 @@ class TestYahooFinanceAdapterIntegration:
         db_session.add(ticker)
         db_session.commit()
         db_session.refresh(ticker)
-        
+
         # Create mapping
         TickerSymbolMappingService.set_provider_symbol(
             db_session, ticker.id, yahoo_provider.id, '500X.MI', is_primary=True
@@ -88,13 +90,13 @@ class TestYahooFinanceAdapterIntegration:
         # Verify fallback works
         TickerSymbolMappingService.delete_mapping(db_session, ticker.id, yahoo_provider.id)
         provider_symbol = adapter._get_provider_symbol(ticker)
-        assert provider_symbol == '500X'  # Falls back to internal symbol
+        assert provider_symbol == '500X_TEST1'  # Falls back to internal symbol
 
     def test_yahoo_adapter_get_quote_with_mapping(self, db_session, yahoo_provider, test_currency):
         """Test get_quote with ticker object uses mapping"""
-        # Create ticker
+        # Create ticker with unique symbol
         ticker = Ticker(
-            symbol='500X',
+            symbol='500X_TEST2',
             name='iShares Core S&P 500 UCITS ETF',
             type='etf',
             currency_id=test_currency.id,
@@ -103,7 +105,7 @@ class TestYahooFinanceAdapterIntegration:
         db_session.add(ticker)
         db_session.commit()
         db_session.refresh(ticker)
-        
+
         # Create mapping
         TickerSymbolMappingService.set_provider_symbol(
             db_session, ticker.id, yahoo_provider.id, '500X.MI', is_primary=True
@@ -141,13 +143,13 @@ class TestYahooFinanceAdapterIntegration:
             
             # Verify quote uses internal symbol
             if quote:
-                assert quote.symbol == '500X'  # Internal symbol
+                assert quote.symbol == '500X_TEST2'  # Internal symbol
 
     def test_yahoo_adapter_get_quotes_batch_with_mapping(self, db_session, yahoo_provider, test_currency):
         """Test get_quotes_batch with ticker objects uses mappings"""
-        # Create tickers
-        ticker1 = Ticker(symbol='500X', name='Test 1', type='etf', currency_id=test_currency.id, status='open')
-        ticker2 = Ticker(symbol='ANAU', name='Test 2', type='stock', currency_id=test_currency.id, status='open')
+        # Create tickers with unique symbols
+        ticker1 = Ticker(symbol='500X_TEST3', name='Test 1', type='etf', currency_id=test_currency.id, status='open')
+        ticker2 = Ticker(symbol='ANAU_TEST3', name='Test 2', type='stock', currency_id=test_currency.id, status='open')
         db_session.add_all([ticker1, ticker2])
         db_session.commit()
         db_session.refresh(ticker1)
@@ -204,7 +206,7 @@ class TestImportOrchestratorIntegration:
         
         # Create ticker (simulating import process)
         ticker = Ticker(
-            symbol='500X',
+            symbol='500X_TEST4',
             name='iShares Core S&P 500 UCITS ETF',
             type='etf',
             currency_id=test_currency.id,
@@ -216,17 +218,17 @@ class TestImportOrchestratorIntegration:
         
         # Simulate metadata with display_symbol different from internal symbol
         metadata = {
-            '500X': {
-                'symbol': '500X',
+            '500X_TEST4': {
+                'symbol': '500X_TEST4',
                 'display_symbol': '500X.MI',  # Different from internal symbol
                 'company_name': 'iShares Core S&P 500 UCITS ETF'
             }
         }
-        
+
         # Simulate enriched records
         enriched_records = [{
             'ticker_id': ticker.id,
-            'symbol': '500X'
+            'symbol': '500X_TEST4'
         }]
         
         # Call _update_ticker_metadata (which should create mapping)
@@ -249,7 +251,7 @@ class TestImportOrchestratorIntegration:
         
         # Create ticker
         ticker = Ticker(
-            symbol='AAPL',
+            symbol='AAPL_TEST5',
             name='Apple Inc.',
             type='stock',
             currency_id=test_currency.id,
@@ -261,17 +263,17 @@ class TestImportOrchestratorIntegration:
         
         # Simulate metadata with display_symbol same as internal symbol
         metadata = {
-            'AAPL': {
-                'symbol': 'AAPL',
-                'display_symbol': 'AAPL',  # Same as internal symbol
+            'AAPL_TEST5': {
+                'symbol': 'AAPL_TEST5',
+                'display_symbol': 'AAPL_TEST5',  # Same as internal symbol
                 'company_name': 'Apple Inc.'
             }
         }
-        
+
         # Simulate enriched records
         enriched_records = [{
             'ticker_id': ticker.id,
-            'symbol': 'AAPL'
+            'symbol': 'AAPL_TEST5'
         }]
         
         # Call _update_ticker_metadata
@@ -337,11 +339,13 @@ class TestAPIIntegration:
 
     def test_update_ticker_with_provider_symbols(self, db_session, yahoo_provider, test_currency):
         """Test updating ticker via API with provider_symbols"""
+        import uuid
         from services.ticker_service import TickerService
-        
-        # Create ticker first
+
+        # Create ticker first with unique symbol (max 10 chars)
+        unique_symbol = f'UPD{uuid.uuid4().hex[:4]}'
         ticker = TickerService.create(db_session, {
-            'symbol': '500X',
+            'symbol': unique_symbol,
             'name': 'iShares Core S&P 500 UCITS ETF',
             'type': 'etf',
             'currency_id': test_currency.id,

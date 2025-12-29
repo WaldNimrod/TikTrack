@@ -20,10 +20,12 @@
 ### בעיה: העדפה לא נטענת
 
 **תסמינים:**
+
 - העדפה מחזירה `null` או `undefined`
 - ערך ברירת מחדל לא מוצג
 
 **סיבות אפשריות:**
+
 1. העדפה לא קיימת ב-`PreferenceType`
 2. `profile_id` שגוי
 3. מטמון פגום
@@ -71,10 +73,12 @@ if not pref_type:
 ### בעיה: העדפה לא נשמרת
 
 **תסמינים:**
+
 - שמירה נראית מוצלחת אבל הערך לא משתנה
 - אחרי refresh הערך חוזר לערך הקודם
 
 **סיבות אפשריות:**
+
 1. `profile_id` שגוי (ForeignKeyViolation)
 2. שגיאת validation
 3. מטמון לא מתעדכן
@@ -128,11 +132,13 @@ except ForeignKeyViolation:
 ### בעיה: רקורסיה ב-getPreference
 
 **תסמינים:**
+
 - `🚨 RECURSION DETECTED in getPreference`
 - לולאה אינסופית
 - דפדפן קופא
 
 **סיבות אפשריות:**
+
 1. `getPreference()` קורא ל-`Logger` שבתורו קורא ל-`getPreference()`
 2. `getCurrentPreference()` קורא ל-`getPreference()` בזמן ש-`getPreference()` כבר רץ
 
@@ -187,6 +193,7 @@ window.getCurrentPreference = async function(preferenceName, options = {}) {
 ### שגיאה: ForeignKeyViolation
 
 **תסמינים:**
+
 ```
 (psycopg2.errors.ForeignKeyViolation) insert or update on table "user_preferences" 
 violates foreign key constraint "user_preferences_profile_id_fkey"
@@ -219,6 +226,7 @@ console.log('Profile ID שנשמר:', result.profile_id);
 ### שגיאה: Preference לא קיים ב-PreferenceType
 
 **תסמינים:**
+
 - `ValidationError: Preference 'preference_name' not found`
 - העדפה לא מוחזרת ב-`get_preferences_by_names()`
 
@@ -263,6 +271,7 @@ if preference_name in DEFAULT_PREFERENCES:
 ### שגיאה: ערך לא תקין (Validation)
 
 **תסמינים:**
+
 - `ValidationError: Invalid value for preference`
 - שמירה נכשלת
 
@@ -294,6 +303,7 @@ if not is_valid:
 ### שגיאה: PreferencesCore לא זמין
 
 **תסמינים:**
+
 - `TypeError: window.PreferencesCore is undefined`
 - `Cannot read property 'getPreference' of undefined`
 
@@ -327,6 +337,7 @@ await window.initializeUnifiedApp();
 ### שגיאה: מטמון לא מתעדכן
 
 **תסמינים:**
+
 - ערך ישן מוצג גם אחרי שמירה
 - אחרי refresh הערך החדש מוצג
 
@@ -363,6 +374,7 @@ const value = await window.PreferencesCore.getPreference('preference_name', 1, 0
 ### שגיאה: רקורסיה ב-getCurrentPreference
 
 **תסמינים:**
+
 - `🚨 RECURSION DETECTED in getPreference`
 - לולאה אינסופית
 
@@ -392,6 +404,7 @@ if (!window.__GET_PREFERENCE_IN_PROGRESS__) {
 ### בעיה: מטמון פגום
 
 **תסמינים:**
+
 - ערכים לא נכונים מוצגים
 - אחרי ניקוי מטמון הכל עובד
 
@@ -413,6 +426,7 @@ const value = await window.PreferencesCore.getPreference('preference_name', 1, 0
 ### בעיה: מטמון לא נשמר
 
 **תסמינים:**
+
 - אחרי refresh הערכים נעלמים
 - מטמון localStorage ריק
 
@@ -445,6 +459,7 @@ console.log('מטמון:', cached);
 ### בעיה: פרופיל לא פעיל
 
 **תסמינים:**
+
 - העדפות לא נטענות
 - `ProfileNotFoundError`
 
@@ -473,6 +488,7 @@ if (!activeProfile) {
 ### בעיה: החלפת פרופיל לא עובדת
 
 **תסמינים:**
+
 - אחרי החלפת פרופיל העדפות לא משתנות
 - ערכים ישנים מוצגים
 
@@ -505,6 +521,7 @@ if (result.success) {
 ### בעיה: שדות לא מתמלאים
 
 **תסמינים:**
+
 - שדות ריקים אחרי טעינה
 - ערכים לא מוצגים
 
@@ -533,6 +550,7 @@ await groupManager.loadGroup('trading_settings');
 ### בעיה: צבעים לא מוצגים
 
 **תסמינים:**
+
 - color pickers שחורים
 - צבעי ברירת מחדל לא מוצגים
 
@@ -567,6 +585,7 @@ window.PreferencesUIV4.populateAllFormFields(colors);
 ### בעיה: טעינה איטית
 
 **תסמינים:**
+
 - עמוד נטען לאט
 - הרבה קריאות API
 
@@ -593,6 +612,7 @@ setTimeout(async () => {
 ### בעיה: יותר מדי קריאות API
 
 **תסמינים:**
+
 - מאות קריאות API בטעינת עמוד
 - rate limiting
 
@@ -628,19 +648,23 @@ const prefs = await window.PreferencesData.loadPreferencesByNames({
 ### בעיה: סקריפט אימות העדפות נכשל עם `DATABASE_URL is not configured`
 
 **תסמינים:**
+
 - שגיאה על `POSTGRES_HOST`/`DATABASE_URL` חסר
 
 **פתרון:**
+
 - הרץ עם משתני PostgreSQL מוגדרים
 - או השתמש ב-`start_server.sh` שמגדיר אותם
 
 ### בעיה: בדיקת Selenium נכשלת בהורדת WebDriver
 
 **תסמינים:**
+
 - `Could not reach host. Are you offline?`
 - כישלון בהקמת driver
 
 **פתרון:**
+
 - ודא גישה לרשת להורדת driver
 - ודא ש-Firefox/Chrome מותקנים
 
@@ -649,10 +673,12 @@ const prefs = await window.PreferencesData.loadPreferencesByNames({
 ### בעיה: `GET /api/preferences/default` מחזיר 404 עבור `default_trading_account` או `primaryCurrency`
 
 **תסמינים:**
+
 - תשובת API: `Preference 'default_trading_account' not found`
 - תשובת API: `Preference 'primaryCurrency' not found`
 
 **פתרון:**
+
 - ודא שהשרת רץ עם אותו DB שבו הוספת את ה‑preferences.
 - בצע restart לשרת עם `start_server.sh` כדי לטעון את ה‑DB העדכני.
 - אמת שההעדפות קיימות ב־`preference_types` עם `is_active = true`.

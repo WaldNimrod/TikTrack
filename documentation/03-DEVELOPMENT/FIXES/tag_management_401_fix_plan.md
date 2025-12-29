@@ -23,6 +23,7 @@
 ### מה עובד בעמודים אחרים
 
 בעמודים אחרים (trades, trade_plans, alerts, tickers):
+
 - `api-fetch-wrapper.js` מוסיף אוטומטית את ה-token לכל קריאת `fetch()`
 - אין צורך בלוגיקה מיוחדת כי האוטנטיקציה כבר הושלמה כשהעמוד נטען
 
@@ -37,6 +38,7 @@
 ### שלב 1: החזרת הקוד למצב המקורי ✅
 
 1. **החזרת `fetch` במקום `window.fetch`:**
+
    ```javascript
    // ✅ נכון
    const response = await fetch('/api/trading-accounts/');
@@ -52,6 +54,7 @@
 ### שלב 2: תיקון ספציפי ל-tag_management ✅
 
 הלוגיקה ב-`init()` נשארת כי היא נחוצה:
+
 - ממתינה לאוטנטיקציה לפני קריאה ל-`loadAccountsForFilter()`
 - בודקת שיש token ב-`sessionStorage` או `UnifiedCacheManager`
 - בודקת ש-`window.currentUser` קיים
@@ -60,6 +63,7 @@
 ### שלב 3: תיקון ב-core-systems.js ✅
 
 יש גם לוגיקה ב-`core-systems.js` שממתינה לאוטנטיקציה לפני קריאה ל-`initializeHeaderSystem()`:
+
 - זה עובד יחד עם הלוגיקה ב-`header-system.js`
 - זה מבטיח שהאוטנטיקציה הושלמה לפני ש-header-system מנסה לטעון חשבונות
 

@@ -33,19 +33,16 @@
      * אתחול עמוד ניהול משתמשים
      */
     async init() {
-      console.log('🎯 [UserManagementPage] init() STARTED');
       if (this.initialized) {
         window.Logger?.warn('UserManagementPage already initialized', { page: 'user-management' });
         return;
       }
 
       try {
-        console.log('🎯 [UserManagementPage] init() PASSED initialized check');
         window.Logger?.info('🚀 Initializing User Management Page...', { page: 'user-management' });
 
         // Wait for required systems to load
         await this.waitForSystems();
-        console.log('✅ [UserManagementPage] Systems loaded, proceeding with initialization');
 
         // Load users data
         await this.loadUsersData();
@@ -111,53 +108,14 @@
      */
     async loadUsersData() {
       try {
-        console.log('🚀 [UserManagementPage] loadUsersData called');
         window.Logger?.info('Loading users data...', { page: 'user-management' });
 
         // Load users from API (using window.fetch for auth token injection)
-        let headers = {
-          'Content-Type': 'application/json'
-        };
-
-        // Add extra delay to ensure UnifiedCacheManager is fully ready
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Try to get token manually if API Fetch Wrapper fails
-        try {
-          // Try UnifiedCacheManager first
-          if (window.UnifiedCacheManager?.initialized) {
-            const token = await window.UnifiedCacheManager.get('authToken', {
-              layer: 'sessionStorage',
-              includeUserId: false
-            });
-            if (token) {
-              headers['Authorization'] = `Bearer ${token}`;
-            }
-          }
-
-          // Fallback to sessionStorage directly
-          if (!headers['Authorization'] && typeof sessionStorage !== 'undefined') {
-            const token = sessionStorage.getItem('dev_authToken') || sessionStorage.getItem('authToken');
-            if (token) {
-              headers['Authorization'] = `Bearer ${token}`;
-            }
-          }
-
-          // Another fallback - try localStorage
-          if (!headers['Authorization'] && typeof localStorage !== 'undefined') {
-            const token = localStorage.getItem('authToken');
-            if (token) {
-              headers['Authorization'] = `Bearer ${token}`;
-            }
-          }
-        } catch (e) {
-          window.Logger?.warn('Failed to get token for manual injection', { page: 'user-management', error: e.message });
-        }
-
-        console.log('🌐 [UserManagementPage] Making API call to /api/users/ with headers:', headers);
         const usersResponse = await window.fetch('/api/users/', {
           method: 'GET',
-          headers: headers
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         if (!usersResponse.ok) {
@@ -183,17 +141,13 @@
         const usersData = await usersResponse.json();
 
         // Check if response has data array
-        console.log('📥 [UserManagementPage] Raw API response:', usersData);
         if (usersData && Array.isArray(usersData.data)) {
           this.users = usersData.data;
-          console.log('✅ [UserManagementPage] Loaded users from data array:', this.users.length);
         } else if (Array.isArray(usersData)) {
           // Fallback: if response is directly an array
           this.users = usersData;
-          console.log('✅ [UserManagementPage] Loaded users from direct array:', this.users.length);
         } else {
           this.users = [];
-          console.log('❌ [UserManagementPage] No users data found');
         }
 
         // Update statistics
@@ -202,7 +156,6 @@
         // Update table
         this.updateUsersTable();
 
-        console.log('🎯 [UserManagementPage] Final users array:', this.users);
         window.Logger?.info(`✅ Loaded ${this.users.length} users`, { page: 'user-management' });
       } catch (error) {
         window.Logger?.error('❌ Error loading users data', error, { page: 'user-management' });

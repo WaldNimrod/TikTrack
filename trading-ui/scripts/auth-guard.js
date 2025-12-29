@@ -149,11 +149,6 @@ async function showLoginModal() {
  * Checks authentication on page load
  */
 async function initAuthGuard() {
-  window.Logger?.info?.('🚀 [Auth Guard] Initializing', {
-    page: 'auth-guard',
-    currentPath: window.location.pathname,
-    timestamp: new Date().toISOString()
-  });
   
   // Check if this is a public page - skip authentication check
   const isPublic = isPublicPage();
@@ -192,9 +187,7 @@ async function initAuthGuard() {
   // Increased delay to allow session cookie to be set after page reload
   // This prevents race condition where we check auth before session is ready
   // Increased delay to 1000ms to give session more time to stabilize
-  window.Logger?.info?.('⏳ [Auth Guard] Starting 1 second delay for session stabilization', { page: 'auth-guard' });
   await new Promise(resolve => setTimeout(resolve, 1000));
-  window.Logger?.info?.('✅ [Auth Guard] Delay completed, checking authentication', { page: 'auth-guard' });
   
   // Wait for UnifiedCacheManager to be initialized first
   if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
@@ -237,45 +230,17 @@ async function initAuthGuard() {
   
   let result = { authenticated: false, user: null, error: 'unknown' };
   try {
-    window.Logger?.info?.('🔍 [Auth Guard] About to call checkAuthentication', { page: 'auth-guard' });
-    window.Logger?.info?.('🔍 [Auth Guard] Calling checkAuthentication', { page: 'auth-guard' });
     const r = await checkAuthentication();
-    window.Logger?.info?.('🔍 [Auth Guard] checkAuthentication result', {
-      authenticated: r?.authenticated,
-      hasUser: !!r?.user,
-      error: r?.error,
-      page: 'auth-guard'
-    });
     if (r) result = r;
   } catch (e) {
-    window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', {
-      error: e?.message,
-      page: 'auth-guard'
-    });
+    window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
   }
   
   if (result.authenticated) {
-    window.Logger?.info?.('✅ [Auth Guard] User authenticated, page access granted', {
-      page: 'auth-guard',
-      userId: result.user?.id,
-      timestamp: new Date().toISOString()
-    });
     // User is authenticated - page can load normally
     return;
   } else {
-    window.Logger?.warn?.('❌ [Auth Guard] User not authenticated, redirecting to login', {
-      page: 'auth-guard',
-      error: result.error,
-      currentPath: window.location.pathname,
-      timestamp: new Date().toISOString()
-    });
-
     // User is not authenticated - redirect to login page
-    window.Logger?.info?.('🔄 [Auth Guard] Redirecting to login page', {
-      page: 'auth-guard',
-      currentUrl: window.location.href,
-      timestamp: new Date().toISOString()
-    });
 
     // Save current URL for redirect after login (only if not already on login page)
     if (!window.location.pathname.includes('login.html')) {

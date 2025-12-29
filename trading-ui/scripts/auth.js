@@ -1339,11 +1339,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   // Wrap everything in try-catch-finally to ensure promise is resolved
   let finalResult;
   try {
-    window.Logger?.info?.('[auth.js] checkAuthentication: Starting token retrieval', {
-      page: 'auth',
-      currentPath: window.location.pathname
-    });
-
     // Ensure we have a token before hitting the server
     let tokenAvailable = false;
     let effectiveToken = null;
@@ -1421,11 +1416,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
 
     if (response.ok) {
       const data = await response.json();
-      window.Logger?.info?.('[auth.js] checkAuthentication: Server response OK', {
-        page: 'auth',
-        hasUser: !!data.data?.user,
-        userId: data.data?.user?.id
-      });
       if (data.status === 'success' && data.data?.user) {
         const newUser = data.data.user;
         const wasAuthenticated = !!currentUser;
@@ -1446,13 +1436,6 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         if (typeof sessionStorage !== 'undefined') {
           sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
         }
-
-        window.Logger?.info?.('[auth.js] Login successful - token saved', {
-          page: 'auth',
-          userId: currentUser?.id,
-          hasToken: !!authToken,
-          tokenLength: authToken?.length
-        });
 
         // Close login modal if present (prevents lingering modal in dev/no-cache)
         closeLoginModal();

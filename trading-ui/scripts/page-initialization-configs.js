@@ -660,8 +660,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           window.Logger?.info('👥 Initializing User Management Page...', { page: 'page-initialization-configs' });
 
-          // Add delay to avoid conflicts with auth-guard timing
-          await new Promise(resolve => setTimeout(resolve, 2000));
 
           // Initialize User Management Page - wait if not loaded yet
           if (window.UserManagementPage && typeof window.UserManagementPage.init === 'function') {

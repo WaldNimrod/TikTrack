@@ -74,6 +74,30 @@
         });
       }
 
+      // Fallback: Try direct sessionStorage access
+      if (typeof sessionStorage !== 'undefined') {
+        const token = sessionStorage.getItem('dev_authToken') || sessionStorage.getItem('authToken');
+        if (token) {
+          window.Logger?.info?.('[API Fetch Wrapper] Token from direct sessionStorage', {
+            found: true,
+            page: window.location.pathname
+          });
+          return token;
+        }
+      }
+
+      // Fallback: Try localStorage
+      if (typeof localStorage !== 'undefined') {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          window.Logger?.info?.('[API Fetch Wrapper] Token from localStorage', {
+            found: true,
+            page: window.location.pathname
+          });
+          return token;
+        }
+      }
+
       // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
       if (typeof sessionStorage !== 'undefined') {
         const fallback = sessionStorage.getItem('dev_authToken');

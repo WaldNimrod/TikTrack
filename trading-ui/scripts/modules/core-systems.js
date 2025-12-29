@@ -820,7 +820,6 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           window.pageInitializationConfigs[hyphenName]
         ) {
           pageConfig = window.pageInitializationConfigs[hyphenName];
-          console.log(`🎯 [core-systems] Found page config for ${hyphenName} (mapped from ${this.pageInfo.name})`);
           if (window.Logger?.debug) {
             window.Logger.debug(`Found page config in pageInitializationConfigs for ${hyphenName} (mapped from ${this.pageInfo.name})`, { page: 'core-systems' });
           }

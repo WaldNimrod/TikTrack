@@ -163,12 +163,6 @@ function broadcastAuthEvent(eventPayload) {
 }
 
 async function saveAuthToCache(user, token = 'session_based') {
-  console.log('💾 [auth.js] saveAuthToCache called', {
-    userId: user?.id,
-    username: user?.username,
-    tokenType: typeof token,
-    token: !!token
-  });
   window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
     userId: user?.id,
     username: user?.username,

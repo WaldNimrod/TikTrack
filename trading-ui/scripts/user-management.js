@@ -124,11 +124,28 @@
 
         // Try to get token manually if API Fetch Wrapper fails
         try {
+          // Try UnifiedCacheManager first
           if (window.UnifiedCacheManager?.initialized) {
             const token = await window.UnifiedCacheManager.get('authToken', {
               layer: 'sessionStorage',
               includeUserId: false
             });
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`;
+            }
+          }
+
+          // Fallback to sessionStorage directly
+          if (!headers['Authorization'] && typeof sessionStorage !== 'undefined') {
+            const token = sessionStorage.getItem('dev_authToken') || sessionStorage.getItem('authToken');
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`;
+            }
+          }
+
+          // Another fallback - try localStorage
+          if (!headers['Authorization'] && typeof localStorage !== 'undefined') {
+            const token = localStorage.getItem('authToken');
             if (token) {
               headers['Authorization'] = `Bearer ${token}`;
             }

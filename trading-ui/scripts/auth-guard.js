@@ -179,6 +179,15 @@ async function initAuthGuard() {
       sessionStorage.removeItem('recent_login_timestamp');
     }
   }
+
+  // Special handling for user_management page - add extra delay
+  if (window.location.pathname.includes('user_management')) {
+    window.Logger?.info?.('⏳ [Auth Guard] User management page detected, adding extra delay', {
+      page: 'auth-guard',
+      path: window.location.pathname
+    });
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
   
   // Increased delay to allow session cookie to be set after page reload
   // This prevents race condition where we check auth before session is ready

@@ -122,6 +122,10 @@
           'Content-Type': 'application/json'
         };
 
+        // Add extra delay to ensure UnifiedCacheManager is fully ready
+        console.log('[UserManagementPage] Adding extra delay before token retrieval');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         // Try to get token manually if API Fetch Wrapper fails
         try {
           // Try UnifiedCacheManager first

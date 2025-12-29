@@ -1447,6 +1447,13 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
           sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
         }
 
+        window.Logger?.info?.('[auth.js] Login successful - token saved', {
+          page: 'auth',
+          userId: currentUser?.id,
+          hasToken: !!authToken,
+          tokenLength: authToken?.length
+        });
+
         // Close login modal if present (prevents lingering modal in dev/no-cache)
         closeLoginModal();
         

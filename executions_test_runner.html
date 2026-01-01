@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang='he' dir='rtl'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Executions Test Runner</title>
+</head>
+<body>
+    <h1>Executions Test Runner - Stage 2 Batch 1</h1>
+    <div id='results'></div>
+    
+    <script>
+    // Load required scripts
+    const scripts = [
+        'scripts/jquery-3.6.0.min.js',
+        'scripts/logger-service.js',
+        'scripts/unified-cache-manager.js',
+        'scripts/unified-crud-service.js',
+        'scripts/crud_testing_dashboard.js'
+    ];
+
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    async function loadAllScripts() {
+        for (const src of scripts) {
+            await loadScript(src);
+        }
+    }
+
+    async function runTests() {
+        try {
+            console.log('🔄 Loading scripts...');
+            await loadAllScripts();
+            
+            console.log('🚀 Running executions test...');
+            await window.runExecutionTestOnly();
+            
+            document.getElementById('results').innerHTML = '<h2>✅ Executions test completed - check console for results</h2>';
+            
+        } catch (error) {
+            console.error('❌ Test failed:', error);
+            document.getElementById('results').innerHTML = '<h2 style="color:red">❌ Test failed - check console</h2>';
+        }
+    }
+
+    // Run tests when page loads
+    window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>
+

@@ -32,6 +32,26 @@
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/book.svg" width="24" height="24" alt="book" class="icon"> יומן מסחר</h2>
                         <div class="section-header-controls">
+                            <!-- View Mode Toggle -->
+                            <div class="btn-group me-2" role="group" aria-label="View mode">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="viewModeWeeklyBtn" onclick="window.tradingJournalPage?.switchViewMode('weekly')" title="תצוגה שבועית">
+                                    <i class="fas fa-calendar-week"></i> שבועי
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm active" id="viewModeMonthlyBtn" onclick="window.tradingJournalPage?.switchViewMode('monthly')" title="תצוגה חודשית">
+                                    <i class="fas fa-calendar-alt"></i> חודשי
+                                </button>
+                            </div>
+
+                            <!-- Notes CRUD Buttons -->
+                            <div class="btn-group me-2" role="group" aria-label="Notes CRUD">
+                                <button data-button-type="ADD" data-onclick="addJournalEntry('note')" data-text="הוסף הערה" title="הוסף הערה חדשה ליומן">
+                                </button>
+                                <button data-button-type="EDIT" data-onclick="editSelectedNote()" data-text="ערוך הערה" title="ערוך הערה נבחרת" disabled id="editNoteBtn">
+                                </button>
+                                <button data-button-type="DELETE" data-onclick="deleteSelectedNote()" data-text="מחק הערה" title="מחק הערה נבחרת" disabled id="deleteNoteBtn">
+                                </button>
+                            </div>
+
                             <button data-button-type="ADD" data-onclick="addJournalEntry()" data-text="הוסף רשומה" title="הוסף רשומת יומן חדשה">
                             </button>
                             <button data-button-type="REFRESH" data-onclick="refreshJournal()" data-text="רענן" title="רענן רשומות">
@@ -183,7 +203,7 @@
     <!-- [20] Load Order: 20 | Strategy: defer -->
     <script src="/trading-ui/scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
     <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="/trading-ui/scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <script src="/trading-ui/scripts/color-scheme-system.js></script> <!-- Dynamic color system -->
     <!-- [22] Load Order: 22 | Strategy: defer -->
     <script src="/trading-ui/scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
 
@@ -371,14 +391,16 @@
     <!-- [90] Load Order: 90 | Strategy: defer -->
     <script src="/trading-ui/scripts/modal-configs/notes-config.js?v=1.0.0" defer></script> <!-- Notes modal configuration -->
     <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="/trading-ui/scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
+    <script src="/trading-ui/scripts/modal-configs/trading-journal-config.js?v=1.0.0" defer></script> <!-- Trading journal modal configuration -->
     <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="/trading-ui/scripts/trade-selector-modal.js?v=1.0.0" defer></script> <!-- Trade selector modal -->
+    <script src="/trading-ui/scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
     <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="/trading-ui/scripts/modal-configs/conditions-config.js?v=1.0.0" defer></script> <!-- Condition modal configuration (from conditions package) -->
+    <script src="/trading-ui/scripts/trade-selector-modal.js?v=1.0.0" defer></script> <!-- Trade selector modal -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="/trading-ui/scripts/modal-configs/tag-search-config.js?v=1.0.0" defer></script> <!-- Tag search drawer configuration (from dashboard package) -->
+    <script src="/trading-ui/scripts/modal-configs/conditions-config.js?v=1.0.0" defer></script> <!-- Condition modal configuration (from conditions package) -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
+    <script src="/trading-ui/scripts/modal-configs/tag-search-config.js?v=1.0.0" defer></script> <!-- Tag search drawer configuration (from dashboard package) -->
+    <!-- [96] Load Order: 96 | Strategy: defer -->
     <script src="/trading-ui/scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
 
     <!-- =============================================================== -->
@@ -388,15 +410,15 @@
     <!-- Dependencies: base, services, modules -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [96] Load Order: 96 | Strategy: defer -->
-    <script src="/trading-ui/scripts/table-mappings.js?v=1.0.0" defer></script> <!-- Table mappings (optional - only for pages with tables) -->
     <!-- [97] Load Order: 97 | Strategy: defer -->
-    <script src="/trading-ui/scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <script src="/trading-ui/scripts/table-mappings.js?v=1.0.0" defer></script> <!-- Table mappings (optional - only for pages with tables) -->
     <!-- [98] Load Order: 98 | Strategy: defer -->
-    <script src="/trading-ui/scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <script src="/trading-ui/scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
     <!-- [99] Load Order: 99 | Strategy: defer -->
-    <script src="/trading-ui/scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <script src="/trading-ui/scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
     <!-- [100] Load Order: 100 | Strategy: defer -->
+    <script src="/trading-ui/scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [101] Load Order: 101 | Strategy: defer -->
     <script src="/trading-ui/scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
@@ -406,11 +428,11 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [101] Load Order: 101 | Strategy: defer -->
-    <script src="/trading-ui/scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
     <!-- [102] Load Order: 102 | Strategy: defer -->
-    <script src="/trading-ui/scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <script src="/trading-ui/scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
     <!-- [103] Load Order: 103 | Strategy: defer -->
+    <script src="/trading-ui/scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [104] Load Order: 104 | Strategy: defer -->
     <script src="/trading-ui/scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
@@ -420,27 +442,27 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [104] Load Order: 104 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache -->
     <!-- [105] Load Order: 105 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <script src="/trading-ui/scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache -->
     <!-- [106] Load Order: 106 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="/trading-ui/scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [107] Load Order: 107 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences events -->
+    <script src="/trading-ui/scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
     <!-- [108] Load Order: 108 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="/trading-ui/scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences events -->
     <!-- [109] Load Order: 109 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="/trading-ui/scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
     <!-- [110] Load Order: 110 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="/trading-ui/scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
     <!-- [111] Load Order: 111 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="/trading-ui/scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
     <!-- [112] Load Order: 112 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- Preferences validation -->
+    <script src="/trading-ui/scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
     <!-- [113] Load Order: 113 | Strategy: defer -->
-    <script src="/trading-ui/scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- Preferences lazy loader -->
+    <script src="/trading-ui/scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- Preferences validation -->
     <!-- [114] Load Order: 114 | Strategy: defer -->
+    <script src="/trading-ui/scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- Preferences lazy loader -->
+    <!-- [115] Load Order: 115 | Strategy: defer -->
     <script src="/trading-ui/scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
 
     <!-- =============================================================== -->
@@ -450,11 +472,11 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [113] Load Order: 113 | Strategy: defer -->
+    <!-- [116] Load Order: 116 | Strategy: defer -->
     <script src="/trading-ui/scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script> <!-- TradingView Lightweight Charts -->
-    <!-- [114] Load Order: 114 | Strategy: defer -->
+    <!-- [117] Load Order: 117 | Strategy: defer -->
     <script src="/trading-ui/scripts/charts/tradingview-theme.js?v=1.0.0" defer></script> <!-- TradingView theme -->
-    <!-- [115] Load Order: 115 | Strategy: defer -->
+    <!-- [118] Load Order: 118 | Strategy: defer -->
     <script src="/trading-ui/scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script> <!-- TradingView system adapter -->
 
     <!-- =============================================================== -->
@@ -464,51 +486,51 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [116] Load Order: 116 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/trades-data.js?v=1.0.0" defer></script> <!-- Trades data service (CRUD + Cache) -->
-    <!-- [117] Load Order: 117 | Strategy: defer -->
-    <script src="/trading-ui/scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
-    <!-- [118] Load Order: 118 | Strategy: defer -->
-    <script src="/trading-ui/scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
     <!-- [119] Load Order: 119 | Strategy: defer -->
-    <script src="/trading-ui/scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
+    <script src="/trading-ui/scripts/services/trades-data.js?v=1.0.0" defer></script> <!-- Trades data service (CRUD + Cache) -->
     <!-- [120] Load Order: 120 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
+    <script src="/trading-ui/scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
     <!-- [121] Load Order: 121 | Strategy: defer -->
-    <script src="/trading-ui/scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
+    <script src="/trading-ui/scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
     <!-- [122] Load Order: 122 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/notes-data.js?v=1.0.0" defer></script> <!-- Notes data service -->
+    <script src="/trading-ui/scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
     <!-- [123] Load Order: 123 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/alerts-data.js?v=1.0.0" defer></script> <!-- Alerts data service -->
+    <script src="/trading-ui/scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
     <!-- [124] Load Order: 124 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/tickers-data.js?v=1.0.0" defer></script> <!-- Tickers data service -->
+    <script src="/trading-ui/scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
     <!-- [125] Load Order: 125 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/trading-accounts-data.js?v=1.0.0" defer></script> <!-- Trading accounts data service -->
+    <script src="/trading-ui/scripts/services/notes-data.js?v=1.0.0" defer></script> <!-- Notes data service -->
     <!-- [126] Load Order: 126 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/cash-flows-data.js?v=1.0.0" defer></script> <!-- Cash flows data service -->
+    <script src="/trading-ui/scripts/services/alerts-data.js?v=1.0.0" defer></script> <!-- Alerts data service -->
     <!-- [127] Load Order: 127 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/trade-history-data.js?v=1.0.0" defer></script> <!-- Trade history data service -->
+    <script src="/trading-ui/scripts/services/tickers-data.js?v=1.0.0" defer></script> <!-- Tickers data service -->
     <!-- [128] Load Order: 128 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/portfolio-state-data.js?v=1.0.0" defer></script> <!-- Portfolio state data service -->
+    <script src="/trading-ui/scripts/services/trading-accounts-data.js?v=1.0.0" defer></script> <!-- Trading accounts data service -->
     <!-- [129] Load Order: 129 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/trading-journal-data.js?v=1.0.0" defer></script> <!-- Trading journal data service -->
+    <script src="/trading-ui/scripts/services/cash-flows-data.js?v=1.0.0" defer></script> <!-- Cash flows data service -->
     <!-- [130] Load Order: 130 | Strategy: defer -->
-    <script src="/trading-ui/scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
+    <script src="/trading-ui/scripts/services/trade-history-data.js?v=1.0.0" defer></script> <!-- Trade history data service -->
     <!-- [131] Load Order: 131 | Strategy: defer -->
-    <script src="/trading-ui/scripts/trade-history-page.js?v=1.0.0" defer></script> <!-- Trade history page script (page-specific) -->
+    <script src="/trading-ui/scripts/services/portfolio-state-data.js?v=1.0.0" defer></script> <!-- Portfolio state data service -->
     <!-- [132] Load Order: 132 | Strategy: defer -->
-    <script src="/trading-ui/scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
+    <script src="/trading-ui/scripts/services/trading-journal-data.js?v=1.0.0" defer></script> <!-- Trading journal data service -->
     <!-- [133] Load Order: 133 | Strategy: defer -->
-    <script src="/trading-ui/scripts/calendar/calendar-date-utils.js?v=1.0.0" defer></script> <!-- Calendar date utilities for trading journal -->
+    <script src="/trading-ui/scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
     <!-- [134] Load Order: 134 | Strategy: defer -->
-    <script src="/trading-ui/scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
+    <script src="/trading-ui/scripts/trade-history-page.js?v=1.0.0" defer></script> <!-- Trade history page script (page-specific) -->
     <!-- [135] Load Order: 135 | Strategy: defer -->
-    <script src="/trading-ui/scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <script src="/trading-ui/scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
     <!-- [136] Load Order: 136 | Strategy: defer -->
-    <script src="/trading-ui/scripts/account-activity.js?v=1.0.0" defer></script> <!-- Account activity system -->
+    <script src="/trading-ui/scripts/calendar/calendar-date-utils.js?v=1.0.0" defer></script> <!-- Calendar date utilities for trading journal -->
     <!-- [137] Load Order: 137 | Strategy: defer -->
-    <script src="/trading-ui/scripts/positions-portfolio.js?v=1.0.0" defer></script> <!-- Positions and portfolio system -->
+    <script src="/trading-ui/scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
     <!-- [138] Load Order: 138 | Strategy: defer -->
+    <script src="/trading-ui/scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <!-- [139] Load Order: 139 | Strategy: defer -->
+    <script src="/trading-ui/scripts/account-activity.js?v=1.0.0" defer></script> <!-- Account activity system -->
+    <!-- [140] Load Order: 140 | Strategy: defer -->
+    <script src="/trading-ui/scripts/positions-portfolio.js?v=1.0.0" defer></script> <!-- Positions and portfolio system -->
+    <!-- [141] Load Order: 141 | Strategy: defer -->
     <script src="/trading-ui/scripts/trading-journal-page.js?v=1.0.0" defer></script> <!-- Trading journal page script (page-specific) -->
 
     <!-- =============================================================== -->
@@ -518,11 +540,11 @@
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [139] Load Order: 139 | Strategy: defer -->
+    <!-- [142] Load Order: 142 | Strategy: defer -->
     <script src="/trading-ui/scripts/entity-details-api.js?v=1.0.0" defer></script> <!-- Entity details API -->
-    <!-- [140] Load Order: 140 | Strategy: defer -->
+    <!-- [143] Load Order: 143 | Strategy: defer -->
     <script src="/trading-ui/scripts/entity-details-renderer.js?v=1.0.0" defer></script> <!-- Entity details renderer -->
-    <!-- [141] Load Order: 141 | Strategy: defer -->
+    <!-- [144] Load Order: 144 | Strategy: defer -->
     <script src="/trading-ui/scripts/entity-details-modal.js?v=1.0.0" defer></script> <!-- Entity details modal -->
 
     <!-- =============================================================== -->
@@ -532,9 +554,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [142] Load Order: 142 | Strategy: defer -->
+    <!-- [145] Load Order: 145 | Strategy: defer -->
     <script src="/trading-ui/scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
-    <!-- [143] Load Order: 143 | Strategy: defer -->
+    <!-- [146] Load Order: 146 | Strategy: defer -->
     <script src="/trading-ui/scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
@@ -544,23 +566,23 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [144] Load Order: 144 | Strategy: defer -->
-    <script src="/trading-ui/scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [145] Load Order: 145 | Strategy: defer -->
-    <script src="/trading-ui/scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [146] Load Order: 146 | Strategy: defer -->
-    <script src="/trading-ui/scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
     <!-- [147] Load Order: 147 | Strategy: defer -->
-    <script src="/trading-ui/scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <script src="/trading-ui/scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
     <!-- [148] Load Order: 148 | Strategy: defer -->
-    <script src="/trading-ui/scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <script src="/trading-ui/scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [149] Load Order: 149 | Strategy: defer -->
-    <script src="/trading-ui/scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
+    <script src="/trading-ui/scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
     <!-- [150] Load Order: 150 | Strategy: defer -->
-    <script src="/trading-ui/scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <script src="/trading-ui/scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
     <!-- [151] Load Order: 151 | Strategy: defer -->
-    <script src="/trading-ui/scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <script src="/trading-ui/scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
     <!-- [152] Load Order: 152 | Strategy: defer -->
+    <script src="/trading-ui/scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
+    <!-- [153] Load Order: 153 | Strategy: defer -->
+    <script src="/trading-ui/scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <!-- [154] Load Order: 154 | Strategy: defer -->
+    <script src="/trading-ui/scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <!-- [155] Load Order: 155 | Strategy: defer -->
     <script src="/trading-ui/scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
 
     <!-- =============================================================== -->
@@ -570,7 +592,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 152 | Unique Scripts Loaded: 152 -->
+    <!-- 📊 Total Scripts Processed: 155 | Unique Scripts Loaded: 155 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

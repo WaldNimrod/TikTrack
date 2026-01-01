@@ -18,6 +18,9 @@ import re
 
 logger = logging.getLogger(__name__)
 
+# DEBUG: Add this to verify the file is loaded
+logger.info("DEBUG: validation_service.py loaded")
+
 class ValidationService:
     """Service for validating data against dynamic constraints"""
     
@@ -35,21 +38,35 @@ class ValidationService:
         Returns:
             Tuple of (is_valid, list_of_errors)
         """
-        logger.info(f"Starting validation for {table_name} with data: {data}, exclude_id: {exclude_id}")
+        print(f"DEBUG: validate_data called for {table_name}")
+        logger.info(f"Starting validation for {table_name} with data keys: {list(data.keys())}, exclude_id: {exclude_id}")
         errors = []
-        
+
         try:
             # Get all constraints for this table
             constraints_query = text("""
-                SELECT c.id, c.constraint_type, c.column_name, c.constraint_definition, 
+                SELECT c.id, c.constraint_type, c.column_name, c.constraint_definition,
                        c.is_active
-                FROM constraints c 
+                FROM constraints c
                 WHERE c.table_name = :table_name AND c.is_active = TRUE
             """)
-            
+
             constraints = db.execute(constraints_query, {"table_name": table_name}).fetchall()
             logger.info(f"Validating {table_name} - found {len(constraints)} constraints")
-            
+
+            # Also check model-level NOT NULL constraints
+            print(f"DEBUG: About to get model constraints for {table_name}")
+            model_constraints = ValidationService._get_model_constraints(table_name)
+            print(f"DEBUG: Got {len(model_constraints)} model constraints")
+            logger.info(f"Validating {table_name} - found {len(model_constraints)} model constraints")
+            for mc in model_constraints:
+                print(f"DEBUG: Model constraint: {mc}")
+                logger.info(f"Model constraint: {mc}")
+
+            # Combine both constraint sources
+            all_constraints = list(constraints) + model_constraints
+            logger.info(f"📊 Total constraints: {len(constraints)} DB + {len(model_constraints)} model = {len(all_constraints)} total")
+
             # Custom validation for executions.realized_pl based on action
             # Realized P/L is required only for sell (closing long position) and cover (closing short position)
             # Realized P/L is not required for buy (opening long position) and short (opening short position)
@@ -64,9 +81,15 @@ class ValidationService:
                     logger.warning(f"Realized P/L should be NULL or 0 for {action} actions (opening positions), got: {realized_pl}")
                     # This is a warning, not an error - we'll allow it but log it
             
-            logger.info(f"Starting constraint loop for {table_name}")
-            for constraint in constraints:
-                constraint_id, constraint_type, field_name, definition, is_active = constraint
+            logger.info(f"Starting constraint loop for {table_name}, total constraints: {len(all_constraints)}")
+            for i, constraint in enumerate(all_constraints):
+                logger.info(f"📋 Processing constraint {i}: {constraint}")
+                try:
+                    constraint_id, constraint_type, field_name, definition, is_active = constraint
+                    logger.info(f"🔧 Unpacked: id={constraint_id}, type='{constraint_type}', field={field_name}, active={is_active}")
+                except Exception as unpack_error:
+                    logger.error(f"❌ Failed to unpack constraint {i}: {unpack_error}")
+                    continue
                 
                 # Skip inactive constraints
                 if not is_active:
@@ -78,8 +101,14 @@ class ValidationService:
                 
                 # Validate based on constraint type
                 if constraint_type == 'NOT NULL':
-                    if not ValidationService._validate_not_null(field_value):
-                        errors.append(f"Field '{field_name}' is required")
+                    logger.info(f"Processing NOT_NULL constraint for {field_name}")
+                    is_valid = ValidationService._validate_not_null(field_value)
+                    logger.info(f"_validate_not_null({field_value}) returned: {is_valid}")
+                    if not is_valid:
+                        error_msg = f"Field '{field_name}' is required"
+                        logger.error(f"Adding validation error: {error_msg}")
+                        errors.append(error_msg)
+                        logger.error(f"errors now contains: {errors}")
                 
                 elif constraint_type == 'CHECK':
                     if field_value is not None and not ValidationService._validate_check(field_value, definition):
@@ -123,7 +152,45 @@ class ValidationService:
         
         logger.info(f"Validation completed for {table_name}: {len(errors)} errors found")
         return len(errors) == 0, errors
-    
+
+    @staticmethod
+    def _get_model_constraints(table_name: str) -> List[tuple]:
+        """
+        Get model-level constraints (like NOT NULL from SQLAlchemy models)
+
+        Returns:
+            List of tuples: (constraint_id, constraint_type, column_name, definition, is_active)
+        """
+        model_constraints = []
+
+        try:
+            logger.info(f"Getting model constraints for {table_name}")
+
+            if table_name == 'executions':
+                # Import execution model
+                from models.execution import Execution
+
+                # Check each column for nullable=False
+                for column in Execution.__table__.columns:
+                    logger.info(f"Checking column {column.name}, nullable={column.nullable}")
+                    if not column.nullable and column.name != 'id':  # Skip id as it's auto-generated
+                        constraint_id = f"model_{table_name}_{column.name}_not_null"
+                        model_constraints.append((
+                            constraint_id,  # constraint_id
+                            'NOT_NULL',     # constraint_type
+                            column.name,    # column_name
+                            f"{column.name} IS NOT NULL",  # definition
+                            True            # is_active
+                        ))
+                        logger.info(f"Added model constraint: {column.name} NOT NULL for {table_name}")
+
+        except Exception as e:
+            logger.error(f"Error getting model constraints for {table_name}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
+        return model_constraints
+
     @staticmethod
     def _validate_not_null(value: Any) -> bool:
         """Validate NOT NULL constraint"""

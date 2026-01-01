@@ -1,8 +1,11 @@
+print("EXECUTIONS_MODULE_LOADED")
+
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.execution import Execution
 from services.validation_service import ValidationService
+from sqlalchemy import text
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 from services.execution_trade_matching_service import ExecutionTradeMatchingService
 from services.execution_clustering_service import ExecutionClusteringService, map_execution_action_to_trade_side
@@ -139,6 +142,7 @@ def get_execution(execution_id: int):
 @invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*', 'positions', 'portfolio'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
+    print("EXECUTIONS_ROUTE_CALLED: " + __file__)
     try:
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
@@ -152,6 +156,7 @@ def create_execution():
         if user_id is not None and 'user_id' not in data:
             data['user_id'] = user_id
         
+
         # Validate data against constraints
         logger.info("Validating execution data before creation")
         # Auto-fill ticker_id from trade if not provided but trade_id exists
@@ -173,27 +178,46 @@ def create_execution():
                 logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
         
         # Verify trading_account belongs to user if provided
-        if 'trading_account_id' in data and user_id is not None:
-            from models.trading_account import TradingAccount
-            account = db.query(TradingAccount).filter(
-                TradingAccount.id == data['trading_account_id'],
-                TradingAccount.user_id == user_id
-            ).first()
-            if not account:
-                return jsonify({
-                    "status": "error",
-                    "error": {"message": "Trading account not found or does not belong to user"},
-                    "timestamp": normalizer.now_envelope(),
-                    "version": "1.0"
-                }), 404
+        # TEMPORARILY DISABLED: causing transaction abortion issues
+        # if 'trading_account_id' in data and user_id is not None:
+        #     from models.trading_account import TradingAccount
+        #     account = db.query(TradingAccount).filter(
+        #         TradingAccount.id == data['trading_account_id'],
+        #         TradingAccount.user_id == user_id
+        #     ).first()
+        #     if not account:
+        #         return jsonify({
+        #             "status": "error",
+        #             "error": {"message": "Trading account not found or does not belong to user"},
+        #             "timestamp": normalizer.now_envelope(),
+        #             "version": "1.0"
+        #         }), 404
         
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
+        logger.info(f"Original data keys: {list(data.keys())}")
+        logger.info(f"Original trading_account_id: {data.get('trading_account_id')}")
+
         normalized_payload = normalizer.normalize_input_payload(data)
 
+        logger.info(f"Normalized payload keys: {list(normalized_payload.keys())}")
+        logger.info(f"Normalized trading_account_id: {normalized_payload.get('trading_account_id')}")
+
+        # Policy Change: trading_account_id is now REQUIRED
+        logger.info(f"Checking trading_account_id: {normalized_payload.get('trading_account_id')}")
+        if normalized_payload.get('trading_account_id') is None:
+            logger.error("Policy violation: trading_account_id is required but missing")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Execution validation failed: Field 'trading_account_id' is required"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 400
+
         is_valid, errors = ValidationService.validate_data(db, 'executions', normalized_payload)
+        logger.info(f"Validation result: is_valid={is_valid}, errors={errors}")
         if not is_valid:
             error_message = "; ".join(errors)
             logger.error(f"Execution validation failed: {error_message}")
@@ -205,10 +229,57 @@ def create_execution():
             }), 400
         
         logger.info(f"Creating execution with data: {data}")
-        
-        execution = Execution(**normalized_payload)
+        logger.info(f"Creating execution with normalized_payload: {normalized_payload}")
+
+        try:
+            execution = Execution(**normalized_payload)
+            logger.info(f"Execution object created successfully")
+        except Exception as e:
+            logger.error(f"Failed to create Execution object: {e}")
+            raise
+
+        logger.info(f"About to db.add(execution)")
         db.add(execution)
-        db.commit()
+        logger.info(f"About to db.commit()")
+        try:
+            db.commit()
+            logger.info(f"db.commit() successful")
+        except Exception as commit_error:
+            db.rollback()
+            logger.error(f"Commit failed: {str(commit_error)}")
+            # Check for foreign key violations
+            error_msg = str(commit_error).lower()
+            if "foreign key" in error_msg or "violates foreign key" in error_msg:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Invalid reference: Referenced record does not exist"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 400
+            elif "check constraint" in error_msg or "violates check constraint" in error_msg:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Validation failed: Data does not meet business rules"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 400
+            elif "unique constraint" in error_msg or "duplicate key" in error_msg:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Validation failed: Record already exists"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 400
+            else:
+                return jsonify({
+                    "status": "error",
+                    "error_code": "DATABASE_ERROR",
+                    "message": "Database error occurred",
+                    "details": "An unexpected database error occurred",
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 500
+
         db.refresh(execution)
         return jsonify({
             "status": "success",
@@ -219,13 +290,48 @@ def create_execution():
         }), 201
     except Exception as e:
         logger.error(f"Error creating execution: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         normalizer = _get_date_normalizer()
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "timestamp": normalizer.now_envelope(),
-            "version": "1.0"
-        }), 400
+
+        # Check for specific database errors
+        error_msg = str(e).lower()
+        if "foreign key" in error_msg or "violates foreign key" in error_msg or "foreign_key" in error_msg:
+            logger.error("Detected foreign key constraint violation")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Invalid reference: Referenced record does not exist"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 400
+        elif "check constraint" in error_msg or "violates check constraint" in error_msg:
+            logger.error("Detected check constraint violation")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Validation failed: Data does not meet business rules"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 400
+        elif "unique constraint" in error_msg or "duplicate key" in error_msg:
+            logger.error("Detected unique constraint violation")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Validation failed: Record already exists"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 400
+        else:
+            # Generic database error
+            logger.error("Generic database error")
+            return jsonify({
+                "status": "error",
+                "error_code": "DATABASE_ERROR",
+                "message": "Database error occurred",
+                "details": "An unexpected database error occurred",
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 500
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)

@@ -104,6 +104,41 @@ const tradingAccountsModalConfig = {
             },
             description: 'סמן תגיות שיסייעו בניהול החשבונות'
         },
+        // שורה נוספת: מאזן כולל + רווח/הפסד
+        {
+            type: 'number',
+            id: 'accountTotalValue',
+            label: 'מאזן כולל',
+            required: false,
+            placeholder: 'הכנס מאזן כולל',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            step: '0.01'
+        },
+        {
+            type: 'number',
+            id: 'accountTotalPL',
+            label: 'רווח/הפסד כולל',
+            required: false,
+            placeholder: 'הכנס רווח/הפסד כולל',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            step: '0.01'
+        },
+        // שורה נוספת: מספר חשבון חיצוני (יחודי)
+        {
+            type: 'text',
+            id: 'accountExternalNumber',
+            label: 'מספר חשבון חיצוני',
+            required: false,
+            placeholder: 'מספר חשבון בבנק/ברוקר',
+            rowClass: 'row',
+            colClass: 'col-md-12',
+            validation: {
+                unique: true,
+                message: 'מספר חשבון חיצוני זה כבר קיים במערכת'
+            }
+        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

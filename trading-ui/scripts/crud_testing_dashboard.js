@@ -340,29 +340,31 @@ class IntegratedCRUDE2ETester {
                 fields: {
                     name: { id: '#accountName', type: 'text', required: true },
                     currency_id: { id: '#accountCurrency', type: 'int', required: true },
-                    // type field removed - not in TradingAccount model
-                    opening_balance: { id: '#accountOpeningBalance', type: 'number', default: 0 },
-                    status: { id: '#accountStatus', type: 'text', default: 'open' },
-                    notes: { id: '#accountNotes', type: 'rich-text', default: null }
+                    opening_balance: { id: '#accountOpeningBalance', type: 'number', default: 0.0 }, // nullable=True in DB
+                    status: { id: '#accountStatus', type: 'text', default: 'open' }, // ENUM: open, closed, cancelled
+                    total_value: { id: '#accountTotalValue', type: 'number', default: 0 },
+                    total_pl: { id: '#accountTotalPL', type: 'number', default: 0 },
+                    notes: { id: '#accountNotes', type: 'rich-text', default: null },
+                    external_account_number: { id: '#accountExternalNumber', type: 'text', required: false, unique: true }
                 },
                 modalId: 'tradingAccountsModal'
             },
             execution: {
-                required: ['ticker_id', 'trading_account_id', 'action', 'quantity', 'price', 'date'],
+                required: ['ticker_id', 'trading_account_id', 'action', 'quantity', 'price', 'date'], // trading_account_id required for executions per policy
                 fields: {
                     ticker_id: { id: '#executionTicker', type: 'int', required: true },
-                    trading_account_id: { id: '#executionAccount', type: 'int', required: true },
-                    action: { id: '#executionType', type: 'text', required: true, default: 'buy' },
+                    trading_account_id: { id: '#executionAccount', type: 'int', required: true }, // required for executions per policy
+                    action: { id: '#executionType', type: 'select', required: true, default: 'buy' }, // ENUM: buy, sell, short, cover
                     quantity: { id: '#executionQuantity', type: 'number', required: true, default: 100 },
                     price: { id: '#executionPrice', type: 'number', required: true, default: 100 },
                     date: { id: '#executionDate', type: 'datetime-local', required: true },
                     fee: { id: '#executionCommission', type: 'number', default: 0 },
-                    source: { id: '#executionSource', type: 'text', default: 'manual' },
+                    source: { id: '#executionSource', type: 'select', default: 'manual' }, // ENUM: manual, api, file_import, direct_import
                     external_id: { id: '#executionExternalId', type: 'text', default: null },
                     notes: { id: '#executionNotes', type: 'rich-text', default: null },
                     realized_pl: { id: '#executionRealizedPL', type: 'number', default: null },
                     mtm_pl: { id: '#executionMTMPL', type: 'number', default: null },
-                    trade_id: { id: '#trade_id', type: 'int', default: null }
+                    trade_id: { id: '#executionTradeId', type: 'int', default: null }
                 },
                 modalId: 'executionsModal'
             },
@@ -377,7 +379,7 @@ class IntegratedCRUDE2ETester {
                     source: { id: '#cashFlowSource', type: 'text', required: true, default: 'manual' },
                     external_id: { id: '#cashFlowExternalId', type: 'text', default: null },
                     description: { id: '#cashFlowDescription', type: 'rich-text', default: null },
-                    trade_id: { id: '#trade_id', type: 'int', default: null }
+                    trade_id: { id: '#cashFlowTradeId', type: 'int', default: null }
                 },
                 modalId: 'cashFlowModal'
             },
@@ -1238,8 +1240,22 @@ class IntegratedCRUDE2ETester {
             }
 
 
+            // #region agent log - create payload
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1244',message:'About to call UnifiedCRUDService.create',data:{entityType:entityType,testData:testData,runId:'stage2_batch1',hypothesisId:'create_payload_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+
+            // #region agent log - executions payload snapshot
+            if (entityType === 'execution') {
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1244',message:'Executions payload before CREATE - INTEGER IDs VERIFICATION',data:{entityType:entityType,testData:testData,integer_ids:{ticker_id:{value:testData.ticker_id,type:typeof testData.ticker_id,is_integer:Number.isInteger(testData.ticker_id)},trading_account_id:{value:testData.trading_account_id,type:typeof testData.trading_account_id,is_integer:Number.isInteger(testData.trading_account_id)},trade_id:{value:testData.trade_id,type:typeof testData.trade_id,is_integer:testData.trade_id === null || Number.isInteger(testData.trade_id)}},runId:'stage2_batch1',hypothesisId:'executions_integer_ids_verification'},timestamp:Date.now()})}).catch(()=>{});
+            }
+            // #endregion
+
             // Call the CRUD service directly
             const result = await crudService.create(entityType, testData);
+
+            // #region agent log - create result
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1248',message:'UnifiedCRUDService.create completed',data:{entityType:entityType,result:result,runId:'stage2_batch1',hypothesisId:'create_result_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
 
             // Handle both old format (success: boolean) and new format (status: string)
             const isSuccess = result && (result.success === true || result.status === 'success');
@@ -1303,6 +1319,10 @@ class IntegratedCRUDE2ETester {
             const apiUrl = `${base}/api/${pluralEntity}/${recordId}`;
             console.log(`🔍 DEBUG: READ test API URL: ${apiUrl}`);
 
+            // #region agent log - read request
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1316',message:'About to call READ API',data:{entityType:entityType,recordId:recordId,apiUrl:apiUrl,runId:'stage2_batch1',hypothesisId:'read_request_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+
             const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
@@ -1321,6 +1341,10 @@ class IntegratedCRUDE2ETester {
             if (!result || (result.status !== 'success' && result.success !== true)) {
                 throw new Error(`Invalid response format: ${JSON.stringify(result)}`);
             }
+
+            // #region agent log - read result
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1339',message:'READ API call completed',data:{entityType:entityType,recordId:recordId,result:result,runId:'stage2_batch1',hypothesisId:'read_result_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
 
             console.log(`📖 DEBUG: Successfully read record ${recordId} for ${entityType}:`, result);
             return { success: true, data: result };
@@ -1383,6 +1407,11 @@ class IntegratedCRUDE2ETester {
             // #endregion
 
             const updateResult = await mainWindow.UnifiedCRUDService.updateEntity(entityType, recordId, updateData);
+
+            // #region agent log - update result
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1403',message:'UnifiedCRUDService.updateEntity completed',data:{entityType:entityType,recordId:recordId,updateResult:updateResult,runId:'stage2_batch1',hypothesisId:'update_result_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+
             if (!updateResult || !updateResult.success) {
                 throw new Error(`Failed to update record: ${updateResult?.error || 'Unknown error'}`);
             }
@@ -1421,7 +1450,16 @@ class IntegratedCRUDE2ETester {
                 throw new Error('UnifiedCRUDService not available in main window');
             }
 
+            // #region agent log - delete request
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1447',message:'About to call UnifiedCRUDService.delete',data:{entityType:entityType,recordId:recordId,runId:'stage2_batch1',hypothesisId:'delete_request_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+
             const deleteResult = await mainWindow.UnifiedCRUDService.delete(entityType, recordId);
+
+            // #region agent log - delete result
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1447',message:'UnifiedCRUDService.delete completed',data:{entityType:entityType,recordId:recordId,deleteResult:deleteResult,runId:'stage2_batch1',hypothesisId:'delete_result_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+
             if (!deleteResult || !deleteResult.success) {
                 throw new Error(`Failed to delete record: ${deleteResult?.error || 'Unknown error'}`);
             }
@@ -2663,217 +2701,40 @@ class IntegratedCRUDE2ETester {
      * Fetch active trading account for current user (admin) before tests
      */
     async fetchActiveTradingAccountForCurrentUser() {
-                        if (typeof arg === 'object') {
-                            try {
-                                return JSON.stringify(arg);
-                            } catch (e) {
-                                return String(arg);
-                            }
-                        }
-                        return String(arg);
-                    }).join(' ');
-                    
-                    // Filter out expected/non-critical errors
-                    const msgLower = message.toLowerCase();
-                    const isExpectedError = msgLower.includes('404') ||
-                        msgLower.includes('not found') ||
-                        msgLower.includes('network') ||
-                        msgLower.includes('cors') ||
-                        msgLower.includes('cross-origin') ||
-                        msgLower.includes('blocked by client') ||
-                        msgLower.includes('favicon') ||
-                        msgLower.includes('401') ||
-                        msgLower.includes('unauthorized') ||
-                        msgLower.includes('modalmanagerv2 not yet available') ||
-                        msgLower.includes('iconmappings.buttons not loaded') ||
-                        msgLower.includes('preferencesdata.loadallpreferencesraw api is not available') ||
-                        msgLower.includes('calendardataloader not available') ||
-                        msgLower.includes('generateentitytypefilterbutton not available') ||
-                        msgLower.includes('eod load attempt failed') ||
-                        msgLower.includes('element not found') ||
-                        msgLower.includes('container not found') ||
-                        msgLower.includes('section not found') ||
-                        msgLower.includes('table not found') ||
-                        msgLower.includes('select not found') ||
-                        msgLower.includes('button not found') ||
-                        msgLower.includes('not yet available') ||
-                        msgLower.includes('not available after waiting');
-                    
-                    if (!isExpectedError) {
-                        consoleErrors.push({
-                            message: message,
-                            timestamp: new Date().toISOString(),
-                            type: 'error'
-                        });
-                    }
-                    
-                    originalError.apply(window.console, args);
-                };
-                
-                // Override console.warn for critical warnings
-                mainWindow.console.warn = function(...args) {
-                    const message = args.map(arg => {
-                        if (typeof arg === 'object') {
-                            try {
-                                return JSON.stringify(arg);
-                } catch (e) {
-                                return String(arg);
-                            }
-                        }
-                        return String(arg);
-                    }).join(' ');
-                    
-                    const msgLower = message.toLowerCase();
-                    const isExpectedWarning = msgLower.includes('modalmanagerv2 not yet available') ||
-                        msgLower.includes('iconmappings.buttons not loaded') ||
-                        msgLower.includes('preferencesdata.loadallpreferencesraw api is not available') ||
-                        msgLower.includes('calendardataloader not available') ||
-                        msgLower.includes('generateentitytypefilterbutton not available') ||
-                        msgLower.includes('ticker filter select not found') ||
-                        msgLower.includes('journal entries cards container not found') ||
-                        msgLower.includes('activity chart section not found') ||
-                        msgLower.includes('no timeline data available') ||
-                        msgLower.includes('no market price data available') ||
-                        msgLower.includes('eod load attempt failed') ||
-                        msgLower.includes('failed to load eod alerts data') ||
-                        msgLower.includes('cannot read properties of undefined') ||
-                        msgLower.includes('dashboard section not found') ||
-                        msgLower.includes('element not found') ||
-                        msgLower.includes('container not found') ||
-                        msgLower.includes('section not found') ||
-                        msgLower.includes('table not found') ||
-                        msgLower.includes('select not found') ||
-                        msgLower.includes('button not found') ||
-                        msgLower.includes('not yet available') ||
-                        msgLower.includes('not available after waiting') ||
-                        msgLower.includes('skipping') ||
-                        msgLower.includes('401') ||
-                        msgLower.includes('unauthorized') ||
-                        msgLower.includes('favicon') ||
-                        msgLower.includes('404') ||
-                        msgLower.includes('not found') ||
-                        msgLower.includes('network') ||
-                        msgLower.includes('cors') ||
-                        msgLower.includes('cross-origin') ||
-                        msgLower.includes('blocked by client') ||
-                        msgLower.includes('research api unavailable') ||
-                        msgLower.includes('api unavailable');
-                    
-                    // Only capture critical warnings (not expected ones)
-                    if (!isExpectedWarning && (
-                        message.includes('not defined') || 
-                        message.includes('is not a function') ||
-                        message.includes('Failed to load') ||
-                        message.includes('Uncaught'))) {
-                        consoleErrors.push({
-                            message: message,
-                            timestamp: new Date().toISOString(),
-                            type: 'warning'
-                        });
-                    }
-                    
-                    originalWarn.apply(window.console, args);
-                };
-                
-                // Global error handler
-                if (window.addEventListener) {
-                    window.addEventListener('error', (event) => {
-                        const msg = (event.message || 'Unknown error').toLowerCase();
-                        const isExpectedError = msg.includes('404') ||
-                            msg.includes('not found') ||
-                            msg.includes('network') ||
-                            msg.includes('cors') ||
-                            msg.includes('cross-origin') ||
-                            msg.includes('blocked by client') ||
-                            msg.includes('failed to load eod alerts data') ||
-                            msg.includes('cannot read properties of undefined') ||
-                            msg.includes('research api unavailable') ||
-                            msg.includes('api unavailable') ||
-                            msg.includes('401') ||
-                            msg.includes('unauthorized') ||
-                            msg.includes('favicon');
-                        
-                        if (!isExpectedError) {
-                            consoleErrors.push({
-                                message: event.message || 'Unknown error',
-                                filename: event.filename || 'unknown',
-                                lineno: event.lineno || 0,
-                                colno: event.colno || 0,
-                                type: 'runtime'
-                            });
-                        }
-                    });
-                    
-                    // Unhandled promise rejection handler
-                    window.addEventListener('unhandledrejection', (event) => {
-                        const msg = (event.reason?.message || String(event.reason) || 'Unhandled promise rejection').toLowerCase();
-                        const isExpectedRejection = msg.includes('404') ||
-                            msg.includes('not found') ||
-                            msg.includes('network') ||
-                            msg.includes('cors') ||
-                            msg.includes('cross-origin') ||
-                            msg.includes('blocked by client') ||
-                            msg.includes('failed to load eod alerts data') ||
-                            msg.includes('cannot read properties of undefined') ||
-                            msg.includes('research api unavailable') ||
-                            msg.includes('api unavailable') ||
-                            msg.includes('401') ||
-                            msg.includes('unauthorized');
-                        
-                        if (!isExpectedRejection) {
-                            consoleErrors.push({
-                                message: event.reason?.message || String(event.reason) || 'Unhandled promise rejection',
-                                type: 'promise'
-                            });
-                        }
-                    });
-                }
+        console.log('🔍 Fetching active trading account for current user...');
+
+        try {
+            const accountId = await window.UnifiedPayloadBuilder?.fetchActiveTradingAccountForCurrentUser();
+            if (accountId) {
+                window.UnifiedPayloadBuilder.setActiveTradingAccount(accountId);
+
+                // #region agent log - active account fetched
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'crud_testing_dashboard.js:2703',
+                        message:'active_trading_account_fetched',
+                        data:{
+                            accountId: accountId,
+                            timestamp: Date.now()
+                        },
+                        sessionId:'init_loading_clarification',
+                        runId:'init_loading_clarification',
+                        hypothesisId:'active-account-resolution-fixed'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+                console.log('✅ Active trading account set:', accountId);
+                return accountId;
+            } else {
+                console.warn('⚠️ No active trading account found');
+                return null;
             }
-
-            // Wait for page to fully load and initialize
-            if (typeof this.waitForPageLoad !== 'function') {
-                console.error('DEBUG: this.waitForPageLoad is not a function', {
-                    this: this,
-                    hasWaitForPageLoad: 'waitForPageLoad' in this,
-                    thisKeys: Object.keys(this)
-                });
-                throw new Error('waitForPageLoad method is not available');
-            }
-            // Main window testing - page already loaded
-
-            // Inject and run Info Summary tests
-            const testResult = await this.runInfoSummaryTestsInMainWindow(pageKey, page);
-
-            // Return success result with test details
-            return {
-                page: page.name,
-                pageKey,
-                status: testResult.status,
-                issues: testResult.issues || [],
-                warnings: testResult.warnings || [],
-                consoleErrors: consoleErrors,
-                executionTime: Date.now() - startTime,
-                ...testResult.details
-            };
-
         } catch (error) {
-            this.logger?.error('❌ [testPageInfoSummary] Test failed', {
-                pageKey,
-                error: error.message,
-                page: page.name
-            });
-            return {
-                page: page.name,
-                pageKey,
-                status: 'failed',
-                error: error.message,
-                issues: [`Test error: ${error.message}`],
-                warnings: [],
-                consoleErrors: consoleErrors,
-                executionTime: Date.now() - startTime
-            };
-        } finally {
-            this.cleanupTestIframes();
+            console.error('❌ Error fetching active trading account:', error);
+            return null;
         }
     }
 
@@ -4153,12 +4014,22 @@ window.UnifiedPayloadBuilder = {
     activeTradingAccountId: null,
 
     // Main entry point for payload generation
-    build: function(entityType, fieldMap, isUpdate = false) {
-        return this.generateTestData(entityType, fieldMap, isUpdate);
+    build: async function(entityType, fieldMap, isUpdate = false) {
+        // #region agent log - payload build start
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4178',message:'UnifiedPayloadBuilder.build() called',data:{entityType:entityType,isUpdate:isUpdate,runId:'stage2_batch1',hypothesisId:'payload_build_verification'},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+
+        const result = await this.generateTestData(entityType, fieldMap, isUpdate);
+
+        // #region agent log - payload build complete
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4185',message:'UnifiedPayloadBuilder.build() completed',data:{entityType:entityType,isUpdate:isUpdate,result:result,runId:'stage2_batch1',hypothesisId:'payload_build_verification'},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+
+        return result;
     },
 
     // Generate test data based on field map
-    generateTestData: function(entityType, fieldMap, isUpdate = false) {
+    generateTestData: async function(entityType, fieldMap, isUpdate = false) {
         if (!fieldMap || !fieldMap.fields) {
             throw new Error(`No field map found for entity: ${entityType}`);
         }
@@ -4167,11 +4038,11 @@ window.UnifiedPayloadBuilder = {
 
         // Generate value for each field in the map
         for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
-            testData[fieldName] = this.generateFieldValue(fieldName, fieldConfig, entityType, isUpdate);
+            testData[fieldName] = await this.generateFieldValue(fieldName, fieldConfig, entityType, isUpdate);
         }
 
         // Apply entity-specific overrides
-        this.applyEntitySpecificOverrides(testData, entityType, isUpdate);
+        await this.applyEntitySpecificOverrides(testData, entityType, isUpdate);
 
         // Apply update modifications if needed
         if (isUpdate) {
@@ -4188,10 +4059,14 @@ window.UnifiedPayloadBuilder = {
     },
 
     // Generate value for individual field
-    generateFieldValue: function(fieldName, fieldConfig, entityType, isUpdate) {
+    generateFieldValue: async function(fieldName, fieldConfig, entityType, isUpdate) {
         // Handle dynamic ID resolution first
         if (this.isDynamicIdField(fieldName)) {
-            return this.resolveDynamicId(fieldName, entityType);
+            const resolvedId = await this.resolveDynamicId(fieldName, entityType);
+            // #region agent log - field value generation with ID resolution
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4235',message:'Field value generated with dynamic ID',data:{fieldName:fieldName,entityType:entityType,resolvedId:resolvedId,idType:typeof resolvedId,runId:'stage2_batch1',hypothesisId:'async_id_resolution_verification'},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+            return resolvedId;
         }
 
         // Handle date/datetime fields
@@ -4226,18 +4101,22 @@ window.UnifiedPayloadBuilder = {
     },
 
     // Resolve dynamic IDs
-    resolveDynamicId: function(fieldName, entityType) {
+    resolveDynamicId: async function(fieldName, entityType) {
         switch (fieldName) {
             case 'trading_account_id':
                 // Use active trading account if available, otherwise fetch one
                 if (this.activeTradingAccountId) {
                     return this.activeTradingAccountId;
                 }
-                return this.fetchValidTradingAccount();
+                return await this.fetchValidTradingAccount();
             case 'ticker_id':
                 return this.fetchValidTicker();
             case 'trade_id':
-                return this.fetchValidTrade();
+                // #region agent log - trade_id resolution
+                const tradeId = await this.fetchValidTrade();
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4282',message:'Dynamic trade_id resolution',data:{entityType:entityType,resolvedTradeId:tradeId,tradeIdType:typeof tradeId,runId:'stage2_batch1',hypothesisId:'dynamic_trade_id_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                return tradeId;
             case 'currency_id':
                 return this.fetchValidCurrency();
             case 'user_id':
@@ -4260,10 +4139,17 @@ window.UnifiedPayloadBuilder = {
         }
     },
 
+    // Generate unique symbol for tickers to avoid duplicates
+    generateUniqueSymbol: function() {
+        const timestamp = Date.now().toString().slice(-4); // Last 4 digits of timestamp
+        const randomChar = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random A-Z
+        return `TST${randomChar}${timestamp}`;
+    },
+
     // Generate text values
     generateTextValue: function(fieldName, fieldConfig) {
         if (fieldName === 'symbol') {
-            return this.validTickers[Math.floor(Math.random() * this.validTickers.length)];
+            return this.generateUniqueSymbol();
         }
         if (fieldName === 'name') {
             return `Test ${fieldName} ${Date.now()}`;
@@ -4310,12 +4196,41 @@ window.UnifiedPayloadBuilder = {
     },
 
     // Apply entity-specific overrides
-    applyEntitySpecificOverrides: function(testData, entityType, isUpdate) {
+    applyEntitySpecificOverrides: async function(testData, entityType, isUpdate) {
+        // #region agent log - entity overrides start
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4320',message:'applyEntitySpecificOverrides() called',data:{entityType:entityType,isUpdate:isUpdate,testData:testData,runId:'stage2_batch1',hypothesisId:'entity_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+
         switch (entityType) {
+            case 'ticker':
+                // Ensure required fields for ticker
+                if (!testData.currency_id) {
+                    testData.currency_id = this.fetchValidCurrency();
+                }
+                // Generate unique symbol to avoid duplicates
+                if (!testData.symbol || isUpdate) {
+                    testData.symbol = this.generateUniqueSymbol();
+                }
+                // #region agent log - ticker overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4375',message:'Ticker entity overrides applied',data:{symbol:testData.symbol,name:testData.name,currency_id:testData.currency_id,type:testData.type,status:testData.status,runId:'stage2_batch2',hypothesisId:'ticker_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
+            case 'trade':
+                // Ensure required fields for trade
+                if (!testData.trading_account_id) {
+                    testData.trading_account_id = this.activeTradingAccountId || await this.fetchValidTradingAccount();
+                }
+                if (!testData.ticker_id) {
+                    testData.ticker_id = this.fetchValidTicker();
+                }
+                // #region agent log - trade overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4385',message:'Trade entity overrides applied',data:{trading_account_id:testData.trading_account_id,ticker_id:testData.ticker_id,status:testData.status,side:testData.side,investment_type:testData.investment_type,runId:'stage2_batch2',hypothesisId:'trade_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
             case 'trade_plan':
                 // Ensure required fields for trade_plan
                 if (!testData.trading_account_id) {
-                    testData.trading_account_id = this.activeTradingAccountId || this.fetchValidTradingAccount();
+                    testData.trading_account_id = this.activeTradingAccountId || await this.fetchValidTradingAccount();
                 }
                 if (!testData.ticker_id) {
                     testData.ticker_id = this.fetchValidTicker();
@@ -4324,13 +4239,91 @@ window.UnifiedPayloadBuilder = {
             case 'cash_flow':
                 // Ensure required fields for cash_flow
                 if (!testData.trading_account_id) {
-                    testData.trading_account_id = this.activeTradingAccountId || this.fetchValidTradingAccount();
+                    testData.trading_account_id = this.activeTradingAccountId || await this.fetchValidTradingAccount();
                 }
                 if (!testData.currency_id) {
                     testData.currency_id = this.fetchValidCurrency();
                 }
                 break;
+            case 'trading_journal':
+                // Ensure required fields for trading_journal
+                if (!testData.trade_id) {
+                    testData.trade_id = this.fetchValidTrade();
+                }
+                if (!testData.entry_date) {
+                    testData.entry_date = new Date().toISOString().slice(0, 16); // datetime-local format
+                }
+                // Optional fields with defaults
+                if (!testData.notes) {
+                    testData.notes = 'Test journal entry from automated testing';
+                }
+                if (!testData.mood) {
+                    testData.mood = 'Neutral';
+                }
+                if (!testData.lessons_learned) {
+                    testData.lessons_learned = 'Learning from automated test execution';
+                }
+                if (!testData.performance_rating) {
+                    testData.performance_rating = Math.floor(Math.random() * 10) + 1; // 1-10 rating
+                }
+                // #region agent log - trading_journal overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4395',message:'Trading journal entity overrides applied',data:{trade_id:testData.trade_id,entry_date:testData.entry_date,notes:testData.notes,mood:testData.mood,lessons_learned:testData.lessons_learned,performance_rating:testData.performance_rating,runId:'stage2_batch5',hypothesisId:'trading_journal_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
+            case 'note':
+                // Ensure required fields for note
+                if (!testData.related_type_id) {
+                    testData.related_type_id = 1; // Default to ticker type
+                }
+                if (!testData.related_id) {
+                    testData.related_id = 1; // Default to ticker ID 1
+                }
+                if (!testData.content) {
+                    testData.content = `Test note content ${Date.now()}`;
+                }
+                // #region agent log - note overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4375',message:'Note entity overrides applied',data:{related_type_id:testData.related_type_id,related_id:testData.related_id,content:testData.content.substring(0,50)+'...',runId:'stage2_batch3',hypothesisId:'note_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
+            case 'alert':
+                // Ensure required fields for alert
+                if (!testData.status) {
+                    testData.status = 'new'; // Required field with default
+                }
+                if (!testData.condition_attribute) {
+                    testData.condition_attribute = 'price';
+                }
+                if (!testData.condition_operator) {
+                    testData.condition_operator = 'more_than';
+                }
+                if (testData.condition_number === null || testData.condition_number === undefined) {
+                    testData.condition_number = 100;
+                }
+                if (!testData.related_type_id) {
+                    testData.related_type_id = 4; // Default to trade type
+                }
+                // #region agent log - alert overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4385',message:'Alert entity overrides applied',data:{status:testData.status,condition_attribute:testData.condition_attribute,condition_operator:testData.condition_operator,condition_number:testData.condition_number,related_type_id:testData.related_type_id,runId:'stage2_batch3',hypothesisId:'alert_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
+            case 'execution':
+                // Ensure required fields for execution
+                if (!testData.ticker_id) {
+                    testData.ticker_id = this.fetchValidTicker();
+                }
+                // trading_account_id is now required for executions per policy
+                if (!testData.trading_account_id) {
+                    testData.trading_account_id = this.activeTradingAccountId || await this.fetchValidTradingAccount();
+                }
+                // #region agent log - execution overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4389',message:'Execution entity overrides applied',data:{ticker_id:testData.ticker_id,trading_account_id:testData.trading_account_id,trade_id:testData.trade_id,runId:'stage2_batch1',hypothesisId:'execution_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                break;
         }
+
+        // #region agent log - entity overrides complete
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4349',message:'applyEntitySpecificOverrides() completed',data:{entityType:entityType,isUpdate:isUpdate,finalTestData:testData,runId:'stage2_batch1',hypothesisId:'entity_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
     },
 
     // Apply modifications for updates
@@ -4449,31 +4442,89 @@ window.UnifiedPayloadBuilder = {
         const logData = {
             entityType,
             isUpdate,
+            operation: isUpdate ? 'UPDATE' : 'CREATE',
             fieldCount: Object.keys(testData).length,
             hasTradingAccountId: !!testData.trading_account_id,
             hasTickerId: !!testData.ticker_id,
+            hasCurrencyId: !!testData.currency_id,
             hasDateFields: Object.keys(testData).some(key =>
                 key.includes('date') || key.includes('created_at') || key.includes('updated_at')
             ),
             payloadKeys: Object.keys(testData)
         };
 
-        // #region agent log - payload generated
+        // Add entity-specific validation data
+        if (entityType === 'ticker') {
+            logData.tickerValidation = {
+                symbol: testData.symbol,
+                symbolLength: testData.symbol?.length,
+                name: testData.name,
+                type: testData.type,
+                currency_id: testData.currency_id,
+                status: testData.status,
+                hasRemarks: !!testData.remarks
+            };
+            logData.numericIds = {
+                currency_id: typeof testData.currency_id === 'number' ? testData.currency_id : 'NOT_NUMERIC'
+            };
+        } else if (entityType === 'trade') {
+            logData.tradeValidation = {
+                trading_account_id: testData.trading_account_id,
+                ticker_id: testData.ticker_id,
+                status: testData.status,
+                side: testData.side,
+                investment_type: testData.investment_type,
+                planned_quantity: testData.planned_quantity,
+                entry_price: testData.entry_price
+            };
+            logData.numericIds = {
+                trading_account_id: typeof testData.trading_account_id === 'number' ? testData.trading_account_id : 'NOT_NUMERIC',
+                ticker_id: typeof testData.ticker_id === 'number' ? testData.ticker_id : 'NOT_NUMERIC'
+            };
+        } else if (entityType === 'note') {
+            logData.noteValidation = {
+                related_type_id: testData.related_type_id,
+                related_id: testData.related_id,
+                content: testData.content?.substring(0, 50) + '...',
+                hasTagIds: Array.isArray(testData.tag_ids)
+            };
+            logData.numericIds = {
+                related_type_id: typeof testData.related_type_id === 'number' ? testData.related_type_id : 'NOT_NUMERIC',
+                related_id: typeof testData.related_id === 'number' ? testData.related_id : 'NOT_NUMERIC'
+            };
+        } else if (entityType === 'alert') {
+            logData.alertValidation = {
+                status: testData.status,
+                condition_attribute: testData.condition_attribute,
+                condition_operator: testData.condition_operator,
+                condition_number: testData.condition_number,
+                related_type_id: testData.related_type_id,
+                hasExpiryDate: !!testData.expiry_date,
+                hasCreatedAt: !!testData.created_at
+            };
+            logData.numericIds = {
+                related_type_id: typeof testData.related_type_id === 'number' ? testData.related_type_id : 'NOT_NUMERIC',
+                related_id: typeof testData.related_id === 'number' ? testData.related_id : 'NOT_NUMERIC',
+                condition_number: typeof testData.condition_number === 'number' ? testData.condition_number : 'NOT_NUMERIC'
+            };
+        }
+
+        // #region agent log - payload generated with entity validation
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
                 location:'crud_testing_dashboard.js:4150',
-                message:'payload_generated',
+                message:`${entityType}_${isUpdate ? 'update' : 'create'}_payload_generated`,
                 data: logData,
-                sessionId:'payload-unification',
-                runId:'payload-unification-1',
-                hypothesisId:'payload-unification-working'
+                sessionId:'stage2_batch2_payload_logging',
+                runId:'stage2_batch2',
+                hypothesisId:`${entityType}_payload_verification`
             })
         }).catch(()=>{});
         // #endregion
 
-        window.Logger?.info?.(`Generated ${isUpdate ? 'update' : 'create'} payload for ${entityType}`, logData);
+        window.Logger?.info?.(`Generated ${isUpdate ? 'UPDATE' : 'CREATE'} payload for ${entityType}`, logData);
     }
 };
 

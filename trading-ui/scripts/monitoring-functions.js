@@ -35,6 +35,7 @@
 // === Data Functions ===
 // - waitForPageFullyLoaded() - Waitforpagefullyloaded
 // - getScriptLoadOrder() - Getscriptloadorder
+// - checkScriptExecutionSuccess() - Checkscriptexecutionsuccess
 
 // === Utility Functions ===
 // - checkForMismatches() - Checkformismatches
@@ -940,7 +941,10 @@ async function runDetailedPageScan(pageName, pageConfig) {
         
         // Package Documentation
         packageDocumentation: packageDocumentation,
-        
+
+        // Script Execution Success Check
+        executionSuccess: checkScriptExecutionSuccess(),
+
         // Summary
         summary: {
             totalIssues: mismatchResults.mismatches + 
@@ -1606,6 +1610,94 @@ function generateFixRecommendations(issues) {
     return recommendations;
 }
 
+/**
+ * Check Script Execution Success
+ * בדיקת הצלחת ביצוע סקריפטים
+ *
+ * Uses globals availability and Logger signals as primary indicators
+ * instead of unreliable script.complete property
+ *
+ * @returns {Object} Execution status with detailed evidence
+ */
+function checkScriptExecutionSuccess() {
+    const executionStatus = {
+        success: false,
+        evidence: [],
+        missingGlobals: [],
+        availableGlobals: [],
+        loggerInitialized: false,
+        servicesLoaded: 0,
+        totalServices: 0,
+        confidence: 0
+    };
+
+    // Critical globals that must be available
+    const criticalGlobals = [
+        'window.API_BASE_URL',
+        'window.Logger',
+        'window.ModalManagerV2',
+        'window.UnifiedAppInitializer',
+        'window.TikTrackAuth'
+    ];
+
+    // Check critical globals
+    criticalGlobals.forEach(globalPath => {
+        try {
+            const value = eval(globalPath);
+            if (value !== undefined && value !== null) {
+                executionStatus.availableGlobals.push(globalPath);
+                executionStatus.evidence.push(`✅ ${globalPath} = ${typeof value}`);
+            } else {
+                executionStatus.missingGlobals.push(globalPath);
+                executionStatus.evidence.push(`❌ ${globalPath} = ${value}`);
+            }
+        } catch (e) {
+            executionStatus.missingGlobals.push(globalPath);
+            executionStatus.evidence.push(`❌ ${globalPath} = ERROR: ${e.message}`);
+        }
+    });
+
+    // Check Logger initialization (strong indicator)
+    if (window.Logger && typeof window.Logger.info === 'function') {
+        executionStatus.loggerInitialized = true;
+        executionStatus.evidence.push('✅ Logger.info function available');
+        executionStatus.confidence += 25;
+    } else {
+        executionStatus.evidence.push('❌ Logger.info function not available');
+    }
+
+    // Check for service initialization evidence in console logs
+    // (This would require access to recent console entries)
+    const servicesToCheck = [
+        'CacheSyncManager',
+        'HeaderSystem',
+        'ModalManagerV2',
+        'UnifiedCacheManager',
+        'AuthGuard'
+    ];
+
+    servicesToCheck.forEach(service => {
+        if (window[service]) {
+            executionStatus.servicesLoaded++;
+            executionStatus.evidence.push(`✅ ${service} available globally`);
+        }
+    });
+
+    executionStatus.totalServices = servicesToCheck.length;
+
+    // Calculate confidence score
+    const globalsScore = (executionStatus.availableGlobals.length / criticalGlobals.length) * 50;
+    const servicesScore = (executionStatus.servicesLoaded / executionStatus.totalServices) * 25;
+    const loggerScore = executionStatus.loggerInitialized ? 25 : 0;
+
+    executionStatus.confidence = Math.round(globalsScore + servicesScore + loggerScore);
+
+    // Determine success
+    executionStatus.success = executionStatus.confidence >= 75 && executionStatus.missingGlobals.length === 0;
+
+    return executionStatus;
+}
+
 // Export functions globally
 window.runDetailedPageScan = runDetailedPageScan;
 window.waitForPageFullyLoaded = waitForPageFullyLoaded;
@@ -1616,6 +1708,7 @@ window.normalizeScriptPath = normalizeScriptPath;
 window.getScriptLoadOrder = getScriptLoadOrder;
 window.compareHTMLvsDOM = compareHTMLvsDOM;
 window.getPackageDocumentation = getPackageDocumentation;
+window.checkScriptExecutionSuccess = checkScriptExecutionSuccess;
 window.formatComparisonReport = formatComparisonReport;
 window.generateFixRecommendations = generateFixRecommendations;
 

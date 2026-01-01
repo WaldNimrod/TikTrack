@@ -36,6 +36,53 @@ if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
 
+// #region agent log - Header visual verification after full load
+window.addEventListener('load', function() {
+  // Wait 1 second after window.onload for any deferred initialization
+  setTimeout(() => {
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:window-load-verification',
+        message:'header_visual_verification_after_window_load',
+        data:{
+          timestamp: Date.now(),
+          page: window.location.pathname,
+          unifiedHeaderExists: !!document.getElementById('unified-header'),
+          unifiedHeaderVisible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false,
+          tiktrackHeaderExists: !!document.querySelector('.tiktrack-header'),
+          tiktrackHeaderVisible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false,
+          headerSystemReady: window.headerSystemReady,
+          headerSystemInstance: typeof window.headerSystem,
+          documentReadyState: document.readyState,
+          initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready'
+        },
+        sessionId:'header-visual-verification',
+        runId:'header-visual-verification-1',
+        hypothesisId:'header_visual_verification'
+      })
+    }).catch(()=>{});
+
+    // Additional Logger evidence for header state
+    window.Logger?.info?.('👁️ Header Visual Verification', {
+      page: 'header-system',
+      unifiedHeader: {
+        exists: !!document.getElementById('unified-header'),
+        visible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false
+      },
+      tiktrackHeader: {
+        exists: !!document.querySelector('.tiktrack-header'),
+        visible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false
+      },
+      headerSystemReady: window.headerSystemReady,
+      initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready',
+      timestamp: new Date().toISOString()
+    });
+  }, 1000);
+});
+// #endregion
+
 // ===== FilterManager Class =====
 // Prevent duplicate declaration
 if (typeof window.FilterManager === 'undefined') {
@@ -1145,9 +1192,29 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    // #region agent log - header creation start
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:createHeader',
+        message:'HeaderSystem.createHeader() started',
+        data:{
+          existingHeader: !!document.getElementById('unified-header'),
+          bodyChildrenCount: document.body?.children?.length || 0,
+          documentReadyState: document.readyState,
+          runId:'init_loading_support',
+          hypothesisId:'header_dom_modification'
+        },
+        timestamp:Date.now(),
+        sessionId:'init-loading-debug'
+      })
+    }).catch(()=>{});
+    // #endregion
+
     // No dedicated auth pages; always render header
     const isAuthPage = false;
-    
+
     if (isAuthPage) {
       window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
       return;
@@ -1171,6 +1238,27 @@ class HeaderSystem {
     doc.body.childNodes.forEach(node => {
         existingHeader.appendChild(node.cloneNode(true));
     });
+
+    // #region agent log - header creation complete
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:createHeader',
+        message:'HeaderSystem.createHeader() completed',
+        data:{
+          headerCreated: true,
+          headerElementCount: existingHeader?.children?.length || 0,
+          bodyChildrenCount: document.body?.children?.length || 0,
+          documentReadyState: document.readyState,
+          runId:'init_loading_support',
+          hypothesisId:'header_dom_modification'
+        },
+        timestamp:Date.now(),
+        sessionId:'init-loading-debug'
+      })
+    }).catch(()=>{});
+    // #endregion
   }
 
   /**
@@ -2030,76 +2118,182 @@ window.HeaderSystem = {
         message:'HeaderSystem_initialize_start',
         data:{
           timestamp: Date.now(),
+          documentReadyState: document.readyState,
           HeaderSystemClass: typeof window.HeaderSystemClass,
-          existingHeaderSystem: typeof window.headerSystem
+          existingHeaderSystem: typeof window.headerSystem,
+          isDOMContentLoaded: document.readyState === 'complete' || document.readyState === 'interactive'
         },
-        sessionId:'header-debug-2',
-        runId:'header-debug-2',
-        hypothesisId:'header-system-init-failure'
+        sessionId:'init_loading_critical',
+        runId:'init_loading_critical',
+        hypothesisId:'header_domcontentloaded_guard'
       })
     }).catch(()=>{});
     // #endregion
 
-    window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
-      page: 'header-system',
-      timestamp: new Date().toISOString(),
-    });
+    // MINIMAL GUARD: Delay header initialization until DOMContentLoaded fully fires
+    // This prevents race conditions with color-scheme-system.js DOMContentLoaded handler
+    const initStartTime = performance.now();
+    console.log(`⏰ [TIMING] HeaderSystem.initialize() called at ${initStartTime.toFixed(2)}ms`);
 
-    try {
-      if (typeof window.HeaderSystemClass === 'function') {
-        if (!window.headerSystem) {
-          window.Logger?.info?.('🆕 HeaderSystem.initialize() - Creating new instance', {
+    if (document.readyState === 'loading') {
+      console.log('⏳ [TIMING] HeaderSystem.initialize() - DOM still loading, delaying initialization...');
+      console.log(`📊 [BEFORE] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
+
+      // #region agent log - header init delayed
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'header-system.js:delay-guard',
+          message:'HeaderSystem_initialize_delayed',
+          data:{
+            timestamp: Date.now(),
+            initStartTime,
+            documentReadyState: document.readyState,
+            reason: 'DOM still loading - delaying to prevent race with color-scheme-system'
+          },
+          sessionId:'init_loading_critical',
+          runId:'init_loading_critical',
+          hypothesisId:'header_domcontentloaded_guard'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      return new Promise((resolve, reject) => {
+        document.addEventListener('DOMContentLoaded', async (event) => {
+          const domContentLoadedTime = performance.now();
+          const delayDuration = domContentLoadedTime - initStartTime;
+          console.log(`✅ [TIMING] HeaderSystem.initialize() - DOMContentLoaded fired at ${domContentLoadedTime.toFixed(2)}ms (delayed ${delayDuration.toFixed(2)}ms)`);
+          console.log(`📊 [AFTER] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
+
+          // #region agent log - header init proceeding after DOMContentLoaded
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              location:'header-system.js:proceed-after-domcontentloaded',
+              message:'HeaderSystem_initialize_proceeding_after_DOMContentLoaded',
+              data:{
+                timestamp: Date.now(),
+                domContentLoadedTime,
+                delayDuration,
+                documentReadyState: document.readyState,
+                headerSystemReadyBefore: window.headerSystemReady
+              },
+              sessionId:'init_loading_critical',
+              runId:'init_loading_critical',
+              hypothesisId:'header_domcontentloaded_guard'
+            })
+          }).catch(()=>{});
+          // #endregion
+
+          try {
+            await performHeaderInitialization();
+            const completionTime = performance.now();
+            console.log(`🎯 [TIMING] HeaderSystem.initialize() completed at ${completionTime.toFixed(2)}ms (total: ${(completionTime - initStartTime).toFixed(2)}ms)`);
+            resolve(true);
+          } catch (error) {
+            reject(error);
+          }
+        }, { once: true });
+      });
+    } else {
+      // DOM already loaded, proceed immediately
+      console.log(`✅ [TIMING] HeaderSystem.initialize() - DOM already loaded (${document.readyState}), proceeding immediately...`);
+      console.log(`📊 [IMMEDIATE] headerSystemReady: ${window.headerSystemReady}`);
+      const result = await performHeaderInitialization();
+      const completionTime = performance.now();
+      console.log(`🎯 [TIMING] HeaderSystem.initialize() completed at ${completionTime.toFixed(2)}ms (total: ${(completionTime - initStartTime).toFixed(2)}ms)`);
+      return result;
+    }
+
+    // Helper function to perform the actual initialization
+    async function performHeaderInitialization() {
+      window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
+        page: 'header-system',
+        timestamp: new Date().toISOString(),
+        documentReadyState: document.readyState
+      });
+
+      try {
+        if (typeof window.HeaderSystemClass === 'function') {
+          if (!window.headerSystem) {
+            window.Logger?.info?.('🆕 HeaderSystem.initialize() - Creating new instance', {
+              page: 'header-system',
+            });
+            window.headerSystem = new window.HeaderSystemClass();
+          } else {
+            window.Logger?.info?.('♻️ HeaderSystem.initialize() - Reusing existing instance', {
+              page: 'header-system',
+              isInitialized: window.headerSystem.isInitialized,
+            });
+          }
+
+          window.headerSystem.init();
+          window.headerSystemReady = true;
+
+          // #region agent log - header init complete
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              location:'header-system.js:2041',
+              message:'HeaderSystem_initialize_complete',
+              data:{
+                timestamp: Date.now(),
+                headerSystem: typeof window.headerSystem,
+                isInitialized: window.headerSystem?.isInitialized,
+                hasUnifiedHeader: !!document.getElementById('unified-header'),
+                tiktrackHeader: !!document.querySelector('.tiktrack-header'),
+                headerElements: document.querySelectorAll('[class*="header"]').length,
+                documentReadyState: document.readyState
+              },
+              sessionId:'init_loading_critical',
+              runId:'init_loading_critical',
+              hypothesisId:'header-domcontentloaded-guard-success'
+            })
+          }).catch(()=>{});
+          // #endregion
+
+          window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
             page: 'header-system',
+            headerSystemReady: true,
+            documentReadyState: document.readyState
           });
-          window.headerSystem = new window.HeaderSystemClass();
+          return true;
         } else {
-          window.Logger?.info?.('♻️ HeaderSystem.initialize() - Reusing existing instance', {
-            page: 'header-system',
-            isInitialized: window.headerSystem.isInitialized,
-          });
+          throw new Error('HeaderSystemClass not found');
         }
-        
-        window.headerSystem.init();
-        window.headerSystemReady = true;
-
-        // #region agent log - header init complete
+      } catch (error) {
+        // #region agent log - header init error
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({
-            location:'header-system.js:2041',
-            message:'HeaderSystem_initialize_complete',
+            location:'header-system.js:error-handler',
+            message:'HeaderSystem_initialize_error',
             data:{
               timestamp: Date.now(),
-              headerSystem: typeof window.headerSystem,
-              isInitialized: window.headerSystem?.isInitialized,
-              hasUnifiedHeader: !!document.getElementById('unified-header'),
-              tiktrackHeader: !!document.querySelector('.tiktrack-header'),
-              headerElements: document.querySelectorAll('[class*="header"]').length
+              error: error.message,
+              stack: error.stack?.substring(0, 500),
+              documentReadyState: document.readyState
             },
-            sessionId:'header-debug-2',
-            runId:'header-debug-2',
-            hypothesisId:'header-render-verification'
+            sessionId:'init_loading_critical',
+            runId:'init_loading_critical',
+            hypothesisId:'header-domcontentloaded-guard-error'
           })
         }).catch(()=>{});
         // #endregion
 
-        window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
+        window.Logger?.error?.('❌ HeaderSystem.initialize() - ERROR', {
           page: 'header-system',
-          headerSystemReady: true,
+          error: error.message,
+          stack: error.stack,
+          documentReadyState: document.readyState
         });
-      } else {
-        throw new Error('HeaderSystemClass not found');
+        throw error;
       }
-    } catch (error) {
-      window.Logger?.error?.('❌ HeaderSystem.initialize() - ERROR', {
-        page: 'header-system',
-        error: error.message,
-        stack: error.stack,
-      });
-      throw error;
     }
-  }
 };
 
 // Expose filter system for compatibility

@@ -268,7 +268,6 @@ class CRUDEnhancedTester {
           // Use unified payload builder for consistent test data
           return await getUnifiedTestData('execution');
         },
-        },
         expectedButtons: ['הוסף ביצוע', 'ערוך', 'מחק'],
         tableSelector: '#executionsTable',
         modalSelector: '#executionsModal',
@@ -291,6 +290,28 @@ class CRUDEnhancedTester {
         tableSelector: '#cashFlowsTable',
         modalSelector: '#cashFlowModal',
         priority: 2,
+      },
+
+      trading_journal: {
+        type: 'user_page',
+        displayName: 'יומן מסחר',
+        apiUrl: '/api/trading-journal/',
+        pageUrl: '/trading_journal',
+        hasCRUD: false, // Journal entries are READ-ONLY, Notes CRUD is within journal interface
+        hasNotesCRUD: true, // Notes can be created/edited/deleted from within journal
+        // testData will be populated dynamically with actual IDs for Notes CRUD
+        testData: null,
+        getTestData: async function() {
+          // Notes CRUD within journal - use notes entity for test data
+          return await getUnifiedTestData('notes');
+        },
+        expectedButtons: [], // No direct journal CRUD buttons - Notes CRUD via journal interface
+        tableSelector: '#tradingJournalTable',
+        modalSelector: '#tradingJournalModal',
+        priority: 2,
+        journalViews: ['weekly', 'monthly'], // Journal-specific view tests
+        journalFilters: ['dateRange', 'mood', 'performance'], // Journal-specific filter tests
+        journalDrilldown: true, // Test clicking journal entries to open entity details
       },
 
       trade_plans: {
@@ -1933,4 +1954,479 @@ window.runDeepTestingForProblematic = async function () {
       window.showErrorNotification('שגיאה בבדיקות מפורטות', `הבדיקות נכשלו: ${error.message}`, 7000);
     }
   }
+};
+
+// ============================================================================
+// TRADING JOURNAL SPECIFIC TESTS
+// ============================================================================
+
+/**
+ * Test trading journal view switching (weekly/monthly)
+ */
+window.testJournalViewSwitching = async function() {
+  const startTime = Date.now();
+  const issues = [];
+  const debugCalls = [];
+
+  try {
+    window.Logger?.info('🗓️ [testJournalViewSwitching] Starting journal view tests');
+
+    // Test weekly view
+    const weeklyViewBtn = document.querySelector('[data-view="weekly"], .weekly-view, #weeklyView');
+    if (weeklyViewBtn) {
+      weeklyViewBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for view change
+
+      // Verify weekly view is active
+      const weeklyActive = document.querySelector('.view-active[data-view="weekly"], .weekly-view.active');
+      if (!weeklyActive) {
+        issues.push('Weekly view not activated after click');
+      }
+
+      // #region agent log - journal view switch weekly
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'crud-testing-enhanced.js:testJournalViewSwitching',
+          message:'journal_view_switched_to_weekly',
+          data:{
+            viewType: 'weekly',
+            viewActivated: !!weeklyActive,
+            timestamp: Date.now()
+          },
+          sessionId:'stage_2_batch_5_journal_tests',
+          runId:'journal_view_switching',
+          hypothesisId:'journal_view_functionality'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      debugCalls.push({
+        operation: 'view_switch',
+        view: 'weekly',
+        success: !!weeklyActive,
+        timeMs: Date.now() - startTime
+      });
+    } else {
+      issues.push('Weekly view button not found');
+    }
+
+    // Test monthly view (only if we have the toggles)
+    if (monthlyViewBtn) {
+      monthlyViewBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for view change
+
+      // Verify monthly view is active
+      const monthlyActive = document.querySelector('.view-active[data-view="monthly"], .monthly-view.active');
+      if (!monthlyActive) {
+        issues.push('Monthly view not activated after click');
+      }
+
+      // #region agent log - journal view switch monthly
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'crud-testing-enhanced.js:testJournalViewSwitching',
+          message:'journal_view_switched_to_monthly',
+          data:{
+            viewType: 'monthly',
+            viewActivated: !!monthlyActive,
+            timestamp: Date.now()
+          },
+          sessionId:'stage_2_batch_5_journal_tests',
+          runId:'journal_view_switching',
+          hypothesisId:'journal_view_functionality'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      debugCalls.push({
+        operation: 'view_switch',
+        view: 'monthly',
+        success: !!monthlyActive,
+        timeMs: Date.now() - startTime
+      });
+    }
+
+  } catch (error) {
+    window.Logger?.error('❌ [testJournalViewSwitching] Failed:', error);
+    issues.push(`Journal view switching failed: ${error.message}`);
+  }
+
+  return {
+    testName: 'Trading Journal View Switching',
+    success: issues.length === 0,
+    issues: issues,
+    debugCalls: debugCalls,
+    executionTime: Date.now() - startTime
+  };
+};
+
+/**
+ * Test trading journal table filtering and date range
+ */
+window.testJournalTableFiltering = async function() {
+  const startTime = Date.now();
+  const issues = [];
+  const debugCalls = [];
+
+  try {
+    window.Logger?.info('🔍 [testJournalTableFiltering] Starting journal filter tests');
+
+    // Test date range filter
+    const dateFromInput = document.querySelector('#journalDateFrom, [name="date_from"], .date-range-from');
+    const dateToInput = document.querySelector('#journalDateTo, [name="date_to"], .date-range-to');
+
+    if (dateFromInput && dateToInput) {
+      // Set date range (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      dateFromInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+      dateToInput.value = new Date().toISOString().split('T')[0];
+
+      // Trigger change events
+      dateFromInput.dispatchEvent(new Event('change', { bubbles: true }));
+      dateToInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for filtering
+
+      // Check if table rows are consistent with date range
+      const tableRows = document.querySelectorAll('#tradingJournalTable tbody tr, .journal-entries tr');
+      const visibleRows = Array.from(tableRows).filter(row => row.offsetHeight > 0);
+
+      // #region agent log - journal date filter applied
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'crud-testing-enhanced.js:testJournalTableFiltering',
+          message:'journal_date_filter_applied',
+          data:{
+            dateFrom: dateFromInput.value,
+            dateTo: dateToInput.value,
+            visibleRows: visibleRows.length,
+            totalRows: tableRows.length,
+            timestamp: Date.now()
+          },
+          sessionId:'stage_2_batch_5_journal_tests',
+          runId:'journal_table_filtering',
+          hypothesisId:'journal_filter_functionality'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      debugCalls.push({
+        operation: 'date_filter',
+        dateRange: `${dateFromInput.value} to ${dateToInput.value}`,
+        visibleRows: visibleRows.length,
+        totalRows: tableRows.length,
+        timeMs: Date.now() - startTime
+      });
+    } else {
+      issues.push('Date range inputs not found');
+    }
+
+    // Test mood filter if exists
+    const moodFilter = document.querySelector('#journalMoodFilter, [name="mood_filter"], .mood-filter');
+    if (moodFilter) {
+      moodFilter.value = 'Neutral';
+      moodFilter.dispatchEvent(new Event('change', { bubbles: true }));
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // #region agent log - journal mood filter applied
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'crud-testing-enhanced.js:testJournalTableFiltering',
+          message:'journal_mood_filter_applied',
+          data:{
+            moodValue: 'Neutral',
+            timestamp: Date.now()
+          },
+          sessionId:'stage_2_batch_5_journal_tests',
+          runId:'journal_table_filtering',
+          hypothesisId:'journal_filter_functionality'
+        })
+      }).catch(()=>{});
+      // #endregion
+    }
+
+  } catch (error) {
+    window.Logger?.error('❌ [testJournalTableFiltering] Failed:', error);
+    issues.push(`Journal table filtering failed: ${error.message}`);
+  }
+
+  return {
+    testName: 'Trading Journal Table Filtering',
+    success: issues.length === 0,
+    issues: issues,
+    debugCalls: debugCalls,
+    executionTime: Date.now() - startTime
+  };
+};
+
+/**
+ * Test trading journal detail drill-down
+ */
+window.testJournalDrilldown = async function() {
+  const startTime = Date.now();
+  const issues = [];
+  const debugCalls = [];
+
+  try {
+    window.Logger?.info('🔍 [testJournalDrilldown] Starting journal drill-down tests');
+
+    // Find a journal entry row to click
+    const journalRows = document.querySelectorAll('#tradingJournalTable tbody tr, .journal-entries tr');
+    const clickableRow = Array.from(journalRows).find(row =>
+      row.querySelector('[data-entity-id], .clickable, .drilldown')
+    );
+
+    if (clickableRow) {
+      // Click the row to open entity details
+      clickableRow.click();
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for modal/detail view
+
+      // Check if entity details modal opened
+      const detailModal = document.querySelector('#entityDetailsModal, .entity-details-modal, .detail-modal.show');
+      const entityDetails = document.querySelector('.entity-details, .detail-view');
+
+      const drilldownSuccess = !!(detailModal || entityDetails);
+
+      // #region agent log - journal drilldown executed
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'crud-testing-enhanced.js:testJournalDrilldown',
+          message:'journal_drilldown_executed',
+          data:{
+            rowClicked: true,
+            detailModalOpened: !!detailModal,
+            entityDetailsShown: !!entityDetails,
+            drilldownSuccess: drilldownSuccess,
+            timestamp: Date.now()
+          },
+          sessionId:'stage_2_batch_5_journal_tests',
+          runId:'journal_drilldown',
+          hypothesisId:'journal_drilldown_functionality'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      debugCalls.push({
+        operation: 'drilldown_click',
+        rowFound: true,
+        detailOpened: drilldownSuccess,
+        timeMs: Date.now() - startTime
+      });
+
+      if (!drilldownSuccess) {
+        issues.push('Entity details did not open after clicking journal entry');
+      }
+    } else {
+      issues.push('No clickable journal entry rows found');
+      debugCalls.push({
+        operation: 'drilldown_click',
+        rowFound: false,
+        timeMs: Date.now() - startTime
+      });
+    }
+
+  } catch (error) {
+    window.Logger?.error('❌ [testJournalDrilldown] Failed:', error);
+    issues.push(`Journal drill-down failed: ${error.message}`);
+  }
+
+  return {
+    testName: 'Trading Journal Drill-down',
+    success: issues.length === 0,
+    issues: issues,
+    debugCalls: debugCalls,
+    executionTime: Date.now() - startTime
+  };
+};
+
+/**
+ * Test Notes CRUD operations from within trading journal
+ */
+window.testJournalNotesCRUD = async function() {
+  const startTime = Date.now();
+  const issues = [];
+  const debugCalls = [];
+
+  try {
+    window.Logger?.info('📝 [testJournalNotesCRUD] Starting journal Notes CRUD tests');
+
+    // Get test data for notes
+    const tester = window.crudEnhancedTester || new CRUDEnhancedTester();
+    const testData = await tester.entities.notes.getTestData();
+    if (!testData) {
+      issues.push('No test data available for Notes CRUD');
+      return {
+        testName: 'Journal Notes CRUD',
+        success: false,
+        issues: issues,
+        debugCalls: debugCalls,
+        executionTime: Date.now() - startTime
+      };
+    }
+
+    // Test CREATE note from journal
+    if (createBtn) {
+      createBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Fill note form
+      const noteTextarea = document.querySelector('#noteContent, #journalNoteContent, .note-content');
+      if (noteTextarea) {
+        noteTextarea.value = testData.content || 'Test note from journal interface';
+        noteTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // Submit note
+      const submitBtn = document.querySelector('#saveNote, .save-note-btn, [data-action="save-note"]');
+      if (submitBtn) {
+        submitBtn.click();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for save
+
+        // #region agent log - journal note created
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'crud-testing-enhanced.js:testJournalNotesCRUD',
+            message:'journal_note_created',
+            data:{
+              operation: 'CREATE',
+              noteContent: testData.content || 'Test note from journal interface',
+              timestamp: Date.now()
+            },
+            sessionId:'stage_2_batch_5_journal_tests',
+            runId:'journal_notes_crud',
+            hypothesisId:'journal_notes_crud_functionality'
+          })
+        }).catch(()=>{});
+        // #endregion
+
+        debugCalls.push({
+          operation: 'note_create',
+          success: true,
+          timeMs: Date.now() - startTime
+        });
+      } else {
+        issues.push('Note submit button not found');
+      }
+    } else {
+      issues.push('Add note button not found in journal');
+    }
+
+    // Test EDIT note from journal (find and click existing note)
+    const noteRows = document.querySelectorAll('.note-row, .journal-note, [data-note-id]');
+    if (noteRows.length > 0) {
+      const firstNote = noteRows[0];
+      const editBtn = firstNote.querySelector('.edit-note, [data-action="edit"]');
+
+      if (editBtn) {
+        editBtn.click();
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Modify note content
+        const editTextarea = document.querySelector('#editNoteContent, .edit-note-content');
+        if (editTextarea) {
+          editTextarea.value = 'Updated note content from journal';
+          editTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          // Save changes
+          const updateBtn = document.querySelector('#updateNote, .update-note-btn');
+          if (updateBtn) {
+            updateBtn.click();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // #region agent log - journal note updated
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({
+                location:'crud-testing-enhanced.js:testJournalNotesCRUD',
+                message:'journal_note_updated',
+                data:{
+                  operation: 'UPDATE',
+                  updatedContent: 'Updated note content from journal',
+                  timestamp: Date.now()
+                },
+                sessionId:'stage_2_batch_5_journal_tests',
+                runId:'journal_notes_crud',
+                hypothesisId:'journal_notes_crud_functionality'
+              })
+            }).catch(()=>{});
+            // #endregion
+
+            debugCalls.push({
+              operation: 'note_update',
+              success: true,
+              timeMs: Date.now() - startTime
+            });
+          }
+        }
+      }
+    }
+
+    // Test DELETE note from journal
+    if (noteRows.length > 0) {
+      const firstNote = noteRows[0];
+      const deleteBtn = firstNote.querySelector('.delete-note, [data-action="delete"]');
+
+      if (deleteBtn) {
+        // Confirm delete (if confirmation dialog exists)
+        const confirmBtn = document.querySelector('.confirm-delete, .btn-danger');
+        if (confirmBtn) {
+          confirmBtn.click();
+        } else {
+          deleteBtn.click();
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // #region agent log - journal note deleted
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'crud-testing-enhanced.js:testJournalNotesCRUD',
+            message:'journal_note_deleted',
+            data:{
+              operation: 'DELETE',
+              timestamp: Date.now()
+            },
+            sessionId:'stage_2_batch_5_journal_tests',
+            runId:'journal_notes_crud',
+            hypothesisId:'journal_notes_crud_functionality'
+          })
+        }).catch(()=>{});
+        // #endregion
+
+        debugCalls.push({
+          operation: 'note_delete',
+          success: true,
+          timeMs: Date.now() - startTime
+        });
+      }
+    }
+
+  } catch (error) {
+    window.Logger?.error('❌ [testJournalNotesCRUD] Failed:', error);
+    issues.push(`Journal Notes CRUD failed: ${error.message}`);
+  }
+
+  return {
+    testName: 'Journal Notes CRUD',
+    success: issues.length === 0,
+    issues: issues,
+    debugCalls: debugCalls,
+    executionTime: Date.now() - startTime
+  };
 };

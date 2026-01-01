@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד ראשי - TikTrack</title>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-layout/_dashboard.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/07-pages/_index.css?v=1.0.0">
+
+</head>
+<body>
     <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
@@ -8,24 +22,30 @@
     <!-- 🔧 Mode: development | Use Bundles: false -->
 
     <!-- =============================================================== -->
+    <!-- ===== CRITICAL BASE BUNDLE - SYNCHRONOUS LOADING ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 0 | Description: Critical base scripts that must execute synchronously to fix defer queue failure -->
+    <!-- Dependencies: None - These load first to prevent defer stalls -->
+    <!-- Critical: EMERGENCY | Fix: init_loading_blocker_support | Version: 1.6.0 -->
+
+    <!-- [SYNC-1] Critical API Foundation -->
+    <script src="/trading-ui/scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration - SYNCHRONOUS -->
+    <script src="/trading-ui/scripts/api-fetch-wrapper.js?v=1.0.0"></script> <!-- Global fetch wrapper for Authorization - SYNCHRONOUS -->
+    <script src="/trading-ui/scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system - SYNCHRONOUS -->
+    <script src="/trading-ui/scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager - SYNCHRONOUS -->
+    <script src="/trading-ui/scripts/page-state-manager.js?v=1.0.0"></script> <!-- Page state manager - SYNCHRONOUS -->
+
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/17: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 1 | Description: Core systems required for all pages -->
-    <!-- Dependencies:  -->
+    <!-- Dependencies: Critical base bundle loaded -->
     <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- [1] Load Order: 1 | Strategy: defer -->
-    <script src="/trading-ui/scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 | Strategy: defer -->
-    <script src="/trading-ui/scripts/api-fetch-wrapper.js?v=1.0.0" defer></script> <!-- Global fetch wrapper for Authorization injection and 401 handling -->
     <!-- [3] Load Order: 3 | Strategy: defer -->
     <script src="/trading-ui/scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
     <!-- [4] Load Order: 4 | Strategy: defer -->
     <script src="/trading-ui/scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 | Strategy: defer -->
-    <script src="/trading-ui/scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
-    <!-- [6] Load Order: 6 | Strategy: defer -->
-    <script src="/trading-ui/scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
     <!-- [7] Load Order: 7 | Strategy: defer -->
     <script src="/trading-ui/scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
     <!-- [8] Load Order: 8 | Strategy: defer -->
@@ -55,7 +75,7 @@
     <!-- [20] Load Order: 20 | Strategy: defer -->
     <script src="/trading-ui/scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
     <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="/trading-ui/scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <script src="/trading-ui/scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
     <!-- [22] Load Order: 22 | Strategy: defer -->
     <script src="/trading-ui/scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
 
@@ -487,6 +507,53 @@
     <!-- 📊 Total Scripts Processed: 167 | Unique Scripts Loaded: 167 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 
+    <!-- =============================================================== -->
+    <!-- ===== INIT-LOAD-SENTINEL ===== -->
+    <!-- =============================================================== -->
+    <!-- Purpose: Log script loading status at page end to verify defer execution -->
+    <script>
+        (function() {
+            // Wait a bit for all scripts to potentially load
+            setTimeout(function() {
+                const scripts = document.scripts;
+                const totalScripts = scripts.length;
+                const completedScripts = Array.from(scripts).filter(s => s.complete).length;
+                const documentReadyState = document.readyState;
+
+                console.log('[INIT-LOAD-SENTINEL]', {
+                    timestamp: new Date().toISOString(),
+                    totalScripts: totalScripts,
+                    completedScripts: completedScripts,
+                    documentReadyState: documentReadyState,
+                    scriptsExecuted: completedScripts > 0,
+                    deferQueueWorking: completedScripts === totalScripts
+                });
+
+                // #region agent log - init load sentinel
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'index.html:init-load-sentinel',
+                        message:'init_load_sentinel_executed',
+                        data:{
+                            totalScripts: totalScripts,
+                            completedScripts: completedScripts,
+                            documentReadyState: documentReadyState,
+                            scriptsExecuted: completedScripts > 0,
+                            deferQueueWorking: completedScripts === totalScripts,
+                            timestamp: Date.now()
+                        },
+                        sessionId:'init_loading_pipeline_alignment',
+                        runId:'init_loading_pipeline_alignment',
+                        hypothesisId:'sentinel_script_execution_verification'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+            }, 2000); // Wait 2 seconds for scripts to load
+        })();
+    </script>
 
 </body>
 </html>

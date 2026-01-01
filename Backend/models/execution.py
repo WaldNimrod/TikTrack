@@ -12,7 +12,7 @@ class Execution(BaseModel):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
                     comment="User who owns this execution")
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)  # Required - every execution must have a ticker
-    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)  # Policy Change: Required - every execution must belong to a trading account
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable - executions can exist without trades
     action = Column(String(20), nullable=False, default='buy')  # ENUM: buy, sell, short, cover
     date = Column(DateTime, nullable=False)  # NOT NULL, must be >= trade.open_date

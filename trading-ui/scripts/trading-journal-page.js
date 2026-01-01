@@ -1337,18 +1337,30 @@ const updateJournalEntriesTableBody = async entries => {
     // Render description
     const descriptionHTML = description.length > 50 ? `${description.substring(0, 50)}...` : description;
 
-    // Action buttons
-    const actionsHTML = `
+    // Action buttons - include Notes CRUD for note entries
+    let actionsHTML = `
                 <button class="btn btn-sm btn-outline-primary me-1" onclick="window.tradingJournalPage.handleEntryClickById('${entityType}', '${entry.entity_id || entry.id}')" title="צפה בפרטים">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-secondary" onclick="window.tradingJournalPage.zoomToDay(${new Date(date).getDate()}, ${new Date(date).getMonth()}, ${new Date(date).getFullYear()})" title="הצג יום מלא">
                     <i class="fas fa-calendar-day"></i>
+                </button>`;
+
+    // Add Notes CRUD buttons for note entries
+    if (entityType === 'note') {
+        actionsHTML += `
+                <button class="btn btn-sm btn-outline-success me-1" onclick="window.tradingJournalPage.editNote('${entry.entity_id || entry.id}')" title="ערוך הערה">
+                    <i class="fas fa-edit"></i>
                 </button>
-            `;
+                <button class="btn btn-sm btn-outline-danger" onclick="window.tradingJournalPage.deleteNote('${entry.entity_id || entry.id}')" title="מחק הערה">
+                    <i class="fas fa-trash"></i>
+                </button>`;
+    }
+
+    actionsHTML += `</td>`;
 
     return `
-            <tr data-entity-id="${entry.entity_id || entry.id}" data-entry-type="${entityType}" data-date="${date}">
+            <tr data-entity-id="${entry.entity_id || entry.id}" data-entry-type="${entityType}" data-date="${date}" onclick="window.tradingJournalPage.handleNoteRowSelection(this)">
                 <td>${dateHTML}</td>
                 <td>${entityTypeHTML}</td>
                 <td>${statusHTML}</td>
@@ -1614,30 +1626,410 @@ const renderJournalEntriesCards = async entries => {
 };
 
 /**
-     * Switch between table and cards view
+     * Switch between weekly, monthly, table and cards view
      */
 const switchViewMode = async mode => {
   window.tradingJournalViewMode = mode;
 
-  // Update button states
+  // Update button states for weekly/monthly
+  const weeklyBtn = document.getElementById('viewModeWeeklyBtn');
+  const monthlyBtn = document.getElementById('viewModeMonthlyBtn');
   const cardsBtn = document.getElementById('viewModeCardsBtn');
   const tableBtn = document.getElementById('viewModeTableBtn');
-  if (cardsBtn && tableBtn) {
-    if (mode === 'cards') {
-      cardsBtn.classList.add('active');
-      tableBtn.classList.remove('active');
+
+  // Reset all button states
+  if (weeklyBtn) weeklyBtn.classList.remove('active');
+  if (monthlyBtn) monthlyBtn.classList.remove('active');
+  if (cardsBtn) cardsBtn.classList.remove('active');
+  if (tableBtn) tableBtn.classList.remove('active');
+
+  // Set active button based on mode
+  if (mode === 'weekly' && weeklyBtn) {
+    weeklyBtn.classList.add('active');
+  } else if (mode === 'monthly' && monthlyBtn) {
+    monthlyBtn.classList.add('active');
+  } else if (mode === 'cards' && cardsBtn) {
+    cardsBtn.classList.add('active');
+  } else if (mode === 'table' && tableBtn) {
+    tableBtn.classList.add('active');
+  }
+
+  // Log view mode change
+  if (window.Logger) {
+    window.Logger.info('Trading journal view mode switched', {
+      mode,
+      page: PAGE_NAME
+    });
+  }
+
+  // #region agent log - view mode switch
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:switchViewMode',message:'View mode switched',data:{mode:mode,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  // Render based on mode
+  if (mode === 'weekly') {
+    await renderWeeklyView();
+  } else if (mode === 'monthly') {
+    await renderMonthlyView();
+  } else {
+    // Fallback to existing table/cards logic
+    const entries = window.tradingJournalEntries || [];
+    if (mode === 'table') {
+      await renderJournalEntriesTable(entries);
     } else {
-      tableBtn.classList.add('active');
-      cardsBtn.classList.remove('active');
+      await renderJournalEntriesCards(entries);
+    }
+  }
+};
+
+/**
+ * Render weekly view of trading journal
+ */
+const renderWeeklyView = async () => {
+  const tableContainer = document.querySelector('#tradingJournalTable').parentElement;
+
+  // Calculate week start and end
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+
+  // Load entries for the week
+  const entries = await loadJournalEntriesForDateRange(weekStart, weekEnd);
+
+  // Group by day
+  const entriesByDay = {};
+  entries.forEach(entry => {
+    const dateKey = new Date(entry.date || entry.created_at).toDateString();
+    if (!entriesByDay[dateKey]) {
+      entriesByDay[dateKey] = [];
+    }
+    entriesByDay[dateKey].push(entry);
+  });
+
+  // Render weekly summary
+  let html = '<div class="weekly-view">';
+  html += '<h4>תצוגה שבועית - ' + weekStart.toLocaleDateString('he-IL') + ' עד ' + weekEnd.toLocaleDateString('he-IL') + '</h4>';
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(weekStart);
+    currentDate.setDate(weekStart.getDate() + i);
+    const dateKey = currentDate.toDateString();
+    const dayEntries = entriesByDay[dateKey] || [];
+
+    html += '<div class="weekly-day-card mb-3 p-3 border rounded">';
+    html += '<h5>' + currentDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric' }) + '</h5>';
+    html += '<p class="text-muted">רשומות: ' + dayEntries.length + '</p>';
+
+    if (dayEntries.length > 0) {
+      html += '<ul class="list-group list-group-flush">';
+      dayEntries.slice(0, 3).forEach(entry => {
+        html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
+        html += '<span>' + (entry.ticker_symbol || 'לא ידוע') + ' - ' + (entry.action || 'פעולה') + '</span>';
+        html += '<button class="btn btn-sm btn-outline-primary" onclick="window.tradingJournalPage.handleEntryClickById(\'' + entry.entity_type + '\', ' + entry.entity_id + ')">צפה</button>';
+        html += '</li>';
+      });
+      if (dayEntries.length > 3) {
+        html += '<li class="list-group-item text-center"><small>ועוד ' + (dayEntries.length - 3) + ' רשומות...</small></li>';
+      }
+      html += '</ul>';
+    }
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  tableContainer.innerHTML = html;
+
+  if (window.Logger) {
+    window.Logger.info('Weekly view rendered', {
+      weekStart: weekStart.toISOString(),
+      weekEnd: weekEnd.toISOString(),
+      totalEntries: entries.length,
+      page: PAGE_NAME
+    });
+  }
+
+  // #region agent log - weekly view rendered
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:renderWeeklyView',message:'Weekly view rendered',data:{weekStart:weekStart.toISOString(),weekEnd:weekEnd.toISOString(),totalEntries:entries.length,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+};
+
+/**
+ * Render monthly view of trading journal
+ */
+const renderMonthlyView = async () => {
+  const tableContainer = document.querySelector('#tradingJournalTable').parentElement;
+
+  // Load entries for current month
+  const monthStart = new Date(currentYear, currentMonth, 1);
+  const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+
+  const entries = await loadJournalEntriesForDateRange(monthStart, monthEnd);
+
+  // Group by week
+  const entriesByWeek = {};
+  entries.forEach(entry => {
+    const date = new Date(entry.date || entry.created_at);
+    const weekNum = Math.ceil((date.getDate() - date.getDay() + 1) / 7);
+    const weekKey = 'שבוע ' + weekNum;
+    if (!entriesByWeek[weekKey]) {
+      entriesByWeek[weekKey] = [];
+    }
+    entriesByWeek[weekKey].push(entry);
+  });
+
+  // Render monthly summary
+  let html = '<div class="monthly-view">';
+  html += '<h4>תצוגה חודשית - ' + monthStart.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }) + '</h4>';
+
+  Object.keys(entriesByWeek).sort().forEach(weekKey => {
+    const weekEntries = entriesByWeek[weekKey];
+
+    html += '<div class="monthly-week-card mb-3 p-3 border rounded">';
+    html += '<h5>' + weekKey + '</h5>';
+    html += '<p class="text-muted">רשומות: ' + weekEntries.length + '</p>';
+
+    if (weekEntries.length > 0) {
+      // Summary stats
+      const profitLoss = weekEntries.reduce((sum, entry) => sum + (entry.realized_pl || 0), 0);
+      html += '<p class="mb-2"><strong>רווח/הפסד: ' + profitLoss.toFixed(2) + '</strong></p>';
+
+      html += '<ul class="list-group list-group-flush">';
+      weekEntries.slice(0, 5).forEach(entry => {
+        html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
+        html += '<span>' + new Date(entry.date || entry.created_at).toLocaleDateString('he-IL') + ' - ' + (entry.ticker_symbol || 'לא ידוע') + '</span>';
+        html += '<button class="btn btn-sm btn-outline-primary" onclick="window.tradingJournalPage.handleEntryClickById(\'' + entry.entity_type + '\', ' + entry.entity_id + ')">צפה</button>';
+        html += '</li>';
+      });
+      if (weekEntries.length > 5) {
+        html += '<li class="list-group-item text-center"><small>ועוד ' + (weekEntries.length - 5) + ' רשומות...</small></li>';
+      }
+      html += '</ul>';
+    }
+    html += '</div>';
+  });
+
+  html += '</div>';
+
+  tableContainer.innerHTML = html;
+
+  if (window.Logger) {
+    window.Logger.info('Monthly view rendered', {
+      month: currentMonth + 1,
+      year: currentYear,
+      totalEntries: entries.length,
+      page: PAGE_NAME
+    });
+  }
+
+  // #region agent log - monthly view rendered
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:renderMonthlyView',message:'Monthly view rendered',data:{month:currentMonth+1,year:currentYear,totalEntries:entries.length,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+};
+
+/**
+ * Load journal entries for a specific date range
+ */
+const loadJournalEntriesForDateRange = async (startDate, endDate) => {
+  try {
+    const result = await window.TradingJournalData.loadEntries({
+      date_from: startDate.toISOString().split('T')[0],
+      date_to: endDate.toISOString().split('T')[0],
+      entity_type: window.currentEntityFilter || 'all',
+      ticker_symbol: window.currentTickerFilter || null
+    });
+
+    return result?.entries || [];
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error loading journal entries for date range', {
+        error,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        page: PAGE_NAME
+      });
+    }
+    return [];
+  }
+};
+
+/**
+ * Add new journal entry with type support
+ */
+const addJournalEntry = async (entryType = 'journal') => {
+  if (entryType === 'note') {
+    // Open notes modal for new note
+    if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+      window.ModalManagerV2.showModal('notesModal');
+    if (window.Logger) {
+      window.Logger.info('Notes modal opened for new note from journal', { page: PAGE_NAME });
+    }
+
+    // #region agent log - add note button clicked
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:addJournalEntry',message:'Add note button clicked',data:{entryType:entryType,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    } else {
+      if (window.Logger) {
+        window.Logger.warn('ModalManagerV2 not available for notes modal', { page: PAGE_NAME });
+      }
+    }
+  } else {
+    // Original journal entry logic
+    if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+      window.ModalManagerV2.showModal('tradingJournalModal');
+      if (window.Logger) {
+        window.Logger.info('Trading journal modal opened for new entry', { page: PAGE_NAME });
+      }
+    } else {
+      if (window.Logger) {
+        window.Logger.warn('ModalManagerV2 not available for trading journal modal', { page: PAGE_NAME });
+      }
+    }
+  }
+};
+
+/**
+ * Edit selected note from journal
+ */
+const editSelectedNote = async () => {
+  const selectedNoteId = getSelectedNoteId();
+  if (!selectedNoteId) {
+    if (window.NotificationSystem) {
+      window.NotificationSystem.showWarning('אזהרה', 'אנא בחר הערה לעריכה');
+    }
+    return;
+  }
+
+  // Open notes modal in edit mode with selected note
+  if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+    // Set edit mode and note ID
+    if (window.notesModalConfig) {
+      window.notesModalConfig.editMode = true;
+      window.notesModalConfig.editId = selectedNoteId;
+    }
+    window.ModalManagerV2.showModal('notesModal');
+
+    if (window.Logger) {
+      window.Logger.info('Notes modal opened for editing', {
+        noteId: selectedNoteId,
+        page: PAGE_NAME
+      });
+    }
+
+    // #region agent log - edit note button clicked
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:editSelectedNote',message:'Edit note button clicked',data:{noteId:selectedNoteId,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+  }
+};
+
+/**
+ * Delete selected note from journal
+ */
+const deleteSelectedNote = async () => {
+  const selectedNoteId = getSelectedNoteId();
+  if (!selectedNoteId) {
+    if (window.NotificationSystem) {
+      window.NotificationSystem.showWarning('אזהרה', 'אנא בחר הערה למחיקה');
+    }
+    return;
+  }
+
+  // Confirm deletion
+  if (!confirm('האם אתה בטוח שברצונך למחוק הערה זו?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/notes/${selectedNoteId}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showSuccess('הצלחה', 'ההערה נמחקה בהצלחה');
+      }
+
+      // Refresh journal entries
+      await loadAndRenderJournalEntries();
+
+      if (window.Logger) {
+        window.Logger.info('Note deleted successfully', {
+          noteId: selectedNoteId,
+          page: PAGE_NAME
+        });
+
+        // #region agent log - note deleted
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:deleteSelectedNote',message:'Note deleted successfully',data:{noteId:selectedNoteId,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      }
+    } else {
+      throw new Error('Failed to delete note');
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error deleting note', {
+        error,
+        noteId: selectedNoteId,
+        page: PAGE_NAME
+      });
+    }
+    if (window.NotificationSystem) {
+      window.NotificationSystem.showError('שגיאה', 'שגיאה במחיקת ההערה');
+    }
+  }
+};
+
+/**
+ * Get selected note ID from journal table
+ */
+const getSelectedNoteId = () => {
+  // Find selected row in journal table
+  const selectedRow = document.querySelector('#tradingJournalTable tbody tr.selected-row');
+  if (selectedRow) {
+    const entityType = selectedRow.getAttribute('data-entry-type');
+    const entityId = selectedRow.getAttribute('data-entity-id');
+
+    if (entityType === 'note') {
+      return parseInt(entityId);
     }
   }
 
-  // Render based on mode
-  const entries = window.tradingJournalEntries || [];
-  if (mode === 'table') {
-    await renderJournalEntriesTable(entries);
+  // Fallback: check if any note rows are selected
+  const noteRows = document.querySelectorAll('#tradingJournalTable tbody tr[data-entry-type="note"]');
+  for (const row of noteRows) {
+    if (row.classList.contains('selected-row')) {
+      return parseInt(row.getAttribute('data-entity-id'));
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Handle row selection for notes
+ */
+const handleNoteRowSelection = (row) => {
+  // Remove selection from other rows
+  document.querySelectorAll('#tradingJournalTable tbody tr.selected-row').forEach(r => {
+    r.classList.remove('selected-row');
+  });
+
+  // Add selection to clicked row
+  row.classList.add('selected-row');
+
+  // Enable/disable edit/delete buttons based on selection
+  const entityType = row.getAttribute('data-entry-type');
+  const editBtn = document.getElementById('editNoteBtn');
+  const deleteBtn = document.getElementById('deleteNoteBtn');
+
+  if (entityType === 'note') {
+    if (editBtn) editBtn.disabled = false;
+    if (deleteBtn) deleteBtn.disabled = false;
   } else {
-    await renderJournalEntriesCards(entries);
+    if (editBtn) editBtn.disabled = true;
+    if (deleteBtn) deleteBtn.disabled = true;
   }
 };
 
@@ -2089,6 +2481,83 @@ const handleDoubleClickEntry = async entry => {
 };
 
 /**
+ * Edit a note entry from the journal
+ * @param {string} noteId - The note ID to edit
+ */
+const editNote = async noteId => {
+  if (!noteId) {
+    if (window.Logger) {
+      window.Logger.warn('Invalid note ID for edit', { page: PAGE_NAME });
+    }
+    return;
+  }
+
+  try {
+    // Open notes modal in edit mode
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      await window.ModalManagerV2.showModal('notesModal', { mode: 'edit', entityId: noteId });
+      if (window.Logger) {
+        window.Logger.info('Opened note edit modal from journal', { noteId, page: PAGE_NAME });
+      }
+    } else {
+      if (window.Logger) {
+        window.Logger.warn('ModalManagerV2 not available for note edit', { page: PAGE_NAME });
+      }
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error opening note edit modal', { noteId, error, page: PAGE_NAME });
+    }
+  }
+};
+
+/**
+ * Delete a note entry from the journal
+ * @param {string} noteId - The note ID to delete
+ */
+const deleteNote = async noteId => {
+  if (!noteId) {
+    if (window.Logger) {
+      window.Logger.warn('Invalid note ID for delete', { page: PAGE_NAME });
+    }
+    return;
+  }
+
+  // Show confirmation dialog
+  const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    // Use UnifiedCRUDService to delete the note
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      const result = await window.UnifiedCRUDService.deleteEntity('note', noteId, {
+        modalId: null, // No modal to close
+        successMessage: 'הערה נמחקה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn: () => {
+          // Reload journal entries after deletion
+          loadAndRenderJournalEntries();
+        }
+      });
+
+      if (window.Logger) {
+        window.Logger.info('Note deleted from journal', { noteId, page: PAGE_NAME });
+      }
+    } else {
+      if (window.Logger) {
+        window.Logger.warn('UnifiedCRUDService not available for note delete', { page: PAGE_NAME });
+      }
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error deleting note', { noteId, error, page: PAGE_NAME });
+    }
+  }
+};
+
+/**
      * Navigate to previous month
      */
 const prevMonth = async function() {
@@ -2398,12 +2867,27 @@ window.tradingJournalPage = {
   loadTickerFilter,
   currentMonth: () => currentMonth,
   currentYear: () => currentYear,
+  // New functions for weekly/monthly views and Notes CRUD
+  renderWeeklyView,
+  renderMonthlyView,
+  loadJournalEntriesForDateRange,
+  addJournalEntry,
+  editNote,
+  deleteNote,
+  editSelectedNote,
+  deleteSelectedNote,
+  getSelectedNoteId,
+  handleNoteRowSelection,
 };
 
 // Make functions available globally (for HTML onclick)
 window.filterJournalByEntityType = filterJournalByEntityType;
 window.filterJournalByTicker = filterJournalByTicker;
 window.handleAddEntry = handleAddEntry;
+// New global functions for Notes CRUD
+window.addJournalEntry = addJournalEntry;
+window.editSelectedNote = editSelectedNote;
+window.deleteSelectedNote = deleteSelectedNote;
 
 /**
    * Render icons in dropdown menu items

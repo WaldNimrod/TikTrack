@@ -11,8 +11,8 @@
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | מערכת אתחול מאוחדת | `trading-ui/scripts/unified-app-initializer.js`<br>`trading-ui/scripts/page-initialization-configs.js` | [UNIFIED_INITIALIZATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md) | אתחול בן 5 שלבים, טוען מודולים ומגדיר תצורת עמוד |
-| מערכת התראות | `trading-ui/scripts/notification-system.js` | [NOTIFICATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md) | שכבת התראות אחידה (Success/Error/Info/Warning/Details) |
-| Modal Manager V2 | `trading-ui/scripts/modal-manager-v2.js` | [MODAL_SYSTEM_V2.md](../02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md) | ניהול פתיחה, עריכה, מחיקה ותרחישי CRUD אחידים במודלים |
+| מערכת התראות | `trading-ui/scripts/notification-system.js` | [NOTIFICATION_SYSTEM_IMPLEMENTATION.md](../03-DEVELOPMENT/GUIDELINES/NOTIFICATION_SYSTEM_IMPLEMENTATION.md) | שכבת התראות אחידה (Success/Error/Info/Warning/Details) |
+| Modal Manager V2 | `trading-ui/scripts/modal-manager-v2.js` | [MODAL_QUANTUM_SYSTEM_COMPLETE_GUIDE.md](../02-ARCHITECTURE/FRONTEND/MODAL_QUANTUM_SYSTEM_COMPLETE_GUIDE.md) | ניהול פתיחה, עריכה, מחיקה ותרחישי CRUD אחידים במודלים |
 | Modal Navigation System | `trading-ui/scripts/modal-navigation-manager.js` | [MODAL_NAVIGATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/MODAL_NAVIGATION_SYSTEM.md) | ניווט stack של מודלים, breadcrumb, backdrop מאוחד |
 | Modal Z-Index Manager | `trading-ui/scripts/modal-z-index-manager.js` | [NESTED_MODALS_Z_INDEX_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NESTED_MODALS_Z_INDEX_SYSTEM.md)<br>[NESTED_MODALS_GUIDE.md](../03-DEVELOPMENT/GUIDES/NESTED_MODALS_GUIDE.md) | ניהול דינמי של z-index למודולים מקוננים, מניעת backdrop כפול, dimming של מודולים קודמים ✅ **חדש! ינואר 2025** |
 | Conditions Dev Playbook | `documentation/04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_DEV_PLAYBOOK.md` | [CONDITIONS_SYSTEM_DEV_PLAYBOOK.md](../04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_DEV_PLAYBOOK.md) | מדריך מפתחים מלא למערכת התנאים – ארכיטקטורה, זרימות Modal, בדיקות, Plan→Trade→Alert |

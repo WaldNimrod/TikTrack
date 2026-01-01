@@ -999,7 +999,10 @@ if (useBundles && fs.existsSync(bundlePath)) {
 - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - ארכיטקטורה כללית
 - `documentation/REFACTOR_INITIALIZATION_SYSTEM_COMPLETION_REPORT.md` - דוח השלמה
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה
-- `documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md` - מדריך מקיף לכלי בדיקת סדר טעינה ותלויות ✅ **חדש! דצמבר 2025**
+- `documentation/02-ARCHITECTURE/FRONTEND/LOAD_ORDER_VALIDATION_SYSTEM.md` - מערכת אימות סדר טעינה
+- `documentation/03-DEVELOPMENT/TOOLS/INIT_LOADING_MONITORING_SYSTEM_GUIDE.md` - מדריך מערכת ניטור Init/Loading
+- `documentation/02-ARCHITECTURE/FRONTEND/PACKAGE_MANIFEST_SOT_DEVELOPER_GUIDE.md` - מדריך מפתחים ל-Package Manifest SOT
+- `documentation/02-ARCHITECTURE/FRONTEND/MONITORING_SYSTEMS_ARCHITECTURE_OVERVIEW.md` - סקירת ארכיטקטורת מערכות ניטור
 
 ### כלי בדיקה
 

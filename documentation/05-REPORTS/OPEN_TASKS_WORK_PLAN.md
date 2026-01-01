@@ -4,7 +4,7 @@
 **Goal:** Close all open items, stabilize tests, and reach 100% pass rate for production readiness.
 **Status:** ✅ COMPLETED - All Gates Green, Registry Suite Integrated
 
-**SUPERSeded Notice:** This document is now historical. All active work moved to `CRUD_TESTING_INTEGRATION_MASTER_PLAN.md` as the current master plan. Teams should work from the master plan only.
+**SUPERSeded Notice:** This document is now historical. All active work moved to `documentation/02-ARCHITECTURE/FRONTEND/team_workflow_main_tasks_list.md`. The former master plan is archived at `documentation/05-REPORTS/ARCHIVE/CRUD_TESTING_INTEGRATION_MASTER_PLAN_2026_01_01.md`. Teams should work from the master task list only.
 
 ---
 

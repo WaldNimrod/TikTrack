@@ -1,0 +1,6 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done: הרצנו מטריצה מלאה של 15 ישויות × 2 דפדפנים = 30 בדיקות - 29/30 נכשלו, רק watch_lists התחילה בדיקה
+Evidence: 29 שגיאות "Dashboard not loaded properly. Cards: false, Functions: false", watch_lists: fail/unknown/unknown/unknown, Firefox לא זמין
+Blockers: בעיית טעינת UI מתמשכת - כרטיסי בדיקה ופונקציות לא נטענים בדשבורד
+Next: צריך לתקן טעינת UI בדשבורד לפני המשך בדיקות

@@ -15,8 +15,8 @@
 // - warn() - Warn
 
 window.testUnifiedTableSystem = function() {
-  console.log('🔍 ===== UNIFIED TABLE SYSTEM TEST =====');
-  console.log('');
+  window.Logger?.info('🔍 ===== UNIFIED TABLE SYSTEM TEST =====');
+  window.Logger?.info('');
   
   const results = {
     passed: 0,
@@ -30,10 +30,10 @@ window.testUnifiedTableSystem = function() {
     results.tests.push({ name, passed, details });
     if (passed) {
       results.passed++;
-      console.log(`✅ PASS: ${name}`);
+      window.Logger?.info(`✅ PASS: ${name}`);
     } else {
       results.failed++;
-      console.error(`❌ FAIL: ${name}${details ? ' - ' + details : ''}`);
+      window.Logger?.error(`❌ FAIL: ${name}${details ? ' - ' + details : ''}`);
     }
     return passed;
   }
@@ -42,14 +42,14 @@ window.testUnifiedTableSystem = function() {
     const passed = typeof condition === 'function' ? condition() : !!condition;
     if (!passed) {
       results.warnings++;
-      console.warn(`⚠️ WARN: ${name}${details ? ' - ' + details : ''}`);
+      window.Logger?.warn(`⚠️ WARN: ${name}${details ? ' - ' + details : ''}`);
     }
     return passed;
   }
 
   // ===== TEST 1: System Availability =====
-  console.log('📋 TEST 1: System Availability');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 1: System Availability');
+  window.Logger?.info('-----------------------------------');
   
   test('UnifiedTableSystem exists', () => window.UnifiedTableSystem);
   test('TableRegistry exists', () => window.UnifiedTableSystem?.registry);
@@ -60,11 +60,11 @@ window.testUnifiedTableSystem = function() {
   test('TableStyleManager exists', () => window.UnifiedTableSystem?.styles);
   test('TableEventHandler exists', () => window.UnifiedTableSystem?.events);
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 2: Table Registration =====
-  console.log('📋 TEST 2: Table Registration');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 2: Table Registration');
+  window.Logger?.info('-----------------------------------');
   
   const registeredTables = window.UnifiedTableSystem?.registry?.getAllTables() || [];
   test('At least one table registered', registeredTables.length > 0, 
@@ -79,12 +79,12 @@ window.testUnifiedTableSystem = function() {
   test('portfolio table registered', 
     window.UnifiedTableSystem?.registry?.isRegistered('portfolio'));
   
-  console.log('Registered tables:', registeredTables);
-  console.log('');
+  window.Logger?.info('Registered tables:', registeredTables);
+  window.Logger?.info('');
 
   // ===== TEST 3: Table Configuration =====
-  console.log('📋 TEST 3: Table Configuration');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 3: Table Configuration');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -97,11 +97,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 4: Data Access =====
-  console.log('📋 TEST 4: Data Access');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 4: Data Access');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -117,11 +117,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 5: DOM Elements =====
-  console.log('📋 TEST 5: DOM Elements');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 5: DOM Elements');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -141,11 +141,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 6: Sorting Functionality =====
-  console.log('📋 TEST 6: Sorting Functionality');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 6: Sorting Functionality');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -171,11 +171,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 7: Rendering Functionality =====
-  console.log('📋 TEST 7: Rendering Functionality');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 7: Rendering Functionality');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -198,11 +198,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 8: Column Mappings =====
-  console.log('📋 TEST 8: Column Mappings');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 8: Column Mappings');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     const config = window.UnifiedTableSystem?.registry?.getConfig(tableType);
@@ -223,11 +223,11 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 9: Integration with tables.js =====
-  console.log('📋 TEST 9: Integration with tables.js');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 9: Integration with tables.js');
+  window.Logger?.info('-----------------------------------');
   
   test('window.sortTable exists', typeof window.sortTable === 'function');
   test('window.sortTableData exists', typeof window.sortTableData === 'function');
@@ -264,10 +264,10 @@ window.testUnifiedTableSystem = function() {
       if (retryHasAnyExport) {
         const retryMappings = window.TABLE_COLUMN_MAPPINGS || window.tableMappings?.TABLE_COLUMN_MAPPINGS || {};
         const retryMappingCount = Object.keys(retryMappings).length;
-        console.log(`✅ [RETRY] window.TABLE_COLUMN_MAPPINGS found after delay: ${retryMappingCount} mappings`);
+        window.Logger?.info(`✅ [RETRY] window.TABLE_COLUMN_MAPPINGS found after delay: ${retryMappingCount} mappings`);
         test('window.TABLE_COLUMN_MAPPINGS exists (retry)', true, `Has ${retryMappingCount} table mappings (${retryHasDirectExport ? 'direct' : 'object'} export)`);
       } else {
-        console.error('❌ [RETRY] window.TABLE_COLUMN_MAPPINGS still not found after delay');
+        window.Logger?.error('❌ [RETRY] window.TABLE_COLUMN_MAPPINGS still not found after delay');
         test('window.TABLE_COLUMN_MAPPINGS exists (retry)', false, 'table-mappings.js may not be loaded - check package-manifest.js loading order');
       }
     }, 500);
@@ -292,11 +292,11 @@ window.testUnifiedTableSystem = function() {
     }
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 10: State Management =====
-  console.log('📋 TEST 10: State Management');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 10: State Management');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     if (window.UnifiedTableSystem?.state) {
@@ -320,24 +320,24 @@ window.testUnifiedTableSystem = function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== SUMMARY =====
-  console.log('📊 ===== TEST SUMMARY =====');
-  console.log(`✅ Passed: ${results.passed}`);
-  console.log(`❌ Failed: ${results.failed}`);
-  console.log(`⚠️ Warnings: ${results.warnings}`);
-  console.log(`📈 Total: ${results.passed + results.failed + results.warnings}`);
-  console.log('');
+  window.Logger?.info('📊 ===== TEST SUMMARY =====');
+  window.Logger?.info(`✅ Passed: ${results.passed}`);
+  window.Logger?.info(`❌ Failed: ${results.failed}`);
+  window.Logger?.info(`⚠️ Warnings: ${results.warnings}`);
+  window.Logger?.info(`📈 Total: ${results.passed + results.failed + results.warnings}`);
+  window.Logger?.info('');
   
   if (results.failed === 0) {
-    console.log('🎉 All critical tests passed!');
+    window.Logger?.info('🎉 All critical tests passed!');
   } else {
-    console.log('⚠️ Some tests failed. Please review the errors above.');
+    window.Logger?.info('⚠️ Some tests failed. Please review the errors above.');
   }
   
-  console.log('');
-  console.log('🔍 ===== END TEST =====');
+  window.Logger?.info('');
+  window.Logger?.info('🔍 ===== END TEST =====');
   
   return results;
 };

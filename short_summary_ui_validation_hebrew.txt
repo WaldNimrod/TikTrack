@@ -1,0 +1,13 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: GREEN
+Done:
+- הושלם אימות UI להודעות שגיאה ב-trading_account ו-cash_flow
+- נבדק extractErrorMessage() על תגובות API
+Evidence:
+- trading_account: "Currency ID is required" (400, specific)
+- cash_flow: "Database error occurred" (500, specific)
+- אין "Unknown error" - הודעות ספציפיות מוצגות בטבלה
+Blockers:
+- none
+Next:
+- Gate 1 אימות UI הושלם בהצלחה ✅

@@ -23,7 +23,6 @@ def setup_auth_middleware(app):
         '/api/auth/register',
         '/api/health',
         '/api/ai_analysis/templates',  # Templates are shared and public
-        '/api/users',  # User management API - temporarily public for debugging
     ]
 
     def _get_serializer():
@@ -34,8 +33,10 @@ def setup_auth_middleware(app):
 
     @app.before_request
     def load_user():
+        print(f"MIDDLEWARE: Called for {request.method} {request.path}")
         # Skip authentication for public endpoints
         if any(request.path.startswith(endpoint) for endpoint in PUBLIC_ENDPOINTS):
+            print(f"MIDDLEWARE: Skipping public endpoint {request.path}")
             return
 
         g.user_id = None

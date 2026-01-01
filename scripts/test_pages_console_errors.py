@@ -95,7 +95,7 @@ ALL_PAGES = [
     # עמודים משניים (Secondary Pages)
     {"name": "דשבורד נתונים חיצוניים", "url": "/external_data_dashboard.html", "category": "secondary", "priority": "low"},
     {"name": "ניהול גרפים", "url": "/chart_management.html", "category": "secondary", "priority": "low"},
-    {"name": "דשבורד בדיקות CRUD", "url": "/crud_testing_dashboard.html", "category": "secondary", "priority": "low"},
+    {"name": "דשבורד בדיקות CRUD", "url": "/crud_testing_dashboard", "category": "secondary", "priority": "low"},
     
     # עמודי אימות (Auth Pages) - login is via modal on base pages
     {"name": "התחברות למערכת", "url": "/login.html", "category": "auth", "priority": "medium"},

@@ -17,7 +17,7 @@ from services.date_normalization_service import DateNormalizationService
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,10 @@ ALL_EXCHANGE_TYPES = {
     LEGACY_EXCHANGE_TO_TYPE,
 }
 
-cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash-flows')
+cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash_flows')
+
+# Alias blueprint for backward compatibility (dash instead of underscore)
+cash_flows_dash_bp = Blueprint('cash_flows_dash', __name__, url_prefix='/api/cash-flows')
 
 # Create a service class for cash flows
 class CashFlowService:
@@ -92,6 +95,7 @@ cash_flow_service = CashFlowService()
 base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
 
 @cash_flows_bp.route('/', methods=['GET'])
+@cash_flows_dash_bp.route('/', methods=['GET'])
 @handle_database_session(auto_commit=True, auto_close=True)
 def get_cash_flows():
     """Get all cash flows using base API with custom data enhancement and exchange filtering"""
@@ -263,6 +267,7 @@ def get_cash_flows():
 # IMPORTANT: Specific routes (like /delete-imported) must be defined BEFORE parameterized routes (like /<int:cash_flow_id>)
 # Otherwise Flask will try to match "delete-imported" as an integer parameter
 @cash_flows_bp.route('/delete-imported', methods=['DELETE'])
+@cash_flows_dash_bp.route('/delete-imported', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def delete_imported_cash_flows():
@@ -349,6 +354,7 @@ def delete_imported_cash_flows():
     # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
+@cash_flows_dash_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):
     """Get cash flow by ID"""
     try:
@@ -410,6 +416,8 @@ def get_cash_flow(cash_flow_id: int):
     # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/', methods=['POST'])
+@cash_flows_dash_bp.route('/', methods=['POST'])
+@require_authentication()
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def create_cash_flow():
@@ -424,6 +432,12 @@ def create_cash_flow():
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
+        # Map flow_type to type if provided (for backward compatibility)
+        if 'flow_type' in data and data['flow_type']:
+            data['type'] = data['flow_type']
+            del data['flow_type']
+            logger.info(f"Mapped flow_type '{data['type']}' to type field")
+
         # Set user_id if authenticated
         if user_id is not None and 'user_id' not in data:
             data['user_id'] = user_id
@@ -563,6 +577,7 @@ def create_cash_flow():
     # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
+@cash_flows_dash_bp.route('/<int:cash_flow_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def update_cash_flow(cash_flow_id: int):
@@ -710,6 +725,7 @@ def update_cash_flow(cash_flow_id: int):
     # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
+@cash_flows_dash_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def delete_cash_flow(cash_flow_id: int):
@@ -749,6 +765,7 @@ def delete_cash_flow(cash_flow_id: int):
     # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/delete-all', methods=['DELETE'])
+@cash_flows_dash_bp.route('/delete-all', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows'])
 def delete_all_cash_flows():
@@ -811,6 +828,7 @@ def delete_all_cash_flows():
 # ===== Currency Exchange Endpoints =====
 
 @cash_flows_bp.route('/exchange', methods=['POST'])
+@cash_flows_dash_bp.route('/exchange', methods=['POST'])
 @handle_database_session(auto_commit=False, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def create_currency_exchange():
@@ -1032,6 +1050,7 @@ def create_currency_exchange():
         }), 400
 
 @cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['GET'])
+@cash_flows_dash_bp.route('/exchange/<exchange_uuid>', methods=['GET'])
 @handle_database_session(auto_commit=True, auto_close=True)
 def get_currency_exchange(exchange_uuid: str):
     """Get currency exchange details by UUID"""
@@ -1095,6 +1114,7 @@ def get_currency_exchange(exchange_uuid: str):
         }), 500
 
 @cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['PUT'])
+@cash_flows_dash_bp.route('/exchange/<exchange_uuid>', methods=['PUT'])
 @handle_database_session(auto_commit=False, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def update_currency_exchange(exchange_uuid: str):
@@ -1364,6 +1384,7 @@ def update_currency_exchange(exchange_uuid: str):
         }), 400
 
 @cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['DELETE'])
+@cash_flows_dash_bp.route('/exchange/<exchange_uuid>', methods=['DELETE'])
 @handle_database_session(auto_commit=False, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def delete_currency_exchange(exchange_uuid: str):
@@ -1434,3 +1455,5 @@ def delete_currency_exchange(exchange_uuid: str):
             "error": {"message": "Failed to delete currency exchange"},
             "version": "1.0"
         }), 500
+
+# Dash blueprint will be registered in app.py

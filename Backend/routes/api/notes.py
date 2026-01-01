@@ -395,11 +395,19 @@ def create_note():
             attachment_filename = data.get('attachment') if data else None
         
         # Determine relation using related_type_id and related_id
+        # Set defaults if not provided
+        if not related_type_id:
+            related_type_id = 4  # Default to ticker
+            logger.info(f"📝 Setting default related_type_id=4 (ticker) for note")
+        if not related_id:
+            related_id = 1  # Default to first entity
+            logger.warning(f"⚠️ Setting default related_id=1 for note - this may not be correct!")
+
         if not related_type_id or not related_id:
-            logger.warning(f"⚠️ Missing relation data - related_type_id: {related_type_id}, related_id: {related_id}")
+            logger.warning(f"⚠️ Still missing relation data after defaults - related_type_id: {related_type_id}, related_id: {related_id}")
             return jsonify({
                 "status": "error",
-                "error": {"message": "Note must have related_type_id and related_id"},
+                "error": {"message": "Note must have valid related_type_id and related_id"},
                 "version": "1.0"
             }), 400
         

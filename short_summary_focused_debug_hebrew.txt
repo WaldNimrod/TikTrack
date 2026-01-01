@@ -1,0 +1,6 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done: הרצנו בדיקה ממוקדת ל-3 ישויות (trade_plan, cash_flow, user_profile) עם iframe-based testing - כל הבדיקות נכשלו
+Evidence: trade_plan - iframe loading timeout, cash_flow/user_profile - funcName undefined script error, אין API calls בכלל
+Blockers: iframe loading issues - הבדיקות לא מצליחות לטעון את העמודים ב-iframe או לבצע את הסקריפטים
+Next: צריך לתקן iframe loading ו-script execution לפני המשך

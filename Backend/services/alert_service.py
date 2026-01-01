@@ -437,6 +437,26 @@ class AlertService:
             else:
                 logger.info(f"condition_attribute already set to: {alert_data.get('condition_attribute')}")
                 
+            # Map common operator abbreviations to proper values
+            if 'condition_operator' in alert_data and alert_data.get('condition_operator'):
+                operator_mapping = {
+                    'gt': 'more_than',
+                    'gte': 'more_than',
+                    'greater_than': 'more_than',
+                    'lt': 'less_than',
+                    'lte': 'less_than',
+                    'less_than_equal': 'less_than',
+                    'eq': 'equals',
+                    'equal': 'equals',
+                    '==': 'equals',
+                    'cross_above': 'cross_up',
+                    'cross_below': 'cross_down'
+                }
+                current_operator = alert_data['condition_operator']
+                if current_operator in operator_mapping:
+                    alert_data['condition_operator'] = operator_mapping[current_operator]
+                    logger.info(f"Mapped condition_operator '{current_operator}' to '{alert_data['condition_operator']}'")
+
             if 'condition_operator' not in alert_data:
                 logger.warning(f"condition_operator missing, setting default")
                 alert_data['condition_operator'] = 'more_than'

@@ -27,7 +27,7 @@ class DefaultsTestingSystem {
      * @param {Object} page - Page configuration
      */
     async testDefaults(page) {
-        console.log('🔍 DEBUG: testDefaults called for page:', page.key, page.name);
+        window.Logger?.info('🔍 DEBUG: testDefaults called for page:', page.key, page.name);
 
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
             method: 'POST',
@@ -65,7 +65,7 @@ class DefaultsTestingSystem {
         let testIframe = null;
 
         try {
-            console.log('🔍 DEBUG: testDefaults try block started for page:', page.key);
+            window.Logger?.info('🔍 DEBUG: testDefaults try block started for page:', page.key);
 
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
@@ -81,12 +81,12 @@ class DefaultsTestingSystem {
                 })
             }).catch(() => {});
 
-            console.log('🔍 DEBUG: About to call loadPageInIframe for page:', page.key);
+            window.Logger?.info('🔍 DEBUG: About to call loadPageInIframe for page:', page.key);
 
             // Clean up any existing iframes before starting new test
-            console.log('🔍 DEBUG: About to cleanup test iframes');
+            window.Logger?.info('🔍 DEBUG: About to cleanup test iframes');
             this.crossPageTester.cleanupTestIframes();
-            console.log('🔍 DEBUG: cleanupTestIframes completed');
+            window.Logger?.info('🔍 DEBUG: cleanupTestIframes completed');
 
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
@@ -126,9 +126,9 @@ class DefaultsTestingSystem {
                 })
             }).catch(() => {});
 
-            console.log('🔍 DEBUG: About to call loadPageInIframe with URL:', pageUrl);
+            window.Logger?.info('🔍 DEBUG: About to call loadPageInIframe with URL:', pageUrl);
             testIframe = await this.crossPageTester.loadPageInIframe(pageUrl);
-            console.log('🔍 DEBUG: loadPageInIframe completed, iframe exists:', !!testIframe);
+            window.Logger?.info('🔍 DEBUG: loadPageInIframe completed, iframe exists:', !!testIframe);
 
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
                 method: 'POST',
@@ -167,20 +167,20 @@ class DefaultsTestingSystem {
 
             // CRITICAL: Initialize PreferencesCore in iframe before testing
             // This ensures preferences are loaded and available for testing
-            console.log('🔍 DEBUG: About to initialize PreferencesCore in iframe');
+            window.Logger?.info('🔍 DEBUG: About to initialize PreferencesCore in iframe');
             try {
                 if (iframeWindow.PreferencesCore && typeof iframeWindow.PreferencesCore.initializeWithLazyLoading === 'function') {
-                    console.log('🔍 DEBUG: PreferencesCore found, calling initializeWithLazyLoading');
+                    window.Logger?.info('🔍 DEBUG: PreferencesCore found, calling initializeWithLazyLoading');
                     await iframeWindow.PreferencesCore.initializeWithLazyLoading();
                     // Wait a bit for preferences to be cached
-                    console.log('🔍 DEBUG: Waiting 1 second for preferences to be cached');
+                    window.Logger?.info('🔍 DEBUG: Waiting 1 second for preferences to be cached');
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    console.log('🔍 DEBUG: Preferences initialization completed');
+                    window.Logger?.info('🔍 DEBUG: Preferences initialization completed');
                 } else {
-                    console.log('🔍 DEBUG: PreferencesCore not found or method not available');
+                    window.Logger?.info('🔍 DEBUG: PreferencesCore not found or method not available');
                 }
             } catch (prefInitError) {
-                console.log('🔍 DEBUG: Preferences initialization failed:', prefInitError.message);
+                window.Logger?.info('🔍 DEBUG: Preferences initialization failed:', prefInitError.message);
                 // Log but don't fail - preferences might already be loaded
                 if (window.Logger && window.Logger.debug) {
                     window.Logger.debug(`Preferences initialization in iframe failed (non-critical): ${prefInitError.message}`, {
@@ -239,7 +239,7 @@ class DefaultsTestingSystem {
             this.stats.totalTests++;
 
         } catch (error) {
-            console.error('❌ Error in testDefaults:', error);
+            window.Logger?.error('❌ Error in testDefaults:', error);
             result.status = 'error';
             result.tests.push({
                 name: 'שגיאת מערכת',
@@ -322,7 +322,7 @@ class DefaultsTestingSystem {
             }
         }
 
-        console.log('🔍 DEBUG: testDefaults function COMPLETED for page:', page.key);
+        window.Logger?.info('🔍 DEBUG: testDefaults function COMPLETED for page:', page.key);
         return result;
     }
 
@@ -332,11 +332,11 @@ class DefaultsTestingSystem {
     async testModalDefaults(page, iframeDoc, iframeWindow, testIframe, result, defaultAccount, defaultCurrency) {
         try {
             // Wait for page to fully load
-            console.log('🔍 DEBUG: Waiting for main content element in iframe');
+            window.Logger?.info('🔍 DEBUG: Waiting for main content element in iframe');
             await this.crossPageTester.waitForElementInIframe(testIframe, 'main, [data-section="main"], .main-content', 10000);
-            console.log('🔍 DEBUG: Main content element found, waiting additional 1 second');
+            window.Logger?.info('🔍 DEBUG: Main content element found, waiting additional 1 second');
             await new Promise(resolve => setTimeout(resolve, 1000)); // Additional wait for page initialization
-            console.log('🔍 DEBUG: Page initialization complete');
+            window.Logger?.info('🔍 DEBUG: Page initialization complete');
 
             // Try to open add modal
             const addButton = iframeDoc.querySelector('button[data-onclick*="showAddModal"], button[data-onclick*="add"], button[data-button-type="ADD"]');
@@ -350,14 +350,14 @@ class DefaultsTestingSystem {
 
                     if (modalId) {
                         try {
-                            console.log('DEBUG: About to call showModal for', modalId);
+                            window.Logger?.info('DEBUG: About to call showModal for', modalId);
                             await iframeWindow.ModalManagerV2.showModal(modalId, 'add');
-                            console.log('DEBUG: showModal completed for', modalId);
+                            window.Logger?.info('DEBUG: showModal completed for', modalId);
 
                             // Wait for modal to be fully visible and date fields to be populated
-                            console.log('🔍 DEBUG: Waiting 3 seconds for modal to be fully visible');
+                            window.Logger?.info('🔍 DEBUG: Waiting 3 seconds for modal to be fully visible');
                             await new Promise(resolve => setTimeout(resolve, 3000));
-                            console.log('🔍 DEBUG: Modal should now be visible, starting field tests');
+                            window.Logger?.info('🔍 DEBUG: Modal should now be visible, starting field tests');
 
                             // Test date fields
                             await this.testDateFields(page, iframeDoc, iframeWindow, result, modalId, entityType);
@@ -509,12 +509,12 @@ class DefaultsTestingSystem {
      */
     async testAccountCurrencyFields(page, iframeDoc, iframeWindow, result, modalId, entityType, defaultAccount, defaultCurrency) {
         // Wait for modal to load and preferences to be applied
-        console.log(`⏳ Waiting 8 seconds for modal to load and preferences to apply...`);
+        window.Logger?.info(`⏳ Waiting 8 seconds for modal to load and preferences to apply...`);
         await new Promise(resolve => setTimeout(resolve, 8000));
-        console.log(`✅ Finished waiting, now checking account field...`);
+        window.Logger?.info(`✅ Finished waiting, now checking account field...`);
 
         // Find account field (prioritize specific entity field first)
-        console.log('🔍 DEBUG: Looking for account field...');
+        window.Logger?.info('🔍 DEBUG: Looking for account field...');
         const accountField = iframeDoc.querySelector(`#${entityType}Account`) ||
                            iframeDoc.querySelector(`#executionAccount`) ||
                            iframeDoc.querySelector(`#tradeAccount`) ||
@@ -526,10 +526,10 @@ class DefaultsTestingSystem {
 
         if (accountField) {
             const fieldValue = accountField.value;
-            console.log('🔍 DEBUG: Account field value:', fieldValue, 'defaultAccount preference:', defaultAccount);
+            window.Logger?.info('🔍 DEBUG: Account field value:', fieldValue, 'defaultAccount preference:', defaultAccount);
             const hasValue = fieldValue && fieldValue !== '' && fieldValue !== '0' && fieldValue !== 'null';
             const matchesPreference = defaultAccount && fieldValue === String(defaultAccount);
-            console.log('🔍 DEBUG: hasValue:', hasValue, 'matchesPreference:', matchesPreference);
+            window.Logger?.info('🔍 DEBUG: hasValue:', hasValue, 'matchesPreference:', matchesPreference);
 
             result.tests.push({
                 name: 'חשבון מסחר - בשדה הטופס',
@@ -957,7 +957,7 @@ class DefaultsTestingSystem {
             const localValue = iframeWindow.localStorage ? iframeWindow.localStorage.getItem(preferenceName) : null;
             return localValue;
         } catch (error) {
-            console.warn(`Failed to get preference ${preferenceName}:`, error);
+            window.Logger?.warn(`Failed to get preference ${preferenceName}:`, error);
             return null;
         }
     }

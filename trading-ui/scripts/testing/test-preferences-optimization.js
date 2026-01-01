@@ -54,7 +54,7 @@
    * Measure page load time
    */
   async function testPageLoad() {
-    console.log('📊 Testing page load performance...');
+    window.Logger?.info('📊 Testing page load performance...');
     
     const results = [];
     
@@ -72,9 +72,9 @@
         results.push(duration);
         testResults.loadTimes.push(duration);
         
-        console.log(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms`);
+        window.Logger?.info(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms`);
       } catch (error) {
-        console.error(`  Iteration ${i + 1} failed:`, error);
+        window.Logger?.error(`  Iteration ${i + 1} failed:`, error);
         testResults.errors.push({ test: 'pageLoad', iteration: i + 1, error: error.message });
       }
       
@@ -86,9 +86,9 @@
     const minTime = Math.min(...results);
     const maxTime = Math.max(...results);
     
-    console.log(`✅ Average load time: ${avgTime.toFixed(2)}ms`);
-    console.log(`   Min: ${minTime.toFixed(2)}ms, Max: ${maxTime.toFixed(2)}ms`);
-    console.log();
+    window.Logger?.info(`✅ Average load time: ${avgTime.toFixed(2)}ms`);
+    window.Logger?.info(`   Min: ${minTime.toFixed(2)}ms, Max: ${maxTime.toFixed(2)}ms`);
+    window.Logger?.info();
     
     return { avg: avgTime, min: minTime, max: maxTime, results };
   }
@@ -97,7 +97,7 @@
    * Measure save time
    */
   async function testSavePerformance() {
-    console.log('💾 Testing save performance...');
+    window.Logger?.info('💾 Testing save performance...');
     
     const results = [];
     
@@ -122,9 +122,9 @@
         results.push(duration);
         testResults.saveTimes.push(duration);
         
-        console.log(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms`);
+        window.Logger?.info(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms`);
       } catch (error) {
-        console.error(`  Iteration ${i + 1} failed:`, error);
+        window.Logger?.error(`  Iteration ${i + 1} failed:`, error);
         testResults.errors.push({ test: 'save', iteration: i + 1, error: error.message });
       }
       
@@ -136,9 +136,9 @@
     const minTime = Math.min(...results);
     const maxTime = Math.max(...results);
     
-    console.log(`✅ Average save time: ${avgTime.toFixed(2)}ms`);
-    console.log(`   Min: ${minTime.toFixed(2)}ms, Max: ${maxTime.toFixed(2)}ms`);
-    console.log();
+    window.Logger?.info(`✅ Average save time: ${avgTime.toFixed(2)}ms`);
+    window.Logger?.info(`   Min: ${minTime.toFixed(2)}ms, Max: ${maxTime.toFixed(2)}ms`);
+    window.Logger?.info();
     
     return { avg: avgTime, min: minTime, max: maxTime, results };
   }
@@ -147,7 +147,7 @@
    * Count API calls
    */
   function countAPICalls() {
-    console.log('📡 Counting API calls...');
+    window.Logger?.info('📡 Counting API calls...');
     
     // Intercept fetch calls
     const originalFetch = window.fetch;
@@ -183,7 +183,7 @@
    * Test cache performance
    */
   async function testCachePerformance() {
-    console.log('🔍 Testing cache performance...');
+    window.Logger?.info('🔍 Testing cache performance...');
     
     let hits = 0;
     let misses = 0;
@@ -201,7 +201,7 @@
     misses++;
     testResults.cacheMisses++;
     
-    console.log(`  First load (cache miss): ${duration1.toFixed(2)}ms`);
+    window.Logger?.info(`  First load (cache miss): ${duration1.toFixed(2)}ms`);
     
     // Second load (should be cache hit)
     const start2 = performance.now();
@@ -216,9 +216,9 @@
     hits++;
     testResults.cacheHits++;
     
-    console.log(`  Second load (cache hit): ${duration2.toFixed(2)}ms`);
-    console.log(`  Speed improvement: ${((duration1 - duration2) / duration1 * 100).toFixed(1)}%`);
-    console.log();
+    window.Logger?.info(`  Second load (cache hit): ${duration2.toFixed(2)}ms`);
+    window.Logger?.info(`  Speed improvement: ${((duration1 - duration2) / duration1 * 100).toFixed(1)}%`);
+    window.Logger?.info();
     
     return { hits, misses, hitRate: hits / (hits + misses) };
   }
@@ -227,10 +227,10 @@
    * Run all performance tests
    */
   async function runAllTests() {
-    console.log('='.repeat(60));
-    console.log('Preferences System Optimization Tests');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('Preferences System Optimization Tests');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
     
     // Setup API call counter
     const apiCounter = countAPICalls();
@@ -246,49 +246,49 @@
     testResults.apiCalls = apiCalls;
     
     // Summary
-    console.log('='.repeat(60));
-    console.log('Test Summary');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('Test Summary');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
     
-    console.log('📊 Load Performance:');
-    console.log(`   Average: ${loadResults.avg.toFixed(2)}ms`);
-    console.log(`   Min: ${loadResults.min.toFixed(2)}ms`);
-    console.log(`   Max: ${loadResults.max.toFixed(2)}ms`);
-    console.log(`   Target: < 500ms ${loadResults.avg < 500 ? '✅' : '❌'}`);
-    console.log();
+    window.Logger?.info('📊 Load Performance:');
+    window.Logger?.info(`   Average: ${loadResults.avg.toFixed(2)}ms`);
+    window.Logger?.info(`   Min: ${loadResults.min.toFixed(2)}ms`);
+    window.Logger?.info(`   Max: ${loadResults.max.toFixed(2)}ms`);
+    window.Logger?.info(`   Target: < 500ms ${loadResults.avg < 500 ? '✅' : '❌'}`);
+    window.Logger?.info();
     
-    console.log('💾 Save Performance:');
-    console.log(`   Average: ${saveResults.avg.toFixed(2)}ms`);
-    console.log(`   Min: ${saveResults.min.toFixed(2)}ms`);
-    console.log(`   Max: ${saveResults.max.toFixed(2)}ms`);
-    console.log(`   Target: < 200ms ${saveResults.avg < 200 ? '✅' : '❌'}`);
-    console.log();
+    window.Logger?.info('💾 Save Performance:');
+    window.Logger?.info(`   Average: ${saveResults.avg.toFixed(2)}ms`);
+    window.Logger?.info(`   Min: ${saveResults.min.toFixed(2)}ms`);
+    window.Logger?.info(`   Max: ${saveResults.max.toFixed(2)}ms`);
+    window.Logger?.info(`   Target: < 200ms ${saveResults.avg < 200 ? '✅' : '❌'}`);
+    window.Logger?.info();
     
-    console.log('📡 API Calls:');
-    console.log(`   Total: ${apiCallCount}`);
-    console.log(`   Target: < 3 ${apiCallCount < 3 ? '✅' : '❌'}`);
+    window.Logger?.info('📡 API Calls:');
+    window.Logger?.info(`   Total: ${apiCallCount}`);
+    window.Logger?.info(`   Target: < 3 ${apiCallCount < 3 ? '✅' : '❌'}`);
     if (apiCalls.length > 0) {
-      console.log('   Calls:');
+      window.Logger?.info('   Calls:');
       apiCalls.forEach((call, idx) => {
-        console.log(`     ${idx + 1}. ${call.method} ${call.url}`);
+        window.Logger?.info(`     ${idx + 1}. ${call.method} ${call.url}`);
       });
     }
-    console.log();
+    window.Logger?.info();
     
-    console.log('🔍 Cache Performance:');
-    console.log(`   Hits: ${cacheResults.hits}`);
-    console.log(`   Misses: ${cacheResults.misses}`);
-    console.log(`   Hit Rate: ${(cacheResults.hitRate * 100).toFixed(1)}%`);
-    console.log(`   Target: > 80% ${cacheResults.hitRate > 0.8 ? '✅' : '❌'}`);
-    console.log();
+    window.Logger?.info('🔍 Cache Performance:');
+    window.Logger?.info(`   Hits: ${cacheResults.hits}`);
+    window.Logger?.info(`   Misses: ${cacheResults.misses}`);
+    window.Logger?.info(`   Hit Rate: ${(cacheResults.hitRate * 100).toFixed(1)}%`);
+    window.Logger?.info(`   Target: > 80% ${cacheResults.hitRate > 0.8 ? '✅' : '❌'}`);
+    window.Logger?.info();
     
     if (testResults.errors.length > 0) {
-      console.log('❌ Errors:');
+      window.Logger?.info('❌ Errors:');
       testResults.errors.forEach(error => {
-        console.log(`   ${error.test} (iteration ${error.iteration}): ${error.error}`);
+        window.Logger?.info(`   ${error.test} (iteration ${error.iteration}): ${error.error}`);
       });
-      console.log();
+      window.Logger?.info();
     }
     
     // Store results globally
@@ -303,8 +303,8 @@
       errors: testResults.errors
     };
     
-    console.log('✅ Test results stored in window.preferencesTestResults');
-    console.log();
+    window.Logger?.info('✅ Test results stored in window.preferencesTestResults');
+    window.Logger?.info();
     
     return window.preferencesTestResults;
   }
@@ -312,7 +312,7 @@
   // Export to window
   window.testPreferencesOptimization = runAllTests;
   
-  console.log('✅ Preferences optimization test script loaded');
-  console.log('   Run: window.testPreferencesOptimization()');
+  window.Logger?.info('✅ Preferences optimization test script loaded');
+  window.Logger?.info('   Run: window.testPreferencesOptimization()');
 })();
 

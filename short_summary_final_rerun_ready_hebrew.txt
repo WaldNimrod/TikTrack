@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הכנת סקריפט rerun מלא (15 entities)
+- המתנה לאישור תיקוני Teams A/B/C עם runtime proof
+Evidence:
+- סקריפט מוכן (crud_e2e_final_rerun_ready.js)
+- מצפה ל-8 entities שיתוקנו: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(400), user_profile(400), trading_journal(400), data_import(500)
+Blockers:
+- ממתין לאישור תיקונים מ-Teams A/B/C
+Next: לאחר אישור - rerun מלא עם צפי ל-15/15 PASS

@@ -56,47 +56,47 @@
      * בדיקת זמינות CRUDResponseHandler
      */
     function testCRUDResponseHandlerAvailability() {
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '🧪 בדיקת זמינות CRUDResponseHandler' + COLORS.reset);
-        console.log(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '🧪 בדיקת זמינות CRUDResponseHandler' + COLORS.reset);
+        window.Logger?.info(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         TEST_RESULTS.total++;
 
         if (typeof window.CRUDResponseHandler === 'undefined' || window.CRUDResponseHandler === null) {
             TEST_RESULTS.failed++;
             TEST_RESULTS.errors.push('CRUDResponseHandler לא זמין ב-window');
-            console.log(COLORS.red + '❌ FAILED: CRUDResponseHandler לא זמין' + COLORS.reset);
+            window.Logger?.info(COLORS.red + '❌ FAILED: CRUDResponseHandler לא זמין' + COLORS.reset);
             return false;
         }
 
         if (typeof window.CRUDResponseHandler.handleSaveResponse !== 'function') {
             TEST_RESULTS.failed++;
             TEST_RESULTS.errors.push('CRUDResponseHandler.handleSaveResponse לא זמין');
-            console.log(COLORS.red + '❌ FAILED: handleSaveResponse לא זמין' + COLORS.reset);
+            window.Logger?.info(COLORS.red + '❌ FAILED: handleSaveResponse לא זמין' + COLORS.reset);
             return false;
         }
 
         if (typeof window.CRUDResponseHandler.handleUpdateResponse !== 'function') {
             TEST_RESULTS.failed++;
             TEST_RESULTS.errors.push('CRUDResponseHandler.handleUpdateResponse לא זמין');
-            console.log(COLORS.red + '❌ FAILED: handleUpdateResponse לא זמין' + COLORS.reset);
+            window.Logger?.info(COLORS.red + '❌ FAILED: handleUpdateResponse לא זמין' + COLORS.reset);
             return false;
         }
 
         if (typeof window.CRUDResponseHandler.handleDeleteResponse !== 'function') {
             TEST_RESULTS.failed++;
             TEST_RESULTS.errors.push('CRUDResponseHandler.handleDeleteResponse לא זמין');
-            console.log(COLORS.red + '❌ FAILED: handleDeleteResponse לא זמין' + COLORS.reset);
+            window.Logger?.info(COLORS.red + '❌ FAILED: handleDeleteResponse לא זמין' + COLORS.reset);
             return false;
         }
 
         TEST_RESULTS.passed++;
-        console.log(COLORS.green + '✅ PASSED: CRUDResponseHandler זמין וכל הפונקציות קיימות' + COLORS.reset);
-        console.log('   - handleSaveResponse: ✅');
-        console.log('   - handleUpdateResponse: ✅');
-        console.log('   - handleDeleteResponse: ✅');
-        console.log('   - handleError: ✅');
-        console.log('   - executeCRUDOperation: ✅');
+        window.Logger?.info(COLORS.green + '✅ PASSED: CRUDResponseHandler זמין וכל הפונקציות קיימות' + COLORS.reset);
+        window.Logger?.info('   - handleSaveResponse: ✅');
+        window.Logger?.info('   - handleUpdateResponse: ✅');
+        window.Logger?.info('   - handleDeleteResponse: ✅');
+        window.Logger?.info('   - handleError: ✅');
+        window.Logger?.info('   - executeCRUDOperation: ✅');
         return true;
     }
 
@@ -104,9 +104,9 @@
      * בדיקת Global Shortcuts
      */
     function testGlobalShortcuts() {
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '🧪 בדיקת Global Shortcuts' + COLORS.reset);
-        console.log(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '🧪 בדיקת Global Shortcuts' + COLORS.reset);
+        window.Logger?.info(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         const shortcuts = [
             'handleSaveResponse',
@@ -122,11 +122,11 @@
             TEST_RESULTS.total++;
             if (typeof window[shortcut] === 'function') {
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ ${shortcut}: זמין` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ ${shortcut}: זמין` + COLORS.reset);
             } else {
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`Global shortcut ${shortcut} לא זמין`);
-                console.log(COLORS.red + `❌ ${shortcut}: לא זמין` + COLORS.reset);
+                window.Logger?.info(COLORS.red + `❌ ${shortcut}: לא זמין` + COLORS.reset);
                 allPassed = false;
             }
         });
@@ -138,9 +138,9 @@
      * בדיקת אינטגרציה עם מערכות אחרות
      */
     function testSystemIntegration() {
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '🧪 בדיקת אינטגרציה עם מערכות אחרות' + COLORS.reset);
-        console.log(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '🧪 בדיקת אינטגרציה עם מערכות אחרות' + COLORS.reset);
+        window.Logger?.info(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         const systems = {
             'Notification System': typeof window.showSuccessNotification === 'function' && typeof window.showErrorNotification === 'function',
@@ -154,11 +154,11 @@
             TEST_RESULTS.total++;
             if (available) {
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ ${name}: זמין` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ ${name}: זמין` + COLORS.reset);
             } else {
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`${name} לא זמין`);
-                console.log(COLORS.yellow + `⚠️ ${name}: לא זמין (לא קריטי)` + COLORS.reset);
+                window.Logger?.info(COLORS.yellow + `⚠️ ${name}: לא זמין (לא קריטי)` + COLORS.reset);
                 // לא נכשל כי זה לא קריטי
             }
         });
@@ -172,9 +172,9 @@
     async function testEntityCRUD(entityConfig) {
         const { name, page, createFn, updateFn, deleteFn, loadFn, modalId, entityName } = entityConfig;
 
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + `🧪 בדיקת CRUD עבור ${name}` + COLORS.reset);
-        console.log(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + `🧪 בדיקת CRUD עבור ${name}` + COLORS.reset);
+        window.Logger?.info(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         const results = {
             create: { passed: false, error: null },
@@ -190,78 +190,78 @@
                 await window[loadFn]();
                 results.load.passed = true;
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ טעינת נתונים: הצליח` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ טעינת נתונים: הצליח` + COLORS.reset);
             } catch (error) {
                 results.load.error = error.message;
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`${name} - טעינת נתונים נכשלה: ${error.message}`);
-                console.log(COLORS.red + `❌ טעינת נתונים: נכשל - ${error.message}` + COLORS.reset);
+                window.Logger?.info(COLORS.red + `❌ טעינת נתונים: נכשל - ${error.message}` + COLORS.reset);
             }
         } else {
             TEST_RESULTS.skipped++;
-            console.log(COLORS.yellow + `⏭️ טעינת נתונים: דילוג (פונקציה לא זמינה)` + COLORS.reset);
+            window.Logger?.info(COLORS.yellow + `⏭️ טעינת נתונים: דילוג (פונקציה לא זמינה)` + COLORS.reset);
         }
 
         // בדיקת יצירה
         if (createFn && typeof window[createFn] === 'function') {
             TEST_RESULTS.total++;
-            console.log(COLORS.blue + `   🔄 בודק יצירה...` + COLORS.reset);
+            window.Logger?.info(COLORS.blue + `   🔄 בודק יצירה...` + COLORS.reset);
             // לא נריץ בפועל כי זה ייצור רשומה אמיתית
             // רק נבדוק שהפונקציה קיימת ומשתמשת ב-CRUDResponseHandler
             const fnString = window[createFn].toString();
             if (fnString.includes('CRUDResponseHandler') || fnString.includes('handleSaveResponse')) {
                 results.create.passed = true;
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ יצירה: משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ יצירה: משתמש ב-CRUDResponseHandler` + COLORS.reset);
             } else {
                 results.create.error = 'לא משתמש ב-CRUDResponseHandler';
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`${name} - יצירה לא משתמשת ב-CRUDResponseHandler`);
-                console.log(COLORS.red + `❌ יצירה: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.red + `❌ יצירה: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
             }
         } else {
             TEST_RESULTS.skipped++;
-            console.log(COLORS.yellow + `⏭️ יצירה: דילוג (פונקציה לא זמינה)` + COLORS.reset);
+            window.Logger?.info(COLORS.yellow + `⏭️ יצירה: דילוג (פונקציה לא זמינה)` + COLORS.reset);
         }
 
         // בדיקת עדכון
         if (updateFn && typeof window[updateFn] === 'function') {
             TEST_RESULTS.total++;
-            console.log(COLORS.blue + `   🔄 בודק עדכון...` + COLORS.reset);
+            window.Logger?.info(COLORS.blue + `   🔄 בודק עדכון...` + COLORS.reset);
             const fnString = window[updateFn].toString();
             if (fnString.includes('CRUDResponseHandler') || fnString.includes('handleUpdateResponse')) {
                 results.update.passed = true;
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ עדכון: משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ עדכון: משתמש ב-CRUDResponseHandler` + COLORS.reset);
             } else {
                 results.update.error = 'לא משתמש ב-CRUDResponseHandler';
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`${name} - עדכון לא משתמש ב-CRUDResponseHandler`);
-                console.log(COLORS.red + `❌ עדכון: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.red + `❌ עדכון: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
             }
         } else {
             TEST_RESULTS.skipped++;
-            console.log(COLORS.yellow + `⏭️ עדכון: דילוג (פונקציה לא זמינה)` + COLORS.reset);
+            window.Logger?.info(COLORS.yellow + `⏭️ עדכון: דילוג (פונקציה לא זמינה)` + COLORS.reset);
         }
 
         // בדיקת מחיקה
         if (deleteFn && typeof window[deleteFn] === 'function') {
             TEST_RESULTS.total++;
-            console.log(COLORS.blue + `   🔄 בודק מחיקה...` + COLORS.reset);
+            window.Logger?.info(COLORS.blue + `   🔄 בודק מחיקה...` + COLORS.reset);
             const fnString = window[deleteFn].toString();
             if (fnString.includes('CRUDResponseHandler') || fnString.includes('handleDeleteResponse')) {
                 results.delete.passed = true;
                 TEST_RESULTS.passed++;
-                console.log(COLORS.green + `✅ מחיקה: משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.green + `✅ מחיקה: משתמש ב-CRUDResponseHandler` + COLORS.reset);
             } else {
                 results.delete.error = 'לא משתמש ב-CRUDResponseHandler';
                 TEST_RESULTS.failed++;
                 TEST_RESULTS.errors.push(`${name} - מחיקה לא משתמשת ב-CRUDResponseHandler`);
-                console.log(COLORS.red + `❌ מחיקה: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
+                window.Logger?.info(COLORS.red + `❌ מחיקה: לא משתמש ב-CRUDResponseHandler` + COLORS.reset);
             }
         } else {
             TEST_RESULTS.skipped++;
-            console.log(COLORS.yellow + `⏭️ מחיקה: דילוג (פונקציה לא זמינה)` + COLORS.reset);
+            window.Logger?.info(COLORS.yellow + `⏭️ מחיקה: דילוג (פונקציה לא זמינה)` + COLORS.reset);
         }
 
         return results;
@@ -271,9 +271,9 @@
      * בדיקת כל הישויות
      */
     async function testAllEntities() {
-        console.log('\n' + COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '🧪 בדיקת כל הישויות במערכת' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '🧪 בדיקת כל הישויות במערכת' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         const entities = [
             {
@@ -360,9 +360,9 @@
      * בדיקת Fallback
      */
     function testFallback() {
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '🧪 בדיקת Fallback' + COLORS.reset);
-        console.log(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '🧪 בדיקת Fallback' + COLORS.reset);
+        window.Logger?.info(COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         TEST_RESULTS.total++;
 
@@ -389,12 +389,12 @@
 
         if (hasFallback) {
             TEST_RESULTS.passed++;
-            console.log(COLORS.green + '✅ PASSED: יש fallback אם CRUDResponseHandler לא זמין' + COLORS.reset);
+            window.Logger?.info(COLORS.green + '✅ PASSED: יש fallback אם CRUDResponseHandler לא זמין' + COLORS.reset);
             return true;
         } else {
             TEST_RESULTS.failed++;
             TEST_RESULTS.errors.push('לא נמצא fallback אם CRUDResponseHandler לא זמין');
-            console.log(COLORS.yellow + '⚠️ WARNING: לא נמצא fallback מפורש (יכול להיות תקין אם לא נדרש)' + COLORS.reset);
+            window.Logger?.info(COLORS.yellow + '⚠️ WARNING: לא נמצא fallback מפורש (יכול להיות תקין אם לא נדרש)' + COLORS.reset);
             return false;
         }
     }
@@ -403,9 +403,9 @@
      * הדפסת סיכום
      */
     function printSummary() {
-        console.log('\n' + COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.blue + '📊 סיכום תוצאות בדיקות' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.blue + '📊 סיכום תוצאות בדיקות' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         const total = TEST_RESULTS.total;
         const passed = TEST_RESULTS.passed;
@@ -413,19 +413,19 @@
         const skipped = TEST_RESULTS.skipped;
         const percentage = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
 
-        console.log(`\n${COLORS.bright}סה"כ בדיקות:${COLORS.reset} ${total}`);
-        console.log(`${COLORS.green}✅ עברו:${COLORS.reset} ${passed} (${percentage}%)`);
-        console.log(`${COLORS.red}❌ נכשלו:${COLORS.reset} ${failed}`);
-        console.log(`${COLORS.yellow}⏭️ דילוג:${COLORS.reset} ${skipped}`);
+        window.Logger?.info(`\n${COLORS.bright}סה"כ בדיקות:${COLORS.reset} ${total}`);
+        window.Logger?.info(`${COLORS.green}✅ עברו:${COLORS.reset} ${passed} (${percentage}%)`);
+        window.Logger?.info(`${COLORS.red}❌ נכשלו:${COLORS.reset} ${failed}`);
+        window.Logger?.info(`${COLORS.yellow}⏭️ דילוג:${COLORS.reset} ${skipped}`);
 
         if (TEST_RESULTS.errors.length > 0) {
-            console.log(`\n${COLORS.red}${COLORS.bright}שגיאות שנמצאו:${COLORS.reset}`);
+            window.Logger?.info(`\n${COLORS.red}${COLORS.bright}שגיאות שנמצאו:${COLORS.reset}`);
             TEST_RESULTS.errors.forEach((error, index) => {
-                console.log(`${COLORS.red}  ${index + 1}. ${error}${COLORS.reset}`);
+                window.Logger?.info(`${COLORS.red}  ${index + 1}. ${error}${COLORS.reset}`);
             });
         }
 
-        console.log('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.cyan + '═══════════════════════════════════════════════════════════' + COLORS.reset);
 
         // החזרת תוצאות
         return {
@@ -442,11 +442,11 @@
      * הרצת כל הבדיקות
      */
     async function runAllTests() {
-        console.log('\n' + COLORS.bright + COLORS.cyan + '╔═══════════════════════════════════════════════════════════╗' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.cyan + '║' + COLORS.reset + COLORS.bright + COLORS.blue + '  🧪 CRUD Response Handler E2E Test Suite' + COLORS.reset + COLORS.bright + COLORS.cyan + '                    ║' + COLORS.reset);
-        console.log(COLORS.bright + COLORS.cyan + '╚═══════════════════════════════════════════════════════════╝' + COLORS.reset);
-        console.log(COLORS.blue + `עמוד נוכחי: ${window.location.pathname}` + COLORS.reset);
-        console.log(COLORS.blue + `תאריך: ${new Date().toLocaleString('he-IL')}` + COLORS.reset);
+        window.Logger?.info('\n' + COLORS.bright + COLORS.cyan + '╔═══════════════════════════════════════════════════════════╗' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.cyan + '║' + COLORS.reset + COLORS.bright + COLORS.blue + '  🧪 CRUD Response Handler E2E Test Suite' + COLORS.reset + COLORS.bright + COLORS.cyan + '                    ║' + COLORS.reset);
+        window.Logger?.info(COLORS.bright + COLORS.cyan + '╚═══════════════════════════════════════════════════════════╝' + COLORS.reset);
+        window.Logger?.info(COLORS.blue + `עמוד נוכחי: ${window.location.pathname}` + COLORS.reset);
+        window.Logger?.info(COLORS.blue + `תאריך: ${new Date().toLocaleString('he-IL')}` + COLORS.reset);
 
         // בדיקות בסיסיות
         testCRUDResponseHandlerAvailability();
@@ -469,8 +469,8 @@
     // הרצה אוטומטית
     if (typeof window !== 'undefined') {
         window.runCRUDE2ETests = runAllTests;
-        console.log(COLORS.green + '\n✅ סקריפט בדיקה נטען בהצלחה!' + COLORS.reset);
-        console.log(COLORS.blue + 'הרץ את הבדיקות עם: runCRUDE2ETests()' + COLORS.reset);
+        window.Logger?.info(COLORS.green + '\n✅ סקריפט בדיקה נטען בהצלחה!' + COLORS.reset);
+        window.Logger?.info(COLORS.blue + 'הרץ את הבדיקות עם: runCRUDE2ETests()' + COLORS.reset);
     }
 
     // החזרת פונקציה לייצוא

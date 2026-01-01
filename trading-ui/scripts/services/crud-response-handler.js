@@ -38,30 +38,30 @@ class CRUDResponseHandler {
      * });
      */
     static async handleSaveResponse(response, options = {}) {
-        console.log('🔵 handleSaveResponse CALLED');
-        console.log('🔵 handleSaveResponse - response ok:', response.ok);
-        console.log('🔵 handleSaveResponse - options:', options);
+        window.Logger?.info('🔵 handleSaveResponse CALLED');
+        window.Logger?.info('🔵 handleSaveResponse - response ok:', response.ok);
+        window.Logger?.info('🔵 handleSaveResponse - options:', options);
         
         try {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
-                console.log('❌ handleSaveResponse - Response not OK');
-                console.log('❌ Response status:', response.status);
-                console.log('❌ Response statusText:', response.statusText);
+                window.Logger?.info('❌ handleSaveResponse - Response not OK');
+                window.Logger?.info('❌ Response status:', response.status);
+                window.Logger?.info('❌ Response statusText:', response.statusText);
                 
                 let errorData;
                 try {
                     const responseText = await response.text();
-                    console.log('❌ Response text (raw):', responseText);
+                    window.Logger?.info('❌ Response text (raw):', responseText);
                     errorData = JSON.parse(responseText);
                 } catch (parseError) {
-                    console.error('❌ Failed to parse error response:', parseError);
+                    window.Logger?.error('❌ Failed to parse error response:', parseError);
                     errorData = { error: 'שגיאה לא צפויה מהשרת' };
                 }
                 
-                console.log('❌ Error data:', errorData);
-                console.log('❌ Error message:', errorData.message || errorData.error);
-                console.log('❌ Full error object:', JSON.stringify(errorData, null, 2));
+                window.Logger?.info('❌ Error data:', errorData);
+                window.Logger?.info('❌ Error message:', errorData.message || errorData.error);
+                window.Logger?.info('❌ Full error object:', JSON.stringify(errorData, null, 2));
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
@@ -72,7 +72,7 @@ class CRUDResponseHandler {
                     }
                     
                     // Log detailed validation error
-                    console.error('❌ Validation Error Details:', {
+                    window.Logger?.error('❌ Validation Error Details:', {
                         status: response.status,
                         message: message,
                         errorData: errorData,
@@ -93,7 +93,7 @@ class CRUDResponseHandler {
                                 });
                             }
                         } catch (parserError) {
-                            console.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
+                            window.Logger?.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
                         }
                     }
                     
@@ -129,10 +129,10 @@ class CRUDResponseHandler {
             }
 
             // תגובה תקינה
-            console.log('✅ handleSaveResponse - Response OK, reading JSON...');
+            window.Logger?.info('✅ handleSaveResponse - Response OK, reading JSON...');
             const result = await response.json();
-            console.log('✅ handleSaveResponse - JSON read successfully');
-            console.log('🔍 handleSaveResponse - result structure:', {
+            window.Logger?.info('✅ handleSaveResponse - JSON read successfully');
+            window.Logger?.info('🔍 handleSaveResponse - result structure:', {
                 hasStatus: 'status' in result,
                 hasData: 'data' in result,
                 hasId: result?.data?.id !== undefined,
@@ -144,13 +144,13 @@ class CRUDResponseHandler {
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
                 const message = options.successMessage || `${options.entityName || 'פריט'} נוסף בהצלחה`;
-                console.log('✅ handleSaveResponse - Showing success notification:', message);
+                window.Logger?.info('✅ handleSaveResponse - Showing success notification:', message);
                 window.showSuccessNotification('הצלחה', message);
             }
 
             // סגירת modal
             if (options.modalId) {
-                console.log('✅ handleSaveResponse - Closing modal:', options.modalId);
+                window.Logger?.info('✅ handleSaveResponse - Closing modal:', options.modalId);
                 if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
                     window.ModalManagerV2.hideModal(options.modalId);
                 } else if (bootstrap?.Modal) {
@@ -162,17 +162,17 @@ class CRUDResponseHandler {
             }
 
             // רענון טבלה - מערכת מרכזית
-            console.log('✅ handleSaveResponse - Calling handleTableRefresh...');
+            window.Logger?.info('✅ handleSaveResponse - Calling handleTableRefresh...');
             
             await this.handleTableRefresh(options);
-            console.log('✅ handleSaveResponse - handleTableRefresh completed');
+            window.Logger?.info('✅ handleSaveResponse - handleTableRefresh completed');
 
             return result;
             
         } catch (error) {
-            console.error('❌ handleSaveResponse - Error caught:', error);
-            console.error('❌ handleSaveResponse - Error message:', error.message);
-            console.error('❌ handleSaveResponse - Error stack:', error.stack);
+            window.Logger?.error('❌ handleSaveResponse - Error caught:', error);
+            window.Logger?.error('❌ handleSaveResponse - Error message:', error.message);
+            window.Logger?.error('❌ handleSaveResponse - Error stack:', error.stack);
             
             if (typeof window.showErrorNotification === 'function') {
                 const message = `שגיאה בשמירת ${options.entityName || 'פריט'}`;
@@ -225,7 +225,7 @@ class CRUDResponseHandler {
                                 });
                             }
                         } catch (parserError) {
-                            console.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
+                            window.Logger?.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
                         }
                     }
                     
@@ -267,7 +267,7 @@ class CRUDResponseHandler {
             return result;
             
         } catch (error) {
-            console.error('❌ שגיאה בעדכון:', error);
+            window.Logger?.error('❌ שגיאה בעדכון:', error);
             
             if (typeof window.showErrorNotification === 'function') {
                 const message = `שגיאה בעדכון ${options.entityName || 'פריט'}`;
@@ -293,19 +293,19 @@ class CRUDResponseHandler {
      * });
      */
     static async handleDeleteResponse(response, options = {}) {
-        console.log('🔥🔥🔥 handleDeleteResponse CALLED with response status:', response.status);
-        console.log('🔥 handleDeleteResponse - options:', options);
+        window.Logger?.info('🔥🔥🔥 handleDeleteResponse CALLED with response status:', response.status);
+        window.Logger?.info('🔥 handleDeleteResponse - options:', options);
         
         try {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
-                console.log('❌ handleDeleteResponse - Response not OK, status:', response.status);
+                window.Logger?.info('❌ handleDeleteResponse - Response not OK, status:', response.status);
                 const errorData = await response.json();
-                console.log('❌ handleDeleteResponse - Error data:', errorData);
+                window.Logger?.info('❌ handleDeleteResponse - Error data:', errorData);
                 
                 // שגיאת ולידציה (HTTP 400) - למשל פריט מקושר
                 if (response.status === 400) {
-                    console.log('❌ handleDeleteResponse - 400 error, showing validation error');
+                    window.Logger?.info('❌ handleDeleteResponse - 400 error, showing validation error');
                     if (typeof window.showSimpleErrorNotification === 'function') {
                         const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
                         const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
@@ -329,7 +329,7 @@ class CRUDResponseHandler {
                 // NOTE: Even if item not found (404), we still need to refresh the table
                 // because the item might have been deleted by another user or the UI state is stale
                 if (response.status === 404) {
-                    console.log('❌ handleDeleteResponse - 404 error, item not found - refreshing table anyway');
+                    window.Logger?.info('❌ handleDeleteResponse - 404 error, item not found - refreshing table anyway');
                     if (typeof window.showErrorNotification === 'function') {
                         const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
                         const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
@@ -348,40 +348,40 @@ class CRUDResponseHandler {
                     }
                     
                     // Still refresh the table to sync with server state
-                    console.log('🔥 handleDeleteResponse - 404: Calling handleTableRefresh to sync UI with server...');
+                    window.Logger?.info('🔥 handleDeleteResponse - 404: Calling handleTableRefresh to sync UI with server...');
                     await this.handleTableRefresh(options);
-                    console.log('🔥 handleDeleteResponse - 404: handleTableRefresh completed');
+                    window.Logger?.info('🔥 handleDeleteResponse - 404: handleTableRefresh completed');
                     
                     return false;
                 }
                 
                 // שגיאת מערכת אחרת
-                console.log('❌ handleDeleteResponse - System error, throwing:', errorData.message || errorData.error);
+                window.Logger?.info('❌ handleDeleteResponse - System error, throwing:', errorData.message || errorData.error);
                 const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
                 const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
                 throw new Error(message || errorMsg || `HTTP error! status: ${response.status}`);
             }
 
             // תגובה תקינה
-            console.log('✅ handleDeleteResponse - Response OK, proceeding with success flow');
+            window.Logger?.info('✅ handleDeleteResponse - Response OK, proceeding with success flow');
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
                 const message = options.successMessage || `${options.entityName || 'פריט'} נמחק בהצלחה`;
-                console.log('🔥 handleDeleteResponse - Showing success notification:', message);
+                window.Logger?.info('🔥 handleDeleteResponse - Showing success notification:', message);
                 window.showSuccessNotification('הצלחה', message);
             }
 
             // רענון טבלה - מערכת מרכזית
-            console.log('🔥 handleDeleteResponse - Calling handleTableRefresh...');
+            window.Logger?.info('🔥 handleDeleteResponse - Calling handleTableRefresh...');
             await this.handleTableRefresh(options);
-            console.log('🔥 handleDeleteResponse - handleTableRefresh completed');
+            window.Logger?.info('🔥 handleDeleteResponse - handleTableRefresh completed');
 
-            console.log('✅ handleDeleteResponse - Success flow completed, returning true');
+            window.Logger?.info('✅ handleDeleteResponse - Success flow completed, returning true');
             return true;
             
         } catch (error) {
-            console.error('❌ handleDeleteResponse - Error occurred:', error);
+            window.Logger?.error('❌ handleDeleteResponse - Error occurred:', error);
             
             if (typeof window.showErrorNotification === 'function') {
                 const entityTypeName = options.entityName || 'הפריט';
@@ -404,7 +404,7 @@ class CRUDResponseHandler {
      * CRUDResponseHandler.handleError(error, 'שמירת טרייד');
      */
     static handleError(error, operation = 'פעולה') {
-        console.error(`❌ שגיאה ב${operation}:`, error);
+        window.Logger?.error(`❌ שגיאה ב${operation}:`, error);
         
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(`שגיאה ב${operation}`, error.message || 'שגיאה לא ידועה');
@@ -480,7 +480,7 @@ class CRUDResponseHandler {
     static handleLoadResponse(response, options = {}) {
         const { tableId, entityName, columns, onRetry } = options;
 
-        console.error(`❌ Server error ${response.status} loading ${entityName || 'data'}`);
+        window.Logger?.error(`❌ Server error ${response.status} loading ${entityName || 'data'}`);
 
         // User notification
         if (typeof window.showNotification === 'function') {
@@ -527,7 +527,7 @@ class CRUDResponseHandler {
     static handleNetworkError(error, options = {}) {
         const { tableId, entityName, columns, onRetry } = options;
 
-        console.error(`❌ Network error loading ${entityName || 'data'}:`, error);
+        window.Logger?.error(`❌ Network error loading ${entityName || 'data'}:`, error);
 
         // User notification
         if (typeof window.showNotification === 'function') {
@@ -571,13 +571,13 @@ class CRUDResponseHandler {
         const { tableId, columns, icon, title, message, onRetry, errorType, errorDetails } = config;
 
         if (!tableId) {
-            console.warn('⚠️ _renderTableError: tableId is required');
+            window.Logger?.warn('⚠️ _renderTableError: tableId is required');
             return;
         }
 
         const tbody = document.querySelector(`#${tableId} tbody`);
         if (!tbody) {
-            console.warn(`⚠️ _renderTableError: tbody not found for table #${tableId}`);
+            window.Logger?.warn(`⚠️ _renderTableError: tbody not found for table #${tableId}`);
             return;
         }
 
@@ -688,19 +688,19 @@ class CRUDResponseHandler {
      */
     static async handleTableRefresh(options = {}) {
         try {
-            console.log('🔄 handleTableRefresh called with options:', options);
+            window.Logger?.info('🔄 handleTableRefresh called with options:', options);
             
             // פשטות מקסימלית: אם יש reloadFn - קוראים לו ישירות ללא cache clearing
             if (options.reloadFn && typeof options.reloadFn === 'function') {
-                console.log('✅ handleTableRefresh: Calling reloadFn...');
-                console.log('🔍 handleTableRefresh: reloadFn type:', typeof options.reloadFn);
-                console.log('🔍 handleTableRefresh: reloadFn name:', options.reloadFn.name || 'anonymous');
+                window.Logger?.info('✅ handleTableRefresh: Calling reloadFn...');
+                window.Logger?.info('🔍 handleTableRefresh: reloadFn type:', typeof options.reloadFn);
+                window.Logger?.info('🔍 handleTableRefresh: reloadFn name:', options.reloadFn.name || 'anonymous');
                 try {
                     await options.reloadFn();
-                    console.log('✅ handleTableRefresh: reloadFn completed successfully');
+                    window.Logger?.info('✅ handleTableRefresh: reloadFn completed successfully');
                 } catch (reloadError) {
-                    console.error('❌ handleTableRefresh: Error in reloadFn:', reloadError);
-                    console.error('❌ handleTableRefresh: Error stack:', reloadError.stack);
+                    window.Logger?.error('❌ handleTableRefresh: Error in reloadFn:', reloadError);
+                    window.Logger?.error('❌ handleTableRefresh: Error stack:', reloadError.stack);
                     throw reloadError; // Re-throw to be caught by outer catch
                 }
                 return;
@@ -708,7 +708,7 @@ class CRUDResponseHandler {
 
             // אם דורש hard reload (להעדפות בלבד)
             if (options.requiresHardReload) {
-                console.log('⚠️ handleTableRefresh: requiresHardReload=true, calling clearCacheQuick');
+                window.Logger?.info('⚠️ handleTableRefresh: requiresHardReload=true, calling clearCacheQuick');
                 if (typeof window.clearCacheQuick === 'function') {
                     await window.clearCacheQuick();
                 }
@@ -717,10 +717,10 @@ class CRUDResponseHandler {
 
             // ברירת מחדל - אין פעולה
             // זה מגיע רק אם לא הועבר reloadFn, מה שאומר שזה כנראה old code
-            console.warn('⚠️ handleTableRefresh called without reloadFn - no action taken');
+            window.Logger?.warn('⚠️ handleTableRefresh called without reloadFn - no action taken');
         } catch (error) {
-            console.error('❌ שגיאה ברענון טבלה:', error);
-            console.error('❌ שגיאה ברענון טבלה - stack:', error.stack);
+            window.Logger?.error('❌ שגיאה ברענון טבלה:', error);
+            window.Logger?.error('❌ שגיאה ברענון טבלה - stack:', error.stack);
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה ברענון טבלה', error.message || 'שגיאה לא ידועה');
             }
@@ -743,16 +743,16 @@ class CRUDResponseHandler {
      * @param {string} entityType - סוג הישות (trades, alerts, etc.)
      */
     static async clearEntityCache(entityType) {
-        console.log(`🔥 clearEntityCache called for entityType: ${entityType}`);
+        window.Logger?.info(`🔥 clearEntityCache called for entityType: ${entityType}`);
         
         if (!this._isUnifiedCacheManagerAvailable()) {
-            console.debug(`⚠️ UnifiedCacheManager not available or not initialized - skipping cache clear for ${entityType}`);
+            window.Logger?.debug(`⚠️ UnifiedCacheManager not available or not initialized - skipping cache clear for ${entityType}`);
             return;
         }
         
         try {
             const keys = await window.UnifiedCacheManager.getAllKeys();
-            console.log(`🔥 clearEntityCache - All keys:`, keys);
+            window.Logger?.info(`🔥 clearEntityCache - All keys:`, keys);
             
             const entityKeys = keys.filter(k => 
                 k.startsWith(`${entityType}_`) || 
@@ -760,14 +760,14 @@ class CRUDResponseHandler {
                 k.includes(entityType)
             );
             
-            console.log(`🔥 clearEntityCache - Entity keys to remove:`, entityKeys);
+            window.Logger?.info(`🔥 clearEntityCache - Entity keys to remove:`, entityKeys);
             
             for (const key of entityKeys) {
                 await window.UnifiedCacheManager.remove(key);
             }
-            console.log(`✅ נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+            window.Logger?.info(`✅ נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
         } catch (error) {
-            console.error(`❌ שגיאה בניקוי מטמון ${entityType}:`, error);
+            window.Logger?.error(`❌ שגיאה בניקוי מטמון ${entityType}:`, error);
         }
     }
 
@@ -832,9 +832,9 @@ class CRUDResponseHandler {
             if (action && window.CacheSyncManager?.invalidateByAction) {
                 try {
                     await window.CacheSyncManager.invalidateByAction(action);
-                    console.log(`🔄 נוקה מטמון עבור ${entityType} דרך CacheSyncManager (action: ${action})`);
+                    window.Logger?.info(`🔄 נוקה מטמון עבור ${entityType} דרך CacheSyncManager (action: ${action})`);
                 } catch (cacheError) {
-                    console.warn(`⚠️ CacheSyncManager.invalidateByAction failed for ${entityType}, falling back to direct invalidation`, cacheError);
+                    window.Logger?.warn(`⚠️ CacheSyncManager.invalidateByAction failed for ${entityType}, falling back to direct invalidation`, cacheError);
                     // Fallback to direct invalidation
                     await this._invalidateCacheDirectly(entityType);
                 }
@@ -842,7 +842,7 @@ class CRUDResponseHandler {
                 // Fallback to direct invalidation if CacheSyncManager not available or entity type not mapped
                 await this._invalidateCacheDirectly(entityType);
             } else {
-                console.debug(`⚠️ Cache managers not available - skipping cache clear for ${entityType}`);
+                window.Logger?.debug(`⚠️ Cache managers not available - skipping cache clear for ${entityType}`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם
@@ -856,13 +856,13 @@ class CRUDResponseHandler {
             
             if (loadFunction && typeof loadFunction === 'function') {
                 await loadFunction();
-                console.log(`✅ רוען טבלה עבור ${entityType}`);
+                window.Logger?.info(`✅ רוען טבלה עבור ${entityType}`);
             } else {
-                console.warn(`⚠️ לא נמצאה פונקציית טעינה עבור ${entityType}`);
+                window.Logger?.warn(`⚠️ לא נמצאה פונקציית טעינה עבור ${entityType}`);
             }
 
         } catch (error) {
-            console.error(`❌ שגיאה ברענון ${entityType}:`, error);
+            window.Logger?.error(`❌ שגיאה ברענון ${entityType}:`, error);
         }
     }
 
@@ -887,9 +887,9 @@ class CRUDResponseHandler {
             for (const key of entityKeys) {
                 await window.UnifiedCacheManager.remove(key);
             }
-            console.log(`🔄 נוקה מטמון ישיר עבור ${entityType} (${entityKeys.length} מפתחות)`);
+            window.Logger?.info(`🔄 נוקה מטמון ישיר עבור ${entityType} (${entityKeys.length} מפתחות)`);
         } catch (error) {
-            console.warn(`⚠️ Failed to invalidate cache directly for ${entityType}:`, error);
+            window.Logger?.warn(`⚠️ Failed to invalidate cache directly for ${entityType}:`, error);
         }
     }
 
@@ -949,7 +949,7 @@ class CRUDResponseHandler {
             }
         } catch (error) {
             // אי אפשר לגשת לדגלים - זה בסדר, פונקציית הטעינה תטפל בזה
-            console.log(`ℹ️ לא ניתן לאפס דגל טעינה עבור ${entityType}`);
+            window.Logger?.info(`ℹ️ לא ניתן לאפס דגל טעינה עבור ${entityType}`);
         }
     }
 
@@ -970,7 +970,7 @@ class CRUDResponseHandler {
             
             // כאן אפשר להוסיף דגלים מיוחדים נוספים עבור ישויות אחרות
         } catch (error) {
-            console.log(`ℹ️ לא ניתן לאפס דגלים מיוחדים עבור ${entityType}`);
+            window.Logger?.info(`ℹ️ לא ניתן לאפס דגלים מיוחדים עבור ${entityType}`);
         }
     }
 

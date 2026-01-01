@@ -33,7 +33,7 @@ from typing import Dict, Any, Optional
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -553,6 +553,7 @@ def check_linked_items(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/', methods=['POST'])
+@require_authentication()
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after creating ticker
 def create_ticker():
@@ -585,7 +586,7 @@ def create_ticker():
         # Check if ticker already exists
         from models.ticker import Ticker
         from models.user_ticker import UserTicker
-        
+
         existing_ticker = db.query(Ticker).filter(
             Ticker.symbol == data.get('symbol')
         ).first()
@@ -627,13 +628,15 @@ def create_ticker():
                 if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
+                        "error_code": "VALIDATION_ERROR",
+                        "message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת",
                         "version": "1.0"
                     }), 400
                 else:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
+                        "error_code": "VALIDATION_ERROR",
+                        "message": f"שגיאה ביצירת טיקר: {error_msg}",
                         "version": "1.0"
                     }), 400
             

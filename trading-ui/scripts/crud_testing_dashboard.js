@@ -33,7 +33,90 @@
 // INTEGRATED CRUD TESTING DASHBOARD 2.0
 // ============================================================================
 
+/**
+ * Integrated CRUD E2E Tester - Main testing dashboard class
+ *
+ * Provides comprehensive testing capabilities for CRUD operations across all pages.
+ * Integrates UI testing, API validation, and E2E workflows in a unified platform.
+ *
+ * @class IntegratedCRUDE2ETester
+ * @property {Object} pages - Mapping of page configurations
+ * @property {string|null} currentTestType - Current active test type
+ * @property {Object} results - Test results organized by type
+ * @property {Object} logger - Logger instance for debugging
+ * @property {Object} activeTradingAccountId - Active trading account ID for admin user
+ */
+
+// ============================================================================
+// INDEX OF FUNCTIONS
+// ============================================================================
+
+/**
+ * @fileoverview CRUD Testing Dashboard - Complete Function Index
+ *
+ * MAIN TESTING METHODS:
+ * ====================
+ * - runRegistrySuite() - Execute tests from TestRegistry using TestOrchestrator
+ * - runE2ETests() - Run comprehensive E2E tests across all CRUD pages
+ * - runGenericCRUDTest(pageKey, page) - Execute CRUD operations for specific page
+ *
+ * CRUD OPERATIONS:
+ * ===============
+ * - performCreateTest(mainWindow, mainDoc, entityType, fieldMap) - Create entity test
+ * - performReadTest(mainWindow, mainDoc, entityType, recordId) - Read entity test
+ * - performUpdateTest(mainWindow, mainDoc, entityType, fieldMap, recordId) - Update entity test
+ * - performDeleteTest(mainWindow, mainDoc, entityType, recordId) - Delete entity test
+ *
+ * INFO SUMMARY TESTING:
+ * ===================
+ * - runInfoSummaryTests() - Execute info summary tests across pages
+ * - testPageInfoSummary(pageKey, page) - Test info summary for single page
+ * - runInfoSummaryTestsInMainWindow(pageKey, page) - Run tests in main window
+ *
+ * DATA GENERATION & UTILITIES:
+ * ===========================
+ * - generateTestData(entityType, fieldMap, isUpdate) - Generate test data
+ * - getEntityFieldMaps() - Get field maps for all entities
+ * - initializePagesMapping() - Initialize page configurations
+ *
+ * UI INTERACTION METHODS:
+ * =====================
+ * - setFormFieldsDirectly(mainDoc, fields, testData) - Set form field values
+ * - reSetEntryPrice(mainDoc, fields, testData) - Reset entry price field
+ * - submitForm(mainWindow, mainDoc, entityType, formData) - Submit form data
+ *
+ * CONFIGURATION & SETUP:
+ * =====================
+ * - getConfigKeyForPage(pageKey) - Get config key for page
+ * - createInfoSummaryTestFunction(config) - Create test function for info summary
+ * - mapPageKeyToEntityType(pageKey) - Map page key to entity type
+ *
+ * RESULTS & REPORTING:
+ * ===================
+ * - updateTestResults() - Update test results display
+ * - updateTestResultsTable() - Update results table in UI
+ * - updateProgressBar() - Update progress bar display
+ * - updateTestStats() - Update test statistics display
+ * - recalculateStatsFromResults() - Recalculate stats from results
+ *
+ * UTILITY METHODS:
+ * ===============
+ * - fetchActiveTradingAccountForCurrentUser() - Fetch active trading account
+ * - UnifiedPayloadBuilder.build() - Build unified payload (static method)
+ *
+ * ============================================================================
+ */
+
 class IntegratedCRUDE2ETester {
+    /**
+     * Initialize the integrated testing dashboard
+     *
+     * Sets up page mappings, test results containers, and initializes the logger.
+     * Prepares the system for running comprehensive CRUD tests across all pages.
+     *
+     * @constructor
+     * @memberof IntegratedCRUDE2ETester
+     */
     constructor() {
         this.pages = this.initializePagesMapping();
         this.currentTestType = null;
@@ -66,11 +149,25 @@ class IntegratedCRUDE2ETester {
         this.logger = window.Logger;
         this.monitoringActive = false;
 
-        console.log('🚀 Integrated CRUD E2E Tester initialized');
+        this.logger?.info?.('🚀 Integrated CRUD E2E Tester initialized');
     }
 
     /**
-     * Run test suite from registry (Test Registry + Orchestrator)
+     * Execute test suite using Test Registry and Test Orchestrator
+     *
+     * Loads tests from the global TestRegistry, filters them using TestRelevancyRules
+     * based on current page context, and executes them using TestOrchestrator.
+     * Provides comprehensive test coverage with progress tracking.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @returns {Promise<void>} - Completes when registry suite execution finishes
+     *
+     * @requires window.TestOrchestrator - Global test orchestrator instance
+     * @requires window.TestRegistry - Global test registry with TEST_REGISTRY
+     * @requires window.TestRelevancyRules - Global relevancy rules system
+     *
+     * @fires IntegratedCRUDE2ETester#registryTestsCompleted - When suite execution completes
      */
     async runRegistrySuite() {
         if (!window.TestOrchestrator) {
@@ -627,7 +724,18 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * E2E Testing - Complete workflows
+     * Run comprehensive E2E (End-to-End) tests across all CRUD pages
+     *
+     * Executes complete workflow tests for all pages that support CRUD operations.
+     * Tests include create, read, update, and delete operations with validation.
+     * Handles special cases for tag_management, preferences, and data_import.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @returns {Promise<void>} - Completes when all E2E tests are finished
+     *
+     * @fires IntegratedCRUDE2ETester#testResultsUpdated - After each page test completion
+     * @fires IntegratedCRUDE2ETester#e2eTestsCompleted - When all tests are done
      */
     async runE2ETests() {
         this.logger?.info('🔄 Starting E2E Tests');
@@ -649,11 +757,7 @@ class IntegratedCRUDE2ETester {
             for (const [pageKey, page] of crudPages) {
                 // #endregion
                 
-                // Clean up any existing iframes before starting new test
-                this.cleanupTestIframes();
-                
-                const iframesBeforeTest = document.querySelectorAll('iframe[id^="test-iframe-"]').length;
-                // #endregion
+                // Main window testing - no iframe cleanup needed
                 
                 try {
                     // Special handling for tag_management (has two CRUD types: categories and tags)
@@ -692,13 +796,9 @@ class IntegratedCRUDE2ETester {
                         executionTime: 0
                     });
                 } finally {
-                    // Clean up iframes after each test
-                    this.cleanupTestIframes();
-                    const iframesAfterTest = document.querySelectorAll('iframe[id^="test-iframe-"]').length;
-                    // #endregion
-                    
-                    // Small delay between tests to allow cleanup to complete
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Main window testing - no cleanup needed
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
             }
 
@@ -752,15 +852,16 @@ class IntegratedCRUDE2ETester {
      */
     async runSingleEntityTest(entityType) {
         try {
-            console.log(`🔍 DEBUG: runSingleEntityTest called for ${entityType}`);
+            this.logger?.debug?.(`🔍 runSingleEntityTest called for ${entityType}`);
             this.logger?.debug(`🔍 Running single entity test for ${entityType}`);
 
             // Show test results section immediately when tests start
             this.updateTestResults();
 
             // Find the page for this entity
-            console.log(`🔍 DEBUG: Looking for page with entityType: ${entityType}`);
-            console.log(`🔍 DEBUG: Available pages:`, Object.keys(this.pages));
+            this.logger?.debug?.(`🔍 Looking for page with entityType: ${entityType}`, {
+                availablePages: Object.keys(this.pages)
+            });
 
             const pageEntry = Object.entries(this.pages).find(([key, page]) => {
                 const matches = page.url.includes(entityType) || key === entityType;
@@ -825,69 +926,77 @@ class IntegratedCRUDE2ETester {
 
 
     /**
-     * Run generic CRUD test for a page
+     * Execute generic CRUD (Create, Read, Update, Delete) test for a specific page
+     *
+     * Performs comprehensive CRUD testing on a single page using main window services.
+     * Tests include data creation, retrieval, modification, and deletion with validation.
+     * All operations are performed directly in the main window without iframe isolation.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @param {string} pageKey - Unique identifier for the page being tested
+     * @param {Object} page - Page configuration object with name, url, and CRUD capabilities
+     * @param {string} page.name - Human-readable page name in Hebrew
+     * @param {string} page.url - Page URL path
+     * @param {boolean} page.hasCRUD - Whether the page supports CRUD operations
+     * @returns {Promise<Object>} - Test result object with success status and details
+     *
+     * @fires IntegratedCRUDE2ETester#crudTestStepCompleted - After each CRUD operation
+     * @fires IntegratedCRUDE2ETester#crudTestCompleted - When full CRUD test finishes
      */
     async runGenericCRUDTest(pageKey, page) {
         const startTime = Date.now();
         let testSteps = [];
 
         try {
-            console.log(`🔄 DEBUG: runGenericCRUDTest called for ${page.name} (${pageKey})`);
+            this.logger?.debug?.(`🔄 runGenericCRUDTest called for ${page.name} (${pageKey})`);
             this.logger?.debug(`🔄 Running generic CRUD test for ${page.name}`);
 
             // Update test results after each test
             this.updateTestResults();
 
-            console.log(`🔄 DEBUG: About to load page in iframe: ${page.url}`);
+            this.logger?.debug?.(`🔄 Starting direct testing for page: ${page.name}`);
 
-            // Load page in iframe for testing
-            const iframe = await this.loadPageInIframe(page.url);
-            console.log(`✅ DEBUG: Iframe loaded successfully for ${page.name}`);
-
-            const iframeDoc = iframe.contentDocument;
-            const iframeWindow = iframe.contentWindow;
+            // Use main window services for direct testing
+            // Use main window for testing
 
                 // Wait for page to fully load and initialization to complete
                 let waitCount = 0;
-                const maxWaitTime = 300; // 30 seconds for full initialization
+                const maxWaitTime = 50; // 5 seconds for main window services
                 while (waitCount < maxWaitTime) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     waitCount++;
 
-                    // Check if UnifiedAppInitializer has completed
-                    const unifiedAppInitialized = iframeWindow.globalInitializationState?.unifiedAppInitialized;
-                    const hasUnifiedCRUD = !!iframeWindow.UnifiedCRUDService;
-                    const hasWindowUnifiedCRUD = !!window.UnifiedCRUDService;
-                    const iframeContext = iframeWindow !== window;
-                    const iframeOrigin = iframeWindow.location?.origin;
-                    const mainOrigin = window.location?.origin;
+                    // Check for essential services in main window
+                    const hasUnifiedCRUD = !!window.UnifiedCRUDService;
+                    const hasAllServices = window.UnifiedCRUDService &&
+                                          window.DataCollectionService &&
+                                          window.CRUDResponseHandler &&
+                                          window.CacheSyncManager;
 
-                    // Check for essential services and initialization
-                    const hasAllServices = iframeWindow.UnifiedCRUDService &&
-                                          iframeWindow.DataCollectionService &&
-                                          iframeWindow.CRUDResponseHandler &&
-                                          iframeWindow.CacheSyncManager;
-
-                    if (unifiedAppInitialized && hasAllServices) {
-                        console.log(`✅ DEBUG: Page fully initialized after ${waitCount * 100}ms`);
-                        console.log(`✅ DEBUG: iframe context: ${iframeContext}, origins match: ${iframeOrigin === mainOrigin}`);
-                        console.log(`✅ DEBUG: All services loaded: UnifiedCRUD: ${hasUnifiedCRUD}, DataCollection: ${!!iframeWindow.DataCollectionService}, CRUDResponse: ${!!iframeWindow.CRUDResponseHandler}, CacheSync: ${!!iframeWindow.CacheSyncManager}`);
+                    if (hasAllServices) {
+                        this.logger?.debug?.(`✅ Main window services available after ${waitCount * 100}ms`, {
+                            servicesLoaded: {
+                                UnifiedCRUD: hasUnifiedCRUD,
+                                DataCollection: !!window.DataCollectionService,
+                                CRUDResponse: !!window.CRUDResponseHandler,
+                                CacheSync: !!window.CacheSyncManager
+                            }
+                        });
                         break;
                     }
 
-                    // Debug every 2 seconds
+                    // Debug logging every 2.5 seconds
                     if (waitCount % 20 === 0) {
                         console.log(`🔄 DEBUG: Waiting for initialization, attempt ${waitCount}/${maxWaitTime}`);
                         console.log(`🔄 DEBUG: UnifiedApp initialized: ${unifiedAppInitialized}`);
-                        console.log(`🔄 DEBUG: UnifiedCRUD in iframe: ${hasUnifiedCRUD}`);
+                        this.logger?.debug?.(`🔄 UnifiedCRUD in main window: ${hasUnifiedCRUD}`);
                         console.log(`🔄 DEBUG: UnifiedCRUD in main window: ${hasWindowUnifiedCRUD}`);
-                        console.log(`🔄 DEBUG: iframe context: ${iframeContext}`);
-                        console.log(`🔄 DEBUG: iframe readyState: ${iframeDoc.readyState}`);
-                        console.log(`🔄 DEBUG: iframe location: ${iframeWindow.location?.href}`);
-                        console.log(`🔄 DEBUG: iframe global objects:`, {
-                            UnifiedCRUDService: typeof iframeWindow.UnifiedCRUDService,
-                            ModalManagerV2: typeof iframeWindow.ModalManagerV2,
-                            window: !!iframeWindow.window
+                        this.logger?.debug?.(`🔄 Direct testing context`, {
+                            servicesAvailable: {
+                                UnifiedCRUDService: typeof window.UnifiedCRUDService,
+                                ModalManagerV2: typeof window.ModalManagerV2
+                            }
                         });
 
                         // #region agent log - HYPOTHESIS: Iframe initialization status
@@ -895,26 +1004,25 @@ class IntegratedCRUDE2ETester {
                             method:'POST',
                             headers:{'Content-Type':'application/json'},
                             body:JSON.stringify({
-                                location:'crud_testing_dashboard.js:iframe-wait-loop',
+                                location:'crud_testing_dashboard.js:main-window-wait-loop',
                                 message:`Iframe initialization check attempt ${waitCount}`,
                                 data:{
                                     unifiedAppInitialized,
                                     hasUnifiedCRUD,
                                     hasWindowUnifiedCRUD,
-                                    iframeContext,
-                                    iframeOrigin,
-                                    mainOrigin,
-                                    iframeReadyState: iframeDoc.readyState,
-                                    iframeLocation: iframeWindow.location?.href,
+                                    mainWindowContext: 'main',
+                                    mainWindowOrigin: window.location?.origin,
+                                    mainWindowReadyState: document.readyState,
+                                    mainWindowLocation: window.location?.href,
                                     globalObjects: {
-                                        UnifiedCRUDService: typeof iframeWindow.UnifiedCRUDService,
-                                        ModalManagerV2: typeof iframeWindow.ModalManagerV2,
-                                        window: !!iframeWindow.window
+                                        UnifiedCRUDService: typeof window.UnifiedCRUDService,
+                                        ModalManagerV2: typeof window.ModalManagerV2,
+                                        window: !!window.window
                                     }
                                 },
                                 timestamp:Date.now(),
                                 sessionId:'debug-session',
-                                runId:'iframe-initialization-debug',
+                                runId:'main-window-initialization-debug',
                                 hypothesisId:'IFRAME_INIT_STATUS'
                             })
                         }).catch(()=>{});
@@ -922,31 +1030,31 @@ class IntegratedCRUDE2ETester {
                     }
                 }
 
-                if (!iframeWindow.UnifiedCRUDService) {
+                if (!window.UnifiedCRUDService) {
                     // Additional debugging for UnifiedCRUDService availability
-                    console.error(`❌ DEBUG: UnifiedCRUDService not found in iframe after 30 seconds`);
-                    console.error(`❌ DEBUG: iframe window properties:`, Object.keys(iframeWindow).filter(key => key.includes('Unified') || key.includes('CRUD')));
-                    console.error(`❌ DEBUG: iframe global objects:`, {
-                        UnifiedCRUDService: iframeWindow.UnifiedCRUDService,
-                        window: iframeWindow.window,
-                        parent: iframeWindow.parent,
-                        top: iframeWindow.top
+                    this.logger?.error?.(`❌ UnifiedCRUDService not found in main window after 5 seconds`, {
+                        mainWindowKeys: Object.keys(window).filter(key => key.includes('Unified') || key.includes('CRUD')),
+                        mainWindowGlobals: {
+                            UnifiedCRUDService: window.UnifiedCRUDService,
+                            DataCollectionService: window.DataCollectionService,
+                            CRUDResponseHandler: window.CRUDResponseHandler,
+                            CacheSyncManager: window.CacheSyncManager
+                        }
                     });
 
-                    // #region agent log - HYPOTHESIS: UnifiedCRUDService not found in iframe
+                    // #region agent log - HYPOTHESIS: UnifiedCRUDService not found in main window
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
                         body:JSON.stringify({
-                            location:'crud_testing_dashboard.js:unified-crud-not-found',
-                            message:'UnifiedCRUDService not found in iframe after timeout',
+                            location:'crud_testing_dashboard.js:unified-crud-not-found-main-window',
+                            message:'UnifiedCRUDService not found in main window after timeout',
                             data:{
-                                iframeWindowKeys: Object.keys(iframeWindow).filter(key => key.includes('Unified') || key.includes('CRUD')),
-                                hasUnifiedCRUD: !!iframeWindow.UnifiedCRUDService,
-                                iframeLocation: iframeWindow.location?.href,
-                                iframeReadyState: iframeDoc.readyState,
-                                globalInitState: iframeWindow.globalInitializationState,
-                                scriptsLoaded: Array.from(iframeDoc.querySelectorAll('script')).map(s => s.src).filter(src => src.includes('unified-crud'))
+                                mainWindowKeys: Object.keys(window).filter(key => key.includes('Unified') || key.includes('CRUD')),
+                                hasUnifiedCRUD: !!window.UnifiedCRUDService,
+                                mainWindowLocation: window.location?.href,
+                                globalInitState: window.globalInitializationState,
+                                scriptsLoaded: Array.from(document.querySelectorAll('script')).map(s => s.src).filter(src => src.includes('unified-crud'))
                             },
                             timestamp:Date.now(),
                             sessionId:'debug-session',
@@ -956,17 +1064,17 @@ class IntegratedCRUDE2ETester {
                     }).catch(()=>{});
                     // #endregion
 
-                    throw new Error('UnifiedCRUDService not loaded in iframe after 30 seconds');
+                    throw new Error('UnifiedCRUDService not loaded in main window after 5 seconds');
                 }
 
-                if (!iframeWindow.globalInitializationState?.unifiedAppInitialized) {
-                    console.warn(`⚠️ DEBUG: UnifiedApp may not be fully initialized, but proceeding with UnifiedCRUD available`);
+                if (!mainWindow.globalInitializationState?.unifiedAppInitialized) {
+                    this.logger?.warn?.(`⚠️ Main window services may not be fully initialized, but proceeding with UnifiedCRUD available`);
                 }
 
 
 
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:658',message:'After iframe load wait',data:{pageKey,iframeWindowKeys:Object.keys(iframeWindow),hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,hasParentUnifiedCRUD:!!window.UnifiedCRUDService},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:main-window-services-ready',message:'Main window services ready for testing',data:{pageKey,mainWindowKeys:Object.keys(window),hasUnifiedCRUD:!!window.UnifiedCRUDService,unifiedCRUDType:typeof window.UnifiedCRUDService},timestamp:Date.now(),sessionId:'debug-session',runId:'main-window-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
             // #endregion
 
             // Get field map for this entity
@@ -982,21 +1090,21 @@ class IntegratedCRUDE2ETester {
 
             // === CREATE TEST ===
             testSteps.push('בדיקת יצירה');
-            console.log(`🔄 DEBUG: Starting CREATE test for ${entityType}`);
+            this.logger?.debug?.(`🔄 Starting CREATE test for ${entityType}`);
 
-            const createResult = await this.performCreateTest(iframeWindow, iframeDoc, entityType, fieldMap);
+            const createResult = await this.performCreateTest(window, document, entityType, fieldMap);
             if (!createResult.success) {
                 throw new Error(`Create test failed: ${createResult.error}`);
             }
 
             const createdRecordId = createResult.recordId;
-            console.log(`✅ DEBUG: CREATE test passed, record ID: ${createdRecordId}`);
+            this.logger?.debug?.(`✅ CREATE test passed, record ID: ${createdRecordId}`);
 
             // === READ TEST ===
             testSteps.push('בדיקת קריאה');
             console.log(`🔄 DEBUG: Starting READ test for ${entityType} ID: ${createdRecordId}`);
 
-            const readResult = await this.performReadTest(iframeWindow, iframeDoc, entityType, createdRecordId);
+            const readResult = await this.performReadTest(window, document, entityType, createdRecordId);
             if (!readResult.success) {
                 throw new Error(`Read test failed: ${readResult.error}`);
             }
@@ -1007,7 +1115,7 @@ class IntegratedCRUDE2ETester {
             testSteps.push('בדיקת עדכון');
             console.log(`🔄 DEBUG: Starting UPDATE test for ${entityType} ID: ${createdRecordId}`);
 
-            const updateResult = await this.performUpdateTest(iframeWindow, iframeDoc, entityType, fieldMap, createdRecordId);
+            const updateResult = await this.performUpdateTest(window, document, entityType, fieldMap, createdRecordId);
             if (!updateResult.success) {
                 throw new Error(`Update test failed: ${updateResult.error}`);
             }
@@ -1018,7 +1126,7 @@ class IntegratedCRUDE2ETester {
             testSteps.push('בדיקת מחיקה');
             console.log(`🔄 DEBUG: Starting DELETE test for ${entityType} ID: ${createdRecordId}`);
 
-            const deleteResult = await this.performDeleteTest(iframeWindow, iframeDoc, entityType, createdRecordId);
+            const deleteResult = await this.performDeleteTest(window, document, entityType, createdRecordId);
             if (!deleteResult.success) {
                 throw new Error(`Delete test failed: ${deleteResult.error}`);
             }
@@ -1084,16 +1192,31 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Perform CREATE test operation
+     * Perform CREATE test operation in main window
+     *
+     * Tests entity creation using UnifiedCRUDService.create() method.
+     * Generates test data based on field map configuration and validates
+     * successful creation with proper ID assignment.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @param {Window} mainWindow - Main window object (for service access)
+     * @param {Document} mainDoc - Main document object (for DOM access)
+     * @param {string} entityType - Type of entity to create (e.g., 'trade', 'alert')
+     * @param {Object} fieldMap - Field configuration map for data generation
+     * @returns {Promise<Object>} - Test result with success status and created record ID
+     *
+     * @requires mainWindow.UnifiedCRUDService - Active CRUD service instance
+     * @fires IntegratedCRUDE2ETester#createTestCompleted - When create test finishes
      */
-    async performCreateTest(iframeWindow, iframeDoc, entityType, fieldMap) {
+    async performCreateTest(mainWindow, mainDoc, entityType, fieldMap) {
         try {
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performCreateTest',message:'Starting create test',data:{entityType,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,unifiedCRUDKeys:iframeWindow.UnifiedCRUDService ? Object.keys(iframeWindow.UnifiedCRUDService) : null,hasModalManager:!!iframeWindow.ModalManagerV2},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performCreateTest',message:'Starting create test',data:{entityType,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDType:typeof mainWindow.UnifiedCRUDService,unifiedCRUDKeys:mainWindow.UnifiedCRUDService ? Object.keys(mainWindow.UnifiedCRUDService) : null,hasModalManager:!!mainWindow.ModalManagerV2},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
             // #endregion
 
             // Generate test data
-            const testData = this.generateTestData(entityType, fieldMap);
+            const testData = await window.UnifiedPayloadBuilder.build(entityType, fieldMap, false);
             console.log(`🔄 DEBUG: Generated test data for ${entityType}:`, testData);
 
             // Test the CRUD service directly instead of using modals
@@ -1103,15 +1226,15 @@ class IntegratedCRUDE2ETester {
             let crudService = window.UnifiedCRUDService;
             let serviceWindow = window;
 
-            console.log(`🔍 DEBUG: main window UnifiedCRUDService:`, {
+            this.logger?.debug?.(`🔍 Main window UnifiedCRUDService:`, {
                 exists: !!window.UnifiedCRUDService,
                 type: typeof window.UnifiedCRUDService,
                 hasCreate: !!(window.UnifiedCRUDService && typeof window.UnifiedCRUDService.create === 'function')
             });
 
             if (!crudService || typeof crudService.create !== 'function') {
-                console.log(`❌ DEBUG: Neither iframe nor main window has UnifiedCRUDService.create`);
-                throw new Error('UnifiedCRUDService.create is not available in iframe or main window');
+                this.logger?.error?.(`❌ UnifiedCRUDService.create is not available in main window`);
+                throw new Error('UnifiedCRUDService.create is not available in main window');
             }
 
 
@@ -1140,9 +1263,23 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Perform READ test operation
+     * Perform READ test operation using direct API calls
+     *
+     * Tests entity retrieval using direct fetch API calls since UnifiedCRUDService
+     * doesn't provide a generic read method. Validates successful data retrieval
+     * and proper response structure.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @param {Window} mainWindow - Main window object (for service access)
+     * @param {Document} mainDoc - Main document object (for DOM access)
+     * @param {string} entityType - Type of entity to read (e.g., 'trade', 'alert')
+     * @param {number|string} recordId - ID of the record to retrieve
+     * @returns {Promise<Object>} - Test result with success status and retrieved data
+     *
+     * @fires IntegratedCRUDE2ETester#readTestCompleted - When read test finishes
      */
-    async performReadTest(iframeWindow, iframeDoc, entityType, recordId) {
+    async performReadTest(mainWindow, mainDoc, entityType, recordId) {
         try {
             // Use direct API call to read the record (UnifiedCRUDService doesn't have read method)
             // Map entity types to their plural API endpoints
@@ -1195,19 +1332,36 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Perform UPDATE test operation
+     * Perform UPDATE test operation with modal interaction
+     *
+     * Tests entity modification by opening edit modal, updating form fields,
+     * and submitting changes. Validates successful update with proper data persistence.
+     * Uses ModalManagerV2 for modal interactions and UnifiedCRUDService for API calls.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @param {Window} mainWindow - Main window object (for service and modal access)
+     * @param {Document} mainDoc - Main document object (for DOM access)
+     * @param {string} entityType - Type of entity to update (e.g., 'trade', 'alert')
+     * @param {Object} fieldMap - Field configuration map for data generation
+     * @param {number|string} recordId - ID of the record to update
+     * @returns {Promise<Object>} - Test result with success status and update confirmation
+     *
+     * @requires mainWindow.ModalManagerV2 - Modal management service
+     * @requires mainWindow.UnifiedCRUDService - CRUD operations service
+     * @fires IntegratedCRUDE2ETester#updateTestCompleted - When update test finishes
      */
-    async performUpdateTest(iframeWindow, iframeDoc, entityType, fieldMap, recordId) {
+    async performUpdateTest(mainWindow, mainDoc, entityType, fieldMap, recordId) {
         try {
             // Open edit modal for the record
-            if (iframeWindow.ModalManagerV2) {
+            if (mainWindow.ModalManagerV2) {
                 // This would typically involve finding and clicking the edit button for the specific record
                 // For now, we'll simulate the update by calling the service directly
                 console.log(`🔄 DEBUG: Simulating UPDATE for ${entityType} ID: ${recordId}`);
             }
 
             // Prepare updated test data
-            const updateData = this.generateTestData(entityType, fieldMap, true); // true for update mode
+            const updateData = await window.UnifiedPayloadBuilder.build(entityType, fieldMap, true); // true for update mode
             updateData.id = recordId;
 
             // Ensure we have the required fields for update
@@ -1217,18 +1371,18 @@ class IntegratedCRUDE2ETester {
 
             // Use UnifiedCRUDService to update
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'Checking UnifiedCRUDService availability',data:{hasIframeWindow:!!iframeWindow,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDMethods:iframeWindow.UnifiedCRUDService ? Object.getOwnPropertyNames(iframeWindow.UnifiedCRUDService).filter(name => typeof iframeWindow.UnifiedCRUDService[name] === 'function') : [],entityType,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'Checking UnifiedCRUDService availability',data:{hasMainWindow:!!window,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDMethods:mainWindow.UnifiedCRUDService ? Object.getOwnPropertyNames(mainWindow.UnifiedCRUDService).filter(name => typeof mainWindow.UnifiedCRUDService[name] === 'function') : [],entityType,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
             // #endregion
 
-            if (!iframeWindow.UnifiedCRUDService) {
-                throw new Error('UnifiedCRUDService not available in iframe');
+            if (!mainWindow.UnifiedCRUDService) {
+                throw new Error('UnifiedCRUDService not available in main window');
             }
 
             // #region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'About to call UnifiedCRUDService.updateEntity',data:{entityType,recordId,updateDataKeys:Object.keys(updateData),hasId:updateData.id},timestamp:Date.now(),sessionId:'debug-session',runId:'update-fix-verification',hypothesisId:'UPDATE_FIX'})}).catch(()=>{});
             // #endregion
 
-            const updateResult = await iframeWindow.UnifiedCRUDService.updateEntity(entityType, recordId, updateData);
+            const updateResult = await mainWindow.UnifiedCRUDService.updateEntity(entityType, recordId, updateData);
             if (!updateResult || !updateResult.success) {
                 throw new Error(`Failed to update record: ${updateResult?.error || 'Unknown error'}`);
             }
@@ -1243,16 +1397,31 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Perform DELETE test operation
+     * Perform DELETE test operation using UnifiedCRUDService
+     *
+     * Tests entity deletion using UnifiedCRUDService.delete() method.
+     * Validates successful record removal and proper cleanup.
+     * Ensures test data created during testing is properly cleaned up.
+     *
+     * @async
+     * @memberof IntegratedCRUDE2ETester
+     * @param {Window} mainWindow - Main window object (for service access)
+     * @param {Document} mainDoc - Main document object (for DOM access)
+     * @param {string} entityType - Type of entity to delete (e.g., 'trade', 'alert')
+     * @param {number|string} recordId - ID of the record to delete
+     * @returns {Promise<Object>} - Test result with success status and deletion confirmation
+     *
+     * @requires mainWindow.UnifiedCRUDService - Active CRUD service instance
+     * @fires IntegratedCRUDE2ETester#deleteTestCompleted - When delete test finishes
      */
-    async performDeleteTest(iframeWindow, iframeDoc, entityType, recordId) {
+    async performDeleteTest(mainWindow, mainDoc, entityType, recordId) {
         try {
             // Use UnifiedCRUDService to delete
-            if (!iframeWindow.UnifiedCRUDService) {
-                throw new Error('UnifiedCRUDService not available in iframe');
+            if (!mainWindow.UnifiedCRUDService) {
+                throw new Error('UnifiedCRUDService not available in main window');
             }
 
-            const deleteResult = await iframeWindow.UnifiedCRUDService.delete(entityType, recordId);
+            const deleteResult = await mainWindow.UnifiedCRUDService.delete(entityType, recordId);
             if (!deleteResult || !deleteResult.success) {
                 throw new Error(`Failed to delete record: ${deleteResult?.error || 'Unknown error'}`);
             }
@@ -1390,10 +1559,10 @@ class IntegratedCRUDE2ETester {
     /**
      * Set form fields directly when DataCollectionService.setFormData is not sufficient
      */
-    setFormFieldsDirectly(iframeDoc, fields, testData) {
+    setFormFieldsDirectly(mainDoc, fields, testData) {
         for (const [fieldName, fieldConfig] of Object.entries(fields)) {
             if (fieldConfig.default !== undefined || testData[fieldName] !== undefined) {
-                const element = iframeDoc.querySelector(fieldConfig.id);
+                const element = mainDoc.querySelector(fieldConfig.id);
                 if (element) {
                     const valueToSet = fieldConfig.default !== undefined ? fieldConfig.default : testData[fieldName];
                     if (valueToSet !== undefined && valueToSet !== null) {
@@ -1414,8 +1583,8 @@ class IntegratedCRUDE2ETester {
     /**
      * Special handling for trade plan entry price
      */
-    reSetEntryPrice(iframeDoc, fields, testData) {
-        const entryPriceElement = iframeDoc.querySelector(fields.entry_price.id);
+    reSetEntryPrice(mainDoc, fields, testData) {
+        const entryPriceElement = mainDoc.querySelector(fields.entry_price.id);
         if (entryPriceElement) {
             entryPriceElement.value = testData.entry_price;
             entryPriceElement.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1427,27 +1596,27 @@ class IntegratedCRUDE2ETester {
     /**
      * Submit form and get result
      */
-    async submitForm(iframeWindow, iframeDoc, entityType, formData) {
+    async submitForm(mainWindow, mainDoc, entityType, formData) {
         try {
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:submitForm',message:'About to check UnifiedCRUDService',data:{entityType,hasUnifiedCRUD:!!iframeWindow.UnifiedCRUDService,unifiedCRUDType:typeof iframeWindow.UnifiedCRUDService,hasCreateMethod:iframeWindow.UnifiedCRUDService?.create ? typeof iframeWindow.UnifiedCRUDService.create : 'no service',formDataKeys:Object.keys(formData)},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:submitForm',message:'About to check UnifiedCRUDService',data:{entityType,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDType:typeof mainWindow.UnifiedCRUDService,hasCreateMethod:mainWindow.UnifiedCRUDService?.create ? typeof mainWindow.UnifiedCRUDService.create : 'no service',formDataKeys:Object.keys(formData)},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
             // #endregion
 
-            if (!iframeWindow.UnifiedCRUDService) {
-                throw new Error('UnifiedCRUDService not available in iframe');
+            if (!mainWindow.UnifiedCRUDService) {
+                throw new Error('UnifiedCRUDService not available in main window');
             }
 
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:createCall',message:'About to call UnifiedCRUDService.create',data:{entityType,formDataKeys:Object.keys(formData),createMethodType:typeof iframeWindow.UnifiedCRUDService.create,createMethodExists:!!iframeWindow.UnifiedCRUDService.create},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:createCall',message:'About to call UnifiedCRUDService.create',data:{entityType,formDataKeys:Object.keys(formData),createMethodType:typeof mainWindow.UnifiedCRUDService.create,createMethodExists:!!mainWindow.UnifiedCRUDService.create},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
             // #endregion
 
             // Ensure create method exists and is a function
-            if (!iframeWindow.UnifiedCRUDService.create || typeof iframeWindow.UnifiedCRUDService.create !== 'function') {
-                throw new TypeError(`iframeWindow.UnifiedCRUDService.create is not a function. Available methods: ${Object.getOwnPropertyNames(iframeWindow.UnifiedCRUDService).join(', ')}`);
+            if (!mainWindow.UnifiedCRUDService.create || typeof mainWindow.UnifiedCRUDService.create !== 'function') {
+                throw new TypeError(`mainWindow.UnifiedCRUDService.create is not a function. Available methods: ${Object.getOwnPropertyNames(mainWindow.UnifiedCRUDService).join(', ')}`);
             }
 
             // Use UnifiedCRUDService to create
-            const createResult = await iframeWindow.UnifiedCRUDService.create(entityType, formData);
+            const createResult = await mainWindow.UnifiedCRUDService.create(entityType, formData);
             if (!createResult || !createResult.success) {
                 throw new Error(`Create failed: ${createResult?.error || 'Unknown error'}`);
             }
@@ -1467,11 +1636,11 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Run Info Summary tests within an iframe
+     * Run Info Summary tests in main window
      */
-    async runInfoSummaryTestsInIframe(iframeWindow, iframeDocument, pageKey, page) {
+    async runInfoSummaryTestsInMainWindow(pageKey, page) {
         try {
-            this.logger?.debug('🔍 [runInfoSummaryTestsInIframe] Starting Info Summary tests', { pageKey, pageName: page.name });
+            this.logger?.debug('🔍 [runInfoSummaryTestsInMainWindow] Starting Info Summary tests', { pageKey, pageName: page.name });
 
             // Get config for this page
             const configKey = this.getConfigKeyForPage(pageKey);
@@ -1485,14 +1654,14 @@ class IntegratedCRUDE2ETester {
                 };
             }
 
-            // Inject test functions into iframe
+            // Inject test functions into main window
             const testFunction = this.createInfoSummaryTestFunction(config);
-            iframeWindow.eval(testFunction);
+            window.eval(testFunction);
 
             // Run the tests
-            const result = await iframeWindow.runInfoSummaryElementTests();
+            const result = await window.runInfoSummaryElementTests();
 
-            this.logger?.debug('🔍 [runInfoSummaryTestsInIframe] Test result:', result);
+            this.logger?.debug('🔍 [runInfoSummaryTestsInMainWindow] Test result:', result);
 
             return {
                 status: result.success ? 'success' : 'failed',
@@ -1507,7 +1676,7 @@ class IntegratedCRUDE2ETester {
             };
 
         } catch (error) {
-            this.logger?.error('❌ [runInfoSummaryTestsInIframe] Test execution failed', {
+            this.logger?.error('❌ [runInfoSummaryTestsInMainWindow] Test execution failed', {
                 pageKey,
                 error: error.message,
                 page: page.name
@@ -1539,7 +1708,7 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Create Info Summary test function to inject into iframe
+     * Create Info Summary test function to run in main window
      */
     createInfoSummaryTestFunction(config) {
         return `
@@ -1773,192 +1942,14 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Clean up all test iframes to prevent nested iframes
+     * Main window testing - iframe cleanup removed
+     * No cleanup needed for main window tests
      */
-    cleanupTestIframes() {
-        // Remove all iframes from testIframeContainer
-        const container = document.getElementById('testIframeContainer');
-        if (container) {
-            const iframes = container.querySelectorAll('iframe');
-            iframes.forEach(iframe => {
-                try {
-                    // Remove event listeners and clean up
-                    iframe.onload = null;
-                    iframe.onerror = null;
-                    iframe.src = 'about:blank'; // Clear src first
-                    if (iframe.parentNode) {
-                        iframe.parentNode.removeChild(iframe);
-                    }
-                } catch (error) {
-                    this.logger?.warn(`⚠️ [cleanupTestIframes] Error removing iframe: ${error.message}`);
-                }
-            });
-            this.logger?.debug(`🧹 [cleanupTestIframes] Removed ${iframes.length} iframe(s) from container`);
-        }
-        
-        // Also remove any orphaned iframes with test-iframe- prefix
-        const allIframes = document.querySelectorAll('iframe[id^="test-iframe-"]');
-        allIframes.forEach(iframe => {
-            try {
-                iframe.onload = null;
-                iframe.onerror = null;
-                iframe.src = 'about:blank';
-                if (iframe.parentNode) {
-                    iframe.parentNode.removeChild(iframe);
-                }
-            } catch (error) {
-                this.logger?.warn(`⚠️ [cleanupTestIframes] Error removing orphaned iframe: ${error.message}`);
-            }
-        });
-        
-        if (allIframes.length > 0) {
-            this.logger?.debug(`🧹 [cleanupTestIframes] Removed ${allIframes.length} orphaned iframe(s)`);
-        }
-    }
 
     /**
-     * Load page in iframe for testing
-     * @param {string} pageUrl - URL of the page to load
-     * @returns {Promise<HTMLIFrameElement>} - Promise that resolves to the loaded iframe
+     * Main window testing - iframe loading removed
+     * All tests now run directly in the main window
      */
-    async loadPageInIframe(pageUrl) {
-        return new Promise((resolve, reject) => {
-            try {
-                console.log(`🔵 DEBUG: loadPageInIframe called with pageUrl: ${pageUrl}`);
-
-                // Create unique iframe ID
-                const iframeId = `test-iframe-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-                console.log(`🔵 DEBUG: Created iframe ID: ${iframeId}`);
-                this.logger?.info(`🔵 [loadPageInIframe] Starting to load iframe: ${iframeId} for ${pageUrl}`);
-
-                // Create iframe element
-                const iframe = document.createElement('iframe');
-                iframe.id = iframeId;
-                iframe.src = pageUrl;
-                iframe.style.width = '100%';
-                iframe.style.height = '600px';
-                iframe.style.border = '2px solid #26baac';
-                iframe.style.borderRadius = '8px';
-                iframe.style.display = 'block';
-                iframe.style.visibility = 'visible';
-                iframe.style.opacity = '1';
-
-                // Find container and append iframe
-                const container = document.getElementById('testIframeContainer');
-                if (!container) {
-                    throw new Error('testIframeContainer not found');
-                }
-
-                // Make sure container is visible
-                console.log('🔍 DEBUG: Before setting container display - current style.display:', container.style.display);
-                container.style.display = 'block';
-                container.style.visibility = 'visible';
-                console.log('🔍 DEBUG: After setting container display - current style.display:', container.style.display);
-
-                container.appendChild(iframe);
-
-                // Debug iframe display
-                console.log('🔍 DEBUG: Iframe created with display:', iframe.style.display);
-                console.log('🔍 DEBUG: Iframe ID:', iframe.id);
-                console.log('🔍 DEBUG: Iframe element:', iframe);
-
-                // Double-check after a short delay
-                setTimeout(() => {
-                    console.log('🔍 DEBUG: Iframe display after delay:', iframe.style.display);
-                    console.log('🔍 DEBUG: Iframe computed style:', window.getComputedStyle(iframe).display);
-                }, 100);
-
-                // Monitor iframe display changes over time
-                const monitorIframe = (iframe, id) => {
-                    let lastDisplay = iframe.style.display;
-                    let lastComputed = window.getComputedStyle(iframe).display;
-
-                    const checkDisplay = () => {
-                        const currentDisplay = iframe.style.display;
-                        const currentComputed = window.getComputedStyle(iframe).display;
-
-                        if (currentDisplay !== lastDisplay || currentComputed !== lastComputed) {
-                            console.log(`🔄 DEBUG: Iframe ${id} display changed:`, {
-                                oldDisplay: lastDisplay,
-                                newDisplay: currentDisplay,
-                                oldComputed: lastComputed,
-                                newComputed: currentComputed,
-                                timestamp: new Date().toISOString()
-                            });
-                            lastDisplay = currentDisplay;
-                            lastComputed = currentComputed;
-                        }
-                    };
-
-                    // Check every 100ms for 5 seconds
-                    let checks = 0;
-                    const interval = setInterval(() => {
-                        checkDisplay();
-                        checks++;
-                        if (checks >= 50) { // 50 * 100ms = 5 seconds
-                            clearInterval(interval);
-                        }
-                    }, 100);
-                };
-
-                monitorIframe(iframe, iframeId);
-
-                this.logger?.debug(`🔵 [loadPageInIframe] Iframe appended to container: ${iframeId}`);
-
-                // Log container visibility
-                const containerRect = container.getBoundingClientRect();
-                const containerVisible = containerRect.width > 0 && containerRect.height > 0;
-                this.logger?.debug(`🔍 [loadPageInIframe] Container visibility: ${containerVisible}, rect:`, containerRect);
-
-                // Log iframe visibility
-                setTimeout(() => {
-                    const iframeRect = iframe.getBoundingClientRect();
-                    const iframeVisible = iframeRect.width > 0 && iframeRect.height > 0;
-                    this.logger?.debug(`🔍 [loadPageInIframe] Iframe visibility after append: ${iframeVisible}, rect:`, iframeRect);
-
-                    // Check if iframe is in DOM
-                    const isInDOM = document.contains(iframe);
-                    this.logger?.debug(`🔍 [loadPageInIframe] Iframe in DOM: ${isInDOM}, parent: ${iframe.parentElement?.id}`);
-                }, 100);
-
-                let loadStartTime = Date.now();
-
-                // Wait for iframe to load
-                iframe.onload = () => {
-                    const loadTime = Date.now() - loadStartTime;
-                    this.logger?.info(`✅ [loadPageInIframe] Iframe loaded successfully: ${iframeId} (${loadTime}ms)`);
-                    resolve(iframe);
-                };
-
-                iframe.onerror = (error) => {
-                    const loadTime = Date.now() - loadStartTime;
-                    this.logger?.error(`❌ [loadPageInIframe] Failed to load iframe: ${iframeId} (${loadTime}ms)`, { error, pageUrl });
-                    reject(new Error(`Failed to load iframe for ${pageUrl}`));
-                };
-
-                // Check if iframe is actually visible
-                setTimeout(() => {
-                    const rect = iframe.getBoundingClientRect();
-                    const isVisible = rect.width > 0 && rect.height > 0;
-                    this.logger?.debug(`🔍 [loadPageInIframe] Iframe visibility check: ${iframeId}, visible: ${isVisible}, rect:`, rect);
-                }, 1000);
-
-                // Timeout after 120 seconds (increased from 60)
-                setTimeout(() => {
-                    const loadTime = Date.now() - loadStartTime;
-                    if (!iframe.contentDocument || iframe.contentDocument.readyState !== 'complete') {
-                        this.logger?.error(`⏰ [loadPageInIframe] Timeout loading iframe: ${iframeId} (${loadTime}ms)`);
-                        reject(new Error(`Timeout loading iframe for ${pageUrl}`));
-                    }
-                }, 120000);
-
-            } catch (error) {
-                this.logger?.error('❌ [loadPageInIframe] Error creating iframe', { error, pageUrl });
-                reject(error);
-            }
-        });
-    }
 
     /**
      * Load INFO_SUMMARY_CONFIGS dynamically if not already loaded
@@ -2079,29 +2070,23 @@ class IntegratedCRUDE2ETester {
 
             const testResults = [];
 
-            // Run tests sequentially (one at a time) to avoid nested iframes
+            // Run tests sequentially in main window
             for (const [pageKey, page] of pagesWithSummary) {
                 try {
                     this.logger?.info(`🔵 [runInfoSummaryTests] Testing ${page.name} (${pageKey})...`);
-                    
-                    // Clean up any existing iframes before starting new test
-                    this.cleanupTestIframes();
-                    
-                    // Run test for this page
+
+                    // Run test for this page in main window
                     const result = await this.testPageInfoSummary(pageKey, page);
                     testResults.push(result);
-                    
+
                     // Store results immediately after each test
                     this.results['info-summary'] = testResults;
-                    
+
                     // Update test results table after each test
                     this.updateTestResults();
-                    
-                    // Clean up iframe after test completes
-                    this.cleanupTestIframes();
-                    
+
                     // Small delay between tests
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 100));
                     
                 } catch (error) {
                     this.logger?.error(`❌ [runInfoSummaryTests] Test failed for ${page.name}`, { error: error.message });
@@ -2120,7 +2105,7 @@ class IntegratedCRUDE2ETester {
                     // Update test results table even on error
                     this.updateTestResults();
                     
-                    // Clean up iframe even on error
+                    // Main window testing - no cleanup needed
                     this.cleanupTestIframes();
                 }
             }
@@ -2618,49 +2603,9 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Wait for page to fully load and initialize
-     * @param {Window} iframeWindow - The iframe's window object
-     * @param {Document} iframeDocument - The iframe's document object
-     * @param {number} timeout - Maximum wait time in milliseconds (default: 10000)
+     * Main window testing - page load waiting removed
+     * Tests run in already loaded main window
      */
-    async waitForPageLoad(iframeWindow, iframeDocument, timeout = 10000) {
-        return new Promise((resolve, reject) => {
-            let resolved = false;
-
-            const resolveOnce = () => {
-                if (!resolved) {
-                    resolved = true;
-                    resolve();
-                }
-            };
-
-            // Check if document is already ready
-            if (iframeDocument.readyState === 'complete') {
-                // Wait additional 3 seconds for async operations
-                setTimeout(resolveOnce, 3000);
-            } else {
-                // Wait for document to be ready
-                const checkReady = () => {
-                    if (iframeDocument.readyState === 'complete') {
-                        // Wait additional 3 seconds for async operations
-                        setTimeout(resolveOnce, 3000);
-                    } else {
-                        setTimeout(checkReady, 100);
-                    }
-                };
-                checkReady();
-            }
-
-            // Timeout after specified time
-            setTimeout(() => {
-                if (!resolved) {
-                    resolved = true;
-                    this.logger?.warn(`⏰ [waitForPageLoad] Timeout waiting for page load (${timeout}ms)`);
-                    resolve(); // Resolve anyway to continue testing
-                }
-            }, timeout);
-        });
-    }
 
     /**
      * Test info summary for a single page
@@ -2672,31 +2617,52 @@ class IntegratedCRUDE2ETester {
         const consoleErrors = [];
 
         try {
-            // Ensure no existing iframes before loading new one
-            this.cleanupTestIframes();
+            // Main window testing - no iframe setup needed
             
-            // Load page in iframe (handle special cases like index page)
-            let pageUrl = page.url;
-            if (pageKey === 'index') {
-                // Index page is served at root, use /index.html
-                pageUrl = '/index.html';
-            } else if (!pageUrl.endsWith('.html')) {
-                pageUrl = `${pageUrl}.html`;
-            }
-            
-            const iframe = await this.loadPageInIframe(pageUrl);
-            const iframeWindow = iframe.contentWindow;
-            const iframeDocument = iframe.contentDocument;
+            // Run test directly in main window
 
-            // Capture console errors from iframe
-            if (iframeWindow) {
-                const originalError = iframeWindow.console.error;
-                const originalWarn = iframeWindow.console.warn;
-                const errorHandler = (iframeWindow.addEventListener || (() => {}));
-                
-                // Override console.error to capture errors
-                iframeWindow.console.error = function(...args) {
-                    const message = args.map(arg => {
+            // Run test directly in main window
+            const testResult = await this.runInfoSummaryTestsInMainWindow(pageKey, page);
+
+            // Return success result with test details
+            return {
+                page: page.name,
+                pageKey,
+                status: testResult.status,
+                issues: testResult.issues || [],
+                warnings: testResult.warnings || [],
+                consoleErrors: consoleErrors,
+                executionTime: Date.now() - startTime,
+                ...testResult.details
+            };
+
+        } catch (error) {
+            this.logger?.error('❌ [testPageInfoSummary] Test failed', {
+                pageKey,
+                error: error.message,
+                page: page.name
+            });
+            return {
+                page: page.name,
+                pageKey,
+                status: 'failed',
+                error: error.message,
+                issues: [`Test error: ${error.message}`],
+                warnings: [],
+                consoleErrors: consoleErrors,
+                executionTime: Date.now() - startTime
+            };
+        }
+    }
+
+    // ============================================================================
+    // UNIFIED PAYLOAD BUILDER INTEGRATION
+    // ============================================================================
+
+    /**
+     * Fetch active trading account for current user (admin) before tests
+     */
+    async fetchActiveTradingAccountForCurrentUser() {
                         if (typeof arg === 'object') {
                             try {
                                 return JSON.stringify(arg);
@@ -2741,11 +2707,11 @@ class IntegratedCRUDE2ETester {
                         });
                     }
                     
-                    originalError.apply(iframeWindow.console, args);
+                    originalError.apply(window.console, args);
                 };
                 
                 // Override console.warn for critical warnings
-                iframeWindow.console.warn = function(...args) {
+                mainWindow.console.warn = function(...args) {
                     const message = args.map(arg => {
                         if (typeof arg === 'object') {
                             try {
@@ -2806,12 +2772,12 @@ class IntegratedCRUDE2ETester {
                         });
                     }
                     
-                    originalWarn.apply(iframeWindow.console, args);
+                    originalWarn.apply(window.console, args);
                 };
                 
                 // Global error handler
-                if (iframeWindow.addEventListener) {
-                    iframeWindow.addEventListener('error', (event) => {
+                if (window.addEventListener) {
+                    window.addEventListener('error', (event) => {
                         const msg = (event.message || 'Unknown error').toLowerCase();
                         const isExpectedError = msg.includes('404') ||
                             msg.includes('not found') ||
@@ -2839,7 +2805,7 @@ class IntegratedCRUDE2ETester {
                     });
                     
                     // Unhandled promise rejection handler
-                    iframeWindow.addEventListener('unhandledrejection', (event) => {
+                    window.addEventListener('unhandledrejection', (event) => {
                         const msg = (event.reason?.message || String(event.reason) || 'Unhandled promise rejection').toLowerCase();
                         const isExpectedRejection = msg.includes('404') ||
                             msg.includes('not found') ||
@@ -2873,10 +2839,10 @@ class IntegratedCRUDE2ETester {
                 });
                 throw new Error('waitForPageLoad method is not available');
             }
-            await this.waitForPageLoad(iframeWindow, iframeDocument, 10000);
+            // Main window testing - page already loaded
 
             // Inject and run Info Summary tests
-            const testResult = await this.runInfoSummaryTestsInIframe(iframeWindow, iframeDocument, pageKey, page);
+            const testResult = await this.runInfoSummaryTestsInMainWindow(pageKey, page);
 
             // Return success result with test details
             return {
@@ -2910,6 +2876,71 @@ class IntegratedCRUDE2ETester {
             this.cleanupTestIframes();
         }
     }
+
+    // ============================================================================
+    // UNIFIED PAYLOAD BUILDER INTEGRATION
+    // ============================================================================
+
+    /**
+     * Fetch active trading account for current user (admin) before tests
+     */
+    async fetchActiveTradingAccountForCurrentUser() {
+        console.log('🔍 Fetching active trading account for current user...');
+
+        try {
+            const accountId = await window.UnifiedPayloadBuilder?.fetchActiveTradingAccountForCurrentUser();
+            if (accountId) {
+                window.UnifiedPayloadBuilder.setActiveTradingAccount(accountId);
+
+                // #region agent log - active account fetched
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'crud_testing_dashboard.js:2915',
+                        message:'active_trading_account_fetched',
+                        data:{
+                            accountId: accountId,
+                            timestamp: Date.now()
+                        },
+                        sessionId:'payload-unification',
+                        runId:'payload-unification-1',
+                        hypothesisId:'active-account-resolution-working'
+                    })
+                }).catch(()=>{});
+                // #endregion
+
+                window.Logger?.info?.('✅ Active trading account fetched for payload builder', {
+                    accountId,
+                    page: 'crud-testing-dashboard'
+                });
+
+                return accountId;
+            }
+        } catch (error) {
+            console.error('❌ Failed to fetch active trading account:', error);
+
+            // #region agent log - active account fetch failed
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    location:'crud_testing_dashboard.js:2935',
+                    message:'active_trading_account_fetch_failed',
+                    data:{
+                        error: error.message,
+                        timestamp: Date.now()
+                    },
+                    sessionId:'payload-unification',
+                    runId:'payload-unification-1',
+                    hypothesisId:'active-account-resolution-working'
+                })
+            }).catch(()=>{});
+            // #endregion
+        }
+
+        return null;
+    }
 }
 
 // ============================================================================
@@ -2926,7 +2957,12 @@ window.runTradePlanTestOnly = async function() {
     console.log('🔍 DEBUG: window.crudTester exists:', !!window.crudTester);
     try {
         const tester = await ensureCrudTester();
-        console.log('🔍 DEBUG: tester obtained, calling runSingleEntityTest');
+        console.log('🔍 DEBUG: tester obtained, fetching active trading account...');
+
+        // Fetch active trading account before tests
+        await tester.fetchActiveTradingAccountForCurrentUser();
+        console.log('🔍 DEBUG: active trading account fetched, calling runSingleEntityTest');
+
         await tester.runSingleEntityTest('trade_plan');
         console.log('✅ runTradePlanTestOnly completed');
     } catch (error) {
@@ -2935,7 +2971,32 @@ window.runTradePlanTestOnly = async function() {
     }
 };
 
+// Cash Flow Test
+window.runCashFlowTestOnly = async function() {
+    console.log('🔍 runCashFlowTestOnly called');
+    console.log('🔍 DEBUG: window.crudTester exists:', !!window.crudTester);
+    try {
+        const tester = await ensureCrudTester();
+        console.log('🔍 DEBUG: tester obtained, fetching active trading account...');
+
+        // Fetch active trading account before tests
+        await tester.fetchActiveTradingAccountForCurrentUser();
+        console.log('🔍 DEBUG: active trading account fetched, calling runSingleEntityTest');
+
+        await tester.runSingleEntityTest('cash_flow');
+        console.log('✅ runCashFlowTestOnly completed');
+    } catch (error) {
+        console.error('❌ runCashFlowTestOnly failed:', error);
+        console.error('❌ Error stack:', error.stack);
+    }
+};
+
 // Helper function to initialize crudTester if needed
+/**
+ * Ensure CRUD Tester is Available
+ * Creates and initializes the global crudTester instance if not exists
+ * @returns {Promise<IntegratedCRUDE2ETester>} The initialized CRUD tester instance
+ */
 async function ensureCrudTester() {
     if (!window.crudTester) {
         console.log('🔄 Initializing crudTester...');
@@ -3090,6 +3151,10 @@ window.runImportSessionTestOnly = async function() {
 /**
  * Initialize CRUD Testing Dashboard
  * Creates and initializes the integrated testing system
+ */
+/**
+ * Initialize CRUD Testing Dashboard
+ * Sets up the global crudTester instance and configures the testing dashboard
  */
 function initializeCRUDTestingDashboard() {
     try {
@@ -4075,3 +4140,357 @@ window.Logger?.debug('crud_testing_dashboard.js loaded', {
     runIndexSortingTest: typeof window.runIndexSortingTest,
     runAllTableSortingTests: typeof window.runAllTableSortingTests
 });
+
+// ============================================================================
+// UNIFIED PAYLOAD BUILDER - Centralized Payload Generation
+// ============================================================================
+
+window.UnifiedPayloadBuilder = {
+    // Valid tickers for testing
+    validTickers: ['PLTR', 'AAPL', 'TSLA', 'MSFT', 'QQQ'],
+
+    // Active trading account ID (set by fetchActiveTradingAccountForCurrentUser)
+    activeTradingAccountId: null,
+
+    // Main entry point for payload generation
+    build: function(entityType, fieldMap, isUpdate = false) {
+        return this.generateTestData(entityType, fieldMap, isUpdate);
+    },
+
+    // Generate test data based on field map
+    generateTestData: function(entityType, fieldMap, isUpdate = false) {
+        if (!fieldMap || !fieldMap.fields) {
+            throw new Error(`No field map found for entity: ${entityType}`);
+        }
+
+        const testData = {};
+
+        // Generate value for each field in the map
+        for (const [fieldName, fieldConfig] of Object.entries(fieldMap.fields)) {
+            testData[fieldName] = this.generateFieldValue(fieldName, fieldConfig, entityType, isUpdate);
+        }
+
+        // Apply entity-specific overrides
+        this.applyEntitySpecificOverrides(testData, entityType, isUpdate);
+
+        // Apply update modifications if needed
+        if (isUpdate) {
+            this.applyUpdateModifications(testData, entityType);
+        }
+
+        // Validate required fields
+        this.validateRequiredFields(testData, fieldMap.required || [], entityType);
+
+        // Log the generated payload
+        this.logGeneratedPayload(testData, entityType, isUpdate);
+
+        return testData;
+    },
+
+    // Generate value for individual field
+    generateFieldValue: function(fieldName, fieldConfig, entityType, isUpdate) {
+        // Handle dynamic ID resolution first
+        if (this.isDynamicIdField(fieldName)) {
+            return this.resolveDynamicId(fieldName, entityType);
+        }
+
+        // Handle date/datetime fields
+        if (fieldConfig.type === 'date' || fieldConfig.type === 'datetime-local') {
+            return this.generateDateValue(fieldName, fieldConfig.type);
+        }
+
+        // Use default value if specified
+        if (fieldConfig.default !== undefined && !isUpdate) {
+            return fieldConfig.default;
+        }
+
+        // Generate based on type
+        switch (fieldConfig.type) {
+            case 'text':
+                return this.generateTextValue(fieldName, fieldConfig);
+            case 'number':
+            case 'int':
+                return this.generateNumberValue(fieldName, fieldConfig);
+            case 'rich-text':
+                return this.generateTextValue(fieldName, fieldConfig);
+            case 'tags':
+                return [];
+            default:
+                return this.generateTextValue(fieldName, fieldConfig);
+        }
+    },
+
+    // Check if field needs dynamic ID resolution
+    isDynamicIdField: function(fieldName) {
+        return ['trading_account_id', 'ticker_id', 'trade_id', 'currency_id', 'related_id', 'user_id'].includes(fieldName);
+    },
+
+    // Resolve dynamic IDs
+    resolveDynamicId: function(fieldName, entityType) {
+        switch (fieldName) {
+            case 'trading_account_id':
+                // Use active trading account if available, otherwise fetch one
+                if (this.activeTradingAccountId) {
+                    return this.activeTradingAccountId;
+                }
+                return this.fetchValidTradingAccount();
+            case 'ticker_id':
+                return this.fetchValidTicker();
+            case 'trade_id':
+                return this.fetchValidTrade();
+            case 'currency_id':
+                return this.fetchValidCurrency();
+            case 'user_id':
+                return 2; // Admin user ID
+            case 'related_id':
+                // Depends on related_type_id, but for testing use trading_account_id
+                return this.activeTradingAccountId || this.fetchValidTradingAccount();
+            default:
+                return 1; // Fallback
+        }
+    },
+
+    // Generate date/datetime values
+    generateDateValue: function(fieldName, type) {
+        const now = new Date();
+        if (type === 'datetime-local') {
+            return now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM format
+        } else {
+            return now.toISOString().split('T')[0]; // YYYY-MM-DD format
+        }
+    },
+
+    // Generate text values
+    generateTextValue: function(fieldName, fieldConfig) {
+        if (fieldName === 'symbol') {
+            return this.validTickers[Math.floor(Math.random() * this.validTickers.length)];
+        }
+        if (fieldName === 'name') {
+            return `Test ${fieldName} ${Date.now()}`;
+        }
+        if (fieldName === 'status') {
+            return 'open';
+        }
+        if (fieldName === 'side') {
+            return 'Long';
+        }
+        if (fieldName === 'investment_type') {
+            return 'swing';
+        }
+        if (fieldName === 'type') {
+            return 'deposit'; // For cash_flow
+        }
+        if (fieldName === 'source') {
+            return 'manual';
+        }
+        if (fieldName === 'action') {
+            return 'buy';
+        }
+        if (fieldName === 'condition_operator') {
+            return 'more_than';
+        }
+        return `test_${fieldName}_${Date.now()}`;
+    },
+
+    // Generate number values
+    generateNumberValue: function(fieldName, fieldConfig) {
+        if (fieldName === 'amount' || fieldName === 'planned_amount') {
+            return 1000 + Math.floor(Math.random() * 9000);
+        }
+        if (fieldName === 'price' || fieldName === 'entry_price') {
+            return 100 + Math.floor(Math.random() * 900);
+        }
+        if (fieldName === 'quantity') {
+            return 10 + Math.floor(Math.random() * 90);
+        }
+        if (fieldName === 'opening_balance') {
+            return 10000;
+        }
+        return Math.floor(Math.random() * 1000) + 1;
+    },
+
+    // Apply entity-specific overrides
+    applyEntitySpecificOverrides: function(testData, entityType, isUpdate) {
+        switch (entityType) {
+            case 'trade_plan':
+                // Ensure required fields for trade_plan
+                if (!testData.trading_account_id) {
+                    testData.trading_account_id = this.activeTradingAccountId || this.fetchValidTradingAccount();
+                }
+                if (!testData.ticker_id) {
+                    testData.ticker_id = this.fetchValidTicker();
+                }
+                break;
+            case 'cash_flow':
+                // Ensure required fields for cash_flow
+                if (!testData.trading_account_id) {
+                    testData.trading_account_id = this.activeTradingAccountId || this.fetchValidTradingAccount();
+                }
+                if (!testData.currency_id) {
+                    testData.currency_id = this.fetchValidCurrency();
+                }
+                break;
+        }
+    },
+
+    // Apply modifications for updates
+    applyUpdateModifications: function(testData, entityType) {
+        // For updates, modify some fields to show change
+        if (testData.notes) {
+            testData.notes = testData.notes + ' (updated)';
+        }
+        if (testData.amount) {
+            testData.amount = testData.amount + 100;
+        }
+    },
+
+    // Validate required fields
+    validateRequiredFields: function(testData, requiredFields, entityType) {
+        const missing = requiredFields.filter(field => !testData[field]);
+        if (missing.length > 0) {
+            console.warn(`Missing required fields for ${entityType}:`, missing);
+        }
+    },
+
+    // Dynamic ID fetching methods
+    async fetchValidTradingAccount() {
+        try {
+            // Try to get the active account for the current user first
+            if (this.activeTradingAccountId) {
+                return this.activeTradingAccountId;
+            }
+
+            const response = await fetch('/api/trading-accounts/');
+            const data = await response.json();
+            if (data && data.length > 0) {
+                // Return the first active account
+                const activeAccount = data.find(acc => acc.status === 'open') || data[0];
+                return activeAccount.id;
+            }
+        } catch (error) {
+            console.warn('Failed to fetch trading accounts:', error);
+        }
+        return 1; // Fallback
+    },
+
+    async fetchValidTicker() {
+        try {
+            const response = await fetch('/api/tickers/');
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return data[0].id;
+            }
+        } catch (error) {
+            console.warn('Failed to fetch tickers:', error);
+        }
+        return 1; // Fallback
+    },
+
+    async fetchValidTrade() {
+        try {
+            const response = await fetch('/api/trades/');
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return data[0].id;
+            }
+        } catch (error) {
+            console.warn('Failed to fetch trades:', error);
+        }
+        return 1; // Fallback
+    },
+
+    async fetchValidCurrency() {
+        try {
+            const response = await fetch('/api/currencies/');
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return data[0].id;
+            }
+        } catch (error) {
+            console.warn('Failed to fetch currencies:', error);
+        }
+        return 1; // Fallback USD
+    },
+
+    // Set active trading account (called before tests)
+    setActiveTradingAccount: function(accountId) {
+        this.activeTradingAccountId = accountId;
+        console.log('UnifiedPayloadBuilder: Set active trading account:', accountId);
+    },
+
+    // Fetch active trading account for current user
+    async fetchActiveTradingAccountForCurrentUser() {
+        try {
+            // Get current user info
+            const authResponse = await fetch('/api/auth/me');
+            const userData = await authResponse.json();
+
+            if (userData && userData.id) {
+                // Get trading accounts for this user
+                const accountsResponse = await fetch('/api/trading-accounts/');
+                const accounts = await accountsResponse.json();
+
+                // Find active account for this user
+                const userAccounts = accounts.filter(acc => acc.user_id === userData.id && acc.status === 'open');
+                if (userAccounts.length > 0) {
+                    this.activeTradingAccountId = userAccounts[0].id;
+                    console.log('UnifiedPayloadBuilder: Found active trading account for user:', this.activeTradingAccountId);
+                    return this.activeTradingAccountId;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to fetch active trading account for user:', error);
+        }
+        return null;
+    },
+
+    // Log generated payload
+    logGeneratedPayload: function(testData, entityType, isUpdate) {
+        const logData = {
+            entityType,
+            isUpdate,
+            fieldCount: Object.keys(testData).length,
+            hasTradingAccountId: !!testData.trading_account_id,
+            hasTickerId: !!testData.ticker_id,
+            hasDateFields: Object.keys(testData).some(key =>
+                key.includes('date') || key.includes('created_at') || key.includes('updated_at')
+            ),
+            payloadKeys: Object.keys(testData)
+        };
+
+        // #region agent log - payload generated
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                location:'crud_testing_dashboard.js:4150',
+                message:'payload_generated',
+                data: logData,
+                sessionId:'payload-unification',
+                runId:'payload-unification-1',
+                hypothesisId:'payload-unification-working'
+            })
+        }).catch(()=>{});
+        // #endregion
+
+        window.Logger?.info?.(`Generated ${isUpdate ? 'update' : 'create'} payload for ${entityType}`, logData);
+    }
+};
+
+// ============================================================================
+// INTEGRATION WITH ENHANCED TESTER
+// ============================================================================
+
+// Update enhanced tester to use unified payload builder
+if (window.CRUDEnhancedTester) {
+    // Override getTestData methods to use unified builder
+    const originalGetTestData = window.CRUDEnhancedTester.prototype.getTestData;
+    window.CRUDEnhancedTester.prototype.getTestData = function(entityType, isUpdate = false) {
+        const fieldMap = window.crudDashboard?.pages?.[entityType];
+        if (fieldMap && window.UnifiedPayloadBuilder) {
+            return window.UnifiedPayloadBuilder.build(entityType, fieldMap, isUpdate);
+        }
+        // Fallback to original method
+        return originalGetTestData.call(this, entityType, isUpdate);
+    };
+}

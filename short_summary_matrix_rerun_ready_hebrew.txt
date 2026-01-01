@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הכנת סקריפט Matrix-Based Rerun לפי Failure-to-Fix Matrix
+- מטריצה מגדירה 8 תיקונים נדרשים מ-Teams A/B/C ל-8 entities שנכשלים
+Evidence:
+- סקריפט מוכן עם payloads מתוקנים ו-matrix compliance tracking
+- 7 entities עובדים כרגע, 8 נדרשים תיקון לפי מטריצה
+Blockers:
+- ממתין לאישור תיקוני מטריצה מ-Teams A/B/C עם runtime proof
+Next: לאחר אישור תיקוני מטריצה - rerun מלא עם צפי ל-15/15 PASS

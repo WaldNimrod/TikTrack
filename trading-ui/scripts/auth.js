@@ -76,7 +76,7 @@ const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new Bro
  */
 function isPublicPage() {
   const path = window.location?.pathname || '';
-  const publicPages = ['login.html', 'register.html', 'reset_password.html', 'forgot_password.html'];
+  const publicPages = ['login', 'register', 'reset_password', 'forgot_password'];
   return publicPages.some(page => path.includes(page));
 }
 
@@ -940,7 +940,7 @@ async function logout() {
   // Redirect to login page after logout (not modal - full page redirect for clean state)
   // Small delay to allow UI updates and cache clearing to complete
   setTimeout(() => {
-    window.location.href = '/login.html';
+    window.location.href = '/login';
   }, 200);
 }
 
@@ -1265,7 +1265,7 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
             window.location.href = redirectPath;
           } else {
             // Default to index.html (dashboard)
-            window.location.href = 'index.html';
+            window.location.href = 'index';
           }
         }, 1000);
       }
@@ -1573,7 +1573,7 @@ function createLoginInterface(containerId, onSuccess = null) {
     </form>
     
     <div style="text-align: center; margin-top: 1rem;">
-      <a href="forgot_password.html" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+      <a href="forgot_password" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
     </div>
     
     <div class="demo-credentials">

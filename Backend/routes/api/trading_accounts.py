@@ -12,12 +12,16 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trading_accounts_bp = Blueprint('trading_accounts', __name__, url_prefix='/api/trading-accounts')
+trading_accounts_bp = Blueprint('trading_accounts', __name__, url_prefix='/api/trading_accounts')
+
+# Alias blueprint for backward compatibility (dash instead of underscore)
+trading_accounts_dash_bp = Blueprint('trading_accounts_dash', __name__, url_prefix='/api/trading-accounts')
 
 # Initialize base API
 base_api = BaseEntityAPI('trading_accounts', TradingAccountService, 'trading_accounts')
 
 @trading_accounts_bp.route('/', methods=['GET'])
+@trading_accounts_dash_bp.route('/', methods=['GET'])
 @require_authentication()
 @handle_database_session()
 def get_trading_accounts():
@@ -27,6 +31,8 @@ def get_trading_accounts():
     return jsonify(response), status_code
 
 @trading_accounts_bp.route('/open', methods=['GET'])
+@trading_accounts_dash_bp.route('/open', methods=['GET'])
+@trading_accounts_dash_bp.route('/open', methods=['GET'])
 @require_authentication()
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
@@ -53,6 +59,8 @@ def get_open_trading_accounts():
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['GET'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>', methods=['GET'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>', methods=['GET'])
 @api_endpoint(cache_ttl=120, rate_limit=60)
 @handle_database_session()
 def get_trading_account(trading_account_id: int):
@@ -62,6 +70,8 @@ def get_trading_account(trading_account_id: int):
     return jsonify(response), status_code
 
 @trading_accounts_bp.route('/by-name/<account_name>', methods=['GET'])
+@trading_accounts_dash_bp.route('/by-name/<account_name>', methods=['GET'])
+@trading_accounts_dash_bp.route('/by-name/<account_name>', methods=['GET'])
 @api_endpoint(cache_ttl=120, rate_limit=60)
 @handle_database_session()
 def get_trading_account_by_name(account_name: str):
@@ -94,15 +104,52 @@ def get_trading_account_by_name(account_name: str):
         }), 500
 
 @trading_accounts_bp.route('/', methods=['POST'])
+@trading_accounts_dash_bp.route('/', methods=['POST'])
+@require_authentication()
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def create_trading_account():
     """Create new trading account"""
+    print("DEBUG: Route matched - create_trading_account called")
     try:
+        print("DEBUG: Starting create_trading_account")
         data = request.get_json()
+        print(f"DEBUG: Received trading account data: {data}")
+        print(f"DEBUG: data.get('name'): {data.get('name')}")
+        print(f"DEBUG: not data.get('name'): {not data.get('name')}")
+
+        # Basic validation for required fields
+        if not data:
+            return jsonify({
+                "status": "error",
+                "error_code": "VALIDATION_ERROR",
+                "message": "Request data is required",
+                "details": "Please provide trading account data",
+                "version": "1.0"
+            }), 400
+
+        if not data.get('name') or not data.get('name').strip():
+            return jsonify({
+                "status": "error",
+                "error_code": "VALIDATION_ERROR",
+                "message": "Trading account name is required",
+                "details": "Please provide a valid name for the trading account",
+                "version": "1.0"
+            }), 400
+
+        if not data.get('currency_id'):
+            return jsonify({
+                "status": "error",
+                "error_code": "VALIDATION_ERROR",
+                "message": "Currency ID is required",
+                "details": "Please provide a valid currency_id for the trading account",
+                "version": "1.0"
+            }), 400
+
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
+
         db: Session = g.db
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
@@ -136,6 +183,7 @@ def create_trading_account():
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['PUT'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def update_trading_account(trading_account_id: int):
@@ -184,6 +232,7 @@ def update_trading_account(trading_account_id: int):
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>/open-trades', methods=['GET'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>/open-trades', methods=['GET'])
 @cache_for(ttl=30)  # Cache for 30 seconds - open trades change frequently
 @handle_database_session()
 def get_trading_account_open_trades(trading_account_id: int):
@@ -208,6 +257,7 @@ def get_trading_account_open_trades(trading_account_id: int):
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['DELETE'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def delete_trading_account(trading_account_id: int):
@@ -266,6 +316,7 @@ def delete_trading_account(trading_account_id: int):
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>/stats', methods=['GET'])
+@trading_accounts_dash_bp.route('/<int:trading_account_id>/stats', methods=['GET'])
 @cache_for(ttl=60)  # Cache for 1 minute - stats don't change frequently
 @handle_database_session()
 def get_trading_account_stats(trading_account_id: int):
@@ -295,3 +346,5 @@ def get_trading_account_stats(trading_account_id: int):
             "error": {"message": "Failed to retrieve trading account stats"},
             "version": "1.0"
         }), 500
+
+# Dash blueprint will be registered in app.py

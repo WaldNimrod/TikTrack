@@ -1,0 +1,13 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- Puppeteer נכשל - עוברים ל-Manual QA יציב
+- הכנת הנחיות מפורטות לביצוע Manual Full CRUD E2E
+- הכנת טמפלט תיעוד לכל entity שנכשל
+Evidence:
+- Puppeteer timeout errors בריצות קודמות
+- Browser automation instability
+- צורך בבקרה מלאה על תהליך הבדיקה
+Blockers:
+- ממתין לביצוע Manual QA על ידי המשתמש
+Next: ביצוע Manual Full CRUD E2E מהדשבורד עם תיעוד מלא

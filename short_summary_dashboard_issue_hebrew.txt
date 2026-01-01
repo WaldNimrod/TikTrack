@@ -1,0 +1,6 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done: בדקנו 3 ישויות (trades, trade_plans, executions) - התחברות עובדת, דשבורד נטען, אבל כרטיסי בדיקה ופונקציות חסרים
+Evidence: Page content analysis מראה 29 visible elements אבל testCards: false, functions unavailable
+Blockers: בעיית טעינת UI בדשבורד - צריך Team A לבדוק script loading, Team B UI rendering
+Next: המתן לניתוח root cause מדשבורד ואז נמשיך עם בדיקות

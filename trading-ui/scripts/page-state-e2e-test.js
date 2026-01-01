@@ -638,7 +638,7 @@
    * הרצת כל הבדיקות
    */
   async function runPageStateE2ETests() {
-    console.log('🧪 Starting Page State Management E2E Tests...\n');
+    window.Logger?.info('🧪 Starting Page State Management E2E Tests...\n');
     
     TEST_RESULTS.passed = 0;
     TEST_RESULTS.failed = 0;
@@ -658,21 +658,21 @@
     await testClearPageState();
 
     // הדפסת תוצאות
-    console.log('\n📊 Test Results:');
-    console.log(`  Total: ${TEST_RESULTS.total}`);
-    console.log(`  Passed: ${TEST_RESULTS.passed}`);
-    console.log(`  Failed: ${TEST_RESULTS.failed}`);
-    console.log(`  Success Rate: ${((TEST_RESULTS.passed / TEST_RESULTS.total) * 100).toFixed(1)}%`);
+    window.Logger?.info('\n📊 Test Results:');
+    window.Logger?.info(`  Total: ${TEST_RESULTS.total}`);
+    window.Logger?.info(`  Passed: ${TEST_RESULTS.passed}`);
+    window.Logger?.info(`  Failed: ${TEST_RESULTS.failed}`);
+    window.Logger?.info(`  Success Rate: ${((TEST_RESULTS.passed / TEST_RESULTS.total) * 100).toFixed(1)}%`);
     
-    console.log('\n📋 Detailed Results:');
+    window.Logger?.info('\n📋 Detailed Results:');
     TEST_RESULTS.details.forEach(detail => {
       const icon = detail.status === 'passed' ? '✅' : '❌';
-      console.log(`  ${icon} ${detail.test}: ${detail.status}`);
+      window.Logger?.info(`  ${icon} ${detail.test}: ${detail.status}`);
       if (detail.error) {
-        console.log(`     Error: ${detail.error}`);
+        window.Logger?.info(`     Error: ${detail.error}`);
       }
       if (detail.note) {
-        console.log(`     Note: ${detail.note}`);
+        window.Logger?.info(`     Note: ${detail.note}`);
       }
     });
 
@@ -683,6 +683,6 @@
   window.runPageStateE2ETests = runPageStateE2ETests;
   window.PageStateE2ETestResults = TEST_RESULTS;
 
-  console.log('✅ Page State E2E Test script loaded. Run: window.runPageStateE2ETests()');
+  window.Logger?.info('✅ Page State E2E Test script loaded. Run: window.runPageStateE2ETests()');
 })();
 

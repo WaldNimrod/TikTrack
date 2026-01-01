@@ -68,14 +68,14 @@ function logTest(testName, passed, message = '', duration = 0) {
     testResults.failed++;
   }
   
-  console.log(`${status}: ${testName}`);
+  window.Logger?.info(`${status}: ${testName}`);
   if (message) {
-    console.log(`   ${message}`);
+    window.Logger?.info(`   ${message}`);
   }
   if (duration > 0) {
-    console.log(`   Duration: ${duration.toFixed(2)}ms`);
+    window.Logger?.info(`   Duration: ${duration.toFixed(2)}ms`);
   }
-  console.log();
+  window.Logger?.info();
 }
 
 async function testPageLoad(page) {
@@ -322,16 +322,16 @@ async function testOptimisticUpdate(page) {
 }
 
 async function runAllTests() {
-  console.log('='.repeat(60));
-  console.log('PREFERENCES SYSTEM - PUPPETEER E2E TESTS');
-  console.log('='.repeat(60));
-  console.log();
-  console.log(`Base URL: ${TEST_CONFIG.baseURL}`);
-  console.log(`Test User: ${TEST_CONFIG.testUser}`);
-  console.log(`Test Profile: ${TEST_CONFIG.testProfile}`);
-  console.log(`Test Group: ${TEST_CONFIG.testGroup}`);
-  console.log(`Test Preference: ${TEST_CONFIG.testPreference}`);
-  console.log();
+  window.Logger?.info('='.repeat(60));
+  window.Logger?.info('PREFERENCES SYSTEM - PUPPETEER E2E TESTS');
+  window.Logger?.info('='.repeat(60));
+  window.Logger?.info();
+  window.Logger?.info(`Base URL: ${TEST_CONFIG.baseURL}`);
+  window.Logger?.info(`Test User: ${TEST_CONFIG.testUser}`);
+  window.Logger?.info(`Test Profile: ${TEST_CONFIG.testProfile}`);
+  window.Logger?.info(`Test Group: ${TEST_CONFIG.testGroup}`);
+  window.Logger?.info(`Test Preference: ${TEST_CONFIG.testPreference}`);
+  window.Logger?.info();
 
   const browser = await puppeteer.launch({
     headless: false, // Set to true for CI/CD
@@ -356,26 +356,26 @@ async function runAllTests() {
   }
 
   // Summary
-  console.log('='.repeat(60));
-  console.log('TEST SUMMARY');
-  console.log('='.repeat(60));
-  console.log();
-  console.log(`Total Tests: ${testResults.passed + testResults.failed}`);
-  console.log(`Passed: ${testResults.passed} ✅`);
-  console.log(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
-  console.log();
+  window.Logger?.info('='.repeat(60));
+  window.Logger?.info('TEST SUMMARY');
+  window.Logger?.info('='.repeat(60));
+  window.Logger?.info();
+  window.Logger?.info(`Total Tests: ${testResults.passed + testResults.failed}`);
+  window.Logger?.info(`Passed: ${testResults.passed} ✅`);
+  window.Logger?.info(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
+  window.Logger?.info();
 
   if (testResults.failed > 0) {
-    console.log('Failed Tests:');
+    window.Logger?.info('Failed Tests:');
     testResults.tests.forEach(test => {
       if (!test.passed) {
-        console.log(`  - ${test.name}: ${test.message}`);
+        window.Logger?.info(`  - ${test.name}: ${test.message}`);
       }
     });
-    console.log();
+    window.Logger?.info();
     process.exit(1);
   } else {
-    console.log('✅ All tests passed!');
+    window.Logger?.info('✅ All tests passed!');
     process.exit(0);
   }
 }
@@ -383,7 +383,7 @@ async function runAllTests() {
 // Run if called directly
 if (require.main === module) {
   runAllTests().catch(error => {
-    console.error('❌ Test execution failed:', error);
+    window.Logger?.error('❌ Test execution failed:', error);
     process.exit(1);
   });
 }

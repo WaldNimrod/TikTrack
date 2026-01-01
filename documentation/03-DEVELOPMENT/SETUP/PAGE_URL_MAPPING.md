@@ -201,6 +201,47 @@ if filename in ['linter-dashboard-demo', 'create_linter_dashboard']:
 
 ---
 
+## ⚠️ כללים חד-משמעיים (CRITICAL)
+
+### ✅ חובה: Snake Case בלבד
+
+כל URLs במערכת חייבים להיות ב-**snake_case** (קו תחתון), לא kebab-case:
+
+```bash
+✅ נכון: http://localhost:8080/trade_plans
+✅ נכון: http://localhost:8080/ai_analysis
+✅ נכון: http://localhost:8080/user_management
+
+❌ אסור: http://localhost:8080/trade-plans
+❌ אסור: http://localhost:8080/ai-analysis
+❌ אסור: http://localhost:8080/user-management
+```
+
+### ❌ אסור: .html בקישורי מערכת
+
+**.html אסור לחלוטין** בקישורי מערכת ובדיקות:
+
+```bash
+✅ נכון: http://localhost:8080/trades
+✅ נכון: http://localhost:8080/preferences
+
+❌ אסור: http://localhost:8080/trades.html
+❌ אסור: http://localhost:8080/preferences.html
+❌ אסור: http://localhost:8080/trading-ui/trades.html
+```
+
+### 📋 רשימות חריגים
+
+**חריגים מותרים רק אם רשומים ברשימות הרשמיות:**
+
+- **חריגים זמניים:** `documentation/02-ARCHITECTURE/FRONTEND/KEBAB_CASE_EXCEPTIONS.md`
+- **חריגים קבועים:** `documentation/02-ARCHITECTURE/FRONTEND/PERMANENT_EXCEPTIONS.md`
+- **רשימת עמודים:** `documentation/PAGES_LIST.md`
+
+**כל חריג חדש דורש אישור Team 0 + תיעוד ברשימה הרלוונטית.**
+
+---
+
 ## 🔗 קישורים רלוונטיים
 
 - [Backend/routes/pages.py](../../Backend/routes/pages.py) - קובץ ה-routes
@@ -232,4 +273,148 @@ def ai_analysis() -> Any:
 
 ---
 
-**עודכן:** 28 בינואר 2025
+## 🔧 מקור אמת יחיד ל-Payloads (CRITICAL)
+
+### מדוע מקור אמת יחיד
+
+**בעיה קודמת:** פיצול payloads בין קבצים שונים גרם לחוסר עקביות ולבאגים:
+
+- `generateTestData()` בדשבורד
+- `payloads` בקבצי Python
+- `test data` ב-scripts שונים
+- כל אחד עם לוגיקה שונה
+
+**פתרון:** מקור אמת יחיד = `crud_testing_dashboard.js` (כולל Field Maps)
+
+### מה זה כולל
+
+#### 1. **Field Mappings (חובה)**
+
+```javascript
+// crud_testing_dashboard.js - מקור אמת יחיד
+const FIELD_MAPPINGS = {
+  trade_plan: {
+    required: ['trading_account_id', 'ticker_id', 'side', 'investment_type'],
+    optional: ['notes', 'quantity', 'entry_price'],
+    dates: ['created_at', 'updated_at'], // חובה למלא
+    relations: ['trading_account_id', 'ticker_id'] // IDs דינמיים בלבד
+  }
+};
+```
+
+#### 2. **Test Data Generation (חובה)**
+
+```javascript
+// crud_testing_dashboard.js - מקור אמת יחיד
+async function generateTestData(entityName) {
+  const userAccounts = await fetch('/api/trading_accounts').then(r => r.json());
+  const userTickers = await fetch('/api/tickers').then(r => r.json());
+
+  return {
+    trading_account_id: userAccounts[0].id, // דינמי
+    ticker_id: userTickers[0].id, // דינמי
+    side: 'Long',
+    investment_type: 'stocks',
+    created_at: new Date().toISOString(), // חובה
+    updated_at: new Date().toISOString()  // חובה
+  };
+}
+```
+
+#### 3. **Validation Rules (חובה)**
+
+```javascript
+// crud_testing_dashboard.js - מקור אמת יחיד
+const VALIDATION_RULES = {
+  trade_plan: {
+    trading_account_id: { required: true, type: 'number', dynamic: true },
+    ticker_id: { required: true, type: 'number', dynamic: true },
+    side: { required: true, enum: ['Long', 'Short'] },
+    investment_type: { required: true, enum: ['stocks', 'options'] }
+  }
+};
+```
+
+### כללים חד-משמעיים
+
+#### ✅ חובה: טיקרים חוקיים בלבד
+
+```javascript
+const VALID_TICKERS = ['PLTR', 'AAPL', 'TSLA', 'MSFT', 'QQQ'];
+```
+
+#### ✅ חובה: מילוי כל שדות התאריך
+
+```javascript
+// לא להסתמך על default - למלא במפורש
+const payload = {
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+};
+```
+
+#### ✅ חובה: IDs דינמיים בלבד
+
+```javascript
+// ❌ אסור: hardcoded IDs
+trading_account_id: 1
+
+// ✅ נכון: dynamic lookup
+const accounts = await fetchUserAccounts();
+trading_account_id: accounts[0].id
+```
+
+### תהליך עדכון
+
+#### 1. **עדכון Field Maps**
+
+הוסף/שנה רק ב-`crud_testing_dashboard.js`
+
+#### 2. **עדכון Test Data**
+
+שנה רק את `generateTestData()` function
+
+#### 3. **עדכון Validation**
+
+שנה רק את `VALIDATION_RULES` object
+
+#### 4. **איחוד עם קבצים אחרים**
+
+כל קבצי Python/JavaScript אחרים חייבים להשתמש בנתונים מהדשבורד
+
+### QA Procedures - עדכון
+
+#### 🔄 QA רץ רק אחרי איחוד payloads + אימות constraints
+
+```bash
+# תהליך QA חדש:
+1. איחוד payloads ב-crud_testing_dashboard.js
+2. אימות constraints (required fields, valid enums)
+3. הרצת QA עם Logger בלבד
+```
+
+#### 📊 ריצות מתועדות בלוגר בלבד (לא console)
+
+```javascript
+// ✅ נכון: Logger evidence
+window.Logger.info("CRUD Test Started", {
+  entity: entityName,
+  payload: testPayload,
+  timestamp: new Date().toISOString()
+});
+
+// ❌ אסור: console logging
+console.log("Test started", payload);
+```
+
+### למה זה חשוב
+
+1. **עקביות:** פחות באגים מ-duplication
+2. **תחזוקה:** שינוי במקום אחד בלבד
+3. **דיוק:** נתוני בדיקה מייצגים מציאות
+4. **אמינות:** QA מבוסס על נתונים תקינים
+
+---
+
+**עודכן:** 30 בדצמבר 2025

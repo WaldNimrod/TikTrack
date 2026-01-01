@@ -1,0 +1,397 @@
+{
+  "timestamp": "2025-12-31T11:54:56.424Z",
+  "summary": {
+    "total": 30,
+    "completed": 30,
+    "errors": 16,
+    "passed": 0,
+    "failed": 0
+  },
+  "results": {
+    "trades": {
+      "chrome": {
+        "entity": "trades",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "trades",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "trade_plans": {
+      "chrome": {
+        "entity": "trade_plans",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "trade_plans",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "executions": {
+      "chrome": {
+        "entity": "executions",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "executions",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "alerts": {
+      "chrome": {
+        "entity": "alerts",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "alerts",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "tickers": {
+      "chrome": {
+        "entity": "tickers",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "tickers",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "user_management": {
+      "chrome": {
+        "entity": "user_management",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "user_management",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "tag_management": {
+      "chrome": {
+        "entity": "tag_management",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "tag_management",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "data_import": {
+      "chrome": {
+        "entity": "data_import",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "data_import",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "trading_accounts": {
+      "chrome": {
+        "entity": "trading_accounts",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "trading_accounts",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "notes": {
+      "chrome": {
+        "entity": "notes",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "notes",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "cash_flow": {
+      "chrome": {
+        "entity": "cash_flow",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "cash_flow",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "watch_lists": {
+      "chrome": {
+        "entity": "watch_lists",
+        "function": "runWatchListTestOnly",
+        "create": "fail",
+        "read": "unknown",
+        "update": "unknown",
+        "delete": "unknown",
+        "status": "error",
+        "executionTime": 0,
+        "details": {}
+      },
+      "firefox": {
+        "entity": "watch_lists",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "preferences": {
+      "chrome": {
+        "entity": "preferences",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "preferences",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "user_profile": {
+      "chrome": {
+        "entity": "user_profile",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "user_profile",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    },
+    "import_session": {
+      "chrome": {
+        "entity": "import_session",
+        "browser": "chrome",
+        "error": "Dashboard not loaded properly. Cards: false, Functions: false",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      },
+      "firefox": {
+        "entity": "import_session",
+        "browser": "firefox",
+        "error": "Browser was not found at the configured executablePath (firefox)",
+        "operations": {
+          "create": "error",
+          "read": "error",
+          "update": "error",
+          "delete": "error"
+        }
+      }
+    }
+  },
+  "environment": {
+    "baseUrl": "http://localhost:8080",
+    "dashboardUrl": "http://localhost:8080/crud_testing_dashboard",
+    "browsers": [
+      "chrome",
+      "firefox"
+    ],
+    "entities": [
+      "trades",
+      "trade_plans",
+      "executions",
+      "alerts",
+      "tickers",
+      "user_management",
+      "tag_management",
+      "data_import",
+      "trading_accounts",
+      "notes",
+      "cash_flow",
+      "watch_lists",
+      "preferences",
+      "user_profile",
+      "import_session"
+    ]
+  }
+}

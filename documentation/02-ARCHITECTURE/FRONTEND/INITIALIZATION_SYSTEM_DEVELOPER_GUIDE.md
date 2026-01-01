@@ -275,6 +275,14 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 
 הכלי יוצר אוטומטית את תגי ה-`<script>` עם ה-`loadingStrategy` הנכון.
 
+### 💡 הערה חשובה: Hard refresh + Server Restart לפני QA
+
+לפני ביצוע QA או בדיקות על שינויים בסקריפטים:
+
+1. **Server Restart** - הפעל `./start_server.sh` מחדש
+2. **Hard Refresh** - Ctrl+F5 או Ctrl+Shift+R בדפדפן
+3. **Verify Versions** - בדוק ב-Network tab שכל הסקריפטים נטענים עם `?v=` עדכני
+
 ---
 
 ## 📚 הוספת package חדש

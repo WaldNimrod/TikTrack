@@ -77,7 +77,7 @@
       testResults.summary.passed++;
     } else {
       testResults.summary.failed++;
-      console.error(`❌ FAILED: ${name}`, details);
+      window.Logger?.error(`❌ FAILED: ${name}`, details);
     }
     
     testResults.summary.total++;
@@ -204,20 +204,20 @@
    * Run all tests
    */
   async function runAllTests() {
-    console.log('🚀 Starting Frontend Wrappers Testing...\n');
+    window.Logger?.info('🚀 Starting Frontend Wrappers Testing...\n');
     
     for (const wrapperConfig of wrappersToTest) {
-      console.log(`Testing ${wrapperConfig.service}.${wrapperConfig.wrapper}...`);
+      window.Logger?.info(`Testing ${wrapperConfig.service}.${wrapperConfig.wrapper}...`);
       await testWrapper(wrapperConfig);
       await testErrorHandling(wrapperConfig);
     }
 
     // Print summary
-    console.log('\n📊 Test Summary:');
-    console.log(`Total Tests: ${testResults.summary.total}`);
-    console.log(`Passed: ${testResults.summary.passed}`);
-    console.log(`Failed: ${testResults.summary.failed}`);
-    console.log(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
+    window.Logger?.info('\n📊 Test Summary:');
+    window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+    window.Logger?.info(`Passed: ${testResults.summary.passed}`);
+    window.Logger?.info(`Failed: ${testResults.summary.failed}`);
+    window.Logger?.info(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
 
     // Store results in window for external access
     window.frontendWrappersTestResults = testResults;

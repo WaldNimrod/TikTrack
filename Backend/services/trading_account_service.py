@@ -80,11 +80,17 @@ class TradingAccountService:
         is_valid, errors = ValidationService.validate_data(db, 'trading_accounts', data)
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
-        
-        trading_account = TradingAccount(**data)
-        db.add(trading_account)
-        db.commit()
-        db.refresh(trading_account)
+
+        # Create trading account object with validation
+        try:
+            trading_account = TradingAccount(**data)
+            db.add(trading_account)
+            db.commit()
+            db.refresh(trading_account)
+        except Exception as e:
+            # Handle database constraint violations (NOT NULL, etc.)
+            db.rollback()
+            raise ValueError(f"Invalid trading account data: {str(e)}")
         logger.info(f"Created trading_account: {trading_account.name}")
         return trading_account
     

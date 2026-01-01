@@ -58,17 +58,17 @@
     testResults.total++;
     if (passed) {
       testResults.passed++;
-      console.log(`✅ PASS: ${name}${message ? ` - ${message}` : ''}${duration ? ` (${duration.toFixed(2)}ms)` : ''}`);
+      window.Logger?.info(`✅ PASS: ${name}${message ? ` - ${message}` : ''}${duration ? ` (${duration.toFixed(2)}ms)` : ''}`);
     } else {
       testResults.failed++;
-      console.error(`❌ FAIL: ${name}${message ? ` - ${message}` : ''}${duration ? ` (${duration.toFixed(2)}ms)` : ''}`);
+      window.Logger?.error(`❌ FAIL: ${name}${message ? ` - ${message}` : ''}${duration ? ` (${duration.toFixed(2)}ms)` : ''}`);
     }
   }
 
   function logSection(title) {
-    console.log('\n' + '='.repeat(60));
-    console.log(title);
-    console.log('='.repeat(60) + '\n');
+    window.Logger?.info('\n' + '='.repeat(60));
+    window.Logger?.info(title);
+    window.Logger?.info('='.repeat(60) + '\n');
   }
 
   /**
@@ -456,14 +456,14 @@
   async function runAllTests() {
     testResults.startTime = Date.now();
     
-    console.log('\n' + '='.repeat(60));
-    console.log('AI ANALYSIS SYSTEM - AUTOMATED TEST SUITE');
-    console.log('='.repeat(60));
-    console.log(`\nTest Configuration:`);
-    console.log(`  Timeout: ${TEST_CONFIG.timeout}ms`);
-    console.log(`  Retries: ${TEST_CONFIG.retries}`);
-    console.log(`  Verbose: ${TEST_CONFIG.verbose}`);
-    console.log('');
+    window.Logger?.info('\n' + '='.repeat(60));
+    window.Logger?.info('AI ANALYSIS SYSTEM - AUTOMATED TEST SUITE');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info(`\nTest Configuration:`);
+    window.Logger?.info(`  Timeout: ${TEST_CONFIG.timeout}ms`);
+    window.Logger?.info(`  Retries: ${TEST_CONFIG.retries}`);
+    window.Logger?.info(`  Verbose: ${TEST_CONFIG.verbose}`);
+    window.Logger?.info('');
 
     try {
       await runUnitTests();
@@ -471,7 +471,7 @@
       await runE2ETests();
       await runPerformanceTests();
     } catch (error) {
-      console.error('❌ Test suite error:', error);
+      window.Logger?.error('❌ Test suite error:', error);
       testResults.errors.push({ test: 'Test suite', error: error.message });
     }
 
@@ -480,19 +480,19 @@
 
     // Print summary
     logSection('TEST SUMMARY');
-    console.log(`Total Tests: ${testResults.total}`);
-    console.log(`Passed: ${testResults.passed} ✅`);
-    console.log(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
-    console.log(`Total Duration: ${testResults.duration.toFixed(2)}ms`);
+    window.Logger?.info(`Total Tests: ${testResults.total}`);
+    window.Logger?.info(`Passed: ${testResults.passed} ✅`);
+    window.Logger?.info(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
+    window.Logger?.info(`Total Duration: ${testResults.duration.toFixed(2)}ms`);
     
     if (testResults.errors.length > 0) {
-      console.log('\nErrors:');
+      window.Logger?.info('\nErrors:');
       testResults.errors.forEach((err, idx) => {
-        console.log(`  ${idx + 1}. ${err.test}: ${err.error}`);
+        window.Logger?.info(`  ${idx + 1}. ${err.test}: ${err.error}`);
       });
     }
 
-    console.log('\n' + '='.repeat(60) + '\n');
+    window.Logger?.info('\n' + '='.repeat(60) + '\n');
 
     return testResults;
   }
@@ -501,8 +501,8 @@
   window.runAllAIAnalysisTests = runAllTests;
   window.aiAnalysisTestResults = testResults;
 
-  console.log('✅ AI Analysis automated test suite loaded');
-  console.log('Run: window.runAllAIAnalysisTests()');
+  window.Logger?.info('✅ AI Analysis automated test suite loaded');
+  window.Logger?.info('Run: window.runAllAIAnalysisTests()');
 })();
 
 

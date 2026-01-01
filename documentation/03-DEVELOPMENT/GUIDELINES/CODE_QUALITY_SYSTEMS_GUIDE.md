@@ -138,6 +138,17 @@ stages:
 
 ## Automated Scanning
 
+#### Registry Suite Integration
+
+The testing system now includes an integrated Registry Suite that provides:
+
+- **Centralized Test Discovery**: All tests registered in `test-registry.js`
+- **Relevancy Filtering**: Automatic filtering via `test-relevancy-rules.js`
+- **Unified Execution**: Orchestrated through `test-orchestrator.js`
+- **Results Processing**: Standardized via `test-results-model.js`
+
+**Configuration Matrix**: See `TEST_RELEVANCY_MATRIX.md` for page-to-test mappings.
+
 ### Error Handling Coverage Scanner
 
 **Purpose:** Analyze error handling patterns across the codebase
@@ -340,7 +351,12 @@ jobs:
    - SAST (Static Application Security Testing)
    - Secret detection
 
-4. **Performance**
+4. **Integration Testing**
+   - Registry Suite execution
+   - Relevancy rule validation
+   - Cross-system integration tests
+
+5. **Performance**
    - Load testing
    - Bundle size analysis
    - Runtime performance metrics
@@ -481,6 +497,14 @@ jobs:
 - **Jest:** `jest.config.js`
 - **Git Hooks:** `.husky/`
 
+### Registry System Files
+
+- **Test Registry:** `trading-ui/scripts/test-registry.js`
+- **Relevancy Rules:** `trading-ui/scripts/test-relevancy-rules.js`
+- **Test Orchestrator:** `trading-ui/scripts/testing/test-orchestrator.js`
+- **Results Model:** `trading-ui/scripts/testing/test-results-model.js`
+- **Relevancy Matrix:** `documentation/05-REPORTS/TEST_RELEVANCY_MATRIX.md`
+
 ### Quality Scripts
 
 - **Linting:** `npm run lint`
@@ -489,9 +513,50 @@ jobs:
 - **Coverage:** `npm run test:coverage`
 - **Security:** `npm run security-scan`
 
+### Registry Suite Troubleshooting
+
+#### Common Integration Issues
+
+**Registry Button Missing**
+
+- **Symptoms**: "Registry Suite" button not visible in dashboard
+- **Root Cause**: UI wiring incomplete or cache issues
+- **Solution**:
+  - Verify `crud_testing_dashboard.html` includes button with `onclick="runRegistrySuite()"`
+  - Check CSS visibility rules
+  - Ensure cache busting: `crud_testing_dashboard.js?v=1.0.32` or newer
+  - Clear browser cache and reload
+
+**API 404 Errors**
+
+- **Symptoms**: HTTP 404 on `/api/trade_plans/`, `/api/trading_accounts/`, `/api/preferences/`
+- **Root Cause**: Missing Flask routes in backend API blueprints
+- **Solution**:
+  - Add missing routes following existing patterns:
+
+    ```python
+    @api_bp.route("/trade_plans/", methods=["GET"])
+    def list_trade_plans():
+        return jsonify({"status": "success", "data": TradePlanService.get_all()})
+    ```
+
+  - Verify route naming consistency (underscore vs kebab-case)
+  - Test endpoints with curl: `curl -s http://127.0.0.1:8080/api/trade_plans/ | jq '.status'`
+
+**Error Details Not Shown**
+
+- **Symptoms**: UI shows "Unknown error" instead of actual HTTP error
+- **Root Cause**: CRUD service not configured for detailed error reporting
+- **Solution**:
+  - Use main window `window.UnifiedCRUDService` (not iframe)
+  - Pass `{ returnErrorDetails: true }` in CRUD calls
+  - Extract error message: `result?.error?.message || result?.error || result?.message || "Unknown error"`
+
 ### Related Documentation
 
 - [CRUD_TESTING_ADMIN_RUNBOOK.md](CRUD_TESTING_ADMIN_RUNBOOK.md)
+- [CRUD_TESTING_INTEGRATION_MASTER_PLAN.md](../../05-REPORTS/CRUD_TESTING_INTEGRATION_MASTER_PLAN.md)
+- [TEST_RELEVANCY_MATRIX.md](../../05-REPORTS/TEST_RELEVANCY_MATRIX.md)
 - [QA_AND_DEBUGGING_GUIDE.md](../TOOLS/QA_AND_DEBUGGING_GUIDE.md)
 - [SECURITY_GUIDELINES.md](../SECURITY_GUIDELINES.md)
 - [PERFORMANCE_OPTIMIZATION_GUIDE.md](../PERFORMANCE_OPTIMIZATION_GUIDE.md)

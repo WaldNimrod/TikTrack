@@ -27,8 +27,8 @@
 // - warn() - Warn
 
 window.testPositionsPortfolioSystem = async function() {
-  console.log('🔍 ===== COMPREHENSIVE POSITIONS/PORTFOLIO SYSTEM TEST =====');
-  console.log('');
+  window.Logger?.info('🔍 ===== COMPREHENSIVE POSITIONS/PORTFOLIO SYSTEM TEST =====');
+  window.Logger?.info('');
   
   const results = {
     passed: 0,
@@ -43,10 +43,10 @@ window.testPositionsPortfolioSystem = async function() {
     results.tests.push({ name, passed, details });
     if (passed) {
       results.passed++;
-      console.log(`✅ PASS: ${name}${details ? ' - ' + details : ''}`);
+      window.Logger?.info(`✅ PASS: ${name}${details ? ' - ' + details : ''}`);
     } else {
       results.failed++;
-      console.error(`❌ FAIL: ${name}${details ? ' - ' + details : ''}`);
+      window.Logger?.error(`❌ FAIL: ${name}${details ? ' - ' + details : ''}`);
     }
     return passed;
   }
@@ -55,14 +55,14 @@ window.testPositionsPortfolioSystem = async function() {
     const passed = typeof condition === 'function' ? condition() : !!condition;
     if (!passed) {
       results.warnings++;
-      console.warn(`⚠️ WARN: ${name}${details ? ' - ' + details : ''}`);
+      window.Logger?.warn(`⚠️ WARN: ${name}${details ? ' - ' + details : ''}`);
     }
     return passed;
   }
 
   // ===== TEST 1: System Availability =====
-  console.log('📋 TEST 1: System Availability');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 1: System Availability');
+  window.Logger?.info('-----------------------------------');
   
   test('window.initPositionsPortfolio exists', () => typeof window.initPositionsPortfolio === 'function');
   test('window.positionsPortfolioState exists', () => !!window.positionsPortfolioState);
@@ -72,11 +72,11 @@ window.testPositionsPortfolioSystem = async function() {
   test('window.showPositionDetails exists', () => typeof window.showPositionDetails === 'function');
   test('window.UnifiedCacheManager exists', () => !!window.UnifiedCacheManager);
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 2: DOM Elements =====
-  console.log('📋 TEST 2: DOM Elements');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 2: DOM Elements');
+  window.Logger?.info('-----------------------------------');
   
   test('positionsTable exists', () => !!document.getElementById('positionsTable'));
   test('portfolioTable exists', () => !!document.getElementById('portfolioTable'));
@@ -87,11 +87,11 @@ window.testPositionsPortfolioSystem = async function() {
   test('positionsTotalValue exists', () => !!document.getElementById('positionsTotalValue'));
   test('positionsAccountTotalValue exists', () => !!document.getElementById('positionsAccountTotalValue'));
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 3: Table Registration =====
-  console.log('📋 TEST 3: Table Registration');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 3: Table Registration');
+  window.Logger?.info('-----------------------------------');
   
   if (window.UnifiedTableSystem) {
     test('trading_accounts table registered', () => window.UnifiedTableSystem.registry.isRegistered('trading_accounts'));
@@ -111,11 +111,11 @@ window.testPositionsPortfolioSystem = async function() {
     test('UnifiedTableSystem available', false, 'UnifiedTableSystem not loaded');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 4: Data Loading =====
-  console.log('📋 TEST 4: Data Loading');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 4: Data Loading');
+  window.Logger?.info('-----------------------------------');
   
   // Test trading accounts data
   const accountsData = window.trading_accountsData || [];
@@ -139,11 +139,11 @@ window.testPositionsPortfolioSystem = async function() {
     test('state has isLoading', () => typeof window.positionsPortfolioState.isLoading === 'boolean');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 5: Table Rendering =====
-  console.log('📋 TEST 5: Table Rendering');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 5: Table Rendering');
+  window.Logger?.info('-----------------------------------');
   
   ['positions', 'portfolio', 'trading_accounts'].forEach(tableType => {
     const tableId = tableType === 'positions' ? 'positionsTable' : 
@@ -175,11 +175,11 @@ window.testPositionsPortfolioSystem = async function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 6: Sorting Functionality =====
-  console.log('📋 TEST 6: Sorting Functionality');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 6: Sorting Functionality');
+  window.Logger?.info('-----------------------------------');
   
   ['trading_accounts', 'positions', 'portfolio'].forEach(tableType => {
     if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
@@ -207,11 +207,11 @@ window.testPositionsPortfolioSystem = async function() {
     }
   });
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 7: Account Selector =====
-  console.log('📋 TEST 7: Account Selector');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 7: Account Selector');
+  window.Logger?.info('-----------------------------------');
   
   const positionsSelector = document.getElementById('positionsAccountSelector');
   if (positionsSelector) {
@@ -226,11 +226,11 @@ window.testPositionsPortfolioSystem = async function() {
     warn('portfolio selector has multiple accounts', () => portfolioSelector.options.length > 1, `Found ${portfolioSelector.options.length} accounts`);
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 8: Header Statistics =====
-  console.log('📋 TEST 8: Header Statistics');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 8: Header Statistics');
+  window.Logger?.info('-----------------------------------');
   
   const countText = document.getElementById('positionsCountText');
   if (countText) {
@@ -251,11 +251,11 @@ window.testPositionsPortfolioSystem = async function() {
     warn('positions account total is displayed', () => accountTotal.style.display !== 'none', 'Account total might be hidden');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 9: Data Display - All Fields and Calculations =====
-  console.log('📋 TEST 9: Data Display - All Fields and Calculations');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 9: Data Display - All Fields and Calculations');
+  window.Logger?.info('-----------------------------------');
   
   if (positionsData.length > 0) {
     const samplePosition = positionsData[0];
@@ -319,11 +319,11 @@ window.testPositionsPortfolioSystem = async function() {
     warn('data display test skipped', false, 'No positions data available');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 10: Number Formatting =====
-  console.log('📋 TEST 10: Number Formatting');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 10: Number Formatting');
+  window.Logger?.info('-----------------------------------');
   
   // Check formatting functions
   if (typeof window.formatCurrencyHebrew === 'function') {
@@ -387,11 +387,11 @@ window.testPositionsPortfolioSystem = async function() {
     }
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 11: Position Details Modal =====
-  console.log('📋 TEST 11: Position Details Modal');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 11: Position Details Modal');
+  window.Logger?.info('-----------------------------------');
   
   test('showPositionDetails is function', () => typeof window.showPositionDetails === 'function');
   
@@ -439,11 +439,11 @@ window.testPositionsPortfolioSystem = async function() {
     warn('position details modal test skipped', false, 'No positions data available');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 12: Filtering Functionality =====
-  console.log('📋 TEST 12: Filtering Functionality');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 12: Filtering Functionality');
+  window.Logger?.info('-----------------------------------');
   
   // Check portfolio filters
   const showClosedCheckbox = document.getElementById('portfolioIncludeClosed');
@@ -494,11 +494,11 @@ window.testPositionsPortfolioSystem = async function() {
     }
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 13: API Integration =====
-  console.log('📋 TEST 13: API Integration');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 13: API Integration');
+  window.Logger?.info('-----------------------------------');
   
   // Test that API endpoints are accessible (if we have account ID)
   if (window.positionsPortfolioState?.selectedAccountId) {
@@ -525,11 +525,11 @@ window.testPositionsPortfolioSystem = async function() {
     warn('API test skipped', false, 'No account selected');
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== TEST 14: Event Handlers =====
-  console.log('📋 TEST 14: Event Handlers');
-  console.log('-----------------------------------');
+  window.Logger?.info('📋 TEST 14: Event Handlers');
+  window.Logger?.info('-----------------------------------');
   
   // Check that sortable headers have onclick handlers
   // Note: We check for data-onclick attribute (used by EventHandlerManager) as well as onclick
@@ -561,31 +561,31 @@ window.testPositionsPortfolioSystem = async function() {
     test('portfolio table sortable headers have handlers', () => hasHandlers > 0, `Found ${hasHandlers}/${sortableHeaders.length} with handlers`);
   }
   
-  console.log('');
+  window.Logger?.info('');
 
   // ===== SUMMARY =====
   const duration = Date.now() - results.startTime;
-  console.log('📊 ===== TEST SUMMARY =====');
-  console.log(`✅ Passed: ${results.passed}`);
-  console.log(`❌ Failed: ${results.failed}`);
-  console.log(`⚠️ Warnings: ${results.warnings}`);
-  console.log(`📈 Total: ${results.passed + results.failed + results.warnings}`);
-  console.log(`⏱️ Duration: ${duration}ms`);
-  console.log('');
+  window.Logger?.info('📊 ===== TEST SUMMARY =====');
+  window.Logger?.info(`✅ Passed: ${results.passed}`);
+  window.Logger?.info(`❌ Failed: ${results.failed}`);
+  window.Logger?.info(`⚠️ Warnings: ${results.warnings}`);
+  window.Logger?.info(`📈 Total: ${results.passed + results.failed + results.warnings}`);
+  window.Logger?.info(`⏱️ Duration: ${duration}ms`);
+  window.Logger?.info('');
   
   if (results.failed === 0) {
-    console.log('🎉 All critical tests passed!');
+    window.Logger?.info('🎉 All critical tests passed!');
   } else {
-    console.log('⚠️ Some tests failed. Please review the errors above.');
-    console.log('');
-    console.log('Failed tests:');
+    window.Logger?.info('⚠️ Some tests failed. Please review the errors above.');
+    window.Logger?.info('');
+    window.Logger?.info('Failed tests:');
     results.tests.filter(t => !t.passed).forEach(t => {
-      console.log(`  ❌ ${t.name}${t.details ? ' - ' + t.details : ''}`);
+      window.Logger?.info(`  ❌ ${t.name}${t.details ? ' - ' + t.details : ''}`);
     });
   }
   
-  console.log('');
-  console.log('🔍 ===== END TEST =====');
+  window.Logger?.info('');
+  window.Logger?.info('🔍 ===== END TEST =====');
   
   return results;
 };

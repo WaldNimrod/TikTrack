@@ -1,0 +1,16 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- הושלם Full CRUD E2E עם restart server + hard refresh + אימות גרסאות JS
+- תועד totals + timestamp + evidence מלא לכל כשל
+- אימות תנאי ריצה מלא
+Evidence:
+- Server Restart: ✅ הופעל מחדש לפני הריצה
+- Hard Refresh: ✅ בוצע Ctrl+F5 לפני הריצה
+- JS Versions: ✅ נטענו 105 קבצי JS עם גרסאות שונות
+- Login: ✅ admin/admin123 התחבר בהצלחה
+- Test Start: ✅ הכפתור נלחץ והבדיקה התחילה
+Blockers:
+- בדיקה לא הושלמה: רק 4 entities התחילו מתוך 15
+- כל הבדיקות נכשלו בריצה (C:e2e failed)
+Next: חקירת סיבת הכשל וריצה חוזרת

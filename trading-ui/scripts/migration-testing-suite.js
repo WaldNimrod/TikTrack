@@ -49,7 +49,7 @@ class MigrationTestingSuite {
         const suiteId = this.startTestSuite('Migration Full Test Suite');
         
         try {
-            console.log('🧪 התחלת בדיקות מיגרציה מלאות...');
+            window.Logger?.info('🧪 התחלת בדיקות מיגרציה מלאות...');
             
             for (const testName of this.availableTests) {
                 await this.runTest(testName);
@@ -61,7 +61,7 @@ class MigrationTestingSuite {
             return results;
             
         } catch (error) {
-            console.error('❌ שגיאה בהרצת בדיקות:', error);
+            window.Logger?.error('❌ שגיאה בהרצת בדיקות:', error);
             return this.endTestSuite(suiteId, 'FAILED');
         }
     }
@@ -278,7 +278,7 @@ class MigrationTestingSuite {
                     layer: 'localStorage',
                     ttl: null
                 });
-                console.log('✅ User preferences saved to UnifiedCacheManager');
+                window.Logger?.info('✅ User preferences saved to UnifiedCacheManager');
             }
             
             this.endTest(testId, 'PASSED', 'עקביות בין עמודים תקינה');
@@ -506,7 +506,7 @@ class MigrationTestingSuite {
             this.testStats[`${status.toLowerCase()}Tests`]++;
             
             const statusIcon = status === 'PASSED' ? '✅' : status === 'FAILED' ? '❌' : '⏭️';
-            console.log(`${statusIcon} ${test.name}: ${message} (${test.duration}ms)`);
+            window.Logger?.info(`${statusIcon} ${test.name}: ${message} (${test.duration}ms)`);
         }
         
         return test;
@@ -525,7 +525,7 @@ class MigrationTestingSuite {
         };
         
         this.testStats.startTime = Date.now();
-        console.log(`🧪 התחלת סדרת בדיקות: ${suiteName}`);
+        window.Logger?.info(`🧪 התחלת סדרת בדיקות: ${suiteName}`);
         
         return suiteId;
     }
@@ -544,8 +544,8 @@ class MigrationTestingSuite {
             const successRate = this.testStats.totalTests > 0 ? 
                 (this.testStats.passedTests / this.testStats.totalTests * 100).toFixed(2) : 0;
             
-            console.log(`🏁 סיום סדרת בדיקות: ${status}`);
-            console.log(`📊 תוצאות: ${this.testStats.passedTests}/${this.testStats.totalTests} הצליחו (${successRate}%)`);
+            window.Logger?.info(`🏁 סיום סדרת בדיקות: ${status}`);
+            window.Logger?.info(`📊 תוצאות: ${this.testStats.passedTests}/${this.testStats.totalTests} הצליחו (${successRate}%)`);
             
             return {
                 ...this.currentTestSuite,
@@ -604,7 +604,7 @@ class MigrationTestingSuite {
         if (window.MigrationLogger) {
             window.MigrationLogger.warning(message, 'testing');
         } else {
-            console.warn(`⚠️ ${message}`);
+            window.Logger?.warn(`⚠️ ${message}`);
         }
     }
 
@@ -619,7 +619,7 @@ class MigrationTestingSuite {
         if (typeof testMethod === 'function') {
             await testMethod.call(this);
         } else {
-            console.warn(`⚠️ בדיקה לא נמצאה: ${testName}`);
+            window.Logger?.warn(`⚠️ בדיקה לא נמצאה: ${testName}`);
         }
     }
 }
@@ -631,7 +631,7 @@ window.MigrationTestingSuite = new MigrationTestingSuite();
 if (window.UnifiedInitializationSystem) {
     window.UnifiedInitializationSystem.addCoreSystem('MigrationTestingSuite', {
         initialize: async () => {
-            console.log('🧪 MigrationTestingSuite initialized');
+            window.Logger?.info('🧪 MigrationTestingSuite initialized');
             return true;
         },
         dependencies: ['UnifiedCacheManager', 'MigrationLogger'],
@@ -639,4 +639,4 @@ if (window.UnifiedInitializationSystem) {
     });
 }
 
-console.log('✅ MigrationTestingSuite loaded successfully');
+window.Logger?.info('✅ MigrationTestingSuite loaded successfully');

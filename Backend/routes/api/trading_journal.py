@@ -24,7 +24,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone, timedelta
 from services.business_logic.historical_data_business_service import HistoricalDataBusinessService
 from services.advanced_cache_service import cache_with_deps
-from .base_entity_decorators import handle_database_session
+from .base_entity_decorators import handle_database_session, require_authentication
 from .base_entity_utils import BaseEntityUtils
 import logging
 from typing import Optional
@@ -32,6 +32,60 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 trading_journal_bp = Blueprint('trading_journal', __name__, url_prefix='/api/trading_journal')
+
+
+@trading_journal_bp.route('/', methods=['GET'])
+@require_authentication()
+def get_trading_journal_list():
+    """
+    Get trading journal overview - list endpoint for CRUD dashboard.
+    Returns basic information about available journal endpoints.
+    """
+    try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+
+        # Return available journal endpoints with basic info
+        return jsonify({
+            "status": "success",
+            "data": [
+                {
+                    "endpoint": "/entries",
+                    "description": "Get journal entries for date range",
+                    "parameters": ["start_date", "end_date", "entity_type", "entity_id"]
+                },
+                {
+                    "endpoint": "/statistics",
+                    "description": "Get journal statistics",
+                    "parameters": ["start_date", "end_date"]
+                },
+                {
+                    "endpoint": "/calendar",
+                    "description": "Get journal calendar view",
+                    "parameters": ["start_date", "end_date"]
+                },
+                {
+                    "endpoint": "/by-entity",
+                    "description": "Get journal entries by entity",
+                    "parameters": ["entity_type", "entity_id", "start_date", "end_date"]
+                },
+                {
+                    "endpoint": "/activity-stats",
+                    "description": "Get activity statistics",
+                    "parameters": ["start_date", "end_date"]
+                }
+            ],
+            "message": "Trading journal endpoints available",
+            "version": "1.0"
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error getting trading journal list: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to get trading journal information"},
+            "version": "1.0"
+        }), 500
 
 
 @trading_journal_bp.route('/entries', methods=['GET'])
@@ -584,4 +638,21 @@ def get_activity_stats():
             f"Error retrieving activity stats: {str(e)}"
         )
         return jsonify(error_payload), 500
+
+
+# POST endpoint for trading journal (not supported - read-only)
+@trading_journal_bp.route('/', methods=['POST'])
+@require_authentication()
+def create_trading_journal_entry():
+    """
+    Trading journal entries are created automatically when trades/executions/notes are created.
+    Direct creation is not supported.
+    """
+    return jsonify({
+        "status": "error",
+        "error_code": "METHOD_NOT_ALLOWED",
+        "message": "Trading journal entries cannot be created directly. They are generated automatically from trades, executions, and notes.",
+        "details": "Use the appropriate trade/execution/note endpoints to create journal entries.",
+        "version": "1.0"
+    }), 400
 

@@ -20,7 +20,7 @@
 // - testPerformance() - Testperformance
 // - quickTest() - Quicktest
 
-console.log('🧪 Notification System Tester loaded');
+window.Logger?.info('🧪 Notification System Tester loaded');
 
 // ===== בדיקות בסיסיות =====
 
@@ -28,7 +28,7 @@ console.log('🧪 Notification System Tester loaded');
  * בדיקת זמינות פונקציות
  */
 function testFunctionAvailability() {
-  console.log('🔍 Testing function availability...');
+  window.Logger?.info('🔍 Testing function availability...');
   
   const functions = [
     'showNotification',
@@ -44,7 +44,7 @@ function testFunctionAvailability() {
   const results = {};
   functions.forEach(func => {
     results[func] = typeof window[func] === 'function';
-    console.log(`${results[func] ? '✅' : '❌'} ${func}: ${results[func]}`);
+    window.Logger?.info(`${results[func] ? '✅' : '❌'} ${func}: ${results[func]}`);
   });
   
   return results;
@@ -54,7 +54,7 @@ function testFunctionAvailability() {
  * בדיקת פונקציות חכמות
  */
 function testSmartFunctions() {
-  console.log('🧠 Testing smart functions...');
+  window.Logger?.info('🧠 Testing smart functions...');
   
   const smartFunctions = [
     'showNotificationSmart',
@@ -67,7 +67,7 @@ function testSmartFunctions() {
   const results = {};
   smartFunctions.forEach(func => {
     results[func] = typeof window[func] === 'function';
-    console.log(`${results[func] ? '✅' : '❌'} ${func}: ${results[func]}`);
+    window.Logger?.info(`${results[func] ? '✅' : '❌'} ${func}: ${results[func]}`);
   });
   
   return results;
@@ -77,7 +77,7 @@ function testSmartFunctions() {
  * בדיקת קטגוריות
  */
 async function testCategories() {
-  console.log('📊 Testing notification categories...');
+  window.Logger?.info('📊 Testing notification categories...');
   
   const categories = ['system', 'business', 'ui', 'development', 'performance'];
   const results = {};
@@ -86,10 +86,10 @@ async function testCategories() {
     try {
       const enabled = await window.shouldShowNotification(category);
       results[category] = enabled;
-      console.log(`${enabled ? '✅' : '❌'} ${category}: ${enabled ? 'enabled' : 'disabled'}`);
+      window.Logger?.info(`${enabled ? '✅' : '❌'} ${category}: ${enabled ? 'enabled' : 'disabled'}`);
     } catch (error) {
       results[category] = false;
-      console.log(`❌ ${category}: error - ${error.message}`);
+      window.Logger?.info(`❌ ${category}: error - ${error.message}`);
     }
   }
   
@@ -100,7 +100,7 @@ async function testCategories() {
  * בדיקת הודעות בסיסיות
  */
 async function testBasicNotifications() {
-  console.log('🔔 Testing basic notifications...');
+  window.Logger?.info('🔔 Testing basic notifications...');
   
   const tests = [
     { func: 'showSuccessNotification', title: 'בדיקה', message: 'הודעת הצלחה', category: 'system' },
@@ -113,15 +113,15 @@ async function testBasicNotifications() {
   
   for (const test of tests) {
     try {
-      console.log(`🧪 Testing ${test.func}...`);
+      window.Logger?.info(`🧪 Testing ${test.func}...`);
       
       if (typeof window[test.func] === 'function') {
         await window[test.func](test.title, test.message, 2000, test.category);
         results.push({ test: test.func, success: true });
-        console.log(`✅ ${test.func} - success`);
+        window.Logger?.info(`✅ ${test.func} - success`);
       } else {
         results.push({ test: test.func, success: false, error: 'Function not found' });
-        console.log(`❌ ${test.func} - function not found`);
+        window.Logger?.info(`❌ ${test.func} - function not found`);
       }
       
       // המתן קצת בין בדיקות
@@ -129,7 +129,7 @@ async function testBasicNotifications() {
       
     } catch (error) {
       results.push({ test: test.func, success: false, error: error.message });
-      console.log(`❌ ${test.func} - error: ${error.message}`);
+      window.Logger?.info(`❌ ${test.func} - error: ${error.message}`);
     }
   }
   
@@ -140,7 +140,7 @@ async function testBasicNotifications() {
  * בדיקת זיהוי אוטומטי
  */
 async function testAutoDetection() {
-  console.log('🤖 Testing auto-detection...');
+  window.Logger?.info('🤖 Testing auto-detection...');
   
   const tests = [
     { message: 'טרייד נשמר בהצלחה', expected: 'business' },
@@ -154,7 +154,7 @@ async function testAutoDetection() {
   
   for (const test of tests) {
     try {
-      console.log(`🧪 Testing auto-detection for: "${test.message}"`);
+      window.Logger?.info(`🧪 Testing auto-detection for: "${test.message}"`);
       
       if (typeof window.detectNotificationCategory === 'function') {
         const detected = window.detectNotificationCategory(test.message, 'info', 'בדיקה', {
@@ -170,7 +170,7 @@ async function testAutoDetection() {
           success: success
         });
         
-        console.log(`${success ? '✅' : '❌'} Expected: ${test.expected}, Detected: ${detected}`);
+        window.Logger?.info(`${success ? '✅' : '❌'} Expected: ${test.expected}, Detected: ${detected}`);
       } else {
         results.push({
           message: test.message,
@@ -179,7 +179,7 @@ async function testAutoDetection() {
           success: false,
           error: 'detectNotificationCategory function not found'
         });
-        console.log(`❌ detectNotificationCategory function not found`);
+        window.Logger?.info(`❌ detectNotificationCategory function not found`);
       }
       
     } catch (error) {
@@ -190,7 +190,7 @@ async function testAutoDetection() {
         success: false,
         error: error.message
       });
-      console.log(`❌ Error testing auto-detection: ${error.message}`);
+      window.Logger?.info(`❌ Error testing auto-detection: ${error.message}`);
     }
   }
   
@@ -201,13 +201,13 @@ async function testAutoDetection() {
  * בדיקת ביצועים
  */
 function testPerformance() {
-  console.log('⚡ Testing performance...');
+  window.Logger?.info('⚡ Testing performance...');
   
   const iterations = 100;
   const results = {};
   
   // בדיקת זיהוי אוטומטי
-  console.time('auto-detection');
+  window.Logger?.time('auto-detection');
   for (let i = 0; i < iterations; i++) {
     if (typeof window.detectNotificationCategory === 'function') {
       window.detectNotificationCategory('טרייד נשמר בהצלחה', 'success', 'הצלחה', {
@@ -216,16 +216,16 @@ function testPerformance() {
       });
     }
   }
-  console.timeEnd('auto-detection');
+  window.Logger?.timeEnd('auto-detection');
   
   // בדיקת קריאת העדפות - מופחתת
-  console.time('preference-check');
+  window.Logger?.time('preference-check');
   for (let i = 0; i < Math.min(iterations, 10); i++) {
     if (typeof window.shouldShowNotification === 'function') {
       window.shouldShowNotification('system');
     }
   }
-  console.timeEnd('preference-check');
+  window.Logger?.timeEnd('preference-check');
   
   results.iterations = iterations;
   results.completed = true;
@@ -237,8 +237,8 @@ function testPerformance() {
  * הרצת כל הבדיקות
  */
 async function runAllTests() {
-  console.log('🚀 Starting comprehensive notification system tests...');
-  console.log('='.repeat(60));
+  window.Logger?.info('🚀 Starting comprehensive notification system tests...');
+  window.Logger?.info('='.repeat(60));
   
   const results = {
     timestamp: new Date().toISOString(),
@@ -262,9 +262,9 @@ async function runAllTests() {
     results.performance = testPerformance();
     
     // סיכום
-    console.log('='.repeat(60));
-    console.log('📊 TEST SUMMARY');
-    console.log('='.repeat(60));
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('📊 TEST SUMMARY');
+    window.Logger?.info('='.repeat(60));
     
     const functionTests = Object.values(results.functionAvailability);
     const smartTests = Object.values(results.smartFunctions);
@@ -272,23 +272,23 @@ async function runAllTests() {
     const notificationTests = results.basicNotifications.map(t => t.success);
     const detectionTests = results.autoDetection.map(t => t.success);
     
-    console.log(`✅ Function Availability: ${functionTests.filter(Boolean).length}/${functionTests.length}`);
-    console.log(`✅ Smart Functions: ${smartTests.filter(Boolean).length}/${smartTests.length}`);
-    console.log(`✅ Categories: ${categoryTests.filter(Boolean).length}/${categoryTests.length}`);
-    console.log(`✅ Basic Notifications: ${notificationTests.filter(Boolean).length}/${notificationTests.length}`);
-    console.log(`✅ Auto Detection: ${detectionTests.filter(Boolean).length}/${detectionTests.length}`);
-    console.log(`✅ Performance: ${results.performance.completed ? 'completed' : 'failed'}`);
+    window.Logger?.info(`✅ Function Availability: ${functionTests.filter(Boolean).length}/${functionTests.length}`);
+    window.Logger?.info(`✅ Smart Functions: ${smartTests.filter(Boolean).length}/${smartTests.length}`);
+    window.Logger?.info(`✅ Categories: ${categoryTests.filter(Boolean).length}/${categoryTests.length}`);
+    window.Logger?.info(`✅ Basic Notifications: ${notificationTests.filter(Boolean).length}/${notificationTests.length}`);
+    window.Logger?.info(`✅ Auto Detection: ${detectionTests.filter(Boolean).length}/${detectionTests.length}`);
+    window.Logger?.info(`✅ Performance: ${results.performance.completed ? 'completed' : 'failed'}`);
     
     // הצגת תוצאות מפורטות
-    console.log('='.repeat(60));
-    console.log('📋 DETAILED RESULTS');
-    console.log('='.repeat(60));
-    console.log(JSON.stringify(results, null, 2));
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('📋 DETAILED RESULTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info(JSON.stringify(results, null, 2));
     
     return results;
     
   } catch (error) {
-    console.error('❌ Test suite failed:', error);
+    window.Logger?.error('❌ Test suite failed:', error);
     results.error = error.message;
     return results;
   }
@@ -298,7 +298,7 @@ async function runAllTests() {
  * בדיקה מהירה
  */
 async function quickTest() {
-  console.log('⚡ Running quick test...');
+  window.Logger?.info('⚡ Running quick test...');
   
   const basic = testFunctionAvailability();
   const smart = testSmartFunctions();
@@ -311,7 +311,7 @@ async function quickTest() {
     totalTests: Object.keys(basic).length + Object.keys(smart).length + Object.keys(categories).length
   };
   
-  console.log('📊 Quick Test Results:', summary);
+  window.Logger?.info('📊 Quick Test Results:', summary);
   return summary;
 }
 
@@ -335,6 +335,6 @@ if (!window.notificationSystemTesterInitialized) {
   window.notificationSystemTesterInitialized = true;
 }
 
-console.log('✅ Notification System Tester ready');
-console.log('💡 Use window.notificationSystemTester.runAllTests() for full test suite');
+window.Logger?.info('✅ Notification System Tester ready');
+window.Logger?.info('💡 Use window.notificationSystemTester.runAllTests() for full test suite');
 

@@ -18,6 +18,21 @@
  *
  * Dependencies:
  * - IntegratedCRUDE2ETester (main testing system)
+ *
+ * ===== FUNCTION INDEX =====
+ * === Global Functions ===
+ * - getUnifiedTestData(entityType, fieldMap, isUpdate) - Get unified test data using UnifiedPayloadBuilder
+ *
+ * === Class: CRUDEnhancedTester ===
+ * - constructor() - Initialize the enhanced tester
+ * - runUITests() - Run UI interaction tests
+ * - performCreateTest(mainWindow, mainDoc, entityType, fieldMap) - Perform create operation test
+ * - performUpdateTest(mainWindow, mainDoc, entityType, fieldMap, recordId) - Perform update operation test
+ * - performDeleteTest(mainWindow, mainDoc, entityType, recordId) - Perform delete operation test
+ * - performReadTest(mainWindow, mainDoc, entityType, recordId) - Perform read operation test
+ * - runQuickTest() - Run quick test suite
+ * - runDeepTesting() - Run comprehensive deep testing
+ * - runDeepTestingForProblematic() - Run deep testing for problematic pages
  * - Selenium WebDriver (for browser automation)
  * - Puppeteer (for advanced browser control)
  *
@@ -25,6 +40,14 @@
  * @version 2.0.0
  * @lastUpdated December 2025 - Advanced UI Testing Implementation
  * 
+ * ============================================================================
+ * UNIFIED TEST DATA GENERATOR - INTEGRATION WITH PAYLOAD BUILDER
+ * ============================================================================
+ *
+ * This file now uses the UnifiedPayloadBuilder from crud_testing_dashboard.js
+ * for consistent test data generation across all test runners.
+ *
+ * Usage: await getUnifiedTestData(entityType, fieldMap, isUpdate)
  * ============================================================================
  * FUNCTION INDEX - CRUD Enhanced Testing System
  * ============================================================================
@@ -69,9 +92,50 @@
  * ============================================================================
  */
 
+/**
+ * UNIFIED TEST DATA GENERATOR
+ * Uses the global UnifiedPayloadBuilder for consistent test data across all test runners
+ */
+/**
+ * Get Unified Test Data
+ * Retrieves test data using the UnifiedPayloadBuilder system for consistency across all test runners
+ * @param {string} entityType - The entity type (e.g., 'trade_plan', 'cash_flow')
+ * @param {Object} fieldMap - Optional field map, will fetch from UnifiedPayloadBuilder if not provided
+ * @param {boolean} isUpdate - Whether this is for update operation (affects data generation)
+ * @returns {Promise<Object>} Generated test data object
+ */
+async function getUnifiedTestData(entityType, fieldMap = null, isUpdate = false) {
+    // Wait for UnifiedPayloadBuilder to be available
+    let attempts = 0;
+    while (!window.UnifiedPayloadBuilder && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
+    if (!window.UnifiedPayloadBuilder) {
+        throw new Error('UnifiedPayloadBuilder not available after 5 seconds');
+    }
+
+    // If no fieldMap provided, try to get it from the dashboard
+    if (!fieldMap) {
+        const fieldMaps = window.UnifiedPayloadBuilder.getEntityFieldMaps();
+        fieldMap = fieldMaps[entityType];
+        if (!fieldMap) {
+            throw new Error(`No fieldMap found for entity: ${entityType}`);
+        }
+    }
+
+    // Use the unified builder
+    return await window.UnifiedPayloadBuilder.build(entityType, fieldMap, isUpdate);
+}
+
 class CRUDEnhancedTester {
+  /**
+   * CRUDEnhancedTester Constructor
+   * Initializes the enhanced UI testing system with comprehensive entity mapping
+   */
   constructor() {
-    console.log('🚀 אתחול CRUDEnhancedTester...');
+    window.Logger?.info('🚀 אתחול CRUDEnhancedTester...');
 
     // מיפוי כל 29 העמודים במערכת
     this.entities = this.initializeEntitiesMapping();
@@ -103,7 +167,7 @@ class CRUDEnhancedTester {
     // Client request ID base for tracing
     this.requestCounter = 0;
 
-    console.log('✅ CRUDEnhancedTester אותחל בהצלחה');
+    window.Logger?.info('✅ CRUDEnhancedTester אותחל בהצלחה');
   }
 
   /**
@@ -122,29 +186,8 @@ class CRUDEnhancedTester {
         // testData will be populated dynamically with actual IDs
         testData: null,
         getTestData: async function() {
-          // Get actual IDs from user's data
-          const accountsRes = await fetch('/api/trading-accounts/');
-          const accountsData = await accountsRes.json();
-          const accounts = accountsData.data || [];
-          const accountId = accounts.length > 0 ? accounts[0].id : null;
-          
-          const tickersRes = await fetch('/api/tickers/');
-          const tickersData = await tickersRes.json();
-          const tickers = tickersData.data || [];
-          const tickerId = tickers.length > 0 ? tickers[0].id : null;
-          
-          if (!accountId || !tickerId) {
-            throw new Error('No trading account or ticker available for testing');
-          }
-          
-          return {
-            trading_account_id: accountId,
-            ticker_id: tickerId,
-            status: 'open',
-            investment_type: 'swing',
-            side: 'Long',
-            notes: 'CRUD Test Record - Safe to delete',
-          };
+          // Use unified payload builder for consistent test data
+          return await getUnifiedTestData('trade');
         },
         expectedButtons: ['הוסף טרייד', 'ערוך', 'מחק'],
         tableSelector: '#tradesTable',
@@ -222,26 +265,9 @@ class CRUDEnhancedTester {
         // testData will be populated dynamically with actual IDs
         testData: null,
         getTestData: async function() {
-          // Get actual trade ID from user's data
-          const tradesRes = await fetch('/api/trades/');
-          const tradesData = await tradesRes.json();
-          const trades = tradesData.data || [];
-          const tradeId = trades.length > 0 ? trades[0].id : null;
-          
-          if (!tradeId) {
-            throw new Error('No trade available for testing');
-          }
-          
-          return {
-            trade_id: tradeId,
-            action: 'buy',
-            date: new Date().toISOString(),
-            quantity: 100,
-            price: 150.5,
-            fee: 1.5,
-            source: 'manual',
-            notes: 'CRUD Test Execution - Safe to delete',
-          };
+          // Use unified payload builder for consistent test data
+          return await getUnifiedTestData('execution');
+        },
         },
         expectedButtons: ['הוסף ביצוע', 'ערוך', 'מחק'],
         tableSelector: '#executionsTable',
@@ -258,26 +284,8 @@ class CRUDEnhancedTester {
         // testData will be populated dynamically with actual IDs
         testData: null,
         getTestData: async function() {
-          // Get actual trading_account ID from user's data
-          const accountsRes = await fetch('/api/trading-accounts/');
-          const accountsData = await accountsRes.json();
-          const accounts = accountsData.data || [];
-          const accountId = accounts.length > 0 ? accounts[0].id : null;
-          
-          if (!accountId) {
-            throw new Error('No trading account available for testing');
-          }
-          
-          return {
-            trading_account_id: accountId,
-            type: 'deposit',
-            amount: 1000.0,
-            date: new Date().toISOString().split('T')[0],
-            description: 'CRUD Test Cash Flow - Safe to delete',
-            currency_id: 1,
-            usd_rate: 1.0,
-            source: 'manual',
-          };
+          // Use unified payload builder for consistent test data
+          return await getUnifiedTestData('cash_flow');
         },
         expectedButtons: ['הוסף תזרים', 'ערוך', 'מחק'],
         tableSelector: '#cashFlowsTable',
@@ -309,18 +317,8 @@ class CRUDEnhancedTester {
             throw new Error('No trading account or ticker available for testing');
           }
           
-          return {
-            trading_account_id: accountId,
-            ticker_id: tickerId,
-            investment_type: 'swing',
-            side: 'Long',
-            status: 'open',
-            planned_amount: 1000,
-            entry_price: 150.0,
-            entry_conditions: 'CRUD Test Entry Conditions',
-            target_price: 155.0,
-            reasons: 'CRUD Test Trade Plan - Safe to delete',
-          };
+          // Use unified payload builder for consistent test data
+          return await getUnifiedTestData('trade_plan');
         },
         expectedButtons: ['הוסף תוכנית', 'ערוך', 'מחק'],
         tableSelector: '#tradePlansTable',
@@ -461,13 +459,8 @@ class CRUDEnhancedTester {
         hasCRUD: true,
         testData: null,
         getTestData: async function() {
-          const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
-          return {
-            name: `CRUD Test Category ${stamp}`,
-            description: 'CRUD Test Tag Category - Safe to delete',
-            order_index: 0,
-            is_active: true,
-          };
+          // Use unified payload builder for consistent test data
+          return await getUnifiedTestData('tag_category');
         },
         expectedButtons: ['קטגוריה חדשה', 'תגית חדשה'],
         tableSelector: '#tagCategoriesTable',
@@ -715,7 +708,7 @@ class CRUDEnhancedTester {
     const debugCalls = [];
     let testRecordId = null;
 
-    console.log(`🔍 Entity details:`, {
+    window.Logger?.info(`🔍 Entity details:`, {
       hasApi: !!entity.apiUrl,
       hasCRUD: entity.hasCRUD,
       apiUrl: entity.apiUrl
@@ -726,10 +719,10 @@ class CRUDEnhancedTester {
       const pageLoadResult = await this.testPageLoad(entity.pageUrl);
       if (pageLoadResult.success) {
         score += 20;
-        console.log(`✅ ${entityName}: Page loads successfully`);
+        window.Logger?.info(`✅ ${entityName}: Page loads successfully`);
       } else {
         issues.push(`Page Load failed: ${pageLoadResult.error}`);
-        console.log(`❌ ${entityName}: Page load failed - ${pageLoadResult.error}`);
+        window.Logger?.info(`❌ ${entityName}: Page load failed - ${pageLoadResult.error}`);
       }
 
       // 2. בדיקת API GET (20 נקודות) - רק לישויות עם API
@@ -739,7 +732,7 @@ class CRUDEnhancedTester {
         if (loadResult.success) {
           score += 20;
           apiWorking = true;
-          console.log(`✅ ${entityName}: API GET works`);
+          window.Logger?.info(`✅ ${entityName}: API GET works`);
           debugCalls.push({
             step: 'GET',
             url: entity.apiUrl,
@@ -751,7 +744,7 @@ class CRUDEnhancedTester {
           });
         } else {
           issues.push(`API Load failed: ${loadResult.error}`);
-          console.log(`❌ ${entityName}: API GET failed - ${loadResult.error}`);
+          window.Logger?.info(`❌ ${entityName}: API GET failed - ${loadResult.error}`);
           if (loadResult.curl)
             debugCalls.push({
               step: 'GET',
@@ -766,7 +759,7 @@ class CRUDEnhancedTester {
         // אם אין API, נותנים נקודות על כך שזה נורמלי
         score += 20;
         apiWorking = true; // No API is OK
-        console.log(`✅ ${entityName}: No API (as expected)`);
+        window.Logger?.info(`✅ ${entityName}: No API (as expected)`);
       }
 
       // 3. בדיקת CREATE (15 נקודות) - רק לישויות עם CRUD ו-API שעובד
@@ -778,7 +771,7 @@ class CRUDEnhancedTester {
             testData = await entity.getTestData();
           } catch (error) {
             issues.push(`Failed to get test data: ${error.message}`);
-            console.log(`❌ ${entityName}: Failed to get test data - ${error.message}`);
+            window.Logger?.info(`❌ ${entityName}: Failed to get test data - ${error.message}`);
             testData = null;
           }
         }
@@ -788,7 +781,7 @@ class CRUDEnhancedTester {
         if (createResult.success) {
           score += 15;
           testRecordId = createResult.id;
-          console.log(`✅ ${entityName}: CREATE works (ID: ${testRecordId})`);
+          window.Logger?.info(`✅ ${entityName}: CREATE works (ID: ${testRecordId})`);
           debugCalls.push({
             step: 'POST',
             url: entity.apiUrl,
@@ -800,7 +793,7 @@ class CRUDEnhancedTester {
           });
         } else {
           issues.push(`CREATE failed: ${createResult.error}`);
-          console.log(`❌ ${entityName}: CREATE failed - ${createResult.error}`);
+          window.Logger?.info(`❌ ${entityName}: CREATE failed - ${createResult.error}`);
           if (createResult.curl)
             debugCalls.push({
               step: 'POST',
@@ -812,12 +805,12 @@ class CRUDEnhancedTester {
         }
         } else {
           issues.push(`No test data available for CREATE`);
-          console.log(`⚠️ ${entityName}: No test data available`);
+          window.Logger?.info(`⚠️ ${entityName}: No test data available`);
         }
       } else {
         // אם אין CRUD, נותנים נקודות
         score += 15;
-        console.log(`✅ ${entityName}: No CRUD (as expected)`);
+        window.Logger?.info(`✅ ${entityName}: No CRUD (as expected)`);
       }
 
       // 4. בדיקת UPDATE (15 נקודות) - רק אם CREATE הצליח ו-API עובד
@@ -840,7 +833,7 @@ class CRUDEnhancedTester {
         const updateResult = await this.testAPIUpdate(entity.apiUrl, testRecordId, updateData);
         if (updateResult.success) {
           score += 15;
-          console.log(`✅ ${entityName}: UPDATE works`);
+          window.Logger?.info(`✅ ${entityName}: UPDATE works`);
           debugCalls.push({
             step: 'PUT',
             url: `${entity.apiUrl}/${testRecordId}`,
@@ -851,7 +844,7 @@ class CRUDEnhancedTester {
           });
         } else {
           issues.push(`UPDATE failed: ${updateResult.error}`);
-          console.log(`❌ ${entityName}: UPDATE failed - ${updateResult.error}`);
+          window.Logger?.info(`❌ ${entityName}: UPDATE failed - ${updateResult.error}`);
           if (updateResult.curl)
             debugCalls.push({
               step: 'PUT',
@@ -863,7 +856,7 @@ class CRUDEnhancedTester {
         }
       } else if (!entity.hasCRUD) {
         score += 15;
-        console.log(`✅ ${entityName}: No UPDATE needed`);
+        window.Logger?.info(`✅ ${entityName}: No UPDATE needed`);
       }
 
       // 5. בדיקת DELETE (15 נקודות) - רק אם CREATE הצליח ו-API עובד
@@ -871,7 +864,7 @@ class CRUDEnhancedTester {
         const deleteResult = await this.testAPIDelete(entity.apiUrl, testRecordId);
         if (deleteResult.success) {
           score += 15;
-          console.log(`✅ ${entityName}: DELETE works`);
+          window.Logger?.info(`✅ ${entityName}: DELETE works`);
           debugCalls.push({
             step: 'DELETE',
             url: `${entity.apiUrl}/${testRecordId}`,
@@ -882,7 +875,7 @@ class CRUDEnhancedTester {
           });
         } else {
           issues.push(`DELETE failed: ${deleteResult.error}`);
-          console.log(`❌ ${entityName}: DELETE failed - ${deleteResult.error}`);
+          window.Logger?.info(`❌ ${entityName}: DELETE failed - ${deleteResult.error}`);
           if (deleteResult.curl)
             debugCalls.push({
               step: 'DELETE',
@@ -894,14 +887,14 @@ class CRUDEnhancedTester {
         }
       } else if (!entity.hasCRUD) {
         score += 15;
-        console.log(`✅ ${entityName}: No DELETE needed`);
+        window.Logger?.info(`✅ ${entityName}: No DELETE needed`);
       }
 
       // 6. בדיקת זמן תגובה (15 נקודות) עם SLA פר-יישות
       const responseTime = Date.now() - startTime;
       if (entity.skipResponseTimePenalty) {
         score += 15;
-        console.log(`✅ ${entityName}: Response time check skipped (policy)`);
+        window.Logger?.info(`✅ ${entityName}: Response time check skipped (policy)`);
       } else {
         // Prefer pure GET latency if available over total duration (CRUD adds noise)
         const getCall = debugCalls.find(c => c.step === 'GET');
@@ -909,18 +902,18 @@ class CRUDEnhancedTester {
           getCall && typeof getCall.timeMs === 'number' ? getCall.timeMs : responseTime;
         if (latency <= slaMs) {
           score += 15;
-          console.log(`✅ ${entityName}: GET latency within SLA (${latency}ms ≤ ${slaMs}ms)`);
+          window.Logger?.info(`✅ ${entityName}: GET latency within SLA (${latency}ms ≤ ${slaMs}ms)`);
         } else if (latency < Math.max(slaMs * 2, 10000)) {
           score += 10;
-          console.log(`⚠️ ${entityName}: GET latency slow (${latency}ms > SLA ${slaMs}ms)`);
+          window.Logger?.info(`⚠️ ${entityName}: GET latency slow (${latency}ms > SLA ${slaMs}ms)`);
           issues.push(`Slow GET latency: ${latency}ms (SLA ${slaMs}ms)`);
         } else {
           issues.push(`Very slow GET latency: ${latency}ms (SLA ${slaMs}ms)`);
-          console.log(`❌ ${entityName}: Very slow GET latency (${latency}ms)`);
+          window.Logger?.info(`❌ ${entityName}: Very slow GET latency (${latency}ms)`);
         }
       }
     } catch (error) {
-      console.error(`💥 ${entityName}: Test failed with error:`, error);
+      window.Logger?.error(`💥 ${entityName}: Test failed with error:`, error);
       issues.push(`Test failed: ${error.message}`);
     }
 
@@ -946,7 +939,7 @@ class CRUDEnhancedTester {
       debug: { calls: debugCalls },
     };
 
-    console.log(
+    window.Logger?.info(
       `📊 ${entityName}: Final Score = ${result.score}/100 ${result.needsDeepTesting ? '(needs deep testing)' : '(passed)'}`
     );
 
@@ -958,7 +951,7 @@ class CRUDEnhancedTester {
    * @returns {Object} דוח מקיף עם כל התוצאות
    */
   async runAllEntitiesTest() {
-    console.log('🚀 Starting comprehensive testing of all entities...');
+    window.Logger?.info('🚀 Starting comprehensive testing of all entities...');
     const startTime = Date.now();
 
     // התחלת progress tracking
@@ -992,20 +985,20 @@ class CRUDEnhancedTester {
       const progressText = `בודק ${entity.displayName} (${currentIndex}/${this.stats.total})`;
       const progressDetails = `מעבד ${entity.displayName}...`;
 
-      console.log(`🔄 PROGRESS UPDATE: ${progressPercent}% - ${progressText}`);
+      window.Logger?.info(`🔄 PROGRESS UPDATE: ${progressPercent}% - ${progressText}`);
 
       if (window.updateProgress) {
-        console.log('✅ Calling window.updateProgress');
+        window.Logger?.info('✅ Calling window.updateProgress');
         window.updateProgress(progressPercent, progressText, progressDetails);
       } else {
-        console.log('❌ window.updateProgress not available');
+        window.Logger?.info('❌ window.updateProgress not available');
       }
 
       // עדכון סטטוס
       this.stats.inProgress = 1;
       this.updateStatsDisplay();
 
-      console.log(
+      window.Logger?.info(
         `\n🎯 ${this.stats.tested + 1}/${this.stats.total}: Testing ${entity.displayName}...`
       );
 
@@ -1029,7 +1022,7 @@ class CRUDEnhancedTester {
         this.updateStatsDisplay();
 
       } catch (error) {
-        console.error(`❌ Error testing ${entityName}:`, error);
+        window.Logger?.error(`❌ Error testing ${entityName}:`, error);
 
         // יצירת תוצאה שגוי גם במקרה של שגיאה
         const errorResult = {
@@ -1060,7 +1053,7 @@ class CRUDEnhancedTester {
     }
 
     const totalTime = Date.now() - startTime;
-    console.log(`\n🏁 All tests completed in ${Math.round(totalTime / 1000)} seconds`);
+    window.Logger?.info(`\n🏁 All tests completed in ${Math.round(totalTime / 1000)} seconds`);
 
     // הצגת תוצאות סופיות גם אם יש שגיאות
     if (window.updateProgress) {
@@ -1135,9 +1128,9 @@ class CRUDEnhancedTester {
       // שמירה ב-localStorage
       localStorage.setItem('lastCRUDTestReport', JSON.stringify(reportData));
 
-      console.log('✅ Report saved to storage successfully');
+      window.Logger?.info('✅ Report saved to storage successfully');
     } catch (error) {
-      console.warn('⚠️ Failed to save report to storage:', error);
+      window.Logger?.warn('⚠️ Failed to save report to storage:', error);
     }
   }
 
@@ -1789,11 +1782,11 @@ class CRUDEnhancedTester {
    * @param {Object} report הדוח המקיף
    */
   displayFinalReport(report) {
-    console.log('\n🎉 FINAL REPORT GENERATED:');
-    console.log(`📊 Overall Score: ${report.summary.overallScore}/100`);
-    console.log(`✅ Passed: ${report.summary.passedEntities}/${report.summary.totalEntities}`);
-    console.log(`⚠️  Problematic: ${report.summary.problematicEntities}`);
-    console.log(`🚨 Critical: ${report.summary.criticalEntities}`);
+    window.Logger?.info('\n🎉 FINAL REPORT GENERATED:');
+    window.Logger?.info(`📊 Overall Score: ${report.summary.overallScore}/100`);
+    window.Logger?.info(`✅ Passed: ${report.summary.passedEntities}/${report.summary.totalEntities}`);
+    window.Logger?.info(`⚠️  Problematic: ${report.summary.problematicEntities}`);
+    window.Logger?.info(`🚨 Critical: ${report.summary.criticalEntities}`);
 
     // הצגת דוח בכרטיס
     const finalReportCard = document.getElementById('finalReportCard');
@@ -1934,7 +1927,7 @@ window.runDeepTestingForProblematic = async function () {
     }
 
   } catch (error) {
-    console.error('❌ Deep testing failed:', error);
+    window.Logger?.error('❌ Deep testing failed:', error);
 
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בבדיקות מפורטות', `הבדיקות נכשלו: ${error.message}`, 7000);

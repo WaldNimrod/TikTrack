@@ -1,0 +1,1095 @@
+{
+  "runId": "gate1-yellow-current-1767048647481",
+  "timestamp": "2025-12-29T22:50:47.481Z",
+  "environment": "localhost:8080",
+  "status": "red",
+  "context": "YELLOW status current check - QA after fixes loaded",
+  "summary": {
+    "totalEntities": 15,
+    "testedEntities": 15,
+    "passedEntities": 7,
+    "failedEntities": 8,
+    "successRate": "46.7",
+    "totalExecutionTimeMs": 5930,
+    "averageResponseTime": 79.4
+  },
+  "testResults": [
+    {
+      "entity": "trade",
+      "endpoint": "/api/trades",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 46,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 38,
+          "error": null,
+          "entityId": 287
+        },
+        "read": {
+          "success": true,
+          "responseTime": 19,
+          "error": null
+        },
+        "update": {
+          "success": true,
+          "responseTime": 25,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 23,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 151,
+      "error": null
+    },
+    {
+      "entity": "trade_plan",
+      "endpoint": "/api/trade_plans",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 42,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 23,
+          "error": "HTTP 404",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 66,
+      "error": null
+    },
+    {
+      "entity": "alert",
+      "endpoint": "/api/alerts",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 27,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 24,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 51,
+      "error": null
+    },
+    {
+      "entity": "ticker",
+      "endpoint": "/api/tickers",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 46,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 30,
+          "error": "HTTP 500",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 77,
+      "error": null
+    },
+    {
+      "entity": "trading_account",
+      "endpoint": "/api/trading_accounts",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 53,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 14,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 68,
+      "error": null
+    },
+    {
+      "entity": "note",
+      "endpoint": "/api/notes",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 32,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 27,
+          "error": null,
+          "entityId": 195
+        },
+        "read": {
+          "success": true,
+          "responseTime": 17,
+          "error": null
+        },
+        "update": {
+          "success": true,
+          "responseTime": 21,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 18,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 115,
+      "error": null
+    },
+    {
+      "entity": "tag",
+      "endpoint": "/api/tags",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 36,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 27,
+          "error": null,
+          "entityId": 9
+        },
+        "read": {
+          "success": false,
+          "responseTime": 13,
+          "error": "HTTP 404"
+        },
+        "update": {
+          "success": true,
+          "responseTime": 21,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 18,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 116,
+      "error": null
+    },
+    {
+      "entity": "watch_list",
+      "endpoint": "/api/watch_lists",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 41,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 22,
+          "error": null,
+          "entityId": 18
+        },
+        "read": {
+          "success": true,
+          "responseTime": 15,
+          "error": null
+        },
+        "update": {
+          "success": true,
+          "responseTime": 18,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 15,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 112,
+      "error": null
+    },
+    {
+      "entity": "execution",
+      "endpoint": "/api/executions",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 47,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 20,
+          "error": "HTTP 404",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 67,
+      "error": null
+    },
+    {
+      "entity": "cash_flow",
+      "endpoint": "/api/cash_flows",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 53,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 14,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 68,
+      "error": null
+    },
+    {
+      "entity": "user_profile",
+      "endpoint": "/api/user_profile",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 17,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 10,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 27,
+      "error": null
+    },
+    {
+      "entity": "user_management",
+      "endpoint": "/api/user_management",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 25,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 19,
+          "error": null,
+          "entityId": 6
+        },
+        "read": {
+          "success": true,
+          "responseTime": 15,
+          "error": null
+        },
+        "update": {
+          "success": true,
+          "responseTime": 18,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 11,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 88,
+      "error": null
+    },
+    {
+      "entity": "trading_journal",
+      "endpoint": "/api/trading_journal",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 27,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 12,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 40,
+      "error": null
+    },
+    {
+      "entity": "tag_management",
+      "endpoint": "/api/tag_management",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 23,
+          "error": null
+        },
+        "create": {
+          "success": true,
+          "responseTime": 27,
+          "error": null,
+          "entityId": 10
+        },
+        "read": {
+          "success": false,
+          "responseTime": 9,
+          "error": "HTTP 404"
+        },
+        "update": {
+          "success": true,
+          "responseTime": 22,
+          "error": null
+        },
+        "delete": {
+          "success": true,
+          "responseTime": 17,
+          "error": null
+        }
+      },
+      "overallSuccess": true,
+      "executionTimeMs": 98,
+      "error": null
+    },
+    {
+      "entity": "data_import",
+      "endpoint": "/api/data_import",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 25,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 21,
+          "error": "HTTP 405",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "overallSuccess": false,
+      "executionTimeMs": 47,
+      "error": null
+    }
+  ],
+  "failures": [
+    {
+      "entity": "trade_plan",
+      "endpoint": "/api/trade_plans",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 42,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 23,
+          "error": "HTTP 404",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 66
+    },
+    {
+      "entity": "alert",
+      "endpoint": "/api/alerts",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 27,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 24,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 51
+    },
+    {
+      "entity": "ticker",
+      "endpoint": "/api/tickers",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 46,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 30,
+          "error": "HTTP 500",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 77
+    },
+    {
+      "entity": "trading_account",
+      "endpoint": "/api/trading_accounts",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 53,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 14,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 68
+    },
+    {
+      "entity": "cash_flow",
+      "endpoint": "/api/cash_flows",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 53,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 14,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 68
+    },
+    {
+      "entity": "user_profile",
+      "endpoint": "/api/user_profile",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 17,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 10,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 27
+    },
+    {
+      "entity": "trading_journal",
+      "endpoint": "/api/trading_journal",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 27,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 12,
+          "error": "HTTP 400",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 40
+    },
+    {
+      "entity": "data_import",
+      "endpoint": "/api/data_import",
+      "operations": {
+        "list": {
+          "success": true,
+          "responseTime": 25,
+          "error": null
+        },
+        "create": {
+          "success": false,
+          "responseTime": 21,
+          "error": "HTTP 405",
+          "entityId": null
+        },
+        "read": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "update": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        },
+        "delete": {
+          "success": false,
+          "responseTime": 0,
+          "error": null
+        }
+      },
+      "error": null,
+      "executionTimeMs": 47
+    }
+  ],
+  "acceptance": {
+    "is15Of15Pass": false,
+    "evidenceProvided": true,
+    "remainingFailures": [
+      {
+        "entity": "trade_plan",
+        "endpoint": "/api/trade_plans",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 42,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 23,
+            "error": "HTTP 404",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 66
+      },
+      {
+        "entity": "alert",
+        "endpoint": "/api/alerts",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 27,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 24,
+            "error": "HTTP 400",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 51
+      },
+      {
+        "entity": "ticker",
+        "endpoint": "/api/tickers",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 46,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 30,
+            "error": "HTTP 500",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 77
+      },
+      {
+        "entity": "trading_account",
+        "endpoint": "/api/trading_accounts",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 53,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 14,
+            "error": "HTTP 400",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 68
+      },
+      {
+        "entity": "cash_flow",
+        "endpoint": "/api/cash_flows",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 53,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 14,
+            "error": "HTTP 400",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 68
+      },
+      {
+        "entity": "user_profile",
+        "endpoint": "/api/user_profile",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 17,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 10,
+            "error": "HTTP 400",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 27
+      },
+      {
+        "entity": "trading_journal",
+        "endpoint": "/api/trading_journal",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 27,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 12,
+            "error": "HTTP 400",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 40
+      },
+      {
+        "entity": "data_import",
+        "endpoint": "/api/data_import",
+        "operations": {
+          "list": {
+            "success": true,
+            "responseTime": 25,
+            "error": null
+          },
+          "create": {
+            "success": false,
+            "responseTime": 21,
+            "error": "HTTP 405",
+            "entityId": null
+          },
+          "read": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "update": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          },
+          "delete": {
+            "success": false,
+            "responseTime": 0,
+            "error": null
+          }
+        },
+        "error": null,
+        "executionTimeMs": 47
+      }
+    ]
+  }
+}

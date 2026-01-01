@@ -573,7 +573,7 @@
    * הרצת כל הבדיקות
    */
   async function runModalNavigationE2ETests() {
-    console.log('🧪 Starting Modal Navigation System E2E Tests...\n');
+    window.Logger?.info('🧪 Starting Modal Navigation System E2E Tests...\n');
 
     // איפוס תוצאות
     testResults.passed = 0;
@@ -594,24 +594,24 @@
     const total = testResults.passed + testResults.failed;
     const successRate = total > 0 ? ((testResults.passed / total) * 100).toFixed(1) : 0;
 
-    console.log('\n📊 Test Results:');
-    console.log(`  ✅ Passed: ${testResults.passed}`);
-    console.log(`  ❌ Failed: ${testResults.failed}`);
-    console.log(`  📈 Success Rate: ${successRate}%`);
-    console.log(`  📝 Total: ${total}`);
+    window.Logger?.info('\n📊 Test Results:');
+    window.Logger?.info(`  ✅ Passed: ${testResults.passed}`);
+    window.Logger?.info(`  ❌ Failed: ${testResults.failed}`);
+    window.Logger?.info(`  📈 Success Rate: ${successRate}%`);
+    window.Logger?.info(`  📝 Total: ${total}`);
 
     if (testResults.errors.length > 0) {
-      console.log('\n❌ Errors:');
+      window.Logger?.info('\n❌ Errors:');
       testResults.errors.forEach(({ test, error }) => {
-        console.log(`  - ${test}: ${error}`);
+        window.Logger?.info(`  - ${test}: ${error}`);
       });
     }
 
     if (testResults.details.length > 0) {
-      console.log('\n📋 Details:');
+      window.Logger?.info('\n📋 Details:');
       testResults.details.forEach(({ test, status, message }) => {
         const icon = status === 'passed' ? '✅' : '❌';
-        console.log(`  ${icon} ${test}: ${message}`);
+        window.Logger?.info(`  ${icon} ${test}: ${message}`);
       });
     }
 
@@ -627,7 +627,7 @@
   // הוספה ל-window
   if (typeof window !== 'undefined') {
     window.runModalNavigationE2ETests = runModalNavigationE2ETests;
-    console.log('✅ Modal Navigation E2E Test loaded. Run: window.runModalNavigationE2ETests()');
+    window.Logger?.info('✅ Modal Navigation E2E Test loaded. Run: window.runModalNavigationE2ETests()');
   }
 
   // Export for Node.js

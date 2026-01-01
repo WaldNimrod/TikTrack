@@ -1,0 +1,14 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- הושלם Full CRUD E2E (15 entities) עם admin/admin123
+- תועד totals + timestamp + evidence מלא לכל כשל
+- אימות לאחר backend auth verification של Team C
+Evidence:
+- תוצאות זהות: 9/15 עוברים (60%) - ללא שיפור נוסף
+- 9 עוברים: trade, note, tag, watch_list, execution, user_management, trading_journal, tag_management, data_import
+- 6 נכשלים: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(404), user_profile(400)
+Blockers:
+- תוצאות יציבות - הבעיות לא קשורות ל-authentication
+- נותרו 6 entities לפתרון: routes, payload validation, server errors
+Next: Teams A/B/C להמשיך עם התיקונים הספציפיים לפי המטריצה

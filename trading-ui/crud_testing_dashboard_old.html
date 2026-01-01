@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד בדיקות CRUD 2.0 - TikTrack</title>
+
+    <!--
+    ========================================================================================
+    CRUD TESTING DASHBOARD - MATRIX ORGANIZATION
+    ========================================================================================
+
+    ארגון הכפתורים במטריצות היררכיות ברורות:
+
+    עמודה 1 (🎯): בדיקות יחידות - UI/API/E2E/Debug/Info/Table Sorting
+                  - אלו בדיקות כלליות שרצות על כל המערכת
+
+    עמודה 2 (📊): מטריצת בדיקות קבוצות (5×5) - 5 קבוצות עמודים × 5 סוגי בדיקות
+                  - משתמש: 16 עמודים עם טבלאות
+                  - ניהול משתמש: 4 עמודים עם טבלאות
+                  - כלי פיתוח: 12 עמודים עם טבלאות
+                  - עמודי בדיקה: 14 עמודים עם טבלאות
+                  - עמודים טכניים: 10 עמודים עם טבלאות
+
+                  סוגי בדיקות: defaults/colors/sorting/sections/filters
+
+    עמודה 3 (🎯): בדיקות ישויות ספציפיות - טריידים, התראות, טיקרים וכו'
+                  - בדיקות על ישויות מוגדרות במערכת
+
+    עמודה 4 (🌐): בדיקות כלליות - מצב יישום
+                  - ירוק: מיושם ונבדק
+                  - כחול: מיושם חדש
+                  - צהוב: מיושם, צריך בדיקה
+                  - אפור: לא מיושם
+
+    מצב כפתורים:
+    - ✓ = מחובר לפונקציה קיימת ונבדק
+    - 🚧 = מחובר לפונקציה אך טרם נבדק
+    - ✗ = לא רלוונטי לקבוצה זו
+
+    ========================================================================================
+    -->
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+
+    <!-- TikTrack Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906" media="print" onload="this.media='all'; this.onload=null;">
+
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906" media="print" onload="this.media='all'; this.onload=null;">
+
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content" data-section="crud-testing">
+
+                <!-- UI Content Section Top Start-->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/development.svg" alt="דשבורד בדיקות CRUD 2.0" class="section-icon">
+                            דשבורד בדיקות CRUD 2.0
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH" data-onclick="refreshDashboard()" data-text="רענן" title="רענן את הדשבורד" disabled style="opacity: 0.5;">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- סטטוס כללי -->
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">סטטוס מערכת הבדיקות</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Progress Bar -->
+                                        <div id="progressContainer" style="display: none;" class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span id="progressText">מעדכן...</span>
+                                                <span id="progressPercent">0%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                                     role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <small class="text-muted mt-1" id="progressDetails">מתכונן לבדיקה...</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- 1. בדיקות פרטניות - כרטיסים משופרים -->
+                <div class="content-section" id="individual-tests-section" data-section="individual-tests">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/development.svg" alt="בדיקות פרטניות" class="section-icon">
+                            🎯 בדיקות פרטניות - CRUD E2E
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('individual-tests')" data-text="הצג/הסתר" title="הצג/הסתר בדיקות פרטניות"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- כרטיסי ישויות CRUD -->
+                        <div class="individual-test-cards">
+                            <!-- מסחר עיקרי -->
+                            <div class="test-entity-card trades">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon trades">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">טריידים</h5>
+                                            <p class="test-entity-description">בדיקות CRUD מלאות לניהול עסקאות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradeTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradesDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradesSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card trade-plans">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon trade-plans">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">תכניות מסחר</h5>
+                                            <p class="test-entity-description">ניהול תכניות מסחר ותכנון עסקאות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradePlanTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradePlansDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradePlansSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card executions">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon executions">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">ביצועי עסקאות</h5>
+                                            <p class="test-entity-description">מעקב אחר ביצוע עסקאות ותוצאות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runExecutionTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runExecutionsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runExecutionsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card alerts">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon alerts">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">התראות</h5>
+                                            <p class="test-entity-description">ניהול התראות ואזעקות במערכת</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runAlertTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runAlertsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runAlertsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ניהול ופיקוח -->
+                            <div class="test-entity-card tickers">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon tickers">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">טיקרים</h5>
+                                            <p class="test-entity-description">ניהול טיקרים ונכסים פיננסיים</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTickerTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTickersDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTickersSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card accounts">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon accounts">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">חשבונות מסחר</h5>
+                                            <p class="test-entity-description">ניהול חשבונות מסחר ופלטפורמות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runTradingAccountTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradingAccountsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runTradingAccountsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- תיעוד וניהול -->
+                            <div class="test-entity-card notes">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon notes">
+                                            <i class="fas fa-sticky-note"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">הערות</h5>
+                                            <p class="test-entity-description">ניהול הערות ותיעוד במערכת</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runNoteTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runNotesDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runNotesSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-entity-card cash-flows">
+                                <div class="test-entity-header">
+                                    <div class="test-entity-title">
+                                        <div class="test-entity-icon cash-flows">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="test-entity-name">תזרימי מזומן</h5>
+                                            <p class="test-entity-description">מעקב אחר תזרימי מזומן והכנסות</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="test-entity-body">
+                                    <div class="test-entity-buttons">
+                                        <button class="test-entity-button" onclick="runCashFlowTestOnly()">
+                                            <span class="test-entity-button-label">בדיקת CRUD מלאה</span>
+                                            <span class="test-entity-button-status">E2E</span>
+                                            <i class="fas fa-play test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runCashFlowsDefaultsTest()">
+                                            <span class="test-entity-button-label">ברירות מחדל</span>
+                                            <span class="test-entity-button-status">DEFAULTS</span>
+                                            <i class="fas fa-check-circle test-entity-button-icon"></i>
+                                        </button>
+                                        <button class="test-entity-button" onclick="runCashFlowsSortingTest()">
+                                            <span class="test-entity-button-label">מיון טבלה</span>
+                                            <span class="test-entity-button-status">SORTING</span>
+                                            <i class="fas fa-sort test-entity-button-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                    
+                                <!-- 2. בדיקות קבוצתיות - מטריצה 5×5 -->
+                                                <div class="mb-4">
+                                    <div class="card border-success">
+                                            <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0">📊 בדיקות קבוצתיות - מטריצה (5×5)</h6>
+                                            <small class="text-white-50">5 קבוצות עמודים × 5 סוגי בדיקות</small>
+                                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered">
+                                                    <thead class="table-light">
+                                                        <tr class="text-center">
+                                                            <th style="width: 20%;">קבוצה</th>
+                                                            <th style="width: 16%;"><i class="fas fa-calendar-check text-primary"></i> ברירות מחדל</th>
+                                                            <th style="width: 16%;"><i class="fas fa-palette text-success"></i> צבעים</th>
+                                                            <th style="width: 16%;"><i class="fas fa-sort text-info"></i> מיון</th>
+                                                            <th style="width: 16%;"><i class="fas fa-folder-open text-warning"></i> סקשנים</th>
+                                                            <th style="width: 16%;"><i class="fas fa-filter text-secondary"></i> פילטרים</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="fw-bold text-primary">👤 משתמש<br><small class="text-muted">(16 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runAllDefaultsTests()" title="ברירות מחדל - כל הישויות ברצף"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'colors', 'עמודי משתמש')" title="צבעים - 16 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sorting', 'עמודי משתמש')" title="מיון - 16 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'sections', 'עמודי משתמש')" title="סקשנים - 2 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('user', 'filters', 'עמודי משתמש')" title="פילטרים - 16 טבלאות"><small>✓</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-danger">🔐 ניהול<br><small class="text-muted">(4 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'defaults', 'ניהול משתמש')" title="ברירות מחדל - 4 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'colors', 'ניהול משתמש')" title="צבעים - 4 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'sorting', 'ניהול משתמש')" title="מיון - 4 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100" onclick="runCrossPageTestForGroup('userManagement', 'filters', 'ניהול משתמש')" title="פילטרים - 4 טבלאות"><small>✓</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-info">🛠️ פיתוח<br><small class="text-muted">(12 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'defaults', 'כלי פיתוח')" title="ברירות מחדל - 12 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'colors', 'כלי פיתוח')" title="צבעים - 12 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('developmentTools', 'sorting', 'כלי פיתוח')" title="מיון - 12 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-warning">🧪 בדיקה<br><small class="text-muted">(14 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'defaults', 'עמודי בדיקה')" title="ברירות מחדל - 14 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'colors', 'עמודי בדיקה')" title="צבעים - 14 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('testing', 'sorting', 'עמודי בדיקה')" title="מיון - 14 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="fw-bold text-secondary">⚙️ טכניים<br><small class="text-muted">(10 טבלאות)</small></td>
+                                                            <td class="text-center"><button class="btn btn-outline-primary btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'defaults', 'עמודים טכניים')" title="ברירות מחדל - 10 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-success btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'colors', 'עמודים טכניים')" title="צבעים - 10 עמודים"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-info btn-sm w-100" onclick="runCrossPageTestForGroup('technical', 'sorting', 'עמודים טכניים')" title="מיון - 10 טבלאות"><small>✓</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-warning btn-sm w-100 disabled" title="סקשנים - לא רלוונטי לקבוצה זו"><small>✗</small></button></td>
+                                                            <td class="text-center"><button class="btn btn-outline-secondary btn-sm w-100 disabled" title="פילטרים - טרם מוטמע"><small>🚧</small></button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot class="table-light">
+                                                        <tr>
+                                                            <td colspan="6" class="text-center">
+                                                                <small class="text-muted">
+                                                                    <strong>סיכום:</strong> 25 כפתורים מתוך 25 אפשריים | 
+                                                                    4 לא רלוונטיים (✗) | 
+                                                                    2 טרם מוטמעים (🚧)
+                                                                </small>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                                        </div>
+                                                    </div>
+
+                                <!-- 3. בדיקות כלליות - רשימה עם מספר עמודים -->
+                                <div class="mb-4">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0">🌐 בדיקות כלליות</h6>
+                                            <small class="text-white-50">בדיקות מקיפות לכל המערכת</small>
+                                                        </div>
+                                            <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 30%;">בדיקה</th>
+                                                            <th style="width: 15%;">מצב</th>
+                                                            <th style="width: 20%;">כיסוי</th>
+                                                            <th style="width: 35%;">תיאור</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><i class="fas fa-sitemap text-primary"></i> Registry Suite</td>
+                                                            <td><span class="badge bg-primary">★ מרכזי</span></td>
+                                                            <td><small class="text-muted">כל הבדיקות לפי רישום</small></td>
+                                                            <td><button class="btn btn-primary btn-sm w-100" onclick="runRegistrySuite()" title="הרצת כל הבדיקות לפי ה-Registry">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-desktop text-primary"></i> UI Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל העמודים</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runUITests()" title="בדיקות ממשק משתמש לכל העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-exchange-alt text-success"></i> API Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל הישויות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runAPITests()" title="בדיקות API לכל הישויות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-route text-info"></i> E2E Tests</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל הישויות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runE2ETests()" title="בדיקות מקצה לקצה לישויות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-tools text-warning"></i> Debug Tools</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל המערכת</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runDebugTools()" title="כלי דיבוג וניטור">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-chart-bar text-secondary"></i> Info Summary</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">כל העמודים</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runCrossPageInfoSummaryTest()" title="סיכום מידע בכל העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-table text-dark"></i> Table Sorting</td>
+                                                            <td><span class="badge bg-success">✓ מיושם</span></td>
+                                                            <td><small class="text-muted">56 טבלאות</small></td>
+                                                            <td><button class="btn btn-success btn-sm w-100" onclick="runAllTableSortingTests()" title="מיון לכל הטבלאות במערכת">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-palette text-primary"></i> All Colors</td>
+                                                            <td><span class="badge bg-info">🆕 חדש</span></td>
+                                                            <td><small class="text-muted">60 עמודים</small></td>
+                                                            <td><button class="btn btn-info btn-sm w-100" onclick="runAllColorsTests()" title="צבעים לכל 60 העמודים">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-folder-open text-success"></i> All Sections</td>
+                                                            <td><span class="badge bg-info">🆕 חדש</span></td>
+                                                            <td><small class="text-muted">2 עמודים</small></td>
+                                                            <td><button class="btn btn-info btn-sm w-100" onclick="runAllSectionsTests()" title="סקשנים לכל העמודים עם sections">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-filter text-warning"></i> All Filters</td>
+                                                            <td><span class="badge bg-warning">⚠️ צריך בדיקה</span></td>
+                                                            <td><small class="text-muted">56 טבלאות</small></td>
+                                                            <td><button class="btn btn-warning btn-sm w-100" onclick="runAllFiltersTests()" title="פילטרים לכל 56 הטבלאות">הרץ</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><i class="fas fa-calendar-check text-info"></i> All Defaults</td>
+                                                            <td><span class="badge bg-warning">⚠️ צריך בדיקה</span></td>
+                                                            <td><small class="text-muted">60 עמודים</small></td>
+                                                            <td><button class="btn btn-warning btn-sm w-100" onclick="runAllDefaultsTests()" title="ברירות מחדל לכל 60 העמודים">הרץ</button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Results Section -->
+                <div class="content-section" data-section="test-results">
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">תוצאות בדיקות</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- Progress Bar -->
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" id="testProgressBar" role="progressbar" style="width: 0%">
+                                        <span id="testProgressText">0%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Final Report Card -->
+                                <div id="finalReportCard" class="card mb-3" style="display: none;">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-check-circle"></i>
+                                            דוח סופי - בדיקות הושלמו
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-success" id="overallScore">0/100</h4>
+                                                    <small>ציון כללי</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-primary" id="passedCount">0</h4>
+                                                    <small>עברו</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-warning" id="problematicCount">0</h4>
+                                                    <small>בעייתיים</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-danger" id="criticalCount">0</h4>
+                                                    <small>קריטיים</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>זמן ביצוע כולל</h6>
+                                                <p class="mb-0" id="totalTime">--</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>מספר ישויות שנבדקו</h6>
+                                                <p class="mb-0" id="entitiesTested">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Enhanced Results Table -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-table me-2"></i>
+                                        תוצאות בדיקות מפורטות
+                                    </h6>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="copyTestResultsToClipboard()" title="העתק תוצאות ללוח">
+                                            <i class="fas fa-copy me-1"></i>העתק
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="exportTestResults()" title="ייצוא תוצאות לקובץ">
+                                            <i class="fas fa-download me-1"></i>ייצוא
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="test-results-table">
+                                    <table class="table" id="testResultsTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 60px;">#</th>
+                                                <th style="width: 180px;">עמוד/ישות</th>
+                                                <th style="width: 120px;">סוג בדיקה</th>
+                                                <th style="width: 100px;">סטטוס</th>
+                                                <th style="width: 120px;">זמן ביצוע</th>
+                                                <th style="width: 100px;">כמות</th>
+                                                <th>פרטים ותוצאות</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="testResultsBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-5">
+                                                    <i class="fas fa-play-circle fa-2x mb-3 text-secondary"></i>
+                                                    <br>
+                                                    <strong>בחר סוג בדיקה כדי להתחיל</strong>
+                                                    <br>
+                                                    <small class="text-muted">התוצאות יוצגו כאן בזמן אמת</small>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- E2E Test Iframe Container - Visible below results table -->
+                                <div id="testIframeContainer" class="mt-4" style="position: relative; width: 100%; min-height: 600px; border: 2px solid #26baac; border-radius: 8px; overflow: hidden; background: #f8f9fa;">
+                                    <div class="p-2 bg-primary text-white text-center">
+                                        <strong>🔍 E2E Test Preview - בדיקת ממשק משתמש בזמן אמת</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debug Tools Section -->
+                <div class="content-section" data-section="debug-tools" style="display: none;">
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Live Monitoring</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-info w-100 mb-2" onclick="startLiveMonitoring()">
+                                            התחל ניטור חי
+                                        </button>
+                                        <div id="liveLogs" class="small text-muted" style="max-height: 200px; overflow-y: auto;">
+                                            <!-- Live logs will appear here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Error Tracking</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-danger w-100 mb-2" onclick="showErrorTracker()">
+                                            הצג מעקב שגיאות
+                                        </button>
+                                        <div id="errorTracker" class="small text-muted">
+                                            <!-- Error tracking will appear here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    
+    
+    <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: crud-testing-dashboard | Generated: 2025-12-05T20:51:04.271Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/5: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [1.5] Load Order: 1.5 | Strategy: defer -->
+    <script src="scripts/api-fetch-wrapper.js?v=1.0.0" defer></script> <!-- Global fetch wrapper for Authorization injection and 401 handling -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 | Strategy: defer -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 | Strategy: defer -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [15] Load Order: 15 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+    <!-- [16] Load Order: 16 | Strategy: defer -->
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
+    <!-- [17] Load Order: 17 | Strategy: defer -->
+    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [18] Load Order: 18 | Strategy: defer -->
+    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
+    <!-- [19] Load Order: 19 | Strategy: defer -->
+    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
+    <!-- [20] Load Order: 20 | Strategy: defer -->
+    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
+    <!-- [21] Load Order: 21 | Strategy: defer -->
+    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/5: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [28] Load Order: 28 | Strategy: defer -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <!-- [31] Load Order: 31 | Strategy: defer -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <!-- [32] Load Order: 32 | Strategy: defer -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <!-- [35] Load Order: 35 | Strategy: defer -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/5: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [43] Load Order: 43 | Strategy: defer -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [44] Load Order: 44 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [45] Load Order: 45 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [46] Load Order: 46 | Strategy: defer -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/5: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [47] Load Order: 47 | Strategy: defer -->
+    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
+    <!-- [48] Load Order: 48 | Strategy: defer -->
+    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [49] Load Order: 49 | Strategy: defer -->
+    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/15: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v3.0 (Backend-first architecture - complete data from server) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 3.0.0 -->
+
+    <!-- [X] Load Order: X | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-core.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/5: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [50] Load Order: 50 | Strategy: defer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
+    <!-- [51] Load Order: 51 | Strategy: defer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
+    <!-- [52] Load Order: 52 | Strategy: defer -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <!-- [53] Load Order: 53 | Strategy: defer -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <!-- [54] Load Order: 54 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [55] Page-specific: crud-testing-enhanced.js | Strategy: defer -->
+    <script src="scripts/crud-testing-enhanced.js?v=1.0.8" defer></script> <!-- CRUD testing enhanced system -->
+    <!-- [56] Page-specific: advanced-debug-monitor.js | Strategy: defer -->
+    <script src="scripts/advanced-debug-monitor.js?v=1.0.0" defer></script> <!-- Advanced debug and monitoring system -->
+    <!-- [57] Page-specific: cross-page-testing-system.js | Strategy: defer -->
+    <script src="scripts/cross-page-testing-system.js?v=1.0.0" defer></script> <!-- Cross-page testing system -->
+    <!-- [58] Page-specific: defaults-testing-system.js | Strategy: defer -->
+    <script src="scripts/defaults-testing-system.js?v=1.0.0" defer></script> <!-- Defaults testing system -->
+    <!-- [59] Page-specific: sorting-testing-system.js | Strategy: blocking -->
+    <script src="scripts/sorting-testing-system.js?v=1.0.0"></script> <!-- Sorting testing system -->
+    <!-- [60] Page-specific: test-registry.js | Strategy: defer -->
+    <script src="scripts/test-registry.js?v=1.0.0" defer></script> <!-- Test registry (source of truth) -->
+    <!-- [61] Page-specific: test-results-model.js | Strategy: defer -->
+    <script src="scripts/testing/test-results-model.js?v=1.0.0" defer></script> <!-- Unified test results model -->
+    <!-- [62] Page-specific: test-orchestrator.js | Strategy: defer -->
+    <script src="scripts/testing/test-orchestrator.js?v=1.0.0" defer></script> <!-- Test orchestrator -->
+    <!-- [58] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
+    <script src="scripts/crud_testing_dashboard.js?v=1.0.30" defer></script> <!-- Main page script -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 56 | Unique Scripts Loaded: 56 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+
+    <!-- Modal for Button System Tests Results -->
+    <div class="modal fade" id="buttonSystemTestsModal" tabindex="-1" aria-labelledby="buttonSystemTestsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buttonSystemTestsModalLabel">תוצאות בדיקות מערכת הכפתורים</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Results will be inserted here by JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Force initialization after all scripts load
+    setTimeout(function() {
+        if (window.unifiedAppInit && window.unifiedAppInit.initialize) {
+            console.log('🚀 Force starting UnifiedAppInitializer...');
+            window.unifiedAppInit.initialize().catch(console.error);
+        } else {
+            console.error('❌ unifiedAppInit not available:', {
+                unifiedAppInit: typeof window.unifiedAppInit,
+                UnifiedAppInitializer: typeof window.UnifiedAppInitializer
+            });
+        }
+    }, 2000);
+    </script>
+
+</body>
+</html>

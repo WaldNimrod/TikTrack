@@ -76,11 +76,11 @@ async function waitForPageFullyLoaded() {
  * @param {Array<Object>} htmlScripts - Optional: Scripts extracted from HTML file
  */
 async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
-    
+
     // Real-time error detection - capture 404 errors for scripts
     const errorLog = [];
     const script404Errors = []; // Track script 404 errors specifically
-    
+
     const originalConsoleError = console.error;
     console.error = function(...args) {
         const errorMessage = args.join(' ');
@@ -122,7 +122,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
     const loadedScripts = Array.from(document.querySelectorAll('script[src]'))
         .map(script => script.src.split('/').pop().split('?')[0])
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
-    
+
     // Also collect full paths for duplicate detection
     const loadedScriptsFullPaths = Array.from(document.querySelectorAll('script[src]'))
         .map(script => {
@@ -150,9 +150,20 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
     
     
-    // Check for scripts not defined in manifest
+    // Check for scripts not defined in manifest (only for packages used by this page)
     const manifestScripts = [];
-    if (window.PACKAGE_MANIFEST) {
+    if (window.PACKAGE_MANIFEST && pageConfig && pageConfig.packages) {
+        // Only include scripts from packages that are actually used by this page
+        pageConfig.packages.forEach(packageName => {
+            const pkg = window.PACKAGE_MANIFEST[packageName];
+            if (pkg && pkg.scripts) {
+                pkg.scripts.forEach(script => {
+                    manifestScripts.push(script.file);
+                });
+            }
+        });
+    } else if (window.PACKAGE_MANIFEST) {
+        // Fallback: include all scripts if pageConfig is not available
         Object.values(window.PACKAGE_MANIFEST).forEach(pkg => {
             if (pkg.scripts) {
                 pkg.scripts.forEach(script => {
@@ -330,14 +341,21 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
                 normalizedRequired.replace(/^scripts\//, ''), // Without scripts/ prefix: "api-config.js"
                 requiredFilename // Just filename: "api-config.js"
             ];
-            
+
             // First, check against loadedScriptsFullPaths (full paths from DOM)
             isLoaded = loadedScriptsFullPaths.some(loadedScriptFullPath => {
                 const normalizedLoaded = loadedScriptFullPath.toLowerCase();
                 const loadedFilename = normalizedLoaded.split('/').pop();
-                
+
                 // Check all possible path variations
-                for (const possiblePath of possiblePaths) {
+                const pathVariations = [
+                    normalizedRequired, // Original: "api-config.js" or "scripts/api-config.js"
+                    `scripts/${normalizedRequired}`, // With scripts/ prefix: "scripts/api-config.js"
+                    normalizedRequired.replace(/^scripts\//, ''), // Without scripts/ prefix: "api-config.js"
+                    requiredFilename // Just filename: "api-config.js"
+                ];
+
+                for (const possiblePath of pathVariations) {
                     if (normalizedLoaded === possiblePath ||
                         normalizedLoaded.endsWith('/' + possiblePath) ||
                         normalizedLoaded.endsWith(possiblePath) ||
@@ -345,7 +363,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
                         return true;
                     }
                 }
-                
+
                 // Final check: filename match (case-insensitive)
                 return loadedFilename === requiredFilename;
             });
@@ -363,7 +381,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         if (!isLoaded || script404) {
             mismatches.push({
                 type: 'missing_script',
-                message: script404 
+                message: script404
                     ? `סקריפט חסר: ${requiredScript} - שגיאת 404 (קובץ לא קיים בשרת)`
                     : `סקריפט חסר: ${requiredScript} - מתועד אבל לא נטען`,
                 severity: 'error',
@@ -1134,6 +1152,7 @@ function compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest) 
         missingInDOM: [],
         extraInDOM: [],
         pathDifferences: [],
+        earlyStopDetection: null,
         summary: {
             htmlScriptsCount: htmlScripts.length,
             domScriptsCount: domScripts.length,
@@ -1141,9 +1160,22 @@ function compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest) 
         }
     };
 
-    // Enrich HTML scripts with manifest data
+    // Create filtered manifest containing only packages used by this page
+    const pagePackageManifest = {};
+    if (packageManifest && pageConfig && pageConfig.packages) {
+        pageConfig.packages.forEach(packageName => {
+            if (packageManifest[packageName]) {
+                pagePackageManifest[packageName] = packageManifest[packageName];
+            }
+        });
+    } else {
+        // Fallback: use full manifest if pageConfig is not available
+        Object.assign(pagePackageManifest, packageManifest);
+    }
+
+    // Enrich HTML scripts with manifest data (only for page packages)
     const enrichedHtmlScripts = htmlScripts.map(htmlScript => {
-        const manifestInfo = getScriptLoadOrder(htmlScript.file, packageManifest);
+        const manifestInfo = getScriptLoadOrder(htmlScript.file, pagePackageManifest);
         return {
             ...htmlScript,
             loadOrder: manifestInfo?.loadOrder || 999,
@@ -1264,11 +1296,52 @@ function compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest) 
         }
     });
 
-    comparison.summary.differencesCount = 
+    comparison.summary.differencesCount =
         comparison.orderDifferences.length +
         comparison.missingInDOM.length +
         comparison.extraInDOM.length +
         comparison.pathDifferences.length;
+
+    // Early stop detection: find the last loaded script and the next expected one
+    if (comparison.missingInDOM.length > 0) {
+        // Sort missing scripts by their HTML position
+        const sortedMissing = comparison.missingInDOM.sort((a, b) => a.htmlPosition - b.htmlPosition);
+
+        // Find the first missing script (earliest in HTML order)
+        const firstMissing = sortedMissing[0];
+
+        // Find the last loaded script before the first missing one
+        let lastLoadedBeforeMissing = null;
+        for (let i = firstMissing.htmlPosition - 1; i >= 0; i--) {
+            const scriptAtPos = enrichedHtmlScripts.find(s => s.position === i);
+            if (scriptAtPos) {
+                const normalized = normalizeScriptPath(scriptAtPos.file);
+                if (domScriptMap.has(normalized)) {
+                    lastLoadedBeforeMissing = scriptAtPos;
+                    break;
+                }
+            }
+        }
+
+        comparison.earlyStopDetection = {
+            lastLoadedScript: lastLoadedBeforeMissing ? {
+                file: lastLoadedBeforeMissing.file,
+                position: lastLoadedBeforeMissing.position,
+                package: lastLoadedBeforeMissing.package,
+                loadOrder: lastLoadedBeforeMissing.loadOrder
+            } : null,
+            firstMissingScript: {
+                file: firstMissing.file,
+                position: firstMissing.htmlPosition,
+                package: firstMissing.package,
+                loadOrder: firstMissing.loadOrder
+            },
+            missingCount: comparison.missingInDOM.length,
+            gapAnalysis: lastLoadedBeforeMissing ?
+                `Gap of ${firstMissing.htmlPosition - lastLoadedBeforeMissing.position} positions` :
+                'No scripts loaded before first missing script'
+        };
+    }
 
     return comparison;
 }

@@ -114,7 +114,7 @@ class UnifiedCRUDService {
                     throw new Error('DataCollectionService not available');
                 }
                 data = window.DataCollectionService.collectFormData(options.fieldMap);
-                console.log(`🔍 DEBUG: Collected formData for ${entityType}:`, data);
+                window.Logger?.info(`🔍 DEBUG: Collected formData for ${entityType}:`, data);
                 window.Logger?.debug('Collected form data', { data, page: 'unified-crud-service' });
             } else if (!data && options.formId) {
                 // Fallback: try to collect from form directly
@@ -227,7 +227,7 @@ class UnifiedCRUDService {
                 let serviceResult;
                 if (entityType === 'watch_list' || entityType === 'execution' || entityType === 'cash_flow' || entityType === 'alert' || entityType === 'trading_account' || entityType === 'ticker' || entityType === 'trade') {
                     // Watch lists, execution, cash_flow, alert, trading_account, ticker, and trade services expect (payload, options) signature
-                    console.log('🔍 DEBUG: Calling service with payload:', payload, 'entityType:', entityType);
+                    window.Logger?.info('🔍 DEBUG: Calling service with payload:', payload, 'entityType:', entityType);
                     serviceResult = await useService(payload, {});
                 } else {
                     // Other services might expect { payload: ... } format
@@ -822,7 +822,7 @@ class UnifiedCRUDService {
                             stack: refreshError.stack,
                             page: 'unified-crud-service'
                         });
-                        console.error('Error refreshing linked items modal:', refreshError);
+                        window.Logger?.error('Error refreshing linked items modal:', refreshError);
                     }
                     
                     // Reload data if function provided

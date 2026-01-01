@@ -26,11 +26,11 @@
 (function() {
   'use strict';
 
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🔍 בדיקת טעינת עמוד ביצועים (Executions Page)');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('🔍 בדיקת טעינת עמוד ביצועים (Executions Page)');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   const results = {
     passed: 0,
@@ -59,14 +59,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${name}: ${message}`);
+      window.Logger?.info(`${status} ${name}: ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${name}: ${message}`);
+        window.Logger?.warn(`${status} ${name}: ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${name}: ${message}`);
+        window.Logger?.error(`${status} ${name}: ${message}`);
       }
     }
     
@@ -93,14 +93,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${name}(): ${message}`);
+      window.Logger?.info(`${status} ${name}(): ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${name}(): ${message}`);
+        window.Logger?.warn(`${status} ${name}(): ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${name}(): ${message}`);
+        window.Logger?.error(`${status} ${name}(): ${message}`);
       }
     }
     
@@ -129,14 +129,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${fullName}: ${message}`);
+      window.Logger?.info(`${status} ${fullName}: ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${fullName}: ${message}`);
+        window.Logger?.warn(`${status} ${fullName}: ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${fullName}: ${message}`);
+        window.Logger?.error(`${status} ${fullName}: ${message}`);
       }
     }
     
@@ -146,42 +146,42 @@
   // ============================================================================
   // 1. בדיקת PAGE_CONFIGS
   // ============================================================================
-  console.log('📋 שלב 1: בדיקת הגדרות עמוד (PAGE_CONFIGS)');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 1: בדיקת הגדרות עמוד (PAGE_CONFIGS)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasPageConfigs = checkGlobal('PAGE_CONFIGS') || checkGlobal('PAGE_INITIALIZATION_CONFIGS');
   const pageConfig = window.PAGE_CONFIGS?.executions || window.PAGE_INITIALIZATION_CONFIGS?.executions;
   
   if (pageConfig) {
-    console.log(`✅ קונפיגורציית עמוד נטענה: ${pageConfig.name || 'Executions'}`);
-    console.log(`   חבילות מוגדרות: ${pageConfig.packages?.length || 0}`);
-    console.log(`   גלובלים נדרשים: ${pageConfig.requiredGlobals?.length || 0}`);
+    window.Logger?.info(`✅ קונפיגורציית עמוד נטענה: ${pageConfig.name || 'Executions'}`);
+    window.Logger?.info(`   חבילות מוגדרות: ${pageConfig.packages?.length || 0}`);
+    window.Logger?.info(`   גלובלים נדרשים: ${pageConfig.requiredGlobals?.length || 0}`);
   } else {
-    console.error('❌ קונפיגורציית עמוד לא נמצאה!');
+    window.Logger?.error('❌ קונפיגורציית עמוד לא נמצאה!');
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 2. בדיקת חבילת BASE (חובה)
   // ============================================================================
-  console.log('📦 שלב 2: בדיקת חבילת BASE (חובה)');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📦 שלב 2: בדיקת חבילת BASE (חובה)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkGlobal('NotificationSystem');
   checkObjectProperty('window', 'Logger', true);
   checkObjectProperty('window', 'CacheSyncManager', true);
   checkObjectProperty('window', 'IconSystem', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 3. בדיקת חבילת CONDITIONS (קריטי לעמוד זה!)
   // ============================================================================
-  console.log('🎯 שלב 3: בדיקת חבילת CONDITIONS (קריטי!)');
-  console.log('───────────────────────────────────────────────────────────────');
-  console.log('⚠️  זהו הבדיקה החשובה ביותר - חבילת conditions נדרשת ליצירת trades עם תנאים');
-  console.log('');
+  window.Logger?.info('🎯 שלב 3: בדיקת חבילת CONDITIONS (קריטי!)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⚠️  זהו הבדיקה החשובה ביותר - חבילת conditions נדרשת ליצירת trades עם תנאים');
+  window.Logger?.info('');
   
   checkObjectProperty('window', 'conditionsTranslations', false);
   checkObjectProperty('window', 'conditionsValidator', false);
@@ -194,22 +194,22 @@
   
   // בדיקת אתחול
   if (window.conditionsInitializer) {
-    console.log('   ℹ️  window.conditionsInitializer זמין');
+    window.Logger?.info('   ℹ️  window.conditionsInitializer זמין');
     if (typeof window.conditionsInitializer.initialize === 'function') {
-      console.log('   ✅ window.conditionsInitializer.initialize() זמין');
+      window.Logger?.info('   ✅ window.conditionsInitializer.initialize() זמין');
     } else {
-      console.error('   ❌ window.conditionsInitializer.initialize() חסר!');
+      window.Logger?.error('   ❌ window.conditionsInitializer.initialize() חסר!');
       results.failed++;
     }
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 4. בדיקת חבילת SERVICES
   // ============================================================================
-  console.log('🔧 שלב 4: בדיקת חבילת SERVICES');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔧 שלב 4: בדיקת חבילת SERVICES');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkObjectProperty('window', 'SelectPopulatorService', true);
   checkObjectProperty('window', 'RichTextEditorService', true);
@@ -217,109 +217,109 @@
   checkObjectProperty('window', 'DOMPurify', true);
   checkFunction('loadExecutionsData', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 5. בדיקת חבילת UI-ADVANCED
   // ============================================================================
-  console.log('🎨 שלב 5: בדיקת חבילת UI-ADVANCED');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🎨 שלב 5: בדיקת חבילת UI-ADVANCED');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('setupSortableHeaders', true);
   checkGlobal('DataUtils', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 6. בדיקת חבילת MODULES
   // ============================================================================
-  console.log('📚 שלב 6: בדיקת חבילת MODULES');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📚 שלב 6: בדיקת חבילת MODULES');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('loadUserPreferences', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 7. בדיקת חבילת ENTITY-SERVICES
   // ============================================================================
-  console.log('🏢 שלב 7: בדיקת חבילת ENTITY-SERVICES');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🏢 שלב 7: בדיקת חבילת ENTITY-SERVICES');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkObjectProperty('window', 'tickerService', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 8. בדיקת PENDING EXECUTION TRADE CREATION
   // ============================================================================
-  console.log('💰 שלב 8: בדיקת Pending Execution Trade Creation');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('💰 שלב 8: בדיקת Pending Execution Trade Creation');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkObjectProperty('window', 'PendingExecutionTradeCreation', true);
   checkObjectProperty('window', 'executionsModalConfig', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 9. בדיקת חבילת VALIDATION
   // ============================================================================
-  console.log('✓ שלב 9: בדיקת חבילת VALIDATION');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('✓ שלב 9: בדיקת חבילת VALIDATION');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('validateSelectField', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // סיכום תוצאות
   // ============================================================================
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('📊 סיכום תוצאות');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`✅ הצלחות: ${results.passed}`);
-  console.log(`❌ כשלונות: ${results.failed}`);
-  console.log(`⚠️  אזהרות: ${results.warnings}`);
-  console.log(`📋 סך הכל בדיקות: ${results.checks.length}`);
-  console.log('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('📊 סיכום תוצאות');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info(`✅ הצלחות: ${results.passed}`);
+  window.Logger?.info(`❌ כשלונות: ${results.failed}`);
+  window.Logger?.info(`⚠️  אזהרות: ${results.warnings}`);
+  window.Logger?.info(`📋 סך הכל בדיקות: ${results.checks.length}`);
+  window.Logger?.info('\n');
 
   // הערכת מצב כללי
   const successRate = ((results.passed / results.checks.length) * 100).toFixed(1);
-  console.log(`📈 אחוז הצלחה: ${successRate}%`);
-  console.log('\n');
+  window.Logger?.info(`📈 אחוז הצלחה: ${successRate}%`);
+  window.Logger?.info('\n');
 
   if (results.failed === 0) {
-    console.log('🎉 מצוין! כל הבדיקות עברו בהצלחה!');
-    console.log('   העמוד מוכן לשימוש מלא.');
+    window.Logger?.info('🎉 מצוין! כל הבדיקות עברו בהצלחה!');
+    window.Logger?.info('   העמוד מוכן לשימוש מלא.');
   } else {
-    console.error('⚠️  נמצאו בעיות שצריך לטפל בהן:');
+    window.Logger?.error('⚠️  נמצאו בעיות שצריך לטפל בהן:');
     results.checks
       .filter(check => check.status === '❌')
       .forEach(check => {
-        console.error(`   ❌ ${check.name}: ${check.message}`);
+        window.Logger?.error(`   ❌ ${check.name}: ${check.message}`);
       });
   }
 
   // בדיקת conditions package ספציפית
   const conditionsLoaded = window.conditionsInitializer !== undefined;
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
   if (conditionsLoaded) {
-    console.log('✅ חבילת CONDITIONS נטענה בהצלחה!');
-    console.log('   ניתן ליצור trades עם תנאים מעמוד ביצועים.');
+    window.Logger?.info('✅ חבילת CONDITIONS נטענה בהצלחה!');
+    window.Logger?.info('   ניתן ליצור trades עם תנאים מעמוד ביצועים.');
   } else {
-    console.error('❌ חבילת CONDITIONS לא נטענה!');
-    console.error('   ⚠️  זהו באג קריטי - לא ניתן ליצור trades עם תנאים.');
-    console.error('   בדוק את executions.html וודא שכל הסקריפטים של conditions package נטענים.');
+    window.Logger?.error('❌ חבילת CONDITIONS לא נטענה!');
+    window.Logger?.error('   ⚠️  זהו באג קריטי - לא ניתן ליצור trades עם תנאים.');
+    window.Logger?.error('   בדוק את executions.html וודא שכל הסקריפטים של conditions package נטענים.');
   }
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 10. בדיקת סקשנים 3+4 - ניטור מפורט
   // ============================================================================
-  console.log('🔍 שלב 10: ניטור מפורט של סקשנים 3+4');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔍 שלב 10: ניטור מפורט של סקשנים 3+4');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת סקשן 3 (trade-creation)
   const tradeCreationSection = document.querySelector('[data-section="trade-creation"]') || document.getElementById('tradeCreationClustersSection');
@@ -327,30 +327,30 @@
   const tradeCreationBody = tradeCreationSection?.querySelector('.section-body');
   const tradeCreationTable = document.getElementById('executionTradeCreationClustersTable');
   
-  console.log('\n📊 סקשן 3 (Trade Creation):');
+  window.Logger?.info('\n📊 סקשן 3 (Trade Creation):');
   if (tradeCreationSection) {
-    console.log('   ✅ סקשן נמצא ב-DOM');
+    window.Logger?.info('   ✅ סקשן נמצא ב-DOM');
     const isVisible = tradeCreationSection.offsetParent !== null;
     const bodyDisplay = tradeCreationBody ? window.getComputedStyle(tradeCreationBody).display : 'unknown';
     const isCollapsed = bodyDisplay === 'none';
-    console.log(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
-    console.log(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
+    window.Logger?.info(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
+    window.Logger?.info(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
     
     if (tradeCreationHeader) {
       const headerVisible = tradeCreationHeader.offsetParent !== null;
-      console.log(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
+      window.Logger?.info(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
     } else {
-      console.error('   ❌ כותרת לא נמצאה!');
+      window.Logger?.error('   ❌ כותרת לא נמצאה!');
     }
     
     if (tradeCreationTable) {
       const tableRows = tradeCreationTable.querySelectorAll('tbody tr').length;
-      console.log(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
+      window.Logger?.info(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
     } else {
-      console.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
+      window.Logger?.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
     }
   } else {
-    console.error('   ❌ סקשן לא נמצא ב-DOM!');
+    window.Logger?.error('   ❌ סקשן לא נמצא ב-DOM!');
   }
   
   // בדיקת סקשן 4 (suggestions)
@@ -359,30 +359,30 @@
   const suggestionsBody = suggestionsSection?.querySelector('.section-body');
   const suggestionsTable = document.getElementById('tradeSuggestionsTable');
   
-  console.log('\n📊 סקשן 4 (Suggestions):');
+  window.Logger?.info('\n📊 סקשן 4 (Suggestions):');
   if (suggestionsSection) {
-    console.log('   ✅ סקשן נמצא ב-DOM');
+    window.Logger?.info('   ✅ סקשן נמצא ב-DOM');
     const isVisible = suggestionsSection.offsetParent !== null;
     const bodyDisplay = suggestionsBody ? window.getComputedStyle(suggestionsBody).display : 'unknown';
     const isCollapsed = bodyDisplay === 'none';
-    console.log(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
-    console.log(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
+    window.Logger?.info(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
+    window.Logger?.info(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
     
     if (suggestionsHeader) {
       const headerVisible = suggestionsHeader.offsetParent !== null;
-      console.log(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
+      window.Logger?.info(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
     } else {
-      console.error('   ❌ כותרת לא נמצאה!');
+      window.Logger?.error('   ❌ כותרת לא נמצאה!');
     }
     
     if (suggestionsTable) {
       const tableRows = suggestionsTable.querySelectorAll('tbody tr').length;
-      console.log(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
+      window.Logger?.info(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
     } else {
-      console.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
+      window.Logger?.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
     }
   } else {
-    console.error('   ❌ סקשן לא נמצא ב-DOM!');
+    window.Logger?.error('   ❌ סקשן לא נמצא ב-DOM!');
   }
   
   // בדיקת הטבלה השנייה (main)
@@ -390,30 +390,30 @@
   const mainTable = document.getElementById('executionsTable');
   const mainTableRows = mainTable?.querySelectorAll('tbody tr').length || 0;
   
-  console.log('\n📊 סקשן 2 (Main Table):');
+  window.Logger?.info('\n📊 סקשן 2 (Main Table):');
   if (mainSection) {
     const mainBody = mainSection.querySelector('.section-body');
     const mainBodyDisplay = mainBody ? window.getComputedStyle(mainBody).display : 'unknown';
     const mainIsVisible = mainBodyDisplay !== 'none';
-    console.log(`   ${mainIsVisible ? '✅' : '❌'} סקשן ${mainIsVisible ? 'פתוח' : 'סגור'}`);
-    console.log(`   ${mainTableRows > 0 ? '✅' : '⚠️'} טבלה: ${mainTableRows} שורות`);
+    window.Logger?.info(`   ${mainIsVisible ? '✅' : '❌'} סקשן ${mainIsVisible ? 'פתוח' : 'סגור'}`);
+    window.Logger?.info(`   ${mainTableRows > 0 ? '✅' : '⚠️'} טבלה: ${mainTableRows} שורות`);
     
     if (mainTableRows > 0) {
-      console.log('   ✅ הטבלה השנייה מוצגת - ניתן להתחיל טעינת סקשנים 3+4');
+      window.Logger?.info('   ✅ הטבלה השנייה מוצגת - ניתן להתחיל טעינת סקשנים 3+4');
     } else {
-      console.warn('   ⚠️  הטבלה השנייה עדיין לא מוצגת');
+      window.Logger?.warn('   ⚠️  הטבלה השנייה עדיין לא מוצגת');
     }
   }
   
   // בדיקת זמינות נתונים
-  console.log('\n📊 זמינות נתונים:');
+  window.Logger?.info('\n📊 זמינות נתונים:');
   const hasExecutionClusteringService = typeof window.ExecutionClusteringService !== 'undefined';
   const hasExecutionAssignmentService = typeof window.ExecutionAssignmentService !== 'undefined';
-  console.log(`   ${hasExecutionClusteringService ? '✅' : '❌'} ExecutionClusteringService: ${hasExecutionClusteringService ? 'זמין' : 'חסר'}`);
-  console.log(`   ${hasExecutionAssignmentService ? '✅' : '❌'} ExecutionAssignmentService: ${hasExecutionAssignmentService ? 'זמין' : 'חסר'}`);
+  window.Logger?.info(`   ${hasExecutionClusteringService ? '✅' : '❌'} ExecutionClusteringService: ${hasExecutionClusteringService ? 'זמין' : 'חסר'}`);
+  window.Logger?.info(`   ${hasExecutionAssignmentService ? '✅' : '❌'} ExecutionAssignmentService: ${hasExecutionAssignmentService ? 'זמין' : 'חסר'}`);
   
   // בדיקת API calls
-  console.log('\n📊 ניטור API Calls:');
+  window.Logger?.info('\n📊 ניטור API Calls:');
   if (window.performance && window.performance.getEntriesByType) {
     const apiCalls = window.performance.getEntriesByType('resource')
       .filter(entry => entry.name.includes('/api/executions'))
@@ -424,16 +424,16 @@
       }));
     
     if (apiCalls.length > 0) {
-      console.log(`   ✅ נמצאו ${apiCalls.length} קריאות API:`);
+      window.Logger?.info(`   ✅ נמצאו ${apiCalls.length} קריאות API:`);
       apiCalls.forEach(call => {
-        console.log(`      - ${call.url.substring(call.url.lastIndexOf('/'))} (${call.duration}ms)`);
+        window.Logger?.info(`      - ${call.url.substring(call.url.lastIndexOf('/'))} (${call.duration}ms)`);
       });
     } else {
-      console.warn('   ⚠️  לא נמצאו קריאות API (ייתכן שעדיין לא בוצעו)');
+      window.Logger?.warn('   ⚠️  לא נמצאו קריאות API (ייתכן שעדיין לא בוצעו)');
     }
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // החזרת תוצאות לשימוש נוסף
   return {

@@ -1,0 +1,14 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- QA מושהה בגלל בעיות טעינה/אימות המונעות ריצה מלאה
+- ריצות נפסקות אחרי 4/15 entities בלבד
+- צורך ב-restart server + hard refresh לפני כל ריצה
+Evidence:
+- Console errors ו-network failures במהלך ריצות
+- בעיות authentication ו-JS loading
+- בדיקות לא מסתיימות במלואן
+Blockers:
+- QA SUSPENDED - בעיות טעינה/אימות מונעות ריצה מלאה
+- Teams A/C צריכים לתקן loading/auth issues
+Next: אחרי תיקונים - restart server + hard refresh + rerun מלא

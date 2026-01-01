@@ -109,11 +109,11 @@
       await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
     }
 
-    // Save current URL for redirect after login
-    sessionStorage.setItem('login_redirect_url', window.location.href);
+    // TEST MODE: Disable redirect for runtime verification
+    console.log('[API Fetch Wrapper] TEST MODE: Skipping login redirect on 401');
 
-    // Redirect to login page
-    window.location.href = '/login.html';
+    // Don't redirect - allow page to continue loading for testing
+    return;
   }
 
   window.fetch = async function (url, options = {}) {

@@ -410,7 +410,7 @@ class AllPagesMonitoringTest {
         if (typeof window.showDetailsModal === 'function') {
             window.showDetailsModal('🔍 תוצאות בדיקת כל העמודים', html);
         } else {
-            console.log('All Pages Monitoring Test Results:', this.results);
+            window.Logger?.info('All Pages Monitoring Test Results:', this.results);
         }
 
         // Save results globally

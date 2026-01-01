@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done: 
+- Completed Full CRUD E2E validation (15 entities)
+- Documented 10 remaining failures with evidence
+Evidence:
+- 5/15 entities pass (trade, note, tag, watch_list, execution)
+- 10/15 fail with 404/400/500 errors (endpoint details in report)
+Blockers:
+- Gap between Teams A/B/C deployment confirmations and QA results
+Next: Await runtime verification trace before rerun

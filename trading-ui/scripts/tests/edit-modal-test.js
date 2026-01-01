@@ -163,7 +163,7 @@
         async testEntityType(entityConfig) {
             const { type, modalId, dataVar } = entityConfig;
             
-            console.log(`\n🧪 Testing ${type}...`);
+            window.Logger?.info(`\n🧪 Testing ${type}...`);
             
             // Get first ID
             const testId = this.getFirstId(dataVar);
@@ -175,7 +175,7 @@
                 };
             }
             
-            console.log(`   Using ID: ${testId}`);
+            window.Logger?.info(`   Using ID: ${testId}`);
             
             // Open edit modal
             if (!window.ModalManagerV2 || typeof window.ModalManagerV2.showEditModal !== 'function') {
@@ -213,7 +213,7 @@
                     apiData = await response.json();
                 }
             } catch (error) {
-                console.warn(`   ⚠️ Could not fetch API data: ${error.message}`);
+                window.Logger?.warn(`   ⚠️ Could not fetch API data: ${error.message}`);
             }
             
             // Check each field
@@ -280,8 +280,8 @@
          * @returns {Promise<Object>} Complete test results
          */
         async runAllTests() {
-            console.log('🚀 Starting Edit Modal Test Suite...');
-            console.log('='.repeat(60));
+            window.Logger?.info('🚀 Starting Edit Modal Test Suite...');
+            window.Logger?.info('='.repeat(60));
             
             const results = {};
             
@@ -291,19 +291,19 @@
                     results[entityConfig.type] = result;
                     
                     if (result.success) {
-                        console.log(`✅ ${entityConfig.type}: All fields checked (${result.checkedCount}/${result.fieldCount} fields)`);
+                        window.Logger?.info(`✅ ${entityConfig.type}: All fields checked (${result.checkedCount}/${result.fieldCount} fields)`);
                         this.results.passed.push(entityConfig.type);
                     } else {
-                        console.error(`❌ ${entityConfig.type}: Found ${result.issues?.length || 0} issues`);
+                        window.Logger?.error(`❌ ${entityConfig.type}: Found ${result.issues?.length || 0} issues`);
                         if (result.issues) {
                             result.issues.forEach(issue => {
-                                console.error(`   - ${issue.message}`);
+                                window.Logger?.error(`   - ${issue.message}`);
                             });
                         }
                         this.results.failed.push({ entityType: entityConfig.type, result });
                     }
                 } catch (error) {
-                    console.error(`❌ ${entityConfig.type}: Test failed with error:`, error);
+                    window.Logger?.error(`❌ ${entityConfig.type}: Test failed with error:`, error);
                     results[entityConfig.type] = {
                         entityType: entityConfig.type,
                         success: false,
@@ -317,11 +317,11 @@
             }
             
             // Summary
-            console.log('\n' + '='.repeat(60));
-            console.log('📊 Test Summary:');
-            console.log(`✅ Passed: ${this.results.passed.length}`);
-            console.log(`❌ Failed: ${this.results.failed.length}`);
-            console.log('='.repeat(60));
+            window.Logger?.info('\n' + '='.repeat(60));
+            window.Logger?.info('📊 Test Summary:');
+            window.Logger?.info(`✅ Passed: ${this.results.passed.length}`);
+            window.Logger?.info(`❌ Failed: ${this.results.failed.length}`);
+            window.Logger?.info('='.repeat(60));
             
             return {
                 results,
@@ -377,6 +377,6 @@
         testSuite.runAllTests();
     }
 
-    console.log('✅ Edit Modal Test Suite loaded. Use: new EditModalTestSuite().runAllTests()');
+    window.Logger?.info('✅ Edit Modal Test Suite loaded. Use: new EditModalTestSuite().runAllTests()');
 })();
 

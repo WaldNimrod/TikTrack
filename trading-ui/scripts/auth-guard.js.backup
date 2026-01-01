@@ -26,12 +26,38 @@
 // === Other ===
 // - waitForAuthJS() - Waitforauthjs
 
+// Public pages that don't require authentication
+const PUBLIC_PAGES = [
+  'login.html',
+  'register.html',
+  'reset_password.html',
+  'forgot_password.html'
+];
+
+/**
+ * Helper function to send debug log only if not on public page
+ * Prevents CORS errors on login.html and other public pages
+ */
+// Debug logging function removed to avoid CORS errors
+
+/**
+ * Check if current page is a public page (doesn't require authentication)
+ * @returns {boolean}
+ */
+function isPublicPage() {
+  const path = window.location.pathname;
+  return PUBLIC_PAGES.some(page => path.includes(page));
+}
+
 /**
  * Check authentication status with server
  * @returns {Promise<{authenticated: boolean, user: object|null, error: string|null}>}
  */
 async function checkAuthentication() {
   window.Logger?.info?.('🔐 [Auth Guard] Starting authentication check', { page: 'auth-guard' });
+
+  // DO NOT set window._checkingAuth here - it's managed by auth.js to prevent concurrent calls
+  // Setting it here would interfere with the race condition prevention mechanism in auth.js
 
   if (!window.TikTrackAuth || typeof window.TikTrackAuth.checkAuthentication !== 'function') {
     window.Logger?.error?.('❌ [Auth Guard] TikTrackAuth not available', { page: 'auth-guard' });
@@ -54,9 +80,9 @@ async function checkAuthentication() {
     }
     return result;
   } catch (error) {
-    window.Logger?.error?.('❌ [Auth Guard] Authentication check failed', { 
-      page: 'auth-guard', 
-      error: error.message 
+    window.Logger?.error?.('❌ [Auth Guard] Authentication check failed', {
+      page: 'auth-guard',
+      error: error.message
     });
     return { authenticated: false, user: null, error: error.message };
   }
@@ -65,10 +91,9 @@ async function checkAuthentication() {
 /**
  * Show login modal
  */
-
 async function showLoginModal() {
   window.Logger?.info?.('🔐 [Auth Guard] Showing login modal', { page: 'auth-guard' });
-
+  
   // ✅ לוג אימות - בדיקת זמינות
   window.Logger?.info?.('🔍 [Auth Guard] showLoginModal - checking availability', {
     page: 'auth-guard',
@@ -124,34 +149,80 @@ async function showLoginModal() {
  * Checks authentication on page load
  */
 async function initAuthGuard() {
-  console.log('[AUTH-GUARD] initAuthGuard called at', new Date().toISOString());
-
-  // TEMPORARILY DISABLE GUARD TO DEBUG
-  /*
-  // RE-ENABLE GUARD WITH PROPER LOGIC
-  if (window._authGuardRunning) {
-    console.warn('[Auth Guard] initAuthGuard prevented - already running');
-    return;
-  }
-  window._authGuardRunning = true;
-  */
-
-  try {
-    window.Logger?.info?.('🚀 [Auth Guard] Initializing', { page: 'auth-guard' });
-
-  // Small delay to allow session cookie to be set after page reload
-  // This prevents race condition where we check auth before session is ready
-  // Increased delay to 500ms to give session more time to stabilize
-  await new Promise(resolve => setTimeout(resolve, 500));
   
-  // Wait briefly for token to be available (UC or sessionStorage) before first check
+  // Check if this is a public page - skip authentication check
+  const isPublic = isPublicPage();
+  if (isPublic) {
+    window.Logger?.info?.('✅ [Auth Guard] Public page detected, skipping auth check', { 
+      page: 'auth-guard',
+      path: window.location.pathname 
+    });
+    return; // No need to check authentication for public pages
+  }
+  
+  // Check for recent login to prevent redirect loop
+  const recentLogin = sessionStorage.getItem('recent_login_timestamp');
+  if (recentLogin) {
+    const timeSinceLogin = Date.now() - parseInt(recentLogin);
+    if (timeSinceLogin < 5000) {
+      window.Logger?.info?.('⏳ [Auth Guard] Recent login detected, waiting before check', {
+        page: 'auth-guard',
+        timeSinceLogin
+      });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Clear timestamp after waiting to prevent future loops
+      sessionStorage.removeItem('recent_login_timestamp');
+    }
+  }
+
+  // Special handling for user_management page - add extra delay
+  if (window.location.pathname.includes('user_management')) {
+    window.Logger?.info?.('⏳ [Auth Guard] User management page detected, adding extra delay', {
+      page: 'auth-guard',
+      path: window.location.pathname
+    });
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+  
+  // Increased delay to allow session cookie to be set after page reload
+  // This prevents race condition where we check auth before session is ready
+  // Increased delay to 1000ms to give session more time to stabilize
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Wait for UnifiedCacheManager to be initialized first
+  if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+    window.Logger?.info?.('⏳ [Auth Guard] Waiting for UnifiedCacheManager initialization', { page: 'auth-guard' });
+    let attempts = 0;
+    while (!window.UnifiedCacheManager.initialized && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    if (window.UnifiedCacheManager.initialized) {
+      window.Logger?.info?.('✅ [Auth Guard] UnifiedCacheManager initialized', { page: 'auth-guard' });
+    } else {
+      window.Logger?.warn?.('⚠️ [Auth Guard] UnifiedCacheManager not initialized after waiting', { page: 'auth-guard' });
+    }
+  }
+
+  // Wait briefly for token to be available (SessionStorageLayer or bootstrap fallback) before first check
   let tokenReady = false;
   for (let i = 0; i < 10; i++) {
     const hasUC = window.UnifiedCacheManager?.initialized;
-    const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { includeUserId: false }).catch(() => null) : null;
+    // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
+    const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { 
+      layer: 'sessionStorage', 
+      includeUserId: false 
+    }).catch((e) => {
+      return null;
+    }) : null;
+    // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
     const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+
+    console.log('[auth-guard] Check', i, '- UC initialized:', hasUC, 'UC token:', !!ucToken, 'SS token:', !!ssToken);
+
     if (ucToken || ssToken) {
       tokenReady = true;
+      console.log('[auth-guard] Token found! UC:', !!ucToken, 'SS:', !!ssToken);
       break;
     }
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -159,46 +230,38 @@ async function initAuthGuard() {
   
   let result = { authenticated: false, user: null, error: 'unknown' };
   try {
-    console.log('[AUTH-GUARD] Calling checkAuthentication');
     const r = await checkAuthentication();
-    console.log('[AUTH-GUARD] checkAuthentication result:', r);
     if (r) result = r;
   } catch (e) {
-    console.log('[AUTH-GUARD] checkAuthentication threw:', e?.message);
     window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
   }
   
   if (result.authenticated) {
-    window.Logger?.info?.('✅ [Auth Guard] User authenticated, page access granted', {
-      page: 'auth-guard',
-      userId: result.user?.id
-    });
     // User is authenticated - page can load normally
     return;
   } else {
-    window.Logger?.warn?.('❌ [Auth Guard] User not authenticated, showing login modal', {
-      page: 'auth-guard',
-      error: result.error
-    });
-    // User is not authenticated - show login modal
-    console.log('[AUTH-GUARD] About to call showLoginModal');
-    await showLoginModal();
-    console.log('[AUTH-GUARD] showLoginModal completed');
+    // User is not authenticated - redirect to login page
+
+    // Save current URL for redirect after login (only if not already on login page)
+    if (!window.location.pathname.includes('login.html')) {
+      sessionStorage.setItem('login_redirect_url', window.location.href);
+    }
+
+    // Redirect to login page (only if not already on login page)
+    if (!window.location.pathname.includes('login.html')) {
+      // Redirect to login page immediately (no confirm dialog)
+      window.location.href = '/login.html';
+    } else {
+      window.Logger?.warn?.('⚠️ [Auth Guard] Already on login page, preventing redirect loop', {
+        page: 'auth-guard'
+      });
+    }
   }
-} finally {
-  // RELEASE THE LOCK after a delay to prevent immediate re-triggering
-  console.log('[AUTH-GUARD] Releasing lock in 1 second');
-  setTimeout(() => {
-    console.log('[AUTH-GUARD] Lock released');
-    window._authGuardRunning = false;
-  }, 1000);
 }
 
 // Initialize when DOM is ready and auth.js is loaded
 // We wait for auth.js to be available before running auth-guard
 async function waitForAuthJS() {
-  console.log('[AUTH-GUARD] waitForAuthJS called');
-
   // ✅ לוג אימות - תחילת waitForAuthJS
   window.Logger?.info?.('⏳ [Auth Guard] waitForAuthJS started', {
     page: 'auth-guard',
@@ -235,15 +298,11 @@ async function waitForAuthJS() {
   await initAuthGuard();
 }
 
-console.log('[AUTH-GUARD] auth-guard.js loaded, waiting for DOM ready');
-
 // Start when DOM is ready
 if (document.readyState === 'loading') {
-  console.log('[AUTH-GUARD] DOM loading, adding event listener');
   document.addEventListener('DOMContentLoaded', waitForAuthJS);
 } else {
   // DOM already ready, start immediately
-  console.log('[AUTH-GUARD] DOM already ready, starting immediately');
   waitForAuthJS();
 }
 

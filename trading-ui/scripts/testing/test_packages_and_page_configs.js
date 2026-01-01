@@ -56,7 +56,7 @@
       testResults.summary.passed++;
     } else {
       testResults.summary.failed++;
-      console.error(`❌ FAILED: ${name}`, details);
+      window.Logger?.error(`❌ FAILED: ${name}`, details);
     }
     
     testResults.summary.total++;
@@ -76,7 +76,7 @@
    * Test Packages System
    */
   function testPackagesSystem() {
-    console.log('\n🔍 Testing Packages System');
+    window.Logger?.info('\n🔍 Testing Packages System');
 
     // Test 1.1: PACKAGE_MANIFEST available
     const test1_1 = test(
@@ -87,7 +87,7 @@
     addTestResult('packagesSystem', test1_1);
 
     if (!window.PACKAGE_MANIFEST) {
-      console.warn('⚠️ PACKAGE_MANIFEST not available, skipping package tests');
+      window.Logger?.warn('⚠️ PACKAGE_MANIFEST not available, skipping package tests');
       return;
     }
 
@@ -133,14 +133,14 @@
     );
     addTestResult('packagesSystem', test1_3);
 
-    console.log(`✅ Packages System Tests: ${testResults.packagesSystem.passed}/${testResults.packagesSystem.passed + testResults.packagesSystem.failed} tests passed`);
+    window.Logger?.info(`✅ Packages System Tests: ${testResults.packagesSystem.passed}/${testResults.packagesSystem.passed + testResults.packagesSystem.failed} tests passed`);
   }
 
   /**
    * Test Page Configs
    */
   function testPageConfigs() {
-    console.log('\n🔍 Testing Page Configs');
+    window.Logger?.info('\n🔍 Testing Page Configs');
 
     // Get current page name
     const path = window.location.pathname;
@@ -160,7 +160,7 @@
     addTestResult('pageConfigs', test2_1);
 
     if (!pageConfig) {
-      console.warn(`⚠️ No page config found for ${pageName}, skipping page config tests`);
+      window.Logger?.warn(`⚠️ No page config found for ${pageName}, skipping page config tests`);
       return;
     }
 
@@ -229,24 +229,24 @@
     );
     addTestResult('pageConfigs', test2_5);
 
-    console.log(`✅ Page Configs Tests: ${testResults.pageConfigs.passed}/${testResults.pageConfigs.passed + testResults.pageConfigs.failed} tests passed`);
+    window.Logger?.info(`✅ Page Configs Tests: ${testResults.pageConfigs.passed}/${testResults.pageConfigs.passed + testResults.pageConfigs.failed} tests passed`);
   }
 
   /**
    * Run all tests
    */
   function runAllTests() {
-    console.log('🚀 Starting Packages System and Page Configs Testing...\n');
+    window.Logger?.info('🚀 Starting Packages System and Page Configs Testing...\n');
     
     testPackagesSystem();
     testPageConfigs();
 
     // Print summary
-    console.log('\n📊 Test Summary:');
-    console.log(`Total Tests: ${testResults.summary.total}`);
-    console.log(`Passed: ${testResults.summary.passed}`);
-    console.log(`Failed: ${testResults.summary.failed}`);
-    console.log(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
+    window.Logger?.info('\n📊 Test Summary:');
+    window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+    window.Logger?.info(`Passed: ${testResults.summary.passed}`);
+    window.Logger?.info(`Failed: ${testResults.summary.failed}`);
+    window.Logger?.info(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
 
     // Store results in window for external access
     window.packagesAndPageConfigsTestResults = testResults;

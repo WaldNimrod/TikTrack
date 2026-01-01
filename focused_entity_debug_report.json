@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-12-31T15:18:52.209Z",
+  "focusEntities": [
+    "trade_plan",
+    "cash_flow",
+    "user_profile"
+  ],
+  "results": {
+    "trade_plan": {
+      "entity": "trade_plan",
+      "success": false,
+      "error": "funcName is not defined"
+    },
+    "cash_flow": {
+      "entity": "cash_flow",
+      "success": false,
+      "error": "funcName is not defined"
+    },
+    "user_profile": {
+      "entity": "user_profile",
+      "success": false,
+      "error": "funcName is not defined"
+    }
+  },
+  "environment": {
+    "dashboardUrl": "http://localhost:8080/crud_testing_dashboard",
+    "method": "Logger + Network only"
+  }
+}

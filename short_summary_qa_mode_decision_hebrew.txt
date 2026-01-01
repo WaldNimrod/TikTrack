@@ -1,0 +1,6 @@
+Subject: QA Mode Decision | Team D
+Status: RED
+Done: דיווח מדויק על שגיאות טעינה וריצה - זיהינו שגיאות קריטיות: Header/TopBar חסרים, CrudResponseHandler חסר, API עם undefined ID, כשלים מוקדמים
+Evidence: Page loading: headerLoaded/topBarLoaded false, CrudResponseHandler undefined; Runtime: GET /api/user_profiles/undefined → 404, "Read test failed", trade_plan/cash_flow timeout לפני instrumentation
+Blockers: Dashboard loading issues - Header/TopBar לא נטענים, Services חיוניים חסרים, סדר טעינה לקוי
+Next: תקן טעינת Dashboard (Header/TopBar, CrudResponseHandler), המשך עם iframe mode

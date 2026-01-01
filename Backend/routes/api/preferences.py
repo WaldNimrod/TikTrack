@@ -44,6 +44,15 @@ preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences
 # Default Preferences Endpoints
 # ============================================================================
 
+@preferences_bp.route('/', methods=['GET'])
+@require_authentication()
+def get_preferences() -> Any:
+    """
+    Get user preferences - alias for /bootstrap for API consistency
+    Returns the same data as bootstrap endpoint.
+    """
+    return bootstrap_preferences()
+
 @preferences_bp.route('/bootstrap', methods=['GET'])
 @require_authentication()
 def bootstrap_preferences() -> Any:

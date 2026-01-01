@@ -355,11 +355,8 @@ except Exception as e:
 logger.info(" Server initialization completed")
 
 # -----------------------------------------------------------------------------
-# Authentication Middleware
+# Authentication Middleware (moved after blueprints)
 # -----------------------------------------------------------------------------
-from middleware.auth_middleware import setup_auth_middleware
-setup_auth_middleware(app)
-logger.info(" Authentication middleware initialized")
 
 # -----------------------------------------------------------------------------
 # Legacy testing compatibility (Flask app + SQLAlchemy-style DB proxy)
@@ -475,6 +472,19 @@ app.register_blueprint(users_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
+
+# Register dash blueprints for backward compatibility (underscore standard)
+from routes.api import trading_accounts, trade_plans, cash_flows
+app.register_blueprint(trading_accounts.trading_accounts_dash_bp)
+app.register_blueprint(trade_plans.trade_plans_dash_bp)
+app.register_blueprint(cash_flows.cash_flows_dash_bp)
+
+# Register alias blueprints for CRUD dashboard compatibility
+from routes.api.users import users_bp as users_blueprint
+from routes.api.tags import tags_bp as tags_blueprint
+app.register_blueprint(users_blueprint, url_prefix='/api/user_profile', name='user_profile')
+app.register_blueprint(users_blueprint, url_prefix='/api/user_management', name='user_management')
+app.register_blueprint(tags_blueprint, url_prefix='/api/tag_management', name='tag_management')
 
 # EOD Metrics API
 from routes.api.eod_metrics import eod_bp
@@ -2799,6 +2809,13 @@ if __name__ == "__main__":
     # - Background task feedback available via API polling
     # - Notification system works without WebSockets
     
+    # -----------------------------------------------------------------------------
+    # Authentication Middleware (after all blueprints)
+    # -----------------------------------------------------------------------------
+    from middleware.auth_middleware import setup_auth_middleware
+    setup_auth_middleware(app)
+    logger.info(" Authentication middleware initialized")
+
     # Display server startup information
     if IS_PRODUCTION:
         env_name = "PRODUCTION"

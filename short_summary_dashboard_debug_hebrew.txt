@@ -1,0 +1,6 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done: ביצענו דיבוג מלא של טעינת הדשבורד - זיהינו ש-Hard Refresh גורם לאיבוד session והפניה לדף התחברות
+Evidence: לפני Hard Refresh - דשבורד נטען, סקריפטים ב-200 OK. אחרי Hard Refresh - ניתוב ל-login.html, testCardCount: 0, פונקציות undefined
+Blockers: Hard refresh מנקה session storage וגורם לאיבוד אימות - צריך לבדוק בדפדפן רגיל בלי hard refresh
+Next: בדיקה ידנית בדפדפן רגיל + תיקון session persistence

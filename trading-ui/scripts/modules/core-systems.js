@@ -714,6 +714,25 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       const isInIframe = window !== window.top;
       console.log(`🏁 [UnifiedAppInitializer] Starting initialization`, { isInIframe });
 
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'core-systems.js:713',
+          message:'unified_app_initializer_started',
+          data:{
+            isInIframe,
+            initialized: this.initialized,
+            initializationInProgress: this.initializationInProgress
+          },
+          sessionId:'core-debug',
+          runId:'core-init-1',
+          hypothesisId:'unified-app-initializer-not-starting'
+        })
+      }).catch(()=>{});
+      // #endregion
+
       if (this.initialized) {
         console.log('✅ [UnifiedAppInitializer] Application already initialized');
         return this.getStatus();
@@ -1224,8 +1243,48 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               }
             }
             
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({
+                location:'core-systems.js:1247',
+                message:'about_to_call_initializeHeaderSystem',
+                data:{
+                  initializeHeaderSystem: typeof window.initializeHeaderSystem,
+                  HeaderSystem: typeof window.HeaderSystem,
+                  unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized
+                },
+                sessionId:'core-debug',
+                runId:'core-init-2',
+                hypothesisId:'header-system-call-failing'
+              })
+            }).catch(()=>{});
+            // #endregion
+
             try {
-              window.initializeHeaderSystem();
+              console.log('🎯 CORE-SYSTEMS: Calling initializeHeaderSystem...');
+              const result = await window.initializeHeaderSystem();
+              console.log('✅ CORE-SYSTEMS: initializeHeaderSystem completed:', result);
+
+              // #region agent log
+              fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                  location:'core-systems.js:1250',
+                  message:'initializeHeaderSystem_completed',
+                  data:{
+                    result: result,
+                    headerSystem: typeof window.headerSystem,
+                    headerSystemInitialized: window.headerSystem?.isInitialized
+                  },
+                  sessionId:'core-debug',
+                  runId:'core-init-2',
+                  hypothesisId:'header-system-call-completed'
+                })
+              }).catch(()=>{});
+              // #endregion
             } catch (error) {
               if (window.Logger?.error) {
                 window.Logger.error('Error initializing Header System', {
@@ -2350,6 +2409,24 @@ window.unifiedAppInit = new UnifiedAppInitializer();
  * @updated 1.6.0 - Moved to init-system package
  */
 window.initializeUnifiedApp = async function () {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      location:'core-systems.js:2352',
+      message:'initializeUnifiedApp_called',
+      data:{
+        unifiedAppInit: typeof window.unifiedAppInit,
+        unifiedAppInitInitialize: typeof window.unifiedAppInit?.initialize
+      },
+      sessionId:'core-debug',
+      runId:'core-init-1',
+      hypothesisId:'unified-app-not-starting'
+    })
+  }).catch(()=>{});
+  // #endregion
+
   return await window.unifiedAppInit.initialize();
 };
 
@@ -2431,6 +2508,25 @@ const initializeUnifiedAppWhenReady = async () => {
     readyState: document.readyState,
     location: window.location.href
   });
+
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      location:'core-systems.js:2429',
+      message:'initializeUnifiedAppWhenReady_called',
+      data:{
+        isInIframe,
+        readyState: document.readyState,
+        location: window.location.href
+      },
+      sessionId:'core-debug',
+      runId:'core-init-1',
+      hypothesisId:'core-not-starting'
+    })
+  }).catch(()=>{});
+  // #endregion
 
   // Initialize globalInitializationState if not exists
   if (!window.globalInitializationState) {

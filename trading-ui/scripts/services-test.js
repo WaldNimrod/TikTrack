@@ -46,7 +46,7 @@ const testResults = {
 
 function testDataCollection() {
     try {
-        console.log('🧪 Testing DataCollectionService...');
+        window.Logger?.info('🧪 Testing DataCollectionService...');
         
         // איסוף נתונים
         const data = window.DataCollectionService.collectFormData({
@@ -55,7 +55,7 @@ function testDataCollection() {
             dateField: { id: 'testDate', type: 'dateOnly' }
         });
         
-        console.log('✅ Data collected:', data);
+        window.Logger?.info('✅ Data collected:', data);
         
         // הצגת תוצאות
         const result = document.getElementById('result1');
@@ -75,7 +75,7 @@ function testDataCollection() {
         updateSummary();
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
         testResults.dataCollection = false;
         updateSummary();
     }
@@ -83,7 +83,7 @@ function testDataCollection() {
 
 function testSetFormData() {
     try {
-        console.log('🧪 Testing setFormData...');
+        window.Logger?.info('🧪 Testing setFormData...');
         
         window.DataCollectionService.setFormData({
             textField: { id: 'testText', type: 'text' },
@@ -93,25 +93,25 @@ function testSetFormData() {
             numberField: 999.99
         });
         
-        console.log('✅ Form data set successfully');
+        window.Logger?.info('✅ Form data set successfully');
         window.showSuccessNotification('הצלחה', 'נתונים הוגדרו בהצלחה');
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
     }
 }
 
 function testResetForm() {
     try {
-        console.log('🧪 Testing resetForm...');
+        window.Logger?.info('🧪 Testing resetForm...');
         
         window.DataCollectionService.resetForm('testForm1', true);
         
-        console.log('✅ Form reset successfully');
+        window.Logger?.info('✅ Form reset successfully');
         window.showSuccessNotification('הצלחה', 'טופס נוקה בהצלחה');
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
     }
 }
 
@@ -119,7 +119,7 @@ function testResetForm() {
 
 function testFieldRenderer() {
     try {
-        console.log('🧪 Testing FieldRendererService...');
+        window.Logger?.info('🧪 Testing FieldRendererService...');
         
         // בדיקת status badges
         const statusBadges = [
@@ -217,12 +217,12 @@ function testFieldRenderer() {
             });
         });
         
-        console.log('✅ All badges rendered successfully');
+        window.Logger?.info('✅ All badges rendered successfully');
         testResults.fieldRenderer = true;
         updateSummary();
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
         testResults.fieldRenderer = false;
         updateSummary();
     }
@@ -232,7 +232,7 @@ function testFieldRenderer() {
 
 async function testSelectPopulator() {
     try {
-        console.log('🧪 Testing SelectPopulatorService...');
+        window.Logger?.info('🧪 Testing SelectPopulatorService...');
         
         const result = document.getElementById('result3');
         result.style.display = 'block';
@@ -257,12 +257,12 @@ async function testSelectPopulator() {
             result.appendChild(node.cloneNode(true));
         });
         
-        console.log('✅ All selects populated successfully');
+        window.Logger?.info('✅ All selects populated successfully');
         testResults.selectPopulator = true;
         updateSummary();
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
         const result = document.getElementById('result3');
         result.textContent = '';
         const errorHTML = `<h5 class="text-danger">❌ שגיאה: ${error.message}</h5>`;
@@ -279,7 +279,7 @@ async function testSelectPopulator() {
 // ===== TEST 4: CRUD RESPONSE HANDLER =====
 
 function testCRUDSuccess() {
-    console.log('🧪 Testing CRUDResponseHandler - Success...');
+    window.Logger?.info('🧪 Testing CRUDResponseHandler - Success...');
     
     // סימולציה של תגובה מוצלחת
     const mockResponse = new Response(JSON.stringify({ id: 123, name: 'Test' }), {
@@ -297,7 +297,7 @@ function testCRUDSuccess() {
 }
 
 function testCRUDValidation() {
-    console.log('🧪 Testing CRUDResponseHandler - Validation Error...');
+    window.Logger?.info('🧪 Testing CRUDResponseHandler - Validation Error...');
     
     // סימולציה של שגיאת ולידציה (400)
     const mockResponse = new Response(JSON.stringify({ message: 'שדה חובה חסר' }), {
@@ -311,7 +311,7 @@ function testCRUDValidation() {
 }
 
 function testCRUDServerError() {
-    console.log('🧪 Testing CRUDResponseHandler - Server Error...');
+    window.Logger?.info('🧪 Testing CRUDResponseHandler - Server Error...');
     
     // סימולציה של שגיאת מערכת (500)
     const mockResponse = new Response(JSON.stringify({ message: 'שגיאת שרת פנימית' }), {
@@ -328,7 +328,7 @@ function testCRUDServerError() {
 
 async function testDefaultValues() {
     try {
-        console.log('🧪 Testing DefaultValueSetter...');
+        window.Logger?.info('🧪 Testing DefaultValueSetter...');
         
         // הגדרת תאריך נוכחי
         window.DefaultValueSetter.setCurrentDate('testDefaultDate');
@@ -354,12 +354,12 @@ async function testDefaultValues() {
             result.appendChild(node.cloneNode(true));
         });
         
-        console.log('✅ Default values set successfully');
+        window.Logger?.info('✅ Default values set successfully');
         testResults.defaultValues = true;
         updateSummary();
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
         testResults.defaultValues = false;
         updateSummary();
     }
@@ -367,16 +367,16 @@ async function testDefaultValues() {
 
 async function testPreferenceValues() {
     try {
-        console.log('🧪 Testing preference values...');
+        window.Logger?.info('🧪 Testing preference values...');
         
         // נסה לטעון ברירת מחדל למטבע (אם קיימת)
         const currency = await window.DefaultValueSetter.setPreferenceValue('testDefaultStatus', 'primaryCurrency');
         
-        console.log('✅ Preference value loaded:', currency);
+        window.Logger?.info('✅ Preference value loaded:', currency);
         window.showInfoNotification('מידע', `ברירת מחדל: ${currency || 'לא הוגדר'}`);
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
     }
 }
 
@@ -384,7 +384,7 @@ async function testPreferenceValues() {
 
 function testStatistics() {
     try {
-        console.log('🧪 Testing StatisticsCalculator...');
+        window.Logger?.info('🧪 Testing StatisticsCalculator...');
         
         // נתוני בדיקה
         const testData = [
@@ -426,12 +426,12 @@ function testStatistics() {
             result.appendChild(node.cloneNode(true));
         });
         
-        console.log('✅ Statistics calculated successfully');
+        window.Logger?.info('✅ Statistics calculated successfully');
         testResults.statistics = true;
         updateSummary();
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Test failed:', error);
         testResults.statistics = false;
         updateSummary();
     }
@@ -501,7 +501,7 @@ function updateSummary() {
 // ===== INITIALIZATION =====
 
 window.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Services Test Page Initialized');
+    window.Logger?.info('🚀 Services Test Page Initialized');
     
     // הצגת summary ריק
     updateSummary();

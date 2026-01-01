@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הושלם Full CRUD E2E לאחר תיקוני Teams A/B/C
+- תועד חוסר שיפור: נשאר 7/15 הצלחה (אותן תוצאות)
+Evidence:
+- אותן 7 entities עוברים: trade, note, tag, watch_list, execution, user_management, tag_management
+- אותן 8 entities נכשלים: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(400), user_profile(400), trading_journal(400), data_import(500)
+Blockers:
+- CRITICAL: תיקוני Teams A/B/C לא הוחלו או לא יעילים - אותן בעיות נשארות
+Next: Teams A/B/C חייבים לאמת runtime deployment ולהחיל תיקונים אמיתיים

@@ -29,12 +29,12 @@ class SortingTestingSystem {
      * @param {Object} page - Page configuration
      */
     async testSorting(page) {
-        console.log('🔍 DEBUG: SortingTestingSystem.testSorting called for page:', page.key, page.name);
+        window.Logger?.info('🔍 DEBUG: SortingTestingSystem.testSorting called for page:', page.key, page.name);
 
         // Check if page has already been tested
         const pageKey = `${page.key}-${page.name}`;
         if (this.testedPages.has(pageKey)) {
-            console.log('⚠️ Page already tested, skipping:', page.name);
+            window.Logger?.info('⚠️ Page already tested, skipping:', page.name);
             // #region agent log - PAGE ALREADY TESTED
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
@@ -94,7 +94,7 @@ class SortingTestingSystem {
         let testIframe = null;
 
         try {
-            console.log('🔍 DEBUG: SortingTestingSystem.testSorting try block started for page:', page.key);
+            window.Logger?.info('🔍 DEBUG: SortingTestingSystem.testSorting try block started for page:', page.key);
 
             // Skip testing the current page to avoid conflicts
             const currentPath = window.location.pathname;
@@ -125,7 +125,7 @@ class SortingTestingSystem {
             // #endregion
 
             if (currentPath === pagePath || page.key === 'index') {
-                console.log('⚠️ Skipping sorting test for page:', page.key, '- index page causes conflicts when loaded in iframe');
+                window.Logger?.info('⚠️ Skipping sorting test for page:', page.key, '- index page causes conflicts when loaded in iframe');
                 result.status = 'warning';
                 result.executionTime = Date.now() - startTime;
                 result.message = `דילוג על בדיקת דף הבית: ${page.name} (גורם להתנגשויות ב-iframe)`;
@@ -139,7 +139,7 @@ class SortingTestingSystem {
 
             // Also check if this page was already tested (deduplication)
             if (this.testedPages.has(pageKey)) {
-                console.log('⚠️ Skipping already tested page:', page.key);
+                window.Logger?.info('⚠️ Skipping already tested page:', page.key);
                 result.status = 'warning';
                 result.executionTime = Date.now() - startTime;
                 result.message = `עמוד כבר נבדק: ${page.name}`;
@@ -163,9 +163,9 @@ class SortingTestingSystem {
             }).catch(() => {});
 
             // Clean up any existing iframes before starting new test
-            console.log('🔍 DEBUG: About to cleanup test iframes');
+            window.Logger?.info('🔍 DEBUG: About to cleanup test iframes');
             this.crossPageTester.cleanupTestIframes();
-            console.log('🔍 DEBUG: cleanupTestIframes completed');
+            window.Logger?.info('🔍 DEBUG: cleanupTestIframes completed');
 
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
@@ -175,10 +175,10 @@ class SortingTestingSystem {
                 pageUrl = `${pageUrl}.html`;
             }
 
-            console.log('🔍 DEBUG: About to call loadPageInIframe for page:', page.key);
+            window.Logger?.info('🔍 DEBUG: About to call loadPageInIframe for page:', page.key);
             testIframe = await this.crossPageTester.loadPageInIframe(pageUrl);
 
-            console.log('🔍 DEBUG: loadPageInIframe completed, iframe loaded');
+            window.Logger?.info('🔍 DEBUG: loadPageInIframe completed, iframe loaded');
 
             const iframeDoc = this.crossPageTester.getIframeDocument(testIframe);
             const iframeWindow = this.crossPageTester.getIframeWindow(testIframe);
@@ -509,7 +509,7 @@ class SortingTestingSystem {
             result.errors.push(error.message);
             result.error = error.message;
             result.executionTime = Date.now() - startTime;
-            console.error(`❌ Error in SortingTestingSystem.testSorting for ${page.name}:`, error);
+            window.Logger?.error(`❌ Error in SortingTestingSystem.testSorting for ${page.name}:`, error);
 
             result.tests.push({
                 name: 'טעינת עמוד',
@@ -531,7 +531,7 @@ class SortingTestingSystem {
             this.crossPageTester.crudTester.updateTestResults();
         }
 
-        console.log(`✅ SortingTestingSystem.testSorting completed for ${page.name}:`, result);
+        window.Logger?.info(`✅ SortingTestingSystem.testSorting completed for ${page.name}:`, result);
         return result;
     }
 
@@ -555,7 +555,7 @@ class SortingTestingSystem {
      * Run comprehensive sorting tests on all pages
      */
     async runAllSortingTests() {
-        console.log('🚀 Starting comprehensive sorting test');
+        window.Logger?.info('🚀 Starting comprehensive sorting test');
 
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
             method: 'POST',
@@ -576,13 +576,13 @@ class SortingTestingSystem {
 
         for (const page of allPages) {
             try {
-                console.log(`🔍 Testing sorting for page: ${page.name}`);
+                window.Logger?.info(`🔍 Testing sorting for page: ${page.name}`);
                 const result = await this.testSorting(page);
                 if (result) {
                     results.push(result);
                 }
             } catch (error) {
-                console.error(`❌ Error testing page ${page.name}:`, error);
+                window.Logger?.error(`❌ Error testing page ${page.name}:`, error);
                 const errorResult = {
                     page: page.name,
                     status: 'error',
@@ -595,7 +595,7 @@ class SortingTestingSystem {
             }
         }
 
-        console.log(`✅ Comprehensive sorting test completed: ${results.length} pages tested`);
+        window.Logger?.info(`✅ Comprehensive sorting test completed: ${results.length} pages tested`);
 
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
             method: 'POST',
@@ -621,3 +621,20 @@ class SortingTestingSystem {
 
 // Make it globally available
 window.SortingTestingSystem = SortingTestingSystem;
+
+// #region agent log
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+    location:'sorting-testing-system.js:623',
+    message:'sorting_testing_loaded',
+    data:{
+      SortingTestingSystem: typeof window.SortingTestingSystem
+    },
+    sessionId:'script-loading',
+    runId:'init-system-scripts-1',
+    hypothesisId:'init-system-scripts-loading'
+  })
+}).catch(()=>{});
+// #endregion

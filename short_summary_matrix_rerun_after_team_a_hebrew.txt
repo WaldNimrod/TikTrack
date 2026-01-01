@@ -1,0 +1,12 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- הושלם Full CRUD E2E (15 entities) לאחר תיקוני Team A v1.0.38
+- תועד totals + timestamp + evidence מלא לכל כשל
+Evidence:
+- שיפור משמעותי: 9/15 עוברים (60%) לעומת 7/15 קודם (+2 entities)
+- 9 עוברים: trade, note, tag, watch_list, execution, user_management, trading_journal, tag_management, data_import
+- 6 נכשלים: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(404), user_profile(400)
+Blockers:
+- נותרו 6 entities לפתרון - בעיקר validation ו-route issues
+Next: Teams A/B/C להמשיך עם התיקונים הנותרים לפי המטריצה

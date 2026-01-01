@@ -115,17 +115,17 @@
    * Main check function
    */
   async function checkAllPages() {
-    console.log('🔍 Starting comprehensive page preferences integration check...\n');
+    window.Logger?.info('🔍 Starting comprehensive page preferences integration check...\n');
     
     const results = [];
     const runtimeStatus = checkRuntimeStatus();
     
-    console.log('📊 Runtime Status:');
-    console.log(JSON.stringify(runtimeStatus, null, 2));
-    console.log('\n');
+    window.Logger?.info('📊 Runtime Status:');
+    window.Logger?.info(JSON.stringify(runtimeStatus, null, 2));
+    window.Logger?.info('\n');
 
     for (const page of MAIN_PAGES) {
-      console.log(`\n📄 Checking ${page.name} (${page.description})...`);
+      window.Logger?.info(`\n📄 Checking ${page.name} (${page.description})...`);
       
       const configStatus = checkPageConfig(page.name);
       const htmlStatus = await checkHTMLScripts(page.file);
@@ -172,26 +172,26 @@
 
       results.push(status);
       
-      console.log(`  Status: ${status.status}`);
+      window.Logger?.info(`  Status: ${status.status}`);
       if (status.issues.length > 0) {
-        status.issues.forEach(issue => console.log(`  ${issue}`));
+        status.issues.forEach(issue => window.Logger?.info(`  ${issue}`));
       }
     }
 
     // Summary
-    console.log('\n\n📊 SUMMARY:');
-    console.log('='.repeat(60));
+    window.Logger?.info('\n\n📊 SUMMARY:');
+    window.Logger?.info('='.repeat(60));
     
     const okCount = results.filter(r => r.issues.length === 0).length;
     const issuesCount = results.filter(r => r.issues.length > 0).length;
     
-    console.log(`✅ Pages OK: ${okCount}/${MAIN_PAGES.length}`);
-    console.log(`❌ Pages with issues: ${issuesCount}/${MAIN_PAGES.length}`);
+    window.Logger?.info(`✅ Pages OK: ${okCount}/${MAIN_PAGES.length}`);
+    window.Logger?.info(`❌ Pages with issues: ${issuesCount}/${MAIN_PAGES.length}`);
     
-    console.log('\n📋 Pages with issues:');
+    window.Logger?.info('\n📋 Pages with issues:');
     results.filter(r => r.issues.length > 0).forEach(page => {
-      console.log(`\n  ${page.page} (${page.description}):`);
-      page.issues.forEach(issue => console.log(`    ${issue}`));
+      window.Logger?.info(`\n  ${page.page} (${page.description}):`);
+      page.issues.forEach(issue => window.Logger?.info(`    ${issue}`));
     });
 
     // Return results for programmatic access
@@ -206,7 +206,7 @@
       }
     };
 
-    console.log('\n\n💾 Results saved to window.__PAGES_PREFERENCES_STATUS__');
+    window.Logger?.info('\n\n💾 Results saved to window.__PAGES_PREFERENCES_STATUS__');
     
     return results;
   }
@@ -216,8 +216,8 @@
   
   // Auto-run if in browser
   if (typeof window !== 'undefined' && window.document) {
-    console.log('🚀 Page Preferences Integration Status Checker loaded');
-    console.log('   Run: checkPagesPreferencesStatus()');
+    window.Logger?.info('🚀 Page Preferences Integration Status Checker loaded');
+    window.Logger?.info('   Run: checkPagesPreferencesStatus()');
   }
 
 })();

@@ -155,15 +155,15 @@ class ConditionsTestManager {
      * Initialize the testing system
      */
     async initialize() {
-        console.log('🔧 initialize() called');
+        window.Logger?.info('🔧 initialize() called');
         
         if (this.initialized) {
-            console.log('🔧 Already initialized, returning');
+            window.Logger?.info('🔧 Already initialized, returning');
             return;
         }
         
         try {
-            console.log('🔧 Starting initialization...');
+            window.Logger?.info('🔧 Starting initialization...');
             await this.logWithUnifiedSystem('info', 'מערכת בדיקת תנאים מאותחלת...', 'development');
             
             // Wait for conditions system to be ready
@@ -173,23 +173,23 @@ class ConditionsTestManager {
             this.initializeModularComponents();
             
             // Setup event listeners
-            console.log('🔧 Setting up event listeners...');
+            window.Logger?.info('🔧 Setting up event listeners...');
             this.setupEventListeners();
             
             // Setup quick stats
-            console.log('🔧 Setting up quick stats...');
+            window.Logger?.info('🔧 Setting up quick stats...');
             this.setupQuickStats();
             
             // Initialize test results
-            console.log('🔧 Initializing test results...');
+            window.Logger?.info('🔧 Initializing test results...');
             this.initializeTestResults();
             
             this.initialized = true;
-            console.log('🔧 Initialization complete!');
+            window.Logger?.info('🔧 Initialization complete!');
             await this.logWithUnifiedSystem('info', 'מערכת בדיקת תנאים מוכנה לשימוש', 'development');
             
         } catch (error) {
-            console.error('🔧 Initialization error:', error);
+            window.Logger?.error('🔧 Initialization error:', error);
             await this.logWithUnifiedSystem('error', `שגיאה באתחול: ${error.message}`, 'system');
             throw error;
         }
@@ -207,7 +207,7 @@ class ConditionsTestManager {
             if (window.conditionsSystem && window.conditionsSystem.initializer) {
                 const status = window.conditionsSystem.initializer.getStatus();
                 if (status.isInitialized) {
-                    console.log('✅ Conditions system is ready');
+                    window.Logger?.info('✅ Conditions system is ready');
                     return;
                 }
             }
@@ -231,7 +231,7 @@ class ConditionsTestManager {
             this.crudManager = this.conditionsSystem.crudManager;
             this.formGenerator = this.conditionsSystem.formGenerator;
             
-            console.log('✅ Modular components initialized');
+            window.Logger?.info('✅ Modular components initialized');
         } else {
             throw new Error('Conditions system not available');
         }
@@ -241,18 +241,18 @@ class ConditionsTestManager {
      * Setup event listeners
      */
     setupEventListeners() {
-        console.log('🔧 Setting up event listeners...');
+        window.Logger?.info('🔧 Setting up event listeners...');
         
         // Run test buttons
         const runTestButtons = document.querySelectorAll('.run-test-btn');
-        console.log(`🔧 Found ${runTestButtons.length} run test buttons`);
+        window.Logger?.info(`🔧 Found ${runTestButtons.length} run test buttons`);
         
         runTestButtons.forEach((btn, index) => {
-            console.log(`🔧 Setting up button ${index + 1}:`, btn.dataset.test);
+            window.Logger?.info(`🔧 Setting up button ${index + 1}:`, btn.dataset.test);
             btn.addEventListener('click', (e) => {
-                console.log('🔧 Button clicked:', e.target);
+                window.Logger?.info('🔧 Button clicked:', e.target);
                 const testId = e.target.closest('.run-test-btn').dataset.test;
-                console.log('🔧 Test ID:', testId);
+                window.Logger?.info('🔧 Test ID:', testId);
                 this.runTest(testId);
             });
         });
@@ -326,15 +326,15 @@ class ConditionsTestManager {
      * Run a specific test
      */
     async runTest(testId) {
-        console.log('🔧 runTest called with testId:', testId);
+        window.Logger?.info('🔧 runTest called with testId:', testId);
         
         if (!this.tests[testId]) {
-            console.log('🔧 Test not found:', testId);
+            window.Logger?.info('🔧 Test not found:', testId);
             await this.logWithUnifiedSystem('error', `בדיקה לא נמצאה: ${testId}`, 'system');
             return;
         }
         
-        console.log('🔧 Test found, starting...');
+        window.Logger?.info('🔧 Test found, starting...');
 
         const test = this.tests[testId];
         const testElement = document.querySelector(`[data-test="${testId}"]`);
@@ -540,13 +540,13 @@ class ConditionsTestManager {
             const response = await fetch('/api/trade-plans/');
             const data = await response.json();
             
-            console.log('Trade plans response:', data);
+            window.Logger?.info('Trade plans response:', data);
             
             if (data && data.data && data.data.length > 0) {
-                console.log('Found existing trade plan:', data.data[0].id);
+                window.Logger?.info('Found existing trade plan:', data.data[0].id);
                 return data.data[0].id;
             } else {
-                console.log('No trade plans found, creating new one...');
+                window.Logger?.info('No trade plans found, creating new one...');
                 // If no trade plans exist, create one first
                 const createResponse = await fetch('/api/trade-plans/', {
                     method: 'POST',
@@ -561,18 +561,18 @@ class ConditionsTestManager {
                 });
                 
                 if (!createResponse.ok) {
-                    console.error('Failed to create trade plan:', createResponse.status, createResponse.statusText);
+                    window.Logger?.error('Failed to create trade plan:', createResponse.status, createResponse.statusText);
                     const errorText = await createResponse.text();
-                    console.error('Error response:', errorText);
+                    window.Logger?.error('Error response:', errorText);
                     return 1; // Fallback
                 }
                 
                 const createData = await createResponse.json();
-                console.log('Created new trade plan:', createData);
+                window.Logger?.info('Created new trade plan:', createData);
                 return createData.data.id;
             }
         } catch (error) {
-            console.warn('Could not get trade plan ID, using default ID 1:', error);
+            window.Logger?.warn('Could not get trade plan ID, using default ID 1:', error);
             return 1;
         }
     }
@@ -666,7 +666,7 @@ class ConditionsTestManager {
             this.displayLogEntry(logEntry);
             
         } catch (error) {
-            console.error('Error in unified logging:', error);
+            window.Logger?.error('Error in unified logging:', error);
             // Fallback to console
             console[level](`[${category.toUpperCase()}] ${message}`, data);
         }
@@ -918,7 +918,7 @@ class ConditionsTestManager {
             this.logWithUnifiedSystem('✅ Quick statistics loaded successfully', 'success', 'ui');
 
         } catch (error) {
-            console.error('❌ Failed to load quick stats:', error);
+            window.Logger?.error('❌ Failed to load quick stats:', error);
             this.logWithUnifiedSystem(`❌ Failed to load quick stats: ${error.message}`, 'error', 'system');
             
             // Set error values
@@ -969,7 +969,7 @@ class ConditionsUIManager {
     }
 
     async initialize() {
-        console.log('🎨 Initializing Conditions UI Manager...');
+        window.Logger?.info('🎨 Initializing Conditions UI Manager...');
         
         // Wait for conditions system to be ready
         await this.waitForConditionsSystem();
@@ -986,7 +986,7 @@ class ConditionsUIManager {
         // Load conditions
         await this.loadConditions();
         
-        console.log('✅ Conditions UI Manager initialized');
+        window.Logger?.info('✅ Conditions UI Manager initialized');
     }
     
     /**
@@ -1001,7 +1001,7 @@ class ConditionsUIManager {
             if (window.conditionsSystem && window.conditionsSystem.initializer) {
                 const status = window.conditionsSystem.initializer.getStatus();
                 if (status.isInitialized) {
-                    console.log('✅ Conditions system is ready for UI Manager');
+                    window.Logger?.info('✅ Conditions system is ready for UI Manager');
                     return;
                 }
             }
@@ -1025,7 +1025,7 @@ class ConditionsUIManager {
             this.crudManager = this.conditionsSystem.crudManager;
             this.formGenerator = this.conditionsSystem.formGenerator;
             
-            console.log('✅ UI Manager modular components initialized');
+            window.Logger?.info('✅ UI Manager modular components initialized');
         } else {
             throw new Error('Conditions system not available for UI Manager');
         }
@@ -1083,7 +1083,7 @@ class ConditionsUIManager {
             if (this.crudManager) {
                 this.methods = await this.crudManager.getTradingMethods();
                 this.populateMethodsSelect();
-                console.log(`✅ Loaded ${this.methods.length} methods using modular system`);
+                window.Logger?.info(`✅ Loaded ${this.methods.length} methods using modular system`);
             } else {
                 // Fallback to direct API call
                 const response = await fetch('/api/trading-methods/');
@@ -1092,11 +1092,11 @@ class ConditionsUIManager {
                 if (result.status === 'success') {
                     this.methods = result.data;
                     this.populateMethodsSelect();
-                    console.log(`✅ Loaded ${this.methods.length} methods using fallback`);
+                    window.Logger?.info(`✅ Loaded ${this.methods.length} methods using fallback`);
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to load methods:', error);
+            window.Logger?.error('❌ Failed to load methods:', error);
         }
     }
 
@@ -1220,7 +1220,7 @@ class ConditionsUIManager {
             if (this.crudManager) {
                 this.conditions = await this.crudManager.readConditions(this.currentTradePlanId);
                 await this.renderConditions();
-                console.log(`✅ Loaded ${this.conditions.length} conditions using modular system`);
+                window.Logger?.info(`✅ Loaded ${this.conditions.length} conditions using modular system`);
             } else {
                 // Fallback to direct API call
                 const response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`);
@@ -1229,11 +1229,11 @@ class ConditionsUIManager {
                 if (result.status === 'success') {
                     this.conditions = result.data;
                     await this.renderConditions();
-                    console.log(`✅ Loaded ${this.conditions.length} conditions using fallback`);
+                    window.Logger?.info(`✅ Loaded ${this.conditions.length} conditions using fallback`);
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to load conditions:', error);
+            window.Logger?.error('❌ Failed to load conditions:', error);
             const listBody = document.getElementById('conditionsListBody');
             if (listBody) {
                 listBody.textContent = '';
@@ -1433,7 +1433,7 @@ class ConditionsUIManager {
                     await this.crudManager.createCondition(this.currentTradePlanId, data);
                 }
                 
-                console.log('✅ Condition saved successfully using modular system');
+                window.Logger?.info('✅ Condition saved successfully using modular system');
                 this.hideForm();
                 await this.loadConditions();
             } else {
@@ -1457,7 +1457,7 @@ class ConditionsUIManager {
 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    console.log('✅ Condition saved successfully using fallback');
+                    window.Logger?.info('✅ Condition saved successfully using fallback');
                     this.hideForm();
                     await this.loadConditions();
                 } else {
@@ -1465,7 +1465,7 @@ class ConditionsUIManager {
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to save condition:', error);
+            window.Logger?.error('❌ Failed to save condition:', error);
             alert('שגיאה בשמירת התנאי');
         }
     }
@@ -1481,7 +1481,7 @@ class ConditionsUIManager {
             // Use modular system if available
             if (this.crudManager) {
                 await this.crudManager.deleteCondition(conditionId);
-                console.log('✅ Condition deleted successfully using modular system');
+                window.Logger?.info('✅ Condition deleted successfully using modular system');
                 await this.loadConditions();
             } else {
                 // Fallback to direct API call
@@ -1491,14 +1491,14 @@ class ConditionsUIManager {
 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    console.log('✅ Condition deleted successfully using fallback');
+                    window.Logger?.info('✅ Condition deleted successfully using fallback');
                     await this.loadConditions();
                 } else {
                     alert('שגיאה במחיקת התנאי');
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to delete condition:', error);
+            window.Logger?.error('❌ Failed to delete condition:', error);
             alert('שגיאה במחיקת התנאי');
         }
     }
@@ -1522,12 +1522,12 @@ class ConditionsUIManager {
             const result = await response.json();
             if (result.status === 'success') {
                 alert('התראה נוצרה בהצלחה!');
-                console.log('✅ Alert created successfully');
+                window.Logger?.info('✅ Alert created successfully');
             } else {
                 alert('שגיאה ביצירת התראה');
             }
         } catch (error) {
-            console.error('❌ Failed to create alert:', error);
+            window.Logger?.error('❌ Failed to create alert:', error);
             alert('שגיאה ביצירת התראה');
         }
     }
@@ -1560,7 +1560,7 @@ class ConditionsUIManager {
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to evaluate all conditions:', error);
+            window.Logger?.error('❌ Failed to evaluate all conditions:', error);
             await this.logWithUnifiedSystem('error', `❌ Failed to evaluate all conditions: ${error.message}`, 'system');
         }
     }
@@ -1579,7 +1579,7 @@ class ConditionsUIManager {
                 window.showNotificationSmart('הערכות התנאים רוענו', 'info');
             }
         } catch (error) {
-            console.error('❌ Failed to refresh evaluations:', error);
+            window.Logger?.error('❌ Failed to refresh evaluations:', error);
             await this.logWithUnifiedSystem('error', `❌ Failed to refresh evaluations: ${error.message}`, 'system');
         }
     }
@@ -1671,7 +1671,7 @@ class ConditionsUIManager {
                 return result;
             }
         } catch (error) {
-            console.error(`❌ Failed to evaluate condition ${conditionId}:`, error);
+            window.Logger?.error(`❌ Failed to evaluate condition ${conditionId}:`, error);
             await this.logWithUnifiedSystem('error', `❌ Failed to evaluate condition ${conditionId}: ${error.message}`, 'system');
         }
     }
@@ -1745,21 +1745,21 @@ let conditionsUIManager;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🔧 DOM Content Loaded, creating conditionsTestManager...');
+    window.Logger?.info('🔧 DOM Content Loaded, creating conditionsTestManager...');
     try {
         conditionsTestManager = new ConditionsTestManager();
-        console.log('🔧 conditionsTestManager created:', conditionsTestManager);
+        window.Logger?.info('🔧 conditionsTestManager created:', conditionsTestManager);
         // Don't auto-initialize - let the unified system handle it
         window.conditionsTestManager = conditionsTestManager;
-        console.log('🔧 conditionsTestManager assigned to window');
+        window.Logger?.info('🔧 conditionsTestManager assigned to window');
         
         // Also create UI manager
         conditionsUIManager = new ConditionsUIManager();
         await conditionsUIManager.initialize();
         window.conditionsUIManager = conditionsUIManager;
-        console.log('🔧 conditionsUIManager created and initialized');
+        window.Logger?.info('🔧 conditionsUIManager created and initialized');
     } catch (error) {
-        console.error('🔧 Failed to create conditions test manager:', error);
+        window.Logger?.error('🔧 Failed to create conditions test manager:', error);
     }
 });
 

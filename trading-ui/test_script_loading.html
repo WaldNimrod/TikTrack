@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Script Loading</title>
+</head>
+<body>
+    <h1>Testing Script Loading</h1>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        function log(msg) {
+            output.innerHTML += '<div>' + msg + '</div>';
+            console.log(msg);
+        }
+        
+        log('Page loaded, starting script loading test...');
+    </script>
+    
+    <!-- Test scripts -->
+    <script src="/trading-ui/scripts/color-scheme-system.js?v=1.0.0" defer onload="log('color-scheme-system.js loaded')"></script>
+    <script src="/trading-ui/scripts/debug-modal-z-index.js?v=1.0.0" defer onload="log('debug-modal-z-index.js loaded')"></script>
+    <script src="/trading-ui/scripts/header-system.js?v=1735680000" defer onload="log('header-system.js loaded')"></script>
+    
+    <script>
+        setTimeout(() => {
+            const scripts = document.querySelectorAll('script');
+            log('Total scripts in DOM: ' + scripts.length);
+            scripts.forEach((s, i) => {
+                if (s.src) {
+                    const filename = s.src.split('/').pop().split('?')[0];
+                    log('Script ' + i + ': ' + filename);
+                }
+            });
+        }, 2000);
+    </script>
+</body>
+</html>

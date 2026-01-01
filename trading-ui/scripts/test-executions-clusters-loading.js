@@ -25,11 +25,11 @@
 (function() {
   'use strict';
 
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🔍 ניטור מפורט: טעינת אשכולות בעמוד ביצועים');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('🔍 ניטור מפורט: טעינת אשכולות בעמוד ביצועים');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   const monitor = {
     startTime: Date.now(),
@@ -49,9 +49,9 @@
     monitor.checks.push(check);
     
     const icon = status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⚠️';
-    console.log(`${icon} [${check.time}ms] ${name}`);
+    window.Logger?.info(`${icon} [${check.time}ms] ${name}`);
     if (Object.keys(details).length > 0) {
-      console.log('   ', details);
+      window.Logger?.info('   ', details);
     }
     
     if (status === 'fail') {
@@ -68,17 +68,17 @@
       details
     };
     monitor.timeline.push(entry);
-    console.log(`📅 [${entry.time}ms] ${event}`);
+    window.Logger?.info(`📅 [${entry.time}ms] ${event}`);
     if (Object.keys(details).length > 0) {
-      console.log('   ', details);
+      window.Logger?.info('   ', details);
     }
   }
 
   // ============================================================================
   // 1. בדיקת DOM Elements
   // ============================================================================
-  console.log('📋 שלב 1: בדיקת אלמנטי DOM');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 1: בדיקת אלמנטי DOM');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const tradeCreationSection = document.getElementById('tradeCreationClustersSection');
   const tradeCreationContainer = document.getElementById('executionTradeCreationClustersContainer');
@@ -128,13 +128,13 @@
     errorText: tradeCreationError?.textContent || ''
   });
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 2. בדיקת מצב הסקשן
   // ============================================================================
-  console.log('📊 שלב 2: בדיקת מצב הסקשן');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📊 שלב 2: בדיקת מצב הסקשן');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   if (tradeCreationSection) {
     const sectionBody = tradeCreationSection.querySelector('.section-body');
@@ -170,13 +170,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 3. בדיקת נתונים מוטענים מראש
   // ============================================================================
-  console.log('💾 שלב 3: בדיקת נתונים מוטענים מראש');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('💾 שלב 3: בדיקת נתונים מוטענים מראש');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasSections34Data = typeof window.executionsSections34Data !== 'undefined';
   logCheck('executionsSections34Data Global', hasSections34Data ? 'pass' : 'fail', {
@@ -218,13 +218,13 @@
     }
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 4. בדיקת Services
   // ============================================================================
-  console.log('🔧 שלב 4: בדיקת Services');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔧 שלב 4: בדיקת Services');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasExecutionClusteringService = typeof window.ExecutionClusteringService !== 'undefined';
   logCheck('ExecutionClusteringService', hasExecutionClusteringService ? 'pass' : 'fail', {
@@ -238,13 +238,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 5. בדיקת פונקציות אתחול
   // ============================================================================
-  console.log('⚙️  שלב 5: בדיקת פונקציות אתחול');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⚙️  שלב 5: בדיקת פונקציות אתחול');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasInitializeExecutionsPage = typeof window.initializeExecutionsPage === 'function';
   logCheck('initializeExecutionsPage', hasInitializeExecutionsPage ? 'pass' : 'warning', {
@@ -258,13 +258,13 @@
     suggestion: 'Check if function is called in initializeExecutionsPage'
   });
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 6. בדיקת טבלה
   // ============================================================================
-  console.log('📋 שלב 6: בדיקת טבלת אשכולות');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 6: בדיקת טבלת אשכולות');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   if (tradeCreationTableBody) {
     const rows = tradeCreationTableBody.querySelectorAll('tr');
@@ -298,13 +298,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 7. בדיקת Cache
   // ============================================================================
-  console.log('💾 שלב 7: בדיקת Cache');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('💾 שלב 7: בדיקת Cache');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasUnifiedCacheManager = typeof window.UnifiedCacheManager !== 'undefined';
   logCheck('UnifiedCacheManager', hasUnifiedCacheManager ? 'pass' : 'warning', {
@@ -327,13 +327,13 @@
       });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 8. בדיקת API Response
   // ============================================================================
-  console.log('🌐 שלב 8: בדיקת API Response');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🌐 שלב 8: בדיקת API Response');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // נבדוק את ה-performance entries
   if (window.performance && window.performance.getEntriesByType) {
@@ -366,13 +366,13 @@
       });
     });
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 9. בדיקת Event Listeners
   // ============================================================================
-  console.log('👂 שלב 9: בדיקת Event Listeners');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('👂 שלב 9: בדיקת Event Listeners');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // נבדוק אם יש event listeners רשומים
   logCheck('Sections Restored Flag', typeof window.sectionsRestored !== 'undefined' ? 'pass' : 'warning', {
@@ -380,67 +380,67 @@
     value: window.sectionsRestored
   });
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 10. סיכום וניתוח
   // ============================================================================
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('📊 סיכום ניטור');
-  console.log('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('📊 סיכום ניטור');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
   
   const totalChecks = monitor.checks.length;
   const passedChecks = monitor.checks.filter(c => c.status === 'pass').length;
   const failedChecks = monitor.checks.filter(c => c.status === 'fail').length;
   const warningChecks = monitor.checks.filter(c => c.status === 'warning').length;
   
-  console.log(`✅ הצלחות: ${passedChecks}/${totalChecks}`);
-  console.log(`❌ כשלונות: ${failedChecks}/${totalChecks}`);
-  console.log(`⚠️  אזהרות: ${warningChecks}/${totalChecks}`);
-  console.log(`⏱️  זמן כולל: ${Date.now() - monitor.startTime}ms`);
-  console.log('\n');
+  window.Logger?.info(`✅ הצלחות: ${passedChecks}/${totalChecks}`);
+  window.Logger?.info(`❌ כשלונות: ${failedChecks}/${totalChecks}`);
+  window.Logger?.info(`⚠️  אזהרות: ${warningChecks}/${totalChecks}`);
+  window.Logger?.info(`⏱️  זמן כולל: ${Date.now() - monitor.startTime}ms`);
+  window.Logger?.info('\n');
   
   // ניתוח בעיות
   if (failedChecks > 0) {
-    console.log('❌ בעיות קריטיות:');
+    window.Logger?.info('❌ בעיות קריטיות:');
     monitor.errors.forEach(error => {
-      console.error(`   - ${error.name}:`, error.details);
+      window.Logger?.error(`   - ${error.name}:`, error.details);
     });
-    console.log('\n');
+    window.Logger?.info('\n');
   }
   
   if (warningChecks > 0) {
-    console.log('⚠️  אזהרות:');
+    window.Logger?.info('⚠️  אזהרות:');
     monitor.warnings.forEach(warning => {
-      console.warn(`   - ${warning.name}:`, warning.details);
+      window.Logger?.warn(`   - ${warning.name}:`, warning.details);
     });
-    console.log('\n');
+    window.Logger?.info('\n');
   }
   
   // המלצות
-  console.log('💡 המלצות:');
+  window.Logger?.info('💡 המלצות:');
   const hasData = window.executionsSections34Data?.tradeCreation?.data?.length > 0;
   const hasTableRows = tradeCreationTableBody?.querySelectorAll('tr').length > 0;
   const sectionIsOpen = tradeCreationSection && 
     window.getComputedStyle(tradeCreationSection.querySelector('.section-body')).display !== 'none';
   
   if (hasData && !hasTableRows && sectionIsOpen) {
-    console.log('   ⚠️  נתונים קיימים אבל לא מוצגים בטבלה!');
-    console.log('   🔍 סיבה אפשרית: initializeTradeCreationClustersSection לא נקרא');
-    console.log('   💡 פתרון: בדוק למה checkAndInitialize לא מזהה שהסקשן פתוח');
+    window.Logger?.info('   ⚠️  נתונים קיימים אבל לא מוצגים בטבלה!');
+    window.Logger?.info('   🔍 סיבה אפשרית: initializeTradeCreationClustersSection לא נקרא');
+    window.Logger?.info('   💡 פתרון: בדוק למה checkAndInitialize לא מזהה שהסקשן פתוח');
   } else if (hasData && !hasTableRows && !sectionIsOpen) {
-    console.log('   ⚠️  נתונים קיימים אבל הסקשן סגור');
-    console.log('   💡 פתרון: פתח את הסקשן ידנית ותבדוק אם הנתונים מוצגים');
+    window.Logger?.info('   ⚠️  נתונים קיימים אבל הסקשן סגור');
+    window.Logger?.info('   💡 פתרון: פתח את הסקשן ידנית ותבדוק אם הנתונים מוצגים');
   } else if (!hasData) {
-    console.log('   ⚠️  אין נתונים מוטענים');
-    console.log('   💡 פתרון: בדוק למה preloadSections34Data לא טען נתונים');
+    window.Logger?.info('   ⚠️  אין נתונים מוטענים');
+    window.Logger?.info('   💡 פתרון: בדוק למה preloadSections34Data לא טען נתונים');
   } else if (hasData && hasTableRows) {
-    console.log('   ✅ הכל עובד תקין!');
+    window.Logger?.info('   ✅ הכל עובד תקין!');
   }
   
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
   
   // החזרת תוצאות
   return {

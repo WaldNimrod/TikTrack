@@ -14,7 +14,7 @@
  * Last Updated: 2025-01-27
  */
 
-console.log('🧪 Comprehensive Cache Clearing Test Suite loaded');
+window.Logger?.info('🧪 Comprehensive Cache Clearing Test Suite loaded');
 
 /**
  * Main test function - tests all 4 levels comprehensively
@@ -23,9 +23,9 @@ console.log('🧪 Comprehensive Cache Clearing Test Suite loaded');
  * @returns {Promise<void>}
  */
 window.runComprehensiveCacheClearingTest = async function() {
-    console.log('\n' + '='.repeat(80));
-    console.log('🧪 COMPREHENSIVE CACHE CLEARING TEST SUITE');
-    console.log('='.repeat(80));
+    window.Logger?.info('\n' + '='.repeat(80));
+    window.Logger?.info('🧪 COMPREHENSIVE CACHE CLEARING TEST SUITE');
+    window.Logger?.info('='.repeat(80));
     
     const startTime = Date.now();
     
@@ -56,19 +56,19 @@ window.runComprehensiveCacheClearingTest = async function() {
         };
         
         // Summary
-        console.log('\n' + '='.repeat(80));
-        console.log('📊 FINAL SUMMARY');
-        console.log('='.repeat(80));
-        console.table(overallResults);
+        window.Logger?.info('\n' + '='.repeat(80));
+        window.Logger?.info('📊 FINAL SUMMARY');
+        window.Logger?.info('='.repeat(80));
+        window.Logger?.table(overallResults);
         
         const duration = Date.now() - startTime;
         const passedCount = Object.values(overallResults).filter(r => r && typeof r === 'object' && r.passed === true).length;
         const testedCount = Object.values(overallResults).filter(r => r && typeof r === 'object' && r.tested === true).length;
         const failedCount = testedCount - passedCount;
         
-        console.log(`\n✅ Tests Passed: ${passedCount}/${testedCount}`);
-        console.log(`📊 Success Rate: ${(passedCount/testedCount*100).toFixed(1)}%`);
-        console.log(`⏱️ Total Duration: ${duration}ms`);
+        window.Logger?.info(`\n✅ Tests Passed: ${passedCount}/${testedCount}`);
+        window.Logger?.info(`📊 Success Rate: ${(passedCount/testedCount*100).toFixed(1)}%`);
+        window.Logger?.info(`⏱️ Total Duration: ${duration}ms`);
         
         // Build detailed message
         let detailedMessage = `סה"כ נבדקו: ${testedCount} רמות\n`;
@@ -143,7 +143,7 @@ window.runComprehensiveCacheClearingTest = async function() {
         return overallResults;
         
     } catch (error) {
-        console.error('❌ Critical error in comprehensive test:', error);
+        window.Logger?.error('❌ Critical error in comprehensive test:', error);
         
         // Show critical error notification
         if (typeof window.showErrorNotification === 'function') {
@@ -166,7 +166,7 @@ window.runComprehensiveCacheClearingTest = async function() {
  * @returns {Promise<Object>} Test results
  */
 async function testLevel_Light() {
-    console.log('\n🟢 ========== TESTING LIGHT LEVEL ==========');
+    window.Logger?.info('\n🟢 ========== TESTING LIGHT LEVEL ==========');
     
     const result = {
         level: 'light',
@@ -178,27 +178,27 @@ async function testLevel_Light() {
     
     try {
         // ===== SAMPLE CREATION =====
-        console.log('\n📝 Creating sample keys...');
+        window.Logger?.info('\n📝 Creating sample keys...');
         
         // Sample 1: Memory Layer
         await window.UnifiedCacheManager.layers.memory.save('test-light-memory', 'sample-data-memory');
         const memoryBefore = window.UnifiedCacheManager.layers.memory.cache.has('test-light-memory');
-        console.log(`  Memory: test-light-memory created: ${memoryBefore}`);
+        window.Logger?.info(`  Memory: test-light-memory created: ${memoryBefore}`);
         
         // Sample 2: localStorage tiktrack_*
         await window.UnifiedCacheManager.save('test-light-ls', 'sample-data-ls', { layer: 'localStorage' });
         const lsBefore = localStorage.getItem('tiktrack_test-light-ls') !== null;
-        console.log(`  localStorage: tiktrack_test-light-ls created: ${lsBefore}`);
+        window.Logger?.info(`  localStorage: tiktrack_test-light-ls created: ${lsBefore}`);
         
         // Sample 3: IndexedDB
         await window.UnifiedCacheManager.save('test-light-idb', 'sample-data-idb', { layer: 'indexedDB' });
         const idbBefore = true; // assume created
-        console.log(`  IndexedDB: test-light-idb created: ${idbBefore}`);
+        window.Logger?.info(`  IndexedDB: test-light-idb created: ${idbBefore}`);
         
         // Sample 4: Orphan Key
         localStorage.setItem('test-light-orphan', 'sample-orphan');
         const orphanBefore = localStorage.getItem('test-light-orphan') !== null;
-        console.log(`  Orphan: test-light-orphan created: ${orphanBefore}`);
+        window.Logger?.info(`  Orphan: test-light-orphan created: ${orphanBefore}`);
         
         result.samples = {
             memory: memoryBefore,
@@ -208,39 +208,39 @@ async function testLevel_Light() {
         };
         
         // ===== CLEAR LIGHT =====
-        console.log('\n🧹 Clearing with Light level...');
+        window.Logger?.info('\n🧹 Clearing with Light level...');
         const clearResult = await window.clearAllCache({ 
             level: 'light', 
             skipConfirmation: true,
             verbose: false
         });
-        console.log('Clear result:', clearResult);
+        window.Logger?.info('Clear result:', clearResult);
         
         // Wait for completion
         await new Promise(r => setTimeout(r, 200));
         
         // ===== VALIDATION =====
-        console.log('\n✅ Validating results...');
+        window.Logger?.info('\n✅ Validating results...');
         
         // Check 1: Memory should be cleared
         const memoryAfter = window.UnifiedCacheManager.layers.memory.cache.has('test-light-memory');
         result.details.memoryCleared = !memoryAfter;
-        console.log(`  Memory cleared: ${!memoryAfter} ${!memoryAfter ? '✅' : '❌'}`);
+        window.Logger?.info(`  Memory cleared: ${!memoryAfter} ${!memoryAfter ? '✅' : '❌'}`);
         
         // Check 2: localStorage should NOT be cleared
         const lsAfter = localStorage.getItem('tiktrack_test-light-ls') !== null;
         result.details.localStoragePreserved = lsAfter;
-        console.log(`  localStorage preserved: ${lsAfter} ${lsAfter ? '✅' : '❌'}`);
+        window.Logger?.info(`  localStorage preserved: ${lsAfter} ${lsAfter ? '✅' : '❌'}`);
         
         // Check 3: IndexedDB should NOT be cleared
         const idbAfter = await window.UnifiedCacheManager.get('test-light-idb', { layer: 'indexedDB' });
         result.details.indexedDBPreserved = idbAfter !== null;
-        console.log(`  IndexedDB preserved: ${idbAfter !== null} ${idbAfter !== null ? '✅' : '❌'}`);
+        window.Logger?.info(`  IndexedDB preserved: ${idbAfter !== null} ${idbAfter !== null ? '✅' : '❌'}`);
         
         // Check 4: Orphan should NOT be cleared
         const orphanAfter = localStorage.getItem('test-light-orphan') !== null;
         result.details.orphanPreserved = orphanAfter;
-        console.log(`  Orphan preserved: ${orphanAfter} ${orphanAfter ? '✅' : '❌'}`);
+        window.Logger?.info(`  Orphan preserved: ${orphanAfter} ${orphanAfter ? '✅' : '❌'}`);
         
         // ===== CLEANUP TEST DATA =====
         localStorage.removeItem('tiktrack_test-light-ls');
@@ -254,7 +254,7 @@ async function testLevel_Light() {
             result.details.indexedDBPreserved &&
             result.details.orphanPreserved;
         
-        console.log(`\n${result.passed ? '✅ LIGHT PASSED' : '❌ LIGHT FAILED'}`);
+        window.Logger?.info(`\n${result.passed ? '✅ LIGHT PASSED' : '❌ LIGHT FAILED'}`);
         
         // Show notification
         if (result.passed) {
@@ -278,7 +278,7 @@ async function testLevel_Light() {
         }
         
     } catch (error) {
-        console.error('❌ Light test error:', error);
+        window.Logger?.error('❌ Light test error:', error);
         result.passed = false;
         result.error = error.message;
         
@@ -303,7 +303,7 @@ async function testLevel_Light() {
  * @returns {Promise<Object>} Test results
  */
 async function testLevel_Medium() {
-    console.log('\n🔵 ========== TESTING MEDIUM LEVEL ==========');
+    window.Logger?.info('\n🔵 ========== TESTING MEDIUM LEVEL ==========');
     
     const result = {
         level: 'medium',
@@ -315,7 +315,7 @@ async function testLevel_Medium() {
     
     try {
         // ===== SAMPLE CREATION =====
-        console.log('\n📝 Creating sample keys from each branch...');
+        window.Logger?.info('\n📝 Creating sample keys from each branch...');
         
         // Branch 1: Memory
         await window.UnifiedCacheManager.layers.memory.save('test-med-memory', 'data-memory');
@@ -333,7 +333,7 @@ async function testLevel_Medium() {
         localStorage.setItem('test-med-orphan', 'orphan-data');
         localStorage.setItem('colorScheme', 'test-scheme');  // Real orphan
         
-        console.log('  ✅ All samples created');
+        window.Logger?.info('  ✅ All samples created');
         
         const before = {
             memory: window.UnifiedCacheManager.layers.memory.cache.has('test-med-memory'),
@@ -344,11 +344,11 @@ async function testLevel_Medium() {
             orphan2: localStorage.getItem('colorScheme') !== null
         };
         
-        console.log('Before:', before);
+        window.Logger?.info('Before:', before);
         result.samples = before;
         
         // ===== CLEAR MEDIUM =====
-        console.log('\n🧹 Clearing with Medium level...');
+        window.Logger?.info('\n🧹 Clearing with Medium level...');
         const clearResult = await window.clearAllCache({ 
             level: 'medium', 
             skipConfirmation: true,
@@ -358,33 +358,33 @@ async function testLevel_Medium() {
         await new Promise(r => setTimeout(r, 200));
         
         // ===== VALIDATION =====
-        console.log('\n✅ Validating each branch...');
+        window.Logger?.info('\n✅ Validating each branch...');
         
         // Branch 1: Memory - should be cleared
         const memoryAfter = window.UnifiedCacheManager.layers.memory.cache.has('test-med-memory');
         result.details.memoryCleared = !memoryAfter;
-        console.log(`  Branch 1 - Memory: ${!memoryAfter ? '✅ cleared' : '❌ not cleared'}`);
+        window.Logger?.info(`  Branch 1 - Memory: ${!memoryAfter ? '✅ cleared' : '❌ not cleared'}`);
         
         // Branch 2: localStorage tiktrack_* - should be cleared
         const lsAfter = localStorage.getItem('tiktrack_test-med-ls') !== null;
         result.details.localStorageCleared = !lsAfter;
-        console.log(`  Branch 2 - localStorage (tiktrack_*): ${!lsAfter ? '✅ cleared' : '❌ not cleared'}`);
+        window.Logger?.info(`  Branch 2 - localStorage (tiktrack_*): ${!lsAfter ? '✅ cleared' : '❌ not cleared'}`);
         
         // Branch 3: IndexedDB - should be cleared
         const idbAfter = await window.UnifiedCacheManager.get('test-med-idb', { layer: 'indexedDB' });
         result.details.indexedDBCleared = idbAfter === null;
-        console.log(`  Branch 3 - IndexedDB: ${idbAfter === null ? '✅ cleared' : '❌ not cleared'}`);
+        window.Logger?.info(`  Branch 3 - IndexedDB: ${idbAfter === null ? '✅ cleared' : '❌ not cleared'}`);
         
         // Branch 4: Backend - should be cleared
         const backendAfter = window.UnifiedCacheManager.layers.backend.cache.has('test-med-backend');
         result.details.backendCleared = !backendAfter;
-        console.log(`  Branch 4 - Backend: ${!backendAfter ? '✅ cleared' : '❌ not cleared'}`);
+        window.Logger?.info(`  Branch 4 - Backend: ${!backendAfter ? '✅ cleared' : '❌ not cleared'}`);
         
         // Branch 5: Orphans - should NOT be cleared
         const orphan1After = localStorage.getItem('test-med-orphan') !== null;
         const orphan2After = localStorage.getItem('colorScheme') !== null;
         result.details.orphansPreserved = orphan1After && orphan2After;
-        console.log(`  Branch 5 - Orphans: ${orphan1After && orphan2After ? '✅ preserved' : '❌ deleted (ERROR!)'}`);
+        window.Logger?.info(`  Branch 5 - Orphans: ${orphan1After && orphan2After ? '✅ preserved' : '❌ deleted (ERROR!)'}`);
         
         // ===== CLEANUP =====
         localStorage.removeItem('test-med-orphan');
@@ -398,7 +398,7 @@ async function testLevel_Medium() {
             result.details.backendCleared &&
             result.details.orphansPreserved;
         
-        console.log(`\n${result.passed ? '✅ MEDIUM PASSED - All branches validated!' : '❌ MEDIUM FAILED'}`);
+        window.Logger?.info(`\n${result.passed ? '✅ MEDIUM PASSED - All branches validated!' : '❌ MEDIUM FAILED'}`);
         
         // Show notification
         if (result.passed) {
@@ -429,7 +429,7 @@ async function testLevel_Medium() {
         }
         
     } catch (error) {
-        console.error('❌ Medium test error:', error);
+        window.Logger?.error('❌ Medium test error:', error);
         result.passed = false;
         result.error = error.message;
         
@@ -454,7 +454,7 @@ async function testLevel_Medium() {
  * @returns {Promise<Object>} Test results
  */
 async function testLevel_Full() {
-    console.log('\n🟠 ========== TESTING FULL LEVEL ==========');
+    window.Logger?.info('\n🟠 ========== TESTING FULL LEVEL ==========');
     
     const result = {
         level: 'full',
@@ -467,7 +467,7 @@ async function testLevel_Full() {
     
     try {
         // ===== SAMPLE CREATION - One from each category =====
-        console.log('\n📝 Creating samples from EACH orphan category...');
+        window.Logger?.info('\n📝 Creating samples from EACH orphan category...');
         
         // UnifiedCM layers (will be cleared in Medium, tested here for completeness)
         await window.UnifiedCacheManager.save('test-full-memory', 'data', { layer: 'memory' });
@@ -477,32 +477,32 @@ async function testLevel_Full() {
         // Orphan Category 1: State (2 keys)
         localStorage.setItem('cashFlowsSectionState', 'test-state-1');
         localStorage.setItem('executionsTopSectionCollapsed', 'test-state-2');
-        console.log('  📌 State orphans: 2 created');
+        window.Logger?.info('  📌 State orphans: 2 created');
         
         // Orphan Category 2: Preferences (4 keys)
         localStorage.setItem('colorScheme', 'test-pref-1');
         localStorage.setItem('customColorScheme', 'test-pref-2');
         localStorage.setItem('headerFilters', 'test-pref-3');
         localStorage.setItem('consoleSettings', 'test-pref-4');
-        console.log('  📌 Preferences orphans: 4 created');
+        window.Logger?.info('  📌 Preferences orphans: 4 created');
         
         // Orphan Category 3: Auth (2 keys) - CRITICAL!
         localStorage.setItem('authToken', 'test-auth-1');
         localStorage.setItem('currentUser', 'test-auth-2');
-        console.log('  📌 Auth orphans: 2 created');
+        window.Logger?.info('  📌 Auth orphans: 2 created');
         
         // Orphan Category 4: Testing (4 keys)
         localStorage.setItem('crud_test_results', 'test-testing-1');
         localStorage.setItem('linterLogs', 'test-testing-2');
         localStorage.setItem('css-duplicates-results', 'test-testing-3');
         localStorage.setItem('serverMonitorSettings', 'test-testing-4');
-        console.log('  📌 Testing orphans: 4 created');
+        window.Logger?.info('  📌 Testing orphans: 4 created');
         
         // Orphan Category 5: Dynamic (patterns)
         localStorage.setItem('sortState_trades', 'test-dynamic-1');
         localStorage.setItem('section-visibility-alerts-section1', 'test-dynamic-2');
         localStorage.setItem('top-section-collapsed-tickers', 'test-dynamic-3');
-        console.log('  📌 Dynamic orphans: 3 created');
+        window.Logger?.info('  📌 Dynamic orphans: 3 created');
         
         // Sample 6: Non-orphan key (should stay in Full, deleted in Nuclear)
         localStorage.setItem('some-random-key', 'should-stay-in-full');
@@ -515,10 +515,10 @@ async function testLevel_Full() {
             'sortState_trades', 'section-visibility-alerts-section1', 'top-section-collapsed-tickers'
         ];
         
-        console.log(`\n✅ Total samples created: ${result.orphansSampled.length + 4} (15 orphans + 4 UnifiedCM)`);
+        window.Logger?.info(`\n✅ Total samples created: ${result.orphansSampled.length + 4} (15 orphans + 4 UnifiedCM)`);
         
         // ===== CLEAR FULL =====
-        console.log('\n🧹 Clearing with Full level...');
+        window.Logger?.info('\n🧹 Clearing with Full level...');
         const clearResult = await window.clearAllCache({ 
             level: 'full', 
             skipConfirmation: true,
@@ -529,14 +529,14 @@ async function testLevel_Full() {
         await new Promise(r => setTimeout(r, 300));
         
         // ===== VALIDATION - Check each orphan =====
-        console.log('\n✅ Validating each orphan category...');
+        window.Logger?.info('\n✅ Validating each orphan category...');
         
         const orphansAfter = {};
         result.orphansSampled.forEach(key => {
             const exists = localStorage.getItem(key) !== null;
             orphansAfter[key] = exists;
             if (exists) {
-                console.log(`  ❌ ${key}: still exists (SHOULD BE DELETED!)`);
+                window.Logger?.info(`  ❌ ${key}: still exists (SHOULD BE DELETED!)`);
             }
         });
         
@@ -546,7 +546,7 @@ async function testLevel_Full() {
         result.details.orphansCleared = `${orphansCleared}/${orphansTotal}`;
         result.details.orphansClearedPercent = (orphansCleared / orphansTotal * 100).toFixed(1) + '%';
         
-        console.log(`\n  📊 Orphans cleared: ${orphansCleared}/${orphansTotal} (${result.details.orphansClearedPercent})`);
+        window.Logger?.info(`\n  📊 Orphans cleared: ${orphansCleared}/${orphansTotal} (${result.details.orphansClearedPercent})`);
         
         // Check by category
         result.details.categories = {
@@ -561,17 +561,17 @@ async function testLevel_Full() {
                     !orphansAfter['top-section-collapsed-tickers']
         };
         
-        console.log('  Categories:');
-        console.log(`    State: ${result.details.categories.state ? '✅' : '❌'}`);
-        console.log(`    Preferences: ${result.details.categories.preferences ? '✅' : '❌'}`);
-        console.log(`    Auth: ${result.details.categories.auth ? '✅' : '❌'}`);
-        console.log(`    Testing: ${result.details.categories.testing ? '✅' : '❌'}`);
-        console.log(`    Dynamic: ${result.details.categories.dynamic ? '✅' : '❌'}`);
+        window.Logger?.info('  Categories:');
+        window.Logger?.info(`    State: ${result.details.categories.state ? '✅' : '❌'}`);
+        window.Logger?.info(`    Preferences: ${result.details.categories.preferences ? '✅' : '❌'}`);
+        window.Logger?.info(`    Auth: ${result.details.categories.auth ? '✅' : '❌'}`);
+        window.Logger?.info(`    Testing: ${result.details.categories.testing ? '✅' : '❌'}`);
+        window.Logger?.info(`    Dynamic: ${result.details.categories.dynamic ? '✅' : '❌'}`);
         
         // Check non-orphan (should stay)
         const randomKeyAfter = localStorage.getItem('some-random-key') !== null;
         result.details.nonOrphanPreserved = randomKeyAfter;
-        console.log(`\n  Non-orphan key preserved: ${randomKeyAfter} ${randomKeyAfter ? '✅' : '❌'}`);
+        window.Logger?.info(`\n  Non-orphan key preserved: ${randomKeyAfter} ${randomKeyAfter ? '✅' : '❌'}`);
         
         // Cleanup
         localStorage.removeItem('some-random-key');
@@ -582,7 +582,7 @@ async function testLevel_Full() {
             Object.values(result.details.categories).every(v => v === true) &&
             result.details.nonOrphanPreserved;
         
-        console.log(`\n${result.passed ? '✅ FULL PASSED - 100% orphans cleared!' : '❌ FULL FAILED'}`);
+        window.Logger?.info(`\n${result.passed ? '✅ FULL PASSED - 100% orphans cleared!' : '❌ FULL FAILED'}`);
         
         // Show notification
         if (result.passed) {
@@ -613,7 +613,7 @@ async function testLevel_Full() {
         }
         
     } catch (error) {
-        console.error('❌ Full test error:', error);
+        window.Logger?.error('❌ Full test error:', error);
         result.passed = false;
         result.error = error.message;
         
@@ -638,14 +638,14 @@ async function testLevel_Full() {
  * @returns {Promise<Object>} Test results
  */
 async function testLevel_Nuclear() {
-    console.log('\n☢️ ========== TESTING NUCLEAR LEVEL ==========');
-    console.log('⚠️⚠️⚠️ WARNING: This will DELETE EVERYTHING! ⚠️⚠️⚠️');
-    console.log('This test should ONLY run in isolated/test environment!');
-    console.log('\nAre you SURE? This will:');
-    console.log('  ☢️ Clear ALL localStorage (including other sites on localhost)');
-    console.log('  ☢️ DELETE entire IndexedDB database');
-    console.log('  ☢️ Clear sessionStorage');
-    console.log('\nTo proceed, run: await testLevel_Nuclear_Confirmed()');
+    window.Logger?.info('\n☢️ ========== TESTING NUCLEAR LEVEL ==========');
+    window.Logger?.info('⚠️⚠️⚠️ WARNING: This will DELETE EVERYTHING! ⚠️⚠️⚠️');
+    window.Logger?.info('This test should ONLY run in isolated/test environment!');
+    window.Logger?.info('\nAre you SURE? This will:');
+    window.Logger?.info('  ☢️ Clear ALL localStorage (including other sites on localhost)');
+    window.Logger?.info('  ☢️ DELETE entire IndexedDB database');
+    window.Logger?.info('  ☢️ Clear sessionStorage');
+    window.Logger?.info('\nTo proceed, run: await testLevel_Nuclear_Confirmed()');
     
     return {
         level: 'nuclear',
@@ -661,7 +661,7 @@ async function testLevel_Nuclear() {
  * ⚠️ Only run in safe/isolated environment!
  */
 window.testLevel_Nuclear_Confirmed = async function() {
-    console.log('\n☢️ ========== NUCLEAR TEST - CONFIRMED ==========');
+    window.Logger?.info('\n☢️ ========== NUCLEAR TEST - CONFIRMED ==========');
     
     const result = {
         level: 'nuclear',
@@ -680,10 +680,10 @@ window.testLevel_Nuclear_Confirmed = async function() {
             sessionStorageCount: sessionStorage?.length || 0
         };
         
-        console.log('Before:', result.before);
+        window.Logger?.info('Before:', result.before);
         
         // ===== CLEAR NUCLEAR =====
-        console.log('\n☢️ Clearing with Nuclear level...');
+        window.Logger?.info('\n☢️ Clearing with Nuclear level...');
         const clearResult = await window.clearAllCache({ 
             level: 'nuclear', 
             skipConfirmation: true,
@@ -693,7 +693,7 @@ window.testLevel_Nuclear_Confirmed = async function() {
         await new Promise(r => setTimeout(r, 500));
         
         // ===== VALIDATION =====
-        console.log('\n✅ Validating complete destruction...');
+        window.Logger?.info('\n✅ Validating complete destruction...');
         
         result.after = {
             localStorageCount: localStorage.length,
@@ -703,8 +703,8 @@ window.testLevel_Nuclear_Confirmed = async function() {
         result.details.allLocalStorageCleared = result.after.localStorageCount === 0;
         result.details.sessionStorageCleared = result.after.sessionStorageCount === 0;
         
-        console.log(`  localStorage: ${result.before.localStorageCount} → ${result.after.localStorageCount} ${result.details.allLocalStorageCleared ? '✅' : '❌'}`);
-        console.log(`  sessionStorage: ${result.before.sessionStorageCount} → ${result.after.sessionStorageCount} ${result.details.sessionStorageCleared ? '✅' : '❌'}`);
+        window.Logger?.info(`  localStorage: ${result.before.localStorageCount} → ${result.after.localStorageCount} ${result.details.allLocalStorageCleared ? '✅' : '❌'}`);
+        window.Logger?.info(`  sessionStorage: ${result.before.sessionStorageCount} → ${result.after.sessionStorageCount} ${result.details.sessionStorageCleared ? '✅' : '❌'}`);
         
         // Check IndexedDB deletion
         try {
@@ -720,7 +720,7 @@ window.testLevel_Nuclear_Confirmed = async function() {
             });
             
             result.details.indexedDBDeleted = !dbCheck.exists;
-            console.log(`  IndexedDB: ${dbCheck.exists ? '❌ still exists' : '✅ deleted'}`);
+            window.Logger?.info(`  IndexedDB: ${dbCheck.exists ? '❌ still exists' : '✅ deleted'}`);
         } catch (e) {
             result.details.indexedDBDeleted = 'unknown';
         }
@@ -729,11 +729,11 @@ window.testLevel_Nuclear_Confirmed = async function() {
             result.details.allLocalStorageCleared &&
             (result.details.indexedDBDeleted === true || result.details.indexedDBDeleted === 'unknown');
         
-        console.log(`\n${result.passed ? '✅ NUCLEAR PASSED - Everything destroyed!' : '❌ NUCLEAR FAILED'}`);
-        console.log('⚠️ Page refresh required now!');
+        window.Logger?.info(`\n${result.passed ? '✅ NUCLEAR PASSED - Everything destroyed!' : '❌ NUCLEAR FAILED'}`);
+        window.Logger?.info('⚠️ Page refresh required now!');
         
     } catch (error) {
-        console.error('❌ Nuclear test error:', error);
+        window.Logger?.error('❌ Nuclear test error:', error);
         result.passed = false;
         result.error = error.message;
     }
@@ -746,7 +746,7 @@ window.testLevel_Nuclear_Confirmed = async function() {
  * Faster than full test, good for rapid iteration
  */
 window.quickVerifyLevel = async function(level) {
-    console.log(`\n🔍 Quick Verify: ${level.toUpperCase()}`);
+    window.Logger?.info(`\n🔍 Quick Verify: ${level.toUpperCase()}`);
     
     const samples = {
         memory: 'quick-mem-' + Date.now(),
@@ -761,7 +761,7 @@ window.quickVerifyLevel = async function(level) {
     await window.UnifiedCacheManager.save(samples.indexedDB, 'data', { layer: 'indexedDB' });
     localStorage.setItem(samples.orphan, 'orphan-data');
     
-    console.log('✅ Samples created');
+    window.Logger?.info('✅ Samples created');
     
     // Clear
     await window.clearAllCache({ level, skipConfirmation: true, verbose: false });
@@ -774,7 +774,7 @@ window.quickVerifyLevel = async function(level) {
         orphan: localStorage.getItem(samples.orphan) === null
     };
     
-    console.table(results);
+    window.Logger?.table(results);
     
     // Cleanup
     localStorage.removeItem(samples.orphan);
@@ -792,7 +792,7 @@ window.quickVerifyLevel = async function(level) {
     }
     
     const passed = JSON.stringify(results) === JSON.stringify(expected);
-    console.log(`\n${passed ? '✅ PASS' : '❌ FAIL'} - ${level.toUpperCase()}`);
+    window.Logger?.info(`\n${passed ? '✅ PASS' : '❌ FAIL'} - ${level.toUpperCase()}`);
     
     // Show notification
     if (passed) {
@@ -860,14 +860,14 @@ window.checkRefreshMarker = function(key, originalMarker) {
     }
 };
 
-console.log('✅ Comprehensive test suite ready!');
-console.log('\nAvailable functions:');
-console.log('  - runComprehensiveCacheClearingTest() - Full suite (Light, Medium, Full)');
-console.log('  - testLevel_Light() - Test Light only');
-console.log('  - testLevel_Medium() - Test Medium only');
-console.log('  - testLevel_Full() - Test Full only');
-console.log('  - testLevel_Nuclear() - Instructions for Nuclear');
-console.log('  - quickVerifyLevel(level) - Quick check');
-console.log('  - createRefreshMarker(key) - Create marker with timestamp');
-console.log('  - checkRefreshMarker(key, original) - Detect refresh');
+window.Logger?.info('✅ Comprehensive test suite ready!');
+window.Logger?.info('\nAvailable functions:');
+window.Logger?.info('  - runComprehensiveCacheClearingTest() - Full suite (Light, Medium, Full)');
+window.Logger?.info('  - testLevel_Light() - Test Light only');
+window.Logger?.info('  - testLevel_Medium() - Test Medium only');
+window.Logger?.info('  - testLevel_Full() - Test Full only');
+window.Logger?.info('  - testLevel_Nuclear() - Instructions for Nuclear');
+window.Logger?.info('  - quickVerifyLevel(level) - Quick check');
+window.Logger?.info('  - createRefreshMarker(key) - Create marker with timestamp');
+window.Logger?.info('  - checkRefreshMarker(key, original) - Detect refresh');
 

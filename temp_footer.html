@@ -1,0 +1,76 @@
+    <!-- Modal Cleanup: Force cleanup of any lingering modals/backdrops on page load -->
+    <script>
+        // Immediate cleanup when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[index.html] DOM ready - immediate modal cleanup');
+            forceModalCleanup();
+        });
+
+        // Additional cleanup on window load
+        window.addEventListener('load', function() {
+            console.log('[index.html] Window loaded - checking for lingering modals');
+            setTimeout(function() {
+                forceModalCleanup();
+            }, 500);
+        });
+
+        // Force cleanup function
+        function forceModalCleanup() {
+            const openModals = document.querySelectorAll('.modal.show');
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            const hasModalOpenClass = document.body.classList.contains('modal-open');
+
+            console.log('[index.html] Modal cleanup check:', {
+                openModalsCount: openModals.length,
+                openModalIds: Array.from(openModals).map(m => m.id),
+                backdropsCount: allBackdrops.length,
+                bodyHasModalOpen: hasModalOpenClass,
+                bodyOverflow: document.body.style.overflow,
+                page: window.location.pathname
+            });
+
+            let cleanupPerformed = false;
+
+            // Hide all visible modals
+            openModals.forEach(modal => {
+                console.log('[index.html] Force hiding modal:', modal.id);
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                cleanupPerformed = true;
+            });
+
+            // Remove all backdrops
+            allBackdrops.forEach(backdrop => {
+                console.log('[index.html] Force removing backdrop');
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+                cleanupPerformed = true;
+            });
+
+            // Clean up body classes and styles
+            if (hasModalOpenClass) {
+                document.body.classList.remove('modal-open');
+                cleanupPerformed = true;
+            }
+
+            if (document.body.style.overflow === 'hidden') {
+                document.body.style.overflow = '';
+                cleanupPerformed = true;
+            }
+
+            if (cleanupPerformed) {
+                console.log('[index.html] Modal cleanup completed');
+            } else {
+                console.log('[index.html] No modal cleanup needed');
+            }
+        }
+
+        // Also cleanup beforeunload to prevent issues when navigating away
+        window.addEventListener('beforeunload', function() {
+            forceModalCleanup();
+        });
+    </script>
+</body>
+</html>

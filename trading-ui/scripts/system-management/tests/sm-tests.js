@@ -31,7 +31,7 @@ class SMTests {
       'sm-system-settings'
     ];
     
-    console.log('🧪 Starting section tests...');
+    window.Logger?.info('🧪 Starting section tests...');
     
     for (const sectionId of sections) {
       try {
@@ -47,7 +47,7 @@ class SMTests {
     const passed = Object.values(results).filter(r => r.passed).length;
     const total = sections.length;
     
-    console.log(`✅ Tests completed: ${passed}/${total} passed`);
+    window.Logger?.info(`✅ Tests completed: ${passed}/${total} passed`);
     
     return {
       results,
@@ -222,12 +222,12 @@ class SMTests {
    * הרצת כל הבדיקות והצגת תוצאות
    */
   static async runAllTests() {
-    console.log('🚀 Starting System Management Tests...');
+    window.Logger?.info('🚀 Starting System Management Tests...');
     const results = await this.testAllSections();
     
     // Display results
-    console.table(results.results);
-    console.log('Summary:', results.summary);
+    window.Logger?.table(results.results);
+    window.Logger?.info('Summary:', results.summary);
     
     return results;
   }

@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Defer Test</title>
+</head>
+<body>
+    <h1>Testing Defer Behavior</h1>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        function log(msg) {
+            const div = document.createElement('div');
+            div.textContent = msg;
+            output.appendChild(div);
+            console.log(msg);
+        }
+        log('Page started');
+    </script>
+    
+    <!-- Synchronous scripts -->
+    <script src="/trading-ui/scripts/api-config.js?v=1.0.0"></script>
+    <script>log('api-config loaded');</script>
+    
+    <!-- Defer scripts -->
+    <script src="/trading-ui/scripts/color-scheme-system.js?v=1.0.0" defer onload="log('color-scheme defer loaded')"></script>
+    <script src="/trading-ui/scripts/debug-modal-z-index.js?v=1.0.0" defer onload="log('debug-modal defer loaded')"></script>
+    <script src="/trading-ui/scripts/header-system.js?v=1735680000" defer onload="log('header-system defer loaded')"></script>
+    
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const allScripts = document.querySelectorAll('script');
+                log('Final count: ' + allScripts.length + ' scripts');
+                allScripts.forEach((s, i) => {
+                    if (s.src) {
+                        const filename = s.src.split('/').pop().split('?')[0];
+                        log('Script ' + i + ': ' + filename + ' (defer:' + s.defer + ')');
+                    }
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

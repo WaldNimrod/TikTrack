@@ -1,0 +1,12 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הושלם Current Yellow Check - Full CRUD E2E (15 entities)
+- תועד totals + timestamp + evidence מלא לכל כשל
+Evidence:
+- 7/15 עוברים: trade, note, tag, watch_list, execution, user_management, tag_management
+- 8/15 נכשלים: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(400), user_profile(400), trading_journal(400), data_import(500)
+Blockers:
+- CRITICAL: ללא התקדמות - אותן תוצאות כמו Yellow Status Check הקודם (7/15)
+- Teams A/B/C fixes לא הוחלו או לא יעילים
+Next: Teams A/B/C חייבים לוודא runtime deployment אמיתי ותיקונים יעילים

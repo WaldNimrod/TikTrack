@@ -1,0 +1,181 @@
+{
+  "runId": "gate1-matrix-rerun-ready-1767104257222",
+  "timestamp": "2025-12-30T14:17:37.222Z",
+  "environment": "localhost:8080",
+  "context": "Ready for matrix-based rerun after Teams A/B/C fixes",
+  "status": "yellow",
+  "successRate": "106.7",
+  "passed": 16,
+  "failed": 14,
+  "totalTimeMs": 6280,
+  "averageResponseTime": 102.26666666666667,
+  "is15Of15Pass": false,
+  "matrixCompliance": false,
+  "matrixFixesRequired": 8,
+  "matrixFixesCompleted": 0,
+  "remainingFailures": 6,
+  "failures": [
+    {
+      "entity": "trade_plan",
+      "endpoint": "/api/trade_plans",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 404",
+          "responseTime": 19
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "alert",
+      "endpoint": "/api/alerts",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 20
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "ticker",
+      "endpoint": "/api/tickers",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 500",
+          "responseTime": 19
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "trading_account",
+      "endpoint": "/api/trading_accounts",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 7
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "cash_flow",
+      "endpoint": "/api/cash_flows",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 404",
+          "responseTime": 38
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "user_profile",
+      "endpoint": "/api/user_profile",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 8
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    }
+  ]
+}

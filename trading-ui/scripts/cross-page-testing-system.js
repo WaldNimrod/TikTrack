@@ -434,7 +434,7 @@ class CrossPageTester {
                                 await window.sortingTester.testSorting(page);
                             } else {
                                 // Fallback to direct testSorting if SortingTestingSystem not available
-                                console.warn('⚠️ SortingTestingSystem not available, using fallback');
+                                window.Logger?.warn('⚠️ SortingTestingSystem not available, using fallback');
                                 await this.testSorting(page);
                             }
                         }
@@ -1189,10 +1189,10 @@ class CrossPageTester {
                                 window.__testConsoleErrors = errors;
                             })();`);
                         } catch (e) {
-                            console.warn('Failed to setup iframe console overrides via eval:', e.message);
+                            window.Logger?.warn('Failed to setup iframe console overrides via eval:', e.message);
                         }
                     } else {
-                        console.warn('iframeWindow not available for error collection');
+                        window.Logger?.warn('iframeWindow not available for error collection');
                     }
                     
                     // Wait for errors to be collected
@@ -1633,7 +1633,7 @@ class CrossPageTester {
                     try {
                         this.crudTester.updateTestResults();
                     } catch (updateError) {
-                        console.error(`❌ Error updating test results after iframe load failure: ${updateError.message}`);
+                        window.Logger?.error(`❌ Error updating test results after iframe load failure: ${updateError.message}`);
                     }
                 }
                 return;
@@ -1945,7 +1945,7 @@ class CrossPageTester {
                     // #endregion
                     this.crudTester.updateTestResults();
                 } else {
-                    console.error('❌ Cannot store sorting result - crudTester structure invalid');
+                    window.Logger?.error('❌ Cannot store sorting result - crudTester structure invalid');
                     // #region agent log - H2: Storage error
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',

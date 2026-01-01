@@ -26,11 +26,11 @@
 (function() {
   'use strict';
 
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🔍 בדיקת טעינת עמוד בסיס נתונים (Database Display Page)');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('🔍 בדיקת טעינת עמוד בסיס נתונים (Database Display Page)');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   const results = {
     passed: 0,
@@ -59,14 +59,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${name}: ${message}`);
+      window.Logger?.info(`${status} ${name}: ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${name}: ${message}`);
+        window.Logger?.warn(`${status} ${name}: ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${name}: ${message}`);
+        window.Logger?.error(`${status} ${name}: ${message}`);
       }
     }
     
@@ -93,14 +93,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${name}(): ${message}`);
+      window.Logger?.info(`${status} ${name}(): ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${name}(): ${message}`);
+        window.Logger?.warn(`${status} ${name}(): ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${name}(): ${message}`);
+        window.Logger?.error(`${status} ${name}(): ${message}`);
       }
     }
     
@@ -129,14 +129,14 @@
 
     if (exists) {
       results.passed++;
-      console.log(`${status} ${fullName}: ${message}`);
+      window.Logger?.info(`${status} ${fullName}: ${message}`);
     } else {
       if (optional) {
         results.warnings++;
-        console.warn(`${status} ${fullName}: ${message}`);
+        window.Logger?.warn(`${status} ${fullName}: ${message}`);
       } else {
         results.failed++;
-        console.error(`${status} ${fullName}: ${message}`);
+        window.Logger?.error(`${status} ${fullName}: ${message}`);
       }
     }
     
@@ -146,45 +146,45 @@
   // ============================================================================
   // 1. בדיקת PAGE_CONFIGS
   // ============================================================================
-  console.log('📋 שלב 1: בדיקת הגדרות עמוד (PAGE_CONFIGS)');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 1: בדיקת הגדרות עמוד (PAGE_CONFIGS)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasPageConfigs = checkGlobal('PAGE_CONFIGS') || checkGlobal('PAGE_INITIALIZATION_CONFIGS');
   const pageConfig = window.PAGE_CONFIGS?.db_display || window.PAGE_INITIALIZATION_CONFIGS?.db_display;
   
   if (pageConfig) {
-    console.log(`✅ קונפיגורציית עמוד נטענה: ${pageConfig.name || 'Database Display'}`);
-    console.log(`   חבילות מוגדרות: ${pageConfig.packages?.length || 0}`);
+    window.Logger?.info(`✅ קונפיגורציית עמוד נטענה: ${pageConfig.name || 'Database Display'}`);
+    window.Logger?.info(`   חבילות מוגדרות: ${pageConfig.packages?.length || 0}`);
     if (pageConfig.packages) {
-      console.log(`   רשימת חבילות: ${pageConfig.packages.join(', ')}`);
+      window.Logger?.info(`   רשימת חבילות: ${pageConfig.packages.join(', ')}`);
     }
-    console.log(`   גלובלים נדרשים: ${pageConfig.requiredGlobals?.length || 0}`);
+    window.Logger?.info(`   גלובלים נדרשים: ${pageConfig.requiredGlobals?.length || 0}`);
   } else {
-    console.error('❌ קונפיגורציית עמוד לא נמצאה!');
+    window.Logger?.error('❌ קונפיגורציית עמוד לא נמצאה!');
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 2. בדיקת חבילת BASE (חובה)
   // ============================================================================
-  console.log('📦 שלב 2: בדיקת חבילת BASE (חובה)');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📦 שלב 2: בדיקת חבילת BASE (חובה)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkGlobal('NotificationSystem');
   checkObjectProperty('window', 'Logger', true);
   checkObjectProperty('window', 'CacheSyncManager', true);
   checkObjectProperty('window', 'IconSystem', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 3. בדיקת חבילת SERVICES (קריטי לעמוד זה!)
   // ============================================================================
-  console.log('🔧 שלב 3: בדיקת חבילת SERVICES (קריטי!)');
-  console.log('───────────────────────────────────────────────────────────────');
-  console.log('⚠️  זהו הבדיקה החשובה ביותר - חבילת services נדרשת לטעינת נתונים וטבלאות');
-  console.log('');
+  window.Logger?.info('🔧 שלב 3: בדיקת חבילת SERVICES (קריטי!)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⚠️  זהו הבדיקה החשובה ביותר - חבילת services נדרשת לטעינת נתונים וטבלאות');
+  window.Logger?.info('');
   
   // בדיקת window.loadTableData - הפונקציה המרכזית לטבלאות
   checkFunction('loadTableData', false); // ⭐ הקריטי ביותר
@@ -194,21 +194,21 @@
   
   // בדיקת data-basic.js
   if (typeof window.loadTableData === 'function') {
-    console.log('   ✅ window.loadTableData() זמין לטעינת טבלאות');
+    window.Logger?.info('   ✅ window.loadTableData() זמין לטעינת טבלאות');
   } else {
-    console.error('   ❌ window.loadTableData() חסר! - לא ניתן לטעון טבלאות');
+    window.Logger?.error('   ❌ window.loadTableData() חסר! - לא ניתן לטעון טבלאות');
     results.failed++;
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 4. בדיקת חבילת UI-ADVANCED (קריטי לעמוד זה!)
   // ============================================================================
-  console.log('🎨 שלב 4: בדיקת חבילת UI-ADVANCED (קריטי!)');
-  console.log('───────────────────────────────────────────────────────────────');
-  console.log('⚠️  חבילת ui-advanced נדרשת לרינדור וניהול טבלאות');
-  console.log('');
+  window.Logger?.info('🎨 שלב 4: בדיקת חבילת UI-ADVANCED (קריטי!)');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⚠️  חבילת ui-advanced נדרשת לרינדור וניהול טבלאות');
+  window.Logger?.info('');
   
   // בדיקת מערכת טבלאות
   checkFunction('setupSortableHeaders', false); // ⭐ קריטי למיון טבלאות
@@ -221,93 +221,93 @@
   checkFunction('setupPagination', true);
   
   if (typeof window.setupSortableHeaders === 'function') {
-    console.log('   ✅ window.setupSortableHeaders() זמין למיון טבלאות');
+    window.Logger?.info('   ✅ window.setupSortableHeaders() זמין למיון טבלאות');
   } else {
-    console.error('   ❌ window.setupSortableHeaders() חסר! - לא ניתן למיין טבלאות');
+    window.Logger?.error('   ❌ window.setupSortableHeaders() חסר! - לא ניתן למיין טבלאות');
     results.failed++;
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 5. בדיקת חבילת CRUD
   // ============================================================================
-  console.log('📊 שלב 5: בדיקת חבילת CRUD');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📊 שלב 5: בדיקת חבילת CRUD');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('formatDate', true);
   checkGlobal('DataUtils', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 6. בדיקת חבילת PREFERENCES
   // ============================================================================
-  console.log('⚙️  שלב 6: בדיקת חבילת PREFERENCES');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⚙️  שלב 6: בדיקת חבילת PREFERENCES');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('loadUserPreferences', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 7. בדיקת פונקציות ספציפיות לעמוד
   // ============================================================================
-  console.log('🗄️  שלב 7: בדיקת פונקציות ספציפיות לעמוד');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🗄️  שלב 7: בדיקת פונקציות ספציפיות לעמוד');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   checkFunction('loadDatabaseInfo', true);
   checkFunction('initSystemCheck', true);
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 8. בדיקת תקינות טבלאות בדף
   // ============================================================================
-  console.log('📋 שלב 8: בדיקת תקינות טבלאות בדף');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 8: בדיקת תקינות טבלאות בדף');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const tables = document.querySelectorAll('table');
-  console.log(`   נמצאו ${tables.length} טבלאות בדף`);
+  window.Logger?.info(`   נמצאו ${tables.length} טבלאות בדף`);
   
   if (tables.length > 0) {
     tables.forEach((table, index) => {
       const tableId = table.id || `table-${index}`;
       const hasDataSection = table.closest('[data-section]');
-      console.log(`   ${hasDataSection ? '✅' : '⚠️'} טבלה: ${tableId} ${hasDataSection ? '(בסקשן)' : '(ללא סקשן)'}`);
+      window.Logger?.info(`   ${hasDataSection ? '✅' : '⚠️'} טבלה: ${tableId} ${hasDataSection ? '(בסקשן)' : '(ללא סקשן)'}`);
     });
   } else {
-    console.warn('   ⚠️  לא נמצאו טבלאות בדף - ייתכן שהן נטענות דינמית');
+    window.Logger?.warn('   ⚠️  לא נמצאו טבלאות בדף - ייתכן שהן נטענות דינמית');
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // סיכום תוצאות
   // ============================================================================
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('📊 סיכום תוצאות');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`✅ הצלחות: ${results.passed}`);
-  console.log(`❌ כשלונות: ${results.failed}`);
-  console.log(`⚠️  אזהרות: ${results.warnings}`);
-  console.log(`📋 סך הכל בדיקות: ${results.checks.length}`);
-  console.log('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('📊 סיכום תוצאות');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info(`✅ הצלחות: ${results.passed}`);
+  window.Logger?.info(`❌ כשלונות: ${results.failed}`);
+  window.Logger?.info(`⚠️  אזהרות: ${results.warnings}`);
+  window.Logger?.info(`📋 סך הכל בדיקות: ${results.checks.length}`);
+  window.Logger?.info('\n');
 
   // הערכת מצב כללי
   const successRate = ((results.passed / results.checks.length) * 100).toFixed(1);
-  console.log(`📈 אחוז הצלחה: ${successRate}%`);
-  console.log('\n');
+  window.Logger?.info(`📈 אחוז הצלחה: ${successRate}%`);
+  window.Logger?.info('\n');
 
   if (results.failed === 0) {
-    console.log('🎉 מצוין! כל הבדיקות עברו בהצלחה!');
-    console.log('   העמוד מוכן לשימוש מלא.');
+    window.Logger?.info('🎉 מצוין! כל הבדיקות עברו בהצלחה!');
+    window.Logger?.info('   העמוד מוכן לשימוש מלא.');
   } else {
-    console.error('⚠️  נמצאו בעיות שצריך לטפל בהן:');
+    window.Logger?.error('⚠️  נמצאו בעיות שצריך לטפל בהן:');
     results.checks
       .filter(check => check.status === '❌')
       .forEach(check => {
-        console.error(`   ❌ ${check.name}: ${check.message}`);
+        window.Logger?.error(`   ❌ ${check.name}: ${check.message}`);
       });
   }
 
@@ -315,25 +315,25 @@
   const servicesLoaded = typeof window.loadTableData === 'function' || typeof loadTableData === 'function';
   const uiAdvancedLoaded = typeof window.setupSortableHeaders === 'function' || typeof setupSortableHeaders === 'function';
   
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
   if (servicesLoaded && uiAdvancedLoaded) {
-    console.log('✅ חבילות SERVICES ו-UI-ADVANCED נטענו בהצלחה!');
-    console.log('   ניתן לטעון ולנהל טבלאות בעמוד.');
+    window.Logger?.info('✅ חבילות SERVICES ו-UI-ADVANCED נטענו בהצלחה!');
+    window.Logger?.info('   ניתן לטעון ולנהל טבלאות בעמוד.');
   } else {
-    console.error('❌ בעיות בטעינת חבילות קריטיות:');
+    window.Logger?.error('❌ בעיות בטעינת חבילות קריטיות:');
     if (!servicesLoaded) {
-      console.error('   ❌ חבילת SERVICES לא נטענה כראוי!');
-      console.error('      ⚠️  window.loadTableData חסר - לא ניתן לטעון טבלאות');
+      window.Logger?.error('   ❌ חבילת SERVICES לא נטענה כראוי!');
+      window.Logger?.error('      ⚠️  window.loadTableData חסר - לא ניתן לטעון טבלאות');
     }
     if (!uiAdvancedLoaded) {
-      console.error('   ❌ חבילת UI-ADVANCED לא נטענה כראוי!');
-      console.error('      ⚠️  window.setupSortableHeaders חסר - לא ניתן למיין טבלאות');
+      window.Logger?.error('   ❌ חבילת UI-ADVANCED לא נטענה כראוי!');
+      window.Logger?.error('      ⚠️  window.setupSortableHeaders חסר - לא ניתן למיין טבלאות');
     }
-    console.error('   בדוק את db_display.html וודא שכל הסקריפטים של services ו-ui-advanced packages נטענים.');
+    window.Logger?.error('   בדוק את db_display.html וודא שכל הסקריפטים של services ו-ui-advanced packages נטענים.');
   }
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   // החזרת תוצאות לשימוש נוסף
   return {

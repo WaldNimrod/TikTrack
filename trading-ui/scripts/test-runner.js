@@ -24,7 +24,7 @@ class TestRunner {
      * הרצת כל הבדיקות
      */
     async runAllTests() {
-        console.log('🧪 Starting comprehensive testing of Smart Initialization System...');
+        window.Logger?.info('🧪 Starting comprehensive testing of Smart Initialization System...');
         this.results.startTime = Date.now();
         
         try {
@@ -74,7 +74,7 @@ class TestRunner {
             this.generateReport();
             
         } catch (error) {
-            console.error('❌ Test execution failed:', error);
+            window.Logger?.error('❌ Test execution failed:', error);
             this.addResult('Test Execution', false, `Failed to execute tests: ${error.message}`);
         }
         
@@ -479,7 +479,7 @@ class TestRunner {
         });
 
         const status = passed ? '✅' : '❌';
-        console.log(`${status} ${testName}: ${message}`);
+        window.Logger?.info(`${status} ${testName}: ${message}`);
     }
 
     /**
@@ -490,30 +490,30 @@ class TestRunner {
         const duration = this.results.endTime - this.results.startTime;
         const successRate = ((this.results.passed / this.results.total) * 100).toFixed(1);
         
-        console.log('\n📊 TEST REPORT');
-        console.log('================');
-        console.log(`Total Tests: ${this.results.total}`);
-        console.log(`Passed: ${this.results.passed} ✅`);
-        console.log(`Failed: ${this.results.failed} ❌`);
-        console.log(`Success Rate: ${successRate}%`);
-        console.log(`Duration: ${duration}ms`);
+        window.Logger?.info('\n📊 TEST REPORT');
+        window.Logger?.info('================');
+        window.Logger?.info(`Total Tests: ${this.results.total}`);
+        window.Logger?.info(`Passed: ${this.results.passed} ✅`);
+        window.Logger?.info(`Failed: ${this.results.failed} ❌`);
+        window.Logger?.info(`Success Rate: ${successRate}%`);
+        window.Logger?.info(`Duration: ${duration}ms`);
         
         if (this.results.failed > 0) {
-            console.log('\n❌ FAILED TESTS:');
+            window.Logger?.info('\n❌ FAILED TESTS:');
             this.results.details
                 .filter(detail => !detail.passed)
                 .forEach(detail => {
-                    console.log(`  - ${detail.test}: ${detail.message}`);
+                    window.Logger?.info(`  - ${detail.test}: ${detail.message}`);
                 });
         }
         
-        console.log('\n🎯 RECOMMENDATIONS:');
+        window.Logger?.info('\n🎯 RECOMMENDATIONS:');
         if (successRate >= 90) {
-            console.log('  ✅ System is ready for production!');
+            window.Logger?.info('  ✅ System is ready for production!');
         } else if (successRate >= 70) {
-            console.log('  ⚠️  System needs minor fixes before production');
+            window.Logger?.info('  ⚠️  System needs minor fixes before production');
         } else {
-            console.log('  ❌ System needs significant fixes before production');
+            window.Logger?.info('  ❌ System needs significant fixes before production');
         }
         
         return this.results;
@@ -527,10 +527,10 @@ window.TestRunner = TestRunner;
 if (typeof window !== 'undefined' && window.location) {
     // Only auto-run on system management page
     if (window.location.pathname.includes('system-management')) {
-        console.log('🚀 Auto-starting comprehensive tests...');
+        window.Logger?.info('🚀 Auto-starting comprehensive tests...');
         const testRunner = new TestRunner();
         testRunner.runAllTests().then(results => {
-            console.log('🏁 Testing completed!', results);
+            window.Logger?.info('🏁 Testing completed!', results);
         });
     }
 }

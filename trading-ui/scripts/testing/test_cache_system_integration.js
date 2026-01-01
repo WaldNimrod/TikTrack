@@ -56,7 +56,7 @@
       testResults.summary.passed++;
     } else {
       testResults.summary.failed++;
-      console.error(`❌ FAILED: ${name}`, details);
+      window.Logger?.error(`❌ FAILED: ${name}`, details);
     }
     
     testResults.summary.total++;
@@ -76,7 +76,7 @@
    * Test UnifiedCacheManager integration
    */
   function testUnifiedCacheManager() {
-    console.log('\n🔍 Testing UnifiedCacheManager Integration');
+    window.Logger?.info('\n🔍 Testing UnifiedCacheManager Integration');
 
     // Test 1.1: UnifiedCacheManager available
     const test1_1 = test(
@@ -152,14 +152,14 @@
     );
     addTestResult('unifiedCacheManager', test1_5);
 
-    console.log(`✅ UnifiedCacheManager Tests: ${testResults.unifiedCacheManager.passed}/${testResults.unifiedCacheManager.passed + testResults.unifiedCacheManager.failed} tests passed`);
+    window.Logger?.info(`✅ UnifiedCacheManager Tests: ${testResults.unifiedCacheManager.passed}/${testResults.unifiedCacheManager.passed + testResults.unifiedCacheManager.failed} tests passed`);
   }
 
   /**
    * Test CacheTTLGuard integration
    */
   function testCacheTTLGuard() {
-    console.log('\n🔍 Testing CacheTTLGuard Integration');
+    window.Logger?.info('\n🔍 Testing CacheTTLGuard Integration');
 
     // Test 2.1: CacheTTLGuard available
     const test2_1 = test(
@@ -222,14 +222,14 @@
     );
     addTestResult('cacheTTLGuard', test2_4);
 
-    console.log(`✅ CacheTTLGuard Tests: ${testResults.cacheTTLGuard.passed}/${testResults.cacheTTLGuard.passed + testResults.cacheTTLGuard.failed} tests passed`);
+    window.Logger?.info(`✅ CacheTTLGuard Tests: ${testResults.cacheTTLGuard.passed}/${testResults.cacheTTLGuard.passed + testResults.cacheTTLGuard.failed} tests passed`);
   }
 
   /**
    * Test CacheSyncManager integration
    */
   function testCacheSyncManager() {
-    console.log('\n🔍 Testing CacheSyncManager Integration');
+    window.Logger?.info('\n🔍 Testing CacheSyncManager Integration');
 
     // Test 3.1: CacheSyncManager available
     const test3_1 = test(
@@ -293,25 +293,25 @@
     );
     addTestResult('cacheSyncManager', test3_4);
 
-    console.log(`✅ CacheSyncManager Tests: ${testResults.cacheSyncManager.passed}/${testResults.cacheSyncManager.passed + testResults.cacheSyncManager.failed} tests passed`);
+    window.Logger?.info(`✅ CacheSyncManager Tests: ${testResults.cacheSyncManager.passed}/${testResults.cacheSyncManager.passed + testResults.cacheSyncManager.failed} tests passed`);
   }
 
   /**
    * Run all tests
    */
   function runAllTests() {
-    console.log('🚀 Starting Cache System Integration Testing...\n');
+    window.Logger?.info('🚀 Starting Cache System Integration Testing...\n');
     
     testUnifiedCacheManager();
     testCacheTTLGuard();
     testCacheSyncManager();
 
     // Print summary
-    console.log('\n📊 Test Summary:');
-    console.log(`Total Tests: ${testResults.summary.total}`);
-    console.log(`Passed: ${testResults.summary.passed}`);
-    console.log(`Failed: ${testResults.summary.failed}`);
-    console.log(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
+    window.Logger?.info('\n📊 Test Summary:');
+    window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+    window.Logger?.info(`Passed: ${testResults.summary.passed}`);
+    window.Logger?.info(`Failed: ${testResults.summary.failed}`);
+    window.Logger?.info(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
 
     // Store results in window for external access
     window.cacheSystemIntegrationTestResults = testResults;

@@ -32,8 +32,8 @@
 // - MockupPagesComprehensiveTester.testConsoleErrors() - Testconsoleerrors
 // - MockupPagesComprehensiveTester.testIntegrations() - Testintegrations
 // - MockupPagesComprehensiveTester.getPageConfig() - Getpageconfig
-// - console.error() - Error
-// - console.warn() - Warn
+// - window.Logger?.error() - Error
+// - window.Logger?.warn() - Warn
 
 (function() {
     'use strict';
@@ -366,7 +366,7 @@
          * Test single page
          */
         async testPage(page) {
-            console.log(`\n🧪 Testing page: ${page.name}`);
+            window.Logger?.info(`\n🧪 Testing page: ${page.name}`);
             
             // Reset error tracking for this page
             this.consoleErrors = [];
@@ -423,7 +423,7 @@
          * Test all pages
          */
         async testAllPages() {
-            console.log('🚀 Starting comprehensive test of all mockup pages...\n');
+            window.Logger?.info('🚀 Starting comprehensive test of all mockup pages...\n');
             
             this.initializeConsoleMonitoring();
             this.results.summary.totalPages = this.mockupPages.length;
@@ -435,13 +435,13 @@
                     
                     if (result.status === 'passed') {
                         this.results.summary.pagesWithoutErrors++;
-                        console.log(`✅ ${page.name}: PASSED`);
+                        window.Logger?.info(`✅ ${page.name}: PASSED`);
                     } else {
                         this.results.summary.pagesWithErrors++;
-                        console.log(`❌ ${page.name}: FAILED (${result.summary.errorCount} errors)`);
+                        window.Logger?.info(`❌ ${page.name}: FAILED (${result.summary.errorCount} errors)`);
                     }
                 } catch (error) {
-                    console.error(`❌ Error testing ${page.name}:`, error);
+                    window.Logger?.error(`❌ Error testing ${page.name}:`, error);
                     this.results.summary.pagesWithErrors++;
                 }
             }
@@ -555,6 +555,6 @@
         return tester.testAllPages();
     };
 
-    console.log('✅ Mockup Pages Comprehensive Tester loaded');
+    window.Logger?.info('✅ Mockup Pages Comprehensive Tester loaded');
 })();
 

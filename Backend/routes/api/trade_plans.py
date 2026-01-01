@@ -13,7 +13,10 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade-plans')
+trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans')
+
+# Alias blueprint for backward compatibility (dash instead of underscore)
+trade_plans_dash_bp = Blueprint('trade_plans_dash', __name__, url_prefix='/api/trade-plans')
 
 # Initialize base API
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
@@ -24,6 +27,7 @@ def _get_date_normalizer():
     return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 @trade_plans_bp.route('/', methods=['GET'])
+@trade_plans_dash_bp.route('/', methods=['GET'])
 @require_authentication()
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
@@ -36,6 +40,7 @@ def get_trade_plans():
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
+@trade_plans_dash_bp.route('/<int:plan_id>', methods=['GET'])
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_trade_plan(plan_id: int):
@@ -45,6 +50,7 @@ def get_trade_plan(plan_id: int):
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+@trade_plans_dash_bp.route('/account/<int:trading_account_id>', methods=['GET'])
 @handle_database_session()
 def get_trade_plans_by_account(trading_account_id: int):
     """Get trade plans by account"""
@@ -70,6 +76,8 @@ def get_trade_plans_by_account(trading_account_id: int):
         return jsonify(payload), 500
 
 @trade_plans_bp.route('/', methods=['POST'])
+@trade_plans_dash_bp.route('/', methods=['POST'])
+@require_authentication()
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def create_trade_plan():
@@ -193,7 +201,11 @@ def create_trade_plan():
         )
         return jsonify(payload), 400
 
+# Dash blueprint will be registered in app.py
+
+
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
+@trade_plans_dash_bp.route('/<int:plan_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def update_trade_plan(plan_id: int):
@@ -254,7 +266,11 @@ def update_trade_plan(plan_id: int):
         )
         return jsonify(payload), 400
 
+# Dash blueprint will be registered in app.py
+
+
 @trade_plans_bp.route('/<int:plan_id>/confirm-status-change', methods=['POST'])
+@trade_plans_dash_bp.route('/<int:plan_id>/confirm-status-change', methods=['POST'])
 def confirm_status_change(plan_id: int):
     """Confirm status change with user response"""
     try:
@@ -300,10 +316,12 @@ def confirm_status_change(plan_id: int):
             str(e)
         )
         return jsonify(payload), 400
-    finally:
-        db.close()
+
+# Dash blueprint will be registered in app.py
+
 
 @trade_plans_bp.route('/<int:plan_id>/cancel', methods=['POST'])
+@trade_plans_dash_bp.route('/<int:plan_id>/cancel', methods=['POST'])
 def cancel_trade_plan(plan_id: int):
     """Cancel trade plan"""
     db = None
@@ -334,11 +352,13 @@ def cancel_trade_plan(plan_id: int):
             str(e)
         )
         return jsonify(payload), 400
-    finally:
-        if db:
-            db.close()
+
+# Dash blueprint will be registered in app.py
+
+
 
 @trade_plans_bp.route('/<int:plan_id>/activate', methods=['POST'])
+@trade_plans_dash_bp.route('/<int:plan_id>/activate', methods=['POST'])
 def activate_trade_plan(plan_id: int):
     """Activate trade plan"""
     try:
@@ -366,10 +386,12 @@ def activate_trade_plan(plan_id: int):
             str(e)
         )
         return jsonify(payload), 400
-    finally:
-        db.close()
+
+# Dash blueprint will be registered in app.py
+
 
 @trade_plans_bp.route('/summary', methods=['GET'])
+@trade_plans_dash_bp.route('/summary', methods=['GET'])
 def get_trade_plan_summary():
     """Get trade plan summary"""
     try:
@@ -395,6 +417,7 @@ def get_trade_plan_summary():
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/can-cancel', methods=['GET'])
+@trade_plans_dash_bp.route('/<int:plan_id>/can-cancel', methods=['GET'])
 def can_cancel_trade_plan(plan_id: int):
     """Check if trade plan can be cancelled"""
     try:
@@ -415,12 +438,14 @@ def can_cancel_trade_plan(plan_id: int):
             str(e)
         )
         return jsonify(payload), 400
-    finally:
-        db.close()
+
+# Dash blueprint will be registered in app.py
+
 
 
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['DELETE'])
+@trade_plans_dash_bp.route('/<int:plan_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def delete_trade_plan(plan_id: int):
@@ -444,6 +469,7 @@ def delete_trade_plan(plan_id: int):
             "לא ניתן למחוק תכנון זה - יש פריטים מקושרים אליו"
         )
         return jsonify(payload), 400
+
     except Exception as e:
         logger.error(f"Error deleting trade plan {plan_id}: {str(e)}")
         normalizer = _get_date_normalizer()
@@ -452,3 +478,9 @@ def delete_trade_plan(plan_id: int):
             str(e)
         )
         return jsonify(payload), 400
+
+# Dash blueprint will be registered in app.py
+
+
+# Export blueprints for app.py
+__all__ = ['trade_plans_bp', 'trade_plans_dash_bp']

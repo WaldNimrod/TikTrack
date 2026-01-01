@@ -178,24 +178,24 @@
      * Run all tests
      */
     async runAllTests() {
-      console.group('🧪 Comprehensive Initialization Test');
+      window.Logger?.group('🧪 Comprehensive Initialization Test');
       
-      console.log('Testing core-systems.js...');
+      window.Logger?.info('Testing core-systems.js...');
       this.testCoreSystems();
       
-      console.log('Testing preferences initialization...');
+      window.Logger?.info('Testing preferences initialization...');
       await this.testPreferencesInitialization();
       
-      console.log('Testing for duplicate initializations...');
+      window.Logger?.info('Testing for duplicate initializations...');
       this.testDuplicateInitializations();
       
-      console.log('Testing required systems...');
+      window.Logger?.info('Testing required systems...');
       this.testRequiredSystems();
       
-      console.log('Testing for 429 errors...');
+      window.Logger?.info('Testing for 429 errors...');
       await this.test429Errors();
       
-      console.groupEnd();
+      window.Logger?.groupEnd();
       
       return this.results;
     }
@@ -204,33 +204,33 @@
      * Print test results
      */
     printResults() {
-      console.group('📊 Test Results');
+      window.Logger?.group('📊 Test Results');
       
-      console.log(`Core Systems Loaded: ${this.results.coreSystemsLoaded ? '✅' : '❌'}`);
-      console.log(`Preferences Initialized: ${this.results.preferencesInitialized ? '✅' : '❌'}`);
-      console.log(`Duplicate Initializations: ${this.results.duplicateInitializations.length === 0 ? '✅' : '❌'} (${this.results.duplicateInitializations.length})`);
-      console.log(`Missing Systems: ${this.results.missingSystems.length === 0 ? '✅' : '❌'} (${this.results.missingSystems.join(', ')})`);
-      console.log(`Errors: ${this.results.errors.length === 0 ? '✅' : '❌'} (${this.results.errors.length})`);
-      console.log(`Warnings: ${this.results.warnings.length === 0 ? '✅' : '⚠️'} (${this.results.warnings.length})`);
+      window.Logger?.info(`Core Systems Loaded: ${this.results.coreSystemsLoaded ? '✅' : '❌'}`);
+      window.Logger?.info(`Preferences Initialized: ${this.results.preferencesInitialized ? '✅' : '❌'}`);
+      window.Logger?.info(`Duplicate Initializations: ${this.results.duplicateInitializations.length === 0 ? '✅' : '❌'} (${this.results.duplicateInitializations.length})`);
+      window.Logger?.info(`Missing Systems: ${this.results.missingSystems.length === 0 ? '✅' : '❌'} (${this.results.missingSystems.join(', ')})`);
+      window.Logger?.info(`Errors: ${this.results.errors.length === 0 ? '✅' : '❌'} (${this.results.errors.length})`);
+      window.Logger?.info(`Warnings: ${this.results.warnings.length === 0 ? '✅' : '⚠️'} (${this.results.warnings.length})`);
       
       if (this.results.networkCalls.length > 0) {
-        console.group('🌐 Network Calls:');
+        window.Logger?.group('🌐 Network Calls:');
         this.results.networkCalls.forEach((call, index) => {
-          console.log(`${index + 1}. ${call.url} (${call.duration.toFixed(2)}ms)`);
+          window.Logger?.info(`${index + 1}. ${call.url} (${call.duration.toFixed(2)}ms)`);
         });
-        console.groupEnd();
+        window.Logger?.groupEnd();
       }
       
       if (this.results.errors.length > 0) {
-        console.group('❌ Errors:');
-        this.results.errors.forEach(error => console.error(error));
-        console.groupEnd();
+        window.Logger?.group('❌ Errors:');
+        this.results.errors.forEach(error => window.Logger?.error(error));
+        window.Logger?.groupEnd();
       }
       
       if (this.results.warnings.length > 0) {
-        console.group('⚠️ Warnings:');
-        this.results.warnings.forEach(warning => console.warn(warning));
-        console.groupEnd();
+        window.Logger?.group('⚠️ Warnings:');
+        this.results.warnings.forEach(warning => window.Logger?.warn(warning));
+        window.Logger?.groupEnd();
       }
       
       const allPassed = this.results.coreSystemsLoaded && 
@@ -239,8 +239,8 @@
                        this.results.missingSystems.length === 0 &&
                        this.results.errors.length === 0;
       
-      console.log(`\n${allPassed ? '✅ All tests passed!' : '❌ Some tests failed'}`);
-      console.groupEnd();
+      window.Logger?.info(`\n${allPassed ? '✅ All tests passed!' : '❌ Some tests failed'}`);
+      window.Logger?.groupEnd();
       
       return allPassed;
     }
@@ -256,7 +256,7 @@
     return test.printResults();
   };
 
-  console.log('✅ Comprehensive Initialization Test loaded - Run: window.runComprehensiveInitializationTest()');
+  window.Logger?.info('✅ Comprehensive Initialization Test loaded - Run: window.runComprehensiveInitializationTest()');
 })();
 
 

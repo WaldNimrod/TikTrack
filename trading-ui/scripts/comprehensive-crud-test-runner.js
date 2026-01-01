@@ -6,7 +6,7 @@
  * כולל בדיקת סדר טעינה, בדיקות CRUD מלאות, ועדכון רשומות בפועל
  * 
  * שימוש:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard
  * 2. פתח את הקונסול (F12)
  * 3. העתק והדבק את הקוד הזה בקונסול
  * 4. לחץ Enter
@@ -181,8 +181,8 @@ async function checkPageLoadingOrder(pageName) {
 
   try {
 
-    // נווט לעמוד
-    window.location.href = `/${pageName}.html`;
+    // נווט לעמוד (use clean URLs without .html extensions)
+    window.location.href = `/${pageName}`;
     await new Promise(resolve => setTimeout(resolve, 2000)); // המתן לטעינה
 
     
@@ -266,8 +266,8 @@ async function testPageCRUD(pageName) {
  */
 async function runComprehensiveTests() {
 
-  console.log('🚀 Starting Comprehensive CRUD Tests...');
-  console.log(`📋 Testing ${MAIN_PAGES.length} main pages\n`);
+  window.Logger?.info('🚀 Starting Comprehensive CRUD Tests...');
+  window.Logger?.info(`📋 Testing ${MAIN_PAGES.length} main pages\n`);
   
   const results = {
     loadingOrder: [],
@@ -283,48 +283,48 @@ async function runComprehensiveTests() {
   };
   
   // בדיקת סדר טעינה
-  console.log('🔍 Checking loading order...\n');
+  window.Logger?.info('🔍 Checking loading order...\n');
   for (const pageName of MAIN_PAGES) {
-    console.log(`Checking ${pageName}...`);
+    window.Logger?.info(`Checking ${pageName}...`);
     const result = await checkPageLoadingOrder(pageName);
     results.loadingOrder.push(result);
     
     if (result.loadingOrder === 'OK') {
       results.summary.loadingOrderPassed++;
-      console.log(`✅ ${pageName}: Loading order OK`);
+      window.Logger?.info(`✅ ${pageName}: Loading order OK`);
     } else {
       results.summary.loadingOrderFailed++;
-      console.log(`❌ ${pageName}: Loading order issues`);
+      window.Logger?.info(`❌ ${pageName}: Loading order issues`);
       if (result.issues) {
-        result.issues.forEach(issue => console.log(`   - ${issue}`));
+        result.issues.forEach(issue => window.Logger?.info(`   - ${issue}`));
       }
     }
   }
   
   // חזרה לדשבורד לבדיקות CRUD
-  console.log('\n🔄 Returning to CRUD testing dashboard...');
-  window.location.href = '/crud_testing_dashboard.html';
+  window.Logger?.info('\n🔄 Returning to CRUD testing dashboard...');
+  window.location.href = '/crud_testing_dashboard';
   await new Promise(resolve => setTimeout(resolve, 3000));
   
   // בדיקות CRUD
-  console.log('\n🧪 Running CRUD tests...\n');
+  window.Logger?.info('\n🧪 Running CRUD tests...\n');
   for (const pageName of MAIN_PAGES) {
-    console.log(`Testing ${pageName}...`);
+    window.Logger?.info(`Testing ${pageName}...`);
     const result = await testPageCRUD(pageName);
     results.crud.push(result);
     
     if (result.crud === 'PASSED') {
       results.summary.crudPassed++;
-      console.log(`✅ ${pageName}: CRUD tests PASSED (${result.score}/100)`);
+      window.Logger?.info(`✅ ${pageName}: CRUD tests PASSED (${result.score}/100)`);
     } else if (result.crud === 'FAILED') {
       results.summary.crudFailed++;
-      console.log(`❌ ${pageName}: CRUD tests FAILED (${result.score}/100)`);
+      window.Logger?.info(`❌ ${pageName}: CRUD tests FAILED (${result.score}/100)`);
       if (result.issues) {
-        result.issues.forEach(issue => console.log(`   - ${issue}`));
+        result.issues.forEach(issue => window.Logger?.info(`   - ${issue}`));
       }
     } else {
       results.summary.crudErrors++;
-      console.log(`💥 ${pageName}: CRUD tests ERROR - ${result.error}`);
+      window.Logger?.info(`💥 ${pageName}: CRUD tests ERROR - ${result.error}`);
     }
     
     // הפסקה קטנה בין בדיקות
@@ -332,21 +332,21 @@ async function runComprehensiveTests() {
   }
   
   // סיכום
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 FINAL RESULTS SUMMARY');
-  console.log('='.repeat(60));
-  console.log(`\n📋 Loading Order:`);
-  console.log(`   ✅ Passed: ${results.summary.loadingOrderPassed}/${results.summary.total}`);
-  console.log(`   ❌ Failed: ${results.summary.loadingOrderFailed}/${results.summary.total}`);
-  console.log(`\n🧪 CRUD Tests:`);
-  console.log(`   ✅ Passed: ${results.summary.crudPassed}/${results.summary.total}`);
-  console.log(`   ❌ Failed: ${results.summary.crudFailed}/${results.summary.total}`);
-  console.log(`   💥 Errors: ${results.summary.crudErrors}/${results.summary.total}`);
+  window.Logger?.info('\n' + '='.repeat(60));
+  window.Logger?.info('📊 FINAL RESULTS SUMMARY');
+  window.Logger?.info('='.repeat(60));
+  window.Logger?.info(`\n📋 Loading Order:`);
+  window.Logger?.info(`   ✅ Passed: ${results.summary.loadingOrderPassed}/${results.summary.total}`);
+  window.Logger?.info(`   ❌ Failed: ${results.summary.loadingOrderFailed}/${results.summary.total}`);
+  window.Logger?.info(`\n🧪 CRUD Tests:`);
+  window.Logger?.info(`   ✅ Passed: ${results.summary.crudPassed}/${results.summary.total}`);
+  window.Logger?.info(`   ❌ Failed: ${results.summary.crudFailed}/${results.summary.total}`);
+  window.Logger?.info(`   💥 Errors: ${results.summary.crudErrors}/${results.summary.total}`);
   
 
   // שמירת תוצאות
   localStorage.setItem('comprehensive_crud_test_report', JSON.stringify(results));
-  console.log('\n💾 Results saved to localStorage as "comprehensive_crud_test_report"');
+  window.Logger?.info('\n💾 Results saved to localStorage as "comprehensive_crud_test_report"');
 
   return results;
 }
@@ -359,7 +359,7 @@ if (typeof window !== 'undefined') {
 }
 
 // הודעת הוראות
-console.log(`
+window.Logger?.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║  Comprehensive CRUD Test Runner - Ready                     ║
 ╚══════════════════════════════════════════════════════════════╝

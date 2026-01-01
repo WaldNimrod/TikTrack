@@ -98,12 +98,12 @@
     }
     testResults.summary.duration += duration;
 
-    console.log(`${status}: ${testName}`);
+    window.Logger?.info(`${status}: ${testName}`);
     if (message) {
-      console.log(`   ${message}`);
+      window.Logger?.info(`   ${message}`);
     }
     if (duration > 0) {
-      console.log(`   Duration: ${duration.toFixed(2)}ms`);
+      window.Logger?.info(`   Duration: ${duration.toFixed(2)}ms`);
     }
   }
 
@@ -248,17 +248,17 @@
    * Run all unit tests
    */
   async function runUnitTests() {
-    console.log('='.repeat(60));
-    console.log('UNIT TESTS');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('UNIT TESTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
 
     await testPreferencesCoreInitialize();
     await testPreferencesV4GetGroup();
     await testPreferencesGroupManagerSaveGroup();
     testUnifiedCacheManager();
 
-    console.log();
+    window.Logger?.info();
   }
 
   // ============================================================================
@@ -354,15 +354,15 @@
    * Run all integration tests
    */
   async function runIntegrationTests() {
-    console.log('='.repeat(60));
-    console.log('INTEGRATION TESTS');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('INTEGRATION TESTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
 
     await testPageLoadFlow();
     await testSaveFlow();
 
-    console.log();
+    window.Logger?.info();
   }
 
   // ============================================================================
@@ -441,14 +441,14 @@
    * Run all E2E tests
    */
   async function runE2ETests() {
-    console.log('='.repeat(60));
-    console.log('E2E TESTS');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('E2E TESTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
 
     await testCompleteUserFlow();
 
-    console.log();
+    window.Logger?.info();
   }
 
   // ============================================================================
@@ -474,7 +474,7 @@
         const duration = performance.now() - startTime;
         results.push(duration);
       } catch (error) {
-        console.error(`Iteration ${i + 1} failed:`, error);
+        window.Logger?.error(`Iteration ${i + 1} failed:`, error);
       }
       // Small delay between iterations
       if (i < TEST_CONFIG.iterations - 1) {
@@ -521,7 +521,7 @@
         const duration = performance.now() - startTime;
         results.push(duration);
       } catch (error) {
-        console.error(`Iteration ${i + 1} failed:`, error);
+        window.Logger?.error(`Iteration ${i + 1} failed:`, error);
       }
       await new Promise(resolve => setTimeout(resolve, 200));
     }
@@ -541,15 +541,15 @@
    * Run all performance tests
    */
   async function runPerformanceTests() {
-    console.log('='.repeat(60));
-    console.log('PERFORMANCE TESTS');
-    console.log('='.repeat(60));
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('PERFORMANCE TESTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
 
     await testLoadPerformance();
     await testSavePerformance();
 
-    console.log();
+    window.Logger?.info();
   }
 
   // ============================================================================
@@ -560,17 +560,17 @@
    * Run all tests
    */
   async function runAllTests() {
-    console.log('='.repeat(60));
-    console.log('PREFERENCES SYSTEM - AUTOMATED TEST SUITE');
-    console.log('='.repeat(60));
-    console.log();
-    console.log(`Test Configuration:`);
-    console.log(`  User ID: ${TEST_CONFIG.testUser}`);
-    console.log(`  Profile ID: ${TEST_CONFIG.testProfile}`);
-    console.log(`  Group: ${TEST_CONFIG.testGroup}`);
-    console.log(`  Preference: ${TEST_CONFIG.testPreference}`);
-    console.log(`  Test Value: ${TEST_CONFIG.testValue}`);
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('PREFERENCES SYSTEM - AUTOMATED TEST SUITE');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
+    window.Logger?.info(`Test Configuration:`);
+    window.Logger?.info(`  User ID: ${TEST_CONFIG.testUser}`);
+    window.Logger?.info(`  Profile ID: ${TEST_CONFIG.testProfile}`);
+    window.Logger?.info(`  Group: ${TEST_CONFIG.testGroup}`);
+    window.Logger?.info(`  Preference: ${TEST_CONFIG.testPreference}`);
+    window.Logger?.info(`  Test Value: ${TEST_CONFIG.testValue}`);
+    window.Logger?.info();
 
     const overallStartTime = performance.now();
 
@@ -584,37 +584,37 @@
     testResults.summary.duration = overallDuration;
 
     // Print summary
-    console.log('='.repeat(60));
-    console.log('TEST SUMMARY');
-    console.log('='.repeat(60));
-    console.log();
-    console.log(`Total Tests: ${testResults.summary.total}`);
-    console.log(`Passed: ${testResults.summary.passed} ✅`);
-    console.log(`Failed: ${testResults.summary.failed} ${testResults.summary.failed > 0 ? '❌' : ''}`);
-    console.log(`Total Duration: ${overallDuration.toFixed(2)}ms`);
-    console.log();
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('TEST SUMMARY');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info();
+    window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+    window.Logger?.info(`Passed: ${testResults.summary.passed} ✅`);
+    window.Logger?.info(`Failed: ${testResults.summary.failed} ${testResults.summary.failed > 0 ? '❌' : ''}`);
+    window.Logger?.info(`Total Duration: ${overallDuration.toFixed(2)}ms`);
+    window.Logger?.info();
 
     // Print failed tests
     if (testResults.summary.failed > 0) {
-      console.log('Failed Tests:');
+      window.Logger?.info('Failed Tests:');
       Object.keys(testResults).forEach(category => {
         if (Array.isArray(testResults[category])) {
           testResults[category].forEach(result => {
             if (!result.passed) {
-              console.log(`  [${category.toUpperCase()}] ${result.test}: ${result.message}`);
+              window.Logger?.info(`  [${category.toUpperCase()}] ${result.test}: ${result.message}`);
             }
           });
         }
       });
-      console.log();
+      window.Logger?.info();
     }
 
     // Store results globally
     window.preferencesTestResults = testResults;
 
-    console.log('✅ Test results stored in window.preferencesTestResults');
-    console.log('   Access via: window.preferencesTestResults');
-    console.log();
+    window.Logger?.info('✅ Test results stored in window.preferencesTestResults');
+    window.Logger?.info('   Access via: window.preferencesTestResults');
+    window.Logger?.info();
 
     return testResults;
   }
@@ -623,8 +623,8 @@
   window.runAllPreferenceTests = runAllTests;
   window.preferencesTestConfig = TEST_CONFIG;
 
-  console.log('✅ Automated preference test suite loaded');
-  console.log('   Run: window.runAllPreferenceTests()');
-  console.log();
+  window.Logger?.info('✅ Automated preference test suite loaded');
+  window.Logger?.info('   Run: window.runAllPreferenceTests()');
+  window.Logger?.info();
 })();
 

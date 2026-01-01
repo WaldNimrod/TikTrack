@@ -16,7 +16,8 @@
 4. [Methods](#methods)
 5. [Global Functions](#global-functions)
 6. [Examples](#examples)
-7. [Error Handling](#error-handling)
+7. [Monitoring Tools](#monitoring-tools)
+8. [Error Handling](#error-handling)
 
 ---
 
@@ -835,6 +836,46 @@ try {
 ```
 
 ---
+
+## 🔍 Monitoring Tools
+
+### DependencyAnalyzer
+
+כלי לבדיקת תלויות בין חבילות וסקריפטים.
+
+```javascript
+const analyzer = new DependencyAnalyzer();
+const result = analyzer.analyze();
+
+console.log(result);
+// Output:
+// {
+//   "missing": ["jquery.js"],
+//   "circular": [],
+//   "unused": ["old-lib.js"],
+//   "valid": true
+// }
+```
+
+### LoadOrderValidator
+
+כלי לבדיקת סדר טעינה מול התצורה הצפויה.
+
+```javascript
+const validator = new LoadOrderValidator();
+const result = validator.compareLoadOrder();
+
+console.log(result);
+// Output:
+// {
+//   "configOrder": ["base", "auth", "header", "init-system"],
+//   "actualOrder": ["base", "auth", "header", "init-system"],
+//   "matches": true,
+//   "violations": []
+// }
+```
+
+**חשוב:** כלי הניטור משווים תצורה מול DOM בפועל - הם לא טוענים סקריפטים בעצמם.
 
 ## ⚠️ Error Handling
 

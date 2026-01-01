@@ -1579,7 +1579,7 @@ function generateDetailedLog() {
                 // Charts removed - no longer used on index page
             },
             quickLinks: {
-                preferences: document.querySelector('a[href="preferences.html"]') ? 'זמין' : 'לא זמין',
+                preferences: document.querySelector('a[href="preferences"]') ? 'זמין' : 'לא זמין',
                 settings: document.querySelector('a[title="הגדרות"]') ? 'זמין' : 'לא זמין',
                 help: document.querySelector('a[title="עזרה"]') ? 'זמין' : 'לא זמין',
                 messages: document.querySelector('a[title="הודעות"]') ? 'זמין' : 'לא זמין',

@@ -1,0 +1,14 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- הושלם Full CRUD E2E (15 entities) עם admin/admin123 לאחר תיקוני Team A/C
+- תועד totals + timestamp + evidence מלא לכל כשל
+- אימות דוח Team B על 3 כשלים בלבד
+Evidence:
+- תוצאות זהות לחלוטין: 9/15 עוברים (60%) - ללא שיפור
+- כל 6 entities עדיין נכשלים: trade_plan(404), alert(400), ticker(500), trading_account(400), cash_flow(404), user_profile(400)
+- פער קריטי בין דוחות הצוותים לבין runtime בפועל
+Blockers:
+- תיקונים של Teams A/C לא הוטמעו בפועל או לא יעילים
+- צורך בתיקונים ממשיים לפני המשך QA
+Next: Teams A/C להטמיע תיקונים בפועל ולא רק לדווח

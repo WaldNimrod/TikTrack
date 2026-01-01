@@ -67,7 +67,7 @@
             timestamp: Date.now(),
             detail: event.detail || {}
           };
-          console.log(`✅ Event fired: ${eventName}`, event.detail);
+          window.Logger?.info(`✅ Event fired: ${eventName}`, event.detail);
         };
 
         window.addEventListener(eventName, handler);
@@ -275,30 +275,30 @@
      * Run complete test suite
      */
     async runCompleteTest(timeout = 10000) {
-      console.log('🧪 Starting Preferences Loading Complete Test...\n');
+      window.Logger?.info('🧪 Starting Preferences Loading Complete Test...\n');
 
       // Setup event listeners
       this.setupEventListeners();
 
       // Check load order
-      console.log('📋 Checking load order...');
+      window.Logger?.info('📋 Checking load order...');
       const loadOrderResult = this.checkLoadOrder();
-      console.log(loadOrderResult.message);
+      window.Logger?.info(loadOrderResult.message);
 
       // Wait for events
-      console.log('\n⏳ Waiting for preferences events (timeout: ' + timeout + 'ms)...');
+      window.Logger?.info('\n⏳ Waiting for preferences events (timeout: ' + timeout + 'ms)...');
       const eventsResult = await this.checkEvents(timeout);
-      console.log(eventsResult.message);
+      window.Logger?.info(eventsResult.message);
 
       // Check flags
-      console.log('\n🏁 Checking preference flags...');
+      window.Logger?.info('\n🏁 Checking preference flags...');
       const flagsResult = this.checkFlags();
-      console.log(flagsResult.message);
+      window.Logger?.info(flagsResult.message);
 
       // Measure performance
-      console.log('\n⚡ Measuring performance...');
+      window.Logger?.info('\n⚡ Measuring performance...');
       const performanceResult = this.measurePerformance();
-      console.log(performanceResult.message);
+      window.Logger?.info(performanceResult.message);
 
       // Calculate overall status
       const allPassed = loadOrderResult.passed && 
@@ -321,36 +321,36 @@
      * Print test summary
      */
     printSummary() {
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 COMPLETE TEST SUMMARY');
-      console.log('='.repeat(60));
-      console.log(`Overall Status: ${this.results.overall.toUpperCase()}`);
-      console.log('\n📋 Load Order:');
-      console.log(`  ${this.results.loadOrder.message}`);
-      console.log('\n📡 Events:');
-      console.log(`  ${this.results.events.message}`);
+      window.Logger?.info('\n' + '='.repeat(60));
+      window.Logger?.info('📊 COMPLETE TEST SUMMARY');
+      window.Logger?.info('='.repeat(60));
+      window.Logger?.info(`Overall Status: ${this.results.overall.toUpperCase()}`);
+      window.Logger?.info('\n📋 Load Order:');
+      window.Logger?.info(`  ${this.results.loadOrder.message}`);
+      window.Logger?.info('\n📡 Events:');
+      window.Logger?.info(`  ${this.results.events.message}`);
       if (this.results.events.summary) {
         Object.entries(this.results.events.summary).forEach(([event, fired]) => {
-          console.log(`    ${fired ? '✅' : '❌'} ${event}`);
+          window.Logger?.info(`    ${fired ? '✅' : '❌'} ${event}`);
         });
       }
-      console.log('\n🏁 Flags:');
-      console.log(`  ${this.results.flags.message}`);
+      window.Logger?.info('\n🏁 Flags:');
+      window.Logger?.info(`  ${this.results.flags.message}`);
       if (this.results.flags.flags) {
         Object.entries(this.results.flags.flags).forEach(([flag, set]) => {
-          console.log(`    ${set ? '✅' : '❌'} ${flag}`);
+          window.Logger?.info(`    ${set ? '✅' : '❌'} ${flag}`);
         });
       }
-      console.log('\n⚡ Performance:');
-      console.log(`  ${this.results.performance.message}`);
+      window.Logger?.info('\n⚡ Performance:');
+      window.Logger?.info(`  ${this.results.performance.message}`);
       if (this.results.performance.metrics) {
         Object.entries(this.results.performance.metrics).forEach(([metric, value]) => {
           if (value !== null) {
-            console.log(`    ${metric}: ${value}ms`);
+            window.Logger?.info(`    ${metric}: ${value}ms`);
           }
         });
       }
-      console.log('='.repeat(60) + '\n');
+      window.Logger?.info('='.repeat(60) + '\n');
     }
 
     /**
@@ -367,7 +367,7 @@
     
     // Auto-run if in browser console
     if (window.console && typeof window.console.log === 'function') {
-      console.log('✅ PreferencesLoadingCompleteTest loaded. Run: new PreferencesLoadingCompleteTest().runCompleteTest()');
+      window.Logger?.info('✅ PreferencesLoadingCompleteTest loaded. Run: new PreferencesLoadingCompleteTest().runCompleteTest()');
     }
   }
 

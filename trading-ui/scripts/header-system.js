@@ -1310,10 +1310,10 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/strategy_analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1337,7 +1337,6 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/user_profile">👤 פרופיל משתמש</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/user_management">👥 ניהול משתמשים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
@@ -1356,50 +1355,50 @@ class HeaderSystem {
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
                           <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative_analysis_page.html">📊 ניתוח השוואתי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date_comparison_modal.html">📅 השוואת תאריכים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic_calendar_page.html">📆 לוח כלכלי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional_tracking_widget.html">😊 תיעוד רגשי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history_widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price_history_page.html">💰 היסטוריית מחירים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy_analysis_page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview_test_page.html">📈 גראפים TV</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions_modals.html">🧩 מודלי תנאים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions_test.html">🧪 בדיקות תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/add_ticker_modal.html">➕ הוספת טיקר</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag_quick_action.html">🚩 פעולה מהירה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch_list_modal.html">👁️ רשימת מעקב</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch_lists-page.html">📋 רשימות מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
                           </ul>
                         </li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/server_monitor">🖥️ ניטור שרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/background_tasks">⚙️ ניהול משימות רקע</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/notifications_center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/code_quality_dashboard">📊 איכות קוד ולינטר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/cache_management">💾 ניהול מטמון</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/init_system_management">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧩 בדיקות תנאים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/conditions-test">🧩 בדיקות תנאים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 מוניטור אילוצים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test_header_only">🧪 בדיקת ראש הדף</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/css_management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart_management">📊 ניהול גרפים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/dynamic_colors_display">🌈 תצוגת צבעים דינמית</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview_test_page.html">📈 בדיקת TradingView</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tradingview_widgets_showcase">🎯 ווידג'טים TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 בדיקת TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item">
@@ -2020,6 +2019,27 @@ window.HeaderSystemClass = HeaderSystem;
 
 window.HeaderSystem = {
   initialize: function() {
+    console.log('🎯 HeaderSystem.initialize() called');
+
+    // #region agent log - header init start
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:2021',
+        message:'HeaderSystem_initialize_start',
+        data:{
+          timestamp: Date.now(),
+          HeaderSystemClass: typeof window.HeaderSystemClass,
+          existingHeaderSystem: typeof window.headerSystem
+        },
+        sessionId:'header-debug-2',
+        runId:'header-debug-2',
+        hypothesisId:'header-system-init-failure'
+      })
+    }).catch(()=>{});
+    // #endregion
+
     window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
       page: 'header-system',
       timestamp: new Date().toISOString(),
@@ -2041,7 +2061,29 @@ window.HeaderSystem = {
         
         window.headerSystem.init();
         window.headerSystemReady = true;
-        
+
+        // #region agent log - header init complete
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'header-system.js:2041',
+            message:'HeaderSystem_initialize_complete',
+            data:{
+              timestamp: Date.now(),
+              headerSystem: typeof window.headerSystem,
+              isInitialized: window.headerSystem?.isInitialized,
+              hasUnifiedHeader: !!document.getElementById('unified-header'),
+              tiktrackHeader: !!document.querySelector('.tiktrack-header'),
+              headerElements: document.querySelectorAll('[class*="header"]').length
+            },
+            sessionId:'header-debug-2',
+            runId:'header-debug-2',
+            hypothesisId:'header-render-verification'
+          })
+        }).catch(()=>{});
+        // #endregion
+
         window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
           page: 'header-system',
           headerSystemReady: true,
@@ -2099,152 +2141,7 @@ if (window.Logger) {
   window.Logger.debug('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
 
-// ===== AUTO-INITIALIZATION FALLBACK =====
-// Ensure header is initialized on all pages (except auth pages) even if UnifiedAppInitializer doesn't run
-// זה מבטיח שה-header יתאחל בכל עמוד (חוץ מ-auth pages) גם אם UnifiedAppInitializer לא רץ
-
-(function() {
-  'use strict';
-  
-  // No dedicated auth pages; always initialize header
-  const isAuthPage = false;
-  
-  if (isAuthPage) {
-    if (window.Logger?.debug) {
-      window.Logger.debug('Skipping Header System auto-initialization for auth page', { page: 'header-system' });
-    }
-    return;
-  }
-  
-  // Function to initialize header with retry logic
-  const ensureHeaderInitialized = async () => {
-    // Check if header is already initialized
-    if (window.headerSystem && window.headerSystem.isInitialized) {
-      if (window.Logger?.debug) {
-        window.Logger.debug('Header System already initialized, skipping auto-init', { page: 'header-system' });
-      }
-      return;
-    }
-    
-    // Check if UnifiedAppInitializer exists and might initialize the header
-    const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined' || 
-                                     typeof window.initializeUnifiedApp !== 'undefined' ||
-                                     (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing);
-    
-    if (hasUnifiedAppInitializer) {
-      // Wait longer for UnifiedAppInitializer to initialize the header
-      let waitCount = 0;
-      const maxWait = 50; // 5 seconds - give UnifiedAppInitializer enough time
-      
-      while (waitCount < maxWait) {
-        // Check if header was initialized
-        if (window.headerSystem && window.headerSystem.isInitialized) {
-          if (window.Logger?.debug) {
-            window.Logger.debug('Header System initialized by UnifiedAppInitializer', { 
-              waitCount,
-              page: 'header-system' 
-            });
-          }
-          return;
-        }
-        
-        // Check if UnifiedAppInitializer is still initializing
-        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          waitCount++;
-          continue;
-        }
-        
-        // Check if UnifiedAppInitializer finished initializing
-        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitialized) {
-          // UnifiedAppInitializer finished, check one more time if header was initialized
-          await new Promise(resolve => setTimeout(resolve, 200));
-          if (window.headerSystem && window.headerSystem.isInitialized) {
-            if (window.Logger?.debug) {
-              window.Logger.debug('Header System initialized by UnifiedAppInitializer (after completion)', { 
-                waitCount,
-                page: 'header-system' 
-              });
-            }
-            return;
-          }
-          // UnifiedAppInitializer finished but didn't initialize header, break and initialize ourselves
-          break;
-        }
-        
-        // Wait a bit more
-        await new Promise(resolve => setTimeout(resolve, 100));
-        waitCount++;
-      }
-    }
-    
-    // Initialize header if not already initialized
-    if (!window.headerSystem || !window.headerSystem.isInitialized) {
-      // Mark that fallback initialization is being used
-      window.__headerSystemInitMethod = 'fallback';
-      
-      if (window.Logger?.info) {
-        window.Logger.info('🔄 Auto-initializing Header System (FALLBACK METHOD)', {
-          hasUnifiedAppInitializer,
-          unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
-          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing,
-          page: window.location.pathname
-        }, { page: 'header-system' });
-      }
-      
-      // Also log to console for easy tracking
-      console.log('🔄 [HEADER INIT] Using FALLBACK method for:', window.location.pathname);
-      
-      // Store in localStorage for tracking
-      try {
-        const initLog = {
-          page: window.location.pathname,
-          method: 'fallback',
-          timestamp: new Date().toISOString()
-        };
-        const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
-        existingLogs.push(initLog);
-        localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
-      } catch (e) {
-        // Ignore localStorage errors
-      }
-      
-      try {
-        if (typeof window.initializeHeaderSystem === 'function') {
-          window.initializeHeaderSystem();
-        } else if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-          window.HeaderSystem.initialize();
-        } else {
-          if (window.Logger?.warn) {
-            window.Logger.warn('⚠️ Header System initialization functions not available', {
-              initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
-              HeaderSystemExists: typeof window.HeaderSystem !== 'undefined'
-            }, { page: 'header-system' });
-          }
-        }
-      } catch (error) {
-        if (window.Logger?.error) {
-          window.Logger.error('❌ Error auto-initializing Header System', {
-            error: error.message,
-            stack: error.stack
-          }, { page: 'header-system' });
-        } else {
-          console.error('❌ Error auto-initializing Header System:', error);
-        }
-      }
-    }
-  };
-  
-  // Initialize when DOM is ready
-  // Use longer delay to ensure UnifiedAppInitializer has time to initialize first
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wait 1 second after DOMContentLoaded to allow UnifiedAppInitializer to start
-      setTimeout(ensureHeaderInitialized, 1000);
-    });
-  } else {
-    // DOM is already loaded, wait longer to allow other systems to initialize first
-    setTimeout(ensureHeaderInitialized, 1500);
-  }
-})();
+// Export HeaderSystem to global scope for package validation
+// Keep existing HeaderSystem object and also export the class for validation
+window.HeaderSystemClass = HeaderSystem;
 

@@ -13,7 +13,7 @@ import logging
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 # Import user service
@@ -47,22 +47,23 @@ class UserServiceWrapper:
 base_api = BaseEntityAPI('users', UserServiceWrapper, 'users')
 
 @users_bp.route('/', methods=['GET'])
+@require_authentication()
 def get_all_users():
-    """Get default user (single user system)"""
+    """Get current authenticated user (single user system)"""
     try:
-        # Get default user from database
-        default_user = user_service.get_default_user()
-        if default_user:
+        # Get current authenticated user
+        current_user = user_service.get_user_by_id(g.user_id)
+        if current_user:
             return jsonify({
                 "status": "success",
-                "data": [default_user],  # Return as array for consistency
-                "message": "Default user retrieved successfully",
+                "data": [current_user],  # Return as array for consistency
+                "message": "Current user retrieved successfully",
                 "version": "1.0"
             }), 200
         else:
             return jsonify({
                 "status": "error",
-                "error": {"message": "No default user found"},
+                "error": {"message": f"User with ID {g.user_id} not found"},
                 "version": "1.0"
             }), 404
     except Exception as e:

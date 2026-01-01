@@ -1,0 +1,64 @@
+{
+  "runId": "ui-validation-api-direct-1767082410646",
+  "timestamp": "2025-12-30T08:13:30.646Z",
+  "environment": "http://localhost:8080",
+  "status": "passed",
+  "context": "Direct API validation for trading_account and cash_flow error messages",
+  "entities": {
+    "trading_account": {
+      "entity": "trading_account",
+      "apiTestStarted": true,
+      "createAttempted": true,
+      "apiResponseReceived": true,
+      "apiResponseStatus": 400,
+      "apiResponseData": {
+        "details": "Please provide a valid currency_id for the trading account",
+        "error_code": "VALIDATION_ERROR",
+        "message": "Currency ID is required",
+        "status": "error",
+        "version": "1.0",
+        "timestamp": {
+          "utc": "2025-12-30T08:13:30.869218Z",
+          "epochMs": 1767082410869,
+          "local": "2025-12-30T10:13:30.869218+02:00",
+          "timezone": "Asia/Jerusalem",
+          "display": "30.12.2025 10:13"
+        }
+      },
+      "errorMessageExtracted": "Currency ID is required",
+      "isSpecificError": true,
+      "isUnknownError": false,
+      "extractErrorMessageWorked": true
+    },
+    "cash_flow": {
+      "entity": "cash_flow",
+      "apiTestStarted": true,
+      "createAttempted": true,
+      "apiResponseReceived": true,
+      "apiResponseStatus": 500,
+      "apiResponseData": {
+        "details": "An unexpected database error occurred",
+        "error_code": "DATABASE_ERROR",
+        "message": "Database error occurred",
+        "status": "error",
+        "timestamp": {
+          "utc": "2025-12-30T10:13:30.904226Z",
+          "epochMs": 1767089610904,
+          "local": "2025-12-30T12:13:30.904226+02:00",
+          "timezone": "Asia/Jerusalem",
+          "display": "30.12.2025 12:13"
+        },
+        "version": "1.0"
+      },
+      "errorMessageExtracted": "Database error occurred",
+      "isSpecificError": true,
+      "isUnknownError": false,
+      "extractErrorMessageWorked": true
+    }
+  },
+  "acceptance": {
+    "specificErrorsDisplayed": true,
+    "noUnknownErrors": true,
+    "extractErrorMessageWorking": true
+  }
+}

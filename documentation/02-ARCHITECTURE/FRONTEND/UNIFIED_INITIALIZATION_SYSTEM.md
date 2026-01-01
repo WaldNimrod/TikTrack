@@ -3,7 +3,7 @@
 ## Unified Initialization System
 
 **תאריך יצירה:** 24 בנובמבר 2025  
-**גרסה:** 1.7.0  
+**גרסה:** 1.6.0  
 **עודכן:** 19 בדצמבר 2025 - Code Review Fixes  
 **סטטוס:** ✅ פעיל ומתועד עם שיפורי אבטחה ואחידות  
 **נקודת כניסה:** `trading-ui/scripts/modules/core-systems.js` (ב-`init-system` package)
@@ -83,6 +83,14 @@
 ---
 
 ## 🏗️ ארכיטקטורה
+
+### Load Order Rules (חובה)
+
+הסדר המדויק של טעינת קבצים הוא קריטי למניעת ReferenceError:
+
+1. **`package-manifest.js`** — ראשון, מגדיר את כל החבילות והתלויות
+2. **`page-initialization-configs.js`** — שני, מגדיר איזה חבילות נטענות לכל עמוד
+3. **`core-systems.js`** — אחרון, מבצע את האיתחול בפועל (loadOrder: 22)
 
 ### מבנה הקבצים המרכזיים
 

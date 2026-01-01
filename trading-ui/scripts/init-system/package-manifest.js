@@ -288,7 +288,7 @@ const PACKAGE_MANIFEST = {
         external: true
       },
       {
-        file: 'scripts/vendor/floating-ui.dom.min.js',
+        file: 'vendor/floating-ui.dom.min.js',
         globalCheck: 'window.FloatingUIDOM',
         description: 'Floating UI DOM - Smart positioning library (for overlay/tooltip positioning)',
         required: false, // Optional - UnifiedUIPositioningService has fallback
@@ -1643,7 +1643,7 @@ const PACKAGE_MANIFEST = {
     description: 'Helper systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 11,
+    loadOrder: 6.4, // Changed from 11 to 6.4 to load before conditions (6.5) as specified in page config
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - helper functions, has dependencies on base and services
     scripts: [
@@ -1695,6 +1695,20 @@ const PACKAGE_MANIFEST = {
         description: 'Research system',
         required: true,
         loadOrder: 4
+      },
+      {
+        file: 'services/linked-items-service.js',
+        globalCheck: 'window.LinkedItemsService',
+        description: 'Shared logic service for linked items',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'linked-items.js',
+        globalCheck: 'window.viewLinkedItems',
+        description: 'Linked items UI',
+        required: true,
+        loadOrder: 6
       }
     ],
     estimatedSize: '~60KB',
@@ -2210,6 +2224,13 @@ const PACKAGE_MANIFEST = {
         required: false,
         loadOrder: 9
       },
+      {
+        file: 'widgets/widget-monitor.js',
+        globalCheck: 'window.WidgetMonitor',
+        description: 'Widget monitoring and debugging system - must load early to monitor widget initializations',
+        required: false,
+        loadOrder: 10 // Load early in init-system to monitor widgets before customInitializers run
+      },
       // unified-app-initializer.js removed - initialization now handled by core-systems.js
     ],
     estimatedSize: '~45KB',
@@ -2295,13 +2316,6 @@ const PACKAGE_MANIFEST = {
         description: 'Watch lists widget for dashboard',
         required: false,
         loadOrder: 8
-      },
-      {
-        file: 'widgets/widget-monitor.js',
-        globalCheck: 'window.WidgetMonitor',
-        description: 'Widget monitoring and debugging system',
-        required: false,
-        loadOrder: 99 // Load after all widgets
       },
       // ⚠️ NOTE: tag-search-config.js moved to modules package (loadOrder: 24)
       // It must load before modal-manager-v2.js which is in modules package

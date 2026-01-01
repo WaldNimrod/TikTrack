@@ -54,13 +54,72 @@ window.FilterManager = class FilterManager {
   }
 
   async init() {
+    
     await this.loadFilters();
     this.setupHoverBehavior();
-    // Load accounts after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      this.loadAccountsForFilter();
-    }, 500);
+    // For tag-management page, wait for authentication to complete before loading accounts
+    // This prevents 401 errors when api-fetch-wrapper hasn't added token to headers yet
+    const isTagManagementPage = window.location.pathname.includes('tag_management');
+    if (isTagManagementPage) {
+      // Wait for authentication to complete (auth-guard sets window.currentUser when done)
+      // Also verify that api-fetch-wrapper can get the token
+      let authWaitCount = 0;
+      let authReady = false;
+      while (authWaitCount < 50 && !authReady) {
+        // Check if auth-guard has completed by checking for currentUser
+        const hasUser = !!window.currentUser;
+        let hasToken = false;
+
+        // Check if token is available for api-fetch-wrapper
+        if (window.UnifiedCacheManager?.initialized) {
+          try {
+            const token = await window.UnifiedCacheManager.get('authToken', {
+              layer: 'sessionStorage',
+              includeUserId: false
+            });
+            hasToken = !!token;
+          } catch (e) {
+            // Continue checking
+          }
+        }
+        if (!hasToken && typeof sessionStorage !== 'undefined') {
+          hasToken = !!sessionStorage.getItem('dev_authToken');
+        }
+
+        // Verify authentication with TikTrackAuth
+        if (hasUser && hasToken && window.TikTrackAuth?.checkAuthentication) {
+          try {
+            const authResult = await window.TikTrackAuth.checkAuthentication();
+            if (authResult?.authenticated && authResult?.user) {
+              authReady = true;
+              break;
+            }
+          } catch (e) {
+            // Continue waiting
+          }
+        } else if (hasUser && hasToken) {
+          // If we have user and token but TikTrackAuth not available, proceed
+          authReady = true;
+          break;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+        authWaitCount++;
+      }
+
+      if (window.Logger?.debug) {
+        window.Logger.debug('HeaderSystem: Waited for auth completion', {
+          authWaitCount,
+          hasCurrentUser: !!window.currentUser,
+          authReady,
+          page: 'header-system'
+        });
+      }
+    }
+    // Load accounts after authentication is confirmed (or immediately for other pages)
+    this.loadAccountsForFilter();
   }
+
 
   async loadFilters() {
     if (window.PageStateManager && window.PageStateManager.initialized) {
@@ -682,7 +741,10 @@ window.FilterManager = class FilterManager {
     // Ensure accounts is an array
     if (!Array.isArray(accounts)) {
       accounts = [];
-      window.Logger?.warn?.('⚠️ accounts is not an array, resetting to empty array', { page: 'header-system', accountsType: typeof accounts });
+      window.Logger?.debug?.('⚠️ accounts is not an array, resetting to empty array (expected in iframe context)', { 
+        page: 'header-system', 
+        accountsType: typeof accounts 
+      });
     }
 
     const openAccounts = accounts.filter(account => account.status === 'open');
@@ -1222,10 +1284,14 @@ class HeaderSystem {
                         <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only" data-icon-replace="entity:home">
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trade_plans" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trade_plans">
                         <span class="nav-text">תכנון</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/ai_analysis">אנליזת AI</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
@@ -1244,11 +1310,10 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/ai_analysis">אנליזת AI</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy_analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1272,6 +1337,7 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/user_profile">👤 פרופיל משתמש</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/user_management">👥 ניהול משתמשים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
@@ -1281,10 +1347,60 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                       </ul>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/dev_tools" class="tiktrack-nav-link" data-page="development-tools">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/dev_tools" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
                         <span class="nav-text">פיתוח</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li class="dropdown-submenu">
+                          <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
+                          <ul class="level3-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/comparative_analysis_page">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/date_comparison_modal">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/economic_calendar_page">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/emotional_tracking_widget">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/history_widget">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/price_history_page">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/strategy_analysis_page">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tradingview_test_page">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions_modals">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧪 בדיקות תנאים</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/add_ticker_modal">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/flag_quick_action">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/watch_list_modal">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/watch_lists_page">📋 רשימות מעקב</a></li>
+                          </ul>
+                        </li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server_monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background_tasks">⚙️ ניהול משימות רקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications_center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code_quality_dashboard">📊 איכות קוד ולינטר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache_management">💾 ניהול מטמון</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init_system_management">🚀 ניהול מערכת אתחול</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧩 בדיקות תנאים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 מוניטור אילוצים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test_header_only">🧪 בדיקת ראש הדף</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/css_management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/chart_management">📊 ניהול גרפים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/dynamic_colors_display">🌈 תצוגת צבעים דינמית</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview_test_page">📈 בדיקת TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview_widgets_showcase">🎯 ווידג'טים TradingView</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item">
                       <a href="#" class="tiktrack-nav-link" data-onclick="CacheControlMenu.triggerAction('full', event)" 
@@ -1904,6 +2020,26 @@ window.HeaderSystemClass = HeaderSystem;
 
 window.HeaderSystem = {
   initialize: function() {
+    console.log('🎯 HeaderSystem.initialize() called');
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:2022',
+        message:'HeaderSystem_initialize_start',
+        data:{
+          HeaderSystemClass: typeof window.HeaderSystemClass,
+          existingHeaderSystem: typeof window.headerSystem
+        },
+        sessionId:'header-debug',
+        runId:'header-check-4',
+        hypothesisId:'header-system-init-failure'
+      })
+    }).catch(()=>{});
+    // #endregion
+
     window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
       page: 'header-system',
       timestamp: new Date().toISOString(),
@@ -1916,30 +2052,100 @@ window.HeaderSystem = {
             page: 'header-system',
           });
           window.headerSystem = new window.HeaderSystemClass();
+
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              location:'header-system.js:2034',
+              message:'HeaderSystem_instance_created',
+              data:{
+                headerSystem: typeof window.headerSystem,
+                hasInitMethod: typeof window.headerSystem?.init
+              },
+              sessionId:'header-debug',
+              runId:'header-check-4',
+              hypothesisId:'header-system-instance-created'
+            })
+          }).catch(()=>{});
+          // #endregion
         } else {
           window.Logger?.info?.('♻️ HeaderSystem.initialize() - Reusing existing instance', {
             page: 'header-system',
             isInitialized: window.headerSystem.isInitialized,
           });
         }
-        
+
+        console.log('🎯 HeaderSystem: About to call init()...');
         window.headerSystem.init();
+        console.log('✅ HeaderSystem: init() completed');
+
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'header-system.js:2042',
+            message:'HeaderSystem_init_called',
+            data:{
+              headerSystem: typeof window.headerSystem,
+              isInitialized: window.headerSystem?.isInitialized
+            },
+            sessionId:'header-debug',
+            runId:'header-check-4',
+            hypothesisId:'header-system-init-called'
+          })
+        }).catch(()=>{});
+        // #endregion
+
+        window.headerSystem.isInitialized = true;
         window.headerSystemReady = true;
-        
-        window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
+        window.__headerSystemInitMethod = 'planned'; // Mark as initialized by PLANNED method
+
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'header-system.js:2045',
+            message:'HeaderSystem_initialize_complete',
+            data:{
+              headerSystem: typeof window.headerSystem,
+              isInitialized: window.headerSystem?.isInitialized,
+              hasUnifiedHeader: !!document.getElementById('unified-header'),
+              tiktrackHeader: !!document.querySelector('.tiktrack-header'),
+              headerElements: document.querySelectorAll('[class*="header"]').length
+            },
+            sessionId:'header-debug',
+            runId:'header-fix-1',
+            hypothesisId:'header-render-verification'
+          })
+        }).catch(()=>{});
+        // #endregion
+
+        window.Logger?.info?.('✅ HeaderSystem.initialize() - SUCCESS', {
           page: 'header-system',
-          headerSystemReady: true,
+          hasUnifiedHeader: !!document.getElementById('unified-header'),
+          timestamp: new Date().toISOString(),
         });
+
+        return true; // Return success
       } else {
-        throw new Error('HeaderSystemClass not found');
+        window.Logger?.error?.('❌ HeaderSystemClass not available', {
+          page: 'header-system',
+          HeaderSystemClass: typeof window.HeaderSystemClass,
+        });
+        return false; // Return failure
       }
     } catch (error) {
-      window.Logger?.error?.('❌ HeaderSystem.initialize() - ERROR', {
-        page: 'header-system',
+      window.Logger?.error?.('❌ HeaderSystem.initialize() - FAILED', {
         error: error.message,
         stack: error.stack,
+        page: 'header-system',
       });
-      throw error;
+      console.error('❌ HeaderSystem.initialize() failed:', error);
+      return false; // Return failure
     }
   }
 };
@@ -1954,18 +2160,145 @@ Object.defineProperty(window, 'filterSystem', {
 
 // Create initializeHeaderSystem wrapper for compatibility with core-systems.js
 window.initializeHeaderSystem = function() {
+  // Add re-entry guard to prevent recursive initialization
+  if (window.__headerInitInProgress) {
+    console.log('⚠️ initializeHeaderSystem: Already in progress, skipping');
+    return false;
+  }
+  window.__headerInitInProgress = true;
+
+  console.log('🎯 initializeHeaderSystem() called - START');
+
+  // #region agent log - header init start
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      location:'header-system.js:2162',
+      message:'initializeHeaderSystem_START',
+      data:{
+        timestamp: Date.now(),
+        headerSystemExists: typeof window.headerSystem,
+        isInitialized: window.headerSystem?.isInitialized,
+        __headerInitInProgress: window.__headerInitInProgress
+      },
+      sessionId:'header-init-fix',
+      runId:'header-init-fix-1',
+      hypothesisId:'single-entry-point-verified'
+    })
+  }).catch(()=>{});
+  // #endregion
+
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      location:'header-system.js:2157',
+      message:'initializeHeaderSystem_called',
+      data:{
+        HeaderSystem: typeof window.HeaderSystem,
+        HeaderSystemInitialize: typeof window.HeaderSystem?.initialize,
+        __headerInitInProgress: window.__headerInitInProgress
+      },
+      sessionId:'header-debug',
+      runId:'header-fix-1',
+      hypothesisId:'reentry-guard-added'
+    })
+  }).catch(()=>{});
+  // #endregion
+
   window.Logger?.info?.('🔧 initializeHeaderSystem() wrapper called', {
     page: 'header-system',
     HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
   });
-  
-  if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-    return window.HeaderSystem.initialize();
-  } else {
-    window.Logger?.error?.('❌ HeaderSystem.initialize not available', {
-      page: 'header-system',
-    });
-    return false;
+
+  console.log('🎯 initializeHeaderSystem: checking HeaderSystem...', {
+    HeaderSystem: typeof window.HeaderSystem,
+    HeaderSystemInitialize: typeof window.HeaderSystem?.initialize
+  });
+
+  try {
+    if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+      console.log('✅ initializeHeaderSystem: calling HeaderSystem.initialize()');
+      const result = window.HeaderSystem.initialize();
+      window.__headerInitInProgress = false; // Clear guard on success
+
+      // #region agent log - header init complete
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'header-system.js:2204',
+          message:'initializeHeaderSystem_COMPLETE',
+          data:{
+            timestamp: Date.now(),
+            result: result,
+            headerSystemExists: typeof window.headerSystem,
+            isInitialized: window.headerSystem?.isInitialized,
+            __headerInitInProgress: window.__headerInitInProgress
+          },
+          sessionId:'header-init-fix',
+          runId:'header-init-fix-1',
+          hypothesisId:'single-entry-point-verified'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      return result;
+    } else {
+      console.log('❌ initializeHeaderSystem: HeaderSystem.initialize not available');
+      window.Logger?.error?.('❌ HeaderSystem.initialize not available', {
+        page: 'header-system',
+      });
+      window.__headerInitInProgress = false; // Clear guard on failure
+
+      // #region agent log - header init failed
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'header-system.js:2208',
+          message:'initializeHeaderSystem_FAILED',
+          data:{
+            timestamp: Date.now(),
+            reason: 'HeaderSystem.initialize not available',
+            headerSystemExists: typeof window.HeaderSystem,
+            __headerInitInProgress: window.__headerInitInProgress
+          },
+          sessionId:'header-init-fix',
+          runId:'header-init-fix-1',
+          hypothesisId:'single-entry-point-verified'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ initializeHeaderSystem: Exception occurred:', error);
+    window.__headerInitInProgress = false; // Clear guard on exception
+
+    // #region agent log - header init error
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:2216',
+        message:'initializeHeaderSystem_ERROR',
+        data:{
+          timestamp: Date.now(),
+          error: error.message,
+          __headerInitInProgress: window.__headerInitInProgress
+        },
+        sessionId:'header-init-fix',
+        runId:'header-init-fix-1',
+        hypothesisId:'single-entry-point-verified'
+      })
+    }).catch(()=>{});
+    // #endregion
+
+    throw error;
   }
 };
 
@@ -1980,155 +2313,13 @@ if (window.HeaderSystem && !window.HeaderSystem.createFilterSystem) {
 }
 
 if (window.Logger) {
-  window.Logger.info('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
+  window.Logger.debug('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
 
-// ===== AUTO-INITIALIZATION FALLBACK =====
-// Ensure header is initialized on all pages (except auth pages) even if UnifiedAppInitializer doesn't run
-// זה מבטיח שה-header יתאחל בכל עמוד (חוץ מ-auth pages) גם אם UnifiedAppInitializer לא רץ
+// ===== SINGLE INITIALIZATION ENTRY POINT =====
+// Header initialization is now handled exclusively by UnifiedAppInitializer
+// Removed auto-fallback to prevent duplicate initialization calls
 
-(function() {
-  'use strict';
-  
-  // No dedicated auth pages; always initialize header
-  const isAuthPage = false;
-  
-  if (isAuthPage) {
-    if (window.Logger?.debug) {
-      window.Logger.debug('Skipping Header System auto-initialization for auth page', { page: 'header-system' });
-    }
-    return;
-  }
-  
-  // Function to initialize header with retry logic
-  const ensureHeaderInitialized = async () => {
-    // Check if header is already initialized
-    if (window.headerSystem && window.headerSystem.isInitialized) {
-      if (window.Logger?.debug) {
-        window.Logger.debug('Header System already initialized, skipping auto-init', { page: 'header-system' });
-      }
-      return;
-    }
-    
-    // Check if UnifiedAppInitializer exists and might initialize the header
-    const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined' || 
-                                     typeof window.initializeUnifiedApp !== 'undefined' ||
-                                     (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing);
-    
-    if (hasUnifiedAppInitializer) {
-      // Wait longer for UnifiedAppInitializer to initialize the header
-      let waitCount = 0;
-      const maxWait = 50; // 5 seconds - give UnifiedAppInitializer enough time
-      
-      while (waitCount < maxWait) {
-        // Check if header was initialized
-        if (window.headerSystem && window.headerSystem.isInitialized) {
-          if (window.Logger?.debug) {
-            window.Logger.debug('Header System initialized by UnifiedAppInitializer', { 
-              waitCount,
-              page: 'header-system' 
-            });
-          }
-          return;
-        }
-        
-        // Check if UnifiedAppInitializer is still initializing
-        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          waitCount++;
-          continue;
-        }
-        
-        // Check if UnifiedAppInitializer finished initializing
-        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitialized) {
-          // UnifiedAppInitializer finished, check one more time if header was initialized
-          await new Promise(resolve => setTimeout(resolve, 200));
-          if (window.headerSystem && window.headerSystem.isInitialized) {
-            if (window.Logger?.debug) {
-              window.Logger.debug('Header System initialized by UnifiedAppInitializer (after completion)', { 
-                waitCount,
-                page: 'header-system' 
-              });
-            }
-            return;
-          }
-          // UnifiedAppInitializer finished but didn't initialize header, break and initialize ourselves
-          break;
-        }
-        
-        // Wait a bit more
-        await new Promise(resolve => setTimeout(resolve, 100));
-        waitCount++;
-      }
-    }
-    
-    // Initialize header if not already initialized
-    if (!window.headerSystem || !window.headerSystem.isInitialized) {
-      // Mark that fallback initialization is being used
-      window.__headerSystemInitMethod = 'fallback';
-      
-      if (window.Logger?.info) {
-        window.Logger.info('🔄 Auto-initializing Header System (FALLBACK METHOD)', {
-          hasUnifiedAppInitializer,
-          unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
-          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing,
-          page: window.location.pathname
-        }, { page: 'header-system' });
-      }
-      
-      // Also log to console for easy tracking
-      console.log('🔄 [HEADER INIT] Using FALLBACK method for:', window.location.pathname);
-      
-      // Store in localStorage for tracking
-      try {
-        const initLog = {
-          page: window.location.pathname,
-          method: 'fallback',
-          timestamp: new Date().toISOString()
-        };
-        const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
-        existingLogs.push(initLog);
-        localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
-      } catch (e) {
-        // Ignore localStorage errors
-      }
-      
-      try {
-        if (typeof window.initializeHeaderSystem === 'function') {
-          window.initializeHeaderSystem();
-        } else if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-          window.HeaderSystem.initialize();
-        } else {
-          if (window.Logger?.warn) {
-            window.Logger.warn('⚠️ Header System initialization functions not available', {
-              initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
-              HeaderSystemExists: typeof window.HeaderSystem !== 'undefined'
-            }, { page: 'header-system' });
-          }
-        }
-      } catch (error) {
-        if (window.Logger?.error) {
-          window.Logger.error('❌ Error auto-initializing Header System', {
-            error: error.message,
-            stack: error.stack
-          }, { page: 'header-system' });
-        } else {
-          console.error('❌ Error auto-initializing Header System:', error);
-        }
-      }
-    }
-  };
-  
-  // Initialize when DOM is ready
-  // Use longer delay to ensure UnifiedAppInitializer has time to initialize first
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wait 1 second after DOMContentLoaded to allow UnifiedAppInitializer to start
-      setTimeout(ensureHeaderInitialized, 1000);
-    });
-  } else {
-    // DOM is already loaded, wait longer to allow other systems to initialize first
-    setTimeout(ensureHeaderInitialized, 1500);
-  }
-})();
+// Export HeaderSystem to global scope for package validation
+window.HeaderSystem = HeaderSystem;
 

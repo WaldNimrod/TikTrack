@@ -103,16 +103,16 @@
 
     performanceResults.tests.push(result);
 
-    console.log(`${status} ${warning} ${name}: ${actualTime}ms (threshold: ${threshold}ms)`);
+    window.Logger?.info(`${status} ${warning} ${name}: ${actualTime}ms (threshold: ${threshold}ms)`);
     if (warning) {
-      console.log(`  ⚠️  Close to threshold (${((actualTime / threshold) * 100).toFixed(1)}%)`);
+      window.Logger?.info(`  ⚠️  Close to threshold (${((actualTime / threshold) * 100).toFixed(1)}%)`);
     }
   }
 
   function logSection(title) {
-    console.log('\n' + '='.repeat(60));
-    console.log(title);
-    console.log('='.repeat(60) + '\n');
+    window.Logger?.info('\n' + '='.repeat(60));
+    window.Logger?.info(title);
+    window.Logger?.info('='.repeat(60) + '\n');
   }
 
   /**
@@ -159,7 +159,7 @@
         }
       }
     } catch (error) {
-      console.error('❌ Error testing page load time:', error);
+      window.Logger?.error('❌ Error testing page load time:', error);
     }
   }
 
@@ -171,7 +171,7 @@
 
     try {
       if (!window.AIAnalysisData || !window.AIAnalysisData.loadTemplates) {
-        console.log('⚠️  AIAnalysisData.loadTemplates not available');
+        window.Logger?.info('⚠️  AIAnalysisData.loadTemplates not available');
         return;
       }
 
@@ -198,7 +198,7 @@
         PERFORMANCE_THRESHOLDS.templatesLoad * 0.3
       );
     } catch (error) {
-      console.error('❌ Error testing templates load performance:', error);
+      window.Logger?.error('❌ Error testing templates load performance:', error);
     }
   }
 
@@ -210,7 +210,7 @@
 
     try {
       if (!window.AIAnalysisData || !window.AIAnalysisData.loadHistory) {
-        console.log('⚠️  AIAnalysisData.loadHistory not available');
+        window.Logger?.info('⚠️  AIAnalysisData.loadHistory not available');
         return;
       }
 
@@ -225,7 +225,7 @@
         PERFORMANCE_THRESHOLDS.historyLoad
       );
     } catch (error) {
-      console.error('❌ Error testing history load performance:', error);
+      window.Logger?.error('❌ Error testing history load performance:', error);
     }
   }
 
@@ -237,7 +237,7 @@
 
     try {
       if (!window.AIAnalysisData || !window.AIAnalysisData.validateAnalysisRequest) {
-        console.log('⚠️  Validation API not available');
+        window.Logger?.info('⚠️  Validation API not available');
         return;
       }
 
@@ -258,7 +258,7 @@
         PERFORMANCE_THRESHOLDS.apiValidate
       );
     } catch (error) {
-      console.error('❌ Error testing API response performance:', error);
+      window.Logger?.error('❌ Error testing API response performance:', error);
     }
   }
 
@@ -270,7 +270,7 @@
 
     try {
       if (!window.UnifiedCacheManager) {
-        console.log('⚠️  UnifiedCacheManager not available');
+        window.Logger?.info('⚠️  UnifiedCacheManager not available');
         return;
       }
 
@@ -315,7 +315,7 @@
         // Ignore cleanup errors
       }
     } catch (error) {
-      console.error('❌ Error testing cache performance:', error);
+      window.Logger?.error('❌ Error testing cache performance:', error);
     }
   }
 
@@ -327,7 +327,7 @@
 
     try {
       if (!window.AIAnalysisManager) {
-        console.log('⚠️  AIAnalysisManager not available');
+        window.Logger?.info('⚠️  AIAnalysisManager not available');
         return;
       }
 
@@ -344,7 +344,7 @@
         );
       }
     } catch (error) {
-      console.error('❌ Error testing manager init performance:', error);
+      window.Logger?.error('❌ Error testing manager init performance:', error);
     }
   }
 
@@ -356,7 +356,7 @@
 
     try {
       if (!window.AIAnalysisManager) {
-        console.log('⚠️  AIAnalysisManager not available');
+        window.Logger?.info('⚠️  AIAnalysisManager not available');
         return;
       }
 
@@ -391,7 +391,7 @@
         );
       }
     } catch (error) {
-      console.error('❌ Error testing rendering performance:', error);
+      window.Logger?.error('❌ Error testing rendering performance:', error);
     }
   }
 
@@ -408,11 +408,11 @@
         const totalMB = (memory.totalJSHeapSize / 1048576).toFixed(2);
         const limitMB = (memory.jsHeapSizeLimit / 1048576).toFixed(2);
 
-        console.log(`Memory Usage:`);
-        console.log(`  Used: ${usedMB} MB`);
-        console.log(`  Total: ${totalMB} MB`);
-        console.log(`  Limit: ${limitMB} MB`);
-        console.log(`  Usage: ${((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100).toFixed(2)}%`);
+        window.Logger?.info(`Memory Usage:`);
+        window.Logger?.info(`  Used: ${usedMB} MB`);
+        window.Logger?.info(`  Total: ${totalMB} MB`);
+        window.Logger?.info(`  Limit: ${limitMB} MB`);
+        window.Logger?.info(`  Usage: ${((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100).toFixed(2)}%`);
 
         const usagePercent = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
         const passed = usagePercent < 80; // Less than 80% usage
@@ -420,16 +420,16 @@
         performanceResults.summary.total++;
         if (passed) {
           performanceResults.summary.passed++;
-          console.log(`✅ PASS Memory usage: ${usagePercent.toFixed(2)}% (threshold: 80%)`);
+          window.Logger?.info(`✅ PASS Memory usage: ${usagePercent.toFixed(2)}% (threshold: 80%)`);
         } else {
           performanceResults.summary.failed++;
-          console.log(`❌ FAIL Memory usage: ${usagePercent.toFixed(2)}% (threshold: 80%)`);
+          window.Logger?.info(`❌ FAIL Memory usage: ${usagePercent.toFixed(2)}% (threshold: 80%)`);
         }
       } else {
-        console.log('⚠️  Performance.memory not available (Chrome only)');
+        window.Logger?.info('⚠️  Performance.memory not available (Chrome only)');
       }
     } catch (error) {
-      console.error('❌ Error testing memory usage:', error);
+      window.Logger?.error('❌ Error testing memory usage:', error);
     }
   }
 
@@ -451,7 +451,7 @@
         );
 
         if (aiResources.length > 0) {
-          console.log(`Found ${aiResources.length} AI Analysis related resources:`);
+          window.Logger?.info(`Found ${aiResources.length} AI Analysis related resources:`);
           
           let totalTime = 0;
           let maxTime = 0;
@@ -462,30 +462,30 @@
             maxTime = Math.max(maxTime, duration);
             
             const resourceName = entry.name.split('/').pop();
-            console.log(`  ${index + 1}. ${resourceName}: ${duration.toFixed(2)}ms`);
+            window.Logger?.info(`  ${index + 1}. ${resourceName}: ${duration.toFixed(2)}ms`);
           });
 
           const avgTime = totalTime / aiResources.length;
-          console.log(`\n  Average: ${avgTime.toFixed(2)}ms`);
-          console.log(`  Max: ${maxTime.toFixed(2)}ms`);
-          console.log(`  Total: ${totalTime.toFixed(2)}ms`);
+          window.Logger?.info(`\n  Average: ${avgTime.toFixed(2)}ms`);
+          window.Logger?.info(`  Max: ${maxTime.toFixed(2)}ms`);
+          window.Logger?.info(`  Total: ${totalTime.toFixed(2)}ms`);
 
           // Log as test
           const passed = avgTime < 1000; // Average less than 1 second
           performanceResults.summary.total++;
           if (passed) {
             performanceResults.summary.passed++;
-            console.log(`✅ PASS Average network time: ${avgTime.toFixed(2)}ms (threshold: 1000ms)`);
+            window.Logger?.info(`✅ PASS Average network time: ${avgTime.toFixed(2)}ms (threshold: 1000ms)`);
           } else {
             performanceResults.summary.failed++;
-            console.log(`❌ FAIL Average network time: ${avgTime.toFixed(2)}ms (threshold: 1000ms)`);
+            window.Logger?.info(`❌ FAIL Average network time: ${avgTime.toFixed(2)}ms (threshold: 1000ms)`);
           }
         } else {
-          console.log('⚠️  No AI Analysis related resources found');
+          window.Logger?.info('⚠️  No AI Analysis related resources found');
         }
       }
     } catch (error) {
-      console.error('❌ Error testing network performance:', error);
+      window.Logger?.error('❌ Error testing network performance:', error);
     }
   }
 
@@ -495,14 +495,14 @@
   async function runAllPerformanceTests() {
     performanceResults.startTime = Date.now();
 
-    console.log('\n' + '='.repeat(60));
-    console.log('AI ANALYSIS SYSTEM - PERFORMANCE TESTS');
-    console.log('='.repeat(60));
-    console.log('\nPerformance Thresholds:');
+    window.Logger?.info('\n' + '='.repeat(60));
+    window.Logger?.info('AI ANALYSIS SYSTEM - PERFORMANCE TESTS');
+    window.Logger?.info('='.repeat(60));
+    window.Logger?.info('\nPerformance Thresholds:');
     Object.entries(PERFORMANCE_THRESHOLDS).forEach(([key, value]) => {
-      console.log(`  ${key}: ${value}ms`);
+      window.Logger?.info(`  ${key}: ${value}ms`);
     });
-    console.log('');
+    window.Logger?.info('');
 
     try {
       await testPageLoadTime();
@@ -515,7 +515,7 @@
       await testMemoryUsage();
       await testNetworkPerformance();
     } catch (error) {
-      console.error('❌ Performance test suite error:', error);
+      window.Logger?.error('❌ Performance test suite error:', error);
     }
 
     performanceResults.endTime = Date.now();
@@ -523,14 +523,14 @@
 
     // Print summary
     logSection('PERFORMANCE TEST SUMMARY');
-    console.log(`Total Tests: ${performanceResults.summary.total}`);
-    console.log(`Passed: ${performanceResults.summary.passed} ✅`);
-    console.log(`Failed: ${performanceResults.summary.failed} ${performanceResults.summary.failed > 0 ? '❌' : ''}`);
-    console.log(`Warnings: ${performanceResults.summary.warnings} ${performanceResults.summary.warnings > 0 ? '⚠️' : ''}`);
-    console.log(`Total Duration: ${(performanceResults.duration / 1000).toFixed(2)}s`);
+    window.Logger?.info(`Total Tests: ${performanceResults.summary.total}`);
+    window.Logger?.info(`Passed: ${performanceResults.summary.passed} ✅`);
+    window.Logger?.info(`Failed: ${performanceResults.summary.failed} ${performanceResults.summary.failed > 0 ? '❌' : ''}`);
+    window.Logger?.info(`Warnings: ${performanceResults.summary.warnings} ${performanceResults.summary.warnings > 0 ? '⚠️' : ''}`);
+    window.Logger?.info(`Total Duration: ${(performanceResults.duration / 1000).toFixed(2)}s`);
     
     // Detailed summary
-    console.log('\nPerformance Breakdown:');
+    window.Logger?.info('\nPerformance Breakdown:');
     const categoryBreakdown = {};
     performanceResults.tests.forEach(test => {
       if (!categoryBreakdown[test.category]) {
@@ -546,10 +546,10 @@
 
     Object.entries(categoryBreakdown).forEach(([category, stats]) => {
       const passRate = ((stats.passed / stats.total) * 100).toFixed(1);
-      console.log(`  ${category}: ${stats.passed}/${stats.total} passed (${passRate}%)`);
+      window.Logger?.info(`  ${category}: ${stats.passed}/${stats.total} passed (${passRate}%)`);
     });
 
-    console.log('\n' + '='.repeat(60) + '\n');
+    window.Logger?.info('\n' + '='.repeat(60) + '\n');
 
     return performanceResults;
   }
@@ -559,7 +559,7 @@
   window.aiAnalysisPerformanceResults = performanceResults;
   window.AI_ANALYSIS_PERFORMANCE_THRESHOLDS = PERFORMANCE_THRESHOLDS;
 
-  console.log('✅ AI Analysis performance test suite loaded');
-  console.log('Run: window.runAIAnalysisPerformanceTests()');
+  window.Logger?.info('✅ AI Analysis performance test suite loaded');
+  window.Logger?.info('Run: window.runAIAnalysisPerformanceTests()');
 })();
 

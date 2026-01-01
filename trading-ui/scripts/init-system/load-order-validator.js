@@ -26,6 +26,24 @@ if (window.Logger) {
 /**
  * Load Order Validator Class
  */
+// #region agent log - LoadOrderValidator loaded
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+    location:'load-order-validator.js:29',
+    message:'LoadOrderValidator_class_defined',
+    data:{
+      timestamp: Date.now(),
+      location: window.location.href
+    },
+    sessionId:'load-order-debug',
+    runId:'load-order-debug-1',
+    hypothesisId:'load-order-validator-loading'
+  })
+}).catch(()=>{});
+// #endregion
+
 class LoadOrderValidator {
     constructor() {
         this.manifest = null;
@@ -464,7 +482,28 @@ const loadOrderValidator = new LoadOrderValidator();
 
 // Export globally
 window.loadOrderValidator = loadOrderValidator;
+window.LoadOrderValidator = LoadOrderValidator;
 
 if (window.Logger) {
   window.Logger.debug('✅ Load Order Validator loaded successfully', { page: 'load-order-validator' });
 }
+
+// #region agent log - LoadOrderValidator fully loaded
+fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+    location:'load-order-validator.js:483',
+    message:'LoadOrderValidator_fully_loaded',
+    data:{
+      timestamp: Date.now(),
+      LoadOrderValidator: typeof window.LoadOrderValidator,
+      loadOrderValidator: typeof window.loadOrderValidator,
+      location: window.location.href
+    },
+    sessionId:'load-order-debug',
+    runId:'load-order-debug-1',
+    hypothesisId:'load-order-validator-loading'
+  })
+}).catch(()=>{});
+// #endregion

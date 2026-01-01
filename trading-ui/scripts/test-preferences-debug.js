@@ -287,8 +287,8 @@
      * Run all tests
      */
     async runAllTests() {
-      console.log('🧪 Starting Preferences Debug Tests...');
-      console.log('='.repeat(80));
+      window.Logger?.info('🧪 Starting Preferences Debug Tests...');
+      window.Logger?.info('='.repeat(80));
 
       // Get userId and profileId from PreferencesCore if available
       if (window.PreferencesCore) {
@@ -297,53 +297,53 @@
       }
 
       // Test 1: Check global preferences
-      console.log('\n📋 Running Test 1: Check window.currentPreferences...');
+      window.Logger?.info('\n📋 Running Test 1: Check window.currentPreferences...');
       await this.test1_CheckGlobalPreferences();
 
       // Test 2: Check all preferences API
-      console.log('\n📋 Running Test 2: Check /api/preferences/user API...');
+      window.Logger?.info('\n📋 Running Test 2: Check /api/preferences/user API...');
       await this.test2_CheckAllPreferencesAPI();
 
       // Test 3: Check group APIs for problematic groups
       // Updated to match actual group names in database
       const groupsToTest = ['ui_settings', 'trading_settings', 'colors_unified', 'basic_settings', 'filter_settings', 'notification_settings', 'chart_settings_unified'];
       for (const group of groupsToTest) {
-        console.log(`\n📋 Running Test 3: Check /api/preferences/user/group API for '${group}'...`);
+        window.Logger?.info(`\n📋 Running Test 3: Check /api/preferences/user/group API for '${group}'...`);
         await this.test3_CheckGroupAPI(group);
       }
 
       // Test 4: Check PreferencesV4.getGroup for problematic groups
       for (const group of groupsToTest) {
-        console.log(`\n📋 Running Test 4: Check PreferencesV4.getGroup('${group}')...`);
+        window.Logger?.info(`\n📋 Running Test 4: Check PreferencesV4.getGroup('${group}')...`);
         await this.test4_CheckPreferencesV4GetGroup(group);
       }
 
       // Test 5: Check PreferencesCore state
-      console.log('\n📋 Running Test 5: Check PreferencesCore state...');
+      window.Logger?.info('\n📋 Running Test 5: Check PreferencesCore state...');
       await this.test5_CheckPreferencesCoreState();
 
       // Print summary
-      console.log('\n' + '='.repeat(80));
-      console.log('📊 TEST SUMMARY');
-      console.log('='.repeat(80));
+      window.Logger?.info('\n' + '='.repeat(80));
+      window.Logger?.info('📊 TEST SUMMARY');
+      window.Logger?.info('='.repeat(80));
       
       const passed = this.results.tests.filter(t => t.passed).length;
       const failed = this.results.tests.filter(t => !t.passed).length;
       
-      console.log(`Total Tests: ${this.results.tests.length}`);
-      console.log(`✅ Passed: ${passed}`);
-      console.log(`❌ Failed: ${failed}`);
+      window.Logger?.info(`Total Tests: ${this.results.tests.length}`);
+      window.Logger?.info(`✅ Passed: ${passed}`);
+      window.Logger?.info(`❌ Failed: ${failed}`);
       
-      console.log('\n📋 Detailed Results:');
+      window.Logger?.info('\n📋 Detailed Results:');
       this.results.tests.forEach((test, index) => {
         const status = test.passed ? '✅' : '❌';
-        console.log(`\n${status} ${test.name}`);
-        console.log(JSON.stringify(test.details, null, 2));
+        window.Logger?.info(`\n${status} ${test.name}`);
+        window.Logger?.info(JSON.stringify(test.details, null, 2));
       });
 
       // Save results to window for inspection
       window.__preferencesDebugTestResults = this.results;
-      console.log('\n💾 Results saved to window.__preferencesDebugTestResults');
+      window.Logger?.info('\n💾 Results saved to window.__preferencesDebugTestResults');
 
       return this.results;
     }
@@ -376,7 +376,7 @@
     return test.runAllTests();
   };
 
-  console.log('✅ Preferences Debug Test script loaded');
-  console.log('💡 Run manually: window.runPreferencesDebugTest()');
+  window.Logger?.info('✅ Preferences Debug Test script loaded');
+  window.Logger?.info('💡 Run manually: window.runPreferencesDebugTest()');
 })();
 

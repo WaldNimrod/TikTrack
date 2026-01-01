@@ -1,0 +1,232 @@
+{
+  "runId": "gate1-yellow-current-1767048647481",
+  "timestamp": "2025-12-29T22:50:47.481Z",
+  "environment": "localhost:8080",
+  "context": "YELLOW status current check - QA after fixes loaded",
+  "status": "red",
+  "successRate": "46.7",
+  "passed": 7,
+  "failed": 8,
+  "totalTimeMs": 5930,
+  "averageResponseTime": 79.4,
+  "is15Of15Pass": false,
+  "remainingFailures": 8,
+  "failures": [
+    {
+      "entity": "trade_plan",
+      "endpoint": "/api/trade_plans",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 404",
+          "responseTime": 23
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "alert",
+      "endpoint": "/api/alerts",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 24
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "ticker",
+      "endpoint": "/api/tickers",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 500",
+          "responseTime": 30
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "trading_account",
+      "endpoint": "/api/trading_accounts",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 14
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "cash_flow",
+      "endpoint": "/api/cash_flows",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 14
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "user_profile",
+      "endpoint": "/api/user_profile",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 10
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "trading_journal",
+      "endpoint": "/api/trading_journal",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 400",
+          "responseTime": 12
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    },
+    {
+      "entity": "data_import",
+      "endpoint": "/api/data_import",
+      "error": null,
+      "failedOperations": [
+        {
+          "operation": "create",
+          "error": "HTTP 405",
+          "responseTime": 21
+        },
+        {
+          "operation": "read",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "update",
+          "error": null,
+          "responseTime": 0
+        },
+        {
+          "operation": "delete",
+          "error": null,
+          "responseTime": 0
+        }
+      ]
+    }
+  ]
+}

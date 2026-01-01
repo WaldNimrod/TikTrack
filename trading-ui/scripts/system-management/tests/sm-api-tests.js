@@ -36,7 +36,7 @@ class SMAPITests {
     
     const results = {};
     
-    console.log('🧪 Starting API endpoint tests...');
+    window.Logger?.info('🧪 Starting API endpoint tests...');
     
     for (const endpoint of endpoints) {
       try {
@@ -52,7 +52,7 @@ class SMAPITests {
     const passed = Object.values(results).filter(r => r.passed).length;
     const total = endpoints.length;
     
-    console.log(`✅ API tests completed: ${passed}/${total} passed`);
+    window.Logger?.info(`✅ API tests completed: ${passed}/${total} passed`);
     
     return {
       results,
@@ -154,12 +154,12 @@ class SMAPITests {
    * הרצת כל בדיקות ה-API והצגת תוצאות
    */
   static async runAllTests() {
-    console.log('🚀 Starting System Management API Tests...');
+    window.Logger?.info('🚀 Starting System Management API Tests...');
     const results = await this.testAllEndpoints();
     
     // Display results
-    console.table(results.results);
-    console.log('Summary:', results.summary);
+    window.Logger?.table(results.results);
+    window.Logger?.info('Summary:', results.summary);
     
     return results;
   }

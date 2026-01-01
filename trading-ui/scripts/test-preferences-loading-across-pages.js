@@ -296,26 +296,26 @@
      * Test all pages
      */
     async testAllPages() {
-      console.log('🧪 Starting Preferences Loading Test across all pages...');
-      console.log(`📋 Testing ${this.pages.length} pages...\n`);
+      window.Logger?.info('🧪 Starting Preferences Loading Test across all pages...');
+      window.Logger?.info(`📋 Testing ${this.pages.length} pages...\n`);
 
       for (const pageName of this.pages) {
-        console.log(`Testing ${pageName}...`);
+        window.Logger?.info(`Testing ${pageName}...`);
         const result = await this.testPage(pageName);
         this.results.pages[pageName] = result;
         this.results.total++;
 
         if (result.overall === 'passed') {
           this.results.passed++;
-          console.log(`  ✅ ${pageName}: PASSED`);
+          window.Logger?.info(`  ✅ ${pageName}: PASSED`);
         } else if (result.overall === 'warning') {
           this.results.warnings++;
-          console.log(`  ⚠️  ${pageName}: WARNING`);
+          window.Logger?.info(`  ⚠️  ${pageName}: WARNING`);
         } else if (result.overall === 'failed') {
           this.results.failed++;
-          console.log(`  ❌ ${pageName}: FAILED`);
+          window.Logger?.info(`  ❌ ${pageName}: FAILED`);
         } else {
-          console.log(`  ⚠️  ${pageName}: ERROR - ${result.error || 'Unknown error'}`);
+          window.Logger?.info(`  ⚠️  ${pageName}: ERROR - ${result.error || 'Unknown error'}`);
         }
       }
 
@@ -327,45 +327,45 @@
      * Print test summary
      */
     printSummary() {
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 TEST SUMMARY');
-      console.log('='.repeat(60));
-      console.log(`Total Pages: ${this.results.total}`);
-      console.log(`✅ Passed: ${this.results.passed}`);
-      console.log(`⚠️  Warnings: ${this.results.warnings}`);
-      console.log(`❌ Failed: ${this.results.failed}`);
-      console.log('='.repeat(60) + '\n');
+      window.Logger?.info('\n' + '='.repeat(60));
+      window.Logger?.info('📊 TEST SUMMARY');
+      window.Logger?.info('='.repeat(60));
+      window.Logger?.info(`Total Pages: ${this.results.total}`);
+      window.Logger?.info(`✅ Passed: ${this.results.passed}`);
+      window.Logger?.info(`⚠️  Warnings: ${this.results.warnings}`);
+      window.Logger?.info(`❌ Failed: ${this.results.failed}`);
+      window.Logger?.info('='.repeat(60) + '\n');
 
       // Print failed pages
       if (this.results.failed > 0) {
-        console.log('❌ FAILED PAGES:');
+        window.Logger?.info('❌ FAILED PAGES:');
         Object.entries(this.results.pages).forEach(([page, result]) => {
           if (result.overall === 'failed') {
-            console.log(`\n  ${page}:`);
+            window.Logger?.info(`\n  ${page}:`);
             Object.entries(result.checks).forEach(([checkName, check]) => {
               if (!check.passed) {
-                console.log(`    - ${checkName}: ${check.details.message}`);
+                window.Logger?.info(`    - ${checkName}: ${check.details.message}`);
               }
             });
           }
         });
-        console.log('');
+        window.Logger?.info('');
       }
 
       // Print pages with warnings
       if (this.results.warnings > 0) {
-        console.log('⚠️  PAGES WITH WARNINGS:');
+        window.Logger?.info('⚠️  PAGES WITH WARNINGS:');
         Object.entries(this.results.pages).forEach(([page, result]) => {
           if (result.overall === 'warning') {
-            console.log(`\n  ${page}:`);
+            window.Logger?.info(`\n  ${page}:`);
             Object.entries(result.checks).forEach(([checkName, check]) => {
               if (!check.passed) {
-                console.log(`    - ${checkName}: ${check.details.message}`);
+                window.Logger?.info(`    - ${checkName}: ${check.details.message}`);
               }
             });
           }
         });
-        console.log('');
+        window.Logger?.info('');
       }
     }
 
@@ -448,7 +448,7 @@
     
     // Auto-run if in browser console
     if (window.console && typeof window.console.log === 'function') {
-      console.log('✅ PreferencesLoadingTest loaded. Run: new PreferencesLoadingTest().testAllPages()');
+      window.Logger?.info('✅ PreferencesLoadingTest loaded. Run: new PreferencesLoadingTest().testAllPages()');
     }
   }
 

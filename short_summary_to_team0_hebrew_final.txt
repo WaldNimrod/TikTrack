@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הושלם Full CRUD E2E עם Network Trace מלא (15 entities)
+- תועדו 10 כשלים עם trace evidence מלא
+Evidence:
+- Network trace: 39 requests (69.2% success), 19 endpoints
+- 5/15 entities עוברים; 10/15 נכשלים עם endpoint details
+Blockers:
+- CRITICAL: Network trace חושף פער קטסטרופלי - אימותי A/B/C לא מדויקים
+Next: Teams A/B/C לתקן endpoints שנכשלו לפני rerun

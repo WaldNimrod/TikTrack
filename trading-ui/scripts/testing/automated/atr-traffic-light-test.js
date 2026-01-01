@@ -61,10 +61,10 @@
         testResults.total++;
         if (passed) {
             testResults.passed++;
-            console.log(`✅ PASS [${category}] ${testName}${duration > 0 ? ` (${duration.toFixed(2)}ms)` : ''}`);
+            window.Logger?.info(`✅ PASS [${category}] ${testName}${duration > 0 ? ` (${duration.toFixed(2)}ms)` : ''}`);
         } else {
             testResults.failed++;
-            console.error(`❌ FAIL [${category}] ${testName}: ${message}${duration > 0 ? ` (${duration.toFixed(2)}ms)` : ''}`);
+            window.Logger?.error(`❌ FAIL [${category}] ${testName}: ${message}${duration > 0 ? ` (${duration.toFixed(2)}ms)` : ''}`);
         }
         testResults.details.push({
             category,
@@ -414,15 +414,15 @@
     // ===== MAIN TEST RUNNER =====
 
     async function runAllATRTests() {
-        console.log('============================================================');
-        console.log('ATR TRAFFIC LIGHT SYSTEM - COMPREHENSIVE TEST SUITE');
-        console.log('============================================================');
-        console.log('');
-        console.log('Test Configuration:');
-        console.log(`  User ID: ${TEST_CONFIG.testUser}`);
-        console.log(`  Profile ID: ${TEST_CONFIG.testProfile}`);
-        console.log(`  Test Cases: ${TEST_CONFIG.testCases.length}`);
-        console.log('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('ATR TRAFFIC LIGHT SYSTEM - COMPREHENSIVE TEST SUITE');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('');
+        window.Logger?.info('Test Configuration:');
+        window.Logger?.info(`  User ID: ${TEST_CONFIG.testUser}`);
+        window.Logger?.info(`  Profile ID: ${TEST_CONFIG.testProfile}`);
+        window.Logger?.info(`  Test Cases: ${TEST_CONFIG.testCases.length}`);
+        window.Logger?.info('');
 
         testResults = {
             passed: 0,
@@ -432,62 +432,62 @@
         };
 
         // Unit Tests
-        console.log('============================================================');
-        console.log('UNIT TESTS');
-        console.log('============================================================');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('UNIT TESTS');
+        window.Logger?.info('============================================================');
         await testFieldRendererServiceExists();
         await testRenderATRWithDefaults();
         await testRenderATRWithCustomThresholds();
         await testRenderATRWithNullValues();
 
         // Integration Tests
-        console.log('');
-        console.log('============================================================');
-        console.log('INTEGRATION TESTS');
-        console.log('============================================================');
+        window.Logger?.info('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('INTEGRATION TESTS');
+        window.Logger?.info('============================================================');
         await testPreferencesLoading();
         await testEntityDetailsRendererIntegration();
 
         // CSS Tests
-        console.log('');
-        console.log('============================================================');
-        console.log('CSS TESTS');
-        console.log('============================================================');
+        window.Logger?.info('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('CSS TESTS');
+        window.Logger?.info('============================================================');
         await testCSSClassesExist();
 
         // E2E Tests
-        console.log('');
-        console.log('============================================================');
-        console.log('E2E TESTS');
-        console.log('============================================================');
+        window.Logger?.info('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('E2E TESTS');
+        window.Logger?.info('============================================================');
         await testTickerDetailsPage();
 
         // Performance Tests
-        console.log('');
-        console.log('============================================================');
-        console.log('PERFORMANCE TESTS');
-        console.log('============================================================');
+        window.Logger?.info('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('PERFORMANCE TESTS');
+        window.Logger?.info('============================================================');
         await testRenderATRPerformance();
 
         // Summary
-        console.log('');
-        console.log('============================================================');
-        console.log('TEST SUMMARY');
-        console.log('============================================================');
-        console.log(`Total Tests: ${testResults.total}`);
-        console.log(`Passed: ${testResults.passed} ✅`);
-        console.log(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
-        console.log(`Success Rate: ${((testResults.passed / testResults.total) * 100).toFixed(2)}%`);
-        console.log('');
+        window.Logger?.info('');
+        window.Logger?.info('============================================================');
+        window.Logger?.info('TEST SUMMARY');
+        window.Logger?.info('============================================================');
+        window.Logger?.info(`Total Tests: ${testResults.total}`);
+        window.Logger?.info(`Passed: ${testResults.passed} ✅`);
+        window.Logger?.info(`Failed: ${testResults.failed} ${testResults.failed > 0 ? '❌' : ''}`);
+        window.Logger?.info(`Success Rate: ${((testResults.passed / testResults.total) * 100).toFixed(2)}%`);
+        window.Logger?.info('');
 
         if (testResults.failed > 0) {
-            console.log('Failed Tests:');
+            window.Logger?.info('Failed Tests:');
             testResults.details
                 .filter(t => !t.passed)
                 .forEach(t => {
-                    console.log(`  ❌ [${t.category}] ${t.testName}: ${t.message}`);
+                    window.Logger?.info(`  ❌ [${t.category}] ${t.testName}: ${t.message}`);
                 });
-            console.log('');
+            window.Logger?.info('');
         }
 
         return {
@@ -502,6 +502,6 @@
     // Export to window
     window.runATRTests = runAllATRTests;
 
-    console.log('✅ ATR Traffic Light Test Suite loaded. Run: window.runATRTests()');
+    window.Logger?.info('✅ ATR Traffic Light Test Suite loaded. Run: window.runATRTests()');
 })();
 

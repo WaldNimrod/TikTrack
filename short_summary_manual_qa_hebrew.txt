@@ -1,0 +1,6 @@
+Subject: Manual QA | Team D
+Status: FAILED
+Done: הרצתי QA ידני ל-3 ישויות עם DB constraints - זיהיתי בעיות אמיתיות: Trading account not found (trade_plan/cash_flow), Internal server error (user_profile)
+Evidence: Logger מלא + Network evidence - כל שגיאות מייצגות בעיה אמיתית (לא Unknown error), Payloads עומדים באילוצים
+Blockers: משתמש admin לא קשור לחשבונות מסחר, user profile API עם 500 error
+Next: צור trading account למשתמש admin, תקן user profile API 500 error

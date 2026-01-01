@@ -317,7 +317,7 @@ class QuickQualityCheckManager {
                                 <h6><i class="fas fa-info-circle"></i> מידע נוסף</h6>
                                 <p class="mb-0">
                                     לבדיקות מפורטות יותר, עבור ל
-                                    <a href="code_quality_dashboard.html" class="alert-link">דשבורד איכות הקוד</a>
+                                    <a href="code_quality_dashboard" class="alert-link">דשבורד איכות הקוד</a>
                                 </p>
                             </div>
                         </div>
@@ -326,7 +326,7 @@ class QuickQualityCheckManager {
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             סגור
                         </button>
-                        <a href="code_quality_dashboard.html" class="btn btn-primary">
+                        <a href="code_quality_dashboard" class="btn btn-primary">
                             <i class="fas fa-external-link-alt"></i>
                             דשבורד מלא
                         </a>

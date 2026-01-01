@@ -1,0 +1,6 @@
+Subject: QA Prep | Team D
+Status: COMPLETED
+Done: הכנתי מקור אמת יחיד (UnifiedPayloadBuilder) + טבלת Payload ↔ Field Map ↔ DB Constraints ל-3 ישויות (trade_plan, cash_flow, user_profile)
+Evidence: טבלת ניתוח מלאה ב-professional_report_to_development_manager.md עם Field Maps, Payloads שנוצרים, ו-DB constraints מ-SQLAlchemy models
+Blockers: זיהיתי inconsistencies: usd_rate חסר ב-cash_flow, planned_amount defaults שונים, phone field commented out ב-user_profile
+Next: מוכן לבדיקות ידניות עם admin/admin123 אחרי אישור constraints מ-Team C

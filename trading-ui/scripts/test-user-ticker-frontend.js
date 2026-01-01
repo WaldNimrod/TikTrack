@@ -36,13 +36,13 @@
     function logTest(name, passed, message = '') {
         const status = passed ? '✅' : '❌';
         const logMessage = `${status} ${name}${message ? ': ' + message : ''}`;
-        console.log(logMessage);
+        window.Logger?.info(logMessage);
         testResults.push({ name, passed, message });
         return passed;
     }
     
     async function testTickersDataService() {
-        console.log('\n=== Testing TickersData Service ===');
+        window.Logger?.info('\n=== Testing TickersData Service ===');
         
         if (!window.tickersData) {
             return logTest('TickersData service available', false, 'window.tickersData not found');
@@ -69,7 +69,7 @@
     }
     
     async function testSelectPopulatorService() {
-        console.log('\n=== Testing SelectPopulatorService ===');
+        window.Logger?.info('\n=== Testing SelectPopulatorService ===');
         
         if (!window.SelectPopulatorService) {
             return logTest('SelectPopulatorService available', false, 'window.SelectPopulatorService not found');
@@ -111,7 +111,7 @@
     }
     
     async function testAPIEndpoints() {
-        console.log('\n=== Testing API Endpoints ===');
+        window.Logger?.info('\n=== Testing API Endpoints ===');
         
         // Test GET /api/tickers/my
         try {
@@ -152,7 +152,7 @@
     }
     
     async function testTickerSelectors() {
-        console.log('\n=== Testing Ticker Selectors on Page ===');
+        window.Logger?.info('\n=== Testing Ticker Selectors on Page ===');
         
         // Find all ticker select elements
         const tickerSelects = document.querySelectorAll('select[id*="ticker" i], select[name*="ticker" i], select[data-field*="ticker" i]');
@@ -178,7 +178,7 @@
     }
     
     async function testTickersPage() {
-        console.log('\n=== Testing Tickers Page ===');
+        window.Logger?.info('\n=== Testing Tickers Page ===');
         
         // Check if we're on tickers page
         if (!window.location.pathname.includes('tickers')) {
@@ -208,11 +208,11 @@
     }
     
     async function runAllTests() {
-        console.log('\n' + '='.repeat(60));
-        console.log('FRONTEND USER-TICKER INTEGRATION TESTS');
-        console.log('='.repeat(60));
-        console.log(`Page: ${window.location.pathname}`);
-        console.log(`Time: ${new Date().toLocaleString()}`);
+        window.Logger?.info('\n' + '='.repeat(60));
+        window.Logger?.info('FRONTEND USER-TICKER INTEGRATION TESTS');
+        window.Logger?.info('='.repeat(60));
+        window.Logger?.info(`Page: ${window.location.pathname}`);
+        window.Logger?.info(`Time: ${new Date().toLocaleString()}`);
         
         await testTickersDataService();
         await testSelectPopulatorService();
@@ -221,24 +221,24 @@
         await testTickersPage();
         
         // Summary
-        console.log('\n' + '='.repeat(60));
-        console.log('TEST SUMMARY');
-        console.log('='.repeat(60));
+        window.Logger?.info('\n' + '='.repeat(60));
+        window.Logger?.info('TEST SUMMARY');
+        window.Logger?.info('='.repeat(60));
         
         const passed = testResults.filter(r => r.passed).length;
         const total = testResults.length;
         
         testResults.forEach(result => {
             const status = result.passed ? '✅' : '❌';
-            console.log(`${status} ${result.name}${result.message ? ': ' + result.message : ''}`);
+            window.Logger?.info(`${status} ${result.name}${result.message ? ': ' + result.message : ''}`);
         });
         
-        console.log(`\nTotal: ${passed}/${total} tests passed`);
+        window.Logger?.info(`\nTotal: ${passed}/${total} tests passed`);
         
         if (passed === total) {
-            console.log('✅ All tests passed! 🎉');
+            window.Logger?.info('✅ All tests passed! 🎉');
         } else {
-            console.log(`❌ ${total - passed} test(s) failed`);
+            window.Logger?.info(`❌ ${total - passed} test(s) failed`);
         }
         
         return { passed, total, results: testResults };
@@ -251,7 +251,7 @@
     if (window.location.search.includes('test=user-ticker') || window.location.hash === '#test') {
         runAllTests();
     } else {
-        console.log('Frontend test script loaded. Run window.testUserTickerIntegration() to execute tests.');
+        window.Logger?.info('Frontend test script loaded. Run window.testUserTickerIntegration() to execute tests.');
     }
 })();
 

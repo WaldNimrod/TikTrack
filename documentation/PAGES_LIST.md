@@ -6,6 +6,22 @@
 
 ---
 
+## ⚠️ כללים חד-משמעיים (CRITICAL)
+
+### ✅ URLs: Snake Case בלבד
+
+כל URLs חייבים להיות ב-**snake_case** (קו תחתון). **אין חריגים.**
+
+### ❌ URLs: ללא .html
+
+**.html אסור בקישורי מערכת ובדיקות.** השתמש ב-URLs נקיים בלבד.
+
+### 📋 חריגים
+
+ראה: `KEBAB_CASE_EXCEPTIONS.md`, `PERMANENT_EXCEPTIONS.md`
+
+---
+
 ## ✅ מקור אמת (as-made)
 
 **מקורות:**  

@@ -1,0 +1,15 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: YELLOW
+Done:
+- QA מושהה בגלל auth loop + טעינה חלקית ששוברות את הריצות
+- Auth Loop: /api/auth/me/undefined calls גורמים ללולאות אימות
+- טעינה חלקית: קבצי JS לא נטענים במלואם
+- בדיקות נפסקות באמצע ולא מסתיימות
+Evidence:
+- Console errors מראים auth recursion ו-stack overflow
+- Network tab מציג /api/auth/me/undefined calls חוזרים
+- Scripts לא נטענים לפני תחילת QA
+Blockers:
+- QA SUSPENDED - Auth loop + טעינה חלקית מונעות ריצה מלאה
+- Teams A/C צריכים לתקן recursion prevention וטעינה מלאה
+Next: אחרי תיקונים - restart server + hard refresh + rerun מלא

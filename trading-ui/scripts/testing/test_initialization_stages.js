@@ -49,7 +49,7 @@
       testResults.summary.passed++;
     } else {
       testResults.summary.failed++;
-      console.error(`❌ FAILED: ${name}`, details);
+      window.Logger?.error(`❌ FAILED: ${name}`, details);
     }
     
     testResults.summary.total++;
@@ -69,7 +69,7 @@
    * Stage 1: Core Systems - Cache System
    */
   function testStage1() {
-    console.log('\n🔍 Testing Stage 1: Core Systems - Cache System');
+    window.Logger?.info('\n🔍 Testing Stage 1: Core Systems - Cache System');
     
     // Test 1.1: UnifiedCacheManager available
     const test1_1 = test(
@@ -125,14 +125,14 @@
     );
     addTestResult('stage1', test1_6);
 
-    console.log(`✅ Stage 1: ${testResults.stage1.passed}/${testResults.stage1.passed + testResults.stage1.failed} tests passed`);
+    window.Logger?.info(`✅ Stage 1: ${testResults.stage1.passed}/${testResults.stage1.passed + testResults.stage1.failed} tests passed`);
   }
 
   /**
    * Stage 2: UI Systems - requiredGlobals
    */
   function testStage2() {
-    console.log('\n🔍 Testing Stage 2: UI Systems - requiredGlobals');
+    window.Logger?.info('\n🔍 Testing Stage 2: UI Systems - requiredGlobals');
     
     // Get current page name
     const path = window.location.pathname;
@@ -143,7 +143,7 @@
     const pageConfig = window.pageInitializationConfigs?.[pageName] || window.PAGE_CONFIGS?.[pageName];
     
     if (!pageConfig) {
-      console.warn(`⚠️ No page config found for ${pageName}`);
+      window.Logger?.warn(`⚠️ No page config found for ${pageName}`);
       const test2_0 = test('Page config exists', false, { pageName });
       addTestResult('stage2', test2_0);
       return;
@@ -204,14 +204,14 @@
       addTestResult('stage2', test2_3);
     }
 
-    console.log(`✅ Stage 2: ${testResults.stage2.passed}/${testResults.stage2.passed + testResults.stage2.failed} tests passed`);
+    window.Logger?.info(`✅ Stage 2: ${testResults.stage2.passed}/${testResults.stage2.passed + testResults.stage2.failed} tests passed`);
   }
 
   /**
    * Stage 3: Page Systems - Custom Initializers
    */
   function testStage3() {
-    console.log('\n🔍 Testing Stage 3: Page Systems - Custom Initializers');
+    window.Logger?.info('\n🔍 Testing Stage 3: Page Systems - Custom Initializers');
     
     // Get current page name
     const path = window.location.pathname;
@@ -222,7 +222,7 @@
     const pageConfig = window.pageInitializationConfigs?.[pageName] || window.PAGE_CONFIGS?.[pageName];
     
     if (!pageConfig) {
-      console.warn(`⚠️ No page config found for ${pageName}`);
+      window.Logger?.warn(`⚠️ No page config found for ${pageName}`);
       const test3_0 = test('Page config exists', false, { pageName });
       addTestResult('stage3', test3_0);
       return;
@@ -284,14 +284,14 @@
       addTestResult('stage3', test3_4);
     }
 
-    console.log(`✅ Stage 3: ${testResults.stage3.passed}/${testResults.stage3.passed + testResults.stage3.failed} tests passed`);
+    window.Logger?.info(`✅ Stage 3: ${testResults.stage3.passed}/${testResults.stage3.passed + testResults.stage3.failed} tests passed`);
   }
 
   /**
    * Stage 4: Validation Systems
    */
   function testStage4() {
-    console.log('\n🔍 Testing Stage 4: Validation Systems');
+    window.Logger?.info('\n🔍 Testing Stage 4: Validation Systems');
     
     // Test 4.1: Business Logic API available for validations
     const businessLogicEndpoints = [
@@ -334,14 +334,14 @@
     );
     addTestResult('stage4', test4_2);
 
-    console.log(`✅ Stage 4: ${testResults.stage4.passed}/${testResults.stage4.passed + testResults.stage4.failed} tests passed`);
+    window.Logger?.info(`✅ Stage 4: ${testResults.stage4.passed}/${testResults.stage4.passed + testResults.stage4.failed} tests passed`);
   }
 
   /**
    * Stage 5: Finalization
    */
   function testStage5() {
-    console.log('\n🔍 Testing Stage 5: Finalization');
+    window.Logger?.info('\n🔍 Testing Stage 5: Finalization');
     
     // Test 5.1: Business Logic API available for final calculations
     const calculationFunctions = [
@@ -377,14 +377,14 @@
     );
     addTestResult('stage5', test5_2);
 
-    console.log(`✅ Stage 5: ${testResults.stage5.passed}/${testResults.stage5.passed + testResults.stage5.failed} tests passed`);
+    window.Logger?.info(`✅ Stage 5: ${testResults.stage5.passed}/${testResults.stage5.passed + testResults.stage5.failed} tests passed`);
   }
 
   /**
    * Run all tests
    */
   function runAllTests() {
-    console.log('🚀 Starting UnifiedAppInitializer - 5 Stages Testing...\n');
+    window.Logger?.info('🚀 Starting UnifiedAppInitializer - 5 Stages Testing...\n');
     
     testStage1();
     testStage2();
@@ -393,11 +393,11 @@
     testStage5();
 
     // Print summary
-    console.log('\n📊 Test Summary:');
-    console.log(`Total Tests: ${testResults.summary.total}`);
-    console.log(`Passed: ${testResults.summary.passed}`);
-    console.log(`Failed: ${testResults.summary.failed}`);
-    console.log(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
+    window.Logger?.info('\n📊 Test Summary:');
+    window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+    window.Logger?.info(`Passed: ${testResults.summary.passed}`);
+    window.Logger?.info(`Failed: ${testResults.summary.failed}`);
+    window.Logger?.info(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
 
     // Store results in window for external access
     window.initializationStagesTestResults = testResults;

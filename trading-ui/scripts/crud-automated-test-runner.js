@@ -5,13 +5,13 @@
  * סקריפט להרצת בדיקות CRUD אוטומטיות על 8 העמודים המרכזיים
  * 
  * שימוש:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard
  * 2. פתח את הקונסול (F12)
  * 3. העתק והדבק את הקוד הזה בקונסול
  * 4. לחץ Enter
  * 
  * או:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard
  * 2. לחץ על כפתור "הרץ כל הבדיקות"
  * 
  * @version 1.0.0
@@ -29,12 +29,12 @@
  * @returns {Promise<Object>} דוח תוצאות
  */
 async function runCRUDAutomatedTests() {
-  console.log('🚀 Starting CRUD Automated Tests for 8 Main Pages...');
-  console.log('📋 Pages to test: trades, trade_plans, alerts, tickers, trading_accounts, executions, cash_flows, notes');
+  window.Logger?.info('🚀 Starting CRUD Automated Tests for 8 Main Pages...');
+  window.Logger?.info('📋 Pages to test: trades, trade_plans, alerts, tickers, trading_accounts, executions, cash_flows, notes');
   
   // בדיקה שהמערכת זמינה
   if (!window.CRUDEnhancedTester) {
-    console.error('❌ CRUDEnhancedTester not available. Make sure you are on crud_testing_dashboard.html');
+    window.Logger?.error('❌ CRUDEnhancedTester not available. Make sure you are on crud_testing_dashboard');
     return null;
   }
   
@@ -55,7 +55,7 @@ async function runCRUDAutomatedTests() {
     'notes'
   ];
   
-  console.log(`\n📊 Testing ${mainPages.length} main pages...\n`);
+  window.Logger?.info(`\n📊 Testing ${mainPages.length} main pages...\n`);
   
   const results = [];
   const startTime = Date.now();
@@ -66,7 +66,7 @@ async function runCRUDAutomatedTests() {
     const entity = window.crudEnhancedTester.entities[entityName];
     
     if (!entity) {
-      console.error(`❌ Entity '${entityName}' not found in mapping`);
+      window.Logger?.error(`❌ Entity '${entityName}' not found in mapping`);
       results.push({
         entity: entityName,
         score: 0,
@@ -76,9 +76,9 @@ async function runCRUDAutomatedTests() {
       continue;
     }
     
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`🧪 [${i + 1}/${mainPages.length}] Testing: ${entity.displayName} (${entityName})`);
-    console.log(`${'='.repeat(60)}`);
+    window.Logger?.info(`\n${'='.repeat(60)}`);
+    window.Logger?.info(`🧪 [${i + 1}/${mainPages.length}] Testing: ${entity.displayName} (${entityName})`);
+    window.Logger?.info(`${'='.repeat(60)}`);
     
     try {
       const result = await window.crudEnhancedTester.smartEntityTest(entityName);
@@ -86,14 +86,14 @@ async function runCRUDAutomatedTests() {
       
       // הצגת תוצאה
       const status = result.score >= 80 ? '✅ PASSED' : '❌ FAILED';
-      console.log(`\n${status} - Score: ${result.score}/100`);
+      window.Logger?.info(`\n${status} - Score: ${result.score}/100`);
       if (result.issues.length > 0) {
-        console.log(`⚠️ Issues:`);
-        result.issues.forEach(issue => console.log(`   - ${issue}`));
+        window.Logger?.info(`⚠️ Issues:`);
+        result.issues.forEach(issue => window.Logger?.info(`   - ${issue}`));
       }
       
     } catch (error) {
-      console.error(`💥 Error testing ${entityName}:`, error);
+      window.Logger?.error(`💥 Error testing ${entityName}:`, error);
       results.push({
         entity: entityName,
         displayName: entity.displayName,
@@ -112,42 +112,42 @@ async function runCRUDAutomatedTests() {
   const totalTime = Date.now() - startTime;
   
   // סיכום תוצאות
-  console.log(`\n${'='.repeat(60)}`);
-  console.log('📊 FINAL RESULTS SUMMARY');
-  console.log(`${'='.repeat(60)}`);
-  console.log(`⏱️ Total Time: ${Math.round(totalTime / 1000)} seconds`);
-  console.log(`📋 Pages Tested: ${results.length}`);
+  window.Logger?.info(`\n${'='.repeat(60)}`);
+  window.Logger?.info('📊 FINAL RESULTS SUMMARY');
+  window.Logger?.info(`${'='.repeat(60)}`);
+  window.Logger?.info(`⏱️ Total Time: ${Math.round(totalTime / 1000)} seconds`);
+  window.Logger?.info(`📋 Pages Tested: ${results.length}`);
   
   const passed = results.filter(r => r.score >= 80).length;
   const failed = results.filter(r => r.score < 80).length;
   
-  console.log(`✅ Passed (≥80): ${passed}`);
-  console.log(`❌ Failed (<80): ${failed}`);
+  window.Logger?.info(`✅ Passed (≥80): ${passed}`);
+  window.Logger?.info(`❌ Failed (<80): ${failed}`);
   
   // חישוב ציון ממוצע
   const avgScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
-  console.log(`📊 Average Score: ${Math.round(avgScore)}/100`);
+  window.Logger?.info(`📊 Average Score: ${Math.round(avgScore)}/100`);
   
   // עמודים שנכשלו
   if (failed > 0) {
-    console.log(`\n❌ Failed Pages:`);
+    window.Logger?.info(`\n❌ Failed Pages:`);
     results
       .filter(r => r.score < 80)
       .forEach(r => {
-        console.log(`   - ${r.displayName || r.entity}: ${r.score}/100`);
+        window.Logger?.info(`   - ${r.displayName || r.entity}: ${r.score}/100`);
         if (r.issues && r.issues.length > 0) {
-          r.issues.forEach(issue => console.log(`     • ${issue}`));
+          r.issues.forEach(issue => window.Logger?.info(`     • ${issue}`));
         }
       });
   }
   
   // עמודים שעברו
   if (passed > 0) {
-    console.log(`\n✅ Passed Pages:`);
+    window.Logger?.info(`\n✅ Passed Pages:`);
     results
       .filter(r => r.score >= 80)
       .forEach(r => {
-        console.log(`   - ${r.displayName || r.entity}: ${r.score}/100`);
+        window.Logger?.info(`   - ${r.displayName || r.entity}: ${r.score}/100`);
       });
   }
   
@@ -174,9 +174,9 @@ async function runCRUDAutomatedTests() {
   // שמירת דוח ב-localStorage
   try {
     localStorage.setItem('crud_automated_test_report', JSON.stringify(report));
-    console.log(`\n💾 Report saved to localStorage: 'crud_automated_test_report'`);
+    window.Logger?.info(`\n💾 Report saved to localStorage: 'crud_automated_test_report'`);
   } catch (e) {
-    console.warn('⚠️ Could not save report to localStorage:', e);
+    window.Logger?.warn('⚠️ Could not save report to localStorage:', e);
   }
   
   // הצגת הודעה
@@ -205,7 +205,7 @@ if (typeof window !== 'undefined') {
 }
 
 // הודעת הוראות
-console.log(`
+window.Logger?.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║  CRUD Automated Test Runner - Ready                         ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -216,7 +216,7 @@ console.log(`
    or
 
    runCRUDAutomatedTests().then(report => {
-     console.log('Report:', report);
+     window.Logger?.info('Report:', report);
    });
 
 📊 The script will test all 8 main pages:

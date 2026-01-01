@@ -11,7 +11,7 @@ import logging
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -50,6 +50,7 @@ def get_alert(alert_id: int):
     return jsonify(response), status_code
 
 @alerts_bp.route('/', methods=['POST'])
+@require_authentication()
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['alerts'])
 def create_alert():

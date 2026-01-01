@@ -55,7 +55,7 @@
       testResults.summary.passed++;
     } else {
       testResults.summary.failed++;
-      console.error(`❌ FAILED: ${name}`, details);
+      window.Logger?.error(`❌ FAILED: ${name}`, details);
     }
     
     testResults.summary.total++;
@@ -75,7 +75,7 @@
    * Test preferences:critical-loaded event
    */
   function testPreferencesEvent() {
-    console.log('\n🔍 Testing preferences:critical-loaded event');
+    window.Logger?.info('\n🔍 Testing preferences:critical-loaded event');
 
     // Test 1.1: Event fired
     const test1_1 = test(
@@ -124,14 +124,14 @@
     );
     addTestResult('eventTests', test1_4);
 
-    console.log(`✅ Event Tests: ${testResults.eventTests.passed}/${testResults.eventTests.passed + testResults.eventTests.failed} tests passed`);
+    window.Logger?.info(`✅ Event Tests: ${testResults.eventTests.passed}/${testResults.eventTests.passed + testResults.eventTests.failed} tests passed`);
   }
 
   /**
    * Test __preferencesCriticalLoaded flag
    */
   function testPreferencesFlag() {
-    console.log('\n🔍 Testing __preferencesCriticalLoaded flag');
+    window.Logger?.info('\n🔍 Testing __preferencesCriticalLoaded flag');
 
     // Test 2.1: Flag set
     const test2_1 = test(
@@ -167,14 +167,14 @@
     );
     addTestResult('flagTests', test2_3);
 
-    console.log(`✅ Flag Tests: ${testResults.flagTests.passed}/${testResults.flagTests.passed + testResults.flagTests.failed} tests passed`);
+    window.Logger?.info(`✅ Flag Tests: ${testResults.flagTests.passed}/${testResults.flagTests.passed + testResults.flagTests.failed} tests passed`);
   }
 
   /**
    * Test Business Logic API dependency on Preferences
    */
   function testBusinessLogicDependency() {
-    console.log('\n🔍 Testing Business Logic API dependency on Preferences');
+    window.Logger?.info('\n🔍 Testing Business Logic API dependency on Preferences');
 
     // Test 3.1: Business Logic API doesn't depend on Preferences
     // Check if Business Logic API wrappers work without preferences
@@ -214,7 +214,7 @@
     );
     addTestResult('dependencyTests', test3_2);
 
-    console.log(`✅ Dependency Tests: ${testResults.dependencyTests.passed}/${testResults.dependencyTests.passed + testResults.dependencyTests.failed} tests passed`);
+    window.Logger?.info(`✅ Dependency Tests: ${testResults.dependencyTests.passed}/${testResults.dependencyTests.passed + testResults.dependencyTests.failed} tests passed`);
   }
 
   /**
@@ -225,14 +225,14 @@
     window.addEventListener('preferences:critical-loaded', (event) => {
       eventFired = true;
       eventDetail = event.detail;
-      console.log('✅ preferences:critical-loaded event received', event.detail);
+      window.Logger?.info('✅ preferences:critical-loaded event received', event.detail);
     }, { once: true });
 
     // Check if flag is already set
     if (window.__preferencesCriticalLoaded) {
       flagSet = true;
       flagDetail = window.__preferencesCriticalLoadedDetail;
-      console.log('✅ __preferencesCriticalLoaded flag already set', flagDetail);
+      window.Logger?.info('✅ __preferencesCriticalLoaded flag already set', flagDetail);
     }
 
     // Monitor flag changes
@@ -240,7 +240,7 @@
       if (window.__preferencesCriticalLoaded && !flagSet) {
         flagSet = true;
         flagDetail = window.__preferencesCriticalLoadedDetail;
-        console.log('✅ __preferencesCriticalLoaded flag set', flagDetail);
+        window.Logger?.info('✅ __preferencesCriticalLoaded flag set', flagDetail);
         clearInterval(checkFlag);
       }
     }, 100);
@@ -255,7 +255,7 @@
    * Run all tests
    */
   function runAllTests() {
-    console.log('🚀 Starting Preferences Loading Events Testing...\n');
+    window.Logger?.info('🚀 Starting Preferences Loading Events Testing...\n');
     
     // Setup event listener first
     setupEventListener();
@@ -267,11 +267,11 @@
       testBusinessLogicDependency();
 
       // Print summary
-      console.log('\n📊 Test Summary:');
-      console.log(`Total Tests: ${testResults.summary.total}`);
-      console.log(`Passed: ${testResults.summary.passed}`);
-      console.log(`Failed: ${testResults.summary.failed}`);
-      console.log(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
+      window.Logger?.info('\n📊 Test Summary:');
+      window.Logger?.info(`Total Tests: ${testResults.summary.total}`);
+      window.Logger?.info(`Passed: ${testResults.summary.passed}`);
+      window.Logger?.info(`Failed: ${testResults.summary.failed}`);
+      window.Logger?.info(`Success Rate: ${((testResults.summary.passed / testResults.summary.total) * 100).toFixed(2)}%`);
 
       // Store results in window for external access
       window.preferencesLoadingEventsTestResults = testResults;

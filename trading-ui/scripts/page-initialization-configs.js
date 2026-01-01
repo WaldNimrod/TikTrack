@@ -199,6 +199,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
         'services',
+        'helper', // Required for LinkedItemsService
         'ui-advanced',
         'modules', // Required for ModalManagerV2 (tag search drawer)
         'crud',
@@ -230,7 +231,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TickerListWidget', // Ticker List Widget
         'window.TickerChartWidget', // Ticker Chart Widget
         'window.TradingViewWidgetsFactory', // TradingView Widgets Factory (required for TickerChartWidget)
-        'window.WatchListsWidgetService', // Watch Lists Widget Service
         'window.WatchListsWidget', // Watch Lists Widget
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System

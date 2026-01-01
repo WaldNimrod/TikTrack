@@ -1,0 +1,11 @@
+Subject: CRUD Integration | Gate 1 | Team D
+Status: RED
+Done:
+- הושלם Full CRUD E2E validation (15 entities)
+- תועדו 10 כשלים עם evidence
+Evidence:
+- 5/15 entities עוברים (trade, note, tag, watch_list, execution)
+- 10/15 נכשלים עם שגיאות 404/400/500 (פרטים בדוח)
+Blockers:
+- פער בין אימותי פריסה של Teams A/B/C לתוצאות QA
+Next: המתנה ל-trace runtime לפני rerun

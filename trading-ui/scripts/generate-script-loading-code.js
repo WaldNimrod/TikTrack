@@ -95,8 +95,9 @@ try {
  * @param {string} pageName - Page name
  * @param {string} mode - 'development' or 'production' (auto-detected if null)
  * @param {boolean} useBundles - Whether to use bundles (auto-set based on mode if null)
+ * @param {boolean} updateInPlace - Whether to update the HTML file in place (default: false)
  */
-function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
+function generateScriptLoadingCode(pageName, mode = null, useBundles = null, updateInPlace = false) {
 
   // Auto-detect environment if not provided
   if (!mode) {
@@ -227,7 +228,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
         // Handle external URLs (CDN) vs local files
         const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://')
           ? script.file
-          : `/trading-ui/scripts/${script.file}?v=1.0.0`;
+          : script.file.startsWith('scripts/')
+            ? `/trading-ui/${script.file}?v=1.0.0`  // File already has scripts/ prefix
+            : `/trading-ui/scripts/${script.file}?v=1.0.0`;  // Add scripts/ prefix
         
         // Generate script tag with loading strategy
         let scriptTag;
@@ -327,6 +330,7 @@ const pageName = process.argv[2];
 const modeArg = process.argv.find(arg => arg.startsWith('--mode='));
 const useBundlesArg = process.argv.find(arg => arg === '--use-bundles' || arg === '--bundles');
 const noBundlesArg = process.argv.find(arg => arg === '--no-bundles');
+const updateInPlaceArg = process.argv.find(arg => arg === '--update-in-place');
 
 // Parse mode - auto-detect if not provided
 let mode = modeArg ? modeArg.split('=')[1] : null;

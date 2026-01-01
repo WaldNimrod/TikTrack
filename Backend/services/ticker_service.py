@@ -636,11 +636,16 @@ class TickerService:
         # Normalize data
         normalized_symbol = TickerService._normalize_symbol(ticker_data.get('symbol'))
         ticker_data['symbol'] = normalized_symbol
-        
+
         if 'name' in ticker_data and ticker_data['name']:
             ticker_data['name'] = ticker_data['name'].strip()
         # currency_id doesn't need normalization - it's already a number
-        
+
+        # Remove unsupported fields that may come from API requests
+        unsupported_fields = ['exchange', 'market', 'country', 'sector', 'industry']
+        for field in unsupported_fields:
+            ticker_data.pop(field, None)
+
         ticker = Ticker(**ticker_data)
         db.add(ticker)
         db.flush()  # Use flush instead of commit - let the decorator handle the commit

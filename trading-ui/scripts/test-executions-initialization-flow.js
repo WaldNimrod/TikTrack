@@ -29,11 +29,11 @@
 (function() {
   'use strict';
 
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🔍 ניטור תהליך איתחול עמוד ביצועים');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('🔍 ניטור תהליך איתחול עמוד ביצועים');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
 
   const monitor = {
     startTime: Date.now(),
@@ -49,9 +49,9 @@
       details
     };
     monitor.events.push(event);
-    console.log(`📅 [${event.time}ms] ${name}`);
+    window.Logger?.info(`📅 [${event.time}ms] ${name}`);
     if (Object.keys(details).length > 0) {
-      console.log('   ', details);
+      window.Logger?.info('   ', details);
     }
   }
 
@@ -65,9 +65,9 @@
     monitor.issues.push(issue);
     
     const icon = severity === 'error' ? '❌' : severity === 'warning' ? '⚠️' : 'ℹ️';
-    console.log(`${icon} ${message}`);
+    window.Logger?.info(`${icon} ${message}`);
     if (Object.keys(details).length > 0) {
-      console.log('   ', details);
+      window.Logger?.info('   ', details);
     }
   }
 
@@ -78,15 +78,15 @@
       time: Date.now() - monitor.startTime
     };
     monitor.duplicates.push(dup);
-    console.log(`🔄 כפילות: ${name}`);
-    console.log('   נמצא ב:', locations);
+    window.Logger?.info(`🔄 כפילות: ${name}`);
+    window.Logger?.info('   נמצא ב:', locations);
   }
 
   // ============================================================================
   // 1. בדיקת מערכת האיתחול המאוחדת
   // ============================================================================
-  console.log('📋 שלב 1: בדיקת מערכת האיתחול המאוחדת');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📋 שלב 1: בדיקת מערכת האיתחול המאוחדת');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined';
   logEvent('UnifiedAppInitializer Check', {
@@ -110,13 +110,13 @@
     logIssue('error', 'Executions page config not found!');
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 2. בדיקת כפילויות בקריאות איתחול
   // ============================================================================
-  console.log('🔄 שלב 2: בדיקת כפילויות בקריאות איתחול');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔄 שלב 2: בדיקת כפילויות בקריאות איתחול');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת initializeExecutionsPage
   const initializeExecutionsPageLocations = [];
@@ -185,13 +185,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 3. בדיקת קוד מקומי חליפי
   // ============================================================================
-  console.log('🔍 שלב 3: בדיקת קוד מקומי חליפי');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔍 שלב 3: בדיקת קוד מקומי חליפי');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת האם יש קוד שמעקף את מערכת האיתחול המאוחדת
   const hasDirectDOMContentLoaded = (() => {
@@ -230,13 +230,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 4. בדיקת תהליך הטעינה
   // ============================================================================
-  console.log('📊 שלב 4: בדיקת תהליך הטעינה');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('📊 שלב 4: בדיקת תהליך הטעינה');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת סדר הטעינה
   const loadOrder = [];
@@ -283,13 +283,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 5. בדיקת סיבוכיות יתר
   // ============================================================================
-  console.log('🔧 שלב 5: בדיקת סיבוכיות יתר');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔧 שלב 5: בדיקת סיבוכיות יתר');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת מספר ה-timeouts
   const timeoutCount = (() => {
@@ -325,13 +325,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 6. בדיקת תהליך ה-preloading
   // ============================================================================
-  console.log('🔄 שלב 6: בדיקת תהליך ה-preloading');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🔄 שלב 6: בדיקת תהליך ה-preloading');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת executionsSections34Data
   const hasSections34Data = !!window.executionsSections34Data;
@@ -396,13 +396,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 7. בדיקת רינדור אשכולות
   // ============================================================================
-  console.log('🎨 שלב 7: בדיקת רינדור אשכולות');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('🎨 שלב 7: בדיקת רינדור אשכולות');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // בדיקת DOM elements
   const tradeCreationSection = document.getElementById('tradeCreationClustersSection');
@@ -470,13 +470,13 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 8. בדיקת timing של כל השלבים
   // ============================================================================
-  console.log('⏱️  שלב 8: בדיקת timing של כל השלבים');
-  console.log('───────────────────────────────────────────────────────────────');
+  window.Logger?.info('⏱️  שלב 8: בדיקת timing של כל השלבים');
+  window.Logger?.info('───────────────────────────────────────────────────────────────');
   
   // נבדוק את הזמנים של כל האירועים
   const eventsByTime = monitor.events.sort((a, b) => a.time - b.time);
@@ -507,14 +507,14 @@
     });
   }
   
-  console.log('\n');
+  window.Logger?.info('\n');
 
   // ============================================================================
   // 9. סיכום וניתוח
   // ============================================================================
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('📊 סיכום ניטור');
-  console.log('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('📊 סיכום ניטור');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
   
   const totalEvents = monitor.events.length;
   const totalIssues = monitor.issues.length;
@@ -522,73 +522,73 @@
   const errors = monitor.issues.filter(i => i.severity === 'error').length;
   const warnings = monitor.issues.filter(i => i.severity === 'warning').length;
   
-  console.log(`📅 אירועים: ${totalEvents}`);
-  console.log(`❌ שגיאות: ${errors}`);
-  console.log(`⚠️  אזהרות: ${warnings}`);
-  console.log(`🔄 כפילויות: ${totalDuplicates}`);
-  console.log(`⏱️  זמן כולל: ${Date.now() - monitor.startTime}ms`);
-  console.log('\n');
+  window.Logger?.info(`📅 אירועים: ${totalEvents}`);
+  window.Logger?.info(`❌ שגיאות: ${errors}`);
+  window.Logger?.info(`⚠️  אזהרות: ${warnings}`);
+  window.Logger?.info(`🔄 כפילויות: ${totalDuplicates}`);
+  window.Logger?.info(`⏱️  זמן כולל: ${Date.now() - monitor.startTime}ms`);
+  window.Logger?.info('\n');
   
   // ניתוח בעיות
   if (errors > 0) {
-    console.log('❌ בעיות קריטיות:');
+    window.Logger?.info('❌ בעיות קריטיות:');
     monitor.issues.filter(i => i.severity === 'error').forEach(issue => {
-      console.error(`   - ${issue.message}`);
+      window.Logger?.error(`   - ${issue.message}`);
       if (Object.keys(issue.details).length > 0) {
-        console.error('     ', issue.details);
+        window.Logger?.error('     ', issue.details);
       }
     });
-    console.log('\n');
+    window.Logger?.info('\n');
   }
   
   if (warnings > 0) {
-    console.log('⚠️  אזהרות:');
+    window.Logger?.info('⚠️  אזהרות:');
     monitor.issues.filter(i => i.severity === 'warning').forEach(issue => {
-      console.warn(`   - ${issue.message}`);
+      window.Logger?.warn(`   - ${issue.message}`);
       if (Object.keys(issue.details).length > 0) {
-        console.warn('     ', issue.details);
+        window.Logger?.warn('     ', issue.details);
       }
     });
-    console.log('\n');
+    window.Logger?.info('\n');
   }
   
   if (totalDuplicates > 0) {
-    console.log('🔄 כפילויות:');
+    window.Logger?.info('🔄 כפילויות:');
     monitor.duplicates.forEach(dup => {
-      console.warn(`   - ${dup.name}:`);
+      window.Logger?.warn(`   - ${dup.name}:`);
       dup.locations.forEach(loc => {
-        console.warn(`     * ${loc}`);
+        window.Logger?.warn(`     * ${loc}`);
       });
     });
-    console.log('\n');
+    window.Logger?.info('\n');
   }
   
   // המלצות
-  console.log('💡 המלצות:');
+  window.Logger?.info('💡 המלצות:');
   if (totalDuplicates > 0) {
-    console.log('   1. יש להסיר כפילויות בקריאות איתחול');
-    console.log('   2. יש להשתמש רק במערכת האיתחול המאוחדת');
+    window.Logger?.info('   1. יש להסיר כפילויות בקריאות איתחול');
+    window.Logger?.info('   2. יש להשתמש רק במערכת האיתחול המאוחדת');
   }
   if (hasSectionsRestoredWait || hasMutationObserver) {
-    console.log('   3. יש להסיר קוד מקומי חליפי ולהשתמש במערכת המאוחדת');
+    window.Logger?.info('   3. יש להסיר קוד מקומי חליפי ולהשתמש במערכת המאוחדת');
   }
   if (timeoutCount > 3 || eventListenerCount > 5) {
-    console.log('   4. יש לפשט את הקוד ולהסיר סיבוכיות יתר');
+    window.Logger?.info('   4. יש לפשט את הקוד ולהסיר סיבוכיות יתר');
   }
   if (hasSections34Data && (!window.executionsSections34Data.tradeCreation?.loaded || !window.executionsSections34Data.suggestions?.loaded)) {
-    console.log('   5. יש לבדוק למה preloadSections34Data לא הושלם');
+    window.Logger?.info('   5. יש לבדוק למה preloadSections34Data לא הושלם');
   }
   if (tradeCreationTableBody && tradeCreationTableBody.querySelectorAll('tr').length === 0 && 
       window.executionsSections34Data?.tradeCreation?.data?.length > 0) {
-    console.log('   6. יש לבדוק למה renderClusters לא נקרא למרות שיש נתונים');
+    window.Logger?.info('   6. יש לבדוק למה renderClusters לא נקרא למרות שיש נתונים');
   }
   if (errors === 0 && warnings === 0 && totalDuplicates === 0) {
-    console.log('   ✅ הכל תקין! העמוד ממש את מערכת האיתחול המאוחדת נכון.');
+    window.Logger?.info('   ✅ הכל תקין! העמוד ממש את מערכת האיתחול המאוחדת נכון.');
   }
   
-  console.log('\n');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('\n');
+  window.Logger?.info('\n');
+  window.Logger?.info('═══════════════════════════════════════════════════════════════');
+  window.Logger?.info('\n');
   
   // החזרת תוצאות
   return {

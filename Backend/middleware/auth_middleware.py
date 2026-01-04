@@ -17,7 +17,14 @@ def setup_auth_middleware(app):
     - Expects Authorization: Bearer <token>
     - Sets g.user_id / g.current_user if token is valid
     """
-    
+    # Prevent double-registration
+    if app.extensions.get("auth_middleware_registered"):
+        logger.info("🔐 Auth middleware already registered, skipping")
+        return
+
+    app.extensions["auth_middleware_registered"] = True
+    logger.info("🔐 Setting up authentication middleware")
+
     PUBLIC_ENDPOINTS = [
         '/api/auth/login',
         '/api/auth/register',
@@ -45,12 +52,15 @@ def setup_auth_middleware(app):
 
     @app.before_request
     def load_user():
-        print(f"MIDDLEWARE: Called for {request.method} {request.path}")
+        if request.path.startswith('/api/'):
+            logger.critical(f"🚨 MIDDLEWARE CALLED for {request.method} {request.path}")
         # Skip authentication for public endpoints
         is_public = any(request.path.startswith(endpoint) for endpoint in PUBLIC_ENDPOINTS)
-        print(f"MIDDLEWARE: Is public endpoint? {is_public} for {request.path}")
+        if request.path.startswith('/api/'):
+            logger.critical(f"🚨 Is public? {is_public}, PUBLIC_ENDPOINTS: {[ep for ep in PUBLIC_ENDPOINTS if '/api/' in ep]}")
         if is_public:
-            print(f"MIDDLEWARE: Skipping public endpoint {request.path}")
+            if request.path.startswith('/api/'):
+                logger.critical(f"🚨 Skipping public API endpoint {request.path}")
             return
 
         g.user_id = None

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-01-04T03:06:14.140Z",
+  "summary": {
+    "totalFunctions": 0,
+    "totalDuplicates": 0,
+    "exactDuplicates": 0,
+    "nearDuplicates": 0,
+    "similarPatterns": 0,
+    "potentialDuplicates": 0,
+    "categories": {}
+  },
+  "duplicates": {
+    "exact": [],
+    "near": [],
+    "similar": [],
+    "potential": []
+  },
+  "categories": {},
+  "recommendations": []
+}

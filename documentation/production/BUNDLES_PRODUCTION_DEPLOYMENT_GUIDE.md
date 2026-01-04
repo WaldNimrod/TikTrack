@@ -177,7 +177,7 @@ node scripts/update-all-pages-to-bundles.js
 📦 Updating All Pages to Production Mode with Bundles
 ================================================================================
 
-Found 21 pages in PAGE_CONFIGS
+Found 21 pages in pageInitializationConfigs
 
 [1/21] Processing: index...
 ✅ Updated: index (index.html)

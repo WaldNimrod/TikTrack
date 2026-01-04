@@ -17,6 +17,24 @@ Scope: applies to all projects; project-specific references live in daily files.
 - Team instructions: `documentation/05-REPORTS/team_instructions_YYYY_MM_DD.md`
 - Professional report: `documentation/05-REPORTS/professional_report_YYYY_MM_DD.md`
 
+**Daily file ownership (mandatory)**
+
+- Team 0 owns and edits all three daily files above.
+- Each team edits only its own team report file (not listed here).
+
+**Program-level documentation split (mandatory, project-agnostic template)**
+
+Use this 4-file structure whenever a project introduces a new core system or program that requires strict ownership separation (example: init/loading manifest program). Naming is fixed, content is program-specific.
+
+- **Full specification** (Team 0 owner, Team E editor, others read-only):
+  - `documentation/02-ARCHITECTURE/<AREA>/<PROGRAM>_TARGET_SPEC.md`
+- **Roles + plan + gates** (Team 0 owner, Team E editor, others read-only):
+  - `documentation/05-REPORTS/<PROGRAM>_ROLES_AND_PLAN_YYYY_MM_DD.md`
+- **Team completion log** (Team E owner, Teams A/B/C/D/F edit, Team 0 read-only):
+  - `documentation/05-REPORTS/<PROGRAM>_TEAM_PROGRESS_YYYY_MM_DD.md`
+- **Task transfer to teams** (Team 0 owner, others read-only):
+  - `documentation/05-REPORTS/<PROGRAM>_TEAM_TASKS_YYYY_MM_DD.md`
+
 **Archived plans**
 
 - Historical references only (read-only).
@@ -160,6 +178,23 @@ Each task must include:
 
 ---
 
+## 6.1) Evidence Storage and File Naming (Mandatory)
+
+- Evidence must be stored in a **file** inside the repo; DevTools-only references are not accepted.
+- Every report must include **exact file paths** to evidence artifacts, plus a JSON path or line reference when applicable.
+- If evidence is captured in DevTools (Console/Network), export it to a file and store it under:
+  - `documentation/05-REPORTS/artifacts/YYYY_MM_DD/`
+- File names must be explicit: `team_<team>__task_<task_slug>__evidence_<short_desc>.{json,log,txt}`
+- If an existing file is used (e.g., `focused_api_results.json`), the report must specify the exact **JSON path** to the evidence.
+
+## 6.2) File Ownership and Communication Separation (Mandatory)
+
+- Team 0 sends **short messages** for transfer; full details must live in the team's own report file.
+- Each team edits **only its own report file** (no cross-editing).
+- Team 0 edits only Team 0 files (master task list, team_updates, team_instructions, professional_report).
+
+---
+
 ## 7) Daily File Rules
 
 - Team reports are daily files (English + underscores).
@@ -189,7 +224,9 @@ Each task must include:
 **Team D**
 
 - Provide endpoint + payload + error text evidence.
-- QA runs use authenticated session unless testing auth failures.
+- QA runs must use authenticated sessions for all protected pages (no TEST MODE or bypass).
+- Login modal is deprecated; auth must redirect to the login page only.
+- QA runs in the dev environment on port 8080 (production is separate).
 
 **Team E**
 

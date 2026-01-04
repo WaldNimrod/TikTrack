@@ -28,6 +28,19 @@ mimetypes.add_type('application/javascript', '.js')
 # Add Backend directory to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Additional explicit MIME type configuration for Flask
+import werkzeug.utils
+original_send_file = werkzeug.utils.send_file
+
+def send_file_with_correct_mime(*args, **kwargs):
+    """Override send_file to ensure correct MIME types"""
+    response = original_send_file(*args, **kwargs)
+    if hasattr(response, 'mimetype') and response.mimetype == 'text/javascript':
+        response.mimetype = 'application/javascript'
+    return response
+
+werkzeug.utils.send_file = send_file_with_correct_mime
+
 # Import configuration settings for cache modes and server config
 from config.settings import (
     DEVELOPMENT_MODE,
@@ -264,6 +277,11 @@ from routes.api.quotes_v1 import quotes_bp
 from routes.pages import pages_bp
 
 app = Flask(__name__)
+
+# Register auth middleware globally at app init (not only in __main__)
+from middleware.auth_middleware import setup_auth_middleware
+setup_auth_middleware(app)
+
 # Set secret key for session management
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
 # Configure session lifetime - sessions expire after 24 hours of inactivity
@@ -316,6 +334,12 @@ CORS(app, supports_credentials=True, origins=[
 
 # Legacy SQLAlchemy compatibility layer for tests
 db = LegacyDBProxy(app)
+
+# Additional MIME type fix for Flask - ensure JS files are served correctly
+@app.before_request
+def fix_mime_types():
+    """Fix MIME types for static files before serving"""
+    pass  # Will be handled in route handlers
 
 
 @app.teardown_appcontext
@@ -2652,11 +2676,18 @@ def serve_ui_files(filename):
     if not os.path.exists(full_path):
         print(f"DEBUG: File not found: {filename}")
         return "File not found", 404
+
     # Guess mimetype and set explicitly to avoid JSON default
     guessed, _ = mimetypes.guess_type(full_path)
+
+    # FIX: Ensure JS files are served as application/javascript, not text/javascript
+    if filename.endswith('.js'):
+        guessed = 'application/javascript'
+
     resp = send_from_directory(UI_DIR, filename)
     if guessed:
         resp.mimetype = guessed
+        print(f"DEBUG: Serving {filename} with MIME type: {guessed}")
 
     return resp
 
@@ -2667,9 +2698,10 @@ def serve_static_files(filename):
     # First try UI directory
     ui_path = os.path.join(UI_DIR, filename)
     if os.path.exists(ui_path):
-        # Determine correct mimetype
+        # Determine correct mimetype - FIX: Ensure JS files are served as application/javascript
         if filename.endswith('.js'):
             mimetype = 'application/javascript'
+            print(f"DEBUG: Serving JS file {filename} with MIME type: {mimetype}")
         elif filename.endswith('.css'):
             mimetype = 'text/css'
         else:
@@ -2859,11 +2891,8 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     # -----------------------------------------------------------------------------
-    # Authentication Middleware (after all blueprints)
+    # Authentication Middleware - registered globally at app init
     # -----------------------------------------------------------------------------
-    from middleware.auth_middleware import setup_auth_middleware
-    setup_auth_middleware(app)
-    logger.info(" Authentication middleware initialized")
 
     # Display server startup information
     if IS_PRODUCTION:

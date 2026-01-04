@@ -585,7 +585,8 @@ const pageInitializationConfigs = {
         'window.PendingTradePlanWidget',
         'window.TikTrackAuth',
         'window.UserProfilePage',
-        'window.AIAnalysisManager'
+        'window.AIAnalysisManager',
+        'ModalManagerV2' // Required for user profile modals
       ],
       pageSpecificScripts: [
         'scripts/user-profile.js',
@@ -2228,6 +2229,7 @@ const pageInitializationConfigs = {
         'window.IconSystem', 'DataUtils', 'window.initializeResearchPage',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
+        'ModalManagerV2' // Required for research page modals
       ],
       preloadAssets: ['research-data'],
       cacheStrategy: 'standard',

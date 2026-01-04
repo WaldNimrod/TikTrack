@@ -264,7 +264,7 @@ python3 Backend/server_health_check.py
 ## 🔗 Related Documentation
 
 - [Database Documentation](../database/README.md)
-- [Development Guidelines](../development/README.md)
+- [Development Guidelines](../03-DEVELOPMENT/README.md)
 - [Backend Documentation](../backend/README.md)
 
 ---

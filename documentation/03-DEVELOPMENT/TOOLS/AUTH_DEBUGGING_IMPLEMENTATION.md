@@ -11,7 +11,7 @@
 - **UnifiedCacheManager עם SessionStorageLayer**: authToken/currentUser נשמרים ב-SessionStorageLayer (שכבה 5) עם `includeUserId:false` בלבד; פינוי דרך `forceLogoutAndPrompt`.
 - **Bootstrap Mechanism**: `bootstrapAuthFromSessionStorage()` רץ לפני UnifiedCacheManager ומסתנכרן אוטומטית ל-SessionStorageLayer אחרי אתחול.
 - **Redirect בלבד**: אין מודול כניסה. בכל 401/חוסר טוקן → הפניה ל-`/login.html`.
-- **ללא modal**: אין `showLoginModal` ואין יצירת ממשק כניסה בתוך העמוד.
+- **ללא modal**: אין `showLoginModal` ואין יצירת ממשק כניסה בתוך העמוד (הוסר לחלוטין ב-P0 Auth Hardening).
 - **Preferences ברירת מחדל**: `/api/preferences/default` מחזיר צבעי לוגו (#26baac, #fc5a06). טעינה רכה (soft-fail) כשאין משתמש.
 - **Rate Limit (429)**: בעמודים עתירי trade-plans (למשל `/trades_formatted.html`) חובה לצמצם מקביליות, להגדיל דיליי, ולהישען על CacheTTLGuard/RateLimitTracker.
 - **בידוד נתונים מלא**: כל Service Layer מסנן לפי user_id בצורה חובה. משתמשים רואים רק נתונים שלהם.
@@ -38,8 +38,8 @@
 2. **סלניום**  
    - עמוד בודד: `python3 scripts/test_pages_console_errors.py --page "/"`  
    - סוויפ מלא: `python3 scripts/test_pages_console_errors.py`
-3. **Redirect**  
-   - לפתוח עמוד מוגן ללא טוקן → הפניה ל-`/login.html` (ללא modal).
+3. **Redirect** (P0 Auth Hardening)
+   - לפתוח עמוד מוגן ללא טוקן → הפניה ל-`/login.html` (ללא modal, ללא fallbacks).
 4. **Auth/Cache**  
    - אחרי login: `UnifiedCacheManager.get('authToken', {layer: 'sessionStorage', includeUserId:false})` קיים; בטאב נוסף אין 401 מוקדמים ל-tickers/watch_lists/preferences.
    - Bootstrap: `sessionStorage.getItem('dev_authToken')` זמין לפני UnifiedCacheManager מאותחל.

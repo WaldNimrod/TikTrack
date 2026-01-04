@@ -21,7 +21,6 @@
 // - checkAuthentication() - Checkauthentication
 
 // === UI Functions ===
-// - showLoginModal() - Redirecttologinpage
 
 // === Other ===
 // - waitForAuthJS() - Waitforauthjs
@@ -91,7 +90,6 @@ async function checkAuthentication() {
 /**
  * Redirect to login page only (login modal removed)
  */
-async function showLoginModal() {
   window.Logger?.info?.('🔐 [Auth Guard] Redirecting to login page', { page: 'auth-guard' });
 
   // REMOVE MODAL FLOW: Always redirect to login page
@@ -222,7 +220,6 @@ async function waitForAuthJS() {
   window.Logger?.info?.('⏳ [Auth Guard] waitForAuthJS started', {
     page: 'auth-guard',
     tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
-    showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function',
     documentReadyState: document.readyState,
     timestamp: new Date().toISOString()
   });
@@ -238,7 +235,6 @@ async function waitForAuthJS() {
         window.Logger?.info?.('✅ [Auth Guard] auth.js loaded', { 
           page: 'auth-guard',
           attempts: i + 1,
-          hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function'
         });
         break;
       }
@@ -246,7 +242,6 @@ async function waitForAuthJS() {
   } else {
     window.Logger?.info?.('✅ [Auth Guard] auth.js already loaded', {
       page: 'auth-guard',
-      hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function'
     });
   }
   
@@ -270,5 +265,4 @@ async function waitForAuthJS() {
 window.AuthGuard = {
   init: initAuthGuard,
   checkAuth: checkAuthentication,
-  showLoginModal
 };

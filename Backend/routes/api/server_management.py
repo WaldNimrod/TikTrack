@@ -16,7 +16,7 @@ from typing import Any, Dict
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 # Create blueprint
@@ -368,8 +368,9 @@ def get_server_status() -> Any:
         }), 500
 
 @server_management_bp.route('/system/info', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
+@require_authentication()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_info() -> Any:
     """
     Get detailed system information using base API patterns

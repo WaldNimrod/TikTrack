@@ -32,7 +32,6 @@
 // - showLoginSuccess() - Showloginsuccess
 // - showDashboard() - Showdashboard
 // - showLogin() - Showlogin
-// - showLoginModal() - Showloginmodal
 // - updateUserProfile() - Updateuserprofile
 // - updatePassword() - Updatepassword
 
@@ -51,7 +50,6 @@
 
 // === TESTING HOOKS (Fix Pack 5) ===
 // - isTestingEnvironment() - Istestingenvironment
-// - enableTestMode() - Enabletestmode
 // - performTestLogin() - Performtestlogin
 // - getTestAuthState() - Gettestauthstate
 
@@ -1828,7 +1826,7 @@ function createLogoutButton(containerId) {
 /**
  * Redirect to login page only (login modal removed)
  */
-async function showLoginModal() {
+function redirectToLogin() {
   window.Logger?.info?.('🔐 [auth.js] Redirecting to login page (no modal)', { page: 'auth' });
   const path = window.location?.pathname || '';
   if (path === '/login' || path === '/login.html') {
@@ -2307,7 +2305,6 @@ window.TikTrackAuth = {
   setLoadingState,
   register,
   loadSavedCredentials,
-  showLoginModal,
   // Helper functions for consistent cache operations
   saveAuthToCache,
   getAuthFromCache,
@@ -2324,13 +2321,11 @@ window.TikTrackAuth = {
 if (window.Logger) {
   window.Logger.info('✅ [auth.js] window.TikTrackAuth defined', {
     page: 'auth',
-    hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function',
     functions: Object.keys(window.TikTrackAuth || {}),
     timestamp: new Date().toISOString()
   });
 } else {
   console.log('✅ [auth.js] window.TikTrackAuth defined', {
-    hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function',
     functions: Object.keys(window.TikTrackAuth || {})
   });
 }
@@ -2480,19 +2475,14 @@ if (typeof window !== 'undefined') {
 // Detect testing environment
 function isTestingEnvironment() {
   return window.location.hostname === 'localhost' ||
-         window.location.hostname === '127.0.0.1' ||
-         window.location.search.includes('test_mode') ||
-         window.localStorage.getItem('tiktrack_test_mode') === 'true' ||
-         window.sessionStorage.getItem('tiktrack_test_mode') === 'true';
+         window.location.hostname === '127.0.0.1';
 }
 
 // Enable test mode for automated testing
-function enableTestMode(bypassAuth = false) {
+function enableTestMode(bypassAuth) {
   console.log('[Auth] Enabling test mode, bypassAuth:', bypassAuth);
 
   // Set test mode flags
-  localStorage.setItem('tiktrack_test_mode', 'true');
-  sessionStorage.setItem('tiktrack_test_mode', 'true');
 
   if (bypassAuth) {
     localStorage.setItem('tiktrack_auth_bypass', 'true');
@@ -2516,9 +2506,9 @@ function enableTestMode(bypassAuth = false) {
       detail: { user: window.currentUser, testMode: true }
     }));
   }
-
-  console.log('[Auth] Test mode enabled');
 }
+
+// Perform test login with automated credentials
 
 // Perform test login with automated credentials
 async function performTestLogin(username = 'admin', password = 'admin123') {
@@ -2596,7 +2586,6 @@ async function getTestAuthState() {
 if (typeof window !== 'undefined') {
   window.AuthTesting = {
     isTestingEnvironment: isTestingEnvironment,
-    enableTestMode: enableTestMode,
     performTestLogin: performTestLogin,
     getTestAuthState: getTestAuthState
   };

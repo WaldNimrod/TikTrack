@@ -30,11 +30,11 @@ const ALL_PAGES = [
 ];
 
 const REQUIRED_GLOBALS = [
-    'window.API_BASE_URL',
-    'window.Logger',
-    'window.ModalManagerV2',
-    'window.UnifiedAppInitializer',
-    'window.TikTrackAuth'
+    { check: 'window.API_BASE_URL', name: 'API_BASE_URL' },
+    { check: 'window.Logger', name: 'Logger' },
+    { check: 'window.ModalManagerV2', name: 'ModalManagerV2' },
+    { check: 'window.UnifiedAppInitializer', name: 'UnifiedAppInitializer' },
+    { check: 'window.TikTrackAuth', name: 'TikTrackAuth' }
 ];
 
 async function authenticateAndTestPages() {
@@ -49,6 +49,17 @@ async function authenticateAndTestPages() {
     });
 
     const page = await browser.newPage();
+    let authToken;
+
+    // Intercept requests to add auth headers
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+        const headers = { ...request.headers() };
+        if (authToken && request.url().includes('/api/') && !request.url().includes('/api/auth/login')) {
+            headers['Authorization'] = `Bearer ${authToken}`;
+        }
+        request.continue({ headers });
+    });
 
     const allResults = {
         timestamp: new Date().toISOString(),
@@ -97,8 +108,19 @@ async function authenticateAndTestPages() {
         }
 
         console.log('✅ Authentication successful');
+        authToken = loginResponse.data.access_token;
 
-        // Step 3: Set authentication data in page context
+        // Step 3: Set authentication cookies for all requests
+        await page.setCookie({
+            name: 'auth_token',
+            value: loginResponse.data.access_token,
+            domain: 'localhost',
+            path: '/',
+            httpOnly: false,
+            secure: false
+        });
+
+        // Also set authentication data in page context
         await page.evaluate((token, user) => {
             // Set in localStorage
             localStorage.setItem('authToken', token);
@@ -109,12 +131,6 @@ async function authenticateAndTestPages() {
             sessionStorage.setItem('currentUser', JSON.stringify(user));
             sessionStorage.setItem('dev_authToken', token);
             sessionStorage.setItem('dev_currentUser', JSON.stringify(user));
-
-            // Force UnifiedCacheManager initialization if available
-            if (window.UnifiedCacheManager) {
-                window.UnifiedCacheManager.save('authToken', token, { layer: 'sessionStorage', includeUserId: false });
-                window.UnifiedCacheManager.save('currentUser', user, { layer: 'sessionStorage', includeUserId: false });
-            }
         }, loginResponse.data.access_token, loginResponse.data.user);
 
         // Step 3: Test each page
@@ -165,15 +181,22 @@ async function authenticateAndTestPages() {
                 const allScripts = await page.$$eval('script', scripts => scripts.length);
                 result.dom_scripts = allScripts;
 
-                // Check globals
-                for (const globalCheck of REQUIRED_GLOBALS) {
+                // Check globals - corrected logic for API_BASE_URL (empty string is valid)
+                for (const globalObj of REQUIRED_GLOBALS) {
                     try {
-                        const exists = await page.evaluate(`!!(${globalCheck})`);
+                        const value = await page.evaluate(`${globalObj.check}`);
+                        let exists = value !== undefined && value !== null;
+
+                        // Special case for API_BASE_URL - empty string is valid
+                        if (globalObj.name === 'API_BASE_URL' && value === '') {
+                            exists = true;
+                        }
+
                         if (!exists) {
-                            result.requiredGlobals_missing.push(globalCheck);
+                            result.requiredGlobals_missing.push(globalObj.name);
                         }
                     } catch (e) {
-                        result.requiredGlobals_missing.push(globalCheck);
+                        result.requiredGlobals_missing.push(globalObj.name);
                     }
                 }
 

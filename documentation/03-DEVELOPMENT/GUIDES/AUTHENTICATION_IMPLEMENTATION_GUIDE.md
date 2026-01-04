@@ -74,7 +74,7 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 - כל 401 או חוסר token → הפניה ל-`/login.html`
 - בדף login אין auth guard
 
-**אסור:** `showLoginModal`, יצירת modal, או טיפול ב-login בתוך מודול.
+**אסור:** `showLoginModal`, יצירת modal, או טיפול ב-login בתוך מודול (הוסר לחלוטין במסגרת P0 Auth Hardening).
 **הבהרת QA:** `register.html`, `forgot_password.html`, `reset_password.html` הם עמודים מלאים (לא modals) ויש להיבדק כעמודים עצמאיים.
 
 ### 5. אחסון אימות (Option 1)
@@ -345,7 +345,7 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 
 1. **`trading-ui/scripts/auth.js`**
    - מערכת authentication הראשית
-   - פונקציות: `login()`, `checkAuthentication()`, `showLoginModal()`
+   - פונקציות: `login()`, `checkAuthentication()` (showLoginModal הוסר ב-P0 Auth Hardening)
    - ניהול tokens ו-users
    - `bootstrapAuthFromSessionStorage()` - bootstrap מהיר לפני UnifiedCacheManager
    - `saveAuthToCache()`, `getAuthFromCache()`, `removeAuthFromCache()` - ניהול auth tokens
@@ -421,6 +421,27 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 - **סיבה:** מניעת שגיאות CORS ב-debug logging endpoint
 - **איך לחזור לפעול:** הסר את ה-`return` ב-`sendDebugLog()` אם צריך debug logs
 - **הערה:** אין confirm dialogs במערכת - הוסרו לשיפור חוויית משתמש
+
+---
+
+## 🔒 P0 Auth Hardening - שינויים אחרונים
+
+### הסרת Test Mode
+**הוסר לחלוטין:** כל התייחסויות ל-TEST_MODE, auth_bypass, ודגלים לבדיקות פיתוח
+- **לפני:** אפשרויות bypass לבדיקות פיתוח
+- **אחרי:** אימות מלא בכל סביבה (כולל development)
+
+### הסרת Modal Flows
+**הוסר לחלוטין:** כל modal-based authentication flows
+- **showLoginModal()** - הוסר מ-auth.js
+- **Modal login forms** - הוחלפו ב-redirect ל-/login.html
+- **Inline login handling** - אסור בכל מודולים
+
+### Auth Guard Enforcement
+**חיזוק מנגנון ההגנה:**
+- **Redirect בלבד** - כל מצב לא מאומת מפנה ל-/login.html
+- **ללא modal fallbacks** - אין חלופות modal בכל סביבה
+- **Session-based only** - ללא localStorage auth tokens
 
 ---
 

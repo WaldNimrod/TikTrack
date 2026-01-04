@@ -35,7 +35,7 @@ from sqlalchemy.orm import Session
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -47,24 +47,11 @@ def _get_serializer():
     """Get serializer for token validation"""
     return URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='tiktrack-auth-token')
 
-def _check_manual_auth():
-    """Manual Bearer token authentication check"""
-    auth_header = request.headers.get('Authorization', '')
-    if not auth_header.lower().startswith('bearer '):
-        return None
-    token = auth_header.split(' ', 1)[1].strip()
-    if not token:
-        return None
-    try:
-        serializer = _get_serializer()
-        data = serializer.loads(token, max_age=60 * 60 * 24)  # 24h
-        return data.get('user_id')
-    except (SignatureExpired, BadSignature, Exception):
-        return None
-
 # Initialize base API (system overview is complex, so we'll use it selectively)
 
 @system_overview_bp.route('/overview', methods=['GET'])
+@handle_database_session()
+@require_authentication()
 @api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_overview():
     """
@@ -74,13 +61,7 @@ def get_system_overview():
         JSON: Complete system overview including health, metrics, and status
     """
     try:
-        # Manual authentication check (middleware bypass workaround)
-        user_id = _check_manual_auth()
-        if user_id is None:
-            return jsonify({
-                'status': 'error',
-                'error': {'message': 'Authentication required'}
-            }), 401
+        # Authentication handled by @handle_database_session() decorator
 
         start_time = time.time()
 
@@ -161,6 +142,8 @@ def get_system_health():
         }), 500
 
 @system_overview_bp.route('/metrics', methods=['GET'])
+@handle_database_session()
+@require_authentication()
 @api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_metrics():
     """
@@ -170,13 +153,7 @@ def get_system_metrics():
         JSON: Current system metrics
     """
     try:
-        # Manual authentication check (middleware bypass workaround)
-        user_id = _check_manual_auth()
-        if user_id is None:
-            return jsonify({
-                'status': 'error',
-                'error': {'message': 'Authentication required'}
-            }), 401
+        # Authentication handled by @handle_database_session() decorator
         metrics = metrics_collector.collect_all_metrics()
         
         return jsonify({
@@ -192,6 +169,8 @@ def get_system_metrics():
         }), 500
 
 @system_overview_bp.route('/info', methods=['GET'])
+@handle_database_session()
+@require_authentication()
 @api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_info():
     """
@@ -201,13 +180,7 @@ def get_system_info():
         JSON: System information
     """
     try:
-        # Manual authentication check (middleware bypass workaround)
-        user_id = _check_manual_auth()
-        if user_id is None:
-            return jsonify({
-                'status': 'error',
-                'error': {'message': 'Authentication required'}
-            }), 401
+        # Authentication handled by @handle_database_session() decorator
         system_info = get_system_information()
         
         return jsonify({

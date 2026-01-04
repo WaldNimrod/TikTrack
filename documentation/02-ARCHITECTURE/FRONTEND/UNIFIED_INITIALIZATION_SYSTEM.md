@@ -8,6 +8,8 @@
 **סטטוס:** ✅ פעיל ומתועד עם שיפורי אבטחה ואחידות  
 **נקודת כניסה:** `trading-ui/scripts/modules/core-systems.js` (ב-`init-system` package)
 
+**הערת מעבר (זמני):** מערכת האיתחול/טעינה הזו יוצאת משימוש. המקור החדש: `documentation/02-ARCHITECTURE/FRONTEND/INIT_LOADING_MANIFEST_TARGET_SPEC.md`
+
 ---
 
 ## 🔧 Code Review Fixes - December 2025
@@ -130,6 +132,12 @@ trading-ui/scripts/
 - `UnifiedAppInitializer` עבר מ-`base` package ל-`init-system` package
 - נטען אחרון כדי שכל המערכות יהיו זמינות לפני איתחול
 - תלויות הופחתו מ-25 ל-1 (`base` בלבד)
+
+**שינוי חשוב (ינואר 2026 - P0 Auth Hardening):**
+
+- הוסר TEST MODE fallback מ-auth guard
+- הסר auth bypass flags (tiktrack_test_mode, auth_bypass)
+- חיזוק אימות מלא בכל סביבות (ללא פיתוח bypass)
 
 **מבנה:**
 

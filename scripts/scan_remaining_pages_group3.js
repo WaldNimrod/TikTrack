@@ -1,0 +1,187 @@
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+
+// Group 3: Test pages (should work without authentication)
+const GROUP_3_PAGES = [
+    'watch_list',
+    'defer_test',
+    'test_script_loading',
+    'test_phase1_recovery',
+    'test_bootstrap_popover_comparison',
+    'test_overlay_debug',
+    'test_recent_items_widget',
+    'test_phase3_1_comprehensive',
+    'test_unified_widget_comprehensive',
+    'test_user_ticker_integration',
+    'test_ticker_widgets_performance',
+    'test_frontend_wrappers',
+    'test_unified_widget',
+    'test_unified_widget_integration',
+    'test_nested_modal_rich_text',
+    'button_color_mapping_simple',
+    'tradingview_widgets_showcase',
+    'test_header_only',
+    'conditions_test',
+    'mockups/flag_quick_action',
+    'mockups/watch_lists_page',
+    'mockups/add_ticker_modal',
+    'mockups/watch_list_modal',
+    'test_monitoring',
+    'test_quill',
+    'test_cash_flow',
+    'test_sorting',
+    'test_modal_loop',
+    'test_modal_stability',
+    'test_runtime',
+    'test_auth_console'
+];
+
+const REQUIRED_GLOBALS = [
+    { check: 'window.API_BASE_URL', name: 'API_BASE_URL' },
+    { check: 'window.Logger', name: 'Logger' },
+    { check: 'window.ModalManagerV2', name: 'ModalManagerV2' },
+    { check: 'window.UnifiedAppInitializer', name: 'UnifiedAppInitializer' },
+    { check: 'window.TikTrackAuth', name: 'TikTrackAuth' }
+];
+
+async function scanGroup3Pages() {
+    console.log('🧪 Starting GROUP 3 scan: Test pages (no auth required)');
+    console.log(`📊 Testing ${GROUP_3_PAGES.length} pages`);
+    console.log('=' * 60);
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+
+    const allResults = {
+        timestamp: new Date().toISOString(),
+        group: 'Group 3 - Test Pages',
+        auth_required: false,
+        total_pages: GROUP_3_PAGES.length,
+        summary: {
+            ok: 0,
+            critical: 0,
+            no_scripts: 0,
+            navigation_error: 0
+        },
+        results: []
+    };
+
+    for (let i = 0; i < GROUP_3_PAGES.length; i++) {
+        const pageUrl = GROUP_3_PAGES[i];
+        console.log(`🔍 [${i + 1}/${GROUP_3_PAGES.length}] Testing: ${pageUrl}`);
+
+        try {
+            const page = await browser.newPage();
+
+            // Enable console logging
+            let consoleErrors = [];
+            let loggerMessages = [];
+
+            page.on('console', msg => {
+                const text = msg.text();
+                if (msg.type() === 'error') {
+                    console.log(`❌ CONSOLE ERROR [${pageUrl}]: ${text}`);
+                    consoleErrors.push(text);
+                } else if (text.includes('Logger') || text.includes('[INFO]') || text.includes('[ERROR]') || text.includes('[WARN]')) {
+                    loggerMessages.push(text);
+                }
+            });
+
+            const result = {
+                page: pageUrl,
+                authenticated: false,
+                html_scripts: 0,
+                dom_scripts: 0,
+                requiredGlobals_missing: [],
+                load_order: 'OK',
+                errors: consoleErrors,
+                logger_summary: loggerMessages.slice(0, 10).join('; '),
+                status: 'UNKNOWN',
+                timestamp: new Date().toISOString()
+            };
+
+            // Navigate to page
+            await page.goto(`http://localhost:8080/${pageUrl}`, { 
+                waitUntil: 'networkidle2',
+                timeout: 30000 
+            });
+
+            // Wait for scripts to load
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Count scripts
+            const htmlScripts = await page.$$eval('script[src]', scripts => scripts.length);
+            result.html_scripts = htmlScripts;
+            const allScripts = await page.$$eval('script', scripts => scripts.length);
+            result.dom_scripts = allScripts;
+
+            // Check globals
+            for (const globalObj of REQUIRED_GLOBALS) {
+                try {
+                    const value = await page.evaluate(`${globalObj.check}`);
+                    let exists = value !== undefined && value !== null;
+
+                    // Special case for API_BASE_URL - empty string is valid
+                    if (globalObj.name === 'API_BASE_URL' && value === '') {
+                        exists = true;
+                    }
+
+                    if (!exists) {
+                        result.requiredGlobals_missing.push(globalObj.name);
+                    }
+                } catch (e) {
+                    result.requiredGlobals_missing.push(globalObj.name);
+                }
+            }
+
+            // Determine status
+            if (result.requiredGlobals_missing.length > 0 || consoleErrors.length > 0) {
+                result.status = 'CRITICAL';
+                allResults.summary.critical++;
+            } else if (result.html_scripts === 0) {
+                result.status = 'NO_SCRIPTS';
+                allResults.summary.no_scripts++;
+            } else {
+                result.status = 'OK';
+                allResults.summary.ok++;
+            }
+
+            console.log(`${pageUrl}: ${result.status} (${result.html_scripts}/${result.dom_scripts} scripts, missing: ${result.requiredGlobals_missing.length})`);
+            allResults.results.push(result);
+
+            await page.close();
+
+        } catch (error) {
+            console.log(`❌ FAILED to test ${pageUrl}: ${error.message}`);
+            allResults.results.push({
+                page: pageUrl,
+                authenticated: false,
+                status: 'NAVIGATION_ERROR',
+                error: error.message,
+                timestamp: new Date().toISOString()
+            });
+            allResults.summary.navigation_error++;
+        }
+
+        // Small delay between pages
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    // Save results
+    const outputPath = path.join(__dirname, '..', 'documentation', '05-REPORTS', 'artifacts', '2026_01_04', 'group3_test_pages_scan.json');
+    fs.writeFileSync(outputPath, JSON.stringify(allResults, null, 2));
+    
+    console.log('\n📊 GROUP 3 SUMMARY:');
+    console.log(`✅ OK: ${allResults.summary.ok}/${GROUP_3_PAGES.length}`);
+    console.log(`❌ CRITICAL: ${allResults.summary.critical}/${GROUP_3_PAGES.length}`);
+    console.log(`🚫 NO SCRIPTS: ${allResults.summary.no_scripts}/${GROUP_3_PAGES.length}`);
+    console.log(`🌐 NAVIGATION ERROR: ${allResults.summary.navigation_error}/${GROUP_3_PAGES.length}`);
+    console.log(`\n💾 Results saved to: ${outputPath}`);
+
+    await browser.close();
+}
+
+scanGroup3Pages().catch(console.error);

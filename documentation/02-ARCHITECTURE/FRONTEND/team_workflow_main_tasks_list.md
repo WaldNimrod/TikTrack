@@ -14,16 +14,77 @@ archived_reference: documentation/05-REPORTS/ARCHIVE/CRUD_TESTING_INTEGRATION_MA
 
 ## current_priorities
 
-0) task_0_option1_load_order_discipline ✅ COMPLETED - Task 1 unblocked, Cache Stage B-Lite ready
+0) task_0_option1_load_order_discipline ✅ COMPLETED - all pages reported PASS, final QA evidence pending
 1) init_loading_full_78_pages_stability ✅ COMPLETED - ready for cache_stage_b_lite
 2) remove_iframe_remaining_usage ✅ COMPLETED - runtime verification passed
-3) remove_iframe_remaining_usage
-4) additional_crud_pages_completion
-5) crud_final_closures_and_regression
-6) homepage_widgets_cleanup
-7) data_import_end_to_end_process
-8) crud_testing_dashboard_full_test_suite
-9) itcss_compliance_audit_post_init
+3) auth_architecture_option1_alignment ⏳ OPEN - finalize cleanup + QA evidence
+4) task_1_p0_auth_hardening_22_pages_green ⏳ OPEN - fix 3 critical + 8 test_failed pages
+5) task_1_p0_backend_admin_auth_regression ⏳ OPEN - admin endpoints return 200 without auth
+6) additional_crud_pages_completion ⏳ OPEN
+7) crud_final_closures_and_regression ⏳ OPEN
+8) homepage_widgets_cleanup ⏳ OPEN
+9) data_import_end_to_end_process ⏳ OPEN
+10) crud_testing_dashboard_full_test_suite ⏳ OPEN
+11) itcss_compliance_audit_post_init ⏳ OPEN
+
+## remaining_tasks_by_priority
+
+### P0 - Auth Architecture Hardening (Option 1) ⏳ OPEN
+- Fix 3 CRITICAL pages missing globals (ModalManagerV2/UnifiedAppInitializer):
+  - /research → missing ModalManagerV2 (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[1])
+  - /user_profile → missing ModalManagerV2 (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[14])
+  - /ticker_dashboard → missing UnifiedAppInitializer (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[16])
+- Resolve 8 TEST_FAILED pages (navigation/resource issues):
+  - /trade_plans (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[5])
+  - /tickers (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[6])
+  - /trading_accounts (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[7])
+  - /portfolio_state (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[17])
+  - /data_import (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[18])
+  - /user_ticker (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[19])
+  - /preferences (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[20])
+  - /tag_management (evidence: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json#$.results[21])
+- Backend auth regression: admin endpoints returning 200 without auth:
+  - /api/system/overview, /api/system/metrics, /api/system/info
+  - Evidence: documentation/05-REPORTS/artifacts/2026_01_04/team_c_p0_auth_hardening_backend_fixes_evidence_2026_01_04.json#$.investigation_findings.unexpected_admin_endpoint_behavior
+- Verify test endpoints removed remain 404:
+  - /api/auth/test/auth-state, /api/auth/test/login, /api/auth/test/logout
+  - Evidence: documentation/05-REPORTS/artifacts/2026_01_04/team_c_p0_auth_hardening_backend_fixes_evidence_2026_01_04.json#$.investigation_findings.test_endpoints_successfully_removed
+
+### task_1_p0_auth_hardening_22_pages_pattern_map (from monitoring)
+source: documentation/05-REPORTS/artifacts/2026_01_04/authenticated_full_pages_monitoring_results.json
+
+Pattern summary (all pages):
+- ERR_INSUFFICIENT_RESOURCES: 73,836 (likely Selenium/Chrome resource limit; validate by single-page runs)
+- RESOURCE_404: 78
+- MIME_TYPE_REFUSED_SCRIPT: 69
+- STATS_CALC_ERROR: 42
+- TABLE_RENDER_ERROR: 28
+- UNHANDLED_PROMISE_REJECTION: 14
+- API_FETCH_ERROR: 14
+
+Critical pages (missing globals):
+- /research: missing ModalManagerV2; common pattern set includes RESOURCE_404 + MIME_TYPE_REFUSED_SCRIPT + TABLE_RENDER_ERROR + STATS_CALC_ERROR
+- /user_profile: missing ModalManagerV2; common pattern set includes RESOURCE_404 + MIME_TYPE_REFUSED_SCRIPT + TABLE_RENDER_ERROR + STATS_CALC_ERROR
+- /ticker_dashboard: missing UnifiedAppInitializer; common pattern set includes TABLE_RENDER_ERROR + STATS_CALC_ERROR
+
+TEST_FAILED pages (no errors captured in JSON; investigate navigation/resource handling):
+- /trade_plans, /tickers, /trading_accounts, /portfolio_state, /data_import, /user_ticker, /preferences, /tag_management
+Actions:
+- Re-run single-page monitoring with cache disabled and capture console + network HAR.
+- Verify route → HTML mapping and scripts list for each page (check page-initialization-configs.js package list).
+- Confirm that scripts are loading via /scripts route with application/javascript.
+
+### P1 - Init/Loading Final Polish
+- Homepage content mismatch verification (runtime validation on `/` + `trading-ui/scripts/index.js`)
+- Ensure QA enforcement is documented for dev:8080 auth-required flows
+
+### P2 - Regression + Follow-up
+- additional_crud_pages_completion
+- crud_final_closures_and_regression
+- homepage_widgets_cleanup
+- data_import_end_to_end_process
+- crud_testing_dashboard_full_test_suite
+- itcss_compliance_audit_post_init
 
 ## current_tasks_detail
 

@@ -16,9 +16,10 @@ Version: 1.0
 Date: September 2025
 """
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, current_app
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import logging
 import time
 import psutil
@@ -42,21 +43,47 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 system_overview_bp = Blueprint('system_overview', __name__, url_prefix='/api/system')
 
+def _get_serializer():
+    """Get serializer for token validation"""
+    return URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='tiktrack-auth-token')
+
+def _check_manual_auth():
+    """Manual Bearer token authentication check"""
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.lower().startswith('bearer '):
+        return None
+    token = auth_header.split(' ', 1)[1].strip()
+    if not token:
+        return None
+    try:
+        serializer = _get_serializer()
+        data = serializer.loads(token, max_age=60 * 60 * 24)  # 24h
+        return data.get('user_id')
+    except (SignatureExpired, BadSignature, Exception):
+        return None
+
 # Initialize base API (system overview is complex, so we'll use it selectively)
 
 @system_overview_bp.route('/overview', methods=['GET'])
 @api_endpoint(cache_ttl=60, rate_limit=60)
-@handle_database_session()
 def get_system_overview():
     """
     Get comprehensive system overview using base API patterns
-    
+
     Returns:
         JSON: Complete system overview including health, metrics, and status
     """
     try:
+        # Manual authentication check (middleware bypass workaround)
+        user_id = _check_manual_auth()
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Authentication required'}
+            }), 401
+
         start_time = time.time()
-        
+
         # Get comprehensive health check
         health_report = health_service.comprehensive_health_check()
         
@@ -134,14 +161,22 @@ def get_system_health():
         }), 500
 
 @system_overview_bp.route('/metrics', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_metrics():
     """
     Get current system metrics
-    
+
     Returns:
         JSON: Current system metrics
     """
     try:
+        # Manual authentication check (middleware bypass workaround)
+        user_id = _check_manual_auth()
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Authentication required'}
+            }), 401
         metrics = metrics_collector.collect_all_metrics()
         
         return jsonify({
@@ -157,14 +192,22 @@ def get_system_metrics():
         }), 500
 
 @system_overview_bp.route('/info', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_info():
     """
     Get system information
-    
+
     Returns:
         JSON: System information
     """
     try:
+        # Manual authentication check (middleware bypass workaround)
+        user_id = _check_manual_auth()
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Authentication required'}
+            }), 401
         system_info = get_system_information()
         
         return jsonify({
@@ -180,6 +223,8 @@ def get_system_info():
         }), 500
 
 @system_overview_bp.route('/database', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_database_info():
     """
     Get database information and statistics
@@ -226,6 +271,8 @@ def get_cache_info():
         }), 500
 
 @system_overview_bp.route('/logs', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_logs():
     """
     Get recent system logs
@@ -290,6 +337,8 @@ def get_system_logs():
         }), 500
 
 @system_overview_bp.route('/performance', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_performance_metrics():
     """
     Get performance metrics and trends
@@ -308,7 +357,11 @@ def get_performance_metrics():
         
         # Get trends
         trends = metrics_collector.analyze_trends(hours)
-        
+
+        # Handle case where trends has error
+        if isinstance(trends, dict) and 'error' in trends:
+            trends = {'error': trends['error']}
+
         # Get health trends
         health_trends = health_service.get_health_trends(hours)
         
@@ -357,6 +410,8 @@ def get_external_data_status():
         }), 500
 
 @system_overview_bp.route('/alerts', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 def get_system_alerts():
     """
     Get system alerts and warnings
@@ -529,7 +584,7 @@ def list_backups():
     """
     try:
         backup_service = BackupService()
-        backups = backup_service.get_backup_list()
+        backups = backup_service.list_backups()
         
         return jsonify({
             'status': 'success',

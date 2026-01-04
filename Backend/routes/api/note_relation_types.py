@@ -18,21 +18,10 @@ note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='
 
 @note_relation_types_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=600, rate_limit=60)
-@handle_database_session()
 @cache_for(ttl=600)  # Cache for 10 minutes - note relation types don't change
 def get_note_relation_types():
-    """Get all note relation types using SQLAlchemy (requires authentication)"""
-    db: Session = g.db
-    
-    # Get user_id from Flask context (set by auth middleware)
-    user_id = getattr(g, 'user_id', None)
-    
-    if user_id is None:
-        return jsonify({
-            "status": "error",
-            "error": {"message": "User authentication required"},
-            "version": "1.0"
-        }), 401
+    """Get all note relation types using SQLAlchemy (public endpoint - system catalog)"""
+    db: Session = next(get_db())
     
     try:
         # Note relation types are system-wide (shared), but require authentication

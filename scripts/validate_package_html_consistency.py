@@ -26,20 +26,20 @@ TRADING_UI_DIR = PROJECT_ROOT / "trading-ui"
 SCRIPTS_DIR = TRADING_UI_DIR / "scripts"
 
 # Correct paths
-PAGE_CONFIGS_FILE = SCRIPTS_DIR / "page-initialization-configs.js"
+PAGE_INITIALIZATION_CONFIGS_FILE = SCRIPTS_DIR / "page-initialization-configs.js"
 PACKAGE_MANIFEST_FILE = SCRIPTS_DIR / "init-system" / "package-manifest.js"
 
 def load_page_configs() -> Dict:
     """Load page initialization configs"""
-    config_file = PAGE_CONFIGS_FILE
+    config_file = PAGE_INITIALIZATION_CONFIGS_FILE
 
     with open(config_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Extract the PAGE_CONFIGS object using regex
-    match = re.search(r'window\.PAGE_CONFIGS\s*=\s*({.*?});', content, re.DOTALL)
+    # Extract the pageInitializationConfigs object using regex
+    match = re.search(r'window\.pageInitializationConfigs\s*=\s*({.*?});', content, re.DOTALL)
     if not match:
-        raise ValueError("Could not parse PAGE_CONFIGS from file")
+        raise ValueError("Could not parse pageInitializationConfigs from file")
 
     # Convert to valid JSON (replace single quotes, etc.)
     config_str = match.group(1)
@@ -50,7 +50,7 @@ def load_page_configs() -> Dict:
     try:
         return json.loads(config_str)
     except json.JSONDecodeError as e:
-        print(f"Failed to parse PAGE_CONFIGS: {e}")
+        print(f"Failed to parse pageInitializationConfigs: {e}")
         return {}
 
 def load_package_manifest() -> Dict:

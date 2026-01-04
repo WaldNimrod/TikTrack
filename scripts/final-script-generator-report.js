@@ -16,8 +16,8 @@ eval(manifestContent.replace('const PACKAGE_MANIFEST =', 'var PACKAGE_MANIFEST =
 const configsPath = path.join(__dirname, '../trading-ui/scripts/page-initialization-configs.js');
 const configsContent = fs.readFileSync(configsPath, 'utf8');
 
-// Extract PAGE_CONFIGS
-const PAGE_CONFIGS = {};
+// Extract pageInitializationConfigs
+const pageInitializationConfigs = {};
 const pageRegex = /'(\w+)':\s*\{([\s\S]*?)\}(?=\s*(?:,|'|\}))/g;
 let match;
 
@@ -29,7 +29,7 @@ while ((match = pageRegex.exec(configsContent)) !== null) {
     if (packagesMatch) {
         const packagesStr = packagesMatch[1];
         const packages = packagesStr.match(/'([^']+)'/g)?.map(p => p.replace(/'/g, '')) || [];
-        PAGE_CONFIGS[pageName] = { packages };
+        pageInitializationConfigs[pageName] = { packages };
     }
 }
 
@@ -120,7 +120,7 @@ let report = `# דוח סופי - כלי ייצור קוד טעינה משופר
 `;
 
 TEST_PAGES.forEach((pageName, idx) => {
-    const pageConfig = PAGE_CONFIGS[pageName];
+    const pageConfig = pageInitializationConfigs[pageName];
     if (!pageConfig) return;
     
     const packages = pageConfig.packages;
@@ -143,7 +143,7 @@ report += `## 📊 סטטיסטיקות
 `;
 
 TEST_PAGES.forEach(pageName => {
-    const pageConfig = PAGE_CONFIGS[pageName];
+    const pageConfig = pageInitializationConfigs[pageName];
     if (!pageConfig) return;
     
     const packages = pageConfig.packages;

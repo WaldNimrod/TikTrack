@@ -2765,7 +2765,8 @@ function getAvailableColorSchemes() {
 
 // Export to global scope for backward compatibility
 window.getInvestmentTypeColor = getInvestmentTypeColor;
-window.getInvestmentTypeBackgroundColor = getInvestmentTypeBackgroundColor;
+// NOTE: getInvestmentTypeBackgroundColor is exported by color-scheme-system.js to avoid conflicts
+// window.getInvestmentTypeBackgroundColor = getInvestmentTypeBackgroundColor;
 window.getInvestmentTypeTextColor = getInvestmentTypeTextColor;
 window.getInvestmentTypeBorderColor = getInvestmentTypeBorderColor;
 window.createInvestmentTypeLegend = createInvestmentTypeLegend;

@@ -257,11 +257,8 @@ class SelectPopulatorService {
 
             // Add authentication headers
             let token = null;
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                token = await window.UnifiedCacheManager.get('authToken');
-            } else {
-                token = localStorage.getItem('authToken');
-            }
+            // Option 1: Token injection handled globally by api-fetch-wrapper
+            // Manual token retrieval removed
             const headers = { 'Content-Type': 'application/json' };
             if (token) { headers['Authorization'] = `Bearer ${token}`; }
 
@@ -466,11 +463,8 @@ class SelectPopulatorService {
             // טעינת מטבעות מ-API
             // Add authentication headers
             let token = null;
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                token = await window.UnifiedCacheManager.get('authToken');
-            } else {
-                token = localStorage.getItem('authToken');
-            }
+            // Option 1: Token injection handled globally by api-fetch-wrapper
+            // Manual token retrieval removed
             const headers = { 'Content-Type': 'application/json' };
             if (token) { headers['Authorization'] = `Bearer ${token}`; }
 
@@ -542,11 +536,8 @@ class SelectPopulatorService {
             // טעינת טריידים מ-API
             // Add authentication headers
             let token = null;
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                token = await window.UnifiedCacheManager.get('authToken');
-            } else {
-                token = localStorage.getItem('authToken');
-            }
+            // Option 1: Token injection handled globally by api-fetch-wrapper
+            // Manual token retrieval removed
             const headers = { 'Content-Type': 'application/json' };
             if (token) { headers['Authorization'] = `Bearer ${token}`; }
 
@@ -611,11 +602,8 @@ class SelectPopulatorService {
             // טעינת תוכניות מ-API
             // Add authentication headers
             let token = null;
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                token = await window.UnifiedCacheManager.get('authToken');
-            } else {
-                token = localStorage.getItem('authToken');
-            }
+            // Option 1: Token injection handled globally by api-fetch-wrapper
+            // Manual token retrieval removed
             const headers = { 'Content-Type': 'application/json' };
             if (token) { headers['Authorization'] = `Bearer ${token}`; }
 

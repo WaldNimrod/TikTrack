@@ -1609,34 +1609,9 @@ window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 
 // Load entity colors with defaults fallback for testing (no auth required)
-const colorSchemeInitTime = performance.now();
-console.log(`🎨 [TIMING] Color scheme DOMContentLoaded handler started at ${colorSchemeInitTime.toFixed(2)}ms`);
-console.log(`📊 [COLOR-SCHEME BEFORE] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}, headerSystemExists: ${typeof window.headerSystem}`);
 
-// #region agent log - color scheme DOMContentLoaded start
-fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-  method:'POST',
-  headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({
-    location:'color-scheme-system.js:DOMContentLoaded',
-    message:'Color scheme DOMContentLoaded handler started',
-    data:{
-      timestamp: Date.now(),
-      initTime: colorSchemeInitTime,
-      documentReadyState: document.readyState,
-      hasUnifiedHeader: !!document.getElementById('unified-header'),
-      bodyChildrenCount: document.body?.children?.length || 0,
-      headerSystemReady: window.headerSystemReady,
-      headerSystemExists: typeof window.headerSystem,
-      runId:'init_loading_critical',
-      hypothesisId:'color_scheme_domcontentloaded_race'
-    },
-    timestamp:Date.now(),
-    sessionId:'init_loading_critical'
-  })
-}).catch(()=>{});
-// #endregion
-
+// Define async function for loading entity colors
+async function loadEntityColorsAsync() {
   try {
     // First try to get user preferences (if authenticated)
     if (window.loadColorPreferences && typeof window.loadColorPreferences === 'function') {
@@ -1700,7 +1675,7 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
 
 // Export preference integration functions
 window.loadEntityColorsFromPreferences = loadEntityColorsFromPreferences;
-window.loadEntityColors = loadEntityColors;
+window.loadEntityColors = loadEntityColorsAsync;
 window.generateAndApplyEntityCSS = generateAndApplyEntityCSS;
 window.updateCSSVariablesFromPreferences = updateCSSVariablesFromPreferences;
 window.loadColorPreferences = loadColorPreferences;
@@ -1756,29 +1731,7 @@ window.ColorSchemeSystem = {
     const currentLength = currentHTML.length;
     const diff = currentLength - servedLength;
 
-    // #region agent log - DOM state comparison
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'color-scheme-system.js:dom-comparison',
-        message:`DOM state comparison: ${label}`,
-        data:{
-          label: label,
-          servedHTMLLength: servedLength,
-          currentHTMLLength: currentLength,
-          difference: diff,
-          hasUnifiedHeader: !!document.getElementById('unified-header'),
-          bodyChildCount: document.body?.children?.length || 0,
-          headerScripts: Array.from(document.querySelectorAll('script')).filter(s => s.src && s.src.includes('header')).length,
-          runId:'init_loading_support',
-          hypothesisId:'dom_modification_tracking'
-        },
-        timestamp:Date.now(),
-        sessionId:'init-loading-debug'
-      })
-    }).catch(()=>{});
-    // #endregion
+    // DOM state comparison
 
     return {
       label,
@@ -1900,6 +1853,7 @@ if (typeof loadColorPreferences === 'function' && typeof updateCSSVariablesFromP
 }
 
 // Only set current entity color from page (doesn't require preferences)
+const colorSchemeInitTime = performance.now();
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', async () => {
     await setCurrentEntityColorFromPage();
@@ -1908,35 +1862,11 @@ if (document.readyState === 'loading') {
   setCurrentEntityColorFromPage();
 }
 
-// #region agent log - color scheme DOMContentLoaded complete
+    // color scheme DOMContentLoaded complete
   const colorSchemeCompletionTime = performance.now();
   console.log(`🎨 [TIMING] Color scheme DOMContentLoaded handler completed at ${colorSchemeCompletionTime.toFixed(2)}ms (duration: ${(colorSchemeCompletionTime - colorSchemeInitTime).toFixed(2)}ms)`);
   console.log(`📊 [COLOR-SCHEME AFTER] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}, headerSystemExists: ${typeof window.headerSystem}`);
 
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location:'color-scheme-system.js:DOMContentLoaded',
-      message:'Color scheme DOMContentLoaded handler completed',
-      data:{
-        timestamp: Date.now(),
-        completionTime: colorSchemeCompletionTime,
-        duration: colorSchemeCompletionTime - colorSchemeInitTime,
-        documentReadyState: document.readyState,
-        hasUnifiedHeader: !!document.getElementById('unified-header'),
-        bodyChildrenCount: document.body?.children?.length || 0,
-        cssVarsSet: Array.from(document.documentElement.style).filter(prop => prop.startsWith('--entity-')),
-        headerSystemReady: window.headerSystemReady,
-        headerSystemExists: typeof window.headerSystem,
-        runId:'init_loading_critical',
-        hypothesisId:'color_scheme_domcontentloaded_race'
-      },
-      timestamp:Date.now(),
-      sessionId:'init_loading_critical'
-    })
-  }).catch(()=>{});
-  // #endregion
 
 // Color Scheme System loaded successfully
 window.colorSchemeSystemReady = true;

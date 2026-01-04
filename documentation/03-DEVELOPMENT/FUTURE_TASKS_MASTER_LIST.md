@@ -254,8 +254,8 @@
   - `documentation/frontend/README.md`.
   - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md`.
   - `documentation/frontend/JS_ORGANIZATION.md`.
-  - `documentation/development/README.md`.
-  - `documentation/development/NOTIFICATION_SYSTEM_IMPLEMENTATION.md`.
+  - `documentation/03-DEVELOPMENT/README.md`.
+  - `documentation/03-DEVELOPMENT/GUIDELINES/NOTIFICATION_SYSTEM_IMPLEMENTATION.md`.
   - `documentation/USER_MANAGEMENT_SYSTEM.md`.
   - `JAVASCRIPT_ARCHITECTURE_ANALYSIS.md`.
   - `PREFERENCES_SYSTEM_ARCHITECTURE_SPECIFICATION.md`.

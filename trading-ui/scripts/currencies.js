@@ -493,7 +493,7 @@ async function initializeCurrenciesPage() {
 // ייצוא פונקציות גלובליות
 window.openCurrencyDetails = openCurrencyDetails;
 
-// #region agent log
+// region agent log
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
   method:'POST',
   headers:{'Content-Type':'application/json'},
@@ -509,7 +509,7 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     hypothesisId:'helper-scripts-loading'
   })
 }).catch(()=>{});
-// #endregion
+// endregion
 window.editCurrency = editCurrency;
 window.deleteCurrency = deleteCurrency;
 window.showDeleteCurrencyModal = showDeleteCurrencyModal;

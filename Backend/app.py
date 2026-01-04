@@ -9,7 +9,7 @@ No connection to testing system!
 
 """
 
-from flask import Flask, jsonify, request, send_from_directory, g, Request
+from flask import Flask, jsonify, request, send_from_directory, g, Request, make_response
 from flask_cors import CORS
 import os
 from datetime import datetime
@@ -21,14 +21,18 @@ import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+# Override mimetypes for JS files to use application/javascript
+import mimetypes
+mimetypes.add_type('application/javascript', '.js')
+
 # Add Backend directory to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import configuration settings for cache modes and server config
 from config.settings import (
-    DEVELOPMENT_MODE, 
-    CACHE_DISABLED, 
-    DEFAULT_CACHE_TTL, 
+    DEVELOPMENT_MODE,
+    CACHE_DISABLED,
+    DEFAULT_CACHE_TTL,
     CACHE_ENABLED,
     HOST,
     PORT,
@@ -38,6 +42,11 @@ from config.settings import (
     UI_DIR,
     BASE_DIR
 )
+
+# Debug: Print UI_DIR
+print(f"DEBUG: UI_DIR = {UI_DIR}")
+print(f"DEBUG: UI_DIR exists = {UI_DIR.exists()}")
+print(f"DEBUG: UI_DIR absolute = {UI_DIR.absolute()}")
 
 # Import new architecture components
 from config.database import init_db
@@ -268,8 +277,42 @@ from config.settings import IS_PRODUCTION
 app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
 # SameSite: CSRF protection while maintaining UX
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# Configure CORS to support session cookies
-CORS(app, supports_credentials=True, origins=['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:5001', 'http://127.0.0.1:5001'])
+
+# ===== TESTING SESSION MANAGEMENT (Fix Pack 5) =====
+
+# Add testing-specific session configuration
+if not IS_PRODUCTION:
+    # Relax session security for testing compatibility
+    app.config['SESSION_COOKIE_HTTPONLY'] = False  # Allow JavaScript access for testing
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None' if IS_PRODUCTION else 'Lax'
+
+    # Add testing origins for CORS
+    testing_origins = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:8081',
+        'http://127.0.0.1:8081'
+    ]
+
+    # Extend CORS for testing
+    from flask_cors import CORS
+    CORS(app, supports_credentials=True, origins=[
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+        'http://localhost:5001',
+        'http://127.0.0.1:5001'
+    ] + testing_origins)
+# Configure CORS to support session cookies (including testing environments)
+CORS(app, supports_credentials=True, origins=[
+    'http://localhost:8080',      # Development
+    'http://127.0.0.1:8080',     # Development
+    'http://localhost:5001',     # Testing
+    'http://127.0.0.1:5001',     # Testing
+    'http://localhost:3000',     # Testing (alternative port)
+    'http://127.0.0.1:3000',     # Testing (alternative port)
+    'http://localhost:8081',     # Testing (Selenium)
+    'http://127.0.0.1:8081'      # Testing (Selenium)
+])
 
 # Legacy SQLAlchemy compatibility layer for tests
 db = LegacyDBProxy(app)
@@ -540,8 +583,6 @@ app.register_blueprint(status_bp)
 # API quotes endpoints (specification compliant)
 app.register_blueprint(quotes_bp)
 
-app.register_blueprint(pages_bp)
-
 # Register Conditions System blueprints
 from routes.api.plan_conditions import plan_conditions_bp
 from routes.api.trade_conditions import trade_conditions_bp
@@ -559,6 +600,8 @@ app.register_blueprint(quotes_last_bp)
 app.register_blueprint(plan_conditions_list_bp)
 app.register_blueprint(user_preferences_list_bp)
 app.register_blueprint(ai_analysis_bp)
+
+app.register_blueprint(pages_bp)
 
 # Debug logging endpoint
 @app.route('/api/debug/log', methods=['POST'])
@@ -2624,16 +2667,22 @@ def serve_static_files(filename):
     # First try UI directory
     ui_path = os.path.join(UI_DIR, filename)
     if os.path.exists(ui_path):
-        # Guess mimetype and set explicitly to avoid JSON default
-        import mimetypes
-        guessed, _ = mimetypes.guess_type(ui_path)
-        resp = send_from_directory(UI_DIR, filename)
-        if guessed:
-            resp.mimetype = guessed
+        # Determine correct mimetype
+        if filename.endswith('.js'):
+            mimetype = 'application/javascript'
         elif filename.endswith('.css'):
-            resp.mimetype = 'text/css'
-        elif filename.endswith('.js'):
-            resp.mimetype = 'application/javascript'
+            mimetype = 'text/css'
+        else:
+            import mimetypes
+            guessed, _ = mimetypes.guess_type(ui_path)
+            mimetype = guessed or 'application/octet-stream'
+
+        # Read file and return with explicit mimetype
+        with open(ui_path, 'rb') as f:
+            content = f.read()
+        resp = make_response(content)
+        resp.headers['Content-Type'] = mimetype + '; charset=utf-8'
+        resp.headers['Content-Length'] = len(content)
         return resp
     return "File not found", 404
 

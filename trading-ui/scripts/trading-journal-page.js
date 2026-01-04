@@ -1662,9 +1662,9 @@ const switchViewMode = async mode => {
     });
   }
 
-  // #region agent log - view mode switch
+  // region agent log - view mode switch
   fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:switchViewMode',message:'View mode switched',data:{mode:mode,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
+  // endregion
 
   // Render based on mode
   if (mode === 'weekly') {
@@ -1751,9 +1751,9 @@ const renderWeeklyView = async () => {
     });
   }
 
-  // #region agent log - weekly view rendered
+  // region agent log - weekly view rendered
   fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:renderWeeklyView',message:'Weekly view rendered',data:{weekStart:weekStart.toISOString(),weekEnd:weekEnd.toISOString(),totalEntries:entries.length,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
+  // endregion
 };
 
 /**
@@ -1824,9 +1824,9 @@ const renderMonthlyView = async () => {
     });
   }
 
-  // #region agent log - monthly view rendered
+  // region agent log - monthly view rendered
   fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:renderMonthlyView',message:'Monthly view rendered',data:{month:currentMonth+1,year:currentYear,totalEntries:entries.length,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'weekly_monthly_toggle',timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
+  // endregion
 };
 
 /**
@@ -1867,9 +1867,9 @@ const addJournalEntry = async (entryType = 'journal') => {
       window.Logger.info('Notes modal opened for new note from journal', { page: PAGE_NAME });
     }
 
-    // #region agent log - add note button clicked
+    // region agent log - add note button clicked
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:addJournalEntry',message:'Add note button clicked',data:{entryType:entryType,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
+    // endregion
     } else {
       if (window.Logger) {
         window.Logger.warn('ModalManagerV2 not available for notes modal', { page: PAGE_NAME });
@@ -1918,9 +1918,9 @@ const editSelectedNote = async () => {
       });
     }
 
-    // #region agent log - edit note button clicked
+    // region agent log - edit note button clicked
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:editSelectedNote',message:'Edit note button clicked',data:{noteId:selectedNoteId,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
+    // endregion
   }
 };
 
@@ -1960,9 +1960,9 @@ const deleteSelectedNote = async () => {
           page: PAGE_NAME
         });
 
-        // #region agent log - note deleted
+        // region agent log - note deleted
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-journal-page.js:deleteSelectedNote',message:'Note deleted successfully',data:{noteId:selectedNoteId,page:PAGE_NAME},runId:'stage2_batch5_ui_features',hypothesisId:'notes_crud_buttons',timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+        // endregion
       }
     } else {
       throw new Error('Failed to delete note');

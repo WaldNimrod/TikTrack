@@ -143,7 +143,7 @@ class UIValidationSpecificEntities {
                         });
                         if (response.ok) {
                             const data = await response.json();
-                            localStorage.setItem('authToken', data.data.access_token);
+                            sessionStorage.setItem('dev_authToken', data.data.access_token); // Option 1: bootstrap key
                             console.log('API login successful');
                         }
                     } catch (e) {

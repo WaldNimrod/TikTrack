@@ -144,13 +144,13 @@
   }
 
   // ============================================================================
-  // 1. בדיקת PAGE_CONFIGS
+  // 1. בדיקת pageInitializationConfigs
   // ============================================================================
-  window.Logger?.info('📋 שלב 1: בדיקת הגדרות עמוד (PAGE_CONFIGS)');
+  window.Logger?.info('📋 שלב 1: בדיקת הגדרות עמוד (pageInitializationConfigs)');
   window.Logger?.info('───────────────────────────────────────────────────────────────');
   
-  const hasPageConfigs = checkGlobal('PAGE_CONFIGS') || checkGlobal('PAGE_INITIALIZATION_CONFIGS');
-  const pageConfig = window.PAGE_CONFIGS?.db_display || window.PAGE_INITIALIZATION_CONFIGS?.db_display;
+  const hasPageConfigs = checkGlobal('pageInitializationConfigs') || checkGlobal('pageInitializationConfigs');
+  const pageConfig = window.pageInitializationConfigs?.db_display || window.pageInitializationConfigs?.db_display;
   
   if (pageConfig) {
     window.Logger?.info(`✅ קונפיגורציית עמוד נטענה: ${pageConfig.name || 'Database Display'}`);

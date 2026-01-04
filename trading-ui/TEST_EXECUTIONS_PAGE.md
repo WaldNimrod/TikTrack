@@ -93,7 +93,7 @@
    - `conditions-ui-manager.js`
    - `conditions-modal-controller.js`
 
-### ❌ PAGE_CONFIGS לא נמצא
+### ❌ pageInitializationConfigs לא נמצא
 
 **סיבה:** `page-initialization-configs.js` לא נטען.
 

@@ -162,7 +162,7 @@ function generateBrowserScript() {
       
       if (typeof window.runDetailedPageScan === 'function') {
         try {
-          const pageConfig = window.PAGE_CONFIGS?.[pageName];
+          const pageConfig = window.pageInitializationConfigs?.[pageName];
           if (pageConfig) {
             result.monitoringResults = await window.runDetailedPageScan(pageName, pageConfig);
           }

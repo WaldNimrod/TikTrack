@@ -115,7 +115,7 @@
           "globalCheck": "window.bootstrap"
         },
         {
-          "file": "scripts/vendor/floating-ui.dom.min.js",
+          "file": "vendor/floating-ui.dom.min.js",
           "loadOrder": "16.5",
           "required": false,
           "globalCheck": "window.FloatingUIDOM"
@@ -191,12 +191,6 @@
           "loadOrder": 1,
           "required": true,
           "globalCheck": "window.TikTrackAuth"
-        },
-        {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
         },
         {
           "file": "services/data-collection-service.js",
@@ -587,12 +581,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -1063,6 +1051,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -1312,7 +1312,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -1355,6 +1355,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -1409,12 +1415,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -1569,7 +1569,7 @@
           "globalCheck": "window.bootstrap"
         },
         {
-          "file": "scripts/vendor/floating-ui.dom.min.js",
+          "file": "vendor/floating-ui.dom.min.js",
           "loadOrder": "16.5",
           "required": false,
           "globalCheck": "window.FloatingUIDOM"
@@ -1645,12 +1645,6 @@
           "loadOrder": 1,
           "required": true,
           "globalCheck": "window.TikTrackAuth"
-        },
-        {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
         },
         {
           "file": "services/data-collection-service.js",
@@ -2041,12 +2035,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -2517,6 +2505,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -2766,7 +2766,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -2809,6 +2809,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -2863,12 +2869,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -3023,7 +3023,7 @@
           "globalCheck": "window.bootstrap"
         },
         {
-          "file": "scripts/vendor/floating-ui.dom.min.js",
+          "file": "vendor/floating-ui.dom.min.js",
           "loadOrder": "16.5",
           "required": false,
           "globalCheck": "window.FloatingUIDOM"
@@ -3099,12 +3099,6 @@
           "loadOrder": 1,
           "required": true,
           "globalCheck": "window.TikTrackAuth"
-        },
-        {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
         },
         {
           "file": "services/data-collection-service.js",
@@ -3495,12 +3489,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -3971,6 +3959,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -4220,7 +4220,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -4263,6 +4263,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -4317,12 +4323,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -4417,12 +4417,6 @@
           "globalCheck": "window.TikTrackAuth"
         },
         {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
-        },
-        {
           "file": "services/data-collection-service.js",
           "loadOrder": 1,
           "required": true,
@@ -4811,12 +4805,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -5287,6 +5275,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -5536,7 +5536,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -5579,6 +5579,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -5633,12 +5639,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -5687,7 +5687,8 @@
     "header": {
       "loadOrder": "1.2",
       "dependencies": [
-        "base"
+        "base",
+        "auth"
       ],
       "scripts": [
         {
@@ -5701,12 +5702,6 @@
           "loadOrder": 1,
           "required": true,
           "globalCheck": "window.TikTrackAuth"
-        },
-        {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
         },
         {
           "file": "services/data-collection-service.js",
@@ -6097,12 +6092,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -6573,6 +6562,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -6822,7 +6823,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -6865,6 +6866,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -6919,12 +6926,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -6983,12 +6984,6 @@
           "globalCheck": "window.TikTrackAuth"
         },
         {
-          "file": "auth-guard.js",
-          "loadOrder": 2,
-          "required": true,
-          "globalCheck": "window.AuthGuard"
-        },
-        {
           "file": "services/data-collection-service.js",
           "loadOrder": 1,
           "required": true,
@@ -7377,12 +7372,6 @@
           "loadOrder": 21,
           "required": true,
           "globalCheck": "window.tagModalConfig"
-        },
-        {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
         },
         {
           "file": "modal-configs/conditions-config.js",
@@ -7853,6 +7842,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -8102,7 +8103,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -8145,6 +8146,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -8199,12 +8206,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -8456,6 +8457,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -8705,7 +8718,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -8748,6 +8761,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -8802,12 +8821,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -9054,12 +9067,6 @@
           "globalCheck": "window.tagModalConfig"
         },
         {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
-        },
-        {
           "file": "modal-configs/conditions-config.js",
           "loadOrder": 23,
           "required": false,
@@ -9528,6 +9535,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -9777,7 +9796,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -9820,6 +9839,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -9874,12 +9899,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -10095,12 +10114,6 @@
           "globalCheck": "window.tagModalConfig"
         },
         {
-          "file": "trade-selector-modal.js",
-          "loadOrder": 22,
-          "required": false,
-          "globalCheck": "window.tradeSelectorModal"
-        },
-        {
           "file": "modal-configs/conditions-config.js",
           "loadOrder": 23,
           "required": false,
@@ -10569,6 +10582,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -10818,7 +10843,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -10861,6 +10886,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -10915,12 +10946,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -11424,6 +11449,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -11673,7 +11710,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -11716,6 +11753,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -11770,12 +11813,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -11982,7 +12019,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -12025,6 +12062,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -12079,12 +12122,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -12564,6 +12601,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -12813,7 +12862,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -12856,6 +12905,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -12910,12 +12965,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -13304,6 +13353,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -13553,7 +13614,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -13596,6 +13657,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -13650,12 +13717,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -14039,6 +14100,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -14288,7 +14361,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -14331,6 +14404,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -14385,12 +14464,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -14732,6 +14805,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -14981,7 +15066,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -15024,6 +15109,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -15078,12 +15169,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -15229,7 +15314,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -15272,6 +15357,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -15326,12 +15417,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -15613,6 +15698,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -15862,7 +15959,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -15905,6 +16002,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -15959,12 +16062,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -16228,6 +16325,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -16477,7 +16586,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -16520,6 +16629,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -16576,12 +16691,6 @@
           "globalCheck": "window.WatchListsWidget"
         },
         {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
-        },
-        {
           "file": "index.js",
           "loadOrder": 9,
           "required": true,
@@ -16626,7 +16735,7 @@
       ]
     },
     "helper": {
-      "loadOrder": 11,
+      "loadOrder": "6.4",
       "dependencies": [
         "base",
         "services"
@@ -16675,6 +16784,18 @@
           "globalCheck": "window.initializeResearchPage"
         },
         {
+          "file": "services/linked-items-service.js",
+          "loadOrder": 5,
+          "required": true,
+          "globalCheck": "window.LinkedItemsService"
+        },
+        {
+          "file": "linked-items.js",
+          "loadOrder": 6,
+          "required": true,
+          "globalCheck": "window.viewLinkedItems"
+        },
+        {
           "file": "system-management/system-management-main.js",
           "loadOrder": null,
           "required": true,
@@ -16924,7 +17045,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -16967,6 +17088,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -17021,12 +17148,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -17227,7 +17348,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -17270,6 +17391,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -17324,12 +17451,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -17506,7 +17627,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -17549,6 +17670,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -17603,12 +17730,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -17784,7 +17905,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -17827,6 +17948,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -17881,12 +18008,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -18067,7 +18188,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -18110,6 +18231,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -18164,12 +18291,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -18328,7 +18449,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -18371,6 +18492,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -18425,12 +18552,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -18562,7 +18683,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -18605,6 +18726,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -18659,12 +18786,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -18773,7 +18894,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -18816,6 +18937,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -18870,12 +18997,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -18943,7 +19064,7 @@
           "file": "page-initialization-configs.js",
           "loadOrder": 2,
           "required": true,
-          "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS"
+          "globalCheck": "window.pageInitializationConfigs"
         },
         {
           "file": "init-system-check.js",
@@ -18986,6 +19107,12 @@
           "loadOrder": 9,
           "required": false,
           "globalCheck": "window.loadOrderValidator"
+        },
+        {
+          "file": "widgets/widget-monitor.js",
+          "loadOrder": "10 // Load early in init-system to monitor widgets before customInitializers run",
+          "required": false,
+          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "services/dashboard-data.js",
@@ -19040,12 +19167,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -19156,12 +19277,6 @@
           "loadOrder": 8,
           "required": false,
           "globalCheck": "window.WatchListsWidget"
-        },
-        {
-          "file": "widgets/widget-monitor.js",
-          "loadOrder": "99 // Load after all widgets",
-          "required": false,
-          "globalCheck": "window.WidgetMonitor"
         },
         {
           "file": "index.js",
@@ -19353,9 +19468,16 @@
       "issue": "Package data (order 7) depends on services (order 8)",
       "severity": "error",
       "type": "Dependency Order Violation"
+    },
+    {
+      "package": "helper",
+      "dependency": "services",
+      "issue": "Package helper (order 6.4) depends on services (order 8)",
+      "severity": "error",
+      "type": "Dependency Order Violation"
     }
   ],
   "optimalOrder": {},
   "dependencies": {},
-  "timestamp": "2025-12-29T01:23:14.115Z"
+  "timestamp": "2026-01-03T22:00:57.265Z"
 }

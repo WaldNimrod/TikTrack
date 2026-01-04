@@ -55,7 +55,7 @@ class PageStandardizer {
    * Get scripts for a page based on its packages
    */
   getScriptsForPage(pageName) {
-    if (!window.PAGE_CONFIGS || !window.PAGE_CONFIGS[pageName]) {
+    if (!window.pageInitializationConfigs || !window.pageInitializationConfigs[pageName]) {
       console.warn(`No config found for page: ${pageName}`);
       // Fallback to base package from PACKAGE_MANIFEST
       if (window.PACKAGE_MANIFEST && window.PACKAGE_MANIFEST.base) {
@@ -69,7 +69,7 @@ class PageStandardizer {
       return this.coreScripts; // Return only core scripts as last resort
     }
 
-    const config = window.PAGE_CONFIGS[pageName];
+    const config = window.pageInitializationConfigs[pageName];
     const packages = config.packages || ['base'];
 
     let scripts = [];
@@ -164,7 +164,7 @@ class PageStandardizer {
 
     const scripts = this.getScriptsForPage(pageName);
     console.log(
-      `📦 Required packages: ${window.PAGE_CONFIGS?.[pageName]?.packages?.join(', ') || 'base'}`
+      `📦 Required packages: ${window.pageInitializationConfigs?.[pageName]?.packages?.join(', ') || 'base'}`
     );
     console.log(`📜 Required scripts (${scripts.length}):`);
     scripts.forEach(script => {
@@ -173,7 +173,7 @@ class PageStandardizer {
 
     return {
       pageName,
-      packages: window.PAGE_CONFIGS?.[pageName]?.packages || ['base'],
+      packages: window.pageInitializationConfigs?.[pageName]?.packages || ['base'],
       requiredScripts: scripts,
       scriptCount: scripts.length,
     };
@@ -194,7 +194,7 @@ class PageStandardizer {
     console.log('\n📊 Summary:');
     console.log(`Total pages: ${results.length}`);
     console.log(
-      `Pages with configs: ${results.filter(r => window.PAGE_CONFIGS?.[r.pageName]).length}`
+      `Pages with configs: ${results.filter(r => window.pageInitializationConfigs?.[r.pageName]).length}`
     );
     console.log(
       `Average scripts per page: ${(results.reduce((sum, r) => sum + r.scriptCount, 0) / results.length).toFixed(1)}`
@@ -213,7 +213,7 @@ class PageStandardizer {
     console.log('='.repeat(50));
 
     results.forEach(result => {
-      const hasConfig = !!window.PAGE_CONFIGS?.[result.pageName];
+      const hasConfig = !!window.pageInitializationConfigs?.[result.pageName];
       const status = hasConfig ? '✅' : '❌';
       console.log(
         `${status} ${result.pageName.padEnd(25)} | ${result.packages.join(', ').padEnd(20)} | ${result.scriptCount} scripts`

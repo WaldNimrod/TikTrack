@@ -1983,7 +1983,7 @@ window.testJournalViewSwitching = async function() {
         issues.push('Weekly view not activated after click');
       }
 
-      // #region agent log - journal view switch weekly
+      // region agent log - journal view switch weekly
       fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2000,7 +2000,7 @@ window.testJournalViewSwitching = async function() {
           hypothesisId:'journal_view_functionality'
         })
       }).catch(()=>{});
-      // #endregion
+      // endregion
 
       debugCalls.push({
         operation: 'view_switch',
@@ -2023,7 +2023,7 @@ window.testJournalViewSwitching = async function() {
         issues.push('Monthly view not activated after click');
       }
 
-      // #region agent log - journal view switch monthly
+      // region agent log - journal view switch monthly
       fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2040,7 +2040,7 @@ window.testJournalViewSwitching = async function() {
           hypothesisId:'journal_view_functionality'
         })
       }).catch(()=>{});
-      // #endregion
+      // endregion
 
       debugCalls.push({
         operation: 'view_switch',
@@ -2097,7 +2097,7 @@ window.testJournalTableFiltering = async function() {
       const tableRows = document.querySelectorAll('#tradingJournalTable tbody tr, .journal-entries tr');
       const visibleRows = Array.from(tableRows).filter(row => row.offsetHeight > 0);
 
-      // #region agent log - journal date filter applied
+      // region agent log - journal date filter applied
       fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2116,7 +2116,7 @@ window.testJournalTableFiltering = async function() {
           hypothesisId:'journal_filter_functionality'
         })
       }).catch(()=>{});
-      // #endregion
+      // endregion
 
       debugCalls.push({
         operation: 'date_filter',
@@ -2136,7 +2136,7 @@ window.testJournalTableFiltering = async function() {
       moodFilter.dispatchEvent(new Event('change', { bubbles: true }));
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // #region agent log - journal mood filter applied
+      // region agent log - journal mood filter applied
       fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2152,7 +2152,7 @@ window.testJournalTableFiltering = async function() {
           hypothesisId:'journal_filter_functionality'
         })
       }).catch(()=>{});
-      // #endregion
+      // endregion
     }
 
   } catch (error) {
@@ -2197,7 +2197,7 @@ window.testJournalDrilldown = async function() {
 
       const drilldownSuccess = !!(detailModal || entityDetails);
 
-      // #region agent log - journal drilldown executed
+      // region agent log - journal drilldown executed
       fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2216,7 +2216,7 @@ window.testJournalDrilldown = async function() {
           hypothesisId:'journal_drilldown_functionality'
         })
       }).catch(()=>{});
-      // #endregion
+      // endregion
 
       debugCalls.push({
         operation: 'drilldown_click',
@@ -2294,7 +2294,7 @@ window.testJournalNotesCRUD = async function() {
         submitBtn.click();
         await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for save
 
-        // #region agent log - journal note created
+        // region agent log - journal note created
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -2311,7 +2311,7 @@ window.testJournalNotesCRUD = async function() {
             hypothesisId:'journal_notes_crud_functionality'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         debugCalls.push({
           operation: 'note_create',
@@ -2347,7 +2347,7 @@ window.testJournalNotesCRUD = async function() {
             updateBtn.click();
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // #region agent log - journal note updated
+            // region agent log - journal note updated
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
               method:'POST',
               headers:{'Content-Type':'application/json'},
@@ -2364,7 +2364,7 @@ window.testJournalNotesCRUD = async function() {
                 hypothesisId:'journal_notes_crud_functionality'
               })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             debugCalls.push({
               operation: 'note_update',
@@ -2391,7 +2391,7 @@ window.testJournalNotesCRUD = async function() {
         }
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // #region agent log - journal note deleted
+        // region agent log - journal note deleted
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -2407,7 +2407,7 @@ window.testJournalNotesCRUD = async function() {
             hypothesisId:'journal_notes_crud_functionality'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         debugCalls.push({
           operation: 'note_delete',

@@ -217,6 +217,25 @@ pip install --upgrade webdriver-manager
 ./start_server.sh
 ```
 
+### שגיאה: "SyntaxError: '#' not followed by identifier"
+
+**פתרון:** בדוק שה-execute_script ב-login process לא מכיל הערות JavaScript לא חוקיות:
+
+```python
+# ❌ שגוי - הערה עם # בתוך JavaScript string
+driver.execute_script("""
+sessionStorage.setItem('dev_authToken', arguments[0]);
+# Option 1: No localStorage for auth tokens
+window.authToken = arguments[0];
+""", token, user)
+
+# ✅ נכון - ללא הערות בתוך JavaScript string
+driver.execute_script("""
+sessionStorage.setItem('dev_authToken', arguments[0]);
+window.authToken = arguments[0];
+""", token, user)
+```
+
 ### שגיאה: "Timeout"
 
 **פתרון:** הגדל timeout ב-`test_pages_console_errors.py`:
@@ -236,5 +255,5 @@ WebDriverWait(driver, 20)  # במקום 10
 
 ---
 
-**תאריך עדכון אחרון:** 5 בדצמבר 2025
+**תאריך עדכון אחרון:** 4 בינואר 2026
 

@@ -34,12 +34,12 @@ const configContent = fs.readFileSync(configPath, 'utf8');
 // Simple extraction - find each page config manually
 const pages = {};
 
-// Extract PAGE_CONFIGS section
-const pageConfigsMatch = configContent.match(/const PAGE_CONFIGS = \{([\s\S]*?)\}(?=\s*;|\s*const ADDITIONAL_PAGE_CONFIGS)/);
+// Extract pageInitializationConfigs section
+const pageConfigsMatch = configContent.match(/const pageInitializationConfigs = \{([\s\S]*?)\}(?=\s*;|\s*const additionalPageInitializationConfigs)/);
 const mainConfigText = pageConfigsMatch ? pageConfigsMatch[1] : '';
 
-// Extract ADDITIONAL_PAGE_CONFIGS section
-const additionalMatch = configContent.match(/const ADDITIONAL_PAGE_CONFIGS = \{([\s\S]*?)\};/);
+// Extract additionalPageInitializationConfigs section
+const additionalMatch = configContent.match(/const additionalPageInitializationConfigs = \{([\s\S]*?)\};/);
 const additionalConfigText = additionalMatch ? additionalMatch[1] : '';
 
 const allConfigText = mainConfigText + (additionalConfigText ? ',' + additionalConfigText : '');
@@ -126,7 +126,7 @@ console.log(separator);
 USER_PAGES.forEach(pageName => {
     const page = pages[pageName];
     if (!page) {
-        console.log(`| ${pageName} | ${'⚠️ לא נמצא ב-PAGE_CONFIGS'.padEnd(sortedPackages.length * 5)} |`);
+        console.log(`| ${pageName} | ${'⚠️ לא נמצא ב-pageInitializationConfigs'.padEnd(sortedPackages.length * 5)} |`);
         return;
     }
     

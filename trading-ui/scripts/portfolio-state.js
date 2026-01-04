@@ -2515,7 +2515,7 @@ async function updateTradesSummary(trades) {
             return;
         }
 
-        // #region agent log - PORTFOLIO_RENDERING
+        // region agent log - PORTFOLIO_RENDERING
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -2535,7 +2535,7 @@ async function updateTradesSummary(trades) {
             timestamp: Date.now()
           })
         }).catch(() => {});
-        // #endregion
+        // endregion
 
         await window.InfoSummarySystem.calculateAndRender(trades, config);
     } catch (error) {
@@ -6284,7 +6284,7 @@ async function waitForScripts() {
     
     // Only set up fallback if UnifiedAppInitializer is not available
     // UnifiedAppInitializer will call initializePage() via customInitializers
-    if (!window.UnifiedAppInitializer && !window.PAGE_CONFIGS) {
+    if (!window.UnifiedAppInitializer && !window.pageInitializationConfigs) {
         // UnifiedAppInitializer not available, use fallback
         initializePageFallback();
     } else {

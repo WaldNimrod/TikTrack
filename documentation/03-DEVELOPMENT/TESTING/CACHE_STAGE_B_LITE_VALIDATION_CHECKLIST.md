@@ -11,6 +11,7 @@
 - [ ] Confirm `CACHE_DISABLED=true` in both `Backend/config/settings.py` and `production/Backend/config/settings.py`.
 - [ ] Verify header cache menu buttons are visible on every page (dev & prod).
 - [ ] Ensure local storage/IndexedDB are cleared before starting tests.
+- [ ] Confirm no `authToken`/`currentUser` keys exist in `localStorage` (auth must be sessionStorage only).
 
 ---
 
@@ -58,6 +59,7 @@
 
 - [ ] No usage of `window.*Data` or manual `localStorage.setItem` outside UnifiedCacheManager.
 - [ ] Search for `sessionStorage` usage; ensure routed through cache manager or removed.
+- [ ] Verify auth keys exist only in sessionStorage (`dev_authToken`, `dev_currentUser`).
 - [ ] Confirm modules rely on documented key patterns (see Stage B-Lite spec Section 3.4).
 
 ---
@@ -68,4 +70,3 @@
 - [ ] Capture `window.currentPreferences` snapshot confirming `{ profileId, isFallback }` state.
 - [ ] Re-enable any developer logging toggles that were changed during validation.
 - [ ] Report discrepancies back to cache task tracker before proceeding to Stage C.
-

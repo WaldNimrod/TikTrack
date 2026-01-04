@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="styles-new/07-pages/_login.css?v=1.0.0">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="images/icons/favicon.ico">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,13 +65,28 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="scripts/api-config.js?v=1.0.0"></script>
-    <script src="scripts/api-fetch-wrapper.js?v=1.0.0"></script>
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
-    <script src="scripts/auth.js?v=1.0.0"></script>
-    <script src="scripts/logger-service.js?v=1.0.0"></script>
-    <script src="scripts/login.js?v=1.0.0"></script>
-  <script src="scripts/color-scheme-system.js></script> <!-- Dynamic color system -->
+    <!-- Scripts - Load order critical for login flow -->
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest system -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configs -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Core systems initialization -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- API configuration -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="scripts/api-fetch-wrapper.js?v=1.0.0" defer></script> <!-- Global fetch wrapper for Authorization injection -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system (exports window.login) -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Logger service -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="scripts/test_auth_infrastructure.js?v=1.0.0" defer></script> <!-- Test auth infrastructure (Fix Pack 5) -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="scripts/login.js?v=1.0.0" defer></script> <!-- Login functionality (waits for window.login from auth.js) -->
 </body>
 </html>

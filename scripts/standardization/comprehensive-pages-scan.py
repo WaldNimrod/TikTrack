@@ -20,7 +20,7 @@ DOCS_DIR = PROJECT_ROOT / 'documentation' / '05-REPORTS'
 
 # מערכות לבדיקה (לפי מטריצת סטנדרטיזציה)
 REQUIRED_SYSTEMS = {
-    'Unified Init System': ['window.unifiedAppInitializer', 'window.PAGE_CONFIGS', 'window.PACKAGE_MANIFEST'],
+    'Unified Init System': ['window.unifiedAppInitializer', 'window.pageInitializationConfigs', 'window.PACKAGE_MANIFEST'],
     'Section Toggle System': ['window.toggleSection'],
     'NotificationSystem': ['window.NotificationSystem', 'window.showSuccessNotification', 'window.showErrorNotification'],
     'ModalManagerV2': ['window.ModalManagerV2'],

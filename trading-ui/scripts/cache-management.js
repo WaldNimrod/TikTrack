@@ -215,16 +215,16 @@ class CacheManagementPage {
      * רישום במערכת הגדרות העמודים
      */
     registerWithPageConfigs() {
-        if (window.PAGE_CONFIGS) {
-            window.PAGE_CONFIGS['cache-management'] = {
+        if (window.pageInitializationConfigs) {
+            window.pageInitializationConfigs['cache-management'] = {
                 init: () => this.init(),
                 modules: ['cache', 'notifications', 'logs'],
                 cleanup: () => this.cleanup()
             };
             if (window.Logger && typeof window.Logger.info === 'function') {
-                window.Logger.info('✅ Registered with PAGE_CONFIGS');
+                window.Logger.info('✅ Registered with pageInitializationConfigs');
             } else if (window.DEBUG_MODE) {
-                console.log('✅ Registered with PAGE_CONFIGS');
+                console.log('✅ Registered with pageInitializationConfigs');
             }
         }
     }

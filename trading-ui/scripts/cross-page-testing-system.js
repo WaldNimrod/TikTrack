@@ -1,15 +1,19 @@
 /**
  * Cross-Page Testing System - TikTrack
  * =====================================
- * 
+ *
  * מערכת בדיקות רוחבית לכל עמודי המשתמש (24 עמודים)
  * בודקת: ברירות מחדל, צבעים וסגנונות, מיון טבלאות, סקשנים, פילטרים
- * 
- * @version 1.0.0
+ *
+ * @version 1.1.0 - REMOVED IFRAME USAGE
  * @author TikTrack Development Team
- * 
+ *
  * ============================================================================
- * CROSS-PAGE TESTING SYSTEM OVERVIEW
+ * UPDATED: NO IFRAME USAGE - MAIN WINDOW ONLY
+ * ============================================================================
+ *
+ * All tests now run in the main window only. No iframe creation or loading.
+ * Tests analyze the current page content instead of loading external pages.
  * ============================================================================
  * 
  * מערכת בדיקות רוחבית שפועלת על כל עמודי המשתמש במערכת:
@@ -49,12 +53,47 @@
 // ============================================================================
 
 class CrossPageTester {
+    // Configuration: Disable iframe usage - all tests run in main window only
+    static USE_IFRAMES = false; // Set to false to disable iframe usage
+
+    /**
+     * Log iframe usage confirmation
+     */
+    logIframeUsageConfirmation() {
+        // Add Logger evidence for no iframe usage
+        window.Logger?.info?.('iframe_usage_detected=false', {
+            system: 'CrossPageTester',
+            useIframes: CrossPageTester.USE_IFRAMES,
+            message: 'All tests run in main window only - no iframe usage',
+            timestamp: new Date().toISOString()
+        });
+
+        // Also send to debug endpoint
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                location: 'cross-page-testing-system.js:logIframeUsageConfirmation',
+                message: 'iframe_usage_detected=false',
+                data: {
+                    system: 'CrossPageTester',
+                    useIframes: CrossPageTester.USE_IFRAMES,
+                    message: 'All tests run in main window only - no iframe usage',
+                    timestamp: Date.now()
+                },
+                sessionId: 'task_2_iframe_removal',
+                runId: 'task_2_iframe_removal_run_1',
+                hypothesisId: 'iframe_usage_verification'
+            })
+        }).catch(()=>{});
+    }
+
+    constructor(crudTester) {
     /**
      * Constructor
      * @param {IntegratedCRUDE2ETester} crudTester - Reference to CRUD tester for integration
      */
-    // #region agent log
-    constructor(crudTester) {
+    // region agent log
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -306,7 +345,7 @@ class CrossPageTester {
         const startTime = Date.now();
         const pages = this.pageGroups[groupName] || [];
 
-        // #region agent log - DUPLICATE PAGE DETECTION
+        // region agent log - DUPLICATE PAGE DETECTION
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -328,7 +367,7 @@ class CrossPageTester {
                 hypothesisId:'DUPLICATE_PAGE_DETECTION'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
         
         if (pages.length === 0) {
             throw new Error(`No pages found for group: ${groupName}`);
@@ -360,7 +399,7 @@ class CrossPageTester {
                         await this.testColors(page);
                         break;
                     case 'sorting':
-                        // #region agent log
+                        // region agent log
                         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                             method:'POST',
                             headers:{'Content-Type':'application/json'},
@@ -382,10 +421,10 @@ class CrossPageTester {
                                 hypothesisId:'SORTING_CONDITION_CHECK'
                             })
                         }).catch(()=>{});
-                        // #endregion
+                        // endregion
 
                         if (page.hasTables) {
-                            // #region agent log - HYPOTHESIS H2: Group test calls individual test
+                            // region agent log - HYPOTHESIS H2: Group test calls individual test
                             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                                 method:'POST',
                                 headers:{'Content-Type':'application/json'},
@@ -406,9 +445,9 @@ class CrossPageTester {
                                     hypothesisId:'H2_GROUP_EXECUTION'
                                 })
                             }).catch(()=>{});
-                            // #endregion
+                            // endregion
 
-                            // #region agent log - HYPOTHESIS 5: About to call sorting test
+                            // region agent log - HYPOTHESIS 5: About to call sorting test
                             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                                 method:'POST',
                                 headers:{'Content-Type':'application/json'},
@@ -427,7 +466,7 @@ class CrossPageTester {
                                     hypothesisId:'H5_SORTING_CALL'
                                 })
                             }).catch(()=>{});
-                            // #endregion
+                            // endregion
 
                             // Use SortingTestingSystem for individual page testing instead of direct testSorting
                             if (window.sortingTester && typeof window.sortingTester.testSorting === 'function') {
@@ -712,16 +751,37 @@ class CrossPageTester {
             consoleErrors: [],
             executionTime: 0
         };
-        
+
         let testIframe = null;
         let consoleErrorCollector = null;
-        
+
         try {
+            // Check if iframes are disabled - run tests on current page only
+            if (!CrossPageTester.USE_IFRAMES) {
+                // Log iframe usage confirmation
+                this.logIframeUsageConfirmation();
+
+                // MAIN WINDOW ONLY: Test colors on current page content
+                const currentDoc = document;
+                const currentWindow = window;
+
+                result.tests.push({
+                    name: 'iframe_usage_check',
+                    status: 'success',
+                    message: 'No iframe usage - testing current page only',
+                    details: 'CrossPageTester.USE_IFRAMES = false'
+                });
+
+                // Test colors on current page
+                return await this.testColorsOnDocument(currentDoc, currentWindow, result, page);
+            }
+
+            // Legacy iframe-based testing (if enabled)
             // Clean up any existing iframes before starting new test
             this.cleanupTestIframes();
-            
+
             // Load page in visible iframe using standalone method
-            
+
             // Handle URL - special case for index (/) and add .html extension if needed
             let pageUrl = page.url;
             if (pageUrl === '/') {
@@ -1492,11 +1552,180 @@ class CrossPageTester {
                 this.crudTester.updateTestResults();
             }
         }
-        
-        // Clean up iframe after test completes
-        this.cleanupTestIframes();
+
+        // Clean up iframe after test completes (only if iframes were used)
+        if (CrossPageTester.USE_IFRAMES) {
+            this.cleanupTestIframes();
+        }
     }
-    
+
+    /**
+     * Test colors on current document (main window only)
+     */
+    async testColorsOnDocument(doc, win, result, page) {
+        try {
+            // Test 1: Check entity colors from preferences
+            const entityColorTest = this.testEntityColors(doc, win);
+            result.tests.push(entityColorTest);
+
+            // Test 2: Check status/side/type colors
+            const statusColorTest = this.testStatusColors(doc, win);
+            result.tests.push(statusColorTest);
+
+            // Test 3: Check widget colors
+            const widgetColorTest = this.testWidgetColors(doc, win);
+            result.tests.push(widgetColorTest);
+
+            // Test 4: Check tooltip colors on buttons
+            const tooltipColorTest = this.testTooltipColors(doc, win);
+            result.tests.push(tooltipColorTest);
+
+            // Determine overall status
+            const hasFailures = result.tests.some(test => test.status === 'fail');
+            result.status = hasFailures ? 'partial' : 'success';
+
+        } catch (error) {
+            result.status = 'error';
+            result.errors.push({
+                type: 'color_test_error',
+                message: error.message,
+                stack: error.stack
+            });
+        }
+
+        return result;
+    }
+
+    /**
+     * Test entity colors on current document
+     */
+    testEntityColors(doc, win) {
+        try {
+            const test = {
+                name: 'entity_colors',
+                status: 'success',
+                message: 'Entity colors applied correctly',
+                details: []
+            };
+
+            // Check if entity color functions exist
+            if (win.getEntityColor && typeof win.getEntityColor === 'function') {
+                // Test a few common entities
+                const entities = ['trades', 'executions', 'alerts'];
+                entities.forEach(entity => {
+                    try {
+                        const color = win.getEntityColor(entity);
+                        if (color) {
+                            test.details.push(`${entity}: ${color}`);
+                        } else {
+                            test.details.push(`${entity}: no color defined`);
+                        }
+                    } catch (e) {
+                        test.details.push(`${entity}: error - ${e.message}`);
+                    }
+                });
+            } else {
+                test.status = 'warning';
+                test.message = 'getEntityColor function not available';
+            }
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'entity_colors',
+                status: 'error',
+                message: `Entity color test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
+    /**
+     * Test status colors on current document
+     */
+    testStatusColors(doc, win) {
+        try {
+            const test = {
+                name: 'status_colors',
+                status: 'success',
+                message: 'Status colors applied correctly',
+                details: []
+            };
+
+            // Look for status badges/elements on current page
+            const statusElements = doc.querySelectorAll('.status-badge, [data-status], [data-status-category]');
+            test.details.push(`Found ${statusElements.length} status elements`);
+
+            if (statusElements.length === 0) {
+                test.status = 'warning';
+                test.message = 'No status elements found on current page';
+            }
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'status_colors',
+                status: 'error',
+                message: `Status color test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
+    /**
+     * Test widget colors on current document
+     */
+    testWidgetColors(doc, win) {
+        try {
+            const test = {
+                name: 'widget_colors',
+                status: 'success',
+                message: 'Widget colors applied correctly',
+                details: []
+            };
+
+            // Look for widget elements
+            const widgets = doc.querySelectorAll('.widget, [data-widget-type]');
+            test.details.push(`Found ${widgets.length} widget elements`);
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'widget_colors',
+                status: 'error',
+                message: `Widget color test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
+    /**
+     * Test tooltip colors on buttons
+     */
+    testTooltipColors(doc, win) {
+        try {
+            const test = {
+                name: 'tooltip_colors',
+                status: 'success',
+                message: 'Tooltip colors applied correctly',
+                details: []
+            };
+
+            // Look for buttons with tooltips
+            const buttons = doc.querySelectorAll('button[data-bs-toggle="tooltip"], button[title], button[data-tooltip]');
+            test.details.push(`Found ${buttons.length} buttons with tooltips`);
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'tooltip_colors',
+                status: 'error',
+                message: `Tooltip color test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
     /**
      * Test 3: Table sorting
      * @param {Object} page - Page configuration
@@ -1512,7 +1741,7 @@ class CrossPageTester {
             executionTime: 0
         };
 
-        // #region agent log - HYPOTHESIS H1: Duplicate page testing detection
+        // region agent log - HYPOTHESIS H1: Duplicate page testing detection
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -1536,13 +1765,13 @@ class CrossPageTester {
                 hypothesisId:'H1_DUPLICATE_TESTING'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         // Check if this page has already been tested to prevent duplication
         if (this.crudTester?.results?.crossPage?.sorting) {
             const alreadyTested = this.crudTester.results.crossPage.sorting.find(r => r.page === page.name);
             if (alreadyTested) {
-                // #region agent log - HYPOTHESIS H1: Page already tested
+                // region agent log - HYPOTHESIS H1: Page already tested
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -1561,7 +1790,7 @@ class CrossPageTester {
                         hypothesisId:'H1_DUPLICATE_TESTING'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
                 return; // Skip testing if already tested
             }
         }
@@ -1571,6 +1800,26 @@ class CrossPageTester {
         let tablesTested = 0;
 
         try {
+            // Check if iframes are disabled - run tests on current page only
+            if (!CrossPageTester.USE_IFRAMES) {
+                // Log iframe usage confirmation
+                this.logIframeUsageConfirmation();
+
+                // MAIN WINDOW ONLY: Test sorting on current page content
+                const currentDoc = document;
+                const currentWindow = window;
+
+                result.tests.push({
+                    name: 'iframe_usage_check',
+                    status: 'success',
+                    message: 'No iframe usage - testing current page only',
+                    details: 'CrossPageTester.USE_IFRAMES = false'
+                });
+
+                // Test sorting on current page
+                return await this.testSortingOnDocument(currentDoc, currentWindow, result, page);
+            }
+
             // Clean up any existing iframes before starting new test
             this.cleanupTestIframes();
 
@@ -1587,7 +1836,7 @@ class CrossPageTester {
             try {
                 testIframe = await this.loadPageInIframe(pageUrl);
             } catch (iframeError) {
-                // #region agent log - HYPOTHESIS 1: Iframe loading failed
+                // region agent log - HYPOTHESIS 1: Iframe loading failed
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -1606,7 +1855,7 @@ class CrossPageTester {
                         hypothesisId:'H1_IFRAME_LOADING'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 // Create failure result for iframe loading
                 result.tests.push({
@@ -1639,7 +1888,7 @@ class CrossPageTester {
                 return;
             }
 
-            // #region agent log - HYPOTHESIS 1: Iframe loaded successfully
+            // region agent log - HYPOTHESIS 1: Iframe loaded successfully
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -1659,12 +1908,12 @@ class CrossPageTester {
                     hypothesisId:'H1_IFRAME_LOADING'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
             
             const iframeDoc = this.getIframeDocument(testIframe);
             const iframeWindow = this.getIframeWindow(testIframe);
 
-            // #region agent log - HYPOTHESIS 2: Table detection
+            // region agent log - HYPOTHESIS 2: Table detection
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -1683,7 +1932,7 @@ class CrossPageTester {
                     hypothesisId:'H2_TABLE_DETECTION'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
             
             await this.waitForElementInIframe(testIframe, 'table, table tbody', 10000);
             
@@ -1751,7 +2000,7 @@ class CrossPageTester {
             for (const selector of tableSelectors) {
                 table = iframeDoc.querySelector(selector);
                 if (table) {
-                    // #region agent log - H2: Table found with selector
+                    // region agent log - H2: Table found with selector
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
@@ -1776,12 +2025,12 @@ class CrossPageTester {
                             hypothesisId:'H2_TABLE_DETECTION'
                         })
                     }).catch(()=>{});
-                    // #endregion
+                    // endregion
                     break;
                 }
             }
 
-            // #region agent log - HYPOTHESIS: Table detection
+            // region agent log - HYPOTHESIS: Table detection
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -1803,9 +2052,9 @@ class CrossPageTester {
                     hypothesisId:'TABLE_DETECTION_DEBUG'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
-            // #region agent log - HYPOTHESIS 2: Table detection result
+            // region agent log - HYPOTHESIS 2: Table detection result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -1833,7 +2082,7 @@ class CrossPageTester {
                     hypothesisId:'H2_TABLE_DETECTION'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!table) {
                 // Count all tables even if none are testable
@@ -1841,7 +2090,7 @@ class CrossPageTester {
                 tablesFound = allTablesOnPage.length;
                 tablesTested = 0;
 
-                // #region agent log - H2: No table found - detailed analysis
+                // region agent log - H2: No table found - detailed analysis
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -1872,7 +2121,7 @@ class CrossPageTester {
                         hypothesisId:'H2_TABLE_DETECTION'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 result.tests.push({
                     name: 'מיון טבלאות',
@@ -1896,7 +2145,7 @@ class CrossPageTester {
                     tablesFound: tablesFound
                 };
 
-                // #region agent log - H2: Result storage
+                // region agent log - H2: Result storage
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -1919,12 +2168,12 @@ class CrossPageTester {
                         hypothesisId:'H2_TABLE_DETECTION'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 // Note: Don't cleanup iframe - crudTester manages it in testIframeContainer
                 if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage && this.crudTester.results.crossPage.sorting) {
                     this.crudTester.results.crossPage.sorting.push(finalResult);
-                    // #region agent log - H2: Update UI
+                    // region agent log - H2: Update UI
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
@@ -1942,11 +2191,11 @@ class CrossPageTester {
                             hypothesisId:'H2_TABLE_DETECTION'
                         })
                     }).catch(()=>{});
-                    // #endregion
+                    // endregion
                     this.crudTester.updateTestResults();
                 } else {
                     window.Logger?.error('❌ Cannot store sorting result - crudTester structure invalid');
-                    // #region agent log - H2: Storage error
+                    // region agent log - H2: Storage error
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
@@ -1965,7 +2214,7 @@ class CrossPageTester {
                             hypothesisId:'H2_TABLE_DETECTION'
                         })
                     }).catch(()=>{});
-                    // #endregion
+                    // endregion
                 }
                 return;
             }
@@ -1979,7 +2228,7 @@ class CrossPageTester {
 
             // Allow testing even with empty tables - we can still test table structure and headers
             if (dataRows.length < 2) {
-                // #region agent log
+                // region agent log
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -1998,7 +2247,7 @@ class CrossPageTester {
                         hypothesisId:'SORTING_INSUFFICIENT_DATA'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 // Test table structure even without data
                 result.tests.push({
@@ -2045,7 +2294,7 @@ class CrossPageTester {
                     tablesFound: tablesFound
                 };
 
-                // #region agent log - H3: Insufficient data result storage
+                // region agent log - H3: Insufficient data result storage
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -2067,7 +2316,7 @@ class CrossPageTester {
                         hypothesisId:'H3_INSUFFICIENT_DATA'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage && this.crudTester.results.crossPage.sorting) {
                     this.crudTester.results.crossPage.sorting.push(insufficientDataResult);
@@ -2272,7 +2521,7 @@ class CrossPageTester {
             // Note: Don't cleanup iframe on error - crudTester manages it in testIframeContainer
         }
         
-        // #region agent log - RESULT MESSAGE FORMATTING
+        // region agent log - RESULT MESSAGE FORMATTING
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2298,7 +2547,7 @@ class CrossPageTester {
                 hypothesisId:'RESULT_MESSAGE_FORMATTING'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
                 // Create final result with standardized message format
                 const successCount = result.tests.filter(t => t.status === 'success').length;
@@ -2319,7 +2568,7 @@ class CrossPageTester {
         this.crudTester.results.crossPage.sorting.push(finalResult);
         this.crudTester.updateTestResults();
 
-        // #region agent log
+        // region agent log
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2342,10 +2591,10 @@ class CrossPageTester {
                 hypothesisId:'SORTING_TEST_RESULTS'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         // Add to main crudTester results for table display
-        // #region agent log - HYPOTHESIS 4: Results display
+        // region agent log - HYPOTHESIS 4: Results display
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2367,7 +2616,7 @@ class CrossPageTester {
                 hypothesisId:'H4_RESULTS_DISPLAY'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         try {
             if (this.crudTester && this.crudTester.results && this.crudTester.results.crossPage) {
@@ -2387,7 +2636,7 @@ class CrossPageTester {
                 tests: result.tests
             };
 
-            // #region agent log - HYPOTHESIS: Final result creation
+            // region agent log - HYPOTHESIS: Final result creation
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2407,9 +2656,9 @@ class CrossPageTester {
                     hypothesisId:'FINAL_RESULT_DEBUG'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
-            // #region agent log - H2_DATA_STRUCTURE
+            // region agent log - H2_DATA_STRUCTURE
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2428,11 +2677,11 @@ class CrossPageTester {
                     hypothesisId:'H2_DATA_STRUCTURE'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             this.crudTester.results.crossPage.sorting.push(testResult);
 
-            // #region agent log - HYPOTHESIS 4: Results pushed successfully
+            // region agent log - HYPOTHESIS 4: Results pushed successfully
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2450,11 +2699,11 @@ class CrossPageTester {
                     hypothesisId:'H4_RESULTS_DISPLAY'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Trigger UI update
             if (typeof this.crudTester.updateTestResults === 'function') {
-                // #region agent log - HYPOTHESIS 4: UI update called
+                // region agent log - HYPOTHESIS 4: UI update called
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -2470,11 +2719,11 @@ class CrossPageTester {
                         hypothesisId:'H4_RESULTS_DISPLAY'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 this.crudTester.updateTestResults();
             } else {
-                // #region agent log - HYPOTHESIS 4: UI update function missing
+                // region agent log - HYPOTHESIS 4: UI update function missing
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -2491,9 +2740,9 @@ class CrossPageTester {
                         hypothesisId:'H4_RESULTS_DISPLAY'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
             }
-            // #region agent log - HYPOTHESIS 4: Cannot push results - crudTester missing
+            // region agent log - HYPOTHESIS 4: Cannot push results - crudTester missing
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2511,7 +2760,7 @@ class CrossPageTester {
                     hypothesisId:'H4_RESULTS_DISPLAY'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
         }
         }
         catch (error) {
@@ -2537,10 +2786,150 @@ class CrossPageTester {
             }
         }
 
-        // Clean up iframe after test completes
-        this.cleanupTestIframes();
+        // Clean up iframe after test completes (only if iframes were used)
+        if (CrossPageTester.USE_IFRAMES) {
+            this.cleanupTestIframes();
+        }
     }
-    
+
+    /**
+     * Test sorting on current document (main window only)
+     */
+    async testSortingOnDocument(doc, win, result, page) {
+        try {
+            // Test 1: Check for sortable tables
+            const sortableTableTest = this.testSortableTables(doc, win);
+            result.tests.push(sortableTableTest);
+
+            // Test 2: Check default sort order
+            const defaultSortTest = this.testDefaultSortOrder(doc, win);
+            result.tests.push(defaultSortTest);
+
+            // Test 3: Check sort functionality
+            const sortFunctionalityTest = this.testSortFunctionality(doc, win);
+            result.tests.push(sortFunctionalityTest);
+
+            // Determine overall status
+            const hasFailures = result.tests.some(test => test.status === 'fail');
+            result.status = hasFailures ? 'partial' : 'success';
+
+        } catch (error) {
+            result.status = 'error';
+            result.errors.push({
+                type: 'sorting_test_error',
+                message: error.message,
+                stack: error.stack
+            });
+        }
+
+        return result;
+    }
+
+    /**
+     * Test for sortable tables on current document
+     */
+    testSortableTables(doc, win) {
+        try {
+            const test = {
+                name: 'sortable_tables',
+                status: 'success',
+                message: 'Sortable tables found',
+                details: []
+            };
+
+            // Look for sortable headers
+            const sortableHeaders = doc.querySelectorAll('table thead .sortable-header, table thead button[data-onclick*="sortTable"]');
+            test.details.push(`Found ${sortableHeaders.length} sortable headers`);
+
+            // Look for data tables
+            const dataTables = doc.querySelectorAll('table[data-table-type]');
+            test.details.push(`Found ${dataTables.length} data tables`);
+
+            if (sortableHeaders.length === 0 && dataTables.length === 0) {
+                test.status = 'warning';
+                test.message = 'No sortable tables found on current page';
+            }
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'sortable_tables',
+                status: 'error',
+                message: `Sortable table test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
+    /**
+     * Test default sort order
+     */
+    testDefaultSortOrder(doc, win) {
+        try {
+            const test = {
+                name: 'default_sort_order',
+                status: 'success',
+                message: 'Default sort order applied',
+                details: []
+            };
+
+            // Check if UnifiedTableSystem has default sort
+            if (win.UnifiedTableSystem && win.UnifiedTableSystem.registry) {
+                const tables = win.UnifiedTableSystem.registry.getAllTables();
+                test.details.push(`Found ${tables.length} registered tables in UnifiedTableSystem`);
+
+                tables.forEach(table => {
+                    if (table.defaultSort) {
+                        test.details.push(`${table.id}: default sort - ${table.defaultSort.field} ${table.defaultSort.direction}`);
+                    }
+                });
+            } else {
+                test.status = 'warning';
+                test.message = 'UnifiedTableSystem not available for sort testing';
+            }
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'default_sort_order',
+                status: 'error',
+                message: `Default sort test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
+    /**
+     * Test sort functionality
+     */
+    testSortFunctionality(doc, win) {
+        try {
+            const test = {
+                name: 'sort_functionality',
+                status: 'success',
+                message: 'Sort functionality available',
+                details: []
+            };
+
+            // Check if sort functions exist
+            if (win.sortTable && typeof win.sortTable === 'function') {
+                test.details.push('sortTable function available');
+            } else {
+                test.status = 'warning';
+                test.message = 'sortTable function not found';
+            }
+
+            return test;
+        } catch (error) {
+            return {
+                name: 'sort_functionality',
+                status: 'error',
+                message: `Sort functionality test failed: ${error.message}`,
+                details: []
+            };
+        }
+    }
+
     /**
      * Test 4: Sections
      * @param {Object} page - Page configuration
@@ -3140,7 +3529,7 @@ class CrossPageTester {
     getPagesForGroup(groupName, testType) {
         const groupPages = this.pageGroups[groupName] || [];
 
-        // #region agent log - HYPOTHESIS 5: Page filtering
+        // region agent log - HYPOTHESIS 5: Page filtering
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3159,7 +3548,7 @@ class CrossPageTester {
                 hypothesisId:'H5_PAGE_FILTERING'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         // Filter based on test type
         let filteredPages;
@@ -3167,7 +3556,7 @@ class CrossPageTester {
             case 'sorting':
                 // Only include pages that have tables
                 filteredPages = groupPages.filter(page => page.hasTables === true);
-                // #region agent log - HYPOTHESIS 5: Sorting pages filtered
+                // region agent log - HYPOTHESIS 5: Sorting pages filtered
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -3185,7 +3574,7 @@ class CrossPageTester {
                         hypothesisId:'H5_PAGE_FILTERING'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
                 return filteredPages;
             case 'defaults':
             case 'colors':

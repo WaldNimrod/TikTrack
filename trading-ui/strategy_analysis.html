@@ -689,7 +689,7 @@
     <!-- [24] Load Order: 24 | Strategy: defer -->
     <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
     <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js></script> <!-- Dynamic color system -->
+    <script src="scripts/color-scheme-system.js" defer></script> <!-- Dynamic color system -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -743,11 +743,8 @@
     <!-- Critical: NO | Version: 1.5.0 -->
 
     <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
     <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
     <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
     <!-- [47] Load Order: 47 | Strategy: defer -->
     <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
     <!-- [48] Load Order: 48 | Strategy: defer -->
@@ -767,19 +764,12 @@
     <!-- [55] Load Order: 55 | Strategy: defer -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
     <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
     <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
     <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
     <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
     <!-- [60] Load Order: 60 | Strategy: defer -->
-    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
     <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
     <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/12: UI ADVANCED PACKAGE ===== -->
@@ -865,7 +855,6 @@
     <!-- [88] Load Order: 88 | Strategy: defer -->
     <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
     <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/12: ENTITY SERVICES PACKAGE ===== -->
@@ -907,7 +896,6 @@
     <!-- [101] Load Order: 101 | Strategy: defer -->
     <script src="scripts/entity-details-renderer.js?v=1.0.0" defer></script> <!-- Entity details renderer -->
     <!-- [102] Load Order: 102 | Strategy: defer -->
-    <script src="scripts/entity-details-modal.js?v=1.0.0" defer></script> <!-- Entity details modal -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 10/12: INFO SUMMARY PACKAGE ===== -->
@@ -966,5 +954,38 @@
 
     <!-- Page-specific script -->
     <script src="scripts/strategy-analysis-page.js?v=1.0.0" defer></script>
+
+    <!-- P0 globals verification instrumentation -->
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const modalManagerAvailable = typeof window.ModalManagerV2 !== 'undefined';
+                const unifiedAppInitAvailable = typeof window.UnifiedAppInitializer !== 'undefined';
+                const loggerAvailable = typeof window.Logger !== 'undefined';
+
+                const allGlobalsAvailable = modalManagerAvailable && unifiedAppInitAvailable && loggerAvailable;
+
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'strategy_analysis.html:globals_check',
+                        message:'P0 page globals verification after Team C fixes',
+                        data:{
+                            page:'strategy_analysis',
+                            modalManagerAvailable:modalManagerAvailable,
+                            unifiedAppInitAvailable:unifiedAppInitAvailable,
+                            loggerAvailable:loggerAvailable,
+                            allGlobalsAvailable:allGlobalsAvailable,
+                            status: allGlobalsAvailable ? 'PASS' : 'FAIL',
+                            runId:'p0_globals_verification',
+                            hypothesisId:'p0_page_globals_check'
+                        },
+                        timestamp:Date.now()
+                    })
+                }).catch(()=>{});
+            }, 2000); // Wait 2 seconds for all scripts to load
+        });
+    </script>
 </body>
 </html>

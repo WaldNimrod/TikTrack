@@ -363,7 +363,7 @@ class UnifiedCRUDService {
      * });
      */
     static async create(entityType, entityData, options = {}) {
-        // #region agent log - HYPOTHESIS: UnifiedCRUDService.create called
+        // region agent log - HYPOTHESIS: UnifiedCRUDService.create called
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -384,7 +384,7 @@ class UnifiedCRUDService {
                 hypothesisId:'CRUD_SERVICE_CREATE_CALL'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         window.Logger?.debug('UnifiedCRUDService.create called', {
             entityType,
@@ -1150,7 +1150,7 @@ class UnifiedCRUDService {
 
 // ===== EXPORT TO GLOBAL SCOPE =====
 
-// #region agent log - HYPOTHESIS: UnifiedCRUDService registration
+// region agent log - HYPOTHESIS: UnifiedCRUDService registration
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1169,11 +1169,11 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         hypothesisId:'CRUD_SERVICE_REGISTRATION'
     })
 }).catch(()=>{});
-// #endregion
+// endregion
 
 window.UnifiedCRUDService = UnifiedCRUDService;
 
-// #region agent log - HYPOTHESIS: UnifiedCRUDService registration complete
+// region agent log - HYPOTHESIS: UnifiedCRUDService registration complete
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1192,5 +1192,5 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         hypothesisId:'CRUD_SERVICE_REGISTRATION_COMPLETE'
     })
 }).catch(()=>{});
-// #endregion
+// endregion
 

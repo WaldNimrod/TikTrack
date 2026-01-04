@@ -116,7 +116,7 @@ def add_mockup_page(content, page_name, page_data):
     }},
 """
     
-    # Find insertion point (before closing brace of ADDITIONAL_PAGE_CONFIGS)
+    # Find insertion point (before closing brace of additionalPageInitializationConfigs)
     insert_pattern = r'(\s+)(\};)\s*// ===== GLOBAL EXPORT ====='
     match = re.search(insert_pattern, content)
     
@@ -128,8 +128,8 @@ def add_mockup_page(content, page_name, page_data):
         new_content = content[:insertion_point] + page_config + content[insertion_point:]
         return new_content
     else:
-        # Fallback: add at end of ADDITIONAL_PAGE_CONFIGS
-        pattern = r'(const ADDITIONAL_PAGE_CONFIGS = \{[\s\S]*?)(\s+\};)'
+        # Fallback: add at end of additionalPageInitializationConfigs
+        pattern = r'(const additionalPageInitializationConfigs = \{[\s\S]*?)(\s+\};)'
         match = re.search(pattern, content)
         if match:
             insertion_point = match.end(1)

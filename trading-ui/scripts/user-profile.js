@@ -12,6 +12,74 @@
  * Last Updated: January 28, 2025
  */
 
+console.log('[user-profile.js] Script loaded, checking initial state...');
+console.log('[user-profile.js] window.authToken:', !!window.authToken);
+console.log('[user-profile.js] window.currentUser:', !!window.currentUser);
+console.log('[user-profile.js] sessionStorage.authToken:', sessionStorage.getItem('authToken') ? 'present' : 'null');
+console.log('[user-profile.js] sessionStorage.currentUser:', sessionStorage.getItem('currentUser') ? 'present' : 'null');
+
+// Immediate auth check - redirect if not authenticated
+(async function() {
+  try {
+    console.log('[user-profile.js] Running immediate auth check...');
+
+    // Wait for auth data to be available or timeout
+    let authWaitAttempts = 0;
+    const maxAuthWait = 100; // 5 seconds
+
+    while ((!window.authToken || !window.currentUser) && authWaitAttempts < maxAuthWait) {
+      // Check sessionStorage for tokens
+      const sessionToken = sessionStorage.getItem('authToken');
+      const sessionUser = sessionStorage.getItem('currentUser');
+
+      if (sessionToken && sessionUser) {
+        // Try to set window objects from sessionStorage
+        try {
+          window.authToken = sessionToken;
+          window.currentUser = JSON.parse(sessionUser);
+          console.log('[user-profile.js] Set auth data from sessionStorage');
+          break;
+        } catch (e) {
+          console.log('[user-profile.js] Failed to parse session user:', e.message);
+        }
+      }
+
+      // Check UnifiedCacheManager if available
+      if (window.UnifiedCacheManager?.initialized) {
+        try {
+          const ucToken = await window.UnifiedCacheManager.get('authToken', { layer: 'sessionStorage' });
+          const ucUser = await window.UnifiedCacheManager.get('currentUser', { layer: 'sessionStorage' });
+          if (ucToken && ucUser) {
+            window.authToken = ucToken;
+            window.currentUser = ucUser;
+            console.log('[user-profile.js] Set auth data from UnifiedCacheManager');
+            break;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 50));
+      authWaitAttempts++;
+    }
+
+    if (!window.authToken || !window.currentUser) {
+      console.log('[user-profile.js] No auth tokens found after waiting, redirecting to login');
+      // Save current URL for redirect after login
+      sessionStorage.setItem('login_redirect_url', window.location.href);
+      window.location.href = '/login.html';
+      return;
+    }
+
+    console.log('[user-profile.js] Auth check passed, continuing initialization');
+
+  } catch (error) {
+    console.log('[user-profile.js] Auth check failed:', error.message);
+    window.location.href = '/login.html';
+  }
+})();
+
 (function() {
   'use strict';
 
@@ -36,6 +104,29 @@
       try {
         window.Logger?.info('🚀 Initializing User Profile Page...', { page: 'user-profile' });
 
+        // region agent log - user profile auth check
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            location: 'trading-ui/scripts/user-profile.js:init',
+            message: 'User profile page initialization - checking auth state',
+            data: {
+              hasTikTrackAuth: !!window.TikTrackAuth,
+              hasAuthToken: !!window.authToken,
+              hasCurrentUser: !!window.currentUser,
+              currentUserId: window.currentUser?.id,
+              isAuthenticated: window.TikTrackAuth?.isAuthenticated?.(),
+              documentReadyState: document.readyState,
+              timestamp: Date.now()
+            },
+            sessionId: 'user_profile_auth_check',
+            runId: 'option1_user_profile_fix',
+            hypothesisId: 'user_profile_auth_state'
+          })
+        }).catch(() => {});
+        // endregion
+
         // Wait for auth.js to load if not available
         if (!window.TikTrackAuth) {
           window.Logger?.info('Waiting for TikTrackAuth to load...', { page: 'user-profile' });
@@ -46,12 +137,56 @@
           }
         }
 
-        // Check authentication
-        if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
-          window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-          window.location.href = '/';
-          return;
+        // Wait for UnifiedCacheManager to initialize and sync auth data
+        console.log('[user-profile] Starting UnifiedCacheManager wait, current state:', {
+          hasUCM: !!window.UnifiedCacheManager,
+          initialized: window.UnifiedCacheManager?.initialized,
+          hasAuthToken: !!window.authToken,
+          hasCurrentUser: !!window.currentUser
+        });
+
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+          window.Logger?.info('Waiting for UnifiedCacheManager to initialize...', { page: 'user-profile' });
+          let attempts = 0;
+          while ((!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+          }
+          console.log(`[user-profile] UnifiedCacheManager wait completed after ${attempts} attempts`);
+          window.Logger?.info(`UnifiedCacheManager wait completed after ${attempts} attempts`, { page: 'user-profile' });
         }
+
+        // Additional wait for auth data to be available in window objects
+        if (!window.authToken || !window.currentUser) {
+          window.Logger?.info('Waiting for auth data to be available...', { page: 'user-profile' });
+          let attempts = 0;
+          while ((!window.authToken || !window.currentUser) && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+            // Try to sync from UnifiedCacheManager if available
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+              try {
+                console.log('[user-profile] About to call UnifiedCacheManager.get...');
+                const token = await window.UnifiedCacheManager.get('authToken', { layer: 'sessionStorage' });
+                const user = await window.UnifiedCacheManager.get('currentUser', { layer: 'sessionStorage' });
+                console.log(`[user-profile] UnifiedCacheManager.get results: token=${!!token}, user=${!!user}`);
+                console.log(`[user-profile] Token value:`, token);
+                console.log(`[user-profile] User value:`, user);
+                if (token) window.authToken = token;
+                if (user) window.currentUser = user;
+                window.Logger?.debug(`Synced auth data: token=${!!token}, user=${!!user}`, { page: 'user-profile' });
+              } catch (e) {
+                console.log('[user-profile] UnifiedCacheManager.get error:', e.message);
+                // Ignore sync errors
+                window.Logger?.warn('Auth sync failed', { error: e.message, page: 'user-profile' });
+              }
+            }
+          }
+          window.Logger?.info(`Auth data wait completed after ${attempts} attempts`, { page: 'user-profile' });
+        }
+
+        // Authentication is handled by ensureAuthenticatedForPage in page-initialization-configs.js
+        // ensureAuthenticatedForPage already verified authentication before this code runs
 
         // Load user profile data
         await this.loadUserProfile();
@@ -89,6 +224,7 @@
     async loadUserProfile() {
       try {
         window.Logger?.info('Loading user profile data...', { page: 'user-profile' });
+        window.Logger?.info(`Auth state at loadUserProfile: token=${!!window.authToken}, user=${!!window.currentUser}`, { page: 'user-profile' });
 
         // Try to get from cache first (UnifiedCacheManager)
         let user = null;
@@ -97,7 +233,7 @@
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
           try {
             const cachedUser = await window.UnifiedCacheManager.get(cacheKey, {
-              layer: 'localStorage',
+              layer: 'sessionStorage',
               ttl: 300000, // 5 minutes
               includeUserId: false
             });
@@ -110,7 +246,12 @@
           }
         }
 
-        // If not in cache, try from TikTrackAuth
+        // If not in cache, try from window.currentUser (from bootstrap)
+        if (!user) {
+          user = window.currentUser;
+        }
+
+        // If still no user, try from TikTrackAuth
         if (!user) {
           user = window.TikTrackAuth?.getCurrentUser();
         }
@@ -118,6 +259,9 @@
         // If still no user, fetch from API
         if (!user) {
           try {
+            // region agent log - user-profile fetch /api/auth/me
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/user-profile.js:fetch_api_auth_me',message:'Fetching /api/auth/me for user data',data:{page:window.location.pathname,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H7_user_profile_api_calls',timestamp:Date.now()})}).catch(()=>{});
+            // endregion
             const response = await fetch('/api/auth/me', {
               method: 'GET', });
 
@@ -130,7 +274,7 @@
                 if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
                   try {
                     await window.UnifiedCacheManager.save(cacheKey, user, {
-                      layer: 'localStorage',
+                      layer: 'sessionStorage',
                       ttl: 300000,
                       includeUserId: false
                     });
@@ -151,12 +295,7 @@
             }
           }
 
-          // Not authenticated - redirect to login
-          if (!user) {
-            window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-            window.location.href = '/';
-            return;
-          }
+          // Authentication is handled by ensureAuthenticatedForPage - if we reach here, user should be authenticated
         }
 
         // Populate form with user data
@@ -269,6 +408,9 @@
       try {
         window.Logger?.info('Updating user profile...', { page: 'user-profile' });
 
+        // region agent log - user-profile PUT /api/auth/me
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/user-profile.js:put_api_auth_me',message:'PUT /api/auth/me for profile update',data:{page:window.location.pathname,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H7_user_profile_api_calls',timestamp:Date.now()})}).catch(()=>{});
+        // endregion
         const response = await fetch('/api/auth/me', {
           method: 'PUT',
           headers: {
@@ -332,21 +474,21 @@
           window.Logger?.debug('✅ Updated currentUser in UnifiedCacheManager', { page: 'user-profile' });
         } catch (e) {
           console.warn('Error saving currentUser to cache:', e);
-          // Fallback to localStorage
+          // Fallback to sessionStorage bootstrap key (Option 1 - no localStorage)
           try {
-            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-            window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+            sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            window.Logger?.debug('✅ Updated currentUser in sessionStorage bootstrap key (fallback)', { page: 'user-profile' });
           } catch (storageError) {
-            window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+            window.Logger?.warn('Failed to update currentUser in sessionStorage', { error: storageError, page: 'user-profile' });
           }
         }
       } else {
-        // Fallback to localStorage if UnifiedCacheManager not available
+        // Fallback to sessionStorage bootstrap key if UnifiedCacheManager not available (Option 1)
         try {
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-          window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+          sessionStorage.setItem('dev_currentUser', JSON.stringify(updatedUser));
+          window.Logger?.debug('✅ Updated currentUser in sessionStorage bootstrap key (fallback)', { page: 'user-profile' });
         } catch (storageError) {
-          window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+          window.Logger?.warn('Failed to update currentUser in sessionStorage', { error: storageError, page: 'user-profile' });
         }
       }
 
@@ -364,7 +506,7 @@
         try {
           const cacheKey = 'user_profile_data';
           await window.UnifiedCacheManager.save(cacheKey, updatedUser, {
-            layer: 'localStorage',
+            layer: 'sessionStorage',
             ttl: 300000, // 5 minutes
             includeUserId: false
           });

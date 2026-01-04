@@ -126,7 +126,7 @@ class InfoSummarySystem {
             timestamp: Date.now()
           })
         }).catch(() => {});
-        // #endregion
+        // endregion
 
         return result;
       },
@@ -373,7 +373,7 @@ class InfoSummarySystem {
    * @returns {Promise<Object>|Object} Calculated statistics (Promise if async calculators are used)
    */
   async calculateStatsFromData(data, stats) {
-    // #region agent log - calculateStatsFromData entry
+    // region agent log - calculateStatsFromData entry
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -392,7 +392,7 @@ class InfoSummarySystem {
           timestamp: Date.now()
         })
       }).catch(() => {});
-    // #endregion
+    // endregion
 
     const results = {};
     const asyncCalculations = [];
@@ -418,7 +418,7 @@ class InfoSummarySystem {
         } else {
           results[stat.id] = calculatorResult;
 
-          // #region agent log - individual stat calculation result
+          // region agent log - individual stat calculation result
           fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -439,7 +439,7 @@ class InfoSummarySystem {
                 timestamp: Date.now()
               })
             }).catch(() => {});
-          // #endregion
+          // endregion
         }
         
         // Handle sub-stats (like buy/sell breakdown)
@@ -476,7 +476,7 @@ class InfoSummarySystem {
       });
     }
 
-    // #region agent log - calculateStatsFromData final results
+    // region agent log - calculateStatsFromData final results
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -495,7 +495,7 @@ class InfoSummarySystem {
           timestamp: Date.now()
         })
       }).catch(() => {});
-    // #endregion
+    // endregion
 
     return results;
   }
@@ -549,7 +549,7 @@ class InfoSummarySystem {
           timestamp: Date.now()
         })
       }).catch(() => {});
-    // #endregion
+    // endregion
 
     const container = document.getElementById(containerId);
     if (!container) {
@@ -571,7 +571,7 @@ class InfoSummarySystem {
             timestamp: Date.now()
           })
         }).catch(() => {});
-      // #endregion
+      // endregion
 
       if (window.Logger) {
         window.Logger.debug(`Container '${containerId}' not found - skipping render`, { containerId });
@@ -690,7 +690,7 @@ class InfoSummarySystem {
         timestamp: Date.now()
       })
     }).catch(() => {});
-    // #endregion
+    // endregion
 
     const dataset = this._resolveDataSource(data, config);
 
@@ -740,7 +740,7 @@ class InfoSummarySystem {
             timestamp: Date.now()
           })
         }).catch(() => {});
-      // #endregion
+      // endregion
 
       const stats = await this.calculateStatsFromData(dataset, config.stats);
 
@@ -761,7 +761,7 @@ class InfoSummarySystem {
             timestamp: Date.now()
           })
         }).catch(() => {});
-      // #endregion
+      // endregion
 
       // Render the summary
       this.renderInfoSummary(config.containerId, stats, config);

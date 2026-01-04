@@ -406,7 +406,7 @@ class UnifiedCacheManager {
     async initialize() {
         try {
             window.Logger.debug('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
-            
+
             // אתחול IndexedDB
             if (window.indexedDB) {
                 try {
@@ -424,7 +424,7 @@ class UnifiedCacheManager {
                 window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
                 this.layers.indexedDB = new LocalStorageLayer();
             }
-            
+
             // אתחול שכבות אחרות
             await this.layers.memory.initialize();
             await this.layers.sessionStorage.initialize();
@@ -566,9 +566,26 @@ class UnifiedCacheManager {
         const startTime = performance.now();
         
         try {
+            // If specific layer requested, search only that layer
+            if (options.layer && this.layers[options.layer]) {
+                const data = await this.layers[options.layer].get(key, options);
+                if (data !== null) {
+                    // עדכון סטטיסטיקות
+                    this.stats.operations.get++;
+                    this.stats.layers[options.layer].entries++;
+
+                    const responseTime = performance.now() - startTime;
+                    this.hits++; // Increment hit counter
+                    this.updatePerformanceStats(responseTime, true);
+
+                    // window.Logger.info(`✅ Retrieved ${key} from ${options.layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
+                    return data;
+                }
+            }
+
             // חיפוש בכל השכבות לפי סדר עדיפות
             const searchOrder = ['memory', 'localStorage', 'indexedDB', 'backend'];
-            
+
             for (const layer of searchOrder) {
                 if (this.layers[layer]) {
                     const data = await this.layers[layer].get(key, options);
@@ -576,7 +593,7 @@ class UnifiedCacheManager {
                         // עדכון סטטיסטיקות
                         this.stats.operations.get++;
                         this.stats.layers[layer].entries++;
-                        
+
                         const responseTime = performance.now() - startTime;
                         this.hits++; // Increment hit counter
                         this.updatePerformanceStats(responseTime, true);
@@ -1440,9 +1457,9 @@ class SessionStorageLayer {
                     clearedCount++;
                 }
             });
-            // Also clear bootstrap keys (dev_authToken, dev_currentUser, recent_login_timestamp)
+            // Also clear bootstrap keys (authToken, currentUser, recent_login_timestamp)
             // These are used by bootstrapAuthFromSessionStorage() before UnifiedCacheManager initializes
-            const bootstrapKeys = ['dev_authToken', 'dev_currentUser', 'recent_login_timestamp'];
+            const bootstrapKeys = ['authToken', 'currentUser', 'recent_login_timestamp'];
             bootstrapKeys.forEach(key => {
                 if (sessionStorage.getItem(key) !== null) {
                     sessionStorage.removeItem(key);
@@ -2052,7 +2069,7 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         }
         
         // 3. Clear sessionStorage (only our keys)
-        // NOTE: SessionStorageLayer and auth bootstrap keys (dev_authToken, dev_currentUser, recent_login_timestamp)
+        // NOTE: SessionStorageLayer and auth bootstrap keys (authToken, currentUser, recent_login_timestamp)
         // are already cleared by SessionStorageLayer.clear() in step 1 (via this.clear('all')).
         // This section clears other sessionStorage keys (preferences, etc.) that aren't managed by SessionStorageLayer.
         try {
@@ -2062,8 +2079,8 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key.startsWith('tiktrack_session_')) return false;
                 
                 // Skip auth bootstrap keys (already cleared by SessionStorageLayer.clear() in step 1)
-                if (key === 'dev_authToken') return false;
-                if (key === 'dev_currentUser') return false;
+                if (key === 'authToken') return false;
+                if (key === 'currentUser') return false;
                 if (key === 'recent_login_timestamp') return false;
                 
                 // UnifiedCacheManager keys (with prefix) - but not sessionStorage layer

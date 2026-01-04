@@ -125,7 +125,7 @@ trading-ui/scripts/
   packages: ['base', 'services', 'ui-advanced'], // Packages required for this page
   requiredGlobals: [
     'window.UnifiedAppInitializer', // Unified Init System (required if using init-system package)
-    'window.PAGE_CONFIGS', // Unified Init System
+    'window.pageInitializationConfigs', // Unified Init System
     'window.PACKAGE_MANIFEST', // Unified Init System
     'NotificationSystem',
     'window.IconSystem',

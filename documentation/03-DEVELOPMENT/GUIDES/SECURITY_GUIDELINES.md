@@ -143,6 +143,18 @@ def get_custom_data():
 3. **אם לא מחובר** - מפנה לדף הכניסה
 4. **אם מחובר** - מאפשר גישה לעמוד
 
+### מדיניות ללא מודול
+
+- **אין מודול כניסה** בכלל.
+- כל מצב לא מאומת → **redirect ל-`/login.html` בלבד**.
+- בדף `login.html` אין auth-guard ואין בדיקות אימות.
+
+### אחסון אימות (Option 1)
+
+- authToken/currentUser נשמרים **רק** ב-SessionStorageLayer של `UnifiedCacheManager`.
+- bootstrap keys: `dev_authToken`, `dev_currentUser` ב-`sessionStorage` בלבד.
+- **אסור** לשמור `authToken`/`currentUser` ב-`localStorage`.
+
 ### עמודים ציבוריים
 
 עמודים שלא צריכים אימות (login, register, reset-password, forgot-password):
@@ -445,4 +457,3 @@ if user_id is not None:
 
 **עודכן:** 01.12.2025  
 **גרסה:** 1.0.0
-

@@ -35,13 +35,13 @@ function loadPageConfigs() {
   sandbox.window.initPositionsPortfolio = async () => {};
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox);
-  return sandbox.window.PAGE_CONFIGS || {};
+  return sandbox.window.pageInitializationConfigs || {};
 }
 
 function loadGenerator(manifest, pageConfigs) {
   const code = fs.readFileSync(generatorPath, 'utf8');
   const sandbox = {
-    window: { PACKAGE_MANIFEST: manifest, PAGE_CONFIGS: pageConfigs, showNotification: () => {} },
+    window: { PACKAGE_MANIFEST: manifest, pageInitializationConfigs: pageConfigs, showNotification: () => {} },
     console,
     document: { readyState: 'complete', addEventListener: () => {} },
     navigator: { clipboard: { writeText: async () => {} } },

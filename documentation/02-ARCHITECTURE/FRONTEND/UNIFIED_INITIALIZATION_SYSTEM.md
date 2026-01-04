@@ -84,13 +84,20 @@
 
 ## 🏗️ ארכיטקטורה
 
-### Load Order Rules (חובה)
+### Load Order Rules (חובה) - Option 1 Discipline
 
-הסדר המדויק של טעינת קבצים הוא קריטי למניעת ReferenceError:
+הסדר המדויק של טעינת קבצים הוא קריטי למניעת ReferenceError ומיישם את משמעת Option 1:
 
-1. **`package-manifest.js`** — ראשון, מגדיר את כל החבילות והתלויות
-2. **`page-initialization-configs.js`** — שני, מגדיר איזה חבילות נטענות לכל עמוד
+**Init Flow - 3 שלבים חובה:**
+1. **`package-manifest.js`** — ראשון, מגדיר את כל החבילות והתלויות (ללא fallback/bundle ב-dev)
+2. **`page-initialization-configs.js`** — שני, מגדיר איזה חבילות נטענות לכל עמוד (ה-SOT היחיד)
 3. **`core-systems.js`** — אחרון, מבצע את האיתחול בפועל (loadOrder: 22)
+
+**Option 1 Load-Order Discipline:**
+- Auth package חייב להיות נוכח בכל עמוד מוגן
+- Auth guard נטען ב-load order 23-24 (אחרי auth.js)
+- Redirect-only flow - ללא modal login
+- SessionStorageLayer בלבד (ללא localStorage auth)
 
 ### מבנה הקבצים המרכזיים
 
@@ -189,9 +196,9 @@ class UnifiedAppInitializer {
 **פעולות:**
 
 1. **טעינת Page Config:**
-   - קריאת `window.pageInitializationConfigs[pageName]`
-   - Fallback ל-`window.PAGE_CONFIGS[pageName]` (legacy)
-   - יצירת config object
+   - קריאת `window.pageInitializationConfigs[pageName]` (ה-SOT היחיד)
+   - אין fallback או תמיכה לאחור - pageInitializationConfigs הוא המקור היחיד
+   - יצירת config object עם Option 1 load-order discipline
 
 2. **העתקת מטאדאטה:**
    - `packages` array (קריטי לאתחול העדפות)
@@ -841,16 +848,7 @@ npm run test:bundles -- --package=base
 
 #### Fallback Mechanism
 
-אם bundle לא קיים, המערכת נופלת חזרה לקבצים המקוריים:
-
-```javascript
-// generate-script-loading-code.js
-if (useBundles && fs.existsSync(bundlePath)) {
-  // Use bundle
-} else {
-  // Fallback to individual files
-}
-```
+- אין fallback: טעינה חייבת לעמוד במניפסט ובקונפיג בלבד.
 
 ### יתרונות Bundling
 
@@ -999,6 +997,8 @@ if (useBundles && fs.existsSync(bundlePath)) {
 - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - ארכיטקטורה כללית
 - `documentation/REFACTOR_INITIALIZATION_SYSTEM_COMPLETION_REPORT.md` - דוח השלמה
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה
+- `documentation/02-ARCHITECTURE/FRONTEND/INIT_LOADING_SYSTEM_ARCHITECTURE.md` - ארכיטקטורה מקיפה של מערכת Init/Loading
+- `documentation/03-DEVELOPMENT/GUIDELINES/INIT_LOADING_DEVELOPER_WORKFLOW.md` - מדריך זרימת עבודה למפתחים
 - `documentation/02-ARCHITECTURE/FRONTEND/LOAD_ORDER_VALIDATION_SYSTEM.md` - מערכת אימות סדר טעינה
 - `documentation/03-DEVELOPMENT/TOOLS/INIT_LOADING_MONITORING_SYSTEM_GUIDE.md` - מדריך מערכת ניטור Init/Loading
 - `documentation/02-ARCHITECTURE/FRONTEND/PACKAGE_MANIFEST_SOT_DEVELOPER_GUIDE.md` - מדריך מפתחים ל-Package Manifest SOT
@@ -1120,4 +1120,3 @@ if (useBundles && fs.existsSync(bundlePath)) {
 - תרחישי שימוש נפוצים
 - פתרון בעיות
 - טיפים למפתח העתידי
-

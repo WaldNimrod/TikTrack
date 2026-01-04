@@ -21,8 +21,8 @@ eval(manifestContent.replace('const PACKAGE_MANIFEST =', 'var PACKAGE_MANIFEST =
 const configsPath = path.join(__dirname, '../trading-ui/scripts/page-initialization-configs.js');
 const configsContent = fs.readFileSync(configsPath, 'utf8');
 
-// Extract PAGE_CONFIGS
-const PAGE_CONFIGS = {};
+// Extract pageInitializationConfigs
+const pageInitializationConfigs = {};
 const pageRegex = /'(\w+)':\s*\{([\s\S]*?)\}(?=\s*(?:,|'|\}))/g;
 let match;
 
@@ -35,7 +35,7 @@ while ((match = pageRegex.exec(configsContent)) !== null) {
     if (packagesMatch) {
         const packagesStr = packagesMatch[1];
         const packages = packagesStr.match(/'([^']+)'/g)?.map(p => p.replace(/'/g, '')) || [];
-        PAGE_CONFIGS[pageName] = { packages };
+        pageInitializationConfigs[pageName] = { packages };
     }
 }
 
@@ -112,7 +112,7 @@ const results = {};
 let totalIssues = 0;
 
 TEST_PAGES.forEach(pageName => {
-    const pageConfig = PAGE_CONFIGS[pageName];
+    const pageConfig = pageInitializationConfigs[pageName];
     if (!pageConfig || !pageConfig.packages) {
         results[pageName] = { error: 'No config found' };
         totalIssues++;
@@ -221,8 +221,8 @@ if (totalIssues === 0) {
 
 // Show sample generated code
 const samplePage = TEST_PAGES.find(p => results[p] && !results[p].hasErrors && !results[p].error) || TEST_PAGES[0];
-if (samplePage && PAGE_CONFIGS[samplePage]) {
-    const sampleGenerated = generateCompleteScriptSection(samplePage, PAGE_CONFIGS[samplePage].packages);
+if (samplePage && pageInitializationConfigs[samplePage]) {
+    const sampleGenerated = generateCompleteScriptSection(samplePage, pageInitializationConfigs[samplePage].packages);
     report += `## דוגמת קוד מיוצר (${samplePage})\n\n`;
     report += `\`\`\`html\n${sampleGenerated.html.substring(0, 2000)}...\n\`\`\`\n\n`;
 }

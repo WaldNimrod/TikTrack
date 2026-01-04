@@ -70,7 +70,7 @@ async function loadCurrenciesFromServer() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // Option 1: bootstrap key fallback
     }
     const headers = {
       'Content-Type': 'application/json',

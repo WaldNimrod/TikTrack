@@ -29,16 +29,16 @@ def update_page_configs():
             if 'UnifiedAppInitializer' not in required_globals and 'unifiedAppInitializer' not in required_globals:
                 # הוספה בתחילת requiredGlobals
                 if required_globals.strip():
-                    new_globals = "        'window.UnifiedAppInitializer', // Unified Init System\n        'window.PAGE_CONFIGS', // Unified Init System\n        'window.PACKAGE_MANIFEST', // Unified Init System\n" + required_globals
+                    new_globals = "        'window.UnifiedAppInitializer', // Unified Init System\n        'window.pageInitializationConfigs', // Unified Init System\n        'window.PACKAGE_MANIFEST', // Unified Init System\n" + required_globals
                 else:
-                    new_globals = "        'window.UnifiedAppInitializer', // Unified Init System\n        'window.PAGE_CONFIGS', // Unified Init System\n        'window.PACKAGE_MANIFEST', // Unified Init System"
+                    new_globals = "        'window.UnifiedAppInitializer', // Unified Init System\n        'window.pageInitializationConfigs', // Unified Init System\n        'window.PACKAGE_MANIFEST', // Unified Init System"
                 return f"packages: [{packages}],\n      requiredGlobals: [\n{new_globals}"
             # אם יש unifiedAppInitializer (lowercase), להמיר ל-UnifiedAppInitializer
             elif 'unifiedAppInitializer' in required_globals and 'UnifiedAppInitializer' not in required_globals:
                 new_globals = required_globals.replace('unifiedAppInitializer', 'UnifiedAppInitializer')
-                # הוספת PAGE_CONFIGS ו-PACKAGE_MANIFEST אם חסרים
-                if 'PAGE_CONFIGS' not in new_globals:
-                    new_globals = "        'window.PAGE_CONFIGS', // Unified Init System\n" + new_globals
+                # הוספת pageInitializationConfigs ו-PACKAGE_MANIFEST אם חסרים
+                if 'pageInitializationConfigs' not in new_globals:
+                    new_globals = "        'window.pageInitializationConfigs', // Unified Init System\n" + new_globals
                 if 'PACKAGE_MANIFEST' not in new_globals:
                     new_globals = "        'window.PACKAGE_MANIFEST', // Unified Init System\n" + new_globals
                 return f"packages: [{packages}],\n      requiredGlobals: [\n{new_globals}"

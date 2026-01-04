@@ -1491,7 +1491,7 @@ window.initializeIndexPage = async function() {
     // have been removed and replaced by UnifiedPendingActionsWidget which is initialized in page-initialization-configs.js
 };
 
-// Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers
+// Note: initializeIndexPage() is now called via pageInitializationConfigs.index.customInitializers
 // in unified-app-initializer.js, so we don't need to call it directly here.
 // This prevents duplicate chart initialization.
 
@@ -1874,5 +1874,79 @@ window.addEventListener('widgetContentUpdated', () => {
         equalizeWidgetHeights();
     }, 300);
 });
+
+/**
+ * Global graceful degradation system for unauthenticated users
+ * Provides consistent login prompts across all widgets
+ */
+window.GracefulDegradation = {
+    /**
+     * Show login required message in a container
+     * @param {string} containerId - Container element ID
+     * @param {string} featureName - Name of the feature requiring login
+     */
+    showLoginRequired(containerId, featureName = 'תכונה זו') {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            window.Logger?.warn?.('GracefulDegradation: Cannot show login message - container not found', {
+                containerId,
+                page: 'index'
+            });
+            return;
+        }
+
+        // Create login required message
+        const loginMessage = document.createElement('div');
+        loginMessage.className = 'login-required-message alert alert-info text-center p-4';
+        loginMessage.innerHTML = `
+            <div class="mb-3">
+                <i class="fas fa-lock fa-3x text-primary"></i>
+            </div>
+            <div class="mb-3">
+                <h5 class="alert-heading">נדרש התחברות</h5>
+            </div>
+            <div class="mb-4">
+                <strong>${featureName}</strong> זמינה רק למשתמשים מחוברים
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="window.location.href='/login.html'">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                התחבר לחשבון
+            </button>
+            <div class="mt-3">
+                <small class="text-muted">אין לך חשבון?
+                    <a href="/register" class="text-decoration-none">הירשם כאן</a>
+                </small>
+            </div>
+        `;
+
+        // Clear container and add message
+        container.innerHTML = '';
+        container.appendChild(loginMessage);
+
+        window.Logger?.info?.('GracefulDegradation: Login required message displayed', {
+            containerId,
+            featureName,
+            page: 'index'
+        });
+    },
+
+    /**
+     * Check if user is authenticated and show login message if not
+     * @param {string} containerId - Container element ID
+     * @param {string} featureName - Name of the feature requiring login
+     * @returns {boolean} - True if authenticated, false if not
+     */
+    requireAuth(containerId, featureName = 'תכונה זו') {
+        const isAuthenticated = window.TikTrackAuth?.isAuthenticated?.() || false;
+        if (!isAuthenticated) {
+            this.showLoginRequired(containerId, featureName);
+            return false;
+        }
+        return true;
+    }
+};
+
+// Legacy alias for backward compatibility
+window.showLoginRequiredMessage = window.GracefulDegradation.showLoginRequired;
 
 window.Logger.info('✅ Index page ready', { page: "index" });

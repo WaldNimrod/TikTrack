@@ -3,7 +3,7 @@
 Authentication API Routes - User registration and login
 """
 
-from flask import Blueprint, request, jsonify, current_app, g
+from flask import Blueprint, request, jsonify, current_app, g, session
 from typing import Dict, Any
 import logging
 from datetime import datetime
@@ -638,4 +638,161 @@ def reset_password():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Password reset failed: {str(e)}'}
+        }), 500
+
+
+# ===== TESTING ENDPOINTS (Fix Pack 5) =====
+
+@auth_bp.route('/test/auth-state', methods=['GET'])
+def get_auth_state():
+    """
+    Get current authentication state for testing validation
+
+    Returns:
+        {
+            "status": "success",
+            "data": {
+                "is_authenticated": bool,
+                "user_id": int | null,
+                "username": str | null,
+                "session_valid": bool,
+                "session_expires": timestamp | null
+            }
+        }
+    """
+    try:
+        # Check if user is authenticated
+        user_id = session.get('user_id')
+        username = session.get('username')
+
+        is_authenticated = user_id is not None and username is not None
+
+        response_data = {
+            'is_authenticated': is_authenticated,
+            'user_id': user_id,
+            'username': username,
+            'session_valid': is_authenticated,
+            'session_expires': session.get('_permanent', False),
+            'test_mode': True
+        }
+
+        return jsonify({
+            'status': 'success',
+            'data': response_data
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error getting auth state: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Failed to get auth state: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/test/login', methods=['POST'])
+def test_login():
+    """
+    Testing endpoint for automated login (bypasses some security for testing)
+
+    Request Body:
+        {
+            "username": "admin",
+            "password": "admin123"
+        }
+
+    Returns:
+        Standard login response format
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+
+        username = data.get('username', 'admin')
+        password = data.get('password', 'admin123')
+
+        # For testing, allow default admin credentials
+        if username == 'admin' and password == 'admin123':
+            # Create session for admin user
+            session['user_id'] = 1
+            session['username'] = 'admin'
+            session['role'] = 'admin'
+            session.permanent = True
+
+            logger.info(f"Test login successful for user: {username}")
+
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'user': {
+                        'id': 1,
+                        'username': 'admin',
+                        'role': 'admin',
+                        'email': 'admin@tiktrack.com'
+                    },
+                    'access_token': f'test_session_{datetime.now().timestamp()}',
+                    'message': 'Test login successful'
+                }
+            }), 200
+
+        # Fall back to normal authentication
+        result = auth_service.authenticate_user(username, password)
+
+        if result['success']:
+            # Create session
+            session['user_id'] = result['user']['id']
+            session['username'] = result['user']['username']
+            session['role'] = result['user']['role']
+            session.permanent = True
+
+            logger.info(f"Test login successful for user: {username}")
+
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'user': result['user'],
+                    'access_token': f'test_session_{datetime.now().timestamp()}',
+                    'message': 'Test login successful'
+                }
+            }), 200
+
+        return jsonify({
+            'status': 'error',
+            'error': {'message': 'Invalid credentials'}
+        }), 401
+
+    except Exception as e:
+        logger.error(f"Error in test login: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Test login failed: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/test/logout', methods=['POST'])
+def test_logout():
+    """
+    Testing endpoint for automated logout
+    """
+    try:
+        # Clear session
+        session.clear()
+
+        logger.info("Test logout successful")
+
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'message': 'Test logout successful'
+            }
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error in test logout: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Test logout failed: {str(e)}'}
         }), 500

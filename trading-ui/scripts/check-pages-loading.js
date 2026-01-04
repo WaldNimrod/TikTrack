@@ -20,7 +20,7 @@
  * Check if all packages are loaded correctly for a page
  */
 async function checkPagePackages(pageName) {
-  const pageConfig = window.PAGE_INITIALIZATION_CONFIGS?.[pageName];
+  const pageConfig = window.pageInitializationConfigs?.[pageName];
   if (!pageConfig) {
     console.error(`❌ Page config not found for: ${pageName}`);
     return { success: false, error: 'No page config found' };
@@ -93,7 +93,7 @@ async function checkPagePackages(pageName) {
  * Check all pages
  */
 async function checkAllPages() {
-  const pages = Object.keys(window.PAGE_INITIALIZATION_CONFIGS || {});
+  const pages = Object.keys(window.pageInitializationConfigs || {});
   const results = [];
 
   console.log(`🔍 Checking ${pages.length} pages...`);

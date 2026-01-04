@@ -2824,7 +2824,7 @@ SystemManagement.getModeColor = function(mode) {
     
     const validationResults = {
       unifiedInitializer: !!window.UnifiedAppInitializer,
-      pageConfigs: !!window.PAGE_CONFIGS,
+      pageConfigs: !!window.pageInitializationConfigs,
       notificationSystem: !!window.NotificationSystem,
       cacheSystem: !!window.UnifiedCacheManager,
       headerSystem: !!window.headerSystem

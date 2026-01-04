@@ -394,7 +394,7 @@ if (onclickValue) {
 
 - **סטנדרט Event Handling:** `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md`
 - **EventHandlerManager:** `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md`
-- **Button System:** `documentation/02-ARCHITECTURE/FRONTEND/button-system.md`
+- **Button System:** `documentation/02-ARCHITECTURE/FRONTEND/button_system.md`
 - **UnifiedTableSystem:** `documentation/02-ARCHITECTURE/FRONTEND/TABLE_SYSTEM_ANALYSIS.md`
 
 ---

@@ -132,7 +132,7 @@ Object.keys(USER_PAGES).forEach(pageKey => {
     const page = pages[pageKey];
     if (!page) {
         markdown += `### ${USER_PAGES[pageKey]}\n\n`;
-        markdown += '⚠️ **לא נמצא ב-PAGE_CONFIGS**\n\n';
+        markdown += '⚠️ **לא נמצא ב-pageInitializationConfigs**\n\n';
         return;
     }
     

@@ -581,6 +581,27 @@ window.{EntityName}Data = {
 
 ---
 
+## 🔐 Auth/Cache Integration - Option 1
+
+### UnifiedCacheManager Auth Integration
+
+מערכת האימות משתמשת ב-UnifiedCacheManager SessionStorageLayer (שכבה 5) לאחסון auth tokens:
+
+**אחסון Auth Tokens:**
+- `authToken` + `currentUser` נשמרים ב-SessionStorageLayer
+- `includeUserId:false` - auth tokens לא קשורים ל-user ID ספציפי
+- ללא localStorage auth (אסור לפי Option 1)
+
+**Bootstrap Mechanism:**
+- `dev_authToken`/`dev_currentUser` ב-sessionStorage ישיר
+- מסתנכרן ל-SessionStorageLayer אחרי UnifiedCacheManager מאותחל
+- מאפשר גישה מיידית ל-auth data לפני full cache initialization
+
+**Session Management:**
+- cache clearing מנקה גם bootstrap keys
+- auth preservation במהלך cache operations
+- sessionStorage בלבד - ללא cross-tab persistence
+
 ## 📚 מסמכים קשורים
 
 ### תיעוד ארכיטקטורה

@@ -177,22 +177,22 @@ class PackageManifestAudit {
     // Load page configs - extract using regex (simpler approach)
     const configsContent = fs.readFileSync(configsPath, 'utf8');
     
-    // Extract PAGE_CONFIGS object using regex
-    // Look for: const PAGE_CONFIGS = { ... };
-    let PAGE_CONFIGS = {};
+    // Extract pageInitializationConfigs object using regex
+    // Look for: const pageInitializationConfigs = { ... };
+    let pageInitializationConfigs = {};
     
-    // Try to find the PAGE_CONFIGS definition
-    const configsMatch = configsContent.match(/const\s+PAGE_CONFIGS\s*=\s*({[\s\S]*?});/);
+    // Try to find the pageInitializationConfigs definition
+    const configsMatch = configsContent.match(/const\s+pageInitializationConfigs\s*=\s*({[\s\S]*?});/);
     if (configsMatch) {
       try {
         // Evaluate the object
         const vm = require('vm');
-        const context = { PAGE_CONFIGS: {} };
+        const context = { pageInitializationConfigs: {} };
         vm.createContext(context);
-        vm.runInContext(`PAGE_CONFIGS = ${configsMatch[1]};`, context);
-        PAGE_CONFIGS = context.PAGE_CONFIGS;
+        vm.runInContext(`pageInitializationConfigs = ${configsMatch[1]};`, context);
+        pageInitializationConfigs = context.pageInitializationConfigs;
       } catch (e) {
-        console.warn('Could not parse PAGE_CONFIGS, trying alternative method:', e.message);
+        console.warn('Could not parse pageInitializationConfigs, trying alternative method:', e.message);
         // Alternative: extract page names directly
         const pagePattern = /['"]([a-z0-9_-]+(?:\.html)?)['"]\s*:\s*\{/gi;
         const pages = new Set();
@@ -202,18 +202,18 @@ class PackageManifestAudit {
         }
         // Create minimal configs for validation
         pages.forEach(pageName => {
-          PAGE_CONFIGS[pageName] = { packages: [] };
+          pageInitializationConfigs[pageName] = { packages: [] };
         });
       }
     }
     
-    this.validateConfigs(PAGE_CONFIGS, PACKAGE_MANIFEST);
+    this.validateConfigs(pageInitializationConfigs, PACKAGE_MANIFEST);
   }
 
   /**
    * Validate configs helper
    */
-  validateConfigs(PAGE_CONFIGS, PACKAGE_MANIFEST) {
+  validateConfigs(pageInitializationConfigs, PACKAGE_MANIFEST) {
     // Validate each page config
     const validPackages = Object.keys(PACKAGE_MANIFEST);
     const allGlobals = new Set();
@@ -230,7 +230,7 @@ class PackageManifestAudit {
       }
     });
     
-    for (const [pageName, config] of Object.entries(PAGE_CONFIGS)) {
+    for (const [pageName, config] of Object.entries(pageInitializationConfigs)) {
       if (!config || !config.packages) continue;
       
       // Check packages exist

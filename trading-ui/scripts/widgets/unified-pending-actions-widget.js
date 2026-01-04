@@ -1419,7 +1419,13 @@
       state.config = { ...DEFAULT_CONFIG, ...config };
       state.activeAction = config.defaultAction || DEFAULT_CONFIG.defaultAction;
       state.activeEntity = config.defaultEntity || DEFAULT_CONFIG.defaultEntity;
-      
+
+      // Check authentication status for graceful degradation
+      if (!window.GracefulDegradation?.requireAuth(containerId, 'פעולות ממתינות')) {
+        state.initialized = true;
+        return;
+      }
+
       // Cache elements
       const elementsCached = cacheElements();
       
@@ -1573,7 +1579,7 @@
       
       window.Logger?.info?.('UnifiedPendingActionsWidget: Destroyed and cleaned up', { page: 'unified-pending-actions-widget' });
     },
-    
+
     version: '2.0.0'
   };
 

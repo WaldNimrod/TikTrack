@@ -35,7 +35,7 @@ class SortingTestingSystem {
         const pageKey = `${page.key}-${page.name}`;
         if (this.testedPages.has(pageKey)) {
             window.Logger?.info('⚠️ Page already tested, skipping:', page.name);
-            // #region agent log - PAGE ALREADY TESTED
+            // region agent log - PAGE ALREADY TESTED
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -53,7 +53,7 @@ class SortingTestingSystem {
                     hypothesisId:'INDIVIDUAL_TESTING'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
             return null; // Return null to indicate page was skipped
         }
 
@@ -100,7 +100,7 @@ class SortingTestingSystem {
             const currentPath = window.location.pathname;
             const pagePath = page.url === '/' ? '/index.html' : (page.url.endsWith('.html') ? page.url : `${page.url}.html`);
 
-            // #region agent log - HYPOTHESIS 6: Check current page logic
+            // region agent log - HYPOTHESIS 6: Check current page logic
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -122,7 +122,7 @@ class SortingTestingSystem {
                     hypothesisId:'H6_CURRENT_PAGE_CHECK'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (currentPath === pagePath || page.key === 'index') {
                 window.Logger?.info('⚠️ Skipping sorting test for page:', page.key, '- index page causes conflicts when loaded in iframe');
@@ -622,7 +622,7 @@ class SortingTestingSystem {
 // Make it globally available
 window.SortingTestingSystem = SortingTestingSystem;
 
-// #region agent log
+// region agent log
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
   method:'POST',
   headers:{'Content-Type':'application/json'},
@@ -637,4 +637,4 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     hypothesisId:'init-system-scripts-loading'
   })
 }).catch(()=>{});
-// #endregion
+// endregion

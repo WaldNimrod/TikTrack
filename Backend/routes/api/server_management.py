@@ -273,6 +273,7 @@ def get_restart_status() -> Any:
         }), 500
 
 @server_management_bp.route('/current-mode', methods=['GET'])
+@handle_database_session()
 def get_current_server_mode() -> Any:
     """
     Get current server cache mode based on environment variables

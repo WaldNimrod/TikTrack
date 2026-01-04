@@ -202,7 +202,7 @@ ${scriptsHTML}
   }
   
   /**
-   * Generate PAGE_CONFIGS entry
+   * Generate pageInitializationConfigs entry
    */
   generateConfig(pageName, packages) {
     const title = this.generateTitle(pageName);
@@ -405,7 +405,7 @@ if (document.readyState === 'loading') {
    */
   generateScriptTagsForPage(pageName) {
     // Get packages from page-initialization-configs.js dynamically
-    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName];
     const packages = pageConfig?.packages || ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'];
     return this.generateCompleteScriptSection(pageName);
   }
@@ -415,7 +415,7 @@ if (document.readyState === 'loading') {
    */
   generateCompleteScriptSection(pageName) {
     // Get packages from page-initialization-configs.js dynamically
-    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName];
     const packages = pageConfig?.packages || ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'];
     
     let html = '';

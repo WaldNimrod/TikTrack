@@ -156,8 +156,8 @@ def generate_test_report():
         
         if 'PACKAGE_MANIFEST' in content:
             checks.append('PACKAGE_MANIFEST validation')
-        if 'PAGE_CONFIGS' in content:
-            checks.append('PAGE_CONFIGS validation')
+        if 'pageInitializationConfigs' in content:
+            checks.append('pageInitializationConfigs validation')
         if 'requiredGlobals' in content:
             checks.append('requiredGlobals configuration')
         if 'packages' in content.lower():

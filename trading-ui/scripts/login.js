@@ -11,13 +11,25 @@
     'use strict';
 
     // Constants from auth.js - must match
-    const DEV_SESSION_TOKEN_KEY = 'dev_authToken';
-    const DEV_SESSION_USER_KEY = 'dev_currentUser';
+    const SESSION_TOKEN_KEY = 'authToken';
+    const SESSION_USER_KEY = 'currentUser';
 
-    // Wait for DOM to be ready
-    document.addEventListener('DOMContentLoaded', function() {
+    // Wait for DOM and scripts to be ready (supports defer attribute)
+    function initializeWhenReady() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeLoginPage);
+        } else {
+            // DOM already loaded (defer scripts load after DOMContentLoaded)
+            initializeLoginPage();
+        }
+    }
+    
+    // Initialize immediately if scripts loaded after DOMContentLoaded
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
         initializeLoginPage();
-    });
+    } else {
+        document.addEventListener('DOMContentLoaded', initializeLoginPage);
+    }
 
     function initializeLoginPage() {
         // Force cleanup of any lingering modals/backdrops from previous pages
@@ -116,8 +128,100 @@
         setLoadingState(true);
 
         try {
-            // Call login API
-            const loginData = await login(username, password);
+            // agent log - login function availability check
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    location: 'trading-ui/scripts/login.js:handleLoginSubmit',
+                    message: 'Checking for window.login availability',
+                    data: {
+                        windowLoginType: typeof window.login,
+                        documentReadyState: document.readyState,
+                        timestamp: Date.now()
+                    },
+                    sessionId: 'login_function_availability_check',
+                    runId: 'option1_login_fix',
+                    hypothesisId: 'login_function_available'
+                })
+            }).catch(() => {});
+            // endregion
+
+            // Wait for login function to be available
+            let attempts = 0;
+            while (typeof window.login !== 'function' && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+                console.log(`[login.js] Waiting for login function, attempt ${attempts}, available:`, typeof window.login);
+                
+                // agent log - waiting for login function
+                if (attempts % 10 === 0) {
+                    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            location: 'trading-ui/scripts/login.js:handleLoginSubmit',
+                            message: 'Still waiting for window.login',
+                            data: {
+                                attempts: attempts,
+                                windowLoginType: typeof window.login,
+                                documentReadyState: document.readyState,
+                                timestamp: Date.now()
+                            },
+                            sessionId: 'login_function_availability_check',
+                            runId: 'option1_login_fix',
+                            hypothesisId: 'login_function_waiting'
+                        })
+                    }).catch(() => {});
+                }
+                // endregion
+            }
+
+            if (typeof window.login !== 'function') {
+                // region agent log - login function not available error
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        location: 'trading-ui/scripts/login.js:handleLoginSubmit',
+                        message: 'ERROR: login function not available after waiting',
+                        data: {
+                            attempts: attempts,
+                            windowLoginType: typeof window.login,
+                            documentReadyState: document.readyState,
+                            timestamp: Date.now()
+                        },
+                        sessionId: 'login_function_availability_check',
+                        runId: 'option1_login_fix',
+                        hypothesisId: 'login_function_not_available'
+                    })
+                }).catch(() => {});
+                // endregion
+                throw new Error('login function not available after waiting - auth.js failed to load');
+            }
+            
+            // region agent log - login function available success
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    location: 'trading-ui/scripts/login.js:handleLoginSubmit',
+                    message: 'SUCCESS: login function available',
+                    data: {
+                        attempts: attempts,
+                        windowLoginType: typeof window.login,
+                        documentReadyState: document.readyState,
+                        timestamp: Date.now()
+                    },
+                    sessionId: 'login_function_availability_check',
+                    runId: 'option1_login_fix',
+                    hypothesisId: 'login_function_available_success'
+                })
+            }).catch(() => {});
+            // endregion
+
+            console.log('[login.js] login function available, calling...');
+            const loginData = await window.login(username, password);
 
             // Success - handle authentication data
             authToken = loginData.data?.access_token || 'session_based';
@@ -135,41 +239,67 @@
                     }
 
                     if (window.UnifiedCacheManager.initialized) {
-                        console.log('[login.js] About to save auth data to UnifiedCacheManager...');
+                        console.log('[login.js] About to save auth data to UnifiedCacheManager SessionStorageLayer...');
                         try {
-                            await saveAuthToCache(currentUser, authToken);
-                            console.log('[login.js] Successfully saved auth data to UnifiedCacheManager');
+                            // Option 1: Use UnifiedCacheManager SessionStorageLayer directly
+                            await window.UnifiedCacheManager.save('authToken', authToken, { 
+                                layer: 'sessionStorage', 
+                                includeUserId: false 
+                            });
+                            await window.UnifiedCacheManager.save('currentUser', currentUser, { 
+                                layer: 'sessionStorage', 
+                                includeUserId: false 
+                            });
+                            
+                            // Also save to bootstrap keys for compatibility (before UnifiedCacheManager initializes)
+                            if (typeof sessionStorage !== 'undefined') {
+                                sessionStorage.setItem(SESSION_TOKEN_KEY, authToken);
+                                sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(currentUser));
+                            }
+                            
+                            console.log('[login.js] Successfully saved auth data to UnifiedCacheManager SessionStorageLayer');
 
                             // Verify the data was saved
-                            const savedToken = await window.UnifiedCacheManager.get('authToken', { includeUserId: false });
-                            const savedUser = await window.UnifiedCacheManager.get('currentUser', { includeUserId: false });
+                            const savedToken = await window.UnifiedCacheManager.get('authToken', { 
+                                layer: 'sessionStorage', 
+                                includeUserId: false 
+                            });
+                            const savedUser = await window.UnifiedCacheManager.get('currentUser', { 
+                                layer: 'sessionStorage', 
+                                includeUserId: false 
+                            });
                             console.log('[login.js] Verification - saved token:', !!savedToken, 'saved user:', !!savedUser);
 
                         } catch (error) {
                             console.error('[login.js] Failed to save auth data:', error);
+                            // Fallback to sessionStorage bootstrap keys
+                            if (typeof sessionStorage !== 'undefined') {
+                                sessionStorage.setItem(SESSION_TOKEN_KEY, authToken);
+                                sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(currentUser));
+                            }
                         }
                     } else {
-                        console.warn('[login.js] UnifiedCacheManager not initialized, using fallback storage');
-                        // Fallback to sessionStorage
+                        console.warn('[login.js] UnifiedCacheManager not initialized, using sessionStorage bootstrap keys');
+                        // Fallback to sessionStorage bootstrap keys (Option 1 compliant)
                         if (typeof sessionStorage !== 'undefined') {
-                            sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(currentUser));
-                            sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, authToken);
+                            sessionStorage.setItem(SESSION_TOKEN_KEY, authToken);
+                            sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(currentUser));
                         }
+
+                        // Update window objects immediately for immediate authentication
+                        window.authToken = authToken;
+                        window.currentUser = currentUser;
                     }
                 } else {
-                    console.warn('[login.js] UnifiedCacheManager not available, using fallback storage');
-                    // Fallback to sessionStorage
+                    console.warn('[login.js] UnifiedCacheManager not available, using sessionStorage bootstrap keys');
+                    // Fallback to sessionStorage bootstrap keys (Option 1 compliant)
                     if (typeof sessionStorage !== 'undefined') {
-                        sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(currentUser));
-                        sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, authToken);
+                        sessionStorage.setItem(SESSION_TOKEN_KEY, authToken);
+                        sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(currentUser));
                     }
                 }
 
-                // Also save to localStorage as backup (for api-fetch-wrapper)
-                if (typeof localStorage !== 'undefined') {
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                }
+                // Auth data is stored via saveAuthToCache() function (SessionStorageLayer only per Option 1)
 
                 console.log('[login.js] Auth data saved - token:', authToken ? 'present' : 'null', 'user:', currentUser?.username || 'null');
             }

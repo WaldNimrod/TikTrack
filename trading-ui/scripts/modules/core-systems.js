@@ -714,24 +714,6 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       const isInIframe = window !== window.top;
       console.log(`🏁 [UnifiedAppInitializer] Starting initialization`, { isInIframe });
 
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          location:'core-systems.js:713',
-          message:'unified_app_initializer_started',
-          data:{
-            isInIframe,
-            initialized: this.initialized,
-            initializationInProgress: this.initializationInProgress
-          },
-          sessionId:'core-debug',
-          runId:'core-init-1',
-          hypothesisId:'unified-app-initializer-not-starting'
-        })
-      }).catch(()=>{});
-      // #endregion
 
       if (this.initialized) {
         console.log('✅ [UnifiedAppInitializer] Application already initialized');
@@ -816,9 +798,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.Logger.debug('Looking for page config', {
           pageName: this.pageInfo.name,
           hasPageInitializationConfigs: typeof window.pageInitializationConfigs !== 'undefined',
-          hasPAGE_CONFIGS: typeof window.PAGE_CONFIGS !== 'undefined',
           pageInitializationConfigsKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : [],
-          PAGE_CONFIGSKeys: typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [],
         }, { page: 'core-systems' });
       }
 
@@ -843,13 +823,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             window.Logger.debug(`Found page config in pageInitializationConfigs for ${hyphenName} (mapped from ${this.pageInfo.name})`, { page: 'core-systems' });
           }
         } else if (
-          typeof window.PAGE_CONFIGS !== 'undefined' &&
-          window.PAGE_CONFIGS[this.pageInfo.name]
+          typeof window.pageInitializationConfigs !== 'undefined' &&
+          window.pageInitializationConfigs[this.pageInfo.name]
         ) {
-          // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
-          pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+          // Fallback to pageInitializationConfigs if pageInitializationConfigs not available
+          pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
           if (window.Logger?.debug) {
-            window.Logger.debug(`Found page config in PAGE_CONFIGS for ${this.pageInfo.name}`, { page: 'core-systems' });
+            window.Logger.debug(`Found page config in pageInitializationConfigs for ${this.pageInfo.name}`, { page: 'core-systems' });
           }
         } else {
           // Only log warning if page config is critical
@@ -857,13 +837,14 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { 
               page: 'core-systems',
               triedHyphen: hyphenName,
-              availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [])
+              availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : [])
             });
           }
         }
       }
 
       // Store custom initializers from page config
+
       if (pageConfig?.customInitializers) {
         this.customInitializers = pageConfig.customInitializers;
       }
@@ -1209,7 +1190,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
                   }
                 }
                 if (!hasToken && typeof sessionStorage !== 'undefined') {
-                  hasToken = !!sessionStorage.getItem('dev_authToken');
+                  hasToken = !!sessionStorage.getItem('authToken');
                 }
                 
                 // Verify authentication with TikTrackAuth
@@ -1243,48 +1224,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               }
             }
             
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({
-                location:'core-systems.js:1247',
-                message:'about_to_call_initializeHeaderSystem',
-                data:{
-                  initializeHeaderSystem: typeof window.initializeHeaderSystem,
-                  HeaderSystem: typeof window.HeaderSystem,
-                  unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized
-                },
-                sessionId:'core-debug',
-                runId:'core-init-2',
-                hypothesisId:'header-system-call-failing'
-              })
-            }).catch(()=>{});
-            // #endregion
 
             try {
               console.log('🎯 CORE-SYSTEMS: Calling initializeHeaderSystem...');
               const result = await window.initializeHeaderSystem();
               console.log('✅ CORE-SYSTEMS: initializeHeaderSystem completed:', result);
 
-              // #region agent log
-              fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                  location:'core-systems.js:1250',
-                  message:'initializeHeaderSystem_completed',
-                  data:{
-                    result: result,
-                    headerSystem: typeof window.headerSystem,
-                    headerSystemInitialized: window.headerSystem?.isInitialized
-                  },
-                  sessionId:'core-debug',
-                  runId:'core-init-2',
-                  hypothesisId:'header-system-call-completed'
-                })
-              }).catch(()=>{});
-              // #endregion
             } catch (error) {
               if (window.Logger?.error) {
                 window.Logger.error('Error initializing Header System', {
@@ -1613,6 +1558,8 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         return;
       }
 
+
+
       // Removed debug log - custom initializers execution is tracked internally
       for (let i = 0; i < this.customInitializers.length; i++) {
         const initializer = this.customInitializers[i];
@@ -1636,6 +1583,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           // Removed debug log - duplicate initializer check is internal
           continue;
         }
+
 
         // Removed debug log - custom initializer execution is tracked internally
         if (typeof initializer === 'function') {
@@ -1786,6 +1734,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       const path = window.location.pathname;
       const filename = path.split('/').pop() || 'index';
       const pageName = filename.replace('.html', '');
+
 
       if (window.Logger?.debug) {
         window.Logger.debug('Page detection', { path, filename, pageName }, { page: 'core-systems' });
@@ -2409,23 +2358,6 @@ window.unifiedAppInit = new UnifiedAppInitializer();
  * @updated 1.6.0 - Moved to init-system package
  */
 window.initializeUnifiedApp = async function () {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location:'core-systems.js:2352',
-      message:'initializeUnifiedApp_called',
-      data:{
-        unifiedAppInit: typeof window.unifiedAppInit,
-        unifiedAppInitInitialize: typeof window.unifiedAppInit?.initialize
-      },
-      sessionId:'core-debug',
-      runId:'core-init-1',
-      hypothesisId:'unified-app-not-starting'
-    })
-  }).catch(()=>{});
-  // #endregion
 
   return await window.unifiedAppInit.initialize();
 };
@@ -2509,24 +2441,6 @@ const initializeUnifiedAppWhenReady = async () => {
     location: window.location.href
   });
 
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location:'core-systems.js:2429',
-      message:'initializeUnifiedAppWhenReady_called',
-      data:{
-        isInIframe,
-        readyState: document.readyState,
-        location: window.location.href
-      },
-      sessionId:'core-debug',
-      runId:'core-init-1',
-      hypothesisId:'core-not-starting'
-    })
-  }).catch(()=>{});
-  // #endregion
 
   // Initialize globalInitializationState if not exists
   if (!window.globalInitializationState) {
@@ -5346,15 +5260,15 @@ window.setDynamicLoading = function (enabled) {
 };
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
-// NOTE: PAGE_CONFIGS is now defined in page-initialization-configs.js
+// NOTE: pageInitializationConfigs is now defined in page-initialization-configs.js
 // This file (core-systems.js) uses window.pageInitializationConfigs which is set by page-initialization-configs.js
-// The PAGE_CONFIGS definition below is kept for backward compatibility but should not be used
+// The pageInitializationConfigs definition below is kept for backward compatibility but should not be used
 // All page configurations with packages array are in page-initialization-configs.js
 
-// ARCHIVED: PAGE_CONFIGS definition removed - use page-initialization-configs.js instead
+// ARCHIVED: pageInitializationConfigs definition removed - use page-initialization-configs.js instead
 // This ensures single source of truth and includes packages array required for preferences initialization
-if (false && typeof window.PAGE_CONFIGS === 'undefined') {
-  const PAGE_CONFIGS = {
+if (false && typeof window.pageInitializationConfigs === 'undefined') {
+  const pageInitializationConfigs = {
     // Main Pages
     index: {
       name: 'Dashboard',
@@ -5462,8 +5376,8 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
           });
 
           // Use page-initialization-configs if available, otherwise fallback
-          if (window.PAGE_CONFIGS?.executions?.customInitializers) {
-            const pageConfigInitializers = window.PAGE_CONFIGS.executions.customInitializers;
+          if (window.pageInitializationConfigs?.executions?.customInitializers) {
+            const pageConfigInitializers = window.pageInitializationConfigs.executions.customInitializers;
             window.Logger?.info?.('📋 Using page-initialization-configs initializers', {
               count: pageConfigInitializers.length,
               page: 'core-systems',
@@ -6215,7 +6129,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
    */
   window.getPageConfig = function (pageName) {
     return (
-      PAGE_CONFIGS[pageName] || {
+      pageInitializationConfigs[pageName] || {
         name: pageName,
         requiresFilters: false,
         requiresValidation: false,
@@ -6230,7 +6144,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
    * @returns {Object} All page configurations
    */
   window.getAllPageConfigs = function () {
-    return PAGE_CONFIGS;
+    return pageInitializationConfigs;
   };
 
   /**
@@ -6279,8 +6193,8 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
   };
 
   // ===== GLOBAL EXPORT =====
-  // REMOVED: PAGE_CONFIGS export - use page-initialization-configs.js instead
-  // window.PAGE_CONFIGS = PAGE_CONFIGS;
-  // window.PAGE_CONFIGS.__SOURCE = 'core-systems';
-  // window.pageInitializationConfigs = PAGE_CONFIGS;
+  // REMOVED: pageInitializationConfigs export - use page-initialization-configs.js instead
+  // window.pageInitializationConfigs = pageInitializationConfigs;
+  // window.pageInitializationConfigs.__SOURCE = 'core-systems';
+  // window.pageInitializationConfigs = pageInitializationConfigs;
 })(); // Close IIFE that starts on line 99

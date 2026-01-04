@@ -15,7 +15,7 @@ const configsContent = fs.readFileSync(configsPath, 'utf8');
 const vm = require('vm');
 const context = { 
   window: {}, 
-  PAGE_CONFIGS: {}, 
+  pageInitializationConfigs: {}, 
   module: {}, 
   exports: {}, 
   require: require, 
@@ -24,7 +24,7 @@ const context = {
 };
 vm.createContext(context);
 vm.runInContext(configsContent, context);
-const PAGE_CONFIGS = context.window.PAGE_CONFIGS || context.PAGE_CONFIGS || {};
+const pageInitializationConfigs = context.window.pageInitializationConfigs || context.pageInitializationConfigs || {};
 
 // Load package manifest
 const manifestPath = path.join(__dirname, 'init-system', 'package-manifest.js');
@@ -64,8 +64,8 @@ modalConfigs.forEach(config => {
 console.log('\n');
 
 // Get all pages with modules package
-const pagesWithModules = Object.keys(PAGE_CONFIGS).filter(pageName => {
-  const config = PAGE_CONFIGS[pageName];
+const pagesWithModules = Object.keys(pageInitializationConfigs).filter(pageName => {
+  const config = pageInitializationConfigs[pageName];
   return config && config.packages && config.packages.includes('modules');
 });
 
@@ -102,7 +102,7 @@ pagesWithModules.forEach(pageName => {
   const pageIssues = [];
   modalConfigs.forEach(config => {
     // Check if this config is required for this page
-    const pageConfig = PAGE_CONFIGS[pageName];
+    const pageConfig = pageInitializationConfigs[pageName];
     const requiredGlobals = pageConfig?.requiredGlobals || [];
     const isRequired = config.required && requiredGlobals.some(g => g.includes(config.globalCheck?.replace('window.', '') || ''));
     

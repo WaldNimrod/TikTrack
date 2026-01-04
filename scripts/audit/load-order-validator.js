@@ -132,12 +132,12 @@ class LoadOrderValidator {
       exports: {},
       require: require,
       __dirname: path.dirname(this.configsPath),
-      window: { PAGE_CONFIGS: {} },
-      PAGE_CONFIGS: {}
+      window: { pageInitializationConfigs: {} },
+      pageInitializationConfigs: {}
     };
     vm.createContext(context);
     vm.runInContext(content, context);
-    return context.PAGE_CONFIGS || context.window.PAGE_CONFIGS || {};
+    return context.pageInitializationConfigs || context.window.pageInitializationConfigs || {};
   }
 
   /**

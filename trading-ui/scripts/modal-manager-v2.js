@@ -506,9 +506,9 @@ class ModalManagerV2 {
      */
     createCRUDModal(config) {
         try {
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:createCRUDModal-start',message:'Starting createCRUDModal',data:{configId:config.id,configKeys:config ? Object.keys(config) : null,hasEntityType:!!config?.entityType,entityType:config?.entityType},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // בדיקת תקינות קונפיגורציה
             this.validateConfiguration(config);
@@ -516,16 +516,16 @@ class ModalManagerV2 {
             // יצירת HTML המודל
             const modalHTML = this.generateModalHTML(config);
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:createCRUDModal-html-generated',message:'Modal HTML generated, about to insert into DOM',data:{configId:config.id,modalHTMLLength:modalHTML?.length,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // הוספה לדף
             const modalElement = this.insertModalIntoDOM(modalHTML);
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:createCRUDModal-inserted',message:'Modal inserted into DOM, about to initialize systems',data:{configId:config.id,modalElementId:modalElement?.id,modalElementExists:!!modalElement,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // אתחול כל המערכות
             this.initializeModalSystems(modalElement, config);
@@ -537,9 +537,9 @@ class ModalManagerV2 {
                 isActive: false
             });
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:createCRUDModal-complete',message:'Modal creation completed successfully',data:{configId:config.id,modalStored:this.modals.has(config.id),totalModals:this.modals.size,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
             
             return modalElement;
         } catch (error) {
@@ -1244,16 +1244,20 @@ class ModalManagerV2 {
      * @returns {Promise<void>}
      */
     async showModal(modalId, mode = 'add', entityData = null, options = {}) {
-        // #region agent log
+        // region agent log - auth flow verification
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/modal-manager-v2.js:showModal',message:'ModalManagerV2.showModal called - checking for unauthorized login modals',data:{modalId,mode,entityDataKeys:entityData ? Object.keys(entityData) : null,isLoginModal:modalId === 'loginModal' || modalId?.includes('login'),port:window.location.port,hostname:window.location.hostname,pathname:window.location.pathname,timestamp:Date.now()},sessionId:'auth_flow_verification_8080',runId:'auth_redirect_verification',hypothesisId:'no_modal_creation'})}).catch(()=>{});
+        // endregion
+
+        // region agent log
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-start',message:'showModal called - checking initialization',data:{modalId,mode,entityDataKeys:entityData ? Object.keys(entityData) : null,isInitialized:this.isInitialized,configurationsSize:this.configurations?.size,modalsSize:this.modals?.size,iframeContext:window !== window.top,windowLocation:window.location?.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-        // #endregion
+        // endregion
 
         try {
             // Check if ModalManagerV2 is initialized
             if (!this.isInitialized) {
-                // #region agent log
+                // region agent log
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-init-check',message:'ModalManagerV2 not initialized, attempting init',data:{modalId,hasConfigurations:!!this.configurations,configurationsSize:this.configurations?.size,hasModals:!!this.modals,modalsSize:this.modals?.size},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                // #endregion
+                // endregion
 
                 window.Logger?.warn?.('⚠️ [ModalManagerV2] Not initialized, attempting initialization', { modalId, mode });
                 try {
@@ -1263,20 +1267,20 @@ class ModalManagerV2 {
                     while (!this.isInitialized && retries < 10) {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         retries++;
-                        // #region agent log
+                        // region agent log
                         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-init-retry',message:'Waiting for initialization',data:{modalId,retries,isInitialized:this.isInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                        // #endregion
+                        // endregion
                     }
                     if (!this.isInitialized) {
-                        // #region agent log
+                        // region agent log
                         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-init-failed',message:'ModalManagerV2 initialization failed',data:{modalId,hasConfigurations:!!this.configurations,configurationsSize:this.configurations?.size},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                        // #endregion
+                        // endregion
                         throw new Error('ModalManagerV2 initialization failed');
                     }
                 } catch (initError) {
-                    // #region agent log
+                    // region agent log
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-init-error',message:'ModalManagerV2 initialization error',data:{modalId,error:initError?.message,hasConfigurations:!!this.configurations},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                    // #endregion
+                    // endregion
                     window.Logger?.error?.('❌ [ModalManagerV2] Initialization failed', {
                         modalId,
                         mode,
@@ -1288,9 +1292,9 @@ class ModalManagerV2 {
             
             console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, options, modalsCount: this.modals.size });
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:showModal-existence-check',message:'About to check if modal exists in registry',data:{modalId,existsInRegistry:this.modals.has(modalId),registrySize:this.modals.size,configurationsSize:this.configurations?.size,hasConfigurationsMap:!!this.configurations,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה
             if (!this.modals.has(modalId)) {
@@ -1302,9 +1306,9 @@ class ModalManagerV2 {
                 if (this.configurations.has(modalId)) {
                     config = this.configurations.get(modalId);
                     console.log(`✅ Found config in configurations map for ${modalId}`);
-                    // #region agent log
+                    // region agent log
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:config-found-in-map',message:'Found modal config in configurations map',data:{modalId,configExists:!!config,configKeys:config ? Object.keys(config) : null,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                    // #endregion
+                    // endregion
                 } else {
                     // נסה למצוא את הקונפיגורציה במשתנים הגלובליים
                     // אפשרויות: modalIdConfig, modalIdModalConfig, או קונפיגורציות ספציפיות
@@ -1325,9 +1329,9 @@ class ModalManagerV2 {
                         if (window[name]) {
                             config = window[name];
                             console.log(`✅ Found config in window.${name}`);
-                            // #region agent log
+                            // region agent log
                             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:config-found-in-window',message:'Found modal config in window global',data:{modalId,configName:name,configExists:!!config,configKeys:config ? Object.keys(config) : null,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                            // #endregion
+                            // endregion
                             break;
                         }
                     }
@@ -1354,9 +1358,9 @@ class ModalManagerV2 {
                             isDynamic: true
                         });
                     } else {
-                        // #region agent log
+                        // region agent log
                         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:no-config-found',message:'No modal configuration found anywhere',data:{modalId,possibleNames:possibleNames,configurationsSize:this.configurations?.size,hasConfigurationsMap:!!this.configurations,iframeContext:window !== window.top,windowKeysPresent:possibleNames.map(name => ({name, exists: !!window[name]}))},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                        // #endregion
+                        // endregion
                         console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
                         console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
                         if (window.showErrorNotification) {
@@ -1509,7 +1513,7 @@ class ModalManagerV2 {
                             const defaultAccount = await window.getPreferenceFromMemory('default_trading_account');
                             if (defaultAccount) {
                                 executionAccountSelect.value = defaultAccount;
-                                // #endregion
+                                // endregion
                                 console.log(`✅ Execution account set immediately to ${defaultAccount}`);
                             }
                         } catch (error) {
@@ -1918,15 +1922,15 @@ class ModalManagerV2 {
                 }
             }
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:domCheck',message:'DOM check result after retries',data:{modalId,modalElementExists:!!modalElement,modalElementId:modalElement?.id,modalInDom,domCheckAttempts,maxDomCheckAttempts,documentBodyChildren:document.body.children.length,iframeCheck:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!modalInDom) {
                 console.error('❌ Modal element not in DOM after retries:', modalId);
-                // #region agent log
+                // region agent log
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:domError',message:'Modal element not in DOM after retries - throwing error',data:{modalId,modalElementExists:!!modalElement,domCheckAttempts,iframeContext:window !== window.top},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-availability-debug',hypothesisId:'MODAL_AVAILABILITY'})}).catch(()=>{});
-                // #endregion
+                // endregion
                 if (window.showErrorNotification) {
                     window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא בדף.`);
                 }
@@ -4886,7 +4890,7 @@ class ModalManagerV2 {
     async applyRemainingDefaults(form) {
         if (!form) return;
 
-        // #endregion
+        // endregion
 
         // Get modal config
         const modalElement = form.closest('.modal');
@@ -4926,21 +4930,21 @@ class ModalManagerV2 {
                 // SelectPopulatorService only populates options, it doesn't always set the default value
                 // So we need to apply the preference value ourselves
                 if (fieldElement.tagName === 'SELECT') {
-                    // #endregion
+                    // endregion
 
                     // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService with defaultFromPreferences)
                     // But include executionAccount for executions modal
                     if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
-                        // #endregion
+                        // endregion
                         continue;
                     }
                     
                     // For SELECT fields with defaultFromPreferences, apply preference value AFTER options are populated
                     if (field.defaultFromPreferences) {
-                        // #endregion
+                        // endregion
                         if (window.getPreferenceFromMemory) {
                             const prefName = this._getPreferenceNameForField(field.id);
-                            // #endregion
+                            // endregion
                         if (prefName) {
                             // Use the same robust preference retrieval as cross-page testing
                             let prefValue = null;
@@ -4980,18 +4984,18 @@ class ModalManagerV2 {
                                 }
                             }
 
-                            // #endregion
+                            // endregion
 
                             if (prefValue !== null && prefValue !== undefined) {
                                     // Check if the option exists in the select
                                     const optionExists = fieldElement.querySelector(`option[value="${prefValue}"]`);
                                     if (optionExists) {
                                         fieldElement.value = String(prefValue);
-                                        // #endregion
+                                        // endregion
                                         console.log(`✅ Applied preference default for SELECT ${field.id} (${prefName}):`, prefValue);
                                         continue;
                                     } else {
-                                        // #endregion
+                                        // endregion
                                         console.log(`⚠️ Option ${prefValue} not found in SELECT ${field.id}`);
                                     }
                                 }
@@ -5023,11 +5027,11 @@ class ModalManagerV2 {
                 
                 // Apply defaultFromPreferences first (before defaultValue) for non-SELECT fields
                 if (field.defaultFromPreferences) {
-                    // #endregion
+                    // endregion
                     console.log(`🔍 Checking defaultFromPreferences for field: ${field.id}`);
                     if (window.getPreferenceFromMemory) {
                         const prefName = this._getPreferenceNameForField(field.id);
-                        // #endregion
+                        // endregion
                         console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
                         if (prefName) {
                             // Use the same robust preference retrieval as cross-page testing
@@ -5068,23 +5072,23 @@ class ModalManagerV2 {
                                 }
                             }
 
-                            // #endregion
+                            // endregion
                             console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
                             if (prefValue !== null && prefValue !== undefined) {
                                 fieldElement.value = prefValue;
-                                // #endregion
+                                // endregion
                                 console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
                                 continue;
                             } else {
-                                // #endregion
+                                // endregion
                                 console.log(`⚠️ No preference value found for ${prefName}`);
                             }
                         } else {
-                            // #endregion
+                            // endregion
                             console.log(`⚠️ No preference name mapping found for field: ${field.id}`);
                         }
                     } else {
-                        // #endregion
+                        // endregion
                         console.log(`⚠️ getPreferenceFromMemory not available`);
                     }
                 }
@@ -6466,7 +6470,7 @@ class ModalManagerV2 {
                     if (optionExists) {
                         // Set immediately
                         executionAccountSelect.value = valueToPreserve;
-                        // #endregion
+                        // endregion
                         console.log(`✅ [initializeSpecialHandlers] Set executionAccount value immediately: ${valueToPreserve}`);
 
                         // Also set after a delay in case something clears it
@@ -7592,9 +7596,9 @@ class ModalManagerV2 {
         
         document.body.appendChild(modalElement);
 
-        // #region agent log
+        // region agent log
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'modal-manager-v2.js:insertModalIntoDOM',message:'Modal inserted into DOM',data:{modalId:modalElement.id,documentType:typeof document,windowType:typeof window,iframeContext:window !== window.top,documentBodyContains:document.body.contains(modalElement),parentElement:modalElement.parentElement?.tagName},timestamp:Date.now(),sessionId:'debug-session',runId:'modal-dom-debug',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
-        // #endregion
+        // endregion
 
         return modalElement;
     }

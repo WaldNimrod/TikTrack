@@ -17,7 +17,7 @@ function getAllPages() {
     const configPath = path.join(TRADING_UI_DIR, 'scripts', 'page-initialization-configs.js');
     const content = fs.readFileSync(configPath, 'utf8');
     
-    // Extract page names from PAGE_CONFIGS
+    // Extract page names from pageInitializationConfigs
     const pages = [];
     const pageRegex = /^\s+([a-z_]+)\s*:\s*\{/gm;
     let match;
@@ -111,7 +111,7 @@ function main() {
     console.log();
     
     const pages = getAllPages();
-    console.log(`Found ${pages.length} pages in PAGE_CONFIGS\n`);
+    console.log(`Found ${pages.length} pages in pageInitializationConfigs\n`);
     
     const results = {
         successful: [],

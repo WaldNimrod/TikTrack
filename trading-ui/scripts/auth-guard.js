@@ -2,8 +2,8 @@
  * Authentication Guard - Simple authentication check
  * מערכת הגנת נתיבים - בדיקת אימות פשוטה
  *
- * Simple logic: Check if user is authenticated -> Yes: Continue, No: Show login modal
- * לוגיקה פשוטה: בדוק אם משתמש מחובר -> כן: המשך, לא: הצג מודול כניסה
+ * Simple logic: Check if user is authenticated -> Yes: Continue, No: Redirect to login page
+ * לוגיקה פשוטה: בדוק אם משתמש מחובר -> כן: המשך, לא: הפניה לעמוד כניסה
  *
  * File: trading-ui/scripts/auth-guard.js
  * Version: 2.0 - Simplified
@@ -21,7 +21,7 @@
 // - checkAuthentication() - Checkauthentication
 
 // === UI Functions ===
-// - showLoginModal() - Showloginmodal
+// - showLoginModal() - Redirecttologinpage
 
 // === Other ===
 // - waitForAuthJS() - Waitforauthjs
@@ -89,59 +89,13 @@ async function checkAuthentication() {
 }
 
 /**
- * Show login modal
+ * Redirect to login page only (login modal removed)
  */
 async function showLoginModal() {
-  window.Logger?.info?.('🔐 [Auth Guard] Showing login modal', { page: 'auth-guard' });
-  
-  // ✅ לוג אימות - בדיקת זמינות
-  window.Logger?.info?.('🔍 [Auth Guard] showLoginModal - checking availability', {
-    page: 'auth-guard',
-    tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
-    showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function',
-    timestamp: new Date().toISOString()
-  });
-  
-  // Wait for auth.js to load if not available yet
-  if (typeof window.TikTrackAuth?.showLoginModal !== 'function') {
-    window.Logger?.info?.('⏳ [Auth Guard] Waiting for auth.js to load...', { page: 'auth-guard' });
-    
-    // Wait up to 5 seconds for auth.js to load
-    for (let i = 0; i < 50; i++) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        window.Logger?.info?.('✅ [Auth Guard] auth.js loaded', { 
-          page: 'auth-guard',
-          attempts: i + 1
-        });
-        break;
-      }
-    }
-  }
-  
-  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-    window.Logger?.info?.('✅ [Auth Guard] Calling window.TikTrackAuth.showLoginModal', { page: 'auth-guard' });
-    try {
-      await window.TikTrackAuth.showLoginModal(() => {
-        window.Logger?.info?.('✅ [Auth Guard] Login successful, reloading page', { page: 'auth-guard' });
-        window.location.reload();
-      });
-      window.Logger?.info?.('✅ [Auth Guard] showLoginModal completed successfully', { page: 'auth-guard' });
-    } catch (error) {
-      window.Logger?.error?.('❌ [Auth Guard] Error calling showLoginModal', {
-        page: 'auth-guard',
-        error: error.message,
-        stack: error.stack
-      });
-    }
-  } else {
-    window.Logger?.error?.('❌ [Auth Guard] Login modal function not available after waiting', {
-      page: 'auth-guard',
-      tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
-      tikTrackAuthType: typeof window.TikTrackAuth,
-      showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function'
-    });
-  }
+  window.Logger?.info?.('🔐 [Auth Guard] Redirecting to login page', { page: 'auth-guard' });
+
+  // REMOVE MODAL FLOW: Always redirect to login page
+  window.location.href = '/login.html';
 }
 
 /**
@@ -149,13 +103,17 @@ async function showLoginModal() {
  * Checks authentication on page load
  */
 async function initAuthGuard() {
-  
+
+  // region agent log - initAuthGuard called
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth-guard.js:initAuthGuard:entry',message:'initAuthGuard called',data:{page:window.location.pathname,isPublicPage:isPublicPage(),hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H4_auth_guard_running',timestamp:Date.now()})}).catch(()=>{});
+  // endregion
+
   // Check if this is a public page - skip authentication check
   const isPublic = isPublicPage();
   if (isPublic) {
-    window.Logger?.info?.('✅ [Auth Guard] Public page detected, skipping auth check', { 
+    window.Logger?.info?.('✅ [Auth Guard] Public page detected, skipping auth check', {
       page: 'auth-guard',
-      path: window.location.pathname 
+      path: window.location.pathname
     });
     return; // No need to check authentication for public pages
   }
@@ -216,7 +174,7 @@ async function initAuthGuard() {
       return null;
     }) : null;
     // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
-    const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+    const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('authToken') : null;
 
     console.log('[auth-guard] Check', i, '- UC initialized:', hasUC, 'UC token:', !!ucToken, 'SS token:', !!ssToken);
 
@@ -235,37 +193,6 @@ async function initAuthGuard() {
   } catch (e) {
     window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
   }
-  
-  // TEST MODE: Always bypass authentication for runtime verification
-  const isTestMode = window.location.hostname === '127.0.0.1' ||
-                    window.location.hostname === 'localhost' ||
-                    window.location.search.includes('test_mode=1') ||
-                    sessionStorage.getItem('test_mode_enabled') === '1';
-
-  if (isTestMode) {
-    window.Logger?.info?.('🔧 [Auth Guard] TEST MODE: Authentication checks disabled', {
-      page: 'auth-guard',
-      hostname: window.location.hostname,
-      testMode: true
-    });
-
-    // Simulate authenticated user for testing
-    window.currentUser = {
-      id: 1,
-      username: 'test_admin',
-      role: 'admin',
-      email: 'admin@tiktrack.com'
-    };
-    window.authToken = 'test_mode_token_' + Date.now();
-    window.TEST_MODE_ACTIVE = true;
-
-    window.Logger?.info?.('✅ [Auth Guard] TEST MODE: Proceeding with full page load', {
-      page: 'auth-guard',
-      testUser: window.currentUser.username
-    });
-
-    return;
-  }
 
   if (result.authenticated) {
     // User is authenticated - page can load normally
@@ -278,23 +205,13 @@ async function initAuthGuard() {
       sessionStorage.setItem('login_redirect_url', window.location.href);
     }
 
-    // TEST MODE: Disable redirects for runtime verification
-    window.Logger?.info?.('🔧 [Auth Guard] TEST MODE: Redirect disabled for verification', {
+    // REMOVE TEST MODE: Always redirect to login page
+    window.Logger?.info?.('🔐 [Auth Guard] Authentication required, redirecting to login page', {
       page: 'auth-guard',
-      testMode: true
+      currentPath: window.location.pathname
     });
 
-    // Simulate authenticated user for testing
-    window.currentUser = {
-      id: 1,
-      username: 'test_admin',
-      role: 'admin',
-      email: 'admin@tiktrack.com'
-    };
-    window.authToken = 'test_verification_token_' + Date.now();
-    window.TEST_MODE_ACTIVE = true;
-
-    return;
+    window.location.href = '/login.html';
   }
 }
 
@@ -337,15 +254,19 @@ async function waitForAuthJS() {
   await initAuthGuard();
 }
 
-// Start when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', waitForAuthJS);
-} else {
-  // DOM already ready, start immediately
-  waitForAuthJS();
-}
+// ===== AUTO-EXECUTION DISABLED =====
+// DISABLED: Auto-execution removed to prevent conflict with page-initialization-configs.js
+// The auth guard logic is now handled by ensureAuthenticatedForPage() in page-initialization-configs.js
+// This file is kept for backward compatibility and manual initialization if needed
+//
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', waitForAuthJS);
+// } else {
+//   // DOM already ready, start immediately
+//   waitForAuthJS();
+// }
 
-// Export functions globally
+// Export functions globally (for manual initialization if needed)
 window.AuthGuard = {
   init: initAuthGuard,
   checkAuth: checkAuthentication,

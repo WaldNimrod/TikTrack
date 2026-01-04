@@ -36,52 +36,6 @@ if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
 
-// #region agent log - Header visual verification after full load
-window.addEventListener('load', function() {
-  // Wait 1 second after window.onload for any deferred initialization
-  setTimeout(() => {
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'header-system.js:window-load-verification',
-        message:'header_visual_verification_after_window_load',
-        data:{
-          timestamp: Date.now(),
-          page: window.location.pathname,
-          unifiedHeaderExists: !!document.getElementById('unified-header'),
-          unifiedHeaderVisible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false,
-          tiktrackHeaderExists: !!document.querySelector('.tiktrack-header'),
-          tiktrackHeaderVisible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false,
-          headerSystemReady: window.headerSystemReady,
-          headerSystemInstance: typeof window.headerSystem,
-          documentReadyState: document.readyState,
-          initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready'
-        },
-        sessionId:'header-visual-verification',
-        runId:'header-visual-verification-1',
-        hypothesisId:'header_visual_verification'
-      })
-    }).catch(()=>{});
-
-    // Additional Logger evidence for header state
-    window.Logger?.info?.('👁️ Header Visual Verification', {
-      page: 'header-system',
-      unifiedHeader: {
-        exists: !!document.getElementById('unified-header'),
-        visible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false
-      },
-      tiktrackHeader: {
-        exists: !!document.querySelector('.tiktrack-header'),
-        visible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false
-      },
-      headerSystemReady: window.headerSystemReady,
-      initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready',
-      timestamp: new Date().toISOString()
-    });
-  }, 1000);
-});
-// #endregion
 
 // ===== FilterManager Class =====
 // Prevent duplicate declaration
@@ -130,7 +84,7 @@ window.FilterManager = class FilterManager {
           }
         }
         if (!hasToken && typeof sessionStorage !== 'undefined') {
-          hasToken = !!sessionStorage.getItem('dev_authToken');
+          hasToken = !!sessionStorage.getItem('authToken');
         }
 
         // Verify authentication with TikTrackAuth
@@ -1192,25 +1146,6 @@ class HeaderSystem {
   }
 
   static createHeader() {
-    // #region agent log - header creation start
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'header-system.js:createHeader',
-        message:'HeaderSystem.createHeader() started',
-        data:{
-          existingHeader: !!document.getElementById('unified-header'),
-          bodyChildrenCount: document.body?.children?.length || 0,
-          documentReadyState: document.readyState,
-          runId:'init_loading_support',
-          hypothesisId:'header_dom_modification'
-        },
-        timestamp:Date.now(),
-        sessionId:'init-loading-debug'
-      })
-    }).catch(()=>{});
-    // #endregion
 
     // No dedicated auth pages; always render header
     const isAuthPage = false;
@@ -1239,26 +1174,6 @@ class HeaderSystem {
         existingHeader.appendChild(node.cloneNode(true));
     });
 
-    // #region agent log - header creation complete
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'header-system.js:createHeader',
-        message:'HeaderSystem.createHeader() completed',
-        data:{
-          headerCreated: true,
-          headerElementCount: existingHeader?.children?.length || 0,
-          bodyChildrenCount: document.body?.children?.length || 0,
-          documentReadyState: document.readyState,
-          runId:'init_loading_support',
-          hypothesisId:'header_dom_modification'
-        },
-        timestamp:Date.now(),
-        sessionId:'init-loading-debug'
-      })
-    }).catch(()=>{});
-    // #endregion
   }
 
   /**
@@ -1283,13 +1198,18 @@ class HeaderSystem {
       } else if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
         currentUser = window.TikTrackAuth.getCurrentUser();
       } else {
-        // Try localStorage
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-          try {
-            currentUser = JSON.parse(storedUser);
-          } catch (e) {
-            // Ignore parse errors
+        // Try UnifiedCacheManager SessionStorageLayer (Option 1 - no localStorage)
+        if (window.UnifiedCacheManager?.initialized) {
+          currentUser = window.UnifiedCacheManager.get('currentUser', { layer: 'sessionStorage' });
+        } else {
+          // Fallback to sessionStorage bootstrap key
+          const storedUser = sessionStorage.getItem('currentUser');
+          if (storedUser) {
+            try {
+              currentUser = JSON.parse(storedUser);
+            } catch (e) {
+              // Ignore parse errors
+            }
           }
         }
       }
@@ -1464,7 +1384,7 @@ class HeaderSystem {
                           </ul>
                         </li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
@@ -1472,7 +1392,7 @@ class HeaderSystem {
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init_system_management">🚀 ניהול מערכת אתחול</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
@@ -2036,24 +1956,20 @@ window.handleHeaderLogout = async function(event) {
   const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
   
   if (isAuth) {
-    // User is authenticated - perform logout (which will show login modal)
+    // User is authenticated - perform logout
     if (window.TikTrackAuth?.logout) {
       await window.TikTrackAuth.logout();
     } else {
-      // Fallback if TikTrackAuth not available - show login modal
-      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        await window.TikTrackAuth.showLoginModal();
-      } else {
-        window.location.href = '/';
-      }
+      // region agent log - header-system logout redirect
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/header-system.js:logout_redirect',message:'Header system logout redirect (no logout function)',data:{page:window.location.pathname,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H6_header_logout_redirect',timestamp:Date.now()})}).catch(()=>{});
+      // endregion
+      window.location.href = '/login.html';
     }
   } else {
-    // User is not authenticated - show login modal
-    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-      await window.TikTrackAuth.showLoginModal();
-    } else {
-      window.location.href = '/';
-    }
+    // region agent log - header-system auth redirect
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/header-system.js:auth_redirect',message:'Header system auth redirect (user not authenticated)',data:{page:window.location.pathname,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H6_header_auth_redirect',timestamp:Date.now()})}).catch(()=>{});
+    // endregion
+    window.location.href = '/login.html';
   }
 };
 
@@ -2109,26 +2025,6 @@ window.HeaderSystem = {
   initialize: function() {
     console.log('🎯 HeaderSystem.initialize() called');
 
-    // #region agent log - header init start
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'header-system.js:2021',
-        message:'HeaderSystem_initialize_start',
-        data:{
-          timestamp: Date.now(),
-          documentReadyState: document.readyState,
-          HeaderSystemClass: typeof window.HeaderSystemClass,
-          existingHeaderSystem: typeof window.headerSystem,
-          isDOMContentLoaded: document.readyState === 'complete' || document.readyState === 'interactive'
-        },
-        sessionId:'init_loading_critical',
-        runId:'init_loading_critical',
-        hypothesisId:'header_domcontentloaded_guard'
-      })
-    }).catch(()=>{});
-    // #endregion
 
     // MINIMAL GUARD: Delay header initialization until DOMContentLoaded fully fires
     // This prevents race conditions with color-scheme-system.js DOMContentLoaded handler
@@ -2139,25 +2035,6 @@ window.HeaderSystem = {
       console.log('⏳ [TIMING] HeaderSystem.initialize() - DOM still loading, delaying initialization...');
       console.log(`📊 [BEFORE] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
 
-      // #region agent log - header init delayed
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          location:'header-system.js:delay-guard',
-          message:'HeaderSystem_initialize_delayed',
-          data:{
-            timestamp: Date.now(),
-            initStartTime,
-            documentReadyState: document.readyState,
-            reason: 'DOM still loading - delaying to prevent race with color-scheme-system'
-          },
-          sessionId:'init_loading_critical',
-          runId:'init_loading_critical',
-          hypothesisId:'header_domcontentloaded_guard'
-        })
-      }).catch(()=>{});
-      // #endregion
 
       return new Promise((resolve, reject) => {
         document.addEventListener('DOMContentLoaded', async (event) => {
@@ -2166,26 +2043,6 @@ window.HeaderSystem = {
           console.log(`✅ [TIMING] HeaderSystem.initialize() - DOMContentLoaded fired at ${domContentLoadedTime.toFixed(2)}ms (delayed ${delayDuration.toFixed(2)}ms)`);
           console.log(`📊 [AFTER] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
 
-          // #region agent log - header init proceeding after DOMContentLoaded
-          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-              location:'header-system.js:proceed-after-domcontentloaded',
-              message:'HeaderSystem_initialize_proceeding_after_DOMContentLoaded',
-              data:{
-                timestamp: Date.now(),
-                domContentLoadedTime,
-                delayDuration,
-                documentReadyState: document.readyState,
-                headerSystemReadyBefore: window.headerSystemReady
-              },
-              sessionId:'init_loading_critical',
-              runId:'init_loading_critical',
-              hypothesisId:'header_domcontentloaded_guard'
-            })
-          }).catch(()=>{});
-          // #endregion
 
           try {
             await performHeaderInitialization();
@@ -2201,10 +2058,7 @@ window.HeaderSystem = {
       // DOM already loaded, proceed immediately
       console.log(`✅ [TIMING] HeaderSystem.initialize() - DOM already loaded (${document.readyState}), proceeding immediately...`);
       console.log(`📊 [IMMEDIATE] headerSystemReady: ${window.headerSystemReady}`);
-      const result = await performHeaderInitialization();
-      const completionTime = performance.now();
-      console.log(`🎯 [TIMING] HeaderSystem.initialize() completed at ${completionTime.toFixed(2)}ms (total: ${(completionTime - initStartTime).toFixed(2)}ms)`);
-      return result;
+      return performHeaderInitialization();
     }
 
     // Helper function to perform the actual initialization
@@ -2232,28 +2086,6 @@ window.HeaderSystem = {
           window.headerSystem.init();
           window.headerSystemReady = true;
 
-          // #region agent log - header init complete
-          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-              location:'header-system.js:2041',
-              message:'HeaderSystem_initialize_complete',
-              data:{
-                timestamp: Date.now(),
-                headerSystem: typeof window.headerSystem,
-                isInitialized: window.headerSystem?.isInitialized,
-                hasUnifiedHeader: !!document.getElementById('unified-header'),
-                tiktrackHeader: !!document.querySelector('.tiktrack-header'),
-                headerElements: document.querySelectorAll('[class*="header"]').length,
-                documentReadyState: document.readyState
-              },
-              sessionId:'init_loading_critical',
-              runId:'init_loading_critical',
-              hypothesisId:'header-domcontentloaded-guard-success'
-            })
-          }).catch(()=>{});
-          // #endregion
 
           window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
             page: 'header-system',
@@ -2265,25 +2097,6 @@ window.HeaderSystem = {
           throw new Error('HeaderSystemClass not found');
         }
       } catch (error) {
-        // #region agent log - header init error
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            location:'header-system.js:error-handler',
-            message:'HeaderSystem_initialize_error',
-            data:{
-              timestamp: Date.now(),
-              error: error.message,
-              stack: error.stack?.substring(0, 500),
-              documentReadyState: document.readyState
-            },
-            sessionId:'init_loading_critical',
-            runId:'init_loading_critical',
-            hypothesisId:'header-domcontentloaded-guard-error'
-          })
-        }).catch(()=>{});
-        // #endregion
 
         window.Logger?.error?.('❌ HeaderSystem.initialize() - ERROR', {
           page: 'header-system',
@@ -2294,6 +2107,7 @@ window.HeaderSystem = {
         throw error;
       }
     }
+  }
 };
 
 // Expose filter system for compatibility
@@ -2338,4 +2152,3 @@ if (window.Logger) {
 // Export HeaderSystem to global scope for package validation
 // Keep existing HeaderSystem object and also export the class for validation
 window.HeaderSystemClass = HeaderSystem;
-

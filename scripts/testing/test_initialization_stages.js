@@ -125,7 +125,7 @@
     const pageName = filename.replace('.html', '');
     
     // Get page config
-    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.pageInitializationConfigs?.[pageName];
     
     if (!pageConfig) {
       console.warn(`⚠️ No page config found for ${pageName}`);
@@ -204,7 +204,7 @@
     const pageName = filename.replace('.html', '');
     
     // Get page config
-    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.pageInitializationConfigs?.[pageName];
     
     if (!pageConfig) {
       console.warn(`⚠️ No page config found for ${pageName}`);

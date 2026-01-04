@@ -77,7 +77,7 @@ async function authenticateUser(page, username, password, options = {}) {
     const authPromise = page.waitForFunction(
       () => {
         try {
-          const currentUser = localStorage.getItem('currentUser');
+          const currentUser = sessionStorage.getItem('currentUser'); // Option 1
           return currentUser !== null && currentUser !== '';
         } catch (e) {
           return false;
@@ -108,8 +108,8 @@ async function authenticateUser(page, username, password, options = {}) {
     // Verify authentication by checking localStorage
     const isAuthenticated = await page.evaluate(() => {
       try {
-        const currentUser = localStorage.getItem('currentUser');
-        const authToken = localStorage.getItem('authToken');
+        const currentUser = sessionStorage.getItem('currentUser');
+        const authToken = sessionStorage.getItem('authToken'); // Option 1
         return currentUser !== null && currentUser !== '' && authToken !== null;
       } catch (e) {
         return false;
@@ -126,7 +126,7 @@ async function authenticateUser(page, username, password, options = {}) {
       if (errorMessage) {
         throw new Error(`Authentication failed: ${errorMessage}`);
       }
-      throw new Error('Authentication failed - currentUser or authToken not found in localStorage');
+      throw new Error('Authentication failed - currentUser or authToken not found in sessionStorage (Option 1)');
     }
 
     // Wait a bit more for any redirects to settle (auth.js redirects after 1 second)
@@ -164,7 +164,7 @@ async function waitForAuthentication(page, timeout = 10000) {
     await page.waitForFunction(
       () => {
         try {
-          const currentUser = localStorage.getItem('currentUser');
+          const currentUser = sessionStorage.getItem('currentUser'); // Option 1
           return currentUser !== null && currentUser !== '';
         } catch (e) {
           return false;
@@ -187,8 +187,8 @@ async function verifyAuthentication(page) {
   try {
     const isAuthenticated = await page.evaluate(() => {
       try {
-        const currentUser = localStorage.getItem('currentUser');
-        const authToken = localStorage.getItem('authToken');
+        const currentUser = sessionStorage.getItem('currentUser');
+        const authToken = sessionStorage.getItem('authToken'); // Option 1
         return currentUser !== null && currentUser !== '' && authToken !== null;
       } catch (e) {
         return false;
@@ -209,7 +209,7 @@ async function getCurrentUser(page) {
   try {
     const user = await page.evaluate(() => {
       try {
-        const currentUserStr = localStorage.getItem('currentUser');
+        const currentUserStr = sessionStorage.getItem('currentUser'); // Option 1
         if (!currentUserStr) {
           return null;
         }
@@ -237,8 +237,8 @@ async function logoutUser(page, baseURL = process.env.BASE_URL || 'http://localh
 
     // Clear localStorage
     await page.evaluate(() => {
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('currentUser');
+      sessionStorage.removeItem('authToken'); // Option 1
       sessionStorage.clear();
     });
 

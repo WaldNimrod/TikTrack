@@ -74,10 +74,10 @@ class RuntimeValidator {
    * Check missing systems
    */
   checkMissingSystems() {
-    if (!window.PAGE_CONFIGS) return;
+    if (!window.pageInitializationConfigs) return;
     
     const pageName = window.location.pathname.split('/').pop().replace('.html', '');
-    const config = window.PAGE_CONFIGS[pageName];
+    const config = window.pageInitializationConfigs[pageName];
     
     if (!config || !config.requiredGlobals) return;
     
@@ -125,13 +125,13 @@ class RuntimeValidator {
    */
   checkLoadOrder() {
     // בדיקה שחבילות עם dependencies נטענו אחרי התלויות שלהן
-    if (!window.PAGE_CONFIGS || !window.PACKAGE_MANIFEST) {
+    if (!window.pageInitializationConfigs || !window.PACKAGE_MANIFEST) {
       console.log('✅ סדר טעינה תקין (אין מידע על חבילות)');
       return;
     }
     
     const pageName = window.location.pathname.split('/').pop().replace('.html', '');
-    const config = window.PAGE_CONFIGS[pageName];
+    const config = window.pageInitializationConfigs[pageName];
     
     if (!config || !config.packages) {
       console.log('✅ סדר טעינה תקין (אין חבילות מוגדרות)');

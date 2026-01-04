@@ -125,7 +125,7 @@ class InitSystemCheck {
             }
 
             // קבלת קונפיגורציית העמוד
-            const pageConfig = window.PAGE_CONFIGS?.[currentPage];
+            const pageConfig = window.pageInitializationConfigs?.[currentPage];
             if (!pageConfig) {
                 throw new Error(`לא נמצא קונפיגורציה לעמוד ${currentPage}`);
             }
@@ -177,15 +177,15 @@ class InitSystemCheck {
             const htmlClass = document.documentElement.className;
             // Check if class matches a known page name pattern (e.g., "trading-journal-page")
             if (htmlClass && htmlClass.includes('-page') && !htmlClass.includes(' ')) {
-                // Verify it exists in PAGE_CONFIGS
-                if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[htmlClass]) {
+                // Verify it exists in pageInitializationConfigs
+                if (window.pageInitializationConfigs && window.pageInitializationConfigs[htmlClass]) {
                     return htmlClass;
                 }
             }
         }
         
-        // If pageName exists in PAGE_CONFIGS, use it
-        if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[pageName]) {
+        // If pageName exists in pageInitializationConfigs, use it
+        if (window.pageInitializationConfigs && window.pageInitializationConfigs[pageName]) {
             return pageName;
         }
         
@@ -1028,7 +1028,7 @@ class InitSystemCheck {
         } else if (type === 'loading_order') {
             return 'תקן את סדר הטעינה בקובץ HTML לפי המניפסט';
         } else if (type === 'missing_global') {
-            return 'הוסף את החבילה המתאימה ל-PAGE_CONFIGS או וודא שהסקריפט נטען';
+            return 'הוסף את החבילה המתאימה ל-pageInitializationConfigs או וודא שהסקריפט נטען';
         }
 
         return 'בדוק את התיעוד לפרטים נוספים';

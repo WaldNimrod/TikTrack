@@ -703,6 +703,12 @@
         ...config
       };
 
+      // Check authentication status for graceful degradation
+      if (!window.GracefulDegradation?.requireAuth(containerId, 'רשימת מניות')) {
+        state.initialized = true;
+        return;
+      }
+
       if (!cacheElements()) {
         window.Logger?.error?.('❌ TickerListWidget: Container not found', { containerId, page: 'ticker-list-widget' });
         return;

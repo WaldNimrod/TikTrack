@@ -271,11 +271,11 @@ class MetricsCollector:
                 'timestamp': datetime.now().isoformat(),
                 'cache': {
                     'total_entries': stats.get('total_entries', 0),
-                    'active_entries': stats.get('active_entries', 0),
+                    'active_entries': stats.get('total_entries', 0) - stats.get('expired_entries', 0),  # active = total - expired
                     'expired_entries': stats.get('expired_entries', 0),
-                    'memory_usage_bytes': stats.get('memory_usage', 0),
+                    'memory_usage_bytes': stats.get('estimated_memory_mb', 0) * (1024 * 1024),  # Convert MB to bytes
                     'hit_rate_percent': round(hit_rate * 100, 2),
-                    'memory_usage_mb': round(stats.get('memory_usage', 0) / (1024 * 1024), 4)
+                    'memory_usage_mb': round(stats.get('estimated_memory_mb', 0), 4)
                 },
                 'collection_time_ms': round((time.time() - start_time) * 1000, 2)
             }
@@ -365,7 +365,7 @@ class MetricsCollector:
                 memory_trends.append(metrics['performance']['system']['memory_percent'])
             
             if 'cache' in metrics:
-                cache_trends.append(metrics['cache']['total_entries'])
+                cache_trends.append(metrics['cache'].get('total_entries', 0))
         
         # Calculate averages
         avg_cpu = sum(cpu_trends) / len(cpu_trends) if cpu_trends else 0

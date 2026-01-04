@@ -85,7 +85,7 @@
 
 ### אתחול העדפות
 
-- **מקור הקונפיגורציה:** `page-initialization-configs.js` - PAGE_CONFIGS עם `packages` array
+- **מקור הקונפיגורציה:** `page-initialization-configs.js` - pageInitializationConfigs עם `packages` array
 - **זרימת אתחול:**
   1. `prepareConfiguration()` קורא ל-`window.pageInitializationConfigs[pageName]`
   2. מעתיק `packages` array ל-config
@@ -97,7 +97,7 @@
 
 ### ⚠️ שינויים קריטיים (2025-01-27)
 
-- **PAGE_CONFIGS:** מוגדר רק ב-`page-initialization-configs.js` (לא ב-`core-systems.js`)
+- **pageInitializationConfigs:** מוגדר רק ב-`page-initialization-configs.js` (לא ב-`core-systems.js`)
 - **packages array:** חובה לכל עמוד שצריך העדפות - מוגדר ב-`page-initialization-configs.js`
 - **prepareConfiguration():** מעתיק `packages` מה-pageConfig ל-config
 - **unified-app-initializer.js:** הועבר ל-`archive/scripts/` עם אזהרות למניעת טעינה

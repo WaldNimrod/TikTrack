@@ -147,7 +147,7 @@ requiredGlobals: ["window.MyPackage"]
 const debug = {
   checkPackage: (packageName) => {
     const manifest = window.PACKAGE_MANIFEST?.[packageName];
-    const isInPageConfig = window.PAGE_CONFIGS?.[window.currentPage]?.packages?.includes(packageName);
+    const isInPageConfig = window.pageInitializationConfigs?.[window.currentPage]?.packages?.includes(packageName);
     const scriptLoaded = !!document.querySelector(`script[src*="${packageName}"]`);
 
     return {

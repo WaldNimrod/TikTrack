@@ -329,21 +329,21 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 #### **System Architecture**
 
 - **[Project Summary](project/PROJECT_SUMMARY.md)** - Complete project overview and status
-- **[Database Architecture](database/README.md)** - Database design and relationships
-- **[API Architecture](api/README.md)** - API design and endpoints
+- **[Database Architecture](02-ARCHITECTURE/BACKEND/DATABASE_ARCHITECTURE.md)** - Database design and relationships
+- **[API Architecture](02-ARCHITECTURE/BACKEND/API_ARCHITECTURE.md)** - API design and endpoints
 
 #### **Frontend Architecture**
 
 - **[Header System](frontend/HEADER_SYSTEM_SPEC.md)** - Complete header system specification and documentation ✅ **עודכן נובמבר 2025**
-- **[Filter System](frontend/FILTER_SYSTEM_README.md)** - Advanced filtering system
+- **[Filter System](02-ARCHITECTURE/FRONTEND/HEADER_SYSTEM_README.md)** - Advanced filtering system
 - **[JavaScript Architecture](frontend/JAVASCRIPT_ARCHITECTURE.md)** - JS module organization
 
 ### 🔧 **Development Guides**
 
 #### **Getting Started**
 
-- **[Development Setup](development/README.md)** - Complete development environment setup
-- **[Module Testing](development/MODULE_TESTING.md)** - Module testing procedures
+- **[Development Setup](03-DEVELOPMENT/README.md)** - Complete development environment setup
+- **[Module Testing](03-DEVELOPMENT/GUIDELINES/MODULE_TESTING.md)** - Module testing procedures
 
 #### **Development Practices**
 
@@ -353,40 +353,36 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 
 #### **Core APIs**
 
-- **[API Overview](api/README.md)** - Complete API reference
-- **[Authentication](api/AUTHENTICATION.md)** - API authentication and security
+- **[API Reference](02-ARCHITECTURE/BACKEND/API_REFERENCE.md)** - Complete API reference
+- **[Authentication](02-ARCHITECTURE/BACKEND/AUTHENTICATION_API.md)** - API authentication and security
 
 ### 🗄️ **Database Documentation**
 
 #### **Schema & Models**
 
-- **[Database Schema](database/README.md)** - Complete database structure
-- **[Database Models](database/MODELS.md)** - SQLAlchemy model definitions
-- **[Constraints Implementation](database/CONSTRAINTS_IMPLEMENTATION.md)** - Database constraints and validation
+- **[Database Schema](02-ARCHITECTURE/BACKEND/DATABASE_ARCHITECTURE.md)** - Complete database structure
+- **[Database Models](02-ARCHITECTURE/BACKEND/DATABASE_MODELS.md)** - SQLAlchemy model definitions
+- **[Constraints Implementation](02-ARCHITECTURE/BACKEND/DB_CONSTRAINTS_IMPLEMENTATION.md)** - Database constraints and validation
 
 #### **Data Management**
 
-- **[Page Improvements](database/PAGE_IMPROVEMENTS.md)** - Database page improvements
-- **[Alerts Table Migration](database/ALERTS_TABLE_MIGRATION.md)** - Alerts table migration documentation
+- **[Page Improvements](03-DEVELOPMENT/DB_IMPROVEMENTS/PAGE_IMPROVEMENTS.md)** - Database page improvements
+- **[Alerts Table Migration](03-DEVELOPMENT/DB_MIGRATIONS/ALERTS_MIGRATION.md)** - Alerts table migration documentation
 
 ### 🎨 **Frontend Documentation**
 
 #### **User Interface**
 
-- **[CSS Architecture](frontend/css/README.md)** - CSS system overview
-- **[CSS Variables](frontend/css/CSS_VARIABLES.md)** - CSS variables reference
-- **[Component Style Guide](frontend/css/COMPONENT_STYLE_GUIDE.md)** - Component styling guidelines
-- **[Modal Styling Guide](frontend/css/MODAL_STYLING_GUIDE.md)** - Modal styling standards
+- **[CSS Architecture](03-DEVELOPMENT/GUIDELINES/CSS_SYSTEM_GUIDE.md)** - CSS system overview and variables
 
 #### **JavaScript Modules**
 
 - **[JavaScript Architecture](frontend/JAVASCRIPT_ARCHITECTURE.md)** - JS module organization
-- **[Function Naming](frontend/FUNCTION_NAMING.md)** - Function naming conventions
-- **[JS Organization](frontend/JS_ORGANIZATION.md)** - JavaScript organization guidelines
-- **[Backward Compatibility](frontend/BACKWARD_COMPATIBILITY.md)** - Backward compatibility documentation
-- **[Translation Functions](frontend/TRANSLATION_FUNCTIONS.md)** - Translation functions documentation
-- **[Number Formatting](frontend/NUMBER_FORMATTING.md)** - Global number formatting system
-- **[Notification System](frontend/NOTIFICATION_SYSTEM_README.md)** - Unified notification system documentation
+- **[JavaScript Organization](02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md)** - JavaScript organization guidelines
+- **[Backward Compatibility](02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md)** - Backward compatibility documentation
+- **[Translation Functions](02-ARCHITECTURE/FRONTEND/TRANSLATION_FUNCTIONS.md)** - Translation functions documentation
+- **[Number Formatting](02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md)** - Global number formatting system
+- **[Notification System](03-DEVELOPMENT/GUIDELINES/NOTIFICATION_SYSTEM_IMPLEMENTATION.md)** - Unified notification system documentation
 
 ### 📈 **Features & Modules**
 
@@ -396,8 +392,8 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 - **[Preferences System](features/preferences/PREFERENCES_SYSTEM.md)** - User preferences management
 - **[Currencies System](features/currencies/SUMMARY.md)** - Currency management
 - **[External Data Integration](features/external_data/EXTERNAL_DATA_SYSTEM.md)** - Real-time market data integration
-- **[Notification System](frontend/NOTIFICATION_SYSTEM_README.md)** - Unified notification system for all pages
-- **[Chart Management System](frontend/CHART_SYSTEM_COMPLETE_GUIDE.md)** - Complete charting infrastructure with Chart.js integration
+- **[Notification System](03-DEVELOPMENT/GUIDELINES/NOTIFICATION_SYSTEM_IMPLEMENTATION.md)** - Unified notification system for all pages
+- **[Chart Management System](02-ARCHITECTURE/FRONTEND/PORTFOLIO_STATE_CHARTS_DOCUMENTATION.md)** - Complete charting infrastructure with Chart.js integration
 
 #### **Testing & Validation**
 
@@ -412,13 +408,13 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 
 ### **For Developers**
 
-- **[Development Setup](development/README.md)** - Start here for development
-- **[API Reference](api/README.md)** - Complete API documentation
-- **[Database Schema](database/README.md)** - Database structure and relationships
+- **[Development Setup](03-DEVELOPMENT/README.md)** - Start here for development
+- **[API Reference](02-ARCHITECTURE/BACKEND/API_REFERENCE.md)** - Complete API documentation
+- **[Database Schema](02-ARCHITECTURE/BACKEND/DATABASE_ARCHITECTURE.md)** - Database structure and relationships
 - **[Frontend Architecture](frontend/README.md)** - Frontend system overview
 - **[User Management System](USER_MANAGEMENT_SYSTEM.md)** - User management and preferences system
 - **[External Data Integration](features/external_data/EXTERNAL_DATA_SYSTEM.md)** - Market data system documentation
-- **[Chart Management System](frontend/CHART_SYSTEM_COMPLETE_GUIDE.md)** - Complete charting system documentation
+- **[Chart Management System](02-ARCHITECTURE/FRONTEND/PORTFOLIO_STATE_CHARTS_DOCUMENTATION.md)** - Complete charting system documentation
 
 ### **For System Administrators**
 

@@ -18,20 +18,20 @@ eval(manifestContent.replace('const PACKAGE_MANIFEST =', 'var PACKAGE_MANIFEST =
 const configsPath = path.join(__dirname, '../trading-ui/scripts/page-initialization-configs.js');
 const configsContent = fs.readFileSync(configsPath, 'utf8');
 
-// Extract PAGE_CONFIGS using regex
-const configsMatch = configsContent.match(/const PAGE_CONFIGS = \{([\s\S]*?)\};/);
+// Extract pageInitializationConfigs using regex
+const configsMatch = configsContent.match(/const pageInitializationConfigs = \{([\s\S]*?)\};/);
 if (!configsMatch) {
-    console.error('❌ Could not find PAGE_CONFIGS');
+    console.error('❌ Could not find pageInitializationConfigs');
     process.exit(1);
 }
 
 // Pages to test
 const TEST_PAGES = ['trades', 'executions', 'alerts', 'trade_plans', 'trading_accounts', 'cash_flows', 'tickers', 'notes'];
 
-// Simulate window.PACKAGE_MANIFEST and window.PAGE_CONFIGS
-global.window = { PACKAGE_MANIFEST, PAGE_CONFIGS: {} };
+// Simulate window.PACKAGE_MANIFEST and window.pageInitializationConfigs
+global.window = { PACKAGE_MANIFEST, pageInitializationConfigs: {} };
 
-// Parse PAGE_CONFIGS (simplified - just extract packages)
+// Parse pageInitializationConfigs (simplified - just extract packages)
 const pagesToTest = {};
 
 TEST_PAGES.forEach(pageName => {

@@ -42,7 +42,7 @@
    * Check page configuration in page-initialization-configs.js
    */
   function checkPageConfig(pageName) {
-    const config = window.PAGE_CONFIGS?.[pageName];
+    const config = window.pageInitializationConfigs?.[pageName];
     if (!config) {
       return {
         hasConfig: false,
@@ -102,7 +102,7 @@
   function checkRuntimeStatus() {
     return {
       hasUnifiedAppInitializer: typeof window.UnifiedAppInitializer !== 'undefined',
-      hasPAGE_CONFIGS: typeof window.PAGE_CONFIGS !== 'undefined',
+      hasPageInitializationConfigs: typeof window.pageInitializationConfigs !== 'undefined',
       hasPACKAGE_MANIFEST: typeof window.PACKAGE_MANIFEST !== 'undefined',
       hasPreferencesCore: typeof window.PreferencesCore !== 'undefined',
       hasLazyLoader: typeof window.LazyLoader !== 'undefined',
@@ -141,7 +141,7 @@
 
       // Check for issues
       if (!configStatus.hasConfig) {
-        status.issues.push('❌ No configuration in PAGE_CONFIGS');
+        status.issues.push('❌ No configuration in pageInitializationConfigs');
       }
       
       if (!configStatus.hasPreferencesPackage) {
@@ -221,4 +221,3 @@
   }
 
 })();
-

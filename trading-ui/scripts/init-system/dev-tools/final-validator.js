@@ -108,7 +108,7 @@ class FinalValidator {
             }
             
             // Test if page configs are available
-            if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[pageName]) {
+            if (window.pageInitializationConfigs && window.pageInitializationConfigs[pageName]) {
                 score += 25;
             }
             

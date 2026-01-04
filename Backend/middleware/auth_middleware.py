@@ -22,7 +22,19 @@ def setup_auth_middleware(app):
         '/api/auth/login',
         '/api/auth/register',
         '/api/health',
+        '/api/health/detailed',  # Detailed health check for monitoring
         '/api/ai_analysis/templates',  # Templates are shared and public
+        '/api/trading-methods/',  # System catalog - trading methods
+        '/api/currencies/',  # System catalog - currencies
+        '/api/note-relation-types/',  # System catalog - note relation types
+        '/api/preferences/health',  # Preferences health check for monitoring
+        '/api/system/health',  # System health monitoring
+        '/api/cache/health',  # Cache health monitoring
+        '/api/cache/status',  # Cache status monitoring
+        '/api/cache/info',  # Cache info for debugging
+        '/api/server/status',  # Server status monitoring
+        # NOTE: /api/system/overview, /api/system/metrics, /api/system/info REMOVED from public
+        # These should require authentication as they contain sensitive admin data
     ]
 
     def _get_serializer():
@@ -35,7 +47,9 @@ def setup_auth_middleware(app):
     def load_user():
         print(f"MIDDLEWARE: Called for {request.method} {request.path}")
         # Skip authentication for public endpoints
-        if any(request.path.startswith(endpoint) for endpoint in PUBLIC_ENDPOINTS):
+        is_public = any(request.path.startswith(endpoint) for endpoint in PUBLIC_ENDPOINTS)
+        print(f"MIDDLEWARE: Is public endpoint? {is_public} for {request.path}")
+        if is_public:
             print(f"MIDDLEWARE: Skipping public endpoint {request.path}")
             return
 

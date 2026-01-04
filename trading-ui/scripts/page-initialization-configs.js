@@ -13,6 +13,8 @@
  * Last Updated: 2025-01-27
  */
 
+console.log('[PAGE-INIT] page-initialization-configs.js loaded');
+
 /**
  * Page Initialization Configurations - TikTrack
  * =============================================
@@ -178,8 +180,7 @@
 
 // ===== PAGE CONFIGURATIONS =====
 
-if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE === 'core-systems') {
-  const PAGE_CONFIGS = {
+const pageInitializationConfigs = {
     // Main Pages
     index: {
       name: 'Dashboard',
@@ -201,7 +202,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'services',
         'helper', // Required for LinkedItemsService
         'ui-advanced',
-        'modules', // Required for ModalManagerV2 (tag search drawer)
+        'modules', // Core UI modules (no modal dependencies per Option 1)
         'crud',
         'preferences',
         // 'entity-services', // Temporarily removed to fix script loading issues
@@ -216,7 +217,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'DataUtils',
@@ -235,7 +236,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.CRUDResponseHandler', // CRUD Response Handler
         'window.LinkedItemsService', // Linked Items System
@@ -259,9 +260,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         // Dashboard-specific initialization
         async pageConfig => {
-          window.Logger?.info?.('🔵🔵🔵 CUSTOM INITIALIZER STARTED for index page', { 
-            page: 'page-initialization-configs' 
+          window.Logger?.info?.('🔵🔵🔵 CUSTOM INITIALIZER STARTED for index page', {
+            page: 'page-initialization-configs'
           });
+
+          // ===== AUTH GUARD WITH RETRY LOGIC (Fix Pack 5 Phase 3) =====
+          await ensureAuthenticatedForPage('index');
+
           // window.Logger.info('📊 Initializing Dashboard...', { page: "page-initialization-configs" });
 
           // Load trading accounts data if needed for portfolio
@@ -432,14 +437,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
         'window.Logger',
-        'window.ModalManagerV2',
         'window.TagService',
         'window.TagUIManager',
         'window.TagManagementPage'
@@ -479,7 +483,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'core-ui', // Core UI systems loaded after header
         'services',
         'ui-advanced',
-        // REMOVED: 'modules' - Not needed for preferences page (no modals required)
         'crud',
         'preferences',
         'validation',
@@ -507,9 +510,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         // REMOVED: 'window.showEntityDetails' - Not needed for preferences page
         // REMOVED: 'window.PendingTradePlanWidget' - Not needed for preferences page
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-        // REMOVED: 'window.ModalManagerV2' - Not needed for preferences page
         // REMOVED: 'window.ConditionsSummaryRenderer' - Not needed for preferences page
       // ← NEW: מטאדאטה
       ],
@@ -526,6 +528,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
       // ← NEW: Default state for sections (when no cache exists)
       sectionsDefaultState: 'closed', // 'closed' | 'open'
+
+      customInitializers: [
+        async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('preferences');
+
+          // Preferences page initialization is handled by core-systems.js
+          // No additional initialization needed here
+        },
+      ],
     },
 
     'user-profile': {
@@ -551,15 +563,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
         'window.Logger',
-        'window.ModalManagerV2',
-        'window.ModalNavigationManager',
         'window.SelectPopulatorService',
         'window.DataCollectionService',
         'window.DefaultValueSetter',
@@ -588,8 +598,37 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          console.log('[page-init] User Profile customInitializer STARTED');
+          // region agent log - customInitializers entry
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              location: 'trading-ui/scripts/page-initialization-configs.js:customInitializers:user-profile',
+              message: 'User Profile customInitializers started',
+              data: {
+                hasAuthToken: !!window.authToken,
+                hasCurrentUser: !!window.currentUser,
+                currentUserId: window.currentUser?.id,
+                documentReadyState: document.readyState,
+                timestamp: Date.now()
+              },
+              sessionId: 'bootstrap_auth_debug',
+              runId: 'user_profile_redirect_fix',
+              hypothesisId: 'customInitializers_timing'
+            })
+          }).catch(() => {});
+          // endregion
+
           window.Logger?.info('👤 Initializing User Profile Page...', { page: 'page-initialization-configs' });
-          
+
+          // ===== AUTH GUARD WITH RETRY LOGIC (Option 1 compliance) =====
+          await ensureAuthenticatedForPage('user-profile');
+
+          // region agent log - after auth guard
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/page-initialization-configs.js:user-profile-customInitializer:after-auth',message:'auth guard passed, continuing initialization',data:{page:'user-profile',hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser},sessionId:'debug-session',runId:'user_profile_loop_fix',hypothesisId:'H1_multiple_calls',timestamp:Date.now()})}).catch(()=>{});
+          // endregion
+
           // Initialize User Profile Page
           if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
             await window.UserProfilePage.init();
@@ -626,15 +665,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
         'window.Logger',
-        'window.ModalManagerV2',
-        'window.ModalNavigationManager',
         'window.SelectPopulatorService',
         'window.DataCollectionService',
         'window.DefaultValueSetter',
@@ -718,8 +755,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.TradesData',
-        'window.ModalManagerV2',
-        'window.tradesModalConfig',
         'window.InvestmentCalculationService',
         'window.loadTradesData',
         'window.checkLinkedItemsBeforeAction',
@@ -732,7 +767,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.CRUDResponseHandler', // CRUD Response Handler
         'window.LinkedItemsService', // Linked Items System
@@ -755,6 +790,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD WITH RETRY LOGIC (Fix Pack 5 Phase 3) =====
+          await ensureAuthenticatedForPage('trades');
+
           window.Logger.info('📈 Initializing Trades...', { page: 'page-initialization-configs' });
 
           // Use the new unified initialization function
@@ -947,13 +985,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
         'window.Logger',
-        'window.ModalManagerV2',
         'window.initializeDataImportPage',
         'window.refreshDataImportHistory',
         'window.showImportUserDataNotification',
@@ -976,6 +1013,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async () => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('data_import');
+
           if (typeof window.initializeDataImportPage === 'function') {
             await window.initializeDataImportPage();
           }
@@ -1022,7 +1062,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.TradePlansData',  // Required for trade-plan-service.js
         'window.loadTradePlansData',
-        'window.ModalManagerV2',
         'window.tradePlansModalConfig',
         'window.alertsModalConfig',  // Required for editing alerts from linked items
         'window.notesModalConfig',   // Required for editing notes from linked items
@@ -1122,7 +1161,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'DataUtils',
         'window.loadAlertsData',
-        'window.ModalManagerV2',
         'window.alertsModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
@@ -1148,6 +1186,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('alerts');
+
           window.Logger.info('🔔 Initializing Alerts...', { page: 'page-initialization-configs' });
 
           if (typeof window.loadAlertsData === 'function') {
@@ -1217,7 +1258,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'DataUtils',
         'window.loadTradingAccountsDataForTradingAccountsPage',
-        'window.ModalManagerV2',
         'window.tradingAccountsModalConfig',
         'window.TagUIManager',
         'window.RichTextEditorService',
@@ -1226,7 +1266,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
       // ← NEW: מטאדאטה
       ],
@@ -1418,7 +1458,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem', // from base package
         'DataUtils', // from services package
         'window.loadCashFlowsData',
-        'window.ModalManagerV2',
         'window.cashFlowModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
@@ -1430,7 +1469,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
       ],
       description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
@@ -1496,12 +1535,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'ExternalDataService',
         'window.loadTickersData',
-        'window.ModalManagerV2',
         'window.tickersModalConfig',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
       // ← NEW: מטאדאטה
       ],
@@ -1555,7 +1593,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -1580,6 +1618,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('ticker-dashboard');
+
           window.Logger.info('📊 Initializing Ticker Dashboard...', { page: 'page-initialization-configs' });
 
           // Note: HeaderSystem is already initialized by core-systems.js in manualInitialization
@@ -1600,7 +1641,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
     // Alias for ticker_dashboard.html (underscore instead of hyphen)
-    // 'ticker_dashboard': PAGE_CONFIGS['ticker-dashboard'], // Moved to after PAGE_CONFIGS is defined
+    // 'ticker_dashboard': pageInitializationConfigs['ticker-dashboard'], // Moved to after pageInitializationConfigs is defined
 
     notes: {
       name: 'Notes',
@@ -1641,14 +1682,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.NotesData',
         'window.loadNotesData',
-        'window.ModalManagerV2',
         'window.notesModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
         'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.CRUDResponseHandler', // CRUD Response Handler
         'window.LinkedItemsService', // Linked Items System
@@ -1735,7 +1775,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -1746,8 +1786,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -1769,12 +1807,44 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('system-management');
+
           window.Logger.info('🔧 Initializing System Management...', {
             page: 'page-initialization-configs',
           });
 
-          if (typeof window.loadSystemInfo === 'function') {
-            await window.loadSystemInfo();
+          // Initialize SystemManagement class if available
+          if (typeof window.SystemManagement !== 'undefined') {
+            try {
+              // Wait a bit for DOM to be fully ready
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
+              // Check if instance already exists (from DOMContentLoaded)
+              if (!window.systemManagement) {
+                window.systemManagement = new window.SystemManagement();
+              }
+              
+              // Initialize if not already initialized
+              if (window.systemManagement && !window.systemManagement.isInitialized) {
+                window.systemManagement.init();
+                window.Logger.info('✅ SystemManagement initialized successfully', {
+                  page: 'page-initialization-configs',
+                });
+              } else if (window.systemManagement && window.systemManagement.isInitialized) {
+                window.Logger.info('✅ SystemManagement already initialized', {
+                  page: 'page-initialization-configs',
+                });
+              }
+            } catch (error) {
+              window.Logger.error('❌ Failed to initialize SystemManagement:', error, {
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger.warn('⚠️ SystemManagement class not found', {
+              page: 'page-initialization-configs',
+            });
           }
 
           // Initialize Unified Log System
@@ -1815,7 +1885,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -1826,7 +1896,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -1838,6 +1907,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('server-monitor');
+
           window.Logger.info('🔧 Initializing Server Monitor...', {
             page: 'page-initialization-configs',
           });
@@ -1883,7 +1955,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -1895,7 +1967,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DataCollectionService',
         'window.DefaultValueSetter',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PaginationSystem',
@@ -1968,7 +2039,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -1978,8 +2049,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -1995,6 +2064,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async () => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('notifications-center');
+
           window.Logger.info('📬 Initializing Notifications Center...', {
             page: 'page-initialization-configs',
           });
@@ -2016,7 +2088,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'crud', 'logs', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'window.IconSystem',
@@ -2046,10 +2118,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     trades_formatted: {
       name: 'Trades Formatted',
-      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
+      packages: ['base', 'auth', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'window.IconSystem',
@@ -2091,7 +2163,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     db_display: {
       name: 'Database Display',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'info-summary', 'init-system'],
+      packages: [],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: true,
@@ -2105,6 +2177,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('db_display');
+
           window.Logger.info('🗄️ Initializing Database Display...', {
             page: 'page-initialization-configs',
           });
@@ -2116,15 +2191,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
+    system_management: {
+      name: 'System Management',
+      packages: [],
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'DataUtils',
+      ],
+      customInitializers: [
+        async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('system_management');
+
+          window.Logger.info('⚙️ Initializing System Management...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },
+
     research: {
       name: 'Research',
       description: 'עמוד מחקר שוק - כלים, ניתוחים ונתונים מהירים',
       lastModified: '2025-11-13',
       pageType: 'research',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'conditions', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'conditions', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem',
         'window.IconSystem', 'DataUtils', 'window.initializeResearchPage',
@@ -2173,7 +2271,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2185,7 +2283,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -2200,6 +2297,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('background-tasks');
+
           window.Logger.info('⚙️ Initializing Background Tasks...', {
             page: 'page-initialization-configs',
           });
@@ -2215,7 +2315,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'dev-tools', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2234,7 +2334,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresValidation: false,
       requiresTables: false,
       customInitializers: [
-        function () {
+        async function () {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('init-system-management');
+
           window.Logger.info('🚀 Initializing Init System Management...', {
             page: 'page-initialization-configs',
           });
@@ -2246,10 +2349,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     // Cache Management
     'cache-management': {
       name: 'Cache Management',
-      packages: ['base', 'logs', 'cache', 'init-system'],
+      packages: ['base', 'logs', 'cache', 'modules', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2268,6 +2371,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('cache-management');
+
           window.Logger.info('🗄️ Initializing Cache Management...', {
             page: 'page-initialization-configs',
           });
@@ -2284,7 +2390,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2302,6 +2408,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('conditions-test');
+
           window.Logger.info('🧪 Initializing Conditions Test...', {
             page: 'page-initialization-configs',
           });
@@ -2318,7 +2427,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2411,13 +2520,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
         'window.Logger',
-        'window.ModalManagerV2',
         'window.FieldRendererService',
         'window.CRUDResponseHandler',
         'window.InfoSummarySystem',
@@ -2509,7 +2617,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer',
-        'window.PAGE_CONFIGS',
+        'window.pageInitializationConfigs',
         'window.PACKAGE_MANIFEST',
         'NotificationSystem',
         'window.IconSystem',
@@ -2569,7 +2677,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
    */
   window.getPageConfig = function (pageName) {
     return (
-      PAGE_CONFIGS[pageName] || {
+      pageInitializationConfigs[pageName] || {
         name: pageName,
         requiresFilters: false,
         requiresValidation: false,
@@ -2584,7 +2692,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
    * @returns {Object} All page configurations
    */
   window.getAllPageConfigs = function () {
-    return PAGE_CONFIGS;
+    return pageInitializationConfigs;
   };
 
   /**
@@ -2634,13 +2742,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
   // ===== ADDITIONAL PAGE CONFIGS =====
 
-  const ADDITIONAL_PAGE_CONFIGS = {
+  const additionalPageInitializationConfigs = {
     'code-quality-dashboard': {
       name: 'Code Quality Dashboard',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2653,6 +2761,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async () => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('code-quality-dashboard');
+
           window.Logger.info('📊 Initializing Code Quality Dashboard...', {
             page: 'page-initialization-configs',
           });
@@ -2685,7 +2796,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2736,7 +2847,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2750,8 +2861,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TableSortValueAdapter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -2805,7 +2914,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2817,8 +2926,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -2835,6 +2942,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('css-management');
+
           window.Logger.info('🎨 Initializing CSS Management...', {
             page: 'page-initialization-configs',
           });
@@ -2864,7 +2974,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2874,7 +2984,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -2893,6 +3002,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('dynamic-colors-display');
+
           window.Logger.info('🌈 Initializing Dynamic Colors Display...', {
             page: 'page-initialization-configs',
           });
@@ -2922,7 +3034,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2934,7 +3046,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -2981,7 +3092,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -2993,7 +3104,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DefaultValueSetter',
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -3022,10 +3132,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'tradingview-widgets-showcase': {
       name: 'TradingView Widgets Showcase',
-      packages: ['base', 'preferences', 'tradingview-widgets', 'init-system'],
+      packages: ['base', 'modules', 'preferences', 'tradingview-widgets', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -3056,12 +3166,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
-        'window.ModalManagerV2',
         'window.CRUDResponseHandler',
         'window.ColorSchemeSystem',
         'window.InfoSummarySystem',
@@ -3102,12 +3211,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
         'window.IconSystem',
-        'window.ModalManagerV2',
         'window.CRUDResponseHandler',
         'window.ColorSchemeSystem',
         'window.InfoSummarySystem',
@@ -3129,7 +3237,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'window.IconSystem'
@@ -3146,7 +3254,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'window.IconSystem'
@@ -3161,10 +3269,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     // Development Tools Pages
     'button-color-mapping': {
       name: 'Button Color Mapping',
-      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'window.IconSystem',
@@ -3182,7 +3290,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.ColorManager',
       ],
@@ -3198,7 +3306,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'conditions', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.AlertConditionRenderer',
       ],
@@ -3207,15 +3315,61 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info?.('🔵🔵🔵 CUSTOM INITIALIZER STARTED for conditions-modals page', {
+            page: 'page-initialization-configs'
+          });
+
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('conditions-modals');
+
+          window.Logger.info('🎯 Initializing Conditions Modals Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Initialize conditions management interface
+          if (typeof window.initializeConditionsManagement === 'function') {
+            try {
+              await window.initializeConditionsManagement();
+              window.Logger.info('✅ Conditions Management initialized successfully', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.error('❌ Failed to initialize Conditions Management:', error, {
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger.warn('⚠️ initializeConditionsManagement function not found', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Load conditions data if available
+          if (typeof window.loadConditionsData === 'function') {
+            try {
+              await window.loadConditionsData();
+              window.Logger.info('✅ Conditions data loaded successfully', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.error('❌ Failed to load conditions data:', error, {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
+        },
+      ],
     },
 
 
     'preferences-groups-management': {
       name: 'Preferences Groups Management',
-      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.PreferencesCore',
       ],
@@ -3232,7 +3386,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3248,7 +3402,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system', 'charts'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3264,7 +3418,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-widgets', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3280,7 +3434,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3296,7 +3450,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3312,7 +3466,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3328,7 +3482,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3344,7 +3498,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'tradingview-widgets', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3360,7 +3514,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3376,7 +3530,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3392,7 +3546,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
       ],
@@ -3429,7 +3583,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.WatchListsDataService',
         'window.WatchListsUIService',
         'window.WatchListsPage',
-        'window.ModalManagerV2',
         'window.HeaderSystem',
         'window.UnifiedTableSystem',
         'window.createActionsMenu', // Actions Menu System - required for actions menu
@@ -3483,7 +3636,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'NotificationSystem',
-        'window.ModalManagerV2',
         'window.WatchListModal',
         'window.DefaultValueSetter'
       ],
@@ -3519,7 +3671,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'NotificationSystem',
-        'window.ModalManagerV2',
         'window.AddTickerModal',
         'window.SelectPopulatorService',
         'window.tickersModalConfig' // Required for nested ticker addition modal
@@ -3592,7 +3743,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -3607,7 +3758,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.SelectPopulatorService',
         'window.DataCollectionService',
         'window.FieldRendererService',
-        'window.ModalManagerV2',
         'window.CRUDResponseHandler',
         'window.InfoSummarySystem', // Required for Info Summary tests
         'window.notesModalConfig' // Required for Save as Note feature
@@ -3680,7 +3830,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         'NotificationSystem',
@@ -3692,8 +3842,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.LinkedItemsService',
         'window.CRUDResponseHandler',
         'window.createActionsMenu',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
@@ -3708,6 +3856,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
       customInitializers: [
         async pageConfig => {
+          // ===== AUTH GUARD - Option1 compliance =====
+          await ensureAuthenticatedForPage('tradingview-test-page');
+
           window.Logger?.info('📊 Initializing TradingView Test Page...', {
             page: 'page-initialization-configs',
           });
@@ -3734,7 +3885,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.TikTrackAuth',
         'window.AuthGuard',
@@ -3835,7 +3986,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         "NotificationSystem",
         "window.IconSystem",
@@ -3915,7 +4066,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -3966,7 +4117,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4024,7 +4175,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         "NotificationSystem",
         "window.IconSystem",
@@ -4120,7 +4271,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4174,7 +4325,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer',
-        'window.PAGE_CONFIGS',
+        'window.pageInitializationConfigs',
         'window.PACKAGE_MANIFEST',
         "NotificationSystem",
         "window.IconSystem",
@@ -4244,7 +4395,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4295,7 +4446,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4345,7 +4496,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4395,7 +4546,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
+        'window.pageInitializationConfigs', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 
         "NotificationSystem",
@@ -4444,10 +4595,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   // ===== GLOBAL EXPORT =====
 
   // Merge additional configs
-  Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
+  Object.assign(pageInitializationConfigs, additionalPageInitializationConfigs);
 
   const CACHE_CONTROL_GLOBAL = 'window.CacheControlMenu';
-  Object.values(PAGE_CONFIGS).forEach(config => {
+  Object.values(pageInitializationConfigs).forEach(config => {
     if (Array.isArray(config.requiredGlobals)) {
       if (!config.requiredGlobals.includes(CACHE_CONTROL_GLOBAL)) {
         config.requiredGlobals.push(CACHE_CONTROL_GLOBAL);
@@ -4457,43 +4608,37 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     }
   });
 
-  window.PAGE_CONFIGS = PAGE_CONFIGS;
-  window.PAGE_CONFIGS.__SOURCE = 'page-initialization-configs';
-  window.pageInitializationConfigs = PAGE_CONFIGS;
-  // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
-  window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
-  
-  // CRITICAL: Add aliases AFTER PAGE_CONFIGS is fully defined to avoid "Cannot access before initialization" error
+  // CRITICAL: Add aliases AFTER pageInitializationConfigs is fully defined to avoid "Cannot access before initialization" error
   // Alias for ai_analysis.html (underscore instead of hyphen)
-  if (PAGE_CONFIGS['ai-analysis']) {
-    PAGE_CONFIGS['ai_analysis'] = PAGE_CONFIGS['ai-analysis'];
+  if (pageInitializationConfigs['ai-analysis']) {
+    pageInitializationConfigs['ai_analysis'] = pageInitializationConfigs['ai-analysis'];
   }
   // Alias for user_profile.html (underscore instead of hyphen)
-  if (PAGE_CONFIGS['user-profile']) {
-    PAGE_CONFIGS['user_profile'] = PAGE_CONFIGS['user-profile'];
+  if (pageInitializationConfigs['user-profile']) {
+    pageInitializationConfigs['user_profile'] = pageInitializationConfigs['user-profile'];
   }
   // Alias for user_management.html (underscore instead of hyphen)
-  if (PAGE_CONFIGS['user-management']) {
-    PAGE_CONFIGS['user_management'] = PAGE_CONFIGS['user-management'];
+  if (pageInitializationConfigs['user-management']) {
+    pageInitializationConfigs['user_management'] = pageInitializationConfigs['user-management'];
   }
   // Alias for ticker_dashboard.html (underscore instead of hyphen)
-  if (PAGE_CONFIGS['ticker-dashboard']) {
-    PAGE_CONFIGS['ticker_dashboard'] = PAGE_CONFIGS['ticker-dashboard'];
+  if (pageInitializationConfigs['ticker-dashboard']) {
+    pageInitializationConfigs['ticker_dashboard'] = pageInitializationConfigs['ticker-dashboard'];
   }
 
-// #endregion
+// endregion
 
 // ================================================================================================
 // ===== DEV TOOLS PAGE CONFIGURATION =====
 // ================================================================================================
 
-if (!PAGE_CONFIGS['dev_tools']) {
-  PAGE_CONFIGS['dev_tools'] = {
+if (!pageInitializationConfigs['dev_tools']) {
+  pageInitializationConfigs['dev_tools'] = {
     name: 'Development Tools',
     packages: ['base', 'header', 'services', 'crud', 'preferences', 'dev-tools', 'init-system'],
     requiredGlobals: [
       'window.UnifiedAppInitializer', // Unified Init System
-      'window.PAGE_CONFIGS', // Unified Init System
+      'window.pageInitializationConfigs', // Unified Init System
       'window.PACKAGE_MANIFEST', // Unified Init System
 
       'NotificationSystem',
@@ -4527,13 +4672,14 @@ if (!PAGE_CONFIGS['dev_tools']) {
 }
 
 // CRUD Testing Dashboard 2.0
-if (!PAGE_CONFIGS['crud_testing_dashboard']) {
-  PAGE_CONFIGS['crud_testing_dashboard'] = {
+console.log('[PAGE-INIT] Setting up crud_testing_dashboard config');
+if (!pageInitializationConfigs['crud_testing_dashboard']) {
+  pageInitializationConfigs['crud_testing_dashboard'] = {
     name: 'CRUD Testing Dashboard 2.0',
-    packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
+    packages: ['base', 'auth', 'services', 'ui-advanced', 'crud', 'init-system'],
     requiredGlobals: [
       'window.UnifiedAppInitializer', // Unified Init System
-      'window.PAGE_CONFIGS', // Unified Init System
+      'window.pageInitializationConfigs', // Unified Init System
       'window.PACKAGE_MANIFEST', // Unified Init System
 
       'NotificationSystem',
@@ -4572,6 +4718,9 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
     requiresTables: true,
     customInitializers: [
       async function () {
+        // ===== AUTH GUARD WITH RETRY LOGIC (Fix Pack 5 Phase 3) =====
+        await ensureAuthenticatedForPage('crud_testing_dashboard');
+
         window.Logger?.info('🧪 Initializing CRUD Testing Dashboard 2.0...', {
           page: 'crud_testing_dashboard',
           timestamp: new Date().toISOString()
@@ -4583,7 +4732,7 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
         }
 
         // Define global function for executions defaults test
-        // #region agent log
+        // region agent log
         window.runExecutionsDefaultsTest = async function() {
           try {
             console.log('DEBUG: runExecutionsDefaultsTest started - running ONLY for executions page', {
@@ -4646,7 +4795,7 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
         };
 
         // Define global function for cross-page testing by group (deprecated - use crud_testing_dashboard version)
-        // #region agent log
+        // region agent log
         window.runCrossPageTestForGroup_old = async function(groupType, testType, displayName) {
           console.log('🔍 DEBUG: runCrossPageTestForGroup called with:', groupType, testType, displayName);
 
@@ -5024,9 +5173,451 @@ if (!PAGE_CONFIGS['crud_testing_dashboard']) {
     ],
   };
 }
-} else {
-  // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
-  if (typeof PAGE_CONFIGS !== 'undefined') {
-    Object.assign(window.PAGE_CONFIGS, PAGE_CONFIGS);
+
+// ===== AUTH GUARD WITH RETRY LOGIC (Fix Pack 5 Phase 3) =====
+
+/**
+ * Ensure user is authenticated for page initialization
+ * Provides retry logic and testing environment support
+ * @param {string} pageName - Name of the page requiring authentication
+ */
+async function ensureAuthenticatedForPage(pageName) {
+  const MAX_AUTH_RETRIES = 3;
+  const AUTH_RETRY_DELAY = 1000; // 1 second
+
+  const startTime = Date.now();
+
+  // ===== HARD FAIL: Verify auth package is loaded for protected pages =====
+  // Task 0: Option1 Load-Order Discipline - Hard fail when auth package missing
+  if (!window.TikTrackAuth) {
+    const errorMsg = `[AUTH PACKAGE MISSING] Protected page '${pageName}' requires auth package but window.TikTrackAuth is not available. Auth package must be loaded before protected pages.`;
+    console.error(errorMsg);
+    window.Logger?.error(errorMsg, {
+      page: 'page-initialization-configs',
+      pageName: pageName,
+      hasTikTrackAuth: !!window.TikTrackAuth,
+      availableGlobals: Object.keys(window).filter(k => k.includes('Auth') || k.includes('auth'))
+    });
+
+    // Show critical error and prevent page loading
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת מערכת: חבילת האימות חסרה', 'error');
+    }
+
+    throw new Error(`Auth package missing for protected page: ${pageName}`);
   }
+
+  // region agent log - ensureAuthenticatedForPage entry
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:entry',message:`ensureAuthenticatedForPage called for ${pageName}`,data:{pageName:pageName,startTime:startTime,documentReadyState:document.readyState,locationHref:window.location.href,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken'),sessionUser:sessionStorage.getItem('currentUser'),authPackageVerified:!!window.TikTrackAuth},sessionId:'debug-session',runId:'user_profile_loop_fix',hypothesisId:'H1_multiple_calls',timestamp:Date.now()})}).catch(()=>{});
+  // endregion
+
+  console.log(`[page-init] 🔐 ensureAuthenticatedForPage called for: ${pageName}`);
+  window.Logger?.info(`🔐 Checking authentication for page: ${pageName}`, {
+    page: 'page-initialization-configs',
+    timestamp: new Date().toISOString()
+  });
+
+  // ===== WAIT FOR AUTH BOOTSTRAP COMPLETION =====
+  // Ensure auth bootstrap has completed before checking authentication
+  if (!window.authToken || !window.currentUser) {
+    // Wait for bootstrap to complete
+    let bootstrapWaitAttempts = 0;
+    while ((!window.authToken || !window.currentUser) && bootstrapWaitAttempts < 100) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+      bootstrapWaitAttempts++;
+
+      // Check if UnifiedCacheManager can provide the data
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        try {
+          const token = await window.UnifiedCacheManager.get('authToken', { layer: 'sessionStorage' });
+          const user = await window.UnifiedCacheManager.get('currentUser', { layer: 'sessionStorage' });
+          if (token) window.authToken = token;
+          if (user) window.currentUser = user;
+          window.Logger?.debug(`✅ Synced auth data from UnifiedCacheManager: token=${!!token}, user=${!!user}`, { page: 'page-initialization-configs' });
+          break;
+        } catch (e) {
+          window.Logger?.warn(`Failed to sync auth data: ${e.message}`, { page: 'page-initialization-configs' });
+        }
+      }
+    }
+
+    if (bootstrapWaitAttempts >= 100) {
+      window.Logger?.warn(`⚠️ Bootstrap wait timeout after ${bootstrapWaitAttempts} attempts`, { page: 'page-initialization-configs' });
+    } else {
+      window.Logger?.info(`✅ Bootstrap completed after ${bootstrapWaitAttempts} attempts`, { page: 'page-initialization-configs' });
+    }
+  }
+
+  // ===== DEBUG INSTRUMENTATION - FIX PACK 5 =====
+  // region agent log
+  if (typeof fetch !== 'undefined') {
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage',
+        message: `auth guard started for page: ${pageName}`,
+        data: {
+          page: pageName,
+          startTime: startTime,
+          isTestingEnv: window.AuthTesting?.isTestingEnvironment?.(),
+          hasAuthToken: !!window.authToken,
+          hasCurrentUser: !!window.currentUser,
+          currentUserId: window.currentUser?.id,
+          currentUserName: window.currentUser?.username
+        },
+        sessionId: 'fix_pack_5_test',
+        runId: 'auth_guard_verification',
+        hypothesisId: 'auth_guard_retry_logic'
+      })
+    }).catch(() => {});
+  }
+  // endregion agent log
+
+  for (let attempt = 1; attempt <= MAX_AUTH_RETRIES; attempt++) {
+    try {
+      // region agent log
+      if (typeof fetch !== 'undefined') {
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:retry_loop',
+            message: `auth check attempt ${attempt} for page: ${pageName}`,
+            data: {
+              page: pageName,
+              attempt: attempt,
+              hasAuthToken: !!window.authToken,
+              hasCurrentUser: !!window.currentUser,
+              tokenLength: window.authToken?.length,
+              userId: window.currentUser?.id
+            },
+            sessionId: 'fix_pack_5_test',
+            runId: 'auth_guard_verification',
+            hypothesisId: 'auth_guard_retry_logic'
+          })
+        }).catch(() => {});
+      }
+      // endregion agent log
+
+      // Check if already authenticated (bootstrap or previous check)
+      if (window.authToken && window.currentUser) {
+        // region agent log
+        if (typeof fetch !== 'undefined') {
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:already_authenticated',
+              message: `authentication already confirmed for ${pageName}`,
+              data: {
+                page: pageName,
+                attempt: attempt,
+                userId: window.currentUser.id,
+                username: window.currentUser.username
+              },
+              sessionId: 'fix_pack_5_test',
+              runId: 'auth_guard_verification',
+              hypothesisId: 'auth_guard_false_negative'
+            })
+          }).catch(() => {});
+        }
+        // endregion agent log
+
+        window.Logger?.info(`✅ Authentication confirmed for ${pageName} (attempt ${attempt})`, {
+          page: 'page-initialization-configs',
+          userId: window.currentUser.id,
+          username: window.currentUser.username
+        });
+        return;
+      }
+
+      // If bootstrap didn't set window.authToken/currentUser, try checkAuthentication() to verify with server
+      if (window.TikTrackAuth && typeof window.TikTrackAuth.checkAuthentication === 'function') {
+        try {
+          // region agent log - calling checkAuthentication
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:checkAuthentication',
+              message: `Calling checkAuthentication for ${pageName}`,
+              data: {
+                page: pageName,
+                attempt: attempt,
+                hasAuthToken: !!window.authToken,
+                hasCurrentUser: !!window.currentUser,
+                timestamp: Date.now()
+              },
+              sessionId: 'bootstrap_auth_debug',
+              runId: 'user_profile_redirect_fix',
+              hypothesisId: 'checkAuthentication_call'
+            })
+          }).catch(() => {});
+          // endregion
+
+          const authResult = await window.TikTrackAuth.checkAuthentication();
+          if (authResult && authResult.authenticated) {
+            // region agent log - checkAuthentication success
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:checkAuthentication_success',
+                message: `checkAuthentication succeeded for ${pageName}`,
+                data: {
+                  page: pageName,
+                  attempt: attempt,
+                  hasAuthToken: !!window.authToken,
+                  hasCurrentUser: !!window.currentUser,
+                  timestamp: Date.now()
+                },
+                sessionId: 'bootstrap_auth_debug',
+                runId: 'user_profile_redirect_fix',
+                hypothesisId: 'checkAuthentication_success'
+              })
+            }).catch(() => {});
+            // endregion
+
+            window.Logger?.info(`✅ Authentication confirmed via checkAuthentication for ${pageName} (attempt ${attempt})`, {
+              page: 'page-initialization-configs'
+            });
+            return;
+          }
+        } catch (error) {
+          window.Logger?.warn(`⚠️ checkAuthentication failed for ${pageName}:`, error, {
+            page: 'page-initialization-configs'
+          });
+        }
+      }
+
+      // No testing auto-login or bypass is allowed; authentication must be real.
+
+      // If no tokens available yet, wait for them (e.g., after login redirect)
+      if (!window.authToken && !window.currentUser && attempt === 1) {
+        // Wait for auth data to be available
+        window.Logger?.info(`⏳ [ensureAuthenticatedForPage] No auth tokens found, waiting for login completion...`, {
+          page: 'page-initialization-configs',
+          pageName: pageName
+        });
+
+        let waitAttempts = 0;
+        const maxWaitAttempts = 100; // Wait up to 5 seconds
+        while ((!window.authToken || !window.currentUser) && waitAttempts < maxWaitAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          waitAttempts++;
+
+          // Try to sync from sessionStorage if UnifiedCacheManager is available
+          if (window.UnifiedCacheManager?.initialized) {
+            try {
+              const token = await window.UnifiedCacheManager.get('authToken', { layer: 'sessionStorage' });
+              const user = await window.UnifiedCacheManager.get('currentUser', { layer: 'sessionStorage' });
+              if (token) window.authToken = token;
+              if (user) window.currentUser = user;
+            } catch (e) {
+              // Ignore sync errors
+            }
+          }
+        }
+
+        window.Logger?.info(`✅ [ensureAuthenticatedForPage] Auth wait completed after ${waitAttempts} attempts`, {
+          page: 'page-initialization-configs',
+          hasAuthToken: !!window.authToken,
+          hasCurrentUser: !!window.currentUser
+        });
+
+        // If we got the tokens, continue with the check
+        if (window.authToken && window.currentUser) {
+          continue;
+        }
+      }
+
+      // If we reach here, authentication failed
+      if (attempt === MAX_AUTH_RETRIES) {
+        // region agent log
+        if (typeof fetch !== 'undefined') {
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:final_failure',
+              message: `authentication failed after ${MAX_AUTH_RETRIES} attempts for ${pageName}`,
+              data: {
+                page: pageName,
+                maxRetries: MAX_AUTH_RETRIES,
+                isTestingEnv: window.AuthTesting?.isTestingEnvironment?.(),
+                hasShowErrorNotification: !!window.showErrorNotification
+              },
+              sessionId: 'fix_pack_5_test',
+              runId: 'auth_guard_verification',
+              hypothesisId: 'auth_guard_final_failure'
+            })
+          }).catch(() => {});
+        }
+        // endregion agent log
+
+        window.Logger?.error(`❌ Authentication failed for ${pageName} after ${MAX_AUTH_RETRIES} attempts`, {
+          page: 'page-initialization-configs'
+        });
+
+        // Show user-friendly error for non-testing environments
+        if (!window.AuthTesting?.isTestingEnvironment?.()) {
+          // region agent log
+          if (typeof fetch !== 'undefined') {
+            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:error_notification',
+                message: `showing error notification for ${pageName}`,
+                data: {
+                  page: pageName,
+                  hasShowErrorNotification: !!window.showErrorNotification
+                },
+                sessionId: 'fix_pack_5_test',
+                runId: 'auth_guard_verification',
+                hypothesisId: 'auth_guard_notification'
+              })
+            }).catch(() => {});
+          }
+          // endregion agent log
+
+          if (window.showErrorNotification) {
+            window.showErrorNotification(
+              'שגיאת התחברות',
+              'נדרשת התחברות למערכת. אנא התחבר ונסה שוב.'
+            );
+          }
+        }
+
+        // PRODUCTION: Always redirect to login page, never show modal
+        // TESTING: Show modal for automated testing
+        const isTestingEnvironment = window.AuthTesting?.isTestingEnvironment?.() ||
+                                   window.location.hostname === 'localhost' ||
+                                   window.location.hostname === '127.0.0.1' ||
+                                   window.location.search.includes('test_mode');
+
+        // REMOVE MODAL FLOW: Always redirect to login page in all environments
+        // region agent log - auth guard redirect verification
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage',
+            message: 'auth guard triggering redirect to login page',
+            data: {
+              pageName: pageName,
+              port: window.location.port,
+              hostname: window.location.hostname,
+              pathname: window.location.pathname,
+              isTestingEnvironment: isTestingEnvironment,
+              redirectUrl: '/login.html',
+              timestamp: Date.now(),
+              noModalFallback: true
+            },
+            sessionId: 'auth_flow_verification_8080',
+            runId: 'auth_redirect_verification',
+            hypothesisId: 'auth_guard_redirect_only'
+          })
+        }).catch(() => {});
+        // endregion
+
+        window.Logger?.info(`🔐 [page-initialization-configs] Authentication required, redirecting to login page for ${pageName}`, {
+          page: 'page-initialization-configs',
+          isTestingEnvironment
+        });
+
+        // region agent log - pre-redirect state
+        const preRedirectState = {
+          pageName: pageName,
+          attempt: attempt,
+          hasAuthToken: !!window.authToken,
+          hasCurrentUser: !!window.currentUser,
+          authTokenValue: window.authToken,
+          currentUserValue: window.currentUser,
+          isAuthenticated: window.TikTrackAuth?.isAuthenticated?.(),
+          sessionStorageAuthToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('authToken') : null,
+          sessionStorageCurrentUser: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('currentUser') : null,
+          documentReadyState: document.readyState,
+          windowLocation: window.location.href,
+          timestamp: Date.now()
+        };
+        
+        if (typeof fetch !== 'undefined') {
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              location: 'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:pre_redirect',
+              message: `PRE-REDIRECT STATE for ${pageName}`,
+              data: preRedirectState,
+              sessionId: 'bootstrap_auth_debug',
+              runId: 'user_profile_redirect_fix',
+              hypothesisId: 'pre_redirect_state'
+            })
+          }).catch(() => {});
+        }
+        // endregion
+
+        // Debug: Show confirm dialog before redirect to allow inspection
+        const shouldRedirect = confirm(
+          `🔐 Redirect to login?\n\n` +
+          `Page: ${pageName}\n` +
+          `Attempt: ${attempt}/${MAX_AUTH_RETRIES}\n` +
+          `window.authToken: ${!!window.authToken}\n` +
+          `window.currentUser: ${!!window.currentUser}\n` +
+          `isAuthenticated(): ${window.TikTrackAuth?.isAuthenticated?.()}\n` +
+          `sessionStorage.authToken: ${typeof sessionStorage !== 'undefined' ? !!sessionStorage.getItem('authToken') : 'N/A'}\n` +
+          `sessionStorage.currentUser: ${typeof sessionStorage !== 'undefined' ? !!sessionStorage.getItem('currentUser') : 'N/A'}\n\n` +
+          `Check console for full state object: window.preRedirectState`
+        );
+
+        // Store state in window for console inspection
+        window.preRedirectState = preRedirectState;
+
+        // region agent log - redirect decision
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/page-initialization-configs.js:ensureAuthenticatedForPage:redirect_decision',message:`Redirect decision for ${pageName}: ${shouldRedirect}`,data:{pageName:pageName,attempt:attempt,shouldRedirect:shouldRedirect,preRedirectState:preRedirectState},sessionId:'debug-session',runId:'user_profile_loop_fix',hypothesisId:'H2_redirect_loop',timestamp:Date.now()})}).catch(()=>{});
+        // endregion
+
+        if (!shouldRedirect) {
+          // User cancelled - don't redirect (for debugging)
+          return;
+        }
+
+        window.location.href = '/login.html';
+
+        // Don't throw error - we've handled it with modal/redirect
+        return;
+      }
+
+      // Wait before retry
+      window.Logger?.info(`⏳ Waiting before auth retry ${attempt + 1}/${MAX_AUTH_RETRIES} for ${pageName}`, {
+        page: 'page-initialization-configs'
+      });
+      await new Promise(resolve => setTimeout(resolve, AUTH_RETRY_DELAY));
+
+    } catch (error) {
+      window.Logger?.warn(`⚠️ Auth check error for ${pageName} (attempt ${attempt}): ${error.message}`, {
+        page: 'page-initialization-configs'
+      });
+
+      if (attempt === MAX_AUTH_RETRIES) {
+        throw error;
+      }
+    }
+  }
+}
+
+// Export pageInitializationConfigs for core-systems.js to find
+if (typeof window !== 'undefined') {
+  window.pageInitializationConfigs = pageInitializationConfigs;
+  // Alias watch list page keys for underscore/hyphen variants
+  if (pageInitializationConfigs['watch-list']) {
+    pageInitializationConfigs['watch-lists'] = pageInitializationConfigs['watch-list'];
+    pageInitializationConfigs['watch_lists'] = pageInitializationConfigs['watch-list'];
+  }
+  if (pageInitializationConfigs['init-system-management']) {
+    pageInitializationConfigs['init_system_management'] = pageInitializationConfigs['init-system-management'];
+  }
+  window.ensureAuthenticatedForPage = ensureAuthenticatedForPage;
 }

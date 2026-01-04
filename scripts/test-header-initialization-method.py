@@ -78,10 +78,7 @@ def create_test_report():
                     unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized || false
                 };
                 
-                // Send result to parent if in iframe
-                if (window.parent !== window) {
-                    window.parent.postMessage(result, '*');
-                } else {
+                // Always return result (no iframe support)
                     console.log('HEADER_INIT_RESULT:', JSON.stringify(result));
                 }
             }, 3000); // Wait 3 seconds for initialization

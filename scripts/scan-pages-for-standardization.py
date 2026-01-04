@@ -180,7 +180,7 @@ def generate_report(page_data):
 - **קובץ קונפיגורציה**: {"✅ כן" if page_data["modal_config_exists"] else "❌ לא"}
 
 ### ניהול מצב עמוד
-- **PAGE_CONFIGS**: {"✅ כן" if page_data["has_page_config"] else "❌ לא"}
+- **pageInitializationConfigs**: {"✅ כן" if page_data["has_page_config"] else "❌ לא"}
 - **טעינה אוטומטית**: {"✅ כן" if page_data["has_auto_loading"] else "❌ לא"}
 
 ### מערכת לוגים
@@ -211,7 +211,7 @@ def generate_report(page_data):
     if not page_data["has_auto_loading"]:
         issues.append("- ⚠️ אין טעינה אוטומטית של נתונים")
     if not page_data["has_page_config"]:
-        issues.append("- ⚠️ אין הגדרה ב-PAGE_CONFIGS")
+        issues.append("- ⚠️ אין הגדרה ב-pageInitializationConfigs")
     
     if issues:
         report += "\n".join(issues)
@@ -242,9 +242,9 @@ def generate_report(page_data):
     if page_data["inline_styles_count"] > 0:
         tasks.append("8. העברת כל הסטיילים לקובץ CSS חיצוני")
     if not page_data["has_auto_loading"]:
-        tasks.append("9. הוספת טעינה אוטומטית של נתונים ב-PAGE_CONFIGS.customInitializers")
+        tasks.append("9. הוספת טעינה אוטומטית של נתונים ב-pageInitializationConfigs.customInitializers")
     if not page_data["has_page_config"]:
-        tasks.append("10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא")
+        tasks.append("10. הוספת הגדרה ב-pageInitializationConfigs עם requiredGlobals מלא")
     
     if tasks:
         for i, task in enumerate(tasks, 1):

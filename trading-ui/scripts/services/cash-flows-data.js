@@ -225,14 +225,8 @@
         );
       }
       
-      // Try to show login modal
-      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        window.TikTrackAuth.showLoginModal(() => {
-          window.location.reload();
-        });
-      } else {
-        window.location.href = '/';
-      }
+      // Redirect to login page only (login modal removed)
+      window.location.href = '/login.html';
       
       throw new Error('Authentication required');
     }
@@ -669,5 +663,4 @@
 
   window.Logger?.info?.('✅ Cash Flows Data Service initialized', PAGE_LOG_CONTEXT);
 })();
-
 

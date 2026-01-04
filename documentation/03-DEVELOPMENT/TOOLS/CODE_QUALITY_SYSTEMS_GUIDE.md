@@ -1094,8 +1094,8 @@ Coverage:            60.19%
 ### **תיעוד נוסף**
 
 - [Tools Optimization Report](TOOLS_OPTIMIZATION_REPORT.md)
-- [Error Handling Guide](error-handling-guide.md)
-- [Developer Workflow Guide](developer-workflow-guide.md)
+- [Error Handling Guide](error_handling_guide.md)
+- [Developer Workflow Guide](developer_workflow_guide.md)
 
 ---
 

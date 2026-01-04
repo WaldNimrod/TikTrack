@@ -39,22 +39,22 @@ const PAGE_NAME_MAP = {
 const configPath = path.join(__dirname, '../trading-ui/scripts/page-initialization-configs.js');
 const configContent = fs.readFileSync(configPath, 'utf8');
 
-// Parse PAGE_CONFIGS - find the main object (before ADDITIONAL_PAGE_CONFIGS or closing brace)
-// Find the opening of PAGE_CONFIGS
-const pageConfigsStart = configContent.indexOf('const PAGE_CONFIGS = {');
+// Parse pageInitializationConfigs - find the main object (before additionalPageInitializationConfigs or closing brace)
+// Find the opening of pageInitializationConfigs
+const pageConfigsStart = configContent.indexOf('const pageInitializationConfigs = {');
 if (pageConfigsStart === -1) {
-    console.error('❌ Could not find PAGE_CONFIGS');
+    console.error('❌ Could not find pageInitializationConfigs');
     process.exit(1);
 }
 
-// Find where PAGE_CONFIGS ends (before ADDITIONAL_PAGE_CONFIGS or closing brace)
-const additionalStart = configContent.indexOf('const ADDITIONAL_PAGE_CONFIGS');
+// Find where pageInitializationConfigs ends (before additionalPageInitializationConfigs or closing brace)
+const additionalStart = configContent.indexOf('const additionalPageInitializationConfigs');
 let pageConfigsEnd;
 if (additionalStart !== -1) {
     // Find the closing brace before ADDITIONAL
     let braceCount = 0;
     let foundOpen = false;
-    for (let i = pageConfigsStart + 'const PAGE_CONFIGS = {'.length; i < additionalStart; i++) {
+    for (let i = pageConfigsStart + 'const pageInitializationConfigs = {'.length; i < additionalStart; i++) {
         if (configContent[i] === '{') {
             braceCount++;
             foundOpen = true;
@@ -71,7 +71,7 @@ if (additionalStart !== -1) {
     // No ADDITIONAL, find the closing brace
     let braceCount = 0;
     let foundOpen = false;
-    for (let i = pageConfigsStart + 'const PAGE_CONFIGS = {'.length; i < configContent.length; i++) {
+    for (let i = pageConfigsStart + 'const pageInitializationConfigs = {'.length; i < configContent.length; i++) {
         if (configContent[i] === '{') {
             braceCount++;
             foundOpen = true;
@@ -86,10 +86,10 @@ if (additionalStart !== -1) {
     }
 }
 
-let pageConfigsText = configContent.substring(pageConfigsStart + 'const PAGE_CONFIGS = {'.length, pageConfigsEnd || configContent.length);
+let pageConfigsText = configContent.substring(pageConfigsStart + 'const pageInitializationConfigs = {'.length, pageConfigsEnd || configContent.length);
 
-// Also parse ADDITIONAL_PAGE_CONFIGS if exists
-const additionalMatch = configContent.match(/const ADDITIONAL_PAGE_CONFIGS = \{([\s\S]*?)\};/);
+// Also parse additionalPageInitializationConfigs if exists
+const additionalMatch = configContent.match(/const additionalPageInitializationConfigs = \{([\s\S]*?)\};/);
 if (additionalMatch) {
     pageConfigsText += ',' + additionalMatch[1];
 }
@@ -209,7 +209,7 @@ console.log(separator);
 USER_PAGES.forEach(pageName => {
     const page = pages[pageName];
     if (!page) {
-        console.log(`| ${pageName} | ${'⚠️ לא נמצא ב-PAGE_CONFIGS'.padEnd(120)} |`);
+        console.log(`| ${pageName} | ${'⚠️ לא נמצא ב-pageInitializationConfigs'.padEnd(120)} |`);
         return;
     }
     

@@ -84,7 +84,7 @@ def analyze_missing_patterns():
         report.append("- **סיבה:** מערכת אתחול מרכזית שצריכה להיות בכל עמוד\n")
         report.append("- **פתרון:** הוספת `init-system` package ו-3 globals:\n")
         report.append("  - `window.unifiedAppInitializer`\n")
-        report.append("  - `window.PAGE_CONFIGS`\n")
+        report.append("  - `window.pageInitializationConfigs`\n")
         report.append("  - `window.PACKAGE_MANIFEST`\n\n")
     
     # דפוס 2: Conditions System

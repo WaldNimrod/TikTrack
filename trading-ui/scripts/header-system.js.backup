@@ -36,6 +36,53 @@ if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
 
+// #region agent log - Header visual verification after full load
+window.addEventListener('load', function() {
+  // Wait 1 second after window.onload for any deferred initialization
+  setTimeout(() => {
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:window-load-verification',
+        message:'header_visual_verification_after_window_load',
+        data:{
+          timestamp: Date.now(),
+          page: window.location.pathname,
+          unifiedHeaderExists: !!document.getElementById('unified-header'),
+          unifiedHeaderVisible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false,
+          tiktrackHeaderExists: !!document.querySelector('.tiktrack-header'),
+          tiktrackHeaderVisible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false,
+          headerSystemReady: window.headerSystemReady,
+          headerSystemInstance: typeof window.headerSystem,
+          documentReadyState: document.readyState,
+          initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready'
+        },
+        sessionId:'header-visual-verification',
+        runId:'header-visual-verification-1',
+        hypothesisId:'header_visual_verification'
+      })
+    }).catch(()=>{});
+
+    // Additional Logger evidence for header state
+    window.Logger?.info?.('👁️ Header Visual Verification', {
+      page: 'header-system',
+      unifiedHeader: {
+        exists: !!document.getElementById('unified-header'),
+        visible: document.getElementById('unified-header') ? document.getElementById('unified-header').offsetWidth > 0 && document.getElementById('unified-header').offsetHeight > 0 : false
+      },
+      tiktrackHeader: {
+        exists: !!document.querySelector('.tiktrack-header'),
+        visible: document.querySelector('.tiktrack-header') ? document.querySelector('.tiktrack-header').offsetWidth > 0 && document.querySelector('.tiktrack-header').offsetHeight > 0 : false
+      },
+      headerSystemReady: window.headerSystemReady,
+      initMethod: window.headerSystemReady ? 'planned_initialization' : 'fallback_not_ready',
+      timestamp: new Date().toISOString()
+    });
+  }, 1000);
+});
+// #endregion
+
 // ===== FilterManager Class =====
 // Prevent duplicate declaration
 if (typeof window.FilterManager === 'undefined') {
@@ -1145,9 +1192,29 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    // #region agent log - header creation start
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:createHeader',
+        message:'HeaderSystem.createHeader() started',
+        data:{
+          existingHeader: !!document.getElementById('unified-header'),
+          bodyChildrenCount: document.body?.children?.length || 0,
+          documentReadyState: document.readyState,
+          runId:'init_loading_support',
+          hypothesisId:'header_dom_modification'
+        },
+        timestamp:Date.now(),
+        sessionId:'init-loading-debug'
+      })
+    }).catch(()=>{});
+    // #endregion
+
     // No dedicated auth pages; always render header
     const isAuthPage = false;
-    
+
     if (isAuthPage) {
       window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
       return;
@@ -1171,6 +1238,27 @@ class HeaderSystem {
     doc.body.childNodes.forEach(node => {
         existingHeader.appendChild(node.cloneNode(true));
     });
+
+    // #region agent log - header creation complete
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        location:'header-system.js:createHeader',
+        message:'HeaderSystem.createHeader() completed',
+        data:{
+          headerCreated: true,
+          headerElementCount: existingHeader?.children?.length || 0,
+          bodyChildrenCount: document.body?.children?.length || 0,
+          documentReadyState: document.readyState,
+          runId:'init_loading_support',
+          hypothesisId:'header_dom_modification'
+        },
+        timestamp:Date.now(),
+        sessionId:'init-loading-debug'
+      })
+    }).catch(()=>{});
+    // #endregion
   }
 
   /**
@@ -1310,10 +1398,10 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/strategy_analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1337,7 +1425,6 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/user_profile">👤 פרופיל משתמש</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/user_management">👥 ניהול משתמשים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
@@ -1356,50 +1443,50 @@ class HeaderSystem {
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
                           <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/comparative_analysis_page">📊 ניתוח השוואתי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/date_comparison_modal">📅 השוואת תאריכים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/economic_calendar_page">📆 לוח כלכלי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/emotional_tracking_widget">😊 תיעוד רגשי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/history_widget">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/price_history_page">💰 היסטוריית מחירים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/strategy_analysis_page">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tradingview_test_page">📈 גראפים TV</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions_modals">🧩 מודלי תנאים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧪 בדיקות תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
                             <li class="separator"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/add_ticker_modal">➕ הוספת טיקר</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/flag_quick_action">🚩 פעולה מהירה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/watch_list_modal">👁️ רשימת מעקב</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/watch_lists_page">📋 רשימות מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
                           </ul>
                         </li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/server_monitor">🖥️ ניטור שרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/background_tasks">⚙️ ניהול משימות רקע</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/notifications_center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/code_quality_dashboard">📊 איכות קוד ולינטר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/cache_management">💾 ניהול מטמון</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/init_system_management">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/conditions_test">🧩 בדיקות תנאים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/conditions-test">🧩 בדיקות תנאים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 מוניטור אילוצים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test_header_only">🧪 בדיקת ראש הדף</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/css_management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart_management">📊 ניהול גרפים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/dynamic_colors_display">🌈 תצוגת צבעים דינמית</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tradingview_test_page">📈 בדיקת TradingView</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tradingview_widgets_showcase">🎯 ווידג'טים TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 בדיקת TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item">
@@ -2022,132 +2109,189 @@ window.HeaderSystem = {
   initialize: function() {
     console.log('🎯 HeaderSystem.initialize() called');
 
-    // #region agent log
+    // #region agent log - header init start
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        location:'header-system.js:2022',
+        location:'header-system.js:2021',
         message:'HeaderSystem_initialize_start',
         data:{
+          timestamp: Date.now(),
+          documentReadyState: document.readyState,
           HeaderSystemClass: typeof window.HeaderSystemClass,
-          existingHeaderSystem: typeof window.headerSystem
+          existingHeaderSystem: typeof window.headerSystem,
+          isDOMContentLoaded: document.readyState === 'complete' || document.readyState === 'interactive'
         },
-        sessionId:'header-debug',
-        runId:'header-check-4',
-        hypothesisId:'header-system-init-failure'
+        sessionId:'init_loading_critical',
+        runId:'init_loading_critical',
+        hypothesisId:'header_domcontentloaded_guard'
       })
     }).catch(()=>{});
     // #endregion
 
-    window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
-      page: 'header-system',
-      timestamp: new Date().toISOString(),
-    });
+    // MINIMAL GUARD: Delay header initialization until DOMContentLoaded fully fires
+    // This prevents race conditions with color-scheme-system.js DOMContentLoaded handler
+    const initStartTime = performance.now();
+    console.log(`⏰ [TIMING] HeaderSystem.initialize() called at ${initStartTime.toFixed(2)}ms`);
 
-    try {
-      if (typeof window.HeaderSystemClass === 'function') {
-        if (!window.headerSystem) {
-          window.Logger?.info?.('🆕 HeaderSystem.initialize() - Creating new instance', {
-            page: 'header-system',
-          });
-          window.headerSystem = new window.HeaderSystemClass();
+    if (document.readyState === 'loading') {
+      console.log('⏳ [TIMING] HeaderSystem.initialize() - DOM still loading, delaying initialization...');
+      console.log(`📊 [BEFORE] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
 
-          // #region agent log
+      // #region agent log - header init delayed
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          location:'header-system.js:delay-guard',
+          message:'HeaderSystem_initialize_delayed',
+          data:{
+            timestamp: Date.now(),
+            initStartTime,
+            documentReadyState: document.readyState,
+            reason: 'DOM still loading - delaying to prevent race with color-scheme-system'
+          },
+          sessionId:'init_loading_critical',
+          runId:'init_loading_critical',
+          hypothesisId:'header_domcontentloaded_guard'
+        })
+      }).catch(()=>{});
+      // #endregion
+
+      return new Promise((resolve, reject) => {
+        document.addEventListener('DOMContentLoaded', async (event) => {
+          const domContentLoadedTime = performance.now();
+          const delayDuration = domContentLoadedTime - initStartTime;
+          console.log(`✅ [TIMING] HeaderSystem.initialize() - DOMContentLoaded fired at ${domContentLoadedTime.toFixed(2)}ms (delayed ${delayDuration.toFixed(2)}ms)`);
+          console.log(`📊 [AFTER] document.readyState: ${document.readyState}, headerSystemReady: ${window.headerSystemReady}`);
+
+          // #region agent log - header init proceeding after DOMContentLoaded
           fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
-              location:'header-system.js:2034',
-              message:'HeaderSystem_instance_created',
+              location:'header-system.js:proceed-after-domcontentloaded',
+              message:'HeaderSystem_initialize_proceeding_after_DOMContentLoaded',
               data:{
-                headerSystem: typeof window.headerSystem,
-                hasInitMethod: typeof window.headerSystem?.init
+                timestamp: Date.now(),
+                domContentLoadedTime,
+                delayDuration,
+                documentReadyState: document.readyState,
+                headerSystemReadyBefore: window.headerSystemReady
               },
-              sessionId:'header-debug',
-              runId:'header-check-4',
-              hypothesisId:'header-system-instance-created'
+              sessionId:'init_loading_critical',
+              runId:'init_loading_critical',
+              hypothesisId:'header_domcontentloaded_guard'
             })
           }).catch(()=>{});
           // #endregion
-        } else {
-          window.Logger?.info?.('♻️ HeaderSystem.initialize() - Reusing existing instance', {
-            page: 'header-system',
-            isInitialized: window.headerSystem.isInitialized,
-          });
-        }
 
-        console.log('🎯 HeaderSystem: About to call init()...');
-        window.headerSystem.init();
-        console.log('✅ HeaderSystem: init() completed');
-
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            location:'header-system.js:2042',
-            message:'HeaderSystem_init_called',
-            data:{
-              headerSystem: typeof window.headerSystem,
-              isInitialized: window.headerSystem?.isInitialized
-            },
-            sessionId:'header-debug',
-            runId:'header-check-4',
-            hypothesisId:'header-system-init-called'
-          })
-        }).catch(()=>{});
-        // #endregion
-
-        window.headerSystem.isInitialized = true;
-        window.headerSystemReady = true;
-        window.__headerSystemInitMethod = 'planned'; // Mark as initialized by PLANNED method
-
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            location:'header-system.js:2045',
-            message:'HeaderSystem_initialize_complete',
-            data:{
-              headerSystem: typeof window.headerSystem,
-              isInitialized: window.headerSystem?.isInitialized,
-              hasUnifiedHeader: !!document.getElementById('unified-header'),
-              tiktrackHeader: !!document.querySelector('.tiktrack-header'),
-              headerElements: document.querySelectorAll('[class*="header"]').length
-            },
-            sessionId:'header-debug',
-            runId:'header-fix-1',
-            hypothesisId:'header-render-verification'
-          })
-        }).catch(()=>{});
-        // #endregion
-
-        window.Logger?.info?.('✅ HeaderSystem.initialize() - SUCCESS', {
-          page: 'header-system',
-          hasUnifiedHeader: !!document.getElementById('unified-header'),
-          timestamp: new Date().toISOString(),
-        });
-
-        return true; // Return success
-      } else {
-        window.Logger?.error?.('❌ HeaderSystemClass not available', {
-          page: 'header-system',
-          HeaderSystemClass: typeof window.HeaderSystemClass,
-        });
-        return false; // Return failure
-      }
-    } catch (error) {
-      window.Logger?.error?.('❌ HeaderSystem.initialize() - FAILED', {
-        error: error.message,
-        stack: error.stack,
-        page: 'header-system',
+          try {
+            await           // Simplified synchronous initialization to avoid syntax issues
+          performHeaderInitialization();
+          const completionTime = performance.now();
+          console.log(`🎯 [TIMING] HeaderSystem.initialize() completed at ${completionTime.toFixed(2)}ms (total: ${(completionTime - initStartTime).toFixed(2)}ms)`);
+          resolve(true);
+          } catch (error) {
+            reject(error);
+          }
+        }, { once: true });
       });
-      console.error('❌ HeaderSystem.initialize() failed:', error);
-      return false; // Return failure
+    } else {
+      // DOM already loaded, proceed immediately
+      console.log(`✅ [TIMING] HeaderSystem.initialize() - DOM already loaded (${document.readyState}), proceeding immediately...`);
+      console.log(`📊 [IMMEDIATE] headerSystemReady: ${window.headerSystemReady}`);
+      return performHeaderInitialization();
     }
-  }
+
+    // Helper function to perform the actual initialization
+    async function performHeaderInitialization() {
+      window.Logger?.info?.('🚀 HeaderSystem.initialize() - START', {
+        page: 'header-system',
+        timestamp: new Date().toISOString(),
+        documentReadyState: document.readyState
+      });
+
+      try {
+        if (typeof window.HeaderSystemClass === 'function') {
+          if (!window.headerSystem) {
+            window.Logger?.info?.('🆕 HeaderSystem.initialize() - Creating new instance', {
+              page: 'header-system',
+            });
+            window.headerSystem = new window.HeaderSystemClass();
+          } else {
+            window.Logger?.info?.('♻️ HeaderSystem.initialize() - Reusing existing instance', {
+              page: 'header-system',
+              isInitialized: window.headerSystem.isInitialized,
+            });
+          }
+
+          window.headerSystem.init();
+          window.headerSystemReady = true;
+
+          // #region agent log - header init complete
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              location:'header-system.js:2041',
+              message:'HeaderSystem_initialize_complete',
+              data:{
+                timestamp: Date.now(),
+                headerSystem: typeof window.headerSystem,
+                isInitialized: window.headerSystem?.isInitialized,
+                hasUnifiedHeader: !!document.getElementById('unified-header'),
+                tiktrackHeader: !!document.querySelector('.tiktrack-header'),
+                headerElements: document.querySelectorAll('[class*="header"]').length,
+                documentReadyState: document.readyState
+              },
+              sessionId:'init_loading_critical',
+              runId:'init_loading_critical',
+              hypothesisId:'header-domcontentloaded-guard-success'
+            })
+          }).catch(()=>{});
+          // #endregion
+
+          window.Logger?.info?.('✅ HeaderSystem.initialize() - COMPLETE', {
+            page: 'header-system',
+            headerSystemReady: true,
+            documentReadyState: document.readyState
+          });
+          return true;
+        } else {
+          throw new Error('HeaderSystemClass not found');
+        }
+      } catch (error) {
+        // #region agent log - header init error
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            location:'header-system.js:error-handler',
+            message:'HeaderSystem_initialize_error',
+            data:{
+              timestamp: Date.now(),
+              error: error.message,
+              stack: error.stack?.substring(0, 500),
+              documentReadyState: document.readyState
+            },
+            sessionId:'init_loading_critical',
+            runId:'init_loading_critical',
+            hypothesisId:'header-domcontentloaded-guard-error'
+          })
+        }).catch(()=>{});
+        // #endregion
+
+        window.Logger?.error?.('❌ HeaderSystem.initialize() - ERROR', {
+          page: 'header-system',
+          error: error.message,
+          stack: error.stack,
+          documentReadyState: document.readyState
+        });
+        throw error;
+      }
+    }
 };
 
 // Expose filter system for compatibility
@@ -2160,145 +2304,18 @@ Object.defineProperty(window, 'filterSystem', {
 
 // Create initializeHeaderSystem wrapper for compatibility with core-systems.js
 window.initializeHeaderSystem = function() {
-  // Add re-entry guard to prevent recursive initialization
-  if (window.__headerInitInProgress) {
-    console.log('⚠️ initializeHeaderSystem: Already in progress, skipping');
-    return false;
-  }
-  window.__headerInitInProgress = true;
-
-  console.log('🎯 initializeHeaderSystem() called - START');
-
-  // #region agent log - header init start
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location:'header-system.js:2162',
-      message:'initializeHeaderSystem_START',
-      data:{
-        timestamp: Date.now(),
-        headerSystemExists: typeof window.headerSystem,
-        isInitialized: window.headerSystem?.isInitialized,
-        __headerInitInProgress: window.__headerInitInProgress
-      },
-      sessionId:'header-init-fix',
-      runId:'header-init-fix-1',
-      hypothesisId:'single-entry-point-verified'
-    })
-  }).catch(()=>{});
-  // #endregion
-
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location:'header-system.js:2157',
-      message:'initializeHeaderSystem_called',
-      data:{
-        HeaderSystem: typeof window.HeaderSystem,
-        HeaderSystemInitialize: typeof window.HeaderSystem?.initialize,
-        __headerInitInProgress: window.__headerInitInProgress
-      },
-      sessionId:'header-debug',
-      runId:'header-fix-1',
-      hypothesisId:'reentry-guard-added'
-    })
-  }).catch(()=>{});
-  // #endregion
-
   window.Logger?.info?.('🔧 initializeHeaderSystem() wrapper called', {
     page: 'header-system',
     HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
   });
-
-  console.log('🎯 initializeHeaderSystem: checking HeaderSystem...', {
-    HeaderSystem: typeof window.HeaderSystem,
-    HeaderSystemInitialize: typeof window.HeaderSystem?.initialize
-  });
-
-  try {
-    if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-      console.log('✅ initializeHeaderSystem: calling HeaderSystem.initialize()');
-      const result = window.HeaderSystem.initialize();
-      window.__headerInitInProgress = false; // Clear guard on success
-
-      // #region agent log - header init complete
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          location:'header-system.js:2204',
-          message:'initializeHeaderSystem_COMPLETE',
-          data:{
-            timestamp: Date.now(),
-            result: result,
-            headerSystemExists: typeof window.headerSystem,
-            isInitialized: window.headerSystem?.isInitialized,
-            __headerInitInProgress: window.__headerInitInProgress
-          },
-          sessionId:'header-init-fix',
-          runId:'header-init-fix-1',
-          hypothesisId:'single-entry-point-verified'
-        })
-      }).catch(()=>{});
-      // #endregion
-
-      return result;
-    } else {
-      console.log('❌ initializeHeaderSystem: HeaderSystem.initialize not available');
-      window.Logger?.error?.('❌ HeaderSystem.initialize not available', {
-        page: 'header-system',
-      });
-      window.__headerInitInProgress = false; // Clear guard on failure
-
-      // #region agent log - header init failed
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          location:'header-system.js:2208',
-          message:'initializeHeaderSystem_FAILED',
-          data:{
-            timestamp: Date.now(),
-            reason: 'HeaderSystem.initialize not available',
-            headerSystemExists: typeof window.HeaderSystem,
-            __headerInitInProgress: window.__headerInitInProgress
-          },
-          sessionId:'header-init-fix',
-          runId:'header-init-fix-1',
-          hypothesisId:'single-entry-point-verified'
-        })
-      }).catch(()=>{});
-      // #endregion
-
-      return false;
-    }
-  } catch (error) {
-    console.error('❌ initializeHeaderSystem: Exception occurred:', error);
-    window.__headerInitInProgress = false; // Clear guard on exception
-
-    // #region agent log - header init error
-    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        location:'header-system.js:2216',
-        message:'initializeHeaderSystem_ERROR',
-        data:{
-          timestamp: Date.now(),
-          error: error.message,
-          __headerInitInProgress: window.__headerInitInProgress
-        },
-        sessionId:'header-init-fix',
-        runId:'header-init-fix-1',
-        hypothesisId:'single-entry-point-verified'
-      })
-    }).catch(()=>{});
-    // #endregion
-
-    throw error;
+  
+  if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+    return window.HeaderSystem.initialize();
+  } else {
+    window.Logger?.error?.('❌ HeaderSystem.initialize not available', {
+      page: 'header-system',
+    });
+    return false;
   }
 };
 
@@ -2316,10 +2333,7 @@ if (window.Logger) {
   window.Logger.debug('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
 
-// ===== SINGLE INITIALIZATION ENTRY POINT =====
-// Header initialization is now handled exclusively by UnifiedAppInitializer
-// Removed auto-fallback to prevent duplicate initialization calls
-
 // Export HeaderSystem to global scope for package validation
-window.HeaderSystem = HeaderSystem;
+// Keep existing HeaderSystem object and also export the class for validation
+window.HeaderSystemClass = HeaderSystem;
 

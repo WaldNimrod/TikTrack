@@ -99,7 +99,7 @@
                 log(`⚠️ UnifiedTableSystem (${globalCheck}) not available after ${timeoutMs}ms - checking package load order`);
                 
                 // Check if crud package is supposed to be loaded
-                const pageConfig = window.PAGE_CONFIGS?.['dev_tools'] || window.pageInitializationConfigs?.['dev_tools'];
+                const pageConfig = window.pageInitializationConfigs?.['dev_tools'] || window.pageInitializationConfigs?.['dev_tools'];
                 const hasCrudPackage = pageConfig?.packages?.includes('crud');
                 
                 if (hasCrudPackage) {

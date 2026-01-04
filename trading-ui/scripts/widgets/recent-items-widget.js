@@ -906,10 +906,17 @@
         ...config
       };
 
-      window.Logger?.info?.('RecentItemsWidget: Initializing...', { 
-        containerId, 
+      // Check authentication status for graceful degradation
+      if (!window.GracefulDegradation?.requireAuth(containerId, 'פעילות אחרונה')) {
+        state.initialized = true;
+        state._initializing = false;
+        return;
+      }
+
+      window.Logger?.info?.('RecentItemsWidget: Initializing...', {
+        containerId,
         config: state.config,
-        page: 'recent-items-widget' 
+        page: 'recent-items-widget'
       });
 
       if (!cacheElements()) {
@@ -1001,6 +1008,11 @@
 
       if (!state.initialized) {
         window.Logger?.warn?.('RecentItemsWidget: Failed to initialize, cannot render', { page: 'recent-items-widget' });
+        return;
+      }
+
+      // Check authentication status - if user logged out after initialization, show login message
+      if (!window.GracefulDegradation?.requireAuth(CONTAINER_ID, 'פעילות אחרונה')) {
         return;
       }
 

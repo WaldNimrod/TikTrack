@@ -143,8 +143,8 @@ function loadConfigsWorking() {
   const vm = require('vm');
   const context = { 
     window: {}, 
-    PAGE_CONFIGS: {}, 
-    ADDITIONAL_PAGE_CONFIGS: {},
+    pageInitializationConfigs: {}, 
+    additionalPageInitializationConfigs: {},
     Object: Object,
     module: {}, 
     exports: {}, 
@@ -155,16 +155,16 @@ function loadConfigsWorking() {
   };
   vm.createContext(context);
   vm.runInContext(configsContent, context);
-  // Merge ADDITIONAL_PAGE_CONFIGS into PAGE_CONFIGS if needed
-  let PAGE_CONFIGS = context.window.PAGE_CONFIGS || context.PAGE_CONFIGS || {};
-  if (context.ADDITIONAL_PAGE_CONFIGS && Object.keys(context.ADDITIONAL_PAGE_CONFIGS).length > 0) {
-    PAGE_CONFIGS = { ...PAGE_CONFIGS, ...context.ADDITIONAL_PAGE_CONFIGS };
+  // Merge additionalPageInitializationConfigs into pageInitializationConfigs if needed
+  let pageInitializationConfigs = context.window.pageInitializationConfigs || context.pageInitializationConfigs || {};
+  if (context.additionalPageInitializationConfigs && Object.keys(context.additionalPageInitializationConfigs).length > 0) {
+    pageInitializationConfigs = { ...pageInitializationConfigs, ...context.additionalPageInitializationConfigs };
   }
   // Also check if Object.assign was used
-  if (context.window && context.window.PAGE_CONFIGS) {
-    PAGE_CONFIGS = context.window.PAGE_CONFIGS;
+  if (context.window && context.window.pageInitializationConfigs) {
+    pageInitializationConfigs = context.window.pageInitializationConfigs;
   }
-  return PAGE_CONFIGS;
+  return pageInitializationConfigs;
 }
 
 // Main

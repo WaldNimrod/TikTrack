@@ -486,7 +486,7 @@ if (existing) {
 - [Event Handler Debugging Guide](../../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md)
 - [General Systems List](../../frontend/GENERAL_SYSTEMS_LIST.md)
 - [Logger Service](../../02-ARCHITECTURE/FRONTEND/LOGGER_SERVICE.md)
-- [Button System](../../frontend/button-system.md)
+- [Button System](../../frontend/button_system.md)
 
 ## Version History
 

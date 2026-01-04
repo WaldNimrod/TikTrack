@@ -487,8 +487,8 @@ async function testLevel_Full() {
         window.Logger?.info('  📌 Preferences orphans: 4 created');
         
         // Orphan Category 3: Auth (2 keys) - CRITICAL!
-        localStorage.setItem('authToken', 'test-auth-1');
-        localStorage.setItem('currentUser', 'test-auth-2');
+        sessionStorage.setItem('authToken', 'test-auth-1');
+        sessionStorage.setItem('currentUser', 'test-auth-2'); // Option 1
         window.Logger?.info('  📌 Auth orphans: 2 created');
         
         // Orphan Category 4: Testing (4 keys)

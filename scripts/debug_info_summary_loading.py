@@ -109,8 +109,8 @@ def debug_info_summary_loading(driver):
 
     # Check page configuration
     page_config = driver.execute_script("""
-        if (window.PAGE_CONFIGS && window.PAGE_CONFIGS['portfolio-state']) {
-            const config = window.PAGE_CONFIGS['portfolio-state'];
+        if (window.pageInitializationConfigs && window.pageInitializationConfigs['portfolio-state']) {
+            const config = window.pageInitializationConfigs['portfolio-state'];
             return {
                 packages: config.packages || [],
                 hasInfoSummary: config.packages ? config.packages.includes('info-summary') : false,

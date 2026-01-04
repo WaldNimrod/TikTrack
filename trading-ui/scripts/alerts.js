@@ -75,6 +75,24 @@
  * 
  * ==========================================
  */
+
+/* ===== DEBUG INSTRUMENTATION - FIX PACK 3 ===== */
+// region agent log
+if (typeof fetch !== 'undefined') {
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      location: 'trading-ui/scripts/alerts.js:1',
+      message: 'alerts script loaded - bundle optimization test',
+      data: { page: 'alerts', script_count: 9, optimization: 'bundle_loading', timestamp: Date.now() },
+      sessionId: 'fix_pack_3_test',
+      runId: 'alerts_timeout_fix',
+      hypothesisId: 'script_overload_timeout'
+    })
+  }).catch(() => {});
+}
+// endregion agent log
 /**
  * Alerts Page - Comprehensive Function Index
  * ==========================================
@@ -157,7 +175,7 @@ async function loadAlertsDataInternal(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -3044,7 +3062,7 @@ async function confirmDeleteAlert(alertId) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -3861,7 +3879,7 @@ async function loadTradePlansForConditions() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -3920,7 +3938,7 @@ async function loadTradesForConditions() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -3997,7 +4015,7 @@ async function loadConditionsFromItem() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -4264,7 +4282,7 @@ async function refreshConditionEvaluations() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }
@@ -4449,7 +4467,7 @@ async function loadAlertTickerInfo(tickerId) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
-      token = localStorage.getItem('authToken'); // fallback
+      token = sessionStorage.getItem('authToken'); // bootstrap key fallback (Option 1)
     }
     const headers = { 'Content-Type': 'application/json' };
     if (token) { headers['Authorization'] = `Bearer ${token}`; }

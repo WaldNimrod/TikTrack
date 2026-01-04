@@ -23,7 +23,7 @@ if (window.Logger) {
   window.Logger.debug('🔍 Loading Load Order Validator...', { page: 'load-order-validator' });
 }
 
-// #region agent log - H1: Global error detection for script loading blocks
+// region agent log - H1: Global error detection for script loading blocks
 window.addEventListener('error', function(event) {
   fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     method:'POST',
@@ -46,9 +46,9 @@ window.addEventListener('error', function(event) {
     })
   }).catch(()=>{});
 });
-// #endregion
+// endregion
 
-// #region agent log - H4: Browser cache state detection
+// region agent log - H4: Browser cache state detection
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
   method:'POST',
   headers:{'Content-Type':'application/json'},
@@ -67,12 +67,12 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     hypothesisId:'H4'
   })
 }).catch(()=>{});
-// #endregion
+// endregion
 
 /**
  * Load Order Validator Class
  */
-// #region agent log - LoadOrderValidator loaded
+// region agent log - LoadOrderValidator loaded
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
   method:'POST',
   headers:{'Content-Type':'application/json'},
@@ -88,7 +88,7 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     hypothesisId:'load-order-validator-loading'
   })
 }).catch(()=>{});
-// #endregion
+// endregion
 
 class LoadOrderValidator {
     constructor() {
@@ -113,8 +113,8 @@ class LoadOrderValidator {
         this.manifest = window.PACKAGE_MANIFEST;
 
         // Get page config
-        if (typeof window.PAGE_CONFIGS !== 'undefined' && window.PAGE_CONFIGS[pageName]) {
-            this.pageConfig = window.PAGE_CONFIGS[pageName];
+        if (typeof window.pageInitializationConfigs !== 'undefined' && window.pageInitializationConfigs[pageName]) {
+            this.pageConfig = window.pageInitializationConfigs[pageName];
         } else if (typeof window.pageInitializationConfigs !== 'undefined' && window.pageInitializationConfigs[pageName]) {
             this.pageConfig = window.pageInitializationConfigs[pageName];
         } else {
@@ -148,7 +148,7 @@ class LoadOrderValidator {
             return normalized.toLowerCase();
         };
 
-        // #region agent log - H1: Script loading blocked by errors
+        // region agent log - H1: Script loading blocked by errors
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -166,13 +166,13 @@ class LoadOrderValidator {
             hypothesisId:'H1'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         const scripts = Array.from(document.querySelectorAll('script[src]'))
             .map((script, index) => {
                 const src = script.src;
 
-                // #region agent log - H3: Script timing registration
+                // region agent log - H3: Script timing registration
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                   method:'POST',
                   headers:{'Content-Type':'application/json'},
@@ -191,7 +191,7 @@ class LoadOrderValidator {
                     hypothesisId:'H3'
                   })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 // Normalize path for comparison
                 const normalized = normalizePath(src);
@@ -219,7 +219,7 @@ class LoadOrderValidator {
             })
             .filter(Boolean);
 
-        // #region agent log - H5: Script source URL validation
+        // region agent log - H5: Script source URL validation
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -237,7 +237,7 @@ class LoadOrderValidator {
             hypothesisId:'H5'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         this.actualLoadOrder = scripts;
         return scripts;
@@ -322,7 +322,7 @@ class LoadOrderValidator {
      * Compare actual vs expected load order
      */
     compareLoadOrder() {
-        // #region agent log - H2: Load order comparison start
+        // region agent log - H2: Load order comparison start
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -340,7 +340,7 @@ class LoadOrderValidator {
             hypothesisId:'H2'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         this.mismatches = [];
 
@@ -443,7 +443,7 @@ class LoadOrderValidator {
      * Validate load order for a page
      */
     validate(pageName) {
-        // #region agent log - H2: Loading order validation start
+        // region agent log - H2: Loading order validation start
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -460,10 +460,10 @@ class LoadOrderValidator {
             hypothesisId:'H2'
           })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         if (!this.init(pageName)) {
-            // #region agent log - H2: Init failed
+            // region agent log - H2: Init failed
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
               method:'POST',
               headers:{'Content-Type':'application/json'},
@@ -479,7 +479,7 @@ class LoadOrderValidator {
                 hypothesisId:'H2'
               })
             }).catch(()=>{});
-            // #endregion
+            // endregion
             return null;
         }
 
@@ -651,7 +651,7 @@ if (window.Logger) {
   window.Logger.debug('✅ Load Order Validator loaded successfully', { page: 'load-order-validator' });
 }
 
-// #region agent log - LoadOrderValidator fully loaded
+// region agent log - LoadOrderValidator fully loaded
 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
   method:'POST',
   headers:{'Content-Type':'application/json'},
@@ -669,4 +669,4 @@ fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
     hypothesisId:'load-order-validator-loading'
   })
 }).catch(()=>{});
-// #endregion
+// endregion

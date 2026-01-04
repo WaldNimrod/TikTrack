@@ -29,14 +29,14 @@
         await window.UnifiedCacheManager.remove('authToken');
       } catch (e) {
         console.warn('Error clearing auth cache:', e);
-        // Fallback to localStorage
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('authToken');
+        // Fallback to sessionStorage bootstrap keys (Option 1 - no localStorage)
+        sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('authToken');
       }
     } else {
-      // Fallback to localStorage if UnifiedCacheManager not available
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
+      // Fallback to sessionStorage bootstrap keys if UnifiedCacheManager not available (Option 1)
+      sessionStorage.removeItem('currentUser');
+      sessionStorage.removeItem('authToken');
     }
     
     // Show error notification
@@ -48,16 +48,8 @@
       );
     }
     
-    // Try to show login modal
-    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-      window.TikTrackAuth.showLoginModal(() => {
-        // On successful login, reload the page
-        window.location.reload();
-      });
-    } else {
-      // Fallback: redirect to homepage (login modal lives there)
-      window.location.href = '/';
-    }
+    // Redirect to login page only (login modal removed)
+    window.location.href = '/login.html';
   }
 
   /**

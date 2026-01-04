@@ -20,7 +20,7 @@ DOCS_DIR = PROJECT_ROOT / 'documentation' / '05-REPORTS'
 # מערכות לבדיקה עם globals שלהן
 REQUIRED_SYSTEMS = {
     'Unified Init System': {
-        'globals': ['window.unifiedAppInitializer', 'window.PAGE_CONFIGS', 'window.PACKAGE_MANIFEST'],
+        'globals': ['window.unifiedAppInitializer', 'window.pageInitializationConfigs', 'window.PACKAGE_MANIFEST'],
         'package': 'init-system'
     },
     'Section Toggle System': {

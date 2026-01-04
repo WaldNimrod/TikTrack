@@ -5,6 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דשבורד בדיקות CRUD 2.0 - TikTrack</title>
 
+    <!-- Instrumentation for load chain verification -->
+    <script>
+        (function() {
+            // Track init sequence start
+            window.initSequenceStart = Date.now();
+            window.pageLoadEvents = [];
+
+            function logInitEvent(event, data) {
+                window.pageLoadEvents.push({
+                    event: event,
+                    timestamp: Date.now(),
+                    data: data
+                });
+
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'crud_testing_dashboard.html:page-init-tracker',
+                        message:'page_init_event_' + event,
+                        data:{
+                            page: 'crud_testing_dashboard',
+                            event: event,
+                            timestamp: Date.now(),
+                            sequenceStart: window.initSequenceStart,
+                            timeFromStart: Date.now() - window.initSequenceStart,
+                            documentReadyState: document.readyState,
+                            ...data
+                        },
+                        sessionId:'task_1_init_loading_full_78_pages',
+                        runId:'task_1_init_loading_full_78_pages_run_1',
+                        hypothesisId:'page_init_sequence_tracking'
+                    })
+                }).catch(()=>{});
+            }
+
+            // Track DOM events
+            document.addEventListener('DOMContentLoaded', function() {
+                logInitEvent('dom_content_loaded', {
+                    scriptsLoaded: document.scripts.length,
+                    imagesLoaded: document.images.length
+                });
+            });
+
+            window.addEventListener('load', function() {
+                logInitEvent('window_load', {
+                    totalLoadTime: Date.now() - window.initSequenceStart,
+                    allScriptsComplete: Array.from(document.scripts).every(s => s.complete)
+                });
+            });
+
+            // Track script load events
+            let scriptLoadCount = 0;
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.tagName === 'SCRIPT') {
+                            scriptLoadCount++;
+                            logInitEvent('script_added', {
+                                scriptCount: scriptLoadCount,
+                                src: node.src || 'inline',
+                                defer: node.defer,
+                                async: node.async
+                            });
+                        }
+                    });
+                });
+            });
+            observer.observe(document.head, { childList: true, subtree: true });
+
+            logInitEvent('page_init_start', {
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            });
+        })();
+    </script>
+
     <!--
     ========================================================================================
     CRUD TESTING DASHBOARD - MATRIX ORGANIZATION
@@ -673,12 +750,7 @@
                                     </table>
                                 </div>
                                 
-                                <!-- E2E Test Iframe Container - Visible below results table -->
-                                <div id="testIframeContainer" class="mt-4" style="position: relative; width: 100%; min-height: 600px; border: 2px solid #26baac; border-radius: 8px; overflow: hidden; background: #f8f9fa;">
-                                    <div class="p-2 bg-primary text-white text-center">
-                                        <strong>🔍 E2E Test Preview - בדיקת ממשק משתמש בזמן אמת</strong>
-                                    </div>
-                                </div>
+                                <!-- E2E iframe preview removed: all tests run in main window only -->
                             </div>
                         </div>
                     </div>
@@ -792,7 +864,6 @@
     <!-- [14] Load Order: 14 | Strategy: defer -->
     <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
     <!-- [15] Load Order: 15 | Strategy: defer -->
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
     <!-- [16] Load Order: 16 | Strategy: defer -->
     <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
     <!-- [17] Load Order: 17 | Strategy: defer -->
@@ -812,7 +883,7 @@
     <!-- [24] Load Order: 24 | Strategy: defer -->
     <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
     <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js></script> <!-- Dynamic color system -->
+    <script src="scripts/color-scheme-system.js" defer></script> <!-- Dynamic color system -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/5: SERVICES PACKAGE ===== -->

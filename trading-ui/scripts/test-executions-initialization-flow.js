@@ -93,13 +93,13 @@
     exists: hasUnifiedAppInitializer
   });
   
-  const hasPageConfigs = !!(window.PAGE_CONFIGS || window.PAGE_INITIALIZATION_CONFIGS);
-  logEvent('PAGE_CONFIGS Check', {
+  const hasPageConfigs = !!(window.pageInitializationConfigs || window.pageInitializationConfigs);
+  logEvent('pageInitializationConfigs Check', {
     exists: hasPageConfigs,
-    source: window.PAGE_CONFIGS ? 'PAGE_CONFIGS' : window.PAGE_INITIALIZATION_CONFIGS ? 'PAGE_INITIALIZATION_CONFIGS' : 'none'
+    source: window.pageInitializationConfigs ? 'pageInitializationConfigs' : window.pageInitializationConfigs ? 'pageInitializationConfigs' : 'none'
   });
   
-  const executionsConfig = window.PAGE_CONFIGS?.executions || window.PAGE_INITIALIZATION_CONFIGS?.executions;
+  const executionsConfig = window.pageInitializationConfigs?.executions || window.pageInitializationConfigs?.executions;
   if (executionsConfig) {
     logEvent('Executions Page Config Found', {
       hasCustomInitializers: !!executionsConfig.customInitializers,
@@ -211,7 +211,7 @@
   
   if (hasSectionsRestoredWait) {
     logIssue('warning', 'קוד מחכה ל-sectionsRestored במקום להשתמש במערכת המאוחדת', {
-      suggestion: 'יש להשתמש ב-sectionDefaultStates מ-PAGE_CONFIGS'
+      suggestion: 'יש להשתמש ב-sectionDefaultStates מ-pageInitializationConfigs'
     });
   }
   
@@ -226,7 +226,7 @@
   
   if (hasMutationObserver) {
     logIssue('warning', 'קוד משתמש ב-MutationObserver במקום להשתמש במערכת המאוחדת', {
-      suggestion: 'יש להשתמש ב-sectionDefaultStates ו-customInitializers מ-PAGE_CONFIGS'
+      suggestion: 'יש להשתמש ב-sectionDefaultStates ו-customInitializers מ-pageInitializationConfigs'
     });
   }
   
@@ -241,9 +241,9 @@
   // בדיקת סדר הטעינה
   const loadOrder = [];
   
-  // 1. PAGE_CONFIGS נטען
+  // 1. pageInitializationConfigs נטען
   if (hasPageConfigs) {
-    loadOrder.push('PAGE_CONFIGS loaded');
+    loadOrder.push('pageInitializationConfigs loaded');
   }
   
   // 2. UnifiedAppInitializer רץ

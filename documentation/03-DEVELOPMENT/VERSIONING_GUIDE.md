@@ -6,7 +6,7 @@
 - `Major`, `Minor` → מוגדרים ידנית ע״י נמרוד בלבד (כולל קפיצה לגרסת Production חדשה).
 - `Patch` → קידום אוטומטי כאשר `main` מתקדם לגרסה חדישה (למשל לאחר השלמת פיתוח/בדיקות).
 - `Build` → קידום לכל הפעלה/בדיקה של אותה גרסת קוד (שמירת Trace של Build מקומי או CI).
-- מצב עדכני נרשם ב-`documentation/version-manifest.json` והיסטוריית הפעלות ב-`documentation/development/VERSION_HISTORY.md`.
+- מצב עדכני נרשם ב-`documentation/version-manifest.json` והיסטוריית הפעלות ב-`documentation/production/VERSION_HISTORY.md`.
 
 ## 🛠️ כלי ניהול הגרסה
 
@@ -56,7 +56,7 @@ python3 scripts/versioning/bump-version.py --help
 ## 🗂️ קבצים חשובים
 
 - `documentation/version-manifest.json` – סטטוס מעודכן לכל הסביבות.
-- `documentation/development/VERSION_HISTORY.md` – לוג מלא של עדכוני main.
+- `documentation/production/VERSION_HISTORY.md` – לוג מלא של עדכוני main.
 - `documentation/production/VERSION_HISTORY.md` – לוג פרודקשן (לעיון).
 - `scripts/versioning/bump-version.py` – סקריפט הניהול.
 

@@ -148,7 +148,7 @@
     const pageName = filename.replace('.html', '');
 
     // Test 2.1: Page config exists
-    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName] || window.pageInitializationConfigs?.[pageName];
     const test2_1 = test(
       'Page config exists',
       pageConfig !== undefined && pageConfig !== null,

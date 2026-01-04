@@ -9,7 +9,7 @@
  * 95% of console errors across all pages.
  *
  * KEY FIX: auth package (loadOrder: 1.0) now loads BEFORE header package (loadOrder: 1.2)
- * This ensures window.TikTrackAuth.showLoginModal is available when header-system.js needs it.
+ * This ensures window.TikTrackAuth is available when header-system.js needs redirect logic.
  *
  * IMPACT: Reduced console errors from 3,863 to ~150 total across all pages.
  *
@@ -404,7 +404,7 @@ const PACKAGE_MANIFEST = {
     version: '1.5.0',
     critical: true,
     loadOrder: 1.2,
-    dependencies: ['base'],
+    dependencies: ['base', 'auth'],
     loadingStrategy: 'defer',
     files: [
       'header-system.js'
@@ -424,7 +424,7 @@ const PACKAGE_MANIFEST = {
 
   // 1.5. AUTH PACKAGE - Authentication (loaded separately to avoid conflicts)
   // 🔴 CRITICAL: AUTH PACKAGE - Must load FIRST (loadOrder: 1.0)
-  // 📋 Dependencies: Required by header-system.js (window.TikTrackAuth.showLoginModal)
+  // 📋 Dependencies: Required by header-system.js (redirect to /login.html)
   // 📅 Updated: 2025-12-12 - Changed loadOrder from 1.5 to 1.0 to fix ReferenceError issues
   // 🎯 Impact: Resolved 95% of console errors across all pages
   auth: {
@@ -437,8 +437,7 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base'],
     loadingStrategy: 'defer',
     files: [
-      'auth.js',
-      'auth-guard.js'
+      'auth.js'
     ],
     scripts: [
       {
@@ -447,13 +446,6 @@ const PACKAGE_MANIFEST = {
         description: 'Authentication system',
         required: true,
         loadOrder: 1
-      },
-      {
-        file: 'auth-guard.js',
-        globalCheck: 'window.AuthGuard',
-        description: 'Page protection - authentication guard',
-        required: true,
-        loadOrder: 2
       }
     ],
     estimatedSize: '~150KB',
@@ -467,7 +459,7 @@ const PACKAGE_MANIFEST = {
     description: 'General services',
     version: '1.5.0',
     critical: false,
-    loadOrder: 2,
+    loadOrder: 8,
     dependencies: ['base'],
     loadingStrategy: 'defer', // Critical package - required for most pages, has dependencies on base
     scripts: [
@@ -716,7 +708,7 @@ const PACKAGE_MANIFEST = {
     description: 'Advanced user interface',
     version: '1.5.0',
     critical: false,
-    loadOrder: 3,
+    loadOrder: 9,
     dependencies: ['base', 'services', 'modules'],
     loadingStrategy: 'defer', // Critical package - tables and advanced UI, has dependencies on modules
     scripts: [
@@ -767,7 +759,7 @@ const PACKAGE_MANIFEST = {
     description: 'General modules',
     version: '1.5.0',
     critical: false,
-    loadOrder: 2.5,
+    loadOrder: 9.1,
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Defer to maintain dependency order with base package
     // initializationGuard: 'window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe', // Temporarily disabled for testing
@@ -964,13 +956,6 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 21
       },
-      {
-        file: 'trade-selector-modal.js',
-        globalCheck: 'window.tradeSelectorModal',
-        description: 'Trade selector modal',
-        required: false,
-        loadOrder: 22
-      },
       // ⚠️ CRITICAL: Additional modal configs from other packages
       // These must load before modal-manager-v2.js
       {
@@ -1008,7 +993,7 @@ const PACKAGE_MANIFEST = {
     description: 'Data and table management systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 4,
+    loadOrder: 9.2,
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - CRUD operations, has dependencies on base and services
     scripts: [
@@ -1068,7 +1053,7 @@ const PACKAGE_MANIFEST = {
     description: 'User preferences system v3.0 (Backend-first architecture - complete data from server)',
     version: '3.0.0',
     critical: false,
-    loadOrder: 5,
+    loadOrder: 9.3,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
     loadingStrategy: 'defer', // Critical package - preferences system, has dependencies on base and services
     scripts: [
@@ -1278,7 +1263,7 @@ const PACKAGE_MANIFEST = {
     description: 'External data systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 7,
+    loadOrder: 9.4,
     dependencies: ['base', 'services'],
     loadingStrategy: 'async', // Non-critical - only for external data dashboard page
     scripts: [
@@ -2170,7 +2155,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'page-initialization-configs.js',
-        globalCheck: 'window.PAGE_INITIALIZATION_CONFIGS',
+        globalCheck: 'window.pageInitializationConfigs',
         description: 'Page initialization configurations',
         required: true,
         loadOrder: 2

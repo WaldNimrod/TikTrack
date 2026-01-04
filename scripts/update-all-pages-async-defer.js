@@ -10,18 +10,18 @@ const { generateScriptLoadingCode } = require('../trading-ui/scripts/generate-sc
 
 // Get all pages from page-initialization-configs.js
 const configsPath = path.join(__dirname, '..', 'trading-ui', 'scripts', 'page-initialization-configs.js');
-let PAGE_CONFIGS = {};
+let pageInitializationConfigs = {};
 
 try {
   const configsContent = fs.readFileSync(configsPath, 'utf8');
   const vm = require('vm');
-  const context = { window: {}, PAGE_CONFIGS: {}, module: {}, exports: {}, require: require, __dirname, __filename: configsPath };
+  const context = { window: {}, pageInitializationConfigs: {}, module: {}, exports: {}, require: require, __dirname, __filename: configsPath };
   vm.createContext(context);
   vm.runInContext(configsContent, context);
-  if (context.PAGE_CONFIGS && Object.keys(context.PAGE_CONFIGS).length > 0) {
-    PAGE_CONFIGS = context.PAGE_CONFIGS;
-  } else if (context.window && context.window.PAGE_CONFIGS) {
-    PAGE_CONFIGS = context.window.PAGE_CONFIGS;
+  if (context.pageInitializationConfigs && Object.keys(context.pageInitializationConfigs).length > 0) {
+    pageInitializationConfigs = context.pageInitializationConfigs;
+  } else if (context.window && context.window.pageInitializationConfigs) {
+    pageInitializationConfigs = context.window.pageInitializationConfigs;
   }
 } catch (e) {
   console.error('❌ Could not load page configs:', e.message);
@@ -56,7 +56,7 @@ function updateHTMLFile(filePath) {
     const fileName = path.basename(filePath, '.html');
     
     // Try to find page config - check exact match first
-    let pageConfig = PAGE_CONFIGS[fileName];
+    let pageConfig = pageInitializationConfigs[fileName];
     
     if (!pageConfig) {
       // Try with different variations
@@ -68,8 +68,8 @@ function updateHTMLFile(filePath) {
       ];
       
       for (const variation of variations) {
-        if (PAGE_CONFIGS[variation]) {
-          pageConfig = PAGE_CONFIGS[variation];
+        if (pageInitializationConfigs[variation]) {
+          pageConfig = pageInitializationConfigs[variation];
           break;
         }
       }
@@ -92,8 +92,8 @@ function updateHTMLFile(filePath) {
       return { updated: false, reason: 'no_section' };
     }
     
-    // Generate new script loading code - use the key we found in PAGE_CONFIGS
-    const pageKey = Object.keys(PAGE_CONFIGS).find(key => PAGE_CONFIGS[key] === pageConfig);
+    // Generate new script loading code - use the key we found in pageInitializationConfigs
+    const pageKey = Object.keys(pageInitializationConfigs).find(key => pageInitializationConfigs[key] === pageConfig);
     const newScriptCode = generateScriptLoadingCode(pageKey || fileName);
     
     if (!newScriptCode) {

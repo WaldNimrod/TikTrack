@@ -428,7 +428,7 @@ class TestRunner {
             // Test if old system components still exist
             const oldComponents = [
                 'UnifiedAppInitializer',
-                'PAGE_CONFIGS'
+                'pageInitializationConfigs'
             ];
 
             for (const component of oldComponents) {
@@ -526,7 +526,10 @@ window.TestRunner = TestRunner;
 // Auto-run if called directly
 if (typeof window !== 'undefined' && window.location) {
     // Only auto-run on system management page
-    if (window.location.pathname.includes('system-management')) {
+    if (
+        window.location.pathname.includes('system-management') ||
+        window.location.pathname.includes('system_management')
+    ) {
         window.Logger?.info('🚀 Auto-starting comprehensive tests...');
         const testRunner = new TestRunner();
         testRunner.runAllTests().then(results => {

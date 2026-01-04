@@ -1,7 +1,7 @@
 # Authentication Implementation Guide - TikTrack
 
-**תאריך:** 23 בדצמבר 2025  
-**גרסה:** 1.1.0  
+**תאריך:** 03 ינואר 2026  
+**גרסה:** 1.2.0  
 **מטרה:** מדריך מפורט למפתחים ליישום נכון של authentication בעמודי המערכת
 
 ---
@@ -67,7 +67,26 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 - לפני בדיקת authentication, בודק אם העמוד הוא public page
 - אם כן, מחזיר מיד ללא בדיקת authentication
 
-### 4. Absolute paths בלבד
+### 4. אין מודול כניסה - redirect בלבד
+
+**חובה:** אין להשתמש במודול כניסה כלל. הזרימה היחידה היא:
+
+- כל 401 או חוסר token → הפניה ל-`/login.html`
+- בדף login אין auth guard
+
+**אסור:** `showLoginModal`, יצירת modal, או טיפול ב-login בתוך מודול.
+**הבהרת QA:** `register.html`, `forgot_password.html`, `reset_password.html` הם עמודים מלאים (לא modals) ויש להיבדק כעמודים עצמאיים.
+
+### 5. אחסון אימות (Option 1)
+
+**חובה:** auth נשמר רק ב-`UnifiedCacheManager` בשכבת `sessionStorage`, עם bootstrap keys:
+
+- `dev_authToken`
+- `dev_currentUser`
+
+**אסור:** לשמור `authToken`/`currentUser` ב-`localStorage`.
+
+### 6. Absolute paths בלבד
 
 **חובה:** תמיד להשתמש ב-absolute paths (`scripts/`) ולא ב-relative paths (`../../scripts/`)
 
@@ -83,7 +102,7 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 <script src="../../scripts/auth.js?v=1.0.0" defer></script>
 ```
 
-### 5. אין כפילויות של core-systems.js
+### 7. אין כפילויות של core-systems.js
 
 **חובה:** `core-systems.js` חייב להיטען פעם אחת בלבד
 
@@ -154,7 +173,7 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
   ],
   requiredGlobals: [
     'window.UnifiedAppInitializer',
-    'window.PAGE_CONFIGS',
+    'window.pageInitializationConfigs',
     'window.PACKAGE_MANIFEST',
     'NotificationSystem',
     'window.Logger',
@@ -214,8 +233,10 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 **פתרון:**
 
 1. בדוק את ה-network tab - האם ה-`Authorization` header נשלח?
-2. בדוק את ה-`sessionStorage` ו-`localStorage` - האם יש token?
-3. בדוק את ה-logs - מה אומר `auth-guard.js`?
+2. בדוק את ה-`sessionStorage` - האם יש `dev_authToken` ו-`dev_currentUser`?
+3. בדוק ב-`UnifiedCacheManager` (SessionStorageLayer) שיש `authToken`/`currentUser`.
+4. ודא שאין `authToken`/`currentUser` ב-`localStorage` (אסור לפי הארכיטקטורה).
+5. בדוק את ה-logs - מה אומר `auth-guard.js`?
 
 ### 3. Session Cookie לא נשמר
 
@@ -437,4 +458,3 @@ Authentication Guard היא מערכת המגנה על עמודים פרטיים
 - ✅ הוספת הערה על sendDebugLog() מושבתת
 - ✅ הוספת הערה על הסרת confirm dialogs
 - ✅ עדכון תאריך וגרסה
-

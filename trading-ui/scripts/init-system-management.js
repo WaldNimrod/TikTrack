@@ -141,7 +141,7 @@ async function loadSystemStatus() {
         
         // Get current page info
         const pageName = window.location.pathname.split('/').pop().replace('.html', '');
-        const pageConfig = window.PAGE_CONFIGS ? window.PAGE_CONFIGS[pageName] : null;
+        const pageConfig = window.pageInitializationConfigs ? window.pageInitializationConfigs[pageName] : null;
         
         // Update status cards
         const systemStatusCard = document.getElementById('systemStatusCard');
@@ -160,7 +160,7 @@ async function loadSystemStatus() {
         }
         
         if (pagesCountCard) {
-            const pagesCount = Object.keys(window.PAGE_CONFIGS || {}).length;
+            const pagesCount = Object.keys(window.pageInitializationConfigs || {}).length;
             pagesCountCard.textContent = '';
             const icon = document.createElement('i');
             icon.className = 'fas fa-file-alt';
@@ -191,7 +191,7 @@ async function loadPagesMapping() {
     const statsContainer = document.getElementById('pagesStats');
     
     try {
-        if (!window.PAGE_CONFIGS) {
+        if (!window.pageInitializationConfigs) {
             if (mappingContainer) {
                 mappingContainer.textContent = '';
         // Convert HTML string to DOM elements safely
@@ -199,7 +199,7 @@ async function loadPagesMapping() {
         const doc = parser.parseFromString(`
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        PAGE_CONFIGS לא זמין
+                        pageInitializationConfigs לא זמין
                     </div>
                 `, 'text/html');
         const fragment = document.createDocumentFragment();
@@ -211,7 +211,7 @@ async function loadPagesMapping() {
             return;
         }
         
-        const pages = Object.entries(window.PAGE_CONFIGS);
+        const pages = Object.entries(window.pageInitializationConfigs);
         
         // Update pages stats card
         if (statsContainer) {
@@ -960,7 +960,7 @@ function runStandardizationAnalysis() {
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h5 class="card-title">${results.filter(r => window.PAGE_CONFIGS?.[r.pageName]).length}</h5>
+                                    <h5 class="card-title">${results.filter(r => window.pageInitializationConfigs?.[r.pageName]).length}</h5>
                                     <p class="card-text">עם קונפיג</p>
                                 </div>
                             </div>
@@ -1000,7 +1000,7 @@ function runStandardizationAnalysis() {
         `;
         
         results.forEach(result => {
-            const hasConfig = !!window.PAGE_CONFIGS?.[result.pageName];
+            const hasConfig = !!window.pageInitializationConfigs?.[result.pageName];
             const status = hasConfig ? '✅ מוגדר' : '❌ חסר';
             const statusClass = hasConfig ? 'text-success' : 'text-danger';
             
@@ -1363,19 +1363,19 @@ function loadPagesForScriptGeneration() {
         return;
     }
     
-    if (!window.PAGE_CONFIGS) {
+    if (!window.pageInitializationConfigs) {
         pageSelect.textContent = '';
         const option = document.createElement('option');
         option.value = '';
-        option.textContent = 'PAGE_CONFIGS לא זמין';
+        option.textContent = 'pageInitializationConfigs לא זמין';
         pageSelect.appendChild(option);
         return;
     }
     
-    const pages = Object.entries(window.PAGE_CONFIGS)
+    const pages = Object.entries(window.pageInitializationConfigs)
         .sort(([a], [b]) => {
-            const nameA = window.PAGE_CONFIGS[a]?.name || a;
-            const nameB = window.PAGE_CONFIGS[b]?.name || b;
+            const nameA = window.pageInitializationConfigs[a]?.name || a;
+            const nameB = window.pageInitializationConfigs[b]?.name || b;
             return nameA.localeCompare(nameB, 'he');
         });
     
@@ -1436,7 +1436,7 @@ function generateScriptLoadingCodeForSelectedPage() {
     }
     
     const pageName = pageSelect.value;
-    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName];
     
     if (!pageConfig) {
         showNotification(`לא נמצא קונפיגורציה לעמוד: ${pageName}`, 'error');
@@ -1524,7 +1524,7 @@ function showScriptCodeInModal() {
         return;
     }
     
-    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    const pageConfig = window.pageInitializationConfigs?.[pageName];
     const displayName = pageConfig?.name || pageName;
     
     // Create HTML content for modal
@@ -1899,9 +1899,9 @@ async function runDependencyTests() {
     }
     
     // Test 3: Check page configurations
-    if (window.PAGE_CONFIGS) {
+    if (window.pageInitializationConfigs) {
         const pageName = window.location.pathname.split('/').pop().replace('.html', '');
-        const pageConfig = window.PAGE_CONFIGS[pageName];
+        const pageConfig = window.pageInitializationConfigs[pageName];
         
         if (pageConfig) {
             tests.push({
@@ -1915,7 +1915,7 @@ async function runDependencyTests() {
                 name: 'קונפיגורציית עמוד',
                 status: 'warning',
                 message: 'קונפיגורציה חסרה',
-                details: `עמוד ${pageName} לא מוגדר ב-PAGE_CONFIGS`
+                details: `עמוד ${pageName} לא מוגדר ב-pageInitializationConfigs`
             });
         }
     }
@@ -2142,7 +2142,7 @@ function copyDetailedLog() {
         systemInfo: {
             unifiedAppStatus: window.unifiedAppInit?.getStatus?.() || 'unknown',
             packageManifest: window.PACKAGE_MANIFEST ? Object.keys(window.PACKAGE_MANIFEST) : [],
-            pageConfigs: window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS) : [],
+            pageConfigs: window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : [],
             loadedScripts: Array.from(document.querySelectorAll('script[src]')).map(s => s.src)
         }
     };
@@ -2180,7 +2180,7 @@ async function runComprehensiveTests() {
     // Logger.info('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
     
     // Get all page configs
-    const allPages = Object.keys(window.PAGE_CONFIGS || {});
+    const allPages = Object.keys(window.pageInitializationConfigs || {});
     // Logger.info('🔍 runComprehensiveTests: Found pages:', allPages);
     const results = [];
     
@@ -2192,7 +2192,7 @@ async function runComprehensiveTests() {
     // Test each page
     for (const pageName of allPages) {
             // Logger.info(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
-        const pageConfig = window.PAGE_CONFIGS[pageName];
+        const pageConfig = window.pageInitializationConfigs[pageName];
         if (!pageConfig) {
             Logger.info(`❌ runComprehensiveTests: No config found for page ${pageName}`);
             continue;
@@ -2847,7 +2847,7 @@ function getStatusText(status) {
  */
 async function showPageDetails(pageName) {
     Logger.info(`🔍 showPageDetails: Starting for page: ${pageName}`);
-    const pageConfig = window.PAGE_CONFIGS[pageName];
+    const pageConfig = window.pageInitializationConfigs[pageName];
     
     if (!pageConfig) {
         Logger.info(`❌ showPageDetails: No config found for page ${pageName}`);
@@ -3102,7 +3102,7 @@ function getDetailedMismatches(pageName, pageConfig) {
  */
 function exportTestResults() {
     // Collect all test data
-    const allPages = Object.keys(window.PAGE_CONFIGS || {});
+    const allPages = Object.keys(window.pageInitializationConfigs || {});
     const exportData = {
         timestamp: new Date().toISOString(),
         totalPages: allPages.length,
@@ -3334,8 +3334,8 @@ function copyPagesMapping() {
     let copyText = '=== TikTrack Pages Mapping ===\n';
     copyText += `Date: ${new Date().toISOString()}\n\n`;
     
-    if (window.PAGE_CONFIGS) {
-        const pages = Object.entries(window.PAGE_CONFIGS);
+    if (window.pageInitializationConfigs) {
+        const pages = Object.entries(window.pageInitializationConfigs);
         copyText += `Total Pages: ${pages.length}\n\n`;
         
         pages.forEach(([pageId, config]) => {

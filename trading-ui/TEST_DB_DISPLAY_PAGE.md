@@ -83,7 +83,7 @@
 2. ודא שהסקריפט `scripts/tables.js` נטען
 3. ודא שהוא נטען אחרי חבילת `ui-advanced`
 
-### ❌ PAGE_CONFIGS לא נמצא
+### ❌ pageInitializationConfigs לא נמצא
 
 **סיבה:** `page-initialization-configs.js` לא נטען.
 

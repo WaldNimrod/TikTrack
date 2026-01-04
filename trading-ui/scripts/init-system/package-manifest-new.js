@@ -644,7 +644,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'page-initialization-configs.js',
-        globalCheck: 'window.PAGE_INITIALIZATION_CONFIGS',
+        globalCheck: 'window.pageInitializationConfigs',
         description: 'הגדרות אתחול עמודים',
         required: true
       },

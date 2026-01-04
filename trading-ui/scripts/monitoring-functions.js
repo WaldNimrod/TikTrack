@@ -426,7 +426,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         
         // Check if script exists in manifest as optional (required: false)
         // IMPORTANT: Check ALL packages in manifest, not just those in pageConfig.packages
-        // because optional scripts may be in packages not listed in PAGE_CONFIGS
+        // because optional scripts may be in packages not listed in pageInitializationConfigs
         let isOptionalScript = false;
         if (window.PACKAGE_MANIFEST) {
             // Check all packages in manifest
@@ -755,7 +755,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
             }
             
             const suggestion = suggestedPackage 
-                ? ` - ייתכן שחסרה חבילת "${suggestedPackage}" ב-PAGE_CONFIGS`
+                ? ` - ייתכן שחסרה חבילת "${suggestedPackage}" ב-pageInitializationConfigs`
                 : '';
             
             const loadOrderWarning = loadOrderIssue 
@@ -981,7 +981,7 @@ async function parseHTMLFile(pageName) {
         }
         
         // Get page config to determine if it's a mockup page
-        const pageConfig = window.PAGE_CONFIGS?.[pageName];
+        const pageConfig = window.pageInitializationConfigs?.[pageName];
         const currentPath = window.location.pathname;
         const isMockup = pageConfig?.pageType === 'mockup' || 
                         currentPath.includes('/mockups/') ||
@@ -1592,7 +1592,7 @@ function generateFixRecommendations(issues) {
                 recommendation.fix = `תקן את סדר הטעינה בקובץ HTML לפי המניפסט - ${issue.message || ''}`;
                 break;
             case 'missing_global':
-                recommendation.fix = `הוסף את החבילה המתאימה ל-PAGE_CONFIGS או וודא שהסקריפט נטען`;
+                recommendation.fix = `הוסף את החבילה המתאימה ל-pageInitializationConfigs או וודא שהסקריפט נטען`;
                 break;
             case 'order_difference':
                 recommendation.fix = `תקן את סדר הטעינה של ${issue.script || 'הסקריפט'} בקובץ HTML`;

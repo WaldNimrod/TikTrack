@@ -245,6 +245,8 @@ class IntegratedCRUDE2ETester {
             trade_history: { name: 'היסטוריית טריידים', type: 'user', url: '/trade_history', hasCRUD: false },
             trading_journal: { name: 'יומן מסחר', type: 'user', url: '/trading_journal', hasCRUD: true },
             tag_management: { name: 'תגיות', type: 'user', url: '/tag_management', hasCRUD: true },
+            database_page_entities: { name: 'ישויות דף בסיס נתונים', type: 'technical', url: '/db_display', hasCRUD: false },
+            helper_tables_page_entities: { name: 'ישויות טבלאות עזר', type: 'technical', url: '/db_display', hasCRUD: false },
             data_import: { name: 'ייבוא נתונים', type: 'user', url: '/data_import', hasCRUD: true },
             preferences: { name: 'העדפות', type: 'user', url: '/preferences', hasCRUD: true },
 
@@ -473,6 +475,50 @@ class IntegratedCRUDE2ETester {
                     performance_rating: { id: '#tradingJournalPerformanceRating', type: 'int', default: null }
                 },
                 modalId: 'tradingJournalModal'
+            },
+            tag: {
+                required: ['name', 'slug'],
+                fields: {
+                    category_id: { id: '#tagCategory', type: 'int', default: null },
+                    name: { id: '#tagName', type: 'text', required: true },
+                    slug: { id: '#tagSlug', type: 'text', required: true },
+                    description: { id: '#tagDescription', type: 'text', default: null },
+                    is_active: { id: '#tagIsActive', type: 'bool', default: true }
+                },
+                modalId: 'tagsModal'
+            },
+            tag_category: {
+                required: ['name'],
+                fields: {
+                    name: { id: '#tagCategoryName', type: 'text', required: true },
+                    color_hex: { id: '#tagCategoryColor', type: 'text', default: '#3498db' },
+                    order_index: { id: '#tagCategoryOrder', type: 'int', default: 0 },
+                    is_active: { id: '#tagCategoryIsActive', type: 'bool', default: true }
+                },
+                modalId: 'tagCategoriesModal'
+            },
+            currency: {
+                required: ['symbol', 'name', 'usd_rate'],
+                fields: {
+                    symbol: { id: '#currencySymbol', type: 'text', required: true },
+                    name: { id: '#currencyName', type: 'text', required: true },
+                    usd_rate: { id: '#currencyUsdRate', type: 'number', required: true, default: 1.0 }
+                },
+                modalId: 'currenciesModal'
+            },
+            trading_method: {
+                required: ['name_en', 'name_he', 'category'],
+                fields: {
+                    name_en: { id: '#tradingMethodNameEn', type: 'text', required: true },
+                    name_he: { id: '#tradingMethodNameHe', type: 'text', required: true },
+                    category: { id: '#tradingMethodCategory', type: 'text', required: true },
+                    description_en: { id: '#tradingMethodDescriptionEn', type: 'text', default: null },
+                    description_he: { id: '#tradingMethodDescriptionHe', type: 'text', default: null },
+                    icon_class: { id: '#tradingMethodIconClass', type: 'text', default: 'fas fa-chart-line' },
+                    is_active: { id: '#tradingMethodIsActive', type: 'bool', default: true },
+                    sort_order: { id: '#tradingMethodSortOrder', type: 'int', default: 0 }
+                },
+                modalId: 'tradingMethodsModal'
             }
         };
     }
@@ -757,7 +803,7 @@ class IntegratedCRUDE2ETester {
             // Run generic CRUD tests for all pages (including trades, alerts, user_profile)
             // This uses the unified approach with DataCollectionService, validation, and UnifiedCRUDService
             for (const [pageKey, page] of crudPages) {
-                // #endregion
+                // endregion
                 
                 // Main window testing - no iframe cleanup needed
                 
@@ -785,11 +831,11 @@ class IntegratedCRUDE2ETester {
                     
                     // Generic CRUD test for all other pages
                     this.logger?.info(`🔵 [runE2ETests] Running generic CRUD test for ${page.name}`);
-                    // #endregion
+                    // endregion
                     await this.runGenericCRUDTest(pageKey, page);
-                    // #endregion
+                    // endregion
                 } catch (error) {
-                    // #endregion
+                    // endregion
                     this.logger?.error(`❌ [runE2ETests] Test failed for ${page.name}`, { error: error.message });
                     this.results.e2e.push({
                         workflow: `${page.name} CRUD`,
@@ -1001,7 +1047,7 @@ class IntegratedCRUDE2ETester {
                             }
                         });
 
-                        // #region agent log - HYPOTHESIS: Iframe initialization status
+                        // region agent log - HYPOTHESIS: Iframe initialization status
                         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                             method:'POST',
                             headers:{'Content-Type':'application/json'},
@@ -1028,7 +1074,7 @@ class IntegratedCRUDE2ETester {
                                 hypothesisId:'IFRAME_INIT_STATUS'
                             })
                         }).catch(()=>{});
-                        // #endregion
+                        // endregion
                     }
                 }
 
@@ -1044,7 +1090,7 @@ class IntegratedCRUDE2ETester {
                         }
                     });
 
-                    // #region agent log - HYPOTHESIS: UnifiedCRUDService not found in main window
+                    // region agent log - HYPOTHESIS: UnifiedCRUDService not found in main window
                     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
@@ -1064,7 +1110,7 @@ class IntegratedCRUDE2ETester {
                             hypothesisId:'UNIFIED_CRUD_MISSING'
                         })
                     }).catch(()=>{});
-                    // #endregion
+                    // endregion
 
                     throw new Error('UnifiedCRUDService not loaded in main window after 5 seconds');
                 }
@@ -1075,9 +1121,9 @@ class IntegratedCRUDE2ETester {
 
 
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:main-window-services-ready',message:'Main window services ready for testing',data:{pageKey,mainWindowKeys:Object.keys(window),hasUnifiedCRUD:!!window.UnifiedCRUDService,unifiedCRUDType:typeof window.UnifiedCRUDService},timestamp:Date.now(),sessionId:'debug-session',runId:'main-window-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Get field map for this entity
             const fieldMaps = this.getEntityFieldMaps();
@@ -1213,9 +1259,9 @@ class IntegratedCRUDE2ETester {
      */
     async performCreateTest(mainWindow, mainDoc, entityType, fieldMap) {
         try {
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performCreateTest',message:'Starting create test',data:{entityType,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDType:typeof mainWindow.UnifiedCRUDService,unifiedCRUDKeys:mainWindow.UnifiedCRUDService ? Object.keys(mainWindow.UnifiedCRUDService) : null,hasModalManager:!!mainWindow.ModalManagerV2},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Generate test data
             const testData = await window.UnifiedPayloadBuilder.build(entityType, fieldMap, false);
@@ -1240,22 +1286,22 @@ class IntegratedCRUDE2ETester {
             }
 
 
-            // #region agent log - create payload
+            // region agent log - create payload
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1244',message:'About to call UnifiedCRUDService.create',data:{entityType:entityType,testData:testData,runId:'stage2_batch1',hypothesisId:'create_payload_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
-            // #region agent log - executions payload snapshot
+            // region agent log - executions payload snapshot
             if (entityType === 'execution') {
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1244',message:'Executions payload before CREATE - INTEGER IDs VERIFICATION',data:{entityType:entityType,testData:testData,integer_ids:{ticker_id:{value:testData.ticker_id,type:typeof testData.ticker_id,is_integer:Number.isInteger(testData.ticker_id)},trading_account_id:{value:testData.trading_account_id,type:typeof testData.trading_account_id,is_integer:Number.isInteger(testData.trading_account_id)},trade_id:{value:testData.trade_id,type:typeof testData.trade_id,is_integer:testData.trade_id === null || Number.isInteger(testData.trade_id)}},runId:'stage2_batch1',hypothesisId:'executions_integer_ids_verification'},timestamp:Date.now()})}).catch(()=>{});
             }
-            // #endregion
+            // endregion
 
             // Call the CRUD service directly
             const result = await crudService.create(entityType, testData);
 
-            // #region agent log - create result
+            // region agent log - create result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1248',message:'UnifiedCRUDService.create completed',data:{entityType:entityType,result:result,runId:'stage2_batch1',hypothesisId:'create_result_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Handle both old format (success: boolean) and new format (status: string)
             const isSuccess = result && (result.success === true || result.status === 'success');
@@ -1319,9 +1365,9 @@ class IntegratedCRUDE2ETester {
             const apiUrl = `${base}/api/${pluralEntity}/${recordId}`;
             console.log(`🔍 DEBUG: READ test API URL: ${apiUrl}`);
 
-            // #region agent log - read request
+            // region agent log - read request
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1316',message:'About to call READ API',data:{entityType:entityType,recordId:recordId,apiUrl:apiUrl,runId:'stage2_batch1',hypothesisId:'read_request_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             const response = await fetch(apiUrl, {
                 method: 'GET',
@@ -1342,9 +1388,9 @@ class IntegratedCRUDE2ETester {
                 throw new Error(`Invalid response format: ${JSON.stringify(result)}`);
             }
 
-            // #region agent log - read result
+            // region agent log - read result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1339',message:'READ API call completed',data:{entityType:entityType,recordId:recordId,result:result,runId:'stage2_batch1',hypothesisId:'read_result_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             console.log(`📖 DEBUG: Successfully read record ${recordId} for ${entityType}:`, result);
             return { success: true, data: result };
@@ -1394,23 +1440,23 @@ class IntegratedCRUDE2ETester {
             }
 
             // Use UnifiedCRUDService to update
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'Checking UnifiedCRUDService availability',data:{hasMainWindow:!!window,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDMethods:mainWindow.UnifiedCRUDService ? Object.getOwnPropertyNames(mainWindow.UnifiedCRUDService).filter(name => typeof mainWindow.UnifiedCRUDService[name] === 'function') : [],entityType,updateData},timestamp:Date.now(),sessionId:'debug-session',runId:'update-debug',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!mainWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in main window');
             }
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:performUpdateTest',message:'About to call UnifiedCRUDService.updateEntity',data:{entityType,recordId,updateDataKeys:Object.keys(updateData),hasId:updateData.id},timestamp:Date.now(),sessionId:'debug-session',runId:'update-fix-verification',hypothesisId:'UPDATE_FIX'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             const updateResult = await mainWindow.UnifiedCRUDService.updateEntity(entityType, recordId, updateData);
 
-            // #region agent log - update result
+            // region agent log - update result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1403',message:'UnifiedCRUDService.updateEntity completed',data:{entityType:entityType,recordId:recordId,updateResult:updateResult,runId:'stage2_batch1',hypothesisId:'update_result_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!updateResult || !updateResult.success) {
                 throw new Error(`Failed to update record: ${updateResult?.error || 'Unknown error'}`);
@@ -1450,15 +1496,15 @@ class IntegratedCRUDE2ETester {
                 throw new Error('UnifiedCRUDService not available in main window');
             }
 
-            // #region agent log - delete request
+            // region agent log - delete request
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1447',message:'About to call UnifiedCRUDService.delete',data:{entityType:entityType,recordId:recordId,runId:'stage2_batch1',hypothesisId:'delete_request_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             const deleteResult = await mainWindow.UnifiedCRUDService.delete(entityType, recordId);
 
-            // #region agent log - delete result
+            // region agent log - delete result
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:1447',message:'UnifiedCRUDService.delete completed',data:{entityType:entityType,recordId:recordId,deleteResult:deleteResult,runId:'stage2_batch1',hypothesisId:'delete_result_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!deleteResult || !deleteResult.success) {
                 throw new Error(`Failed to delete record: ${deleteResult?.error || 'Unknown error'}`);
@@ -1636,17 +1682,17 @@ class IntegratedCRUDE2ETester {
      */
     async submitForm(mainWindow, mainDoc, entityType, formData) {
         try {
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:submitForm',message:'About to check UnifiedCRUDService',data:{entityType,hasUnifiedCRUD:!!mainWindow.UnifiedCRUDService,unifiedCRUDType:typeof mainWindow.UnifiedCRUDService,hasCreateMethod:mainWindow.UnifiedCRUDService?.create ? typeof mainWindow.UnifiedCRUDService.create : 'no service',formDataKeys:Object.keys(formData)},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             if (!mainWindow.UnifiedCRUDService) {
                 throw new Error('UnifiedCRUDService not available in main window');
             }
 
-            // #region agent log
+            // region agent log
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:createCall',message:'About to call UnifiedCRUDService.create',data:{entityType,formDataKeys:Object.keys(formData),createMethodType:typeof mainWindow.UnifiedCRUDService.create,createMethodExists:!!mainWindow.UnifiedCRUDService.create},timestamp:Date.now(),sessionId:'debug-session',runId:'crud-service-debug',hypothesisId:'A1,A2,A3,A4'})}).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Ensure create method exists and is a function
             if (!mainWindow.UnifiedCRUDService.create || typeof mainWindow.UnifiedCRUDService.create !== 'function') {
@@ -2189,7 +2235,7 @@ class IntegratedCRUDE2ETester {
      * Shows the test-results section and updates progress/stats
      */
     updateTestResults() {
-        // #region agent log - H5_UI_RENDERING
+        // region agent log - H5_UI_RENDERING
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2206,7 +2252,7 @@ class IntegratedCRUDE2ETester {
                 hypothesisId:'H5_UI_RENDERING'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         try {
             console.log('🔍 DEBUG: updateTestResults called');
@@ -2416,7 +2462,7 @@ class IntegratedCRUDE2ETester {
         // Get current test results from all test types
         const allResults = this.collectAllResults();
 
-        // #region agent log - H1_RESULTS_STORAGE
+        // region agent log - H1_RESULTS_STORAGE
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2435,9 +2481,9 @@ class IntegratedCRUDE2ETester {
                 hypothesisId:'H1_RESULTS_STORAGE'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
-        // #region agent log - H1: Results processing debug
+        // region agent log - H1: Results processing debug
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -2457,7 +2503,7 @@ class IntegratedCRUDE2ETester {
                 hypothesisId:'H1_RESULTS_STORAGE'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         console.log('🔍 DEBUG: updateTestResultsTable - raw results structure:', JSON.stringify(this.results, null, 2));
         console.log('🔍 DEBUG: updateTestResultsTable - processed allResults:', allResults.length, allResults.map(r => ({ page: r.page, testType: r.testType, status: r.status })));
@@ -2503,7 +2549,7 @@ class IntegratedCRUDE2ETester {
             const statusValue = result.status || 'unknown';
             const timeValue = result.executionTime || 0;
 
-            // #region agent log - MESSAGE FIELD DEBUG
+            // region agent log - MESSAGE FIELD DEBUG
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2527,7 +2573,7 @@ class IntegratedCRUDE2ETester {
                     hypothesisId:'MESSAGE_FIELD_DEBUG'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             const messageValue = result.error || result.message || 'Test completed';
 
@@ -2708,7 +2754,7 @@ class IntegratedCRUDE2ETester {
             if (accountId) {
                 window.UnifiedPayloadBuilder.setActiveTradingAccount(accountId);
 
-                // #region agent log - active account fetched
+                // region agent log - active account fetched
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -2724,7 +2770,7 @@ class IntegratedCRUDE2ETester {
                         hypothesisId:'active-account-resolution-fixed'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 console.log('✅ Active trading account set:', accountId);
                 return accountId;
@@ -2753,7 +2799,7 @@ class IntegratedCRUDE2ETester {
             if (accountId) {
                 window.UnifiedPayloadBuilder.setActiveTradingAccount(accountId);
 
-                // #region agent log - active account fetched
+                // region agent log - active account fetched
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -2769,7 +2815,7 @@ class IntegratedCRUDE2ETester {
                         hypothesisId:'active-account-resolution-working'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 window.Logger?.info?.('✅ Active trading account fetched for payload builder', {
                     accountId,
@@ -2781,7 +2827,7 @@ class IntegratedCRUDE2ETester {
         } catch (error) {
             console.error('❌ Failed to fetch active trading account:', error);
 
-            // #region agent log - active account fetch failed
+            // region agent log - active account fetch failed
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -2797,7 +2843,7 @@ class IntegratedCRUDE2ETester {
                     hypothesisId:'active-account-resolution-working'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
         }
 
         return null;
@@ -3022,6 +3068,16 @@ function initializeCRUDTestingDashboard() {
         // Create the main tester instance
         window.crudTester = new IntegratedCRUDE2ETester();
 
+        // Remove iframe preview container when iframe testing is disabled
+        const iframeContainer = document.getElementById('testIframeContainer');
+        if (iframeContainer && window.CrossPageTester?.USE_IFRAMES === false) {
+            iframeContainer.remove();
+        }
+        if (window.CrossPageTester?.USE_IFRAMES === false) {
+            const testIframes = document.querySelectorAll('iframe[id^="cross-page-test-iframe-"]');
+            testIframes.forEach(iframe => iframe.remove());
+        }
+
         // The dashboard UI is initialized through HTML and doesn't need additional setup
         // All event handlers are attached directly in the HTML onclick attributes
 
@@ -3040,13 +3096,14 @@ function initializeCRUDTestingDashboard() {
     }
 }
 
+// REMOVED: Auto-initialization - now handled by page-initialization-configs.js after auth check
 // Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeCRUDTestingDashboard);
-} else {
-    // DOM already loaded
-    initializeCRUDTestingDashboard();
-}
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', initializeCRUDTestingDashboard);
+// } else {
+//     // DOM already loaded
+//     initializeCRUDTestingDashboard();
+// }
 
 // Global function wrappers for HTML onclick handlers
 window.runUITests = async function() {
@@ -3309,7 +3366,7 @@ window.runAllTableSortingTests = async function() {
 
     console.log('🚀 Starting comprehensive sorting test using individual tests');
 
-    // #region agent log - HYPOTHESIS: Comprehensive test start
+    // region agent log - HYPOTHESIS: Comprehensive test start
     fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -3327,7 +3384,7 @@ window.runAllTableSortingTests = async function() {
             hypothesisId:'COMPREHENSIVE_TEST_START'
         })
     }).catch(()=>{});
-    // #endregion
+    // endregion
 
     try {
         // Run all individual sorting tests sequentially to avoid duplication
@@ -3363,7 +3420,7 @@ window.runAllTableSortingTests = async function() {
 
         console.log('✅ Comprehensive sorting test completed');
 
-        // #region agent log - HYPOTHESIS: Comprehensive test end
+        // region agent log - HYPOTHESIS: Comprehensive test end
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3380,12 +3437,12 @@ window.runAllTableSortingTests = async function() {
                 hypothesisId:'COMPREHENSIVE_TEST_END'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
     } catch (error) {
         console.error('❌ Error in comprehensive sorting test:', error);
 
-        // #region agent log - HYPOTHESIS: Comprehensive test error
+        // region agent log - HYPOTHESIS: Comprehensive test error
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3402,7 +3459,7 @@ window.runAllTableSortingTests = async function() {
                 hypothesisId:'COMPREHENSIVE_TEST_ERROR'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
     }
 
     // Run tests sequentially with small delay between groups
@@ -3486,7 +3543,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
     try {
         console.log(`🚀 Starting cross-page test: ${groupName} -> ${testType}`);
 
-        // #region agent log - HYPOTHESIS: Function entry
+        // region agent log - HYPOTHESIS: Function entry
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3507,9 +3564,9 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 hypothesisId:'FUNCTION_ENTRY'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
-        // #region agent log - HYPOTHESIS 3: Function called correctly
+        // region agent log - HYPOTHESIS 3: Function called correctly
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3529,11 +3586,11 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 hypothesisId:'H3_FUNCTION_CALLED'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         if (!window.crudTester) {
             window.crudTester = new IntegratedCRUDE2ETester();
-            // #region agent log - HYPOTHESIS 3: Created crudTester
+            // region agent log - HYPOTHESIS 3: Created crudTester
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -3550,12 +3607,12 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                     hypothesisId:'H3_FUNCTION_CALLED'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
         }
 
         if (!window.crossPageTester && typeof CrossPageTester !== 'undefined') {
             window.crossPageTester = new CrossPageTester(window.crudTester);
-            // #region agent log - HYPOTHESIS 3: Created crossPageTester
+            // region agent log - HYPOTHESIS 3: Created crossPageTester
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
@@ -3572,13 +3629,13 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                     hypothesisId:'H3_FUNCTION_CALLED'
                 })
             }).catch(()=>{});
-            // #endregion
+            // endregion
 
             // Initialize SortingTestingSystem after crossPageTester is created
             if (!window.sortingTester && window.SortingTestingSystem) {
                 window.sortingTester = new window.SortingTestingSystem(window.crossPageTester);
                 console.log('✅ SortingTestingSystem initialized');
-                // #region agent log - HYPOTHESIS 4: SortingTestingSystem initialized
+                // region agent log - HYPOTHESIS 4: SortingTestingSystem initialized
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -3595,7 +3652,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                         hypothesisId:'H4_SORTING_INITIALIZED'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
             }
         }
 
@@ -3631,7 +3688,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
 
                 console.log(`🔍 Testing page: ${page.name} (${page.key})`);
 
-                // #region agent log - H3_PAGE_TESTING
+                // region agent log - H3_PAGE_TESTING
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -3652,7 +3709,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                         hypothesisId:'H3_PAGE_TESTING'
                     })
                 }).catch(()=>{});
-                // #endregion
+                // endregion
 
                 // Call the appropriate test method based on testType
                 switch (testType) {
@@ -3706,7 +3763,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
         if (progressText) progressText.textContent = 'בדיקה הושלמה';
         if (progressDetails) progressDetails.textContent = `הושלמו ${total} עמודים`;
 
-        // #region agent log - H1_RESULTS_STORAGE
+        // region agent log - H1_RESULTS_STORAGE
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3727,7 +3784,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 hypothesisId:'H1_RESULTS_STORAGE'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         // Update test results table
         if (window.crudTester && typeof window.crudTester.updateTestResultsTable === 'function') {
@@ -3770,7 +3827,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
 
         console.log(`✅ Cross-page test completed: ${groupName} -> ${testType}`);
 
-        // #region agent log - HYPOTHESIS: Function exit success
+        // region agent log - HYPOTHESIS: Function exit success
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3789,12 +3846,12 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 hypothesisId:'FUNCTION_EXIT_SUCCESS'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
     } catch (error) {
         console.error('❌ Error in runCrossPageTestForGroup:', error);
 
-        // #region agent log - HYPOTHESIS: Function exit error
+        // region agent log - HYPOTHESIS: Function exit error
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -3813,7 +3870,7 @@ window.runCrossPageTestForGroup = async function(groupName, testType, groupDispl
                 hypothesisId:'FUNCTION_EXIT_ERROR'
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         // Show error notification
         if (window.NotificationSystem && window.NotificationSystem.showError) {
@@ -4015,15 +4072,15 @@ window.UnifiedPayloadBuilder = {
 
     // Main entry point for payload generation
     build: async function(entityType, fieldMap, isUpdate = false) {
-        // #region agent log - payload build start
+        // region agent log - payload build start
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4178',message:'UnifiedPayloadBuilder.build() called',data:{entityType:entityType,isUpdate:isUpdate,runId:'stage2_batch1',hypothesisId:'payload_build_verification'},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+        // endregion
 
         const result = await this.generateTestData(entityType, fieldMap, isUpdate);
 
-        // #region agent log - payload build complete
+        // region agent log - payload build complete
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4185',message:'UnifiedPayloadBuilder.build() completed',data:{entityType:entityType,isUpdate:isUpdate,result:result,runId:'stage2_batch1',hypothesisId:'payload_build_verification'},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+        // endregion
 
         return result;
     },
@@ -4063,9 +4120,9 @@ window.UnifiedPayloadBuilder = {
         // Handle dynamic ID resolution first
         if (this.isDynamicIdField(fieldName)) {
             const resolvedId = await this.resolveDynamicId(fieldName, entityType);
-            // #region agent log - field value generation with ID resolution
+            // region agent log - field value generation with ID resolution
             fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4235',message:'Field value generated with dynamic ID',data:{fieldName:fieldName,entityType:entityType,resolvedId:resolvedId,idType:typeof resolvedId,runId:'stage2_batch1',hypothesisId:'async_id_resolution_verification'},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
+            // endregion
             return resolvedId;
         }
 
@@ -4112,10 +4169,10 @@ window.UnifiedPayloadBuilder = {
             case 'ticker_id':
                 return this.fetchValidTicker();
             case 'trade_id':
-                // #region agent log - trade_id resolution
+                // region agent log - trade_id resolution
                 const tradeId = await this.fetchValidTrade();
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4282',message:'Dynamic trade_id resolution',data:{entityType:entityType,resolvedTradeId:tradeId,tradeIdType:typeof tradeId,runId:'stage2_batch1',hypothesisId:'dynamic_trade_id_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 return tradeId;
             case 'currency_id':
                 return this.fetchValidCurrency();
@@ -4197,9 +4254,9 @@ window.UnifiedPayloadBuilder = {
 
     // Apply entity-specific overrides
     applyEntitySpecificOverrides: async function(testData, entityType, isUpdate) {
-        // #region agent log - entity overrides start
+        // region agent log - entity overrides start
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4320',message:'applyEntitySpecificOverrides() called',data:{entityType:entityType,isUpdate:isUpdate,testData:testData,runId:'stage2_batch1',hypothesisId:'entity_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+        // endregion
 
         switch (entityType) {
             case 'ticker':
@@ -4211,9 +4268,9 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.symbol || isUpdate) {
                     testData.symbol = this.generateUniqueSymbol();
                 }
-                // #region agent log - ticker overrides applied
+                // region agent log - ticker overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4375',message:'Ticker entity overrides applied',data:{symbol:testData.symbol,name:testData.name,currency_id:testData.currency_id,type:testData.type,status:testData.status,runId:'stage2_batch2',hypothesisId:'ticker_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 break;
             case 'trade':
                 // Ensure required fields for trade
@@ -4223,9 +4280,9 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.ticker_id) {
                     testData.ticker_id = this.fetchValidTicker();
                 }
-                // #region agent log - trade overrides applied
+                // region agent log - trade overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4385',message:'Trade entity overrides applied',data:{trading_account_id:testData.trading_account_id,ticker_id:testData.ticker_id,status:testData.status,side:testData.side,investment_type:testData.investment_type,runId:'stage2_batch2',hypothesisId:'trade_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 break;
             case 'trade_plan':
                 // Ensure required fields for trade_plan
@@ -4266,9 +4323,9 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.performance_rating) {
                     testData.performance_rating = Math.floor(Math.random() * 10) + 1; // 1-10 rating
                 }
-                // #region agent log - trading_journal overrides applied
+                // region agent log - trading_journal overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4395',message:'Trading journal entity overrides applied',data:{trade_id:testData.trade_id,entry_date:testData.entry_date,notes:testData.notes,mood:testData.mood,lessons_learned:testData.lessons_learned,performance_rating:testData.performance_rating,runId:'stage2_batch5',hypothesisId:'trading_journal_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 break;
             case 'note':
                 // Ensure required fields for note
@@ -4281,9 +4338,9 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.content) {
                     testData.content = `Test note content ${Date.now()}`;
                 }
-                // #region agent log - note overrides applied
+                // region agent log - note overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4375',message:'Note entity overrides applied',data:{related_type_id:testData.related_type_id,related_id:testData.related_id,content:testData.content.substring(0,50)+'...',runId:'stage2_batch3',hypothesisId:'note_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 break;
             case 'alert':
                 // Ensure required fields for alert
@@ -4302,9 +4359,9 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.related_type_id) {
                     testData.related_type_id = 4; // Default to trade type
                 }
-                // #region agent log - alert overrides applied
+                // region agent log - alert overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4385',message:'Alert entity overrides applied',data:{status:testData.status,condition_attribute:testData.condition_attribute,condition_operator:testData.condition_operator,condition_number:testData.condition_number,related_type_id:testData.related_type_id,runId:'stage2_batch3',hypothesisId:'alert_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
                 break;
             case 'execution':
                 // Ensure required fields for execution
@@ -4315,15 +4372,99 @@ window.UnifiedPayloadBuilder = {
                 if (!testData.trading_account_id) {
                     testData.trading_account_id = this.activeTradingAccountId || await this.fetchValidTradingAccount();
                 }
-                // #region agent log - execution overrides applied
+                // region agent log - execution overrides applied
                 fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4389',message:'Execution entity overrides applied',data:{ticker_id:testData.ticker_id,trading_account_id:testData.trading_account_id,trade_id:testData.trade_id,runId:'stage2_batch1',hypothesisId:'execution_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
+                // endregion
+                break;
+            case 'tag':
+                // Ensure required fields for tag
+                if (!testData.name) {
+                    testData.name = `Test Tag ${Date.now()}`;
+                }
+                if (!testData.slug) {
+                    testData.slug = testData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                }
+                if (!testData.category_id) {
+                    testData.category_id = null; // Optional field
+                }
+                if (!testData.description) {
+                    testData.description = `Test tag description for ${testData.name}`;
+                }
+                if (testData.is_active === undefined) {
+                    testData.is_active = true;
+                }
+                // region agent log - tag overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4405',message:'Tag entity overrides applied',data:{name:testData.name,slug:testData.slug,category_id:testData.category_id,is_active:testData.is_active,runId:'task_3_additional_crud_pages',hypothesisId:'tag_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // endregion
+                break;
+            case 'tag_category':
+                // Ensure required fields for tag_category
+                if (!testData.name) {
+                    testData.name = `Test Category ${Date.now()}`;
+                }
+                if (!testData.color_hex) {
+                    testData.color_hex = '#3498db'; // Default blue color
+                }
+                if (!testData.order_index) {
+                    testData.order_index = 0;
+                }
+                if (testData.is_active === undefined) {
+                    testData.is_active = true;
+                }
+                // region agent log - tag_category overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4415',message:'Tag Category entity overrides applied',data:{name:testData.name,color_hex:testData.color_hex,order_index:testData.order_index,is_active:testData.is_active,runId:'task_3_additional_crud_pages',hypothesisId:'tag_category_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // endregion
+                break;
+            case 'currency':
+                // Ensure required fields for currency
+                if (!testData.symbol) {
+                    testData.symbol = `TST${Date.now().toString().slice(-2)}`; // Unique test symbol
+                }
+                if (!testData.name) {
+                    testData.name = `Test Currency ${testData.symbol}`;
+                }
+                if (!testData.usd_rate) {
+                    testData.usd_rate = 1.0; // Default to 1 USD
+                }
+                // region agent log - currency overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4425',message:'Currency entity overrides applied',data:{symbol:testData.symbol,name:testData.name,usd_rate:testData.usd_rate,runId:'task_3_additional_crud_pages',hypothesisId:'currency_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // endregion
+                break;
+            case 'trading_method':
+                // Ensure required fields for trading_method
+                if (!testData.name_en) {
+                    testData.name_en = `Test Method ${Date.now()}`;
+                }
+                if (!testData.name_he) {
+                    testData.name_he = `שיטת בדיקה ${Date.now()}`;
+                }
+                if (!testData.category) {
+                    testData.category = 'technical'; // Default category
+                }
+                if (!testData.description_en) {
+                    testData.description_en = `Test trading method description for ${testData.name_en}`;
+                }
+                if (!testData.description_he) {
+                    testData.description_he = `תיאור שיטת מסחר לבדיקה עבור ${testData.name_he}`;
+                }
+                if (!testData.icon_class) {
+                    testData.icon_class = 'fas fa-chart-line'; // Default icon
+                }
+                if (testData.is_active === undefined) {
+                    testData.is_active = true;
+                }
+                if (!testData.sort_order) {
+                    testData.sort_order = 0;
+                }
+                // region agent log - trading_method overrides applied
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4435',message:'Trading Method entity overrides applied',data:{name_en:testData.name_en,name_he:testData.name_he,category:testData.category,is_active:testData.is_active,sort_order:testData.sort_order,runId:'task_3_additional_crud_pages',hypothesisId:'trading_method_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
+                // endregion
                 break;
         }
 
-        // #region agent log - entity overrides complete
+        // region agent log - entity overrides complete
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'crud_testing_dashboard.js:4349',message:'applyEntitySpecificOverrides() completed',data:{entityType:entityType,isUpdate:isUpdate,finalTestData:testData,runId:'stage2_batch1',hypothesisId:'entity_overrides_verification'},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+        // endregion
     },
 
     // Apply modifications for updates
@@ -4509,7 +4650,7 @@ window.UnifiedPayloadBuilder = {
             };
         }
 
-        // #region agent log - payload generated with entity validation
+        // region agent log - payload generated with entity validation
         fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -4522,7 +4663,7 @@ window.UnifiedPayloadBuilder = {
                 hypothesisId:`${entityType}_payload_verification`
             })
         }).catch(()=>{});
-        // #endregion
+        // endregion
 
         window.Logger?.info?.(`Generated ${isUpdate ? 'UPDATE' : 'CREATE'} payload for ${entityType}`, logData);
     }

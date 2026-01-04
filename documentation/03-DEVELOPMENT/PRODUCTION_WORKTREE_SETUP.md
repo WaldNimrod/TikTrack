@@ -185,7 +185,7 @@ git push origin production
 - `documentation/production/UPDATE_PROCESS.md`
 - `documentation/production/CODE_SEPARATION.md`
 - `documentation/production/PRODUCTION_SETUP.md`
-- `documentation/development/BACKUP_AND_VERSION_CONTROL_GUIDE.md`
+- `documentation/03-DEVELOPMENT/GUIDELINES/BACKUP_AND_VERSION_CONTROL_GUIDE.md`
 
 ---
 

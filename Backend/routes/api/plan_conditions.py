@@ -1029,7 +1029,7 @@ def evaluate_all_conditions():
             evaluator = ConditionEvaluator(db_session)
             
             # Evaluate all active conditions (filtered by user_id if provided)
-            results = evaluator.evaluate_all_active_conditions(user_id=user_id)
+            results = evaluator.evaluate_all_active_conditions()
             
             # Filter only plan conditions
             plan_results = [r for r in results if r.get('condition_type') == 'plan']

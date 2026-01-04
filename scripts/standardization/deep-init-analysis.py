@@ -42,7 +42,7 @@ def analyze_init_architecture():
                 'document.ready': len(re.findall(r'document\.ready', content, re.IGNORECASE)),
                 'initializeApplication': len(re.findall(r'initializeApplication', content)),
                 'unifiedAppInitializer': len(re.findall(r'unifiedAppInitializer', content)),
-                'PAGE_CONFIGS': len(re.findall(r'PAGE_CONFIGS', content)),
+                'pageInitializationConfigs': len(re.findall(r'pageInitializationConfigs', content)),
                 'PACKAGE_MANIFEST': len(re.findall(r'PACKAGE_MANIFEST', content)),
             }
             
@@ -114,10 +114,10 @@ def analyze_init_architecture():
         else:
             report.append("- ❌ **לא משתמש ב-`unifiedAppInitializer`**\n")
         
-        if patterns['PAGE_CONFIGS'] > 0:
-            report.append(f"- ✅ משתמש ב-`PAGE_CONFIGS` ({patterns['PAGE_CONFIGS']} מופעים)\n")
+        if patterns['pageInitializationConfigs'] > 0:
+            report.append(f"- ✅ משתמש ב-`pageInitializationConfigs` ({patterns['pageInitializationConfigs']} מופעים)\n")
         else:
-            report.append("- ❌ **לא משתמש ב-`PAGE_CONFIGS`**\n")
+            report.append("- ❌ **לא משתמש ב-`pageInitializationConfigs`**\n")
         
         if patterns['DOMContentLoaded'] > 0:
             report.append(f"- ⚠️ יש `DOMContentLoaded` listeners מקומיים ({patterns['DOMContentLoaded']} מופעים)\n")
@@ -126,10 +126,10 @@ def analyze_init_architecture():
             report.append(f"- ✅ משתמש ב-`initializeApplication` ({patterns['initializeApplication']} מופעים)\n")
         
         report.append("\n**מסקנה:**\n")
-        if patterns['unifiedAppInitializer'] == 0 and patterns['PAGE_CONFIGS'] == 0:
+        if patterns['unifiedAppInitializer'] == 0 and patterns['pageInitializationConfigs'] == 0:
             report.append("- 🔴 **ארכיטקטורה מקומית/ישנה** - לא משתמש ב-Unified Init System\n")
             report.append("- 💡 **המלצה:** צריך לבדוק אם יש קוד מקביל או ארכיטקטורה אחרת\n")
-        elif patterns['unifiedAppInitializer'] > 0 or patterns['PAGE_CONFIGS'] > 0:
+        elif patterns['unifiedAppInitializer'] > 0 or patterns['pageInitializationConfigs'] > 0:
             report.append("- 🟡 **שימוש חלקי** - משתמש בחלק מהמערכת\n")
         else:
             report.append("- 🟢 **משתמש ב-Unified Init System**\n")

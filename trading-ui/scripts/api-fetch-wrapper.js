@@ -6,7 +6,7 @@
    * Global wrapper for window.fetch:
    * - Injects Authorization: Bearer <token> from UnifiedCacheManager (includeUserId: false)
    * - Skips auth for static assets and public endpoints
-   * - Handles 401 by forcing logout and redirecting to homepage + login modal
+   * - Handles 401 by forcing logout and redirecting to login page
    * - Strips credentials usage (no cookies)
    */
 
@@ -48,6 +48,25 @@
   }
 
   async function getAuthToken() {
+    // region agent log - Option 1 verification
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/api-fetch-wrapper.js:getAuthToken',
+        message: 'Option 1: Getting auth token from SessionStorageLayer only',
+        data: {
+          hasUnifiedCacheManager: !!window.UnifiedCacheManager,
+          isInitialized: window.UnifiedCacheManager?.initialized,
+          timestamp: Date.now()
+        },
+        sessionId: 'option1_verification',
+        runId: 'option1_implementation_test',
+        hypothesisId: 'option1_sessionstorage_only'
+      })
+    }).catch(() => {});
+    // endregion
+
     try {
       // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
@@ -60,19 +79,15 @@
 
       // Fallback: Try direct sessionStorage access
       if (typeof sessionStorage !== 'undefined') {
-        const token = sessionStorage.getItem('dev_authToken') || sessionStorage.getItem('authToken');
+        const token = sessionStorage.getItem('authToken');
         if (token) return token;
       }
 
-      // Fallback: Try localStorage
-      if (typeof localStorage !== 'undefined') {
-        const token = localStorage.getItem('authToken');
-        if (token) return token;
-      }
+      // Option 1: No localStorage fallback for auth tokens
 
       // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
       if (typeof sessionStorage !== 'undefined') {
-        const fallback = sessionStorage.getItem('dev_authToken');
+        const fallback = sessionStorage.getItem('authToken');
         if (fallback) return fallback;
       }
       
@@ -80,10 +95,7 @@
       if (window.authToken) {
         return window.authToken;
       }
-      if (typeof localStorage !== 'undefined') {
-        const lsToken = localStorage.getItem('authToken');
-        if (lsToken) return lsToken;
-      }
+      // Option 1: No localStorage fallback
       
       return null;
     } catch (error) {
@@ -109,11 +121,40 @@
       await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
     }
 
-    // TEST MODE: Disable redirect for runtime verification
-    console.log('[API Fetch Wrapper] TEST MODE: Skipping login redirect on 401');
+    const path = window.location?.pathname || '';
+    const isLoginPage = path === '/login' || path === '/login.html';
 
-    // Don't redirect - allow page to continue loading for testing
-    return;
+    // region agent log - 401 redirect verification
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/api-fetch-wrapper.js:handle401Error',
+        message: '401 error handling - checking redirect behavior',
+        data: {
+          url: url,
+          port: window.location.port,
+          hostname: window.location.hostname,
+          pathname: path,
+          isLoginPage: isLoginPage,
+          willRedirect: !isLoginPage,
+          timestamp: Date.now()
+        },
+        sessionId: 'auth_flow_verification_8080',
+        runId: 'auth_redirect_verification',
+        hypothesisId: 'api_401_redirect_proper'
+      })
+    }).catch(() => {});
+    // endregion
+
+    if (!isLoginPage) {
+      // region agent log - api-fetch-wrapper 401 redirect
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/api-fetch-wrapper.js:401_redirect',message:'API fetch wrapper redirecting to login on 401',data:{page:window.location.pathname,url:url,status:response.status,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H5_api_401_redirect',timestamp:Date.now()})}).catch(()=>{});
+      // endregion
+
+      console.log('[API Fetch Wrapper] Redirecting to login on 401');
+      window.location.href = '/login.html';
+    }
   }
 
   window.fetch = async function (url, options = {}) {
@@ -162,4 +203,3 @@
 
   window.Logger?.info?.('✅ [API Fetch Wrapper] Loaded successfully');
 })();
-

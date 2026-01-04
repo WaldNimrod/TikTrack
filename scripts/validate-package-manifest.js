@@ -17,7 +17,7 @@ const path = require('path');
 const PROJECT_ROOT = path.join(__dirname, '..');
 const TRADING_UI = path.join(PROJECT_ROOT, 'trading-ui');
 const PACKAGE_MANIFEST_PATH = path.join(TRADING_UI, 'scripts', 'init-system', 'package-manifest.js');
-const PAGE_CONFIGS_PATH = path.join(TRADING_UI, 'scripts', 'page-initialization-configs.js');
+const PAGE_INITIALIZATION_CONFIGS_PATH = path.join(TRADING_UI, 'scripts', 'page-initialization-configs.js');
 
 // All pages that should be validated
 const ALL_PAGES = [
@@ -66,15 +66,15 @@ function loadPackageManifest() {
  */
 function loadPageConfigs() {
     try {
-        const configsContent = fs.readFileSync(PAGE_CONFIGS_PATH, 'utf8');
+        const configsContent = fs.readFileSync(PAGE_INITIALIZATION_CONFIGS_PATH, 'utf8');
 
-        // Extract PAGE_CONFIGS
+        // Extract pageInitializationConfigs
         const vm = require('vm');
-        const context = { PAGE_CONFIGS: {} };
+        const context = { pageInitializationConfigs: {} };
         vm.createContext(context);
         vm.runInContext(configsContent, context);
 
-        return context.PAGE_CONFIGS;
+        return context.pageInitializationConfigs;
     } catch (error) {
         console.error('❌ Error loading page configs:', error.message);
         return {};

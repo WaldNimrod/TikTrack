@@ -994,7 +994,7 @@
     <!-- [20] Load Order: 20 | Strategy: defer -->
     <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
     <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js></script> <!-- Dynamic color system -->
+    <script src="scripts/color-scheme-system.js" defer></script> <!-- Dynamic color system -->
     <!-- [22] Load Order: 22 | Strategy: defer -->
     <script src="scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
 
@@ -1007,6 +1007,10 @@
 
     <!-- [23] Load Order: 23 | Strategy: defer -->
     <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="/trading-ui/scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/5: SERVICES PACKAGE ===== -->
@@ -1088,6 +1092,8 @@
     <!-- [36] Load Order: 36 | Strategy: defer -->
     <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
     <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="/trading-ui/scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
     <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
     <!-- [38] Load Order: 38 | Strategy: defer -->
     <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
@@ -1102,6 +1108,35 @@
 
     <!-- [73] Page-specific: dev_tools.js | Strategy: defer -->
     <script src="scripts/dev_tools.js?v=1.0.0" defer></script> <!-- Main page script -->
+
+    <!-- Logger instrumentation for P0 page fixes -->
+    <script>
+        // Check if fixed globals are now available
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const modalManagerAvailable = typeof window.ModalManagerV2 !== 'undefined';
+                const tikTrackAuthAvailable = typeof window.TikTrackAuth !== 'undefined';
+
+                fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        location:'dev_tools.html:1105',
+                        message:'P0 page globals check after fixes',
+                        data:{
+                            page:'dev_tools',
+                            modalManagerAvailable:modalManagerAvailable,
+                            tikTrackAuthAvailable:tikTrackAuthAvailable,
+                            allGlobalsFixed: modalManagerAvailable && tikTrackAuthAvailable,
+                            runId:'p0_page_fixes',
+                            hypothesisId:'missing_globals_fix_verification'
+                        },
+                        timestamp:Date.now()
+                    })
+                }).catch(()=>{});
+            }, 1000);
+        });
+    </script>
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

@@ -21,15 +21,15 @@
         }
 
         /**
-         * Initialize pages list from PAGE_CONFIGS
+         * Initialize pages list from pageInitializationConfigs
          */
         initializePagesList() {
-            if (!window.PAGE_CONFIGS) {
-                console.error('❌ PAGE_CONFIGS not available');
+            if (!window.pageInitializationConfigs) {
+                console.error('❌ pageInitializationConfigs not available');
                 return;
             }
 
-            this.pages = Object.keys(window.PAGE_CONFIGS)
+            this.pages = Object.keys(window.pageInitializationConfigs)
                 .filter(pageName => {
                     // Skip test/archive/backup pages
                     return !pageName.includes('test') && 
@@ -39,7 +39,7 @@
                 })
                 .map(pageName => ({
                     name: pageName,
-                    config: window.PAGE_CONFIGS[pageName]
+                    config: window.pageInitializationConfigs[pageName]
                 }));
 
             console.log(`✅ Initialized ${this.pages.length} pages for validation`);

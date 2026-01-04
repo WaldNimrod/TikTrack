@@ -217,7 +217,7 @@ def create_my_entity():
 
 - **מיקום**: תפריט "כלי פיתוח" → "בדיקת Cache"
 - **URL**: `http://localhost:8080/cache-test`
-- **מדריך מלא**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
+- **מדריך מלא**: `documentation/03-DEVELOPMENT/GUIDELINES/CACHE_MONITORING_USER_GUIDE.md`
 
 ### **Cache לא מתבטל?**
 
@@ -245,7 +245,7 @@ def create_my_entity():
 - **URL**: `http://localhost:8080/cache-test`  
 - **תכונות**: Dashboard חי, Dependencies matrix, TTL strategy, Invalidation testing
 - **מיקום בתפריט**: "כלי פיתוח" → "פעולות מערכת" → "בדיקת Cache"
-- **מדריך מפורט**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
+- **מדריך מפורט**: `documentation/03-DEVELOPMENT/GUIDELINES/CACHE_MONITORING_USER_GUIDE.md`
 
 ### **📡 API Endpoints לניטור:**
 

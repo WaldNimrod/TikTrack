@@ -86,7 +86,7 @@ const wrongPageConfig = {
 // פונקציית בדיקה פשוטה
 function checkPackageLoading(packageName) {
   const manifest = window.PACKAGE_MANIFEST?.[packageName];
-  const inPageConfig = window.PAGE_CONFIGS?.[window.currentPage]?.packages?.includes(packageName);
+  const inPageConfig = window.pageInitializationConfigs?.[window.currentPage]?.packages?.includes(packageName);
   const scriptInDom = !!document.querySelector(`script[src*="${packageName}"]`);
   const globalAvailable = !!window[packageName.replace('-', '').toUpperCase()];
 

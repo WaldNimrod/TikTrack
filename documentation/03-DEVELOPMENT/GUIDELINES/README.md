@@ -13,11 +13,11 @@ Contains guides for various aspects of TikTrack development.
 **Files:**
 
 - `DEVELOPMENT_CACHE_GUIDE.md`
-- `bootstrap-5-menu-classes-reference.md`
-- `linter-config.md`
-- `menu-classes-comparison.md`
+- `bootstrap_5_menu_classes_reference.md`
+- `linter_config.md`
+- `menu_classes_comparison.md`
 - `menu-migration-workplan.md`
-- `safe-css-migration-guide.md`
+- `safe_css_migration_guide.md`
 
 ## 🎯 Guide Categories
 

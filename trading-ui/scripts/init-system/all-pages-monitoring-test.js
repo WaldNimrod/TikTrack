@@ -37,9 +37,9 @@ class AllPagesMonitoringTest {
      * Initialize with pages list
      */
     init() {
-        // Get pages from PAGE_CONFIGS
-        if (window.PAGE_CONFIGS) {
-            this.pages = Object.keys(window.PAGE_CONFIGS)
+        // Get pages from pageInitializationConfigs
+        if (window.pageInitializationConfigs) {
+            this.pages = Object.keys(window.pageInitializationConfigs)
                 .filter(pageName => {
                     // Skip test pages and backup pages
                     return !pageName.includes('test') && 
@@ -130,7 +130,7 @@ class AllPagesMonitoringTest {
             });
 
             // Get page config
-            const pageConfig = window.PAGE_CONFIGS?.[pageName];
+            const pageConfig = window.pageInitializationConfigs?.[pageName];
             if (!pageConfig) {
                 this.results.push({
                     pageName,
@@ -308,7 +308,7 @@ class AllPagesMonitoringTest {
         } else if (type === 'duplicate_script') {
             return `הסר את הכפילות של ${mismatch.file || 'הסקריפט'} מהקובץ ${scanResults.pageName}.html`;
         } else if (type === 'missing_global') {
-            return `הוסף את החבילה המתאימה ל-PAGE_CONFIGS עבור ${scanResults.pageName} או וודא שהסקריפט נטען`;
+            return `הוסף את החבילה המתאימה ל-pageInitializationConfigs עבור ${scanResults.pageName} או וודא שהסקריפט נטען`;
         }
 
         return `תקן את הבעיה בקובץ ${scanResults.pageName}.html לפי התיעוד`;

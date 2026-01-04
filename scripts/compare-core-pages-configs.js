@@ -42,7 +42,7 @@ CORE_PAGES.forEach(pageName => {
         issues.push({
             page: pageName,
             type: 'missing',
-            message: `Page ${pageName} not found in PAGE_CONFIGS`
+            message: `Page ${pageName} not found in pageInitializationConfigs`
         });
         return;
     }

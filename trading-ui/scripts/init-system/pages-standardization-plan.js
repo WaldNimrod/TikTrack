@@ -32,15 +32,15 @@ class PagesStandardizationPlan {
     }
 
     /**
-     * Initialize pages list from PAGE_CONFIGS
+     * Initialize pages list from pageInitializationConfigs
      */
     initializePagesList() {
         const pages = [];
         
-        // Get pages from PAGE_CONFIGS
-        if (window.PAGE_CONFIGS) {
-            Object.keys(window.PAGE_CONFIGS).forEach(pageName => {
-                const config = window.PAGE_CONFIGS[pageName];
+        // Get pages from pageInitializationConfigs
+        if (window.pageInitializationConfigs) {
+            Object.keys(window.pageInitializationConfigs).forEach(pageName => {
+                const config = window.pageInitializationConfigs[pageName];
                 
                 // Skip test pages and backup pages
                 if (pageName.includes('test') || 
@@ -343,7 +343,7 @@ class PagesStandardizationPlan {
         }
 
         // Get page config
-        const pageConfig = window.PAGE_CONFIGS?.[pageName];
+        const pageConfig = window.pageInitializationConfigs?.[pageName];
         if (!pageConfig) {
             if (typeof showNotification === 'function') {
                 showNotification(`לא נמצא קונפיגורציה לעמוד ${pageName}`, 'error');

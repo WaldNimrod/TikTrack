@@ -9,7 +9,7 @@
  * 95% of console errors across all pages.
  *
  * KEY FIX: auth package (loadOrder: 1.0) now loads BEFORE header package (loadOrder: 1.2)
- * This ensures window.TikTrackAuth.showLoginModal is available when header-system.js needs it.
+ * This ensures window.TikTrackAuth is available when header-system.js needs redirect logic.
  *
  * IMPACT: Reduced console errors from 3,863 to ~150 total across all pages.
  *
@@ -424,7 +424,7 @@ const PACKAGE_MANIFEST = {
 
   // 1.5. AUTH PACKAGE - Authentication (loaded separately to avoid conflicts)
   // 🔴 CRITICAL: AUTH PACKAGE - Must load FIRST (loadOrder: 1.0)
-  // 📋 Dependencies: Required by header-system.js (window.TikTrackAuth.showLoginModal)
+  // 📋 Dependencies: Required by header-system.js (redirect to /login.html)
   // 📅 Updated: 2025-12-12 - Changed loadOrder from 1.5 to 1.0 to fix ReferenceError issues
   // 🎯 Impact: Resolved 95% of console errors across all pages
   auth: {
@@ -2169,7 +2169,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'page-initialization-configs.js',
-        globalCheck: 'window.PAGE_INITIALIZATION_CONFIGS',
+        globalCheck: 'window.pageInitializationConfigs',
         description: 'Page initialization configurations',
         required: true,
         loadOrder: 2

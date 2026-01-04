@@ -18,6 +18,7 @@
 
 // === Initialization ===
 // - setupLoginForm() - Setuploginform
+
 // - createLoginInterface() - Createlogininterface
 // - createLogoutButton() - Createlogoutbutton
 // - setupVisibilityCheck() - Setupvisibilitycheck
@@ -48,6 +49,12 @@
 // === Utility Functions ===
 // - stopVisibilityCheck() - Stopvisibilitycheck
 
+// === TESTING HOOKS (Fix Pack 5) ===
+// - isTestingEnvironment() - Istestingenvironment
+// - enableTestMode() - Enabletestmode
+// - performTestLogin() - Performtestlogin
+// - getTestAuthState() - Gettestauthstate
+
 // === Other ===
 // - removeAuthFromCache() - Removeauthfromcache
 // - forceLogoutAndPrompt() - Forcelogoutandprompt
@@ -66,9 +73,18 @@ let currentUser = null;
 // CRITICAL: Always use includeUserId: false for auth-related keys to avoid key mismatches
 // SessionStorageLayer is used for auth tokens (bootstrap compatibility + unified management)
 const authCacheOptions = { includeUserId: false, layer: 'sessionStorage' };
-const DEV_SESSION_TOKEN_KEY = 'dev_authToken';
-const DEV_SESSION_USER_KEY = 'dev_currentUser';
-const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('tiktrack_auth_channel') : null;
+// Unified keys for compatibility with UnifiedCacheManager SessionStorageLayer
+const SESSION_TOKEN_KEY = 'authToken';  // Changed from 'dev_authToken' to match UCM
+const SESSION_USER_KEY = 'currentUser';  // Changed from 'dev_currentUser' to match UCM
+let authBroadcastChannel = null;
+try {
+  if (typeof BroadcastChannel !== 'undefined') {
+    authBroadcastChannel = new BroadcastChannel('tiktrack_auth_channel');
+  }
+} catch (error) {
+  console.warn('[auth.js] BroadcastChannel disabled:', error?.message || error);
+  authBroadcastChannel = null;
+}
 
 /**
  * Helper function to check if current page is a public page (login, register, etc.)
@@ -92,14 +108,113 @@ function sendDebugLog(location, message, data, hypothesisId) {
 
 // Bootstrap auth from sessionStorage (dev mode) as early as possible
 (function bootstrapAuthFromSessionStorage() {
+  // region agent log - bootstrap start
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      location: 'trading-ui/scripts/auth.js:bootstrapAuthFromSessionStorage',
+      message: 'Bootstrap auth starting',
+      data: {
+        hasSessionStorage: typeof sessionStorage !== 'undefined',
+        documentReadyState: document.readyState,
+        timestamp: Date.now()
+      },
+      sessionId: 'bootstrap_auth_debug',
+      runId: 'user_profile_redirect_fix',
+      hypothesisId: 'bootstrap_timing'
+    })
+  }).catch(() => {});
+  // endregion
+
   try {
-    if (typeof sessionStorage === 'undefined') return;
-    const storedToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
-    const storedUserRaw = sessionStorage.getItem(DEV_SESSION_USER_KEY);
-    if (!storedToken || !storedUserRaw) return;
+    if (typeof sessionStorage === 'undefined') {
+      // region agent log - no sessionStorage
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          location: 'trading-ui/scripts/auth.js:bootstrapAuthFromSessionStorage',
+          message: 'sessionStorage not available',
+          data: { timestamp: Date.now() },
+          sessionId: 'bootstrap_auth_debug',
+          runId: 'user_profile_redirect_fix',
+          hypothesisId: 'bootstrap_no_sessionstorage'
+        })
+      }).catch(() => {});
+      // endregion
+      return;
+    }
+    const storedToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
+    const storedUserRaw = sessionStorage.getItem(SESSION_USER_KEY);
+    
+    // region agent log - bootstrap keys check
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/auth.js:bootstrapAuthFromSessionStorage',
+        message: 'Checking bootstrap keys',
+        data: {
+          tokenKey: SESSION_TOKEN_KEY,
+          userKey: SESSION_USER_KEY,
+          hasStoredToken: !!storedToken,
+          hasStoredUser: !!storedUserRaw,
+          timestamp: Date.now()
+        },
+        sessionId: 'bootstrap_auth_debug',
+        runId: 'user_profile_redirect_fix',
+        hypothesisId: 'bootstrap_keys_check'
+      })
+    }).catch(() => {});
+    // endregion
+
+    if (!storedToken || !storedUserRaw) {
+      // region agent log - no bootstrap keys
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          location: 'trading-ui/scripts/auth.js:bootstrapAuthFromSessionStorage',
+          message: 'No bootstrap keys found',
+          data: {
+            hasStoredToken: !!storedToken,
+            hasStoredUser: !!storedUserRaw,
+            timestamp: Date.now()
+          },
+          sessionId: 'bootstrap_auth_debug',
+          runId: 'user_profile_redirect_fix',
+          hypothesisId: 'bootstrap_no_keys'
+        })
+      }).catch(() => {});
+      // endregion
+      return;
+    }
     const storedUser = JSON.parse(storedUserRaw);
     authToken = storedToken;
     currentUser = storedUser;
+    window.authToken = storedToken;
+    window.currentUser = storedUser;
+
+    // region agent log - bootstrap success
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/auth.js:bootstrapAuthFromSessionStorage',
+        message: 'Bootstrap auth successful',
+        data: {
+          hasAuthToken: !!window.authToken,
+          hasCurrentUser: !!window.currentUser,
+          currentUserId: window.currentUser?.id,
+          timestamp: Date.now()
+        },
+        sessionId: 'bootstrap_auth_debug',
+        runId: 'user_profile_redirect_fix',
+        hypothesisId: 'bootstrap_success'
+      })
+    }).catch(() => {});
+    // endregion
     // Best effort: sync to UnifiedCacheManager after initialization
     // This ensures bootstrap data is synced to SessionStorageLayer for unified management
     if (window.UnifiedCacheManager) {
@@ -163,6 +278,29 @@ function broadcastAuthEvent(eventPayload) {
 }
 
 async function saveAuthToCache(user, token = 'session_based') {
+  // region agent log - Option 1 verification
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      location: 'trading-ui/scripts/auth.js:saveAuthToCache',
+      message: 'Option 1: Saving auth to SessionStorageLayer only',
+      data: {
+        userId: user?.id,
+        username: user?.username,
+        tokenType: typeof token,
+        usingUnifiedCacheManager: !!window.UnifiedCacheManager?.initialized,
+        layer: 'sessionStorage',
+        includeUserId: false,
+        timestamp: Date.now()
+      },
+      sessionId: 'option1_verification',
+      runId: 'option1_implementation_test',
+      hypothesisId: 'option1_sessionstorage_only'
+    })
+  }).catch(() => {});
+  // endregion
+
   window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
     userId: user?.id,
     username: user?.username,
@@ -183,14 +321,14 @@ async function saveAuthToCache(user, token = 'session_based') {
       
       // Also save to bootstrap keys for compatibility (fallback if UnifiedCacheManager not available)
       if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
-        sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
+        sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+        sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
       }
     } else {
       // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
       if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
-        sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
+        sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+        sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
       } else {
         window.AuthDebugMonitor?.log('error', '❌ No sessionStorage available for saveAuthToCache');
         return false;
@@ -213,8 +351,8 @@ async function saveAuthToCache(user, token = 'session_based') {
     // Fallback to bootstrap keys if not found in SessionStorageLayer
     if (!verifyUser || !verifyToken) {
       if (typeof sessionStorage !== 'undefined') {
-        verifyUser = JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
-        verifyToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+        verifyUser = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY) || 'null');
+        verifyToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
       }
     }
     
@@ -261,8 +399,8 @@ async function getAuthFromCache() {
     
     // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
     if (typeof sessionStorage !== 'undefined') {
-      const user = JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
-      const token = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+      const user = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY) || 'null');
+      const token = sessionStorage.getItem(SESSION_TOKEN_KEY);
       if (user && token) {
         return { user, token };
       }
@@ -296,8 +434,8 @@ async function removeAuthFromCache() {
     
     // Always clear bootstrap keys as fallback (bootstrap mode compatibility)
     if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem(DEV_SESSION_TOKEN_KEY);
-      sessionStorage.removeItem(DEV_SESSION_USER_KEY);
+      sessionStorage.removeItem(SESSION_TOKEN_KEY);
+      sessionStorage.removeItem(SESSION_USER_KEY);
     }
     
     window.AuthDebugMonitor?.log('info', '✅ removeAuthFromCache completed');
@@ -311,7 +449,7 @@ async function removeAuthFromCache() {
 }
 
 /**
- * Force logout: clear all auth caches (all layers) and show login modal
+ * Force logout: clear all auth caches (all layers) and redirect to login page
  * Used on 401 / session-expired flows to avoid "phantom auth" states.
  */
 async function forceLogoutAndPrompt(reason = 'unauthorized') {
@@ -360,9 +498,13 @@ async function forceLogoutAndPrompt(reason = 'unauthorized') {
     window.Logger?.warn?.('⚠️ [auth.js] Failed broadcasting logout event', { error: e?.message });
   }
   
-  // Show login modal (preferred). No redirect to login.html (page removed).
-  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-    await window.TikTrackAuth.showLoginModal();
+  const path = window.location?.pathname || '';
+  const isLoginPage = path === '/login' || path === '/login.html';
+  if (!isLoginPage) {
+    try {
+      sessionStorage.setItem('redirectAfterLogin', window.location.href);
+    } catch (_) {}
+    window.location.href = '/login.html';
   }
 }
 
@@ -437,10 +579,7 @@ if (typeof window.addEventListener === 'function') {
           window.dispatchEvent(new CustomEvent('logout:success'));
           window.dispatchEvent(new CustomEvent('user:logged-out'));
           
-          // Show login modal (single flow, no login.html redirects)
-          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-            await window.TikTrackAuth.showLoginModal();
-          }
+          window.location.href = '/login.html';
         } else if (authEvent.type === 'login') {
           // Login event from another tab - update local state
           // Only process if it's actually from another tab (not from current tab)
@@ -514,9 +653,7 @@ if (typeof window.addEventListener === 'function') {
           }
           window.dispatchEvent(new CustomEvent('logout:success'));
           window.dispatchEvent(new CustomEvent('user:logged-out'));
-          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-            await window.TikTrackAuth.showLoginModal();
-          }
+          window.location.href = '/login.html';
         } else if (authEvent.type === 'login') {
           console.log('🔔 Login event received via BroadcastChannel');
           // Refresh header; optionally re-check auth
@@ -574,6 +711,29 @@ async function login(username, password) {
   if (data.data?.user) {
     currentUser = data.data.user;
     authToken = data.data?.access_token;
+
+    // Save bootstrap keys for compatibility (if UnifiedCacheManager not available during bootstrap)
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('authToken', authToken);  // Use same key as UnifiedCacheManager
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));  // Use same key as UnifiedCacheManager
+      }
+    } catch (e) {
+      // Silently ignore sessionStorage errors
+    }
+
+    // Save to UnifiedCacheManager synchronously (primary storage)
+    if (window.UnifiedCacheManager?.initialized) {
+      await window.UnifiedCacheManager.save('authToken', authToken, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+      await window.UnifiedCacheManager.save('currentUser', currentUser, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+    }
+
     await saveAuthToCache(currentUser, authToken);
     
     // Save timestamp to prevent redirect loop (auth-guard checks this)
@@ -584,6 +744,53 @@ async function login(username, password) {
 
   window.AuthDebugMonitor?.log('info', '✅ LOGIN function completed', { username, userId: currentUser?.id });
   return data;
+}
+
+// Export login function immediately for login.js compatibility (critical for script load order)
+if (typeof window !== 'undefined') {
+  window.login = login;
+
+  // region agent log - login function export verification
+  console.log('[auth.js] LOGIN EXPORT: Starting export process');
+  console.log('[auth.js] LOGIN EXPORT: login function type:', typeof login);
+  console.log('[auth.js] LOGIN EXPORT: window.login type before export:', typeof window.login);
+
+  try {
+    window.login = login;
+    console.log('[auth.js] LOGIN EXPORT: window.login type after export:', typeof window.login);
+    console.log('[auth.js] LOGIN EXPORT: window.login is function:', typeof window.login === 'function');
+    console.log('[auth.js] LOGIN EXPORT: window.login === login:', window.login === login);
+
+    // Log to debug system
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        location: 'trading-ui/scripts/auth.js:login_export',
+        message: 'window.login exported immediately after function definition',
+        data: {
+          loginFunctionType: typeof login,
+          windowLoginType: typeof window.login,
+          documentReadyState: document.readyState,
+          exportSuccessful: typeof window.login === 'function',
+          timestamp: Date.now()
+        },
+        sessionId: 'login_function_export_verification',
+        runId: 'option1_login_fix',
+        hypothesisId: 'login_export_immediate'
+      })
+    }).catch((err) => {
+      console.log('[auth.js] LOGIN EXPORT: Fetch failed:', err.message);
+    });
+
+    console.log('[auth.js] LOGIN EXPORT: Export process completed successfully');
+
+  } catch (exportError) {
+    console.error('[auth.js] LOGIN EXPORT: Export failed with error:', exportError);
+  }
+  // endregion
+} else {
+  console.error('[auth.js] LOGIN EXPORT: window is undefined, cannot export');
 }
 
 // פונקציית הרשמה
@@ -628,30 +835,6 @@ function showLoginError(message, containerId = 'loginError') {
   } else {
     // אם אין אלמנט שגיאה, נציג console error
     // שגיאה
-  }
-}
-
-function closeLoginModal() {
-  const modalId = 'loginModal';
-  const modalEl = document.getElementById(modalId);
-  if (!modalEl) {return;}
-  try {
-    const inst = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
-    if (inst) {
-      inst.hide();
-    }
-    modalEl.classList.remove('show');
-    modalEl.style.display = 'none';
-    if (window.ModalNavigationService?.pop) {
-      window.ModalNavigationService.pop(modalId);
-    }
-    if (window.ModalZIndexManager?.forceUpdate) {
-      window.ModalZIndexManager.forceUpdate();
-    }
-    setTimeout(() => modalEl.remove(), 150);
-  } catch (e) {
-    window.Logger?.warn?.('⚠️ [auth.js] closeLoginModal failed', { error: e?.message });
-    modalEl.remove();
   }
 }
 
@@ -842,8 +1025,8 @@ async function logout() {
   
   // Clear from localStorage directly (critical - must be explicit)
   try {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    await window.UnifiedCacheManager?.remove('authToken', { layer: 'sessionStorage' });
+    await window.UnifiedCacheManager?.remove('currentUser', { layer: 'sessionStorage' });
     // Keep saved credentials in localStorage for cross-tab sync (these are safe to keep)
     // localStorage.removeItem('savedUsername'); // Keep for convenience
     // localStorage.removeItem('savedPassword'); // Keep for convenience
@@ -861,7 +1044,7 @@ async function logout() {
     const sessionKeys = Object.keys(sessionStorage);
     sessionKeys.forEach(key => {
       if (key.startsWith('tiktrack_') || key.includes('auth') || key.includes('user') || 
-          key === 'dev_authToken' || key === 'dev_currentUser') {
+          key === 'authToken' || key === 'currentUser') {
         sessionStorage.removeItem(key);
       }
     });
@@ -952,9 +1135,20 @@ async function logout() {
  * @returns {boolean} True if user data exists in memory (may be stale)
  */
 function isAuthenticated() {
-  // Quick sync check - checks in-memory variable first
+  // region agent log - isAuthenticated check
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth.js:isAuthenticated',message:'isAuthenticated() called',data:{page:window.location.pathname,currentUser:!!currentUser,windowCurrentUser:!!window.currentUser,windowAuthToken:!!window.authToken,sessionToken:sessionStorage.getItem('authToken'),sessionUser:sessionStorage.getItem('currentUser')},sessionId:'debug-session',runId:'user_profile_loop_fix_v2',hypothesisId:'H6_isAuthenticated_check',timestamp:Date.now()})}).catch(()=>{});
+  // endregion
+
+  // Quick sync check - checks in-memory variable first, then window globals (bootstrap)
   // NOTE: This should NOT be used for security checks - use checkAuthentication() instead
   if (currentUser) {
+    return true;
+  }
+  // Check window globals (set by bootstrap or login)
+  if (window.currentUser && window.authToken) {
+    // Sync to local variables for consistency
+    currentUser = window.currentUser;
+    authToken = window.authToken;
     return true;
   }
   // No fallback - UnifiedCacheManager is async, use isAuthenticatedSync() for async check
@@ -1152,7 +1346,19 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
           });
           
           // Use helper function for consistent key handling
-          await saveAuthToCache(currentUser, authToken);
+          // Save to UnifiedCacheManager synchronously (primary storage)
+    if (window.UnifiedCacheManager?.initialized) {
+      await window.UnifiedCacheManager.save('authToken', authToken, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+      await window.UnifiedCacheManager.save('currentUser', currentUser, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+    }
+
+    await saveAuthToCache(currentUser, authToken);
         } else {
           window.Logger?.error?.('❌ [auth.js] UnifiedCacheManager not available', { page: 'auth' });
           window.AuthDebugMonitor?.log('error', '❌ UnifiedCacheManager not available');
@@ -1295,6 +1501,10 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
 
+    // region agent log - checkAuthentication entry
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth.js:checkAuthentication:entry',message:'checkAuthentication called',data:{page:window.location.pathname,onAuthenticatedProvided:!!onAuthenticated,onNotAuthenticatedProvided:!!onNotAuthenticated,windowAuthToken:!!window.authToken,windowCurrentUser:!!window.currentUser,sessionToken:sessionStorage.getItem('authToken'),sessionUser:sessionStorage.getItem('currentUser'),unifiedCacheManagerExists:!!window.UnifiedCacheManager,unifiedCacheManagerInitialized:window.UnifiedCacheManager?.initialized},sessionId:'debug-session',runId:'user_profile_loop_fix',hypothesisId:'H3_checkAuthentication_calls',timestamp:Date.now()})}).catch(()=>{});
+    // endregion
+
     console.log('[auth.js] checkAuthentication: Starting authentication check');
     console.log('[auth.js] checkAuthentication: Looking for stored tokens...');
     console.log('[auth.js] checkAuthentication: UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
@@ -1365,23 +1575,19 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
       }
     }
     if (!tokenAvailable && typeof sessionStorage !== 'undefined') {
-      const t = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+      const t = sessionStorage.getItem(SESSION_TOKEN_KEY);
       if (t) {
         tokenAvailable = true;
         effectiveToken = t;
         authToken = t;
-        const uRaw = sessionStorage.getItem(DEV_SESSION_USER_KEY);
+        const uRaw = sessionStorage.getItem(SESSION_USER_KEY);
         try {
           const u = uRaw ? JSON.parse(uRaw) : null;
           currentUser = u;
           // Mirror to globals for dev/no-cache flows
           window.authToken = authToken;
           window.currentUser = currentUser;
-          // Mirror to localStorage so api-fetch-wrapper can pick it up if needed
-          localStorage.setItem('authToken', authToken);
-          if (currentUser) {
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          }
+          // Option 1: No localStorage usage - UnifiedCacheManager handles everything
           if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.save('authToken', t, authCacheOptions);
             if (u) await window.UnifiedCacheManager.save('currentUser', u, authCacheOptions);
@@ -1392,7 +1598,7 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
 
     console.log('[auth.js] checkAuthentication: tokenAvailable =', tokenAvailable, 'effectiveToken =', effectiveToken ? 'present' : 'null');
     console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized =', window.UnifiedCacheManager?.initialized);
-    console.log('[auth.js] checkAuthentication: sessionStorage token =', (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) ? 'present' : 'null') : 'no sessionStorage');
+    console.log('[auth.js] checkAuthentication: sessionStorage token =', (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem(SESSION_TOKEN_KEY) ? 'present' : 'null') : 'no sessionStorage');
 
     if (!tokenAvailable) {
       console.log('[auth.js] checkAuthentication: No token found');
@@ -1424,22 +1630,40 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         currentUser = newUser;
         // Preserve real token if available (dev/no-cache uses bearer token)
         authToken = effectiveToken || authToken || 'session_based'; // Session-based fallback
-        // Mirror to globals/localStorage for dev/no-cache flows
+        // Mirror to globals for dev/no-cache flows (Option 1: no localStorage)
         window.authToken = authToken;
         window.currentUser = currentUser;
-        localStorage.setItem('authToken', authToken);
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Save bootstrap keys to sessionStorage (required for bootstrap mechanism)
+        try {
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(SESSION_TOKEN_KEY, authToken);
+            sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(currentUser));
+          }
+        } catch (e) {
+          // Silently ignore sessionStorage errors
+        }
+
         // Save to UnifiedCacheManager using helper function
-        await saveAuthToCache(currentUser, authToken);
+        // Save to UnifiedCacheManager synchronously (primary storage)
+    if (window.UnifiedCacheManager?.initialized) {
+      await window.UnifiedCacheManager.save('authToken', authToken, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+      await window.UnifiedCacheManager.save('currentUser', currentUser, {
+        layer: 'sessionStorage',
+        includeUserId: false
+      });
+    }
+
+    await saveAuthToCache(currentUser, authToken);
         
         // Save timestamp to prevent redirect loop (auth-guard checks this)
         if (typeof sessionStorage !== 'undefined') {
           sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
         }
 
-        // Close login modal if present (prevents lingering modal in dev/no-cache)
-        closeLoginModal();
-        
         // Mark that user just logged in (prevents auth-guard from checking immediately)
         if (typeof window.AuthGuard?.markJustLoggedIn === 'function') {
           window.AuthGuard.markJustLoggedIn();
@@ -1518,15 +1742,13 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
     onNotAuthenticated();
   } else {
-    // Show login modal; fallback to homepage
-    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-
-      await window.TikTrackAuth.showLoginModal();
-    } else {
-
-      window.location.href = '/';
-    }
+    // Redirect to login page only (login modal removed)
+    window.location.href = '/login.html';
   }
+
+  // region agent log - checkAuthentication exit
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth.js:checkAuthentication:exit',message:'checkAuthentication returning result',data:{authenticated:finalResult?.authenticated,user:finalResult?.user,error:finalResult?.error,hasAuthToken:!!window.authToken,hasCurrentUser:!!window.currentUser},sessionId:'debug-session',runId:'user_profile_loop_fix',hypothesisId:'H3_checkAuthentication_calls',timestamp:Date.now()})}).catch(()=>{});
+  // endregion
 
   if (resolvePromise) resolvePromise(finalResult);
   return finalResult;
@@ -1585,6 +1807,7 @@ function createLoginInterface(containerId, onSuccess = null) {
   // Use innerHTML instead of DOMParser for better compatibility
   container.innerHTML = loginHTML;
 
+
   // הגדרת הטופס
   setupLoginForm('loginForm', onSuccess);
 }
@@ -1603,304 +1826,18 @@ function createLogoutButton(containerId) {
 }
 
 /**
- * Show login modal instead of redirecting to login page
- * הצגת modal כניסה במקום redirect לעמוד כניסה
+ * Redirect to login page only (login modal removed)
  */
-
-async function showLoginModal(onSuccess = null) {
-
-  // PREVENT MULTIPLE MODALS: Check if already showing
-  // TEMPORARILY DISABLED FOR DEBUGGING
-  /*
-  if (window._loginModalShowing) {
-    console.warn('[auth.js] showLoginModal prevented - already showing modal');
+async function showLoginModal() {
+  window.Logger?.info?.('🔐 [auth.js] Redirecting to login page (no modal)', { page: 'auth' });
+  const path = window.location?.pathname || '';
+  if (path === '/login' || path === '/login.html') {
     return;
   }
-  */
-  console.log('[auth.js] showLoginModal: setting flag to true');
-  window._loginModalShowing = true;
-
-  window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' });
-  // Skip if already authenticated (dev/no-cache support via globals/session/localStorage)
   try {
-    const devToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) : null;
-    const devUser = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem(DEV_SESSION_USER_KEY) : null;
-    const lsToken = (typeof localStorage !== 'undefined') ? localStorage.getItem('authToken') : null;
-    if (currentUser || authToken || devToken || lsToken) {
-      window.Logger?.info?.('ℹ️ [auth.js] showLoginModal skipped - token/user already present', {
-        hasCurrentUser: !!currentUser,
-        hasAuthToken: !!authToken,
-        hasDevToken: !!devToken,
-        hasLSToken: !!lsToken
-      });
-      // If a stale modal exists, remove it
-      const stale = document.getElementById('loginModal');
-      if (stale) {
-        stale.remove();
-      }
-      return;
-    }
-  } catch (e) {
-    window.Logger?.warn?.('⚠️ [auth.js] showLoginModal skip check failed', { error: e?.message });
-  }
-
-  const modalId = 'loginModal';
-
-  // CLEANUP ALL EXISTING MODALS FIRST - prevent zombie modals
-  const allExistingModals = document.querySelectorAll('#loginModal');
-  if (allExistingModals.length > 0) {
-    window.Logger?.info?.('🔍 [auth.js] Cleaning up all existing login modals', { count: allExistingModals.length, page: 'auth' });
-    allExistingModals.forEach(modal => {
-      try {
-        modal.remove();
-      } catch (e) {
-        // Ignore errors when removing
-      }
-    });
-  }
-
-  // Also clean up any orphaned backdrops
-  const orphanedBackdrops = document.querySelectorAll('.modal-backdrop');
-  orphanedBackdrops.forEach(backdrop => {
-    try {
-      backdrop.remove();
-    } catch (e) {
-      // Ignore errors when removing
-    }
-  });
-  
-  // Remove orphaned Bootstrap backdrops (leave the global backdrop managed by ModalManagerV2)
-  const strayBackdrops = document.querySelectorAll('.modal-backdrop:not(#globalModalBackdrop)');
-  if (strayBackdrops.length > 0) {
-    window.Logger?.info?.('🔍 [auth.js] Removing orphaned backdrops', { page: 'auth', count: strayBackdrops.length });
-    strayBackdrops.forEach(backdrop => backdrop.remove());
-  }
-  
-  // Create modal HTML - z-index will be managed by ModalZIndexManager
-  const loginModalHTML = `
-    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header border-0 pb-0">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="display: none;"></button>
-          </div>
-          <div class="modal-body pt-0">
-            <div id="loginModalContainer"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add modal to DOM
-  document.body.insertAdjacentHTML('beforeend', loginModalHTML);
-  // Ensure the global backdrop is present and standardized
-  if (window.ModalManagerV2?.ensureGlobalBackdrop) {
-    window.ModalManagerV2.ensureGlobalBackdrop();
-  }
-
-  // Z-Index handling via central systems (ModalZIndexManager + ModalNavigationService)
-  const modalEl = document.getElementById(modalId);
-  const stack = window.ModalNavigationService?.getStack?.() || [];
-  const stackIndex = stack.length; // push-as-new-top
-  const zDefaults = { modal: 1200, dialog: 1201, content: 1202, backdrop: 1199 };
-  const zCalc = (window.ModalZIndexManager?.calculateModalZIndex)
-    ? window.ModalZIndexManager.calculateModalZIndex(stackIndex, stackIndex + 1)
-    : zDefaults;
-
-  if (modalEl) {
-    const dialog = modalEl.querySelector('.modal-dialog');
-    const content = modalEl.querySelector('.modal-content');
-    modalEl.style.zIndex = zCalc.modal;
-    if (dialog) dialog.style.zIndex = zCalc.dialog;
-    if (content) content.style.zIndex = zCalc.content;
-    const globalBackdrop = document.getElementById('globalModalBackdrop');
-    if (globalBackdrop) {
-      globalBackdrop.style.zIndex = zCalc.backdrop;
-    }
-    // Register in navigation stack to keep nesting order consistent
-    if (window.ModalNavigationService?.push) {
-      window.ModalNavigationService.push({ modalId, element: modalEl, source: 'auth-login', timestamp: Date.now() });
-    }
-    // Force z-index recalculation using the central manager if available
-    if (window.ModalZIndexManager?.forceUpdate) {
-      window.ModalZIndexManager.forceUpdate(modalEl);
-    }
-  }
-  window.Logger?.info?.('✅ [auth.js] Modal HTML added to DOM', { page: 'auth' });
-  
-  // Create login interface inside modal
-  const container = document.getElementById('loginModalContainer');
-  if (container) {
-    window.Logger?.info?.('✅ [auth.js] Container found, creating login interface', { page: 'auth' });
-    createLoginInterface('loginModalContainer', async () => {
-      // Login successful - page will auto-reload, just log success
-      window.AuthDebugMonitor?.log('info', '✅ Login completed successfully - page will auto-reload', {
-        timestamp: new Date().toISOString()
-      });
-
-      // Close modal since page will reload
-      const modalInstance = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
-      modalEl.classList.remove('show');
-      modalEl.style.display = 'none';
-      // Remove from navigation stack if present
-      if (window.ModalNavigationService?.pop) {
-        window.ModalNavigationService.pop(modalId);
-      }
-      // Update z-index stack
-      if (window.ModalZIndexManager?.forceUpdate) {
-        window.ModalZIndexManager.forceUpdate();
-      }
-      // Remove element after a short delay to allow transitions
-      setTimeout(() => modalEl.remove(), 150);
-    });
-  } else {
-    window.Logger?.error?.('❌ [auth.js] Container not found', { page: 'auth' });
-  }
-  
-  // Show modal using Bootstrap
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    window.Logger?.info?.('✅ [auth.js] Modal element found, checking Bootstrap', { 
-      page: 'auth',
-      hasBootstrap: typeof window.bootstrap !== 'undefined',
-      hasModal: typeof window.bootstrap?.Modal !== 'undefined'
-    });
-    
-    // Wait a bit for DOM to be ready
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    if (window.bootstrap && window.bootstrap.Modal) {
-      window.Logger?.info?.('✅ [auth.js] Bootstrap available, showing modal', { page: 'auth' });
-      try {
-        const modal = new window.bootstrap.Modal(modalElement, {
-          backdrop: 'static',
-          keyboard: false
-        });
-        modal.show();
-        window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully', { page: 'auth' });
-        if (window.ModalZIndexManager?.registerModal) {
-          window.ModalZIndexManager.registerModal(modalElement);
-        }
-        
-        // Register modal in ModalNavigationService stack before forcing z-index update
-        if (window.ModalNavigationService?.registerModalOpen) {
-          try {
-            window.ModalNavigationService.registerModalOpen(modalElement, {
-              modalId,
-              source: 'auth.js',
-              type: 'auth',
-            });
-          } catch (e) {
-            window.Logger?.warn?.('⚠️ [auth.js] registerModalOpen failed (non-blocking)', {
-              page: 'auth',
-              error: e?.message,
-            });
-          }
-        }
-
-        // Update z-index using ModalZIndexManager (central z-index management system)
-        if (window.ModalZIndexManager) {
-          if (typeof window.ModalZIndexManager.forceUpdate === 'function') {
-            // Use requestAnimationFrame for immediate update, then retry with setTimeout
-            requestAnimationFrame(() => {
-              window.ModalZIndexManager.forceUpdate(modalElement);
-              
-              // Retry after a short delay to ensure z-index is set correctly
-              setTimeout(() => {
-                window.ModalZIndexManager.forceUpdate(modalElement);
-                window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager', { page: 'auth' });
-              }, 120);
-            });
-          } else {
-            window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager.forceUpdate not available', { page: 'auth' });
-          }
-        } else {
-          window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback', { page: 'auth' });
-        }
-        
-        // No manual backdrop creation here; ModalManagerV2/ModalZIndexManager manage the single global backdrop
-      } catch (error) {
-        window.Logger?.error?.('❌ [auth.js] Error showing modal', { 
-          page: 'auth',
-          error: error.message,
-          stack: error.stack
-        });
-      }
-    } else {
-      window.Logger?.warn?.('⏳ [auth.js] Bootstrap not available, waiting...', { page: 'auth' });
-      // Fallback: wait for Bootstrap to load
-      let attempts = 0;
-      const checkBootstrap = setInterval(() => {
-        attempts++;
-        if (window.bootstrap && window.bootstrap.Modal) {
-          clearInterval(checkBootstrap);
-          window.Logger?.info?.('✅ [auth.js] Bootstrap loaded, showing modal', { 
-            page: 'auth',
-            attempts: attempts
-          });
-          try {
-          const modal = new window.bootstrap.Modal(modalElement, {
-              backdrop: 'static',
-              keyboard: false
-            });
-            modal.show();
-            window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully (after wait)', { page: 'auth' });
-          if (window.ModalZIndexManager?.registerModal) {
-            window.ModalZIndexManager.registerModal(modalElement);
-          }
-            
-            // Update z-index using ModalZIndexManager (central z-index management system)
-            if (window.ModalZIndexManager) {
-              if (typeof window.ModalZIndexManager.registerModal === 'function') {
-                window.ModalZIndexManager.registerModal(modalElement);
-              }
-              if (typeof window.ModalZIndexManager.forceUpdate === 'function') {
-                // Use requestAnimationFrame for immediate update, then retry with setTimeout
-                requestAnimationFrame(() => {
-                  window.ModalZIndexManager.forceUpdate(modalElement);
-                  
-                  // Retry after a short delay to ensure z-index is set correctly
-                  setTimeout(() => {
-                    window.ModalZIndexManager.forceUpdate(modalElement);
-                    window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager (after wait)', { page: 'auth' });
-                  }, 100);
-                });
-              } else {
-                window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager.forceUpdate not available (after wait)', { page: 'auth' });
-              }
-            } else {
-              window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback (after wait)', { page: 'auth' });
-            }
-            
-            // No manual backdrop creation here; ModalManagerV2/ModalZIndexManager manage the single global backdrop
-          } catch (error) {
-            window.Logger?.error?.('❌ [auth.js] Error showing modal (after wait)', { 
-              page: 'auth',
-              error: error.message,
-              stack: error.stack
-            });
-          }
-        } else if (attempts > 50) {
-          clearInterval(checkBootstrap);
-          window.Logger?.error?.('❌ [auth.js] Bootstrap Modal not available after waiting', { 
-            page: 'auth',
-            attempts: attempts
-          });
-        }
-      }, 100);
-    }
-  } else {
-    window.Logger?.error?.('❌ [auth.js] Modal element not found after adding to DOM', { page: 'auth' });
-  }
-
-  // RELEASE THE LOCK when modal is closed or after timeout
-  setTimeout(() => {
-    window._loginModalShowing = false;
-  }, 5000); // INCREASED: Allow modal to be shown for 5 seconds before allowing new ones
+    sessionStorage.setItem('redirectAfterLogin', window.location.href);
+  } catch (_) {}
+  window.location.href = '/login.html';
 }
 
 // פונקציה לבדיקת הרשאות
@@ -2473,12 +2410,7 @@ function setupVisibilityCheck() {
             console.warn('Error broadcasting logout event:', error);
           }
           
-          // Show login modal or redirect
-          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-            await window.TikTrackAuth.showLoginModal();
-          } else {
-            window.location.href = '/';
-          }
+          window.location.href = '/login.html';
         } else {
           // Session is valid - update cache with fresh data
           const data = await response.json();
@@ -2543,13 +2475,144 @@ if (typeof window !== 'undefined') {
 // Stop visibility check on logout
 // Note: stopVisibilityCheck is called at the start of logout()
 
+// ===== TESTING HOOKS (Fix Pack 5) =====
+
+// Detect testing environment
+function isTestingEnvironment() {
+  return window.location.hostname === 'localhost' ||
+         window.location.hostname === '127.0.0.1' ||
+         window.location.search.includes('test_mode') ||
+         window.localStorage.getItem('tiktrack_test_mode') === 'true' ||
+         window.sessionStorage.getItem('tiktrack_test_mode') === 'true';
+}
+
+// Enable test mode for automated testing
+function enableTestMode(bypassAuth = false) {
+  console.log('[Auth] Enabling test mode, bypassAuth:', bypassAuth);
+
+  // Set test mode flags
+  localStorage.setItem('tiktrack_test_mode', 'true');
+  sessionStorage.setItem('tiktrack_test_mode', 'true');
+
+  if (bypassAuth) {
+    localStorage.setItem('tiktrack_auth_bypass', 'true');
+    // Simulate authenticated state for testing
+    window.authToken = 'test_bypass_token_' + Date.now();
+    window.currentUser = {
+      id: 1,
+      username: 'test_admin',
+      role: 'admin',
+      permissions: ['all'],
+      email: 'test@tiktrack.com'
+    };
+
+    // Trigger authentication success
+    if (typeof window.onAuthSuccess === 'function') {
+      window.onAuthSuccess();
+    }
+
+    // Dispatch auth event
+    window.dispatchEvent(new CustomEvent('auth:login', {
+      detail: { user: window.currentUser, testMode: true }
+    }));
+  }
+
+  console.log('[Auth] Test mode enabled');
+}
+
+// Perform test login with automated credentials
+async function performTestLogin(username = 'admin', password = 'admin123') {
+  console.log('[Auth] Performing test login for:', username);
+
+  try {
+    // Wait for login form to be available
+    let attempts = 0;
+    while (attempts < 20) {
+      const form = document.querySelector('form[action*="login"], #login-form, .login-form');
+      if (form) break;
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    // Fill form programmatically
+    const usernameInput = document.querySelector('input[name="username"], input[type="text"], #username');
+    const passwordInput = document.querySelector('input[name="password"], input[type="password"], #password');
+
+    if (usernameInput && passwordInput) {
+      usernameInput.value = username;
+      passwordInput.value = password;
+
+      // Trigger input events
+      usernameInput.dispatchEvent(new Event('input', { bubbles: true }));
+      passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+      // Submit form
+      const form = usernameInput.closest('form');
+      if (form) {
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        console.log('[Auth] Test login form submitted');
+        return { success: true };
+      }
+    }
+
+    throw new Error('Login form elements not found');
+
+  } catch (error) {
+    console.error('[Auth] Test login failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Get authentication state for testing validation
+async function getTestAuthState() {
+  if (typeof window === 'undefined') {
+    return {
+      isAuthenticated: false,
+      hasCurrentUser: false,
+      authToken: false,
+      currentUser: null,
+      testMode: false,
+      authBypass: false,
+      sessionValid: false
+    };
+  }
+
+  return {
+    isAuthenticated: !!window.authToken,
+    hasCurrentUser: !!window.currentUser,
+    authToken: !!window.authToken,
+    currentUser: window.currentUser ? {
+      id: window.currentUser.id,
+      username: window.currentUser.username,
+      role: window.currentUser.role
+    } : null,
+    testMode: isTestingEnvironment(),
+    authBypass: localStorage.getItem('tiktrack_auth_bypass') === 'true',
+    sessionValid: !!sessionStorage.getItem('authToken') || !!(await window.UnifiedCacheManager?.get('authToken', { layer: 'sessionStorage' }))
+  };
+}
+
+// Export testing functions for Selenium access
+if (typeof window !== 'undefined') {
+  window.AuthTesting = {
+    isTestingEnvironment: isTestingEnvironment,
+    enableTestMode: enableTestMode,
+    performTestLogin: performTestLogin,
+    getTestAuthState: getTestAuthState
+  };
+
+  // Note: window.login is exported immediately after function definition (line 633) for proper script load order
+}
+
 // Export session validation functions (for backward compatibility)
 // Note: This must be after window.TikTrackAuth is defined (line 1133)
 // This code runs after window.TikTrackAuth is defined, so we can safely access it
 if (typeof window !== 'undefined' && typeof window.TikTrackAuth !== 'undefined') {
   window.TikTrackAuth.setupVisibilityCheck = setupVisibilityCheck;
   window.TikTrackAuth.stopVisibilityCheck = stopVisibilityCheck;
-  // Legacy aliases (deprecated - use setupVisibilityCheck/stopVisibilityCheck)
+  // Legacy aliases (deprecated - use setupVisibilityCheck/stopVisibilitycheck)
   window.TikTrackAuth.startSessionValidation = setupVisibilityCheck;
   window.TikTrackAuth.stopSessionValidation = stopVisibilityCheck;
 }
+
+// Export login function for login.js (must be early for proper loading order)

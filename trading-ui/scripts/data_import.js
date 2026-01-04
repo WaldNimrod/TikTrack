@@ -27,6 +27,22 @@
  * 13. notify
  */
 
+/* ===== DEBUG INSTRUMENTATION - FIX PACK 4 ===== */
+if (typeof fetch !== 'undefined') {
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      location: 'trading-ui/scripts/data_import.js:1',
+      message: 'data_import script loaded - bundle optimization test',
+      data: { page: 'data_import', script_count: 10, optimization: 'bundle_loading', timestamp: Date.now() },
+      sessionId: 'fix_pack_4_test',
+      runId: 'data_import_detached_frame_fix',
+      hypothesisId: 'script_overload_navigation_detach'
+    })
+  }).catch(() => {});
+}
+
 (function initializeDataImportModule() {
     'use strict';
 

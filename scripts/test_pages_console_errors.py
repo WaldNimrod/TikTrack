@@ -289,6 +289,13 @@ def setup_driver(prefer_chrome: bool = False):
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
+
+        # Set Chrome binary location for macOS
+        import platform
+        if platform.system() == 'Darwin':  # macOS
+            chrome_options.binary_location = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+            # Add headless mode to avoid GUI issues
+            chrome_options.add_argument('--headless')
         chrome_path = _resolve_driver_path(
             "CHROMEDRIVER_PATH",
             [
@@ -355,8 +362,6 @@ def login(driver):
                 """
                 sessionStorage.setItem('dev_authToken', arguments[0]);
                 sessionStorage.setItem('dev_currentUser', JSON.stringify(arguments[1] || {}));
-                localStorage.setItem('authToken', arguments[0]);
-                localStorage.setItem('currentUser', JSON.stringify(arguments[1] || {}));
                 window.authToken = arguments[0];
                 window.currentUser = arguments[1] || null;
                 """,
@@ -916,7 +921,7 @@ def main():
     print()
     
     # Prefer Chrome to avoid GitHub rate limits on geckodriver download
-    driver = setup_driver(prefer_chrome=True)
+    driver = setup_driver(prefer_chrome=False)
     if not driver:
         print("❌ Failed to setup WebDriver. Exiting.")
         return

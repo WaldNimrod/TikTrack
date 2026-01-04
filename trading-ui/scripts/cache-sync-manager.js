@@ -337,18 +337,7 @@ class CacheSyncManager {
           return user.id;
         }
       }
-      // Fallback to localStorage
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        try {
-          const user = JSON.parse(storedUser);
-          if (user && user.id) {
-            return user.id;
-          }
-        } catch (e) {
-          // Ignore parse errors
-        }
-      }
+      // Option 1: No localStorage fallback - only use proper auth methods
     } catch (e) {
       // Silent fallback
     }

@@ -21,6 +21,24 @@
  * 
  * ==========================================
  */
+
+/* ===== DEBUG INSTRUMENTATION - FIX PACK 3 ===== */
+// region agent log
+if (typeof fetch !== 'undefined') {
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      location: 'trading-ui/scripts/preferences-page.js:1',
+      message: 'preferences script loaded - bundle optimization test',
+      data: { page: 'preferences', script_count: 9, optimization: 'bundle_loading', timestamp: Date.now() },
+      sessionId: 'fix_pack_3_test',
+      runId: 'preferences_timeout_fix',
+      hypothesisId: 'script_overload_timeout'
+    })
+  }).catch(() => {});
+}
+// endregion agent log
 /**
  * Preferences Page Script - Clean Version
  * Handles page-specific functionality for preferences.html
@@ -30,7 +48,11 @@
  * @since January 2025
  */
 
-window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
+if (window.Logger && typeof window.Logger.info === 'function') {
+if (window.Logger && typeof window.Logger.info === 'function') {
+  window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
+}
+}
 
 /**
  * ============================================================================

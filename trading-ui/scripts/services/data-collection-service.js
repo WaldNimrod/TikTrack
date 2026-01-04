@@ -65,7 +65,7 @@ class DataCollectionService {
                 console.log(`🎯 DEBUG: tickerSymbol element.tagName: ${element.tagName}`);
             }
 
-            // #endregion
+            // endregion
 
             // Special debug for trade plan entry_price
             if (elementId === 'tradePlanEntryPrice') {

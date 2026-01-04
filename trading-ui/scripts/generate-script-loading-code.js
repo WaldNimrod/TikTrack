@@ -72,19 +72,19 @@ try {
 
 // Load page configs - this file doesn't export, so we need to parse it
 const configsPath = path.join(__dirname, 'page-initialization-configs.js');
-let PAGE_CONFIGS = {};
+let pageInitializationConfigs = {};
 
 try {
   const configsContent = fs.readFileSync(configsPath, 'utf8');
-  // Extract PAGE_CONFIGS from the file
+  // Extract pageInitializationConfigs from the file
   const vm = require('vm');
-  const context = { window: {}, PAGE_CONFIGS: {}, module: {}, exports: {}, require: require, __dirname, __filename: configsPath };
+  const context = { window: {}, pageInitializationConfigs: {}, module: {}, exports: {}, require: require, __dirname, __filename: configsPath };
   vm.createContext(context);
   vm.runInContext(configsContent, context);
-  if (context.PAGE_CONFIGS && Object.keys(context.PAGE_CONFIGS).length > 0) {
-    PAGE_CONFIGS = context.PAGE_CONFIGS;
-  } else if (context.window && context.window.PAGE_CONFIGS) {
-    PAGE_CONFIGS = context.window.PAGE_CONFIGS;
+  if (context.pageInitializationConfigs && Object.keys(context.pageInitializationConfigs).length > 0) {
+    pageInitializationConfigs = context.pageInitializationConfigs;
+  } else if (context.window && context.window.pageInitializationConfigs) {
+    pageInitializationConfigs = context.window.pageInitializationConfigs;
   }
 } catch (e) {
   console.error('⚠️ Could not load page configs:', e.message);
@@ -109,7 +109,7 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null, upd
   if (useBundles === null) {
     useBundles = (mode === 'production' || mode === 'testing');
   }
-  const pageConfig = PAGE_CONFIGS[pageName];
+  const pageConfig = pageInitializationConfigs[pageName];
   if (!pageConfig) {
     console.error(`❌ No config found for page: ${pageName}`);
     return null;
@@ -363,7 +363,7 @@ if (pageName) {
 } else {
   // List all pages
   console.log('Available pages:');
-  Object.keys(PAGE_CONFIGS).forEach(page => {
+  Object.keys(pageInitializationConfigs).forEach(page => {
     console.log(`  - ${page}`);
   });
   console.log('\nUsage:');

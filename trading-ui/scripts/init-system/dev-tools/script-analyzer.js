@@ -48,9 +48,9 @@ class ScriptAnalyzer {
     });
     
     // ניתוח חבילות
-    if (window.PAGE_CONFIGS && window.PACKAGE_MANIFEST) {
+    if (window.pageInitializationConfigs && window.PACKAGE_MANIFEST) {
       const pageName = window.location.pathname.split('/').pop().replace('.html', '');
-      const config = window.PAGE_CONFIGS[pageName];
+      const config = window.pageInitializationConfigs[pageName];
       
       if (config && config.packages) {
         results.packages = config.packages.map(pkgName => {

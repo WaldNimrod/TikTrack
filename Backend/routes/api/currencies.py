@@ -19,10 +19,9 @@ currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/currencies')
 
 @currencies_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=3600, rate_limit=60)
-@handle_database_session()
 @cache_with_deps(ttl=3600, dependencies=['currencies'])  # Cache for 1 hour - static data
 def get_currencies():
-    """Get all currencies using CurrencyService"""
+    """Get all currencies using CurrencyService (public endpoint)"""
     db: Session = next(get_db())
     try:
         currencies = CurrencyService.get_all(db)

@@ -26,12 +26,10 @@ trading_methods_bp = Blueprint('trading_methods', __name__, url_prefix='/api/tra
 
 
 @trading_methods_bp.route('/', methods=['GET'])
-@handle_database_session()
 def get_trading_methods():
-    """Get all trading methods with optional parameters"""
-    from flask import g
+    """Get all trading methods with optional parameters (public endpoint)"""
     try:
-        db: Session = g.db
+        db: Session = next(get_db())
         
         # Check if parameters should be included
         include_parameters = request.args.get('include_parameters', 'false').lower() == 'true'

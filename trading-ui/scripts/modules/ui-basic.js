@@ -810,8 +810,8 @@ window.toggleSection = async function (sectionId) {
     const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
                        window.pageInitializationConfigs[pageName] ? 
                        window.pageInitializationConfigs[pageName] : 
-                       (typeof window.PAGE_CONFIGS !== 'undefined' && window.PAGE_CONFIGS[pageName] ? 
-                        window.PAGE_CONFIGS[pageName] : null);
+                       (typeof window.pageInitializationConfigs !== 'undefined' && window.pageInitializationConfigs[pageName] ? 
+                        window.pageInitializationConfigs[pageName] : null);
     const accordionMode = pageConfig?.accordionMode === true;
 
     if (isCollapsed) {
@@ -1065,8 +1065,8 @@ window.restoreAllSectionStates = async function () {
   const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
                      window.pageInitializationConfigs[pageName] ? 
                      window.pageInitializationConfigs[pageName] : 
-                     (typeof window.PAGE_CONFIGS !== 'undefined' && window.PAGE_CONFIGS[pageName] ? 
-                      window.PAGE_CONFIGS[pageName] : null);
+                     (typeof window.pageInitializationConfigs !== 'undefined' && window.pageInitializationConfigs[pageName] ? 
+                      window.pageInitializationConfigs[pageName] : null);
   
   const accordionMode = pageConfig?.accordionMode === true;
   const defaultState = pageConfig?.sectionsDefaultState || 'open'; // 'closed' | 'open' - backward compatible

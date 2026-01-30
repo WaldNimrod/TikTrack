@@ -1,0 +1,23 @@
+{
+  "entities": [
+    {
+      "name": "TradingAccount",
+      "fields": [
+        "trading_account_id",
+        "trading_account_name",
+        "broker_provider",
+        "base_currency",
+        "account_balance"
+      ]
+    },
+    {
+      "name": "Auth",
+      "fields": [
+        "user_email",
+        "password",
+        "mfa_enabled"
+      ]
+    }
+  ],
+  "policy": "No use of the term 'Account'. Use 'Trading Account' exclusively."
+}

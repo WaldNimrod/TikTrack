@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<!-- saved from url=(0030)http://127.0.0.1:8090/register -->
+<html lang="he" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הרשמה - TikTrack</title>
+  <link rel="stylesheet" href="./הרשמה - TikTrack_files/master.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 20%, #eef2ff 0%, #f8fafc 45%, #e0e7ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+      padding: 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
+    .auth-card h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .auth-card p {
+      color: var(--apple-text-secondary, #555);
+      margin-bottom: 1.5rem;
+    }
+    .auth-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .auth-status {
+      margin-top: 1rem;
+      color: var(--apple-text-secondary, #555);
+      font-size: 0.95rem;
+    }
+  </style>
+<!-- CRITICAL: Load package-manifest.js BEFORE loader.js to break chicken-and-egg dependency -->
+<script src="./הרשמה - TikTrack_files/package-manifest.js"></script>
+<script src="./הרשמה - TikTrack_files/loader.js" defer=""></script>
+<script src="./הרשמה - TikTrack_files/api-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/api-fetch-wrapper.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/global-favicon.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/cache-sync-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/error-handlers.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/unified-cache-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/icon-mappings.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/icon-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/icon-replacement-helper.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/cache-clear-menu.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/cache-ttl-guard.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/page-state-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/page-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/translation-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/button-icons.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/bootstrap.bundle.min.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/button-system-init.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/color-scheme-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/notification-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/ui-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/warning-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/logger-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/event-handler-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/auth.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/header-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/validation-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/data-collection-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/field-renderer-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/jspdf.umd.min.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/ai-analysis-data.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/statistics-calculator.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/default-value-setter.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/preferences-data.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/crud-response-handler.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/unified-crud-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/investment-calculation-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/unified-progress-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/tag-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/table-sort-value-adapter.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/lint-status-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/quill.min.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/purify.min.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/rich-text-editor-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/modal-helper-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/modal-navigation-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/modal-z-index-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/tag-ui-manager.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/tag-events.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/data-basic.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/ui-basic.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/data-advanced.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/ui-advanced.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/communication-module.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/business-module.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/localstorage-sync.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/dynamic-loader-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/import-user-data.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/trades-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/trade-plans-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/watch-lists-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/cash-flows-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/tag-management-config.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/modal-manager-v2.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/tables.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/table-data-registry.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/pagination-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/actions-menu-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/date-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/data-utils.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/unified-table-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/account-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/alert-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/ticker-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/condition-translator.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/constraints.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/linked-items-service.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/linked-items.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/sorting-testing-system.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/page-initialization-configs.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/init-system-check.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/monitoring-functions.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/core-systems.js" data-loader="true"></script><script src="./הרשמה - TikTrack_files/register.js" data-loader="true"></script></head>
+<body data-page-key="register" data-new-gr-c-s-check-loaded="14.1270.0" data-gr-ext-installed=""><div id="unified-header"><div class="header-content">
+          <div class="header-top">
+            <div class="header-container">
+              <div class="header-nav">
+                <nav class="main-nav">
+                  <ul class="tiktrack-nav-list">
+                    <li class="tiktrack-nav-item">
+                      <a href="http://127.0.0.1:8090/" class="tiktrack-nav-link" data-page="home">
+                        <img src="./הרשמה - TikTrack_files/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only" data-icon-replace="entity:home">
+                      </a>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/trade_plans" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trade_plans">
+                        <span class="nav-text">תכנון</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-0">
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/ai_analysis">אנליזת AI</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
+                        <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-1">
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/watch_lists">רשימות צפייה</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/ticker_dashboard">📊 דשבורד טיקר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/trading_journal">📓 יומן מסחר</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/research" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="research">
+                        <span class="nav-text">מחקר</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-2">
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/trade_history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/portfolio-state">💼 מצב תיק היסטורי</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/register#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">
+                        <span class="nav-text">נתונים</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-3">
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/alerts">התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/notes">הערות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/trading_accounts">חשבונות מסחר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/user_ticker">הטיקרים שלי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/tickers">טיקרים (מנהל)</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/executions">ביצועים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/cash_flows">תזרימי מזומנים</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/register#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                        <span class="nav-text">הגדרות</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-4">
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/user_profile">👤 פרופיל משתמש</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/data_import">ייבוא נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/tag_management">ניהול תגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/preferences">העדפות</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/db_display">בסיס נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/db_extradata">טבלאות עזר</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="http://127.0.0.1:8090/dev_tools" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
+                        <span class="nav-text">פיתוח</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu" id="menu-5">
+                        <li class="dropdown-submenu">
+                          <a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/register#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
+                          <ul class="level3-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/portfolio_state">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/trade_history">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/conditions-test.html">🧪 בדיקות תנאים</a></li>
+                          </ul>
+                        </li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/system_management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/server-monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/background-tasks">⚙️ ניהול משימות רקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/notifications-center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/cache-management">💾 ניהול מטמון</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/init_system_management">🚀 ניהול מערכת אתחול</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/cache-test">💾 בדיקת Cache</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/conditions-test">🧩 בדיקות תנאים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/constraints">🔒 מוניטור אילוצים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/test-header-only">🧪 בדיקת ראש הדף</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/css-management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/chart_management">📊 ניהול גרפים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/mockups/daily-snapshots/tradingview-test-page.html">📈 בדיקת TradingView</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="http://127.0.0.1:8090/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item">
+                      <a href="http://127.0.0.1:8090/register#" class="tiktrack-nav-link" data-onclick="CacheControlMenu.triggerAction(&#39;full&#39;, event)" title="ניקוי מטמון לפיתוח">
+                        <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
+                      </a>
+                      <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 240px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
+                        <li><a href="http://127.0.0.1:8090/register#" data-cache-action="memory" data-onclick="CacheControlMenu.triggerAction(&#39;memory&#39;, event)" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: 500;" title="ניקוי שכבת הזיכרון בלבד (Memory)">🧠 ניקוי שכבת זיכרון</a></li>
+                        <li><a href="http://127.0.0.1:8090/register#" data-cache-action="local-storage" data-onclick="CacheControlMenu.triggerAction(&#39;local-storage&#39;, event)" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;" title="ניקוי מטמון localStorage (כולל העדפות פרופיל)">💽 ניקוי localStorage</a></li>
+                        <li><a href="http://127.0.0.1:8090/register#" data-cache-action="indexeddb" data-onclick="CacheControlMenu.triggerAction(&#39;indexeddb&#39;, event)" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;" title="ניקוי המטמון המאוחסן ב-IndexedDB">🗃️ ניקוי IndexedDB</a></li>
+                        <li><a href="http://127.0.0.1:8090/register#" data-cache-action="full" data-onclick="CacheControlMenu.triggerAction(&#39;full&#39;, event)" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold;" title="ניקוי כל שכבות המטמון + רענון אוטומטי">🌀 ניקוי מלא + רענון</a></li>
+                      </ul>
+                    </li>
+                    <li class="tiktrack-nav-item">
+                      <a href="http://127.0.0.1:8090/register#" class="tiktrack-nav-link" onclick="runQuickQualityCheck(event)" title="בדיקת איכות מהירה">
+                        <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">⚡</span>
+                      </a>
+                    </li>
+                    <li class="tiktrack-nav-item">
+                      <a href="http://127.0.0.1:8090/register#" class="tiktrack-nav-link" id="initSystemCheckBtn" title="ניטור מערכת איתחול" data-onclick="initSystemCheck?.runPageCheck(event)">
+                        <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+
+              <div class="logo-section">
+                <a href="http://127.0.0.1:8090/" class="logo">
+                  <img src="./הרשמה - TikTrack_files/logo.svg" alt="TikTrack Logo" class="logo-image">
+                  <span class="logo-text">פשוט לנהל תיק</span>
+                </a>
+              </div>
+              
+            </div>
+          </div>
+
+        <div class="header-filters" id="headerFilters" data-section="filters">
+          <div class="filters-container">
+            <div class="filter-group status-filter">
+              <div class="filter-dropdown">
+                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle">
+                  <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
+                  <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-menu" id="statusFilterMenu">
+                  <div class="status-filter-item" data-value="הכול">
+                    <span class="option-text">הכול</span>
+                  </div>
+                  <div class="status-filter-item" data-value="פתוח">
+                    <span class="option-text">פתוח</span>
+                  </div>
+                  <div class="status-filter-item" data-value="סגור">
+                    <span class="option-text">סגור</span>
+                  </div>
+                  <div class="status-filter-item" data-value="מבוטל">
+                    <span class="option-text">מבוטל</span>
+                  </div>
+                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter(&#39;statusFilterMenu&#39;)" title="סגור">×</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-group type-filter">
+              <div class="filter-dropdown">
+                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle">
+                  <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
+                  <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-menu" id="typeFilterMenu">
+                  <div class="type-filter-item" data-value="הכול">
+                    <span class="option-text">הכול</span>
+                  </div>
+                  <div class="type-filter-item" data-value="סווינג">
+                    <span class="option-text">סווינג</span>
+                  </div>
+                  <div class="type-filter-item" data-value="השקעה">
+                    <span class="option-text">השקעה</span>
+                  </div>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
+                  </div>
+                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter(&#39;typeFilterMenu&#39;)" title="סגור">×</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-group account-filter">
+              <div class="filter-dropdown">
+                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle">
+                  <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
+                  <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-menu" id="accountFilterMenu">
+                  <div class="account-filter-item" data-value="הכול">
+                    <span class="option-text">הכול</span>
+                  </div>
+                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter(&#39;accountFilterMenu&#39;)" title="סגור">×</button>
+                <div class="account-filter-item" data-value="4"><span class="option-text">Updated trading_accounts 1768647553408</span></div><div class="account-filter-item" data-value="3"><span class="option-text">Updated trading_accounts 1768648907033</span></div><div class="account-filter-item" data-value="281"><span class="option-text">Test name 1769290403528</span></div><div class="account-filter-item" data-value="285"><span class="option-text">Test name 1769290624884</span></div><div class="account-filter-item" data-value="288"><span class="option-text">Test name 1769291676110</span></div><div class="account-filter-item" data-value="289"><span class="option-text">Test name 1769291962998</span></div><div class="account-filter-item" data-value="282"><span class="option-text">Test name 1769290455156</span></div><div class="account-filter-item" data-value="267"><span class="option-text">Test User Trading Account</span></div><div class="account-filter-item" data-value="283"><span class="option-text">Test name 1769290523536</span></div><div class="account-filter-item" data-value="284"><span class="option-text">Test name 1769290566273</span></div><div class="account-filter-item" data-value="276"><span class="option-text">Test Trading Account</span></div><div class="account-filter-item" data-value="286"><span class="option-text">Test name 1769291058545</span></div><div class="account-filter-item" data-value="270"><span class="option-text">Test Trading Account QA</span></div><div class="account-filter-item" data-value="287"><span class="option-text">Test name 1769291371786</span></div><div class="account-filter-item" data-value="235"><span class="option-text">New Test Account</span></div><div class="account-filter-item" data-value="236"><span class="option-text">New Test Account</span></div><div class="account-filter-item" data-value="237"><span class="option-text">New Test Account</span></div><div class="account-filter-item" data-value="239"><span class="option-text">Test Trading Account</span></div><div class="account-filter-item" data-value="240"><span class="option-text">New Test Account</span></div><div class="account-filter-item" data-value="242"><span class="option-text">Runtime Test Account</span></div><div class="account-filter-item" data-value="243"><span class="option-text">Runtime Test Account</span></div><div class="account-filter-item" data-value="244"><span class="option-text">Runtime Test Account</span></div><div class="account-filter-item" data-value="245"><span class="option-text">Runtime Test Account</span></div><div class="account-filter-item" data-value="246"><span class="option-text">Test Trading Account</span></div><div class="account-filter-item" data-value="247"><span class="option-text">Admin Trading Account</span></div><div class="account-filter-item" data-value="248"><span class="option-text">Admin Trading Account</span></div><div class="account-filter-item" data-value="249"><span class="option-text">Admin Trading Account</span></div><div class="account-filter-item" data-value="250"><span class="option-text">Stage2 Test Account</span></div><div class="account-filter-item" data-value="252"><span class="option-text">Admin Trading Account - Stage2</span></div><div class="account-filter-item" data-value="253"><span class="option-text">Stage2 Valid Test Account</span></div><div class="account-filter-item" data-value="260"><span class="option-text">Admin Valid Trading Account</span></div></div>
+              </div>
+            </div>
+
+            <div class="filter-group date-range-filter">
+              <div class="filter-dropdown">
+                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle">
+                  <span class="selected-value selected-date-text" id="selectedDateRange">כל זמן</span>
+                  <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-menu" id="dateRangeFilterMenu">
+                  <div class="date-range-filter-item" data-value="כל זמן">
+                    <span class="option-text">כל זמן</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="היום">
+                    <span class="option-text">היום</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="אתמול">
+                    <span class="option-text">אתמול</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="השבוע">
+                    <span class="option-text">השבוע</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="שבוע">
+                    <span class="option-text">שבוע (7 ימים)</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="שבוע קודם">
+                    <span class="option-text">שבוע שעבר</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="החודש">
+                    <span class="option-text">החודש</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="חודש">
+                    <span class="option-text">חודש (30 יום)</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="חודש קודם">
+                    <span class="option-text">חודש קודם</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="השנה">
+                    <span class="option-text">השנה</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="שנה">
+                    <span class="option-text">שנה (365 ימים)</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="שנה קודמת">
+                    <span class="option-text">שנה שעברה</span>
+                  </div>
+                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter(&#39;dateRangeFilterMenu&#39;)" title="סגור">×</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-group search-filter">
+              <div class="search-input-wrapper">
+                <input type="text" class="search-filter-input" id="searchFilterInput" placeholder="חיפוש..." onkeyup="handleSearchInput(event)">
+                <button class="search-clear-btn" onclick="clearSearchFilter()" title="נקה חיפוש">×</button>
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button class="reset-btn" onclick="resetAllFilters()" title="איפוס פילטרים">
+                <span class="btn-text">↻</span>
+              </button>
+              <button class="clear-btn" onclick="clearAllFilters()" title="נקה כל הפילטרים">
+                <span class="btn-text">×</span>
+              </button>
+            </div>
+
+            <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
+              <a href="http://127.0.0.1:8090/user_profile" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: block;">
+                <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
+                  <span id="filterUserInitials">RT</span>
+                </div>
+              </a>
+              <button class="auth-toggle-btn" id="filterAuthToggleBtn" onclick="handleHeaderLogout(event)" style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;" title="התחבר/התנתק">
+                <img src="./הרשמה - TikTrack_files/user.svg" alt="התחבר/התנתק" style="width: 24px; height: 24px; opacity: 1; background-color: rgb(255, 255, 255); border: 1px solid rgb(38, 186, 172); border-radius: 6px; padding: 2px; filter: none; box-shadow: rgb(38, 186, 172) 0px 0px 0px 2px inset;" id="filterAuthIcon" data-status="logged-in" title="התנתק">
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filter-toggle-section filter-toggle-main">
+          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" data-onclick="toggleHeaderFilters()">
+            <span class="header-filter-arrow">▲</span>
+          </button>
+        </div>
+        
+        
+        </div>
+    </div>
+  <div class="login-wrapper">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">
+          <img src="./הרשמה - TikTrack_files/logo.svg" alt="TikTrack Logo">
+        </div>
+        <h1 class="login-title">הרשמה</h1>
+        <p class="login-subtitle">הצטרפו ל-TikTrack</p>
+      </div>
+
+      <div class="login-error" id="registerError"></div>
+      <div class="login-success" id="registerSuccess"></div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="username">שם משתמש</label>
+          <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required="">
+        <div data-lastpass-icon-root="" style="position: relative !important; height: 0px !important; width: 0px !important; display: initial !important; float: left !important;"><template shadowrootmode="closed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-lastpass-icon="true" data-testid="infield-icon" style="position: absolute; cursor: pointer; height: 22px; max-height: 22px; width: 22px; max-width: 22px; top: -31.25px; left: 286.633px; z-index: auto; color: rgb(215, 64, 58);"><rect x="0.680176" y="0.763062" width="22.6392" height="22.4737" rx="4" fill="currentColor"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M19.7935 7.9516C19.7935 7.64414 20.0427 7.3949 20.3502 7.3949C20.6576 7.3949 20.9069 7.64414 20.9069 7.9516V16.0487C20.9069 16.3562 20.6576 16.6054 20.3502 16.6054C20.0427 16.6054 19.7935 16.3562 19.7935 16.0487V7.9516Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M4.76288 13.6577C5.68525 13.6577 6.43298 12.9154 6.43298 11.9998C6.43298 11.0842 5.68525 10.3419 4.76288 10.3419C3.8405 10.3419 3.09277 11.0842 3.09277 11.9998C3.09277 12.9154 3.8405 13.6577 4.76288 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.3298 13.6577C11.2521 13.6577 11.9999 12.9154 11.9999 11.9998C11.9999 11.0842 11.2521 10.3419 10.3298 10.3419C9.4074 10.3419 8.65967 11.0842 8.65967 11.9998C8.65967 12.9154 9.4074 13.6577 10.3298 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8964 13.6577C16.8188 13.6577 17.5665 12.9154 17.5665 11.9998C17.5665 11.0842 16.8188 10.3419 15.8964 10.3419C14.974 10.3419 14.2263 11.0842 14.2263 11.9998C14.2263 12.9154 14.974 13.6577 15.8964 13.6577Z" fill="white"></path></svg></template></div></div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">אימייל (אופציונלי)</label>
+          <input type="email" id="email" class="form-control" placeholder="הכנס אימייל">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">סיסמה</label>
+          <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required="">
+        <div data-lastpass-icon-root="" style="position: relative !important; height: 0px !important; width: 0px !important; display: initial !important; float: left !important;"><template shadowrootmode="closed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-lastpass-icon="true" data-testid="infield-icon" style="position: absolute; cursor: pointer; height: 22px; max-height: 22px; width: 22px; max-width: 22px; top: -31.25px; left: 286.633px; z-index: auto; color: rgb(215, 64, 58);"><rect x="0.680176" y="0.763062" width="22.6392" height="22.4737" rx="4" fill="currentColor"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M19.7935 7.9516C19.7935 7.64414 20.0427 7.3949 20.3502 7.3949C20.6576 7.3949 20.9069 7.64414 20.9069 7.9516V16.0487C20.9069 16.3562 20.6576 16.6054 20.3502 16.6054C20.0427 16.6054 19.7935 16.3562 19.7935 16.0487V7.9516Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M4.76288 13.6577C5.68525 13.6577 6.43298 12.9154 6.43298 11.9998C6.43298 11.0842 5.68525 10.3419 4.76288 10.3419C3.8405 10.3419 3.09277 11.0842 3.09277 11.9998C3.09277 12.9154 3.8405 13.6577 4.76288 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.3298 13.6577C11.2521 13.6577 11.9999 12.9154 11.9999 11.9998C11.9999 11.0842 11.2521 10.3419 10.3298 10.3419C9.4074 10.3419 8.65967 11.0842 8.65967 11.9998C8.65967 12.9154 9.4074 13.6577 10.3298 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8964 13.6577C16.8188 13.6577 17.5665 12.9154 17.5665 11.9998C17.5665 11.0842 16.8188 10.3419 15.8964 10.3419C14.974 10.3419 14.2263 11.0842 14.2263 11.9998C14.2263 12.9154 14.974 13.6577 15.8964 13.6577Z" fill="white"></path></svg></template></div></div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">אימות סיסמה</label>
+          <input type="password" id="confirmPassword" class="form-control" placeholder="אמת סיסמה" required="">
+        <div data-lastpass-icon-root="" style="position: relative !important; height: 0px !important; width: 0px !important; display: initial !important; float: left !important;"><template shadowrootmode="closed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-lastpass-icon="true" data-testid="infield-icon" style="position: absolute; cursor: pointer; height: 22px; max-height: 22px; width: 22px; max-width: 22px; top: -31.25px; left: 286.633px; z-index: auto; color: rgb(215, 64, 58);"><rect x="0.680176" y="0.763062" width="22.6392" height="22.4737" rx="4" fill="currentColor"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M19.7935 7.9516C19.7935 7.64414 20.0427 7.3949 20.3502 7.3949C20.6576 7.3949 20.9069 7.64414 20.9069 7.9516V16.0487C20.9069 16.3562 20.6576 16.6054 20.3502 16.6054C20.0427 16.6054 19.7935 16.3562 19.7935 16.0487V7.9516Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M4.76288 13.6577C5.68525 13.6577 6.43298 12.9154 6.43298 11.9998C6.43298 11.0842 5.68525 10.3419 4.76288 10.3419C3.8405 10.3419 3.09277 11.0842 3.09277 11.9998C3.09277 12.9154 3.8405 13.6577 4.76288 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.3298 13.6577C11.2521 13.6577 11.9999 12.9154 11.9999 11.9998C11.9999 11.0842 11.2521 10.3419 10.3298 10.3419C9.4074 10.3419 8.65967 11.0842 8.65967 11.9998C8.65967 12.9154 9.4074 13.6577 10.3298 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8964 13.6577C16.8188 13.6577 17.5665 12.9154 17.5665 11.9998C17.5665 11.0842 16.8188 10.3419 15.8964 10.3419C14.974 10.3419 14.2263 11.0842 14.2263 11.9998C14.2263 12.9154 14.974 13.6577 15.8964 13.6577Z" fill="white"></path></svg></template></div></div>
+
+        <button type="submit" class="btn-login" id="registerBtn">
+          הרשמה
+        </button>
+      </form>
+
+      <div class="login-links">
+        <a href="http://127.0.0.1:8090/login.html">כבר יש לך חשבון? התחבר</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core scripts -->
+  <!-- Init System Scripts - Load Order Critical -->
+  
+  
+  
+  <!-- End Init System Scripts -->
+  
+  
+  
+  
+  
+   <!-- Dynamic color system -->
+
+
+<div data-lastpass-root="" style="position: absolute !important; top: 0px !important; left: 0px !important; height: 0px !important; width: 0px !important; display: initial !important;"><template shadowrootmode="closed"><div style="position: absolute; height: 100vh; width: 100vw; z-index: 2147483647; border-radius: 4px; top: 0px; left: 0px; max-height: 0px; max-width: 280px; min-width: auto;"><iframe data-lastpass-infield="true" allow="clipboard-write" src="chrome-extension://hdokiejnpimakedhajhdlcegeplioahd/webclient-infield.html" style="border: none; height: 100%; width: 100%;"></iframe></div></template></div><div class="modal fade" id="tradesModal" tabindex="-1" aria-labelledby="tradesModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="trade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-trade" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="tradesModalLabel">הוספת טרייד</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-0-5lr8" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-1-5lr9" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="tradesModalForm">
+                                
+                                <div class="row"><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeTicker" class="form-label">
+                            טיקר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradeTicker" name="tradeTicker" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-2">
+                        <label for="tradeTickerInfo" class="form-label">
+                            פרטי מחיר עדכני 
+                        </label>
+                        <div id="tradeTickerInfo" class="form-control-plaintext py-1 px-2">                              
+                            <!-- יתמלא דינמית -->
+                        </div>
+                                                                  
+                    </div>
+                </div></div>
+                    <hr class="my-4">
+                <div class="row"><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeAccount" class="form-label">
+                            חשבון מסחר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradeAccount" name="tradeAccount" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeType" class="form-label">
+                            סוג השקעה <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradeType" name="tradeType" required="">
+                            <option value="">בחר...</option><option value="swing" selected="">סווינג - מסחר לטווח קצר עד בינוני</option><option value="investment">השקעה - השקעה ארוכת טווח</option><option value="passive">פאסיבי - השקעה פאסיבית ללא פעילות מסחרית</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeSide" class="form-label">
+                            צד <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradeSide" name="tradeSide" required="">
+                            <option value="">בחר...</option><option value="Long" selected="">לונג (Long)</option><option value="Short">שורט (Short)</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeStatus" class="form-label">
+                            סטטוס <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradeStatus" name="tradeStatus" required="">
+                            <option value="">בחר...</option><option value="open" selected="">פתוח</option><option value="closed">סגור</option><option value="cancelled">מבוטל</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeQuantity" class="form-label">
+                            כמות <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="tradeQuantity" name="tradeQuantity" required="" min="1" step="0.1" placeholder="הכנס כמות..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeEntryPrice" class="form-label">
+                            מחיר כניסה <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="tradeEntryPrice" name="tradeEntryPrice" required="" min="0.01" step="0.01" placeholder="הכנס מחיר כניסה..." value="">
+                        <small class="form-text text-muted">מחיר הכניסה - מתעדכן אוטומטית לאחר בחירת טיקר</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeStopLoss" class="form-label label-numeric-negative">
+                            Stop Loss 
+                        </label>
+                        <input type="number" class="form-control" id="tradeStopLoss" name="tradeStopLoss" min="0.01" step="0.01" placeholder="הכנס מחיר Stop Loss..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeTakeProfit" class="form-label label-numeric-positive">
+                            Take Profit 
+                        </label>
+                        <input type="number" class="form-control" id="tradeTakeProfit" name="tradeTakeProfit" min="0.01" step="0.01" placeholder="הכנס מחיר Take Profit..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeStopLossPercent" class="form-label label-numeric-negative">
+                            Stop Loss (%) 
+                        </label>
+                        <input type="number" class="form-control" id="tradeStopLossPercent" name="tradeStopLossPercent" min="0.01" step="0.01" placeholder="אחוז סטופ..." value="">
+                        <small class="form-text text-muted">אחוז סטופ ביחס למחיר הכניסה</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeTakeProfitPercent" class="form-label label-numeric-positive">
+                            Take Profit (%) 
+                        </label>
+                        <input type="number" class="form-control" id="tradeTakeProfitPercent" name="tradeTakeProfitPercent" min="0.01" step="0.01" placeholder="אחוז יעד..." value="">
+                        <small class="form-text text-muted">אחוז יעד ביחס למחיר הכניסה</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tradeEntryDate" class="form-label">
+                            תאריך כניסה 
+                        </label>
+                        <input type="datetime-local" class="form-control" id="tradeEntryDate" name="tradeEntryDate" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-12">
+                    <div class="mb-3">
+                        <label for="tradeTags" class="form-label">
+                            תגיות 
+                        </label>
+                        <select class="form-select" id="tradeTags" name="tradeTags" multiple="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-12">
+                    <div class="mb-3">
+                        <label for="tradeNotes" class="form-label">
+                            הערות 
+                        </label>
+                        <div id="tradeNotes" class="rich-text-editor-container" data-editor-id="tradeNotes" data-options="{}">
+                            <!-- Quill editor will be initialized here -->
+                        </div>
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-2-5lra" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-3-5lra" data-onclick="saveTrade()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="tagCategoryModal" tabindex="-1" aria-labelledby="tagCategoryModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="tag_category">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-tag-category" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="tagCategoryModalLabel">קטגוריה חדשה</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-4-5lra" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-5-5lra" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="tagCategoryModalForm">
+                                
+                                <div class="row"><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tagCategoryName" class="form-label">
+                            שם קטגוריה <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="tagCategoryName" name="tagCategoryName" required="" placeholder="לדוגמה: אסטרטגיות" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tagCategoryDescription" class="form-label">
+                            תיאור 
+                        </label>
+                        <textarea class="form-control" id="tagCategoryDescription" name="tagCategoryDescription" rows="4" placeholder="תיאור קצר לקטגוריה (אופציונלי)"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tagCategoryOrder" class="form-label">
+                            סדר תצוגה 
+                        </label>
+                        <input type="number" class="form-control" id="tagCategoryOrder" name="tagCategoryOrder" step="1" placeholder="" value="">
+                        <small class="form-text text-muted">ערך נמוך יוצג ראשון</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tagCategoryActive" name="tagCategoryActive" value="true" checked="">
+                            <label for="tagCategoryActive" class="form-check-label">
+                                קטגוריה פעילה 
+                            </label>
+                        </div>
+                                                                  
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-6-5lra" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-7-5lra" data-onclick="TagManagementPage.saveTagCategory()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="tag">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-tag" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="tagModalLabel">תגית חדשה</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-8-5lrb" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-9-5lrb" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="tagModalForm">
+                                
+                                <div class="row"><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tagName" class="form-label">
+                            שם תגית <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="tagName" name="tagName" required="" placeholder="לדוגמה: פריצה" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tagCategory" class="form-label">
+                            קטגוריה 
+                        </label>
+                        <select class="form-select" id="tagCategory" name="tagCategory">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tagDescription" class="form-label">
+                            תיאור 
+                        </label>
+                        <textarea class="form-control" id="tagDescription" name="tagDescription" rows="4" placeholder="תיאור קצר לתגית (אופציונלי)"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tagActive" name="tagActive" value="true" checked="">
+                            <label for="tagActive" class="form-check-label">
+                                תגית פעילה 
+                            </label>
+                        </div>
+                                                                  
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-10-5lrb" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-11-5lrb" data-onclick="TagManagementPage.saveTag()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="watchListModal" tabindex="-1" aria-labelledby="watchListModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="watch_list">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-watch-list" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="watchListModalLabel">רשימה חדשה</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-12-5lrb" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-13-5lrb" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="watchListModalForm">
+                                
+                                <div class="row"><div class="col-12">
+                    <div class="mb-3">
+                        <label for="watchListName" class="form-label">
+                            שם הרשימה <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="watchListName" name="watchListName" required="" placeholder="לדוגמה: מניות טכנולוגיה" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">איקון</label>
+                    <div class="icon-selector-wrapper">
+                        <button type="button" class="btn btn-outline-secondary icon-selector-trigger" id="watchListIconSelectorTrigger" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <span id="watchListSelectedIconPreview" class="selected-icon-preview">
+                                <span class="icon-preview-placeholder">ללא איקון</span>
+                            </span>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </button>
+                        <div class="dropdown-menu icon-selector-dropdown" id="watchListIconSelectorDropdown">
+                            <ul class="nav nav-tabs icon-library-tabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="watchListTablerTab" data-bs-toggle="tab" data-bs-target="#watchListTablerIcons" type="button" role="tab" onclick="event.stopPropagation();">
+                                        Tabler
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="watchListBootstrapTab" data-bs-toggle="tab" data-bs-target="#watchListBootstrapIcons" type="button" role="tab" onclick="event.stopPropagation();">
+                                        Bootstrap
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content icon-library-content">
+                                <div class="tab-pane fade show active" id="watchListTablerIcons" role="tabpanel">
+                                    <div id="watchListIconSelector" class="icon-selector-grid">
+                                        <!-- Tabler Icons will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="watchListBootstrapIcons" role="tabpanel">
+                                    <div id="watchListBootstrapIconSelector" class="icon-selector-grid">
+                                        <!-- Bootstrap Icons will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="watchListIcon" value="">
+                    <input type="hidden" id="watchListIconLibrary" value="tabler">
+                    <small class="form-text text-muted">איקון שיוצג בכרטיס הרשימה</small>
+                </div>
+            </div><div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">תצוגה ברירת מחדל</label>
+                    <div class="view-mode-selector">
+                        <div class="btn-group view-mode-radio" role="group" aria-label="View mode selection">
+                            <input type="radio" class="btn-check" name="watchListViewMode" id="watchListViewModeTable" value="table" checked="">
+                            <label class="btn btn-outline-primary" for="watchListViewModeTable" data-bs-toggle="tooltip" data-bs-placement="top" title="טבלה">
+                                <i class="bi bi-table"></i>
+                            </label>
+                            <input type="radio" class="btn-check" name="watchListViewMode" id="watchListViewModeCards" value="cards">
+                            <label class="btn btn-outline-primary" for="watchListViewModeCards" data-bs-toggle="tooltip" data-bs-placement="top" title="כרטיסים">
+                                <i class="bi bi-grid-3x3"></i>
+                            </label>
+                            <input type="radio" class="btn-check" name="watchListViewMode" id="watchListViewModeCompact" value="compact">
+                            <label class="btn btn-outline-primary" for="watchListViewModeCompact" data-bs-toggle="tooltip" data-bs-placement="top" title="קומפקטי">
+                                <i class="bi bi-list-ul"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" id="watchListViewMode" value="table">
+                    <small class="form-text text-muted">תצוגה שתוצג בעת פתיחת הרשימה</small>
+                </div>
+            </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-14-5lrc" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-15-5lrc" data-onclick="saveWatchList()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="watch_list_item">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-watch-list_item" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="addTickerModalLabel">הוסף טיקר לרשימה</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-16-5lrc" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-17-5lrc" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addTickerModalForm">
+                                
+                                <div class="row"><div class="col-12">
+                <div class="mb-3">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <label for="tickerSearch" class="form-label fw-bold mb-0">חיפוש טיקר מהמערכת</label>
+                    </div>
+                    <div class="d-flex align-items-end gap-2 mb-2">
+                        <div>
+                            <input type="text" class="form-control" id="tickerSearch" placeholder="הקלד symbol או שם...">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <label class="form-label small mb-0 me-1">דגל:</label>
+                        <div class="d-flex gap-1 align-items-center flex-wrap" id="flagColorPaletteContainer">
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#26baac" data-entity-type="trade" title="Trade">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#0056b3" data-entity-type="trade_plan" title="Trade Plan">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#28a745" data-entity-type="account" title="Account">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#20c997" data-entity-type="cash_flow" title="Cash Flow">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#dc3545" data-entity-type="ticker" title="Ticker">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#fc5a06" data-entity-type="alert" title="Alert">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#6f42c1" data-entity-type="note" title="Note">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" data-color="#17a2b8" data-entity-type="execution" title="Execution">
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary p-1" id="clearFlagColorBtn" title="הסר דגל">
+                                <i class="bi bi-x"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" data-onclick="if(window.ModalManagerV2){window.ModalManagerV2.showModal(&#39;tickersModal&#39;,&#39;add&#39;);}">
+                                <i class="bi bi-plus-circle"></i> הוסף טיקר
+                            </button>
+                        </div>
+                        <input type="hidden" id="itemFlagColor" value="">
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">לא נמצא? הוסף למערכת</small>
+                    </div>
+                    <div id="tickerSearchResults" class="mt-2">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-18-5lrc" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-19-5lrc" data-onclick="addTickerToList()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="cashFlowModal" tabindex="-1" aria-labelledby="cashFlowModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="cash_flow">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-cash-flow" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="cashFlowModalLabel">הוספת תזרים מזומנים</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-20-5lrd" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-21-5lrd" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="cashFlowModalForm">
+                                
+            <ul class="nav nav-tabs mb-3" id="cashFlowModalTabs" role="tablist">
+                
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="cashFlowModalTabregular-tab" data-bs-toggle="tab" data-bs-target="#cashFlowModalTabregular" type="button" role="tab" aria-controls="cashFlowModalTabregular" aria-selected="true" data-tab-id="regular">
+                        תזרים רגיל
+                    </button>
+                </li>
+            
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link " id="cashFlowModalTabexchange-tab" data-bs-toggle="tab" data-bs-target="#cashFlowModalTabexchange" type="button" role="tab" aria-controls="cashFlowModalTabexchange" aria-selected="false" data-tab-id="exchange">
+                        המרת מטבע
+                    </button>
+                </li>
+            
+            </ul>
+        
+                                
+                <div class="tab-content" id="cashFlowModalTabContent">
+                    
+                    <div class="tab-pane fade show active" id="cashFlowModalTabregular" role="tabpanel" aria-labelledby="cashFlowModalTabregular-tab">
+                        <div class="row"><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowType" class="form-label">
+                            סוג תזרים <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="cashFlowType" name="cashFlowType" required="">
+                            <option value="">בחר...</option><option value="deposit">הפקדה</option><option value="withdrawal">משיכה</option><option value="fee">עמלה</option><option value="dividend">דיבידנד</option><option value="transfer_in">העברה מחשבון אחר</option><option value="transfer_out">העברה לחשבון אחר</option><option value="other_positive">אחר חיובי</option><option value="other_negative">אחר שלילי</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowAccount" class="form-label">
+                            חשבון מסחר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="cashFlowAccount" name="cashFlowAccount" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-2">
+                        <label for="cashFlowExchangePairDisplay" class="form-label">
+                            צמד המרה 
+                        </label>
+                        <div id="cashFlowExchangePairDisplay" class="form-control-plaintext py-1 px-2">                              
+                            <!-- יתמלא דינמית -->
+                        </div>
+                        <small class="form-text text-muted">כאשר התזרים הוא חלק מהמרת מטבע יוצג כאן הצמד המלא.</small>                                          
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowAmount" class="form-label">
+                            סכום <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="cashFlowAmount" name="cashFlowAmount" required="" min="0.01" step="0.01" placeholder="" value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowCurrency" class="form-label">
+                            מטבע <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="cashFlowCurrency" name="cashFlowCurrency" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowDate" class="form-label">
+                            תאריך תזרים <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="cashFlowDate" name="cashFlowDate" required="" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            קישור לטרייד 
+                        </label>
+                        <input type="hidden" id="trade_id" name="trade_id" value="">
+                        <div id="linkedTradeButton">
+                            <button type="button" class="btn btn-primary" data-onclick="openTradeSelector(&#39;linkedTrade&#39;)">
+                                קשר לטרייד
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">לחיצה תפתח מודל לבחירת טרייד</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowSource" class="form-label">
+                            מקור <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="cashFlowSource" name="cashFlowSource" required="">
+                            <option value="">בחר...</option><option value="manual" selected="">ידני</option><option value="IBKR-tradelog-csv">IBKR CSV</option><option value="IBKR-api">IBKR API</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cashFlowExternalId" class="form-label">
+                            מזהה חיצוני 
+                        </label>
+                        <input type="text" class="form-control" id="cashFlowExternalId" name="cashFlowExternalId" disabled="" placeholder="מזהה חיצוני (אופציונלי)" value="0">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                        <div class="mb-3">
+                            <label for="cashFlowTags" class="form-label">
+                                תגיות 
+                            </label>
+                            <select class="form-select tag-multi-select" id="cashFlowTags" name="cashFlowTags" data-tag-category="" data-include-inactive="false" data-initial-value="" multiple="" data-tag-entity="cash_flow">
+                                <option value="" disabled="">טוען תגיות...</option>
+                            </select>
+                            <div id="cashFlowTagsTagBadgeContainer" class="mt-2 tag-picker-badges text-start small"></div>
+                            <small class="form-text text-muted">הוסף תגיות לתזרים זה</small>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div><div class="col-12">
+                    <div class="mb-3">
+                        <label for="cashFlowDescription" class="form-label">
+                            תיאור 
+                        </label>
+                        <div id="cashFlowDescription" class="rich-text-editor-container" data-editor-id="cashFlowDescription" data-options="{&quot;direction&quot;:&quot;rtl&quot;,&quot;placeholder&quot;:&quot;תיאור התזרים&quot;,&quot;toolbar&quot;:[[{&quot;header&quot;:[2,3,false]}],[&quot;bold&quot;,&quot;italic&quot;,&quot;underline&quot;,&quot;strike&quot;],[{&quot;color&quot;:[]},{&quot;background&quot;:[]}],[{&quot;align&quot;:[&quot;right&quot;,&quot;center&quot;,&quot;left&quot;,&quot;justify&quot;]}],[{&quot;direction&quot;:&quot;rtl&quot;},{&quot;direction&quot;:&quot;ltr&quot;}],[{&quot;list&quot;:&quot;ordered&quot;},{&quot;list&quot;:&quot;bullet&quot;}],[&quot;link&quot;],[&quot;clean&quot;]]}">
+                            <!-- Quill editor will be initialized here -->
+                        </div>
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                    </div>
+                
+                    <div class="tab-pane fade " id="cashFlowModalTabexchange" role="tabpanel" aria-labelledby="cashFlowModalTabexchange-tab">
+                        <div class="row"><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeAccount" class="form-label">
+                            חשבון מסחר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="currencyExchangeAccount" name="currencyExchangeAccount" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeDate" class="form-label">
+                            תאריך <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="currencyExchangeDate" name="currencyExchangeDate" required="" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeFromCurrency" class="form-label">
+                            מטבע מקור <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="currencyExchangeFromCurrency" name="currencyExchangeFromCurrency" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeToCurrency" class="form-label">
+                            מטבע יעד <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="currencyExchangeToCurrency" name="currencyExchangeToCurrency" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeRate" class="form-label">
+                            שער המרה <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="currencyExchangeRate" name="currencyExchangeRate" required="" min="0.000001" step="0.000001" placeholder="" value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeFeeAmount" class="form-label">
+                            עמלה <small class="text-muted ms-2" id="currencyExchangeFeeAmountCurrencyLabel">-</small>
+                        </label>
+                        <input type="number" class="form-control" id="currencyExchangeFeeAmount" name="currencyExchangeFeeAmount" step="0.01" placeholder="" value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeFromAmount" class="form-label">
+                            סכום להמרה <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="currencyExchangeFromAmount" name="currencyExchangeFromAmount" required="" min="0.01" step="0.01" placeholder="" value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeToAmount" class="form-label">
+                            סכום מומר 
+                        </label>
+                        <input type="number" class="form-control" id="currencyExchangeToAmount" name="currencyExchangeToAmount" disabled="" readonly="" placeholder="" value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-2">
+                        <label for="currencyExchangeNetAmount" class="form-label">
+                            סיכום חישוב 
+                        </label>
+                        <div id="currencyExchangeNetAmount" class="form-control-plaintext py-1 px-2">                              
+                            <!-- יתמלא דינמית -->
+                        </div>
+                        <small class="form-text text-muted">פירוט מלא של ההמרה והעמלה</small>                                          
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeSource" class="form-label">
+                            מקור <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select select-cash-flow-width" id="currencyExchangeSource" name="currencyExchangeSource" required="">
+                            <option value="">בחר...</option><option value="manual" selected="">ידני</option><option value="IBKR-tradelog-csv">IBKR CSV</option><option value="IBKR-api">IBKR API</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="currencyExchangeExternalId" class="form-label">
+                            מזהה חיצוני 
+                        </label>
+                        <input type="text" class="form-control" id="currencyExchangeExternalId" name="currencyExchangeExternalId" disabled="" placeholder="מזהה חיצוני (אופציונלי)" value="0">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                        <div class="mb-3">
+                            <label for="currencyExchangeTags" class="form-label">
+                                תגיות 
+                            </label>
+                            <select class="form-select tag-multi-select" id="currencyExchangeTags" name="currencyExchangeTags" data-tag-category="" data-include-inactive="false" data-initial-value="" multiple="" data-tag-entity="cash_flow">
+                                <option value="" disabled="">טוען תגיות...</option>
+                            </select>
+                            <div id="currencyExchangeTagsTagBadgeContainer" class="mt-2 tag-picker-badges text-start small"></div>
+                            <small class="form-text text-muted">הוסף תגיות להמרת מטבע זו</small>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div><div class="col-12">
+                    <div class="mb-3">
+                        <label for="currencyExchangeDescription" class="form-label">
+                            תיאור 
+                        </label>
+                        <div id="currencyExchangeDescription" class="rich-text-editor-container" data-editor-id="currencyExchangeDescription" data-options="{&quot;direction&quot;:&quot;rtl&quot;,&quot;placeholder&quot;:&quot;תיאור ההמרה&quot;,&quot;toolbar&quot;:[[{&quot;header&quot;:[2,3,false]}],[&quot;bold&quot;,&quot;italic&quot;,&quot;underline&quot;,&quot;strike&quot;],[{&quot;color&quot;:[]},{&quot;background&quot;:[]}],[{&quot;align&quot;:[&quot;right&quot;,&quot;center&quot;,&quot;left&quot;,&quot;justify&quot;]}],[{&quot;direction&quot;:&quot;rtl&quot;},{&quot;direction&quot;:&quot;ltr&quot;}],[{&quot;list&quot;:&quot;ordered&quot;},{&quot;list&quot;:&quot;bullet&quot;}],[&quot;link&quot;],[&quot;clean&quot;]]}">
+                            <!-- Quill editor will be initialized here -->
+                        </div>
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                    </div>
+                
+                </div>
+            
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-22-5lrd" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-23-5lrd" data-onclick="saveCashFlow()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="modal fade" id="tradePlansModal" tabindex="-1" aria-labelledby="tradePlansModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true" data-entity-type="trade_plan">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-colored entity-trade-plan" <!--="" breadcrumb="" navigation="" --="">
+                            <div class="modal-navigation-breadcrumb"></div>
+                            <h5 class="modal-title" id="tradePlansModalLabel">הוספת תוכנית מסחר</h5>
+                            <!-- Back button - uses the button system -->
+                            <button class="btn btn" data-button-type="BACK" data-button-processed="true" id="btn-back-0-5m26" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="חזור" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon icon-tabler icon-tabler-arrow-right  class=&quot;icon&quot;" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="BACK" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M5 12l14 0"></path>
+  <path d="M13 18l6 -6"></path>
+  <path d="M13 6l6 6"></path>
+</svg></button>
+                            <!-- Close button -->
+                            <button class="btn btn" data-button-type="CLOSE" data-button-processed="true" id="btn-close-1-5m27" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="סגור" data-bs-dismiss="modal" type="button" data-variant="small"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon icon-tabler icons-tabler-outline icon-tabler-x  class=&quot;icon&quot;" aria-label="CLOSE" role="img">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <path d="M18 6l-12 12"></path>
+  <path d="M6 6l12 12"></path>
+</svg></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="tradePlansModalForm">
+                                
+                                <div class="row g-3 align-items-end"><div class="col-md-4 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanTicker" class="form-label">
+                            טיקר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradePlanTicker" name="tradePlanTicker" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-4 col-sm-12">
+                    <div class="mb-2">
+                        <label for="tradePlanTickerInfo" class="form-label">
+                            נתוני שוק 
+                        </label>
+                        <div id="tradePlanTickerInfo" class="form-control-plaintext py-1 px-2">                              
+                            <!-- יתמלא דינמית -->
+                        </div>
+                                                                  
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanSide" class="form-label">
+                            צד <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradePlanSide" name="tradePlanSide" required="">
+                            <option value="">בחר...</option><option value="Long" selected="">לונג (Long)</option><option value="Short">שורט (Short)</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanAccount" class="form-label">
+                            חשבון מסחר <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradePlanAccount" name="tradePlanAccount" required="">
+                            <option value="">בחר...</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanType" class="form-label">
+                            סוג השקעה <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradePlanType" name="tradePlanType" required="">
+                            <option value="">בחר...</option><option value="swing" selected="">סווינג - מסחר לטווח קצר עד בינוני</option><option value="investment">השקעה - השקעה ארוכת טווח</option><option value="passive">פאסיבי - השקעה פאסיבית ללא פעילות מסחרית</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanStatus" class="form-label">
+                            סטטוס <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="tradePlanStatus" name="tradePlanStatus" required="">
+                            <option value="">בחר...</option><option value="open" selected="">פתוח</option><option value="closed">סגור</option><option value="cancelled">מבוטל</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanEntryPrice" class="form-label">
+                            מחיר כניסה מתוכנן <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanEntryPrice" name="tradePlanEntryPrice" required="" min="0.01" step="0.01" placeholder="הכנס מחיר כניסה..." value="">
+                        <small class="form-text text-muted">מחיר הכניסה המתוכנן - מתעדכן אוטומטית לאחר בחירת טיקר</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanEntryDate" class="form-label">
+                            תאריך כניסה מתוכנן 
+                        </label>
+                        <input type="datetime-local" class="form-control" id="tradePlanEntryDate" name="tradePlanEntryDate" value="">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanQuantity" class="form-label">
+                            כמות מתוכננת <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanQuantity" name="tradePlanQuantity" required="" min="1" step="0.1" placeholder="הכנס כמות..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="planAmount" class="form-label">
+                            סכום השקעה מתוכנן ($) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="planAmount" name="planAmount" required="" min="0.01" step="0.01" placeholder="הכנס סכום השקעה..." value="">
+                        <small class="form-text text-muted">הסכום הכולל להשקעה בתכנון</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanStopLoss" class="form-label label-numeric-negative">
+                            Stop Loss 
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanStopLoss" name="tradePlanStopLoss" min="0.01" step="0.01" placeholder="הכנס מחיר Stop Loss..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanTakeProfit" class="form-label label-numeric-positive">
+                            Take Profit 
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanTakeProfit" name="tradePlanTakeProfit" min="0.01" step="0.01" placeholder="הכנס מחיר Take Profit..." value="">
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanStopLossPercent" class="form-label label-numeric-negative">
+                            Stop Loss (%) 
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanStopLossPercent" name="tradePlanStopLossPercent" min="0.01" step="0.01" placeholder="אחוז סטופ מתוכנן..." value="">
+                        <small class="form-text text-muted">אחוז סטופ ביחס למחיר הכניסה</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="tradePlanTakeProfitPercent" class="form-label label-numeric-positive">
+                            Take Profit (%) 
+                        </label>
+                        <input type="number" class="form-control" id="tradePlanTakeProfitPercent" name="tradePlanTakeProfitPercent" min="0.01" step="0.01" placeholder="אחוז יעד מתוכנן..." value="">
+                        <small class="form-text text-muted">אחוז יעד ביחס למחיר הכניסה</small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div><div class="col-12">
+                    <div class="mb-2">
+                        <label for="tradePlanRiskSummaryCard" class="form-label">
+                            סיכום תוכנית 
+                        </label>
+                        <div id="tradePlanRiskSummaryCard" class="form-control-plaintext py-1 px-2">                              
+                            <!-- יתמלא דינמית -->
+                        </div>
+                        <small class="form-text text-muted">תצוגת נתוני השקעה, סיכון וסיכוי עבור התוכנית</small>                                          
+                    </div>
+                </div><div class="col-md-4 col-12">
+                        <div class="mb-3">
+                            <label for="tradePlanTags" class="form-label">
+                                תגיות 
+                            </label>
+                            <select class="form-select tag-multi-select" id="tradePlanTags" name="tradePlanTags" data-tag-category="" data-include-inactive="false" data-initial-value="" multiple="" data-tag-entity="trade_plan">
+                                <option value="" disabled="">טוען תגיות...</option>
+                            </select>
+                            <div id="tradePlanTagsTagBadgeContainer" class="mt-2 tag-picker-badges text-start small"></div>
+                            <small class="form-text text-muted">בחר תגיות שיסייעו בארגון ומעקב אחר תוכנית זו</small>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div><div class="col-md-8 col-12">
+                <div class="conditions-control-wrapper d-flex flex-column gap-2" data-conditions-controls="trade_plan">
+                    <div id="tradePlanConditionsSummary" class="conditions-summary-table" data-conditions-summary="">
+                        <div class="text-muted small mb-0">
+                            תנאים פעילים יוצגו כאן לאחר שמירת התכנון.
+                        </div>
+                    </div>
+                    <div class="text-muted small" data-conditions-disabled-hint="">
+                        ניהול תנאים יהיה זמין לאחר שמירת התכנון.
+                    </div>
+                    <div class="d-flex justify-content-end flex-wrap gap-2" dir="rtl">
+                        <button class="btn btn btn-outline-secondary" data-button-type="REFRESH" data-button-processed="true" id="btn-refresh-2-5m27" data-onclick="handleTradePlanEvaluateConditionsClick()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="בדיקת תנאים מול השוק" type="button" data-size="small" data-style="outline" data-variant="small" data-tooltip-static="true">↻</button>
+                        <button class="btn btn btn-outline-primary" data-button-type="ADD" data-button-processed="true" id="btn-add-3-5m27" data-onclick="handleTradePlanConditionsButtonClick()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="הוסף תנאי" type="button" data-size="small" data-style="outline" data-variant="small" data-tooltip-static="true">➕</button>
+                    </div>
+                </div>
+            </div></div><div class="row"><div class="col-12">
+                    <div class="mb-3">
+                        <label for="tradePlanNotes" class="form-label">
+                            הערות 
+                        </label>
+                        <div id="tradePlanNotes" class="rich-text-editor-container" data-editor-id="tradePlanNotes" data-options="{&quot;direction&quot;:&quot;rtl&quot;,&quot;placeholder&quot;:&quot;הכנס הערות נוספות על התוכנית...&quot;,&quot;toolbar&quot;:[[{&quot;header&quot;:[2,3,false]}],[&quot;bold&quot;,&quot;italic&quot;,&quot;underline&quot;,&quot;strike&quot;],[{&quot;color&quot;:[]},{&quot;background&quot;:[]}],[{&quot;align&quot;:[&quot;right&quot;,&quot;center&quot;,&quot;left&quot;,&quot;justify&quot;]}],[{&quot;direction&quot;:&quot;rtl&quot;},{&quot;direction&quot;:&quot;ltr&quot;}],[{&quot;list&quot;:&quot;ordered&quot;},{&quot;list&quot;:&quot;bullet&quot;}],[&quot;link&quot;],[&quot;clean&quot;]]}">
+                            <!-- Quill editor will be initialized here -->
+                        </div>
+                        
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn" data-button-type="CANCEL" data-button-processed="true" id="btn-cancel-4-5m27" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="ביטול" data-bs-dismiss="modal" type="button" data-variant="normal">ביטול</button>
+                            <button class="btn btn" data-button-type="SAVE" data-button-processed="true" id="btn-save-5-5m27" data-onclick="saveTradePlan()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-offset="0,0" data-tooltip="שמור" type="button" data-variant="normal">שמור</button>
+                        </div>
+                    </div>
+                </div>
+            </div></body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>

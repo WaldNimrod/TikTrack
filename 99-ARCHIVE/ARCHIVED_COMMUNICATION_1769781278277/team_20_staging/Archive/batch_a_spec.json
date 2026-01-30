@@ -1,0 +1,10 @@
+{
+  "batch": "A",
+  "entities": [
+    "Trading Account",
+    "Money",
+    "Time"
+  ],
+  "compliance": "ULID, JSONB, Port 8080",
+  "terminology": "Strict 'Trading Account' enforcement"
+}

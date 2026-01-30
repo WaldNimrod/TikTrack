@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "page": "_______________tiktrack",
+    "url": "http://127.0.0.1:8090/trades",
+    "timestamp": "2026-01-30T11:34:33.832Z",
+    "viewport": {
+      "w": 1335,
+      "h": 947
+    }
+  },
+  "structure": {
+    "header": null,
+    "mainNav": {
+      "width": "921.547px",
+      "height": "52px",
+      "padding": "0px",
+      "margin": "0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(0, 0, 0)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "flex",
+      "flexDirection": "row",
+      "justifyContent": "flex-start",
+      "alignItems": "center",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "border": "0px none rgb(0, 0, 0)",
+      "position": "static",
+      "zIndex": "auto"
+    },
+    "logo": {
+      "width": "125px",
+      "height": "37.5px",
+      "padding": "0px",
+      "margin": "0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(0, 0, 0)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "block",
+      "flexDirection": "row",
+      "justifyContent": "normal",
+      "alignItems": "normal",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "border": "0px none rgb(0, 0, 0)",
+      "position": "static",
+      "zIndex": "auto"
+    }
+  },
+  "tokens": {
+    "fontFamily": "\"Noto Sans Hebrew\", -apple-system, \"system-ui\", \"Segoe UI\", Alef, sans-serif",
+    "cssVariables": [
+      ":root { --brand-primary: #26baac; --brand-secondary: #fc5a06; --current-entity-color: var(--brand-primary); --current-entity-color-light: rgba(38, 186, 172, 0.1); --current-entity-color-dark: #1a8f83; --status-open-color: #28a745; --status-closed-color: #6c757d; --status-cancelled-color: #dc3545; --status-pending-color: #ffc107; --numeric-positive-medium: #28a745; --numeric-positive-light: rgba(40, 167, 69, 0.1); --numeric-positive-border: rgba(40, 167, 69, 0.3); --numeric-negative-medium: #dc3545; --numeric-negative-light: rgba(220, 53, 69, 0.1); --numeric-negative-border: rgba(220, 53, 69, 0.3); --numeric-zero-color: #6c757d; --numeric-zero-light: rgba(108, 117, 125, 0.1); --numeric-zero-border: rgba(108, 117, 125, 0.3); --entity-trade: #26baac; --entity-trade_plan: #0056b3; --entity-trade-plan: #0056b3; --entity-trade-plan-color: #0056b3; --entity-execution: #17a2b8; --entity-account: #28a745; --entity-trading_account: #28a745; --entity-trading-account: #28a745; --entity-cash_flow: #20c997; --entity-cash-flow: #20c997; --entity-cash-flow-color: #20c997; --entity-ticker: #dc3545; --entity-alert: #ff9c05; --entity-note: #6f42c1; --entity-preference: #adb5bd; --entity-research: #17a2b8; --entity-design: #6f42c1; --entity-constraint: #e83e8c; --entity-development: #fc5a06; --entity-info: #17a2b8; --chart-secondary-color: var(--brand-primary); --cash-flow-color: #20c997; --trading-account-color: #28a745; --income-color: #28a745; --expense-color: #dc3545; --cash-flow-bg-color: rgba(32, 201, 151, 0.1); }"
+    ]
+  }
+}

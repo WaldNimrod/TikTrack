@@ -1,0 +1,14 @@
+# External & Environment
+node_modules/
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Staging/Communication - נשארים בדרייב בלבד, לא נכנסים לגיט
+communication/
+_Cursor_full_design_*/
+
+# OS specific
+.DS_Store
+*.tmp

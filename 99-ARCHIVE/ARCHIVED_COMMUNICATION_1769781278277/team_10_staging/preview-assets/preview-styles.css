@@ -1,0 +1,10 @@
+
+    /* Phoenix Layout Simulation */
+    body { font-family: 'Assistant', sans-serif; background-color: var(--neutral-50); margin: 0; }
+    GlobalPageTemplate { display: block; min-height: 100vh; position: relative; }
+    TtSection { display: block; background: #fff; border: 1px solid var(--neutral-200); border-radius: 20px; margin-bottom: 24px; overflow: hidden; }
+    TtSectionHeader { display: flex; justify-content: space-between; padding: 16px 24px; background: var(--neutral-50); border-bottom: 1px solid var(--neutral-100); font-weight: 800; }
+    TtSectionRow { display: flex; flex-wrap: wrap; gap: 20px; padding: 24px; }
+    TtSectionCol { flex: 1; min-width: 250px; }
+    .preview-banner { background: var(--entity-accent); color: white; padding: 4px 12px; font-size: 10px; font-weight: bold; text-align: center; }
+  

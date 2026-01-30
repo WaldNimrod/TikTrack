@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>יומן תזרים מזומנים - TikTrack</title>
+    <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+</head>
+<body>
+<GlobalPageTemplate entityContext="trading" pageTitle="יומן תזרים מזומנים">
+    <TtSection title="יומן תנועות מזומנים (הפקדות/משיכות):">
+    <div class="filter-bar-inline">
+        <label>טווח תאריכים:</label>
+        <input type="date"> עד <input type="date">
+    </div>
+    <TtSectionRow>
+        <table class="legacy-audit-table">
+            <thead>
+                <tr>
+                    <th>תאריך פעולה:</th>
+                    <th>סוג תנועה:</th>
+                    <th>חשבון יעד/מקור:</th>
+                    <th>סכום:</th>
+                    <th>מטבע:</th>
+                    <th>סטטוס:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>20/01/2026</td>
+                    <td class="text-deposit">הפקדה</td>
+                    <td>IBKR - Main</td>
+                    <td class="amount-pos">5,000.00</td>
+                    <td>USD</td>
+                    <td><span class="status-verified">מאושר</span></td>
+                </tr>
+                <tr>
+                    <td>15/01/2026</td>
+                    <td class="text-withdrawal">משיכה</td>
+                    <td>IBKR - Main</td>
+                    <td class="amount-neg">-1,200.00</td>
+                    <td>USD</td>
+                    <td><span class="status-verified">מאושר</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </TtSectionRow>
+</TtSection>
+</GlobalPageTemplate>
+<footer class="tt-system-footer">TikTrack System v4.2.0 | Node: PX-S10.20</footer>
+</body>
+</html>

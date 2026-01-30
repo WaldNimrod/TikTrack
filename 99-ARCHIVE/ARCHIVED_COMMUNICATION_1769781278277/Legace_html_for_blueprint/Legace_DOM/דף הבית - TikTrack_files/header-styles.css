@@ -1,0 +1,782 @@
+/* Header Styles - v7.0.0 - Complete Rewrite
+ * ==========================================
+ * 
+ * Clean, organized CSS for header system
+ * All selectors must start with #unified-header
+ * 
+ * File: trading-ui/styles-new/header-styles.css
+ * Version: 7.0.0
+ * Last Updated: November 23, 2025
+ */
+
+/* ===== Base Header Styles ===== */
+#unified-header {
+    background: var(--apple-bg-elevated, #ffffff);
+    border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+    box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.05));
+    position: sticky;
+    top: 0;
+    z-index: 950;
+    width: 100%;
+}
+
+#unified-header .header-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: visible; /* מאפשר לכפתור להיות מחוץ לגבולות */
+}
+
+#unified-header .header-top {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+    position: relative;
+    min-height: 70px;
+    direction: rtl;
+    background: var(--apple-bg-elevated, #ffffff);
+    width: 100%;
+}
+
+#unified-header .header-container {
+    margin: 0 auto;
+    padding: var(--spacing-md, 16px) 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: var(--container-xl, 1400px);
+    direction: rtl;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+/* ===== Logo Styles ===== */
+#unified-header .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+    order: 3;
+    margin-right: auto;
+}
+
+#unified-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+#unified-header .logo:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+    display: block;
+}
+
+#unified-header .logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+    white-space: nowrap;
+}
+
+/* ===== Navigation Styles ===== */
+#unified-header .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    direction: rtl;
+    order: 1;
+    margin-left: auto;
+}
+
+#unified-header .main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    direction: rtl;
+}
+
+#unified-header .tiktrack-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#unified-header .tiktrack-nav-item {
+    position: relative;
+}
+
+#unified-header .tiktrack-nav-item:first-child {
+    margin-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:first-child .tiktrack-nav-link {
+    padding-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:nth-child(2) {
+    margin-right: 0.5rem;
+}
+
+#unified-header .tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #26baac;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+#unified-header .tiktrack-nav-link:hover {
+    color: #1e9a8a;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+/* ===== Dropdown Menu Styles ===== */
+#unified-header .tiktrack-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 3px);
+    right: 0;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 954;
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-menu[style*="opacity: 1"],
+#unified-header .tiktrack-dropdown-menu[style*="visibility: visible"] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#unified-header .tiktrack-dropdown-menu li {
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-arrow {
+    font-size: 0.75rem;
+    color: #666;
+    margin-right: 0.25rem;
+    transition: transform 0.2s ease;
+}
+
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
+    transform: rotate(90deg);
+}
+
+#unified-header .tiktrack-dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #29a6a8;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+#unified-header .tiktrack-dropdown-item:hover {
+    background: #f5f5f7;
+    color: #ff9e04;
+}
+
+#unified-header .separator {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 0.5rem 0;
+}
+
+/* ===== Dropdown Submenu (Level 3) ===== */
+#unified-header .dropdown-submenu {
+    position: relative;
+}
+
+#unified-header .dropdown-submenu > .tiktrack-dropdown-item {
+    padding-right: 0.5rem;
+}
+
+/* יצירת "גשר" בין תפריט רמה 2 לתפריט רמה 3 - מונע סגירה במעבר */
+#unified-header .dropdown-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -5px; /* מכסה אזור קטן - התפריטים צמודים */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: 953; /* מעל תפריט רמה 2, מתחת לתפריט רמה 3 */
+    pointer-events: auto;
+}
+
+/* גשר גם בתפריט רמה 3 - מונע סגירה כשחוזרים */
+#unified-header .level3-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px; /* ב-RTL - מצד שמאל (ימין במסך) */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    pointer-events: auto;
+}
+
+/* Level 3 Submenu - רמה 3 של התפריט */
+#unified-header .level3-submenu {
+    position: absolute;
+    top: 0;
+    right: 100%; /* ב-RTL התפריט מופיע משמאל (ימין במסך) - צמוד ללא רווח */
+    left: auto;
+    bottom: auto;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    max-height: calc(100vh - 20px); /* מקסימום גובה - לא יותר מגובה המסך */
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 952; /* מעל תפריט רמה 2 */
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px); /* ב-RTL תזוזה שמאלה (ימינה במסך) */
+    transition: all 0.3s ease;
+    overflow-y: auto; /* גלילה אם התוכן ארוך */
+    overflow-x: hidden;
+}
+
+/* אם התפריט מתחיל נמוך מדי - ממקמים אותו מלמטה */
+#unified-header .level3-submenu.bottom-aligned {
+    top: auto;
+    bottom: 0;
+}
+
+#unified-header .dropdown-submenu:hover .level3-submenu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+#unified-header .level3-submenu li {
+    list-style: none;
+}
+
+#unified-header .level3-submenu .tiktrack-dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+#unified-header .level3-submenu .separator {
+    margin: 0.5rem 0;
+}
+
+/* ===== Filter Toggle Button ===== */
+#unified-header .filter-toggle-section {
+    display: flex;
+    align-items: center;
+}
+
+/* כפתור ראשי - במרכז העמוד על הקו של סוף הפילטר למטה */
+/* הכפתור נמצא מחוץ ל-header-filters כך שהוא נשאר גלוי גם כשהפילטר סגור */
+#unified-header .filter-toggle-main {
+    position: absolute;
+    top: 149px; /* מיקום כשהפילטר פתוח */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    justify-content: center;
+    align-items: center;
+    z-index: 952;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* כשהפילטר סגור, הכפתור צריך להיות גבוה יותר */
+#unified-header .header-content:has(.header-filters[style*="display: none"]) .filter-toggle-main,
+#unified-header .header-content:has(.header-filters[style*="display:none"]) .filter-toggle-main {
+    top: 75px; /* מיקום כשהפילטר סגור */
+}
+
+#unified-header .filter-toggle-main .header-filter-toggle-btn {
+    pointer-events: all;
+}
+
+/* כפתור משני - בתוך הפילטר, במרכז */
+#unified-header .filter-toggle-secondary {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 952;
+    width: 100%;
+    pointer-events: none;
+}
+
+#unified-header .filter-toggle-secondary .header-filter-toggle-btn {
+    pointer-events: all;
+}
+
+/* Ensure toggle button is always visible even when filters are hidden */
+#unified-header .header-filters[style*="display: none"] ~ .filter-toggle-secondary,
+#unified-header .header-filters[style*="display:none"] ~ .filter-toggle-secondary {
+    display: flex !important;
+}
+
+#unified-header .header-filter-toggle-btn {
+    background: white;
+    border: 1px solid var(--apple-border-light, #e5e5e5);
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    color: var(--apple-text-secondary, #6c757d);
+    font-size: 0.6rem; /* גודל חץ תקין */
+    width: 20px; /* קוטר קטן יותר */
+    height: 20px; /* קוטר קטן יותר */
+    min-width: 20px; /* מונע דריסה */
+    min-height: 20px; /* מונע דריסה */
+    max-width: 20px; /* מונע דריסה */
+    max-height: 20px; /* מונע דריסה */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+    box-sizing: border-box; /* מונע דריסה */
+    box-shadow: none !important; /* הסרת כל צל/הילה */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
+}
+
+#unified-header .header-filter-toggle-btn:hover {
+    background: var(--apple-bg-tertiary, #e5e5e5);
+    color: var(--apple-text-primary, #1d1d1f);
+    border-color: var(--apple-border-medium, #d1d1d1);
+    box-shadow: none !important; /* הסרת כל צל/הילה גם ב-hover */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
+}
+
+#unified-header .header-filter-toggle-btn .header-filter-arrow {
+    font-size: 0.6rem; /* גודל חץ תקין */
+    line-height: 1;
+    display: inline-block;
+}
+
+#unified-header .header-filter-toggle-btn.collapsed .header-filter-arrow {
+    transform: rotate(180deg);
+}
+
+/* ===== Filter Styles ===== */
+#unified-header .header-filters {
+    padding: 12px 0;
+    background: white;
+    position: relative;
+    z-index: 950;
+    min-height: 60px;
+    display: block;
+    margin-top: 0;
+    padding-bottom: 24px;
+}
+
+#unified-header .filters-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md, 16px);
+    max-width: var(--container-xl, 1400px);
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    overflow: visible;
+    direction: rtl; /* RTL for Hebrew - filters start from right */
+    justify-content: flex-start; /* Filters aligned to right (start in RTL) */
+}
+
+#unified-header .filter-group {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    position: relative;
+}
+
+#unified-header .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.9rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    color: #1d1d1f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 400;
+    min-width: 120px;
+    justify-content: space-between;
+}
+
+#unified-header .filter-toggle:hover {
+    border-color: #ff9500;
+    color: #ff9500;
+    background: white;
+}
+
+#unified-header .filter-menu {
+    position: absolute;
+    top: calc(100% + 3px);
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 0.35rem 0 2rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 951;
+    list-style: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+#unified-header .filter-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    display: block;
+}
+
+#unified-header .status-filter-item,
+#unified-header .type-filter-item,
+#unified-header .account-filter-item,
+#unified-header .date-range-filter-item {
+    padding: 0.35rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .status-filter-item:hover,
+#unified-header .type-filter-item:hover,
+#unified-header .account-filter-item:hover,
+#unified-header .date-range-filter-item:hover {
+    background: #f5f5f7;
+    color: #ff9500;
+}
+
+#unified-header .status-filter-item.selected,
+#unified-header .type-filter-item.selected,
+#unified-header .account-filter-item.selected,
+#unified-header .date-range-filter-item.selected {
+    background: #f0f9ff;
+    color: #26baac;
+    font-weight: 500;
+}
+
+#unified-header .option-text {
+    flex: 1;
+}
+
+#unified-header .dropdown-arrow {
+    font-size: 0.75rem;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+
+/* ===== Filter Close Button ===== */
+#unified-header .filter-close-btn {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--apple-bg-secondary, #f5f5f7);
+    border: 1px solid var(--apple-border-light, #e5e5e5);
+    color: var(--apple-text-secondary, #6c757d);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+#unified-header .filter-close-btn:hover {
+    background: var(--apple-bg-tertiary, #e5e5e5);
+    color: var(--apple-text-primary, #1d1d1f);
+    border-color: var(--apple-border-medium, #d1d1d1);
+}
+
+/* ===== Search Filter ===== */
+#unified-header .search-filter {
+    flex: 1;
+    max-width: 150px;
+}
+
+#unified-header .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#unified-header .search-filter-input {
+    width: 100%;
+    padding: 0.35rem 2rem 0.35rem 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    font-size: 0.9rem;
+    font-weight: 300;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-filter-input:focus {
+    outline: none;
+    border-color: #ff9500;
+    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+}
+
+#unified-header .search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+    color: #ff9500;
+}
+
+/* ===== Filter Actions ===== */
+#unified-header .filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ===== Filter User Section ===== */
+#unified-header .filter-user-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto; /* Push to left (end of row in RTL) */
+}
+
+#unified-header .user-avatar-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #26baac;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#unified-header .user-avatar-badge:hover {
+    background: #1fa89a;
+    transform: scale(1.05);
+}
+
+#unified-header .auth-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover {
+    opacity: 1;
+}
+
+#unified-header .auth-toggle-btn img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover img {
+    opacity: 1;
+}
+
+#unified-header .user-profile-link {
+    text-decoration: none;
+}
+
+#unified-header .reset-btn,
+#unified-header .clear-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    padding: 0.35rem 0.9rem;
+    cursor: pointer;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+}
+
+#unified-header .reset-btn:hover,
+#unified-header .clear-btn:hover {
+    border-color: #ff9500;
+    color: #ff9500;
+    background: #fff5e6;
+}
+
+#unified-header .btn-text {
+    display: inline-block;
+}
+
+/* ===== Selected Value Styles ===== */
+#unified-header .selected-value {
+    flex: 1;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ===== Submenu Styles ===== */
+#unified-header .submenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 240px;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: none;
+}
+
+#unified-header .tiktrack-nav-item:hover .submenu {
+    display: block;
+}
+
+#unified-header .submenu li {
+    list-style: none;
+}
+
+#unified-header .submenu a {
+    display: block;
+    padding: 8px 12px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+#unified-header .submenu a:hover {
+    background: #f5f5f7;
+    color: #ff9500;
+}
+
+#unified-header .submenu a:last-child {
+    border-bottom: none;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 768px) {
+    #unified-header .header-container {
+        flex-wrap: wrap;
+        padding: 12px 16px;
+    }
+
+    #unified-header .tiktrack-nav-list {
+        gap: 0.5rem;
+    }
+
+    #unified-header .tiktrack-nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 14px;
+    }
+
+    #unified-header .filters-container {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0 16px;
+    }
+
+    #unified-header .filter-toggle {
+        min-width: 100px;
+        font-size: 0.85rem;
+    }
+}
+

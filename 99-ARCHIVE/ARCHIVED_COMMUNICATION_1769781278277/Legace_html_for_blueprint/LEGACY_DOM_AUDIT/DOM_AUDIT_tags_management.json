@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "page": "______________tiktrack",
+    "url": "http://127.0.0.1:8090/tag_management",
+    "timestamp": "2026-01-30T11:45:05.517Z",
+    "viewport": {
+      "w": 1335,
+      "h": 947
+    }
+  },
+  "structure": {
+    "header": {
+      "html": "<header class=\"row g-0\">\n            <div class=\"col-12\">\n                <div id=\"unified-header\"><div class=\"header-content\">\n          <div class=\"header-top\">\n            <div class=\"header-container\">\n              <div class=\"header-nav\">\n                <nav class=\"main-nav\">\n                  <ul class=\"tiktrack-nav-list\">\n                    <li class=\"tiktrack-nav-item\">\n                      <a href=\"/\" class=\"tiktrack-nav-link\" data-page=\"home\">\n                        <img src=\"images/icons/entities/home.svg\" alt=\"בית\" width=\"36\" height=\"36\" class=\"nav-icon home-icon-only\" data-icon-replace=\"entity:home\">\n                      </a>\n                    </li>\n                    <li class=\"tiktrack-nav-item dropdown\">\n                      <a href=\"/trade_plans\" class=\"tiktrack-nav-link tiktrack-dropdown-toggle\" data-page=\"trade_plans\">\n                        <span class=\"nav-text\">תכנון</span>\n                        <span class=\"tiktrack-dropdown-arrow\">▼</span>\n         ...",
+      "styles": {
+        "width": "1319px",
+        "height": "2783.52px",
+        "padding": "0px",
+        "margin": "0px",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "block",
+        "flexDirection": "row",
+        "justifyContent": "normal",
+        "alignItems": "normal",
+        "borderRadius": "0px",
+        "boxShadow": "none",
+        "border": "0px none rgb(0, 0, 0)",
+        "position": "static",
+        "zIndex": "auto"
+      }
+    },
+    "mainNav": {
+      "width": "1319px",
+      "height": "1428.5px",
+      "padding": "0px",
+      "margin": "0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(0, 0, 0)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "block",
+      "flexDirection": "row",
+      "justifyContent": "normal",
+      "alignItems": "normal",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "border": "0px none rgb(0, 0, 0)",
+      "position": "static",
+      "zIndex": "auto"
+    },
+    "logo": {
+      "width": "329.633px",
+      "height": "100.023px",
+      "padding": "0px",
+      "margin": "0px",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(0, 0, 238)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "inline",
+      "flexDirection": "row",
+      "justifyContent": "normal",
+      "alignItems": "normal",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "border": "0px none rgb(0, 0, 238)",
+      "position": "static",
+      "zIndex": "auto"
+    }
+  },
+  "tokens": {
+    "fontFamily": "Times",
+    "cssVariables": []
+  }
+}

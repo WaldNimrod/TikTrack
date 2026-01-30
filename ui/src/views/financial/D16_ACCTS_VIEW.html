@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול חשבונות מסחר - TikTrack</title>
+    <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+</head>
+<body>
+<GlobalPageTemplate entityContext="trading" pageTitle="ניהול חשבונות מסחר">
+    <TtSection title="חשבונות מסחר פעילים:">
+    <TtSectionRow>
+        <div class="account-card">
+            <div class="card-title">חשבון מסחר מרכזי (Interactive Brokers):</div>
+            <div class="balance-grid">
+                <div class="balance-item">
+                    <span class="currency">USD ($):</span>
+                    <span class="amount">142,500.42</span>
+                </div>
+                <div class="balance-item">
+                    <span class="currency">ILS (₪):</span>
+                    <span class="amount">12,040.00</span>
+                </div>
+            </div>
+            <div class="card-footer">סטטוס: <span class="tag-active">מחובר</span></div>
+        </div>
+        <div class="account-card">
+            <div class="card-title">חשבון גידור (Exante):</div>
+            <div class="balance-grid">
+                <div class="balance-item">
+                    <span class="currency">USD ($):</span>
+                    <span class="amount">54,200.00</span>
+                </div>
+                <div class="balance-item">
+                    <span class="currency">ILS (₪):</span>
+                    <span class="amount">0.00</span>
+                </div>
+            </div>
+            <div class="card-footer">סטטוס: <span class="tag-active">מחובר</span></div>
+        </div>
+    </TtSectionRow>
+    <div class="section-actions-footer"><button class="btn-brand">+ הוסף חשבון מסחר</button></div>
+</TtSection>
+</GlobalPageTemplate>
+<footer class="tt-system-footer">TikTrack System v4.2.0 | Node: PX-S10.20</footer>
+</body>
+</html>

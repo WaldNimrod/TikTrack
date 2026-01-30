@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: TikTrack Project Phoenix API
+  description: |
+    Backend API for Team 20 (Backend Lego Factory).
+    Enforces the Fortress Protocol: Port 8080, ULID identity, and Plural Terminology.
+  version: 2.54.1
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local Development Server
+
+paths:
+  /users/me:
+    get:
+      summary: Get current user identity (D25)
+      tags: [Identity]
+      responses:
+        '200':
+          description: User profile and security tiers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /user-api-keys:
+    get:
+      summary: List API keys for D24 view
+      tags: [Security]
+      responses:
+        '200':
+          description: List of keys with MASKING policy enforced
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserApiKeyResponse'
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        external_ulids:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+        email_addresses:
+          type: string
+          format: email
+        phone_numbers:
+          type: string
+          description: Secondary unique identifier (Unique Index in DB)
+        user_tier_levels:
+          type: string
+          enum: [Bronze, Silver, Gold, Platinum]
+
+    UserApiKeyResponse:
+      type: object
+      required: [external_ulids, provider_enums]
+      properties:
+        external_ulids:
+          type: string
+        provider_enums:
+          type: string
+          enum: [IBKR, POLYGON, YAHOO]
+        encrypted_api_keys:
+          type: string
+          example: "********************"
+          description: Security masking enforced.

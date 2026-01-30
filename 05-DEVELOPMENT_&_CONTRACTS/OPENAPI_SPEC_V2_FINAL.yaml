@@ -1,0 +1,69 @@
+openapi: 3.0.0
+info:
+  title: TikTrack Project Phoenix API (Master Release)
+  version: 2.5.2
+  description: Unified API Specification (Fortress Protocol)
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /health:
+    get:
+      summary: "System Health Check"
+      responses:
+        '200':
+          description: "OK"
+  /auth/login:
+    post:
+      summary: "User authentication"
+      responses:
+        '200': { description: "Success" }
+  /users/me:
+    get:
+      summary: "Get current user profile (D25)"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /trading_accounts:
+    get:
+      summary: "List all trading accounts (Plural)"
+      responses:
+        '200': { description: "Success" }
+  /trades:
+    get:
+      summary: "Hierarchical Trades View"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TradeResponse'
+  /analytics/portfolios:
+    get:
+      summary: "Portfolio Performance Analytics"
+      responses:
+        '200': { description: "Success" }
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        external_ulids: { type: string, pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$' }
+        phone_numbers: { type: string }
+        user_tier_levels: { type: string, enum: [Bronze, Silver, Gold, Platinum] }
+    TradeResponse:
+      type: object
+      properties:
+        external_ulids: { type: string }
+        parent_id: { type: string, nullable: true }
+        calculated_statuses: { type: string }
+        aggregated_pnl_amounts: { type: number }
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeResponse'

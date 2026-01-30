@@ -1,0 +1,1 @@
+import React from 'react'; const GlobalPageTemplate = ({ children, pageTitle }) => <div dir="rtl"><h1 style={{paddingInline: '20px', fontWeight: 700, fontSize: '24px'}}>{pageTitle}</h1>{children}</div>; export default GlobalPageTemplate;

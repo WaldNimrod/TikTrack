@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- saved from url=(0032)http://127.0.0.1:8090/login.html -->
+<html lang="he" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחברות - TikTrack</title>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="./login_files/main.css">
+    <link rel="stylesheet" href="./login_files/_login.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="http://127.0.0.1:8090/images/icons/favicon.ico">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./login_files/css2" rel="stylesheet">
+<!-- CRITICAL: Load package-manifest.js BEFORE loader.js to break chicken-and-egg dependency -->
+<script src="./login_files/package-manifest.js"></script>
+<script src="./login_files/loader.js" defer=""></script>
+<script src="./login_files/api-config.js" data-loader="true"></script><script src="./login_files/api-fetch-wrapper.js" data-loader="true"></script><script src="./login_files/global-favicon.js" data-loader="true"></script><script src="./login_files/cache-sync-manager.js" data-loader="true"></script><script src="./login_files/error-handlers.js" data-loader="true"></script><script src="./login_files/unified-cache-manager.js" data-loader="true"></script><script src="./login_files/icon-mappings.js" data-loader="true"></script><script src="./login_files/icon-system.js" data-loader="true"></script><script src="./login_files/icon-replacement-helper.js" data-loader="true"></script><script src="./login_files/cache-clear-menu.js" data-loader="true"></script><script src="./login_files/cache-ttl-guard.js" data-loader="true"></script><script src="./login_files/page-state-manager.js" data-loader="true"></script><script src="./login_files/page-utils.js" data-loader="true"></script><script src="./login_files/translation-utils.js" data-loader="true"></script><script src="./login_files/button-icons.js" data-loader="true"></script><script src="./login_files/bootstrap.bundle.min.js" data-loader="true"></script><script src="./login_files/button-system-init.js" data-loader="true"></script><script src="./login_files/color-scheme-system.js" data-loader="true"></script><script src="./login_files/notification-system.js" data-loader="true"></script><script src="./login_files/ui-utils.js" data-loader="true"></script><script src="./login_files/warning-system.js" data-loader="true"></script><script src="./login_files/logger-service.js" data-loader="true"></script><script src="./login_files/event-handler-manager.js" data-loader="true"></script><script src="./login_files/auth.js" data-loader="true"></script><script src="./login_files/sorting-testing-system.js" data-loader="true"></script><script src="./login_files/page-initialization-configs.js" data-loader="true"></script><script src="./login_files/init-system-check.js" data-loader="true"></script><script src="./login_files/monitoring-functions.js" data-loader="true"></script><script src="./login_files/core-systems.js" data-loader="true"></script><script src="./login_files/login.js" data-loader="true"></script></head>
+<body class="login-page" data-page-key="login" data-new-gr-c-s-check-loaded="14.1270.0" data-gr-ext-installed="">
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <img src="./login_files/logo.svg" alt="TikTrack Logo">
+                </div>
+                <h1 class="login-title">התחברות</h1>
+                <p class="login-subtitle">ברוכים הבאים ל-TikTrack</p>
+            </div>
+
+            <div class="login-error" id="loginError"></div>
+            <div class="login-success" id="loginSuccess"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">שם משתמש</label>
+                    <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required="">
+                <div data-lastpass-icon-root="" style="position: relative !important; height: 0px !important; width: 0px !important; display: initial !important; float: left !important;"><template shadowrootmode="closed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-lastpass-icon="true" data-testid="infield-icon" style="position: absolute; cursor: pointer; height: 22px; max-height: 22px; width: 22px; max-width: 22px; top: 11.25px; left: 309px; z-index: auto; color: rgb(186, 192, 202);"><rect x="0.680176" y="0.763062" width="22.6392" height="22.4737" rx="4" fill="currentColor"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M19.7935 7.9516C19.7935 7.64414 20.0427 7.3949 20.3502 7.3949C20.6576 7.3949 20.9069 7.64414 20.9069 7.9516V16.0487C20.9069 16.3562 20.6576 16.6054 20.3502 16.6054C20.0427 16.6054 19.7935 16.3562 19.7935 16.0487V7.9516Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M4.76288 13.6577C5.68525 13.6577 6.43298 12.9154 6.43298 11.9998C6.43298 11.0842 5.68525 10.3419 4.76288 10.3419C3.8405 10.3419 3.09277 11.0842 3.09277 11.9998C3.09277 12.9154 3.8405 13.6577 4.76288 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.3298 13.6577C11.2521 13.6577 11.9999 12.9154 11.9999 11.9998C11.9999 11.0842 11.2521 10.3419 10.3298 10.3419C9.4074 10.3419 8.65967 11.0842 8.65967 11.9998C8.65967 12.9154 9.4074 13.6577 10.3298 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8964 13.6577C16.8188 13.6577 17.5665 12.9154 17.5665 11.9998C17.5665 11.0842 16.8188 10.3419 15.8964 10.3419C14.974 10.3419 14.2263 11.0842 14.2263 11.9998C14.2263 12.9154 14.974 13.6577 15.8964 13.6577Z" fill="white"></path></svg></template></div></div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">סיסמה</label>
+                    <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required="">
+                <div data-lastpass-icon-root="" style="position: relative !important; height: 0px !important; width: 0px !important; display: initial !important; float: left !important;"><template shadowrootmode="closed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-lastpass-icon="true" data-testid="infield-icon" style="position: absolute; cursor: pointer; height: 22px; max-height: 22px; width: 22px; max-width: 22px; top: 11.25px; left: 309px; z-index: auto; color: rgb(186, 192, 202);"><rect x="0.680176" y="0.763062" width="22.6392" height="22.4737" rx="4" fill="currentColor"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M19.7935 7.9516C19.7935 7.64414 20.0427 7.3949 20.3502 7.3949C20.6576 7.3949 20.9069 7.64414 20.9069 7.9516V16.0487C20.9069 16.3562 20.6576 16.6054 20.3502 16.6054C20.0427 16.6054 19.7935 16.3562 19.7935 16.0487V7.9516Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M4.76288 13.6577C5.68525 13.6577 6.43298 12.9154 6.43298 11.9998C6.43298 11.0842 5.68525 10.3419 4.76288 10.3419C3.8405 10.3419 3.09277 11.0842 3.09277 11.9998C3.09277 12.9154 3.8405 13.6577 4.76288 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.3298 13.6577C11.2521 13.6577 11.9999 12.9154 11.9999 11.9998C11.9999 11.0842 11.2521 10.3419 10.3298 10.3419C9.4074 10.3419 8.65967 11.0842 8.65967 11.9998C8.65967 12.9154 9.4074 13.6577 10.3298 13.6577Z" fill="white"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8964 13.6577C16.8188 13.6577 17.5665 12.9154 17.5665 11.9998C17.5665 11.0842 16.8188 10.3419 15.8964 10.3419C14.974 10.3419 14.2263 11.0842 14.2263 11.9998C14.2263 12.9154 14.974 13.6577 15.8964 13.6577Z" fill="white"></path></svg></template></div></div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span id="loginBtnText">התחבר</span>
+                    <span id="loginBtnSpinner" class="spinner-hidden">⏳ מתחבר...</span>
+                </button>
+            </form>
+
+            <div class="center-text">
+                <a href="http://127.0.0.1:8090/forgot_password" class="green-link">שכחת סיסמה?</a>
+            </div>
+
+            <div class="demo-credentials">
+                <h6>פרטי התחברות לדמו:</h6>
+                <p><strong>מנהל:</strong> username=admin, password=admin123</p>
+                <p><strong>משתמש:</strong> username=user, password=user123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts - Load order critical for login flow -->
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+     <!-- Package manifest system -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+     <!-- Page initialization configs -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+     <!-- Core systems initialization -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+     <!-- API configuration -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+     <!-- Global fetch wrapper for Authorization injection -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+     <!-- Unified cache system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+     <!-- Authentication system (exports window.login) -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+     <!-- Logger service -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+     <!-- Dynamic color system -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+     <!-- Test auth infrastructure (Fix Pack 5) -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+     <!-- Login functionality (waits for window.login from auth.js) -->
+
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>

@@ -1,9 +1,163 @@
 # 🗂️ TikTrack Master Documentation Index (D15)
 
-**Last Updated:** 01/30/2026, 06:51:10 PM
+**Last Updated:** 01/31/2026, 12:11:21 AM
 **Status:** ✅ **REORGANIZED & UNIFIED**
 
 ---
+
+## 📂 עץ תיקיות (Directory Tree)
+
+```
+documentation/
+├── 00-MANAGEMENT/
+│   ├── 00_ARCHITECT_HANDOVER_v252.md
+│   ├── 00_AUDIT_MANUAL.md
+│   ├── 00_FORTRESS_SOP_v252.md
+│   ├── 00_GOVERNANCE_SOP_v252.md
+│   ├── 00_MASTER_INDEX.md
+│   ├── 00_PHOENIX_WILL.md
+│   ├── 01_System_Blueprint.md
+│   ├── 02_API_Connectivity.md
+│   ├── 03_Product_Capabilities.md
+│   ├── 04_Operations_Strategy.md
+│   └── 05_Setup_Infrastructure.md
+├── 01-ARCHITECTURE/
+│   ├── FRONTEND/
+│   │   ├── COMPONENTS/
+│   │   │   └── TT2_HEADER_SPEC_LOD400.md
+│   │   ├── EXAMPLES/
+│   │   └── WP_10_02_BATCH_A_FIELDS.json
+│   ├── LOGIC/
+│   │   ├── PENDING_LOGIC_ALERTS.md
+│   │   ├── TT2_MARKET_DATA_RESILIENCE.md
+│   │   ├── TT2_TRADING_CALENDAR_LOGIC.md
+│   │   ├── WP_20_07_C_DDL_CORE_SCHEMA.sql
+│   │   ├── WP_20_07_C_FIELD_MAP_ENCRYPTED_CREDENTIALS.md
+│   │   ├── WP_20_07_C_FIELD_MAP_TRADING_ACCOUNTS.md
+│   │   ├── WP_20_07_C_FIELD_MAP_TRADING_ACCOUNTS_BALANCES.md
+│   │   ├── WP_20_07_C_FIELD_MAP_USERS_PROFILES.md
+│   │   ├── WP_20_07_FIELD_MAP_ENCRYPTED_CREDENTIALS.md
+│   │   ├── WP_20_07_FIELD_MAP_EXCHANGE_RATES.md
+│   │   ├── WP_20_07_FIELD_MAP_MARKET_CALENDARS.md
+│   │   ├── WP_20_07_FIELD_MAP_TRADING_ACCOUNTS.md
+│   │   ├── WP_20_07_FIELD_MAP_USERS_PROFILES.md
+│   │   ├── WP_20_08_C_FIELD_MAP_CASH_FLOWS.md
+│   │   ├── WP_20_08_C_FIELD_MAP_TRADING_ACCOUNTS.md
+│   │   ├── WP_20_08_C_FIELD_MAP_TRADING_ACCOUNTS_BALANCES.md
+│   │   ├── WP_20_08_FIELD_MAP_CASH_FLOWS.md
+│   │   ├── WP_20_08_FIELD_MAP_TRADING_ACCOUNTS.md
+│   │   ├── WP_20_08_FIELD_MAP_TRADING_ACCOUNTS_BALANCES.md
+│   │   ├── WP_20_09_C_FIELD_MAP_EXECUTIONS.md
+│   │   ├── WP_20_09_C_FIELD_MAP_PLAYBOOKS.md
+│   │   ├── WP_20_09_C_FIELD_MAP_TICKERS_MAPPINGS.md
+│   │   ├── WP_20_09_C_FIELD_MAP_TRADES.md
+│   │   ├── WP_20_09_FIELD_MAP_EXECUTIONS.md
+│   │   ├── WP_20_09_FIELD_MAP_PLAYBOOKS.md
+│   │   ├── WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md
+│   │   ├── WP_20_09_FIELD_MAP_TRADES.md
+│   │   ├── WP_20_10_FIELD_MAP_BACKGROUND_TASKS.md
+│   │   ├── WP_20_10_FIELD_MAP_DESIGN_STUDIO_TOKENS.md
+│   │   ├── WP_20_10_FIELD_MAP_PULSE_LOGS.md
+│   │   └── WP_20_10_FIELD_MAP_SYSTEM_SETTINGS.md
+│   ├── PHX_DB_SCHEMA_SIGN_OFF.md
+│   ├── TT2_BACKEND_CUBE_INVENTORY.md
+│   ├── TT2_BACKEND_LEGO_SPEC.md
+│   ├── TT2_BATCH_PROGRESS_TRACKER.md
+│   ├── TT2_FULL_40_PAGE_LIST.md
+│   ├── TT2_HEADER_BLUEPRINT.md
+│   ├── TT2_MASTER_BLUEPRINT.md
+│   ├── TT2_MASTER_PALETTE_SPEC.md
+│   ├── TT2_MONOREPO_STRUCTURE.md
+│   ├── TT2_SECTION_ARCHITECTURE_SPEC.md
+│   └── TT2_UI_INTEGRATION_PATTERN.md
+├── 02-DEVELOPMENT/
+│   ├── WP_10_01_D05_TICKERS_MOCKUP.md
+│   ├── WP_10_02_BATCH_A_UI_SPEC.md
+│   ├── WP_10_02_D05_LIVING_MOCKUP.md
+│   ├── WP_10_02_D15_LOGIN_POC_SPEC.md
+│   ├── WP_20_01_BACKEND_FOUNDATION.md
+│   ├── WP_20_01_D05_LOGIC_SCHEMA.md
+│   ├── WP_20_02_IDENTITY_AND_ACCESS.md
+│   ├── WP_20_03_BATCH_A_LOGIC_SPEC.md
+│   └── WP_20_04_BATCH_A_REDESIGN_DIRECTIVE.md
+├── 02-PRODUCT_&_BUSINESS_LOGIC/
+│   └── LEGACY_TO_PHOENIX_MAPPING_V2.5.md
+├── 03-DESIGN_UX_UI/
+│   └── GIN_004_UI_ALIGNMENT_SPEC.md
+├── 03-PROCEDURES/
+│   ├── TT2_ACTION_AUDIT_PROTOCOL.md
+│   ├── TT2_CUBE_DEFINITION_TEMPLATE.md
+│   ├── TT2_OUTPUT_INTEGRATION_PROTOCOL.md
+│   ├── TT2_RTL_DEVELOPMENT_CHARTER.md
+│   ├── TT2_SESSION_TRANSITION_PROTOCOL.md
+│   ├── TT2_TEAM_10_WORK_PLAN.md
+│   ├── TT2_TEAM_20_ONBOARDING.md
+│   ├── TT2_TEAM_MANAGEMENT_TEMPLATES.md
+│   └── TT2_UI_DIGGING_PROCEDURE.md
+├── 04-ENGINEERING_&_ARCHITECTURE/
+│   ├── PHX_DB_SCHEMA_V2.5_FULL_DDL.sql
+│   └── WP_20_11_DDL_MASTER_V2.5.2.sql
+├── 05-DEVELOPMENT_&_CONTRACTS/
+│   ├── OPENAPI_SPEC_V2_FINAL.yaml
+│   └── TEAM_20_DATA_MODELS.py
+├── 05-REPORTS/
+│   ├── 01-WEEKLY/
+│   ├── 02-MONTHLY/
+│   ├── 03-YEARLY/
+│   ├── artifacts/
+│   │   └── VERIFICATION_CERTIFICATE.json
+│   ├── artifacts_SESSION_01/
+│   │   ├── PHASE_1_READINESS_ASSESSMENT.md
+│   │   ├── PHASE_1_READINESS_DECLARATION.md
+│   │   └── PHASE_1_TASK_BREAKDOWN.md
+│   ├── MASTER_SESSION_LEDGER.md
+│   ├── PHX_INITIAL_DEPLOY_LOG.md
+│   ├── PHX_SYNC_LOG.md
+│   ├── S04_CLOSURE_REPORT.md
+│   ├── S05_OPENING_REPORT.md
+│   ├── SESSION_03_CLOSURE_REPORT.md
+│   ├── SESSION_04_CLOSURE_REPORT.md
+│   ├── SESSION_04_OPENING_REPORT.md
+│   ├── SESSION_05_OPENING_REPORT.md
+│   ├── TEAM_ACTIVITY_LEDGER.md
+│   └── TT2_WORKSPACE_AUDIT_REPORT.md
+├── 06-GOVERNANCE_&_COMPLIANCE/
+│   ├── standards/
+│   │   ├── CURSOR_INTERNAL_PLAYBOOK.md
+│   │   └── PHOENIX_MASTER_BIBLE.md
+│   ├── GIN_003_COMPLIANCE_REPORT.md
+│   ├── PHOENIX_REORG_AUDIT_LOG_v3.3.md
+│   ├── PHOENIX_REORG_AUDIT_LOG_v3.4.md
+│   └── PHOENIX_SANITY_REPORT_V1_TEAM_B.md
+├── 07-POLICIES/
+│   ├── TT2_ARCHITECT_ROLE_DEFINITION.md
+│   ├── TT2_GREENFIELD_MANIFESTO.md
+│   ├── TT2_IMMUTABLE_LEDGER_POLICY.md
+│   ├── TT2_JUNIOR_ARCHITECT_CONTRACT.md
+│   ├── TT2_MAINTENANCE_LIFECYCLE.md
+│   ├── TT2_MASTER_DOCUMENTATION_INDEX.md
+│   ├── TT2_MASTER_WORKSPACE_MAP.md
+│   ├── TT2_TEAM_OPERATIONS_CHARTER.md
+│   └── TT2_WORKSPACE_MIGRATION_MANIFEST.md
+├── 07-QA_&_VALIDATION/
+├── 99-ARCHIVE/
+│   ├── OLD_LOGIC_ATTEMPTS/
+│   │   ├── WP_20_03_ENTITY_MONEY_FX.md
+│   │   ├── WP_20_03_ENTITY_TIME_MARKET.md
+│   │   ├── WP_20_04_ENTITY_EXCHANGE_RATES.md
+│   │   ├── WP_20_04_ENTITY_TIME_MARKETS.md
+│   │   └── WP_20_04_ENTITY_TRADING_ACCOUNTS.md
+│   ├── GIN_003_COMPLIANCE_REPORT.md
+│   ├── GIN_004_UI_ALIGNMENT_SPEC.md
+│   ├── LEGACY_TO_PHOENIX_MAPPING_V2.5.md
+│   ├── PHOENIX_SANITY_REPORT_V1_TEAM_B.md
+│   └── PHX_DB_SCHEMA_V2.5_FULL_DDL.sql
+├── D15_SYSTEM_INDEX.md
+└── OPENAPI_SPEC_V2.yaml
+```
+
+---
+
 
 ### 📁 00-MANAGEMENT
 

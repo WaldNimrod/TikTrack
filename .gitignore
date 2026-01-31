@@ -12,3 +12,4 @@ _Cursor_full_design_*/
 # OS specific
 .DS_Store
 *.tmp
+.tmp.driveupload/

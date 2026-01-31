@@ -336,5 +336,45 @@
 
 ---
 
+### 12. Team 60 (DevOps & Platform) - Organizational Definition ✅
+**Date:** 2026-01-31  
+**Status:** ✅ **ARCHITECTURAL_DECISION_APPROVED - DEFINITION_COMPLETE**
+
+**Architectural Decision:**
+- ✅ Team 60 officially defined as "DevOps & Platform" team
+- ✅ Responsible for Build System, Environment Management, Routing Core, Dependency Management, CI/CD
+- ✅ Defined as "האינסטלטור האדריכלי" (The Architectural Installer)
+
+**Responsibilities Defined:**
+- ✅ Build System (package.json, vite.config.js, tsconfig.json)
+- ✅ Environment Management (.env files, VITE_ variables)
+- ✅ Routing Core (React Router setup infrastructure)
+- ✅ Dependency Management (external libraries, version control)
+- ✅ CI/CD (deployment pipelines, automation scripts)
+- ✅ Infrastructure Documentation (technical stack documentation)
+
+**Integration Matrix:**
+- ✅ Works with Team 01/02 (Architecture) for requirements
+- ✅ Works with Team 20 (Backend) for API coordination
+- ✅ Works with Team 30 (Frontend) for build environment services
+
+**Documentation Updates:**
+- ✅ CURSOR_INTERNAL_PLAYBOOK.md updated with Team 60 definition
+- ✅ TEAM_10_INFRASTRUCTURE_REQUEST.md updated to reference Team 60
+- ✅ TEAM_10_TO_TEAM_30_INFRASTRUCTURE_RESPONSE.md updated to reference Team 60
+- ✅ TEAM_10_ROLE_CLARIFICATION.md updated with Team 60 responsibilities
+- ✅ TEAM_30_COMPLETE_ACTIVATION_SESSION_01.md updated to reference Team 60
+- ✅ TT2_TEAM_60_DEFINITION.md created (comprehensive definition document)
+
+**Files:**
+- `documentation/07-POLICIES/TT2_TEAM_60_DEFINITION.md` (Team 60 definition)
+- `06-GOVERNANCE_&_COMPLIANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` (updated)
+- `_COMMUNICATION/TEAM_10_INFRASTRUCTURE_REQUEST.md` (updated to Team 60)
+- `_COMMUNICATION/TEAM_10_TO_TEAM_30_INFRASTRUCTURE_RESPONSE.md` (updated to Team 60)
+- `_COMMUNICATION/TEAM_10_ROLE_CLARIFICATION.md` (updated with Team 60)
+- `_COMMUNICATION/TEAM_30_COMPLETE_ACTIVATION_SESSION_01.md` (updated to Team 60)
+
+---
+
 **Last Updated:** 2026-01-31  
 **Updated By:** Team 10 (The Gateway)

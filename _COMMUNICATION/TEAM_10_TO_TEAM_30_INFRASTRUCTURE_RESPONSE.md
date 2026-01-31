@@ -28,9 +28,9 @@
 - ❌ הגדרת React Router (Router ראשי)
 - ❌ הגדרת Environment Variables
 
-**קבצי תשתית יטופלו על ידי צוות התשתית המתאים.**
+**קבצי תשתית יטופלו על ידי צוות 60 (DevOps & Platform).**
 
-**Team 10 העביר את הבקשה לצוות התשתית.**
+**Team 10 העביר את הבקשה לצוות 60.**
 
 ---
 
@@ -437,13 +437,13 @@ npm run dev
 ---
 
 **Prepared by:** Team 10 (The Gateway)  
-**Status:** ⚠️ **INFRASTRUCTURE_CLARIFICATION - AWAITING INFRASTRUCTURE TEAM**  
-**Next:** Team 30 continues component development, infrastructure questions forwarded to appropriate team
+**Status:** ⚠️ **INFRASTRUCTURE_CLARIFICATION - AWAITING TEAM 60**  
+**Next:** Team 30 continues component development, infrastructure questions forwarded to Team 60 (DevOps & Platform)
 
 **Summary:**
 - ⚠️ תשתיות אינן באחריות Team 30
 - ✅ Team 30 יכול להמשיך לעבוד על Components
-- ⏳ שאלות תשתית יועברו לצוות המתאים
+- ⏳ שאלות תשתית יועברו לצוות 60 (DevOps & Platform)
 
 ---
 

@@ -50,7 +50,7 @@
 - ❌ יצירת HTML/CSS Blueprint (זה Team 31)
 - ❌ יצירת Design Tokens (זה Team 40)
 - ❌ בדיקות QA (זה Team 50)
-- ❌ יצירת תשתיות (Build System, package.json, וכו') - זה צוות התשתית
+- ❌ יצירת תשתיות (Build System, package.json, וכו') - זה Team 60 (DevOps & Platform)
 
 ---
 
@@ -88,7 +88,7 @@ Chief Architect (Nimrod Wald) - חזון ובקרה סופית
 3. **תיאום בין צוותים:**
    - העברת Blueprint מ-Team 31 ל-Team 30
    - העברת שאלות מ-Team 30 ל-Team 20
-   - העברת בקשות תשתית לצוות המתאים
+   - העברת בקשות תשתית ל-Team 60 (DevOps & Platform)
 
 4. **יצירת נוהלים:**
    - CSS Standards Protocol
@@ -115,7 +115,7 @@ Chief Architect (Nimrod Wald) - חזון ובקרה סופית
 **אבל:**
 - אני לא כותב קוד Backend (Team 20)
 - אני לא כותב קוד Frontend (Team 30)
-- אני לא יוצר תשתיות (צוות התשתית)
+- אני לא יוצר תשתיות (Team 60 - DevOps & Platform)
 
 ---
 

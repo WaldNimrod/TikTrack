@@ -1,7 +1,7 @@
-# 📡 בקשה לתשתית: Team 10 → Infrastructure Team
+# 📡 בקשה לתשתית: Team 10 → Team 60 (DevOps & Platform)
 
 **From:** Team 10 (The Gateway)  
-**To:** Infrastructure Team  
+**To:** Team 60 (DevOps & Platform)  
 **Date:** 2026-01-31  
 **Session:** SESSION_01 - Phase 1.3  
 **Subject:** INFRASTRUCTURE_SETUP_REQUEST | Status: YELLOW
@@ -62,8 +62,8 @@
 ---
 
 **Prepared by:** Team 10 (The Gateway)  
-**Status:** ⚠️ **AWAITING INFRASTRUCTURE TEAM RESPONSE**  
-**Next:** Infrastructure team to create required files
+**Status:** ⚠️ **AWAITING TEAM 60 RESPONSE**  
+**Next:** Team 60 to create required infrastructure files
 
 ---
 

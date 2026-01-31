@@ -20,7 +20,7 @@
 
 **תפקידכם:** הוספת JavaScript/React Logic + חיבור ל-Backend API תוך שמירה על HTML/CSS של Team 31
 
-**⚠️ חשוב:** תשתיות (Infrastructure) אינן באחריותכם. קבצי תשתית (package.json, vite.config.js, index.html) יטופלו על ידי צוות התשתית המתאים.
+**⚠️ חשוב:** תשתיות (Infrastructure) אינן באחריותכם. קבצי תשתית (package.json, vite.config.js, index.html) יטופלו על ידי **Team 60 (DevOps & Platform)**.
 
 ---
 
@@ -580,9 +580,9 @@ log_entry | Team 30 | TASK_COMPLETE | 30.1.X | GREEN
 3. ✅ שאלות דרך Team 10 בלבד
 
 ### **תשתיות:**
-1. ✅ **לא באחריות Team 30** - תשתיות יטופלו על ידי צוות התשתית המתאים
+1. ✅ **לא באחריות Team 30** - תשתיות יטופלו על ידי **Team 60 (DevOps & Platform)**
 2. ✅ Team 30 מתמקד ב-Components ו-Logic בלבד
-3. ✅ שאלות תשתית הועברו לצוות המתאים
+3. ✅ שאלות תשתית הועברו ל-Team 60
 
 ---
 
@@ -625,7 +625,7 @@ log_entry | Team 30 | TASK_COMPLETE | 30.1.X | GREEN
    - ✅ audit.js (כבר קיים)
    - ✅ debug.js (כבר קיים)
 
-**⚠️ הערה:** שאלות על תשתית (package.json, vite.config.js, Router ראשי) הועברו לצוות התשתית המתאים. אתם יכולים להמשיך לעבוד על Components.
+**⚠️ הערה:** שאלות על תשתית (package.json, vite.config.js, Router ראשי) הועברו ל-**Team 60 (DevOps & Platform)**. אתם יכולים להמשיך לעבוד על Components.
 
 ---
 

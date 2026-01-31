@@ -126,10 +126,14 @@
     const filterInputs = Array.from(inputs).map((input, idx) => {
       const computed = window.getComputedStyle(input);
       const rect = input.getBoundingClientRect();
+      const inlineStyle = input.getAttribute('style') || '';
+      
       return {
         index: idx,
         type: input.type || input.tagName.toLowerCase(),
         placeholder: input.placeholder || 'N/A',
+        className: input.className || 'N/A',
+        inlineStyle: inlineStyle,
         dimensions: {
           width: rect.width,
           height: rect.height,
@@ -152,7 +156,9 @@
           fontSize: computed.fontSize,
           fontSizePx: parsePx(computed.fontSize),
           fontWeight: computed.fontWeight,
-          fontFamily: computed.fontFamily
+          fontFamily: computed.fontFamily,
+          expectedFontSize: '12px', // 0.75rem
+          fontSizeMatch: parsePx(computed.fontSize) === 12
         },
         borders: {
           border: computed.border,
@@ -181,6 +187,12 @@
       const rect = item.getBoundingClientRect();
       const link = item.querySelector('.tiktrack-nav-link');
       const linkComputed = link ? window.getComputedStyle(link) : null;
+      const navText = link ? link.querySelector('.nav-text') : null;
+      const navTextComputed = navText ? window.getComputedStyle(navText) : null;
+      const navTextInlineStyle = navText ? navText.getAttribute('style') || '' : '';
+      const navIcon = link ? link.querySelector('.nav-icon, .home-icon-only, img.nav-icon') : null;
+      const navIconRect = navIcon ? navIcon.getBoundingClientRect() : null;
+      const navIconComputed = navIcon ? window.getComputedStyle(navIcon) : null;
 
       return {
         index: idx,
@@ -206,6 +218,25 @@
           paddingRightPx: getNumericValue(linkComputed.paddingRight),
           paddingBottomPx: getNumericValue(linkComputed.paddingBottom),
           paddingLeftPx: getNumericValue(linkComputed.paddingLeft)
+        } : null,
+        navText: navTextComputed ? {
+          fontSize: navTextComputed.fontSize,
+          fontSizePx: parsePx(navTextComputed.fontSize),
+          fontWeight: navTextComputed.fontWeight,
+          color: navTextComputed.color,
+          inlineStyle: navTextInlineStyle,
+          expectedFontSize: navTextInlineStyle.includes('1.2rem') ? '16px' : '16px', // Should be 1rem (16px) after override
+          fontSizeMatch: navTextInlineStyle.includes('1.2rem') ? parsePx(navTextComputed.fontSize) === 16 : true
+        } : null,
+        navIcon: navIconRect && navIconComputed ? {
+          width: navIconRect.width,
+          height: navIconRect.height,
+          widthPx: `${navIconRect.width}px`,
+          heightPx: `${navIconRect.height}px`,
+          expectedWidth: 24,
+          expectedHeight: 24,
+          widthMatch: navIconRect.width === 24,
+          heightMatch: navIconRect.height === 24
         } : null
       };
     });
@@ -229,6 +260,16 @@
   const logo = inspectElement('.logo-section', 'Logo Section');
   const logoImage = inspectElement('.logo-image', 'Logo Image');
   const logoText = inspectElement('.logo-text', 'Logo Text');
+  
+  // Enhanced logo text inspection
+  const logoTextElement = document.querySelector('#unified-header .logo-text');
+  const logoTextComputed = logoTextElement ? window.getComputedStyle(logoTextElement) : null;
+  const logoTextEnhanced = logoText.exists && logoTextComputed ? {
+    ...logoText,
+    expectedFontSize: '16px', // 1rem
+    actualFontSizePx: parsePx(logoTextComputed.fontSize),
+    fontSizeMatch: parsePx(logoTextComputed.fontSize) === 16
+  } : logo;
 
   // ===== חישוב גבהים =====
   const headerHeight = header.exists ? header.dimensions.height : null;
@@ -273,7 +314,7 @@
     logo: {
       section: logo,
       image: logoImage,
-      text: logoText
+      text: logoTextEnhanced
     }
   };
 
@@ -314,9 +355,13 @@
     report.filters.inputs.forEach((input, idx) => {
       console.group(`Input ${idx + 1} (${input.type}):`);
       console.log('Placeholder:', input.placeholder);
+      console.log('Class:', input.className);
+      console.log('Inline Style:', input.inlineStyle || 'None');
       console.log('Dimensions:', input.dimensions.widthPx + ' × ' + input.dimensions.heightPx);
       console.log('Padding:', `${input.spacing.paddingTopPx}px ${input.spacing.paddingRightPx}px ${input.spacing.paddingBottomPx}px ${input.spacing.paddingLeftPx}px`);
       console.log('Font Size:', input.typography.fontSize, `(${input.typography.fontSizePx}px)`);
+      console.log('Expected Font Size:', input.typography.expectedFontSize);
+      console.log('Font Size Match:', input.typography.fontSizeMatch ? '✅' : '❌');
       console.log('Font Weight:', input.typography.fontWeight);
       console.log('Border:', input.borders.border);
       console.log('Border Radius:', input.borders.borderRadius);
@@ -330,9 +375,24 @@
   console.log('Nav Links:', report.navigation.navLinkCount);
   console.log('Dropdowns:', report.navigation.dropdownCount);
   report.navigation.navItems.forEach((item, idx) => {
+    console.group(`Item ${idx + 1} (${item.text.substring(0, 20)}...):`);
     if (item.link) {
-      console.log(`Item ${idx + 1} (${item.text}):`, item.link.fontSize, item.link.fontWeight, item.link.color);
+      console.log('Link Font Size:', item.link.fontSize, `(${item.link.fontSizePx}px)`);
+      console.log('Link Font Weight:', item.link.fontWeight);
+      console.log('Link Color:', item.link.color);
     }
+    if (item.navText) {
+      console.log('Nav Text Font Size:', item.navText.fontSize, `(${item.navText.fontSizePx}px)`);
+      console.log('Nav Text Expected:', item.navText.expectedFontSize);
+      console.log('Nav Text Font Size Match:', item.navText.fontSizeMatch ? '✅' : '❌');
+      console.log('Nav Text Inline Style:', item.navText.inlineStyle || 'None');
+    }
+    if (item.navIcon) {
+      console.log('Icon Dimensions:', item.navIcon.widthPx + ' × ' + item.navIcon.heightPx);
+      console.log('Icon Expected:', `${item.navIcon.expectedWidth}px × ${item.navIcon.expectedHeight}px`);
+      console.log('Icon Size Match:', (item.navIcon.widthMatch && item.navIcon.heightMatch) ? '✅' : '❌');
+    }
+    console.groupEnd();
   });
   console.groupEnd();
 
@@ -344,7 +404,11 @@
     console.log('Logo Image Dimensions:', report.logo.image.dimensions.widthPx + ' × ' + report.logo.image.dimensions.heightPx);
   }
   if (report.logo.text.exists) {
-    console.log('Logo Text:', report.logo.text.typography.fontSize, report.logo.text.typography.fontWeight, report.logo.text.typography.color);
+    console.log('Logo Text Font Size:', report.logo.text.typography.fontSize, `(${report.logo.text.actualFontSizePx || report.logo.text.typography.fontSizePx}px)`);
+    console.log('Logo Text Expected:', report.logo.text.expectedFontSize || '16px');
+    console.log('Logo Text Font Size Match:', report.logo.text.fontSizeMatch !== false ? '✅' : '❌');
+    console.log('Logo Text Font Weight:', report.logo.text.typography.fontWeight);
+    console.log('Logo Text Color:', report.logo.text.typography.color);
   }
   console.groupEnd();
 

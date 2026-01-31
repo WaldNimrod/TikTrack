@@ -6,9 +6,12 @@ Status: COMPLETED
 Main FastAPI application with all routes and middleware.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import logging
 import os
 
@@ -26,6 +29,12 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Initialize rate limiter and attach to app state
+# Import limiter from users router (shared instance)
+from .routers.users import limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS middleware
 # In production, set ALLOWED_ORIGINS environment variable (comma-separated)

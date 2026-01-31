@@ -6,16 +6,19 @@ Status: COMPLETED
 FastAPI routes for user profile management.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, Any
 import logging
 
 from datetime import datetime
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 from ..core.database import get_db
-from ..services.auth import get_auth_service, TokenError
-from ..schemas.identity import UserResponse, UserUpdate
+from ..services.auth import get_auth_service, TokenError, AuthenticationError
+from ..schemas.identity import UserResponse, UserUpdate, PasswordChangeRequest, PasswordChangeResponse
 from ..utils.dependencies import get_current_user
 from ..models.identity import User
 
@@ -23,6 +26,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/users", tags=["users"])
 security = HTTPBearer()
+
+# Rate limiter instance (shared with main.py app.state.limiter)
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/me", response_model=UserResponse)
@@ -94,4 +100,60 @@ async def update_user_profile(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Profile update failed"
+        )
+
+
+@router.put("/me/password", response_model=PasswordChangeResponse)
+@limiter.limit("5/15minutes")
+async def change_password(
+    request: Request,
+    data: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Change user password (Architectural Decision - Team 10 Approval).
+    
+    Requires authentication and verification of current password.
+    Rate limited: 5 attempts per 15 minutes per user.
+    
+    Security Features:
+    - Verifies old_password before allowing change
+    - Generic error messages (no user enumeration)
+    - Rate limiting to prevent brute-force attacks
+    - Password hashing with bcrypt
+    """
+    try:
+        auth_service = get_auth_service()
+        
+        # Security Guard: Verify old password
+        if not auth_service.verify_password(data.old_password, current_user.password_hash):
+            # Generic error message (no user enumeration)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid password"
+            )
+        
+        # Hash new password
+        new_password_hash = auth_service.hash_password(data.new_password)
+        
+        # Update user password
+        current_user.password_hash = new_password_hash
+        current_user.updated_at = datetime.utcnow()
+        
+        await db.commit()
+        await db.refresh(current_user)
+        
+        logger.info(f"Password changed successfully for user {current_user.id}")
+        
+        return PasswordChangeResponse(message="Password changed successfully")
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (rate limit, validation, etc.)
+        raise
+    except Exception as e:
+        logger.error(f"Password change error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password change failed"
         )

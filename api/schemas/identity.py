@@ -245,6 +245,39 @@ class UserUpdate(BaseModel):
         }
 
 
+class PasswordChangeRequest(BaseModel):
+    """Password change request schema for authenticated users."""
+    old_password: str = Field(..., min_length=1, description="Current password")
+    new_password: str = Field(..., min_length=8, description="New password (min 8 characters)")
+    
+    @validator("new_password")
+    def validate_new_password(cls, v, values):
+        """Ensure new password is different from old password."""
+        if "old_password" in values and v == values["old_password"]:
+            raise ValueError("New password must be different from current password")
+        return v
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "old_password": "current_password_123",
+                "new_password": "new_secure_password_456"
+            }
+        }
+
+
+class PasswordChangeResponse(BaseModel):
+    """Password change response schema."""
+    message: str = Field(..., description="Success message")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "message": "Password changed successfully"
+            }
+        }
+
+
 # ============================================================================
 # API Keys Schemas
 # ============================================================================

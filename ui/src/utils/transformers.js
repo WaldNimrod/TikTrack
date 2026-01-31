@@ -68,3 +68,47 @@ export const reactToApi = (reactData) => {
   };
   return transform(reactData);
 };
+
+/**
+ * Transform React password change form to API payload
+ * 
+ * @description המרה מנתוני טופס שינוי סיסמה (React camelCase) לפורמט API (snake_case)
+ * @legacyReference Legacy.auth.changePassword()
+ * 
+ * @param {Object} reactData - React form data (camelCase)
+ * @param {string} reactData.currentPassword - הסיסמה הנוכחית
+ * @param {string} reactData.newPassword - הסיסמה החדשה
+ * @returns {Object} API payload (snake_case)
+ * 
+ * @example
+ * const reactData = { currentPassword: "old123", newPassword: "new456" };
+ * const apiPayload = reactToApiPasswordChange(reactData);
+ * // Returns: { old_password: "old123", new_password: "new456" }
+ */
+export function reactToApiPasswordChange(reactData) {
+  return {
+    old_password: reactData.currentPassword,
+    new_password: reactData.newPassword
+  };
+}
+
+/**
+ * Transform API password change response to React state
+ * 
+ * @description המרה מתגובת API של שינוי סיסמה לנתוני React
+ * @legacyReference Legacy.auth.changePassword()
+ * 
+ * @param {Object} apiResponse - API response
+ * @returns {Object} React state data
+ * 
+ * @example
+ * const apiResponse = { message: "Password changed successfully" };
+ * const reactData = apiToReactPasswordChange(apiResponse);
+ * // Returns: { message: "Password changed successfully" }
+ */
+export function apiToReactPasswordChange(apiResponse) {
+  // Usually just success message, but if needed:
+  return {
+    message: apiResponse.message || 'Password changed successfully'
+  };
+}

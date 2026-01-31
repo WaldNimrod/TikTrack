@@ -330,6 +330,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /users/me/password:
+    put:
+      summary: "Change user password"
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      description: |
+        Change password for authenticated user.
+        Requires verification of current password (old_password).
+        Rate limited: 5 attempts per 15 minutes per user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+      responses:
+        '200':
+          description: "Password changed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChangeResponse'
+        '401':
+          description: "Invalid password"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: "Rate limit exceeded (5 attempts per 15 minutes)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /user/api-keys:
     get:
       summary: "List user's API keys (D24)"
@@ -784,6 +827,37 @@ components:
           nullable: true
           description: "Language code (e.g., 'en', 'he')"
           example: "en"
+
+    PasswordChangeRequest:
+      type: object
+      required:
+        - old_password
+        - new_password
+      description: "Password change request schema for authenticated users"
+      properties:
+        old_password:
+          type: string
+          format: password
+          minLength: 1
+          description: "Current password"
+          example: "current_password_123"
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+          description: "New password (min 8 characters). Must be different from current password."
+          example: "new_secure_password_456"
+
+    PasswordChangeResponse:
+      type: object
+      required:
+        - message
+      description: "Password change response schema"
+      properties:
+        message:
+          type: string
+          description: "Success message"
+          example: "Password changed successfully"
 
     # Password Reset Schemas
     PasswordResetRequest:

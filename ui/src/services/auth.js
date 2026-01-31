@@ -392,6 +392,39 @@ const authService = {
   },
 
   /**
+   * Change Password - שינוי סיסמה למשתמש מחובר
+   * 
+   * @description משנה את הסיסמה של המשתמש המחובר
+   * @legacyReference Legacy.auth.changePassword(oldPassword, newPassword)
+   * 
+   * @param {Object} passwordData - נתוני שינוי סיסמה (snake_case after transformation)
+   * @param {string} passwordData.old_password - הסיסמה הנוכחית
+   * @param {string} passwordData.new_password - הסיסמה החדשה
+   * @returns {Promise<Object>} Success response
+   * 
+   * @throws {Error} - אם שינוי הסיסמה נכשל (400, 401, 500)
+   * 
+   * @example
+   * await authService.changePassword({ old_password: "old123", new_password: "new456" });
+   */
+  async changePassword(passwordData) {
+    audit.log('Auth', 'Change password started');
+
+    try {
+      debugLog('Auth', 'Change password payload prepared', passwordData);
+
+      const response = await apiClient.put('/users/me/password', passwordData);
+
+      audit.log('Auth', 'Change password successful');
+      
+      return response.data;
+    } catch (error) {
+      audit.error('Auth', 'Change password failure', error);
+      throw error;
+    }
+  },
+
+  /**
    * Is Authenticated - בדיקה אם המשתמש מחובר
    * 
    * @description בודק אם יש access token ב-localStorage

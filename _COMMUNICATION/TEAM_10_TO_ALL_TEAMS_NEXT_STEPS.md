@@ -15,13 +15,42 @@
 - ✅ Infrastructure מוכן (Team 60)
 - ✅ Components מוכנים (Team 30)
 - ✅ Router מוגדר (Team 60 + Team 30)
+- ✅ דף אינדקס זמני מוכן (IndexPage)
 - ⏳ **צריך רק להריץ את הפרויקט!**
+
+**דף הבית:**
+- דף אינדקס זמני (`/`) עם כפתור "התחבר"
+- הצגת שם משתמש מחובר (אם מחובר)
+- כפתור התנתקות (אם מחובר)
 
 ---
 
 ## 🚀 הצעדים הבאים - צעד אחר צעד
 
-### **שלב 0: הרצת Backend (חובה לאינטגרציה)** ⚠️
+### **שלב 0.1: יצירת משתמש Admin (מומלץ)** 👤
+
+**לפני הרצת השרתים, מומלץ ליצור משתמש admin:**
+
+**דרך Script:**
+```bash
+./scripts/create-admin.sh
+```
+
+**דרך Cursor Task:**
+1. `Cmd+Shift+P` → `Tasks: Run Task`
+2. בחר: `👤 Create Admin User (admin/418141)`
+
+**פרטי משתמש:**
+- **Username:** `admin`
+- **Password:** `418141`
+- **Email:** `admin@tiktrack.com`
+- **Role:** `ADMIN`
+
+**הערה:** הסקריפט בטוח להרצה מספר פעמים - הוא לא יוצר כפילות.
+
+---
+
+### **שלב 0.2: הרצת Backend (חובה לאינטגרציה)** ⚠️
 
 **⚠️ חשוב:** לפני הרצת Frontend, יש להריץ את Backend בפורט 8080!
 
@@ -100,22 +129,26 @@ npm run dev
 
 **אחרי שהדפדפן נפתח:**
 
-1. **דף Login** (`http://localhost:3000/login`):
+1. **דף Index (דף הבית)** (`http://localhost:3000/`):
+   - ✅ דף נטען
+   - ✅ אם לא מחובר: כפתור "התחבר" מוצג
+   - ✅ אם מחובר: שם משתמש, אימייל, תפקיד מוצגים
+   - ✅ כפתור "התנתק" (אם מחובר)
+
+2. **דף Login** (`http://localhost:3000/login`):
    - ✅ דף נטען
    - ✅ CSS נטען (Pico CSS + Phoenix styles)
    - ✅ Form נראה תקין
    - ✅ אין שגיאות ב-console
+   - ✅ אפשר להתחבר עם `admin` / `418141`
 
-2. **דף Register** (`http://localhost:3000/register`):
+3. **דף Register** (`http://localhost:3000/register`):
    - ✅ דף נטען
    - ✅ Form נראה תקין
 
-3. **דף Reset Password** (`http://localhost:3000/reset-password`):
+4. **דף Reset Password** (`http://localhost:3000/reset-password`):
    - ✅ דף נטען
    - ✅ Form נראה תקין
-
-4. **Default Redirect** (`http://localhost:3000/`):
-   - ✅ מפנה אוטומטית ל-`/login`
 
 ---
 
@@ -250,16 +283,21 @@ uvicorn main:app --reload --port 8080
 
 **מה תראו בדפדפן:**
 
-1. **דף Login** (`http://localhost:3000/login`):
-   - Form עם שדות: username/email, password
-   - כפתור "התחבר"
+1. **דף Index (דף הבית)** (`http://localhost:3000/`):
+   - אם לא מחובר: כפתור "התחבר" גדול
+   - אם מחובר: שם משתמש, אימייל, תפקיד, כפתור "התנתק"
    - עיצוב לפי Pico CSS + Phoenix styles
 
-2. **דף Register** (`http://localhost:3000/register`):
+2. **דף Login** (`http://localhost:3000/login`):
+   - Form עם שדות: username/email, password
+   - כפתור "התחבר"
+   - אפשר להתחבר עם `admin` / `418141` (אחרי יצירת משתמש admin)
+
+3. **דף Register** (`http://localhost:3000/register`):
    - Form עם שדות רישום
    - כפתור "הירשם"
 
-3. **דף Reset Password** (`http://localhost:3000/reset-password`):
+4. **דף Reset Password** (`http://localhost:3000/reset-password`):
    - Form לאיפוס סיסמה
 
 ---

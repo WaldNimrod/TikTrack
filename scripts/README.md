@@ -203,5 +203,34 @@ npm install
 
 ---
 
+### **Admin User Scripts:**
+
+#### **`create-admin.sh`**
+יצירת משתמש מנהל ראשי (admin) בבסיס הנתונים.
+
+**שימוש:**
+```bash
+./scripts/create-admin.sh
+```
+
+**או דרך Cursor Task:**
+- `Cmd+Shift+P` → `Tasks: Run Task`
+- בחר: `👤 Create Admin User (admin/418141)`
+
+**פרטי משתמש:**
+- **Username:** `admin`
+- **Password:** `418141`
+- **Email:** `admin@tiktrack.com`
+- **Role:** `ADMIN`
+
+**מה זה עושה:**
+- בודק אם משתמש admin כבר קיים (לא יוצר כפילות)
+- יוצר משתמש admin עם הסיסמה המוצפנת
+- מציג את פרטי המשתמש שנוצר
+
+**הערה:** הסקריפט בטוח להרצה מספר פעמים - הוא לא יוצר כפילות.
+
+---
+
 **Maintained By:** Team 60 (DevOps & Platform)  
 **Last Updated:** 2026-01-31

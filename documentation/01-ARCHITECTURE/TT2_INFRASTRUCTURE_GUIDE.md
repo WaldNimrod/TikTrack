@@ -370,7 +370,40 @@ psql -d tiktrack -f ../04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL
 
 ⚠️ **IMPORTANT:** Backend MUST run on port **8080** (as defined in Master Blueprint).
 
-#### **Backend (Start First):**
+#### **Option 1: Using Scripts (Recommended)**
+
+**Backend:**
+```bash
+./scripts/start-backend.sh
+```
+
+**Frontend:**
+```bash
+./scripts/start-frontend.sh
+```
+
+**Stop Servers:**
+```bash
+./scripts/stop-backend.sh
+./scripts/stop-frontend.sh
+```
+
+**Restart Backend:**
+```bash
+./scripts/restart-backend.sh
+```
+
+**Check Status:**
+```bash
+# Via Cursor Task: "📋 Check Server Status"
+# Or manually:
+lsof -Pi :8080 -sTCP:LISTEN  # Backend
+lsof -Pi :3000 -sTCP:LISTEN  # Frontend
+```
+
+#### **Option 2: Manual Commands**
+
+**Backend (Start First):**
 ```bash
 cd api
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -385,13 +418,30 @@ uvicorn main:app --reload --port 8080
 - ✅ Health check: `curl http://localhost:8080/health` returns `{"status": "ok"}`
 - ✅ API docs accessible at `http://localhost:8080/docs`
 
-#### **Frontend:**
+**Frontend:**
 ```bash
 cd ui
 npm run dev
 # Server runs on http://localhost:3000
 # Proxy configured: /api -> http://localhost:8080
 ```
+
+#### **Option 3: Cursor Tasks**
+
+**Using Cursor Tasks (Easiest):**
+1. Press `Cmd+Shift+P` (macOS) / `Ctrl+Shift+P` (Windows/Linux)
+2. Type: `Tasks: Run Task`
+3. Select: `🚀 Start All Servers (Backend + Frontend)`
+
+**Available Tasks:**
+- 🚀 Start Backend Server (Port 8080)
+- 🛑 Stop Backend Server
+- 🔄 Restart Backend Server
+- 🚀 Start Frontend Dev Server (Port 3000)
+- 🛑 Stop Frontend Dev Server
+- 🚀 Start All Servers (Backend + Frontend) - **Default Build Task**
+- 🛑 Stop All Servers
+- 📋 Check Server Status
 
 ### **Development Workflow**
 

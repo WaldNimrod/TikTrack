@@ -1,0 +1,115 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start Backend Server (Port 8080)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/start-backend.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "🛑 Stop Backend Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/stop-backend.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🔄 Restart Backend Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/restart-backend.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true,
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 Start Frontend Dev Server (Port 3000)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/start-frontend.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "🛑 Stop Frontend Dev Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/stop-frontend.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🚀 Start All Servers (Backend + Frontend)",
+      "dependsOn": [
+        "🚀 Start Backend Server (Port 8080)",
+        "🚀 Start Frontend Dev Server (Port 3000)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "🛑 Stop All Servers",
+      "dependsOn": [
+        "🛑 Stop Backend Server",
+        "🛑 Stop Frontend Dev Server"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "📋 Check Server Status",
+      "type": "shell",
+      "command": "echo 'Backend (8080):' && (lsof -Pi :8080 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running') && echo 'Frontend (3000):' && (lsof -Pi :3000 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running')",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

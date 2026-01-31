@@ -175,13 +175,15 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
 
 - [ ] **POST `/api/v1/auth/login`**
   - [ ] Endpoint exists and accessible
-  - [ ] Accepts `username` OR `email` + `password`
+  - [ ] Accepts `username_or_email` + `password` (single field for both)
   - [ ] Returns JWT token on success
   - [ ] Returns `401` on invalid credentials
   - [ ] Returns `423` on locked account
   - [ ] Updates `last_login_at` on success
   - [ ] Resets `failed_login_attempts` on success
+  - [ ] Sets refresh token in httpOnly cookie
   - [ ] Response includes: `access_token`, `token_type`, `expires_at`, `user`
+  - [ ] Response does NOT include `refresh_token` in body (security)
 
 - [ ] **POST `/api/v1/auth/register`**
   - [ ] Endpoint exists and accessible
@@ -216,9 +218,9 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
   - [ ] Returns masked identifier (no full email/phone)
   - [ ] Returns same response for non-existent users (security)
 
-- [ ] **POST `/api/v1/auth/reset-password/verify`**
+- [ ] **POST `/api/v1/auth/verify-reset`**
   - [ ] Endpoint exists and accessible
-  - [ ] Accepts: `token`, `code` (if SMS), `new_password`
+  - [ ] Accepts: `reset_token`, `verification_code` (if SMS), `new_password`
   - [ ] Validates token expiration
   - [ ] Validates code (if SMS) and attempts
   - [ ] Updates password hash
@@ -230,17 +232,12 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
 - [ ] **POST `/api/v1/auth/verify-phone`**
   - [ ] Endpoint exists and accessible
   - [ ] Requires authentication
-  - [ ] Accepts: `phone_number`
-  - [ ] Sends verification code via SMS
-  - [ ] Returns expiration time
-
-- [ ] **POST `/api/v1/auth/verify-phone/confirm`**
-  - [ ] Endpoint exists and accessible
-  - [ ] Requires authentication
-  - [ ] Accepts: `code`
-  - [ ] Validates code
-  - [ ] Updates `phone_verified = TRUE`
-  - [ ] Sets `phone_verified_at`
+  - [ ] Accepts: `verification_code` (6 digits)
+  - [ ] If no pending code exists, creates reset request and sends SMS
+  - [ ] If code provided, validates and marks phone as verified
+  - [ ] Updates `phone_verified = TRUE` on success
+  - [ ] Sets `phone_verified_at` on success
+  - [ ] Returns `400` on invalid code or too many attempts
 
 **Evidence:** API test results (Postman/curl/automated tests)
 
@@ -252,7 +249,7 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
   - [ ] Endpoint exists and accessible
   - [ ] Requires authentication (JWT token)
   - [ ] Returns current user profile
-  - [ ] Response includes: `external_ulid`, `email`, `username`, `phone_number` (masked), `phone_verified`, `is_email_verified`
+  - [ ] Response includes: `external_ulids` (plural), `email`, `username`, `phone_numbers` (plural, masked), `phone_verified`, `is_email_verified`
   - [ ] Returns `401` if not authenticated
 
 - [ ] **PUT `/api/v1/users/me`**
@@ -273,8 +270,9 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
   - [ ] Endpoint exists and accessible
   - [ ] Requires authentication
   - [ ] Returns only user's own keys
-  - [ ] All keys masked in response (`********************`)
-  - [ ] Returns array of key objects
+  - [ ] All keys masked in response (`masked_key: "********************"`)
+  - [ ] Returns array of `UserApiKeyResponse` objects
+  - [ ] Each object includes: `external_ulids`, `provider`, `masked_key`, `is_active`, `is_verified`
 
 - [ ] **POST `/api/v1/user/api-keys`**
   - [ ] Endpoint exists and accessible
@@ -283,8 +281,9 @@ This sanity checklist ensures all Phase 1 components are properly implemented an
   - [ ] Encrypts keys before storing
   - [ ] Validates provider enum
   - [ ] Checks duplicate (user + provider + label)
-  - [ ] Returns masked key in response
+  - [ ] Returns `UserApiKeyResponse` with `masked_key` field
   - [ ] Returns `409` on duplicate
+  - [ ] Response includes `external_ulids` (ULID, not UUID)
 
 - [ ] **PUT `/api/v1/user/api-keys/{id}`**
   - [ ] Endpoint exists and accessible
@@ -663,6 +662,74 @@ ISSUE-001 | DB Schema | P0 | Missing index on users.email | SQL query result | O
 
 ---
 
+---
+
+## 6. G-Bridge Validation Checklist
+
+### 6.1 RTL Charter Compliance
+
+- [ ] **No Physical Properties:**
+  - [ ] No `margin-left`, `margin-right` in CSS
+  - [ ] No `padding-left`, `padding-right` in CSS
+  - [ ] No `left:`, `right:` positioning
+  - [ ] Logical properties used: `margin-inline-start/end`, `padding-inline-start/end`
+
+**Evidence:** G-Bridge audit output showing no RTL violations
+
+---
+
+### 6.2 LEGO System Compliance
+
+- [ ] **Semantic Tags:**
+  - [ ] No `class="section"` divs
+  - [ ] No `class="card"` divs
+  - [ ] `<tt-section>` tags used instead
+  - [ ] HTML structure follows LEGO system
+
+**Evidence:** G-Bridge audit output, HTML file review
+
+---
+
+### 6.3 DNA Variables Compliance
+
+- [ ] **CSS Variables:**
+  - [ ] No hardcoded hex colors (except allowed: `#26baac`, `#dc2626`, `#f8fafc`)
+  - [ ] All colors use CSS variables (`var(--color-name)`)
+  - [ ] Theme support (dark mode ready)
+
+**Evidence:** G-Bridge audit output, CSS file review
+
+---
+
+### 6.4 Structural Integrity
+
+- [ ] **Header Structure:**
+  - [ ] Unified header exists in `index.html`
+  - [ ] Header height: `158px`
+  - [ ] Header z-index: `950`
+  - [ ] Logo integrity maintained
+
+**Evidence:** G-Bridge audit output, HTML/CSS review
+
+---
+
+### 6.5 G-Bridge Execution
+
+- [ ] **Local Emulator:**
+  - [ ] Script runs successfully: `node "HOENIX G-BRIDGE.js" [file.html]`
+  - [ ] Generates `_PREVIEW_[file].html` output
+  - [ ] Shows APPROVED/REJECTED status
+  - [ ] Lists all issues if REJECTED
+
+- [ ] **Sandbox Integration:**
+  - [ ] Files uploaded to staging pass G-Bridge
+  - [ ] SANDBOX_INDEX.html shows status
+  - [ ] Green banner (APPROVED) or red banner (REJECTED)
+
+**Evidence:** G-Bridge execution logs, sandbox screenshots
+
+---
+
 **Prepared by:** Team 50 (QA)  
-**Status:** ✅ COMPLETED  
+**Status:** ✅ COMPLETED (Updated to match actual implementation + G-Bridge)  
 **Next:** Execute checklist validation and collect evidence

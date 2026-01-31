@@ -1,0 +1,894 @@
+/*
+  Phoenix-Header-Ver: v1.0.0 | Unified Header Styles
+  Sync-Time: 2026-01-31 20:30:00 IST
+  Team: Team 30 (Frontend)
+  Status: Unified Header - Appears on ALL Pages
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅
+  
+  Purpose:
+  This file contains ONLY styles for the Unified Header component.
+  The header appears on ALL pages in the system (except auth pages).
+  
+  IMPORTANT: This file must be loaded AFTER:
+  1. Pico CSS
+  2. phoenix-base.css
+  3. phoenix-components.css (if using LEGO components)
+  
+  LOD 400 Requirement: Height 158px, Z-Index 950
+  Based on original header-styles.css v7.0.0
+*/
+
+/* ============================================
+   Unified Header Styles
+   LOD 400 Requirement: Height 158px, Z-Index 950
+   Based on original header-styles.css v7.0.0
+   ============================================ */
+
+/* ===== Base Header Styles - EXACT COPY FROM ORIGINAL ===== */
+#unified-header {
+  background: var(--apple-bg-elevated, #ffffff);
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.05));
+  position: sticky;
+  top: 0;
+  z-index: 950;
+  width: 100%;
+}
+
+#unified-header .header-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible;
+}
+
+#unified-header .header-top {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  position: relative;
+  min-height: 70px;
+  direction: rtl;
+  background: var(--apple-bg-elevated, #ffffff);
+  width: 100%;
+}
+
+#unified-header .header-container {
+  margin: 0 auto;
+  padding: var(--spacing-md, 16px) 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: var(--container-xl, 1400px);
+  direction: rtl;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+/* Logo Styles - Exact copy from original */
+#unified-header .logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  direction: ltr;
+  order: 3;
+  margin-right: auto;
+}
+
+#unified-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+#unified-header .logo:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+#unified-header .logo-image {
+  width: 125px;
+  height: 37.5px;
+  object-fit: contain;
+  display: block;
+}
+
+#unified-header .logo-text {
+  font-size: 1rem;
+  font-weight: 300;
+  color: #26baac;
+  direction: ltr;
+  text-align: left;
+  align-self: flex-end;
+  margin-bottom: -5px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.user-zone {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.u-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  line-height: 1.2;
+}
+
+.u-role {
+  font-size: 0.5625rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.u-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   Navigation Styles - Exact copy from original
+   ============================================ */
+
+#unified-header .header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  direction: rtl;
+  order: 1;
+  margin-left: auto;
+}
+
+#unified-header .main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  direction: rtl;
+}
+
+#unified-header .tiktrack-nav-list {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#unified-header .tiktrack-nav-item {
+  position: relative;
+}
+
+#unified-header .tiktrack-nav-item:first-child {
+  margin-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:first-child .tiktrack-nav-link {
+  padding-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:nth-child(2) {
+  margin-right: 0.5rem;
+}
+
+#unified-header .tiktrack-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #26baac;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+#unified-header .tiktrack-nav-link:hover {
+  color: #1e9a8a;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+  color: #0f766e;
+  font-weight: 600;
+}
+
+#unified-header .nav-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+#unified-header .home-icon-only {
+  width: 36px;
+  height: 36px;
+}
+
+#unified-header .nav-text {
+  display: inline-block;
+}
+
+/* ===== Dropdown Menu Styles - EXACT COPY FROM ORIGINAL ===== */
+#unified-header .tiktrack-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 3px);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  padding: 0.5rem 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 954;
+  list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-menu[style*="opacity: 1"],
+#unified-header .tiktrack-dropdown-menu[style*="visibility: visible"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#unified-header .tiktrack-dropdown-menu li {
+  list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-arrow {
+  font-size: 0.75rem;
+  color: #666;
+  margin-right: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
+  transform: rotate(90deg);
+}
+
+#unified-header .tiktrack-dropdown-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #29a6a8;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+#unified-header .tiktrack-dropdown-item:hover {
+  background: #f5f5f7;
+  color: #ff9e04;
+}
+
+#unified-header .separator {
+  height: 1px;
+  background: #e5e5e5;
+  margin: 0.5rem 0;
+}
+
+/* Dropdown Submenu (Level 3) - Exact copy from original */
+#unified-header .dropdown-submenu {
+  position: relative;
+}
+
+#unified-header .dropdown-submenu > .tiktrack-dropdown-item {
+  padding-right: 0.5rem;
+}
+
+/* Bridge between level 2 and level 3 menu - prevents closing on transition */
+#unified-header .dropdown-submenu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  background: transparent;
+  z-index: 953;
+  pointer-events: auto;
+}
+
+/* Bridge also in level 3 menu - prevents closing when returning */
+#unified-header .level3-submenu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 10px;
+  height: 100%;
+  background: transparent;
+  z-index: -1;
+  pointer-events: auto;
+}
+
+/* Level 3 Submenu - EXACT COPY FROM ORIGINAL */
+#unified-header .level3-submenu {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  left: auto;
+  bottom: auto;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-height: calc(100vh - 20px);
+  padding: 0.5rem 0;
+  display: none;
+  z-index: 952;
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#unified-header .level3-submenu.bottom-aligned {
+  top: auto;
+  bottom: 0;
+}
+
+#unified-header .dropdown-submenu:hover .level3-submenu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+#unified-header .level3-submenu li {
+  list-style: none;
+}
+
+#unified-header .level3-submenu .tiktrack-dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+#unified-header .level3-submenu .separator {
+  margin: 0.5rem 0;
+}
+
+/* Submenu Styles - EXACT COPY FROM ORIGINAL (for Utils buttons) */
+#unified-header .submenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 240px;
+  z-index: 1000;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: none;
+}
+
+#unified-header .tiktrack-nav-item:hover .submenu {
+  display: block;
+}
+
+#unified-header .submenu li {
+  list-style: none;
+}
+
+#unified-header .submenu a {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  transition: all 0.2s ease;
+}
+
+#unified-header .submenu a:hover {
+  background: #f5f5f7;
+  color: #ff9500;
+}
+
+#unified-header .submenu a:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   Filter Styles - Exact copy from original
+   ============================================ */
+
+#unified-header .header-filters {
+  padding: 12px 0;
+  background: white;
+  position: relative;
+  z-index: 950;
+  min-height: 60px;
+  display: block;
+  margin-top: 0;
+  padding-bottom: 24px;
+}
+
+#unified-header .filters-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  max-width: var(--container-xl, 1400px);
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+  overflow: visible;
+  direction: rtl;
+  justify-content: flex-start;
+}
+
+#unified-header .filter-group {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  position: relative;
+}
+
+#unified-header .filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.9rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5.4px;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.4;
+  min-width: 120px;
+  justify-content: space-between;
+}
+
+#unified-header .filter-toggle:hover {
+  border-color: #ff9500;
+  color: #ff9500;
+  background: white;
+}
+
+#unified-header .filter-menu {
+  position: absolute;
+  top: calc(100% + 3px);
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5.4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  padding: 0.35rem 0 2rem 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 951;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+#unified-header .filter-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  display: block;
+}
+
+#unified-header .status-filter-item,
+#unified-header .type-filter-item,
+#unified-header .account-filter-item,
+#unified-header .date-range-filter-item {
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #1d1d1f;
+  font-size: 0.9rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+}
+
+#unified-header .status-filter-item:hover,
+#unified-header .type-filter-item:hover,
+#unified-header .account-filter-item:hover,
+#unified-header .date-range-filter-item:hover {
+  background: #f5f5f7;
+  color: #ff9500;
+}
+
+#unified-header .status-filter-item.selected,
+#unified-header .type-filter-item.selected,
+#unified-header .account-filter-item.selected,
+#unified-header .date-range-filter-item.selected {
+  background: #f0f9ff;
+  color: #26baac;
+  font-weight: 500;
+}
+
+#unified-header .option-text {
+  flex: 1;
+}
+
+#unified-header .dropdown-arrow {
+  font-size: 0.75rem;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+/* Filter Close Button - EXACT COPY FROM ORIGINAL */
+#unified-header .filter-close-btn {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--apple-bg-secondary, #f5f5f7);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  color: var(--apple-text-secondary, #6c757d);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+#unified-header .filter-close-btn:hover {
+  background: var(--apple-bg-tertiary, #e5e5e5);
+  color: var(--apple-text-primary, #1d1d1f);
+  border-color: var(--apple-border-medium, #d1d1d1);
+}
+
+/* Filter Toggle Button - Exact copy from original */
+#unified-header .filter-toggle-section {
+  display: flex;
+  align-items: center;
+}
+
+#unified-header .filter-toggle-main {
+  position: absolute;
+  top: 149px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  visibility: visible;
+  opacity: 1;
+  justify-content: center;
+  align-items: center;
+  z-index: 952;
+  width: 100%;
+  pointer-events: none;
+}
+
+#unified-header .header-content:has(.header-filters[style*="display: none"]) .filter-toggle-main,
+#unified-header .header-content:has(.header-filters[style*="display:none"]) .filter-toggle-main {
+  top: 75px;
+}
+
+#unified-header .filter-toggle-main .header-filter-toggle-btn {
+  pointer-events: all;
+}
+
+#unified-header .header-filter-toggle-btn {
+  background: white;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  color: var(--apple-text-secondary, #6c757d);
+  font-size: 0.6rem;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  box-sizing: border-box;
+  box-shadow: none;
+  filter: none;
+  text-shadow: none;
+}
+
+#unified-header .header-filter-toggle-btn:hover {
+  background: var(--apple-bg-tertiary, #e5e5e5);
+  color: var(--apple-text-primary, #1d1d1f);
+  border-color: var(--apple-border-medium, #d1d1d1);
+  box-shadow: none;
+  filter: none;
+  text-shadow: none;
+}
+
+#unified-header .header-filter-toggle-btn .header-filter-arrow {
+  font-size: 0.6rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+#unified-header .header-filter-toggle-btn.collapsed .header-filter-arrow {
+  transform: rotate(180deg);
+}
+
+/* Search Filter - Exact copy from original */
+#unified-header .search-filter {
+  flex: 1;
+  max-width: 150px;
+}
+
+#unified-header .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+#unified-header .search-filter-input {
+  width: 100%;
+  padding: 0.35rem 2rem 0.35rem 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 5.4px;
+  font-size: 0.9rem;
+  font-weight: 300;
+  transition: all 0.2s ease;
+}
+
+#unified-header .search-filter-input:focus {
+  outline: none;
+  border-color: #ff9500;
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+}
+
+#unified-header .search-clear-btn {
+  position: absolute;
+  left: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+  color: #ff9500;
+}
+
+/* Filter Actions - EXACT COPY FROM ORIGINAL */
+#unified-header .filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#unified-header .reset-btn,
+#unified-header .clear-btn {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5.4px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  color: #1d1d1f;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+#unified-header .reset-btn:hover,
+#unified-header .clear-btn:hover {
+  border-color: #ff9500;
+  color: #ff9500;
+  background: #fff5e6;
+}
+
+#unified-header .btn-text {
+  display: inline-block;
+}
+
+/* Filter User Section - Exact copy from original */
+#unified-header .filter-user-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+#unified-header .user-avatar-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #26baac;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#unified-header .user-avatar-badge:hover {
+  background: #1fa89a;
+  transform: scale(1.05);
+}
+
+#unified-header .auth-toggle-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover {
+  opacity: 1;
+}
+
+#unified-header .auth-toggle-btn img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover img {
+  opacity: 1;
+}
+
+#unified-header .user-profile-link {
+  text-decoration: none;
+}
+
+#unified-header .selected-value {
+  flex: 1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive Styles - Exact copy from original */
+@media (max-width: 768px) {
+  #unified-header .header-container {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  #unified-header .tiktrack-nav-list {
+    gap: 0.5rem;
+  }
+
+  #unified-header .tiktrack-nav-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 14px;
+  }
+
+  #unified-header .filters-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0 16px;
+  }
+
+  #unified-header .filter-toggle {
+    min-width: 100px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Main Content Container - EXACT COPY FROM LEGACY _layout.css */
+.main-content {
+  width: 100%;
+  max-width: var(--container-xl, 1400px);
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Responsive breakpoints - EXACT COPY FROM LEGACY */
+@media (min-width: 768px) {
+  .main-content {
+    max-width: var(--container-lg, 1200px);
+    padding: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-content {
+    max-width: var(--container-xl, 1400px);
+  }
+}
+
+/* Main Viewport */
+.viewport-main {
+  padding-block: var(--spacing-xl);
+  min-height: calc(100vh - var(--header-height));
+}
+
+.page-header-minimal {
+  margin-block-end: var(--spacing-xl);
+}
+
+.page-header-minimal h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+/* Sub-header Filter (Legacy - kept for backward compatibility) */
+.sub-header-filter {
+  background: var(--color-surface);
+  border-block-end: 1px solid var(--color-border);
+  padding-block: var(--spacing-md);
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  position: relative;
+}
+
+.search-wrap svg {
+  position: absolute;
+  inset-inline-end: var(--spacing-md);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}

@@ -10,22 +10,30 @@ Based on GIN-2026-008 + Architectural Answer (Appendix A).
 
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import and_
 import logging
 import os
 
 from ..core.config import settings
 from ..core.database import get_db
 from ..services.auth import get_auth_service, AuthenticationError, TokenError
+from ..services.password_reset import get_password_reset_service, PasswordResetError
 from ..schemas.identity import (
     LoginRequest,
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
     RefreshResponse,
+    PasswordResetRequest as PasswordResetRequestSchema,
+    PasswordResetVerify
 )
+from ..models.enums import ResetMethod
+from ..models.identity import User, PasswordResetRequest
+from ..utils.identity import uuid_to_ulid
+from ..utils.dependencies import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -271,29 +279,192 @@ async def logout(
 
 @router.post("/reset-password", status_code=status.HTTP_202_ACCEPTED)
 async def reset_password(
+    request: PasswordResetRequestSchema,
     db: AsyncSession = Depends(get_db)
 ):
     """
     Request password reset (EMAIL or SMS).
     
-    TODO: Implement PasswordResetService (Task 20.1.6)
+    Creates a reset request and sends token (EMAIL) or code (SMS).
+    Returns 202 Accepted immediately (security - don't reveal if user exists).
     """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Password reset not yet implemented"
-    )
+    try:
+        password_reset_service = get_password_reset_service()
+        
+        # Determine identifier based on method
+        identifier = request.email if request.method == ResetMethod.EMAIL else request.phone_number
+        
+        await password_reset_service.request_reset(
+            method=request.method,
+            identifier=identifier,
+            db=db
+        )
+        
+        # Always return success (security - prevent user enumeration)
+        return {
+            "message": "If the account exists, a reset link has been sent"
+        }
+        
+    except PasswordResetError as e:
+        # Still return success to prevent user enumeration
+        logger.warning(f"Password reset request failed: {str(e)}")
+        return {
+            "message": "If the account exists, a reset link has been sent"
+        }
+    except Exception as e:
+        logger.error(f"Password reset error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password reset request failed"
+        )
+
+
+@router.post("/verify-reset", status_code=status.HTTP_200_OK)
+async def verify_reset(
+    data: PasswordResetVerify,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Verify and complete password reset.
+    
+    Accepts reset_token (EMAIL) or verification_code (SMS) with new password.
+    Updates user password and marks reset request as USED.
+    """
+    try:
+        password_reset_service = get_password_reset_service()
+        
+        user = await password_reset_service.verify_reset(
+            reset_token=data.reset_token,
+            verification_code=data.verification_code,
+            new_password=data.new_password,
+            db=db
+        )
+        
+        return {
+            "message": "Password reset successfully",
+            "user_id": uuid_to_ulid(user.id)
+        }
+        
+    except PasswordResetError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Password reset verification error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password reset verification failed"
+        )
 
 
 @router.post("/verify-phone", status_code=status.HTTP_200_OK)
 async def verify_phone(
+    verification_code: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Verify phone number with SMS code.
     
-    TODO: Implement PasswordResetService (Task 20.1.6)
+    User must be authenticated. Sends SMS code to user's phone number,
+    then verifies the code to mark phone as verified.
     """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Phone verification not yet implemented"
-    )
+    try:
+        # Check if user has phone number
+        if not current_user.phone_number:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No phone number associated with account"
+            )
+        
+        # Check if already verified
+        if current_user.phone_verified:
+            return {
+                "message": "Phone number already verified",
+                "phone_number": current_user.phone_number,
+                "verified": True
+            }
+        
+        # Find pending reset request for this user's phone (SMS method)
+        from sqlalchemy import select
+        
+        stmt = select(PasswordResetRequest).where(
+            and_(
+                PasswordResetRequest.user_id == current_user.id,
+                PasswordResetRequest.method == ResetMethod.SMS,
+                PasswordResetRequest.sent_to == current_user.phone_number,
+                PasswordResetRequest.status == "PENDING"
+            )
+        ).order_by(PasswordResetRequest.created_at.desc())
+        
+        result = await db.execute(stmt)
+        reset_request = result.scalar_one_or_none()
+        
+        if not reset_request:
+            # No pending request - create one and send code
+            password_reset_service = get_password_reset_service()
+            reset_request = await password_reset_service.request_reset(
+                method=ResetMethod.SMS,
+                identifier=current_user.phone_number,
+                db=db
+            )
+            return {
+                "message": "Verification code sent to phone",
+                "phone_number": current_user.phone_number,
+                "expires_in_minutes": 15
+            }
+        
+        # Verify code
+        if reset_request.verification_code != verification_code:
+            reset_request.attempts_count += 1
+            
+            if reset_request.attempts_count >= reset_request.max_attempts:
+                reset_request.status = "EXPIRED"
+                await db.commit()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Maximum verification attempts exceeded. Please request a new code."
+                )
+            
+            await db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid verification code"
+            )
+        
+        # Check expiration
+        if reset_request.code_expires_at and reset_request.code_expires_at < datetime.utcnow():
+            reset_request.status = "EXPIRED"
+            await db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Verification code has expired. Please request a new code."
+            )
+        
+        # Code is valid - mark phone as verified
+        current_user.phone_verified = True
+        current_user.phone_verified_at = datetime.utcnow()
+        
+        # Mark reset request as USED
+        reset_request.status = "USED"
+        reset_request.used_at = datetime.utcnow()
+        
+        await db.commit()
+        await db.refresh(current_user)
+        
+        return {
+            "message": "Phone number verified successfully",
+            "phone_number": current_user.phone_number,
+            "verified": True,
+            "verified_at": current_user.phone_verified_at.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Phone verification error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Phone verification failed"
+        )

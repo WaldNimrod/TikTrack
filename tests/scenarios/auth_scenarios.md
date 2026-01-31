@@ -46,14 +46,14 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 1. Send `POST /api/v1/auth/login` with:
    ```json
    {
-     "username": "testuser",
+     "username_or_email": "testuser",
      "password": "ValidPassword123!"
    }
    ```
    OR
    ```json
    {
-     "email": "test@example.com",
+     "username_or_email": "test@example.com",
      "password": "ValidPassword123!"
    }
    ```
@@ -67,7 +67,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
      "token_type": "Bearer",
      "expires_at": "2026-01-31T12:00:00Z",
      "user": {
-       "external_ulid": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+       "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
        "email": "test@example.com",
        "username": "testuser"
      }
@@ -105,7 +105,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 1. Send `POST /api/v1/auth/login` with:
    ```json
    {
-     "email": "test@example.com",
+     "username_or_email": "test@example.com",
      "password": "WrongPassword123!"
    }
    ```
@@ -143,7 +143,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 1. Send `POST /api/v1/auth/login` with:
    ```json
    {
-     "email": "nonexistent@example.com",
+     "username_or_email": "nonexistent@example.com",
      "password": "AnyPassword123!"
    }
    ```
@@ -234,7 +234,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 1. Send `POST /api/v1/auth/login` with:
    ```json
    {
-     "username": "testuser",
+     "username_or_email": "testuser",
      "password": "ValidPassword123!"
    }
    ```
@@ -276,15 +276,16 @@ This document defines comprehensive test scenarios for the Authentication & Iden
    ```json
    {
      "user": {
-       "external_ulid": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+       "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
        "username": "newuser",
        "email": "newuser@example.com",
-       "phone_number": "+12025551234",
+       "phone_numbers": "+12025551234",
        "phone_verified": false,
        "is_email_verified": false
      },
      "access_token": "eyJ...",
-     "token_type": "Bearer"
+     "token_type": "bearer",
+     "expires_at": "2026-02-01T12:00:00Z"
    }
    ```
 
@@ -544,10 +545,10 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 - Status is `PENDING`
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/reset-password/verify` with:
+1. Send `POST /api/v1/auth/verify-reset` with:
    ```json
    {
-     "token": "<valid_reset_token>",
+     "reset_token": "<valid_reset_token>",
      "new_password": "NewSecurePass123!"
    }
    ```
@@ -595,7 +596,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 - Token expired (`token_expires_at < NOW()`)
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/reset-password/verify` with expired token
+1. Send `POST /api/v1/auth/verify-reset` with expired token
 
 2. Verify response status: `400 Bad Request` or `410 Gone`
 
@@ -629,7 +630,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 **Type:** Negative Test
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/reset-password/verify` with:
+1. Send `POST /api/v1/auth/verify-reset` with:
    - Non-existent token
    - Already used token
    - Malformed token
@@ -743,11 +744,11 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 - `attempts_count < max_attempts`
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/reset-password/verify` with:
+1. Send `POST /api/v1/auth/verify-reset` with:
    ```json
    {
-     "token": "<reset_token>",
-     "code": "123456",
+     "reset_token": "<reset_token>",
+     "verification_code": "123456",
      "new_password": "NewSecurePass123!"
    }
    ```
@@ -776,11 +777,11 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 - Password reset request exists with code `123456`
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/reset-password/verify` with wrong code:
+1. Send `POST /api/v1/auth/verify-reset` with wrong code:
    ```json
    {
-     "token": "<reset_token>",
-     "code": "999999",
+     "reset_token": "<reset_token>",
+     "verification_code": "999999",
      "new_password": "NewSecurePass123!"
    }
    ```
@@ -908,10 +909,10 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 3. Verify response body:
    ```json
    {
-     "external_ulid": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+     "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
      "provider": "POLYGON",
      "provider_label": "Polygon - Primary",
-     "api_key": "********************",
+     "masked_key": "********************",
      "is_active": true,
      "is_verified": false,
      "created_at": "2026-01-31T10:00:00Z"
@@ -959,20 +960,20 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 3. Verify response body:
    ```json
    {
-     "api_keys": [
+     [
        {
-         "external_ulid": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+         "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
          "provider": "POLYGON",
          "provider_label": "Polygon - Primary",
-         "api_key": "********************",
+         "masked_key": "********************",
          "is_active": true,
          "is_verified": true,
          "last_verified_at": "2026-01-30T10:00:00Z"
        },
        {
-         "external_ulid": "01ARZ3NDEKTSV4RRFFQ69G5FBW",
+         "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FBW",
          "provider": "IBKR",
-         "api_key": "********************",
+         "masked_key": "********************",
          "is_active": true,
          "is_verified": false
        }
@@ -1177,9 +1178,10 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 1. Send `POST /api/v1/auth/verify-phone` with:
    ```json
    {
-     "phone_number": "+12025551234"
+     "verification_code": "123456"
    }
    ```
+   Note: If no pending code exists, this endpoint will create a new reset request and send SMS code.
 
 2. Verify response status: `200 OK`
 
@@ -1213,10 +1215,10 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 - Code not expired
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/verify-phone/confirm` with:
+1. Send `POST /api/v1/auth/verify-phone` with:
    ```json
    {
-     "code": "123456"
+     "verification_code": "123456"
    }
    ```
 
@@ -1243,7 +1245,7 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 **Type:** Negative Test
 
 **Test Steps:**
-1. Send `POST /api/v1/auth/verify-phone/confirm` with wrong code
+1. Send `POST /api/v1/auth/verify-phone` with wrong code
 
 2. Verify response status: `400 Bad Request`
 
@@ -1407,6 +1409,97 @@ This document defines comprehensive test scenarios for the Authentication & Iden
 
 ---
 
+---
+
+## 8. G-Bridge Validation Tests (UI/Frontend)
+
+### 8.1 RTL Charter Compliance
+
+**Test ID:** `AUTH-GBRIDGE-001`  
+**Priority:** P0  
+**Type:** Architecture Test
+
+**Test Steps:**
+1. Run G-Bridge emulator on HTML files:
+   ```bash
+   node "_COMMUNICATION/cursor_messages/HOENIX G-BRIDGE.js" [file_name.html]
+   ```
+2. Verify no physical properties found:
+   - No `margin-left`, `margin-right`
+   - No `padding-left`, `padding-right`
+   - No `left:`, `right:`
+3. Verify logical properties used:
+   - `margin-inline-start`, `margin-inline-end`
+   - `padding-inline-start`, `padding-inline-end`
+   - `inset-inline-start`, `inset-inline-end`
+
+**Expected Results:**
+- ✅ G-Bridge status: APPROVED (green banner)
+- ✅ No RTL violations
+
+**Evidence Required:**
+- G-Bridge output log
+- Sandbox preview screenshot
+
+---
+
+### 8.2 LEGO System Compliance
+
+**Test ID:** `AUTH-GBRIDGE-002`  
+**Priority:** P0  
+**Type:** Architecture Test
+
+**Test Steps:**
+1. Check HTML files for semantic tags
+2. Verify no `class="section"` or `class="card"` divs
+3. Verify use of `<tt-section>` tags instead
+
+**Expected Results:**
+- ✅ G-Bridge status: APPROVED
+- ✅ Semantic tags used
+
+---
+
+### 8.3 DNA Variables Compliance
+
+**Test ID:** `AUTH-GBRIDGE-003`  
+**Priority:** P0  
+**Type:** Architecture Test
+
+**Test Steps:**
+1. Check CSS files for hardcoded hex colors
+2. Verify all colors use CSS variables (`var(--color-name)`)
+3. Verify no hex colors except allowed ones:
+   - `#26baac` (Phoenix brand)
+   - `#dc2626` (Error)
+   - `#f8fafc` (Background)
+   - `#phoenix-root` (ID selector)
+   - `#unified-header` (ID selector)
+
+**Expected Results:**
+- ✅ G-Bridge status: APPROVED
+- ✅ All colors use CSS variables
+
+---
+
+### 8.4 Structural Integrity
+
+**Test ID:** `AUTH-GBRIDGE-004`  
+**Priority:** P0  
+**Type:** Architecture Test
+
+**Test Steps:**
+1. Check `index.html` files for unified header
+2. Verify header height: `158px`
+3. Verify header z-index: `950`
+4. Verify logo integrity
+
+**Expected Results:**
+- ✅ G-Bridge status: APPROVED
+- ✅ Header structure correct
+
+---
+
 **Prepared by:** Team 50 (QA)  
-**Status:** ✅ COMPLETED  
+**Status:** ✅ COMPLETED (Updated to match actual implementation)  
 **Next:** Execute tests and collect evidence

@@ -1,270 +1,165 @@
-# 📋 Evidence Log: Task 50.1.2 - Sanity Checklist Creation
+# 📋 Task Completion Evidence: 50.1.2 - Sanity Checklist
 
 **From:** Team 50 (QA)  
 **To:** Team 10 (The Gateway)  
+**Subject:** Task Completion | WP-50.1.2  
 **Date:** 2026-01-31  
-**Session:** SESSION_01 - Phase 1.1  
-**Task:** 50.1.2  
 **Status:** ✅ COMPLETED
 
 ---
 
-## ✅ Task Completion Summary
+## 📊 Task Summary
 
-**Task:** Create Sanity Checklist for Phase 1  
-**Deliverable:** `tests/sanity/phase1_sanity_checklist.md`  
-**Status:** ✅ COMPLETED  
-**Completion Date:** 2026-01-31
-
----
-
-## 📄 Deliverable Details
-
-### File Created
-- **Path:** `/tests/sanity/phase1_sanity_checklist.md`
-- **Size:** 150+ checklist items
-- **Categories:**
-  - Database Schema: 35 items
-  - API Endpoints: 45 items
-  - UI Components: 30 items
-  - Security: 25 items
-  - Error Handling: 15 items
-
-### Checklist Breakdown
-
-#### 1. Database Schema Checklist (35 items)
-- ✅ **Core Tables Existence (3 tables):**
-  - `user_data.users` - 18 columns verified
-  - `user_data.password_reset_requests` - 12 columns verified
-  - `user_data.user_api_keys` - 20 columns verified
-
-- ✅ **Indexes (12 indexes):**
-  - Users table: 5 indexes
-  - Password reset requests: 4 indexes
-  - API keys: 3 indexes
-
-- ✅ **Constraints (10 constraints):**
-  - Phone format validation
-  - Token/code length validation
-  - Attempt limits
-  - Unique constraints
-  - Rate limit validation
-
-- ✅ **Foreign Keys (4 FKs):**
-  - All relationships verified
-
-- ✅ **ENUMs (3 ENUMs):**
-  - `user_role`, `reset_method`, `api_provider`
-
-#### 2. API Endpoints Checklist (45 items)
-- ✅ **Authentication Endpoints (7 endpoints):**
-  - Login, Register, Logout, Refresh
-  - Password Reset (request + verify)
-  - Phone Verification (request + confirm)
-
-- ✅ **User Profile Endpoints (2 endpoints):**
-  - GET /users/me
-  - PUT /users/me
-
-- ✅ **API Keys Management (5 endpoints):**
-  - GET, POST, PUT, DELETE, VERIFY
-
-- ✅ **Response Formats:**
-  - JSON format
-  - HTTP status codes
-  - Error structure
-  - Success structure
-
-#### 3. UI Components Checklist (30 items)
-- ✅ **Authentication Components:**
-  - Login Form (D15)
-  - Register Form (D15)
-  - Forgot Password Form (D15)
-  - Reset Password Form (D15)
-
-- ✅ **API Keys Management (D24):**
-  - API Keys List
-  - API Key Form
-  - API Key Item
-
-- ✅ **Security Settings (D25):**
-  - Security View
-  - Phone Verification Section
-  - Password Reset Section
-
-- ✅ **Protected Routes:**
-  - Protected Route Component
-
-- ✅ **Form Validation:**
-  - Client-side validation
-  - Server-side error display
-
-#### 4. Security Checklist (25 items)
-- ✅ **Encryption:**
-  - API keys encryption verification
-  - Password hashing verification
-
-- ✅ **Masking:**
-  - API keys masking
-  - Email masking
-  - Phone masking
-
-- ✅ **JWT Tokens:**
-  - Token signing
-  - Expiration handling
-  - Validation
-
-- ✅ **Password Security:**
-  - Strength requirements
-  - Common password rejection
-
-- ✅ **Account Locking:**
-  - Failed attempts tracking
-  - Lock expiration
-
-- ✅ **Input Sanitization:**
-  - SQL injection prevention
-  - XSS prevention
-
-#### 5. Error Handling Checklist (15 items)
-- ✅ **API Error Responses:**
-  - Consistent error format
-  - Appropriate status codes
-
-- ✅ **Validation Errors:**
-  - Field-level validation
-  - Unique constraint validation
-
-- ✅ **Edge Cases:**
-  - Empty requests
-  - Invalid JSON
-  - Long strings
-  - Special characters
-
-- ✅ **Logging:**
-  - Error logging
-  - Sensitive data protection
+**Task ID:** 50.1.2  
+**Task Name:** Create Sanity Checklist  
+**Priority:** P0  
+**Status:** ✅ COMPLETED
 
 ---
 
-## 📚 Reference Documents Used
+## ✅ Deliverables
 
-1. **SQL Schema:** `documentation/04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
-   - Complete table structures reviewed
-   - All indexes verified
-   - All constraints verified
-   - All ENUMs verified
+### 1. Sanity Checklist Document
+**Location:** `tests/sanity/phase1_sanity_checklist.md`  
+**Status:** ✅ COMPLETED & UPDATED
 
-2. **OpenAPI Spec:** `documentation/05-DEVELOPMENT_&_CONTRACTS/OPENAPI_SPEC_V2_FINAL.yaml`
-   - Endpoint definitions reviewed
-   - Response schemas reviewed
+**Content:**
+- 150+ checklist items organized into 6 categories:
+  1. Database Schema (35 items)
+  2. API Endpoints (45 items)
+  3. UI Components (30 items)
+  4. Security (25 items)
+  5. Error Handling (15 items)
+  6. **NEW:** G-Bridge Validation (20 items)
 
-3. **Task Breakdown:** `documentation/05-REPORTS/artifacts_SESSION_01/PHASE_1_TASK_BREAKDOWN.md`
-   - All sub-tasks covered in checklist
+**Updates Made:**
+1. ✅ Fixed endpoint paths to match actual implementation:
+   - `/auth/verify-reset` (not `/auth/reset-password/verify`)
+   - `/auth/verify-phone` (single endpoint)
 
-4. **UI Blueprints:** `documentation/03-DESIGN_UX_UI/GIN_004_UI_ALIGNMENT_SPEC.md`
-   - D15, D24, D25 components verified
+2. ✅ Fixed field names to match actual schemas:
+   - `username_or_email` for login
+   - `external_ulids` (plural)
+   - `phone_numbers` (plural)
+   - `masked_key` in API key responses
 
----
+3. ✅ Added refresh token cookie validation:
+   - Refresh token sent in httpOnly cookie
+   - Refresh token NOT in response body
+   - Cookie security settings verified
 
-## ✅ Compliance Check
-
-### Zero Invention Policy
-- ✅ All checklist items based on specifications only
-- ✅ No invented requirements
-- ✅ All field names match SQL schema
-
-### Evidence Based
-- ✅ Each checklist item includes evidence requirements
-- ✅ SQL queries provided for verification
-- ✅ Test methods specified
-
-### Documentation Standards
-- ✅ Checklist organized by category
-- ✅ Checkboxes for tracking completion
-- ✅ Evidence collection methods specified
-
----
-
-## 📊 Checklist Metrics
-
-**Total Checklist Items:** 150+  
-**Critical (P0):** 80+ items  
-**Important (P1):** 70+ items
-
-**Breakdown:**
-- Database Schema: 35 items (23%)
-- API Endpoints: 45 items (30%)
-- UI Components: 30 items (20%)
-- Security: 25 items (17%)
-- Error Handling: 15 items (10%)
+4. ✅ Added G-Bridge validation section:
+   - RTL Charter compliance checklist
+   - LEGO System compliance checklist
+   - DNA Variables compliance checklist
+   - Structural Integrity checklist
+   - G-Bridge execution checklist
 
 ---
 
-## 🎯 Key Validation Areas
+## 🔍 Validation Against Implementation
 
-1. **Database Integrity:**
-   - All tables exist with correct structure
-   - All indexes created for performance
-   - All constraints enforce data integrity
-   - Foreign keys maintain referential integrity
+### Verified Against:
+- ✅ `api/routers/auth.py` - Authentication endpoints
+- ✅ `api/routers/users.py` - User endpoints
+- ✅ `api/routers/api_keys.py` - API keys endpoints
+- ✅ `api/schemas/identity.py` - Request/response schemas
+- ✅ `api/models/identity.py` - Database models
+- ✅ `documentation/04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` - Database schema
+- ✅ `_COMMUNICATION/cursor_messages/HOENIX G-BRIDGE.js` - G-Bridge script
 
-2. **API Completeness:**
-   - All endpoints implemented
-   - Proper authentication/authorization
-   - Correct response formats
-   - Error handling consistent
-
-3. **UI Functionality:**
-   - All components exist
-   - Forms validate correctly
-   - Error messages display properly
-   - Protected routes work
-
-4. **Security Measures:**
-   - Encryption implemented
-   - Masking applied
-   - Tokens secured
-   - Input sanitized
-
-5. **Error Handling:**
-   - Consistent error format
-   - Appropriate status codes
-   - Edge cases handled
-   - Logging implemented
+### Key Findings:
+1. **Login endpoint** uses `username_or_email` (single field)
+2. **Refresh tokens** sent in httpOnly cookies (not response body)
+3. **Password reset verification** is `/auth/verify-reset`
+4. **Phone verification** is single endpoint `/auth/verify-phone`
+5. **API key responses** use `masked_key` field
+6. **All external IDs** use plural naming convention
 
 ---
 
-## 📝 Validation Process
+## 📈 Checklist Coverage
 
-1. **Execution Steps:**
-   - For each checklist item, verify implementation
-   - Collect evidence (queries, logs, screenshots)
-   - Document issues found
-   - Report to Team 10
+**Total Items:** 170+  
+**P0 (Critical):** 90+ items  
+**P1 (Important):** 80+ items
 
-2. **Evidence Collection:**
-   - SQL queries for DB verification
-   - API test results
-   - UI screenshots
-   - Code review notes
+**Categories:**
+1. ✅ Database Schema (35 items)
+   - Tables existence
+   - Indexes
+   - Constraints
+   - Foreign keys
+   - ENUMs
 
-3. **Issue Tracking:**
-   - Document issues in Critical Issues Log
-   - Assign priority (P0/P1)
-   - Track resolution status
+2. ✅ API Endpoints (45 items)
+   - Authentication endpoints (8 endpoints)
+   - User profile endpoints (2 endpoints)
+   - API Keys endpoints (5 endpoints)
+   - Response formats
+
+3. ✅ UI Components (30 items)
+   - Authentication components
+   - API Keys management
+   - Security settings
+   - Protected routes
+   - Form validation
+
+4. ✅ Security (25 items)
+   - Encryption (API keys, passwords)
+   - Masking (responses)
+   - JWT tokens
+   - Password security
+   - Account locking
+   - Input sanitization
+
+5. ✅ Error Handling (15 items)
+   - API error responses
+   - Validation errors
+   - Edge cases
+   - Logging
+
+6. ✅ **NEW:** G-Bridge Validation (20 items)
+   - RTL Charter compliance
+   - LEGO System compliance
+   - DNA Variables compliance
+   - Structural Integrity
+   - G-Bridge execution
 
 ---
 
-## ✅ Sign-off
+## 🎯 Compliance
 
-**Task Status:** ✅ COMPLETED  
-**Quality:** ✅ VERIFIED  
-**Compliance:** ✅ VERIFIED  
-**Ready for:** Validation execution phase
+- ✅ Based on `PHASE_1_TASK_BREAKDOWN.md`
+- ✅ Aligned with `OPENAPI_SPEC_V2.5.2.yaml`
+- ✅ Matches `PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
+- ✅ Validated against actual implementation
+- ✅ Includes G-Bridge validation per Team 50 strategic guide
+
+---
+
+## 📝 Notes
+
+1. **G-Bridge Integration:** Added comprehensive section 6 with 20 checklist items covering all 4 G-Bridge pillars (RTL, LEGO, DNA Variables, Structural Integrity).
+
+2. **Refresh Token Security:** Added validation for httpOnly cookie implementation - refresh tokens must NOT appear in response body.
+
+3. **Field Naming:** All checklist items updated to use correct plural naming convention per architectural standards.
+
+4. **Endpoint Accuracy:** All endpoint paths verified against actual router implementations.
+
+---
+
+## 🚀 Next Steps
+
+1. Execute sanity checklist validation
+2. Check each item systematically
+3. Collect evidence (SQL queries, API tests, code reviews)
+4. Document any non-compliance issues
+5. Report findings to Team 10
 
 ---
 
 **Prepared by:** Team 50 (QA)  
-**Date:** 2026-01-31  
+**Evidence Status:** ✅ COMPLETE  
 **log_entry | [Team 50] | TASK_COMPLETE | 50.1.2 | GREEN**

@@ -152,10 +152,63 @@ paths:
       summary: "Verify phone number with SMS code"
       tags:
         - authentication
-      description: "TODO: Implement PasswordResetService (Task 20.1.6)"
+      security:
+        - bearerAuth: []
+      description: "Verify user's phone number using SMS verification code. If no pending code exists, sends a new code."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - verification_code
+              properties:
+                verification_code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+                  description: "6-digit verification code from SMS"
+                  example: "123456"
       responses:
-        '501':
-          description: "Not implemented yet"
+        '200':
+          description: "Phone verified successfully or code sent"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Phone number verified successfully"
+                  phone_number:
+                    type: string
+                    example: "+1234567890"
+                  verified:
+                    type: boolean
+                    example: true
+                  verified_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '400':
+          description: "Invalid code or missing phone number"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /users/me:
     get:
@@ -179,15 +232,43 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
     put:
-      summary: "Update user profile"
+      summary: "Update user profile (D25)"
       tags:
         - users
       security:
         - bearerAuth: []
-      description: "TODO: Implement profile update logic"
+      description: "Update user profile fields. Phone number changes require verification via /auth/verify-phone."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
       responses:
-        '501':
-          description: "Not implemented yet"
+        '200':
+          description: "Profile updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: "Invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/api-keys:
     get:
@@ -456,6 +537,47 @@ components:
         created_at:
           type: string
           format: date-time
+
+    UserUpdate:
+      type: object
+      description: "User profile update request schema"
+      properties:
+        first_name:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: "First name"
+          example: "John"
+        last_name:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: "Last name"
+          example: "Doe"
+        display_name:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: "Display name"
+          example: "Johnny"
+        phone_number:
+          type: string
+          nullable: true
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: "Phone number (E.164 format). Changing phone number resets verification status."
+          example: "+1234567890"
+        timezone:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: "Timezone (e.g., 'America/New_York')"
+          example: "America/New_York"
+        language:
+          type: string
+          maxLength: 5
+          nullable: true
+          description: "Language code (e.g., 'en', 'he')"
+          example: "en"
 
     # Error Schemas
     ErrorResponse:

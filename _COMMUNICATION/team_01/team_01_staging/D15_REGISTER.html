@@ -3,61 +3,69 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body { margin:0; padding-top:45px; font-family:Assistant,sans-serif; background:#f8fafc; }
-    .g-bridge-banner { position:fixed; top:0; left:0; right:0; background: #26baac; color:white; padding:8px 20px; font-size:11px; font-weight:900; z-index:10002; letter-spacing:0.5px; border-bottom:1px solid rgba(0,0,0,0.1); }
+    .g-bridge-banner { position:fixed; top:0; left:0; right:0; background: #059669; color:white; padding:8px 20px; font-size:10px; font-weight:900; z-index:10002; letter-spacing:0.5px; border-bottom:1px solid rgba(0,0,0,0.2); }
   </style>
 </head><body>
-<div class="g-bridge-banner">🛡️ G-BRIDGE | APPROVED | REVIEW READY</div>
+<div class="g-bridge-banner">🛡️ G-BRIDGE [12:23:10] | APPROVED | FIDELITY REVIEW READY</div>
   <main id="phoenix-root">
+<!--
+  Phoenix-Core-Ver: v1.1.1 | Batch 1 - Auth Core (Updated)
+  Sync-Time: 2026-01-31 14:00:00 IST
+  Team: Team 30 (Frontend) | Team 50 (QA Review)
+  Status: LEGO System Compliant | Minimalist Spacing | Phone Field Added
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅
+-->
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הרשמה - TikTrack</title>
-    <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הרשמה | TikTrack Phoenix</title>
+  <!-- CSS Loading Order: Pico CSS FIRST, then base, then components, then auth-specific -->
+  <!-- Note: Auth pages don't use header, so phoenix-header.css is not loaded -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="./phoenix-base.css">
+  <link rel="stylesheet" href="./phoenix-components.css">
+  <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
 </head>
-<body data-page-key="register">
-    <div class="login-wrapper" data-lod-verified="true">
-        <div class="login-container">
-            <div class="login-header">
-                <div class="login-logo">
-                    <img src="./images/logo.svg" alt="TikTrack Logo" />
-                </div>
-                <h1 class="login-title">הרשמה</h1>
-                <p class="login-subtitle">הצטרפו ל-TikTrack</p>
-            </div>
-
-            <form id="registerForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">שם משתמש</label>
-                    <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="phone">טלפון</label>
-                    <input type="tel" id="phone" class="form-control" placeholder="05x-xxxxxxx">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="email">אימייל (אופציונלי)</label>
-                    <input type="email" id="email" class="form-control" placeholder="הכנס אימייל">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">סיסמה</label>
-                    <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
-                </div>
-
-                <button type="submit" class="btn-login" id="registerBtn">
-                    הרשמה
-                </button>
-            </form>
-
-            <div class="login-links">
-                <a href="./D15_LOGIN.html">כבר יש לך חשבון? התחבר</a>
-            </div>
+<body class="auth-layout-root">
+  <tt-container>
+    <tt-section>
+      <div class="auth-header">
+        <div class="auth-logo">
+          <img src="./images/logo.svg" alt="TikTrack Logo" />
         </div>
-    </div>
+        <h1 class="auth-title">הרשמה</h1>
+        <p class="auth-subtitle">הצטרפו לקהילת הסוחרים</p>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <label class="form-label">שם משתמש:</label>
+          <input type="text" class="form-control" required placeholder="בחר שם משתמש">
+        </div>
+        <div class="form-group">
+          <label class="form-label">אימייל:</label>
+          <input type="email" class="form-control" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">סיסמה:</label>
+          <input type="password" class="form-control" required placeholder="הכנס סיסמה">
+        </div>
+        <div class="form-group">
+          <label class="form-label">טלפון (אופציונלי):</label>
+          <input type="tel" class="form-control" placeholder="+972-5x-xxxxxxx">
+        </div>
+        <button type="submit" class="btn-auth-primary">צור חשבון</button>
+      </form>
+
+      <div class="auth-footer-zone">
+        <a href="./D15_LOGIN.html" class="auth-link">כבר יש לך חשבון? התחבר</a>
+      </div>
+    </tt-section>
+  </tt-container>
+  
+  <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
 </body>
 </html>
   </main>

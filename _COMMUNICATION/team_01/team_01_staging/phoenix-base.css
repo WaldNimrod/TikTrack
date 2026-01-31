@@ -1,0 +1,348 @@
+/*
+  Phoenix-Base-Ver: v1.0.0 | Global Base Styles for All Pages
+  Sync-Time: 2026-01-31 20:00:00 IST
+  Team: Team 30 (Frontend)
+  Status: Global Base Layer - Foundation for All Pages
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅
+  
+  Purpose:
+  This file contains ONLY the base/default styles for ALL HTML elements.
+  These styles apply to EVERY page in the system.
+  
+  Structure:
+  Level 1: CSS Variables (:root)
+  Level 2: Base Styles (html, body, typography, form elements, buttons)
+  Level 2.1: Typography Base (h1-h6, p, a)
+  Level 2.2: Form Elements Base (input, textarea, select, button)
+  
+  IMPORTANT: This file must be loaded AFTER Pico CSS in HTML to ensure proper override.
+  We use specific selectors instead of !important for clean CSS architecture.
+  
+  NO !important POLICY: All overrides use specific selectors instead of !important.
+*/
+
+/* ============================================
+   Level 1: CSS Variables (:root)
+   ============================================ */
+
+:root {
+  /* ===== Apple Design System Variables (Exact from original) ===== */
+  --apple-blue: #007AFF;
+  --apple-blue-dark: #0056CC;
+  --logo-orange: #ff9e04;
+  --apple-gray-1: #F2F2F7;
+  --apple-gray-2: #E5E5EA;
+  --apple-gray-3: #D1D1D6;
+  --apple-gray-4: #C7C7CC;
+  --apple-gray-5: #AEAEB2;
+  --apple-gray-6: #8E8E93;
+  --apple-gray-7: #636366;
+  --apple-gray-8: #48484A;
+  --apple-gray-9: #3A3A3C;
+  --apple-gray-10: #2C2C2E;
+  --apple-gray-11: #1C1C1E;
+  --apple-red: #FF3B30;
+  --apple-red-dark: #D70015;
+  --apple-green: #34C759;
+  --apple-green-dark: #248A3D;
+  --apple-orange: #FF9500;
+  --apple-orange-dark: #CC7700;
+  --apple-yellow: #FFCC02;
+  --apple-purple: #AF52DE;
+  --apple-pink: #FF2D92;
+  
+  /* ===== Backgrounds (Exact from original) ===== */
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  --apple-bg-elevated: #FFFFFF;
+  
+  /* ===== Text Colors (Exact from original) ===== */
+  --apple-text-primary: #000000;
+  --apple-text-secondary: #3C3C43;
+  --apple-text-tertiary: #3C3C4399;
+  --apple-text-quaternary: #3C3C434D;
+  
+  /* ===== Borders (Exact from original) ===== */
+  --apple-border: #C6C6C8;
+  --apple-border-light: #E5E5EA;
+  
+  /* ===== Shadows (Exact from original) ===== */
+  --apple-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --apple-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --apple-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
+  
+  /* ===== Typography (Exact from original) ===== */
+  --font-family-primary: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-size-xxxl: 32px;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+  
+  /* ===== Spacing (Exact from original) ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+  
+  /* ===== Legacy Compatibility Variables ===== */
+  --color-brand: #26baac;
+  --color-brand-hover: #1e968a;
+  --color-bg-grad: radial-gradient(circle at 10% 20%, #eef2ff 0%, #f8fafc 45%, #e0e7ff 100%);
+  --color-surface: var(--apple-bg-elevated);
+  --color-bg-light: var(--apple-bg-secondary);
+  --color-bg-main: var(--apple-bg-secondary);
+  --color-border: var(--apple-border-light);
+  --color-text-main: var(--apple-text-primary);
+  --color-text-muted: var(--apple-text-secondary);
+  --color-white: var(--apple-bg-primary);
+  --shadow-legacy: 0 20px 60px rgba(0, 0, 0, 0.18);
+  --shadow-sm: var(--apple-shadow-light);
+  --font-main: var(--font-family-primary);
+  --grid-gutter: var(--spacing-md);
+  
+  /* ===== LOD 400 Requirements ===== */
+  --header-height: 158px;
+  --header-row1-height: 98px;
+  --header-row2-height: 60px;
+  --header-z-index: 950;
+  
+  /* ===== Container ===== */
+  --container-max-width: 1400px;
+  --container-xl: 1400px;
+  
+  /* ===== Header Colors (from original header-styles.css) ===== */
+  --header-brand: #26baac;
+  --header-brand-hover: #1e9a8a;
+  --header-brand-active: #0f766e;
+  --header-dropdown-item: #29a6a8;
+  --header-dropdown-item-hover: #ff9e04;
+  --header-filter-hover: #ff9500;
+  --header-filter-selected-bg: #f0f9ff;
+  --header-filter-selected-color: #26baac;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+/* ============================================
+   Level 2: Base Styles (Override Pico CSS)
+   ============================================ */
+
+/* HTML root settings */
+html {
+  direction: rtl;
+  lang: he;
+}
+
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Body base styles - מבוסס על apple-theme.css */
+body {
+  background-color: var(--apple-bg-secondary, #F2F2F7);
+  color: var(--apple-text-primary, #000000);
+  margin: 0;
+  padding: 0;
+  line-height: var(--line-height-normal, 1.4);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+}
+
+/* ============================================
+   Level 2.1: Typography Base (Default Styles)
+   ============================================ */
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: var(--line-height-tight, 1.2);
+  color: var(--apple-text-primary, #000000);
+}
+
+h1 {
+  font-size: var(--font-size-xxxl, 32px);
+}
+
+h2 {
+  font-size: var(--font-size-xxl, 24px);
+}
+
+h3 {
+  font-size: var(--font-size-xl, 20px);
+}
+
+h4 {
+  font-size: var(--font-size-lg, 18px);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+h5 {
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+h6 {
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+/* Paragraphs */
+p {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size-base, 16px);
+  line-height: var(--line-height-normal, 1.4);
+  color: var(--apple-text-primary, #000000);
+}
+
+/* Links */
+a {
+  color: var(--header-brand, #26baac);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--header-brand-hover, #1e9a8a);
+  text-decoration: underline;
+}
+
+/* ============================================
+   Level 2.2: Form Elements Base (Default Styles)
+   ============================================ */
+
+/* Input, Textarea, Select - Base Styles */
+input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
+textarea,
+select {
+  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
+  font-size: var(--font-size-base, 16px);
+  line-height: var(--line-height-normal, 1.4);
+  color: var(--apple-text-primary, #000000);
+  background-color: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: var(--apple-radius-small, 6px);
+  padding: 5px 8px;
+  margin: 0;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: auto;
+  height: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]):focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--header-brand, #26baac);
+  box-shadow: 0 0 0 0.2rem rgba(38, 186, 172, 0.25);
+}
+
+input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden])::placeholder,
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+  opacity: 1;
+}
+
+/* Buttons - Base Styles */
+button,
+.btn {
+  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-normal, 400);
+  line-height: var(--line-height-normal, 1.4);
+  color: var(--apple-text-primary, #000000);
+  background-color: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: var(--apple-radius-small, 6px);
+  padding: 0.375rem 0.75rem;
+  margin: 0;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  user-select: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button:hover,
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:focus,
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(38, 186, 172, 0.25);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+button:disabled,
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Labels */
+label {
+  display: block; 
+  font-weight: var(--font-weight-medium, 500); 
+  font-size: 15px;
+  margin-block-end: var(--spacing-xs, 4px); 
+  color: var(--apple-text-primary, #000000);
+  text-align: start; /* Logical property for RTL */
+  direction: rtl;
+}
+
+/* Form Groups */
+.form-group { 
+  margin-block-end: var(--spacing-md, 16px);
+  text-align: start; /* Logical property for RTL */
+}
+
+/* Form Control - Inherits from base input/textarea/select styles */
+.form-control {
+  /* Uses base styles defined above */
+}

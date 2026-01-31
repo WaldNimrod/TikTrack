@@ -1,0 +1,76 @@
+/*
+  Phoenix-Components-Ver: v1.0.0 | LEGO System Components
+  Sync-Time: 2026-01-31 20:00:00 IST
+  Team: Team 30 (Frontend)
+  Status: LEGO System Components - Reusable Across All Pages
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅
+  
+  Purpose:
+  This file contains ONLY the LEGO System Components (tt-container, tt-section, tt-section-row).
+  These components are used across ALL pages in the system.
+  
+  IMPORTANT: This file must be loaded AFTER phoenix-base.css.
+*/
+
+/* ============================================
+   LEGO System Components
+   Hierarchy: tt-container > tt-section > tt-section-row
+   ============================================ */
+
+/* tt-container: Outer container (Max-width: 1400px, centers content) */
+tt-container {
+  display: block;
+  max-width: var(--container-max-width, 1400px);
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--grid-gutter, var(--spacing-md));
+}
+
+/* tt-section: Independent content unit - DEFAULT STYLES */
+tt-section {
+  display: block;
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 2px;
+  margin-block-end: var(--grid-gutter, var(--spacing-md));
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+}
+
+/* tt-section content area - minimal padding */
+tt-section > * {
+  padding: var(--spacing-lg, 24px);
+}
+
+/* tt-section header (data-title attribute) */
+tt-section[data-title]::before {
+  content: attr(data-title);
+  display: block;
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border-block-end: 1px solid var(--apple-border-light, #e5e5e5);
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--apple-text-secondary, #3C3C43);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* tt-section-row: Internal division for Flex/Grid alignment */
+tt-section-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gutter, var(--spacing-md));
+}
+
+/* Responsive: Row layout on larger screens */
+@media (min-width: 1024px) {
+  tt-section-row {
+    flex-direction: row;
+  }
+}
+
+/* Grid gap enforcement */
+tt-section-row > * {
+  flex: 1;
+}

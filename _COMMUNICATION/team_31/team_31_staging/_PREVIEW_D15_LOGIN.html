@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
+    .g-bridge-banner { position:fixed; top:0; left:0; right:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
+</style></head><body>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE [20:05:31] | APPROVED | FIDELITY READY</div>
+<main id="phoenix-root"><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>התחברות | TikTrack Phoenix</title>
+  <!-- CSS Loading Order: Pico CSS FIRST, then base, then components, then auth-specific -->
+  <!-- Note: Auth pages don't use header, so phoenix-header.css is not loaded -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="./phoenix-base.css">
+  <link rel="stylesheet" href="./phoenix-components.css">
+  <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* G-Bridge Banner - Fixed position banner for validation status */
+    .g-bridge-banner {
+      position: fixed;
+      top: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      background: var(--color-success, #059669);
+      color: white;
+      padding: 8px 20px;
+      font-size: 10px;
+      font-weight: 900;
+      z-index: 10002;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="auth-layout-root">
+  <!--
+    Phoenix-Core-Ver: v1.2.0 | Batch 1 - Auth Core (Final)
+    Sync-Time: 2026-01-31 21:00:00 IST
+    Team: Team 30 (Frontend) | Team 50 (QA Review)
+    Status: ✅ VISUALLY APPROVED | ✅ READY FOR DEVELOPMENT
+    Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | G-Bridge Validated ✅
+  -->
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [21:00:00] | ✅ VISUALLY APPROVED | ✅ READY FOR DEVELOPMENT</div>
+  
+  <tt-container>
+    <tt-section>
+      <div class="auth-header">
+        <div class="auth-logo">
+          <img src="./images/logo.svg" alt="TikTrack Logo" />
+        </div>
+        <p class="auth-subtitle">ברוכים הבאים ל-TikTrack</p>
+        <h1 class="auth-title">התחברות</h1>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <label class="form-label">שם משתמש / אימייל:</label>
+          <input type="text" class="form-control" required placeholder="הכנס שם משתמש">
+        </div>
+        <div class="form-group">
+          <label class="form-label">סיסמה:</label>
+          <input type="password" class="form-control" required placeholder="הכנס סיסמה">
+        </div>
+        <div class="form-options">
+          <label class="remember-me"><input type="checkbox" class="lod-checkbox" checked> זכור אותי</label>
+          <a href="./D15_RESET_PWD.html" class="auth-link">שכחת סיסמה?</a>
+        </div>
+        <button type="submit" class="btn-auth-primary">התחבר</button>
+      </form>
+
+      <div class="auth-footer-zone">
+        <span>אין לך חשבון?</span> <a href="./D15_REGISTER.html" class="auth-link-bold">הרשמה עכשיו</a>
+      </div>
+    </tt-section>
+  </tt-container>
+  
+  <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
+</body>
+</html>
+</main>
+<script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script></body></html>

@@ -110,6 +110,18 @@
         "reveal": "always",
         "panel": "new"
       }
+    },
+    {
+      "label": "👤 Create Admin User (admin/418141)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/create-admin.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true,
+        "clear": true
+      }
     }
   ]
 }

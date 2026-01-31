@@ -13,6 +13,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 // Public Routes (imported by Team 30)
+import IndexPage from '../components/IndexPage';
 import LoginForm from '../components/auth/LoginForm';
 import RegisterForm from '../components/auth/RegisterForm';
 import PasswordResetFlow from '../components/auth/PasswordResetFlow';
@@ -37,6 +38,7 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<IndexPage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/reset-password" element={<PasswordResetFlow />} />
@@ -64,11 +66,8 @@ const AppRouter = () => {
           </ProtectedRoute>
         } /> */}
         
-        {/* Default redirects */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
         {/* 404 fallback */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

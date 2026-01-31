@@ -112,10 +112,10 @@
 - בחר את המשימה הרצויה
 
 **משימות זמינות:**
-- 🚀 Start Backend Server (Port 8080)
+- 🚀 Start Backend Server (Port 8082)
 - 🛑 Stop Backend Server
 - 🔄 Restart Backend Server
-- 🚀 Start Frontend Dev Server (Port 3000)
+- 🚀 Start Frontend Dev Server (Port 8080 - V2)
 - 🛑 Stop Frontend Dev Server
 - 🚀 Start All Servers (Backend + Frontend) - **Default Build Task**
 - 🛑 Stop All Servers

@@ -368,7 +368,7 @@ psql -d tiktrack -f ../04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL
 
 ### **Running Development Servers**
 
-⚠️ **IMPORTANT:** Backend MUST run on port **8080** (as defined in Master Blueprint).
+⚠️ **IMPORTANT:** Frontend V2 MUST run on port **8080** (as defined in Master Blueprint: "Ports: V2 (8080), Legacy (8081)"). Backend API runs on port **8082**.
 
 #### **Option 1: Using Scripts (Recommended)**
 
@@ -422,8 +422,8 @@ uvicorn main:app --reload --port 8080
 ```bash
 cd ui
 npm run dev
-# Server runs on http://localhost:3000
-# Proxy configured: /api -> http://localhost:8080
+# Server runs on http://localhost:8080 (V2 port)
+# Proxy configured: /api -> http://localhost:8082
 ```
 
 #### **Option 3: Cursor Tasks**
@@ -434,7 +434,7 @@ npm run dev
 3. Select: `🚀 Start All Servers (Backend + Frontend)`
 
 **Available Tasks:**
-- 🚀 Start Backend Server (Port 8080)
+- 🚀 Start Backend Server (Port 8082)
 - 🛑 Stop Backend Server
 - 🔄 Restart Backend Server
 - 🚀 Start Frontend Dev Server (Port 3000)

@@ -59,19 +59,19 @@
 ```bash
 cd api
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-uvicorn main:app --reload --port 8080
+uvicorn main:app --reload --port 8082
 ```
 
 **מה זה עושה:**
 - מפעיל את FastAPI server
-- פורט: **8080** (כפי שמוגדר ב-Master Blueprint)
-- API Base URL: `http://localhost:8080/api/v1`
+- פורט: **8082** (Frontend V2 משתמש ב-8080 כפי שמוגדר ב-Master Blueprint)
+- API Base URL: `http://localhost:8082/api/v1`
 - CORS מוגדר לתמיכה ב-Frontend
 
 **בדיקה:**
 - ✅ Server מתחיל ללא שגיאות
-- ✅ Health check: `http://localhost:8080/health` מחזיר `{"status": "ok"}`
-- ✅ API Docs: `http://localhost:8080/docs` נפתח
+- ✅ Health check: `http://localhost:8082/health` מחזיר `{"status": "ok"}`
+- ✅ API Docs: `http://localhost:8082/docs` נפתח
 
 **זמן משוער:** 10-30 שניות
 
@@ -249,7 +249,7 @@ uvicorn main:app --reload --port 8082
 
 ### **עד לראייה בדפדפן:**
 
-1. **הרצת Backend (port 8080):** 10-30 שניות ⚠️ **חובה לאינטגרציה**
+1. **הרצת Backend (port 8082):** 10-30 שניות ⚠️ **חובה לאינטגרציה**
 2. **התקנת Dependencies:** 1-2 דקות
 3. **הרצת Dev Server:** 10-30 שניות
 4. **טעינת דף בדפדפן:** מיידי
@@ -264,7 +264,7 @@ uvicorn main:app --reload --port 8082
 
 ### **Backend (חובה לאינטגרציה):**
 - [ ] Backend רץ בפורט **8082** (`uvicorn main:app --reload --port 8082`)
-- [ ] Health check עובד: `http://localhost:8080/health`
+- [ ] Health check עובד: `http://localhost:8082/health`
 - [ ] Database מחובר (אם נדרש)
 
 ### **Frontend:**
@@ -283,17 +283,17 @@ uvicorn main:app --reload --port 8082
 
 **מה תראו בדפדפן:**
 
-1. **דף Index (דף הבית)** (`http://localhost:3000/`):
+1. **דף Index (דף הבית)** (`http://localhost:8080/`):
    - אם לא מחובר: כפתור "התחבר" גדול
    - אם מחובר: שם משתמש, אימייל, תפקיד, כפתור "התנתק"
    - עיצוב לפי Pico CSS + Phoenix styles
 
-2. **דף Login** (`http://localhost:3000/login`):
+2. **דף Login** (`http://localhost:8080/login`):
    - Form עם שדות: username/email, password
    - כפתור "התחבר"
    - אפשר להתחבר עם `admin` / `418141` (אחרי יצירת משתמש admin)
 
-3. **דף Register** (`http://localhost:3000/register`):
+3. **דף Register** (`http://localhost:8080/register`):
    - Form עם שדות רישום
    - כפתור "הירשם"
 

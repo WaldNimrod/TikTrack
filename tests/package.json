@@ -9,7 +9,8 @@
     "test:user": "node --experimental-modules tests/user-management.test.js",
     "test:apikeys": "node --experimental-modules tests/api-keys.test.js",
     "test:errors": "node --experimental-modules tests/error-handling.test.js",
-    "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors"
+    "test:password-change": "node --experimental-modules tests/password-change.test.js",
+    "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change"
   },
   "dependencies": {
     "selenium-webdriver": "^4.15.0",

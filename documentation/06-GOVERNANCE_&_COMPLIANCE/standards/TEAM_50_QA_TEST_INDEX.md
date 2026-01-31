@@ -25,6 +25,7 @@ tests/
 ├── user-management.test.js     # בדיקות User Management Flow
 ├── api-keys.test.js            # בדיקות API Keys Management Flow
 ├── error-handling.test.js      # בדיקות Error Handling & Security
+├── password-change.test.js     # בדיקות Password Change Flow
 ├── scenarios/                  # תרחישי בדיקה מפורטים
 │   └── auth_scenarios.md
 └── sanity/                     # Sanity Checklists
@@ -73,11 +74,31 @@ tests/
 - ✅ Update User Profile - Successful
 - ✅ Update User Profile - Validation Errors
 - ✅ Update User Profile - Unauthorized Access
-- ⚠️ Change Password - Needs Clarification
-- ⚠️ Change Password - Old Password Validation
 - ✅ Password Strength Validation
 
-**סה"כ תרחישים:** 9 (7 verified, 2 need clarification)
+**סה"כ תרחישים:** 7
+
+---
+
+### 2.5. Password Change Flow (QA Protocol)
+
+**קובץ בדיקות:** `tests/password-change.test.js`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PASSWORD_CHANGE_QA_RESULTS.md`
+
+**תרחישי בדיקה:**
+- ✅ Valid Password Change
+- ✅ Invalid Old Password (401)
+- ✅ Rate Limiting (5/15min)
+- ✅ Unauthorized Access
+- ✅ Expired Token
+- ⚠️ Eye Icon Display (Missing)
+- ⚠️ Eye Icon Functionality (Cannot Verify)
+- ✅ Form Structure (LEGO)
+- ✅ Audit Trail (Debug Mode)
+- ✅ Integration Testing
+- ✅ Transformation Layer (snake_case)
+
+**סה"כ תרחישים:** 11 (9 verified, 2 need Eye icon)
 
 ---
 
@@ -133,10 +154,11 @@ tests/
 | קטגוריה | תרחישים | Code Review | Runtime | Visual | Status |
 |---------|---------|-------------|---------|--------|--------|
 | **Authentication Flow** | 14 | ✅ 14/14 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
-| **User Management Flow** | 9 | ✅ 7/9 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **User Management Flow** | 7 | ✅ 7/7 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **Password Change Flow** | 11 | ✅ 9/11 | ⏸️ Ready | ⏸️ Pending | ⚠️ 1 Issue |
 | **API Keys Management Flow** | 12 | ✅ 12/12 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
 | **Error Handling & Security** | 11 | ✅ 11/11 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
-| **Total** | **46** | **44/46** | **⏸️ Ready** | **⏸️ Pending** | ✅ **Complete** |
+| **Total** | **55** | **53/55** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **1 Issue** |
 
 ---
 
@@ -146,6 +168,7 @@ tests/
 
 - **Authentication:** `tests/auth-flow.test.js`
 - **User Management:** `tests/user-management.test.js`
+- **Password Change:** `tests/password-change.test.js`
 - **API Keys:** `tests/api-keys.test.js`
 - **Error Handling:** `tests/error-handling.test.js`
 - **Configuration:** `tests/selenium-config.js`
@@ -156,6 +179,7 @@ tests/
 - **Phase 1.5 Summary:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.5_INTEGRATION_TESTING_RESULTS.md`
 - **Task 50.2.1:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.1_AUTHENTICATION_FLOW_INTEGRATION.md`
 - **Task 50.2.2:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.2_USER_MANAGEMENT_FLOW_INTEGRATION.md`
+- **Password Change:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PASSWORD_CHANGE_QA_RESULTS.md`
 - **Task 50.2.3:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.3_API_KEYS_FLOW_INTEGRATION.md`
 - **Task 50.2.4:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.4_ERROR_HANDLING_SECURITY_INTEGRATION.md`
 

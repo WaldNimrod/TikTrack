@@ -8,6 +8,15 @@
 
 ---
 
+## 🔗 מטריצה מרכזית
+
+**המטריצה המרכזית עודכנה:**
+📄 `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
+
+**עמוד זה מהווה עדכון נקודתי. המטריצה המרכזית היא המקור האמת (Single Source of Truth).**
+
+---
+
 ## ✅ עדכון Page Tracker
 
 **עמוד:** D15_PROF_VIEW.html (Profile View)  

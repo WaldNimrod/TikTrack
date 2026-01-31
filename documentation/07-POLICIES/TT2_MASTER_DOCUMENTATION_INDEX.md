@@ -3,6 +3,7 @@
 ## נהלים חדשים:
 - **CSS-01** | `TT2_CSS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות CSS (ITCSS + BEM, Fluid Design) | **נוהל מחייב**
 - **JS-01** | `TT2_JS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות JavaScript (Transformation Layer, Audit Trail, JSDoc) | **חדש - נוהל מחייב**
+- **INFRA-01** | `TT2_INFRASTRUCTURE_GUIDE.md` | מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment) | **חדש - מדריך תשתיות**
 - P-11: [TT2_OUTPUT_INTEGRATION_PROTOCOL.md] (חדש).
 - G-08: [TT2_TEAM_OPERATIONS_CHARTER.md] (מעודכן - סטייג'ינג).
 | **G-10** | `TT2_TERMINOLOGY_ENFORCEMENT.md` | פוליסת אכיפת טרמינולוגיה (לשון רבים). |

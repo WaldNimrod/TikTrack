@@ -12,10 +12,10 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
-// Public Routes (will be imported by Team 30)
-// import LoginForm from '../components/auth/LoginForm';
-// import RegisterForm from '../components/auth/RegisterForm';
-// import PasswordResetFlow from '../components/auth/PasswordResetFlow';
+// Public Routes (imported by Team 30)
+import LoginForm from '../components/auth/LoginForm';
+import RegisterForm from '../components/auth/RegisterForm';
+import PasswordResetFlow from '../components/auth/PasswordResetFlow';
 
 // Protected Routes (will be imported by Team 30)
 // import Dashboard from '../views/Dashboard';
@@ -37,10 +37,9 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        {/* TODO: Team 30 - Uncomment and import actual components */}
-        {/* <Route path="/login" element={<LoginForm />} /> */}
-        {/* <Route path="/register" element={<RegisterForm />} /> */}
-        {/* <Route path="/reset-password" element={<PasswordResetFlow />} /> */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/reset-password" element={<PasswordResetFlow />} />
         
         {/* Protected Routes */}
         {/* TODO: Team 30 - Uncomment and import actual components */}

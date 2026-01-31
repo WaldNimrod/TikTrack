@@ -28,5 +28,9 @@ _COMMUNICATION/
 - [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](./06-GOVERNANCE_&_COMPLIANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md)
 - [🏛️ PHOENIX_ORGANIZATIONAL_STRUCTURE.md](./00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md)
 
+## 🏗️ תשתיות (Infrastructure)
+- [🏗️ TT2_INFRASTRUCTURE_GUIDE.md](./01-ARCHITECTURE/TT2_INFRASTRUCTURE_GUIDE.md) - מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment)
+- [🏛️ TT2_MASTER_BLUEPRINT.md](./01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
+
 ---
 ### 🚀 סטטוס סשן נוכחי: SESSION_01 (🟢 OPEN)

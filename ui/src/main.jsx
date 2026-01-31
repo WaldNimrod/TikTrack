@@ -30,8 +30,8 @@ import './styles/phoenix-components.css';
 // 4. Header Component (If header is used)
 import './styles/phoenix-header.css';
 
-// 5. Page-specific CSS - Will be loaded per route by Team 30
-// Example: import './styles/D15_IDENTITY_STYLES.css';
+// 5. Page-specific CSS - Auth pages (D15)
+import './styles/D15_IDENTITY_STYLES.css';
 
 /**
  * Application Bootstrap

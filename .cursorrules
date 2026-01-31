@@ -4,6 +4,11 @@
 ## 🏁 NEW TEAM ONBOARDING (MANDATORY)
 Before performing any task, you MUST:
 1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, or 60)?"
+   - Team 20: Backend Implementation
+   - Team 30: Frontend Execution
+   - Team 40: UI Assets & Design
+   - Team 50: QA & Fidelity
+   - Team 60: DevOps & Platform (Infrastructure)
 2. Locate and study these MANDATORY FILES:
    - /06-GOVERNANCE_&_COMPLIANCE/standards/PHOENIX_MASTER_BIBLE.md
    - /D15_SYSTEM_INDEX.md

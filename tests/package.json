@@ -1,0 +1,22 @@
+{
+  "name": "tiktrack-phoenix-integration-tests",
+  "version": "1.0.0",
+  "description": "Selenium integration tests for Phase 1.5",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-modules tests/run-all.js",
+    "test:auth": "node --experimental-modules tests/auth-flow.test.js",
+    "test:user": "node --experimental-modules tests/user-management.test.js",
+    "test:apikeys": "node --experimental-modules tests/api-keys.test.js",
+    "test:errors": "node --experimental-modules tests/error-handling.test.js",
+    "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.15.0",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}

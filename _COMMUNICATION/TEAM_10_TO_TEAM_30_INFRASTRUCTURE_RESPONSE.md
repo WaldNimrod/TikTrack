@@ -329,18 +329,7 @@ npm install
 
 ## 🎯 Next Steps - Setup
 
-### **שלב 1: יצירת קבצי תשתית**
-1. ✅ **נוצר:** `package.json` - מוכן לשימוש
-2. ✅ **נוצר:** `vite.config.js` - מוכן לשימוש
-3. ✅ **נוצר:** `index.html` - מוכן לשימוש
-4. ✅ **נוצר:** `.env.development` ו-`.env.production` - מוכנים לשימוש
-5. ✅ **נוצר:** `src/config/api.js` - מוכן לשימוש (אופציונלי)
-6. ✅ **נוצר:** `src/router/AppRouter.jsx` - מוכן לשימוש
-7. ✅ **נוצר:** `src/main.jsx` - מוכן לשימוש
-
-**כל קבצי התשתית נוצרו ומוכנים!**
-
-### **שלב 2: התקנת Dependencies**
+### **שלב 1: התקנת Dependencies** ⏳
 ```bash
 cd ui
 npm install
@@ -348,37 +337,62 @@ npm install
 
 **⚠️ הערה:** אם יש שגיאות התקנה, ודאו שיש לכם Node.js גרסה 18+ מותקן.
 
-### **שלב 3: בדיקת Build**
+**Dependencies שיותקנו:**
+- `react` ^18.2.0
+- `react-dom` ^18.2.0
+- `react-router-dom` ^6.20.0
+- `axios` ^1.6.0
+- `@vitejs/plugin-react` ^4.2.0 (dev)
+- `vite` ^5.0.0 (dev)
+
+---
+
+### **שלב 2: הרצת הפרויקט** ⏳
 ```bash
 npm run dev
 ```
 
 **הפרויקט אמור לרוץ על:** `http://localhost:3000`
 
-**בדיקות:**
-- ✅ `/login` - Login page
-- ✅ `/register` - Register page
-- ✅ `/reset-password` - Password reset page
+**בדיקות ראשוניות:**
+- ✅ `/login` - Login page נטען
+- ✅ `/register` - Register page נטען
+- ✅ `/reset-password` - Password reset page נטען
 - ✅ Console נקי (ללא שגיאות)
-- ✅ CSS נטען בסדר הנכון
+- ✅ CSS נטען בסדר הנכון (בדיקה ב-DevTools)
 
-### **שלב 4: המשך עבודה**
+---
+
+### **שלב 3: בדיקת אינטגרציה** ⏳
+1. ✅ בדיקת Login flow (עם Backend)
+2. ✅ בדיקת Register flow (עם Backend)
+3. ✅ בדיקת Protected Routes
+4. ✅ בדיקת Network Integrity (snake_case payloads)
+5. ✅ בדיקת Console Audit (`?debug` mode)
+
+---
+
+### **שלב 4: המשך עבודה** ⏳
 - השלמת משימה 30.1.5 (API Keys UI)
 - השלמת משימה 30.1.6 (Security Settings View)
+- הכנה לאינטגרציה מלאה
 
 ---
 
 ## 📋 קבצים שנוצרו/עודכנו
 
-**קבצי תשתית חדשים:**
-- `ui/package.json` (להגדיר)
-- `ui/vite.config.js` (להגדיר)
-- `ui/index.html` (להגדיר)
-- `ui/.env.development` (להגדיר)
-- `ui/.env.production` (להגדיר)
-- `ui/src/config/api.js` (להגדיר)
-- `ui/src/router/AppRouter.jsx` (להגדיר)
-- `ui/src/main.jsx` (לעדכן)
+**קבצי תשתית שנוצרו:**
+- ✅ `ui/package.json` - מוכן עם כל ה-dependencies
+- ✅ `ui/vite.config.js` - מוכן עם React plugin ו-proxy
+- ✅ `ui/index.html` - מוכן עם RTL ו-CSS loading order
+- ✅ `ui/.env.development` - מוכן עם API_BASE_URL
+- ✅ `ui/.env.production` - מוכן עם API_BASE_URL
+- ✅ `ui/.env.example` - מוכן כדוגמה
+- ✅ `ui/src/config/api.js` - מוכן עם כל ה-endpoints
+- ✅ `ui/src/router/AppRouter.jsx` - מוכן עם כל ה-routes
+- ✅ `ui/src/main.jsx` - מוכן עם CSS loading order
+
+**כל קבצי התשתית נוצרו ומוכנים לשימוש!**
 
 ---
 
@@ -401,8 +415,13 @@ npm run dev
 ---
 
 **Prepared by:** Team 10 (The Gateway)  
-**Status:** ✅ **INFRASTRUCTURE_SETUP_GUIDE_COMPLETE**  
-**Next:** Awaiting Team 30 setup completion
+**Status:** ✅ **INFRASTRUCTURE_FILES_CREATED - READY FOR npm install**  
+**Next:** Awaiting Team 30 to run `npm install` and `npm run dev`
+
+**Summary:**
+- ✅ כל קבצי התשתית נוצרו
+- ✅ כל התשובות לשאלות הטכניות
+- ✅ מוכן להרצה מיידית
 
 ---
 

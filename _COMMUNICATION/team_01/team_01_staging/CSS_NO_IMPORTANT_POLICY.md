@@ -1,7 +1,7 @@
 # 🚫 NO !important POLICY - Phoenix CSS Architecture
 
 **תאריך:** 2026-01-31  
-**גרסה:** v1.5.0  
+**גרסה:** v2.0.0 (Updated: Header Exception)  
 **צוות:** Team 30 (Frontend)  
 **סטטוס:** ✅ **ENFORCED**
 
@@ -10,6 +10,11 @@
 ## 🎯 עקרון יסוד
 
 **אסור להשתמש ב-`!important` ב-CSS של פרויקט פיניקס.**
+
+### ⚠️ חריג יחיד:
+**מותר להשתמש ב-`!important` רק ב-`phoenix-header.css`** - Header הוא אלמנט קריטי שצריך להיות סופר יציב.
+
+### למה אסור ב-!important (בכל מקום חוץ מ-Header)?
 
 זו פרקטיקה רעה שיוצרת בעיות בהמשך:
 - מקשה על תחזוקה
@@ -197,11 +202,12 @@ button:not([type=submit]):not([type=button]) {
 
 ## 📋 Checklist לפני commit
 
-- [ ] אין שימוש ב-`!important` בקוד
+- [ ] אין שימוש ב-`!important` בקוד (חוץ מ-`phoenix-header.css`)
 - [ ] כל ה-overrides משתמשים ב-specificity
 - [ ] הקובץ נטען אחרי Pico CSS ב-HTML
 - [ ] Selectors ספציפיים מספיק לדרוס Pico CSS
 - [ ] היררכיית CSS מאורגנת נכון
+- [ ] אם משתמשים ב-`!important`, זה רק ב-`phoenix-header.css`
 
 ---
 

@@ -13,9 +13,9 @@ from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import (
     String, Boolean, Integer, Text, ForeignKey,
-    CheckConstraint, UniqueConstraint
+    CheckConstraint, Index, TIMESTAMP
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB, TIMESTAMPTZ
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -33,11 +33,11 @@ class User(Base):
     """
     __tablename__ = "users"
     __table_args__ = (
-        {"schema": "user_data"},
         CheckConstraint(
             "phone_number IS NULL OR phone_number ~ '^\\+?[1-9]\\d{1,14}$'",
             name="users_phone_format"
         ),
+        {"schema": "user_data"},
     )
     
     # Primary Key
@@ -56,7 +56,7 @@ class User(Base):
     # Phone Identity (V2.5)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     phone_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
-    phone_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    phone_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
     # Profile
     first_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -76,30 +76,30 @@ class User(Base):
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
     is_email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
-    email_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    email_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
     # Security
-    last_login_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    last_login_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     last_login_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
-    locked_until: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    locked_until: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
     # Audit
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now(),
         onupdate=func.now()
     )
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
-    # Metadata
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    # Metadata (renamed from 'metadata' - reserved name in SQLAlchemy)
+    user_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict, server_default="{}")
     
     # Relationships
     password_reset_requests: Mapped[List["PasswordResetRequest"]] = relationship(
@@ -131,13 +131,13 @@ class PasswordResetRequest(Base):
     """
     __tablename__ = "password_reset_requests"
     __table_args__ = (
-        {"schema": "user_data"},
         CheckConstraint("LENGTH(reset_token) >= 32", name="password_reset_token_length"),
         CheckConstraint(
             "verification_code IS NULL OR LENGTH(verification_code) = 6",
             name="password_reset_code_length"
         ),
         CheckConstraint("attempts_count <= max_attempts", name="password_reset_attempts_limit"),
+        {"schema": "user_data"},
     )
     
     # Primary Key
@@ -161,11 +161,11 @@ class PasswordResetRequest(Base):
     
     # Token (for email)
     reset_token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    token_expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    token_expires_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
     
     # Code (for SMS)
     verification_code: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
-    code_expires_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    code_expires_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     attempts_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     max_attempts: Mapped[int] = mapped_column(Integer, default=3, server_default="3")
     
@@ -178,12 +178,12 @@ class PasswordResetRequest(Base):
     )
     
     # Usage
-    used_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    used_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     used_from_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
     
     # Audit
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now()
     )
@@ -203,10 +203,10 @@ class UserApiKey(Base):
     """
     __tablename__ = "user_api_keys"
     __table_args__ = (
-        {"schema": "user_data"},
-        UniqueConstraint(
+        Index(
+            "user_api_keys_unique_user_provider",
             "user_id", "provider", "provider_label",
-            name="user_api_keys_unique_user_provider",
+            unique=True,
             postgresql_where=func.deleted_at.is_(None)
         ),
         CheckConstraint("LENGTH(api_key_encrypted) > 0", name="user_api_keys_encrypted_not_empty"),
@@ -215,6 +215,7 @@ class UserApiKey(Base):
             name="user_api_keys_rate_limit_positive"
         ),
         CheckConstraint("quota_used_today >= 0", name="user_api_keys_quota_logic"),
+        {"schema": "user_data"},
     )
     
     # Primary Key
@@ -244,14 +245,14 @@ class UserApiKey(Base):
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
-    last_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    last_verified_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     verification_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
     # Rate Limiting
     rate_limit_per_minute: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     rate_limit_per_day: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     quota_used_today: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
-    quota_reset_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    quota_reset_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
     # Audit
     created_by: Mapped[uuid.UUID] = mapped_column(
@@ -265,21 +266,21 @@ class UserApiKey(Base):
         nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now(),
         onupdate=func.now()
     )
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")
     
-    # Metadata
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    # Metadata (renamed from 'metadata' - reserved name in SQLAlchemy)
+    api_key_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict, server_default="{}")
     
     # Relationships
     user: Mapped["User"] = relationship(

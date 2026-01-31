@@ -216,6 +216,35 @@ class UserResponse(BaseModel):
         }
 
 
+class UserUpdate(BaseModel):
+    """User profile update request schema."""
+    first_name: Optional[str] = Field(None, max_length=100, description="First name")
+    last_name: Optional[str] = Field(None, max_length=100, description="Last name")
+    display_name: Optional[str] = Field(None, max_length=100, description="Display name")
+    phone_number: Optional[str] = Field(None, description="Phone number (E.164 format)")
+    timezone: Optional[str] = Field(None, max_length=50, description="Timezone (e.g., 'America/New_York')")
+    language: Optional[str] = Field(None, max_length=5, description="Language code (e.g., 'en', 'he')")
+    
+    @validator("phone_number")
+    def validate_phone(cls, v):
+        """Validate phone number format (E.164)."""
+        if v and not re.match(r'^\+?[1-9]\d{1,14}$', v):
+            raise ValueError("Phone number must be in E.164 format (e.g., +1234567890)")
+        return v
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "display_name": "Johnny",
+                "phone_number": "+1234567890",
+                "timezone": "America/New_York",
+                "language": "en"
+            }
+        }
+
+
 # ============================================================================
 # API Keys Schemas
 # ============================================================================

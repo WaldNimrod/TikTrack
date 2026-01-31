@@ -10,8 +10,8 @@ Based on Architectural Answer + GIN-2026-008 (Appendix A)
 import uuid
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import String, ForeignKey, CheckConstraint
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMPTZ
+from sqlalchemy import String, ForeignKey, CheckConstraint, TIMESTAMP
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -26,9 +26,9 @@ class UserRefreshToken(Base):
     """
     __tablename__ = "user_refresh_tokens"
     __table_args__ = (
-        {"schema": "user_data"},
         CheckConstraint("LENGTH(jti) > 0", name="user_refresh_tokens_jti_not_empty"),
         CheckConstraint("LENGTH(token_hash) > 0", name="user_refresh_tokens_hash_not_empty"),
+        {"schema": "user_data"},
     )
     
     # Primary Key
@@ -51,14 +51,14 @@ class UserRefreshToken(Base):
     jti: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     
     # Expiration
-    expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
     
     # Revocation
-    revoked_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMPTZ, nullable=True)
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     
     # Audit
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now()
     )
@@ -78,19 +78,19 @@ class RevokedToken(Base):
     """
     __tablename__ = "revoked_tokens"
     __table_args__ = (
-        {"schema": "user_data"},
         CheckConstraint("LENGTH(jti) > 0", name="revoked_tokens_jti_not_empty"),
+        {"schema": "user_data"},
     )
     
     # Primary Key
     jti: Mapped[str] = mapped_column(String(255), primary_key=True)
     
     # Expiration (for automatic cleanup)
-    expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
     
     # Revocation timestamp
     revoked_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ,
+        TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now()
     )

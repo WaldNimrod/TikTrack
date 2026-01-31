@@ -671,5 +671,57 @@
 
 ---
 
+### 19. Password Change Flow - Architectural Decision ✅
+**Date:** 2026-01-31  
+**Status:** ✅ **ARCHITECTURAL_DECISION_APPROVED - IMPLEMENTATION_REQUIRED**
+
+**Architectural Decision:**
+- ✅ Endpoint: `PUT /users/me/password` - APPROVED
+- ✅ Payload: snake_case `{ "old_password": "...", "new_password": "..." }`
+- ✅ Security: Old password verification, Rate limiting (5/15min)
+- ✅ Frontend: Security section in Profile View (D15_PROF_VIEW.html)
+
+**Implementation Requirements:**
+
+**Team 20 (Backend):**
+- ✅ Endpoint: `PUT /users/me/password`
+- ✅ Security Guard: Verify old_password before change
+- ✅ Rate Limiting: 5 attempts / 15 minutes
+- ✅ Error Response: 401 Unauthorized with generic message
+
+**Team 30 (Frontend):**
+- ✅ UI Context: Security section in Profile View (D15_PROF_VIEW.html)
+- ✅ LEGO Component: `<tt-section data-title="אבטחת חשבון">`
+- ✅ Naming: React State (camelCase) → API Payload (snake_case)
+- ✅ Transformer: `reactToApiPasswordChange` (currentPassword → old_password, newPassword → new_password)
+- ✅ Eye Icon: Show/hide password (Fidelity match with Legacy)
+
+**Team 50 (QA):**
+- ✅ Security Validation: Cannot change password without valid old_password
+- ✅ Fidelity Match: Eye icon matches Legacy system
+- ✅ Audit Trail: `[Auth] Password change attempt` in Console (`?debug` mode)
+
+**Team 60 (DevOps):**
+- ✅ Proxy Verification: Verify `/api/v1/users/me/password` works through proxy
+- ✅ Status: No changes needed (proxy already configured correctly)
+
+**Documentation Updates:**
+- ✅ D15_PROF_VIEW.html now includes Password Change sub-task
+- ✅ OpenAPI Spec needs update (Team 20)
+
+**Files:**
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_20_PASSWORD_CHANGE_APPROVED.md` (Backend implementation)
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_PASSWORD_CHANGE_APPROVED.md` (Frontend implementation)
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_PASSWORD_CHANGE_QA_PROTOCOL.md` (QA protocol)
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_60_PASSWORD_CHANGE_ENDPOINT.md` (Proxy verification)
+
+**Next Steps:**
+- ⏸️ Team 20: Implement endpoint
+- ⏸️ Team 30: Implement form component
+- ⏸️ Team 50: Execute QA protocol
+- ⏸️ Team 60: Verify proxy (if needed)
+
+---
+
 **Last Updated:** 2026-01-31  
 **Updated By:** Team 10 (The Gateway)

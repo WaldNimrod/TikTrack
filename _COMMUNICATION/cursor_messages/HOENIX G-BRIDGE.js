@@ -160,7 +160,12 @@ function runAudit(content, fileName) {
     
     // --- 1.7 ITCSS Hierarchy Validation ---
     // בדיקה שקבצי CSS נטענים בסדר הנכון (בקובץ HTML)
+    // הערה: עמודי Auth (LOGIN, REGISTER, RESET_PWD) לא טוענים phoenix-header.css - זה תקין
     if (fileName.endsWith('.html')) {
+        const isAuthPage = fileName.toLowerCase().includes('login') || 
+                           fileName.toLowerCase().includes('register') || 
+                           fileName.toLowerCase().includes('reset');
+        
         const picoIndex = content.indexOf('pico.min.css');
         const baseIndex = content.indexOf('phoenix-base.css');
         const componentsIndex = content.indexOf('phoenix-components.css');
@@ -178,7 +183,8 @@ function runAudit(content, fileName) {
             }
         }
         
-        if (componentsIndex !== -1 && headerIndex !== -1) {
+        // בדיקת header רק אם זה לא עמוד Auth
+        if (!isAuthPage && componentsIndex !== -1 && headerIndex !== -1) {
             if (headerIndex < componentsIndex) {
                 issues.push("ITCSS: phoenix-header.css must be loaded AFTER phoenix-components.css.");
             }

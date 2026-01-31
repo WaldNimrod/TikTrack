@@ -1,0 +1,403 @@
+# 📡 תשובה לשאלות תשתית: Team 10 → Team 30
+
+**From:** Team 10 (The Gateway)  
+**To:** Team 30 (Frontend)  
+**Date:** 2026-01-31  
+**Session:** SESSION_01 - Phase 1.3  
+**Subject:** INFRASTRUCTURE_SETUP | Status: GREEN
+
+---
+
+## ✅ תשובות לשאלות טכניות
+
+### **1. React Router Setup**
+
+**תשובה:** אין React Router מוגדר בפרויקט כרגע. יש להגדיר אותו.
+
+**הנחיות:**
+
+#### **א. התקנת React Router:**
+```bash
+cd ui
+npm install react-router-dom
+```
+
+#### **ב. יצירת Router Configuration:**
+
+**קובץ:** `ui/src/router/AppRouter.jsx`
+
+```javascript
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute.jsx';
+import LoginForm from '../components/auth/LoginForm.jsx';
+import RegisterForm from '../components/auth/RegisterForm.jsx';
+import PasswordResetFlow from '../components/auth/PasswordResetFlow.jsx';
+// Import other components as needed
+
+/**
+ * AppRouter - הגדרת Routes למערכת
+ * 
+ * @description מגדיר את כל ה-Routes של האפליקציה
+ * @legacyReference Legacy.routing
+ */
+const AppRouter = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/reset-password" element={<PasswordResetFlow />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              {/* Dashboard component - to be created */}
+              <div>Dashboard</div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/api-keys"
+          element={
+            <ProtectedRoute>
+              {/* API Keys component - to be created */}
+              <div>API Keys</div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/security"
+          element={
+            <ProtectedRoute>
+              {/* Security Settings component - to be created */}
+              <div>Security Settings</div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default AppRouter;
+```
+
+#### **ג. עדכון main.jsx / index.jsx:**
+
+**קובץ:** `ui/src/main.jsx` (או `index.jsx`)
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import AppRouter from './router/AppRouter.jsx';
+import './styles/phoenix-base.css';
+import './styles/phoenix-components.css';
+import './styles/D15_IDENTITY_STYLES.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <AppRouter />
+  </React.StrictMode>
+);
+```
+
+---
+
+### **2. Build System**
+
+**תשובה:** הפרויקט משתמש ב-**Vite** (לפי Master Blueprint).
+
+**הנחיות:**
+
+#### **א. יצירת package.json:**
+
+**קובץ:** `ui/package.json`
+
+```json
+{
+  "name": "tiktrack-phoenix-ui",
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  }
+}
+```
+
+#### **ב. יצירת vite.config.js:**
+
+**קובץ:** `ui/vite.config.js`
+
+```javascript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+/**
+ * Vite Configuration
+ * 
+ * @description הגדרת Vite עבור React
+ */
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  }
+});
+```
+
+#### **ג. יצירת index.html:**
+
+**קובץ:** `ui/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTrack Phoenix</title>
+  
+  <!-- CSS Loading Order (CRITICAL - כפי שמוגדר ב-CSS Standards) -->
+  <!-- 1. Pico CSS FIRST -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
+```
+
+#### **ד. טעינת CSS ב-main.jsx:**
+
+**קובץ:** `ui/src/main.jsx`
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import AppRouter from './router/AppRouter.jsx';
+
+// CSS Loading Order (CRITICAL - כפי שמוגדר ב-CSS Standards)
+// 2. Phoenix Base Styles
+import './styles/phoenix-base.css';
+// 3. LEGO Components
+import './styles/phoenix-components.css';
+// 4. Header Component (if used)
+import './styles/phoenix-header.css';
+// 5. Page-Specific Styles
+import './styles/D15_IDENTITY_STYLES.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <AppRouter />
+  </React.StrictMode>
+);
+```
+
+**⚠️ IMPORTANT:** שמרו על סדר טעינת ה-CSS בדיוק כפי שמוגדר ב-CSS Standards Protocol!
+
+---
+
+### **3. Environment Variables**
+
+**תשובה:** יש להגדיר Environment Variables ב-Vite.
+
+**הנחיות:**
+
+#### **א. יצירת .env files:**
+
+**קובץ:** `ui/.env.development`
+
+```env
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_APP_NAME=TikTrack Phoenix
+VITE_APP_VERSION=2.0.0
+```
+
+**קובץ:** `ui/.env.production`
+
+```env
+VITE_API_BASE_URL=https://api.tiktrack.com/api/v1
+VITE_APP_NAME=TikTrack Phoenix
+VITE_APP_VERSION=2.0.0
+```
+
+**קובץ:** `ui/.env.example`
+
+```env
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_APP_NAME=TikTrack Phoenix
+VITE_APP_VERSION=2.0.0
+```
+
+#### **ב. שימוש ב-Environment Variables:**
+
+**קובץ:** `ui/src/config/api.js`
+
+```javascript
+/**
+ * API Configuration
+ * 
+ * @description הגדרת API base URL מ-Environment Variables
+ */
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: `${API_BASE_URL}/auth/login`,
+    REGISTER: `${API_BASE_URL}/auth/register`,
+    REFRESH: `${API_BASE_URL}/auth/refresh`,
+    LOGOUT: `${API_BASE_URL}/auth/logout`,
+    RESET_PASSWORD: `${API_BASE_URL}/auth/reset-password`,
+    VERIFY_RESET: `${API_BASE_URL}/auth/verify-reset`,
+    VERIFY_PHONE: `${API_BASE_URL}/auth/verify-phone`
+  },
+  USERS: {
+    ME: `${API_BASE_URL}/users/me`
+  },
+  API_KEYS: {
+    LIST: `${API_BASE_URL}/user/api-keys`,
+    CREATE: `${API_BASE_URL}/user/api-keys`,
+    UPDATE: (keyId) => `${API_BASE_URL}/user/api-keys/${keyId}`,
+    DELETE: (keyId) => `${API_BASE_URL}/user/api-keys/${keyId}`,
+    VERIFY: (keyId) => `${API_BASE_URL}/user/api-keys/${keyId}/verify`
+  }
+};
+```
+
+#### **ג. עדכון Auth Service:**
+
+**קובץ:** `ui/src/services/auth.js`
+
+```javascript
+import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api.js';
+import { reactToApi, apiToReact } from '../utils/transformers.js';
+import { audit } from '../utils/audit.js';
+
+// Configure axios base URL
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+
+// ... rest of the code
+```
+
+---
+
+## 📦 Dependencies נדרשים
+
+### **התקנה:**
+
+```bash
+cd ui
+npm install
+```
+
+**Dependencies שכבר צריכים להיות ב-package.json:**
+- `react` ^18.2.0
+- `react-dom` ^18.2.0
+- `react-router-dom` ^6.20.0
+- `axios` ^1.6.0
+
+**Dev Dependencies:**
+- `@vitejs/plugin-react` ^4.2.0
+- `vite` ^5.0.0
+
+---
+
+## 🎯 Next Steps - Setup
+
+### **שלב 1: יצירת קבצי תשתית**
+1. ✅ יצירת `package.json`
+2. ✅ יצירת `vite.config.js`
+3. ✅ יצירת `index.html`
+4. ✅ יצירת `.env.development` ו-`.env.production`
+5. ✅ יצירת `src/config/api.js`
+6. ✅ יצירת `src/router/AppRouter.jsx`
+7. ✅ עדכון `src/main.jsx`
+
+### **שלב 2: התקנת Dependencies**
+```bash
+cd ui
+npm install
+```
+
+### **שלב 3: בדיקת Build**
+```bash
+npm run dev
+```
+
+### **שלב 4: המשך עבודה**
+- השלמת משימה 30.1.5 (API Keys UI)
+- השלמת משימה 30.1.6 (Security Settings View)
+
+---
+
+## 📋 קבצים שנוצרו/עודכנו
+
+**קבצי תשתית חדשים:**
+- `ui/package.json` (להגדיר)
+- `ui/vite.config.js` (להגדיר)
+- `ui/index.html` (להגדיר)
+- `ui/.env.development` (להגדיר)
+- `ui/.env.production` (להגדיר)
+- `ui/src/config/api.js` (להגדיר)
+- `ui/src/router/AppRouter.jsx` (להגדיר)
+- `ui/src/main.jsx` (לעדכן)
+
+---
+
+## ⚠️ הערות חשובות
+
+1. **CSS Loading Order:** שמרו על הסדר בדיוק כפי שמוגדר ב-CSS Standards Protocol
+2. **Environment Variables:** Vite דורש `VITE_` prefix לכל variable
+3. **API Base URL:** השתמשו ב-`import.meta.env.VITE_API_BASE_URL`
+4. **Router:** השתמשו ב-`BrowserRouter` (לא `HashRouter`)
+5. **Protected Routes:** השתמשו ב-`ProtectedRoute` component שכבר יצרתם
+
+---
+
+## 📞 תמיכה
+
+**אם יש שאלות נוספות:**
+- דרך Team 10 (The Gateway)
+- נא לכלול את הקוד הרלוונטי והשגיאה המדויקת
+
+---
+
+**Prepared by:** Team 10 (The Gateway)  
+**Status:** ✅ **INFRASTRUCTURE_SETUP_GUIDE_COMPLETE**  
+**Next:** Awaiting Team 30 setup completion
+
+---
+
+**log_entry | Team 10 | INFRASTRUCTURE_RESPONSE | TEAM_30_SETUP | GREEN | 2026-01-31**

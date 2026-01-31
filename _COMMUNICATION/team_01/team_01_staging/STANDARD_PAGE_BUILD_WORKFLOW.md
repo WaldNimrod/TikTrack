@@ -231,13 +231,14 @@ Before final submission, verify:
 
 Based on existing files, next pages in order:
 
-1. **D15_DASHBOARD.html** - Dashboard page
-2. **D15_PROF_VIEW.html** - Profile view page
-3. **D16_ACCTS_VIEW.html** - Accounts view page
-4. **D18_BRKRS_VIEW.html** - Brokers view page
-5. **D21_CASH_VIEW.html** - Cash flow view page
-6. **D24_API_VIEW.html** - API keys view page
-7. **D25_SEC_VIEW.html** - Securities view page
+**Note:** D15_INDEX.html (Home page) already exists - this is the dashboard/home page.
+
+1. **D15_PROF_VIEW.html** - Profile view page
+2. **D16_ACCTS_VIEW.html** - Accounts view page
+3. **D18_BRKRS_VIEW.html** - Brokers view page
+4. **D21_CASH_VIEW.html** - Cash flow view page
+5. **D24_API_VIEW.html** - API keys view page
+6. **D25_SEC_VIEW.html** - Securities view page
 
 ---
 

@@ -1,6 +1,7 @@
-# 📑 אינדקס תיעוד מרכזי (v6.0)
+# 📑 אינדקס תיעוד מרכזי (v6.1)
 
 ## נהלים חדשים:
+- **CSS-01** | `TT2_CSS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות CSS (ITCSS + BEM, Fluid Design) | **חדש - נוהל מחייב**
 - P-11: [TT2_OUTPUT_INTEGRATION_PROTOCOL.md] (חדש).
 - G-08: [TT2_TEAM_OPERATIONS_CHARTER.md] (מעודכן - סטייג'ינג).
 | **G-10** | `TT2_TERMINOLOGY_ENFORCEMENT.md` | פוליסת אכיפת טרמינולוגיה (לשון רבים). |

@@ -273,6 +273,39 @@ body.auth-layout-root form input {
 
 ---
 
+## 📂 Assets Path Management
+
+**ARCHITECTURAL NOTE:** All asset paths use relative paths from the HTML file location.
+
+### **Current Structure:**
+```
+team_31_staging/
+├── images/
+│   └── logo.svg          # Logo asset
+├── D15_LOGIN.html        # References: ./images/logo.svg
+├── D15_REGISTER.html     # References: ./images/logo.svg
+└── D15_RESET_PWD.html    # References: ./images/logo.svg
+```
+
+### **Path Convention:**
+- **Relative paths:** `./images/logo.svg` (relative to HTML file)
+- **No absolute paths:** Avoid `/images/logo.svg` (breaks in different environments)
+- **No hardcoded URLs:** Avoid `https://example.com/images/logo.svg` (breaks offline)
+
+### **QA Checklist:**
+- ✅ Verify all asset paths work in staging environment
+- ✅ Verify all asset paths work in production environment
+- ✅ Check for broken links (404 errors)
+- ✅ Ensure consistent folder structure across environments
+
+### **Future Considerations:**
+When integrating with backend:
+- Consider using template variables for asset paths (e.g., `{{ ASSETS_URL }}/images/logo.svg`)
+- Or use a build process to resolve paths at compile time
+- Document any path resolution logic in backend integration guide
+
+---
+
 ## ✅ Best Practices
 
 1. **Always use CSS variables** for colors and spacing

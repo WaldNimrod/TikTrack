@@ -223,6 +223,99 @@ Team 31 עבדו קשה מאוד על pixel-perfect fidelity. כל שינוי צ
 
 ---
 
+## 🚨 נוהל CSS מחייב - TT2_CSS_STANDARDS_PROTOCOL
+
+**⚠️ CRITICAL:** לאחר ביקורת אדריכלית ראשית, הוגדר **נוהל CSS מחייב** שכל הצוותים חייבים לעמוד בו.
+
+### **📄 מסמך מחייב:**
+`documentation/07-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`
+
+**חובה לקרוא ולעקוב אחרי כל הכללים במסמך זה לפני כל עבודה על CSS.**
+
+### **עיקרי הנוהל:**
+
+#### **1. מתודולוגיית עבודה: ITCSS + BEM**
+- **ITCSS Hierarchy:** סדר קדוש - Settings → Tools → Generic → Elements → Objects → Components → Trumps
+- **BEM Naming:** Block__Element--Modifier (אין קינון של יותר מ-2 רמות)
+
+#### **2. בקרת רספונסיביות (Fluid Design)**
+- **Fluid Typography:** שימוש ב-`clamp()` במקום Media Queries
+- **Container Queries:** שימוש ב-`@container` במקום `@media` (מסך)
+- **Logical Viewports:** שימוש ב-`svh`/`lvh` במקום `vh` רגיל
+
+#### **3. הרחבת G-Bridge: אוטומציית Linter**
+- **Physical Property Blocker:** חסימה אוטומטית של כל מאפיין פיזי (`margin-left`, `padding-right`, `left`, `right`, `float: left/right`)
+- **Z-Index Registry:** כל Z-Index חייב להיות מוגדר דרך משתנה DNA (`--z-index-*`)
+- **Color Clamp:** חסימה של כל צבע שלא מופיע ברשימת המשתנים המאושרת
+
+#### **4. מערכת הבקרה הויזואלית**
+- **Pixel Match:** סטייה של 0 פיקסלים בכל אלמנט (Digital Twin)
+- **RTL Mirroring:** כל אלמנטים עם `position: absolute` משתמשים ב-`inset-inline-*`
+- **State Integrity:** כל מצבי Hover, Focus, Active נשמרים
+
+#### **5. חוקי הניקיון (Maintainability)**
+- **No Magic Numbers:** כל ריווח חייב להיות כפולה של 8px (יחידת DNA בסיסית)
+- **CSS Shorthand:** חובה להשתמש בקיצורים (`margin-block`, `padding-inline`)
+- **Comments LOD 400:** כל בלוק קוד חייב לכלול כותרת עם Purpose, Legacy Reference, LOD 400 Requirement
+
+#### **6. סדר טעינת קבצי CSS (CRITICAL)**
+```html
+<!-- 1. Pico CSS FIRST (Framework) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+<!-- 2. Phoenix Base Styles (Global defaults) -->
+<link rel="stylesheet" href="./phoenix-base.css">
+
+<!-- 3. LEGO Components (Reusable components) -->
+<link rel="stylesheet" href="./phoenix-components.css">
+
+<!-- 4. Header Component (If header is used) -->
+<link rel="stylesheet" href="./phoenix-header.css">
+
+<!-- 5. Page-Specific Styles (If needed) -->
+<link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+```
+
+**⚠️ IMPORTANT:** שינוי הסדר יגרום לשבירת סגנונות.
+
+#### **7. רשימת בדיקות לפני הגשה**
+
+**בדיקות אוטומטיות (G-Bridge):**
+- [ ] G-Bridge validation passed
+- [ ] No physical properties found
+- [ ] All Z-Indexes use CSS variables
+- [ ] No hardcoded colors found
+- [ ] All spacing uses DNA multiples (8px)
+- [ ] RTL Charter compliance verified
+
+**בדיקות ידניות:**
+- [ ] Visual comparison with Legacy (0 pixel deviation)
+- [ ] RTL mirroring verified
+- [ ] All states tested (hover, focus, active, disabled)
+- [ ] Responsive design tested (mobile, tablet, desktop)
+- [ ] Container queries tested (if used)
+- [ ] Logical viewports tested (svh/lvh)
+- [ ] Comments LOD 400 added to all major blocks
+- [ ] CSS shorthand used throughout
+- [ ] No magic numbers found
+
+### **⚠️ כללי ברזל נוספים:**
+
+1. **אין מאפיינים פיזיים:** רק `margin-inline-*`, `padding-block-*`, `inset-inline-*`
+2. **אין צבעים ישירים:** רק CSS Variables מ-`:root`
+3. **אין Z-Index ישיר:** רק דרך `--z-index-*` variables
+4. **אין Magic Numbers:** רק כפולות של 8px
+5. **אין Media Queries:** רק Container Queries ו-Fluid Typography
+
+### **📚 משאבים:**
+- **מסמך מלא:** `documentation/07-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`
+- **דוגמאות מעשיות:** כלולות במסמך
+- **G-Bridge:** כלי אוטומטי לבדיקת compliance
+
+**חובה לקרוא את המסמך המלא לפני כל עבודה על CSS!**
+
+---
+
 ## 📋 קבצים רלוונטיים מ-Team 31
 
 **חובה לקרוא:**
@@ -241,6 +334,9 @@ Team 31 עבדו קשה מאוד על pixel-perfect fidelity. כל שינוי צ
    - `_COMMUNICATION/team_31/team_31_staging/_PREVIEW_D15_REGISTER.html`
    - `_COMMUNICATION/team_31/team_31_staging/_PREVIEW_D15_RESET_PWD.html`
 
+5. **🚨 CSS Standards Protocol (MANDATORY):**
+   - `documentation/07-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md` - **חובה לקרוא לפני כל עבודה על CSS!**
+
 ---
 
 ## 🚨 כללי ברזל
@@ -250,6 +346,11 @@ Team 31 עבדו קשה מאוד על pixel-perfect fidelity. כל שינוי צ
 3. **השתמשו ב-CSS Variables** מ-`phoenix-base.css` (לא hardcoded colors)
 4. **שמרו על RTL compliance** בכל השינויים
 5. **תעדו כל שינוי** שאתם עושים ב-Evidence files
+6. **🚨 חובה לעמוד בנוהל CSS המחייב:** `TT2_CSS_STANDARDS_PROTOCOL.md`
+7. **🚨 אין מאפיינים פיזיים:** רק Logical Properties (`margin-inline-*`, `padding-block-*`)
+8. **🚨 אין Magic Numbers:** רק כפולות של 8px (יחידת DNA בסיסית)
+9. **🚨 אין Z-Index ישיר:** רק דרך CSS Variables (`--z-index-*`)
+10. **🚨 G-Bridge validation:** חובה לפני כל הגשה
 
 ---
 
@@ -280,10 +381,15 @@ log_entry | [Team 30] | TASK_COMPLETE | 30.1.X | GREEN
 
 ## 🔄 Next Steps
 
-1. **עכשיו:** קראו את כל המסמכים של Team 31
-2. **העתיקו קבצים:** העתיקו את כל הקבצים מ-`team_31_staging/` למיקום המתאים ב-`/ui`
-3. **התחילו עם Auth Service:** משימה 30.1.1 (ללא שינוי)
-4. **התחילו עם Login Integration:** משימה 30.1.2 (עם HTML של Team 31)
+1. **🚨 CRITICAL:** קראו את `TT2_CSS_STANDARDS_PROTOCOL.md` לפני כל עבודה על CSS
+2. **קראו את כל המסמכים של Team 31:**
+   - Handoff Document
+   - Implementation Guide
+   - Standard Workflow
+3. **העתיקו קבצים:** העתיקו את כל הקבצים מ-`team_31_staging/` למיקום המתאים ב-`/ui`
+4. **התחילו עם Auth Service:** משימה 30.1.1 (ללא שינוי)
+5. **התחילו עם Login Integration:** משימה 30.1.2 (עם HTML של Team 31)
+6. **בדיקת G-Bridge:** הרצו G-Bridge validation לפני כל הגשה
 
 ---
 
@@ -301,9 +407,13 @@ log_entry | [Team 30] | TASK_COMPLETE | 30.1.X | GREEN
 ---
 
 **Prepared by:** Team 10 (The Gateway)  
-**Status:** ⚠️ **WORKFLOW UPDATED - TEAM 30 MUST USE TEAM 31 BLUEPRINT**  
+**Status:** ⚠️ **WORKFLOW UPDATED - TEAM 30 MUST USE TEAM 31 BLUEPRINT + CSS STANDARDS PROTOCOL**  
 **Next:** Awaiting Team 30 confirmation and integration progress
+
+**Updates:**
+- 2026-01-31: Added CSS Standards Protocol (TT2_CSS_STANDARDS_PROTOCOL.md) - MANDATORY compliance required
 
 ---
 
 **log_entry | Team 10 | WORKFLOW_UPDATE | TEAM_30_BLUEPRINT_INTEGRATION | YELLOW | 2026-01-31**
+**log_entry | Team 10 | CSS_STANDARDS_UPDATE | TT2_CSS_STANDARDS_PROTOCOL | RED | 2026-01-31**

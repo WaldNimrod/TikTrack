@@ -2,14 +2,24 @@
 
 **Status:** ✅ ACTIVE WORKFLOW  
 **Effective Date:** 2026-01-31  
+**Last Updated:** 2026-01-31 (v2.0 - CSS Standards Integration)  
 **Team:** Team 31 (Blueprint)  
 **Purpose:** Standardized workflow for building all pages in Phoenix V2
+
+**⚠️ MANDATORY:** This workflow now includes CSS Standards Protocol (ITCSS + BEM, Fluid Design) as mandatory requirements.
 
 ---
 
 ## 🎯 Workflow Overview
 
-This workflow ensures consistent, high-quality page implementation following LOD 400 standards and pixel-perfect fidelity requirements.
+This workflow ensures consistent, high-quality page implementation following:
+- LOD 400 standards and pixel-perfect fidelity requirements
+- **CSS Standards Protocol** (ITCSS + BEM, Fluid Design, Logical Properties)
+- **G-Bridge v2.0** validation (Physical Property Blocker, Z-Index Registry, Color Clamp)
+
+**Reference Documents:**
+- `TT2_CSS_STANDARDS_PROTOCOL.md` - Full CSS standards (MANDATORY)
+- `CSS_DEVELOPER_GUIDE.md` - Developer guide with examples
 
 ---
 
@@ -70,16 +80,63 @@ This workflow ensures consistent, high-quality page implementation following LOD
 - Follow RTL Charter (direction: rtl, text-align: right)
 - Implement exact DOM structure from legacy
 
-#### Step 3.2: Apply Styling
-- Use existing CSS files hierarchy:
-  1. Pico CSS (framework)
-  2. `phoenix-base.css` (base styles)
-  3. `phoenix-components.css` (LEGO components)
-  4. `phoenix-header.css` (if header needed)
-  5. Page-specific CSS (if needed)
-- Follow DNA Sync (use CSS variables)
-- Avoid `!important` unless absolutely necessary
-- Ensure single source of truth for common styles
+#### Step 3.2: Apply Styling (MANDATORY CSS Standards)
+
+**⚠️ CRITICAL:** All CSS must follow CSS Standards Protocol.
+
+**1. ITCSS Hierarchy (Sacred Order):**
+```html
+<!-- Load in EXACT order - no exceptions -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<link rel="stylesheet" href="./phoenix-base.css">
+<link rel="stylesheet" href="./phoenix-components.css">
+<link rel="stylesheet" href="./phoenix-header.css">
+<link rel="stylesheet" href="./D15_[PAGE]_STYLES.css"> <!-- Only if needed -->
+```
+
+**2. BEM Naming Convention:**
+- Block: `.component-name`
+- Element: `.component-name__element`
+- Modifier: `.component-name__element--modifier`
+- Example: `.auth-form__input--error`
+
+**3. Logical Properties (RTL Charter):**
+- ✅ Use: `margin-inline-start`, `padding-block-end`, `inset-inline-start`
+- ❌ Never: `margin-left`, `padding-right`, `left:`, `right:`
+
+**4. CSS Variables (DNA Sync):**
+- ✅ Use: `var(--header-brand, #26baac)`
+- ❌ Never: `#26baac` (hardcoded)
+
+**5. Z-Index Registry:**
+- ✅ Use: `z-index: var(--z-index-modal, 1000)`
+- ❌ Never: `z-index: 9999` (direct value)
+
+**6. DNA Multiples (No Magic Numbers):**
+- ✅ Use: `padding: var(--spacing-md, 16px)` (8px * 2)
+- ❌ Never: `padding: 13px` (not a multiple of 8px)
+
+**7. CSS Shorthand:**
+- ✅ Use: `margin-block: 10px; margin-inline: 20px;`
+- ❌ Never: `margin-top: 10px; margin-right: 20px; margin-bottom: 10px; margin-left: 20px;`
+
+**8. Fluid Typography:**
+- ✅ Use: `font-size: clamp(1rem, 5vw, 1.5rem);`
+- ❌ Never: Media queries for font sizes
+
+**9. Container Queries (when applicable):**
+- ✅ Use: `@container (min-width: 500px) { ... }`
+- ❌ Never: `@media (min-width: 768px)` for component-level responsiveness
+
+**10. LOD 400 Comments:**
+```css
+/* ============================================
+   Component: [Name]
+   Purpose: [What it does]
+   Legacy Reference: [Where it was in legacy]
+   LOD 400 Requirement: [Specific requirements]
+   ============================================ */
+```
 
 #### Step 3.3: Implement Functionality
 - Add JavaScript for interactions (if needed)
@@ -90,14 +147,28 @@ This workflow ensures consistent, high-quality page implementation following LOD
 
 ### **Phase 4: Validation** ✅
 
-#### Step 4.1: G-Bridge Validation
+#### Step 4.1: G-Bridge v2.0 Validation (MANDATORY)
+
 - **Command:** `node "../../cursor_messages/HOENIX G-BRIDGE.js" D15_[PAGE_NAME].html`
-- **Checks:**
-  - RTL Charter compliance
-  - LEGO System usage
-  - DNA Sync (CSS Variables)
-  - Structure validation
-  - No hardcoded colors
+- **Version:** v2.0 (Enhanced with new checks)
+
+**Checks Performed:**
+- ✅ **RTL Charter:** Physical Property Blocker (no margin-left, padding-right, etc.)
+- ✅ **Z-Index Registry:** All Z-Index values must use CSS variables
+- ✅ **Color Clamp:** No hardcoded colors (hex, rgb, rgba)
+- ✅ **Magic Numbers:** All spacing must be DNA multiples (8px)
+- ✅ **CSS Shorthand:** Longhand detection (warnings)
+- ✅ **LEGO System:** Use `<tt-section>` instead of `<div class="section">`
+- ✅ **ITCSS Hierarchy:** CSS loading order validation
+- ✅ **Structure:** Required elements (e.g., unified-header)
+
+**Required Result:** ✅ PASSED (0 issues)
+
+**If FAILED:**
+1. Review all issues listed
+2. Fix each issue according to CSS Standards Protocol
+3. Re-run G-Bridge until PASSED
+4. Only then proceed to visual validation
 
 #### Step 4.2: Visual Comparison
 - Open `_PREVIEW_D15_[PAGE_NAME].html` in browser
@@ -203,9 +274,24 @@ This workflow ensures consistent, high-quality page implementation following LOD
 
 ---
 
-## 📊 Quality Checklist
+## 📊 Quality Checklist (Updated for CSS Standards)
 
 Before final submission, verify:
+
+### **CSS Standards Compliance:**
+- [ ] ITCSS hierarchy followed (correct loading order)
+- [ ] BEM naming convention used throughout
+- [ ] No physical properties (margin-left, padding-right, etc.)
+- [ ] All colors use CSS variables (no hardcoded hex/rgb)
+- [ ] All Z-Index values use CSS variables
+- [ ] All spacing is DNA multiples (8px)
+- [ ] CSS shorthand used (margin-block/inline)
+- [ ] Fluid typography used (clamp()) where applicable
+- [ ] Container queries used (instead of media queries for components)
+- [ ] LOD 400 comments added to all major blocks
+- [ ] G-Bridge v2.0 validation passed (✅ PASSED)
+
+### **Original Checklist:**
 
 - [ ] Legacy files studied and understood
 - [ ] Initial analysis script run

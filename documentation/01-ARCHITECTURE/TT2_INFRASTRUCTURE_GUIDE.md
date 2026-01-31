@@ -368,27 +368,44 @@ psql -d tiktrack -f ../04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL
 
 ### **Running Development Servers**
 
+⚠️ **IMPORTANT:** Backend MUST run on port **8080** (as defined in Master Blueprint).
+
+#### **Backend (Start First):**
+```bash
+cd api
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+uvicorn main:app --reload --port 8080
+# Server runs on http://localhost:8080
+# API Base URL: http://localhost:8080/api/v1
+# Health Check: http://localhost:8080/health
+# API Docs: http://localhost:8080/docs
+```
+
+**Verification:**
+- ✅ Health check: `curl http://localhost:8080/health` returns `{"status": "ok"}`
+- ✅ API docs accessible at `http://localhost:8080/docs`
+
 #### **Frontend:**
 ```bash
 cd ui
 npm run dev
 # Server runs on http://localhost:3000
-```
-
-#### **Backend:**
-```bash
-cd api
-source venv/bin/activate
-uvicorn main:app --reload --port 8080
-# Server runs on http://localhost:8080
+# Proxy configured: /api -> http://localhost:8080
 ```
 
 ### **Development Workflow**
 
+**Order of Operations:**
 1. **Start Database** (if running locally)
-2. **Start Backend** (`uvicorn main:app --reload`)
+2. **Start Backend** (`uvicorn main:app --reload --port 8080`) ⚠️ **Port 8080 is MANDATORY**
 3. **Start Frontend** (`npm run dev`)
 4. **Access Application:** `http://localhost:3000`
+
+**Why Port 8080?**
+- Defined in Master Blueprint: "Ports: V2 (8080), Legacy (8081)"
+- Frontend proxy configured for `http://localhost:8080`
+- Environment variables set to `http://localhost:8080/api/v1`
+- Changing port requires updating multiple configuration files
 
 ---
 

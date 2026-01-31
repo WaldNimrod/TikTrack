@@ -21,6 +21,35 @@
 
 ## 🚀 הצעדים הבאים - צעד אחר צעד
 
+### **שלב 0: הרצת Backend (חובה לאינטגרציה)** ⚠️
+
+**⚠️ חשוב:** לפני הרצת Frontend, יש להריץ את Backend בפורט 8080!
+
+**מיקום:** `api/` directory
+
+```bash
+cd api
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+uvicorn main:app --reload --port 8080
+```
+
+**מה זה עושה:**
+- מפעיל את FastAPI server
+- פורט: **8080** (כפי שמוגדר ב-Master Blueprint)
+- API Base URL: `http://localhost:8080/api/v1`
+- CORS מוגדר לתמיכה ב-Frontend
+
+**בדיקה:**
+- ✅ Server מתחיל ללא שגיאות
+- ✅ Health check: `http://localhost:8080/health` מחזיר `{"status": "ok"}`
+- ✅ API Docs: `http://localhost:8080/docs` נפתח
+
+**זמן משוער:** 10-30 שניות
+
+**הערה:** אם Backend לא רץ, Frontend יעבוד אבל לא תהיה אינטגרציה עם API.
+
+---
+
 ### **שלב 1: התקנת Dependencies** ⏳
 
 **מיקום:** `ui/` directory
@@ -187,21 +216,33 @@ uvicorn main:app --reload --port 8080
 
 ### **עד לראייה בדפדפן:**
 
-1. **התקנת Dependencies:** 1-2 דקות
-2. **הרצת Dev Server:** 10-30 שניות
-3. **טעינת דף בדפדפן:** מיידי
+1. **הרצת Backend (port 8080):** 10-30 שניות ⚠️ **חובה לאינטגרציה**
+2. **התקנת Dependencies:** 1-2 דקות
+3. **הרצת Dev Server:** 10-30 שניות
+4. **טעינת דף בדפדפן:** מיידי
 
 **סה"כ:** **2-3 דקות** עד לראייה בדפדפן! 🎉
+
+**הערה:** Frontend יעבוד גם בלי Backend (רק לא תהיה אינטגרציה עם API).
 
 ---
 
 ## 📋 Checklist לפני הרצה
 
-- [ ] Backend רץ (port 8080)
+### **Backend (חובה לאינטגרציה):**
+- [ ] Backend רץ בפורט **8080** (`uvicorn main:app --reload --port 8080`)
+- [ ] Health check עובד: `http://localhost:8080/health`
+- [ ] Database מחובר (אם נדרש)
+
+### **Frontend:**
 - [ ] Dependencies מותקנים (`npm install`)
-- [ ] `.env.development` קיים עם VITE_API_BASE_URL
+- [ ] `.env.development` קיים עם `VITE_API_BASE_URL=http://localhost:8080/api/v1`
 - [ ] `AppRouter.jsx` מכיל את ה-Routes הנכונים
 - [ ] Components קיימים ב-`ui/src/components/auth/`
+
+### **תקשורת:**
+- [ ] Backend CORS מוגדר לתמיכה ב-Frontend (port 3000)
+- [ ] Vite proxy מוגדר ל-Backend (port 8080)
 
 ---
 

@@ -1,0 +1,485 @@
+openapi: 3.0.0
+info:
+  title: TikTrack Project Phoenix API (Master Release)
+  version: 2.5.2
+  description: Unified API Specification (Fortress Protocol) - Updated with Authentication & Identity endpoints
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: "System Health Check"
+      tags:
+        - system
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /auth/register:
+    post:
+      summary: "Register new user"
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: "User registered successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: "refresh_token=httpOnly cookie"
+        '400':
+          description: "Bad request (duplicate user, validation error)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: "User authentication"
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: "Authentication successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: "refresh_token=httpOnly cookie"
+        '401':
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      summary: "Refresh access token (with rotation)"
+      tags:
+        - authentication
+      description: |
+        Refreshes access token using refresh token from httpOnly cookie.
+        Implements refresh token rotation - issues new refresh token.
+      responses:
+        '200':
+          description: "Token refreshed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: "refresh_token=httpOnly cookie (new token)"
+        '401':
+          description: "Invalid or expired refresh token"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: "Logout user - revoke tokens"
+      tags:
+        - authentication
+      description: |
+        Revokes access token (adds to blacklist) and refresh token.
+        Clears refresh token cookie.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: "Logout successful"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT (cleared)"
+        '401':
+          description: "Invalid token"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/reset-password:
+    post:
+      summary: "Request password reset (EMAIL or SMS)"
+      tags:
+        - authentication
+      description: "TODO: Implement PasswordResetService (Task 20.1.6)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /auth/verify-phone:
+    post:
+      summary: "Verify phone number with SMS code"
+      tags:
+        - authentication
+      description: "TODO: Implement PasswordResetService (Task 20.1.6)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /users/me:
+    get:
+      summary: "Get current user profile (D25)"
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "User profile"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: "Update user profile"
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      description: "TODO: Implement profile update logic"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /user/api-keys:
+    get:
+      summary: "List user's API keys (D24)"
+      tags:
+        - api-keys
+      security:
+        - bearerAuth: []
+      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+    post:
+      summary: "Create new API key (D24)"
+      tags:
+        - api-keys
+      security:
+        - bearerAuth: []
+      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /user/api-keys/{key_id}:
+    put:
+      summary: "Update API key (D24)"
+      tags:
+        - api-keys
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "API key ULID"
+      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+    delete:
+      summary: "Delete API key (D24)"
+      tags:
+        - api-keys
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "API key ULID"
+      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /user/api-keys/{key_id}/verify:
+    post:
+      summary: "Verify API key against provider (D24)"
+      tags:
+        - api-keys
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "API key ULID"
+      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      responses:
+        '501':
+          description: "Not implemented yet"
+
+  /trading_accounts:
+    get:
+      summary: "List all trading accounts (Plural)"
+      tags:
+        - trading
+      responses:
+        '200': { description: "Success" }
+
+  /trades:
+    get:
+      summary: "Hierarchical Trades View"
+      tags:
+        - trading
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TradeResponse'
+
+  /analytics/portfolios:
+    get:
+      summary: "Portfolio Performance Analytics"
+      tags:
+        - analytics
+      responses:
+        '200': { description: "Success" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT access token in Authorization header"
+
+  schemas:
+    # Authentication Schemas
+    LoginRequest:
+      type: object
+      required:
+        - username_or_email
+        - password
+      properties:
+        username_or_email:
+          type: string
+          description: "Username or email address"
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 1
+          description: "User password"
+          example: "secure_password_123"
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: "JWT access token"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          default: "bearer"
+          example: "bearer"
+        expires_at:
+          type: string
+          format: date-time
+          description: "Token expiration timestamp"
+          example: "2026-02-01T12:00:00Z"
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          description: "Username"
+          example: "johndoe"
+        email:
+          type: string
+          format: email
+          description: "Email address"
+          example: "john@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: "Password (min 8 characters)"
+          example: "secure_password_123"
+        phone_number:
+          type: string
+          nullable: true
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: "Phone number (E.164 format, optional)"
+          example: "+12025551234"
+
+    RegisterResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: "JWT access token"
+        token_type:
+          type: string
+          default: "bearer"
+        expires_at:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    RefreshResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: "New JWT access token"
+        token_type:
+          type: string
+          default: "bearer"
+        expires_at:
+          type: string
+          format: date-time
+          description: "Token expiration timestamp"
+
+    # User Schemas
+    UserResponse:
+      type: object
+      required:
+        - external_ulids
+        - email
+        - created_at
+      properties:
+        external_ulids:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "User ULID (external identifier)"
+          example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        email:
+          type: string
+          format: email
+          description: "Email address"
+          example: "user@example.com"
+        phone_numbers:
+          type: string
+          nullable: true
+          description: "Phone number"
+          example: "+12025551234"
+        user_tier_levels:
+          type: string
+          enum: [Bronze, Silver, Gold, Platinum]
+          default: Bronze
+          description: "User tier level"
+        username:
+          type: string
+          nullable: true
+          description: "Username"
+        display_name:
+          type: string
+          nullable: true
+          description: "Display name"
+        role:
+          type: string
+          enum: [USER, ADMIN, SUPERADMIN]
+          default: USER
+        is_email_verified:
+          type: boolean
+          default: false
+        phone_verified:
+          type: boolean
+          default: false
+        created_at:
+          type: string
+          format: date-time
+
+    # Error Schemas
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: "Error message"
+          example: "Invalid credentials"
+
+    # Trading Schemas (existing)
+    TradeResponse:
+      type: object
+      properties:
+        external_ulids:
+          type: string
+        parent_id:
+          type: string
+          nullable: true
+        calculated_statuses:
+          type: string
+        aggregated_pnl_amounts:
+          type: number
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeResponse'

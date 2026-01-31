@@ -107,10 +107,7 @@ const authService = {
 
       debugLog('Auth', 'Login payload prepared', payload);
 
-      const response = await apiClient.post('/auth/login', {
-        username_or_email: payload.username_or_email || usernameOrEmail,
-        password: payload.password || password,
-      });
+      const response = await apiClient.post('/auth/login', payload);
 
       // Transform response to React format (camelCase)
       const loginData = apiToReact(response.data);

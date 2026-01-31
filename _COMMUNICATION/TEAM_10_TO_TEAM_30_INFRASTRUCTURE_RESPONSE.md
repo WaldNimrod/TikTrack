@@ -12,11 +12,14 @@
 
 ### **1. React Router Setup**
 
-**תשובה:** אין React Router מוגדר בפרויקט כרגע. יש להגדיר אותו.
+**תשובה:** React Router כבר בשימוש בקוד שלכם (`useNavigate` ב-LoginForm.jsx), אבל צריך להגדיר את ה-Router הראשי.
 
 **הנחיות:**
 
 #### **א. התקנת React Router:**
+**✅ כבר מותקן** (אתם משתמשים ב-`useNavigate` ב-LoginForm.jsx)
+
+אם צריך להתקין:
 ```bash
 cd ui
 npm install react-router-dom
@@ -94,12 +97,21 @@ export default AppRouter;
 
 **קובץ:** `ui/src/main.jsx` (או `index.jsx`)
 
+**⚠️ אם הקובץ כבר קיים, עדכנו אותו כך:**
+
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRouter from './router/AppRouter.jsx';
+
+// CSS Loading Order (CRITICAL - כפי שמוגדר ב-CSS Standards)
+// 2. Phoenix Base Styles
 import './styles/phoenix-base.css';
+// 3. LEGO Components
 import './styles/phoenix-components.css';
+// 4. Header Component (if used)
+import './styles/phoenix-header.css';
+// 5. Page-Specific Styles
 import './styles/D15_IDENTITY_STYLES.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -198,33 +210,9 @@ export default defineConfig({
 </html>
 ```
 
-#### **ד. טעינת CSS ב-main.jsx:**
-
-**קובץ:** `ui/src/main.jsx`
-
-```javascript
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import AppRouter from './router/AppRouter.jsx';
-
-// CSS Loading Order (CRITICAL - כפי שמוגדר ב-CSS Standards)
-// 2. Phoenix Base Styles
-import './styles/phoenix-base.css';
-// 3. LEGO Components
-import './styles/phoenix-components.css';
-// 4. Header Component (if used)
-import './styles/phoenix-header.css';
-// 5. Page-Specific Styles
-import './styles/D15_IDENTITY_STYLES.css';
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <AppRouter />
-  </React.StrictMode>
-);
-```
-
 **⚠️ IMPORTANT:** שמרו על סדר טעינת ה-CSS בדיוק כפי שמוגדר ב-CSS Standards Protocol!
+
+**הערה:** אם יש לכם כבר `main.jsx` או `App.jsx`, עדכנו אותו להשתמש ב-`AppRouter` במקום component ישיר.
 
 ---
 
@@ -299,17 +287,20 @@ export const API_ENDPOINTS = {
 
 **קובץ:** `ui/src/services/auth.js`
 
+**✅ כבר מעודכן!** אני רואה שאתם כבר משתמשים ב-`import.meta.env.VITE_API_BASE_URL`.
+
+**אם תרצו להשתמש ב-API_ENDPOINTS config:**
 ```javascript
-import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api.js';
-import { reactToApi, apiToReact } from '../utils/transformers.js';
-import { audit } from '../utils/audit.js';
 
-// Configure axios base URL
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+// במקום:
+const response = await axios.post(`${API_BASE_URL}/auth/login`, payload);
 
-// ... rest of the code
+// אפשר להשתמש ב:
+const response = await axios.post(API_ENDPOINTS.AUTH.LOGIN, payload);
 ```
+
+**זה אופציונלי - הקוד הנוכחי שלכם תקין!**
 
 ---
 
@@ -325,25 +316,27 @@ npm install
 **Dependencies שכבר צריכים להיות ב-package.json:**
 - `react` ^18.2.0
 - `react-dom` ^18.2.0
-- `react-router-dom` ^6.20.0
-- `axios` ^1.6.0
+- `react-router-dom` ^6.20.0 (✅ כבר בשימוש בקוד שלכם)
+- `axios` ^1.6.0 (✅ כבר בשימוש בקוד שלכם)
 
 **Dev Dependencies:**
 - `@vitejs/plugin-react` ^4.2.0
 - `vite` ^5.0.0
+
+**הערה:** אם `package.json` לא קיים, יש ליצור אותו עם כל ה-dependencies.
 
 ---
 
 ## 🎯 Next Steps - Setup
 
 ### **שלב 1: יצירת קבצי תשתית**
-1. ✅ יצירת `package.json`
-2. ✅ יצירת `vite.config.js`
-3. ✅ יצירת `index.html`
+1. ✅ יצירת `package.json` (אם לא קיים)
+2. ✅ יצירת `vite.config.js` (אם לא קיים)
+3. ✅ יצירת `index.html` (אם לא קיים)
 4. ✅ יצירת `.env.development` ו-`.env.production`
-5. ✅ יצירת `src/config/api.js`
-6. ✅ יצירת `src/router/AppRouter.jsx`
-7. ✅ עדכון `src/main.jsx`
+5. ✅ יצירת `src/config/api.js` (אופציונלי - לשיפור ארגון)
+6. ✅ יצירת `src/router/AppRouter.jsx` (חובה - להגדרת Routes)
+7. ✅ עדכון `src/main.jsx` (אם קיים) או יצירת חדש
 
 ### **שלב 2: התקנת Dependencies**
 ```bash

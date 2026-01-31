@@ -43,7 +43,7 @@ All authentication pages have been built, validated, visually approved, and sign
 ### **Implementation Guide**
 
 **📄 Complete Implementation Guide:**  
-`_COMMUNICATION/team_01/team_01_staging/BATCH_1_AUTH_COMPLETE.md`
+`_COMMUNICATION/team_31/team_31_staging/BATCH_1_AUTH_COMPLETE.md`
 
 This document contains:
 - Complete feature list for each page
@@ -55,13 +55,29 @@ This document contains:
 ### **Standard Workflow Documentation**
 
 **📄 Standard Page Build Workflow:**  
-`_COMMUNICATION/team_01/team_01_staging/STANDARD_PAGE_BUILD_WORKFLOW.md`
+`_COMMUNICATION/team_31/team_31_staging/STANDARD_PAGE_BUILD_WORKFLOW.md`
 
 This workflow will be used for all remaining pages in the system. It includes:
 - 8-phase standardized process
 - Quality checklist
 - File locations reference
 - Next pages roadmap
+
+### **CSS Architecture Documentation**
+
+**📄 CSS Architecture & Hierarchy (CRITICAL REFERENCE):**  
+`_COMMUNICATION/team_31/team_31_staging/CSS_ARCHITECTURE_HIERARCHY.md`
+
+**This document is essential for understanding:**
+- Complete CSS file hierarchy and loading order
+- Purpose of each CSS file (phoenix-base, phoenix-components, phoenix-header)
+- Design principles (SSOT, DNA Sync, Specificity)
+- Override strategy and specificity hierarchy
+- Spacing and color systems
+- LEGO components usage
+- Best practices
+
+**⚠️ IMPORTANT:** Read this document before integrating CSS files to understand the architecture.
 
 ### **CSS Architecture Files**
 

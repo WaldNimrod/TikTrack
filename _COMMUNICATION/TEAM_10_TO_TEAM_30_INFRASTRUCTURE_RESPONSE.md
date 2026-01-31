@@ -4,11 +4,24 @@
 **To:** Team 30 (Frontend)  
 **Date:** 2026-01-31  
 **Session:** SESSION_01 - Phase 1.3  
-**Subject:** INFRASTRUCTURE_SETUP | Status: GREEN
+**Subject:** INFRASTRUCTURE_CLARIFICATION | Status: YELLOW
 
 ---
 
-## ✅ תשובות לשאלות טכניות
+## ⚠️ הבהרה חשובה
+
+**תשתיות (Infrastructure) אינן באחריות של Team 30.**
+
+Team 30 אחראי רק על:
+- ✅ הוספת JavaScript/React Logic
+- ✅ חיבור ל-Backend API
+- ✅ שימוש ב-HTML/CSS של Team 31
+
+**קבצי תשתית (package.json, vite.config.js, index.html) יטופלו על ידי צוות התשתית המתאים.**
+
+---
+
+## ✅ תשובות לשאלות טכניות (לשימוש זמני)
 
 ### **1. React Router Setup**
 
@@ -379,20 +392,16 @@ npm run dev
 
 ---
 
-## 📋 קבצים שנוצרו/עודכנו
+## 📋 הערה חשובה
 
-**קבצי תשתית שנוצרו:**
-- ✅ `ui/package.json` - מוכן עם כל ה-dependencies
-- ✅ `ui/vite.config.js` - מוכן עם React plugin ו-proxy
-- ✅ `ui/index.html` - מוכן עם RTL ו-CSS loading order
-- ✅ `ui/.env.development` - מוכן עם API_BASE_URL
-- ✅ `ui/.env.production` - מוכן עם API_BASE_URL
-- ✅ `ui/.env.example` - מוכן כדוגמה
-- ✅ `ui/src/config/api.js` - מוכן עם כל ה-endpoints
-- ✅ `ui/src/router/AppRouter.jsx` - מוכן עם כל ה-routes
-- ✅ `ui/src/main.jsx` - מוכן עם CSS loading order
+**קבצי תשתית לא נוצרו על ידי Team 10.**
 
-**כל קבצי התשתית נוצרו ומוכנים לשימוש!**
+**Team 30 צריך:**
+1. ✅ להמשיך לעבוד על Components (LoginForm, RegisterForm, וכו')
+2. ✅ לדווח ל-Team 10 על הצורך בתשתית
+3. ✅ להמתין לצוות התשתית להגדרת Build System
+
+**המידע הטכני למעלה הוא רק להבנה - לא ליישום על ידי Team 30.**
 
 ---
 
@@ -415,13 +424,13 @@ npm run dev
 ---
 
 **Prepared by:** Team 10 (The Gateway)  
-**Status:** ✅ **INFRASTRUCTURE_FILES_CREATED - READY FOR npm install**  
-**Next:** Awaiting Team 30 to run `npm install` and `npm run dev`
+**Status:** ⚠️ **INFRASTRUCTURE_CLARIFICATION - AWAITING INFRASTRUCTURE TEAM**  
+**Next:** Team 30 continues component development, infrastructure questions forwarded to appropriate team
 
 **Summary:**
-- ✅ כל קבצי התשתית נוצרו
-- ✅ כל התשובות לשאלות הטכניות
-- ✅ מוכן להרצה מיידית
+- ⚠️ תשתיות אינן באחריות Team 30
+- ✅ Team 30 יכול להמשיך לעבוד על Components
+- ⏳ שאלות תשתית יועברו לצוות המתאים
 
 ---
 

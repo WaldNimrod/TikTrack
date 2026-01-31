@@ -330,13 +330,15 @@ npm install
 ## 🎯 Next Steps - Setup
 
 ### **שלב 1: יצירת קבצי תשתית**
-1. ✅ יצירת `package.json` (אם לא קיים)
-2. ✅ יצירת `vite.config.js` (אם לא קיים)
-3. ✅ יצירת `index.html` (אם לא קיים)
-4. ✅ יצירת `.env.development` ו-`.env.production`
-5. ✅ יצירת `src/config/api.js` (אופציונלי - לשיפור ארגון)
-6. ✅ יצירת `src/router/AppRouter.jsx` (חובה - להגדרת Routes)
-7. ✅ עדכון `src/main.jsx` (אם קיים) או יצירת חדש
+1. ✅ **נוצר:** `package.json` - מוכן לשימוש
+2. ✅ **נוצר:** `vite.config.js` - מוכן לשימוש
+3. ✅ **נוצר:** `index.html` - מוכן לשימוש
+4. ✅ **נוצר:** `.env.development` ו-`.env.production` - מוכנים לשימוש
+5. ✅ **נוצר:** `src/config/api.js` - מוכן לשימוש (אופציונלי)
+6. ✅ **נוצר:** `src/router/AppRouter.jsx` - מוכן לשימוש
+7. ✅ **נוצר:** `src/main.jsx` - מוכן לשימוש
+
+**כל קבצי התשתית נוצרו ומוכנים!**
 
 ### **שלב 2: התקנת Dependencies**
 ```bash
@@ -344,10 +346,21 @@ cd ui
 npm install
 ```
 
+**⚠️ הערה:** אם יש שגיאות התקנה, ודאו שיש לכם Node.js גרסה 18+ מותקן.
+
 ### **שלב 3: בדיקת Build**
 ```bash
 npm run dev
 ```
+
+**הפרויקט אמור לרוץ על:** `http://localhost:3000`
+
+**בדיקות:**
+- ✅ `/login` - Login page
+- ✅ `/register` - Register page
+- ✅ `/reset-password` - Password reset page
+- ✅ Console נקי (ללא שגיאות)
+- ✅ CSS נטען בסדר הנכון
 
 ### **שלב 4: המשך עבודה**
 - השלמת משימה 30.1.5 (API Keys UI)

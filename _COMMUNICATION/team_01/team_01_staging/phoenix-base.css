@@ -276,7 +276,8 @@ select {
   border-radius: 4px; /* Smaller border-radius */
   
   /* Spacing - Match filter dropdown exactly (reduced vertical padding to fit in 60px container) */
-  padding: 0.125rem 0.6rem; /* 2px top/bottom, 9.6px left/right - reduced vertical padding */
+  /* Note: Auth pages override this with !important for larger padding - see D15_IDENTITY_STYLES.css */
+  padding: 0.125rem 0.6rem; /* 2px top/bottom, 9.6px left/right - reduced vertical padding - default for system */
   margin: 0;
   box-sizing: border-box;
   

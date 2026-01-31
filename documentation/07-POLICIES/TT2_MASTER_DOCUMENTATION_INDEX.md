@@ -2,8 +2,11 @@
 
 ## נהלים חדשים:
 - **CSS-01** | `TT2_CSS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות CSS (ITCSS + BEM, Fluid Design) | **נוהל מחייב**
-- **JS-01** | `TT2_JS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות JavaScript (Transformation Layer, Audit Trail, JSDoc) | **חדש - נוהל מחייב**
-- **INFRA-01** | `TT2_INFRASTRUCTURE_GUIDE.md` | מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment) | **חדש - מדריך תשתיות**
+- **JS-01** | `TT2_JS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות JavaScript (Transformation Layer, Audit Trail, JSDoc) | **נוהל מחייב**
+- **INFRA-01** | `TT2_INFRASTRUCTURE_GUIDE.md` | מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment) | **מדריך תשתיות**
+- **QA-01** | `TEAM_50_QA_WORKFLOW_PROTOCOL.md` | נוהל עבודה לבדיקות QA (Code Review → Selenium → Visual Validation) | **חדש - נוהל מחייב**
+- **QA-02** | `TEAM_50_QA_REPORT_TEMPLATE.md` | תבנית דוח QA סטנדרטית | **חדש - תבנית מחייבת**
+- **QA-03** | `TEAM_50_QA_TEST_INDEX.md` | אינדקס בדיקות QA מפורט | **חדש - אינדקס תחזוקה**
 - P-11: [TT2_OUTPUT_INTEGRATION_PROTOCOL.md] (חדש).
 - G-08: [TT2_TEAM_OPERATIONS_CHARTER.md] (מעודכן - סטייג'ינג).
 | **G-10** | `TT2_TERMINOLOGY_ENFORCEMENT.md` | פוליסת אכיפת טרמינולוגיה (לשון רבים). |

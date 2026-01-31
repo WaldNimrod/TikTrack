@@ -35,13 +35,16 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  height: 158px !important; /* Fixed total height - LOD 400 requirement (98px + 60px = 158px) */
-  min-height: 158px;
-  max-height: 158px;
+  height: 120px !important; /* Fixed total height - LOD 400 requirement (60px + 60px = 120px) */
+  min-height: 120px;
+  max-height: 120px;
   box-sizing: border-box;
   overflow: visible; /* Allow filters to be visible - don't clip content */
+  padding: 0 !important; /* Zero padding all sides - override any body/Pico CSS */
   padding-top: 0 !important; /* Override any body/Pico CSS padding - header must stick to top */
+  padding-bottom: 0 !important; /* Override any body/Pico CSS padding - zero bottom padding */
   margin-top: 0 !important; /* Override any body/Pico CSS margin - header must stick to top */
+  margin-bottom: 0 !important; /* Zero bottom margin */
 }
 
 #unified-header .header-content {
@@ -60,9 +63,9 @@
   align-items: center;
   border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
   position: relative;
-  height: auto; /* Height based on content, not fixed */
-  min-height: 0;
-  max-height: none;
+  height: 60px; /* Fixed height - must be 60px to achieve total 120px (60px + 60px) */
+  min-height: 60px;
+  max-height: 60px;
   direction: rtl;
   background: var(--apple-bg-elevated, #ffffff);
   width: 100%;
@@ -81,7 +84,7 @@
   direction: rtl;
   overflow: visible;
   box-sizing: border-box;
-  height: auto; /* Height based on content, not 100% of parent */
+  height: 100%; /* Fill parent height (98px) */
   min-height: 0; /* Allow flex shrinking */
 }
 
@@ -92,7 +95,6 @@
   gap: 1rem;
   direction: ltr;
   order: 3;
-  margin-right: auto;
 }
 
 #unified-header .logo {
@@ -117,15 +119,19 @@
 }
 
 /* Logo Section - Local class for logo text sizing */
-#unified-header .logo-section .logo-text {
-  font-size: 1rem; /* Local override - 16px (1rem), not 20px - specificity handles Pico CSS override */
-  font-weight: 300;
-  color: #26baac;
-  direction: ltr;
-  text-align: left;
+/* Maximum specificity to override Pico CSS and any other styles */
+#unified-header .header-top .header-container .logo-section .logo-text,
+#unified-header .header-top .header-container .logo .logo-text,
+#unified-header .logo-section .logo-text,
+#unified-header .logo .logo-text {
+  font-size: 1rem !important; /* Local override - 16px (1rem), not 20px - !important needed to override Pico CSS */
+  font-weight: 300 !important;
+  color: #26baac !important;
+  direction: ltr !important;
+  text-align: left !important;
   align-self: flex-end;
   margin-bottom: -5px;
-  line-height: 1.4; /* Match legacy line-height */
+  line-height: 1.4 !important; /* Match legacy line-height */
   white-space: nowrap;
 }
 
@@ -142,7 +148,7 @@
 }
 
 .u-name {
-  font-size: 0.75rem;
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) */
   font-weight: 700;
   color: var(--color-text-main);
   line-height: 1.2;
@@ -178,7 +184,6 @@
   flex: 1;
   direction: rtl;
   order: 1;
-  margin-left: auto;
 }
 
 #unified-header .main-nav {
@@ -218,16 +223,17 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem; /* Reduced padding - smaller, more delicate menu */
   color: #26baac;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.2s ease;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem; /* 16px - Main navigation menu size */
 }
 
 #unified-header .tiktrack-nav-link .nav-text {
+  font-size: inherit; /* Inherit 1rem from parent .tiktrack-nav-link */
   line-height: 1.4;
 }
 
@@ -263,11 +269,30 @@
 
 #unified-header .nav-text {
   display: inline-block;
+  font-size: inherit; /* Inherit font-size from parent */
 }
 
 /* Override inline styles for utils icons - make them smaller */
-#unified-header .tiktrack-nav-link .nav-text[style*="font-size: 1.2rem"] {
-  font-size: 1rem; /* Smaller icons - match legacy, specificity handles override */
+/* Maximum specificity + !important to override inline styles */
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text.utils-icon-clean,
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text.utils-icon-fast,
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text.utils-icon-search,
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text[style*="font-size: 1.2rem"],
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text[style*="font-size:1.2rem"],
+#unified-header .tiktrack-nav-link .nav-text[style*="font-size: 1.2rem"],
+#unified-header .tiktrack-nav-link .nav-text[style*="font-size:1.2rem"] {
+  font-size: 1rem !important; /* Smaller icons - match legacy, !important needed to override inline styles */
+  line-height: 1.4 !important;
+}
+
+/* Utils icons colors - using CSS variables */
+#unified-header .tiktrack-nav-link .nav-text.utils-icon-clean {
+  color: var(--apple-red, #dc2626) !important;
+}
+
+#unified-header .tiktrack-nav-link .nav-text.utils-icon-fast,
+#unified-header .tiktrack-nav-link .nav-text.utils-icon-search {
+  color: var(--header-brand, #26baac) !important;
 }
 
 /* ===== Dropdown Menu Styles - EXACT COPY FROM ORIGINAL ===== */
@@ -312,7 +337,7 @@
 }
 
 #unified-header .tiktrack-dropdown-arrow {
-  font-size: 0.6rem; /* Smaller arrow - match legacy */
+  font-size: 0.75rem; /* 12px - Smaller arrow relative to 1rem parent, but visible */
   color: #666;
   margin-right: 0.25rem;
   transition: transform 0.2s ease;
@@ -329,7 +354,9 @@
   color: #29a6a8;
   text-decoration: none;
   transition: all 0.2s ease;
-  font-size: 14px;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
@@ -338,9 +365,10 @@
 }
 
 #unified-header .separator {
-  height: 1px;
+  height: 1px; /* Very thin - 1px */
   background: #e5e5e5;
   margin: 0.5rem 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Shadow on separator */
 }
 
 /* Dropdown Submenu (Level 3) - Exact copy from original */
@@ -434,6 +462,9 @@
   padding: 0.5rem 1rem;
   width: 100%;
   box-sizing: border-box;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
 }
 
 #unified-header .level3-submenu .separator {
@@ -480,7 +511,9 @@
   padding: 8px 12px;
   color: #333;
   text-decoration: none;
-  font-size: 14px;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
   border-bottom: 1px solid #eee;
   transition: all 0.2s ease;
 }
@@ -499,77 +532,75 @@
    ============================================ */
 
 #unified-header .header-filters {
-  padding: 0; /* No padding - height is fixed at 60px */
   background: white;
   position: relative;
+  height: 60px; /* Fixed height - 60px */
+  min-height: 60px;
+  max-height: 60px;
   z-index: 950;
   height: 60px !important; /* Fixed height - match legacy exactly (was 72px, should be 60px) */
   min-height: 60px;
   max-height: 60px;
-  display: block;
-  margin-top: 0;
+  display: flex;
   box-sizing: border-box;
-  overflow: visible; /* Allow filter menus to be visible */
+  overflow: visible;
 }
 
-#unified-header .filters-container {
+/* Filters Container - Same structure as header-container */
+#unified-header .header-filters .filters-container {
   display: flex;
-  align-items: center;
   gap: var(--spacing-md, 16px);
   max-width: var(--container-xl, 1400px);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 20px 20px 0 20px;
   box-sizing: border-box;
   overflow: visible;
   direction: rtl;
-  justify-content: flex-start;
-  height: 100%; /* Fill parent height (60px) */
-  min-height: 0; /* Allow flex shrinking */
+  width: 100%;
 }
 
+/* Filter Groups - Aligned to start (right in RTL) - Same structure as header-nav */
 #unified-header .filter-group {
   display: flex;
-  align-items: center;
   font-size: 0.9em;
   position: relative;
+  order: 1;
 }
 
 #unified-header .filter-dropdown {
   position: relative;
   width: 100%;
+  display: flex;
 }
 
 #unified-header .filter-toggle {
   display: flex;
   align-items: center;
-  gap: 0.25rem; /* Smaller gap - reduce spacing */
-  /* Base styles from phoenix-base.css - specificity handles Pico CSS override */
-  font-size: 0.75rem; /* Smaller font - 12px (0.75rem) - system default */
-  font-weight: 300; /* System default */
-  line-height: 1.2; /* Tighter line-height - system default */
-  padding: 0.25rem 0.6rem; /* Smaller padding - system default (4px 9.6px) */
-  border: 1px solid #ddd; /* System default */
-  border-radius: 4px; /* Smaller border-radius - system default */
+  gap: 0.25rem;
+  line-height: 1.2 !important;
+  padding: 0.125rem 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   background: white;
   color: #1d1d1f;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 100px; /* Smaller min-width */
+  min-width: 100px;
   justify-content: space-between;
   box-sizing: border-box;
-  height: auto; /* Height based on content */
-  /* Base styles defined in phoenix-base.css - specificity (#unified-header .filter-toggle) overrides Pico CSS */
+  height: fit-content;
 }
 
 #unified-header .filter-toggle:hover {
-  border-color: #ff9500;
-  color: #ff9500;
+  border-color: var(--header-brand, #26baac);
+  color: var(--header-brand, #26baac);
   background: white;
+  /* No shadow on hover - only color change */
 }
 
 #unified-header .filter-menu {
   position: absolute;
-  top: calc(100% + 3px);
+  top: 100%; /* No gap - attached to parent element */
   right: 0;
   left: 0;
   background: white;
@@ -578,15 +609,16 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 100%;
   min-width: 100%;
-  padding: 0.35rem 0 2rem 0;
+  padding: 0.35rem 0; /* Removed bottom padding - no empty line */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
   transition: all 0.3s ease;
   z-index: 951;
   list-style: none;
-  font-size: 0.9rem;
-  font-weight: 400;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
   box-sizing: border-box;
 }
 
@@ -605,8 +637,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: #1d1d1f;
-  font-size: 0.9rem;
-  font-weight: 300;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
   display: flex;
   align-items: center;
 }
@@ -630,10 +663,13 @@
 
 #unified-header .option-text {
   flex: 1;
+  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
+  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
+  line-height: 1.2 !important;
 }
 
 #unified-header .dropdown-arrow {
-  font-size: 0.75rem;
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) */
   color: #666;
   transition: transform 0.2s ease;
   display: inline-block;
@@ -651,7 +687,7 @@
   background: var(--apple-bg-secondary, #f5f5f7);
   border: 1px solid var(--apple-border-light, #e5e5e5);
   color: var(--apple-text-secondary, #6c757d);
-  font-size: 0.75rem;
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) */
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -677,7 +713,7 @@
 
 #unified-header .filter-toggle-main {
   position: absolute;
-  top: 149px;
+  bottom: -24px; /* Positioned below bottom line of filters */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -692,7 +728,7 @@
 
 #unified-header .header-content:has(.header-filters[style*="display: none"]) .filter-toggle-main,
 #unified-header .header-content:has(.header-filters[style*="display:none"]) .filter-toggle-main {
-  top: 75px;
+  bottom: -24px; /* Still below bottom when filters are closed */
 }
 
 #unified-header .filter-toggle-main .header-filter-toggle-btn {
@@ -747,35 +783,54 @@
 #unified-header .search-filter {
   flex: 1;
   max-width: 150px;
+  display: flex;
 }
 
 #unified-header .search-input-wrapper {
   position: relative;
   display: flex;
-  align-items: center;
   width: 100%;
 }
 
+/* Maximum specificity to override Pico CSS */
+#unified-header .header-filters .filters-container .filter-group.search-filter .search-input-wrapper .search-filter-input,
+#unified-header .header-filters .filters-container .search-filter .search-input-wrapper .search-filter-input,
+#unified-header .header-filters .search-filter .search-filter-input,
 #unified-header .search-filter-input {
   width: 100%;
-  /* Base styles from phoenix-base.css - specificity handles Pico CSS override */
-  font-size: 0.75rem; /* System default - 12px (0.75rem), match filter dropdown */
-  font-weight: 300; /* System default */
-  line-height: 1.2; /* System default - tighter line-height */
-  /* RTL Hebrew support - padding adjusted for RTL */
-  padding: 0.25rem 0.6rem 0.25rem 2rem; /* Left padding 2rem for clear button (RTL), rest from system default */
-  border: 1px solid #ddd; /* System default */
-  border-radius: 4px; /* System default - smaller border-radius */
+  /* Base styles from phoenix-base.css - !important needed to override Pico CSS */
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) - !important needed to override Pico CSS */
+  font-size: 0.92rem !important;
+  font-weight: 300 !important; /* System default */
+  line-height: 1.2 !important; /* System default - tighter line-height */
+  /* RTL Hebrew support - padding adjusted for RTL, reduced vertical padding */
+  padding: 0.125rem 2rem 0.125rem 0.6rem !important; /* Reduced vertical padding (2px top/bottom), right padding 2rem for clear button (RTL - left side) */
+  padding-top: 0.125rem !important; /* Explicit top padding */
+  padding-bottom: 0.125rem !important; /* Explicit bottom padding */
+  border: 1px solid #ddd !important; /* System default */
+  border-radius: 4px !important; /* System default - smaller border-radius */
   transition: all 0.2s ease;
-  box-sizing: border-box;
-  direction: rtl; /* RTL for Hebrew */
-  text-align: right; /* RTL text alignment */
-  /* Base styles defined in phoenix-base.css - specificity (#unified-header .search-filter-input) overrides Pico CSS */
+  box-sizing: border-box !important;
+  direction: rtl !important; /* RTL for Hebrew */
+  text-align: right !important; /* RTL text alignment */
+  margin: 0 !important; /* Zero margin top/bottom/left/right */
+  margin-top: 0 !important; /* Explicit zero top margin */
+  margin-bottom: 0 !important; /* Explicit zero bottom margin */
+  height: fit-content !important; /* Fit content height - no fixed height */
+  /* Base styles defined in phoenix-base.css - !important needed to override Pico CSS */
+  /* Reduced vertical padding to fit within 60px container height */
 }
 
+/* Maximum specificity for placeholder */
+#unified-header .header-filters .filters-container .filter-group.search-filter .search-input-wrapper .search-filter-input::placeholder,
+#unified-header .header-filters .filters-container .search-filter .search-input-wrapper .search-filter-input::placeholder,
+#unified-header .header-filters .search-filter .search-filter-input::placeholder,
 #unified-header .search-filter-input::placeholder {
-  text-align: right; /* RTL placeholder alignment */
-  direction: rtl; /* RTL placeholder */
+  text-align: right !important; /* RTL placeholder alignment */
+  direction: rtl !important; /* RTL placeholder */
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) */
+  font-size: 0.92rem !important;
+  font-weight: 300 !important; /* Match input font weight */
 }
 
 #unified-header .search-filter-input:focus {
@@ -786,7 +841,7 @@
 
 #unified-header .search-clear-btn {
   position: absolute;
-  right: 0.5rem; /* RTL - button on right side */
+  left: 0.5rem; /* RTL - button on left side (end of object) */
   background: transparent;
   border: none;
   cursor: pointer;
@@ -807,67 +862,77 @@
 }
 
 /* Filter Actions - EXACT COPY FROM ORIGINAL */
+/* Filter Actions - Buttons after filters, before user */
 #unified-header .filter-actions {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
+  order: 2;
 }
 
-#unified-header .reset-btn,
+#unified-header .reset-btn {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.125rem 0.6rem;
+  cursor: pointer;
+  color: var(--header-brand, #26baac); /* Primary color */
+  line-height: 1.2 !important;
+  transition: all 0.2s ease;
+  min-width: auto;
+  min-height: auto;
+  width: auto;
+  height: fit-content;
+}
+
+#unified-header .reset-btn:hover {
+  border-color: var(--header-brand, #26baac);
+  color: var(--header-brand, #26baac);
+  background: white;
+}
+
 #unified-header .clear-btn {
   background: white;
   border: 1px solid #ddd;
-  border-radius: 4px; /* Match filter dropdown */
-  padding: 0.25rem 0.6rem; /* Smaller padding - match filter dropdown (4px 9.6px) */
+  border-radius: 4px;
+  padding: 0.125rem 0.6rem;
   cursor: pointer;
-  color: #1d1d1f;
-  font-size: 0.75rem; /* Smaller font - match filter dropdown (12px) */
-  font-weight: 300; /* Match filter dropdown */
-  line-height: 1.2; /* Match filter dropdown */
+  color: var(--header-dropdown-item-hover, #ff9e04); /* Secondary color */
+  line-height: 1.2 !important;
   transition: all 0.2s ease;
-  min-width: auto; /* Remove default min-width */
-  min-height: auto; /* Remove default min-height */
-  width: auto; /* Auto width based on content */
-  height: auto; /* Auto height based on content */
+  min-width: auto;
+  min-height: auto;
+  width: auto;
+  height: fit-content;
 }
 
-#unified-header .reset-btn:hover,
 #unified-header .clear-btn:hover {
-  border-color: #ff9500;
-  color: #ff9500;
-  background: #fff5e6;
+  border-color: var(--header-dropdown-item-hover, #ff9e04);
+  color: var(--header-dropdown-item-hover, #ff9e04);
+  background: white;
 }
 
 #unified-header .btn-text {
   display: inline-block;
 }
 
-/* Filter User Section - Exact copy from original */
-#unified-header .filter-user-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* User Avatar Badge - Direct child of filters-container, aligned to end (left in RTL) */
+#unified-header .header-filters .filters-container .user-profile-link {
+  order: 3;
   margin-right: auto;
+  text-decoration: none;
 }
 
-#unified-header .user-avatar-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #26baac;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
+/* User Icon - Simple icon, no circle badge - 20% smaller */
+#unified-header .header-filters .filters-container .user-profile-link .user-icon {
+  width: 19.2px; /* 24px - 20% = 19.2px */
+  height: 19.2px; /* 24px - 20% = 19.2px */
+  color: var(--apple-text-primary, #1d1d1f);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-#unified-header .user-avatar-badge:hover {
-  background: #1fa89a;
-  transform: scale(1.05);
+#unified-header .header-filters .filters-container .user-profile-link:hover .user-icon {
+  opacity: 0.7;
 }
 
 #unified-header .auth-toggle-btn {
@@ -889,9 +954,6 @@
   opacity: 1;
 }
 
-#unified-header .user-profile-link {
-  text-decoration: none;
-}
 
 #unified-header .selected-value {
   flex: 1;
@@ -920,7 +982,8 @@
   #unified-header .filters-container {
     flex-wrap: wrap;
     gap: 0.75rem;
-    padding: 0 16px;
+    padding: 20px 16px 0 16px; /* Top padding 20px, side padding 16px, bottom padding 0 */
+    justify-content: space-between;
   }
 
   #unified-header .filter-toggle {
@@ -989,4 +1052,42 @@
   inset-inline-end: var(--spacing-md);
   color: var(--color-text-muted);
   pointer-events: none;
+}
+
+/* ============================================
+   CRITICAL OVERRIDES - Maximum Specificity
+   These rules MUST override Pico CSS and inline styles
+   ============================================ */
+
+/* Logo Text - Force 16px (1rem) */
+#unified-header .header-top .header-container .logo-section .logo .logo-text,
+#unified-header .header-top .header-container .logo-section a.logo .logo-text,
+#unified-header .header-top .header-container .logo .logo-text,
+#unified-header .header-top .header-container .logo-section .logo-text {
+  font-size: 1rem !important; /* 16px - override Pico CSS */
+}
+
+/* Search Input - Force 12px (0.75rem) - Maximum Specificity */
+#unified-header .header-filters .filters-container .filter-group.search-filter .search-input-wrapper input[type="text"].search-filter-input,
+#unified-header .header-filters .filters-container .search-filter .search-input-wrapper input[type="text"].search-filter-input,
+#unified-header .header-filters .filters-container .filter-group.search-filter .search-input-wrapper input.search-filter-input,
+#unified-header .header-filters .filters-container .search-filter .search-input-wrapper input.search-filter-input,
+#unified-header .header-filters .filters-container .search-filter input.search-filter-input,
+#unified-header .header-filters .filters-container input.search-filter-input,
+#unified-header .header-filters input.search-filter-input,
+#unified-header input.search-filter-input {
+  /* Font size inherited from phoenix-base.css * selector - 0.92rem (14.72px) - override Pico CSS */
+  font-size: 0.92rem !important;
+  font-weight: 300 !important;
+  line-height: 1.2 !important;
+}
+
+/* Utils Icons - Force 16px (1rem) to override inline 1.2rem - Maximum Specificity */
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link span.nav-text.utils-icon-clean[style*="1.2rem"],
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link span.nav-text.utils-icon-fast[style*="1.2rem"],
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link span.nav-text.utils-icon-search[style*="1.2rem"],
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link span.nav-text[style*="1.2rem"],
+#unified-header .header-top .header-container .header-nav .main-nav .tiktrack-nav-list .tiktrack-nav-item .tiktrack-nav-link .nav-text[style*="1.2rem"],
+#unified-header .tiktrack-nav-link .nav-text[style*="1.2rem"] {
+  font-size: 1rem !important; /* 16px - override inline 1.2rem (19.2px) */
 }

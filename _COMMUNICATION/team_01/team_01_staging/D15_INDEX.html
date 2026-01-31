@@ -137,19 +137,19 @@
                 <!-- Utils: Original structure -->
                 <li class="tiktrack-nav-item">
                   <a href="#" class="tiktrack-nav-link" title="ניקוי מטמון לפיתוח">
-                    <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
+                    <span class="nav-text utils-icon-clean" style="font-size: 1.2rem;">🧹</span>
                   </a>
                 </li>
                 
                 <li class="tiktrack-nav-item">
                   <a href="#" class="tiktrack-nav-link" title="בדיקת איכות מהירה">
-                    <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">⚡</span>
+                    <span class="nav-text utils-icon-fast" style="font-size: 1.2rem;">⚡</span>
                   </a>
                 </li>
                 
                 <li class="tiktrack-nav-item">
                   <a href="#" class="tiktrack-nav-link" title="ניטור מערכת איתחול">
-                    <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                    <span class="nav-text utils-icon-search" style="font-size: 1.2rem;">🔍</span>
                   </a>
                 </li>
               </ul>
@@ -269,14 +269,12 @@
             </button>
           </div>
           
-          <div class="filter-user-section" id="filterUserSection">
-            <a href="/user_profile" class="user-profile-link" title="פרופיל משתמש - התנתקות דרך עמוד פרופיל">
-              <div class="user-avatar-badge" id="filterUserAvatar">
-                <span id="filterUserInitials">יי</span>
-              </div>
-            </a>
-            <!-- Auth toggle button removed - only profile icon shown -->
-          </div>
+          <a href="/user_profile" class="user-profile-link" title="פרופיל משתמש - התנתקות דרך עמוד פרופיל">
+            <svg class="user-icon" width="19.2" height="19.2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20.59 22C20.59 18.13 16.74 15 12 15C7.26 15 3.41 18.13 3.41 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
         </div>
       </div>
       
@@ -474,8 +472,9 @@
       // Filter Toggle Functionality
       const filterToggleBtn = document.getElementById('headerFilterToggleBtnMain');
       const headerFilters = document.getElementById('headerFilters');
+      const unifiedHeader = document.getElementById('unified-header');
       
-      if (filterToggleBtn && headerFilters) {
+      if (filterToggleBtn && headerFilters && unifiedHeader) {
         let isExpanded = true; // Default: filters are visible
         
         filterToggleBtn.addEventListener('click', (e) => {
@@ -483,47 +482,45 @@
           isExpanded = !isExpanded;
           
           if (isExpanded) {
-            headerFilters.style.display = 'block';
+            // Expand: Show filters, restore header height to 120px
+            headerFilters.style.display = 'flex';
+            unifiedHeader.style.height = '120px';
+            unifiedHeader.style.minHeight = '120px';
+            unifiedHeader.style.maxHeight = '120px';
             filterToggleBtn.classList.remove('collapsed');
             filterToggleBtn.querySelector('.header-filter-arrow').textContent = '▲';
           } else {
+            // Collapse: Hide filters, shrink header height to 60px
             headerFilters.style.display = 'none';
+            unifiedHeader.style.height = '60px';
+            unifiedHeader.style.minHeight = '60px';
+            unifiedHeader.style.maxHeight = '60px';
             filterToggleBtn.classList.add('collapsed');
             filterToggleBtn.querySelector('.header-filter-arrow').textContent = '▼';
           }
         });
       }
       
-      // Filter Menu Toggles (status, type, account, date)
-      const filterToggles = document.querySelectorAll('.filter-toggle');
-      filterToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const menu = toggle.nextElementSibling;
-          if (menu && menu.classList.contains('filter-menu')) {
-            const isOpen = menu.classList.contains('show');
-            
+      // Filter Menu Toggles (status, type, account, date) - Hover instead of click
+      document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+        const toggle = dropdown.querySelector('.filter-toggle');
+        const menu = dropdown.querySelector('.filter-menu');
+        
+        if (toggle && menu) {
+          // Open menu on hover
+          dropdown.addEventListener('mouseenter', () => {
             // Close all other filter menus
             document.querySelectorAll('.filter-menu').forEach(m => {
               if (m !== menu) {
                 m.classList.remove('show');
               }
             });
-            
-            // Toggle current menu
-            if (isOpen) {
-              menu.classList.remove('show');
-            } else {
-              menu.classList.add('show');
-            }
-          }
-        });
-      });
-      
-      // Close filter menus when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.filter-dropdown')) {
-          document.querySelectorAll('.filter-menu').forEach(menu => {
+            // Open current menu
+            menu.classList.add('show');
+          });
+          
+          // Close menu on mouse leave
+          dropdown.addEventListener('mouseleave', () => {
             menu.classList.remove('show');
           });
         }
@@ -547,8 +544,7 @@
           menu.querySelectorAll('[class*="-filter-item"]').forEach(i => i.classList.remove('selected'));
           item.classList.add('selected');
           
-          // Close menu
-          menu.classList.remove('show');
+          // Don't close menu on click - close on mouse leave only
         });
       });
     });

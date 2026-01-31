@@ -151,7 +151,13 @@
 }
 
 * { 
-  box-sizing: border-box; 
+  box-sizing: border-box;
+  /* Global Font Defaults - Applied to ALL elements unless overridden */
+  /* SINGLE SOURCE OF TRUTH - font-family defined ONLY here */
+  font-family: var(--font-family-primary);
+  font-size: 0.92rem; /* 14.72px - System-wide default for all text elements */
+  font-weight: 300; /* Light weight - System-wide default */
+  line-height: 1.4; /* Normal line-height - System-wide default */
 }
 
 /* ============================================
@@ -174,10 +180,9 @@ body {
   color: var(--apple-text-primary, #000000);
   margin: 0;
   padding: 0;
-  line-height: var(--line-height-normal, 1.4);
+  /* Font defaults inherited from * selector - 0.75rem (12px), 300, 1.4, font-family from :root */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
   min-height: 100vh;
   text-rendering: optimizeSpeed;
 }
@@ -186,39 +191,41 @@ body {
    Level 2.1: Typography Base (Default Styles)
    ============================================ */
 
-/* Headings */
+/* Headings - Relative sizes based on global default (0.92rem) */
+/* SINGLE SOURCE OF TRUTH - All heading sizes relative to base font-size */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
   font-weight: var(--font-weight-semibold, 600);
   line-height: var(--line-height-tight, 1.2);
   color: var(--apple-text-primary, #000000);
+  /* font-family and base font-size inherited from * selector */
 }
 
 h1 {
-  font-size: var(--font-size-xxxl, 32px);
+  font-size: 1.5rem; /* ~24px - Relative to base 0.92rem (1.63x) */
 }
 
 h2 {
-  font-size: var(--font-size-xxl, 24px);
+  font-size: 1.25rem; /* ~20px - Relative to base 0.92rem (1.36x) */
 }
 
 h3 {
-  font-size: var(--font-size-xl, 20px);
+  font-size: 1.1rem; /* ~17.6px - Relative to base 0.92rem (1.2x) */
 }
 
 h4 {
-  font-size: var(--font-size-lg, 18px);
+  font-size: 1rem; /* ~16px - Relative to base 0.92rem (1.09x) */
   font-weight: var(--font-weight-medium, 500);
 }
 
 h5 {
-  font-size: var(--font-size-base, 16px);
+  font-size: 0.95rem; /* ~15.2px - Relative to base 0.92rem (1.03x) */
   font-weight: var(--font-weight-medium, 500);
 }
 
 h6 {
-  font-size: var(--font-size-sm, 14px);
+  font-size: 0.85rem; /* ~13.6px - Relative to base 0.92rem (0.92x) */
   font-weight: var(--font-weight-medium, 500);
 }
 
@@ -257,9 +264,8 @@ a:hover {
 input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
 textarea,
 select {
-  /* Typography - Match filter dropdown exactly (smaller, tighter) */
-  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
-  font-size: 0.75rem; /* 12px - smaller system default for dropdowns */
+  /* Typography - Inherit from global defaults */
+  /* font-family and font-size inherited from * selector - SINGLE SOURCE OF TRUTH */
   font-weight: 300; /* Light weight - system default */
   line-height: 1.2; /* Tighter line-height - system default */
   color: #1d1d1f;
@@ -269,15 +275,15 @@ select {
   border: 1px solid #ddd;
   border-radius: 4px; /* Smaller border-radius */
   
-  /* Spacing - Match filter dropdown exactly (smaller padding) */
-  padding: 0.25rem 0.6rem; /* 4px 9.6px - smaller system default */
+  /* Spacing - Match filter dropdown exactly (reduced vertical padding to fit in 60px container) */
+  padding: 0.125rem 0.6rem; /* 2px top/bottom, 9.6px left/right - reduced vertical padding */
   margin: 0;
   box-sizing: border-box;
   
   /* Layout */
   width: 100%;
   min-height: auto;
-  height: auto;
+  height: fit-content; /* Fit content height - no fixed height */
   
   /* Behavior */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -313,15 +319,15 @@ textarea::placeholder {
   font-weight: 300; /* Match input font-weight */
 }
 
-/* Buttons - Base Styles (Smaller default - screen space is valuable) */
+/* Buttons - Base Styles (Smaller default - screen space is valuable, reduced vertical padding) */
 button,
 .btn {
   background-color: #ffffff;
   color: unset;
   border-color: unset;
   border-radius: 4px; /* Smaller border-radius - match filter dropdown */
-  padding: 0.25rem 0.6rem; /* Smaller padding - match filter dropdown (4px 9.6px) */
-  font-size: 0.75rem; /* Smaller font - match filter dropdown (12px) */
+  padding: 0.125rem 0.6rem; /* Reduced vertical padding (2px top/bottom) - must fit in tight containers */
+  /* font-size inherited from * selector - SINGLE SOURCE OF TRUTH */
   font-weight: 300; /* Match filter dropdown */
   line-height: 1.2; /* Tighter line-height - match filter dropdown */
   text-align: center;
@@ -337,9 +343,11 @@ button,
   width: auto;
   margin-inline-end: 0.5rem;
   box-sizing: border-box;
-  font-family: var(--font-family-primary, 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif);
+  /* font-family inherited from * selector - SINGLE SOURCE OF TRUTH */
   min-height: auto; /* Remove default min-height - allow smaller buttons */
   min-width: auto; /* Remove default min-width - allow smaller buttons */
+  height: fit-content; /* Fit content height - no fixed height */
+  /* Reduced vertical padding to fit within tight container heights (e.g., 60px filter container) */
 }
 
 button:hover,
@@ -389,11 +397,11 @@ button:disabled,
   /* Uses base styles defined above */
 }
 
-/* Form Select Styles - Override to match filter dropdown styles (system default) */
+/* Form Select Styles - Override to match filter dropdown styles (system default, reduced vertical padding) */
 .form-select {
   /* Use filter dropdown styles - already defined above in base select */
-  padding: 0.25rem 0.6rem; /* Match filter dropdown exactly - 4px 9.6px */
-  font-size: 0.75rem; /* Match filter dropdown exactly - 12px */
+  padding: 0.125rem 0.6rem; /* Reduced vertical padding (2px top/bottom) - match filter dropdown */
+  /* font-size inherited from * selector - SINGLE SOURCE OF TRUTH */
   font-weight: 300; /* Match filter dropdown exactly - light weight */
   line-height: 1.2; /* Match filter dropdown exactly - tighter */
   color: #1d1d1f; /* Match filter dropdown exactly */
@@ -406,6 +414,8 @@ button:disabled,
   border-radius: 4px; /* Match filter dropdown exactly - smaller */
   transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Match filter dropdown exactly */
   max-width: 250px;
+  height: fit-content; /* Fit content height - no fixed height */
+  /* Reduced vertical padding to fit within tight container heights */
 }
 
 .form-select:focus {

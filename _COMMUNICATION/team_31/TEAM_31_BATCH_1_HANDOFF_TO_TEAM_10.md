@@ -86,7 +86,10 @@ All pages have preview files ready for visual review:
 - `_PREVIEW_D15_REGISTER.html`
 - `_PREVIEW_D15_RESET_PWD.html`
 
-**Location:** `_COMMUNICATION/team_31/team_31_staging/`
+**Source Location:** `_COMMUNICATION/team_31/team_31_staging/`  
+**Note:** All files in `team_31_staging/` are **signed-off and ready for integration**.
+
+**⚠️ IMPORTANT:** All final deliverables are located in `team_31_staging/` directory. This is the **only** location for signed-off files ready for system integration.
 
 ---
 
@@ -94,7 +97,9 @@ All pages have preview files ready for visual review:
 
 ### **Step 1: File Integration**
 
-Copy the following files to your system:
+**Source Location:** `_COMMUNICATION/team_31/team_31_staging/`
+
+Copy the following files from staging to your system:
 
 **HTML Files:**
 - `D15_LOGIN.html`
@@ -102,11 +107,17 @@ Copy the following files to your system:
 - `D15_RESET_PWD.html`
 
 **CSS Files (if not already integrated):**
-- `phoenix-base.css`
-- `phoenix-components.css`
-- `D15_IDENTITY_STYLES.css`
+- `phoenix-base.css` (shared base styles)
+- `phoenix-components.css` (LEGO components - shared)
+- `phoenix-header.css` (header component - shared, not used in auth pages)
+- `D15_IDENTITY_STYLES.css` (auth-specific styles)
 
-**Location:** `_COMMUNICATION/team_31/team_31_staging/`
+**Preview Files (for visual reference):**
+- `_PREVIEW_D15_LOGIN.html`
+- `_PREVIEW_D15_REGISTER.html`
+- `_PREVIEW_D15_RESET_PWD.html`
+
+**⚠️ IMPORTANT:** All final deliverables are located in `team_31_staging/` directory. This is the **only** location for signed-off files ready for system integration.
 
 ### **Step 2: CSS Loading Order**
 
@@ -195,7 +206,10 @@ All pages comply with:
    - Implementation details
    - Challenges and solutions
 
-**Location:** `_COMMUNICATION/team_31/team_31_staging/`
+**Source Location:** `_COMMUNICATION/team_31/team_31_staging/`  
+**Note:** All files in `team_31_staging/` are **signed-off and ready for integration**.
+
+**⚠️ IMPORTANT:** All final deliverables are located in `team_31_staging/` directory. This is the **only** location for signed-off files ready for system integration.
 
 ### **Validation Evidence:**
 
@@ -254,9 +268,9 @@ All pages comply with:
 ## 📞 Support
 
 For questions or issues during integration:
-- **Documentation:** See `BATCH_1_AUTH_COMPLETE.md`
-- **Workflow:** See `STANDARD_PAGE_BUILD_WORKFLOW.md`
-- **Contact:** Team 30 (Frontend)
+- **Documentation:** See `team_31_staging/BATCH_1_AUTH_COMPLETE.md`
+- **Workflow:** See `team_31_staging/STANDARD_PAGE_BUILD_WORKFLOW.md`
+- **Contact:** Team 31 (Blueprint)
 
 ---
 

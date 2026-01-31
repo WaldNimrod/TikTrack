@@ -63,4 +63,5 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    # Backend API runs on port 8082 (Frontend V2 uses port 8080 per Master Blueprint)
+    uvicorn.run(app, host="0.0.0.0", port=8082)

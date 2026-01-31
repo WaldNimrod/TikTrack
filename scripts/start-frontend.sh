@@ -1,7 +1,7 @@
 #!/bin/bash
 # 🚀 Start Frontend Dev Server Script
 # TikTrack Phoenix - Frontend Dev Server Startup
-# Port: 3000
+# Port: 8080 (V2 port as per Master Blueprint: "Ports: V2 (8080), Legacy (8081)")
 
 set -e
 
@@ -34,26 +34,26 @@ if [ ! -d "node_modules" ]; then
     echo -e "${GREEN}✅ Dependencies installed${NC}"
 fi
 
-# Check if port 3000 is already in use
-if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
-    echo -e "${YELLOW}⚠️  Port 3000 is already in use${NC}"
+# Check if port 8080 is already in use
+if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo -e "${YELLOW}⚠️  Port 8080 is already in use${NC}"
     echo "Do you want to kill the existing process? (y/n)"
     read -r response
     if [[ "$response" =~ ^[Yy]$ ]]; then
-        echo -e "${YELLOW}🛑 Killing process on port 3000...${NC}"
-        lsof -ti:3000 | xargs kill -9
+        echo -e "${YELLOW}🛑 Killing process on port 8080...${NC}"
+        lsof -ti:8080 | xargs kill -9
         sleep 2
     else
-        echo -e "${RED}❌ Cannot start server. Port 3000 is in use.${NC}"
+        echo -e "${RED}❌ Cannot start server. Port 8080 is in use.${NC}"
         exit 1
     fi
 fi
 
 # Start the dev server
-echo -e "${GREEN}🚀 Starting Vite dev server on port 3000...${NC}"
+echo -e "${GREEN}🚀 Starting Vite dev server on port 8080 (V2)...${NC}"
 echo "=========================================="
-echo "📍 Frontend URL: http://localhost:3000"
-echo "📍 API Proxy: /api -> http://localhost:8080"
+echo "📍 Frontend URL: http://localhost:8080"
+echo "📍 API Proxy: /api -> http://localhost:8082"
 echo "=========================================="
 echo ""
 

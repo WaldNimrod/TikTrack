@@ -13,14 +13,14 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}🛑 Stopping TikTrack Phoenix Frontend Dev Server${NC}"
 echo "=========================================="
 
-# Check if port 3000 is in use
-if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
-    echo -e "${GREEN}📍 Found process on port 3000${NC}"
-    PID=$(lsof -ti:3000)
+# Check if port 8080 is in use
+if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo -e "${GREEN}📍 Found process on port 8080${NC}"
+    PID=$(lsof -ti:8080)
     echo -e "${YELLOW}🛑 Killing process $PID...${NC}"
     kill -9 $PID
     sleep 1
     echo -e "${GREEN}✅ Frontend dev server stopped${NC}"
 else
-    echo -e "${YELLOW}⚠️  No process found on port 3000${NC}"
+    echo -e "${YELLOW}⚠️  No process found on port 8080${NC}"
 fi

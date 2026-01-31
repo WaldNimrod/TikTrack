@@ -1,7 +1,7 @@
 #!/bin/bash
 # 🚀 Start Backend Server Script
 # TikTrack Phoenix - Backend Server Startup
-# Port: 8080 (as defined in Master Blueprint)
+# Port: 8082 (Frontend V2 uses port 8080 per Master Blueprint)
 
 set -e
 
@@ -45,28 +45,28 @@ if [ ! -f "venv/bin/uvicorn" ]; then
     echo -e "${GREEN}✅ Dependencies installed${NC}"
 fi
 
-# Check if port 8080 is already in use
-if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
-    echo -e "${YELLOW}⚠️  Port 8080 is already in use${NC}"
+# Check if port 8082 is already in use
+if lsof -Pi :8082 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo -e "${YELLOW}⚠️  Port 8082 is already in use${NC}"
     echo "Do you want to kill the existing process? (y/n)"
     read -r response
     if [[ "$response" =~ ^[Yy]$ ]]; then
-        echo -e "${YELLOW}🛑 Killing process on port 8080...${NC}"
-        lsof -ti:8080 | xargs kill -9
+        echo -e "${YELLOW}🛑 Killing process on port 8082...${NC}"
+        lsof -ti:8082 | xargs kill -9
         sleep 2
     else
-        echo -e "${RED}❌ Cannot start server. Port 8080 is in use.${NC}"
+        echo -e "${RED}❌ Cannot start server. Port 8082 is in use.${NC}"
         exit 1
     fi
 fi
 
 # Start the server
-echo -e "${GREEN}🚀 Starting FastAPI server on port 8080...${NC}"
+echo -e "${GREEN}🚀 Starting FastAPI server on port 8082...${NC}"
 echo "=========================================="
-echo "📍 API Base URL: http://localhost:8080/api/v1"
-echo "📍 Health Check: http://localhost:8080/health"
-echo "📍 API Docs: http://localhost:8080/docs"
+echo "📍 API Base URL: http://localhost:8082/api/v1"
+echo "📍 Health Check: http://localhost:8082/health"
+echo "📍 API Docs: http://localhost:8082/docs"
 echo "=========================================="
 echo ""
 
-uvicorn main:app --reload --host 0.0.0.0 --port 8080
+uvicorn main:app --reload --host 0.0.0.0 --port 8082

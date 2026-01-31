@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🚀 Start Backend Server (Port 8080)",
+      "label": "🚀 Start Backend Server (Port 8082)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-backend.sh",
       "problemMatcher": [],
@@ -43,7 +43,7 @@
       }
     },
     {
-      "label": "🚀 Start Frontend Dev Server (Port 3000)",
+      "label": "🚀 Start Frontend Dev Server (Port 8080 - V2)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-frontend.sh",
       "problemMatcher": [],
@@ -74,8 +74,8 @@
     {
       "label": "🚀 Start All Servers (Backend + Frontend)",
       "dependsOn": [
-        "🚀 Start Backend Server (Port 8080)",
-        "🚀 Start Frontend Dev Server (Port 3000)"
+        "🚀 Start Backend Server (Port 8082)",
+        "🚀 Start Frontend Dev Server (Port 8080 - V2)"
       ],
       "dependsOrder": "parallel",
       "problemMatcher": [],
@@ -104,7 +104,7 @@
     {
       "label": "📋 Check Server Status",
       "type": "shell",
-      "command": "echo 'Backend (8080):' && (lsof -Pi :8080 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running') && echo 'Frontend (3000):' && (lsof -Pi :3000 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running')",
+      "command": "echo 'Frontend V2 (8080):' && (lsof -Pi :8080 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running') && echo 'Backend API (8082):' && (lsof -Pi :8082 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running')",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

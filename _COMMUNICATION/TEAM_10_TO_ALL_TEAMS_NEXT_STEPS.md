@@ -114,7 +114,7 @@ npm run dev
 - בונה את הפרויקט
 - מפעיל Hot Module Replacement (HMR)
 
-**הפרויקט אמור לרוץ על:** `http://localhost:3000`
+**הפרויקט אמור לרוץ על:** `http://localhost:8080` (V2 port as per Master Blueprint)
 
 **בדיקות ראשוניות:**
 - ✅ Dev server מתחיל ללא שגיאות
@@ -159,7 +159,7 @@ npm run dev
 ```bash
 cd api
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-uvicorn main:app --reload --port 8080
+uvicorn main:app --reload --port 8082
 ```
 
 **בדיקות:**
@@ -263,19 +263,19 @@ uvicorn main:app --reload --port 8080
 ## 📋 Checklist לפני הרצה
 
 ### **Backend (חובה לאינטגרציה):**
-- [ ] Backend רץ בפורט **8080** (`uvicorn main:app --reload --port 8080`)
+- [ ] Backend רץ בפורט **8082** (`uvicorn main:app --reload --port 8082`)
 - [ ] Health check עובד: `http://localhost:8080/health`
 - [ ] Database מחובר (אם נדרש)
 
 ### **Frontend:**
 - [ ] Dependencies מותקנים (`npm install`)
-- [ ] `.env.development` קיים עם `VITE_API_BASE_URL=http://localhost:8080/api/v1`
+- [ ] `.env.development` קיים עם `VITE_API_BASE_URL=http://localhost:8082/api/v1`
 - [ ] `AppRouter.jsx` מכיל את ה-Routes הנכונים
 - [ ] Components קיימים ב-`ui/src/components/auth/`
 
 ### **תקשורת:**
-- [ ] Backend CORS מוגדר לתמיכה ב-Frontend (port 3000)
-- [ ] Vite proxy מוגדר ל-Backend (port 8080)
+- [ ] Backend CORS מוגדר לתמיכה ב-Frontend (port 8080)
+- [ ] Vite proxy מוגדר ל-Backend (port 8082)
 
 ---
 

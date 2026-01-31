@@ -60,8 +60,8 @@
 - **JSONB:** Flexible data storage
 
 ### **Ports:**
-- **Frontend Dev Server:** 3000
-- **Backend API:** 8080
+- **Frontend V2:** 8080 (as per Master Blueprint: "Ports: V2 (8080), Legacy (8081)")
+- **Backend API:** 8082
 - **Legacy System:** 8081
 
 ---
@@ -77,7 +77,7 @@
 
 #### **Available Scripts:**
 ```bash
-npm run dev      # Start development server (port 3000)
+npm run dev      # Start development server (port 8080 - V2)
 npm run build    # Build for production
 npm run preview  # Preview production build
 npm run lint     # Run ESLint
@@ -85,18 +85,18 @@ npm run lint     # Run ESLint
 
 #### **Vite Configuration:**
 - **File:** `ui/vite.config.js`
-- **Dev Server Port:** 3000
-- **API Proxy:** `/api` → `http://localhost:8080`
+- **Dev Server Port:** 8080 (V2 port as per Master Blueprint)
+- **API Proxy:** `/api` → `http://localhost:8082` (Backend API)
 - **Build Output:** `dist/`
 - **Source Maps:** Enabled
 
 **Key Configuration:**
 ```javascript
 server: {
-  port: 3000,
+  port: 8080,  // V2 port as per Master Blueprint
   proxy: {
     '/api': {
-      target: 'http://localhost:8080',
+      target: 'http://localhost:8082',  // Backend API
       changeOrigin: true,
       secure: false,
     },
@@ -200,7 +200,7 @@ api/
 #### **Main Application:**
 - **File:** `api/main.py`
 - **Framework:** FastAPI
-- **Port:** 8080
+- **Port:** 8082 (Frontend V2 uses port 8080 per Master Blueprint)
 - **CORS:** Enabled (configured for frontend)
 
 #### **Key Features:**
@@ -229,7 +229,7 @@ api/
 ### **API Endpoints**
 
 #### **Base URL:**
-- **Development:** `http://localhost:8080/api/v1`
+- **Development:** `http://localhost:8082/api/v1`
 - **Production:** `https://api.tiktrack.com/api/v1`
 
 #### **Available Endpoints:**
@@ -283,7 +283,7 @@ api/
 
 #### **Available Variables:**
 ```env
-VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_API_BASE_URL=http://localhost:8082/api/v1
 VITE_APP_NAME=TikTrack Phoenix
 VITE_APP_VERSION=2.0.0
 VITE_APP_ENV=development
@@ -447,15 +447,16 @@ npm run dev
 
 **Order of Operations:**
 1. **Start Database** (if running locally)
-2. **Start Backend** (`uvicorn main:app --reload --port 8080`) ⚠️ **Port 8080 is MANDATORY**
-3. **Start Frontend** (`npm run dev`)
-4. **Access Application:** `http://localhost:3000`
+2. **Start Backend** (`uvicorn main:app --reload --port 8082`)
+3. **Start Frontend** (`npm run dev`) ⚠️ **Port 8080 is MANDATORY for V2**
+4. **Access Application:** `http://localhost:8080`
 
-**Why Port 8080?**
+**Why Port 8080 for Frontend?**
 - Defined in Master Blueprint: "Ports: V2 (8080), Legacy (8081)"
-- Frontend proxy configured for `http://localhost:8080`
-- Environment variables set to `http://localhost:8080/api/v1`
-- Changing port requires updating multiple configuration files
+- V2 (Frontend) uses port 8080
+- Backend API runs on port 8082 (different port to avoid conflict)
+- Frontend proxy configured for `http://localhost:8082`
+- Environment variables set to `http://localhost:8082/api/v1`
 
 ---
 
@@ -487,12 +488,12 @@ npm run preview
 #### **Production Server:**
 ```bash
 cd api
-uvicorn main:app --host 0.0.0.0 --port 8080
+uvicorn main:app --host 0.0.0.0 --port 8082
 ```
 
 #### **With Process Manager (PM2):**
 ```bash
-pm2 start "uvicorn main:app --host 0.0.0.0 --port 8080" --name tiktrack-api
+pm2 start "uvicorn main:app --host 0.0.0.0 --port 8082" --name tiktrack-api
 ```
 
 ### **Environment Variables (Production)**
@@ -505,6 +506,7 @@ pm2 start "uvicorn main:app --host 0.0.0.0 --port 8080" --name tiktrack-api
 - Set `DATABASE_URL` to production database
 - Set `SECRET_KEY` to secure random string
 - Set JWT expiration times
+- Backend runs on port 8082 (Frontend V2 uses 8080)
 
 ---
 
@@ -523,8 +525,8 @@ pm2 start "uvicorn main:app --host 0.0.0.0 --port 8080" --name tiktrack-api
 #### **Proxy Issues:**
 - **Problem:** API requests fail
 - **Solution:**
-  - Verify backend is running on port 8080
-  - Check `vite.config.js` proxy configuration
+  - Verify backend is running on port 8082
+  - Check `vite.config.js` proxy configuration (should point to `http://localhost:8082`)
   - Ensure backend CORS is configured correctly
 
 #### **Environment Variables Not Loading:**
@@ -559,10 +561,11 @@ pm2 start "uvicorn main:app --host 0.0.0.0 --port 8080" --name tiktrack-api
   - Check Python path
 
 #### **Port Already in Use:**
-- **Problem:** Port 8080 already in use
+- **Problem:** Port 8080 or 8082 already in use
 - **Solution:**
-  - Find process: `lsof -i :8080` (macOS/Linux)
-  - Kill process or change port in `uvicorn` command
+  - Frontend (8080): `lsof -i :8080` (macOS/Linux)
+  - Backend (8082): `lsof -i :8082` (macOS/Linux)
+  - Kill process or use scripts (they handle this automatically)
 
 ### **General Issues**
 

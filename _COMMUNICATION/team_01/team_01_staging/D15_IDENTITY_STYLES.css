@@ -175,9 +175,10 @@ button.btn-auth-primary:hover {
 }
 
 .remember-me input[type="checkbox"] {
+  /* Inherits base checkbox styles from phoenix-base.css */
+  /* Additional specific styles if needed */
   width: 18px;
   height: 18px;
-  cursor: pointer;
 }
 
 .remember-me label {

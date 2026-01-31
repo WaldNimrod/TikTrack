@@ -142,10 +142,70 @@ paths:
       summary: "Request password reset (EMAIL or SMS)"
       tags:
         - authentication
-      description: "TODO: Implement PasswordResetService (Task 20.1.6)"
+      description: "Request password reset via EMAIL (token) or SMS (verification code). Always returns success to prevent user enumeration."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
       responses:
-        '501':
-          description: "Not implemented yet"
+        '202':
+          description: "Reset request accepted (always returns success for security)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "If the account exists, a reset link has been sent"
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/verify-reset:
+    post:
+      summary: "Verify and complete password reset"
+      tags:
+        - authentication
+      description: "Verify reset token (EMAIL) or verification code (SMS) and update password."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetVerify'
+      responses:
+        '200':
+          description: "Password reset successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully"
+                  user_id:
+                    type: string
+                    pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+                    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        '400':
+          description: "Invalid token/code or expired"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /auth/verify-phone:
     post:
@@ -277,10 +337,28 @@ paths:
         - api-keys
       security:
         - bearerAuth: []
-      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      description: "List all API keys for the authenticated user. Returns masked keys."
       responses:
-        '501':
-          description: "Not implemented yet"
+        '200':
+          description: "List of API keys"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserApiKeyResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     post:
       summary: "Create new API key (D24)"
@@ -288,10 +366,38 @@ paths:
         - api-keys
       security:
         - bearerAuth: []
-      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      description: "Create a new API key for a provider. Keys are encrypted before storage."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserApiKeyCreate'
       responses:
-        '501':
-          description: "Not implemented yet"
+        '201':
+          description: "API key created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserApiKeyResponse'
+        '400':
+          description: "Invalid input or duplicate key"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/api-keys/{key_id}:
     put:
@@ -308,10 +414,60 @@ paths:
             type: string
             pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
           description: "API key ULID"
-      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      description: "Update API key (label, status, or re-encrypt keys)."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider_label:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+                  nullable: true
+                api_key:
+                  type: string
+                  nullable: true
+                api_secret:
+                  type: string
+                  nullable: true
+                additional_config:
+                  type: object
+                  nullable: true
       responses:
-        '501':
-          description: "Not implemented yet"
+        '200':
+          description: "API key updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserApiKeyResponse'
+        '400':
+          description: "Invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "API key not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     delete:
       summary: "Delete API key (D24)"
@@ -327,10 +483,28 @@ paths:
             type: string
             pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
           description: "API key ULID"
-      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      description: "Delete API key (soft delete - sets deleted_at timestamp)."
       responses:
-        '501':
-          description: "Not implemented yet"
+        '204':
+          description: "API key deleted successfully"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "API key not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /user/api-keys/{key_id}/verify:
     post:
@@ -347,10 +521,42 @@ paths:
             type: string
             pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
           description: "API key ULID"
-      description: "TODO: Implement ApiKeyService (Task 20.1.7)"
+      description: "Verify API key against provider API and update verification status."
       responses:
-        '501':
-          description: "Not implemented yet"
+        '200':
+          description: "Verification result"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key_id:
+                    type: string
+                    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+                  is_verified:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "API key verified successfully"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "API key not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /trading_accounts:
     get:
@@ -578,6 +784,137 @@ components:
           nullable: true
           description: "Language code (e.g., 'en', 'he')"
           example: "en"
+
+    # Password Reset Schemas
+    PasswordResetRequest:
+      type: object
+      required:
+        - method
+      properties:
+        method:
+          type: string
+          enum: [EMAIL, SMS]
+          description: "Reset method"
+          example: "EMAIL"
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: "Email address (required if method=EMAIL)"
+          example: "user@example.com"
+        phone_number:
+          type: string
+          nullable: true
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: "Phone number (required if method=SMS)"
+          example: "+1234567890"
+
+    PasswordResetVerify:
+      type: object
+      required:
+        - new_password
+      properties:
+        reset_token:
+          type: string
+          minLength: 32
+          nullable: true
+          description: "Reset token (from email, required if method=EMAIL)"
+          example: "abc123def456..."
+        verification_code:
+          type: string
+          minLength: 6
+          maxLength: 6
+          nullable: true
+          description: "Verification code (from SMS, required if method=SMS)"
+          example: "123456"
+        new_password:
+          type: string
+          minLength: 8
+          description: "New password"
+          example: "new_secure_password_123"
+
+    # API Keys Schemas
+    UserApiKeyCreate:
+      type: object
+      required:
+        - provider
+        - api_key
+      properties:
+        provider:
+          type: string
+          enum: [IBKR, POLYGON, YAHOO_FINANCE, ALPHA_VANTAGE, FINNHUB, TWELVE_DATA, IEX_CLOUD, CUSTOM]
+          description: "API provider"
+          example: "POLYGON"
+        provider_label:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: "Custom label for this key"
+          example: "Production Key"
+        api_key:
+          type: string
+          minLength: 1
+          description: "API key (will be encrypted)"
+          example: "your_api_key_here"
+        api_secret:
+          type: string
+          nullable: true
+          description: "API secret (will be encrypted)"
+          example: "your_api_secret_here"
+        additional_config:
+          type: object
+          nullable: true
+          description: "Additional configuration (JSON)"
+          example: {}
+
+    UserApiKeyResponse:
+      type: object
+      required:
+        - external_ulids
+        - provider
+        - masked_key
+        - is_active
+        - is_verified
+        - created_at
+      properties:
+        external_ulids:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "API key ULID (external identifier)"
+          example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        provider:
+          type: string
+          enum: [IBKR, POLYGON, YAHOO_FINANCE, ALPHA_VANTAGE, FINNHUB, TWELVE_DATA, IEX_CLOUD, CUSTOM]
+          description: "API provider"
+          example: "POLYGON"
+        provider_label:
+          type: string
+          nullable: true
+          description: "Custom label"
+          example: "Production Key"
+        masked_key:
+          type: string
+          description: "Masked API key (always returns ********************)"
+          example: "********************"
+        is_active:
+          type: boolean
+          description: "Active status"
+          example: true
+        is_verified:
+          type: boolean
+          description: "Verification status"
+          example: true
+        last_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: "Last verification timestamp"
+          example: "2026-01-31T12:00:00Z"
+        created_at:
+          type: string
+          format: date-time
+          description: "Creation timestamp"
+          example: "2026-01-31T10:00:00Z"
 
     # Error Schemas
     ErrorResponse:

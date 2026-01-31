@@ -1,4 +1,12 @@
-<!DOCTYPE html>
+<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
+    .g-bridge-banner { position:fixed; top:0; left:0; right:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
+</style></head><body>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE [16:52:45] | APPROVED | FIDELITY READY</div>
+<main id="phoenix-root"><!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -137,7 +145,7 @@
                 <!-- Utils: Original structure -->
                 <li class="tiktrack-nav-item">
                   <a href="#" class="tiktrack-nav-link" title="ניקוי מטמון לפיתוח">
-                    <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
+                    <span class="nav-text" style="color: var(--apple-red, #dc2626); font-size: 1.2rem;">🧹</span>
                   </a>
                 </li>
                 
@@ -243,11 +251,26 @@
                 <div class="date-range-filter-item" data-value="היום">
                   <span class="option-text">היום</span>
                 </div>
+                <div class="date-range-filter-item" data-value="אתמול">
+                  <span class="option-text">אתמול</span>
+                </div>
                 <div class="date-range-filter-item" data-value="השבוע">
                   <span class="option-text">השבוע</span>
                 </div>
+                <div class="date-range-filter-item" data-value="שבוע (7 ימים)">
+                  <span class="option-text">שבוע (7 ימים)</span>
+                </div>
+                <div class="date-range-filter-item" data-value="שבוע שעבר">
+                  <span class="option-text">שבוע שעבר</span>
+                </div>
                 <div class="date-range-filter-item" data-value="החודש">
                   <span class="option-text">החודש</span>
+                </div>
+                <div class="date-range-filter-item" data-value="חודש (30 יום)">
+                  <span class="option-text">חודש (30 יום)</span>
+                </div>
+                <div class="date-range-filter-item" data-value="חודש קודם">
+                  <span class="option-text">חודש קודם</span>
                 </div>
               </div>
             </div>
@@ -270,12 +293,14 @@
           </div>
           
           <div class="filter-user-section" id="filterUserSection">
-            <a href="/user_profile" class="user-profile-link" title="פרופיל משתמש - התנתקות דרך עמוד פרופיל">
+            <a href="/user_profile" class="user-profile-link" title="פרופיל משתמש">
               <div class="user-avatar-badge" id="filterUserAvatar">
                 <span id="filterUserInitials">יי</span>
               </div>
             </a>
-            <!-- Auth toggle button removed - only profile icon shown -->
+            <button class="auth-toggle-btn" id="filterAuthToggleBtn" title="התחבר/התנתק">
+              <img src="./images/icons/tabler/user.svg" alt="התחבר/התנתק" id="filterAuthIcon" data-status="logged-in">
+            </button>
           </div>
         </div>
       </div>
@@ -555,3 +580,5 @@
   </script>
 </body>
 </html>
+</main>
+<script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script></body></html>

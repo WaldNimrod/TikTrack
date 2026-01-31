@@ -20,6 +20,8 @@
 
 **תפקידכם:** הוספת JavaScript/React Logic + חיבור ל-Backend API תוך שמירה על HTML/CSS של Team 31
 
+**⚠️ חשוב:** תשתיות (Infrastructure) אינן באחריותכם. קבצי תשתית (package.json, vite.config.js, index.html) יטופלו על ידי צוות התשתית המתאים.
+
 ---
 
 ## 🎯 Phase 1.3: Authentication & Users Module
@@ -577,6 +579,11 @@ log_entry | Team 30 | TASK_COMPLETE | 30.1.X | GREEN
 2. ✅ Evidence file לכל משימה
 3. ✅ שאלות דרך Team 10 בלבד
 
+### **תשתיות:**
+1. ✅ **לא באחריות Team 30** - תשתיות יטופלו על ידי צוות התשתית המתאים
+2. ✅ Team 30 מתמקד ב-Components ו-Logic בלבד
+3. ✅ שאלות תשתית הועברו לצוות המתאים
+
 ---
 
 ## 📞 תמיכה וקשר
@@ -602,10 +609,23 @@ log_entry | Team 30 | TASK_COMPLETE | 30.1.X | GREEN
 ## 🎯 Next Steps - עכשיו!
 
 1. **🚨 CRITICAL:** קראו את כל המסמכים המחייבים (CSS + JS Standards)
-2. **העתיקו קבצים:** מ-Team 31 ל-`/ui`
-3. **יצירת תשתית:** `utils/transformers.js`, `utils/audit.js`, `utils/debug.js`
-4. **התחילו עם Auth Service:** משימה 30.1.1
-5. **התחילו עם Login Component:** משימה 30.1.2 (עם Blueprint של Team 31)
+2. **העתיקו קבצים:** מ-Team 31 ל-`/ui` (אם עוד לא העתקתם)
+3. **המשיכו לעבוד על Components:**
+   - ✅ LoginForm.jsx (כבר קיים - אפשר לשפר)
+   - ✅ RegisterForm.jsx (כבר קיים - אפשר לשפר)
+   - ✅ PasswordResetFlow.jsx (כבר קיים - אפשר לשפר)
+   - ✅ ProtectedRoute.jsx (כבר קיים - אפשר לשפר)
+   - ⏳ משימה 30.1.5: API Keys Management Component
+   - ⏳ משימה 30.1.6: Security Settings View
+4. **שיפור Services:**
+   - ✅ auth.js (כבר קיים - אפשר לשפר)
+   - ✅ apiKeys.js (כבר קיים - אפשר לשפר)
+5. **שיפור Utils:**
+   - ✅ transformers.js (כבר קיים)
+   - ✅ audit.js (כבר קיים)
+   - ✅ debug.js (כבר קיים)
+
+**⚠️ הערה:** שאלות על תשתית (package.json, vite.config.js, Router ראשי) הועברו לצוות התשתית המתאים. אתם יכולים להמשיך לעבוד על Components.
 
 ---
 

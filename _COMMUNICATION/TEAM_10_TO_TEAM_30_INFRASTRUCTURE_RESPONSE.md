@@ -8,16 +8,29 @@
 
 ---
 
-## ⚠️ הבהרה חשובה
+## ⚠️ הבהרה חשובה - חלוקת אחריות
 
 **תשתיות (Infrastructure) אינן באחריות של Team 30.**
 
-Team 30 אחראי רק על:
+### **תפקיד Team 30 (Frontend):**
 - ✅ הוספת JavaScript/React Logic
 - ✅ חיבור ל-Backend API
 - ✅ שימוש ב-HTML/CSS של Team 31
+- ✅ פיתוח Components (LoginForm, RegisterForm, וכו')
+- ✅ יישום Transformation Layer (apiToReact/reactToApi)
+- ✅ יישום Audit Trail
 
-**קבצי תשתית (package.json, vite.config.js, index.html) יטופלו על ידי צוות התשתית המתאים.**
+### **לא באחריות Team 30:**
+- ❌ יצירת `package.json`
+- ❌ יצירת `vite.config.js`
+- ❌ יצירת `index.html`
+- ❌ הגדרת Build System
+- ❌ הגדרת React Router (Router ראשי)
+- ❌ הגדרת Environment Variables
+
+**קבצי תשתית יטופלו על ידי צוות התשתית המתאים.**
+
+**Team 10 העביר את הבקשה לצוות התשתית.**
 
 ---
 

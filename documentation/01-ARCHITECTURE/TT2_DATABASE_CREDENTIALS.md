@@ -155,6 +155,7 @@ curl http://localhost:8082/health
 ## 📋 Database Schema Status
 
 ### **Authentication Tables Created:**
+
 1. ✅ **`user_data.users`** - Core users table
    - Supports authentication (username, email, password_hash)
    - Supports phone authentication (phone_number, phone_verified)
@@ -165,7 +166,22 @@ curl http://localhost:8082/health
    - Supports email and SMS password reset
    - Token and verification code management
 
-3. ✅ **`user_data.notes`** - User notes
+3. ✅ **`user_data.user_refresh_tokens`** - Refresh token management
+   - Stores refresh tokens for JWT authentication
+   - Supports token rotation and revocation
+   - Foreign key to `user_data.users(id)` ON DELETE CASCADE
+   - Unique constraint on `jti` (JWT ID)
+   - Indexes on `user_id`, `jti`, and `expires_at`
+   - **Columns:**
+     - `id` - UUID PRIMARY KEY
+     - `user_id` - UUID NOT NULL (FK to users.id)
+     - `token_hash` - VARCHAR(255) NOT NULL (SHA-256 hash)
+     - `jti` - VARCHAR(255) UNIQUE NOT NULL (JWT ID)
+     - `expires_at` - TIMESTAMPTZ NOT NULL
+     - `revoked_at` - TIMESTAMPTZ NULL (NULL if active)
+     - `created_at` - TIMESTAMPTZ NOT NULL DEFAULT NOW()
+
+4. ✅ **`user_data.notes`** - User notes
    - Polymorphic notes system
 
 **Note:** Additional tables will be created incrementally during development.
@@ -188,6 +204,14 @@ curl http://localhost:8082/health
 - ✅ Secondary admin user created (`nimrod_wald`, ADMIN)
 - ✅ Authentication tables created (`user_data.users`, `user_data.password_reset_requests`, `user_data.notes`)
 - ✅ Users ready for login testing
+
+### **2026-01-31 (Refresh Token Table):**
+- ✅ `user_data.user_refresh_tokens` table created
+- ✅ Table structure verified (UUID id, user_id FK, token_hash, jti, expires_at, revoked_at, created_at)
+- ✅ Constraints created (jti_not_empty, hash_not_empty, FK to users, unique jti)
+- ✅ Indexes created (user_id, jti, expires_at)
+- ✅ Backend server restarted
+- ✅ Ready for refresh token operations
 
 ---
 

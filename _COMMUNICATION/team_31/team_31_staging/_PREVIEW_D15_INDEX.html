@@ -3,9 +3,9 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
     body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
-    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
+    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#dc2626; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
 </style></head><body>
-<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [9:47:35] | APPROVED | FIDELITY READY</div>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [10:01:32] | REJECTED | 4 issue(s) found</div>
 <main id="phoenix-root"><!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -286,10 +286,7 @@
         <!-- Section Header -->
         <div class="index-section__header">
           <div class="index-section__header-title">
-            <svg class="index-section__header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
+            <img src="images/icons/entities/home.svg" alt="דף הבית" class="index-section__header-icon" width="20" height="20">
             <h1 class="index-section__header-text">דף הבית - TikTrack</h1>
           </div>
           <div class="index-section__header-actions">
@@ -315,13 +312,152 @@
                   <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
                   <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
                 </button>
-                <span class="active-alerts__count-badge" data-role="count" aria-live="polite">0</span>
+                <span class="active-alerts__count-badge" data-role="count" aria-live="polite">3</span>
               </div>
               <div class="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
             </div>
 
             <div class="active-alerts__body">
-              <div class="active-alerts__empty" data-role="empty-state">
+              <div class="active-alerts__list" data-role="list" role="list">
+                <!-- Alert Card Example 1: Trade Alert -->
+                <article class="active-alerts__card active-alerts__card--trade" role="listitem" data-alert-id="1" data-entity-type="trade" style="--active-alert-card-bg: rgba(38, 186, 172, 0.1); --active-alert-card-border: rgba(38, 186, 172, 0.3); --active-alert-card-text: #1a8f83;">
+                  <div class="active-alerts__card-header">
+                    <div class="active-alerts__header-linked">
+                      <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="trade" data-entity-id="1">
+                        <div class="linked-object-card-icon">
+                          <img src="images/icons/entities/trades.svg" alt="טרייד" class="linked-object-card-icon-img" width="60" height="60">
+                        </div>
+                        <div class="linked-object-card-content">
+                          <div class="linked-object-card-title">
+                            <span class="linked-object-card-type">טרייד</span>
+                            <span class="linked-object-card-name">טרייד 1</span>
+                          </div>
+                          <div class="linked-object-card-meta">
+                            <span class="status-badge" data-status-category="open" data-entity="trade">פתוח</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="active-alerts__details">
+                      <button class="btn btn-view-alert" type="button" aria-label="פרטי התראה">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-body">
+                    <div class="active-alerts__row active-alerts__row--condition">
+                      <span class="active-alerts__row-label">תנאי</span>
+                      <span class="active-alerts__row-value">מחיר &gt; 189.98</span>
+                    </div>
+                    <div class="active-alerts__row active-alerts__row--message">
+                      <span class="active-alerts__row-label">הודעה</span>
+                      <span class="active-alerts__row-value">⚡ התראה חדשה: מחיר INTC הגיע ל-$189.98 - הזדמנות לקנייה</span>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-footer">
+                    <time class="active-alerts__timestamp">2026-02-01 10:30</time>
+                    <div class="active-alerts__actions">
+                      <button type="button" class="active-alerts__mark_read" data-alert-id="1" aria-label="סמן התראה כנקראה">✓</button>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- Alert Card Example 2: Account Alert -->
+                <article class="active-alerts__card active-alerts__card--account" role="listitem" data-alert-id="2" data-entity-type="trading_account">
+                  <div class="active-alerts__card-header">
+                    <div class="active-alerts__header-linked">
+                      <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="trading_account" data-entity-id="1">
+                        <div class="linked-object-card-icon">
+                          <img src="images/icons/entities/trading_accounts.svg" alt="חשבון מסחר" class="linked-object-card-icon-img" width="60" height="60">
+                        </div>
+                        <div class="linked-object-card-content">
+                          <div class="linked-object-card-title">
+                            <span class="linked-object-card-type">חשבון מסחר</span>
+                            <span class="linked-object-card-name">חשבון 1</span>
+                          </div>
+                          <div class="linked-object-card-meta">
+                            <span class="status-badge" data-status-category="active" data-entity="trading_account">פעיל</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="active-alerts__details">
+                      <button class="btn btn-view-alert" type="button" aria-label="פרטי התראה">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-body">
+                    <div class="active-alerts__row active-alerts__row--condition">
+                      <span class="active-alerts__row-label">תנאי</span>
+                      <span class="active-alerts__row-value">יתרה &lt; $10,000</span>
+                    </div>
+                    <div class="active-alerts__row active-alerts__row--message">
+                      <span class="active-alerts__row-label">הודעה</span>
+                      <span class="active-alerts__row-value">⚠️ התראה: יתרת חשבון נמוכה - נדרש מימון</span>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-footer">
+                    <time class="active-alerts__timestamp">2026-02-01 09:15</time>
+                    <div class="active-alerts__actions">
+                      <button type="button" class="active-alerts__mark_read" data-alert-id="2" aria-label="סמן התראה כנקראה">✓</button>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- Alert Card Example 3: Ticker Alert -->
+                <article class="active-alerts__card active-alerts__card--ticker" role="listitem" data-alert-id="3" data-entity-type="ticker" style="--active-alert-card-bg: rgba(23, 162, 184, 0.1); --active-alert-card-border: rgba(23, 162, 184, 0.3); --active-alert-card-text: #138496;">
+                  <div class="active-alerts__card-header">
+                    <div class="active-alerts__header-linked">
+                      <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="ticker" data-entity-id="1">
+                        <div class="linked-object-card-icon">
+                          <img src="images/icons/entities/tickers.svg" alt="טיקר" class="linked-object-card-icon-img" width="60" height="60">
+                        </div>
+                        <div class="linked-object-card-content">
+                          <div class="linked-object-card-title">
+                            <span class="linked-object-card-type">טיקר</span>
+                            <span class="linked-object-card-name">AAPL</span>
+                          </div>
+                          <div class="linked-object-card-meta">
+                            <span class="status-badge" data-status-category="active" data-entity="ticker">פעיל</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="active-alerts__details">
+                      <button class="btn btn-view-alert" type="button" aria-label="פרטי התראה">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-body">
+                    <div class="active-alerts__row active-alerts__row--condition">
+                      <span class="active-alerts__row-label">תנאי</span>
+                      <span class="active-alerts__row-value">מחיר &gt; $150.00</span>
+                    </div>
+                    <div class="active-alerts__row active-alerts__row--message">
+                      <span class="active-alerts__row-label">הודעה</span>
+                      <span class="active-alerts__row-value">📈 התראה: AAPL עלה מעל $150.00 - סימן חיובי</span>
+                    </div>
+                  </div>
+                  <div class="active-alerts__card-footer">
+                    <time class="active-alerts__timestamp">2026-02-01 08:45</time>
+                    <div class="active-alerts__actions">
+                      <button type="button" class="active-alerts__mark_read" data-alert-id="3" aria-label="סמן התראה כנקראה">✓</button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="active-alerts__empty is-hidden" data-role="empty-state" style="display: none;">
                 <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
                 <span class="active-alerts__empty-text">אין התראות חדשות</span>
               </div>
@@ -336,23 +472,27 @@
             <div>רווח/הפסד: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
           </div>
 
-          <!-- Portfolio Summary Card (matches Legacy structure) -->
+          <!-- Portfolio Summary Card (matches Legacy structure) - Two display modes: collapsed (single row) and expanded (two rows) -->
           <div class="info-summary portfolio-summary-card" id="portfolioSummaryContent">
             <div class="portfolio-summary__stats" id="portfolioSummaryStats">
-              <div class="portfolio-summary__stats-row">
-                <span>חשבונות פעילים: 0 מתוך 0</span>
-                <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">+$0.00</span></span>
-                <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">+$0.00</span></span>
-                <span>טריידים פתוחים: 0</span>
-                <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$0.00</span></span>
+              <!-- First Row: Always visible -->
+              <div class="portfolio-summary__stats-row portfolio-summary__stats-row--first">
+                <span>חשבונות פעילים: 31 מתוך 53</span>
+                <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
+                <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
+                <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                  </svg>
+                </button>
+              </div>
+              <!-- Second Row: Hidden by default, shown when expanded -->
+              <div class="portfolio-summary__stats-row portfolio-summary__stats-row--second" id="portfolioSummaryStatsRowSecond" style="display: none;">
+                <span>טריידים פתוחים: 71</span>
+                <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
               </div>
             </div>
-            <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-              </svg>
-            </button>
           </div>
         </div>
       </tt-section>
@@ -362,10 +502,7 @@
         <!-- Section Header -->
         <div class="index-section__header">
           <div class="index-section__header-title">
-            <svg class="index-section__header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
+            <img src="images/icons/entities/home.svg" alt="לוח בקרה" class="index-section__header-icon" width="20" height="20">
             <h2 class="index-section__header-text">לוח בקרה</h2>
           </div>
           <div class="index-section__header-meta">
@@ -437,6 +574,93 @@
           </tt-section-row>
         </div>
       </tt-section>
+
+      <!-- Portfolio Table Section -->
+      <tt-section data-section="portfolio">
+        <!-- Section Header -->
+        <div class="index-section__header">
+          <div class="index-section__header-title">
+            <img src="images/icons/entities/trading_accounts.svg" alt="פורטפוליו" class="index-section__header-icon" width="20" height="20">
+            <h2 class="index-section__header-text">פורטפוליו</h2>
+          </div>
+          <div class="index-section__header-actions">
+            <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6l6 -6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section Body: Portfolio Table -->
+        <div class="index-section__body">
+          <div class="portfolio-table-wrapper">
+            <table class="portfolio-table" id="portfolioTable" data-table-type="portfolio">
+              <thead>
+                <tr>
+                  <th class="col-side">צד</th>
+                  <th class="col-symbol">סימבול</th>
+                  <th class="col-ticker">נוכחי</th>
+                  <th class="col-quantity">כמות</th>
+                  <th class="col-avg-price">מחיר ממוצע</th>
+                  <th class="col-market-value">שווי שוק</th>
+                  <th class="col-unrealized-pl">P/L</th>
+                  <th class="col-account">חשבון</th>
+                  <th class="col-percent-portfolio">% פורטפוליו</th>
+                  <th class="col-actions">פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Example Row 1 -->
+                <tr>
+                  <td class="col-side"><span class="side-badge side-badge--long">↑</span></td>
+                  <td class="col-symbol">AAPL</td>
+                  <td class="col-ticker"><span class="numeric-value-positive" dir="ltr">$150.25</span></td>
+                  <td class="col-quantity">100</td>
+                  <td class="col-avg-price"><span class="numeric-value-positive" dir="ltr">$148.50</span></td>
+                  <td class="col-market-value"><span class="numeric-value-positive" dir="ltr">$15,025.00</span></td>
+                  <td class="col-unrealized-pl"><span class="numeric-value-positive" dir="ltr">+$175.00</span></td>
+                  <td class="col-account">חשבון 1</td>
+                  <td class="col-percent-portfolio">4.03%</td>
+                  <td class="col-actions">
+                    <button class="btn-action" aria-label="פעולות">⋯</button>
+                  </td>
+                </tr>
+                <!-- Example Row 2 -->
+                <tr>
+                  <td class="col-side"><span class="side-badge side-badge--short">↓</span></td>
+                  <td class="col-symbol">MSFT</td>
+                  <td class="col-ticker"><span class="numeric-value-positive" dir="ltr">$380.75</span></td>
+                  <td class="col-quantity">50</td>
+                  <td class="col-avg-price"><span class="numeric-value-positive" dir="ltr">$385.00</span></td>
+                  <td class="col-market-value"><span class="numeric-value-positive" dir="ltr">$19,037.50</span></td>
+                  <td class="col-unrealized-pl"><span class="numeric-value-negative" dir="ltr">-$212.50</span></td>
+                  <td class="col-account">חשבון 2</td>
+                  <td class="col-percent-portfolio">5.10%</td>
+                  <td class="col-actions">
+                    <button class="btn-action" aria-label="פעולות">⋯</button>
+                  </td>
+                </tr>
+                <!-- Example Row 3 -->
+                <tr>
+                  <td class="col-side"><span class="side-badge side-badge--long">↑</span></td>
+                  <td class="col-symbol">GOOGL</td>
+                  <td class="col-ticker"><span class="numeric-value-positive" dir="ltr">$142.30</span></td>
+                  <td class="col-quantity">75</td>
+                  <td class="col-avg-price"><span class="numeric-value-positive" dir="ltr">$140.00</span></td>
+                  <td class="col-market-value"><span class="numeric-value-positive" dir="ltr">$10,672.50</span></td>
+                  <td class="col-unrealized-pl"><span class="numeric-value-positive" dir="ltr">+$172.50</span></td>
+                  <td class="col-account">חשבון 1</td>
+                  <td class="col-percent-portfolio">2.86%</td>
+                  <td class="col-actions">
+                    <button class="btn-action" aria-label="פעולות">⋯</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </tt-section>
     </tt-container>
   </main>
 
@@ -482,6 +706,30 @@
           });
         }
       });
+
+      // Portfolio Summary Toggle Functionality
+      const portfolioToggleBtn = document.getElementById('portfolioSummaryToggleSize');
+      const portfolioStatsRowSecond = document.getElementById('portfolioSummaryStatsRowSecond');
+      
+      if (portfolioToggleBtn && portfolioStatsRowSecond) {
+        portfolioToggleBtn.addEventListener('click', function() {
+          const isExpanded = portfolioStatsRowSecond.style.display !== 'none';
+          
+          if (isExpanded) {
+            portfolioStatsRowSecond.style.display = 'none';
+            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מלא');
+            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מלא');
+            // Change icon to eye (show more)
+            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>';
+          } else {
+            portfolioStatsRowSecond.style.display = 'flex';
+            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מצומצם');
+            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מצומצם');
+            // Change icon to eye-off (show less)
+            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+          }
+        });
+      }
     });
   </script>
 </body>

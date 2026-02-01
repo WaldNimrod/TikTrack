@@ -10,10 +10,10 @@ Based on GIN-2026-008 + Architectural Answer (Appendix A).
 import uuid
 import secrets
 import hashlib
+import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 import logging
@@ -31,9 +31,6 @@ from ..schemas.identity import (
 )
 
 logger = logging.getLogger(__name__)
-
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AuthenticationError(Exception):
@@ -79,23 +76,29 @@ class AuthService:
             password: Plain text password
             
         Returns:
-            Hashed password
+            Hashed password string
         """
-        return pwd_context.hash(password)
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """
-        Verify a password against its hash.
+        Verify a password against a hash using bcrypt.
         
         Args:
             plain_password: Plain text password
-            hashed_password: Hashed password from database
+            hashed_password: Bcrypt hash string
             
         Returns:
             True if password matches, False otherwise
         """
-        return pwd_context.verify(plain_password, hashed_password)
+        try:
+            return bcrypt.checkpw(
+                plain_password.encode('utf-8'),
+                hashed_password.encode('utf-8')
+            )
+        except Exception:
+            return False
     
     # ========================================================================
     # JWT Token Creation
@@ -292,7 +295,12 @@ class AuthService:
                 logger.warning(f"User not found: {username_or_email}")
                 raise AuthenticationError("Invalid credentials")
             
-            logger.debug(f"User found: {user.username}, email: {user.email}, is_active: {user.is_active}")
+            logger.info(f"User found: {user.username}, email: {user.email}, is_active: {user.is_active}")
+            
+            # Check if account is active
+            if not user.is_active:
+                logger.warning(f"Account inactive: {user.username}")
+                raise AuthenticationError("Account is inactive")
             
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.utcnow():
@@ -300,11 +308,13 @@ class AuthService:
                 raise AuthenticationError("Account is locked")
             
             # Verify password
-            logger.debug(f"Verifying password for user: {user.username}")
-            logger.debug(f"Password hash (first 50 chars): {user.password_hash[:50]}...")
+            logger.info(f"Verifying password for user: {user.username}")
+            logger.info(f"Password hash (first 50 chars): {user.password_hash[:50]}...")
+            logger.info(f"Password hash length: {len(user.password_hash)}")
+            logger.info(f"Password hash format check: {user.password_hash.startswith('$2b$')}")
             try:
                 password_valid = self.verify_password(password, user.password_hash)
-                logger.debug(f"Password verification result: {password_valid}")
+                logger.info(f"Password verification result: {password_valid}")
             except Exception as e:
                 logger.error(f"Password verification error: {type(e).__name__}: {str(e)}", exc_info=True)
                 raise AuthenticationError("Invalid credentials")

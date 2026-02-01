@@ -146,6 +146,22 @@
   --z-index-header-modal: 1000;
   --z-index-g-bridge-banner: 10002;
   
+  /* ===== Entity Colors (for Active Alerts) ===== */
+  --entity-trade-color: #26baac;
+  --entity-trade-bg: rgba(38, 186, 172, 0.1);
+  --entity-trade-border: rgba(38, 186, 172, 0.3);
+  --entity-trade-text: #1a8f83;
+  
+  --entity-trading-account-color: #28a745;
+  --entity-trading-account-bg: rgba(40, 167, 69, 0.1);
+  --entity-trading-account-border: rgba(40, 167, 69, 0.3);
+  --entity-trading-account-text: #1e7e34;
+  
+  --entity-ticker-color: #17a2b8;
+  --entity-ticker-bg: rgba(23, 162, 184, 0.1);
+  --entity-ticker-border: rgba(23, 162, 184, 0.3);
+  --entity-ticker-text: #138496;
+  
   /* ===== Container ===== */
   --container-max-width: 1400px;
   --container-xl: 1400px;

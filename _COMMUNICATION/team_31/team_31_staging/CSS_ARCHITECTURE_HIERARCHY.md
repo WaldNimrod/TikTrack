@@ -32,8 +32,12 @@ CSS files **MUST** be loaded in this exact order:
 <!-- 4. Header Component (If header is used) -->
 <link rel="stylesheet" href="./phoenix-header.css">
 
-<!-- 5. Page-Specific Styles (If needed) -->
-<link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+<!-- 5. Context-Specific Styles (Shared across multiple pages) -->
+<link rel="stylesheet" href="./D15_DASHBOARD_STYLES.css"> <!-- For dashboard pages -->
+<link rel="stylesheet" href="./D15_IDENTITY_STYLES.css"> <!-- For auth pages -->
+
+<!-- 6. Page-Specific Styles (Only in final stages if absolutely needed) -->
+<!-- <link rel="stylesheet" href="./D15_PAGE_STYLES.css"> -->
 ```
 
 **⚠️ IMPORTANT:** Changing the loading order will break styles due to CSS cascade and specificity.
@@ -126,7 +130,26 @@ CSS files **MUST** be loaded in this exact order:
 
 ---
 
-### **4. D15_IDENTITY_STYLES.css**
+### **5. D15_DASHBOARD_STYLES.css**
+**Purpose:** Shared styles for ALL Dashboard pages (Index, Dashboard, etc.)
+
+**Contains:**
+- Dashboard section headers (BEM pattern: `.dashboard-section__header`, `.index-section__header`)
+- Active alerts component (`.active-alerts`, `.active-alerts__header`, etc.)
+- Summary information (`.info-summary`, `.info-summary__item`)
+- Portfolio summary (`.portfolio-summary`, `.portfolio-summary__stats`)
+- Widget placeholders (`.widget-placeholder`, `.widget-placeholder__title`)
+- Numeric values for financial data (`.numeric-value-positive`, `.numeric-value-negative`, `.numeric-value-zero`)
+- Container queries for responsive design
+
+**Usage:**
+All dashboard pages (Index, Dashboard, etc.) should load this file instead of creating page-specific CSS.
+
+**Key Principle:** Shared across multiple dashboard pages. Follows BEM pattern and CSS Standards Protocol.
+
+---
+
+### **6. D15_IDENTITY_STYLES.css**
 **Purpose:** Authentication pages specific styles
 
 **Contains:**
@@ -269,7 +292,9 @@ body.auth-layout-root form input {
 - `phoenix-base.css` - Base styles (shared)
 - `phoenix-components.css` - LEGO components (shared)
 - `phoenix-header.css` - Header component (shared, conditional)
-- `D15_[PAGE]_STYLES.css` - Page-specific styles (if needed)
+- `D15_DASHBOARD_STYLES.css` - Dashboard pages shared styles (Index, Dashboard, etc.)
+- `D15_IDENTITY_STYLES.css` - Authentication pages shared styles (Login, Register, Reset)
+- `D15_[PAGE]_STYLES.css` - Page-specific styles (only in final stages if absolutely needed)
 
 ---
 

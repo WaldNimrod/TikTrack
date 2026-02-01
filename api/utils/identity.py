@@ -9,6 +9,7 @@ Based on GIN-2026-008: Internal UUID v4, External ULID Strings.
 
 import uuid
 from typing import Optional
+import ulid
 from ulid import ULID
 
 
@@ -37,9 +38,9 @@ def uuid_to_ulid(uuid_value: Optional[uuid.UUID]) -> Optional[str]:
         uuid_value = uuid.UUID(uuid_value)
     
     # Generate ULID from UUID bytes
-    # ULID.from_uuid() creates a deterministic ULID from UUID
-    ulid = ULID.from_uuid(uuid_value)
-    return str(ulid)
+    # ulid.from_uuid() creates a deterministic ULID from UUID
+    ulid_obj = ulid.from_uuid(uuid_value)
+    return str(ulid_obj)
 
 
 def ulid_to_uuid(ulid_string: Optional[str]) -> Optional[uuid.UUID]:

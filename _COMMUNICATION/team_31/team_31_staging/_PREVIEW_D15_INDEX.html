@@ -3,9 +3,9 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
     body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
-    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#dc2626; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
+    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
 </style></head><body>
-<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [10:01:32] | REJECTED | 4 issue(s) found</div>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [10:51:06] | APPROVED | FIDELITY READY</div>
 <main id="phoenix-root"><!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -42,8 +42,6 @@
     Note: Widgets will be built in later phases. This page includes only placeholders.
   -->
 
-  <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>
-  
   <!-- Unified Header: LOD 400 - Height 120px, Z-Index 950 -->
   <header id="unified-header">
     <div class="header-content">
@@ -57,10 +55,7 @@
                 <!-- Home Link -->
                 <li class="tiktrack-nav-item">
                   <a href="/" class="tiktrack-nav-link" data-page="home">
-                    <svg class="user-icon" width="19.2" height="19.2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
+                    <img src="images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                   </a>
                 </li>
                 
@@ -464,34 +459,28 @@
             </div>
           </div>
 
-          <!-- Summary Information (matches Legacy structure) -->
+          <!-- Summary Information - Two rows, centered, full width -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
-            <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
-            <div>יתרה נוכחית: <strong id="currentBalance"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
-            <div>רווח/הפסד: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
-          </div>
-
-          <!-- Portfolio Summary Card (matches Legacy structure) - Two display modes: collapsed (single row) and expanded (two rows) -->
-          <div class="info-summary portfolio-summary-card" id="portfolioSummaryContent">
-            <div class="portfolio-summary__stats" id="portfolioSummaryStats">
-              <!-- First Row: Always visible -->
-              <div class="portfolio-summary__stats-row portfolio-summary__stats-row--first">
-                <span>חשבונות פעילים: 31 מתוך 53</span>
-                <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
-                <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
-                <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                  </svg>
-                </button>
-              </div>
-              <!-- Second Row: Hidden by default, shown when expanded -->
-              <div class="portfolio-summary__stats-row portfolio-summary__stats-row--second" id="portfolioSummaryStatsRowSecond" style="display: none;">
-                <span>טריידים פתוחים: 71</span>
-                <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
-              </div>
+            <!-- First Row: Summary Stats -->
+            <div class="info-summary__row info-summary__row--first">
+              <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+              <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
+              <div>יתרה נוכחית: <strong id="currentBalance"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
+              <div>רווח/הפסד: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
+              <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                  <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                </svg>
+              </button>
+            </div>
+            <!-- Second Row: Portfolio Summary (hidden by default) -->
+            <div class="info-summary__row info-summary__row--second" id="portfolioSummaryContent" style="display: none;">
+              <span>חשבונות פעילים: 31 מתוך 53</span>
+              <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
+              <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
+              <span>טריידים פתוחים: 71</span>
+              <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
             </div>
           </div>
         </div>
@@ -506,7 +495,7 @@
             <h2 class="index-section__header-text">לוח בקרה</h2>
           </div>
           <div class="index-section__header-meta">
-            <span class="index-section__header-count" id="dashboardCount">טריידים: 0 • התראות פעילות: 0 • חשבונות: 0</span>
+            <span class="index-section__header-count" id="dashboardCount">טריידים: 82 • התראות פעילות: 3 • חשבונות: 53</span>
           </div>
           <div class="index-section__header-actions">
             <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
@@ -523,20 +512,141 @@
             <!-- Widget Placeholder: Recent Items -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
-                <h3 class="widget-placeholder__title">טריידים אחרונים / תוכניות אחרונות</h3>
+                <ul class="widget-placeholder__tabs" role="tablist">
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn widget-placeholder__tab-btn--active" role="tab" aria-selected="true" aria-controls="recentTradesPane">טריידים אחרונים</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="recentPlansPane">תוכניות אחרונות</button>
+                  </li>
+                </ul>
               </div>
               <div class="widget-placeholder__body">
-                <p class="widget-placeholder__text">Widget ייבנה בשלב מאוחר</p>
+                <div class="widget-placeholder__tab-content" id="recentTradesPane" role="tabpanel">
+                  <ul class="widget-placeholder__list">
+                    <!-- Example Trade Item 1 -->
+                    <li class="widget-placeholder__list-item">
+                      <div class="widget-placeholder__item-header">
+                        <div class="widget-placeholder__item-title">
+                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <span class="widget-placeholder__item-name">SPY</span>
+                        </div>
+                        <div class="widget-placeholder__item-meta">
+                          <span class="status-badge" data-status-category="open">פתוח</span>
+                          <span class="widget-placeholder__item-date">25.01.26</span>
+                        </div>
+                        <div class="widget-placeholder__item-amount">
+                          <span class="numeric-value-positive" dir="ltr">+$175.00</span>
+                        </div>
+                      </div>
+                    </li>
+                    <!-- Example Trade Item 2 -->
+                    <li class="widget-placeholder__list-item">
+                      <div class="widget-placeholder__item-header">
+                        <div class="widget-placeholder__item-title">
+                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <span class="widget-placeholder__item-name">AAPL</span>
+                        </div>
+                        <div class="widget-placeholder__item-meta">
+                          <span class="status-badge" data-status-category="open">פתוח</span>
+                          <span class="widget-placeholder__item-date">24.01.26</span>
+                        </div>
+                        <div class="widget-placeholder__item-amount">
+                          <span class="numeric-value-negative" dir="ltr">-$45.20</span>
+                        </div>
+                      </div>
+                    </li>
+                    <!-- Example Trade Item 3 -->
+                    <li class="widget-placeholder__list-item">
+                      <div class="widget-placeholder__item-header">
+                        <div class="widget-placeholder__item-title">
+                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <span class="widget-placeholder__item-name">MSFT</span>
+                        </div>
+                        <div class="widget-placeholder__item-meta">
+                          <span class="status-badge" data-status-category="closed">סגור</span>
+                          <span class="widget-placeholder__item-date">23.01.26</span>
+                        </div>
+                        <div class="widget-placeholder__item-amount">
+                          <span class="numeric-value-positive" dir="ltr">+$320.50</span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="recentPlansPane" role="tabpanel">
+                  <ul class="widget-placeholder__list">
+                    <!-- Example Plan Item 1 -->
+                    <li class="widget-placeholder__list-item">
+                      <div class="widget-placeholder__item-header">
+                        <div class="widget-placeholder__item-title">
+                          <img src="images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
+                          <span class="widget-placeholder__item-name">תוכנית SPY - Swing</span>
+                        </div>
+                        <div class="widget-placeholder__item-meta">
+                          <span class="status-badge" data-status-category="active">פעיל</span>
+                          <span class="widget-placeholder__item-date">25.01.26</span>
+                        </div>
+                      </div>
+                    </li>
+                    <!-- Example Plan Item 2 -->
+                    <li class="widget-placeholder__list-item">
+                      <div class="widget-placeholder__item-header">
+                        <div class="widget-placeholder__item-title">
+                          <img src="images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
+                          <span class="widget-placeholder__item-name">תוכנית AAPL - Day Trade</span>
+                        </div>
+                        <div class="widget-placeholder__item-meta">
+                          <span class="status-badge" data-status-category="active">פעיל</span>
+                          <span class="widget-placeholder__item-date">24.01.26</span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
             <!-- Widget Placeholder: Pending Actions -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
-                <h3 class="widget-placeholder__title">פעולות ממתינות</h3>
+                <div class="widget-placeholder__header-title-row">
+                  <h3 class="widget-placeholder__title">
+                    <img src="images/icons/entities/trades.svg" alt="פעולות ממתינות" width="20" height="20" class="widget-placeholder__title-icon">
+                    פעולות ממתינות
+                  </h3>
+                  <div class="widget-placeholder__header-badges">
+                    <span class="widget-placeholder__badge">0</span>
+                  </div>
+                </div>
+                <ul class="widget-placeholder__tabs" role="tablist">
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn widget-placeholder__tab-btn--active" role="tab" aria-selected="true" aria-controls="pendingAssignPlansPane">שיוך תוכניות</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="pendingAssignTradesPane">שיוך טריידים</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="pendingCreatePlansPane">יצירת תוכניות</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="pendingCreateTradesPane">יצירת טריידים</button>
+                  </li>
+                </ul>
               </div>
               <div class="widget-placeholder__body">
-                <p class="widget-placeholder__text">Widget ייבנה בשלב מאוחר</p>
+                <div class="widget-placeholder__tab-content" id="pendingAssignPlansPane" role="tabpanel">
+                  <p class="widget-placeholder__text">כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!</p>
+                </div>
+                <div class="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingAssignTradesPane" role="tabpanel">
+                  <p class="widget-placeholder__text">אין טריידים הזקוקים לשיוך</p>
+                </div>
+                <div class="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreatePlansPane" role="tabpanel">
+                  <p class="widget-placeholder__text">אין הצעות ליצירת תוכניות</p>
+                </div>
+                <div class="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreateTradesPane" role="tabpanel">
+                  <p class="widget-placeholder__text">אין אשכולות ליצירת טרייד</p>
+                </div>
               </div>
             </div>
           </tt-section-row>
@@ -545,10 +655,36 @@
             <!-- Widget Placeholder: Tag Widget -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
-                <h3 class="widget-placeholder__title">תגיות</h3>
+                <div class="widget-placeholder__header-title-row">
+                  <h3 class="widget-placeholder__title">
+                    <img src="images/icons/entities/home.svg" alt="תגיות" width="20" height="20" class="widget-placeholder__title-icon">
+                    תגיות
+                  </h3>
+                  <form class="widget-placeholder__search-form">
+                    <input type="search" class="widget-placeholder__search-input" placeholder="חיפוש תגית..." id="tagWidgetSearchInput">
+                    <select class="widget-placeholder__search-select" id="tagWidgetSearchEntityFilter">
+                      <option value="">כל היישויות</option>
+                      <option value="trade">טריידים</option>
+                      <option value="trade_plan">תכניות</option>
+                      <option value="ticker">טיקרים</option>
+                    </select>
+                    <button type="submit" class="widget-placeholder__search-btn" aria-label="חפש">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
               </div>
               <div class="widget-placeholder__body">
-                <p class="widget-placeholder__text">Widget ייבנה בשלב מאוחר</p>
+                <div class="widget-placeholder__tag-cloud">
+                  <button class="widget-placeholder__tag-btn" type="button">🏷️ test tag</button>
+                  <button class="widget-placeholder__tag-btn" type="button">🏷️ swing</button>
+                  <button class="widget-placeholder__tag-btn" type="button">🏷️ day-trade</button>
+                  <button class="widget-placeholder__tag-btn" type="button">🏷️ long-term</button>
+                  <button class="widget-placeholder__tag-btn" type="button">🏷️ tech</button>
+                </div>
               </div>
             </div>
 
@@ -565,10 +701,124 @@
             <!-- Widget Placeholder: Ticker Chart -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
-                <h3 class="widget-placeholder__title">גרף טיקר</h3>
+                <div class="widget-placeholder__header-title-row">
+                  <h3 class="widget-placeholder__title">
+                    <img src="images/icons/entities/tickers.svg" alt="גרף טיקר" width="20" height="20" class="widget-placeholder__title-icon">
+                    גרף טיקר
+                  </h3>
+                  <button class="widget-placeholder__refresh-btn" aria-label="רענן" title="רענן">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="widget-placeholder__body">
-                <p class="widget-placeholder__text">Widget ייבנה בשלב מאוחר</p>
+                <div class="widget-placeholder__chart-grid">
+                  <!-- Example Chart Item 1 -->
+                  <div class="widget-placeholder__chart-item">
+                    <div class="widget-placeholder__chart-header">
+                      <div class="widget-placeholder__item-title">
+                        <strong class="widget-placeholder__item-symbol">AAPL</strong>
+                        <span class="widget-placeholder__item-name">Apple Inc.</span>
+                      </div>
+                      <div class="widget-placeholder__item-price">
+                        <div class="widget-placeholder__item-price-value">
+                          <span class="numeric-value-positive" dir="ltr">$150.25</span>
+                        </div>
+                        <div class="widget-placeholder__item-price-change">
+                          <span class="numeric-value-positive" dir="ltr">+5.48%</span>
+                          <span class="numeric-value-positive" dir="ltr">+$7.89</span>
+                        </div>
+                      </div>
+                      <button class="widget-placeholder__action-btn" aria-label="דשבורד" title="דשבורד">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="widget-placeholder__chart-placeholder">
+                      <p class="widget-placeholder__text">גרף יוצג כאן</p>
+                    </div>
+                    <div class="widget-placeholder__item-metrics">
+                      <span class="widget-placeholder__metric">
+                        <span class="metric-label">ATR:</span>
+                        <span class="metric-value">$2.45</span>
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Example Chart Item 2 -->
+                  <div class="widget-placeholder__chart-item">
+                    <div class="widget-placeholder__chart-header">
+                      <div class="widget-placeholder__item-title">
+                        <strong class="widget-placeholder__item-symbol">MSFT</strong>
+                        <span class="widget-placeholder__item-name">Microsoft Corp.</span>
+                      </div>
+                      <div class="widget-placeholder__item-price">
+                        <div class="widget-placeholder__item-price-value">
+                          <span class="numeric-value-positive" dir="ltr">$380.75</span>
+                        </div>
+                        <div class="widget-placeholder__item-price-change">
+                          <span class="numeric-value-positive" dir="ltr">+1.59%</span>
+                          <span class="numeric-value-positive" dir="ltr">+$5.88</span>
+                        </div>
+                      </div>
+                      <button class="widget-placeholder__action-btn" aria-label="דשבורד" title="דשבורד">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="widget-placeholder__chart-placeholder">
+                      <p class="widget-placeholder__text">גרף יוצג כאן</p>
+                    </div>
+                    <div class="widget-placeholder__item-metrics">
+                      <span class="widget-placeholder__metric">
+                        <span class="metric-label">ATR:</span>
+                        <span class="metric-value">$4.20</span>
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Example Chart Item 3 -->
+                  <div class="widget-placeholder__chart-item">
+                    <div class="widget-placeholder__chart-header">
+                      <div class="widget-placeholder__item-title">
+                        <strong class="widget-placeholder__item-symbol">GOOGL</strong>
+                        <span class="widget-placeholder__item-name">Alphabet Inc.</span>
+                      </div>
+                      <div class="widget-placeholder__item-price">
+                        <div class="widget-placeholder__item-price-value">
+                          <span class="numeric-value-positive" dir="ltr">$142.30</span>
+                        </div>
+                        <div class="widget-placeholder__item-price-change">
+                          <span class="numeric-value-positive" dir="ltr">+1.14%</span>
+                          <span class="numeric-value-positive" dir="ltr">+$1.61</span>
+                        </div>
+                      </div>
+                      <button class="widget-placeholder__action-btn" aria-label="דשבורד" title="דשבורד">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="widget-placeholder__chart-placeholder">
+                      <p class="widget-placeholder__text">גרף יוצג כאן</p>
+                    </div>
+                    <div class="widget-placeholder__item-metrics">
+                      <span class="widget-placeholder__metric">
+                        <span class="metric-label">ATR:</span>
+                        <span class="metric-value">$3.15</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </tt-section-row>
@@ -583,7 +833,39 @@
             <img src="images/icons/entities/trading_accounts.svg" alt="פורטפוליו" class="index-section__header-icon" width="20" height="20">
             <h2 class="index-section__header-text">פורטפוליו</h2>
           </div>
+          <div class="index-section__header-meta">
+            <span class="index-section__header-count" id="portfolioCount">3 פוזיציות פעילות</span>
+          </div>
           <div class="index-section__header-actions">
+            <!-- Portfolio Filters (matches Legacy structure) -->
+            <div class="portfolio-header-filters">
+              <!-- Account Filter Dropdown -->
+              <select id="portfolioAccountFilter" class="portfolio-filter-select" aria-label="בחר חשבון מסחר">
+                <option value="">כל חשבונות המסחר</option>
+                <option value="1">חשבון 1</option>
+                <option value="2">חשבון 2</option>
+              </select>
+              
+              <!-- Side Filter Buttons -->
+              <div class="portfolio-side-filters" role="group" id="portfolioSideFilterGroup">
+                <button class="portfolio-side-filter-btn" data-side="" aria-label="הצג הכל" title="הצג הכל" type="button">↕</button>
+                <button class="portfolio-side-filter-btn portfolio-side-filter-long" data-side="long" aria-label="רק לונג" title="רק לונג" type="button">↑</button>
+                <button class="portfolio-side-filter-btn portfolio-side-filter-short" data-side="short" aria-label="רק שורט" title="רק שורט" type="button">↓</button>
+              </div>
+              
+              <!-- Checkboxes Container -->
+              <div class="portfolio-checkboxes-container">
+                <label class="portfolio-checkbox-label">
+                  <input type="checkbox" id="portfolioIncludeClosed" class="portfolio-checkbox-input">
+                  <span class="portfolio-checkbox-text">הצג פוזיציות סגורות</span>
+                </label>
+                <label class="portfolio-checkbox-label">
+                  <input type="checkbox" id="portfolioUnifyAccounts" class="portfolio-checkbox-input">
+                  <span class="portfolio-checkbox-text">אחד פוזיציות בין חשבונות מסחר</span>
+                </label>
+              </div>
+            </div>
+            
             <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 9l6 6l6 -6"></path>
@@ -730,8 +1012,46 @@
           }
         });
       }
+
+      // Widget Tabs Functionality (works for all widgets with tabs)
+      const widgetTabs = document.querySelectorAll('.widget-placeholder__tab-btn');
+      widgetTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabList = this.closest('.widget-placeholder__tabs');
+          if (!tabList) return;
+          
+          const widget = tabList.closest('.widget-placeholder');
+          if (!widget) return;
+          
+          const targetPaneId = this.getAttribute('aria-controls');
+          
+          // Remove active class from all tabs in this widget
+          widget.querySelectorAll('.widget-placeholder__tab-btn').forEach(btn => {
+            btn.classList.remove('widget-placeholder__tab-btn--active');
+            btn.setAttribute('aria-selected', 'false');
+          });
+          
+          // Hide all tab content in this widget
+          widget.querySelectorAll('.widget-placeholder__tab-content').forEach(content => {
+            content.classList.add('widget-placeholder__tab-content--hidden');
+          });
+          
+          // Activate clicked tab
+          this.classList.add('widget-placeholder__tab-btn--active');
+          this.setAttribute('aria-selected', 'true');
+          
+          // Show corresponding content
+          const targetPane = document.getElementById(targetPaneId);
+          if (targetPane) {
+            targetPane.classList.remove('widget-placeholder__tab-content--hidden');
+          }
+        });
+      });
     });
   </script>
+  
+  <!-- G-Bridge Banner: Moved to footer to avoid blocking menu -->
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>
 </body>
 </html>
 </main>

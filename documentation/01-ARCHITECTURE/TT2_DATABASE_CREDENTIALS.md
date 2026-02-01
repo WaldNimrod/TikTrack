@@ -181,7 +181,20 @@ curl http://localhost:8082/health
      - `revoked_at` - TIMESTAMPTZ NULL (NULL if active)
      - `created_at` - TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
-4. ✅ **`user_data.notes`** - User notes
+4. ✅ **`user_data.revoked_tokens`** - Token revocation/blacklist
+   - Stores revoked JWT tokens (blacklist)
+   - Used for token validation and security
+   - Primary key on `jti` (JWT ID)
+   - Index on `expires_at` for automatic cleanup
+   - **Columns:**
+     - `jti` - VARCHAR(255) PRIMARY KEY (JWT ID)
+     - `expires_at` - TIMESTAMPTZ NOT NULL
+     - `revoked_at` - TIMESTAMPTZ NOT NULL DEFAULT NOW()
+   - **Constraints:**
+     - `revoked_tokens_jti_not_empty` - CHECK constraint (LENGTH(jti) > 0)
+     - PRIMARY KEY on `jti`
+
+5. ✅ **`user_data.notes`** - User notes
    - Polymorphic notes system
 
 **Note:** Additional tables will be created incrementally during development.
@@ -212,6 +225,14 @@ curl http://localhost:8082/health
 - ✅ Indexes created (user_id, jti, expires_at)
 - ✅ Backend server restarted
 - ✅ Ready for refresh token operations
+
+### **2026-01-31 (Revoked Tokens Table):**
+- ✅ `user_data.revoked_tokens` table created
+- ✅ Table structure verified (jti PRIMARY KEY, expires_at, revoked_at)
+- ✅ Constraints created (jti_not_empty, PRIMARY KEY on jti)
+- ✅ Index created on `expires_at` (for automatic cleanup)
+- ✅ Backend server restarted
+- ✅ Ready for token revocation/blacklist operations
 
 ---
 

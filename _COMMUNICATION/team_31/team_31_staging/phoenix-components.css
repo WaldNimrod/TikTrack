@@ -26,15 +26,15 @@ tt-container {
   padding-inline: var(--grid-gutter, var(--spacing-md));
 }
 
-/* tt-section: Independent content unit - DEFAULT STYLES */
+/* tt-section: Independent content unit - TRANSPARENT BACKGROUND (header/body are separate white cards) */
 tt-section {
   display: block;
-  background: var(--apple-bg-elevated, #ffffff);
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 2px;
+  background: transparent !important; /* Transparent - header and body are separate white cards */
+  border: none !important; /* No border - header and body have their own borders */
+  border-radius: 0 !important; /* No border-radius - header and body have their own */
   margin-block-end: var(--grid-gutter, var(--spacing-md));
-  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  overflow: hidden;
+  box-shadow: none !important; /* No shadow - header and body have their own shadows */
+  overflow: visible; /* Allow header/body to be visible */
 }
 
 /* tt-section content area - minimal padding */

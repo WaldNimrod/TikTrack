@@ -30,7 +30,7 @@
 
 body.index-page,
 body.dashboard-page {
-  background: var(--apple-bg-elevated, #ffffff);
+  background: var(--apple-bg-secondary, #f2f2f7); /* Light gray background - NOT white */
   color: var(--apple-text-primary, #1d1d1f);
 }
 
@@ -39,16 +39,32 @@ body.dashboard-page {
    Shared across all dashboard pages
    ============================================ */
 
-/* Block: Dashboard Section */
+/* Block: Dashboard Section Header - Separate white card */
 .dashboard-section__header,
 .index-section__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
-  background: var(--apple-bg-elevated, #ffffff);
-  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
-  margin-block-end: var(--spacing-md, 16px);
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px;
+  margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  /* Subtle entity color accent on left border */
+  border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
+  min-height: 60px; /* Fixed height for header */
+}
+
+/* Block: Dashboard Section Body - Separate white card below header */
+.dashboard-section__body,
+.index-section__body {
+  padding: var(--spacing-lg, 24px);
+  background: var(--apple-bg-elevated, #ffffff); /* White background - separate card */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px;
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  /* No margin-top - gap is created by header margin-block-end */
 }
 
 /* Element: Header Title */
@@ -63,7 +79,7 @@ body.dashboard-page {
 .index-section__header-icon {
   width: 20px;
   height: 20px;
-  color: var(--header-brand, #26baac);
+  color: var(--color-brand, var(--entity-trade-color));
 }
 
 .dashboard-section__header-text,
@@ -84,7 +100,10 @@ body.dashboard-page {
 .dashboard-section__header-count,
 .index-section__header-count {
   font-size: var(--font-size-base, 0.92rem);
-  color: var(--apple-text-secondary, #86868b);
+  color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
+  opacity: 0.8; /* 0.8 opacity */
+  text-align: center; /* Centered */
+  font-weight: 500; /* Subtitle style */
 }
 
 /* Element: Header Actions */
@@ -133,12 +152,15 @@ body.dashboard-page {
   width: 32px;
   height: 32px;
   padding: 0;
+  margin: var(--spacing-xs, 4px); /* Equal margin from all sides */
   background: transparent;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease;
   color: var(--apple-text-primary, #1d1d1f);
+  flex-shrink: 0; /* Prevent shrinking */
+  align-self: center; /* Center vertically */
 }
 
 .dashboard-section__header-toggle-btn:hover,
@@ -146,11 +168,6 @@ body.dashboard-page {
   background: var(--apple-bg-secondary, #f5f5f7);
 }
 
-/* Element: Section Body */
-.dashboard-section__body,
-.index-section__body {
-  padding: var(--spacing-lg, 24px);
-}
 
 /* ============================================
    Active Alerts Component (BEM Pattern)
@@ -225,9 +242,17 @@ body.dashboard-page {
 }
 
 .active-alerts__list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-md, 16px);
+  max-width: 100%;
+}
+
+/* Maximum 3 cards per row */
+@media (min-width: 1200px) {
+  .active-alerts__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Block: Alert Card */
@@ -467,17 +492,30 @@ body.dashboard-page {
 /* Block: Info Summary */
 .info-summary {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg, 24px);
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
   padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
-  background: var(--apple-bg-secondary, #f5f5f7);
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px;
   margin-block-end: var(--spacing-md, 16px);
   font-size: var(--font-size-base, 0.92rem);
+  width: 100%; /* Full width */
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
 }
 
-/* Element: Summary Item (direct child divs - matches Legacy structure) */
-.info-summary > div {
+/* Element: Summary Row - Each row is centered and full width */
+.info-summary__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center aligned */
+  align-items: center;
+  gap: var(--spacing-lg, 24px);
+  width: 100%; /* Full width */
+}
+
+.info-summary__row > div,
+.info-summary__row > span {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 8px);
@@ -565,33 +603,43 @@ body.dashboard-page {
 
 /* Block: Widget Placeholder */
 .widget-placeholder {
-  background: var(--apple-bg-elevated, #ffffff);
+  background: var(--apple-bg-elevated, #ffffff); /* White background for container */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px;
-  padding: var(--spacing-lg, 24px);
+  overflow: hidden;
   min-height: 200px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Element: Placeholder Header */
+/* Element: Placeholder Header - Separate white card within widget */
 .widget-placeholder__header {
-  margin-block-end: var(--spacing-md, 16px);
-  padding-block-end: var(--spacing-md, 16px);
+  flex-shrink: 0;
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
   border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px 8px 0 0;
+  margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
+  min-height: 48px; /* Fixed smaller height than main container header (60px) */
+  display: flex;
+  align-items: center;
 }
 
 .widget-placeholder__title {
-  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-size: clamp(0.875rem, 2vw, 1rem); /* Smaller than main container header */
   font-weight: 600;
   color: var(--apple-text-primary, #1d1d1f);
   margin: 0;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Smaller padding */
 }
 
-/* Element: Placeholder Body */
+/* Element: Placeholder Body - Separate white card within widget */
 .widget-placeholder__body {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   min-height: 150px;
+  padding: var(--spacing-lg, 24px);
+  background: var(--apple-bg-elevated, #ffffff); /* White background - separate card */
+  border-radius: 0 0 8px 8px;
 }
 
 .widget-placeholder__text {
@@ -599,6 +647,359 @@ body.dashboard-page {
   color: var(--apple-text-secondary, #86868b);
   text-align: center;
   margin: 0;
+  padding: var(--spacing-lg, 24px);
+}
+
+/* Element: Widget Tabs */
+.widget-placeholder__tabs {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+.widget-placeholder__tab-item {
+  margin: 0;
+}
+
+.widget-placeholder__tab-btn {
+  display: block;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: var(--font-size-base, 0.92rem);
+  font-weight: 500;
+  color: var(--apple-text-secondary, #86868b);
+  transition: all 0.2s ease;
+  margin-block-end: -1px;
+}
+
+.widget-placeholder__tab-btn:hover {
+  color: var(--apple-text-primary, #1d1d1f);
+  background: var(--apple-bg-elevated, #ffffff);
+}
+
+.widget-placeholder__tab-btn--active {
+  color: var(--color-brand, var(--entity-trade-color));
+  border-bottom-color: var(--color-brand, var(--entity-trade-color));
+  background: var(--apple-bg-elevated, #ffffff);
+  font-weight: 600;
+}
+
+.widget-placeholder__tab-content {
+  display: block;
+  padding: var(--spacing-lg, 24px);
+  min-height: 150px;
+}
+
+.widget-placeholder__tab-content--hidden {
+  display: none;
+}
+
+/* Element: Widget Header Title Row (for widgets with title + actions) */
+.widget-placeholder__header-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md, 16px);
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+}
+
+.widget-placeholder__title-icon {
+  width: 20px;
+  height: 20px;
+  margin-inline-end: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__header-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--spacing-xs, 8px);
+  background: var(--color-brand, var(--entity-trade-color));
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Element: Widget List (for list-based widgets) */
+.widget-placeholder__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__list-item {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  transition: background 0.2s ease;
+}
+
+.widget-placeholder__list-item:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+.widget-placeholder__list-item:last-child {
+  border-bottom: none;
+}
+
+/* Element: Widget Item Header */
+.widget-placeholder__item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md, 16px);
+}
+
+.widget-placeholder__item-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  flex-grow: 1;
+}
+
+.widget-placeholder__item-icon {
+  flex-shrink: 0;
+}
+
+.widget-placeholder__item-name {
+  font-size: var(--font-size-base, 0.92rem);
+  font-weight: 500;
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.widget-placeholder__item-symbol {
+  font-size: var(--font-size-base, 0.92rem);
+  font-weight: 600;
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.widget-placeholder__item-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  font-size: 0.75rem;
+  color: var(--apple-text-secondary, #86868b);
+}
+
+.widget-placeholder__item-date {
+  font-size: 0.75rem;
+}
+
+.widget-placeholder__item-amount {
+  font-size: var(--font-size-base, 0.92rem);
+  font-weight: 600;
+  text-align: end;
+  min-width: 80px;
+}
+
+.widget-placeholder__item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__item-price-value {
+  font-size: var(--font-size-base, 0.92rem);
+  font-weight: 600;
+}
+
+.widget-placeholder__item-price-change {
+  font-size: 0.75rem;
+}
+
+.widget-placeholder__item-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--apple-text-secondary, #86868b);
+}
+
+.widget-placeholder__action-btn:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.widget-placeholder__item-metrics {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  padding-block-start: var(--spacing-xs, 4px);
+  font-size: 0.75rem;
+  color: var(--apple-text-secondary, #86868b);
+}
+
+.widget-placeholder__metric {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+.metric-label {
+  font-weight: 500;
+}
+
+.metric-value {
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+/* Element: Widget Search Form */
+.widget-placeholder__search-form {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+.widget-placeholder__search-input {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  font-size: 0.75rem;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  background: var(--apple-bg-elevated, #ffffff);
+  width: 150px;
+  height: fit-content;
+}
+
+.widget-placeholder__search-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  font-size: 0.75rem;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  background: var(--apple-bg-elevated, #ffffff);
+  height: fit-content;
+}
+
+.widget-placeholder__search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--color-brand, var(--entity-trade-color));
+  border: 1px solid var(--color-brand, var(--entity-trade-color));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: white;
+}
+
+.widget-placeholder__search-btn:hover {
+  background: var(--color-brand-hover, var(--entity-trade-text));
+}
+
+.widget-placeholder__refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--apple-text-secondary, #86868b);
+}
+
+.widget-placeholder__refresh-btn:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+/* Element: Widget Tag Cloud - Prevent wrapping to new lines */
+.widget-placeholder__tag-cloud {
+  display: flex;
+  flex-wrap: nowrap; /* Single line - no wrapping */
+  gap: var(--spacing-xs, 4px);
+  padding: var(--spacing-sm, 8px);
+  overflow-x: auto; /* Horizontal scroll if needed */
+}
+
+.widget-placeholder__tag-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  background: var(--apple-bg-secondary, #f5f5f7);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: var(--apple-text-primary, #1d1d1f);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.widget-placeholder__tag-btn:hover {
+  background: var(--color-brand, var(--entity-trade-color));
+  color: white;
+  border-color: var(--color-brand, var(--entity-trade-color));
+}
+
+/* Element: Widget Chart Grid */
+.widget-placeholder__chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md, 16px);
+}
+
+.widget-placeholder__chart-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #f5f5f7);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px;
+}
+
+.widget-placeholder__chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm, 8px);
+}
+
+.widget-placeholder__chart-placeholder {
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px dashed var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
 }
 
 /* ============================================
@@ -629,6 +1030,11 @@ body.dashboard-page {
 tt-section-row {
   container-type: inline-size;
   container-name: dashboard-row;
+  margin-block-end: var(--spacing-md, 16px); /* Gap between rows matches gap between cards */
+}
+
+tt-section-row:last-child {
+  margin-block-end: 0; /* No margin after last row */
 }
 
 @container dashboard-row (min-width: 600px) {
@@ -731,4 +1137,113 @@ tt-section-row {
 
 .btn-action:hover {
   background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+/* ============================================
+   Portfolio Header Filters
+   ============================================ */
+
+.portfolio-header-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping to single line */
+  gap: var(--spacing-sm, 8px);
+  margin-inline-end: var(--spacing-md, 16px);
+}
+
+.portfolio-filter-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  font-size: var(--font-size-base, 0.92rem);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  background: var(--apple-bg-elevated, #ffffff);
+  color: var(--apple-text-primary, #1d1d1f);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  height: fit-content;
+  width: 50%; /* Half width - much narrower */
+  max-width: 200px; /* Maximum width constraint */
+}
+
+.portfolio-filter-select:hover {
+  border-color: var(--color-brand, var(--entity-trade-color));
+}
+
+.portfolio-filter-select:focus {
+  outline: none;
+  border-color: var(--color-brand, var(--entity-trade-color));
+  box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
+}
+
+.portfolio-side-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  /* No border/padding - each button is separate */
+}
+
+.portfolio-side-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary, #86868b);
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.portfolio-side-filter-btn:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.portfolio-side-filter-btn.portfolio-side-filter-long:hover {
+  background: var(--apple-green, #34c759);
+  color: white;
+}
+
+.portfolio-side-filter-btn.portfolio-side-filter-short:hover {
+  background: var(--apple-red, #dc2626);
+  color: white;
+}
+
+/* Portfolio Checkboxes - Single line, NO BORDER */
+.portfolio-checkboxes-container {
+  display: flex;
+  flex-direction: row; /* Single line */
+  align-items: center;
+  gap: var(--spacing-md, 16px); /* More gap between checkboxes */
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: none !important; /* No border */
+  border-radius: 0; /* No border-radius */
+  background: transparent; /* Transparent background */
+}
+
+.portfolio-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  font-size: 0.75rem;
+  color: var(--apple-text-secondary, #86868b);
+  cursor: pointer;
+  user-select: none;
+}
+
+.portfolio-checkbox-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.portfolio-checkbox-text {
+  font-size: 0.75rem;
+  line-height: 1.4;
 }

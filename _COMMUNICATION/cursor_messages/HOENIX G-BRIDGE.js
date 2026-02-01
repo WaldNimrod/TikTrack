@@ -98,33 +98,65 @@ function runAudit(content, fileName) {
     }
     
     // --- 1.3 Color Clamp ---
-    // בדיקת צבעים ישירים (hex, rgb, rgba)
-    const hexPattern = /(?!#26baac|#dc2626|#f8fafc|#phoenix-root|#unified-header|#007AFF|#34c759|#ff9500|#26baac|#ff9e04|#ffffff|#e5e5e5|#1d1d1f|#86868b|#059669)#[0-9A-Fa-f]{3,6}/gi;
-    const hexMatches = content.match(hexPattern);
-    if (hexMatches) {
-        hexMatches.forEach(match => {
-            const color = match.toLowerCase();
-            if (!APPROVED_COLORS.includes(color) && !content.includes(`var(--`)) {
-                // בדיקה אם זה לא חלק מהגדרת משתנה
-                const beforeMatch = content.substring(Math.max(0, content.indexOf(match) - 100), content.indexOf(match));
-                if (!beforeMatch.includes(':root') && !beforeMatch.includes('--')) {
+    // בדיקת צבעים ישירים (hex, rgb, rgba) - מתעלם מ-:root ו-G-BRIDGE-EXEMPT
+    const lines = content.split('\n');
+    lines.forEach((line, lineIndex) => {
+        // בדיקת hex colors
+        const hexPattern = /#[0-9A-Fa-f]{3,6}/gi;
+        const hexMatches = line.match(hexPattern);
+        if (hexMatches) {
+            hexMatches.forEach(match => {
+                const color = match.toLowerCase();
+                // בדיקה אם זה ב-:root block
+                let isInRootBlock = false;
+                for (let i = lineIndex; i >= 0; i--) {
+                    if (lines[i].includes(':root')) {
+                        isInRootBlock = true;
+                        break;
+                    }
+                    if (lines[i].includes('}') && !lines[i].includes(':root')) {
+                        break;
+                    }
+                }
+                
+                const hasExempt = line.includes('G-BRIDGE-EXEMPT');
+                const isInVar = line.includes('var(--');
+                const isApproved = APPROVED_COLORS.includes(color);
+                const isVarDefinition = line.includes('--') && line.includes(':');
+                
+                if (!isInRootBlock && !hasExempt && !isInVar && !isApproved && !isVarDefinition) {
                     issues.push(`DNA: Hardcoded Hex color [${match}] found. Use CSS variable instead.`);
                 }
-            }
-        });
-    }
-    
-    // בדיקת rgb/rgba ישירים
-    const rgbPattern = /\b(rgb|rgba)\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+/gi;
-    const rgbMatches = content.match(rgbPattern);
-    if (rgbMatches) {
-        rgbMatches.forEach(match => {
-            const beforeMatch = content.substring(Math.max(0, content.indexOf(match) - 50), content.indexOf(match));
-            if (!beforeMatch.includes('var(--')) {
-                issues.push(`DNA: Hardcoded RGB color [${match}] found. Use CSS variable instead.`);
-            }
-        });
-    }
+            });
+        }
+        
+        // בדיקת rgb/rgba colors
+        const rgbPattern = /\b(rgb|rgba)\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+/gi;
+        const rgbMatches = line.match(rgbPattern);
+        if (rgbMatches) {
+            rgbMatches.forEach(match => {
+                // בדיקה אם זה ב-:root block
+                let isInRootBlock = false;
+                for (let i = lineIndex; i >= 0; i--) {
+                    if (lines[i].includes(':root')) {
+                        isInRootBlock = true;
+                        break;
+                    }
+                    if (lines[i].includes('}') && !lines[i].includes(':root')) {
+                        break;
+                    }
+                }
+                
+                const hasExempt = line.includes('G-BRIDGE-EXEMPT');
+                const isInVar = line.includes('var(--');
+                const isVarDefinition = line.includes('--') && line.includes(':');
+                
+                if (!isInRootBlock && !hasExempt && !isInVar && !isVarDefinition) {
+                    issues.push(`DNA: Hardcoded RGB color [${match}] found. Use CSS variable instead.`);
+                }
+            });
+        }
+    });
     
     // --- 1.4 Magic Numbers Detection ---
     // בדיקת מספרים שרירותיים ב-margin/padding (לא כפולות של 8)

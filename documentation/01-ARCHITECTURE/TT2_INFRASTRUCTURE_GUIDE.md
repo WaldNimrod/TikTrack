@@ -328,11 +328,12 @@ postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
 - `user_data.notes` - User notes
 - `user_api_keys` - API keys (encrypted) - Future
 
-**Current Authentication Tables (4 tables):**
+**Current Authentication Tables (5 tables):**
 1. ✅ `user_data.users` - Core users table
 2. ✅ `user_data.password_reset_requests` - Password recovery
 3. ✅ `user_data.user_refresh_tokens` - Refresh token management
-4. ✅ `user_data.notes` - User notes
+4. ✅ `user_data.revoked_tokens` - Token revocation/blacklist
+5. ✅ `user_data.notes` - User notes
 
 **Full Schema:** See `04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
 

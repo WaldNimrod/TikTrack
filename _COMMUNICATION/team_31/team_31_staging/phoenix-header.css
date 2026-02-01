@@ -111,28 +111,39 @@
   color: inherit;
 }
 
+/* Logo Image - Maximum specificity to override all styles */
+#unified-header .header-top .header-container .logo-section .logo .logo-image,
+#unified-header .header-top .header-container .logo-section a.logo .logo-image,
+#unified-header .header-top .header-container .logo .logo-image,
+#unified-header .header-top .logo-section .logo-image,
+#unified-header .logo-section .logo-image,
+#unified-header .logo .logo-image,
 #unified-header .logo-image {
-  width: 125px;
-  height: 37.5px;
-  object-fit: contain;
-  display: block;
+  width: 125px !important; /* Match legacy exact size */
+  height: 37.5px !important; /* Match legacy exact size */
+  object-fit: contain !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
-/* Logo Section - Local class for logo text sizing */
-/* Maximum specificity to override Pico CSS and any other styles */
-#unified-header .header-top .header-container .logo-section .logo-text,
+/* Logo Text (Slogan) - Maximum specificity to override Pico CSS and any other styles */
+#unified-header .header-top .header-container .logo-section .logo .logo-text,
+#unified-header .header-top .header-container .logo-section a.logo .logo-text,
 #unified-header .header-top .header-container .logo .logo-text,
+#unified-header .header-top .logo-section .logo-text,
 #unified-header .logo-section .logo-text,
-#unified-header .logo .logo-text {
-  font-size: 1rem !important; /* Local override - 16px (1rem), not 20px - !important needed to override Pico CSS */
-  font-weight: 300 !important;
-  color: #26baac !important;
+#unified-header .logo .logo-text,
+#unified-header .logo-text {
+  font-size: 1rem !important; /* 16px - Match legacy exact size */
+  font-weight: 300 !important; /* Match legacy exact weight */
+  color: #26baac !important; /* Match legacy exact color */
   direction: ltr !important;
   text-align: left !important;
-  align-self: flex-end;
-  margin-bottom: -5px;
+  align-self: flex-end !important;
+  margin-bottom: -5px !important;
   line-height: 1.4 !important; /* Match legacy line-height */
-  white-space: nowrap;
+  white-space: nowrap !important;
+  text-decoration: none !important;
 }
 
 .user-zone {
@@ -258,12 +269,12 @@
 }
 
 #unified-header .home-icon-only {
-  width: 24px; /* Smaller icons - match legacy, specificity handles override */
-  height: 24px;
-  max-width: 24px; /* Prevent stretching */
-  max-height: 24px; /* Prevent stretching */
-  min-width: 24px; /* Prevent shrinking */
-  min-height: 24px; /* Prevent shrinking */
+  width: 36px; /* Match legacy exact size - 36x36 */
+  height: 36px;
+  max-width: 36px; /* Prevent stretching */
+  max-height: 36px; /* Prevent stretching */
+  min-width: 36px; /* Prevent shrinking */
+  min-height: 36px; /* Prevent shrinking */
   flex-shrink: 0; /* Prevent flex shrinking */
 }
 

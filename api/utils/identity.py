@@ -63,8 +63,10 @@ def ulid_to_uuid(ulid_string: Optional[str]) -> Optional[uuid.UUID]:
         return None
     
     # Parse ULID and convert to UUID
-    ulid = ULID.from_str(ulid_string)
-    return ulid.to_uuid()
+    # ulid.parse() is the module function, not ULID.from_str()
+    ulid_obj = ulid.parse(ulid_string)
+    # uuid is an attribute, not a method
+    return ulid_obj.uuid
 
 
 def generate_ulid() -> str:
@@ -100,7 +102,7 @@ def is_valid_ulid(ulid_string: str) -> bool:
         False
     """
     try:
-        ULID.from_str(ulid_string)
+        ulid.parse(ulid_string)
         return True
     except (ValueError, TypeError):
         return False

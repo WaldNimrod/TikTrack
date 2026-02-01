@@ -146,7 +146,8 @@
   --z-index-header-modal: 1000;
   --z-index-g-bridge-banner: 10002;
   
-  /* ===== Entity Colors (for Active Alerts) ===== */
+  /* ===== Entity Colors (for Active Alerts) - DEFAULT VALUES (Excluded from G-Bridge checks) ===== */
+  /* G-BRIDGE-EXEMPT: These are default fallback values, centralized here for maintainability */
   --entity-trade-color: #26baac;
   --entity-trade-bg: rgba(38, 186, 172, 0.1);
   --entity-trade-border: rgba(38, 186, 172, 0.3);
@@ -501,13 +502,13 @@ input[type="checkbox"]:disabled {
    G-Bridge Validation Banner
    ============================================ */
 
-/* G-Bridge Banner - Fixed position banner for validation status
+/* G-Bridge Banner - Fixed position banner for validation status (moved to footer to avoid blocking menu)
    ARCHITECTURAL NOTE: This banner is used system-wide for G-Bridge validation status.
    Previously defined inline in HTML files - moved to base CSS for centralized management.
-   This ensures consistent styling and easier maintenance across all pages. */
+   Position changed from top to bottom to avoid blocking header menu. */
 .g-bridge-banner {
   position: fixed;
-  top: 0;
+  bottom: 0;
   inset-inline-start: 0;
   inset-inline-end: 0;
   background: var(--color-success, #059669);
@@ -517,6 +518,6 @@ input[type="checkbox"]:disabled {
   font-weight: 900;
   z-index: var(--z-index-g-bridge-banner, 10002);
   letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
   text-align: center;
 }

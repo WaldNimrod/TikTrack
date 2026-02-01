@@ -69,4 +69,6 @@ echo "📍 API Docs: http://localhost:8082/docs"
 echo "=========================================="
 echo ""
 
-uvicorn main:app --reload --host 0.0.0.0 --port 8082
+# Change to project root and run with api.main:app to handle relative imports
+cd "$PROJECT_ROOT"
+PYTHONPATH="$API_DIR:$PYTHONPATH" uvicorn api.main:app --reload --host 0.0.0.0 --port 8082

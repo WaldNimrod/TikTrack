@@ -278,61 +278,97 @@ class AuthService:
         Raises:
             AuthenticationError: If credentials are invalid
         """
-        # Find user by username or email
-        stmt = select(User).where(
-            (User.username == username_or_email) | (User.email == username_or_email)
-        ).where(User.deleted_at.is_(None))
-        
-        result = await db.execute(stmt)
-        user = result.scalar_one_or_none()
-        
-        if not user:
-            raise AuthenticationError("Invalid credentials")
-        
-        # Check if account is locked
-        if user.locked_until and user.locked_until > datetime.utcnow():
-            raise AuthenticationError("Account is locked")
-        
-        # Verify password
-        if not self.verify_password(password, user.password_hash):
-            # Increment failed login attempts
-            user.failed_login_attempts += 1
-            if user.failed_login_attempts >= 5:
-                user.locked_until = datetime.utcnow() + timedelta(minutes=30)
-            await db.commit()
-            raise AuthenticationError("Invalid credentials")
-        
-        # Reset failed attempts on successful login
-        user.failed_login_attempts = 0
-        user.locked_until = None
-        user.last_login_at = datetime.utcnow()
-        await db.commit()
-        
-        # Create tokens
-        access_token, expires_at, access_jti = self.create_access_token(user)
-        refresh_token, refresh_expires_at, refresh_jti, token_hash = self.create_refresh_token(user)
-        
-        # Store refresh token in database
-        db_refresh_token = UserRefreshToken(
-            user_id=user.id,
-            token_hash=token_hash,
-            jti=refresh_jti,
-            expires_at=refresh_expires_at
-        )
-        db.add(db_refresh_token)
-        await db.commit()
-        
-        # Create response
-        user_response = UserResponse.from_model(user)
-        
-        return LoginResponse(
-            access_token=access_token,
-            token_type="bearer",
-            expires_at=expires_at,
-            user=user_response,
-            refresh_token=refresh_token,  # Will be sent in httpOnly cookie
-            refresh_expires_at=refresh_expires_at
-        )
+        try:
+            # Find user by username or email
+            stmt = select(User).where(
+                (User.username == username_or_email) | (User.email == username_or_email)
+            ).where(User.deleted_at.is_(None))
+            
+            result = await db.execute(stmt)
+            user = result.scalar_one_or_none()
+            
+            if not user:
+                raise AuthenticationError("Invalid credentials")
+            
+            # Check if account is locked
+            if user.locked_until and user.locked_until > datetime.utcnow():
+                raise AuthenticationError("Account is locked")
+            
+            # Verify password
+            try:
+                password_valid = self.verify_password(password, user.password_hash)
+            except Exception as e:
+                logger.error(f"Password verification error: {type(e).__name__}: {str(e)}", exc_info=True)
+                raise AuthenticationError("Invalid credentials")
+            
+            if not password_valid:
+                # Increment failed login attempts
+                try:
+                    user.failed_login_attempts += 1
+                    if user.failed_login_attempts >= 5:
+                        user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                    await db.commit()
+                except Exception as e:
+                    logger.error(f"Failed to update login attempts: {type(e).__name__}: {str(e)}", exc_info=True)
+                    # Don't fail login if we can't update attempts
+                raise AuthenticationError("Invalid credentials")
+            
+            # Reset failed attempts on successful login
+            try:
+                user.failed_login_attempts = 0
+                user.locked_until = None
+                user.last_login_at = datetime.utcnow()
+                await db.commit()
+            except Exception as e:
+                logger.error(f"Failed to update user login status: {type(e).__name__}: {str(e)}", exc_info=True)
+                # Continue even if update fails
+            
+            # Create tokens
+            try:
+                access_token, expires_at, access_jti = self.create_access_token(user)
+                refresh_token, refresh_expires_at, refresh_jti, token_hash = self.create_refresh_token(user)
+            except Exception as e:
+                logger.error(f"Token creation error: {type(e).__name__}: {str(e)}", exc_info=True)
+                raise AuthenticationError("Token creation failed")
+            
+            # Store refresh token in database
+            try:
+                db_refresh_token = UserRefreshToken(
+                    user_id=user.id,
+                    token_hash=token_hash,
+                    jti=refresh_jti,
+                    expires_at=refresh_expires_at
+                )
+                db.add(db_refresh_token)
+                await db.commit()
+            except Exception as e:
+                logger.error(f"Failed to store refresh token: {type(e).__name__}: {str(e)}", exc_info=True)
+                # Rollback the refresh token creation
+                await db.rollback()
+                raise AuthenticationError("Failed to store refresh token")
+            
+            # Create response
+            try:
+                user_response = UserResponse.from_model(user)
+            except Exception as e:
+                logger.error(f"Failed to create user response: {type(e).__name__}: {str(e)}", exc_info=True)
+                raise AuthenticationError("Failed to create response")
+            
+            return LoginResponse(
+                access_token=access_token,
+                token_type="bearer",
+                expires_at=expires_at,
+                user=user_response,
+                refresh_token=refresh_token,  # Will be sent in httpOnly cookie
+                refresh_expires_at=refresh_expires_at
+            )
+        except AuthenticationError:
+            # Re-raise authentication errors
+            raise
+        except Exception as e:
+            # Log unexpected errors and re-raise as AuthenticationError
+            logger.error(f"Unexpected error in login: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise AuthenticationError("Login processing failed")
     
     async def register(
         self,
@@ -358,54 +394,104 @@ class AuthService:
         Raises:
             AuthenticationError: If user already exists
         """
-        # Check if user already exists
-        stmt = select(User).where(
-            (User.username == username) | (User.email == email)
-        ).where(User.deleted_at.is_(None))
-        
-        result = await db.execute(stmt)
-        existing_user = result.scalar_one_or_none()
-        
-        if existing_user:
-            raise AuthenticationError("User already exists")
-        
-        # Create new user
-        user = User(
-            username=username,
-            email=email,
-            password_hash=self.hash_password(password),
-            phone_number=phone_number,
-            role=UserRole.USER
-        )
-        
-        db.add(user)
-        await db.flush()  # Get user.id
-        
-        # Create tokens
-        access_token, expires_at, access_jti = self.create_access_token(user)
-        refresh_token, refresh_expires_at, refresh_jti, token_hash = self.create_refresh_token(user)
-        
-        # Store refresh token
-        db_refresh_token = UserRefreshToken(
-            user_id=user.id,
-            token_hash=token_hash,
-            jti=refresh_jti,
-            expires_at=refresh_expires_at
-        )
-        db.add(db_refresh_token)
-        await db.commit()
-        
-        # Create response
-        user_response = UserResponse.from_model(user)
-        
-        return RegisterResponse(
-            access_token=access_token,
-            token_type="bearer",
-            expires_at=expires_at,
-            user=user_response,
-            refresh_token=refresh_token,  # Will be sent in httpOnly cookie
-            refresh_expires_at=refresh_expires_at
-        )
+        try:
+            # Check if user already exists
+            try:
+                stmt = select(User).where(
+                    (User.username == username) | (User.email == email)
+                ).where(User.deleted_at.is_(None))
+                
+                result = await db.execute(stmt)
+                existing_user = result.scalar_one_or_none()
+                
+                if existing_user:
+                    raise AuthenticationError("User already exists")
+            except AuthenticationError:
+                raise
+            except Exception as e:
+                logger.error(f"Database query error during user check: {type(e).__name__}: {str(e)}", exc_info=True)
+                raise AuthenticationError("Registration failed")
+            
+            # Create new user
+            try:
+                user = User(
+                    username=username,
+                    email=email,
+                    password_hash=self.hash_password(password),
+                    phone_number=phone_number,
+                    role=UserRole.USER
+                )
+                
+                db.add(user)
+                await db.flush()  # Get user.id
+            except Exception as e:
+                logger.error(f"Failed to create user: {type(e).__name__}: {str(e)}", exc_info=True)
+                await db.rollback()
+                # Check if it's a unique constraint violation
+                if "unique" in str(e).lower() or "duplicate" in str(e).lower():
+                    raise AuthenticationError("User already exists")
+                raise AuthenticationError("Failed to create user")
+            
+            # Create tokens
+            try:
+                access_token, expires_at, access_jti = self.create_access_token(user)
+                refresh_token, refresh_expires_at, refresh_jti, token_hash = self.create_refresh_token(user)
+            except Exception as e:
+                logger.error(f"Token creation error: {type(e).__name__}: {str(e)}", exc_info=True)
+                await db.rollback()
+                raise AuthenticationError("Token creation failed")
+            
+            # Store refresh token
+            try:
+                db_refresh_token = UserRefreshToken(
+                    user_id=user.id,
+                    token_hash=token_hash,
+                    jti=refresh_jti,
+                    expires_at=refresh_expires_at
+                )
+                db.add(db_refresh_token)
+                await db.commit()
+            except Exception as e:
+                logger.error(f"Failed to store refresh token: {type(e).__name__}: {str(e)}", exc_info=True)
+                await db.rollback()
+                raise AuthenticationError("Failed to store refresh token")
+            
+            # Create response
+            try:
+                user_response = UserResponse.from_model(user)
+            except Exception as e:
+                logger.error(f"Failed to create user response: {type(e).__name__}: {str(e)}", exc_info=True)
+                # Don't fail registration if response creation fails, but log it
+                # Try to create a minimal response
+                from ..utils.identity import uuid_to_ulid
+                user_response = UserResponse(
+                    external_ulids=uuid_to_ulid(user.id),
+                    email=user.email,
+                    phone_numbers=user.phone_number,
+                    user_tier_levels="Bronze",
+                    username=user.username,
+                    display_name=user.display_name,
+                    role=user.role,
+                    is_email_verified=user.is_email_verified,
+                    phone_verified=user.phone_verified,
+                    created_at=user.created_at
+                )
+            
+            return RegisterResponse(
+                access_token=access_token,
+                token_type="bearer",
+                expires_at=expires_at,
+                user=user_response,
+                refresh_token=refresh_token,  # Will be sent in httpOnly cookie
+                refresh_expires_at=refresh_expires_at
+            )
+        except AuthenticationError:
+            # Re-raise authentication errors
+            raise
+        except Exception as e:
+            # Log unexpected errors and re-raise as AuthenticationError
+            logger.error(f"Unexpected error in register: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise AuthenticationError("Registration processing failed")
     
     async def refresh_access_token(
         self,

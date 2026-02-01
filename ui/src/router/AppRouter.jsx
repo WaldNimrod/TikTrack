@@ -19,6 +19,7 @@ import RegisterForm from '../components/auth/RegisterForm';
 import PasswordResetFlow from '../components/auth/PasswordResetFlow';
 
 // Protected Routes (will be imported by Team 30)
+import PasswordChangeForm from '../components/profile/PasswordChangeForm';
 // import Dashboard from '../views/Dashboard';
 // import AccountsView from '../views/financial/D16_ACCTS_VIEW';
 // import BrokersView from '../views/financial/D18_BRKRS_VIEW';
@@ -29,7 +30,7 @@ import PasswordResetFlow from '../components/auth/PasswordResetFlow';
  * 
  * @description Main router component with route definitions
  * - Public routes: /login, /register, /reset-password
- * - Protected routes: /dashboard, /accounts, /brokers, /cash
+ * - Protected routes: /profile, /dashboard, /accounts, /brokers, /cash
  * - Default redirect: / -> /login
  * - 404 fallback: * -> /login
  */
@@ -44,6 +45,11 @@ const AppRouter = () => {
         <Route path="/reset-password" element={<PasswordResetFlow />} />
         
         {/* Protected Routes */}
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <PasswordChangeForm />
+          </ProtectedRoute>
+        } />
         {/* TODO: Team 30 - Uncomment and import actual components */}
         {/* <Route path="/dashboard" element={
           <ProtectedRoute>

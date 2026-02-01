@@ -38,6 +38,7 @@ _COMMUNICATION/
 
 ## 🏗️ תשתיות (Infrastructure)
 - [🏗️ TT2_INFRASTRUCTURE_GUIDE.md](./01-ARCHITECTURE/TT2_INFRASTRUCTURE_GUIDE.md) - מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment)
+- [🔐 TT2_DATABASE_CREDENTIALS.md](./01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md) - הגדרת Database Credentials (שם DB, משתמש, הוראות הגדרה)
 - [🏛️ TT2_MASTER_BLUEPRINT.md](./01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
 
 ---

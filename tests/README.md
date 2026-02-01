@@ -36,7 +36,7 @@ npm install
 ### Run Tests
 
 ```bash
-# Run all tests
+# Run all tests (browser visible by default for QA visual validation)
 npm run test:all
 
 # Run individual test suites
@@ -44,7 +44,13 @@ npm run test:auth      # Authentication Flow
 npm run test:user      # User Management Flow
 npm run test:apikeys   # API Keys Management Flow
 npm run test:errors    # Error Handling & Security
+npm run test:password-change  # Password Change Flow
+
+# Run in headless mode (for CI/CD - browser not visible)
+HEADLESS=true npm run test:all
 ```
+
+**Note:** By default, tests run with **visible browser** for QA visual validation. Set `HEADLESS=true` environment variable to run in headless mode (useful for CI/CD).
 
 ---
 
@@ -56,6 +62,8 @@ npm run test:errors    # Error Handling & Security
 - **Frontend URL:** `http://localhost:8080`
 - **Backend URL:** `http://localhost:8082`
 - **Timeout:** 10 seconds (default)
+- **Headless Mode:** Disabled by default (browser visible for QA visual validation)
+  - Set `HEADLESS=true` environment variable to enable headless mode
 
 ### Test Results
 
@@ -120,6 +128,19 @@ Each test logs:
 ---
 
 ## 🔍 Monitoring & Debugging
+
+### Visual Browser Testing
+
+**Default Behavior:** Tests run with **visible browser** for QA visual validation. You can watch the tests execute in real-time, which is essential for:
+- Visual validation of UI elements
+- Debugging test failures
+- Understanding test flow
+- Verifying user experience
+
+**Headless Mode:** Set `HEADLESS=true` to run tests without visible browser (useful for CI/CD):
+```bash
+HEADLESS=true npm run test:all
+```
 
 ### Console Logs
 

@@ -14,14 +14,16 @@ export const TEST_CONFIG = {
   timeout: 10000,
   implicitWait: 3000,
   pageLoadTimeout: 30000,
+  // Headless mode: Set to false to see browser during tests (default: false for QA visual validation)
+  headless: process.env.HEADLESS === 'true' || false,
 };
 
 // Test Users
 export const TEST_USERS = {
   admin: {
     username: 'admin',
-    password: '418141',
-    email: 'admin@tiktrack.local'
+    password: 'Admin123456!', // Minimum 8 characters, meets password requirements
+    email: 'admin@example.com' // Valid email domain (not .local)
   },
   testUser: {
     username: `testuser_${Date.now()}`,
@@ -33,14 +35,29 @@ export const TEST_USERS = {
 
 /**
  * Create WebDriver instance
+ * 
+ * @description Creates Chrome WebDriver with visual browser by default for QA testing
+ * Set HEADLESS=true environment variable to run in headless mode
  */
 export async function createDriver() {
   const options = new chrome.Options();
-  options.addArguments('--headless=new'); // Use new headless mode
-  options.addArguments('--no-sandbox');
-  options.addArguments('--disable-dev-shm-usage');
-  options.addArguments('--disable-gpu');
+  
+  // Headless mode: Only enable if explicitly requested (for CI/CD)
+  // Default: false - Browser visible for QA visual validation
+  if (TEST_CONFIG.headless) {
+    options.addArguments('--headless=new'); // Use new headless mode
+    options.addArguments('--no-sandbox');
+    options.addArguments('--disable-dev-shm-usage');
+    options.addArguments('--disable-gpu');
+  }
+  
+  // Window size for consistent testing
   options.addArguments('--window-size=1920,1080');
+  
+  // Start browser maximized for better visibility
+  if (!TEST_CONFIG.headless) {
+    options.addArguments('--start-maximized');
+  }
   
   const driver = await new Builder()
     .forBrowser('chrome')

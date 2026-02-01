@@ -96,37 +96,82 @@ async def register(
     Creates new user account and returns access token + refresh token (in cookie).
     """
     try:
-        auth_service = get_auth_service()
-        register_response = await auth_service.register(
-            username=request.username,
-            email=request.email,
-            password=request.password,
-            phone_number=request.phone_number,
-            db=db
-        )
+        logger.info(f"Registration attempt started for: {request.username} ({request.email[:3] if request.email else 'N/A'}***)")
+        
+        # Validate input
+        if not request.username or not request.email or not request.password:
+            logger.warning("Registration attempt with missing required fields")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username, email, and password are required"
+            )
+        
+        # Get auth service
+        try:
+            logger.debug("Initializing AuthService for registration...")
+            auth_service = get_auth_service()
+            logger.debug("AuthService initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authentication service unavailable"
+            )
+        
+        # Attempt registration
+        try:
+            logger.debug(f"Attempting registration for user: {request.username}")
+            register_response = await auth_service.register(
+                username=request.username,
+                email=request.email,
+                password=request.password,
+                phone_number=request.phone_number,
+                db=db
+            )
+            logger.debug("Registration service call completed successfully")
+        except AuthenticationError as e:
+            # Generic error message to prevent information leakage
+            logger.info(f"Registration failed for user: {request.username} (authentication error: {str(e)})")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Registration failed. Please check your input."
+            )
+        except Exception as e:
+            # Log detailed error for debugging
+            logger.error(f"Registration service error: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Registration processing failed"
+            )
         
         # Set refresh token in httpOnly cookie
-        if register_response.refresh_token and register_response.refresh_expires_at:
-            set_refresh_token_cookie(
-                response,
-                register_response.refresh_token,
-                register_response.refresh_expires_at
-            )
+        try:
+            if register_response.refresh_token and register_response.refresh_expires_at:
+                logger.debug("Setting refresh token cookie...")
+                set_refresh_token_cookie(
+                    response,
+                    register_response.refresh_token,
+                    register_response.refresh_expires_at
+                )
+                logger.debug("Refresh token cookie set successfully")
+        except Exception as e:
+            logger.error(f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True)
+            # Don't fail registration if cookie setting fails, but log it
         
         # Remove refresh_token from response body (security - sent in cookie only)
         register_response.refresh_token = None
         register_response.refresh_expires_at = None
         
+        logger.info(f"Registration successful for user: {request.username}")
         return register_response
         
-    except AuthenticationError as e:
-        # Generic error message to prevent information leakage
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Registration failed. Please check your input."
-        )
+    except HTTPException:
+        # Re-raise HTTP exceptions (already formatted)
+        raise
     except Exception as e:
-        logger.error(f"Registration error: {str(e)}", exc_info=True)
+        # Log full error details for debugging
+        logger.error(f"Registration error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True)
+        logger.error(f"Error traceback:", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Registration failed"
@@ -145,35 +190,101 @@ async def login(
     Returns access token in response body and refresh token in httpOnly cookie.
     """
     try:
-        auth_service = get_auth_service()
-        login_response = await auth_service.login(
-            username_or_email=request.username_or_email,
-            password=request.password,
-            db=db
-        )
+        logger.info(f"Login attempt started for: {request.username_or_email[:3] if request.username_or_email else 'N/A'}***")
+        
+        # Validate input
+        if not request.username_or_email or not request.password:
+            logger.warning("Login attempt with missing credentials")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username/email and password are required"
+            )
+        
+        # Check database connection
+        try:
+            logger.debug("Checking database connection...")
+            # Simple query to test connection
+            from sqlalchemy import text
+            await db.execute(text("SELECT 1"))
+            logger.debug("Database connection OK")
+        except Exception as e:
+            logger.error(f"Database connection failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database connection failed"
+            )
+        
+        # Get auth service
+        try:
+            logger.debug("Initializing AuthService...")
+            auth_service = get_auth_service()
+            logger.debug("AuthService initialized successfully")
+        except ValueError as e:
+            # JWT_SECRET_KEY validation error
+            logger.error(f"AuthService initialization failed (configuration): {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authentication service configuration error"
+            )
+        except Exception as e:
+            logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authentication service unavailable"
+            )
+        
+        # Attempt login
+        try:
+            logger.debug(f"Attempting login for user: {request.username_or_email[:3]}***")
+            login_response = await auth_service.login(
+                username_or_email=request.username_or_email,
+                password=request.password,
+                db=db
+            )
+            logger.debug("Login service call completed successfully")
+        except AuthenticationError as e:
+            # Generic error message to prevent information leakage
+            logger.info(f"Login failed for user: {request.username_or_email[:3]}*** (authentication error)")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials"
+            )
+        except Exception as e:
+            # Catch any other errors from auth service
+            logger.error(f"Login service error: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Login processing failed"
+            )
         
         # Set refresh token in httpOnly cookie
-        if login_response.refresh_token and login_response.refresh_expires_at:
-            set_refresh_token_cookie(
-                response,
-                login_response.refresh_token,
-                login_response.refresh_expires_at
-            )
+        try:
+            if login_response.refresh_token and login_response.refresh_expires_at:
+                logger.debug("Setting refresh token cookie...")
+                set_refresh_token_cookie(
+                    response,
+                    login_response.refresh_token,
+                    login_response.refresh_expires_at
+                )
+                logger.debug("Refresh token cookie set successfully")
+        except Exception as e:
+            logger.error(f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True)
+            # Don't fail login if cookie setting fails, but log it
         
         # Remove refresh_token from response body (security - sent in cookie only)
         login_response.refresh_token = None
         login_response.refresh_expires_at = None
         
+        logger.info(f"Login successful for user: {request.username_or_email[:3]}***")
         return login_response
         
-    except AuthenticationError as e:
-        # Generic error message to prevent information leakage
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials"
-        )
+    except HTTPException:
+        # Re-raise HTTP exceptions (already formatted)
+        raise
     except Exception as e:
-        logger.error(f"Login error: {str(e)}", exc_info=True)
+        # Log full error details for debugging
+        logger.error(f"Login error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True)
+        logger.error(f"Error traceback:", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed"

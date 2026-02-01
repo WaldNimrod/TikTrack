@@ -130,10 +130,42 @@ const LoginForm = () => {
       navigate('/dashboard');
       
     } catch (err) {
-      // Handle error
-      const errorMessage = err.response?.data?.detail || 
-                          err.message || 
-                          'שגיאה בהתחברות. אנא בדוק את פרטיך.';
+      // Handle error with improved error messages
+      let errorMessage = 'שגיאה בהתחברות. אנא בדוק את פרטיך.';
+      
+      // Detect CORS or network errors
+      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response) {
+        // CORS or network error - provide helpful message
+        errorMessage = 'שגיאת חיבור לשרת. אנא בדוק שהשרת פועל ונסה שוב.';
+        debugLog('Auth', 'Network/CORS error detected', { code: err.code, message: err.message });
+      } else if (err.response) {
+        // Server responded with error
+        const status = err.response.status;
+        
+        if (status === 500) {
+          errorMessage = 'שגיאת שרת פנימית. אנא נסה שוב מאוחר יותר או פנה לתמיכה.';
+        } else if (status === 401) {
+          // Invalid credentials
+          errorMessage = err.response.data?.detail || 
+                        'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+        } else if (status === 400) {
+          // Bad request
+          errorMessage = err.response.data?.detail || 
+                        'בקשה לא תקינה. אנא בדוק את הפרטים שהזנת.';
+        } else if (status === 429) {
+          // Rate limit
+          errorMessage = 'יותר מדי ניסיונות התחברות. אנא נסה שוב מאוחר יותר.';
+        } else {
+          // Other server errors
+          errorMessage = err.response.data?.detail || 
+                        `שגיאת שרת (${status}). אנא נסה שוב מאוחר יותר.`;
+        }
+        
+        debugLog('Auth', 'Server error response', { status, detail: err.response.data?.detail });
+      } else if (err.message) {
+        // Other error with message
+        errorMessage = err.message;
+      }
       
       setError(errorMessage);
       audit.error('Auth', 'Login failed', err);

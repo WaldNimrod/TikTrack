@@ -33,6 +33,11 @@ const PasswordChangeForm = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  
+  // Password visibility state
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   /**
    * Handle Input Change
@@ -151,6 +156,11 @@ const PasswordChangeForm = () => {
         confirmPassword: '',
       });
       
+      // Reset password visibility
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+      
     } catch (err) {
       debugLog('PasswordChangeForm', 'Password change error', err);
       
@@ -198,17 +208,53 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="currentPassword">
             סיסמה נוכחית:
           </label>
-          <input
-            type="password"
-            id="currentPassword"
-            name="currentPassword"
-            className={`form-control js-password-change-current-input ${fieldErrors.currentPassword ? 'auth-form__input--error' : ''}`}
-            required
-            placeholder="הכנס סיסמה נוכחית"
-            value={formData.currentPassword}
-            onChange={handleInputChange}
-            disabled={isLoading}
-          />
+          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+            <input
+              type={showCurrentPassword ? "text" : "password"}
+              id="currentPassword"
+              name="currentPassword"
+              className={`form-control js-password-change-current-input ${fieldErrors.currentPassword ? 'auth-form__input--error' : ''}`}
+              required
+              placeholder="הכנס סיסמה נוכחית"
+              value={formData.currentPassword}
+              onChange={handleInputChange}
+              disabled={isLoading}
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              className="password-toggle js-password-toggle-current"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              aria-label={showCurrentPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--color-30)',
+              }}
+              disabled={isLoading}
+            >
+              {showCurrentPassword ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
           {fieldErrors.currentPassword && (
             <span className="auth-form__error-message">{fieldErrors.currentPassword}</span>
           )}
@@ -219,17 +265,53 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="newPassword">
             סיסמה חדשה:
           </label>
-          <input
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            className={`form-control js-password-change-new-input ${fieldErrors.newPassword ? 'auth-form__input--error' : ''}`}
-            required
-            placeholder="הכנס סיסמה חדשה"
-            value={formData.newPassword}
-            onChange={handleInputChange}
-            disabled={isLoading}
-          />
+          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+            <input
+              type={showNewPassword ? "text" : "password"}
+              id="newPassword"
+              name="newPassword"
+              className={`form-control js-password-change-new-input ${fieldErrors.newPassword ? 'auth-form__input--error' : ''}`}
+              required
+              placeholder="הכנס סיסמה חדשה"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              disabled={isLoading}
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              className="password-toggle js-password-toggle-new"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              aria-label={showNewPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--color-30)',
+              }}
+              disabled={isLoading}
+            >
+              {showNewPassword ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
           {fieldErrors.newPassword && (
             <span className="auth-form__error-message">{fieldErrors.newPassword}</span>
           )}
@@ -240,17 +322,53 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="confirmPassword">
             אימות סיסמה:
           </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            className={`form-control js-password-change-confirm-input ${fieldErrors.confirmPassword ? 'auth-form__input--error' : ''}`}
-            required
-            placeholder="הכנס סיסמה שוב"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            disabled={isLoading}
-          />
+          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              name="confirmPassword"
+              className={`form-control js-password-change-confirm-input ${fieldErrors.confirmPassword ? 'auth-form__input--error' : ''}`}
+              required
+              placeholder="הכנס סיסמה שוב"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              disabled={isLoading}
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              className="password-toggle js-password-toggle-confirm"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--color-30)',
+              }}
+              disabled={isLoading}
+            >
+              {showConfirmPassword ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
           {fieldErrors.confirmPassword && (
             <span className="auth-form__error-message">{fieldErrors.confirmPassword}</span>
           )}

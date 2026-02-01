@@ -433,6 +433,104 @@ ui/src/
 
 ---
 
+### ד. איקונים אחידים (Icon Standards) 🚨 חובה
+
+**חוק ברזל: כל האיקונים במערכת חייבים להיות אחידים ופשוטים.**
+
+#### **1. סטנדרט איקונים**
+
+**✅ מותר:**
+- **SVG Inline פשוט** - שימוש ב-SVG פשוטים עם `viewBox` ו-`stroke`
+- **אין תלויות חיצוניות** - אין שימוש בספריות איקונים חיצוניות (כמו lucide-react, react-icons, וכו')
+- **צבע אחיד** - שימוש ב-`currentColor` כדי שיורש מה-parent
+- **גודל אחיד** - גודל סטנדרטי של 18px או 24px לפי הקונטקסט
+
+**❌ אסור:**
+- ❌ **אין שימוש בספריות איקונים חיצוניות** (lucide-react, react-icons, font-awesome, וכו')
+- ❌ **אין שימוש ב-React Components לאיקונים** (כמו `<Eye />` מ-lucide-react)
+- ❌ **אין שימוש ב-font icons** (icon fonts)
+- ❌ **אין המצאת איקונים חדשים** - רק איקונים פשוטים וסטנדרטיים
+
+#### **2. פורמט SVG סטנדרטי**
+
+**כל איקון חייב להיות בפורמט הבא:**
+
+```jsx
+// ✅ נכון - SVG פשוט עם viewBox
+<svg 
+  width="18" 
+  height="18" 
+  viewBox="0 0 24 24" 
+  fill="none" 
+  stroke="currentColor" 
+  strokeWidth="2" 
+  strokeLinecap="round" 
+  strokeLinejoin="round"
+>
+  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+  <circle cx="12" cy="12" r="3"></circle>
+</svg>
+
+// ❌ לא נכון - React Component מ-lucide-react
+import { Eye } from 'lucide-react';
+<Eye size={18} />
+```
+
+#### **3. דוגמאות איקונים נפוצים**
+
+**Eye Icon (הצג סיסמה):**
+```jsx
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+  <circle cx="12" cy="12" r="3"></circle>
+</svg>
+```
+
+**EyeOff Icon (הסתר סיסמה):**
+```jsx
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+  <line x1="1" y1="1" x2="23" y2="23"></line>
+</svg>
+```
+
+#### **4. כללי שימוש**
+
+**מיקום איקונים:**
+- ✅ איקונים בתוך buttons: מיקום absolute בתוך wrapper
+- ✅ איקונים בתוך labels: מיקום inline עם text
+- ✅ איקונים standalone: מיקום flex עם gap
+
+**סגנון איקונים:**
+- ✅ `stroke="currentColor"` - יורש צבע מה-parent
+- ✅ `fill="none"` - אין fill (רק stroke)
+- ✅ `strokeWidth="2"` - עובי stroke אחיד
+- ✅ `strokeLinecap="round"` - קצוות מעוגלים
+- ✅ `strokeLinejoin="round"` - חיבורים מעוגלים
+
+**גודל איקונים:**
+- ✅ **18px** - איקונים קטנים (בתוך inputs, buttons קטנים)
+- ✅ **24px** - איקונים בינוניים (בתוך navigation, headers)
+- ✅ **גודל אחיד** - כל האיקונים באותו קונטקסט באותו גודל
+
+#### **5. בדיקות לפני הגשה**
+
+**חובה לבדוק:**
+- [ ] כל האיקונים הם SVG inline פשוטים
+- [ ] אין שימוש בספריות איקונים חיצוניות
+- [ ] כל האיקונים משתמשים ב-`currentColor`
+- [ ] כל האיקונים באותו גודל בקונטקסט דומה
+- [ ] אין React Components לאיקונים
+
+**דוגמה לבדיקה:**
+```bash
+# חיפוש שימוש בספריות איקונים חיצוניות
+grep -r "lucide-react\|react-icons\|@heroicons" ui/src/
+# אמור להחזיר: אין תוצאות
+```
+
+---
+
 ## 3. פרוטוקול בדיקה (QA Protocol) - צוות 50
 
 צוות ה-QA יבדוק את תקינות הלוגיקה בשלושה צירים:
@@ -637,6 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - [ ] אין שימוש ב-BEM classes כ-JS selectors
 - [ ] כל פונקציות מתועדות ב-JSDoc עם `@legacyReference`
 - [ ] Audit Trail מיושם בכל המודולים
+- [ ] כל האיקונים הם SVG inline פשוטים (אין ספריות חיצוניות)
 
 ### ✅ בדיקות ידניות
 
@@ -666,5 +765,23 @@ document.addEventListener('DOMContentLoaded', () => {
 ---
 
 **Last Updated:** 2026-01-31  
+**Version:** v1.5 (Added Icon Standards)  
 **Maintained By:** Team 10 (The Gateway)  
 **Approved By:** Chief Architect - Phoenix v252
+
+---
+
+## 8. היסטוריית עדכונים
+
+### v1.5 (2026-01-31)
+- ✅ **הוסף:** סעיף ד' - איקונים אחידים (Icon Standards)
+- ✅ **הוסף:** חוק ברזל - כל האיקונים חייבים להיות SVG inline פשוטים
+- ✅ **הוסף:** איסור על שימוש בספריות איקונים חיצוניות
+- ✅ **הוסף:** דוגמאות לאיקונים נפוצים (Eye, EyeOff)
+- ✅ **הוסף:** כללי שימוש ובדיקות לפני הגשה
+
+### v1.4 (2026-01-31)
+- ✅ **הוסף:** Transformation Layer standards
+- ✅ **הוסף:** DOM Selectors standards
+- ✅ **הוסף:** Audit Trail System
+- ✅ **הוסף:** JSDoc requirements

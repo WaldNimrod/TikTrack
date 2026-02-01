@@ -1,9 +1,10 @@
 # 🏗️ TikTrack Phoenix - Infrastructure Guide
 
-**Version:** 2.0  
+**Version:** 2.1  
 **Date:** 2026-01-31  
 **Session:** SESSION_01  
-**Status:** ✅ **COMPLETE**
+**Status:** ✅ **COMPLETE**  
+**Last Updated:** 2026-01-31 (Database Credentials Configuration)
 
 ---
 
@@ -252,6 +253,68 @@ api/
 - **Connection:** SQLAlchemy ORM
 - **Connection Pool:** Configured in `api/core/database.py`
 
+### **Database Configuration (Production Setup)**
+
+#### **Database Name:**
+```
+TikTrack-phoenix-db
+```
+
+#### **Database User:**
+```
+TikTrackDbAdmin
+```
+
+#### **Database Connection Format:**
+```
+postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
+```
+
+⚠️ **SECURITY:** The database password is stored in `api/.env` file (which is in `.gitignore`). **Never commit the password to git.** Store the password securely in a password manager.
+
+#### **Database Setup Steps:**
+1. **Create Database:**
+   ```bash
+   createdb TikTrack-phoenix-db
+   ```
+
+2. **Create User:**
+   ```sql
+   CREATE USER TikTrackDbAdmin WITH PASSWORD '<secure-password>';
+   ```
+
+3. **Grant Privileges:**
+   ```sql
+   GRANT ALL PRIVILEGES ON DATABASE "TikTrack-phoenix-db" TO TikTrackDbAdmin;
+   ```
+
+4. **Create Schemas:**
+   ```sql
+   \c TikTrack-phoenix-db
+   CREATE SCHEMA IF NOT EXISTS user_data;
+   CREATE SCHEMA IF NOT EXISTS market_data;
+   GRANT ALL ON SCHEMA user_data TO TikTrackDbAdmin;
+   GRANT ALL ON SCHEMA market_data TO TikTrackDbAdmin;
+   ```
+
+5. **Set Default Privileges:**
+   ```sql
+   ALTER DEFAULT PRIVILEGES IN SCHEMA user_data GRANT ALL ON TABLES TO TikTrackDbAdmin;
+   ALTER DEFAULT PRIVILEGES IN SCHEMA market_data GRANT ALL ON TABLES TO TikTrackDbAdmin;
+   ```
+
+6. **Configure Environment Variable:**
+   ```bash
+   # In api/.env file:
+   DATABASE_URL=postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
+   ```
+
+#### **Password Security:**
+- **Password Generation:** Use cryptographically secure random string (32+ characters)
+- **Storage:** Store in `api/.env` (already in `.gitignore`)
+- **Backup:** Store password in secure password manager
+- **Rotation:** Rotate password periodically for security
+
 ### **Schema Structure:**
 - **External IDs:** ULID strings (for API responses)
 - **Internal IDs:** BIGINT (for database relations)
@@ -266,6 +329,29 @@ api/
 - `user_api_keys` - API keys (encrypted)
 
 **Full Schema:** See `04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
+
+### **Database Verification:**
+To verify database connection is working:
+```bash
+# Test connection
+psql postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db -c "SELECT 1;"
+
+# Check Backend health endpoint
+curl http://localhost:8082/health
+```
+
+**Expected Health Check Response:**
+```json
+{
+    "status": "ok",
+    "components": {
+        "database": {
+            "status": "ok",
+            "message": "Database connection successful"
+        }
+    }
+}
+```
 
 ---
 
@@ -303,12 +389,21 @@ const appName = import.meta.env.VITE_APP_NAME;
 
 #### **Key Variables:**
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/tiktrack
+# Database Configuration
+DATABASE_URL=postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
+
+# JWT Configuration
 SECRET_KEY=your-secret-key-here
 JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=15
 JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
 ```
+
+⚠️ **IMPORTANT:** 
+- Replace `<PASSWORD>` with the actual database password
+- Password is stored securely in `api/.env` (in `.gitignore`)
+- Never commit `.env` file to git
+- Store password in secure password manager
 
 #### **Configuration Management:**
 - **File:** `api/core/config.py`
@@ -358,13 +453,32 @@ pip install -r requirements.txt
 ```
 
 #### **4. Database Setup:**
+
+**⚠️ IMPORTANT:** Use the production database configuration (see [Database Infrastructure](#-database-infrastructure) section above).
+
+**Quick Setup:**
 ```bash
 # Create database
-createdb tiktrack
+createdb TikTrack-phoenix-db
+
+# Create user (replace <secure-password> with actual password)
+psql -c "CREATE USER TikTrackDbAdmin WITH PASSWORD '<secure-password>';"
+psql -c "GRANT ALL PRIVILEGES ON DATABASE \"TikTrack-phoenix-db\" TO TikTrackDbAdmin;"
+
+# Connect to database and create schemas
+psql -d TikTrack-phoenix-db -c "CREATE SCHEMA IF NOT EXISTS user_data;"
+psql -d TikTrack-phoenix-db -c "CREATE SCHEMA IF NOT EXISTS market_data;"
+psql -d TikTrack-phoenix-db -c "GRANT ALL ON SCHEMA user_data TO TikTrackDbAdmin;"
+psql -d TikTrack-phoenix-db -c "GRANT ALL ON SCHEMA market_data TO TikTrackDbAdmin;"
 
 # Run schema (if available)
-psql -d tiktrack -f ../04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql
+psql -d TikTrack-phoenix-db -f ../04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql
+
+# Configure DATABASE_URL in api/.env
+# DATABASE_URL=postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
 ```
+
+**For detailed setup instructions, see [Database Infrastructure](#-database-infrastructure) section.**
 
 ### **Running Development Servers**
 

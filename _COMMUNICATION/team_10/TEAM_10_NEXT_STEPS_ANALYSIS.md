@@ -1,175 +1,217 @@
-# 📊 ניתוח צעדים הבאים: Team 10
+# 📋 ניתוח צעדים הבאים - Team 10
 
 **From:** Team 10 (The Gateway)  
 **Date:** 2026-01-31  
-**Session:** SESSION_01  
-**Subject:** NEXT_STEPS_ANALYSIS | Status: ANALYSIS
+**Session:** SESSION_01 - Phase 1.5  
+**Subject:** NEXT_STEPS_ANALYSIS | Status: 📋 **ANALYSIS**
 
 ---
 
-## 📋 סטטוס נוכחי
+## 🎯 מצב נוכחי
 
-### **Phase 1.1: DB & Backend Foundation** ✅
-- **Status:** ✅ **COMPLETE**
-- **Team:** Team 20 (Backend)
-- **Completion:** 100% (9/9 tasks)
+### **Phase 1.5: Integration Testing** ✅ **AUTHENTICATION COMPLETE**
 
-### **Phase 1.2: API Routes** ✅
-- **Status:** ✅ **COMPLETE**
-- **Team:** Team 20 (Backend)
-- **Completion:** 100% (All endpoints implemented)
-
-### **Phase 1.3: Frontend Integration** ✅
-- **Status:** ✅ **COMPLETE - QA APPROVED**
-- **Team:** Team 30 (Frontend)
-- **QA Status:** ✅ **COMPLETE - 0 ISSUES FOUND**
-- **Completion:** Frontend components ready, QA passed
-
-### **Phase 1.4: Backend QA Review** ✅
-- **Status:** ✅ **COMPLETE - APPROVED**
-- **Team:** Team 50 (QA)
-- **Completion:** ✅ All tasks completed (50.1.3, 50.1.4, 50.1.5)
-- **Results:**
-  - ✅ OpenAPI Spec: 100% Complete
-  - ✅ All security features verified
-  - ✅ All compliance verified
-  - ✅ Team 20 response approved
+**הושלם:**
+- ✅ Authentication System - 100% pass rate (7/7 tests)
+- ✅ Login Endpoint - 100% pass rate (4/4 tests)
+- ✅ Users/Me Endpoint - 100% pass rate (3/3 tests) - FIXED
+- ✅ Token Validation - VERIFIED
+- ✅ All 5 authentication tables operational
+- ✅ Production readiness: READY
 
 ---
 
-## 🎯 הצעד הבא לפי התוכנית
+## 📋 הצעדים הבאים לפי התוכנית
 
-### **Phase 1.5: Integration Testing** (הצעד הבא)
+### **1. השלמת Phase 1.3: Frontend Integration** 🟢 **IN PROGRESS**
 
-**סטטוס:**
-- ✅ Phase 1.1: DB & Backend Foundation - COMPLETE
-- ✅ Phase 1.2: API Routes - COMPLETE
-- ✅ Phase 1.3: Frontend Integration - COMPLETE (QA Approved, 0 issues)
-- ✅ Phase 1.4: Backend QA Review - COMPLETE (Approved)
-- 🎯 **Phase 1.5: Integration Testing** - **הצעד הבא**
+**עמודים שנותרו:**
+- 🟢 **D15_PROF_VIEW** - IN PROGRESS
+  - ✅ Profile Display - COMPLETE
+  - ✅ Profile Update - COMPLETE
+  - ⏸️ Password Change - Pending (Architectural Decision Approved)
+- 🟢 **D24_API_VIEW** - IN PROGRESS (API Keys Management)
+- 🟢 **D25_SEC_VIEW** - IN PROGRESS (Security Settings)
 
----
-
-### **מה זה Integration Testing (Phase 1.5)?**
-
-**מטרה:**
-- בדיקות end-to-end מלאות של Backend + Frontend יחד
-- בדיקות workflows מלאים (registration → login → API keys → profile)
-- בדיקות אינטגרציה מלאות בין כל הרכיבים
-
-**מה צריך לבדוק:**
-1. **Authentication Flow:**
-   - Registration → Email verification → Login → Token refresh → Logout
-   - Password reset flow (EMAIL/SMS)
-   - Phone verification
-
-2. **User Management Flow:**
-   - Get current user
-   - Update user profile
-   - Change password
-
-3. **API Keys Management Flow:**
-   - Create API key
-   - List API keys
-   - Update API key
-   - Verify API key
-   - Delete API key
-
-4. **Error Handling:**
-   - Network errors
-   - API errors
-   - Validation errors
-   - Authentication errors
-
-5. **Security:**
-   - Token expiration handling
-   - Refresh token rotation
-   - CORS verification
-   - API key masking
+**פעולות נדרשות:**
+- ⏸️ Team 20: Implement Password Change endpoint (`PUT /users/me/password`)
+- ⏸️ Team 30: Implement Password Change form component
+- ⏸️ Team 30: Complete D24_API_VIEW integration
+- ⏸️ Team 30: Complete D25_SEC_VIEW integration
+- ⏸️ Team 50: QA testing for remaining pages
 
 ---
 
-### **דרישות ל-Phase 1.5:**
+### **2. Phase 1.6: Visual Fidelity & Design Fixes** ⚠️ **NEW - REQUIRED**
 
-**Infrastructure:**
-- ✅ Backend server רץ על פורט 8082
-- ✅ Frontend server רץ על פורט 8080
-- ✅ Database מחובר
-- ✅ כל ה-endpoints פעילים
+**⚠️ בעיה שזוהתה:**
+- העיצובים שיצרנו בבלופרינט השתבשו במהלך העבודה
+- נדרש תיקון fidelity מול Blueprint המקורי
 
-**Components:**
-- ✅ Backend: כל ה-endpoints מוכנים (Phase 1.4 approved)
-- ✅ Frontend: כל ה-components מוכנים (Phase 1.3 QA approved)
-- ✅ Services: Auth service, API Keys service מוכנים
+**מתי לבצע תיקונים:**
+1. **לפני השלמת Phase 1.3** - מומלץ לתקן עיצובים לפני מעבר לשלב הבא
+2. **לאחר כל Integration** - לבדוק fidelity אחרי כל אינטגרציה של עמוד
+3. **לפני Production** - חובה לתקן לפני Production Deployment
 
-**Testing:**
-- ⏸️ Integration test scenarios (צריך ליצור)
-- ⏸️ End-to-end test cases (צריך ליצור)
-- ⏸️ Test data preparation (admin user, test users)
+**איך לבצע תיקונים:**
 
----
+**שלב 1: זיהוי בעיות (Team 50)**
+- [ ] Team 50 מבצע Visual Comparison מול Blueprint המקורי
+- [ ] מזהה כל הבדלים (פונטים, צבעים, עימוד, spacing)
+- [ ] יוצר דוח מפורט עם screenshots והשוואות
 
-### **מי צריך לעשות את זה?**
+**שלב 2: תיקון Blueprint (Team 31 או Team 40)**
+- [ ] אם הבעיה ב-Blueprint עצמו - Team 31 מתקן
+- [ ] אם הבעיה ב-Design Tokens - Team 40 מתקן
+- [ ] עדכון Blueprint HTML/CSS
 
-**Team 50 (QA):**
-- אחראי על יצירת Integration Test Scenarios
-- אחראי על ביצוע Integration Testing
-- אחראי על דיווח תוצאות
+**שלב 3: תיקון Frontend (Team 30)**
+- [ ] Team 30 מעדכן את הקוד Frontend לפי Blueprint המתוקן
+- [ ] וידוא שימוש ב-Design Tokens הנכונים
+- [ ] בדיקת Pixel Perfect fidelity
 
-**Team 30 (Frontend) + Team 20 (Backend):**
-- תמיכה ב-QA בבדיקות
-- תיקון bugs אם נמצאו
-- תמיכה טכנית
-
----
-
-## 📊 המלצה
-
-### **הצעד הבא המומלץ:**
-
-**Phase 1.5: Integration Testing** (Priority: P0)
-
-**למה:**
-- זה השלב הבא בתוכנית (לפי לוג ההתקדמות)
-- Phase 1.3 ו-Phase 1.4 הושלמו בהצלחה
-- צריך לוודא שהכל עובד יחד לפני Production
-
-**מה לעשות:**
-1. **הודע ל-Team 50:**
-   - להכין Integration Test Scenarios
-   - להתחיל Integration Testing
-   - לדווח על תוצאות
-
-2. **ודא Infrastructure:**
-   - Backend רץ (`http://localhost:8082`)
-   - Frontend רץ (`http://localhost:8080`)
-   - Database מחובר
-
-3. **תמוך בצוותים:**
-   - Team 30 + Team 20 צריכים להיות זמינים לתמיכה
-   - תמוך ב-QA בבדיקות
+**שלב 4: QA Verification (Team 50)**
+- [ ] Team 50 מבצע Visual Regression Testing
+- [ ] וידוא 100% match עם Blueprint
+- [ ] וידוא 100% match עם Legacy (אם רלוונטי)
 
 ---
 
-## 📝 סיכום
+### **3. Phase 1.7: Production Deployment** ⏸️ **FUTURE**
 
-**הצעד הבא לפי התוכנית:**
+**לאחר השלמת:**
+- ✅ Phase 1.3 (כל העמודים)
+- ✅ Phase 1.5 (כל הבדיקות)
+- ✅ Phase 1.6 (תיקוני עיצוב)
 
-**Phase 1.5: Integration Testing**
-- ✅ Phase 1.1-1.4 הושלמו בהצלחה
-- 🎯 Phase 1.5 הוא הצעד הבא
-- ⏸️ צריך להכין Integration Test Scenarios
-- ⏸️ צריך לבצע Integration Testing
-- ⏸️ צריך לדווח על תוצאות
+---
 
-**לאחר Phase 1.5:**
-- Phase 1.6: Production Deployment (לפי התוכנית)
+## 🎯 המלצה: סדר עדיפויות
+
+### **Priority 1: השלמת Password Change** 🔴 **P0**
+- **סיבה:** Architectural Decision כבר אושר
+- **צוותים:** Team 20 (Backend) + Team 30 (Frontend)
+- **זמן משוער:** 1-2 ימים
+
+### **Priority 2: תיקוני עיצוב (Fidelity Fixes)** 🟡 **P1**
+- **סיבה:** חשוב לתקן לפני שמצטברים עוד שינויים
+- **צוותים:** Team 50 (זיהוי) → Team 31/40 (תיקון Blueprint) → Team 30 (תיקון Frontend)
+- **זמן משוער:** 2-3 ימים (תלוי בהיקף הבעיות)
+
+### **Priority 3: השלמת D24_API_VIEW ו-D25_SEC_VIEW** 🟢 **P2**
+- **סיבה:** חלק מ-Phase 1.3
+- **צוות:** Team 30
+- **זמן משוער:** 2-3 ימים
+
+---
+
+## 📋 נוהל תיקוני עיצוב (Design Fidelity Fix Protocol)
+
+### **מתי לבצע תיקונים:**
+
+1. **לפני השלמת Phase 1.3** ✅ **מומלץ**
+   - תיקון עיצובים לפני מעבר לשלב הבא
+   - מונע הצטברות בעיות
+
+2. **לאחר כל Integration** ✅ **מומלץ**
+   - בדיקת fidelity אחרי כל אינטגרציה של עמוד
+   - זיהוי מוקדם של בעיות
+
+3. **לפני Production** 🔴 **חובה**
+   - חובה לתקן לפני Production Deployment
+   - לא ניתן לעבור ל-Production עם בעיות fidelity
+
+### **איך לבצע תיקונים:**
+
+#### **שלב 1: זיהוי בעיות (Team 50 - QA)**
+
+**פעולות:**
+1. [ ] Visual Comparison מול Blueprint המקורי
+2. [ ] זיהוי כל הבדלים (פונטים, צבעים, עימוד, spacing, icons)
+3. [ ] יצירת דוח מפורט עם:
+   - Screenshots של Blueprint המקורי
+   - Screenshots של המצב הנוכחי
+   - רשימת הבדלים מפורטת
+   - Priority לכל בעיה (CRITICAL/HIGH/MEDIUM/LOW)
+
+**תוצר:**
+- דוח QA: `TEAM_50_FIDELITY_ISSUES_REPORT.md`
+- Screenshots בתיקייה: `documentation/05-REPORTS/artifacts_SESSION_01/fidelity_issues/`
+
+#### **שלב 2: תיקון Blueprint (Team 31 או Team 40)**
+
+**אם הבעיה ב-Blueprint עצמו:**
+- **Team 31:** מתקן את ה-Blueprint HTML/CSS
+- עדכון קבצי Blueprint ב-`_COMMUNICATION/team_31/team_31_staging/`
+- וידוא compliance עם CSS Standards
+
+**אם הבעיה ב-Design Tokens:**
+- **Team 40:** מתקן את Design Tokens
+- עדכון קבצי Design Tokens
+- וידוא שימוש נכון ב-Tokens
+
+**תוצר:**
+- Blueprint מתוקן או Design Tokens מתוקנים
+- הודעה ל-Team 10 על השלמת התיקון
+
+#### **שלב 3: תיקון Frontend (Team 30)**
+
+**פעולות:**
+1. [ ] עדכון הקוד Frontend לפי Blueprint המתוקן
+2. [ ] וידוא שימוש ב-Design Tokens הנכונים
+3. [ ] בדיקת Pixel Perfect fidelity
+4. [ ] וידוא שימוש ב-CSS Layers הנכונים (Base/Comp/Header)
+
+**תוצר:**
+- Frontend מתוקן
+- הודעה ל-Team 10 על השלמת התיקון
+
+#### **שלב 4: QA Verification (Team 50)**
+
+**פעולות:**
+1. [ ] Visual Regression Testing
+2. [ ] וידוא 100% match עם Blueprint המתוקן
+3. [ ] וידוא 100% match עם Legacy (אם רלוונטי)
+4. [ ] בדיקת Responsive Design (אם רלוונטי)
+
+**תוצר:**
+- דוח QA: `TEAM_50_FIDELITY_FIX_VERIFICATION.md`
+- אישור או דחייה של התיקון
+
+---
+
+## 🔗 קישורים רלוונטיים
+
+1. **Official Page Tracker:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
+2. **CSS Standards:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/TT2_CSS_STANDARDS_PROTOCOL.md`
+3. **QA Workflow:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`
+4. **Progress Log:** `documentation/05-REPORTS/artifacts_SESSION_01/SESSION_01_PROGRESS_LOG.md`
+
+---
+
+## ✅ סיכום והמלצות
+
+### **הצעד הבא המיידי:**
+
+1. **Priority 1:** השלמת Password Change (Team 20 + Team 30)
+2. **Priority 2:** תיקוני עיצוב - התחלה מיידית (Team 50 → Team 31/40 → Team 30)
+3. **Priority 3:** השלמת D24_API_VIEW ו-D25_SEC_VIEW (Team 30)
+
+### **מתי לתקן עיצובים:**
+
+✅ **מומלץ:** לפני השלמת Phase 1.3  
+✅ **מומלץ:** לאחר כל Integration  
+🔴 **חובה:** לפני Production
+
+### **איך לתקן:**
+
+1. Team 50 מזהה בעיות (Visual Comparison)
+2. Team 31/40 מתקן Blueprint/Design Tokens
+3. Team 30 מתקן Frontend
+4. Team 50 מאמת את התיקון
 
 ---
 
 **Team 10 (The Gateway)**  
-**Status:** 📊 **ANALYSIS_COMPLETE**
-
----
-
-**log_entry | Team 10 | NEXT_STEPS_ANALYSIS | SESSION_01 | ANALYSIS | 2026-01-31**
+**Date:** 2026-01-31  
+**log_entry | Team 10 | NEXT_STEPS_ANALYSIS | COMPLETE | 2026-01-31**

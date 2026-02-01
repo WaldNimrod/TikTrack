@@ -414,17 +414,42 @@ class AuthService:
             AuthenticationError: If user already exists
         """
         try:
-            # Check if user already exists
+            # Check if user already exists (username, email, or phone_number)
             try:
+                # Build query conditions
+                from sqlalchemy import or_
+                
+                conditions = [
+                    User.username == username,
+                    User.email == email
+                ]
+                
+                # Add phone_number check if provided
+                if phone_number:
+                    conditions.append(User.phone_number == phone_number)
+                
+                # Combine conditions with OR
+                combined_condition = conditions[0] | conditions[1]
+                if phone_number:
+                    combined_condition = combined_condition | conditions[2]
+                
                 stmt = select(User).where(
-                    (User.username == username) | (User.email == email)
+                    combined_condition
                 ).where(User.deleted_at.is_(None))
                 
                 result = await db.execute(stmt)
                 existing_user = result.scalar_one_or_none()
                 
                 if existing_user:
-                    raise AuthenticationError("User already exists")
+                    # Determine which field caused the conflict
+                    if existing_user.username == username:
+                        raise AuthenticationError("Username already exists")
+                    elif existing_user.email == email:
+                        raise AuthenticationError("Email already exists")
+                    elif phone_number and existing_user.phone_number == phone_number:
+                        raise AuthenticationError("Phone number already exists")
+                    else:
+                        raise AuthenticationError("User already exists")
             except AuthenticationError:
                 raise
             except Exception as e:

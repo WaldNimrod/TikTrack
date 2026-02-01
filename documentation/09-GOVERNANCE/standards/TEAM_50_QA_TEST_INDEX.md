@@ -147,6 +147,48 @@ tests/
 
 ---
 
+### 5. Validation Comprehensive Testing (P0 MANDATORY)
+
+**קובץ בדיקות:** `tests/validation-comprehensive.test.js`  
+**דוח QA:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`  
+**משימה:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`
+
+**תרחישי בדיקה:**
+
+#### LoginForm Validation:
+- ⏸️ Empty usernameOrEmail field (שדה חובה)
+- ⏸️ Empty password field (שדה חובה)
+- ⏸️ Field-level validation on blur
+- ⏸️ BEM error classes (auth-form__input--error)
+- ⏸️ ARIA attributes (aria-invalid, aria-describedby)
+- ⏸️ Server-side: 401 Invalid Credentials
+- ⏸️ Server-side: 400 Validation Error
+- ⏸️ Error code translation (AUTH_INVALID_CREDENTIALS → Hebrew)
+
+#### RegisterForm Validation:
+- ⏸️ Empty username (שדה חובה)
+- ⏸️ Username too short (< 3 characters)
+- ⏸️ Invalid email format (אימייל לא תקין)
+- ⏸️ Password too short (< 8 characters)
+- ⏸️ Password mismatch (סיסמאות לא תואמות)
+- ⏸️ Invalid phone format (E.164)
+- ⏸️ Server-side: 400 Duplicate User (USER_ALREADY_EXISTS)
+
+#### Transformation Layer:
+- ⏸️ Payload format (camelCase → snake_case)
+- ⏸️ Response format (snake_case → camelCase)
+
+#### PhoenixSchema:
+- ⏸️ Centralized validation usage
+- ⏸️ Validation messages match schema
+
+#### Error Code Translation:
+- ⏸️ AUTH_INVALID_CREDENTIALS → Hebrew
+
+**סה"כ תרחישים:** 20+
+
+---
+
 ## 📊 סיכום כללי
 
 ### סטטיסטיקות בדיקות
@@ -158,7 +200,8 @@ tests/
 | **Password Change Flow** | 11 | ✅ 9/11 | ⏸️ Ready | ⏸️ Pending | ⚠️ 1 Issue |
 | **API Keys Management Flow** | 12 | ✅ 12/12 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
 | **Error Handling & Security** | 11 | ✅ 11/11 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
-| **Total** | **55** | **53/55** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **1 Issue** |
+| **Validation Comprehensive** | 20+ | ⏸️ In Progress | ⏸️ Ready | ⏸️ Pending | ⏸️ In Progress |
+| **Total** | **75+** | **53/75+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **1 Issue** |
 
 ---
 
@@ -171,6 +214,7 @@ tests/
 - **Password Change:** `tests/password-change.test.js`
 - **API Keys:** `tests/api-keys.test.js`
 - **Error Handling:** `tests/error-handling.test.js`
+- **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
 

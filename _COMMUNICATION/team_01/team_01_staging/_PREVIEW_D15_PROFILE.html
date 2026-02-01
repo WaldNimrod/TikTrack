@@ -1,0 +1,474 @@
+<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
+    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#dc2626; color:white; padding:8px; font-size:10px; font-weight:900; z-index:var(--z-index-g-bridge-banner, 10002); text-align:center; }
+</style></head><body>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.1 [16:11:02] | REJECTED | 1 issue(s) found</div>
+<main id="phoenix-root"><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פרופיל משתמש | TikTrack Phoenix</title>
+  <!-- CSS Loading Order: Pico CSS FIRST, then base, then components, then header, then page-specific -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="./phoenix-base.css">
+  <link rel="stylesheet" href="./phoenix-components.css">
+  <link rel="stylesheet" href="./phoenix-header.css">
+  <link rel="stylesheet" href="./D15_DASHBOARD_STYLES.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="profile-page">
+  <!--
+    Phoenix-Core-Ver: v1.0.0 | User Profile Page
+    Sync-Time: 2026-01-31 22:00:00 IST
+    Team: Team 31 (Blueprint)
+    Status: ✅ COMPLETE
+    Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
+    
+    Purpose:
+    User profile management page with Unified Header and Home page structure.
+    Contains:
+    - Unified Header (already built)
+    - User Information Section
+    - Password Change Section
+    - AI Analysis Settings Section
+  -->
+
+  <!-- Unified Header: LOD 400 - Height 120px, Z-Index 950 -->
+  <header id="unified-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div class="header-container">
+          
+          <!-- Navigation: Original structure with tiktrack-nav-list -->
+          <div class="header-nav">
+            <nav class="main-nav">
+              <ul class="tiktrack-nav-list">
+                <!-- Home Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/" class="tiktrack-nav-link" data-page="home">
+                    <img src="images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                    <span class="nav-text">בית</span>
+                  </a>
+                </li>
+                
+                <!-- Portfolio Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/portfolio" class="tiktrack-nav-link" data-page="portfolio">
+                    <img src="images/icons/entities/trading_accounts.svg" alt="פורטפוליו" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">פורטפוליו</span>
+                  </a>
+                </li>
+                
+                <!-- Market Analysis Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/market_analysis" class="tiktrack-nav-link" data-page="market-analysis">
+                    <img src="images/icons/entities/tickers.svg" alt="ניתוח שוק" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">ניתוח שוק</span>
+                  </a>
+                </li>
+                
+                <!-- Research Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/research" class="tiktrack-nav-link" data-page="research">
+                    <img src="images/icons/entities/research.svg" alt="מחקר" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">מחקר</span>
+                  </a>
+                </li>
+                
+                <!-- Settings Dropdown -->
+                <li class="tiktrack-nav-item dropdown">
+                  <a href="/settings" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                    <img src="images/icons/entities/user.svg" alt="הגדרות" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">הגדרות</span>
+                    <span class="tiktrack-dropdown-arrow">▼</span>
+                  </a>
+                  <ul class="tiktrack-dropdown-menu" id="menu-4">
+                    <li><a class="tiktrack-dropdown-item" href="/user_profile">פרופיל משתמש</a></li>
+                    <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
+                    <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                  </ul>
+                </li>
+                
+                <!-- Dev Tools Dropdown -->
+                <li class="tiktrack-nav-item dropdown">
+                  <a href="/dev_tools" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
+                    <span class="nav-text">פיתוח</span>
+                    <span class="tiktrack-dropdown-arrow">▼</span>
+                  </a>
+                  <ul class="tiktrack-dropdown-menu" id="menu-5">
+                    <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
+                  </ul>
+                </li>
+                
+                <!-- Utils -->
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="ניקוי">
+                    <span class="nav-text utils-icon-clean">🧹</span>
+                  </a>
+                </li>
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="רענון מהיר">
+                    <span class="nav-text utils-icon-fast">⚡</span>
+                  </a>
+                </li>
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="חיפוש">
+                    <span class="nav-text utils-icon-search">🔍</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          
+          <!-- Logo Section: LOD 400 - Exact sizes and colors -->
+          <div class="logo-section">
+            <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image" width="125" height="37.5">
+            <span class="logo-text">TikTrack</span>
+          </div>
+          
+          <!-- User Zone: Right side -->
+          <div class="user-zone">
+            <div class="user-info">
+              <span class="user-name">ישראל ישראלי</span>
+              <span class="user-role">מנהל חשבון</span>
+            </div>
+            <div class="user-avatar">
+              <img src="images/icons/entities/user.svg" alt="משתמש" width="40" height="40">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Header Filters: Second row (60px) -->
+      <div class="header-filters">
+        <div class="header-container">
+          <!-- Filter content will be populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Wrapper: Full-width gray background -->
+  <div class="page-wrapper">
+    <!-- Page Container: Centered, max-width 1400px -->
+    <div class="page-container">
+      <main>
+        <tt-container>
+          
+          <!-- Section: User Information -->
+          <tt-section data-section="user-info">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="images/icons/entities/user.svg" alt="פרופיל משתמש" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">פרופיל משתמש</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">עדכון פרטים אישיים והגדרות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <!-- User Info Card -->
+                <div class="col-md-6">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0 text-muted">פרטי משתמש</h6>
+                    </div>
+                    <div class="card-body">
+                      <form id="userInfoForm">
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label class="form-label" for="profileUsername">שם משתמש</label>
+                            <input type="text" id="profileUsername" class="form-control" readonly>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="profileEmail">אימייל</label>
+                            <input type="email" id="profileEmail" class="form-control" placeholder="הכנס כתובת אימייל">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileFirstName">שם פרטי</label>
+                            <input type="text" id="profileFirstName" class="form-control" placeholder="הכנס שם פרטי">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileLastName">שם משפחה</label>
+                            <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="profileIcon">אייקון משתמש</label>
+                            <input type="text" id="profileIcon" class="form-control" placeholder="למשל: user">
+                            <small class="form-text text-muted">הזינו שם אייקון מתוך IconSystem</small>
+                          </div>
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-primary" id="updateInfoBtn">
+                                <span id="updateInfoBtnText">עדכן פרטים</span>
+                                <span id="updateInfoBtnSpinner" class="btn-spinner d-none">⏳ מעדכן...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password Change Card -->
+                <div class="col-md-6">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0 text-muted">שינוי סיסמה</h6>
+                    </div>
+                    <div class="card-body">
+                      <form id="passwordForm">
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label class="form-label" for="currentPassword">סיסמה נוכחית</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="הכנס סיסמה נוכחית" required>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="newPassword">סיסמה חדשה</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="הכנס סיסמה חדשה (מינימום 6 תווים)" required minlength="6">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="confirmNewPassword">אימות סיסמה חדשה</label>
+                            <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
+                          </div>
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
+                                <span id="updatePasswordBtnText">עדכן סיסמה</span>
+                                <span id="updatePasswordBtnSpinner" class="btn-spinner d-none">⏳ מעדכן...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- Section: AI Analysis Settings -->
+          <tt-section data-section="ai-analysis">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="images/icons/entities/user.svg" alt="הגדרות AI Analysis" class="index-section__header-icon" width="35" height="35">
+                <h2 class="index-section__header-text">הגדרות AI Analysis</h2>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">הגדרת מפתחות API וניהול מנועי AI</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <form id="aiAnalysisSettingsForm">
+                        <div class="row g-3">
+                          <!-- Column 1: Controls -->
+                          <div class="col-md-6">
+                            <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
+                            <select id="aiDefaultProvider" class="form-select" required>
+                              <option value="gemini">Gemini (מומלץ למתחילים)</option>
+                              <option value="perplexity">Perplexity</option>
+                            </select>
+                            <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
+                            
+                            <!-- Gemini API Key -->
+                            <div class="mt-3">
+                              <label class="form-label" for="geminiApiKey">Gemini API Key</label>
+                              <div class="input-group">
+                                <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
+                                  <span id="toggleGeminiKeyIcon">👁️</span>
+                                </button>
+                              </div>
+                              <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                              
+                              <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="validateGeminiBtn">
+                                  <span id="validateGeminiBtnText">בדוק</span>
+                                  <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <!-- Perplexity API Key -->
+                            <div class="mt-3">
+                              <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
+                              <div class="input-group">
+                                <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
+                                  <span id="togglePerplexityKeyIcon">👁️</span>
+                                </button>
+                              </div>
+                              <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                              
+                              <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="validatePerplexityBtn">
+                                  <span id="validatePerplexityBtnText">בדוק</span>
+                                  <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Column 2: Help Panel -->
+                          <div class="col-md-6">
+                            <label class="form-label">איפה להשיג מפתח API?</label>
+                            <div class="alert alert-info mb-0">
+                              <div class="mb-2">
+                                <strong>Gemini:</strong><br>
+                                <small>
+                                  1. עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a><br>
+                                  2. לחץ על "Get API Key"<br>
+                                  3. העתק את המפתח
+                                </small>
+                              </div>
+                              <div>
+                                <strong>Perplexity:</strong><br>
+                                <small>
+                                  1. עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a><br>
+                                  2. התחבר או צור חשבון<br>
+                                  3. עבור ל-"API Keys"<br>
+                                  4. לחץ על "Create API Key"<br>
+                                  5. העתק את המפתח
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="col-12">
+                            <div id="aiAnalysisStatus" class="alert alert-info d-none">
+                              <span id="aiAnalysisStatusText"></span>
+                            </div>
+                          </div>
+                          
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-success" id="saveAiAnalysisBtn">
+                                <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
+                                <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+        </tt-container>
+      </main>
+    </div>
+  </div>
+  
+  <!-- G-Bridge Banner: Moved to footer to avoid blocking menu -->
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>
+
+  <script>
+    /* ============================================
+       Section Toggle Functionality
+       Centralized system-wide toggle for all sections
+       ============================================ */
+    (function initSectionToggle() {
+      // Find all toggle buttons
+      const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
+      
+      toggleButtons.forEach(button => {
+        // Find the parent section (tt-section)
+        const section = button.closest('tt-section');
+        if (!section) return;
+        
+        // Find the section body
+        const sectionBody = section.querySelector('.index-section__body, .dashboard-section__body');
+        if (!sectionBody) return;
+        
+        // Find the SVG icon inside the button
+        const icon = button.querySelector('svg');
+        
+        // Set initial state: sections are open by default
+        let isOpen = true;
+        
+        // Add click handler
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Toggle state
+          isOpen = !isOpen;
+          
+          // Toggle section body visibility with smooth animation
+          if (isOpen) {
+            // Open: Remove hidden attribute and restore display
+            sectionBody.removeAttribute('hidden');
+            // Use requestAnimationFrame to ensure smooth transition
+            requestAnimationFrame(() => {
+              sectionBody.style.display = '';
+            });
+            // Rotate icon to point down (open state)
+            if (icon) {
+              icon.style.transform = 'rotate(0deg)';
+            }
+            button.setAttribute('aria-expanded', 'true');
+          } else {
+            // Close: Set hidden attribute for CSS animation
+            sectionBody.setAttribute('hidden', '');
+            // Rotate icon to point up (closed state)
+            if (icon) {
+              icon.style.transform = 'rotate(180deg)';
+            }
+            button.setAttribute('aria-expanded', 'false');
+            // After animation completes, set display to none
+            setTimeout(() => {
+              if (sectionBody.hasAttribute('hidden')) {
+                sectionBody.style.display = 'none';
+              }
+            }, 300); // Match CSS transition duration
+          }
+        });
+        
+        // Set initial aria-expanded
+        button.setAttribute('aria-expanded', 'true');
+        
+        // Add transition for smooth icon rotation
+        if (icon) {
+          icon.style.transition = 'transform 0.2s ease';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+</main>
+<script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script></body></html>

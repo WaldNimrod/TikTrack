@@ -10,6 +10,7 @@
     "test:apikeys": "node --experimental-modules api-keys.test.js",
     "test:errors": "node --experimental-modules error-handling.test.js",
     "test:password-change": "node --experimental-modules password-change.test.js",
+    "test:validation": "npx mocha validation-comprehensive.test.js --timeout 120000",
     "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change"
   },
   "dependencies": {

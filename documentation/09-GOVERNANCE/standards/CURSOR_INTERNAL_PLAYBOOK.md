@@ -26,7 +26,8 @@ log_entry | [Team X] | READY | 001 | GREEN
 * **צוות 20 (Backend):** מימוש FastAPI בהתאמה ל-LOD 400 SQL.
 * **צוות 30 (Frontend):** מימוש Pixel Perfect מול Design Tokens בלבד.
 * **צוות 40 (UI Assets & Design):** ניהול Design Tokens, CSS Layers (Base/Comp/Header).
-* **צוות 50 (QA):** ולידציה של Evidence בתיקייה 05-REPORTS/artifacts.
+* **צוות 50 (QA & Fidelity):** ולידציה של Evidence בתיקייה 08-REPORTS/artifacts. בדיקות QA ראשיות.
+* **צוות 51 (QA Remote):** צוות QA נוסף הפועל מרחוק על חבילת הקבצים. בדיקות Validation Framework מקיפות.
 * **צוות 60 (DevOps & Platform):** תשתיות ייצור (Build), סביבות פיתוח ו-Deployment.
 
 ---

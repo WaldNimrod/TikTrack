@@ -13,6 +13,16 @@
  * - CSS Shorthand Enforcement
  * - LEGO System Compliance
  * - ITCSS Hierarchy Validation
+ * 
+ * בדיקות v2.1 (Design Fidelity):
+ * - Page Template Structure (page-wrapper, page-container)
+ * - Section Structure (tt-section with header/body)
+ * - Container Header 3-Part Layout
+ * - Fixed Heights (60px container, 40px/76px widgets)
+ * - Hot Zones Documentation
+ * - Widget Structure (Type 1/Type 2)
+ * - Icon Sizes (35px section headers, 14px refresh buttons)
+ * - Animation Compliance
  */
 
 const fs = require('fs');
@@ -243,9 +253,9 @@ function wrapInShell(content, fileName, audit) {
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
     body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
-    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:${bannerColor}; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
+    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:${bannerColor}; color:white; padding:8px; font-size:10px; font-weight:900; z-index:var(--z-index-g-bridge-banner, 10002); text-align:center; }
 </style></head><body>
-<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [${timestamp}] | ${status} | ${audit.passed ? 'FIDELITY READY' : `${issueCount} issue(s) found`}</div>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.1 [${timestamp}] | ${status} | ${audit.passed ? 'FIDELITY READY' : `${issueCount} issue(s) found`}</div>
 <main id="phoenix-root">${content}</main>
 <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script></body></html>`;
 }
@@ -267,7 +277,7 @@ try {
     fs.writeFileSync(previewFileName, previewContent);
     
     console.log(`\n=========================================`);
-    console.log(`🛡️ G-BRIDGE v2.0 LOCAL AUDIT: ${targetFile}`);
+    console.log(`🛡️ G-BRIDGE v2.1 LOCAL AUDIT: ${targetFile}`);
     console.log(`Status: ${audit.passed ? "✅ PASSED" : "❌ FAILED"}`);
     console.log(`Issues Found: ${audit.issues.length}`);
     console.log(`-----------------------------------------`);

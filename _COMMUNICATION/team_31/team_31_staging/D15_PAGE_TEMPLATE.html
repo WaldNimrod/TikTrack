@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <!-- ============================================
+       PHOENIX PAGE TEMPLATE - BASE STRUCTURE
+       ============================================
+       
+       Purpose:
+       This is the standard base template for all Phoenix pages.
+       It provides a consistent structure with:
+       - Unified Header (120px, fixed)
+       - Page wrapper (full-width gray background)
+       - Page container (centered, 1400px max-width)
+       - Standard container/section structure
+       - Section toggle functionality
+       
+       Usage:
+       1. Copy this template for each new page
+       2. Update the <title> tag
+       3. Update the body class (e.g., "portfolio-page", "settings-page")
+       4. Fill in the HOT ZONES marked below
+       5. Update page-specific CSS if needed
+       
+       Version: 1.0.0
+       Last Updated: 2026-01-31
+       Team: Team 31 (Blueprint)
+       Status: ✅ APPROVED BASE TEMPLATE
+       ============================================ -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- HOT ZONE 1: Page Title -->
+  <!-- ============================================
+       UPDATE THIS: Change the page title here
+       ============================================ -->
+  <title>שם העמוד | TikTrack Phoenix</title>
+  
+  <!-- CSS Loading Order: CRITICAL - DO NOT CHANGE ORDER -->
+  <!-- Layer 1: External Framework (Pico CSS) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- Layer 2: Phoenix Base Styles (CSS Variables, Reset, Base Typography) -->
+  <link rel="stylesheet" href="./phoenix-base.css">
+  
+  <!-- Layer 3: Phoenix Components (LEGO System - tt-container, tt-section, etc.) -->
+  <link rel="stylesheet" href="./phoenix-components.css">
+  
+  <!-- Layer 4: Unified Header Styles (LOD 400 - DO NOT MODIFY) -->
+  <link rel="stylesheet" href="./phoenix-header.css">
+  
+  <!-- Layer 5: Page-Specific Styles -->
+  <!-- HOT ZONE 2: Page-Specific CSS -->
+  <!-- ============================================
+       UPDATE THIS: Add your page-specific CSS file here
+       Example: <link rel="stylesheet" href="./D15_DASHBOARD_STYLES.css">
+       ============================================ -->
+  <link rel="stylesheet" href="./D15_DASHBOARD_STYLES.css">
+  
+  <!-- External Scripts -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<!-- HOT ZONE 3: Body Class -->
+<!-- ============================================
+     UPDATE THIS: Change body class to match your page
+     Examples: "index-page", "portfolio-page", "settings-page", "profile-page"
+     ============================================ -->
+<body class="page-template">
+  
+  <!-- ============================================
+       PAGE METADATA COMMENT BLOCK
+       ============================================
+       Update this block for each new page:
+       - Phoenix-Core-Ver: Keep current version
+       - Page Name: Update with actual page name
+       - Sync-Time: Update with current timestamp
+       - Status: Update as page progresses
+       - Purpose: Describe what this page does
+       ============================================ -->
+  <!--
+    Phoenix-Core-Ver: v1.0.0 | Page Template
+    Sync-Time: 2026-01-31 22:00:00 IST
+    Team: Team 31 (Blueprint)
+    Status: ⏳ TEMPLATE - READY FOR IMPLEMENTATION
+    Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
+    
+    Purpose:
+    [DESCRIBE PAGE PURPOSE HERE]
+    
+    Structure:
+    - Unified Header (fixed, 120px height)
+    - Page wrapper (full-width gray background)
+    - Page container (centered, 1400px max-width)
+    - Main content area with tt-container
+    - Sections with standard header/body structure
+  -->
+
+  <!-- ============================================
+       UNIFIED HEADER - DO NOT MODIFY
+       ============================================
+       This header is standardized across all pages.
+       Height: 120px (60px top + 60px filters)
+       Z-Index: Uses CSS variable (--z-index-header)
+       LOD: 400 (Engineering Standard)
+       
+       DO NOT:
+       - Change the structure
+       - Modify CSS classes
+       - Add page-specific content here
+       
+       Navigation is managed globally.
+       ============================================ -->
+  <header id="unified-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div class="header-container">
+          
+          <!-- Navigation: Standard navigation menu -->
+          <div class="header-nav">
+            <nav class="main-nav">
+              <ul class="tiktrack-nav-list">
+                <!-- Home Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/" class="tiktrack-nav-link" data-page="home">
+                    <img src="images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                    <span class="nav-text">בית</span>
+                  </a>
+                </li>
+                
+                <!-- Portfolio Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/portfolio" class="tiktrack-nav-link" data-page="portfolio">
+                    <img src="images/icons/entities/trading_accounts.svg" alt="פורטפוליו" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">פורטפוליו</span>
+                  </a>
+                </li>
+                
+                <!-- Market Analysis Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/market_analysis" class="tiktrack-nav-link" data-page="market-analysis">
+                    <img src="images/icons/entities/tickers.svg" alt="ניתוח שוק" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">ניתוח שוק</span>
+                  </a>
+                </li>
+                
+                <!-- Research Link -->
+                <li class="tiktrack-nav-item">
+                  <a href="/research" class="tiktrack-nav-link" data-page="research">
+                    <img src="images/icons/entities/research.svg" alt="מחקר" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">מחקר</span>
+                  </a>
+                </li>
+                
+                <!-- Settings Dropdown -->
+                <li class="tiktrack-nav-item dropdown">
+                  <a href="/settings" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                    <img src="images/icons/entities/user.svg" alt="הגדרות" width="36" height="36" class="nav-icon">
+                    <span class="nav-text">הגדרות</span>
+                    <span class="tiktrack-dropdown-arrow">▼</span>
+                  </a>
+                  <ul class="tiktrack-dropdown-menu" id="menu-4">
+                    <li><a class="tiktrack-dropdown-item" href="/user_profile">פרופיל משתמש</a></li>
+                    <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
+                    <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                  </ul>
+                </li>
+                
+                <!-- Dev Tools Dropdown -->
+                <li class="tiktrack-nav-item dropdown">
+                  <a href="/dev_tools" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
+                    <span class="nav-text">פיתוח</span>
+                    <span class="tiktrack-dropdown-arrow">▼</span>
+                  </a>
+                  <ul class="tiktrack-dropdown-menu" id="menu-5">
+                    <li><a class="tiktrack-dropdown-item" href="/system_management">🔧 ניהול מערכת</a></li>
+                  </ul>
+                </li>
+                
+                <!-- Utils -->
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="ניקוי">
+                    <span class="nav-text utils-icon-clean">🧹</span>
+                  </a>
+                </li>
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="רענון מהיר">
+                    <span class="nav-text utils-icon-fast">⚡</span>
+                  </a>
+                </li>
+                <li class="tiktrack-nav-item">
+                  <a href="#" class="tiktrack-nav-link" title="חיפוש">
+                    <span class="nav-text utils-icon-search">🔍</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          
+          <!-- Logo Section: LOD 400 - Exact sizes and colors -->
+          <div class="logo-section">
+            <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image" width="125" height="37.5">
+            <span class="logo-text">TikTrack</span>
+          </div>
+          
+          <!-- User Zone: Right side -->
+          <div class="user-zone">
+            <div class="user-info">
+              <span class="user-name">ישראל ישראלי</span>
+              <span class="user-role">מנהל חשבון</span>
+            </div>
+            <div class="user-avatar">
+              <img src="images/icons/entities/user.svg" alt="משתמש" width="40" height="40">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Header Filters: Second row (60px) -->
+      <div class="header-filters">
+        <div class="header-container">
+          <!-- Filter content populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================
+       PAGE WRAPPER - DO NOT MODIFY STRUCTURE
+       ============================================
+       This wrapper provides:
+       - Full-width gray background (uses CSS variable --apple-bg-secondary)
+       - Zero horizontal scrolling (overflow-x: hidden)
+       - Base structure for all pages
+       
+       DO NOT:
+       - Add content directly here
+       - Modify CSS classes
+       - Change the structure
+       ============================================ -->
+  <div class="page-wrapper">
+    
+    <!-- ============================================
+         PAGE CONTAINER - DO NOT MODIFY STRUCTURE
+         ============================================
+         This container provides:
+         - Centered content (max-width: 1400px)
+         - Proper margins and padding
+         - Responsive behavior
+         
+         DO NOT:
+         - Change max-width
+         - Modify CSS classes
+         - Add content directly here
+         ============================================ -->
+    <div class="page-container">
+      
+      <!-- ============================================
+           MAIN CONTENT AREA - START YOUR PAGE HERE
+           ============================================
+           This is where your page-specific content begins.
+           Use the LEGO system components:
+           - tt-container: Main container wrapper
+           - tt-section: Individual sections
+           - tt-section-row: Grid rows within sections
+           
+           Structure:
+           <main>
+             <tt-container>
+               <tt-section>
+                 <!-- Section content -->
+               </tt-section>
+             </tt-container>
+           </main>
+           ============================================ -->
+      <main>
+        <tt-container>
+          
+          <!-- ============================================
+               HOT ZONE 4: PAGE SECTIONS
+               ============================================
+               ADD YOUR PAGE SECTIONS HERE
+               
+               Standard Section Structure:
+               <tt-section data-section="section-name">
+                 <!-- Section Header (60px fixed height) -->
+                 <div class="index-section__header">
+                   <div class="index-section__header-title">
+                     <img src="..." class="index-section__header-icon" width="35" height="35">
+                     <h1 class="index-section__header-text">Section Title</h1>
+                   </div>
+                   <div class="index-section__header-meta">
+                     <span class="index-section__header-count">Subtitle or metadata</span>
+                   </div>
+                   <div class="index-section__header-actions">
+                     <button class="index-section__header-toggle-btn">Toggle</button>
+                   </div>
+                 </div>
+                 
+                 <!-- Section Body (white card, separate from header) -->
+                 <div class="index-section__body">
+                   <tt-section-row>
+                     <!-- Your content here -->
+                   </tt-section-row>
+                 </div>
+               </tt-section>
+               
+               Guidelines:
+               - Each section has a unique data-section attribute
+               - Header is 60px fixed height (cannot break)
+               - Header has 3 parts: Title | Subtitle | Actions
+               - Body is a separate white card below header
+               - Use tt-section-row for grid layouts
+               - Entity colors applied via data-section attribute
+               ============================================ -->
+          
+          <!-- EXAMPLE SECTION - DELETE THIS AND ADD YOUR SECTIONS -->
+          <tt-section data-section="example-section">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="images/icons/entities/user.svg" alt="דוגמה" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">כותרת סקשן</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">כותרת משנה או מידע נוסף</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <!-- HOT ZONE 5: SECTION CONTENT -->
+                <!-- ============================================
+                     ADD YOUR SECTION CONTENT HERE
+                     
+                     This is where you place:
+                     - Forms
+                     - Tables
+                     - Widgets
+                     - Cards
+                     - Any page-specific content
+                     
+                     Use Bootstrap grid classes (col-md-*, etc.)
+                     or custom CSS as needed.
+                     ============================================ -->
+                <div class="col-12">
+                  <p>תוכן הסקשן יכנס כאן</p>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+          
+          <!-- END OF EXAMPLE SECTION - DELETE ABOVE AND ADD YOUR SECTIONS -->
+          
+        </tt-container>
+      </main>
+      
+    </div>
+    <!-- End of page-container -->
+  </div>
+  <!-- End of page-wrapper -->
+  
+  <!-- ============================================
+       G-BRIDGE BANNER - DO NOT MODIFY
+       ============================================
+       This banner is required for G-Bridge validation.
+       Position: Footer (moved from header to avoid blocking menu)
+       ============================================ -->
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>
+
+  <!-- ============================================
+       SECTION TOGGLE FUNCTIONALITY
+       ============================================
+       This script provides centralized toggle functionality
+       for all sections across the system.
+       
+       Features:
+       - Smooth animation (0.3s ease)
+       - Icon rotation (0° open, 180° closed)
+       - ARIA attributes for accessibility
+       - Centralized, reusable code
+       
+       DO NOT MODIFY unless explicitly requested.
+       ============================================ -->
+  <script>
+    /* ============================================
+       Section Toggle Functionality
+       Centralized system-wide toggle for all sections
+       ============================================ */
+    (function initSectionToggle() {
+      // Find all toggle buttons
+      const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
+      
+      toggleButtons.forEach(button => {
+        // Find the parent section (tt-section)
+        const section = button.closest('tt-section');
+        if (!section) return;
+        
+        // Find the section body
+        const sectionBody = section.querySelector('.index-section__body, .dashboard-section__body');
+        if (!sectionBody) return;
+        
+        // Find the SVG icon inside the button
+        const icon = button.querySelector('svg');
+        
+        // Set initial state: sections are open by default
+        let isOpen = true;
+        
+        // Add click handler
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Toggle state
+          isOpen = !isOpen;
+          
+          // Toggle section body visibility with smooth animation
+          if (isOpen) {
+            // Open: Remove hidden attribute and restore display
+            sectionBody.removeAttribute('hidden');
+            // Use requestAnimationFrame to ensure smooth transition
+            requestAnimationFrame(() => {
+              sectionBody.style.display = '';
+            });
+            // Rotate icon to point down (open state)
+            if (icon) {
+              icon.style.transform = 'rotate(0deg)';
+            }
+            button.setAttribute('aria-expanded', 'true');
+          } else {
+            // Close: Set hidden attribute for CSS animation
+            sectionBody.setAttribute('hidden', '');
+            // Rotate icon to point up (closed state)
+            if (icon) {
+              icon.style.transform = 'rotate(180deg)';
+            }
+            button.setAttribute('aria-expanded', 'false');
+            // After animation completes, set display to none
+            setTimeout(() => {
+              if (sectionBody.hasAttribute('hidden')) {
+                sectionBody.style.display = 'none';
+              }
+            }, 300); // Match CSS transition duration
+          }
+        });
+        
+        // Set initial aria-expanded
+        button.setAttribute('aria-expanded', 'true');
+        
+        // Add transition for smooth icon rotation
+        if (icon) {
+          icon.style.transition = 'transform 0.2s ease';
+        }
+      });
+    })();
+  </script>
+  
+  <!-- ============================================
+       HOT ZONE 6: PAGE-SPECIFIC JAVASCRIPT
+       ============================================
+       ADD YOUR PAGE-SPECIFIC JAVASCRIPT HERE
+       
+       This is where you add:
+       - Form handlers
+       - Data fetching
+       - Page-specific interactions
+       - Custom functionality
+       
+       Keep it organized and commented.
+       ============================================ -->
+  <!-- <script>
+    // Your page-specific JavaScript here
+  </script> -->
+  
+</body>
+</html>

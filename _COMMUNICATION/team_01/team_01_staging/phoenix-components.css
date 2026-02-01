@@ -20,21 +20,38 @@
 /* tt-container: Content wrapper (no max-width/margin - page-container handles that) */
 /* NOTE: page-container in phoenix-base.css provides the base structure (max-width 1400px, centered) */
 /* tt-container is now just a content wrapper with padding */
-tt-container {
+/* CRITICAL: Must never cause horizontal overflow */
+/* Using high specificity to ensure overflow prevention */
+main tt-container {
   display: block;
   width: 100%;
+  max-width: 100%;
   padding-inline: var(--grid-gutter, var(--spacing-md));
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  box-sizing: border-box;
 }
 
 /* tt-section: Independent content unit - TRANSPARENT BACKGROUND (header/body are separate white cards) */
-tt-section {
+/* CRITICAL: Must never cause horizontal overflow */
+/* Using high specificity to ensure transparent background and overflow prevention */
+tt-container tt-section {
   display: block;
-  background: transparent !important; /* Transparent - header and body are separate white cards */
-  border: none !important; /* No border - header and body have their own borders */
-  border-radius: 0 !important; /* No border-radius - header and body have their own */
+  background: transparent; /* Transparent - header and body are separate white cards */
+  border: none; /* No border - header and body have their own borders */
+  border-radius: 0; /* No border-radius - header and body have their own */
+  margin-block-start: var(--grid-gutter, var(--spacing-md)); /* Gap from header or previous section */
   margin-block-end: var(--grid-gutter, var(--spacing-md));
-  box-shadow: none !important; /* No shadow - header and body have their own shadows */
-  overflow: visible; /* Allow header/body to be visible */
+  box-shadow: none; /* No shadow - header and body have their own shadows */
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-y: visible; /* Allow vertical overflow for content */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* First section after header - same gap as between sections */
+tt-section:first-of-type {
+  margin-block-start: var(--grid-gutter, var(--spacing-md));
 }
 
 /* tt-section content area - NO padding (header/body have their own padding) */

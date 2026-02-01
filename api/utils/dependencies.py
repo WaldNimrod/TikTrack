@@ -6,7 +6,7 @@ Status: COMPLETED
 Reusable FastAPI dependencies for authentication and database.
 """
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -15,6 +15,7 @@ from ..core.database import get_db
 from ..services.auth import get_auth_service, TokenError
 from ..models.identity import User
 from ..utils.identity import ulid_to_uuid
+from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 import logging
 
 logger = logging.getLogger(__name__)
@@ -55,9 +56,10 @@ async def get_current_user(
         logger.debug(f"User ULID from token: {user_ulid}")
         if not user_ulid:
             logger.warning("Token missing 'sub' claim")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: missing user identifier"
+                detail="Invalid token: missing user identifier",
+                error_code=ErrorCodes.AUTH_TOKEN_INVALID
             )
         
         # Convert ULID to UUID for database lookup
@@ -67,9 +69,10 @@ async def get_current_user(
             logger.debug(f"ULID converted to UUID: {user_uuid}")
         except Exception as e:
             logger.error(f"ULID to UUID conversion failed: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: invalid user identifier format"
+                detail="Invalid token: invalid user identifier format",
+                error_code=ErrorCodes.AUTH_TOKEN_INVALID
             )
         
         # Get user from database
@@ -83,18 +86,20 @@ async def get_current_user(
         
         if not user:
             logger.warning(f"User not found for UUID: {user_uuid}")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found"
+                detail="User not found",
+                error_code=ErrorCodes.USER_NOT_FOUND
             )
         
         logger.debug(f"User found: {user.username}, email: {user.email}, is_active: {user.is_active}")
         
         if not user.is_active:
             logger.warning(f"User account inactive: {user.username}")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="User account is inactive"
+                detail="User account is inactive",
+                error_code=ErrorCodes.USER_INACTIVE
             )
         
         logger.debug(f"Authentication successful for user: {user.username}")
@@ -102,16 +107,18 @@ async def get_current_user(
         
     except TokenError as e:
         logger.warning(f"Token validation error: {str(e)}")
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.AUTH_TOKEN_INVALID
         )
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
+    except HTTPExceptionWithCode:
+        # Re-raise HTTP exceptions with error codes as-is
         raise
     except Exception as e:
         logger.error(f"Authentication error: {type(e).__name__}: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication failed"
+            detail="Authentication failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )

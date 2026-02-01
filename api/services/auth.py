@@ -11,7 +11,7 @@ import uuid
 import secrets
 import hashlib
 import bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -122,7 +122,7 @@ class AuthService:
         if expires_delta is None:
             expires_delta = timedelta(hours=settings.jwt_access_token_expire_hours)
         
-        expires_at = datetime.utcnow() + expires_delta
+        expires_at = datetime.now(timezone.utc) + expires_delta
         
         # Generate unique JWT ID (jti)
         jti = secrets.token_urlsafe(32)
@@ -135,7 +135,7 @@ class AuthService:
             "sub": user_ulid,  # ULID (external identifier)
             "email": user.email,
             "role": user.role.value,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
             "jti": jti,
             "exp": expires_at,
         }
@@ -160,7 +160,7 @@ class AuthService:
             Tuple of (token_string, expires_at, jti)
         """
         expires_delta = timedelta(days=settings.jwt_refresh_token_expire_days)
-        expires_at = datetime.utcnow() + expires_delta
+        expires_at = datetime.now(timezone.utc) + expires_delta
         
         # Generate unique token and JWT ID
         token_string = secrets.token_urlsafe(64)
@@ -207,7 +207,7 @@ class AuthService:
                 stmt = select(RevokedToken).where(
                     and_(
                         RevokedToken.jti == jti,
-                        RevokedToken.expires_at > datetime.utcnow()
+                        RevokedToken.expires_at > datetime.now(timezone.utc)
                     )
                 )
                 result = await db.execute(stmt)
@@ -246,7 +246,7 @@ class AuthService:
             and_(
                 UserRefreshToken.token_hash == token_hash,
                 UserRefreshToken.revoked_at.is_(None),
-                UserRefreshToken.expires_at > datetime.utcnow()
+                UserRefreshToken.expires_at > datetime.now(timezone.utc)
             )
         )
         result = await db.execute(stmt)
@@ -303,7 +303,7 @@ class AuthService:
                 raise AuthenticationError("Account is inactive")
             
             # Check if account is locked
-            if user.locked_until and user.locked_until > datetime.utcnow():
+            if user.locked_until and user.locked_until > datetime.now(timezone.utc):
                 logger.warning(f"Account locked: {user.username}")
                 raise AuthenticationError("Account is locked")
             
@@ -325,7 +325,7 @@ class AuthService:
                 try:
                     user.failed_login_attempts += 1
                     if user.failed_login_attempts >= 5:
-                        user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                        user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=30)
                     await db.commit()
                 except Exception as e:
                     logger.error(f"Failed to update login attempts: {type(e).__name__}: {str(e)}", exc_info=True)
@@ -336,7 +336,7 @@ class AuthService:
             try:
                 user.failed_login_attempts = 0
                 user.locked_until = None
-                user.last_login_at = datetime.utcnow()
+                user.last_login_at = datetime.now(timezone.utc)
                 await db.commit()
             except Exception as e:
                 logger.error(f"Failed to update user login status: {type(e).__name__}: {str(e)}", exc_info=True)
@@ -594,7 +594,7 @@ class AuthService:
             
             if jti:
                 # Add access token to blacklist
-                expires_at = datetime.fromtimestamp(exp) if exp else datetime.utcnow() + timedelta(hours=24)
+                expires_at = datetime.fromtimestamp(exp, tz=timezone.utc) if exp else datetime.now(timezone.utc) + timedelta(hours=24)
                 
                 revoked_token = RevokedToken(
                     jti=jti,
@@ -647,7 +647,7 @@ class AuthService:
         
         count = 0
         for token in tokens:
-            token.revoked_at = datetime.utcnow()
+            token.revoked_at = datetime.now(timezone.utc)
             count += 1
         
         await db.commit()

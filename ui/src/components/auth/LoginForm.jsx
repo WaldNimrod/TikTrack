@@ -9,10 +9,12 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../utils/audit.js';
 import { debugLog } from '../../utils/debug.js';
+import { validateLoginForm, validateUsernameOrEmail, validatePassword } from '../../logic/schemas/authSchema.js';
+import { handleApiError } from '../../utils/errorHandler.js';
 
 /**
  * LoginForm Component
@@ -38,7 +40,7 @@ const LoginForm = () => {
   /**
    * Handle Input Change
    * 
-   * @description מעדכן את state של הטופס
+   * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
@@ -48,42 +50,43 @@ const LoginForm = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear field error when user types
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    // Validate field using Schema
+    if (type !== 'checkbox') {
+      let validationResult = null;
+      switch (name) {
+        case 'usernameOrEmail':
+          validationResult = validateUsernameOrEmail(value);
+          break;
+        case 'password':
+          validationResult = validatePassword(value, { minLength: 1 });
+          break;
+        default:
+          break;
+      }
+      
+      // Update field error
+      if (validationResult) {
+        setFieldErrors(prev => ({
+          ...prev,
+          [name]: validationResult.error
+        }));
+      }
     }
     
-    // Clear general error
-    if (error) {
-      setError(null);
-    }
+    // Don't clear general error immediately - let user see it
+    // Error will be cleared on next form submission attempt
   };
 
   /**
    * Validate Form
    * 
-   * @description בודק תקינות הטופס לפני שליחה
+   * @description בודק תקינות הטופס לפני שליחה באמצעות Schema מרכזי
    * @returns {boolean} - true אם הטופס תקין
    */
   const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.usernameOrEmail.trim()) {
-      errors.usernameOrEmail = 'שדה חובה';
-    }
-    
-    if (!formData.password) {
-      errors.password = 'שדה חובה';
-    } else if (formData.password.length < 1) {
-      errors.password = 'סיסמה חייבת להכיל לפחות תו אחד';
-    }
-    
+    const { isValid, errors } = validateLoginForm(formData);
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   /**
@@ -93,9 +96,16 @@ const LoginForm = () => {
    * @param {Event} e - Event object
    */
   const handleSubmit = async (e) => {
+    // CRITICAL: Always prevent default form submission
     e.preventDefault();
+    e.stopPropagation();
     
-    // Clear previous errors
+    // Prevent multiple submissions
+    if (isLoading) {
+      return;
+    }
+    
+    // Clear previous errors only at start of new submission
     setError(null);
     setFieldErrors({});
     
@@ -125,57 +135,37 @@ const LoginForm = () => {
         localStorage.setItem('remember_me', 'true');
       }
       
-      // Redirect to dashboard
+      // Redirect to dashboard (only on success, not on error)
       audit.log('Auth', 'Redirecting to dashboard');
       navigate('/dashboard');
       
     } catch (err) {
-      // Handle error with improved error messages
-      let errorMessage = 'שגיאה בהתחברות. אנא בדוק את פרטיך.';
+      // CRITICAL: Prevent any navigation or refresh on error
+      // Use centralized error handler
+      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
       
-      // Detect CORS or network errors
-      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response) {
-        // CORS or network error - provide helpful message
-        errorMessage = 'שגיאת חיבור לשרת. אנא בדוק שהשרת פועל ונסה שוב.';
-        debugLog('Auth', 'Network/CORS error detected', { code: err.code, message: err.message });
-      } else if (err.response) {
-        // Server responded with error
-        const status = err.response.status;
-        
-        if (status === 500) {
-          errorMessage = 'שגיאת שרת פנימית. אנא נסה שוב מאוחר יותר או פנה לתמיכה.';
-        } else if (status === 401) {
-          // Invalid credentials
-          errorMessage = err.response.data?.detail || 
-                        'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
-        } else if (status === 400) {
-          // Bad request
-          errorMessage = err.response.data?.detail || 
-                        'בקשה לא תקינה. אנא בדוק את הפרטים שהזנת.';
-        } else if (status === 429) {
-          // Rate limit
-          errorMessage = 'יותר מדי ניסיונות התחברות. אנא נסה שוב מאוחר יותר.';
-        } else {
-          // Other server errors
-          errorMessage = err.response.data?.detail || 
-                        `שגיאת שרת (${status}). אנא נסה שוב מאוחר יותר.`;
-        }
-        
-        debugLog('Auth', 'Server error response', { status, detail: err.response.data?.detail });
-      } else if (err.message) {
-        // Other error with message
-        errorMessage = err.message;
+      // Merge API field errors with existing errors
+      if (Object.keys(apiErrors).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
       }
       
-      setError(errorMessage);
+      // Set form-level error
+      if (apiError) {
+        setError(apiError);
+      } else {
+        setError('שגיאה בהתחברות. אנא בדוק את פרטיך.');
+      }
+      
       audit.error('Auth', 'Login failed', err);
       
-      // Show error in UI (using js-error-feedback element)
-      const errorElement = document.querySelector('.js-error-feedback');
-      if (errorElement) {
-        errorElement.textContent = errorMessage;
-        errorElement.hidden = false;
-      }
+      // Ensure error is visible in DOM and scroll to it
+      // Use setTimeout to ensure DOM update happens after state update
+      setTimeout(() => {
+        const errorElement = document.querySelector('.js-error-feedback');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -183,26 +173,29 @@ const LoginForm = () => {
 
   return (
     <div className="auth-layout-root" dir="rtl">
-      {/* G-Bridge Banner */}
-      <div className="g-bridge-banner">
-        🛡️ G-BRIDGE [{new Date().toLocaleTimeString('he-IL')}] | ✅ READY FOR DEVELOPMENT
-      </div>
-      
       <tt-container>
         <tt-section>
           <div className="auth-header">
             <div className="auth-logo">
-              <img src="./images/logo.svg" alt="TikTrack Logo" />
+              <img src="/images/logo.svg" alt="TikTrack Logo" />
             </div>
             <p className="auth-subtitle">ברוכים הבאים ל-TikTrack</p>
             <h1 className="auth-title">התחברות</h1>
           </div>
 
-          <form className="js-login-form" onSubmit={handleSubmit}>
+          <form 
+            className="js-login-form" 
+            onSubmit={handleSubmit} 
+            noValidate
+            action="#"
+            method="post"
+          >
             {/* Error Feedback (hidden by default, shown on error) */}
-            <div className="auth-form__error js-error-feedback" hidden={!error}>
-              {error}
-            </div>
+            {error && (
+              <div className="auth-form__error js-error-feedback" role="alert" aria-live="polite">
+                {error}
+              </div>
+            )}
 
             <div className="form-group">
               <label className="form-label" htmlFor="usernameOrEmail">
@@ -256,9 +249,9 @@ const LoginForm = () => {
                 />
                 {' '}זכור אותי
               </label>
-              <a href="/reset-password" className="auth-link js-forgot-password-link">
+              <Link to="/reset-password" className="auth-link js-forgot-password-link">
                 שכחת סיסמה?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -272,9 +265,9 @@ const LoginForm = () => {
 
           <div className="auth-footer-zone">
             <span>אין לך חשבון?</span>{' '}
-            <a href="/register" className="auth-link-bold js-register-link">
+            <Link to="/register" className="auth-link-bold js-register-link">
               הרשמה עכשיו
-            </a>
+            </Link>
           </div>
         </tt-section>
       </tt-container>

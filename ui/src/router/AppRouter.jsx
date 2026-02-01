@@ -19,6 +19,7 @@ import RegisterForm from '../components/auth/RegisterForm';
 import PasswordResetFlow from '../components/auth/PasswordResetFlow';
 
 // Protected Routes (will be imported by Team 30)
+import ProfileView from '../components/profile/ProfileView';
 import PasswordChangeForm from '../components/profile/PasswordChangeForm';
 // import Dashboard from '../views/Dashboard';
 // import AccountsView from '../views/financial/D16_ACCTS_VIEW';
@@ -36,7 +37,12 @@ import PasswordChangeForm from '../components/profile/PasswordChangeForm';
  */
 const AppRouter = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<IndexPage />} />
@@ -46,6 +52,11 @@ const AppRouter = () => {
         
         {/* Protected Routes */}
         <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfileView />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/password" element={
           <ProtectedRoute>
             <PasswordChangeForm />
           </ProtectedRoute>

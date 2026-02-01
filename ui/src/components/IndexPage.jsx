@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/auth.js';
 import { audit } from '../utils/audit.js';
 import { debugLog } from '../utils/debug.js';
@@ -130,13 +130,27 @@ const IndexPage = () => {
                 <strong>שם תצוגה:</strong> {currentUser.displayName}
               </p>
             )}
-            <button 
-              onClick={handleLogoutClick}
-              className="secondary"
-              style={{ marginTop: '1rem' }}
-            >
-              התנתק
-            </button>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link 
+                to="/profile"
+                className="primary"
+                style={{ 
+                  display: 'inline-block',
+                  padding: '0.75rem 1.5rem',
+                  textDecoration: 'none',
+                  borderRadius: 'var(--pico-border-radius)',
+                  fontSize: '1rem'
+                }}
+              >
+                ניהול פרופיל
+              </Link>
+              <button 
+                onClick={handleLogoutClick}
+                className="secondary"
+              >
+                התנתק
+              </button>
+            </div>
           </div>
         ) : (
           <div style={{ 

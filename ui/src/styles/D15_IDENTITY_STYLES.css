@@ -26,7 +26,8 @@
    ============================================ */
 
 /* Auth Layout Context */
-body.auth-layout-root {
+body.auth-layout-root,
+.auth-layout-root {
   margin: 0;
   min-height: 100vh;
   direction: rtl;
@@ -35,15 +36,21 @@ body.auth-layout-root {
   justify-content: center;
   background: var(--color-bg-grad);
   font-family: var(--font-main);
-  /* Padding accounts for fixed G-Bridge banner (45px) + standard spacing */
-  padding-top: 45px;
-  padding-inline: var(--spacing-lg, 24px);
-  padding-bottom: var(--spacing-lg, 24px);
+  padding: var(--spacing-lg, 24px);
 }
 
-/* Auth-specific: Narrow section for auth forms */
-body.auth-layout-root tt-section {
+/* Auth-specific: Narrow container and section for auth forms */
+body.auth-layout-root tt-container,
+.auth-layout-root tt-container {
   max-width: 480px;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--spacing-lg, 24px);
+}
+
+body.auth-layout-root tt-section,
+.auth-layout-root tt-section {
+  max-width: 100%;
   margin-inline: auto;
   text-align: center;
 }
@@ -80,6 +87,7 @@ main[data-context="home"] {
 /* Auth-specific classes */
 .auth-header {
   padding-block-end: var(--spacing-md);
+  text-align: center; /* Center align header content (logo, subtitle, title) */
 }
 
 /* Auth Form Controls - Specific overrides for authentication pages only */
@@ -91,7 +99,13 @@ body.auth-layout-root form .form-control,
 body.auth-layout-root form input[type="text"],
 body.auth-layout-root form input[type="password"],
 body.auth-layout-root form input[type="email"],
-body.auth-layout-root form input[type="tel"] {
+body.auth-layout-root form input[type="tel"],
+.auth-layout-root form .form-group input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
+.auth-layout-root form .form-control,
+.auth-layout-root form input[type="text"],
+.auth-layout-root form input[type="password"],
+.auth-layout-root form input[type="email"],
+.auth-layout-root form input[type="tel"] {
   width: 100%;
   padding: 0.75rem 1rem !important; /* Larger padding for auth pages - half of double, !important needed to override base */
   border: 1px solid var(--border-color, #C6C6C8);
@@ -105,14 +119,19 @@ body.auth-layout-root form input[type="tel"] {
 body.auth-layout-root form .form-control:focus,
 body.auth-layout-root form input[type="text"]:focus,
 body.auth-layout-root form input[type="password"]:focus,
-body.auth-layout-root form input[type="email"]:focus {
+body.auth-layout-root form input[type="email"]:focus,
+.auth-layout-root form .form-control:focus,
+.auth-layout-root form input[type="text"]:focus,
+.auth-layout-root form input[type="password"]:focus,
+.auth-layout-root form input[type="email"]:focus {
   outline: none;
   border-color: #26baac;
   box-shadow: 0 0 0 3px rgba(38, 186, 172, 0.1);
 }
 
 /* Form Labels - Exact match to legacy */
-body.auth-layout-root form .form-label {
+body.auth-layout-root form .form-label,
+.auth-layout-root form .form-label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
@@ -121,12 +140,14 @@ body.auth-layout-root form .form-label {
 }
 
 /* Form Groups - Spacing for auth pages */
-body.auth-layout-root form .form-group {
+body.auth-layout-root form .form-group,
+.auth-layout-root form .form-group {
   margin-block-start: var(--spacing-sm, 8px); /* Half spacing */
   margin-block-end: var(--spacing-sm, 8px); /* Half spacing */
 }
 
-body.auth-layout-root form .form-group:first-child {
+body.auth-layout-root form .form-group:first-child,
+.auth-layout-root form .form-group:first-child {
   margin-block-start: 0; /* No top margin for first form group */
 }
 
@@ -233,4 +254,36 @@ button.btn-auth-primary:hover {
 .logo-sm img { 
   height: 37.5px; 
   width: auto; 
+}
+
+/* Error Message Styles - Ensure errors are visible and persistent */
+.auth-form__error {
+  display: block;
+  padding: 0.75rem 1rem;
+  margin-bottom: var(--spacing-md, 16px);
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c33;
+  font-size: 0.875rem;
+  text-align: center;
+  direction: rtl;
+}
+
+.auth-form__error[hidden] {
+  display: none !important;
+}
+
+.auth-form__error-message {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #c33;
+  text-align: right;
+  direction: rtl;
+}
+
+.auth-form__input--error {
+  border-color: #c33 !important;
+  box-shadow: 0 0 0 3px rgba(204, 51, 51, 0.1) !important;
 }

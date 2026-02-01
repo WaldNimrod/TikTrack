@@ -40,12 +40,14 @@ body.dashboard-page {
    ============================================ */
 
 /* Block: Dashboard Section Header - Separate white card */
+/* CRITICAL: 3-part structure - Title | Subtitle (center) | Actions (end) */
+/* All aligned to middle vertically, fixed height, single row, no wrapping */
 .dashboard-section__header,
 .index-section__header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  align-items: center; /* CRITICAL: All elements aligned to middle vertically */
+  justify-content: space-between; /* CRITICAL: 3-part layout */
+  padding: 0 var(--spacing-lg, 24px); /* No vertical padding - fixed height handles spacing */
   background: var(--apple-bg-elevated, #ffffff); /* White background */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px;
@@ -53,13 +55,21 @@ body.dashboard-page {
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
   /* Subtle entity color accent on left border */
   border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
-  min-height: 60px; /* Fixed height for header */
+  /* Entity color accent on bottom border */
+  border-block-end: 3px solid var(--color-brand, var(--entity-trade-color));
+  height: 60px; /* CRITICAL: Fixed height - cannot break or stretch */
+  min-height: 60px;
+  max-height: 60px;
+  flex-wrap: nowrap; /* CRITICAL: All in single row - never wrap */
+  overflow: hidden; /* Prevent content overflow */
+  box-sizing: border-box;
 }
 
 /* Entity-specific header colors */
 /* Portfolio - Trading Account color */
 tt-section[data-section="portfolio"] .index-section__header {
   border-inline-start-color: var(--entity-trading-account-color, #28a745);
+  border-block-end-color: var(--entity-trading-account-color, #28a745); /* Bottom border in entity color */
 }
 
 tt-section[data-section="portfolio"] .index-section__header-icon {
@@ -72,7 +82,8 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 
 /* Widget-specific entity colors - using alt attribute selectors */
 /* Ticker Chart Widget - Ticker color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header {
+/* CRITICAL: Border only on title-row (Type 1), NOT on header itself */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
 }
 
@@ -80,7 +91,17 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   color: var(--entity-ticker-color, #17a2b8);
 }
 
+/* CRITICAL: Ensure header and body do NOT inherit border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header {
+  border-inline-start: none;
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__body {
+  border-inline-start: none;
+}
+
 /* Ticker List Widget - Ticker color */
+/* CRITICAL: Border only on header, NOT on body */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
   border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
 }
@@ -90,7 +111,8 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 }
 
 /* Tag Widget - Research color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header {
+/* CRITICAL: Border only on title-row (Type 1), NOT on header itself */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-research-color, #9c27b0);
 }
 
@@ -98,22 +120,73 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   color: var(--entity-research-color, #9c27b0);
 }
 
-/* Recent Trades Widget - Trade color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
-  border-inline-start: 3px solid var(--entity-trade-color, #26baac);
+/* CRITICAL: Ensure header and body do NOT inherit border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header {
+  border-inline-start: none;
 }
 
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__body {
+  border-inline-start: none;
+}
+
+/* Recent Trades Widget - Trade color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__title-icon {
   color: var(--entity-trade-color, #26baac);
 }
 
+/* Type 2: Border only on title-row (no border on tabs or header itself) */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+  border-inline-start: 3px solid var(--entity-trade-color, #26baac);
+}
+
+/* CRITICAL: Ensure header itself does NOT have border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
+  border-inline-start: none;
+}
+
+/* CRITICAL: Ensure body does NOT inherit border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__body {
+  border-inline-start: none;
+}
+
 /* Pending Actions Widget - Execution color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__title-icon {
+  color: var(--entity-execution-color, #ff9800);
+}
+
+/* Type 2: Border only on title-row (no border on tabs or header itself) */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-execution-color, #ff9800);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__title-icon {
-  color: var(--entity-execution-color, #ff9800);
+/* CRITICAL: Ensure header itself does NOT have border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__header {
+  border-inline-start: none;
+}
+
+/* CRITICAL: Ensure body does NOT inherit border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__body {
+  border-inline-start: none;
+}
+
+/* Ticker List Widget - Ticker color (Type 2 with tabs) */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
+  color: var(--entity-ticker-color, #17a2b8);
+}
+
+/* Type 2: Border only on title-row (no border on tabs or header itself) */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+}
+
+/* CRITICAL: Ensure header itself does NOT have border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
+  border-inline-start: none;
+}
+
+/* CRITICAL: Ensure body does NOT inherit border */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__body {
+  border-inline-start: none;
 }
 
 /* Block: Dashboard Section Body - Separate white card below header */
@@ -127,29 +200,60 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   /* No margin-top - gap is created by header margin-block-end */
   width: 100%; /* Full width */
   box-sizing: border-box; /* Include padding in width */
+  /* Smooth animation for open/close */
+  transition: opacity 0.3s ease, max-height 0.3s ease, padding-block 0.3s ease, margin-block-end 0.3s ease;
+  overflow: hidden;
+  opacity: 1;
+  max-height: 10000px; /* Large enough to accommodate content */
+}
+
+/* Closed state - smooth collapse animation */
+.dashboard-section__body[hidden],
+.index-section__body[hidden] {
+  display: block !important; /* Keep block for animation */
+  opacity: 0;
+  max-height: 0;
+  padding-block: 0;
+  margin-block-end: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Element: Info Summary inside section body - Force full width */
+/* Using high specificity to ensure full width */
 .index-section__body .info-summary,
 .dashboard-section__body .info-summary {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-inline: 0 !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  box-sizing: border-box;
 }
 
-/* Element: Header Title */
+/* Override any conflicting styles with higher specificity */
+tt-section .index-section__body .info-summary,
+tt-section .dashboard-section__body .info-summary {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  box-sizing: border-box;
+}
+
+/* Element: Header Title - Part 1: Title with icon (start, min-width by content) */
 .dashboard-section__header-title,
 .index-section__header-title {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
   gap: var(--spacing-sm, 8px);
+  flex-shrink: 0; /* Don't shrink - min-width by content */
+  margin: 0; /* No margin - padding handled by parent */
+  padding: 0; /* No padding */
 }
 
 .dashboard-section__header-icon,
 .index-section__header-icon {
-  width: 20px;
-  height: 20px;
+  width: 35px;
+  height: 35px;
+  padding-top: 3px;
   color: var(--color-brand, var(--entity-trade-color));
 }
 
@@ -161,30 +265,41 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   margin: 0;
 }
 
-/* Element: Header Meta */
+/* Element: Header Meta - Part 2: Subtitle (center, takes remaining width) */
 .dashboard-section__header-meta,
 .index-section__header-meta {
-  margin-inline-start: auto;
-  margin-inline-end: var(--spacing-md, 16px);
+  flex: 1; /* CRITICAL: Takes remaining width */
+  display: flex;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  justify-content: center; /* CRITICAL: Content centered */
+  margin: 0; /* No margin */
+  padding: 0 var(--spacing-md, 16px); /* Horizontal padding only */
+  min-width: 0; /* Allow shrinking if needed */
 }
 
-.dashboard-section__header-count,
-.index-section__header-count {
+/* Element: Header Count - High specificity to ensure centering */
+.index-section__header-meta .index-section__header-count,
+.dashboard-section__header-meta .dashboard-section__header-count {
   font-size: var(--font-size-base, 0.92rem);
   color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
   opacity: 0.8; /* 0.8 opacity */
-  text-align: center !important; /* Centered - force override */
+  text-align: center; /* Centered */
   font-weight: 500; /* Subtitle style */
-  display: block; /* Block display for centering */
-  width: 100%; /* Full width for centering */
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
+  white-space: nowrap; /* Single line */
 }
 
-/* Element: Header Actions */
+/* Element: Header Actions - Part 3: Buttons area (end, width by content) */
 .dashboard-section__header-actions,
 .index-section__header-actions {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  justify-content: flex-end; /* CRITICAL: Aligned to end */
   gap: var(--spacing-sm, 8px);
+  flex-shrink: 0; /* Don't shrink - width by content */
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
 }
 
 .dashboard-section__header-alert-btn,
@@ -220,12 +335,12 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 .dashboard-section__header-toggle-btn,
 .index-section__header-toggle-btn {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
   justify-content: center;
   width: 32px;
   height: 32px;
   padding: 0;
-  margin: var(--spacing-xs, 4px); /* Equal margin from all sides */
+  margin: 0; /* No margin - parent handles spacing */
   background: transparent;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
@@ -233,7 +348,6 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   transition: background 0.2s ease;
   color: var(--apple-text-primary, #1d1d1f);
   flex-shrink: 0; /* Prevent shrinking */
-  align-self: center; /* Center vertically */
 }
 
 .dashboard-section__header-toggle-btn:hover,
@@ -573,22 +687,33 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   border-radius: 8px;
   margin-block-end: var(--spacing-md, 16px);
   font-size: var(--font-size-base, 0.92rem);
-  width: 100% !important; /* Full width - force override */
-  max-width: 100% !important; /* Ensure full width */
-  box-sizing: border-box !important; /* Include padding in width */
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  /* Force full width by overriding any parent constraints */
-  margin-inline: 0 !important;
+}
+
+/* Override with higher specificity to ensure full width */
+tt-section .index-section__body .info-summary,
+tt-section .dashboard-section__body .info-summary {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-inline: 0;
 }
 
 /* Element: Summary Row - Each row is centered and full width */
 .info-summary__row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center !important; /* Center aligned - force override */
   align-items: center;
   gap: var(--spacing-lg, 24px);
-  width: 100% !important; /* Full width - force override */
+}
+
+/* Using high specificity to ensure centering and full width */
+.index-section__body .info-summary .info-summary__row,
+.dashboard-section__body .info-summary .info-summary__row,
+tt-section .index-section__body .info-summary .info-summary__row,
+tt-section .dashboard-section__body .info-summary .info-summary__row {
+  justify-content: center; /* Center aligned */
+  width: 100%;
 }
 
 .info-summary__row > div,
@@ -690,17 +815,39 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 }
 
 /* Element: Placeholder Header - Separate white card within widget */
+/* CRITICAL: Structure differs for Type 1 (no tabs) vs Type 2 (with tabs) */
 .widget-placeholder__header {
   flex-shrink: 0;
   background: var(--apple-bg-elevated, #ffffff); /* White background */
-  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px 8px 0 0;
   margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
-  min-height: 48px; /* Fixed smaller height than main container header (60px) */
-  max-height: 60px; /* Maximum height constraint */
   display: flex;
   flex-direction: column; /* Allow stacking of title row and tabs */
   align-items: stretch; /* Stretch children to full width */
+  overflow: hidden; /* CRITICAL: Prevent border from extending beyond header */
+  position: relative; /* Ensure border is positioned correctly */
+  /* CRITICAL: Entity color border is set by entity-specific selectors below */
+  /* Border must NOT extend to body - only header */
+}
+
+/* Type 1: Widgets WITHOUT tabs (תגיות + גרף טיקרים) - Border at bottom of header */
+/* Using :not(:has()) for high specificity */
+.widget-placeholder__header:not(:has(.widget-placeholder__tabs)) {
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  height: 40px; /* CRITICAL: Fixed height - title row only */
+  min-height: 40px;
+  max-height: 40px;
+}
+
+/* Type 2: Widgets WITH tabs (טריידים אחרונים, פעולות ממתינות, רשימת טיקרים) - Border between title row and tabs */
+/* Using :has() for high specificity */
+.widget-placeholder__header:has(.widget-placeholder__tabs) {
+  border-bottom: none; /* No border on header - border is on title row */
+  height: 76px; /* CRITICAL: Fixed height - title row (40px) + tabs (36px) */
+  min-height: 76px;
+  max-height: 76px;
+  /* CRITICAL: Entity color border must extend full height of header (including tabs) */
+  /* The border-inline-start is set by entity-specific selectors above */
 }
 
 /* Widget title styles are now in .widget-placeholder__header-title-row .widget-placeholder__title above */
@@ -729,11 +876,13 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  border-bottom: none; /* No border - border is on title row above */
   background: var(--apple-bg-secondary, #f5f5f7);
   flex-shrink: 0; /* Prevent shrinking */
   min-height: 36px; /* Fixed smaller height for tabs */
   max-height: 36px; /* Maximum height - consistent */
+  /* CRITICAL: Tabs inherit the border-inline-start from parent header */
+  /* This ensures the entity color border continues through the tabs area */
 }
 
 .widget-placeholder__tab-item {
@@ -776,42 +925,69 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   display: none;
 }
 
-/* Element: Widget Header Title Row - UNIFIED DESIGN (matches Ticker Chart exactly) */
-.widget-placeholder__header-title-row {
+/* Element: Widget Header Title Row - UNIFIED DESIGN - CLEAN & PRECISE */
+/* CRITICAL: Fixed height, all elements aligned to middle, no extra spacing */
+/* Using high specificity selector to ensure these rules apply */
+.widget-placeholder__header .widget-placeholder__header-title-row {
   display: flex;
-  align-items: center; /* Center vertically */
+  align-items: center; /* CRITICAL: All elements aligned to middle vertically */
   justify-content: space-between;
-  gap: var(--spacing-md, 16px);
-  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Smaller padding for consistent height */
-  min-height: 40px; /* Fixed smaller height than main container header (60px) */
-  max-height: 40px; /* Maximum height - consistent across all widgets */
+  gap: var(--spacing-sm, 8px); /* Reduced gap - clean spacing */
+  padding: 0 var(--spacing-md, 16px); /* No vertical padding - fixed height handles it */
+  height: 40px; /* CRITICAL: Fixed height - cannot break or stretch */
+  min-height: 40px;
+  max-height: 40px;
   flex-shrink: 0; /* Prevent shrinking */
+  margin: 0; /* No margin */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Ensure search form in title row doesn't break height */
+.widget-placeholder__header-title-row .widget-placeholder__search-form {
+  height: 20px; /* Fixed height */
+  max-height: 20px; /* Prevent growing */
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
+}
+
+/* Type 2: Title row WITH tabs - Border at bottom of title row */
+.widget-placeholder__header:has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
 }
 
 .widget-placeholder__title {
   display: flex;
-  align-items: center; /* Center icon and text vertically */
-  justify-content: flex-start; /* Align to start */
+  align-items: center; /* CRITICAL: Icon and text aligned to middle */
+  justify-content: flex-start;
   gap: var(--spacing-xs, 4px);
   font-size: clamp(0.875rem, 2vw, 1rem); /* Smaller than main container header */
   font-weight: 600;
   color: var(--apple-text-primary, #1d1d1f);
   margin: 0;
-  padding: 0; /* No padding - padding is on parent */
+  padding: 0; /* No padding */
   flex: 1; /* Take available space */
+  min-width: 0; /* Allow shrinking if needed */
+  line-height: 1; /* CRITICAL: Prevent line-height from affecting alignment */
 }
 
 .widget-placeholder__title-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0; /* Prevent shrinking */
-  display: block; /* Ensure proper display */
+  display: block;
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
 }
 
 .widget-placeholder__header-badges {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
   gap: var(--spacing-xs, 4px);
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1; /* CRITICAL: Prevent line-height from affecting alignment */
 }
 
 .widget-placeholder__badge {
@@ -972,40 +1148,54 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 4px);
+  height: 20px; /* Fixed height to match input, select and button height */
+  flex-shrink: 0;
 }
 
 .widget-placeholder__search-input {
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  padding: 0 var(--spacing-xs, 4px); /* No vertical padding - fixed height handles it */
   font-size: 0.75rem;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
   background: var(--apple-bg-elevated, #ffffff);
   width: 150px;
-  height: fit-content;
+  height: 20px; /* Fixed height - must match select and button */
+  line-height: 20px; /* Match height for vertical centering */
+  box-sizing: border-box;
+  margin: 0; /* No margin */
+  vertical-align: top; /* Prevent baseline alignment issues */
 }
 
 .widget-placeholder__search-select {
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  padding: 0 var(--spacing-xs, 4px); /* No vertical padding - fixed height handles it */
   font-size: 0.75rem;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
   background: var(--apple-bg-elevated, #ffffff);
-  height: fit-content;
+  height: 20px; /* Fixed height - must match input and button */
+  line-height: 20px; /* Match height for vertical centering */
+  box-sizing: border-box;
+  margin: 0; /* No margin */
+  vertical-align: top; /* Prevent baseline alignment issues */
 }
 
 .widget-placeholder__search-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 20px; /* Match height */
+  height: 20px; /* Fixed height - must match input and select */
   padding: 0;
+  margin: 0; /* No margin - especially no bottom margin */
+  margin-block-end: 0; /* Explicitly remove bottom margin */
   background: var(--color-brand, var(--entity-trade-color));
   border: 1px solid var(--color-brand, var(--entity-trade-color));
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease;
   color: white;
+  flex-shrink: 0;
+  vertical-align: top; /* Prevent baseline alignment issues */
 }
 
 .widget-placeholder__search-btn:hover {
@@ -1014,17 +1204,31 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 
 .widget-placeholder__refresh-btn {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 22px; /* Reduced by 30%: 32px * 0.7 = 22.4px, rounded to 22px */
+  height: 22px; /* Reduced by 30%: 32px * 0.7 = 22.4px, rounded to 22px */
   padding: 0;
+  margin: 0; /* No margin */
   background: transparent;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease;
   color: var(--apple-text-secondary, #86868b);
+  flex-shrink: 0; /* Prevent shrinking */
+  line-height: 1; /* CRITICAL: Prevent line-height from affecting alignment */
+  align-self: center; /* CRITICAL: Force center alignment within flex parent */
+}
+
+/* CRITICAL: SVG inside refresh button must be centered */
+.widget-placeholder__refresh-btn svg {
+  display: block;
+  margin: auto; /* Center the SVG perfectly */
+  padding: 0;
+  width: 14px; /* Reduced by 30%: 20px * 0.7 = 14px */
+  height: 14px; /* Reduced by 30%: 20px * 0.7 = 14px */
+  flex-shrink: 0;
 }
 
 .widget-placeholder__refresh-btn:hover {
@@ -1044,14 +1248,18 @@ tt-section[data-section="portfolio"] .index-section__header-count {
 .widget-placeholder__tag-btn {
   display: inline-flex;
   align-items: center;
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  padding: 2px var(--spacing-xs, 4px); /* Reduced padding - smaller height */
   background: var(--apple-bg-secondary, #f5f5f7);
   border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 16px;
-  font-size: 0.875rem;
+  border-radius: 12px; /* Smaller border-radius for smaller buttons */
+  font-size: 0.75rem; /* Smaller font */
+  line-height: 1.2; /* Tighter line-height */
   color: var(--apple-text-primary, #1d1d1f);
   cursor: pointer;
   transition: all 0.2s ease;
+  height: fit-content; /* Allow natural height based on content */
+  white-space: nowrap; /* Prevent text wrapping */
+}
 }
 
 .widget-placeholder__tag-btn:hover {
@@ -1235,15 +1443,27 @@ tt-section-row:last-child {
    Portfolio Header Filters
    ============================================ */
 
+/* Portfolio Header Filters - Base definition */
 .portfolio-header-filters {
   display: flex;
-  align-items: center;
-  flex-wrap: nowrap !important; /* NEVER wrap - all in single line */
+  align-items: center; /* CRITICAL: Aligned to middle vertically */
   gap: var(--spacing-sm, 8px);
-  margin-inline-end: var(--spacing-md, 16px);
+  margin: 0; /* No margin - parent handles spacing */
+  padding: 0; /* No padding */
   white-space: nowrap; /* Prevent text wrapping */
   overflow-x: auto; /* Horizontal scroll if needed */
   min-width: 0; /* Allow shrinking */
+  height: 100%; /* Match parent height */
+}
+
+/* Portfolio Header Filters - High specificity to prevent wrapping */
+.index-section__header-actions .portfolio-header-filters,
+.dashboard-section__header-actions .portfolio-header-filters,
+tt-section[data-section="portfolio"] .index-section__header-actions .portfolio-header-filters,
+tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfolio-header-filters,
+.index-section__header .index-section__header-actions .portfolio-header-filters,
+.dashboard-section__header .dashboard-section__header-actions .portfolio-header-filters {
+  flex-wrap: nowrap; /* NEVER wrap - all in single line */
 }
 
 .portfolio-filter-select {
@@ -1255,9 +1475,13 @@ tt-section-row:last-child {
   color: var(--apple-text-primary, #1d1d1f);
   cursor: pointer;
   transition: border-color 0.2s ease;
-  height: fit-content;
+  height: 32px; /* CRITICAL: Fixed height - aligned to middle */
   width: 50%; /* Half width - much narrower */
   max-width: 200px; /* Maximum width constraint */
+  box-sizing: border-box;
+  margin: 0; /* No margin */
+  display: flex;
+  align-items: center; /* CRITICAL: Content aligned to middle */
 }
 
 .portfolio-filter-select:hover {
@@ -1279,11 +1503,12 @@ tt-section-row:last-child {
 
 .portfolio-side-filter-btn {
   display: flex;
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle */
   justify-content: center;
   width: 32px;
-  height: 32px;
+  height: 32px; /* CRITICAL: Fixed height - aligned to middle */
   padding: 0;
+  margin: 0; /* No margin */
   background: var(--apple-bg-elevated, #ffffff);
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
@@ -1292,6 +1517,33 @@ tt-section-row:last-child {
   color: var(--apple-text-secondary, #86868b);
   transition: all 0.2s ease;
   flex-shrink: 0; /* Prevent shrinking */
+  line-height: 1; /* CRITICAL: Prevent line-height from affecting alignment */
+}
+
+/* Utility class: Push element down slightly for vertical alignment correction */
+/* This is a reusable utility for fixing alignment issues in headers */
+/* Using high specificity selectors instead of !important */
+.index-section__header-actions .align-push-down,
+.dashboard-section__header-actions .align-push-down,
+.widget-placeholder__header-title-row .align-push-down {
+  padding-top: var(--spacing-xs, 4px);
+  margin-top: 0;
+}
+
+/* Apply to portfolio filter buttons that need alignment fix */
+.index-section__header-actions .portfolio-header-filters .portfolio-side-filter-btn.align-push-down,
+.index-section__header-actions .portfolio-header-filters .portfolio-filter-select.align-push-down,
+.index-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container.align-push-down,
+.dashboard-section__header-actions .portfolio-header-filters .portfolio-side-filter-btn.align-push-down,
+.dashboard-section__header-actions .portfolio-header-filters .portfolio-filter-select.align-push-down,
+.dashboard-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container.align-push-down {
+  padding-top: var(--spacing-xs, 4px);
+}
+
+/* Apply to widget refresh buttons that need alignment fix */
+.widget-placeholder__header-title-row .widget-placeholder__refresh-btn.align-push-down {
+  padding-top: var(--spacing-xs, 4px);
+  margin-top: 0;
 }
 
 .portfolio-side-filter-btn:hover {
@@ -1310,13 +1562,17 @@ tt-section-row:last-child {
 }
 
 /* Portfolio Checkboxes - Single line, NO BORDER */
-.portfolio-checkboxes-container {
+/* High specificity to ensure no border */
+.index-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container,
+.dashboard-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container {
   display: flex;
   flex-direction: row; /* Single line */
-  align-items: center;
+  align-items: center; /* CRITICAL: Aligned to middle vertically */
   gap: var(--spacing-md, 16px); /* More gap between checkboxes */
+  margin: 0; /* No margin */
   padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
-  border: none !important; /* No border */
+  height: 100%; /* Match parent height */
+  border: none; /* No border */
   border-radius: 0; /* No border-radius */
   background: transparent; /* Transparent background */
 }

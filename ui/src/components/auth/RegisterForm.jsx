@@ -9,10 +9,13 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../utils/audit.js';
 import { debugLog } from '../../utils/debug.js';
+import { validateRegisterForm, validateUsername, validatePassword, validateConfirmPassword } from '../../logic/schemas/authSchema.js';
+import { validateEmail, validatePhoneNumber } from '../../logic/schemas/userSchema.js';
+import { handleApiError } from '../../utils/errorHandler.js';
 
 /**
  * RegisterForm Component
@@ -40,7 +43,7 @@ const RegisterForm = () => {
   /**
    * Handle Input Change
    * 
-   * @description מעדכן את state של הטופס
+   * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
@@ -50,13 +53,36 @@ const RegisterForm = () => {
       [name]: value
     }));
     
-    // Clear field error when user types
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    // Validate field using Schema
+    let validationResult = null;
+    switch (name) {
+      case 'username':
+        validationResult = validateUsername(value);
+        break;
+      case 'email':
+        validationResult = validateEmail(value);
+        break;
+      case 'password':
+        validationResult = validatePassword(value, { minLength: 8 });
+        break;
+      case 'confirmPassword':
+        validationResult = validateConfirmPassword(value, formData.password);
+        break;
+      case 'phoneNumber':
+        if (value && value.trim()) {
+          validationResult = validatePhoneNumber(value);
+        }
+        break;
+      default:
+        break;
+    }
+    
+    // Update field error
+    if (validationResult) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: validationResult.error
+      }));
     }
     
     // Clear general error
@@ -68,55 +94,13 @@ const RegisterForm = () => {
   /**
    * Validate Form
    * 
-   * @description בודק תקינות הטופס לפני שליחה
+   * @description בודק תקינות הטופס לפני שליחה באמצעות Schema מרכזי
    * @returns {boolean} - true אם הטופס תקין
    */
   const validateForm = () => {
-    const errors = {};
-    
-    // Username validation
-    if (!formData.username.trim()) {
-      errors.username = 'שדה חובה';
-    } else if (formData.username.length < 3) {
-      errors.username = 'שם משתמש חייב להכיל לפחות 3 תווים';
-    } else if (formData.username.length > 50) {
-      errors.username = 'שם משתמש לא יכול להכיל יותר מ-50 תווים';
-    }
-    
-    // Email validation
-    if (!formData.email.trim()) {
-      errors.email = 'שדה חובה';
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        errors.email = 'כתובת אימייל לא תקינה';
-      }
-    }
-    
-    // Password validation
-    if (!formData.password) {
-      errors.password = 'שדה חובה';
-    } else if (formData.password.length < 8) {
-      errors.password = 'סיסמה חייבת להכיל לפחות 8 תווים';
-    }
-    
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = 'שדה חובה';
-    } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'הסיסמאות אינן תואמות';
-    }
-    
-    // Phone validation (optional)
-    if (formData.phoneNumber && formData.phoneNumber.trim()) {
-      const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-      if (!phoneRegex.test(formData.phoneNumber.trim())) {
-        errors.phoneNumber = 'מספר טלפון לא תקין (פורמט E.164: +972501234567)';
-      }
-    }
-    
+    const { isValid, errors } = validateRegisterForm(formData);
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   /**
@@ -165,20 +149,22 @@ const RegisterForm = () => {
       navigate('/dashboard');
       
     } catch (err) {
-      // Handle error
-      const errorMessage = err.response?.data?.detail || 
-                          err.message || 
-                          'שגיאה בהרשמה. אנא נסה שוב.';
+      // Use centralized error handler
+      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
       
-      setError(errorMessage);
-      audit.error('Auth', 'Register failed', err);
-      
-      // Show error in UI
-      const errorElement = document.querySelector('.js-error-feedback');
-      if (errorElement) {
-        errorElement.textContent = errorMessage;
-        errorElement.hidden = false;
+      // Merge API field errors with existing errors
+      if (Object.keys(apiErrors).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
       }
+      
+      // Set form-level error
+      if (apiError) {
+        setError(apiError);
+      } else {
+        setError('שגיאה בהרשמה. אנא נסה שוב.');
+      }
+      
+      audit.error('Auth', 'Register failed', err);
     } finally {
       setIsLoading(false);
     }
@@ -186,26 +172,29 @@ const RegisterForm = () => {
 
   return (
     <div className="auth-layout-root" dir="rtl">
-      {/* G-Bridge Banner */}
-      <div className="g-bridge-banner">
-        🛡️ G-BRIDGE [{new Date().toLocaleTimeString('he-IL')}] | ✅ READY FOR DEVELOPMENT
-      </div>
-      
       <tt-container>
         <tt-section>
           <div className="auth-header">
             <div className="auth-logo">
-              <img src="./images/logo.svg" alt="TikTrack Logo" />
+              <img src="/images/logo.svg" alt="TikTrack Logo" />
             </div>
             <p className="auth-subtitle">הצטרפו לקהילת הסוחרים</p>
             <h1 className="auth-title">הרשמה</h1>
           </div>
 
-          <form className="js-register-form" onSubmit={handleSubmit}>
+          <form 
+            className="js-register-form" 
+            onSubmit={handleSubmit} 
+            noValidate
+            action="#"
+            method="post"
+          >
             {/* Error Feedback (hidden by default, shown on error) */}
-            <div className="auth-form__error js-error-feedback" hidden={!error}>
-              {error}
-            </div>
+            {error && (
+              <div className="auth-form__error js-error-feedback" role="alert" aria-live="polite">
+                {error}
+              </div>
+            )}
 
             <div className="form-group">
               <label className="form-label" htmlFor="username">
@@ -316,9 +305,9 @@ const RegisterForm = () => {
           </form>
 
           <div className="auth-footer-zone">
-            <a href="/login" className="auth-link js-login-link">
+            <Link to="/login" className="auth-link js-login-link">
               כבר יש לך חשבון? התחבר
-            </a>
+            </Link>
           </div>
         </tt-section>
       </tt-container>

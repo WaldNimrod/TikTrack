@@ -6,13 +6,13 @@ Status: COMPLETED
 FastAPI routes for user profile management.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, Any
 import logging
 
-from datetime import datetime
+from datetime import datetime, timezone
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -20,6 +20,7 @@ from ..core.database import get_db
 from ..services.auth import get_auth_service, TokenError, AuthenticationError
 from ..schemas.identity import UserResponse, UserUpdate, PasswordChangeRequest, PasswordChangeResponse
 from ..utils.dependencies import get_current_user
+from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
 
 logger = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ async def update_user_profile(
             current_user.phone_verified_at = None
         
         # Update timestamp
-        current_user.updated_at = datetime.utcnow()
+        current_user.updated_at = datetime.now(timezone.utc)
         
         await db.commit()
         await db.refresh(current_user)
@@ -91,15 +92,17 @@ async def update_user_profile(
         return UserResponse.from_model(current_user)
         
     except ValueError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
         )
     except Exception as e:
         logger.error(f"Profile update error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Profile update failed"
+            detail="Profile update failed",
+            error_code=ErrorCodes.USER_UPDATE_FAILED
         )
 
 
@@ -129,9 +132,10 @@ async def change_password(
         # Security Guard: Verify old password
         if not auth_service.verify_password(data.old_password, current_user.password_hash):
             # Generic error message (no user enumeration)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid password"
+                detail="Invalid password",
+                error_code=ErrorCodes.AUTH_INVALID_CREDENTIALS
             )
         
         # Hash new password
@@ -139,7 +143,7 @@ async def change_password(
         
         # Update user password
         current_user.password_hash = new_password_hash
-        current_user.updated_at = datetime.utcnow()
+        current_user.updated_at = datetime.now(timezone.utc)
         
         await db.commit()
         await db.refresh(current_user)
@@ -148,12 +152,13 @@ async def change_password(
         
         return PasswordChangeResponse(message="Password changed successfully")
         
-    except HTTPException:
-        # Re-raise HTTP exceptions (rate limit, validation, etc.)
+    except HTTPExceptionWithCode:
+        # Re-raise HTTP exceptions with error codes (rate limit, validation, etc.)
         raise
     except Exception as e:
         logger.error(f"Password change error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Password change failed"
+            detail="Password change failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )

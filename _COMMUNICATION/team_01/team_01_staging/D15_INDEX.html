@@ -265,9 +265,13 @@
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main>
-    <tt-container>
+  <!-- Page Wrapper: Full-width gray background, zero padding/margin on all sides -->
+  <div class="page-wrapper">
+    <!-- Page Container: Centered, max-width 1400px -->
+    <div class="page-container">
+      <!-- Main Content -->
+      <main>
+        <tt-container>
       <!-- Top Section: Active Alerts & Summary -->
       <tt-section data-section="top">
         <!-- Section Header -->
@@ -694,7 +698,7 @@
                     <img src="images/icons/entities/tickers.svg" alt="רשימת טיקרים" width="20" height="20" class="widget-placeholder__title-icon">
                     רשימת טיקרים
                   </h3>
-                  <button class="widget-placeholder__refresh-btn" aria-label="רענן" title="רענן">
+                  <button class="widget-placeholder__refresh-btn align-push-down" aria-label="רענן" title="רענן">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
                       <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
@@ -726,7 +730,7 @@
                     <img src="images/icons/entities/tickers.svg" alt="גרף טיקר" width="20" height="20" class="widget-placeholder__title-icon">
                     גרף טיקר
                   </h3>
-                  <button class="widget-placeholder__refresh-btn" aria-label="רענן" title="רענן">
+                  <button class="widget-placeholder__refresh-btn align-push-down" aria-label="רענן" title="רענן">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
                       <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
@@ -860,21 +864,21 @@
             <!-- Portfolio Filters (matches Legacy structure) -->
             <div class="portfolio-header-filters">
               <!-- Account Filter Dropdown -->
-              <select id="portfolioAccountFilter" class="portfolio-filter-select" aria-label="בחר חשבון מסחר">
+              <select id="portfolioAccountFilter" class="portfolio-filter-select align-push-down" aria-label="בחר חשבון מסחר">
                 <option value="">כל חשבונות המסחר</option>
                 <option value="1">חשבון 1</option>
                 <option value="2">חשבון 2</option>
               </select>
               
               <!-- Side Filter Buttons -->
-              <div class="portfolio-side-filters" role="group" id="portfolioSideFilterGroup">
+              <div class="portfolio-side-filters align-push-down" role="group" id="portfolioSideFilterGroup">
                 <button class="portfolio-side-filter-btn" data-side="" aria-label="הצג הכל" title="הצג הכל" type="button">↕</button>
                 <button class="portfolio-side-filter-btn portfolio-side-filter-long" data-side="long" aria-label="רק לונג" title="רק לונג" type="button">↑</button>
                 <button class="portfolio-side-filter-btn portfolio-side-filter-short" data-side="short" aria-label="רק שורט" title="רק שורט" type="button">↓</button>
               </div>
               
               <!-- Checkboxes Container -->
-              <div class="portfolio-checkboxes-container">
+              <div class="portfolio-checkboxes-container align-push-down">
                 <label class="portfolio-checkbox-label">
                   <input type="checkbox" id="portfolioIncludeClosed" class="portfolio-checkbox-input">
                   <span class="portfolio-checkbox-text">הצג פוזיציות סגורות</span>
@@ -1071,6 +1075,77 @@
         });
       });
     });
+
+    /* ============================================
+       Section Toggle Functionality
+       Centralized system-wide toggle for all sections
+       ============================================ */
+    (function initSectionToggle() {
+      // Find all toggle buttons
+      const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
+      
+      toggleButtons.forEach(button => {
+        // Find the parent section (tt-section)
+        const section = button.closest('tt-section');
+        if (!section) return;
+        
+        // Find the section body
+        const sectionBody = section.querySelector('.index-section__body, .dashboard-section__body');
+        if (!sectionBody) return;
+        
+        // Find the SVG icon inside the button
+        const icon = button.querySelector('svg');
+        
+        // Set initial state: sections are open by default
+        let isOpen = true;
+        
+        // Add click handler
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Toggle state
+          isOpen = !isOpen;
+          
+          // Toggle section body visibility with smooth animation
+          if (isOpen) {
+            // Open: Remove hidden attribute and restore display
+            sectionBody.removeAttribute('hidden');
+            // Use requestAnimationFrame to ensure smooth transition
+            requestAnimationFrame(() => {
+              sectionBody.style.display = '';
+            });
+            // Rotate icon to point down (open state)
+            if (icon) {
+              icon.style.transform = 'rotate(0deg)';
+            }
+            button.setAttribute('aria-expanded', 'true');
+          } else {
+            // Close: Set hidden attribute for CSS animation
+            sectionBody.setAttribute('hidden', '');
+            // Rotate icon to point up (closed state)
+            if (icon) {
+              icon.style.transform = 'rotate(180deg)';
+            }
+            button.setAttribute('aria-expanded', 'false');
+            // After animation completes, set display to none
+            setTimeout(() => {
+              if (sectionBody.hasAttribute('hidden')) {
+                sectionBody.style.display = 'none';
+              }
+            }, 300); // Match CSS transition duration
+          }
+        });
+        
+        // Set initial aria-expanded
+        button.setAttribute('aria-expanded', 'true');
+        
+        // Add transition for smooth icon rotation
+        if (icon) {
+          icon.style.transition = 'transform 0.2s ease';
+        }
+      });
+    })();
   </script>
       </main>
     </div>

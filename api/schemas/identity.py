@@ -175,6 +175,10 @@ class UserResponse(BaseModel):
     user_tier_levels: str = Field(default="Bronze", description="User tier level")
     username: Optional[str] = Field(None, description="Username")
     display_name: Optional[str] = Field(None, description="Display name")
+    first_name: Optional[str] = Field(None, description="First name")
+    last_name: Optional[str] = Field(None, description="Last name")
+    timezone: Optional[str] = Field(None, description="Timezone")
+    language: Optional[str] = Field(None, description="Language code")
     role: UserRole = Field(default=UserRole.USER, description="User role")
     is_email_verified: bool = Field(default=False, description="Email verification status")
     phone_verified: bool = Field(default=False, description="Phone verification status")
@@ -193,6 +197,10 @@ class UserResponse(BaseModel):
             user_tier_levels="Bronze",  # TODO: Implement tier logic
             username=user_model.username,
             display_name=user_model.display_name,
+            first_name=user_model.first_name,  # Added for profile editing
+            last_name=user_model.last_name,  # Added for profile editing
+            timezone=user_model.timezone,  # Added for profile editing
+            language=user_model.language,  # Added for profile editing
             role=user_model.role,
             is_email_verified=user_model.is_email_verified,
             phone_verified=user_model.phone_verified,
@@ -208,6 +216,10 @@ class UserResponse(BaseModel):
                 "user_tier_levels": "Bronze",
                 "username": "johndoe",
                 "display_name": "John Doe",
+                "first_name": "John",
+                "last_name": "Doe",
+                "timezone": "Asia/Jerusalem",
+                "language": "he",
                 "role": "USER",
                 "is_email_verified": True,
                 "phone_verified": False,

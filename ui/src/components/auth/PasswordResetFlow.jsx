@@ -9,7 +9,7 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../utils/audit.js';
 import { debugLog } from '../../utils/debug.js';
@@ -52,21 +52,13 @@ const PasswordResetFlow = () => {
   /**
    * Detect Method from Identifier
    * 
-   * @description מזהה אם המזהה הוא אימייל או טלפון
+   * @description מזהה אם המזהה הוא אימייל או טלפון באמצעות Schema
    * @param {string} identifier - אימייל או טלפון
    * @returns {string} - 'EMAIL' או 'SMS'
    */
   const detectMethod = (identifier) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-    
-    if (emailRegex.test(identifier.trim())) {
-      return 'EMAIL';
-    } else if (phoneRegex.test(identifier.trim())) {
-      return 'SMS';
-    }
-    // Default to EMAIL if unclear
-    return 'EMAIL';
+    const result = validateIdentifier(identifier);
+    return result.method || 'EMAIL';
   };
 
   /**
@@ -76,20 +68,27 @@ const PasswordResetFlow = () => {
     const { value } = e.target;
     setRequestData({ identifier: value });
     
-    // Auto-detect method
+    // Auto-detect method and validate using Schema
     if (value.trim()) {
-      setMethod(detectMethod(value));
-    }
-    
-    // Clear errors
-    if (error) setError(null);
-    if (fieldErrors.identifier) {
+      const identifierResult = validateIdentifier(value);
+      setMethod(identifierResult.method || 'EMAIL');
+      
+      // Update field error
+      setFieldErrors(prev => ({
+        ...prev,
+        identifier: identifierResult.error
+      }));
+    } else {
+      // Clear error if empty
       setFieldErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors.identifier;
         return newErrors;
       });
     }
+    
+    // Clear general error
+    if (error) setError(null);
   };
 
   /**
@@ -102,76 +101,63 @@ const PasswordResetFlow = () => {
       [name]: value
     }));
     
-    // Clear errors
-    if (error) setError(null);
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    // Validate field using Schema
+    const currentMethod = resetToken ? 'EMAIL' : 'SMS';
+    let validationResult = null;
+    
+    switch (name) {
+      case 'resetToken':
+        if (currentMethod === 'EMAIL') {
+          validationResult = validateResetToken(value);
+        }
+        break;
+      case 'verificationCode':
+        if (currentMethod === 'SMS') {
+          validationResult = validateVerificationCode(value, 6);
+        }
+        break;
+      case 'newPassword':
+        validationResult = validatePassword(value, { minLength: 8 });
+        break;
+      case 'confirmPassword':
+        validationResult = validateConfirmPassword(value, verifyData.newPassword);
+        break;
+      default:
+        break;
     }
+    
+    // Update field error
+    if (validationResult) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: validationResult.error
+      }));
+    }
+    
+    // Clear general error
+    if (error) setError(null);
   };
 
   /**
    * Validate Request Form
    */
   const validateRequestForm = () => {
-    const errors = {};
-    
-    if (!requestData.identifier.trim()) {
-      errors.identifier = 'שדה חובה';
-    } else {
-      const detectedMethod = detectMethod(requestData.identifier);
-      if (detectedMethod === 'EMAIL') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(requestData.identifier.trim())) {
-          errors.identifier = 'כתובת אימייל לא תקינה';
-        }
-      } else {
-        const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-        if (!phoneRegex.test(requestData.identifier.trim())) {
-          errors.identifier = 'מספר טלפון לא תקין (פורמט E.164: +972501234567)';
-        }
-      }
-    }
-    
+    const { isValid, errors, method: detectedMethod } = validatePasswordResetRequestForm(requestData);
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+    if (detectedMethod) {
+      setMethod(detectedMethod);
+    }
+    return isValid;
   };
 
   /**
    * Validate Verify Form
    */
   const validateVerifyForm = () => {
-    const errors = {};
-    
     const currentMethod = resetToken ? 'EMAIL' : 'SMS';
-    
-    if (currentMethod === 'EMAIL' && !verifyData.resetToken) {
-      errors.resetToken = 'שדה חובה';
-    }
-    
-    if (currentMethod === 'SMS' && !verifyData.verificationCode) {
-      errors.verificationCode = 'שדה חובה';
-    } else if (currentMethod === 'SMS' && verifyData.verificationCode.length !== 6) {
-      errors.verificationCode = 'קוד אימות חייב להכיל 6 ספרות';
-    }
-    
-    if (!verifyData.newPassword) {
-      errors.newPassword = 'שדה חובה';
-    } else if (verifyData.newPassword.length < 8) {
-      errors.newPassword = 'סיסמה חייבת להכיל לפחות 8 תווים';
-    }
-    
-    if (!verifyData.confirmPassword) {
-      errors.confirmPassword = 'שדה חובה';
-    } else if (verifyData.newPassword !== verifyData.confirmPassword) {
-      errors.confirmPassword = 'הסיסמאות אינן תואמות';
-    }
-    
+    const { isValid, errors } = validatePasswordResetVerifyForm(verifyData, currentMethod);
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   /**
@@ -262,11 +248,16 @@ const PasswordResetFlow = () => {
       }, 2000);
       
     } catch (err) {
-      const errorMessage = err.response?.data?.detail || 
-                          err.message || 
-                          'שגיאה באיפוס הסיסמה. אנא נסה שוב.';
+      // Use centralized error handler
+      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
       
-      setError(errorMessage);
+      // Merge API field errors with existing errors
+      if (Object.keys(apiErrors).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
+      }
+      
+      // Set form-level error
+      setError(apiError || 'שגיאה באיפוס הסיסמה. אנא נסה שוב.');
       audit.error('Auth', 'Password reset verify failed', err);
     } finally {
       setIsLoading(false);
@@ -277,15 +268,11 @@ const PasswordResetFlow = () => {
   if (isVerifyMode) {
     return (
       <div className="auth-layout-root" dir="rtl">
-        <div className="g-bridge-banner">
-          🛡️ G-BRIDGE [{new Date().toLocaleTimeString('he-IL')}] | ✅ READY FOR DEVELOPMENT
-        </div>
-        
         <tt-container>
           <tt-section>
             <div className="auth-header">
               <div className="auth-logo">
-                <img src="./images/logo.svg" alt="TikTrack Logo" />
+                <img src="/images/logo.svg" alt="TikTrack Logo" />
               </div>
               <p className="auth-subtitle">הזן סיסמה חדשה</p>
               <h1 className="auth-title">איפוס סיסמה</h1>
@@ -395,9 +382,9 @@ const PasswordResetFlow = () => {
             </form>
 
             <div className="auth-footer-zone">
-              <a href="/login" className="auth-link js-back-to-login-link">
+              <Link to="/login" className="auth-link js-back-to-login-link">
                 חזרה להתחברות
-              </a>
+              </Link>
             </div>
           </tt-section>
         </tt-container>
@@ -408,10 +395,6 @@ const PasswordResetFlow = () => {
   // Render Request Mode
   return (
     <div className="auth-layout-root" dir="rtl">
-      <div className="g-bridge-banner">
-        🛡️ G-BRIDGE [{new Date().toLocaleTimeString('he-IL')}] | ✅ READY FOR DEVELOPMENT
-      </div>
-      
       <tt-container>
         <tt-section>
           <div className="auth-header">
@@ -466,9 +449,9 @@ const PasswordResetFlow = () => {
           </form>
 
           <div className="auth-footer-zone">
-            <a href="/login" className="auth-link js-back-to-login-link">
+            <Link to="/login" className="auth-link js-back-to-login-link">
               חזרה להתחברות
-            </a>
+            </Link>
           </div>
         </tt-section>
       </tt-container>

@@ -6,7 +6,7 @@ Status: COMPLETED
 Main FastAPI application with all routes and middleware.
 """
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -17,6 +17,7 @@ import os
 
 from .core.config import settings
 from .routers import auth, users, api_keys
+from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -139,13 +140,59 @@ async def detailed_health_check():
     return health_status
 
 
+@app.exception_handler(HTTPExceptionWithCode)
+async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionWithCode):
+    """Handler for HTTPExceptionWithCode - always includes error_code."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "error_code": exc.error_code
+        },
+        headers=exc.headers
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """
+    Handler for standard HTTPException (fallback for Pydantic validation errors).
+    
+    Converts to HTTPExceptionWithCode with appropriate error code.
+    This ensures all errors have an error_code.
+    """
+    # Determine appropriate error code based on status code
+    if exc.status_code == 401:
+        error_code = ErrorCodes.AUTH_UNAUTHORIZED
+    elif exc.status_code == 403:
+        error_code = ErrorCodes.AUTH_UNAUTHORIZED
+    elif exc.status_code == 404:
+        error_code = ErrorCodes.USER_NOT_FOUND
+    elif exc.status_code == 400:
+        error_code = ErrorCodes.VALIDATION_INVALID_FORMAT
+    else:
+        error_code = ErrorCodes.SERVER_ERROR
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "error_code": error_code
+        },
+        headers=exc.headers
+    )
+
+
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    """Global exception handler."""
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for unhandled exceptions."""
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error"}
+        content={
+            "detail": "Internal server error",
+            "error_code": ErrorCodes.SERVER_ERROR
+        }
     )
 
 

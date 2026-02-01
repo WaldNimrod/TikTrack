@@ -9,10 +9,13 @@
  */
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { reactToApiPasswordChange } from '../../utils/transformers.js';
 import { audit } from '../../utils/audit.js';
 import { debugLog } from '../../utils/debug.js';
+import { validatePasswordChangeForm, validatePasswordChange, validateConfirmPassword } from '../../logic/schemas/authSchema.js';
+import { handleApiError } from '../../utils/errorHandler.js';
 
 /**
  * PasswordChangeForm Component
@@ -42,7 +45,7 @@ const PasswordChangeForm = () => {
   /**
    * Handle Input Change
    * 
-   * @description מעדכן את state של הטופס
+   * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
@@ -52,13 +55,32 @@ const PasswordChangeForm = () => {
       [name]: value
     }));
     
-    // Clear field error when user types
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    // Validate field using Schema
+    let validationResult = null;
+    switch (name) {
+      case 'currentPassword':
+        if (!value) {
+          validationResult = { isValid: false, error: 'שדה חובה' };
+        } else {
+          validationResult = { isValid: true, error: null };
+        }
+        break;
+      case 'newPassword':
+        validationResult = validatePasswordChange(value, formData.currentPassword);
+        break;
+      case 'confirmPassword':
+        validationResult = validateConfirmPassword(value, formData.newPassword);
+        break;
+      default:
+        break;
+    }
+    
+    // Update field error
+    if (validationResult) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: validationResult.error
+      }));
     }
     
     // Clear general error and success
@@ -73,45 +95,18 @@ const PasswordChangeForm = () => {
   /**
    * Validate Form
    * 
-   * @description בודק תקינות הטופס לפני שליחה
+   * @description בודק תקינות הטופס לפני שליחה באמצעות Schema מרכזי
    * @returns {boolean} - true אם הטופס תקין
    */
   const validateForm = () => {
-    const errors = {};
-    
-    // Current password validation
-    if (!formData.currentPassword) {
-      errors.currentPassword = 'שדה חובה';
-    }
-    
-    // New password validation
-    if (!formData.newPassword) {
-      errors.newPassword = 'שדה חובה';
-    } else if (formData.newPassword.length < 8) {
-      errors.newPassword = 'סיסמה חייבת להכיל לפחות 8 תווים';
-    }
-    
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = 'שדה חובה';
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      errors.confirmPassword = 'הסיסמאות אינן תואמות';
-    }
-    
-    // Check if new password is different from current
-    if (formData.currentPassword && formData.newPassword && 
-        formData.currentPassword === formData.newPassword) {
-      errors.newPassword = 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית';
-    }
-    
+    const { isValid, errors } = validatePasswordChangeForm(formData);
     setFieldErrors(errors);
     
-    if (Object.keys(errors).length > 0) {
+    if (!isValid) {
       audit.log('PasswordChangeForm', 'Form validation failed', { fieldErrors: errors });
-      return false;
     }
     
-    return true;
+    return isValid;
   };
 
   /**
@@ -164,12 +159,21 @@ const PasswordChangeForm = () => {
     } catch (err) {
       debugLog('PasswordChangeForm', 'Password change error', err);
       
-      // Extract error message
-      const errorMessage = err.response?.data?.detail || 
-                          err.message || 
-                          'שגיאה בשינוי הסיסמה. אנא נסה שוב.';
+      // Use centralized error handler
+      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
       
-      setError(errorMessage);
+      // Merge API field errors with existing errors
+      if (Object.keys(apiErrors).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
+      }
+      
+      // Set form-level error
+      if (apiError) {
+        setError(apiError);
+      } else {
+        setError('שגיאה בשינוי הסיסמה. אנא נסה שוב.');
+      }
+      
       audit.error('PasswordChangeForm', 'Password change failed', err);
     } finally {
       setIsLoading(false);
@@ -177,31 +181,37 @@ const PasswordChangeForm = () => {
   };
 
   return (
-    <tt-section data-title="אבטחת חשבון">
-      <p className="subtitle-sm">ניהול סיסמה והגדרות אבטחה.</p>
-      
-      <form onSubmit={handleSubmit} className="auth-form">
-        {/* General Error Display (LEGO Structure) */}
-        {error && (
-          <tt-container>
-            <tt-section>
-              <div className="auth-form__error js-error-feedback js-password-change-error" role="alert">
+    <div className="auth-layout-root" dir="rtl">
+      <tt-container>
+        <tt-section>
+          <div className="auth-header">
+            <div className="auth-logo">
+              <img src="/images/logo.svg" alt="TikTrack Logo" />
+            </div>
+            <p className="auth-subtitle">ניהול אבטחת החשבון</p>
+            <h1 className="auth-title">שינוי סיסמה</h1>
+          </div>
+
+          <form 
+            className="js-password-change-form" 
+            onSubmit={handleSubmit} 
+            noValidate
+            action="#"
+            method="post"
+          >
+            {/* Error Feedback (hidden by default, shown on error) */}
+            {error && (
+              <div className="auth-form__error js-error-feedback js-password-change-error" role="alert" aria-live="polite">
                 {error}
               </div>
-            </tt-section>
-          </tt-container>
-        )}
-        
-        {/* Success Message */}
-        {success && (
-          <tt-container>
-            <tt-section>
-              <div className="auth-form__success js-success-feedback js-password-change-success" role="alert" style={{ color: 'var(--color-brand)', padding: '12px', backgroundColor: 'var(--color-5)', borderRadius: '4px', marginBottom: '16px' }}>
+            )}
+            
+            {/* Success Message */}
+            {success && (
+              <div className="auth-form__success js-success-feedback js-password-change-success" role="alert" style={{ color: 'var(--color-brand)', padding: '0.75rem 1rem', backgroundColor: '#e6f7f5', border: '1px solid var(--color-brand)', borderRadius: '8px', marginBottom: 'var(--spacing-md, 16px)', textAlign: 'center' }}>
                 {success}
               </div>
-            </tt-section>
-          </tt-container>
-        )}
+            )}
         
         {/* Current Password Field */}
         <div className="form-group">
@@ -374,16 +384,25 @@ const PasswordChangeForm = () => {
           )}
         </div>
         
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="btn btn-full js-password-change-submit"
-          disabled={isLoading}
-        >
-          {isLoading ? 'מעדכן...' : 'עדכן סיסמה'}
-        </button>
-      </form>
-    </tt-section>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="btn-auth-primary js-password-change-submit"
+              disabled={isLoading}
+            >
+              {isLoading ? 'מעדכן...' : 'עדכן סיסמה'}
+            </button>
+          </form>
+
+          {/* Navigation Links */}
+          <div className="auth-footer-zone" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <Link to="/profile" className="auth-link js-back-to-profile-link">
+              חזרה לפרופיל
+            </Link>
+          </div>
+        </tt-section>
+      </tt-container>
+    </div>
   );
 };
 

@@ -128,25 +128,48 @@ curl http://localhost:8082/health
 
 ---
 
-## 👥 System Users
+## 👥 System Users (Base Infrastructure Users)
 
-### **User 1: Primary Administrator**
-- **Username:** `nimrod`
+**⚠️ IMPORTANT:** These are **permanent infrastructure users** that form the foundation of the system. **DO NOT DELETE** these users.
+
+### **User 1: TikTrackAdmin (Super Administrator)**
+- **Username:** `TikTrackAdmin`
+- **Display Name:** `TikTrack Admin`
 - **Email:** `nimrod@mezoo.co`
 - **Phone:** `NULL` (no phone number)
-- **Password:** `4181`
+- **Password:** `4181` (will be updated later)
 - **Role:** `SUPERADMIN`
-- **Status:** ✅ **CREATED** - Active, Email verified
+- **Status:** ✅ **PERMANENT** - Active, Email verified
+- **Purpose:** System super administrator with full system access
 
-### **User 2: Secondary Administrator**
+### **User 2: nimrod_wald (Administrator)**
 - **Username:** `nimrod_wald`
+- **Display Name:** `Nimrod Wald`
 - **Email:** `waldnimrod@gmail.com`
-- **Phone:** `NULL` (no phone number)
-- **Password:** `4181`
+- **Phone:** Verified (phone_verified: True)
+- **Password:** `4181` (will be updated later)
 - **Role:** `ADMIN`
-- **Status:** ✅ **CREATED** - Active, Email verified
+- **Status:** ✅ **PERMANENT** - Active, Email verified, Phone verified
+- **Purpose:** System administrator with administrative privileges
+
+### **User 3: test_user (Test User)**
+- **Username:** `test_user`
+- **Display Name:** `Test User`
+- **Email:** `test_qa_1769933177@example.com`
+- **Phone:** `NULL` (no phone number)
+- **Password:** `4181` (will be updated later)
+- **Role:** `USER`
+- **Status:** ✅ **PERMANENT** - Active (for testing purposes)
+- **Purpose:** QA testing, development testing, integration testing
 
 **Password Hash:** `$2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqcAP8an.qQtG` (bcrypt for password `4181`)
+
+### **Protection Rules:**
+- ✅ **DO NOT DELETE** - These users are infrastructure
+- ✅ **DO NOT DEACTIVATE** - Required for system operation
+- ✅ **DO NOT CHANGE ROLES** - Without approval
+- ✅ **DO NOT CHANGE EMAILS** - Without approval
+- ✅ **ALLOWED:** Password updates (security), Phone/Email verification updates, Profile information updates
 
 ⚠️ **SECURITY:** User passwords are bcrypt hashed in database. Never store plain text passwords.
 

@@ -8,7 +8,7 @@ Implements full CRUD operations with encryption and masking.
 """
 
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, status, Body
 from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -17,6 +17,7 @@ import logging
 from ..core.database import get_db
 from ..utils.dependencies import get_current_user
 from ..utils.identity import ulid_to_uuid
+from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
 from ..schemas.identity import UserApiKeyCreate, UserApiKeyResponse
 from ..services.api_keys import get_api_key_service, ApiKeyError
@@ -54,9 +55,10 @@ async def list_api_keys(
         
     except Exception as e:
         logger.error(f"List API keys error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to list API keys"
+            detail="Failed to list API keys",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -83,15 +85,17 @@ async def create_api_key(
         return UserApiKeyResponse.from_model(api_key)
         
     except ApiKeyError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.API_KEY_CREATE_FAILED
         )
     except Exception as e:
         logger.error(f"Create API key error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create API key"
+            detail="Failed to create API key",
+            error_code=ErrorCodes.API_KEY_CREATE_FAILED
         )
 
 
@@ -136,20 +140,23 @@ async def update_api_key(
         return UserApiKeyResponse.from_model(api_key)
         
     except ApiKeyError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.API_KEY_NOT_FOUND
         )
     except ValueError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid key ID: {str(e)}"
+            detail=f"Invalid key ID: {str(e)}",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
         )
     except Exception as e:
         logger.error(f"Update API key error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update API key"
+            detail="Failed to update API key",
+            error_code=ErrorCodes.API_KEY_UPDATE_FAILED
         )
 
 
@@ -178,20 +185,23 @@ async def delete_api_key(
         return None
         
     except ApiKeyError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.API_KEY_NOT_FOUND
         )
     except ValueError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid key ID: {str(e)}"
+            detail=f"Invalid key ID: {str(e)}",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
         )
     except Exception as e:
         logger.error(f"Delete API key error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete API key"
+            detail="Failed to delete API key",
+            error_code=ErrorCodes.API_KEY_DELETE_FAILED
         )
 
 
@@ -224,18 +234,21 @@ async def verify_api_key(
         }
         
     except ApiKeyError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.API_KEY_NOT_FOUND
         )
     except ValueError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid key ID: {str(e)}"
+            detail=f"Invalid key ID: {str(e)}",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
         )
     except Exception as e:
         logger.error(f"Verify API key error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to verify API key"
+            detail="Failed to verify API key",
+            error_code=ErrorCodes.API_KEY_VERIFY_FAILED
         )

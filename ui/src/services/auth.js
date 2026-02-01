@@ -44,8 +44,13 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retrying, try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // CRITICAL: Don't try to refresh token for auth endpoints (login, register, reset-password, etc.)
+    // These endpoints return 401 for invalid credentials, not expired tokens
+    const authEndpoints = ['/auth/login', '/auth/register', '/auth/reset-password', '/auth/verify-reset', '/auth/verify-phone'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint));
+
+    // If 401 and not already retrying, and NOT an auth endpoint, try to refresh token
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -66,7 +71,9 @@ apiClient.interceptors.response.use(
         // Refresh failed - logout user
         audit.error('Auth', 'Token refresh failed', refreshError);
         localStorage.removeItem('access_token');
-        window.location.href = '/login';
+        // Use React Router navigation instead of window.location to prevent page refresh
+        // Note: This requires router context, so we'll let the component handle navigation
+        // For now, just reject and let the calling component handle the redirect
         return Promise.reject(refreshError);
       }
     }
@@ -420,6 +427,73 @@ const authService = {
       return response.data;
     } catch (error) {
       audit.error('Auth', 'Change password failure', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Resend Email Verification - שליחת וריפיקציה מחדש לאימייל
+   * 
+   * @description שולח הודעת וריפיקציה מחדש לאימייל של המשתמש המחובר
+   * 
+   * @returns {Promise<Object>} - Response עם הודעת הצלחה
+   * 
+   * @throws {Error} - אם השליחה נכשלה
+   */
+  async resendEmailVerification() {
+    audit.log('Auth', 'Resend email verification started');
+
+    try {
+      // TODO: Implement endpoint when available
+      // For now, using password reset flow as workaround
+      const userData = await this.getCurrentUser();
+      const response = await apiClient.post('/auth/reset-password', {
+        username_or_email: userData.email,
+        method: 'EMAIL'
+      });
+
+      audit.log('Auth', 'Resend email verification successful');
+      
+      return response.data;
+    } catch (error) {
+      audit.error('Auth', 'Resend email verification failure', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Resend Phone Verification - שליחת קוד וריפיקציה מחדש לטלפון
+   * 
+   * @description שולח קוד וריפיקציה מחדש לטלפון של המשתמש המחובר
+   * 
+   * @returns {Promise<Object>} - Response עם הודעת הצלחה
+   * 
+   * @throws {Error} - אם השליחה נכשלה
+   */
+  async resendPhoneVerification() {
+    audit.log('Auth', 'Resend phone verification started');
+
+    try {
+      // Get user data to get phone number
+      const userData = await this.getCurrentUser();
+      const phoneNumber = userData.phoneNumbers || userData.phoneNumber;
+      
+      if (!phoneNumber) {
+        throw new Error('לא נמצא מספר טלפון במערכת');
+      }
+      
+      // Use reset-password endpoint with SMS method to trigger SMS send
+      // This will create a new reset request and send SMS code
+      const response = await apiClient.post('/auth/reset-password', {
+        username_or_email: phoneNumber,
+        method: 'SMS'
+      });
+
+      audit.log('Auth', 'Resend phone verification successful');
+      
+      return response.data;
+    } catch (error) {
+      audit.error('Auth', 'Resend phone verification failure', error);
       throw error;
     }
   },

@@ -8,9 +8,10 @@ Implements refresh token rotation with httpOnly cookies.
 Based on GIN-2026-008 + Architectural Answer (Appendix A).
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie, Body
+from fastapi import APIRouter, Depends, status, Response, Cookie, Body
+from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import and_
@@ -55,7 +56,7 @@ def set_refresh_token_cookie(
         expires_at: Token expiration datetime
     """
     # Calculate max_age in seconds
-    max_age = int((expires_at - datetime.utcnow()).total_seconds())
+    max_age = int((expires_at - datetime.now(timezone.utc)).total_seconds())
     
     # Use "strict" in production for better CSRF protection
     # "lax" is acceptable for development and allows redirects
@@ -101,9 +102,10 @@ async def register(
         # Validate input
         if not request.username or not request.email or not request.password:
             logger.warning("Registration attempt with missing required fields")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username, email, and password are required"
+                detail="Username, email, and password are required",
+                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED
             )
         
         # Get auth service
@@ -113,9 +115,10 @@ async def register(
             logger.debug("AuthService initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authentication service unavailable"
+                detail="Authentication service unavailable",
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE
             )
         
         # Attempt registration
@@ -133,16 +136,19 @@ async def register(
             # Log detailed error for debugging (will be removed in production)
             logger.error(f"Registration failed for user: {request.username} (authentication error: {str(e)})", exc_info=True)
             # Generic error message to prevent information leakage
-            raise HTTPException(
+            error_code = ErrorCodes.USER_ALREADY_EXISTS if "already exists" in str(e).lower() else ErrorCodes.USER_UPDATE_FAILED
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Registration failed. Please check your input. Error: {str(e)}"
+                detail=f"Registration failed. Please check your input. Error: {str(e)}",
+                error_code=error_code
             )
         except Exception as e:
             # Log detailed error for debugging
             logger.error(f"Registration service error: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Registration processing failed"
+                detail="Registration processing failed",
+                error_code=ErrorCodes.SERVER_ERROR
             )
         
         # Set refresh token in httpOnly cookie
@@ -166,16 +172,17 @@ async def register(
         logger.info(f"Registration successful for user: {request.username}")
         return register_response
         
-    except HTTPException:
-        # Re-raise HTTP exceptions (already formatted)
+    except HTTPExceptionWithCode:
+        # Re-raise HTTP exceptions with error codes (already formatted)
         raise
     except Exception as e:
         # Log full error details for debugging
         logger.error(f"Registration error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True)
         logger.error(f"Error traceback:", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Registration failed"
+            detail="Registration failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -196,9 +203,10 @@ async def login(
         # Validate input
         if not request.username_or_email or not request.password:
             logger.warning("Login attempt with missing credentials")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username/email and password are required"
+                detail="Username/email and password are required",
+                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED
             )
         
         # Check database connection
@@ -210,9 +218,10 @@ async def login(
             logger.debug("Database connection OK")
         except Exception as e:
             logger.error(f"Database connection failed: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database connection failed"
+                detail="Database connection failed",
+                error_code=ErrorCodes.DATABASE_ERROR
             )
         
         # Get auth service
@@ -223,15 +232,17 @@ async def login(
         except ValueError as e:
             # JWT_SECRET_KEY validation error
             logger.error(f"AuthService initialization failed (configuration): {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authentication service configuration error"
+                detail="Authentication service configuration error",
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE
             )
         except Exception as e:
             logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authentication service unavailable"
+                detail="Authentication service unavailable",
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE
             )
         
         # Attempt login
@@ -246,16 +257,18 @@ async def login(
         except AuthenticationError as e:
             # Generic error message to prevent information leakage
             logger.info(f"Login failed for user: {request.username_or_email[:3]}*** (authentication error)")
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials"
+                detail="Invalid credentials",
+                error_code=ErrorCodes.AUTH_INVALID_CREDENTIALS
             )
         except Exception as e:
             # Catch any other errors from auth service
             logger.error(f"Login service error: {type(e).__name__}: {str(e)}", exc_info=True)
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Login processing failed"
+                detail="Login processing failed",
+                error_code=ErrorCodes.SERVER_ERROR
             )
         
         # Set refresh token in httpOnly cookie
@@ -279,16 +292,17 @@ async def login(
         logger.info(f"Login successful for user: {request.username_or_email[:3]}***")
         return login_response
         
-    except HTTPException:
-        # Re-raise HTTP exceptions (already formatted)
+    except HTTPExceptionWithCode:
+        # Re-raise HTTP exceptions with error codes (already formatted)
         raise
     except Exception as e:
         # Log full error details for debugging
         logger.error(f"Login error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True)
         logger.error(f"Error traceback:", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Login failed"
+            detail="Login failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -305,9 +319,10 @@ async def refresh_token(
     Returns new access token and sets new refresh token in cookie.
     """
     if not refresh_token:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token not provided"
+            detail="Refresh token not provided",
+            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_MISSING
         )
     
     try:
@@ -332,15 +347,17 @@ async def refresh_token(
         return refresh_response
         
     except TokenError as e:
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_INVALID
         )
     except Exception as e:
         logger.error(f"Token refresh error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Token refresh failed"
+            detail="Token refresh failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -375,17 +392,19 @@ async def logout(
     except TokenError as e:
         # Even if token is invalid, clear cookie
         clear_refresh_token_cookie(response)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e)
+            detail=str(e),
+            error_code=ErrorCodes.AUTH_TOKEN_INVALID
         )
     except Exception as e:
         logger.error(f"Logout error: {str(e)}", exc_info=True)
         # Clear cookie even on error
         clear_refresh_token_cookie(response)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Logout failed"
+            detail="Logout failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -425,9 +444,10 @@ async def reset_password(
         }
     except Exception as e:
         logger.error(f"Password reset error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Password reset request failed"
+            detail="Password reset request failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -458,15 +478,26 @@ async def verify_reset(
         }
         
     except PasswordResetError as e:
-        raise HTTPException(
+        error_code = ErrorCodes.PASSWORD_RESET_INVALID_TOKEN
+        if "expired" in str(e).lower():
+            error_code = ErrorCodes.PASSWORD_RESET_TOKEN_EXPIRED
+        elif "code" in str(e).lower() and "invalid" in str(e).lower():
+            error_code = ErrorCodes.PASSWORD_RESET_INVALID_CODE
+        elif "expired" in str(e).lower() and "code" in str(e).lower():
+            error_code = ErrorCodes.PASSWORD_RESET_CODE_EXPIRED
+        elif "attempts" in str(e).lower():
+            error_code = ErrorCodes.PASSWORD_RESET_MAX_ATTEMPTS
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(e),
+            error_code=error_code
         )
     except Exception as e:
         logger.error(f"Password reset verification error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Password reset verification failed"
+            detail="Password reset verification failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )
 
 
@@ -485,9 +516,10 @@ async def verify_phone(
     try:
         # Check if user has phone number
         if not current_user.phone_number:
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No phone number associated with account"
+                detail="No phone number associated with account",
+                error_code=ErrorCodes.PASSWORD_RESET_NO_PHONE
             )
         
         # Check if already verified
@@ -534,24 +566,27 @@ async def verify_phone(
             if reset_request.attempts_count >= reset_request.max_attempts:
                 reset_request.status = "EXPIRED"
                 await db.commit()
-                raise HTTPException(
+                raise HTTPExceptionWithCode(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Maximum verification attempts exceeded. Please request a new code."
+                    detail="Maximum verification attempts exceeded. Please request a new code.",
+                    error_code=ErrorCodes.PASSWORD_RESET_MAX_ATTEMPTS
                 )
             
             await db.commit()
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid verification code"
+                detail="Invalid verification code",
+                error_code=ErrorCodes.PASSWORD_RESET_INVALID_CODE
             )
         
         # Check expiration
         if reset_request.code_expires_at and reset_request.code_expires_at < datetime.utcnow():
             reset_request.status = "EXPIRED"
             await db.commit()
-            raise HTTPException(
+            raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Verification code has expired. Please request a new code."
+                detail="Verification code has expired. Please request a new code.",
+                error_code=ErrorCodes.PASSWORD_RESET_CODE_EXPIRED
             )
         
         # Code is valid - mark phone as verified
@@ -572,11 +607,12 @@ async def verify_phone(
             "verified_at": current_user.phone_verified_at.isoformat()
         }
         
-    except HTTPException:
+    except HTTPExceptionWithCode:
         raise
     except Exception as e:
         logger.error(f"Phone verification error: {str(e)}", exc_info=True)
-        raise HTTPException(
+        raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Phone verification failed"
+            detail="Phone verification failed",
+            error_code=ErrorCodes.SERVER_ERROR
         )

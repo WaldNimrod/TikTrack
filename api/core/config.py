@@ -31,8 +31,23 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
         case_sensitive = False
         extra = "ignore"  # Ignore extra fields in .env that aren't in Settings
+        
+        @classmethod
+        def customise_sources(
+            cls,
+            init_settings,
+            env_settings,
+            file_secret_settings,
+        ):
+            # Priority: env_file (.env) > environment variables > init_settings
+            return (
+                init_settings,
+                env_settings,
+                file_secret_settings,
+            )
 
 
 # Global settings instance

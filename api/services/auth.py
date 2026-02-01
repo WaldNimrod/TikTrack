@@ -280,6 +280,7 @@ class AuthService:
         """
         try:
             # Find user by username or email
+            logger.debug(f"Looking up user: {username_or_email}")
             stmt = select(User).where(
                 (User.username == username_or_email) | (User.email == username_or_email)
             ).where(User.deleted_at.is_(None))
@@ -288,20 +289,28 @@ class AuthService:
             user = result.scalar_one_or_none()
             
             if not user:
+                logger.warning(f"User not found: {username_or_email}")
                 raise AuthenticationError("Invalid credentials")
+            
+            logger.debug(f"User found: {user.username}, email: {user.email}, is_active: {user.is_active}")
             
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.utcnow():
+                logger.warning(f"Account locked: {user.username}")
                 raise AuthenticationError("Account is locked")
             
             # Verify password
+            logger.debug(f"Verifying password for user: {user.username}")
+            logger.debug(f"Password hash (first 50 chars): {user.password_hash[:50]}...")
             try:
                 password_valid = self.verify_password(password, user.password_hash)
+                logger.debug(f"Password verification result: {password_valid}")
             except Exception as e:
                 logger.error(f"Password verification error: {type(e).__name__}: {str(e)}", exc_info=True)
                 raise AuthenticationError("Invalid credentials")
             
             if not password_valid:
+                logger.warning(f"Password verification failed for user: {user.username}")
                 # Increment failed login attempts
                 try:
                     user.failed_login_attempts += 1

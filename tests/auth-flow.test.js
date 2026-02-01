@@ -40,8 +40,23 @@ describe('Authentication Flow Integration Tests', () => {
 
       // Submit form
       await clickElement(driver, 'button[type="submit"]');
-      await driver.sleep(2000);
+      await driver.sleep(3000);
 
+      // Check console logs for errors
+      const consoleLogs = await getConsoleLogs(driver);
+      const errors = consoleLogs.filter(log => log.level === 'SEVERE' || log.message.includes('error') || log.message.includes('Error'));
+      if (errors.length > 0) {
+        logger.log('Registration - Console Errors', 'FAIL', { 
+          message: 'Console errors detected',
+          errors: errors.map(e => e.message).slice(0, 5)
+        });
+        // Log all console errors for debugging
+        console.log('Console Errors:', errors.map(e => `${e.level}: ${e.message}`).join('\n'));
+      }
+
+      // Check current URL to see if we're still on register page (error) or redirected
+      const currentUrlBeforeCheck = await driver.getCurrentUrl();
+      
       // Verify: Token stored in localStorage
       const accessToken = await getLocalStorageValue(driver, 'access_token');
       if (accessToken) {
@@ -50,7 +65,13 @@ describe('Authentication Flow Integration Tests', () => {
           tokenLength: accessToken.length 
         });
       } else {
-        throw new Error('Access token not found in localStorage');
+        // Check for error messages on page
+        const errorElement = await elementExists(driver, '.auth-form__error, .js-error-feedback, [role="alert"]');
+        if (errorElement) {
+          const errorText = await getElementText(driver, '.auth-form__error, .js-error-feedback, [role="alert"]');
+          throw new Error(`Registration failed: ${errorText || 'Unknown error'}. Current URL: ${currentUrlBeforeCheck}`);
+        }
+        throw new Error(`Access token not found in localStorage. Current URL: ${currentUrlBeforeCheck}. Console errors: ${errors.length}`);
       }
 
       // Verify: Redirect to dashboard
@@ -110,7 +131,22 @@ describe('Authentication Flow Integration Tests', () => {
 
       // Submit form
       await clickElement(driver, 'button[type="submit"]');
-      await driver.sleep(2000);
+      await driver.sleep(3000);
+
+      // Check console logs for errors
+      const consoleLogs = await getConsoleLogs(driver);
+      const errors = consoleLogs.filter(log => log.level === 'SEVERE' || log.message.includes('error') || log.message.includes('Error'));
+      if (errors.length > 0) {
+        logger.log('Login - Console Errors', 'FAIL', { 
+          message: 'Console errors detected',
+          errors: errors.map(e => e.message).slice(0, 5)
+        });
+        // Log all console errors for debugging
+        console.log('Console Errors:', errors.map(e => `${e.level}: ${e.message}`).join('\n'));
+      }
+
+      // Check current URL to see if we're still on login page (error) or redirected
+      const currentUrlBeforeCheck = await driver.getCurrentUrl();
 
       // Verify: Token stored
       const accessToken = await getLocalStorageValue(driver, 'access_token');
@@ -120,7 +156,13 @@ describe('Authentication Flow Integration Tests', () => {
           tokenLength: accessToken.length 
         });
       } else {
-        throw new Error('Access token not found');
+        // Check for error messages on page
+        const errorElement = await elementExists(driver, '.auth-form__error, .js-error-feedback, [role="alert"]');
+        if (errorElement) {
+          const errorText = await getElementText(driver, '.auth-form__error, .js-error-feedback, [role="alert"]');
+          throw new Error(`Login failed: ${errorText || 'Unknown error'}. Current URL: ${currentUrlBeforeCheck}`);
+        }
+        throw new Error(`Access token not found. Current URL: ${currentUrlBeforeCheck}. Console errors: ${errors.length}`);
       }
 
       // Verify: Redirect to dashboard

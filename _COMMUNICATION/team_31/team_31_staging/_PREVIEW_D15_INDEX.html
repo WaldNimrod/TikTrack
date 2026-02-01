@@ -5,7 +5,7 @@
     body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
     .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:10002; text-align:center; }
 </style></head><body>
-<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [10:51:06] | APPROVED | FIDELITY READY</div>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.0 [10:55:52] | APPROVED | FIDELITY READY</div>
 <main id="phoenix-root"><!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -157,10 +157,10 @@
           
           <!-- Logo Section -->
           <div class="logo-section">
-            <div class="logo-wrapper">
-              <img src="./images/logo.svg" alt="TikTrack Logo" class="logo-img">
-              <span class="logo-slogan">פשוט לנהל תיק</span>
-            </div>
+            <a href="/" class="logo">
+              <img src="./images/logo.svg" alt="TikTrack Logo" class="logo-image">
+              <span class="logo-text">פשוט לנהל תיק</span>
+            </a>
           </div>
         </div>
       </div>
@@ -990,25 +990,26 @@
       });
 
       // Portfolio Summary Toggle Functionality
+      // Portfolio Summary Toggle Functionality - Toggle second row visibility (id="portfolioSummaryContent")
       const portfolioToggleBtn = document.getElementById('portfolioSummaryToggleSize');
-      const portfolioStatsRowSecond = document.getElementById('portfolioSummaryStatsRowSecond');
+      const portfolioSummaryContent = document.getElementById('portfolioSummaryContent');
       
-      if (portfolioToggleBtn && portfolioStatsRowSecond) {
+      if (portfolioToggleBtn && portfolioSummaryContent) {
         portfolioToggleBtn.addEventListener('click', function() {
-          const isExpanded = portfolioStatsRowSecond.style.display !== 'none';
+          const isHidden = portfolioSummaryContent.style.display === 'none' || !portfolioSummaryContent.style.display;
           
-          if (isExpanded) {
-            portfolioStatsRowSecond.style.display = 'none';
-            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מלא');
-            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מלא');
-            // Change icon to eye (show more)
-            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>';
-          } else {
-            portfolioStatsRowSecond.style.display = 'flex';
+          if (isHidden) {
+            portfolioSummaryContent.style.display = 'flex';
             portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מצומצם');
             portfolioToggleBtn.setAttribute('title', 'הצג סיכום מצומצם');
             // Change icon to eye-off (show less)
             portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+          } else {
+            portfolioSummaryContent.style.display = 'none';
+            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מלא');
+            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מלא');
+            // Change icon to eye (show more)
+            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>';
           }
         });
       }

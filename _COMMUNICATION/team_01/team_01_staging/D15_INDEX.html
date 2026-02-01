@@ -149,10 +149,10 @@
           
           <!-- Logo Section -->
           <div class="logo-section">
-            <div class="logo-wrapper">
-              <img src="./images/logo.svg" alt="TikTrack Logo" class="logo-img">
-              <span class="logo-slogan">פשוט לנהל תיק</span>
-            </div>
+            <a href="/" class="logo">
+              <img src="./images/logo.svg" alt="TikTrack Logo" class="logo-image">
+              <span class="logo-text">פשוט לנהל תיק</span>
+            </a>
           </div>
         </div>
       </div>
@@ -504,6 +504,12 @@
             <!-- Widget Placeholder: Recent Items -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
+                <div class="widget-placeholder__header-title-row">
+                  <h3 class="widget-placeholder__title">
+                    <img src="images/icons/entities/trades.svg" alt="טריידים אחרונים" width="20" height="20" class="widget-placeholder__title-icon">
+                    טריידים אחרונים
+                  </h3>
+                </div>
                 <ul class="widget-placeholder__tabs" role="tablist">
                   <li class="widget-placeholder__tab-item" role="presentation">
                     <button class="widget-placeholder__tab-btn widget-placeholder__tab-btn--active" role="tab" aria-selected="true" aria-controls="recentTradesPane">טריידים אחרונים</button>
@@ -604,7 +610,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/trades.svg" alt="פעולות ממתינות" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="images/icons/entities/executions.svg" alt="פעולות ממתינות" width="20" height="20" class="widget-placeholder__title-icon">
                     פעולות ממתינות
                   </h3>
                   <div class="widget-placeholder__header-badges">
@@ -683,7 +689,29 @@
             <!-- Widget Placeholder: Ticker List -->
             <div class="widget-placeholder">
               <div class="widget-placeholder__header">
-                <h3 class="widget-placeholder__title">רשימת טיקרים</h3>
+                <div class="widget-placeholder__header-title-row">
+                  <h3 class="widget-placeholder__title">
+                    <img src="images/icons/entities/tickers.svg" alt="רשימת טיקרים" width="20" height="20" class="widget-placeholder__title-icon">
+                    רשימת טיקרים
+                  </h3>
+                  <button class="widget-placeholder__refresh-btn" aria-label="רענן" title="רענן">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                    </svg>
+                  </button>
+                </div>
+                <ul class="widget-placeholder__tabs" role="tablist">
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn widget-placeholder__tab-btn--active" role="tab" aria-selected="true" aria-controls="tickerActivePane">טיקרים פעילים</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="tickerWatchlistPane">רשימת צפיה</button>
+                  </li>
+                  <li class="widget-placeholder__tab-item" role="presentation">
+                    <button class="widget-placeholder__tab-btn" role="tab" aria-selected="false" aria-controls="tickerAllPane">כל הטיקרים</button>
+                  </li>
+                </ul>
               </div>
               <div class="widget-placeholder__body">
                 <p class="widget-placeholder__text">Widget ייבנה בשלב מאוחר</p>
@@ -935,8 +963,10 @@
           </div>
         </div>
       </tt-section>
-    </tt-container>
-  </main>
+        </tt-container>
+      </main>
+    </div>
+  </div>
 
   <!-- Header Filter Toggle JavaScript -->
   <script>
@@ -1042,6 +1072,9 @@
       });
     });
   </script>
+      </main>
+    </div>
+  </div>
   
   <!-- G-Bridge Banner: Moved to footer to avoid blocking menu -->
   <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>

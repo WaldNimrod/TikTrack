@@ -163,6 +163,16 @@
   --entity-ticker-border: rgba(23, 162, 184, 0.3);
   --entity-ticker-text: #138496;
   
+  --entity-research-color: #9c27b0; /* Purple for research */
+  --entity-research-bg: rgba(156, 39, 176, 0.1);
+  --entity-research-border: rgba(156, 39, 176, 0.3);
+  --entity-research-text: #7b1fa2;
+  
+  --entity-execution-color: #ff9800; /* Orange for executions */
+  --entity-execution-bg: rgba(255, 152, 0, 0.1);
+  --entity-execution-border: rgba(255, 152, 0, 0.3);
+  --entity-execution-text: #f57c00;
+  
   /* ===== Container ===== */
   --container-max-width: 1400px;
   --container-xl: 1400px;
@@ -213,6 +223,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   text-rendering: optimizeSpeed;
+}
+
+/* ============================================
+   Page Structure: Wrapper & Container
+   ============================================ */
+
+/* Page Wrapper: Full-width gray background, zero padding/margin on all sides */
+/* This is the main page wrapper - CRITICAL BASE STRUCTURE for all system pages */
+.page-wrapper {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--apple-bg-secondary, #F2F2F7); /* Gray background */
+  min-height: calc(100vh - var(--header-height, 120px)); /* Full height minus header */
+}
+
+/* Page Container: Centered, max-width 1400px */
+/* This is the active content area - CRITICAL BASE STRUCTURE for all system pages */
+.page-container {
+  max-width: var(--container-max-width, 1400px);
+  width: 100%;
+  margin-inline: auto; /* Center horizontally */
+  padding: 0; /* No padding - content handles its own spacing */
+  box-sizing: border-box;
 }
 
 /* ============================================

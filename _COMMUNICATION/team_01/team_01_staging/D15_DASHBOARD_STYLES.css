@@ -56,6 +56,66 @@ body.dashboard-page {
   min-height: 60px; /* Fixed height for header */
 }
 
+/* Entity-specific header colors */
+/* Portfolio - Trading Account color */
+tt-section[data-section="portfolio"] .index-section__header {
+  border-inline-start-color: var(--entity-trading-account-color, #28a745);
+}
+
+tt-section[data-section="portfolio"] .index-section__header-icon {
+  color: var(--entity-trading-account-color, #28a745);
+}
+
+tt-section[data-section="portfolio"] .index-section__header-count {
+  color: var(--entity-trading-account-color, #28a745);
+}
+
+/* Widget-specific entity colors - using alt attribute selectors */
+/* Ticker Chart Widget - Ticker color */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header {
+  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__title-icon {
+  color: var(--entity-ticker-color, #17a2b8);
+}
+
+/* Ticker List Widget - Ticker color */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
+  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
+  color: var(--entity-ticker-color, #17a2b8);
+}
+
+/* Tag Widget - Research color */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header {
+  border-inline-start: 3px solid var(--entity-research-color, #9c27b0);
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__title-icon {
+  color: var(--entity-research-color, #9c27b0);
+}
+
+/* Recent Trades Widget - Trade color */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
+  border-inline-start: 3px solid var(--entity-trade-color, #26baac);
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__title-icon {
+  color: var(--entity-trade-color, #26baac);
+}
+
+/* Pending Actions Widget - Execution color */
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__header {
+  border-inline-start: 3px solid var(--entity-execution-color, #ff9800);
+}
+
+.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__title-icon {
+  color: var(--entity-execution-color, #ff9800);
+}
+
 /* Block: Dashboard Section Body - Separate white card below header */
 .dashboard-section__body,
 .index-section__body {
@@ -65,6 +125,17 @@ body.dashboard-page {
   border-radius: 8px;
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
   /* No margin-top - gap is created by header margin-block-end */
+  width: 100%; /* Full width */
+  box-sizing: border-box; /* Include padding in width */
+}
+
+/* Element: Info Summary inside section body - Force full width */
+.index-section__body .info-summary,
+.dashboard-section__body .info-summary {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* Element: Header Title */
@@ -102,8 +173,10 @@ body.dashboard-page {
   font-size: var(--font-size-base, 0.92rem);
   color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
   opacity: 0.8; /* 0.8 opacity */
-  text-align: center; /* Centered */
+  text-align: center !important; /* Centered - force override */
   font-weight: 500; /* Subtitle style */
+  display: block; /* Block display for centering */
+  width: 100%; /* Full width for centering */
 }
 
 /* Element: Header Actions */
@@ -489,7 +562,7 @@ body.dashboard-page {
    Shared across all dashboard pages
    ============================================ */
 
-/* Block: Info Summary */
+/* Block: Info Summary - Full width, centered content */
 .info-summary {
   display: flex;
   flex-direction: column;
@@ -500,18 +573,22 @@ body.dashboard-page {
   border-radius: 8px;
   margin-block-end: var(--spacing-md, 16px);
   font-size: var(--font-size-base, 0.92rem);
-  width: 100%; /* Full width */
+  width: 100% !important; /* Full width - force override */
+  max-width: 100% !important; /* Ensure full width */
+  box-sizing: border-box !important; /* Include padding in width */
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  /* Force full width by overriding any parent constraints */
+  margin-inline: 0 !important;
 }
 
 /* Element: Summary Row - Each row is centered and full width */
 .info-summary__row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Center aligned */
+  justify-content: center !important; /* Center aligned - force override */
   align-items: center;
   gap: var(--spacing-lg, 24px);
-  width: 100%; /* Full width */
+  width: 100% !important; /* Full width - force override */
 }
 
 .info-summary__row > div,
@@ -620,17 +697,13 @@ body.dashboard-page {
   border-radius: 8px 8px 0 0;
   margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
   min-height: 48px; /* Fixed smaller height than main container header (60px) */
+  max-height: 60px; /* Maximum height constraint */
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Allow stacking of title row and tabs */
+  align-items: stretch; /* Stretch children to full width */
 }
 
-.widget-placeholder__title {
-  font-size: clamp(0.875rem, 2vw, 1rem); /* Smaller than main container header */
-  font-weight: 600;
-  color: var(--apple-text-primary, #1d1d1f);
-  margin: 0;
-  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Smaller padding */
-}
+/* Widget title styles are now in .widget-placeholder__header-title-row .widget-placeholder__title above */
 
 /* Element: Placeholder Body - Separate white card within widget */
 .widget-placeholder__body {
@@ -658,6 +731,9 @@ body.dashboard-page {
   padding: 0;
   border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
   background: var(--apple-bg-secondary, #f5f5f7);
+  flex-shrink: 0; /* Prevent shrinking */
+  min-height: 36px; /* Fixed smaller height for tabs */
+  max-height: 36px; /* Maximum height - consistent */
 }
 
 .widget-placeholder__tab-item {
@@ -700,20 +776,36 @@ body.dashboard-page {
   display: none;
 }
 
-/* Element: Widget Header Title Row (for widgets with title + actions) */
+/* Element: Widget Header Title Row - UNIFIED DESIGN (matches Ticker Chart exactly) */
 .widget-placeholder__header-title-row {
   display: flex;
-  align-items: center;
+  align-items: center; /* Center vertically */
   justify-content: space-between;
   gap: var(--spacing-md, 16px);
-  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
-  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Smaller padding for consistent height */
+  min-height: 40px; /* Fixed smaller height than main container header (60px) */
+  max-height: 40px; /* Maximum height - consistent across all widgets */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.widget-placeholder__title {
+  display: flex;
+  align-items: center; /* Center icon and text vertically */
+  justify-content: flex-start; /* Align to start */
+  gap: var(--spacing-xs, 4px);
+  font-size: clamp(0.875rem, 2vw, 1rem); /* Smaller than main container header */
+  font-weight: 600;
+  color: var(--apple-text-primary, #1d1d1f);
+  margin: 0;
+  padding: 0; /* No padding - padding is on parent */
+  flex: 1; /* Take available space */
 }
 
 .widget-placeholder__title-icon {
   width: 20px;
   height: 20px;
-  margin-inline-end: var(--spacing-xs, 4px);
+  flex-shrink: 0; /* Prevent shrinking */
+  display: block; /* Ensure proper display */
 }
 
 .widget-placeholder__header-badges {
@@ -1146,9 +1238,12 @@ tt-section-row:last-child {
 .portfolio-header-filters {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* Allow wrapping to single line */
+  flex-wrap: nowrap !important; /* NEVER wrap - all in single line */
   gap: var(--spacing-sm, 8px);
   margin-inline-end: var(--spacing-md, 16px);
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow-x: auto; /* Horizontal scroll if needed */
+  min-width: 0; /* Allow shrinking */
 }
 
 .portfolio-filter-select {

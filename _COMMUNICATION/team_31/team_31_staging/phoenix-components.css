@@ -17,12 +17,12 @@
    Hierarchy: tt-container > tt-section > tt-section-row
    ============================================ */
 
-/* tt-container: Outer container (Max-width: 1400px, centers content) */
+/* tt-container: Content wrapper (no max-width/margin - page-container handles that) */
+/* NOTE: page-container in phoenix-base.css provides the base structure (max-width 1400px, centered) */
+/* tt-container is now just a content wrapper with padding */
 tt-container {
   display: block;
-  max-width: var(--container-max-width, 1400px);
   width: 100%;
-  margin-inline: auto;
   padding-inline: var(--grid-gutter, var(--spacing-md));
 }
 
@@ -37,9 +37,9 @@ tt-section {
   overflow: visible; /* Allow header/body to be visible */
 }
 
-/* tt-section content area - minimal padding */
+/* tt-section content area - NO padding (header/body have their own padding) */
 tt-section > * {
-  padding: var(--spacing-lg, 24px);
+  padding: 0; /* No padding - header and body are separate cards with their own padding */
 }
 
 /* tt-section header (data-title attribute) */

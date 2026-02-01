@@ -130,11 +130,12 @@ async def register(
             )
             logger.debug("Registration service call completed successfully")
         except AuthenticationError as e:
+            # Log detailed error for debugging (will be removed in production)
+            logger.error(f"Registration failed for user: {request.username} (authentication error: {str(e)})", exc_info=True)
             # Generic error message to prevent information leakage
-            logger.info(f"Registration failed for user: {request.username} (authentication error: {str(e)})")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Registration failed. Please check your input."
+                detail=f"Registration failed. Please check your input. Error: {str(e)}"
             )
         except Exception as e:
             # Log detailed error for debugging

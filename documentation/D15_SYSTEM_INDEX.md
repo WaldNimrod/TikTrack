@@ -41,5 +41,8 @@ _COMMUNICATION/
 - [🔐 TT2_DATABASE_CREDENTIALS.md](./01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md) - הגדרת Database Credentials (שם DB, משתמש, הוראות הגדרה)
 - [🏛️ TT2_MASTER_BLUEPRINT.md](./01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
 
+## 🎨 עיצוב ו-Fidelity (Design & Fidelity)
+- [🎨 TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md](./06-GOVERNANCE_&_COMPLIANCE/standards/TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md) - נוהל תיקון בעיות fidelity מול Blueprint (מתי ואיך לתקן)
+
 ---
 ### 🚀 סטטוס סשן נוכחי: SESSION_01 (🟢 OPEN)

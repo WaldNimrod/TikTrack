@@ -128,9 +128,53 @@ curl http://localhost:8082/health
 
 ---
 
+## 👥 System Users
+
+### **User 1: Primary Administrator**
+- **Username:** `nimrod`
+- **Email:** `nimrod@mezoo.co`
+- **Phone:** `NULL` (no phone number)
+- **Password:** `4181`
+- **Role:** `SUPERADMIN`
+- **Status:** ✅ **CREATED** - Active, Email verified
+
+### **User 2: Secondary Administrator**
+- **Username:** `nimrod_wald`
+- **Email:** `waldnimrod@gmail.com`
+- **Phone:** `NULL` (no phone number)
+- **Password:** `4181`
+- **Role:** `ADMIN`
+- **Status:** ✅ **CREATED** - Active, Email verified
+
+**Password Hash:** `$2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqcAP8an.qQtG` (bcrypt for password `4181`)
+
+⚠️ **SECURITY:** User passwords are bcrypt hashed in database. Never store plain text passwords.
+
+---
+
+## 📋 Database Schema Status
+
+### **Authentication Tables Created:**
+1. ✅ **`user_data.users`** - Core users table
+   - Supports authentication (username, email, password_hash)
+   - Supports phone authentication (phone_number, phone_verified)
+   - Role-based access control (USER, ADMIN, SUPERADMIN)
+   - User status management (is_active, is_email_verified)
+
+2. ✅ **`user_data.password_reset_requests`** - Password recovery
+   - Supports email and SMS password reset
+   - Token and verification code management
+
+3. ✅ **`user_data.notes`** - User notes
+   - Polymorphic notes system
+
+**Note:** Additional tables will be created incrementally during development.
+
+---
+
 ## 🔄 Change Log
 
-### **2026-01-31:**
+### **2026-01-31 (Initial Setup):**
 - ✅ Database `TikTrack-phoenix-db` created
 - ✅ User `TikTrackDbAdmin` created
 - ✅ Password configured securely
@@ -138,6 +182,12 @@ curl http://localhost:8082/health
 - ✅ Schemas created (`user_data`, `market_data`)
 - ✅ Default privileges configured
 - ✅ Backend connection verified
+
+### **2026-01-31 (System Users):**
+- ✅ Primary admin user created (`nimrod`, SUPERADMIN)
+- ✅ Secondary admin user created (`nimrod_wald`, ADMIN)
+- ✅ Authentication tables created (`user_data.users`, `user_data.password_reset_requests`, `user_data.notes`)
+- ✅ Users ready for login testing
 
 ---
 

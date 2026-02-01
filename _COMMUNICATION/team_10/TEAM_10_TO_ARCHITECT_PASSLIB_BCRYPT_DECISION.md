@@ -126,16 +126,20 @@ ValueError: password cannot be longer than 72 bytes, truncate manually if necess
 
 ---
 
-## 🎯 Required Decision
+## 🎯 Decision
 
-**Decision Required:** Approve replacement of `passlib` with direct `bcrypt` usage
+**Decision:** ✅ **APPROVED - Option 3: Replace Passlib with Direct Bcrypt**
 
-**Options:**
-1. ✅ **APPROVE** - Replace with direct bcrypt (Recommended)
-2. ❌ **REJECT** - Request alternative solution
-3. ⏸️ **DEFER** - Request more information
+**Approved by:** Chief Architect (via Team 10)  
+**Date:** 2026-01-31  
+**Status:** ✅ **APPROVED - IMPLEMENTATION AUTHORIZED**
 
-**Recommendation:** ✅ **APPROVE Option 3**
+**Options Considered:**
+1. ✅ **APPROVED** - Replace with direct bcrypt (Selected)
+2. ❌ **REJECTED** - Upgrade Passlib (not possible)
+3. ❌ **REJECTED** - Downgrade Bcrypt (security risk)
+
+**Recommendation:** ✅ **APPROVED Option 3**
 
 ---
 

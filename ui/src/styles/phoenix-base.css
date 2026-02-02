@@ -1,9 +1,24 @@
 /*
-  Phoenix-Base-Ver: v1.1.0 | Global Base Styles for All Pages
-  Sync-Time: 2026-01-31 21:30:00 IST
-  Team: Team 31 (Blueprint)
-  Status: Global Base Layer - Foundation for All Pages
-  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅ | Architectural Review ✅
+  Phoenix-Base-Ver: v1.3.0 | Global Base Styles for All Pages (SSOT)
+  Sync-Time: 2026-02-02 00:00:00 IST
+  Team: Team 31 (Blueprint) + Team 40 (CSS Refactor) + Team 30 (Frontend)
+  Status: Global Base Layer - Foundation for All Pages | SSOT for CSS Variables
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅ | Architectural Review ✅ | CSS Refactor ✅ | Fluid Design ✅
+  
+  REFACTOR NOTE (v1.3.0):
+  - All CSS Variables merged into this file (SSOT)
+  - Removed duplicate files: design-tokens.css, auth.css
+  - Removed Design Tokens JSON files
+  - Removed inline CSS Variables from global_page_template.jsx
+  - Single Source of Truth established
+  - FLUID DESIGN MANDATE: All typography and spacing use clamp() - NO media queries
+  - Typography: clamp() for all font sizes (responsive automatically)
+  - Spacing: clamp() for all margins and paddings (responsive automatically)
+  
+  ARCHITECTURAL DECISION (2026-02-02):
+  - NO media queries for typography and spacing (except dark mode)
+  - Fluid Design using clamp(), min(), max() only
+  - Grid with auto-fit/auto-fill for responsive layouts
   
   Purpose:
   This file contains ONLY the base/default styles for ALL HTML elements.
@@ -56,6 +71,7 @@
   --apple-bg-secondary: #F2F2F7;
   --apple-bg-tertiary: #FFFFFF;
   --apple-bg-elevated: #FFFFFF;
+  --apple-bg-footer: #2C2C2E; /* Dark gray for footer - clear separation (lighter than black) */
   
   /* ===== Text Colors (Exact from original) ===== */
   --apple-text-primary: #000000;
@@ -72,16 +88,17 @@
   --apple-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
   --apple-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
   
-  /* ===== Typography (Exact from original) ===== */
+  /* ===== Typography (Fluid Design - clamp() for responsive) ===== */
   --font-family-primary: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-xxl: 24px;
-  --font-size-xxxl: 32px;
+  /* CRITICAL: Fluid typography using clamp() - no media queries */
+  --font-size-xs: clamp(10px, 1vw + 0.3rem, 12px);
+  --font-size-sm: clamp(12px, 1.5vw + 0.4rem, 14px);
+  --font-size-base: clamp(14px, 2vw + 0.5rem, 16px);
+  --font-size-lg: clamp(16px, 2.5vw + 0.6rem, 18px);
+  --font-size-xl: clamp(18px, 3vw + 0.7rem, 20px);
+  --font-size-xxl: clamp(20px, 3.5vw + 0.8rem, 24px);
+  --font-size-xxxl: clamp(24px, 4vw + 1rem, 32px);
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -92,21 +109,22 @@
   --line-height-relaxed: 1.6;
   --line-height-loose: 1.8;
   
-  /* ===== Spacing (Exact from original) ===== */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
-  --spacing-xxxl: 64px;
+  /* ===== Spacing (Fluid Design - clamp() for responsive) ===== */
+  /* CRITICAL: Fluid spacing using clamp() - no media queries */
+  --spacing-xs: clamp(4px, 0.5vw, 8px);
+  --spacing-sm: clamp(8px, 1vw, 12px);
+  --spacing-md: clamp(12px, 1.5vw, 16px);
+  --spacing-lg: clamp(20px, 2.5vw, 24px);
+  --spacing-xl: clamp(24px, 3vw, 32px);
+  --spacing-xxl: clamp(32px, 4vw, 48px);
+  --spacing-xxxl: clamp(48px, 5vw, 64px);
   
-  /* ===== Apple Spacing (Exact from original) ===== */
-  --apple-spacing-xs: 4px;
-  --apple-spacing-sm: 8px;
-  --apple-spacing-md: 16px;
-  --apple-spacing-lg: 24px;
-  --apple-spacing-xl: 32px;
+  /* ===== Apple Spacing (Fluid Design - clamp() for responsive) ===== */
+  --apple-spacing-xs: clamp(4px, 0.5vw, 8px);
+  --apple-spacing-sm: clamp(8px, 1vw, 12px);
+  --apple-spacing-md: clamp(12px, 1.5vw, 16px);
+  --apple-spacing-lg: clamp(20px, 2.5vw, 24px);
+  --apple-spacing-xl: clamp(24px, 3vw, 32px);
   
   /* ===== Border Radius (Exact from original) ===== */
   --apple-radius-small: 6px;
@@ -129,6 +147,95 @@
   --font-main: var(--font-family-primary);
   --grid-gutter: var(--spacing-md);
   
+  /* ===== Brand Colors (from TT2_MASTER_PALETTE_SPEC) ===== */
+  --color-primary: #26baac;
+  --color-primary-light: #4dd4c4;
+  --color-primary-lighter: #7ee8dc;
+  --color-primary-dark: #1e968a;
+  --color-primary-darker: #167268;
+  
+  --color-secondary: #fc5a06;
+  --color-secondary-light: #ff7a33;
+  --color-secondary-lighter: #ff9a66;
+  --color-secondary-dark: #c84805;
+  --color-secondary-darker: #943604;
+  
+  /* ===== Semantic Colors ===== */
+  --color-error: #ef4444;
+  --color-error-light: #f87171;
+  --color-error-lighter: #fca5a5;
+  --color-error-dark: #dc2626;
+  --color-error-darker: #b91c1c;
+  
+  --color-success: #10b981;
+  --color-success-light: #34d399;
+  --color-success-lighter: #6ee7b7;
+  --color-success-dark: #059669;
+  --color-success-darker: #047857;
+  
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-lighter: #fcd34d;
+  --color-warning-dark: #d97706;
+  --color-warning-darker: #b45309;
+  
+  /* ===== Legacy Color Scale (for backward compatibility) ===== */
+  --color-1: #ffffff;
+  --color-5: #f4f7f9;
+  --color-10: #eef2f5;
+  --color-20: #d1d9e0;
+  --color-30: #94a3b8;
+  --color-40: #4b4f56;
+  --color-45: #334155;
+  --color-50: #1c1e21;
+  
+  /* ===== Text Colors (Semantic) ===== */
+  --text-primary: #1c1e21;
+  --text-secondary: #4b4f56;
+  --text-tertiary: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  /* ===== Additional Typography Variables ===== */
+  --font-hebrew: 'Noto Sans Hebrew', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  
+  /* ===== Additional Spacing Variables ===== */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  
+  /* ===== Additional Shadow Variables ===== */
+  --shadow-none: none;
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-header: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px;
+  
+  /* ===== Border Radius Variables ===== */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+  
   /* ===== LOD 400 Requirements ===== */
   --header-height: 158px;
   --header-row1-height: 98px;
@@ -146,6 +253,16 @@
   --z-index-header-modal: 1000;
   --z-index-g-bridge-banner: 10002;
   
+  /* ===== Additional Z-Index Variables (for consistency) ===== */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  
   /* ===== Container ===== */
   --container-max-width: 1400px;
   --container-xl: 1400px;
@@ -159,6 +276,27 @@
   --header-filter-hover: #ff9500;
   --header-filter-selected-bg: #f0f9ff;
   --header-filter-selected-color: #26baac;
+}
+
+/* ===== Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Background Colors */
+    --color-1: #1c1e21;
+    --color-5: #334155;
+    --color-10: #475569;
+    --color-20: #64748b;
+    --color-30: #94a3b8;
+    --color-40: #cbd5e1;
+    --color-45: #e2e8f0;
+    --color-50: #f1f5f9;
+    
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-inverse: #1c1e21;
+  }
 }
 
 * { 
@@ -179,6 +317,12 @@
 html {
   direction: rtl;
   lang: he;
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  width: 100%;
+  max-width: 100%;
+  height: 100%; /* CRITICAL: Full height for sticky footer */
+  min-height: 100vh; /* CRITICAL: Full viewport height for sticky footer */
+  box-sizing: border-box;
 }
 
 html:focus-within {
@@ -191,11 +335,92 @@ body {
   color: var(--apple-text-primary, #000000);
   margin: 0;
   padding: 0;
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-y: auto; /* Allow vertical scroll only when needed */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   /* Font defaults inherited from * selector - 0.75rem (12px), 300, 1.4, font-family from :root */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
+  min-height: 100vh; /* CRITICAL: Full viewport height for sticky footer */
+  height: 100%; /* CRITICAL: Full height for sticky footer - inherits from html */
   text-rendering: optimizeSpeed;
+}
+
+/* ============================================
+   Page Structure: Wrapper & Container
+   ============================================ */
+
+/* Page Wrapper: Full-width gray background, zero padding/margin on all sides */
+/* This is the main page wrapper - CRITICAL BASE STRUCTURE for all system pages */
+/* CRITICAL: This prevents horizontal scrolling - must never overflow */
+/* CRITICAL: Always 100vw width - edge to edge */
+/* CRITICAL: min-height only - allows content to grow beyond viewport, footer below fold on initial load */
+html body .page-wrapper {
+  width: 100vw; /* CRITICAL: Always 100% viewport width - edge to edge */
+  max-width: 100vw; /* Ensure never exceeds viewport */
+  margin: 0 !important; /* CRITICAL: No margins - starts immediately after header/banner */
+  margin-top: 0 !important; /* CRITICAL: No top margin - must be flush with top */
+  margin-bottom: 0 !important; /* CRITICAL: No bottom margin */
+  padding: 0 !important; /* CRITICAL: No padding */
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  background-color: var(--apple-bg-secondary, #F2F2F7); /* Gray background */
+  min-height: 100vh; /* CRITICAL: Minimum viewport height - allows content to grow */
+  height: auto; /* CRITICAL: Auto height - allows footer to be below fold on initial load */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* CRITICAL: Ensure page-wrapper starts immediately after header/banner with no gap */
+  position: relative;
+  /* CRITICAL: Break out of any container using viewport-based positioning */
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  /* CRITICAL: On short pages, ensure footer is at bottom without extra space */
+  justify-content: flex-start; /* CRITICAL: Start from top, don't center content */
+}
+
+/* CRITICAL: Ensure no gap between header and page-wrapper */
+/* Header is sticky at top, page-wrapper starts immediately below */
+#unified-header + .page-wrapper,
+header + .page-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Page Container: Centered, max-width 1400px */
+/* This is the active content area - CRITICAL BASE STRUCTURE for all system pages */
+/* CRITICAL: This must never exceed 1400px and must be centered */
+/* CRITICAL: Must have minimum height of 100vh to push footer below fold on initial load */
+body .page-wrapper .page-container {
+  flex: 0 1 auto; /* CRITICAL: Don't grow - takes only needed space, but main inside will grow */
+  max-width: var(--container-max-width, 1400px);
+  width: 100%;
+  margin-inline: auto; /* Center horizontally */
+  padding: 0; /* No padding - content handles its own spacing */
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  box-sizing: border-box;
+  min-height: 0; /* CRITICAL: Allow container to shrink below content size */
+  display: flex; /* CRITICAL: Flex container for main element */
+  flex-direction: column; /* CRITICAL: Column layout */
+}
+
+/* Main element - CRITICAL: Must never cause horizontal overflow */
+/* CRITICAL: Must have minimum height of 100vh to push footer below fold on initial load */
+/* CRITICAL: Content centered vertically with equal spacing above and below */
+body .page-wrapper .page-container main {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  box-sizing: border-box;
+  min-height: 100vh; /* CRITICAL: Minimum viewport height - pushes footer below fold on initial load */
+  flex: 0 1 auto; /* CRITICAL: Don't grow - takes only needed space, but min-height ensures 100vh */
+  display: flex; /* CRITICAL: Flex container for content */
+  flex-direction: column; /* CRITICAL: Column layout */
+  justify-content: center; /* CRITICAL: Center content vertically - equal spacing above and below */
+  align-items: stretch; /* CRITICAL: Stretch items to full width */
 }
 
 /* ============================================

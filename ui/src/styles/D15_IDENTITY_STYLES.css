@@ -1,10 +1,14 @@
 /*
-  Phoenix-Identity-Ver: v1.2.1 | Authentication Pages Specific Styles (FINAL APPROVED)
-  Sync-Time: 2026-01-31 21:30:00 IST
+  Phoenix-Identity-Ver: v1.3.0 | Authentication Pages Specific Styles (FINAL APPROVED)
+  Sync-Time: 2026-02-02 00:00:00 IST
   Team: Team 30 (Frontend) | Team 50 (QA Review)
   Status: ✅ FINALLY APPROVED | ✅ READY FOR DEVELOPMENT | ✅ SIGNED OFF
-  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅ | G-Bridge Validated ✅
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | Visual Fidelity ✅ | G-Bridge Validated ✅ | Fluid Design ✅
   Visual Approval: ✅ FINAL APPROVAL GRANTED
+  
+  FLUID DESIGN MANDATE (2026-02-02):
+  - All padding uses clamp() for fluid responsive behavior
+  - NO media queries for responsive design
   
   Purpose:
   This file contains ONLY styles specific to Authentication pages (Login, Register, Reset Password).
@@ -30,22 +34,65 @@ body.auth-layout-root,
 .auth-layout-root {
   margin: 0;
   min-height: 100vh;
+  height: auto; /* CRITICAL: Auto height - no fixed height to prevent extra scroll */
   direction: rtl;
   display: flex;
-  align-items: center;
+  align-items: stretch; /* CRITICAL: Stretch instead of center to prevent extra padding */
   justify-content: center;
   background: var(--color-bg-grad);
   font-family: var(--font-main);
-  padding: var(--spacing-lg, 24px);
+  padding: 0; /* CRITICAL: No padding - page-wrapper handles full width */
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-y: auto; /* Allow vertical scroll only when needed */
+}
+
+/* Page wrapper inside auth-layout-root must be full width */
+/* CRITICAL: Always 100vw width - edge to edge, even inside flex container */
+/* CRITICAL: min-height only - allows content to grow beyond viewport, footer below fold on initial load */
+body.auth-layout-root .page-wrapper,
+.auth-layout-root .page-wrapper {
+  width: 100vw !important; /* CRITICAL: Always 100% viewport width - edge to edge */
+  max-width: 100vw !important; /* Ensure never exceeds viewport */
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 100% !important; /* Take full width in flex container */
+  align-self: stretch !important; /* Stretch to full width */
+  min-height: 100vh !important; /* CRITICAL: Minimum viewport height - allows content to grow */
+  height: auto !important; /* CRITICAL: Auto height - allows footer to be below fold on initial load */
+  /* CRITICAL: Break out of flex container to achieve full viewport width */
+  position: relative;
+  left: calc(50% - 50vw) !important;
+  right: calc(50% - 50vw) !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 /* Auth-specific: Narrow container and section for auth forms */
+/* CRITICAL: Fluid padding using clamp() - no media queries */
+/* CRITICAL: page-container doesn't grow - main inside will have min-height 100vh */
+body.auth-layout-root .page-wrapper .page-container,
+.auth-layout-root .page-wrapper .page-container {
+  flex: 0 1 auto !important; /* CRITICAL: Don't grow - takes only needed space, but main inside will have min-height */
+  display: flex !important; /* CRITICAL: Flex container for main */
+  flex-direction: column !important; /* CRITICAL: Column layout */
+}
+
+/* CRITICAL: main must have minimum height of 100vh to push footer below fold on initial load */
+/* CRITICAL: Content centered vertically with equal spacing above and below */
+body.auth-layout-root .page-wrapper .page-container main,
+.auth-layout-root .page-wrapper .page-container main {
+  min-height: 100vh !important; /* CRITICAL: Minimum viewport height - pushes footer below fold on initial load */
+  flex: 0 1 auto !important; /* CRITICAL: Don't grow - takes only needed space, but min-height ensures 100vh */
+  justify-content: center !important; /* CRITICAL: Center content vertically - equal spacing above and below */
+  align-items: stretch !important; /* CRITICAL: Stretch items to full width */
+}
+
 body.auth-layout-root tt-container,
 .auth-layout-root tt-container {
   max-width: 480px;
   width: 100%;
   margin-inline: auto;
-  padding-inline: var(--spacing-lg, 24px);
+  padding-inline: clamp(16px, 2vw, 24px); /* CRITICAL: Fluid padding - responsive automatically */
 }
 
 body.auth-layout-root tt-section,
@@ -53,6 +100,8 @@ body.auth-layout-root tt-section,
   max-width: 100%;
   margin-inline: auto;
   text-align: center;
+  margin-block-start: 0; /* CRITICAL: No top margin - vertical centering handled by main justify-content: center */
+  margin-block-end: 0; /* CRITICAL: No bottom margin - vertical centering handled by main justify-content: center */
 }
 
 /* System Body Context */
@@ -268,6 +317,12 @@ button.btn-auth-primary:hover {
   font-size: 0.875rem;
   text-align: center;
   direction: rtl;
+}
+
+/* Hidden state - use class instead of [hidden] attribute for better test compatibility */
+.auth-form__error--hidden {
+  display: none !important;
+  visibility: hidden !important;
 }
 
 .auth-form__error[hidden] {

@@ -1,0 +1,83 @@
+
+> tiktrack-phoenix-integration-tests@1.0.0 test:validation
+> npx mocha validation-comprehensive.test.js --timeout 120000
+
+
+
+  Validation Comprehensive Testing
+    LoginForm - Client-side Validation
+✅ [PASS] LoginForm - Empty UsernameOrEmail
+   Error message displayed on submit
+      ✔ should show "שדה חובה" for empty usernameOrEmail field (4177ms)
+✅ [PASS] LoginForm - Empty Password
+   Error message displayed on submit
+      ✔ should show "שדה חובה" for empty password field (4204ms)
+⏸️ [SKIP] LoginForm - Blur Validation
+   Blur validation not implemented or not visible
+      ✔ should validate on blur (field-level validation) (3551ms)
+✅ [PASS] LoginForm - BEM Error Classes
+   BEM error classes applied
+      ✔ should have BEM error classes on invalid fields (535ms)
+⏸️ [SKIP] LoginForm - ARIA Attributes
+   ARIA attributes not found (may be added dynamically)
+      ✔ should have ARIA attributes on invalid fields (542ms)
+    LoginForm - Server-side Validation
+✅ [PASS] LoginForm - 401 Invalid Credentials
+   Error displayed for invalid credentials
+      ✔ should handle 401 Invalid Credentials error (2121ms)
+✅ [PASS] LoginForm - 400 Validation Error
+   Validation errors displayed
+      ✔ should handle 400 Validation Error (1037ms)
+    LoginForm - Error Code Translation
+❌ [FAIL] LoginForm - Error Code Translation
+   Error message not in Hebrew
+      ✔ should translate AUTH_INVALID_CREDENTIALS to Hebrew (2142ms)
+    RegisterForm - Client-side Validation
+✅ [PASS] RegisterForm - Empty Username
+   Error message displayed on submit
+      ✔ should show "שדה חובה" for empty username (4128ms)
+✅ [PASS] RegisterForm - Username Too Short
+   Error message displayed for short username
+      ✔ should show error for username shorter than 3 characters (558ms)
+✅ [PASS] RegisterForm - Invalid Email
+   Error message displayed for invalid email
+      ✔ should show "אימייל לא תקין" for invalid email (597ms)
+✅ [PASS] RegisterForm - Password Too Short
+   Error message displayed for short password
+      ✔ should show error for password shorter than 8 characters (621ms)
+✅ [PASS] RegisterForm - Password Mismatch
+   Error message displayed for mismatched passwords
+      ✔ should show "סיסמאות לא תואמות" for mismatched passwords (629ms)
+✅ [PASS] RegisterForm - Invalid Phone
+   Error message displayed for invalid phone
+      ✔ should show error for invalid phone number format (592ms)
+    RegisterForm - Server-side Validation
+⏸️ [SKIP] RegisterForm - Duplicate User
+   No error displayed (user may not exist or registration succeeded)
+      ✔ should handle 400 Duplicate User error (USER_ALREADY_EXISTS) (5238ms)
+    Transformation Layer - camelCase ↔ snake_case
+⏸️ [SKIP] Transformation Layer - Payload Format
+   Payload format verification requires Network tab inspection
+      ✔ should send payload in snake_case format (3162ms)
+    PhoenixSchema - Centralized Validation
+✅ [PASS] PhoenixSchema - Validation Messages
+   Validation message matches schema
+      ✔ should use PhoenixSchema for validation (not component logic) (1609ms)
+    Error Code Translation
+⏸️ [SKIP] Error Code - AUTH_INVALID_CREDENTIALS
+   Error message in Hebrew but may not match exact expected text
+      ✔ should translate AUTH_INVALID_CREDENTIALS correctly (3283ms)
+
+============================================================
+TEST SUMMARY
+============================================================
+Total Tests: 18
+✅ Passed: 12
+❌ Failed: 1
+⏸️  Skipped: 5
+Pass Rate: 66.67%
+============================================================
+
+
+  18 passing (56s)
+

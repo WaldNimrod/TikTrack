@@ -4,7 +4,7 @@
 **אחריות:** Team 40 (UI Assets & Design)  
 **תוקף:** מחייב לכל המערכת  
 **תאריך עדכון:** 2026-02-01  
-**גרסה:** v1.0
+**גרסה:** v1.1 (Footer Modular Strategy Added)
 
 ---
 
@@ -94,6 +94,73 @@ body {
 ```
 
 **⚠️ קריטי:** אסור גלילה אופקית בשום מצב. כל אלמנט חייב להיות מוגבל לרוחב המקסימלי.
+
+### **1.4 Footer מודולרי (Modular Footer) - 🛡️ החלטה אדריכלית**
+
+הפוטר הוא רכיב משותף (Shared Component) המנוהל באופן מרכזי על ידי **Team 31 (Shared Components)**.
+
+#### **מבנה הקבצים:**
+- **תוכן:** `footer.html` - HTML נקי של הפוטר (מקור אמת יחיד)
+- **טוען:** `footer-loader.js` - סקריפט הזרקה ב-Vanilla JS
+- **עיצוב:** `phoenix-components.css` - סגנונות הפוטר תחת סקשן "FOOTER"
+
+#### **אופן המימוש בעמודים:**
+הזרקת הסקריפט מתבצעת בסוף ה-`<body>`, **לפני** באנר ה-G-Bridge:
+
+```html
+<body class="index-page">
+  <!-- Header -->
+  <header id="unified-header">...</header>
+  
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        <!-- Page Content -->
+      </main>
+    </div>
+  </div>
+  
+  <!-- Footer Loader - לפני G-Bridge Banner -->
+  <script src="./footer-loader.js"></script>
+  
+  <!-- G-Bridge Banner -->
+  <div class="g-bridge-banner">...</div>
+</body>
+```
+
+#### **כללים קריטיים:**
+- ✅ **עדכון תוכן:** כל עדכון תוכן חייב להתבצע **רק** ב-`footer.html`
+- ✅ **עדכון עיצוב:** כל עדכון עיצוב חייב להתבצע **רק** ב-`phoenix-components.css` תחת סקשן "FOOTER"
+- ✅ **ולידציית G-Bridge:** קובץ `footer.html` חייב לעבור ולידציית G-Bridge **באופן עצמאי** ולהופיע ב-Tracker כרכיב מאושר (Approved Blueprint)
+- ⚠️ **חשוב:** מכיוון שהפוטר נטען ב-JS, מנוע ה-G-Bridge לא יזהה את תוכנו בתוך דפי ה-HTML הרגילים
+
+#### **מבנה CSS:**
+```css
+/* FOOTER: Modular Footer Component */
+.page-footer {
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  background: var(--apple-bg-footer, #2C2C2E);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+  padding: var(--spacing-lg, 24px);
+  color: #FFFFFF;
+}
+
+.page-footer__container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  gap: var(--spacing-lg, 24px);
+}
+```
+
+**מיקום קבצים:**
+- `_COMMUNICATION/team_31/team_31_staging/footer.html`
+- `_COMMUNICATION/team_31/team_31_staging/footer-loader.js`
+- `_COMMUNICATION/team_31/team_31_staging/phoenix-components.css` (סקשן FOOTER)
 
 ---
 
@@ -389,6 +456,7 @@ font-size: clamp(0.875rem, 2vw, 1rem);
 - [ ] רק CSS Variables לצבעים
 - [ ] ריווח עקבי (spacing variables)
 - [ ] גבהים קבועים לא נשברים
+- [ ] פוטר מודולרי נטען לפני G-Bridge Banner (`<script src="./footer-loader.js"></script>`)
 
 ---
 
@@ -398,7 +466,10 @@ font-size: clamp(0.875rem, 2vw, 1rem);
 - `documentation/04-DESIGN_UX_UI/UNIFIED_HEADER_SPECIFICATION.md` - מפרט Header
 - `documentation/10-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md` - נוהל CSS
 - `_COMMUNICATION/team_31/team_31_staging/phoenix-base.css` - יישום בפועל
-- `_COMMUNICATION/team_31/team_31_staging/phoenix-components.css` - יישום בפועל
+- `_COMMUNICATION/team_31/team_31_staging/phoenix-components.css` - יישום בפועל (כולל סקשן FOOTER)
+- `_COMMUNICATION/team_31/team_31_staging/footer.html` - תוכן הפוטר המודולרי (מקור אמת יחיד)
+- `_COMMUNICATION/team_31/team_31_staging/footer-loader.js` - טוען הפוטר המודולרי
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - החלטה אדריכלית על פוטר מודולרי
 
 ---
 

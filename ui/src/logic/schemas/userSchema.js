@@ -26,24 +26,81 @@ export const validateEmail = (value) => {
 };
 
 /**
+ * Normalize phone number to E.164 format (without + prefix)
+ * 
+ * @param {string} value - Phone number value
+ * @returns {string|null} - Normalized phone number or null if cannot be normalized
+ */
+export const normalizePhoneNumber = (value) => {
+  if (!value) {
+    return null;
+  }
+  
+  // Remove all spaces, dashes, parentheses, and other formatting
+  let clean = value.replace(/[\s\-()]/g, '');
+  
+  // Remove + if present at the beginning
+  clean = clean.replace(/^\+/, '');
+  
+  // Remove leading zeros if present
+  clean = clean.replace(/^0+/, '');
+  
+  // Common Israeli phone number patterns
+  // 05x-xxxxxxx -> 9725xxxxxxxx
+  if (/^05\d{8}$/.test(clean)) {
+    return `972${clean.substring(1)}`;
+  }
+  
+  // 0x-xxxxxxx -> 972x-xxxxxxx (for landlines)
+  if (/^0\d{8,9}$/.test(clean)) {
+    return `972${clean.substring(1)}`;
+  }
+  
+  // Already in E.164 format without +
+  if (/^[1-9]\d{1,14}$/.test(clean)) {
+    // If starts with 972, it's Israeli number
+    if (/^972\d{8,9}$/.test(clean)) {
+      return clean;
+    }
+    // Otherwise, assume it's already correct
+    return clean;
+  }
+  
+  // If starts with country code 972
+  if (/^972\d{8,9}$/.test(clean)) {
+    return clean;
+  }
+  
+  return null;
+};
+
+/**
  * Validate phone number field
  * 
  * @param {string} value - Phone number value
- * @returns {Object} - { isValid: boolean, error: string|null }
+ * @returns {Object} - { isValid: boolean, error: string|null, normalized: string|null }
  */
 export const validatePhoneNumber = (value) => {
   if (!value) {
-    return { isValid: true, error: null }; // Optional field
+    return { isValid: true, error: null, normalized: null }; // Optional field
   }
   
-  const clean = value.replace(/[\s-()]/g, '');
-  const phoneRegex = /^\+[1-9]\d{1,14}$/;
+  // Try to normalize first
+  const normalized = normalizePhoneNumber(value);
   
-  if (!phoneRegex.test(clean)) {
-    return { isValid: false, error: 'מספר טלפון חייב להיות בפורמט E.164 (דוגמה: +972501234567)' };
+  if (normalized) {
+    // Validate E.164 format (without +): country code (1-3 digits) + number (up to 15 digits total)
+    const phoneRegex = /^[1-9]\d{1,14}$/;
+    if (phoneRegex.test(normalized)) {
+      return { isValid: true, error: null, normalized };
+    }
   }
   
-  return { isValid: true, error: null };
+  return { 
+    isValid: false, 
+    error: 'מספר טלפון חייב להיות בפורמט E.164 (דוגמה: 972501234567)',
+    normalized: null
+  };
 };
 
 /**
@@ -130,10 +187,11 @@ export const validateLanguage = (value) => {
  * Validate entire user form
  * 
  * @param {Object} formData - Form data (camelCase)
- * @returns {Object} - { isValid: boolean, errors: Object }
+ * @returns {Object} - { isValid: boolean, errors: Object, normalizedData: Object }
  */
 export const validateUserForm = (formData) => {
   const errors = {};
+  const normalizedData = { ...formData };
   
   // Email validation
   const emailResult = validateEmail(formData.email);
@@ -141,10 +199,13 @@ export const validateUserForm = (formData) => {
     errors.email = emailResult.error;
   }
   
-  // Phone validation
+  // Phone validation - try to normalize first
   const phoneResult = validatePhoneNumber(formData.phoneNumber);
   if (!phoneResult.isValid) {
     errors.phoneNumber = phoneResult.error;
+  } else if (phoneResult.normalized) {
+    // Use normalized value if available
+    normalizedData.phoneNumber = phoneResult.normalized;
   }
   
   // First name validation
@@ -179,6 +240,7 @@ export const validateUserForm = (formData) => {
   
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
+    normalizedData
   };
 };

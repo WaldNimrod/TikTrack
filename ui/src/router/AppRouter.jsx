@@ -10,17 +10,17 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
+import ProtectedRoute from '../cubes/identity/components/auth/ProtectedRoute';
 
 // Public Routes (imported by Team 30)
 import IndexPage from '../components/IndexPage';
-import LoginForm from '../components/auth/LoginForm';
-import RegisterForm from '../components/auth/RegisterForm';
-import PasswordResetFlow from '../components/auth/PasswordResetFlow';
+import LoginForm from '../cubes/identity/components/auth/LoginForm';
+import RegisterForm from '../cubes/identity/components/auth/RegisterForm';
+import PasswordResetFlow from '../cubes/identity/components/auth/PasswordResetFlow';
 
 // Protected Routes (will be imported by Team 30)
-import ProfileView from '../components/profile/ProfileView';
-import PasswordChangeForm from '../components/profile/PasswordChangeForm';
+import ProfileView from '../cubes/identity/components/profile/ProfileView';
+import PasswordChangeForm from '../cubes/identity/components/profile/PasswordChangeForm';
 // import Dashboard from '../views/Dashboard';
 // import AccountsView from '../views/financial/D16_ACCTS_VIEW';
 // import BrokersView from '../views/financial/D18_BRKRS_VIEW';

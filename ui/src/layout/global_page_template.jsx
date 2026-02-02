@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Filter, Bell, User, ChevronDown, LayoutGrid, List, Plus, Activity, Shield, TrendingUp, Settings } from 'lucide-react';
+import { usePhoenixFilter } from '../cubes/shared/contexts/PhoenixFilterContext.jsx';
 
 /**
  * TikTrack Global Page Template (v1.2.6)
@@ -10,23 +11,9 @@ import { Search, Filter, Bell, User, ChevronDown, LayoutGrid, List, Plus, Activi
 
 const GlobalStyles = () => (
   <style>{`
-    :root {
-      --color-1: #ffffff;
-      --color-5: #f4f7f9;
-      --color-10: #eef2f5;
-      --color-20: #d1d9e0;
-      --color-30: #94a3b8;
-      --color-40: #4b4f56;
-      --color-45: #334155;
-      --color-50: #1c1e21;
-      --legacy-turquoise: #26baac;
-      --legacy-turquoise-hover: #1e968a;
-      --font-main: 'Tahoma', 'Arial', sans-serif;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
     /* Contextual Color Mapping (Entity Context) */
-    .context-trading { --context-primary: var(--legacy-turquoise); }
+    /* Note: All CSS Variables are now in phoenix-base.css (SSOT) */
+    .context-trading { --context-primary: var(--color-brand); }
     .context-portfolio { --context-primary: #1a4d80; }
     .context-admin { --context-primary: #475569; }
 
@@ -69,27 +56,54 @@ const TtHeader = ({ user }) => (
 
 /**
  * TtGlobalFilter - שורת הסינון המערכתית
+ * 
+ * @description שורת פילטרים גלובליים המחוברת ל-PhoenixFilterContext
+ * @standard JS Standards Protocol ✅ | Audit Trail System ✅
  */
-const TtGlobalFilter = () => (
-  <div className="bg-[var(--color-1)] border-b border-[var(--color-20)] px-6 py-3.5 flex items-center justify-between sticky top-[64px] z-40">
-    <div className="flex items-center gap-4 flex-1">
-      <div className="relative group">
-        <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-30)] group-focus-within:text-[var(--context-primary)] transition-colors" />
-        <input 
-          type="text" 
-          placeholder="סינון גלובלי..." 
-          className="bg-[var(--color-5)] border border-[var(--color-20)] pr-10 pl-4 py-2 text-sm rounded-[4px] outline-none focus:border-[var(--context-primary)] w-72 transition-all" 
-        />
+const TtGlobalFilter = () => {
+  const { filters, setFilter, clearFilters } = usePhoenixFilter();
+
+  /**
+   * handleSearchChange - עדכון פילטר חיפוש
+   */
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setFilter('search', value);
+  };
+
+  /**
+   * handleClearFilters - איפוס כל הפילטרים
+   */
+  const handleClearFilters = () => {
+    clearFilters();
+  };
+
+  return (
+    <div className="bg-[var(--color-1)] border-b border-[var(--color-20)] px-6 py-3.5 flex items-center justify-between sticky top-[64px] z-40">
+      <div className="flex items-center gap-4 flex-1">
+        <div className="relative group">
+          <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-30)] group-focus-within:text-[var(--context-primary)] transition-colors" />
+          <input 
+            type="text" 
+            placeholder="סינון גלובלי..." 
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className="bg-[var(--color-5)] border border-[var(--color-20)] pr-10 pl-4 py-2 text-sm rounded-[4px] outline-none focus:border-[var(--context-primary)] w-72 transition-all js-global-search-input" 
+          />
+        </div>
+        <button 
+          className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-[var(--color-40)] hover:bg-[var(--color-10)] rounded-[4px] transition-all js-filter-options-button"
+          onClick={handleClearFilters}
+        >
+          <Filter size={16} className="text-[var(--context-primary)]" /> אפשרויות סינון
+        </button>
       </div>
-      <button className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-[var(--color-40)] hover:bg-[var(--color-10)] rounded-[4px] transition-all">
-        <Filter size={16} className="text-[var(--context-primary)]" /> אפשרויות סינון
+      <button className="bg-[var(--context-primary)] text-white px-5 py-2 rounded-[4px] text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-sm js-quick-action-button">
+        <Plus size={16} /> פעולה מהירה
       </button>
     </div>
-    <button className="bg-[var(--context-primary)] text-white px-5 py-2 rounded-[4px] text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-sm">
-      <Plus size={16} /> פעולה מהירה
-    </button>
-  </div>
-);
+  );
+};
 
 /**
  * TtSectionRow - ניהול גריד ופריסה (שימוש חובה במקום div רגיל)

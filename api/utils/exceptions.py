@@ -8,6 +8,7 @@ Based on ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md (v1.2)
 """
 
 from fastapi import HTTPException
+from typing import Optional
 
 
 class HTTPExceptionWithCode(HTTPException):
@@ -29,7 +30,7 @@ class HTTPExceptionWithCode(HTTPException):
         status_code: int,
         detail: str,
         error_code: str,
-        headers: dict | None = None
+        headers: Optional[dict] = None
     ):
         super().__init__(status_code=status_code, detail=detail, headers=headers)
         self.error_code = error_code

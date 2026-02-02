@@ -61,12 +61,36 @@
   - `tt-section-row` - שורת תוכן
 - [ ] להתאים למבנה הקוביות המודולריות (`ui/src/cubes/{cube_name}/pages/`)
 
-#### 1.2 שימוש ב-Shared Components
+#### 1.2 Fluid Design (רספונסיביות אוטומטית) 📱 **MANDATORY**
+- [ ] שימוש ב-`clamp()` לגדלי פונטים
+- [ ] שימוש ב-`clamp()` לריווחים
+- [ ] שימוש ב-Grid עם `auto-fit` / `auto-fill`
+- [ ] **אין Media Queries** עבור גדלי פונטים וריווחים
+
+**דוגמאות:**
+```css
+/* Typography - Fluid */
+font-size: clamp(0.875rem, 2vw + 0.5rem, 1.125rem);
+
+/* Spacing - Fluid */
+padding: clamp(0.5rem, 1vw + 0.25rem, 1rem);
+margin: clamp(1rem, 2vw + 0.5rem, 2rem);
+
+/* Grid - Fluid */
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+```
+
+#### 1.3 Design Tokens SSOT 🔴 **MANDATORY**
+- [ ] שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד
+- [ ] אין הגדרת CSS Variables חדשות
+- [ ] אין שימוש בקבצי JSON או `design-tokens.css`
+
+#### 1.4 שימוש ב-Shared Components
 - [ ] שימוש ב-Shared Components שזוהו בשלב 2.5
 - [ ] מבנה HTML/JSX שמאפשר שימוש ב-Components משותפים
 - [ ] תיעוד Components משותפים פוטנציאליים
 
-#### 1.3 ⚠️ כלל ברזל - אין JavaScript
+#### 1.5 ⚠️ כלל ברזל - אין JavaScript 🔴 **MANDATORY**
 - [ ] **אין `<script>` tags** בתוך HTML/JSX
 - [ ] **אין inline event handlers** (`onclick`, `onchange`, וכו')
 - [ ] **כל הסקריפטים בקבצים חיצוניים** (באחריות Team 30)
@@ -92,11 +116,17 @@
 
 #### 2.1 שמירה על CSS Architecture
 - [ ] סדר טעינת CSS נכון (10 שלבים)
-- [ ] שימוש ב-CSS Variables מ-`phoenix-base.css`
+- [ ] שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד (SSOT)
 - [ ] עמידה ב-ITCSS hierarchy
 - [ ] שימוש ב-CSS Classes מותאמים אישית (לא Tailwind)
 
-#### 2.2 LEGO System
+#### 2.2 Fluid Design (רספונסיביות אוטומטית) 📱 **MANDATORY**
+- [ ] כל גדלי הפונטים עם `clamp()`
+- [ ] כל הריווחים עם `clamp()`
+- [ ] Layout עם Grid `auto-fit` / `auto-fill`
+- [ ] אין Media Queries עבור גדלי פונטים וריווחים
+
+#### 2.3 LEGO System
 - [ ] שימוש ב-`tt-container` > `tt-section` > `tt-section-row`
 - [ ] אין CSS מותאם אישית - רק Logical Properties
 - [ ] שמירה על עקביות עם הבלופרינטים הקיימים
@@ -129,7 +159,18 @@
 - [ ] לבדוק RTL ו-DNA Sync
 - [ ] לבדוק התאמה למבנה הקוביות המודולריות
 
-#### 4.2 בדיקת כלל ברזל
+#### 4.2 בדיקת Fluid Design 📱 **MANDATORY**
+- [ ] אין Media Queries עבור גדלי פונטים וריווחים
+- [ ] כל גדלי הפונטים עם `clamp()`
+- [ ] כל הריווחים עם `clamp()`
+- [ ] Layout עם Grid `auto-fit` / `auto-fill`
+
+#### 4.3 בדיקת Design Tokens SSOT 🔴 **MANDATORY**
+- [ ] שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד
+- [ ] אין הגדרת CSS Variables חדשות
+- [ ] אין שימוש בקבצי JSON או `design-tokens.css`
+
+#### 4.4 בדיקת כלל ברזל 🔴 **MANDATORY**
 - [ ] **אין JavaScript בתוך הבלופרינט**
 - [ ] **אין inline event handlers**
 - [ ] **כל הסקריפטים בקבצים חיצוניים** (הערות בלבד)
@@ -167,6 +208,10 @@
 ### **בזמן יצירת הבלופרינט:**
 - [ ] שימוש ב-Shared Components שזוהו בשלב 2.5
 - [ ] שמירה על מבנה LEGO System (`tt-container` > `tt-section` > `tt-section-row`)
+- [ ] **Fluid Design:** שימוש ב-`clamp()` לגדלי פונטים וריווחים
+- [ ] **Fluid Design:** Layout עם Grid `auto-fit` / `auto-fill`
+- [ ] **אין Media Queries** עבור גדלי פונטים וריווחים
+- [ ] שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד (SSOT)
 - [ ] שמירה על CSS Architecture
 - [ ] **⚠️ כלל ברזל:** אין JavaScript בתוך הבלופרינט
 - [ ] שימוש ב-JS Selectors עם `js-` prefix
@@ -175,6 +220,8 @@
 
 ### **לפני הגשה:**
 - [ ] בדיקת מבנה LEGO System
+- [ ] בדיקת Fluid Design (אין Media Queries, שימוש ב-`clamp()`)
+- [ ] בדיקת Design Tokens SSOT (רק `phoenix-base.css`)
 - [ ] בדיקת כלל ברזל (אין JavaScript)
 - [ ] בדיקת תעוד
 - [ ] הודעה מסודרת לצוות 10
@@ -200,25 +247,37 @@
 
 ## ⚠️ כללי עבודה קריטיים
 
-### 1. **כלל ברזל - אין JavaScript בתוך הבלופרינט**
+### 1. **כלל ברזל - אין JavaScript בתוך הבלופרינט** 🔴 **MANDATORY**
 - ⚠️ **חובה:** אין `<script>` tags בתוך HTML/JSX
 - ⚠️ **חובה:** אין inline event handlers
 - ⚠️ **חובה:** כל הסקריפטים בקבצים חיצוניים (הערות בלבד)
 - ⚠️ **חובה:** JS Selectors עם `js-` prefix
+- ⚠️ **השלכה:** כל חריגה תגרור פסילת G-Bridge מיידית 🛡️
 
-### 2. **התאמה למבנה הקוביות המודולריות**
+### 2. **Fluid Design Mandate** 📱 **MANDATORY**
+- ⚠️ **חובה:** שימוש ב-`clamp()` לגדלי פונטים וריווחים
+- ⚠️ **חובה:** Layout עם Grid `auto-fit` / `auto-fill`
+- ⚠️ **איסור:** אין Media Queries עבור גדלי פונטים וריווחים
+- ⚠️ **השלכה:** כל חריגה תגרור פסילת G-Bridge מיידית 🛡️
+
+### 3. **Design Tokens SSOT** 🔴 **MANDATORY**
+- ⚠️ **חובה:** שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד
+- ⚠️ **איסור:** אין הגדרת CSS Variables חדשות
+- ⚠️ **איסור:** אין שימוש בקבצי JSON או `design-tokens.css`
+
+### 4. **התאמה למבנה הקוביות המודולריות**
 - ⚠️ **חובה:** הבלופרינט צריך להיות מוכן לשילוב במבנה `ui/src/cubes/{cube_name}/pages/`
-- ⚠️ **חובה:** שימוש ב-Shared Components שזוהו בשלב 2.5
+- ⚠️ **חובה:** שימוש ב-Shared Components שזוהו
 - ⚠️ **חובה:** מבנה HTML/JSX שמאפשר שימוש ב-Components משותפים
 
-### 3. **תיאום לפני יצירת בלופרינט**
+### 5. **תיאום לפני יצירת בלופרינט**
 - ⚠️ **חובה:** תיאום עם Team 10 לפני יצירת כל בלופרינט חדש
 - ⚠️ **חובה:** קבלת דוגמאות/תבניות מ-Team 30 + Team 40
 - ⚠️ **חובה:** קבלת המסמך `CUBE_COMPONENTS_REFERENCE.md`
 
-### 4. **מתי להתחיל**
-- ⚠️ **חובה:** רק לאחר השלמת שלב 2.5 (Cube Components Library)
-- ⚠️ **חובה:** רק לאחר קבלת דוגמאות/תבניות
+### 6. **מתי להתחיל**
+- ⚠️ **חובה:** רק לאחר סיום התהליך על ידי צוותי הפיתוח
+- ⚠️ **חובה:** רק לאחר קבלת תעוד "as made"
 - ⚠️ **חובה:** רק לאחר תיאום עם Team 10
 
 ---
@@ -235,9 +294,14 @@
 ### **מטריצה:**
 - `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md` - מטריצת עמודים (קוביות מוגדרות)
 
+### **החלטות אדריכלית:**
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטות סופיות 🛡️
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_RESPONSIVE_CHARTER.md` - אמנת רספונסיביות
+
 ### **תיעוד:**
 - `documentation/01-ARCHITECTURE/TT2_SECTION_ARCHITECTURE_SPEC.md` - LEGO System Spec
 - `documentation/04-DESIGN_UX_UI/SYSTEM_WIDE_DESIGN_PATTERNS.md` - Design Patterns
+- `documentation/04-DESIGN_UX_UI/TT2_RESPONSIVE_FLUID_DESIGN.md` - Fluid Design Documentation
 - `_COMMUNICATION/team_31/team_31_staging/CSS_ARCHITECTURE_HIERARCHY.md` - CSS Architecture
 
 ### **בלופרינטים קיימים (להתייחסות):**
@@ -249,13 +313,44 @@
 
 - **אתם לא מעורבים בתהליך הבנייה מחדש** של העמודים הקיימים
 - **תפקידכם:** לייצר בלופרינטים חדשים בצורה אופטימלית לשילוב במבנה החדש
-- **מתי להתחיל:** לאחר השלמת שלב 2.5 (לפני שלב 3)
+- **מתי להתחיל:** לאחר סיום התהליך וקבלת תעוד "as made"
 - **תיאום:** חובה לפני יצירת כל בלופרינט חדש
 - **בלופרינטים קיימים:** לא באחריותכם - עברו ל-Team 30 + Team 40
+
+### **החלטות אדריכלית סופיות:**
+- 🛡️ **כל חריגה תגרור פסילת G-Bridge מיידית**
+- 📱 **Fluid Design Mandate:** שימוש ב-`clamp()`, אין Media Queries
+- 🔴 **Clean Slate Rule:** אין JavaScript בתוך הבלופרינט (רטרואקטיבי)
+- 🔴 **Design Tokens SSOT:** רק `phoenix-base.css` הוא מקור האמת
+
+**מסמך עדכון מפורט:** `_COMMUNICATION/team_31/TEAM_31_ARCHITECT_DECISIONS_UPDATE.md`
+
+---
+
+---
+
+## ⏸️ עדכון סטטוס: בחופשה עד לסיום התהליך
+
+**תאריך עדכון:** 2026-02-01  
+**סטטוס:** ⏸️ **בחופשה עד לסיום התהליך**
+
+**הבהרה חשובה:**
+- ⏸️ **צוות 31 בחופשה** עד לסיום התהליך על ידי צוותי הפיתוח (Team 30, Team 40)
+- ⏸️ **לא מתחילים עבודה** על בלופרינטים חדשים עד לסיום התהליך
+- ✅ **ממתינים** להשלמת התוכנית ולקבלת תעוד "as made" מהצוותים
+
+**תוכנית סופית:**
+- `_COMMUNICATION/team_10/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md` - תוכנית מלאה (814 שורות)
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES.md` - החלטת האדריכלית
+
+**לאחר סיום התהליך:**
+- קבלת תעוד "as made" מהצוותים
+- יצירת בלופרינטים חדשים בהתאם למבנה הסופי
+- יישום בהתאם לתוכנית ולמבנה החדש
 
 ---
 
 **צוות 31 (Blueprint)**  
 **תאריך עדכון:** 2026-02-01  
 **גרסה:** v3.0.0  
-**סטטוס:** ⏸️ **ממתין להשלמת שלב 2.5 לפני תחילת עבודה על בלופרינטים נוספים**
+**סטטוס:** ⏸️ **בחופשה עד לסיום התהליך**

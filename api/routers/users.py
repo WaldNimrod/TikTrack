@@ -9,6 +9,8 @@ FastAPI routes for user profile management.
 from fastapi import APIRouter, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from typing import Dict, Any
 import logging
 
@@ -22,6 +24,7 @@ from ..schemas.identity import UserResponse, UserUpdate, PasswordChangeRequest, 
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
+from ..models.enums import UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +82,23 @@ async def update_user_profile(
         
         # Phone number update - if changed, reset verification status
         if data.phone_number is not None and data.phone_number != current_user.phone_number:
+            # Check if phone number is already taken by another user
+            # Exception: ADMIN and SUPERADMIN users can have duplicate phone/email
+            if current_user.role not in (UserRole.ADMIN, UserRole.SUPERADMIN):
+                existing_user = await db.execute(
+                    select(User).where(
+                        User.phone_number == data.phone_number,
+                        User.id != current_user.id,
+                        User.deleted_at.is_(None)
+                    )
+                )
+                if existing_user.scalar_one_or_none():
+                    raise HTTPExceptionWithCode(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Phone number is already in use by another user",
+                        error_code=ErrorCodes.USER_ALREADY_EXISTS
+                    )
+            
             current_user.phone_number = data.phone_number
             current_user.phone_verified = False
             current_user.phone_verified_at = None
@@ -86,11 +106,61 @@ async def update_user_profile(
         # Update timestamp
         current_user.updated_at = datetime.now(timezone.utc)
         
-        await db.commit()
-        await db.refresh(current_user)
+        try:
+            await db.commit()
+            await db.refresh(current_user)
+        except IntegrityError as e:
+            await db.rollback()
+            error_msg = str(e.orig) if hasattr(e, 'orig') else str(e)
+            
+            # Check for unique constraint violations
+            # Exception: ADMIN and SUPERADMIN users can have duplicate phone/email
+            # After DB schema update (PHX_DB_SCHEMA_V2.5_ADMIN_DUPLICATE_EMAIL_PHONE.sql),
+            # admin users should not hit these constraints, but we handle it gracefully
+            if current_user.role in (UserRole.ADMIN, UserRole.SUPERADMIN):
+                # Admin/SuperAdmin can bypass uniqueness constraints
+                # If we still get IntegrityError, it might be a different constraint
+                logger.warning(f"Admin/SuperAdmin user {current_user.id} hit integrity error: {error_msg}")
+                # Check if it's email/phone related - if so, might need DB schema update
+                if "email" in error_msg.lower() or "phone" in error_msg.lower():
+                    logger.error(f"Admin user hit email/phone constraint. DB schema may need update. Error: {error_msg}")
+                    raise HTTPExceptionWithCode(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Admin duplicate email/phone requires database schema update. Please contact system administrator.",
+                        error_code=ErrorCodes.DATABASE_ERROR
+                    )
+                # Other integrity errors - re-raise as generic error
+                logger.error(f"Database integrity error for admin user: {error_msg}", exc_info=True)
+                raise HTTPExceptionWithCode(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Profile update failed due to database constraint violation",
+                    error_code=ErrorCodes.DATABASE_ERROR
+                )
+            elif "email" in error_msg.lower() or "idx_users_email" in error_msg or "users_email_key" in error_msg or "idx_users_email_unique_non_admin" in error_msg:
+                raise HTTPExceptionWithCode(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Email address is already in use by another user",
+                    error_code=ErrorCodes.USER_ALREADY_EXISTS
+                )
+            elif "phone" in error_msg.lower() or "idx_users_phone_unique" in error_msg or "users_phone_number_key" in error_msg or "idx_users_phone_unique_non_admin" in error_msg:
+                raise HTTPExceptionWithCode(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Phone number is already in use by another user",
+                    error_code=ErrorCodes.USER_ALREADY_EXISTS
+                )
+            else:
+                logger.error(f"Database integrity error: {error_msg}", exc_info=True)
+                raise HTTPExceptionWithCode(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Profile update failed due to database constraint violation",
+                    error_code=ErrorCodes.DATABASE_ERROR
+                )
         
         return UserResponse.from_model(current_user)
         
+    except HTTPExceptionWithCode:
+        # Re-raise HTTP exceptions with error codes
+        raise
     except ValueError as e:
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_400_BAD_REQUEST,

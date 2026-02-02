@@ -9,6 +9,7 @@ Main FastAPI application with all routes and middleware.
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -30,6 +31,26 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Register exception handlers BEFORE routers to ensure they're used
+# RequestValidationError handler must be registered early using add_exception_handler
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handler for Pydantic validation errors.
+    
+    Adds error_code to validation error responses.
+    This ensures all validation errors include error_code for frontend handling.
+    """
+    logger.debug(f"RequestValidationError caught: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT
+        }
+    )
+
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # Initialize rate limiter and attach to app state
 # Import limiter from users router (shared instance)
@@ -156,7 +177,7 @@ async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionW
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     """
-    Handler for standard HTTPException (fallback for Pydantic validation errors).
+    Handler for standard HTTPException (fallback for other errors).
     
     Converts to HTTPExceptionWithCode with appropriate error code.
     This ensures all errors have an error_code.

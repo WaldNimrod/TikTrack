@@ -15,6 +15,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0',  // Listen on all interfaces (IPv4 and IPv6)
     port: 8080,  // V2 port as per Master Blueprint: "Ports: V2 (8080), Legacy (8081)"
     proxy: {
       '/api': {

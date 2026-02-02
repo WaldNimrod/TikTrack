@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phoenix Legacy Scanner - Runner</title>
+  <style>
+    body {
+      font-family: 'Assistant', 'Tahoma', sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      direction: rtl;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e293b;
+      margin-top: 0;
+    }
+    .instructions {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 4px;
+      margin: 16px 0;
+      border-right: 4px solid #26baac;
+    }
+    .instructions ol {
+      margin: 8px 0;
+      padding-right: 24px;
+    }
+    .instructions li {
+      margin: 8px 0;
+    }
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      margin: 16px 0;
+    }
+    .btn {
+      background: #26baac;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 8px 4px;
+    }
+    .btn:hover {
+      background: #1f9a8e;
+    }
+    .output {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Phoenix Legacy Scanner - Runner</h1>
+    <p>סקריפט לסריקת קובץ לגסי D16_ACCTS_VIEW.html</p>
+    
+    <div class="instructions">
+      <h3>📋 הוראות שימוש:</h3>
+      <ol>
+        <li>פתח את קובץ הלגסי בדפדפן: <code>ui/src/views/financial/D16_ACCTS_VIEW.html</code></li>
+        <li>פתח את קונסולת הדפדפן (F12 או Cmd+Option+I)</li>
+        <li>העתק את הסקריפט מהקוד למטה והדבק בקונסולה</li>
+        <li>הסקריפט יריץ סריקה ויציג דוח מלא</li>
+        <li>העתק את התוצאה מ-<code>window.phoenixLegacyScan</code></li>
+      </ol>
+    </div>
+    
+    <h3>📝 הסקריפט:</h3>
+    <div class="code-block" id="scannerScript">
+      <!-- Script will be loaded here -->
+    </div>
+    
+    <button class="btn" onclick="copyScript()">📋 העתק סקריפט</button>
+    <button class="btn" onclick="loadScript()">▶️ טען סקריפט</button>
+    
+    <div id="output" class="output" style="display: none;"></div>
+  </div>
+  
+  <script>
+    // Load scanner script
+    async function loadScript() {
+      try {
+        const response = await fetch('./legacy-scanner-D16_ACCTS_VIEW.js');
+        const script = await response.text();
+        document.getElementById('scannerScript').textContent = script;
+      } catch (error) {
+        console.error('Error loading script:', error);
+        alert('שגיאה בטעינת הסקריפט. ודא שהקובץ נמצא באותו תיקייה.');
+      }
+    }
+    
+    function copyScript() {
+      const script = document.getElementById('scannerScript').textContent;
+      navigator.clipboard.writeText(script).then(() => {
+        alert('✅ הסקריפט הועתק ללוח');
+      });
+    }
+    
+    // Auto-load script on page load
+    window.addEventListener('DOMContentLoaded', loadScript);
+  </script>
+</body>
+</html>

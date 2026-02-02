@@ -33,20 +33,32 @@ tt-container {
   padding-inline: clamp(12px, 1.5vw, 16px); /* CRITICAL: Fluid padding - responsive automatically */
 }
 
-/* tt-section: Independent content unit - DEFAULT STYLES */
-tt-section {
+/* tt-section: Independent content unit - TRANSPARENT BACKGROUND (header/body are separate white cards) */
+/* CRITICAL: Must never cause horizontal overflow */
+/* Using high specificity to ensure transparent background and overflow prevention */
+tt-container tt-section {
   display: block;
-  background: var(--apple-bg-elevated, #ffffff);
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 2px;
+  background: transparent !important; /* CRITICAL: Transparent - header and body are separate white cards */
+  border: none; /* No border - header and body have their own borders */
+  border-radius: 0; /* No border-radius - header and body have their own */
+  margin-block-start: var(--grid-gutter, var(--spacing-md)); /* Gap from header or previous section */
   margin-block-end: var(--grid-gutter, var(--spacing-md));
-  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  overflow: hidden;
+  box-shadow: none; /* No shadow - header and body have their own shadows */
+  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-y: visible; /* Allow vertical overflow for content */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* tt-section content area - minimal padding */
+/* First section after header - same gap as between sections */
+tt-section:first-of-type {
+  margin-block-start: var(--grid-gutter, var(--spacing-md));
+}
+
+/* tt-section content area - NO padding (header/body have their own padding) */
 tt-section > * {
-  padding: var(--spacing-lg, 24px);
+  padding: 0; /* No padding - header and body are separate cards with their own padding */
 }
 
 /* tt-section header (data-title attribute) */
@@ -74,6 +86,190 @@ tt-section-row {
 /* Grid children - no flex needed, grid handles layout */
 tt-section-row > * {
   min-width: 0; /* Allow shrinking below content size */
+}
+
+/* ============================================
+   Section Styles - Base Section Components
+   ============================================
+   These styles are used by ALL pages with sections.
+   Moved from D15_DASHBOARD_STYLES.css to central location.
+   
+   Hierarchy:
+   - phoenix-base.css: CSS Variables, Reset, Base Typography
+   - phoenix-components.css: LEGO Components + Section Styles (THIS FILE)
+   - phoenix-header.css: Unified Header Styles
+   - D15_DASHBOARD_STYLES.css: Dashboard-specific styles (widgets, etc.)
+   ============================================ */
+
+/* Block: Section Header - Separate white card */
+/* CRITICAL: 3-part structure - Title | Subtitle (center) | Actions (end) */
+/* All aligned to middle vertically, fixed height, single row, no wrapping */
+.dashboard-section__header,
+.index-section__header {
+  display: flex;
+  align-items: center; /* CRITICAL: All elements aligned to middle vertically */
+  justify-content: space-between; /* CRITICAL: 3-part layout */
+  padding: 0 var(--spacing-lg, 24px); /* No vertical padding - fixed height handles spacing */
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px;
+  margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  /* Subtle entity color accent on left border */
+  border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
+  /* Entity color accent on bottom border */
+  border-block-end: 3px solid var(--color-brand, var(--entity-trade-color));
+  height: 60px; /* CRITICAL: Fixed height - cannot break or stretch */
+  min-height: 60px;
+  max-height: 60px;
+  flex-wrap: nowrap; /* CRITICAL: All in single row - never wrap */
+  overflow: hidden; /* Prevent content overflow */
+  box-sizing: border-box;
+}
+
+/* Block: Section Body - Separate white card below header */
+.dashboard-section__body,
+.index-section__body {
+  display: block;
+  padding: var(--spacing-lg, 24px);
+  background: var(--apple-bg-elevated, #ffffff); /* White background - separate card */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 8px;
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  /* No margin-top - gap is created by header margin-block-end */
+  width: 100%; /* Full width */
+  box-sizing: border-box; /* Include padding in width */
+  /* Smooth animation for open/close */
+  transition: opacity 0.3s ease, max-height 0.3s ease, padding-block 0.3s ease, margin-block-end 0.3s ease;
+  overflow: hidden;
+  opacity: 1;
+  max-height: 10000px; /* Large enough to accommodate content */
+}
+
+/* Closed state - smooth collapse animation */
+.dashboard-section__body[hidden],
+.index-section__body[hidden] {
+  display: block !important; /* Keep block for animation */
+  opacity: 0;
+  max-height: 0;
+  padding-block: 0;
+  margin-block-end: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Element: Header Title - Part 1: Title with icon (start, min-width by content) */
+.dashboard-section__header-title,
+.index-section__header-title {
+  display: flex;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  gap: var(--spacing-sm, 8px);
+  flex-shrink: 0; /* Don't shrink - min-width by content */
+  margin: 0; /* No margin - padding handled by parent */
+  padding: 0; /* No padding */
+}
+
+.dashboard-section__header-icon,
+.index-section__header-icon {
+  width: 35px;
+  height: 35px;
+  padding-top: 3px;
+  color: var(--color-brand, var(--entity-trade-color));
+}
+
+.dashboard-section__header-text,
+.index-section__header-text {
+  font-size: clamp(1rem, 2.5vw, 1.5rem); /* Smaller font size */
+  font-weight: 700; /* Bolder - increased from 600 to 700 */
+  color: var(--apple-text-primary, #1d1d1f);
+  margin: 0;
+}
+
+/* Element: Header Meta - Part 2: Subtitle (center, takes remaining width) */
+.dashboard-section__header-meta,
+.index-section__header-meta {
+  flex: 1; /* CRITICAL: Takes remaining width */
+  display: flex;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  justify-content: center; /* CRITICAL: Content centered */
+  margin: 0; /* No margin */
+  padding: 0 var(--spacing-md, 16px); /* Horizontal padding only */
+  min-width: 0; /* Allow shrinking if needed */
+}
+
+/* Element: Header Count - High specificity to ensure centering */
+.index-section__header-meta .index-section__header-count,
+.dashboard-section__header-meta .dashboard-section__header-count {
+  font-size: var(--font-size-base, 0.92rem);
+  color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
+  opacity: 0.8; /* 0.8 opacity */
+  text-align: center; /* Centered */
+  font-weight: 500; /* Subtitle style */
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
+  white-space: nowrap; /* Single line */
+}
+
+/* Element: Header Actions - Part 3: Buttons area (end, width by content) */
+.dashboard-section__header-actions,
+.index-section__header-actions {
+  display: flex;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  justify-content: flex-end; /* CRITICAL: Aligned to end */
+  gap: var(--spacing-sm, 8px);
+  flex-shrink: 0; /* Don't shrink - width by content */
+  margin: 0; /* No margin */
+  padding: 0; /* No padding */
+}
+
+.dashboard-section__header-toggle-btn,
+.index-section__header-toggle-btn {
+  display: flex;
+  align-items: center; /* CRITICAL: Aligned to middle */
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0; /* No margin - parent handles spacing */
+  background: transparent;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--apple-text-primary, #1d1d1f);
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.dashboard-section__header-toggle-btn:hover,
+.index-section__header-toggle-btn:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+/* Entity-specific header colors - Basic entity colors */
+/* Settings/Preferences Context - Gray (#475569) */
+main[data-context="settings"],
+body.context-settings {
+  --context-primary: #475569;
+}
+
+tt-section[data-section*="section"] .index-section__header-icon,
+tt-section[data-section*="section"] .index-section__header-text,
+tt-section[data-section*="section"] .index-section__header-count {
+  color: var(--context-primary, #475569);
+}
+
+/* Portfolio - Trading Account color */
+tt-section[data-section="portfolio"] .index-section__header {
+  border-inline-start-color: var(--entity-trading-account-color, #28a745);
+  border-block-end-color: var(--entity-trading-account-color, #28a745);
+}
+
+tt-section[data-section="portfolio"] .index-section__header-icon {
+  color: var(--entity-trading-account-color, #28a745);
+}
+
+tt-section[data-section="portfolio"] .index-section__header-count {
+  color: var(--entity-trading-account-color, #28a745);
 }
 
 /* ============================================

@@ -7,9 +7,14 @@ CREATE TABLE users (
     internal_ids BIGSERIAL PRIMARY KEY,
     external_ulids VARCHAR(26) UNIQUE NOT NULL,
     user_tier_levels user_tier DEFAULT 'Bronze',
-    email_addresses VARCHAR(255) UNIQUE NOT NULL,
+    -- Email: UNIQUE constraint handled via partial index (excludes ADMIN/SUPERADMIN)
+    -- See: PHX_DB_SCHEMA_V2.5_ADMIN_DUPLICATE_EMAIL_PHONE.sql
+    email_addresses VARCHAR(255) NOT NULL,
     user_profiles_data JSONB DEFAULT '{}'
 );
+
+-- Note: UNIQUE indexes created separately to allow ADMIN/SUPERADMIN duplicates
+-- See: PHX_DB_SCHEMA_V2.5_ADMIN_DUPLICATE_EMAIL_PHONE.sql for full implementation
 
 CREATE TABLE trading_accounts (
     internal_ids BIGSERIAL PRIMARY KEY,

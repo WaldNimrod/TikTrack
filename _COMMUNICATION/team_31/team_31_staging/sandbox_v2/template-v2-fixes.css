@@ -1,0 +1,33 @@
+/**
+ * Template V2 Fixes - Additional CSS for template fixes
+ * Sync-Time: 2026-02-02 00:00:00 IST
+ * Team: Team 31 (Blueprint)
+ * Status: ✅ TEMPLATE FIXES CSS
+ * 
+ * Purpose:
+ * Additional CSS fixes for template V2:
+ * - Content area minimum height (viewport height minus header and footer)
+ * 
+ * IMPORTANT:
+ * - Footer uses existing approved CSS from phoenix-components.css (no overrides)
+ * - Footer-loader.js handles loading (same as login page)
+ * - This file should be loaded AFTER phoenix-base.css and phoenix-components.css
+ */
+
+/* ============================================
+   Content Area Minimum Height
+   ============================================
+   CRITICAL: Content area must have minimum height based on viewport
+   This ensures footer is pushed down and content area fills screen
+   ============================================ */
+
+/* Page Container: Minimum height = viewport height - header (120px) - footer (200px) */
+/* Footer is loaded dynamically and positioned at bottom (like login page) */
+body .page-wrapper .page-container {
+  min-height: calc(100vh - 120px - 200px); /* Viewport height minus header and footer */
+}
+
+/* Main element: Ensure it takes full available height */
+body .page-wrapper .page-container main {
+  min-height: calc(100vh - 120px - 200px); /* Same as page-container */
+}

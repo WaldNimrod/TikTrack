@@ -152,11 +152,16 @@ Default Routes:
    - LEGO components (reusable building blocks)
    - Semantic tags (tt-container, tt-section, etc.)
 
-4. **phoenix-header.css** (`ui/src/styles/phoenix-header.css`)
+4. **phoenix-tables.css** (`ui/src/styles/phoenix-tables.css`) ⚠️ **נדרש להעברה מסטייג'ינג**
+   - Unified tables system styles
+   - BEM naming convention (phoenix-table-*)
+   - Must be loaded after phoenix-components.css
+
+5. **phoenix-header.css** (`ui/src/styles/phoenix-header.css`)
    - Header component styles
    - Only loaded if header is used
 
-5. **Page-specific CSS** (e.g., `D15_IDENTITY_STYLES.css`)
+6. **Page-specific CSS** (e.g., `D15_IDENTITY_STYLES.css`)
    - Loaded per route by Team 30
    - Page-specific overrides
 
@@ -219,7 +224,7 @@ api/
 - **sqlalchemy** - ORM
 - **pydantic** - Data validation
 - **python-jose** - JWT handling
-- **passlib** - Password hashing
+- **bcrypt** - Password hashing (direct usage, **no passlib**)
 - **python-multipart** - Form data handling
 - **cryptography** - Encryption utilities
 
@@ -243,6 +248,67 @@ api/
 - `/user/api-keys` - API keys management
 
 **Full API Documentation:** See `OPENAPI_SPEC_V2.5.2.yaml`
+
+### **Password Hashing (Authentication)**
+
+#### **Implementation:**
+- **Library:** `bcrypt` (direct usage, **no passlib**)
+- **Location:** `api/services/auth.py`
+- **Version:** bcrypt 5.0.0+ (compatible with Python 3.11+)
+
+#### **Functions:**
+
+##### **hash_password(password: str) -> str**
+```python
+import bcrypt
+
+def hash_password(password: str) -> str:
+    """
+    Hash a password using bcrypt.
+    
+    Args:
+        password: Plain text password
+        
+    Returns:
+        Hashed password string
+    """
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+```
+
+##### **verify_password(plain_password: str, hashed_password: str) -> bool**
+```python
+import bcrypt
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verify a password against a hash using bcrypt.
+    
+    Args:
+        plain_password: Plain text password
+        hashed_password: Bcrypt hash string
+        
+    Returns:
+        True if password matches, False otherwise
+    """
+    try:
+        return bcrypt.checkpw(
+            plain_password.encode('utf-8'),
+            hashed_password.encode('utf-8')
+        )
+    except Exception:
+        return False
+```
+
+#### **Best Practices:**
+- **Salt Generation:** Uses `bcrypt.gensalt()` for automatic salt generation
+- **Encoding:** Always encode passwords to UTF-8 before hashing/verification
+- **Error Handling:** Wraps verification in try-except for security
+- **No passlib:** Direct bcrypt usage (removed passlib in v2.5 due to compatibility issues)
+
+#### **Migration Notes:**
+- **Removed:** `passlib` (was causing compatibility issues with bcrypt 5.0.0)
+- **Direct API:** Same API (`bcrypt.checkpw` / `bcrypt.hashpw`) - no breaking changes
+- **Reference:** See `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_AUTH_FIX.md`
 
 ---
 

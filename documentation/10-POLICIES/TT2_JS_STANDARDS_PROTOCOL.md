@@ -146,6 +146,54 @@ const container = document.querySelector('tt-container');  // שגיאה!
 
 **חוק:** כל JS selector חייב להיות עם `js-` prefix, ללא קשר ל-CSS classes.
 
+#### **טבלאות React (PhoenixTable):**
+
+למרות השימוש ב-React, חובה להוסיף Class עם תחילית `js-` לכל אלמנט אינטראקטיבי בטבלאות לצורך ולידציית G-Bridge ובדיקות Selenium:
+
+```jsx
+// ✅ נכון - JS Selectors בטבלאות React
+<table className="phoenix-table js-table">
+  <thead className="phoenix-table__head">
+    <tr>
+      <th 
+        className="phoenix-table__header js-table-sort-trigger"
+        onClick={handleSort}
+      >
+        <span className="phoenix-table__header-text">שם חשבון</span>
+        <span className="phoenix-table__sort-indicator js-sort-indicator">
+          <svg className="phoenix-table__sort-icon js-sort-icon" />
+        </span>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {/* שורות טבלה */}
+  </tbody>
+</table>
+
+{error && (
+  <div className="phoenix-table__error js-table-error" role="alert">
+    {error}
+  </div>
+)}
+
+{loading && (
+  <div className="phoenix-table__loading js-table-loading">
+    טוען נתונים...
+  </div>
+)}
+```
+
+**JS Selectors בטבלאות:**
+- `.js-table` - טבלה
+- `.js-table-sort-trigger` - טריגר סידור
+- `.js-sort-indicator` - אינדיקטור סידור
+- `.js-sort-icon` - אייקון סידור
+- `.js-table-error` - הודעת שגיאה
+- `.js-table-loading` - מצב טעינה
+
+**קישור למסמך מלא:** `documentation/01-ARCHITECTURE/TT2_TABLES_REACT_FRAMEWORK.md`
+
 ---
 
 ### ג. Naming Conventions Summary
@@ -733,6 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - [ ] כל API responses עוברים דרך `apiToReact` (camelCase)
 - [ ] כל JS selectors משתמשים ב-`js-` prefix
 - [ ] אין שימוש ב-BEM classes כ-JS selectors
+- [ ] טבלאות React משתמשות ב-`js-` prefixed selectors (`.js-table`, `.js-table-sort-trigger`, `.js-sort-indicator`, `.js-sort-icon`, `.js-table-error`, `.js-table-loading`)
 - [ ] כל פונקציות מתועדות ב-JSDoc עם `@legacyReference`
 - [ ] Audit Trail מיושם בכל המודולים
 - [ ] כל האיקונים הם SVG inline פשוטים (אין ספריות חיצוניות)

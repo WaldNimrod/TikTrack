@@ -17,6 +17,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRouter from './router/AppRouter.jsx';
+import { PhoenixFilterProvider } from './cubes/shared/contexts/PhoenixFilterContext.jsx';
 
 // CSS Loading Order (CRITICAL - Follow CSS Standards Protocol)
 // 1. Pico CSS - Already loaded in index.html via CDN
@@ -42,6 +43,8 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-    <AppRouter />
+    <PhoenixFilterProvider>
+      <AppRouter />
+    </PhoenixFilterProvider>
   </React.StrictMode>
 );

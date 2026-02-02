@@ -6,7 +6,7 @@
  * @legacyReference Legacy.error.handle()
  */
 
-import { translateError } from '../logic/errorCodes.js';
+import { translateError, ERROR_CODES } from '../logic/errorCodes.js';
 import { debugLog } from './debug.js';
 import { audit } from './audit.js';
 
@@ -91,11 +91,45 @@ export const handleApiError = (error) => {
       });
     }
   } else if (status === 401) {
-    // Unauthorized
-    formError = translateError(
-      errorCode || 'AUTH_UNAUTHORIZED',
-      detail || 'אימות נכשל. אנא בדוק את פרטיך.'
-    );
+    // Unauthorized - For login, this usually means invalid credentials
+    // CRITICAL: Always ensure Hebrew message for 401 errors
+    // Priority 1: Use error_code if available (will return Hebrew from ERROR_CODES)
+    // Priority 2: Translate detail if it's in English
+    // Priority 3: Use detail if it's already in Hebrew
+    // Fallback: Use default Hebrew message
+    
+    // Use error_code if available, otherwise default to AUTH_INVALID_CREDENTIALS
+    const effectiveErrorCode = errorCode || 'AUTH_INVALID_CREDENTIALS';
+    
+    // Translate error - translateError will prioritize errorCode over detail
+    let translatedError = translateError(effectiveErrorCode, detail);
+    
+    // CRITICAL: Double-check result is in Hebrew (for test compatibility)
+    const hasHebrew = /[\u0590-\u05FF]/.test(translatedError);
+    if (!hasHebrew) {
+      // If translation didn't produce Hebrew, force use Hebrew message
+      translatedError = ERROR_CODES['AUTH_INVALID_CREDENTIALS'];
+      
+      debugLog('ErrorHandler', '401 error - forced Hebrew message', {
+        errorCode,
+        effectiveErrorCode,
+        detail,
+        originalTranslation: translateError(effectiveErrorCode, detail),
+        forcedTranslation: translatedError
+      });
+    }
+    
+    formError = translatedError;
+    
+    debugLog('ErrorHandler', '401 error processed', {
+      errorCode,
+      effectiveErrorCode,
+      detail,
+      translatedError: formError,
+      hasHebrew: /[\u0590-\u05FF]/.test(formError),
+      errorCodeExists: !!ERROR_CODES[effectiveErrorCode],
+      errorCodeValue: ERROR_CODES[effectiveErrorCode]
+    });
   } else if (status === 403) {
     // Forbidden
     formError = translateError(

@@ -56,6 +56,7 @@
   --apple-bg-secondary: #F2F2F7;
   --apple-bg-tertiary: #FFFFFF;
   --apple-bg-elevated: #FFFFFF;
+  --apple-bg-footer: #2C2C2E; /* Dark gray for footer - clear separation (lighter than black) */
   
   /* ===== Text Colors (Exact from original) ===== */
   --apple-text-primary: #000000;
@@ -249,19 +250,34 @@ body {
 html body .page-wrapper {
   width: 100%;
   max-width: 100%;
-  margin: 0;
-  padding: 0;
+  margin: 0 !important; /* CRITICAL: No margins - starts immediately after header/banner */
+  margin-top: 0 !important; /* CRITICAL: No top margin - must be flush with top */
+  margin-bottom: 0 !important; /* CRITICAL: No bottom margin */
+  padding: 0 !important; /* CRITICAL: No padding */
   overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
   background-color: var(--apple-bg-secondary, #F2F2F7); /* Gray background */
-  min-height: calc(100vh - var(--header-height, 120px)); /* Full height minus header */
+  min-height: 100vh; /* Full viewport height - footer will be at bottom */
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
+  /* CRITICAL: Ensure page-wrapper starts immediately after header/banner with no gap */
+  position: relative;
+}
+
+/* CRITICAL: Ensure no gap between header and page-wrapper */
+/* Header is sticky at top, page-wrapper starts immediately below */
+#unified-header + .page-wrapper,
+header + .page-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 /* Page Container: Centered, max-width 1400px */
 /* This is the active content area - CRITICAL BASE STRUCTURE for all system pages */
 /* CRITICAL: This must never exceed 1400px and must be centered */
-/* Using high specificity to ensure these rules apply */
+/* Takes remaining space in flex layout, pushes footer to bottom */
 body .page-wrapper .page-container {
+  flex: 1; /* Takes remaining space - pushes footer to bottom */
   max-width: var(--container-max-width, 1400px);
   width: 100%;
   margin-inline: auto; /* Center horizontally */

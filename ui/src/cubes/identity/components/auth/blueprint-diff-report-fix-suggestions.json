@@ -1,0 +1,441 @@
+{
+  "report": "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/cubes/identity/components/auth/blueprint-diff-report.json",
+  "suggestions": [
+    {
+      "type": "replace",
+      "index": 0,
+      "from": "div",
+      "to": "tt",
+      "suggestion": "Replace <div> with <tt> at index 0"
+    },
+    {
+      "type": "remove_classes",
+      "index": 0,
+      "tag": "tt",
+      "classes": [
+        "page-wrapper"
+      ],
+      "suggestion": "Remove classes \"page-wrapper\" from <tt> at index 0"
+    },
+    {
+      "type": "replace",
+      "index": 1,
+      "from": "div",
+      "to": "tt",
+      "suggestion": "Replace <div> with <tt> at index 1"
+    },
+    {
+      "type": "remove_classes",
+      "index": 1,
+      "tag": "tt",
+      "classes": [
+        "page-container"
+      ],
+      "suggestion": "Remove classes \"page-container\" from <tt> at index 1"
+    },
+    {
+      "type": "replace",
+      "index": 2,
+      "from": "main",
+      "to": "div",
+      "suggestion": "Replace <main> with <div> at index 2"
+    },
+    {
+      "type": "add_classes",
+      "index": 2,
+      "tag": "div",
+      "classes": [
+        "auth-header"
+      ],
+      "suggestion": "Add classes \"auth-header\" to <div> at index 2"
+    },
+    {
+      "type": "replace",
+      "index": 3,
+      "from": "tt",
+      "to": "div",
+      "suggestion": "Replace <tt> with <div> at index 3"
+    },
+    {
+      "type": "add_classes",
+      "index": 3,
+      "tag": "div",
+      "classes": [
+        "auth-logo"
+      ],
+      "suggestion": "Add classes \"auth-logo\" to <div> at index 3"
+    },
+    {
+      "type": "replace",
+      "index": 4,
+      "from": "tt",
+      "to": "img",
+      "suggestion": "Replace <tt> with <img> at index 4"
+    },
+    {
+      "type": "replace",
+      "index": 5,
+      "from": "div",
+      "to": "p",
+      "suggestion": "Replace <div> with <p> at index 5"
+    },
+    {
+      "type": "add_classes",
+      "index": 5,
+      "tag": "p",
+      "classes": [
+        "auth-subtitle"
+      ],
+      "suggestion": "Add classes \"auth-subtitle\" to <p> at index 5"
+    },
+    {
+      "type": "remove_classes",
+      "index": 5,
+      "tag": "p",
+      "classes": [
+        "auth-header"
+      ],
+      "suggestion": "Remove classes \"auth-header\" from <p> at index 5"
+    },
+    {
+      "type": "replace",
+      "index": 6,
+      "from": "div",
+      "to": "h1",
+      "suggestion": "Replace <div> with <h1> at index 6"
+    },
+    {
+      "type": "add_classes",
+      "index": 6,
+      "tag": "h1",
+      "classes": [
+        "auth-title"
+      ],
+      "suggestion": "Add classes \"auth-title\" to <h1> at index 6"
+    },
+    {
+      "type": "remove_classes",
+      "index": 6,
+      "tag": "h1",
+      "classes": [
+        "auth-logo"
+      ],
+      "suggestion": "Remove classes \"auth-logo\" from <h1> at index 6"
+    },
+    {
+      "type": "replace",
+      "index": 7,
+      "from": "img",
+      "to": "form",
+      "suggestion": "Replace <img> with <form> at index 7"
+    },
+    {
+      "type": "replace",
+      "index": 8,
+      "from": "p",
+      "to": "div",
+      "suggestion": "Replace <p> with <div> at index 8"
+    },
+    {
+      "type": "add_classes",
+      "index": 8,
+      "tag": "div",
+      "classes": [
+        "form-group"
+      ],
+      "suggestion": "Add classes \"form-group\" to <div> at index 8"
+    },
+    {
+      "type": "remove_classes",
+      "index": 8,
+      "tag": "div",
+      "classes": [
+        "auth-subtitle"
+      ],
+      "suggestion": "Remove classes \"auth-subtitle\" from <div> at index 8"
+    },
+    {
+      "type": "replace",
+      "index": 9,
+      "from": "h1",
+      "to": "label",
+      "suggestion": "Replace <h1> with <label> at index 9"
+    },
+    {
+      "type": "add_classes",
+      "index": 9,
+      "tag": "label",
+      "classes": [
+        "form-label"
+      ],
+      "suggestion": "Add classes \"form-label\" to <label> at index 9"
+    },
+    {
+      "type": "remove_classes",
+      "index": 9,
+      "tag": "label",
+      "classes": [
+        "auth-title"
+      ],
+      "suggestion": "Remove classes \"auth-title\" from <label> at index 9"
+    },
+    {
+      "type": "replace",
+      "index": 10,
+      "from": "form",
+      "to": "input",
+      "suggestion": "Replace <form> with <input> at index 10"
+    },
+    {
+      "type": "add_classes",
+      "index": 10,
+      "tag": "input",
+      "classes": [
+        "form-control"
+      ],
+      "suggestion": "Add classes \"form-control\" to <input> at index 10"
+    },
+    {
+      "type": "remove_classes",
+      "index": 10,
+      "tag": "input",
+      "classes": [
+        "js-login-form"
+      ],
+      "suggestion": "Remove classes \"js-login-form\" from <input> at index 10"
+    },
+    {
+      "type": "add_classes",
+      "index": 11,
+      "tag": "div",
+      "classes": [
+        "form-group"
+      ],
+      "suggestion": "Add classes \"form-group\" to <div> at index 11"
+    },
+    {
+      "type": "replace",
+      "index": 12,
+      "from": "div",
+      "to": "label",
+      "suggestion": "Replace <div> with <label> at index 12"
+    },
+    {
+      "type": "add_classes",
+      "index": 12,
+      "tag": "label",
+      "classes": [
+        "form-label"
+      ],
+      "suggestion": "Add classes \"form-label\" to <label> at index 12"
+    },
+    {
+      "type": "remove_classes",
+      "index": 12,
+      "tag": "label",
+      "classes": [
+        "form-group"
+      ],
+      "suggestion": "Remove classes \"form-group\" from <label> at index 12"
+    },
+    {
+      "type": "replace",
+      "index": 13,
+      "from": "label",
+      "to": "input",
+      "suggestion": "Replace <label> with <input> at index 13"
+    },
+    {
+      "type": "add_classes",
+      "index": 13,
+      "tag": "input",
+      "classes": [
+        "form-control"
+      ],
+      "suggestion": "Add classes \"form-control\" to <input> at index 13"
+    },
+    {
+      "type": "remove_classes",
+      "index": 13,
+      "tag": "input",
+      "classes": [
+        "form-label"
+      ],
+      "suggestion": "Remove classes \"form-label\" from <input> at index 13"
+    },
+    {
+      "type": "replace",
+      "index": 14,
+      "from": "input",
+      "to": "div",
+      "suggestion": "Replace <input> with <div> at index 14"
+    },
+    {
+      "type": "add_classes",
+      "index": 14,
+      "tag": "div",
+      "classes": [
+        "form-options"
+      ],
+      "suggestion": "Add classes \"form-options\" to <div> at index 14"
+    },
+    {
+      "type": "replace",
+      "index": 15,
+      "from": "span",
+      "to": "label",
+      "suggestion": "Replace <span> with <label> at index 15"
+    },
+    {
+      "type": "add_classes",
+      "index": 15,
+      "tag": "label",
+      "classes": [
+        "remember-me"
+      ],
+      "suggestion": "Add classes \"remember-me\" to <label> at index 15"
+    },
+    {
+      "type": "remove_classes",
+      "index": 15,
+      "tag": "label",
+      "classes": [
+        "auth-form__error-message"
+      ],
+      "suggestion": "Remove classes \"auth-form__error-message\" from <label> at index 15"
+    },
+    {
+      "type": "replace",
+      "index": 16,
+      "from": "div",
+      "to": "input",
+      "suggestion": "Replace <div> with <input> at index 16"
+    },
+    {
+      "type": "add_classes",
+      "index": 16,
+      "tag": "input",
+      "classes": [
+        "lod-checkbox"
+      ],
+      "suggestion": "Add classes \"lod-checkbox\" to <input> at index 16"
+    },
+    {
+      "type": "remove_classes",
+      "index": 16,
+      "tag": "input",
+      "classes": [
+        "form-group"
+      ],
+      "suggestion": "Remove classes \"form-group\" from <input> at index 16"
+    },
+    {
+      "type": "replace",
+      "index": 17,
+      "from": "label",
+      "to": "a",
+      "suggestion": "Replace <label> with <a> at index 17"
+    },
+    {
+      "type": "add_classes",
+      "index": 17,
+      "tag": "a",
+      "classes": [
+        "auth-link"
+      ],
+      "suggestion": "Add classes \"auth-link\" to <a> at index 17"
+    },
+    {
+      "type": "remove_classes",
+      "index": 17,
+      "tag": "a",
+      "classes": [
+        "form-label"
+      ],
+      "suggestion": "Remove classes \"form-label\" from <a> at index 17"
+    },
+    {
+      "type": "replace",
+      "index": 18,
+      "from": "input",
+      "to": "button",
+      "suggestion": "Replace <input> with <button> at index 18"
+    },
+    {
+      "type": "add_classes",
+      "index": 18,
+      "tag": "button",
+      "classes": [
+        "btn-auth-primary"
+      ],
+      "suggestion": "Add classes \"btn-auth-primary\" to <button> at index 18"
+    },
+    {
+      "type": "replace",
+      "index": 19,
+      "from": "span",
+      "to": "div",
+      "suggestion": "Replace <span> with <div> at index 19"
+    },
+    {
+      "type": "add_classes",
+      "index": 19,
+      "tag": "div",
+      "classes": [
+        "auth-footer-zone"
+      ],
+      "suggestion": "Add classes \"auth-footer-zone\" to <div> at index 19"
+    },
+    {
+      "type": "remove_classes",
+      "index": 19,
+      "tag": "div",
+      "classes": [
+        "auth-form__error-message"
+      ],
+      "suggestion": "Remove classes \"auth-form__error-message\" from <div> at index 19"
+    },
+    {
+      "type": "replace",
+      "index": 20,
+      "from": "div",
+      "to": "span",
+      "suggestion": "Replace <div> with <span> at index 20"
+    },
+    {
+      "type": "remove_classes",
+      "index": 20,
+      "tag": "span",
+      "classes": [
+        "form-options"
+      ],
+      "suggestion": "Remove classes \"form-options\" from <span> at index 20"
+    },
+    {
+      "type": "replace",
+      "index": 21,
+      "from": "label",
+      "to": "a",
+      "suggestion": "Replace <label> with <a> at index 21"
+    },
+    {
+      "type": "add_classes",
+      "index": 21,
+      "tag": "a",
+      "classes": [
+        "auth-link-bold"
+      ],
+      "suggestion": "Add classes \"auth-link-bold\" to <a> at index 21"
+    },
+    {
+      "type": "remove_classes",
+      "index": 21,
+      "tag": "a",
+      "classes": [
+        "remember-me"
+      ],
+      "suggestion": "Remove classes \"remember-me\" from <a> at index 21"
+    }
+  ],
+  "timestamp": "2026-02-02T00:07:47.737Z"
+}

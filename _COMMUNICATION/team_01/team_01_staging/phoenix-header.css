@@ -577,6 +577,11 @@
   order: 1;
 }
 
+/* Search Filter - Explicit order to ensure correct positioning */
+#unified-header .filter-group.search-filter {
+  order: 1; /* Same as other filter groups - before actions and user */
+}
+
 #unified-header .filter-dropdown {
   position: relative;
   width: 100%;
@@ -926,10 +931,21 @@
 }
 
 /* User Avatar Badge - Direct child of filters-container, aligned to end (left in RTL) */
-#unified-header .header-filters .filters-container .user-profile-link {
-  order: 3;
-  margin-inline-end: auto;
+/* CRITICAL: Must be last in order - after all filters and actions */
+#unified-header .header-filters .filters-container .filter-user-section {
+  order: 999; /* Highest order - always last */
+  margin-inline-start: auto; /* Push to end (left in RTL) - CRITICAL for correct positioning */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* Don't shrink */
+  padding-block-end: 20px; /* Bottom padding 20px */
+}
+
+#unified-header .header-filters .filters-container .filter-user-section .user-profile-link {
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* User Icon - Simple icon, no circle badge - 20% smaller */

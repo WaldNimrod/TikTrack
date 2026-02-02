@@ -1,0 +1,869 @@
+/*
+  Phoenix-Tables-Ver: v1.0.0 | Unified Tables System
+  Sync-Time: 2026-02-01 21:35:00 IST
+  Team: Team 31 (Blueprint)
+  Status: ✅ BLUEPRINT CSS - READY FOR TEAM 30
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | CSS Standards Protocol ✅
+  
+  Purpose:
+  Unified CSS styles for all Phoenix tables system.
+  Uses BEM naming convention with prefix: phoenix-table-*
+  
+  IMPORTANT: This file must be loaded AFTER phoenix-components.css.
+  
+  Based on:
+  - PHOENIX_TABLES_SPECIFICATION.md
+  - Legacy table styles (legacy-audit-table)
+  - System-wide design patterns
+*/
+
+/* ============================================
+   TABLES SYSTEM - BASE STYLES
+   ============================================ */
+
+/* Table Wrapper - Handles overflow and scroll */
+.phoenix-table-wrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  margin-block-start: var(--spacing-md, 16px);
+}
+
+/* Base Table */
+.phoenix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--apple-bg-primary, #FFFFFF);
+  border: 1px solid rgba(229, 229, 234, 0.5); /* Light gray border with transparency */
+  border-radius: var(--apple-radius-medium, 10px);
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+}
+
+/* Table Head */
+.phoenix-table__head {
+  background: rgba(242, 242, 247, 0.3); /* 0.3 alpha transparent background */
+}
+
+/* Table Header Row - Background for entire header row */
+.phoenix-table__head .phoenix-table__row {
+  background: rgba(242, 242, 247, 0.3); /* 0.3 alpha transparent background */
+}
+
+/* Table Header Cell */
+.phoenix-table__header {
+  padding: 4px 8px; /* 4px top/bottom, 8px left/right - half spacing */
+  background: transparent; /* No background - avoid duplication with row background */
+  color: var(--apple-text-primary, #000000);
+  border-bottom: 1px solid rgba(229, 229, 234, 0.5); /* Light gray border */
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-bold, 700); /* Bold */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: right; /* RTL */
+  height: 48px !important;
+  min-height: 48px;
+  max-height: 48px;
+  vertical-align: middle;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Sortable Header */
+.phoenix-table__header[data-sortable="true"] {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none; /* No border */
+  outline: none; /* No outline */
+}
+
+.phoenix-table__header[data-sortable="true"]:hover {
+  background: transparent; /* No background change on hover */
+  border: none; /* No border on hover */
+  outline: none; /* No outline on hover */
+}
+
+/* Active sort state - no border or outline, only icon color changes */
+.phoenix-table__header[data-sortable="true"][aria-sort="ascending"],
+.phoenix-table__header[data-sortable="true"][aria-sort="descending"] {
+  border: none !important; /* No border */
+  outline: none !important; /* No outline */
+  background: transparent; /* No background change */
+}
+
+/* Header Text */
+.phoenix-table__header-text {
+  display: inline-block;
+  margin-inline-end: var(--spacing-xs, 4px);
+  font-weight: var(--font-weight-bold, 700); /* Bold */
+}
+
+/* Sort Indicator */
+.phoenix-table__sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-inline-start: var(--spacing-xs, 4px);
+}
+
+/* Sort Icon - Beautiful arrows like header menu, smaller, 0.5 alpha */
+.phoenix-table__sort-icon {
+  width: 10px;
+  height: 10px;
+  color: var(--apple-text-tertiary, #3C3C43); /* Set color for currentColor */
+  stroke: currentColor !important; /* Use currentColor so it inherits from color */
+  fill: none !important; /* No fill */
+  opacity: 0.5; /* 0.5 alpha */
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.phoenix-table__header:hover .phoenix-table__sort-icon {
+  opacity: 0.7;
+  color: var(--apple-text-secondary, #3C3C43);
+}
+
+/* Active sort - Secondary color for entire header and icon */
+.phoenix-table__header[aria-sort="ascending"],
+.phoenix-table__header[aria-sort="descending"] {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for entire header text */
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__sort-icon,
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__sort-icon {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color - change color so currentColor works */
+  stroke: currentColor !important; /* Use currentColor */
+  fill: none !important; /* No fill */
+  opacity: 1 !important; /* Full opacity when active */
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__sort-icon {
+  transform: rotate(180deg);
+}
+
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__sort-icon {
+  transform: rotate(0deg);
+}
+
+/* Table Body */
+.phoenix-table__body {
+  background: var(--apple-bg-primary, #FFFFFF);
+}
+
+/* Table Row */
+.phoenix-table__row {
+  border-bottom: 1px solid var(--apple-border-light, #E5E5EA);
+  transition: background-color 0.2s ease;
+  min-height: 48px;
+}
+
+.phoenix-table__row:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect ONLY for body rows, NOT header rows */
+.phoenix-table__body .phoenix-table__row:hover {
+  background: var(--apple-bg-secondary, #F2F2F7);
+}
+
+/* Explicitly prevent hover effect on header rows */
+.phoenix-table__head .phoenix-table__row:hover {
+  background: rgba(242, 242, 247, 0.3) !important; /* Keep header background, no hover effect */
+}
+
+/* Table Cell */
+.phoenix-table__cell {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-normal, 400);
+  line-height: var(--line-height-normal, 1.4);
+  color: var(--apple-text-primary, #000000);
+  text-align: right; /* RTL */
+  vertical-align: middle;
+}
+
+/* Numeric Cell */
+.phoenix-table__cell--numeric {
+  font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace);
+  font-variant-numeric: tabular-nums; /* Fidelity requirement */
+  text-align: center; /* Default: center aligned */
+  letter-spacing: 0.5px;
+  font-weight: var(--font-weight-normal, 400); /* Normal weight */
+  font-size: var(--font-size-base, 16px); /* Standard size */
+}
+
+/* Quantity field - ensure consistent styling */
+.phoenix-table__cell.col-quantity {
+  font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  font-weight: var(--font-weight-normal, 400);
+  font-size: var(--font-size-base, 16px);
+}
+
+/* Currency Cell */
+.phoenix-table__cell--currency {
+  font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace);
+  text-align: center; /* Center aligned */
+  letter-spacing: 0.5px;
+}
+
+/* Numeric Header - Must align with numeric cells */
+.phoenix-table__header.col-amount,
+.phoenix-table__header.col-balance,
+.phoenix-table__header.col-total-pl,
+.phoenix-table__header.col-current_price,
+.phoenix-table__header.col-avg-price,
+.phoenix-table__header.col-market-value,
+.phoenix-table__header.col-unrealized-pl,
+.phoenix-table__header.col-percent-account,
+.phoenix-table__header.col-quantity,
+.phoenix-table__header.col-positions {
+  text-align: center; /* Center align numeric headers */
+}
+
+/* Date Cell */
+.phoenix-table__cell--date {
+  text-align: center;
+  font-size: var(--font-size-sm, 14px);
+}
+
+/* Status Cell */
+.phoenix-table__cell--status {
+  text-align: center;
+}
+
+/* Actions Cell */
+.phoenix-table__cell--actions {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.phoenix-table__status-badge {
+  display: inline-block;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border-radius: var(--apple-radius-small, 6px);
+  font-size: 10px; /* Smaller font */
+  font-weight: var(--font-weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* No line break */
+  border: 1px solid transparent; /* Default transparent border - will be overridden by modifiers */
+}
+
+/* Active/Inactive Badges - Background 0.1 alpha, border and text full color (same standard as Long/Short) */
+.phoenix-table__status-badge--active {
+  background: rgba(52, 199, 89, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-green, #34C759); /* Full color border */
+  color: var(--apple-green, #34C759); /* Full color text */
+}
+
+.phoenix-table__status-badge--inactive {
+  background: rgba(142, 142, 147, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-gray-6, #8E8E93); /* Full color border */
+  color: var(--apple-gray-6, #8E8E93); /* Full color text */
+}
+
+/* All colored badges follow the same standard - Background 0.1 alpha, border and text full color */
+.phoenix-table__status-badge--verified {
+  background: rgba(52, 199, 89, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-green, #34C759); /* Full color border */
+  color: var(--apple-green, #34C759); /* Full color text */
+}
+
+.phoenix-table__status-badge--pending {
+  background: rgba(255, 149, 0, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-orange, #FF9500); /* Full color border */
+  color: var(--apple-orange, #FF9500); /* Full color text */
+}
+
+.phoenix-table__status-badge--high {
+  background: rgba(255, 59, 48, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-red, #FF3B30); /* Full color border */
+  color: var(--apple-red, #FF3B30); /* Full color text */
+}
+
+.phoenix-table__status-badge--medium {
+  background: rgba(255, 149, 0, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-orange, #FF9500); /* Full color border */
+  color: var(--apple-orange, #FF9500); /* Full color text */
+}
+
+.phoenix-table__status-badge--low {
+  background: var(--apple-gray-6, #8E8E93);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+/* ============================================
+   TABLE FILTERS - INTERNAL FILTERS
+   ============================================ */
+
+.phoenix-table-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md, 16px);
+  margin-block-end: var(--spacing-md, 16px);
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-medium, 10px);
+}
+
+.phoenix-table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.phoenix-table-filter-label {
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--apple-text-secondary, #3C3C43);
+  white-space: nowrap;
+}
+
+.phoenix-table-filter-input,
+.phoenix-table-filter-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-small, 6px);
+  font-size: var(--font-size-sm, 14px);
+  font-family: var(--font-family-primary, 'Noto Sans Hebrew', sans-serif);
+  background: var(--apple-bg-primary, #FFFFFF);
+  color: var(--apple-text-primary, #000000);
+}
+
+.phoenix-table-filter-input:focus,
+.phoenix-table-filter-select:focus {
+  outline: none;
+  border-color: var(--color-brand, #26baac);
+  box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .phoenix-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .phoenix-table {
+    min-width: 800px; /* Minimum table width for mobile */
+  }
+  
+  .phoenix-table-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .phoenix-table-filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus state - no green border, only secondary color icon */
+.phoenix-table__header[role="columnheader"]:focus {
+  outline: none !important; /* No outline */
+  border: none !important; /* No border */
+}
+
+.phoenix-table__header[role="columnheader"][tabindex="0"]:focus-visible {
+  outline: none !important; /* No outline */
+  border: none !important; /* No border */
+}
+
+/* Active sort state - Secondary color for entire header and icon, no border */
+.phoenix-table__header[aria-sort="ascending"],
+.phoenix-table__header[aria-sort="descending"] {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for entire header text */
+  border: none !important; /* No border */
+  outline: none !important; /* No outline */
+  box-shadow: none !important; /* No box shadow */
+}
+
+.phoenix-table__header[aria-sort="ascending"]:focus,
+.phoenix-table__header[aria-sort="descending"]:focus {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color on focus */
+  border: none !important; /* No border on focus */
+  outline: none !important; /* No outline on focus */
+  box-shadow: none !important; /* No box shadow on focus */
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__sort-icon,
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__sort-icon {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color - change color so currentColor works */
+  stroke: currentColor !important; /* Use currentColor */
+  fill: none !important; /* No fill */
+  opacity: 1 !important; /* Full opacity when active */
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__header-text,
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__header-text {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for header text */
+}
+
+/* ============================================
+   TABLE ACTIONS TOOLTIP
+   ============================================ */
+
+.table-actions-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.table-actions-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--apple-text-secondary, #3C3C43);
+  cursor: pointer;
+  border-radius: var(--apple-radius-small, 6px);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.table-actions-trigger:hover {
+  background: var(--apple-bg-secondary, #F2F2F7);
+  color: var(--apple-text-primary, #000000);
+}
+
+.table-actions-trigger:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: 2px;
+}
+
+.table-actions-menu {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  inset-inline-end: 100%; /* Attached to button - no gap */
+  display: flex;
+  flex-direction: row; /* Side by side */
+  gap: 3px; /* Small gap between buttons */
+  padding: 3px; /* Small padding around buttons */
+  background: var(--apple-bg-primary, #FFFFFF);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-medium, 10px);
+  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15));
+  z-index: var(--z-index-dropdown, 1000);
+  min-width: auto; /* Auto width for horizontal layout */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease, pointer-events 0.15s ease;
+}
+
+/* Show menu when hovering over trigger or menu */
+.table-actions-tooltip:hover .table-actions-menu,
+.table-actions-tooltip:focus-within .table-actions-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s; /* Show immediately */
+}
+
+.table-actions-menu:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s; /* Show immediately */
+}
+
+/* Close delay - hide after mouse leaves */
+.table-actions-tooltip:not(:hover):not(:focus-within) .table-actions-menu {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0.2s; /* 200ms delay before closing */
+}
+
+.table-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; /* Smaller button */
+  height: 28px; /* Smaller button */
+  padding: 0;
+  border: 1px solid var(--apple-border-light, #E5E5EA); /* Border */
+  background: var(--apple-bg-primary, #FFFFFF); /* White background */
+  color: var(--apple-text-secondary, #3C3C43);
+  cursor: pointer;
+  border-radius: var(--apple-radius-small, 6px);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.table-action-btn svg {
+  width: 14px; /* Smaller icon */
+  height: 14px; /* Smaller icon */
+}
+
+.table-action-btn:hover {
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border-color: currentColor;
+}
+
+.table-action-btn:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: 2px;
+}
+
+/* Primary color (View) */
+.table-action-btn[aria-label*="צפה"] {
+  color: var(--color-brand, #26baac);
+  border-color: var(--color-brand, #26baac);
+}
+
+/* Secondary color (Edit) */
+.table-action-btn[aria-label*="ערוך"] {
+  color: var(--apple-blue, #007AFF);
+  border-color: var(--apple-blue, #007AFF);
+}
+
+/* Warning color (Cancel) */
+.table-action-btn[aria-label*="ביטול"] {
+  color: var(--apple-orange, #FF9500);
+  border-color: var(--apple-orange, #FF9500);
+}
+
+/* Error color (Delete) */
+.table-action-btn[aria-label*="מחק"] {
+  color: var(--apple-red, #FF3B30);
+  border-color: var(--apple-red, #FF3B30);
+}
+
+/* Ticker Link */
+.ticker-link {
+  color: var(--color-brand, #26baac);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium, 500);
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.ticker-link:hover {
+  color: var(--legacy-turquoise-hover, #1e968a);
+  text-decoration: underline;
+}
+
+/* Status Badge - Long/Short */
+/* Long/Short Badges - Background 0.1 alpha, border and text full color, fixed width 45px, first letter uppercase only */
+.phoenix-table__status-badge--long {
+  background: rgba(52, 199, 89, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-green, #34C759); /* Full color border */
+  color: var(--apple-green, #34C759); /* Full color text */
+  width: 45px;
+  text-align: center;
+  text-transform: capitalize; /* Only first letter uppercase */
+  white-space: nowrap; /* No line break */
+}
+
+.phoenix-table__status-badge--short {
+  background: rgba(255, 59, 48, 0.1); /* 0.1 alpha */
+  border: 1px solid var(--apple-red, #FF3B30); /* Full color border */
+  color: var(--apple-red, #FF3B30); /* Full color text */
+  width: 45px;
+  text-align: center;
+  text-transform: capitalize; /* Only first letter uppercase */
+  white-space: nowrap; /* No line break */
+}
+
+/* All colored badges follow the same pattern */
+.phoenix-table__status-badge--buy {
+  background: rgba(52, 199, 89, 0.3);
+  border: 1px solid var(--apple-green, #34C759);
+  color: var(--apple-green, #34C759);
+}
+
+.phoenix-table__status-badge--sell {
+  background: rgba(255, 59, 48, 0.3);
+  border: 1px solid var(--apple-red, #FF3B30);
+  color: var(--apple-red, #FF3B30);
+}
+
+/* Type and Subtype cells - Color based on positive/negative (money in/out) */
+.phoenix-table__cell.col-type[data-type-positive="true"],
+.phoenix-table__cell.col-subtype[data-type-positive="true"] {
+  color: var(--apple-green, #34C759);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.phoenix-table__cell.col-type[data-type-positive="false"],
+.phoenix-table__cell.col-subtype[data-type-positive="false"] {
+  color: var(--apple-red, #FF3B30);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.phoenix-table__status-badge--buy {
+  background: var(--apple-green, #34C759);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--sell {
+  background: var(--apple-red, #FF3B30);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+/* ============================================
+   TABLE PAGINATION
+   ============================================ */
+
+/* Block: Table Pagination */
+.phoenix-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md, 16px);
+  padding: 5px var(--spacing-md, 16px); /* 5px top/bottom, 16px left/right */
+  background: rgba(242, 242, 247, 0.3); /* 0.3 alpha */
+  border-block-start: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: 0 0 var(--apple-radius-medium, 10px) var(--apple-radius-medium, 10px);
+  font-size: var(--font-size-sm, 14px);
+  color: var(--apple-text-secondary, #3C3C43);
+}
+
+/* Element: Pagination Info */
+.phoenix-table-pagination__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+/* Element: Pagination Controls */
+.phoenix-table-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+  white-space: nowrap; /* No line break */
+}
+
+/* Element: Page Size Selector */
+.phoenix-table-pagination__page-size {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+}
+
+.phoenix-table-pagination__page-size-label {
+  font-size: var(--font-size-sm, 14px);
+  color: var(--apple-text-secondary, #3C3C43);
+  opacity: 0.5; /* 0.5 alpha */
+}
+
+.phoenix-table-pagination__page-size-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #FFFFFF);
+  color: var(--apple-text-primary, #000000);
+  font-size: var(--font-size-sm, 14px);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  white-space: nowrap; /* No line break */
+}
+
+.phoenix-table-pagination__page-size-select:hover {
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__page-size-select:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: 2px;
+}
+
+/* Element: Pagination Buttons - Height 25, reversed icons for RTL */
+.phoenix-table-pagination__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 25px; /* Height 25 */
+  padding: 0 var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #FFFFFF);
+  color: var(--apple-text-primary, #000000);
+  font-size: var(--font-size-sm, 14px);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap; /* No line break */
+}
+
+/* Icons are already correct for RTL - no need to flip */
+
+.phoenix-table-pagination__button:hover:not(:disabled) {
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.phoenix-table-pagination__button--active {
+  background: var(--color-brand, #26baac);
+  color: var(--apple-bg-primary, #FFFFFF);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__button--active:hover {
+  background: var(--legacy-turquoise-hover, #1e968a);
+  border-color: var(--legacy-turquoise-hover, #1e968a);
+}
+
+/* Element: Pagination Page Numbers */
+.phoenix-table-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  white-space: nowrap; /* No line break */
+}
+
+.phoenix-table-pagination__page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 25px; /* Height 25 */
+  padding: 0 var(--spacing-xs, 4px);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #FFFFFF);
+  color: var(--apple-text-primary, #000000);
+  font-size: var(--font-size-sm, 14px);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap; /* No line break */
+}
+
+.phoenix-table-pagination__page-number:hover {
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__page-number--active {
+  background: var(--apple-bg-primary, #FFFFFF); /* White background */
+  color: var(--color-brand, #26baac); /* Primary color text */
+  border-color: var(--color-brand, #26baac); /* Primary color border */
+}
+
+.phoenix-table-pagination__page-number--active:hover {
+  background: var(--apple-bg-primary, #FFFFFF);
+  border-color: var(--legacy-turquoise-hover, #1e968a);
+  color: var(--legacy-turquoise-hover, #1e968a);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .phoenix-table-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .phoenix-table-pagination__controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .phoenix-table-pagination__pages {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   TABLE SORTING INDICATORS
+   ============================================ */
+
+/* Element: Sort Indicator Container */
+.phoenix-table__sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: var(--spacing-xs, 4px);
+  vertical-align: middle;
+}
+
+/* Element: Sort Icon - Beautiful arrows like header menu, smaller, 0.5 alpha */
+.phoenix-table__sort-icon {
+  width: 10px;
+  height: 10px;
+  color: var(--apple-text-tertiary, #3C3C43); /* Set color for currentColor */
+  stroke: currentColor !important; /* Use currentColor so it inherits from color */
+  fill: none !important; /* No fill */
+  opacity: 0.5; /* 0.5 alpha */
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.phoenix-table__header:hover .phoenix-table__sort-icon {
+  opacity: 0.7;
+  color: var(--apple-text-secondary, #3C3C43);
+}
+
+/* Modifier: Sort State - None (default) */
+.phoenix-table__sort-icon[data-sort-state="none"] {
+  opacity: 0.5;
+}
+
+/* Modifier: Sort State - ASC - Secondary color arrow, no green border */
+.phoenix-table__sort-icon[data-sort-state="asc"] {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color - change color so currentColor works */
+  stroke: currentColor !important; /* Use currentColor */
+  fill: none !important; /* No fill */
+  opacity: 1 !important; /* Full opacity when active */
+  transform: rotate(180deg);
+}
+
+/* Ensure header has secondary color and no border when sort icon is active (ASC) */
+.phoenix-table__header:has(.phoenix-table__sort-icon[data-sort-state="asc"]) {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for entire header */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.phoenix-table__header:has(.phoenix-table__sort-icon[data-sort-state="asc"]) .phoenix-table__header-text {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for header text */
+}
+
+/* Modifier: Sort State - DESC - Secondary color arrow, no green border */
+.phoenix-table__sort-icon[data-sort-state="desc"] {
+  stroke: var(--apple-blue, #007AFF) !important; /* Secondary color - use stroke */
+  fill: none !important; /* No fill */
+  opacity: 1 !important; /* Full opacity when active */
+  transform: rotate(0deg);
+}
+
+/* Ensure header has secondary color and no border when sort icon is active (DESC) */
+.phoenix-table__header:has(.phoenix-table__sort-icon[data-sort-state="desc"]) {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for entire header */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.phoenix-table__header:has(.phoenix-table__sort-icon[data-sort-state="desc"]) .phoenix-table__header-text {
+  color: var(--apple-blue, #007AFF) !important; /* Secondary color for header text */
+}
+
+/* Modifier: Sort State - Secondary (Multi-sort) */
+.phoenix-table__sort-icon[data-sort-state="secondary"] {
+  color: var(--apple-text-secondary, #3C3C43); /* Set color for currentColor */
+  stroke: currentColor !important; /* Use currentColor */
+  fill: none !important; /* No fill */
+  opacity: 0.5;
+}

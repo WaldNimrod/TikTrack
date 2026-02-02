@@ -36,34 +36,13 @@ body.dashboard-page {
 
 /* ============================================
    Section Headers (BEM Pattern)
-   Shared across all dashboard pages
+   Dashboard-specific overrides only
    ============================================ */
 
-/* Block: Dashboard Section Header - Separate white card */
-/* CRITICAL: 3-part structure - Title | Subtitle (center) | Actions (end) */
-/* All aligned to middle vertically, fixed height, single row, no wrapping */
-.dashboard-section__header,
-.index-section__header {
-  display: flex;
-  align-items: center; /* CRITICAL: All elements aligned to middle vertically */
-  justify-content: space-between; /* CRITICAL: 3-part layout */
-  padding: 0 var(--spacing-lg, 24px); /* No vertical padding - fixed height handles spacing */
-  background: var(--apple-bg-elevated, #ffffff); /* White background */
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 8px;
-  margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
-  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  /* Subtle entity color accent on left border */
-  border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
-  /* Entity color accent on bottom border */
-  border-block-end: 3px solid var(--color-brand, var(--entity-trade-color));
-  height: 60px; /* CRITICAL: Fixed height - cannot break or stretch */
-  min-height: 60px;
-  max-height: 60px;
-  flex-wrap: nowrap; /* CRITICAL: All in single row - never wrap */
-  overflow: hidden; /* Prevent content overflow */
-  box-sizing: border-box;
-}
+/* NOTE: Base styles for .index-section__header and .index-section__body 
+   are defined in phoenix-components.css (higher hierarchy layer).
+   This file contains ONLY dashboard-specific overrides and extensions.
+*/
 
 /* Entity-specific header colors */
 /* Portfolio - Trading Account color */
@@ -189,35 +168,10 @@ tt-section[data-section="portfolio"] .index-section__header-count {
   border-inline-start: none;
 }
 
-/* Block: Dashboard Section Body - Separate white card below header */
-.dashboard-section__body,
-.index-section__body {
-  padding: var(--spacing-lg, 24px);
-  background: var(--apple-bg-elevated, #ffffff); /* White background - separate card */
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 8px;
-  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  /* No margin-top - gap is created by header margin-block-end */
-  width: 100%; /* Full width */
-  box-sizing: border-box; /* Include padding in width */
-  /* Smooth animation for open/close */
-  transition: opacity 0.3s ease, max-height 0.3s ease, padding-block 0.3s ease, margin-block-end 0.3s ease;
-  overflow: hidden;
-  opacity: 1;
-  max-height: 10000px; /* Large enough to accommodate content */
-}
-
-/* Closed state - smooth collapse animation */
-.dashboard-section__body[hidden],
-.index-section__body[hidden] {
-  display: block !important; /* Keep block for animation */
-  opacity: 0;
-  max-height: 0;
-  padding-block: 0;
-  margin-block-end: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
+/* NOTE: Base styles for .index-section__body and [hidden] state
+   are defined in phoenix-components.css (higher hierarchy layer).
+   This file contains ONLY dashboard-specific overrides.
+*/
 
 /* Element: Info Summary inside section body - Force full width */
 /* Using high specificity to ensure full width */
@@ -238,122 +192,20 @@ tt-section .dashboard-section__body .info-summary {
   box-sizing: border-box;
 }
 
-/* Element: Header Title - Part 1: Title with icon (start, min-width by content) */
-.dashboard-section__header-title,
-.index-section__header-title {
-  display: flex;
-  align-items: center; /* CRITICAL: Aligned to middle */
-  gap: var(--spacing-sm, 8px);
-  flex-shrink: 0; /* Don't shrink - min-width by content */
-  margin: 0; /* No margin - padding handled by parent */
-  padding: 0; /* No padding */
-}
+/* ============================================
+   LEGO BLOCK: Alerts + Summary (Inside Section Body)
+   ============================================ */
 
-.dashboard-section__header-icon,
-.index-section__header-icon {
-  width: 35px;
-  height: 35px;
-  padding-top: 3px;
-  color: var(--color-brand, var(--entity-trade-color));
-}
+/* Note: Active Alerts and Summary Info are inside tt-section > index-section__body
+   They are part of the section content, not standalone blocks.
+   The section header provides the title and controls.
+*/
 
-.dashboard-section__header-text,
-.index-section__header-text {
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  color: var(--apple-text-primary, #1d1d1f);
-  margin: 0;
-}
-
-/* Element: Header Meta - Part 2: Subtitle (center, takes remaining width) */
-.dashboard-section__header-meta,
-.index-section__header-meta {
-  flex: 1; /* CRITICAL: Takes remaining width */
-  display: flex;
-  align-items: center; /* CRITICAL: Aligned to middle */
-  justify-content: center; /* CRITICAL: Content centered */
-  margin: 0; /* No margin */
-  padding: 0 var(--spacing-md, 16px); /* Horizontal padding only */
-  min-width: 0; /* Allow shrinking if needed */
-}
-
-/* Element: Header Count - High specificity to ensure centering */
-.index-section__header-meta .index-section__header-count,
-.dashboard-section__header-meta .dashboard-section__header-count {
-  font-size: var(--font-size-base, 0.92rem);
-  color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
-  opacity: 0.8; /* 0.8 opacity */
-  text-align: center; /* Centered */
-  font-weight: 500; /* Subtitle style */
-  margin: 0; /* No margin */
-  padding: 0; /* No padding */
-  white-space: nowrap; /* Single line */
-}
-
-/* Element: Header Actions - Part 3: Buttons area (end, width by content) */
-.dashboard-section__header-actions,
-.index-section__header-actions {
-  display: flex;
-  align-items: center; /* CRITICAL: Aligned to middle */
-  justify-content: flex-end; /* CRITICAL: Aligned to end */
-  gap: var(--spacing-sm, 8px);
-  flex-shrink: 0; /* Don't shrink - width by content */
-  margin: 0; /* No margin */
-  padding: 0; /* No padding */
-}
-
-.dashboard-section__header-alert-btn,
-.index-section__header-alert-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs, 8px);
-  padding: var(--spacing-xs, 8px) var(--spacing-sm, 16px);
-  background: transparent;
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.dashboard-section__header-alert-btn:hover,
-.index-section__header-alert-btn:hover {
-  background: var(--apple-bg-secondary, #f5f5f7);
-}
-
-.dashboard-section__header-alert-icon,
-.index-section__header-alert-icon {
-  font-size: 1rem;
-}
-
-.dashboard-section__header-alert-count,
-.index-section__header-alert-count {
-  font-size: var(--font-size-base, 0.92rem);
-  font-weight: 600;
-  color: var(--apple-text-primary, #1d1d1f);
-}
-
-.dashboard-section__header-toggle-btn,
-.index-section__header-toggle-btn {
-  display: flex;
-  align-items: center; /* CRITICAL: Aligned to middle */
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  margin: 0; /* No margin - parent handles spacing */
-  background: transparent;
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  color: var(--apple-text-primary, #1d1d1f);
-  flex-shrink: 0; /* Prevent shrinking */
-}
-
-.dashboard-section__header-toggle-btn:hover,
-.index-section__header-toggle-btn:hover {
-  background: var(--apple-bg-secondary, #f5f5f7);
-}
+/* NOTE: Base styles for header elements (.index-section__header-title, 
+   .index-section__header-icon, .index-section__header-text, etc.)
+   are defined in phoenix-components.css (higher hierarchy layer).
+   This file contains ONLY dashboard-specific overrides.
+*/
 
 
 /* ============================================
@@ -721,6 +573,11 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 8px);
+}
+
+/* Toggle button always aligned to end (right in RTL) */
+.info-summary__row .portfolio-summary__toggle-btn {
+  margin-inline-start: auto;
 }
 
 .info-summary strong {

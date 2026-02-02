@@ -1,0 +1,432 @@
+/**
+ * Phoenix-Legacy-Scanner-Ver: v1.0.0 | Legacy Page Scanner
+ * Sync-Time: 2026-02-01 20:30:00 IST
+ * Team: Team 31 (Blueprint)
+ * Status: ✅ LEGACY SCANNER FOR D16_ACCTS_VIEW
+ * 
+ * Purpose:
+ * Scans legacy HTML file (D16_ACCTS_VIEW.html) at runtime to extract:
+ * - Page structure and components
+ * - Content elements and their hierarchy
+ * - Styling classes and patterns
+ * - Interactive elements (buttons, forms, etc.)
+ * - Data structure and relationships
+ * 
+ * Usage:
+ * Run this script in browser console while viewing the legacy page,
+ * or load it as a bookmarklet/extension to scan the page structure.
+ * 
+ * Output:
+ * Generates a comprehensive report of the legacy page structure
+ * to guide Phoenix V2 implementation.
+ */
+
+(function scanLegacyPage() {
+  'use strict';
+  
+  console.log('🔍 Phoenix Legacy Scanner: Starting scan of D16_ACCTS_VIEW.html');
+  console.log('='.repeat(80));
+  
+  const report = {
+    pageTitle: document.title,
+    url: window.location.href,
+    timestamp: new Date().toISOString(),
+    structure: {},
+    components: [],
+    styles: [],
+    interactions: [],
+    data: []
+  };
+  
+  // 1. Scan Page Structure
+  console.log('\n📐 Scanning Page Structure...');
+  const body = document.body;
+  report.structure = {
+    hasGlobalPageTemplate: !!document.querySelector('GlobalPageTemplate'),
+    hasTtSection: !!document.querySelector('TtSection'),
+    hasTtSectionRow: !!document.querySelector('TtSectionRow'),
+    hasFooter: !!document.querySelector('footer'),
+    bodyClasses: Array.from(body.classList),
+    bodyDirectChildren: Array.from(body.children).map(child => ({
+      tagName: child.tagName,
+      className: child.className,
+      id: child.id
+    }))
+  };
+  
+  // 2. Scan Components
+  console.log('\n🧩 Scanning Components...');
+  const accountCards = document.querySelectorAll('.account-card');
+  accountCards.forEach((card, index) => {
+    const component = {
+      type: 'account-card',
+      index: index,
+      title: card.querySelector('.card-title')?.textContent?.trim(),
+      balances: [],
+      status: card.querySelector('.card-footer')?.textContent?.trim(),
+      classes: Array.from(card.classList),
+      structure: {
+        hasTitle: !!card.querySelector('.card-title'),
+        hasBalanceGrid: !!card.querySelector('.balance-grid'),
+        hasFooter: !!card.querySelector('.card-footer')
+      }
+    };
+    
+    // Extract balance items
+    const balanceItems = card.querySelectorAll('.balance-item');
+    balanceItems.forEach(item => {
+      const currency = item.querySelector('.currency')?.textContent?.trim();
+      const amount = item.querySelector('.amount')?.textContent?.trim();
+      component.balances.push({ currency, amount });
+    });
+    
+    report.components.push(component);
+  });
+  
+  // 3. Scan Styles
+  console.log('\n🎨 Scanning Styles...');
+  const allElements = document.querySelectorAll('*');
+  const classSet = new Set();
+  allElements.forEach(el => {
+    if (el.className && typeof el.className === 'string') {
+      el.className.split(' ').forEach(cls => {
+        if (cls.trim()) classSet.add(cls.trim());
+      });
+    }
+  });
+  report.styles = Array.from(classSet).sort();
+  
+  // 4. Scan Interactions
+  console.log('\n🖱️ Scanning Interactions...');
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(btn => {
+    report.interactions.push({
+      type: 'button',
+      text: btn.textContent?.trim(),
+      classes: Array.from(btn.classList),
+      id: btn.id,
+      onClick: btn.getAttribute('onclick') || null
+    });
+  });
+  
+  const links = document.querySelectorAll('a');
+  links.forEach(link => {
+    if (link.href && link.href !== '#') {
+      report.interactions.push({
+        type: 'link',
+        text: link.textContent?.trim(),
+        href: link.href,
+        classes: Array.from(link.classList)
+      });
+    }
+  });
+  
+  // 5. Scan Data Structure
+  console.log('\n📊 Scanning Data Structure...');
+  const sections = document.querySelectorAll('TtSection');
+  sections.forEach((section, index) => {
+    const sectionData = {
+      index: index,
+      title: section.getAttribute('title') || section.querySelector('[title]')?.getAttribute('title'),
+      hasRows: !!section.querySelector('TtSectionRow'),
+      rowCount: section.querySelectorAll('TtSectionRow').length,
+      componentCount: section.querySelectorAll('.account-card').length,
+      hasActions: !!section.querySelector('.section-actions-footer')
+    };
+    report.data.push(sectionData);
+  });
+  
+  // 6. Extract Entity Context
+  const globalTemplate = document.querySelector('GlobalPageTemplate');
+  if (globalTemplate) {
+    report.entityContext = globalTemplate.getAttribute('entityContext');
+    report.pageTitleAttr = globalTemplate.getAttribute('pageTitle');
+  }
+  
+  // 7. Output Report
+  console.log('\n📋 SCAN COMPLETE - Full Report:');
+  console.log('='.repeat(80));
+  console.log(JSON.stringify(report, null, 2));
+  console.log('='.repeat(80));
+  
+  // 8. Generate Summary
+  console.log('\n📊 SUMMARY:');
+  console.log(`Page Title: ${report.pageTitle}`);
+  console.log(`Entity Context: ${report.entityContext || 'N/A'}`);
+  console.log(`Account Cards Found: ${report.components.length}`);
+  console.log(`Unique CSS Classes: ${report.styles.length}`);
+  console.log(`Interactive Elements: ${report.interactions.length}`);
+  console.log(`Sections: ${report.data.length}`);
+  
+  // 9. Save to window for export
+  window.phoenixLegacyScan = report;
+  console.log('\n💾 Report saved to window.phoenixLegacyScan');
+  console.log('📋 Copy with: JSON.stringify(window.phoenixLegacyScan, null, 2)');
+  
+  return report;
+})();
+
+VM16019:27 🔍 Phoenix Legacy Scanner: Starting scan of D16_ACCTS_VIEW.html
+VM16019:28 ================================================================================
+VM16019:42 
+📐 Scanning Page Structure...
+VM16019:58 
+🧩 Scanning Components...
+VM16019:87 
+🎨 Scanning Styles...
+VM16019:100 
+🖱️ Scanning Interactions...
+VM16019:125 
+📊 Scanning Data Structure...
+VM16019:147 
+📋 SCAN COMPLETE - Full Report:
+VM16019:148 ================================================================================
+VM16019:149 {
+  "pageTitle": "חשבונות מסחר - TikTrack",
+  "url": "http://127.0.0.1:8090/trading_accounts",
+  "timestamp": "2026-02-01T19:13:33.261Z",
+  "structure": {
+    "hasGlobalPageTemplate": false,
+    "hasTtSection": false,
+    "hasTtSectionRow": false,
+    "hasFooter": false,
+    "bodyClasses": [
+      "trading_accounts-page"
+    ],
+    "bodyDirectChildren": [
+      {
+        "tagName": "DIV",
+        "className": "",
+        "id": "unified-header"
+      },
+      {
+        "tagName": "DIV",
+        "className": "background-wrapper",
+        "id": ""
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "tradesModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "tradePlansModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "tagCategoryModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "tagModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "watchListModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "addTickerModal"
+      },
+      {
+        "tagName": "DIV",
+        "className": "modal fade",
+        "id": "cashFlowModal"
+      }
+    ]
+  },
+  "components": [],
+  "styles": [
+    "account-filter",
+    "account-filter-item",
+    "account-filter-toggle",
+    "actions-1-item",
+    "actions-3-items",
+    "actions-cell",
+    "actions-menu-popup",
+    "actions-menu-wrapper",
+    "actions-trigger",
+    "active",
+    "align-items-center",
+    "align-items-end",
+    "auth-toggle-btn",
+    "background-wrapper",
+    "bi",
+    "bi-chevron-down",
+    "bi-grid-3x3",
+    "bi-list-ul",
+    "bi-plus-circle",
+    "bi-table",
+    "bi-x",
+    "btn",
+    "btn-check",
+    "btn-entity-account",
+    "btn-group",
+    "btn-outline-primary",
+    "btn-outline-secondary",
+    "btn-primary",
+    "btn-sm",
+    "btn-text",
+    "btnbtn-link",
+    "card",
+    "clear-btn",
+    "col-12",
+    "col-actions",
+    "col-amount",
+    "col-avg-price",
+    "col-balance",
+    "col-currency",
+    "col-date",
+    "col-market-value",
+    "col-md-12",
+    "col-md-4",
+    "col-md-6",
+    "col-md-8",
+    "col-name",
+    "col-percent-account",
+    "col-positions",
+    "col-quantity",
+    "col-side",
+    "col-sm-12",
+    "col-status",
+    "col-subtype",
+    "col-symbol",
+    "col-ticker",
+    "col-total-pl",
+    "col-type",
+    "col-unrealized-pl",
+    "col-updated",
+    "conditions-control-wrapper",
+    "conditions-summary-table",
+    "content-section",
+    "d-flex",
+    "d-none",
+    "date-range-filter",
+    "date-range-filter-item",
+    "date-range-filter-toggle",
+    "dropdown",
+    "dropdown-arrow",
+    "dropdown-menu",
+    "dropdown-submenu",
+    "end-0",
+    "entity-badge-base",
+    "entity-cash-flow",
+    "entity-color-active",
+    "entity-tag",
+    "entity-tag-category",
+    "entity-trade",
+    "entity-trade-plan",
+    "entity-trading-account-badge",
+    "entity-trading_account-main-header",
+    "entity-trading_account-sub-header",
+    "entity-watch-list",
+    "entity-watch-list_item",
+    "fade",
+    "filter-actions",
+    "filter-close-btn",
+    "filter-dropdown",
+    "filter-group",
+    "filter-menu",
+    "filter-toggle",
+    "filter-toggle-main",
+    "filter-toggle-section",
+    "filter-user-section",
+    "filters-container",
+    "flag-color-btn-add-modal",
+    "flex-column",
+    "flex-wrap",
+    "form-check",
+    "form-check-input",
+    "form-check-label",
+    "form-control",
+    "form-control-plaintext",
+    "form-label",
+    "form-select",
+    "form-select-sm",
+    "form-text",
+    "fst-italic",
+    "fw-bold",
+    "g-3",
+    "gap-1",
+    "gap-2",
+    "gap-3",
+    "header-container",
+    "header-content",
+    "header-filter-arrow",
+    "header-filter-toggle-btn",
+    "header-filters",
+    "header-nav",
+    "header-top",
+    "home-icon-only",
+    "icon",
+    "icon-library-content",
+    "icon-library-tabs",
+    "icon-preview-placeholder",
+    "icon-selector-dropdown",
+    "icon-selector-grid",
+    "icon-selector-trigger",
+    "icon-selector-wrapper",
+    "info-summary",
+    "invalid-feedback",
+    "items-info",
+    "justify-content-end",
+    "label-numeric-negative",
+    "label-numeric-positive",
+    "level3-submenu",
+    "loading",
+    "logo",
+    "logo-image",
+    "logo-section",
+    "logo-text",
+    "main-content",
+    "main-nav",
+    "mb-0",
+    "mb-2",
+    "mb-3",
+    "me-1",
+    "me-2",
+    "modal",
+    "modal-body",
+    "modal-content",
+    "modal-dialog",
+    "modal-footer",
+    "modal-header",
+    "modal-header-colored",
+    "modal-lg",
+    "modal-md",
+    "modal-navigation-breadcrumb",
+    "modal-title",
+    "ms-2",
+    "ms-auto",
+    "mt-2",
+    "my-4",
+    "nav",
+    "nav-icon",
+    "nav-item",
+    "nav-link",
+    "nav-tabs",
+    "nav-text",
+    "notification-container",
+    "numeric-value-negative",
+    "numeric-value-positive",
+    "numeric-value-zero",
+    "option-text",
+VM16019:150 ================================================================================
+VM16019:153 
+📊 SUMMARY:
+VM16019:154 Page Title: חשבונות מסחר - TikTrack
+VM16019:155 Entity Context: N/A
+VM16019:156 Account Cards Found: 0
+VM16019:157 Unique CSS Classes: 262
+VM16019:158 Interactive Elements: 278
+VM16019:159 Sections: 0
+VM16019:163 
+💾 Report saved to window.phoenixLegacyScan
+VM16019:164 📋 Copy with: JSON.stringify(window.phoenixLegacyScan, null, 2)
+{pageTitle: 'חשבונות מסחר - TikTrack', url: 'http://127.0.0.1:8090/trading_accounts', timestamp: '2026-02-01T19:13:33.261Z', structure: {…}, components: Array(0), …}

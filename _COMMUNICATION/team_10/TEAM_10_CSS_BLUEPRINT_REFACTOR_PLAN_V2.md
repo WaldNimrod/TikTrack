@@ -7,7 +7,9 @@
 **Subject:** CSS_BLUEPRINT_REFACTOR_PLAN_V2 | Status: 🟢 **ACTIVE**  
 **Priority:** 🔴 **P0 - CRITICAL**  
 **⚠️ כלל ברזל:** אין סקריפטים בתוך העמוד - כל הסקריפטים בקבצים חיצוניים  
-**🛡️ ארכיטקטורה:** נעולה לפי החלטת האדריכלית הראשית (`ARCHITECT_DECISION_LEGO_CUBES.md`)
+**🛡️ ארכיטקטורה:** נעולה לפי החלטת האדריכלית הראשית (`ARCHITECT_DECISION_LEGO_CUBES_FINAL.md`)  
+**📱 Fluid Design:** חובה לפי `ARCHITECT_RESPONSIVE_CHARTER.md` - ללא media queries, שימוש ב-`clamp()`/`min()`/`max()`, Grid עם `auto-fit`/`auto-fill`  
+**🛡️ Final Governance Lock:** כל חריגה תגרור פסילת G-Bridge מיידית
 
 ---
 
@@ -20,6 +22,9 @@
 - Team 40 סיים CSS Audit ומצא בעיות קריטיות (כפילויות, היררכיה לא נכונה)
 - Team 30 עובד על מערכת טבלאות React Framework
 - **בדיקה אדריכלית:** התוכנית הקודמת לא עמדה במלואה בארכיטקטורה מודולרית - עודכן בהתאם
+- **⚠️ עדכון קריטי:** זוהתה בעיה - הבלופרינט הנכון הוא `D15_PAGE_TEMPLATE_STAGE_1.html` (לא בלופרינטים אחרים) 🚨
+  - **מקור:** `TEAM_30_TO_TEAM_10_BLUEPRINT_IMPLEMENTATION_UPDATE.md`
+  - **פתרון:** כל הבלופרינטים יש ליישם לפי `D15_PAGE_TEMPLATE_STAGE_1.html` כבסיס + `index.html` לאינדקס
 
 **עמודים בסקופ (לפי קוביות מודולריות):**
 - **Identity & Authentication Cube (D15):** D15_LOGIN, D15_REGISTER, D15_RESET_PWD, D15_PROFILE, D15_INDEX
@@ -85,13 +90,19 @@
 
 **קבצים:**
 - `ui/src/layout/global_page_template.jsx` (לעדכן)
-- `_COMMUNICATION/team_31/team_31_staging/D15_PAGE_TEMPLATE.html` (Blueprint reference)
+- **⚠️ CRITICAL:** `_COMMUNICATION/team_01/team_01_staging/D15_PAGE_TEMPLATE_STAGE_1.html` - **הבלופרינט הנכון** 🛡️ **MANDATORY**
+- **⚠️ CRITICAL:** `_COMMUNICATION/team_01/team_01_staging/index.html` - **אינדקס בלופרינטים** 🛡️ **MANDATORY**
+- `_COMMUNICATION/team_31/team_31_staging/D15_PAGE_TEMPLATE.html` - **לא מעודכן** ⚠️
 
-**סטטוס:** ⏳ **IN PROGRESS** - Team 30 ממשיך בעבודה
+**עדכון קריטי:** `TEAM_10_BLUEPRINT_CRITICAL_UPDATE.md` 🚨
+
+**סטטוס:** ⏳ **IN PROGRESS** - Team 30 ממשיך בעבודה (עם הבלופרינט הנכון)
 
 ---
 
-### **שלב 2: הידוק היררכיה וחלוקה בין קבצי CSS** (P0) 🛡️ **APPROVED BY ARCHITECT**
+### **שלב 2: הידוק היררכיה וחלוקה בין קבצי CSS** (P0) ✅ **COMPLETE** 🛡️ **APPROVED BY ARCHITECT**
+
+**עדכון:** 🛡️ **ARCHITECT DECISION 2026-02-02** - Fluid Design Mandate נוסף לשלב זה
 
 **צוותים:** Team 40 (UI Assets & Design)
 
@@ -99,12 +110,18 @@
 - [x] **2.1** בדיקה ומיפוי של כל קבצי ה-CSS הקיימים ✅ **COMPLETE**
 - [x] **2.2** זיהוי כפילויות ובעיות היררכיה ✅ **COMPLETE**
 - [x] **2.3** אישור תיקונים ✅ **APPROVED BY ARCHITECT** 🛡️
-- [ ] **2.4** תיקון היררכיה וחלוקה ⏳ **IN PROGRESS**
-  - איחוד CSS Variables ל-`phoenix-base.css`
-  - הסרת `design-tokens.css`
-  - הסרת `auth.css`
-  - הסרת inline CSS מ-`global_page_template.jsx`
-- [ ] **2.5** עדכון `CSS_CLASSES_INDEX.md`
+- [x] **2.3** תיקון היררכיה וחלוקה ✅ **COMPLETE**
+  - איחוד CSS Variables ל-`phoenix-base.css` (SSOT) ✅
+  - הסרת `design-tokens.css` ✅
+  - הסרת `auth.css` ✅
+  - הסרת קבצי JSON (`design-tokens/*.json`) ✅
+  - הסרת inline CSS מ-`global_page_template.jsx` ✅
+- [x] **2.4** עדכון `CSS_CLASSES_INDEX.md` ✅ **COMPLETE**
+  - תיעוד כל ה-CSS Classes עם ITCSS layer information ✅
+  - הוספת Authentication & Identity classes (15 classes) ✅
+  - הוספת Form Elements classes (4 classes) ✅
+  - עדכון CSS file hierarchy ✅
+  - גרסה: v1.0 → v1.1 ✅
 
 **ממצאים קריטיים (Team 40 Audit):**
 
@@ -126,25 +143,31 @@
 - `ui/styles/auth.css` (להסיר)
 - `ui/src/layout/global_page_template.jsx` (להסיר inline CSS)
 
-**סטטוס:** ⏳ **IN PROGRESS** - Team 40 ממשיך בעבודה
+**סטטוס:** ✅ **COMPLETE** - כל המשימות הושלמו (2.1-2.4)
+
+**עדכון:** 🛡️ **ARCHITECT DECISION 2026-02-02** - Fluid Design Mandate  
+**משימה חדשה:** **2.6** - הסרת media queries והחלפתן ב-Fluid Design (ראה שלב 2.6 למטה)
 
 ---
 
-### **שלב 2.5: יצירת Cube Components Library** ⭐ **חדש** (P0)
+### **שלב 2.5: יצירת Cube Components Library** ⭐ **חדש** (P0) 🟡 **IN PROGRESS**
 
-**צוותים:** Team 30 (Frontend) + Team 40 (UI Assets)
+**צוותים:** Team 30 (Frontend - מוביל) + Team 40 (UI Assets - ולידציה ויזואלית)
 
 **מטרה:** זיהוי ויצירת Components משותפים ברמת קוביה לפני בנייה מחדש של העמודים.
+
+**הודעה להפעלה:** `TEAM_10_TO_TEAM_30_40_STAGE_2.5_ACTIVATION.md` 🟢  
+**סטטוס נוכחי:** 🟡 **75% Complete (Phase 1 - Identity Cube)**
 
 **תהליך:**
 
 #### **2.5.1 זיהוי Components משותפים לכל קוביה**
 
 **Identity & Authentication Cube (D15):**
-- [ ] **AuthForm** - טופס משותף (Login, Register, Reset Password)
-- [ ] **AuthValidation** - ולידציה משותפת
-- [ ] **AuthErrorHandler** - טיפול בשגיאות משותף
-- [ ] **AuthLayout** - Layout משותף לעמודי Auth
+- [x] **useAuthValidation** - Hook לולידציה משותפת ✅ **COMPLETE**
+- [x] **AuthErrorHandler** - טיפול בשגיאות משותף ✅ **COMPLETE** (הוגש לולידציה)
+- [x] **AuthLayout** - Layout משותף לעמודי Auth ✅ **COMPLETE** (הוגש לולידציה)
+- [ ] **AuthForm** - טופס משותף (Login, Register, Reset Password) 🟡 **IN PROGRESS**
 
 **Financial Cube (D16, D18, D21):**
 - [ ] **FinancialTable** - טבלה משותפת (Accounts, Brokers, Cash)
@@ -198,7 +221,119 @@ ui/src/
 - [ ] תיעוד Props, Usage, Examples
 - [ ] תיעוד State Management משותף
 
-**סטטוס:** ⏸️ **PENDING** - ממתין להשלמת שלב 2
+**סטטוס:** 🟡 **IN PROGRESS** - Phase 1: 75% Complete (3 מתוך 4 Components) ✅
+
+**Components שנוצרו:**
+- ✅ `useAuthValidation` Hook - **COMPLETE** (הוגש לולידציה)
+- ✅ `AuthErrorHandler` Component - **COMPLETE** (הוגש לולידציה)
+- ✅ `AuthLayout` Component - **COMPLETE** (הוגש לולידציה)
+- 🟡 `AuthForm` Component - **IN PROGRESS**
+
+**ולידציה:**
+- 🟡 **Team 40:** בודק קוד של 3 Components שהוגשו
+- ⏸️ **The Visionary:** ממתין להשלמת בדיקות Team 40
+
+**דוחות:**
+- `TEAM_30_STAGE_2.5_PROGRESS_REPORT.md` - דוח התקדמות Team 30
+- `TEAM_30_TO_TEAM_40_VALIDATION_SUBMISSION.md` - הגשה לולידציה
+- `TEAM_40_TO_TEAM_10_STAGE_2.5_READY.md` - Team 40 מוכן לבדיקות
+- `TEAM_40_TO_TEAM_10_VALIDATION_WORKFLOW_UPDATE.md` - עדכון תהליך עבודה (ולידציה סופית)
+
+**דוחות:**
+- `TEAM_30_STAGE_2.5_PROGRESS_REPORT.md` - דוח התקדמות Team 30
+- `TEAM_30_TO_TEAM_40_VALIDATION_SUBMISSION.md` - הגשה לולידציה
+- `TEAM_40_TO_TEAM_10_STAGE_2.5_READY.md` - Team 40 מוכן לבדיקות
+- `TEAM_40_TO_TEAM_10_VALIDATION_WORKFLOW_UPDATE.md` - עדכון תהליך עבודה (ולידציה סופית)
+
+---
+
+### **שלב 2.6: יישום Fluid Design - הסרת Media Queries** 🛡️ **MANDATORY** (P0) 🔴 **NEW**
+
+**צוותים:** Team 40 (UI Assets & Design - מוביל) + Team 30 (Frontend - יישום)
+
+**מקור:** `ARCHITECT_DECISION_LEGO_CUBES.md` + `ARCHITECT_RESPONSIVE_CHARTER.md`  
+**תאריך החלטה:** 2026-02-02  
+**סטטוס:** 🔴 **READY TO START**
+
+**מטרה:** הסרת כל ה-media queries והחלפתן ב-Fluid Design (clamp, min, max, Grid auto-fit/auto-fill).
+
+**עקרונות Fluid Design (חובה):**
+
+#### **1. טיפוגרפיה וריווחים נזילים**
+- **פונטים:** שימוש ב-`clamp(min, preferred, max)` במקום media queries
+- **ריווחים:** שימוש ב-`clamp()` ל-Margins ו-Paddings
+- **דוגמה:**
+  ```css
+  /* ❌ לא נכון - media query */
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+  
+  /* ✅ נכון - Fluid Design */
+  font-size: clamp(14px, 2vw + 0.5rem, 18px);
+  ```
+
+#### **2. גריד גמיש (No-Media-Query Goal)**
+- **Grid:** שימוש ב-`grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))`
+- **Container:** תמיד ברוחב מקסימלי של 1400px (כבר מיושם)
+- **דוגמה:**
+  ```css
+  /* ✅ נכון - Grid גמיש */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(16px, 2vw, 24px);
+  }
+  ```
+
+#### **3. טבלאות ונתונים (Mobile Tables)**
+- **טבלאות לא "נשברות" למובייל** - עטופות ב-`overflow-x: auto`
+- **שימוש ב-Sticky Columns** לשמירה על קונטקסט
+- **רוחב מינימלי** לרכיבי LEGO (כמו טבלאות) עם Horizontal Scroll פנימי
+
+**משימות:**
+
+- [ ] **2.6.1** זיהוי כל ה-media queries בקוד
+  - [ ] `phoenix-components.css` - 1 media query (@media min-width: 1024px)
+  - [ ] `phoenix-base.css` - 1 media query (@media prefers-color-scheme: dark) - **לשמור** (dark mode)
+  - [ ] `phoenix-header.css` - 3 media queries (@media max-width: 768px, min-width: 768px, min-width: 1200px)
+  - [ ] `phoenix-tables.css` - לבדוק אם יש media queries
+  - [ ] קבצי CSS נוספים - סריקה מלאה
+
+- [ ] **2.6.2** החלפת media queries ב-Fluid Design
+  - [ ] **פונטים:** החלפת כל הגדרות font-size ב-`clamp()`
+  - [ ] **ריווחים:** החלפת כל margins/paddings ב-`clamp()` (אם נדרש)
+  - [ ] **Grid:** החלפת media queries ב-`repeat(auto-fit, minmax(...))`
+  - [ ] **טבלאות:** וידוא ש-tables עטופות ב-`overflow-x: auto` (כבר מיושם ב-`.phoenix-table-wrapper`)
+
+- [ ] **2.6.3** בדיקת עמידה ב-Responsive Charter
+  - [ ] כל הפונטים משתמשים ב-`clamp()`
+  - [ ] כל הריווחים משתמשים ב-`clamp()` (אם נדרש)
+  - [ ] כל ה-Grids משתמשים ב-`auto-fit`/`auto-fill`
+  - [ ] אין media queries (חוץ מ-dark mode אם נדרש)
+
+- [ ] **2.6.4** עדכון תיעוד
+  - [ ] עדכון `CSS_CLASSES_INDEX.md` - הסרת התייחסויות ל-media queries
+  - [ ] עדכון `TT2_TABLES_REACT_FRAMEWORK.md` - הוספת סעיף על Fluid Design בטבלאות
+  - [ ] יצירת/עדכון `ARCHITECT_RESPONSIVE_CHARTER.md` - תיעוד מלא
+
+**קבצים לטיפול:**
+- `ui/src/styles/phoenix-components.css` - הסרת `@media (min-width: 1024px)`
+- `ui/src/styles/phoenix-header.css` - הסרת 3 media queries
+- `ui/src/styles/phoenix-tables.css` - לבדוק אם יש media queries
+- `ui/src/styles/phoenix-base.css` - **לשמור** `@media (prefers-color-scheme: dark)` (dark mode)
+
+**החלטות אדריכליות:**
+- 🛡️ **איסור מוחלט:** אין לכתוב קבצי CSS נפרדים למובייל
+- 🛡️ **טכנולוגיה:** `clamp()`, `min()`, `max()` עבור גדלי פונטים וריווחים
+- 🛡️ **Layout:** Flexbox ו-Grid עם `auto-fit` ו-`auto-fill`
+- 🛡️ **Viewports:** רוחב מינימלי לרכיבי LEGO עם Horizontal Scroll פנימי
+
+**קישורים:**
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית 🛡️ **FINAL GOVERNANCE LOCK**
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_RESPONSIVE_CHARTER.md` - אמנת רספונסיביות
+
+**סטטוס:** 🔴 **READY TO START** - ממתין להפעלת Team 40
 
 ---
 
@@ -224,11 +359,11 @@ ui/src/
 
 **תהליך:**
 
-##### **3.1.1 יצירת Cube Structure** 🛡️ **MANDATORY STRUCTURE**
-- [ ] יצירת תיקיית `ui/src/cubes/identity/` (אם לא קיימת)
-- [ ] יצירת תיקיות: `components/`, `contexts/`, `hooks/`, `services/`, `scripts/`, `pages/`
-- [ ] העברת Components קיימים מ-`components/auth/` ו-`components/profile/` → `cubes/identity/components/` 🛡️
-- [ ] העברת `auth.js` מ-`services/` → `cubes/identity/services/` 🛡️
+##### **3.1.1 יצירת Cube Structure** 🛡️ **MANDATORY STRUCTURE** ✅ **COMPLETE**
+- [x] יצירת תיקיית `ui/src/cubes/identity/` ✅ **COMPLETE**
+- [x] יצירת תיקיות: `components/`, `contexts/`, `hooks/`, `services/`, `scripts/`, `pages/` ✅ **COMPLETE**
+- [x] העברת Components קיימים מ-`components/auth/` ו-`components/profile/` → `cubes/identity/components/` ✅ **COMPLETE**
+- [x] העברת `auth.js` מ-`services/` → `cubes/identity/services/` ✅ **COMPLETE**
 
 ##### **3.1.2 יצירת Shared Components**
 - [ ] **AuthForm** - טופס משותף עם Props גמישים
@@ -251,21 +386,77 @@ ui/src/
 
 ##### **3.1.5 בנייה מחדש של עמודים**
 לכל עמוד:
-- [ ] העתקת HTML Blueprint מ-`team_31_staging/`
+- [ ] **⚠️ CRITICAL:** יישום לפי `D15_PAGE_TEMPLATE_STAGE_1.html` כבסיס 🛡️ **MANDATORY**
+- [ ] **⚠️ CRITICAL:** עקיבה אחרי `index.html` לכל הבלופרינטים 🛡️ **MANDATORY**
+- [ ] העתקת תוכן מ-Blueprint ספציפי (לפי האינדקס)
 - [ ] המרה ל-React Component תוך שימוש ב-Shared Components
 - [ ] שימוש ב-AuthContext ו-useAuth Hook
 - [ ] אינטגרציה עם identityApi Service
 - [ ] שמירה על מבנה LEGO System (`tt-container` > `tt-section` > `tt-section-row`)
 - [ ] **⚠️ כלל ברזל:** אין סקריפטים בתוך העמוד - כל הסקריפטים בקבצים חיצוניים
+
+##### **3.1.6 Refactor רטרואקטיבי - הוצאת לוגיקה מקבצי Auth קיימים** 🛡️ **MANDATORY - RETROACTIVE**
+**מקור:** `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - משמעת סקריפטים (The Clean Slate Rule)
+
+**מטרה:** כל עמודי ה-Auth הקיימים חייבים לעבור Refactor להוצאת הלוגיקה לקבצים חיצוניים.
+
+**משימות:**
+- [ ] **3.1.6.1** סריקה מלאה של כל קבצי Auth קיימים
+  - [ ] זיהוי כל תגי `<script>` בתוך קבצי HTML/JSX
+  - [ ] זיהוי כל event handlers inline (`onclick`, `onchange`, וכו')
+  - [ ] רשימת כל הלוגיקה שצריכה להיות מועברת לקבצים חיצוניים
+
+- [ ] **3.1.6.2** יצירת קבצי JavaScript חיצוניים
+  - [ ] `cubes/identity/scripts/auth-login.js` - לוגיקת Login
+  - [ ] `cubes/identity/scripts/auth-register.js` - לוגיקת Register
+  - [ ] `cubes/identity/scripts/auth-reset-password.js` - לוגיקת Reset Password
+  - [ ] `cubes/identity/scripts/auth-profile.js` - לוגיקת Profile
+  - [ ] פונקציות משותפות ב-`cubes/identity/scripts/auth-common.js`
+
+- [ ] **3.1.6.3** העברת לוגיקה לקבצים חיצוניים
+  - [ ] הסרת כל תגי `<script>` מקבצי HTML/JSX
+  - [ ] הסרת כל event handlers inline
+  - [ ] העברת כל הלוגיקה לקבצי JavaScript חיצוניים
+  - [ ] שימוש ב-`js-` prefixed classes במקום inline handlers
+
+- [ ] **3.1.6.4** עדכון קבצי HTML/JSX
+  - [ ] הוספת `<script src="...">` בסוף `<body>` (לפני G-Bridge banner)
+  - [ ] הסרת כל תגי `<script>` פנימיים
+  - [ ] הסרת כל event handlers inline
+
+- [ ] **3.1.6.5** בדיקת עמידה
+  - [ ] אין תגי `<script>` בתוך HTML/JSX
+  - [ ] אין event handlers inline
+  - [ ] כל הלוגיקה בקבצים חיצוניים
+  - [ ] שימוש ב-`js-` prefixed classes
+  - [ ] בדיקת G-Bridge - חייבת לעבור (ירוק)
+
+**קבצים לטיפול:**
+- כל קבצי Auth קיימים (Login, Register, Reset Password, Profile)
+- קבצי HTML בסטייג'ינג (אם יש)
+- קבצי JSX/React (אם יש inline scripts)
+
+**החלטה אדריכלית:**
+- 🛡️ **איסור מוחלט:** אין לכתוב תגי `<script>` בתוך קבצי HTML או JSX
+- 🛡️ **רטרואקטיביות:** כל עמודי ה-Auth הקיימים חייבים לעבור Refactor
+- 🛡️ **G-Bridge:** כל חריגה תגרור פסילת G-Bridge מיידית
+
+**קישורים:**
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית
+- `documentation/10-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md` - JS Standards Protocol
+
+**סטטוס:** 🔴 **READY TO START** - משימה רטרואקטיבית חובה
 - [ ] ארגון קבצי סקריפטים לפי קוביה (`ui/src/cubes/identity/scripts/`)
 - [ ] ולידציה: fidelity, RTL, Accessibility
 
-**בלופרינטים זמינים:**
-- `_COMMUNICATION/team_31/team_31_staging/D15_LOGIN.html`
-- `_COMMUNICATION/team_31/team_31_staging/D15_REGISTER.html`
-- `_COMMUNICATION/team_31/team_31_staging/D15_RESET_PWD.html`
-- `_COMMUNICATION/team_31/team_31_staging/D15_PROFILE.html`
-- `_COMMUNICATION/team_31/team_31_staging/D15_INDEX.html`
+**בלופרינטים זמינים:** ⚠️ **CRITICAL UPDATE**
+- **תבנית בסיס:** `_COMMUNICATION/team_01/team_01_staging/D15_PAGE_TEMPLATE_STAGE_1.html` 🛡️ **MANDATORY**
+- **אינדקס:** `_COMMUNICATION/team_01/team_01_staging/index.html` 🛡️ **MANDATORY**
+- **בלופרינטים ספציפיים:** לפי האינדקס (`index.html`) - יש לבדוק את הקישורים הרלוונטיים
+
+**⚠️ חשוב:** כל הבלופרינטים יש ליישם לפי `D15_PAGE_TEMPLATE_STAGE_1.html` כבסיס + האינדקס (`index.html`)
+
+**עדכון קריטי:** `TEAM_10_BLUEPRINT_CRITICAL_UPDATE.md` 🚨
 
 **Backend API Endpoints:**
 - `/api/auth/login`
@@ -308,7 +499,9 @@ ui/src/
   - `getCashFlow()` (עתידי)
 
 ##### **3.2.5 בנייה מחדש של D16_ACCTS_VIEW**
-- [ ] העתקת HTML Blueprint מ-`team_31_staging/` או `team_01_staging/`
+- [ ] **⚠️ CRITICAL:** יישום לפי `D15_PAGE_TEMPLATE_STAGE_1.html` כבסיס 🛡️ **MANDATORY**
+- [ ] **⚠️ CRITICAL:** עקיבה אחרי `index.html` לכל הבלופרינטים 🛡️ **MANDATORY**
+- [ ] העתקת תוכן מ-Blueprint ספציפי (לפי האינדקס)
 - [ ] המרה ל-React Component תוך שימוש ב-Shared Components
 - [ ] שימוש ב-FinancialContext ו-useFinancial Hook
 - [ ] אינטגרציה עם financialApi Service
@@ -318,9 +511,14 @@ ui/src/
 - [ ] ארגון קבצי סקריפטים לפי קוביה (`ui/src/cubes/financial/scripts/`)
 - [ ] ולידציה: fidelity, RTL, Accessibility
 
-**בלופרינט זמין:**
-- `_COMMUNICATION/team_31/team_31_staging/D16_ACCTS_VIEW.html`
-- `_COMMUNICATION/team_01/team_01_staging/D16_ACCTS_VIEW.html`
+**בלופרינט זמין:** ⚠️ **CRITICAL UPDATE**
+- **תבנית בסיס:** `_COMMUNICATION/team_01/team_01_staging/D15_PAGE_TEMPLATE_STAGE_1.html` 🛡️ **MANDATORY**
+- **אינדקס:** `_COMMUNICATION/team_01/team_01_staging/index.html` 🛡️ **MANDATORY**
+- **בלופרינט ספציפי:** לפי האינדקס - יש לבדוק את הקישור ל-D16_ACCTS_VIEW
+
+**⚠️ חשוב:** יש ליישם לפי `D15_PAGE_TEMPLATE_STAGE_1.html` כבסיס + האינדקס
+
+**עדכון קריטי:** `TEAM_10_BLUEPRINT_CRITICAL_UPDATE.md` 🚨
 
 **Backend API Endpoints:**
 - `/api/trading-accounts`
@@ -807,7 +1005,13 @@ ui/src/
 ---
 
 **Team 10 (The Gateway)**  
-**Date:** 2026-02-01  
-**Status:** 🟢 **ACTIVE - LEGO ARCHITECTURE COMPLIANT**
+**Date:** 2026-02-02 (עודכן עם Fluid Design Mandate)  
+**Status:** 🟢 **ACTIVE - LEGO ARCHITECTURE COMPLIANT - FLUID DESIGN MANDATORY**
 
-**log_entry | Team 10 | CSS_BLUEPRINT_REFACTOR_PLAN_V2 | CREATED | 2026-02-01**
+**עדכונים אחרונים:**
+- 2026-02-02: הוספת שלב 2.6 - יישום Fluid Design (הסרת media queries)
+- 2026-02-02: עדכון לפי החלטות אדריכליות (`ARCHITECT_DECISION_LEGO_CUBES.md`, `ARCHITECT_RESPONSIVE_CHARTER.md`)
+- 2026-02-02: עדכון לפי החלטה אדריכלית סופית (`ARCHITECT_DECISION_LEGO_CUBES_FINAL.md`) - הוספת משימה רטרואקטיבית 3.1.6 (Refactor Auth Scripts)
+- 2026-02-02: 🛡️ **FINAL GOVERNANCE LOCK** - כל חריגה תגרור פסילת G-Bridge מיידית
+
+**log_entry | Team 10 | CSS_BLUEPRINT_REFACTOR_PLAN_V2 | UPDATED_WITH_FLUID_DESIGN | 2026-02-02**

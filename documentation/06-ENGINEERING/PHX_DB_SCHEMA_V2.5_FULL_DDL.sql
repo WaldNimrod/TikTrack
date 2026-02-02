@@ -455,7 +455,9 @@ CREATE TABLE user_data.users (
     
     -- Identity
     username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    -- Email: UNIQUE constraint handled via partial index (excludes ADMIN/SUPERADMIN)
+    -- See: idx_users_email_unique_non_admin
+    email VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     
     -- Phone Identity (NEW in V2.5)
@@ -499,17 +501,33 @@ CREATE TABLE user_data.users (
     )
 );
 
+-- Email: UNIQUE only for non-admin users (ADMIN/SUPERADMIN can have duplicates)
+CREATE UNIQUE INDEX idx_users_email_unique_non_admin
+    ON user_data.users(email)
+    WHERE deleted_at IS NULL 
+    AND role NOT IN ('ADMIN', 'SUPERADMIN');
+
+-- Regular index for email (for queries)
 CREATE INDEX idx_users_email ON user_data.users(email) WHERE deleted_at IS NULL;
+
 CREATE INDEX idx_users_username ON user_data.users(username) WHERE deleted_at IS NULL;
 CREATE INDEX idx_users_role ON user_data.users(role) WHERE deleted_at IS NULL;
-CREATE UNIQUE INDEX idx_users_phone_unique 
-    ON user_data.users(phone_number) 
-    WHERE phone_number IS NOT NULL AND deleted_at IS NULL;
+
+-- Phone: UNIQUE only for non-admin users (ADMIN/SUPERADMIN can have duplicates)
+CREATE UNIQUE INDEX idx_users_phone_unique_non_admin
+    ON user_data.users(phone_number)
+    WHERE phone_number IS NOT NULL 
+    AND deleted_at IS NULL
+    AND role NOT IN ('ADMIN', 'SUPERADMIN');
+
+-- Regular index for phone (for queries)
 CREATE INDEX idx_users_phone 
     ON user_data.users(phone_number) 
     WHERE deleted_at IS NULL;
 
 COMMENT ON TABLE user_data.users IS 'System users';
+COMMENT ON INDEX user_data.idx_users_email_unique_non_admin IS 'Unique email constraint - excludes ADMIN/SUPERADMIN (allows admin dual identity)';
+COMMENT ON INDEX user_data.idx_users_phone_unique_non_admin IS 'Unique phone constraint - excludes ADMIN/SUPERADMIN (allows admin dual identity)';
 
 -- ----------------------------------------------------------------------------
 -- Table: user_data.password_reset_requests (NEW in V2.5)

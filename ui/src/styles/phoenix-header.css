@@ -298,7 +298,8 @@
 #unified-header .tiktrack-dropdown-menu {
   position: absolute;
   top: calc(100% + 3px);
-  inset-inline-end: 0;
+  inset-inline-end: 0; /* Aligned to start of button (right in RTL) */
+  inset-inline-start: auto; /* Goes left from there */
   background: rgba(255, 255, 255, 0.95); /* Semi-transparent - match legacy */
   backdrop-filter: blur(10px);
   border: 1px solid #e5e5e5;
@@ -306,7 +307,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 180px; /* Smaller width - match legacy */
   max-width: 200px;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0; /* Half padding - tighter spacing */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -317,11 +318,14 @@
   flex-direction: column; /* Stack items vertically */
 }
 
+/* Dropdown menu visible on hover - EXACT from blueprint */
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-menu,
 #unified-header .tiktrack-dropdown-menu[style*="opacity: 1"],
 #unified-header .tiktrack-dropdown-menu[style*="visibility: visible"] {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  display: flex;
 }
 
 #unified-header .tiktrack-dropdown-menu li {
@@ -343,13 +347,14 @@
   opacity: 0.7; /* Semi-transparent - match legacy */
 }
 
-#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
-  transform: rotate(90deg);
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow,
+#unified-header .tiktrack-dropdown-arrow.rotated {
+  transform: rotate(180deg);
 }
 
 #unified-header .tiktrack-dropdown-item {
   display: block;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem; /* Half padding - tighter spacing (was 0.5rem 1rem) */
   color: #29a6a8;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -366,8 +371,8 @@
 #unified-header .separator {
   height: 1px; /* Very thin - 1px */
   background: #e5e5e5;
-  margin: 0.5rem 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Shadow on separator */
+  margin: 0.25rem 0; /* Half margin - tighter spacing (was 0.5rem 0) */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05); /* Subtle shadow - very delicate */
 }
 
 /* Dropdown Submenu (Level 3) - Exact copy from original */
@@ -545,6 +550,17 @@
   overflow: visible;
 }
 
+#unified-header .header-filters.collapsed {
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
+}
+
+#unified-header .header-filters.collapsed .filters-container {
+  display: none;
+}
+
 /* Filters Container - Same structure as header-container */
 #unified-header .header-filters .filters-container {
   display: flex;
@@ -621,6 +637,8 @@
   box-sizing: border-box;
 }
 
+/* Filter menu visible on hover - EXACT from blueprint */
+#unified-header .filter-dropdown:hover .filter-menu,
 #unified-header .filter-menu.show {
   opacity: 1;
   visibility: visible;

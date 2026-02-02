@@ -1,0 +1,304 @@
+/*
+  Phoenix-Tables-Ver: v1.0.0 | Unified Tables System
+  Sync-Time: 2026-02-01 21:35:00 IST
+  Team: Team 31 (Blueprint)
+  Status: ✅ BLUEPRINT CSS - READY FOR TEAM 30
+  Compliance: RTL Charter ✅ | DNA Sync ✅ | CSS Standards Protocol ✅
+  
+  Purpose:
+  Unified CSS styles for all Phoenix tables system.
+  Uses BEM naming convention with prefix: phoenix-table-*
+  
+  IMPORTANT: This file must be loaded AFTER phoenix-components.css.
+  
+  Based on:
+  - PHOENIX_TABLES_SPECIFICATION.md
+  - Legacy table styles (legacy-audit-table)
+  - System-wide design patterns
+*/
+
+/* ============================================
+   TABLES SYSTEM - BASE STYLES
+   ============================================ */
+
+/* Table Wrapper - Handles overflow and scroll */
+.phoenix-table-wrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  margin-block-start: var(--spacing-md, 16px);
+}
+
+/* Base Table */
+.phoenix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--apple-bg-primary, #FFFFFF);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-medium, 10px);
+  box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+}
+
+/* Table Head */
+.phoenix-table__head {
+  background: var(--apple-bg-secondary, #F2F2F7);
+}
+
+/* Table Header Cell */
+.phoenix-table__header {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #F2F2F7);
+  color: var(--apple-text-primary, #000000);
+  border-bottom: 2px solid var(--apple-border-light, #E5E5EA);
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: right; /* RTL */
+  height: 48px !important;
+  min-height: 48px;
+  max-height: 48px;
+  vertical-align: middle;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Sortable Header */
+.phoenix-table__header[data-sortable="true"] {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.phoenix-table__header[data-sortable="true"]:hover {
+  background: var(--apple-gray-2, #E5E5EA);
+}
+
+/* Header Text */
+.phoenix-table__header-text {
+  display: inline-block;
+  margin-inline-end: var(--spacing-xs, 4px);
+}
+
+/* Sort Indicator */
+.phoenix-table__sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-inline-start: var(--spacing-xs, 4px);
+}
+
+/* Sort Icon */
+.phoenix-table__sort-icon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__sort-icon {
+  opacity: 1;
+  transform: rotate(180deg);
+}
+
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__sort-icon {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+/* Table Body */
+.phoenix-table__body {
+  background: var(--apple-bg-primary, #FFFFFF);
+}
+
+/* Table Row */
+.phoenix-table__row {
+  border-bottom: 1px solid var(--apple-border-light, #E5E5EA);
+  transition: background-color 0.2s ease;
+  min-height: 48px;
+}
+
+.phoenix-table__row:last-child {
+  border-bottom: none;
+}
+
+.phoenix-table__row:hover {
+  background: var(--apple-bg-secondary, #F2F2F7);
+}
+
+/* Table Cell */
+.phoenix-table__cell {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-normal, 400);
+  line-height: var(--line-height-normal, 1.4);
+  color: var(--apple-text-primary, #000000);
+  text-align: right; /* RTL */
+  vertical-align: middle;
+}
+
+/* Numeric Cell */
+.phoenix-table__cell--numeric {
+  font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace);
+  text-align: left; /* RTL: numbers align left */
+  letter-spacing: 0.5px;
+}
+
+/* Currency Cell */
+.phoenix-table__cell--currency {
+  font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace);
+  text-align: left; /* RTL: numbers align left */
+  letter-spacing: 0.5px;
+}
+
+/* Date Cell */
+.phoenix-table__cell--date {
+  text-align: center;
+  font-size: var(--font-size-sm, 14px);
+}
+
+/* Status Cell */
+.phoenix-table__cell--status {
+  text-align: center;
+}
+
+/* Actions Cell */
+.phoenix-table__cell--actions {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.phoenix-table__status-badge {
+  display: inline-block;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border-radius: var(--apple-radius-small, 6px);
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.phoenix-table__status-badge--active {
+  background: var(--apple-green, #34C759);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--inactive {
+  background: var(--apple-gray-6, #8E8E93);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--verified {
+  background: var(--apple-green, #34C759);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--pending {
+  background: var(--apple-orange, #FF9500);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--high {
+  background: var(--apple-red, #FF3B30);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--medium {
+  background: var(--apple-orange, #FF9500);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+.phoenix-table__status-badge--low {
+  background: var(--apple-gray-6, #8E8E93);
+  color: var(--apple-bg-primary, #FFFFFF);
+}
+
+/* ============================================
+   TABLE FILTERS - INTERNAL FILTERS
+   ============================================ */
+
+.phoenix-table-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md, 16px);
+  margin-block-end: var(--spacing-md, 16px);
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #F2F2F7);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-medium, 10px);
+}
+
+.phoenix-table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.phoenix-table-filter-label {
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--apple-text-secondary, #3C3C43);
+  white-space: nowrap;
+}
+
+.phoenix-table-filter-input,
+.phoenix-table-filter-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #E5E5EA);
+  border-radius: var(--apple-radius-small, 6px);
+  font-size: var(--font-size-sm, 14px);
+  font-family: var(--font-family-primary, 'Noto Sans Hebrew', sans-serif);
+  background: var(--apple-bg-primary, #FFFFFF);
+  color: var(--apple-text-primary, #000000);
+}
+
+.phoenix-table-filter-input:focus,
+.phoenix-table-filter-select:focus {
+  outline: none;
+  border-color: var(--color-brand, #26baac);
+  box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .phoenix-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .phoenix-table {
+    min-width: 800px; /* Minimum table width for mobile */
+  }
+  
+  .phoenix-table-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .phoenix-table-filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.phoenix-table__header[role="columnheader"]:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: -2px;
+}
+
+.phoenix-table__header[role="columnheader"][tabindex="0"]:focus-visible {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: -2px;
+}

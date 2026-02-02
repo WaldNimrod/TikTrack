@@ -95,13 +95,29 @@ body.auth-layout-root tt-container,
   padding-inline: clamp(16px, 2vw, 24px); /* CRITICAL: Fluid padding - responsive automatically */
 }
 
+/* Auth-specific: Narrow section for auth forms - White card background */
+/* CRITICAL: Override transparent background from phoenix-components.css for auth pages */
 body.auth-layout-root tt-section,
 .auth-layout-root tt-section {
   max-width: 100%;
+  width: 100%;
   margin-inline: auto;
+  margin-block-start: 0;
+  margin-block-end: 0;
   text-align: center;
-  margin-block-start: 0; /* CRITICAL: No top margin - vertical centering handled by main justify-content: center */
-  margin-block-end: 0; /* CRITICAL: No bottom margin - vertical centering handled by main justify-content: center */
+  /* White card background - OVERRIDE transparent from phoenix-components.css */
+  background: var(--apple-bg-elevated, #ffffff) !important;
+  border: 1px solid var(--apple-border-light, #e5e5e5) !important;
+  border-radius: 12px;
+  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15)) !important;
+  padding: var(--spacing-xl, 32px);
+  box-sizing: border-box;
+}
+
+/* CRITICAL: Restore padding for auth pages (overrides "no padding" rule from phoenix-components.css) */
+body.auth-layout-root tt-section > *,
+.auth-layout-root tt-section > * {
+  padding: 0; /* Content inside has no padding - padding is on tt-section itself */
 }
 
 /* System Body Context */

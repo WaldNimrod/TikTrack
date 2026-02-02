@@ -1,0 +1,720 @@
+{
+  "timestamp": "2026-02-02T00:09:18.827Z",
+  "blueprint": "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/team_01/team_01_staging/D15_LOGIN.html",
+  "react": "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/cubes/identity/components/auth/LoginForm.jsx",
+  "summary": {
+    "totalDifferences": 48,
+    "byType": {
+      "tag_mismatch": 21,
+      "class_difference": 20,
+      "extra_in_react": 7
+    }
+  },
+  "differences": [
+    {
+      "type": "tag_mismatch",
+      "index": 0,
+      "blueprint": {
+        "tag": "tt-container",
+        "classes": []
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "page-wrapper"
+        ]
+      },
+      "message": "Tag mismatch at index 0: Blueprint has <tt-container>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 0,
+      "tag": "tt-container",
+      "missing": [],
+      "extra": [
+        "page-wrapper"
+      ],
+      "message": "Class differences in <tt-container> at index 0: Missing: [], Extra: [page-wrapper]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 1,
+      "blueprint": {
+        "tag": "tt-section",
+        "classes": []
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "page-container"
+        ]
+      },
+      "message": "Tag mismatch at index 1: Blueprint has <tt-section>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 1,
+      "tag": "tt-section",
+      "missing": [],
+      "extra": [
+        "page-container"
+      ],
+      "message": "Class differences in <tt-section> at index 1: Missing: [], Extra: [page-container]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 2,
+      "blueprint": {
+        "tag": "div",
+        "classes": [
+          "auth-header"
+        ]
+      },
+      "react": {
+        "tag": "main",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 2: Blueprint has <div>, React has <main>"
+    },
+    {
+      "type": "class_difference",
+      "index": 2,
+      "tag": "div",
+      "missing": [
+        "auth-header"
+      ],
+      "extra": [],
+      "message": "Class differences in <div> at index 2: Missing: [auth-header], Extra: []"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 3,
+      "blueprint": {
+        "tag": "div",
+        "classes": [
+          "auth-logo"
+        ]
+      },
+      "react": {
+        "tag": "tt-container",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 3: Blueprint has <div>, React has <tt-container>"
+    },
+    {
+      "type": "class_difference",
+      "index": 3,
+      "tag": "div",
+      "missing": [
+        "auth-logo"
+      ],
+      "extra": [],
+      "message": "Class differences in <div> at index 3: Missing: [auth-logo], Extra: []"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 4,
+      "blueprint": {
+        "tag": "img",
+        "classes": []
+      },
+      "react": {
+        "tag": "tt-section",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 4: Blueprint has <img>, React has <tt-section>"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 5,
+      "blueprint": {
+        "tag": "p",
+        "classes": [
+          "auth-subtitle"
+        ]
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "auth-header"
+        ]
+      },
+      "message": "Tag mismatch at index 5: Blueprint has <p>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 5,
+      "tag": "p",
+      "missing": [
+        "auth-subtitle"
+      ],
+      "extra": [
+        "auth-header"
+      ],
+      "message": "Class differences in <p> at index 5: Missing: [auth-subtitle], Extra: [auth-header]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 6,
+      "blueprint": {
+        "tag": "h1",
+        "classes": [
+          "auth-title"
+        ]
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "auth-logo"
+        ]
+      },
+      "message": "Tag mismatch at index 6: Blueprint has <h1>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 6,
+      "tag": "h1",
+      "missing": [
+        "auth-title"
+      ],
+      "extra": [
+        "auth-logo"
+      ],
+      "message": "Class differences in <h1> at index 6: Missing: [auth-title], Extra: [auth-logo]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 7,
+      "blueprint": {
+        "tag": "form",
+        "classes": []
+      },
+      "react": {
+        "tag": "img",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 7: Blueprint has <form>, React has <img>"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 8,
+      "blueprint": {
+        "tag": "div",
+        "classes": [
+          "form-group"
+        ]
+      },
+      "react": {
+        "tag": "p",
+        "classes": [
+          "auth-subtitle"
+        ]
+      },
+      "message": "Tag mismatch at index 8: Blueprint has <div>, React has <p>"
+    },
+    {
+      "type": "class_difference",
+      "index": 8,
+      "tag": "div",
+      "missing": [
+        "form-group"
+      ],
+      "extra": [
+        "auth-subtitle"
+      ],
+      "message": "Class differences in <div> at index 8: Missing: [form-group], Extra: [auth-subtitle]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 9,
+      "blueprint": {
+        "tag": "label",
+        "classes": [
+          "form-label"
+        ]
+      },
+      "react": {
+        "tag": "h1",
+        "classes": [
+          "auth-title"
+        ]
+      },
+      "message": "Tag mismatch at index 9: Blueprint has <label>, React has <h1>"
+    },
+    {
+      "type": "class_difference",
+      "index": 9,
+      "tag": "label",
+      "missing": [
+        "form-label"
+      ],
+      "extra": [
+        "auth-title"
+      ],
+      "message": "Class differences in <label> at index 9: Missing: [form-label], Extra: [auth-title]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 10,
+      "blueprint": {
+        "tag": "input",
+        "classes": [
+          "form-control"
+        ]
+      },
+      "react": {
+        "tag": "form",
+        "classes": [
+          "js-login-form"
+        ]
+      },
+      "message": "Tag mismatch at index 10: Blueprint has <input>, React has <form>"
+    },
+    {
+      "type": "class_difference",
+      "index": 10,
+      "tag": "input",
+      "missing": [
+        "form-control"
+      ],
+      "extra": [
+        "js-login-form"
+      ],
+      "message": "Class differences in <input> at index 10: Missing: [form-control], Extra: [js-login-form]"
+    },
+    {
+      "type": "class_difference",
+      "index": 11,
+      "tag": "div",
+      "missing": [
+        "form-group"
+      ],
+      "extra": [],
+      "message": "Class differences in <div> at index 11: Missing: [form-group], Extra: []"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 12,
+      "blueprint": {
+        "tag": "label",
+        "classes": [
+          "form-label"
+        ]
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "form-group"
+        ]
+      },
+      "message": "Tag mismatch at index 12: Blueprint has <label>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 12,
+      "tag": "label",
+      "missing": [
+        "form-label"
+      ],
+      "extra": [
+        "form-group"
+      ],
+      "message": "Class differences in <label> at index 12: Missing: [form-label], Extra: [form-group]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 13,
+      "blueprint": {
+        "tag": "input",
+        "classes": [
+          "form-control"
+        ]
+      },
+      "react": {
+        "tag": "label",
+        "classes": [
+          "form-label"
+        ]
+      },
+      "message": "Tag mismatch at index 13: Blueprint has <input>, React has <label>"
+    },
+    {
+      "type": "class_difference",
+      "index": 13,
+      "tag": "input",
+      "missing": [
+        "form-control"
+      ],
+      "extra": [
+        "form-label"
+      ],
+      "message": "Class differences in <input> at index 13: Missing: [form-control], Extra: [form-label]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 14,
+      "blueprint": {
+        "tag": "div",
+        "classes": [
+          "form-options"
+        ]
+      },
+      "react": {
+        "tag": "input",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 14: Blueprint has <div>, React has <input>"
+    },
+    {
+      "type": "class_difference",
+      "index": 14,
+      "tag": "div",
+      "missing": [
+        "form-options"
+      ],
+      "extra": [],
+      "message": "Class differences in <div> at index 14: Missing: [form-options], Extra: []"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 15,
+      "blueprint": {
+        "tag": "label",
+        "classes": [
+          "remember-me"
+        ]
+      },
+      "react": {
+        "tag": "span",
+        "classes": [
+          "auth-form__error-message"
+        ]
+      },
+      "message": "Tag mismatch at index 15: Blueprint has <label>, React has <span>"
+    },
+    {
+      "type": "class_difference",
+      "index": 15,
+      "tag": "label",
+      "missing": [
+        "remember-me"
+      ],
+      "extra": [
+        "auth-form__error-message"
+      ],
+      "message": "Class differences in <label> at index 15: Missing: [remember-me], Extra: [auth-form__error-message]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 16,
+      "blueprint": {
+        "tag": "input",
+        "classes": [
+          "lod-checkbox"
+        ]
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "form-group"
+        ]
+      },
+      "message": "Tag mismatch at index 16: Blueprint has <input>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 16,
+      "tag": "input",
+      "missing": [
+        "lod-checkbox"
+      ],
+      "extra": [
+        "form-group"
+      ],
+      "message": "Class differences in <input> at index 16: Missing: [lod-checkbox], Extra: [form-group]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 17,
+      "blueprint": {
+        "tag": "a",
+        "classes": [
+          "auth-link"
+        ]
+      },
+      "react": {
+        "tag": "label",
+        "classes": [
+          "form-label"
+        ]
+      },
+      "message": "Tag mismatch at index 17: Blueprint has <a>, React has <label>"
+    },
+    {
+      "type": "class_difference",
+      "index": 17,
+      "tag": "a",
+      "missing": [
+        "auth-link"
+      ],
+      "extra": [
+        "form-label"
+      ],
+      "message": "Class differences in <a> at index 17: Missing: [auth-link], Extra: [form-label]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 18,
+      "blueprint": {
+        "tag": "button",
+        "classes": [
+          "btn-auth-primary"
+        ]
+      },
+      "react": {
+        "tag": "input",
+        "classes": []
+      },
+      "message": "Tag mismatch at index 18: Blueprint has <button>, React has <input>"
+    },
+    {
+      "type": "class_difference",
+      "index": 18,
+      "tag": "button",
+      "missing": [
+        "btn-auth-primary"
+      ],
+      "extra": [],
+      "message": "Class differences in <button> at index 18: Missing: [btn-auth-primary], Extra: []"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 19,
+      "blueprint": {
+        "tag": "div",
+        "classes": [
+          "auth-footer-zone"
+        ]
+      },
+      "react": {
+        "tag": "span",
+        "classes": [
+          "auth-form__error-message"
+        ]
+      },
+      "message": "Tag mismatch at index 19: Blueprint has <div>, React has <span>"
+    },
+    {
+      "type": "class_difference",
+      "index": 19,
+      "tag": "div",
+      "missing": [
+        "auth-footer-zone"
+      ],
+      "extra": [
+        "auth-form__error-message"
+      ],
+      "message": "Class differences in <div> at index 19: Missing: [auth-footer-zone], Extra: [auth-form__error-message]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 20,
+      "blueprint": {
+        "tag": "span",
+        "classes": []
+      },
+      "react": {
+        "tag": "div",
+        "classes": [
+          "form-options"
+        ]
+      },
+      "message": "Tag mismatch at index 20: Blueprint has <span>, React has <div>"
+    },
+    {
+      "type": "class_difference",
+      "index": 20,
+      "tag": "span",
+      "missing": [],
+      "extra": [
+        "form-options"
+      ],
+      "message": "Class differences in <span> at index 20: Missing: [], Extra: [form-options]"
+    },
+    {
+      "type": "tag_mismatch",
+      "index": 21,
+      "blueprint": {
+        "tag": "a",
+        "classes": [
+          "auth-link-bold"
+        ]
+      },
+      "react": {
+        "tag": "label",
+        "classes": [
+          "remember-me"
+        ]
+      },
+      "message": "Tag mismatch at index 21: Blueprint has <a>, React has <label>"
+    },
+    {
+      "type": "class_difference",
+      "index": 21,
+      "tag": "a",
+      "missing": [
+        "auth-link-bold"
+      ],
+      "extra": [
+        "remember-me"
+      ],
+      "message": "Class differences in <a> at index 21: Missing: [auth-link-bold], Extra: [remember-me]"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 22,
+      "react": {
+        "tag": "input",
+        "classes": [
+          "js-login-remember-checkbox",
+          "lod-checkbox"
+        ]
+      },
+      "message": "Element at index 22 exists in React but not in Blueprint: <input>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 23,
+      "react": {
+        "tag": "link",
+        "classes": [
+          "auth-link",
+          "js-forgot-password-link"
+        ]
+      },
+      "message": "Element at index 23 exists in React but not in Blueprint: <link>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 24,
+      "react": {
+        "tag": "button",
+        "classes": [
+          "btn-auth-primary",
+          "js-login-submit-button"
+        ]
+      },
+      "message": "Element at index 24 exists in React but not in Blueprint: <button>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 25,
+      "react": {
+        "tag": "div",
+        "classes": [
+          "auth-footer-zone"
+        ]
+      },
+      "message": "Element at index 25 exists in React but not in Blueprint: <div>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 26,
+      "react": {
+        "tag": "span",
+        "classes": []
+      },
+      "message": "Element at index 26 exists in React but not in Blueprint: <span>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 27,
+      "react": {
+        "tag": "link",
+        "classes": [
+          "auth-link-bold",
+          "js-register-link"
+        ]
+      },
+      "message": "Element at index 27 exists in React but not in Blueprint: <link>"
+    },
+    {
+      "type": "extra_in_react",
+      "index": 28,
+      "react": {
+        "tag": "pagefooter",
+        "classes": []
+      },
+      "message": "Element at index 28 exists in React but not in Blueprint: <pagefooter>"
+    }
+  ],
+  "classes": {
+    "blueprint": [
+      "auth-footer-zone",
+      "auth-header",
+      "auth-link",
+      "auth-link-bold",
+      "auth-logo",
+      "auth-subtitle",
+      "auth-title",
+      "btn-auth-primary",
+      "form-control",
+      "form-group",
+      "form-label",
+      "form-options",
+      "lod-checkbox",
+      "remember-me"
+    ],
+    "react": [
+      "auth-footer-zone",
+      "auth-form__error-message",
+      "auth-header",
+      "auth-link",
+      "auth-link-bold",
+      "auth-logo",
+      "auth-subtitle",
+      "auth-title",
+      "btn-auth-primary",
+      "form-group",
+      "form-label",
+      "form-options",
+      "js-forgot-password-link",
+      "js-login-form",
+      "js-login-remember-checkbox",
+      "js-login-submit-button",
+      "js-register-link",
+      "lod-checkbox",
+      "page-container",
+      "page-wrapper",
+      "remember-me"
+    ],
+    "missing": [
+      "form-control"
+    ],
+    "extra": [
+      "auth-form__error-message",
+      "js-forgot-password-link",
+      "js-login-form",
+      "js-login-remember-checkbox",
+      "js-login-submit-button",
+      "js-register-link",
+      "page-container",
+      "page-wrapper"
+    ],
+    "common": [
+      "auth-footer-zone",
+      "auth-header",
+      "auth-link",
+      "auth-link-bold",
+      "auth-logo",
+      "auth-subtitle",
+      "auth-title",
+      "btn-auth-primary",
+      "form-group",
+      "form-label",
+      "form-options",
+      "lod-checkbox",
+      "remember-me"
+    ]
+  }
+}

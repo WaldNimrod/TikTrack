@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import authService from '../services/auth.js';
+import authService from '../cubes/identity/services/auth.js';
 import { audit } from '../utils/audit.js';
 import { debugLog } from '../utils/debug.js';
 

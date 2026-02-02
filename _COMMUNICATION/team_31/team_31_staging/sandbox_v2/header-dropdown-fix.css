@@ -1,0 +1,23 @@
+/**
+ * Header Dropdown Fix - CSS for 180 degree rotation
+ * Sync-Time: 2026-02-02 00:00:00 IST
+ * Team: Team 31 (Blueprint)
+ * Status: ✅ HEADER DROPDOWN FIX
+ * 
+ * Purpose:
+ * Fix dropdown arrow rotation to 180 degrees (not 90)
+ * This CSS works with header-dropdown.js
+ */
+
+/* Dropdown arrow rotation - 180 degrees when menu is open */
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
+  transform: rotate(180deg) !important; /* 180 degrees, not 90 */
+}
+
+/* Ensure dropdown menu is visible on hover */
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  display: flex !important;
+}

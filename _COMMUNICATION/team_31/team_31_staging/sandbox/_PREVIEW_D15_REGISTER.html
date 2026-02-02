@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    body { margin:0; padding-top:45px; font-family:sans-serif; background:#f8fafc; }
+    .g-bridge-banner { position:fixed; top:0; inset-inline-start:0; inset-inline-end:0; background:#059669; color:white; padding:8px; font-size:10px; font-weight:900; z-index:var(--z-index-g-bridge-banner, 10002); text-align:center; }
+</style></head><body>
+<div class="g-bridge-banner">🛡️ LOCAL G-BRIDGE v2.1 [18:04:35] | APPROVED | FIDELITY READY</div>
+<main id="phoenix-root"><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הרשמה | TikTrack Phoenix</title>
+  <!-- CSS Loading Order: Pico CSS FIRST, then base, then components, then auth-specific -->
+  <!-- Note: Auth pages don't use header, so phoenix-header.css is not loaded -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="./phoenix-base.css">
+  <link rel="stylesheet" href="./phoenix-components.css">
+  <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- G-Bridge Banner styles are now in phoenix-base.css for centralized management -->
+</head>
+<body class="auth-layout-root">
+  <!--
+    Phoenix-Core-Ver: v1.2.1 | Batch 1 - Auth Core (FINAL APPROVED)
+    Sync-Time: 2026-01-31 21:30:00 IST
+    Team: Team 30 (Frontend) | Team 50 (QA Review)
+    Status: ✅ FINALLY APPROVED | ✅ READY FOR DEVELOPMENT | ✅ SIGNED OFF
+    Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | G-Bridge Validated ✅
+    Visual Approval: ✅ FINAL APPROVAL GRANTED
+  -->
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [21:30:00] | ✅ FINALLY APPROVED | ✅ READY FOR DEVELOPMENT | ✅ SIGNED OFF</div>
+  
+  <!-- Page Wrapper: Full-width gray background (same as template, but without header) -->
+  <div class="page-wrapper">
+    <!-- Page Container: Centered, max-width 1400px (same as template) -->
+    <div class="page-container">
+      <!-- Main Content -->
+      <main>
+        <tt-container>
+          <tt-section>
+            <div class="auth-header">
+              <div class="auth-logo">
+                <img src="./images/logo.svg" alt="TikTrack Logo" />
+              </div>
+              <p class="auth-subtitle">הצטרפו לקהילת הסוחרים</p>
+              <h1 class="auth-title">הרשמה</h1>
+            </div>
+
+            <form>
+              <div class="form-group">
+                <label class="form-label">שם משתמש:</label>
+                <input type="text" class="form-control" required placeholder="בחר שם משתמש">
+              </div>
+              <div class="form-group">
+                <label class="form-label">אימייל:</label>
+                <input type="email" class="form-control" required placeholder="your@email.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">סיסמה:</label>
+                <input type="password" class="form-control" required placeholder="הכנס סיסמה">
+              </div>
+              <div class="form-group">
+                <label class="form-label">טלפון (אופציונלי):</label>
+                <input type="tel" class="form-control" placeholder="+972-5x-xxxxxxx">
+              </div>
+              <button type="submit" class="btn-auth-primary">צור חשבון</button>
+            </form>
+
+            <div class="auth-footer-zone">
+              <a href="./D15_LOGIN.html" class="auth-link">כבר יש לך חשבון? התחבר</a>
+            </div>
+          </tt-section>
+        </tt-container>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Modular Footer: Loaded dynamically via footer-loader.js -->
+  <script src="./footer-loader.js"></script>
+  
+  <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
+</body>
+</html>
+</main>
+<script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script></body></html>

@@ -26,26 +26,50 @@
    ============================================ */
 
 /* Auth Layout Context */
+/* NOTE: Auth pages now use same wrapper structure as template (page-wrapper > page-container > main) */
+/* This ensures footer works correctly and prevents horizontal scroll issues */
 body.auth-layout-root {
   margin: 0;
+  padding: 0; /* CRITICAL: No padding - page-wrapper starts from top */
   min-height: 100vh;
   direction: rtl;
+  background: var(--color-bg-grad);
+  font-family: var(--font-main);
+}
+
+/* NOTE: G-Bridge Banner is always at bottom (defined in phoenix-base.css) */
+/* No override needed - banner stays at bottom for all pages including auth pages */
+
+/* Auth pages: Center the form content */
+body.auth-layout-root .page-wrapper .page-container main {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-grad);
-  font-family: var(--font-main);
-  /* Padding accounts for fixed G-Bridge banner (45px) + standard spacing */
-  padding-top: 45px;
-  padding-inline: var(--spacing-lg, 24px);
-  padding-bottom: var(--spacing-lg, 24px);
+  min-height: calc(100vh - 45px); /* Full height minus G-Bridge banner */
 }
 
-/* Auth-specific: Narrow section for auth forms */
-body.auth-layout-root tt-section {
+/* Auth Container: Wrapper for form content - Centered, max-width 480px */
+body.auth-layout-root tt-container {
+  width: 100%;
   max-width: 480px;
   margin-inline: auto;
+}
+
+/* Auth-specific: Narrow section for auth forms - White card background */
+body.auth-layout-root tt-section {
+  max-width: 100%;
+  width: 100%;
+  margin-inline: auto;
+  margin-block-start: 0;
+  margin-block-end: 0;
   text-align: center;
+  /* White card background */
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 12px;
+  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15));
+  padding: var(--spacing-xl, 32px);
+  box-sizing: border-box;
 }
 
 /* System Body Context */

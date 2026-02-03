@@ -29,6 +29,9 @@
 6. **D15_IDENTITY_STYLES.css** - Auth Pages Styles (Components Layer)
 7. **D15_DASHBOARD_STYLES.css** - Dashboard Pages Styles (Components Layer)
 
+**📋 תיעוד מפורט:** `documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md`  
+**🔧 כלי בדיקה:** `npm run check:css` (הרץ `check-css-loading.js` בקונסולת הדפדפן)
+
 ### **ITCSS Layers:**
 - **Settings:** CSS Variables (phoenix-base.css)
 - **Generic:** Reset & Base (Pico CSS + phoenix-base.css)

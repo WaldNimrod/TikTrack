@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "check:css": "node -e \"console.log('Run check-css-loading.js in browser console (F12) on http://localhost:8080/')\""
   },
   "dependencies": {
     "react": "^18.2.0",

@@ -941,8 +941,137 @@
     console.log('\n' + '='.repeat(80));
   }
 
+  /**
+   * Check CSS loading (basic check)
+   */
+  function checkCSSLoading() {
+    console.log('\n%c📋 Checking CSS Loading (Basic)', 'color: #ff9500; font-weight: bold;');
+    
+    const loadedFiles = Array.from(document.styleSheets).map(sheet => sheet.href || 'inline');
+    const hasPhoenixBase = loadedFiles.some(href => href && href.includes('phoenix-base.css'));
+    const hasPhoenixComponents = loadedFiles.some(href => href && href.includes('phoenix-components.css'));
+    const hasPhoenixHeader = loadedFiles.some(href => href && href.includes('phoenix-header.css'));
+    const hasDashboardStyles = loadedFiles.some(href => href && href.includes('D15_DASHBOARD_STYLES.css'));
+
+    results.summary.total++;
+    if (hasPhoenixBase && hasPhoenixComponents && hasPhoenixHeader) {
+      results.summary.passed++;
+      console.log('✅ Core CSS files loaded:', {
+        phoenixBase: hasPhoenixBase,
+        phoenixComponents: hasPhoenixComponents,
+        phoenixHeader: hasPhoenixHeader,
+        dashboardStyles: hasDashboardStyles
+      });
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'CSS Loading',
+        property: 'core files',
+        actual: `phoenix-base: ${hasPhoenixBase}, phoenix-components: ${hasPhoenixComponents}, phoenix-header: ${hasPhoenixHeader}`,
+        expected: 'All core CSS files should be loaded'
+      });
+      console.log('❌ Some core CSS files are missing');
+    }
+
+    // Check CSS Variables
+    const rootStyles = getComputedStyle(document.documentElement);
+    const hasVariables = rootStyles.getPropertyValue('--apple-blue') !== '';
+    
+    results.summary.total++;
+    if (hasVariables) {
+      results.summary.passed++;
+      console.log('✅ CSS Variables are available');
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'CSS Variables',
+        property: 'availability',
+        actual: 'Not found',
+        expected: 'CSS Variables should be available (phoenix-base.css may not be loaded)'
+      });
+      console.log('❌ CSS Variables not available - phoenix-base.css may not be loaded');
+    }
+  }
+
+  /**
+   * Check DOM structure (enhanced)
+   */
+  function checkDOMStructure() {
+    console.log('\n%c🏗️ Checking DOM Structure', 'color: #ff9500; font-weight: bold;');
+    
+    // Check page-wrapper
+    const pageWrapper = document.querySelector('.page-wrapper');
+    results.summary.total++;
+    if (pageWrapper) {
+      results.summary.passed++;
+      console.log('✅ .page-wrapper found');
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: '.page-wrapper',
+        property: 'existence',
+        actual: 'Not found',
+        expected: 'Should exist (Template V3 requirement)'
+      });
+      console.log('❌ .page-wrapper not found');
+    }
+
+    // Check page-container
+    const pageContainer = document.querySelector('.page-container');
+    results.summary.total++;
+    if (pageContainer) {
+      results.summary.passed++;
+      console.log('✅ .page-container found');
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: '.page-container',
+        property: 'existence',
+        actual: 'Not found',
+        expected: 'Should exist (Template V3 requirement)'
+      });
+      console.log('❌ .page-container not found');
+    }
+
+    // Check tt-container
+    const ttContainer = document.querySelector('tt-container');
+    results.summary.total++;
+    if (ttContainer) {
+      results.summary.passed++;
+      console.log('✅ tt-container found');
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'tt-container',
+        property: 'existence',
+        actual: 'Not found',
+        expected: 'Should exist (Template V3 requirement)'
+      });
+      console.log('❌ tt-container not found');
+    }
+
+    // Check tt-section
+    const ttSections = document.querySelectorAll('tt-section');
+    results.summary.total++;
+    if (ttSections.length > 0) {
+      results.summary.passed++;
+      console.log(`✅ Found ${ttSections.length} tt-section(s)`);
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'tt-section',
+        property: 'existence',
+        actual: '0 found',
+        expected: 'Should have at least one tt-section (Template V3 requirement)'
+      });
+      console.log('❌ No tt-section found');
+    }
+  }
+
   // Run all checks
   try {
+    checkCSSLoading();
+    checkDOMStructure();
     checkDropdownSpacing();
     checkFilterUserPosition();
     checkInvestmentTypeFilter();

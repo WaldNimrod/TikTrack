@@ -11,7 +11,6 @@
 import React, { useState, useEffect } from 'react';
 import UnifiedHeader from './core/UnifiedHeader.jsx';
 import PageFooter from './core/PageFooter.jsx';
-import { audit } from '../utils/audit.js';
 import { debugLog } from '../utils/debug.js';
 
 // Dashboard-specific styles (must load after phoenix-base.css, phoenix-components.css, phoenix-header.css)
@@ -48,7 +47,7 @@ const HomePage = () => {
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
-    audit.log('HomePage', `Section ${sectionId} toggled`, { isOpen: !openSections[sectionId] });
+    debugLog('HomePage', `Section ${sectionId} toggled`, { isOpen: !openSections[sectionId] });
   };
 
   /**
@@ -56,7 +55,7 @@ const HomePage = () => {
    */
   const handlePortfolioSummaryToggle = () => {
     setShowPortfolioSummary(prev => !prev);
-    audit.log('HomePage', 'Portfolio summary toggled', { isOpen: !showPortfolioSummary });
+    debugLog('HomePage', 'Portfolio summary toggled', { isOpen: !showPortfolioSummary });
   };
 
   /**
@@ -67,12 +66,12 @@ const HomePage = () => {
       ...prev,
       [widgetId]: tabPaneId
     }));
-    audit.log('HomePage', `Widget tab changed`, { widgetId, tabPaneId });
+    debugLog('HomePage', `Widget tab changed`, { widgetId, tabPaneId });
   };
 
   useEffect(() => {
     debugLog('HomePage', 'Component mounted');
-    audit.log('HomePage', 'Page loaded');
+    debugLog('HomePage', 'Page loaded');
   }, []);
 
   return (
@@ -165,11 +164,6 @@ const HomePage = () => {
                             role="listitem" 
                             data-alert-id="1" 
                             data-entity-type="trade"
-                            style={{
-                              '--active-alert-card-bg': 'rgba(38, 186, 172, 0.1)',
-                              '--active-alert-card-border': 'rgba(38, 186, 172, 0.3)',
-                              '--active-alert-card-text': '#1a8f83'
-                            }}
                           >
                             <div className="active-alerts__card-header">
                               <div className="active-alerts__header-linked">
@@ -310,11 +304,6 @@ const HomePage = () => {
                             role="listitem" 
                             data-alert-id="3" 
                             data-entity-type="ticker"
-                            style={{
-                              '--active-alert-card-bg': 'rgba(23, 162, 184, 0.1)',
-                              '--active-alert-card-border': 'rgba(23, 162, 184, 0.3)',
-                              '--active-alert-card-text': '#138496'
-                            }}
                           >
                             <div className="active-alerts__card-header">
                               <div className="active-alerts__header-linked">

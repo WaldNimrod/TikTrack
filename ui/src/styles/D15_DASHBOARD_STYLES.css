@@ -561,8 +561,11 @@ tt-section .dashboard-section__body .info-summary {
 }
 
 .active-alerts__card--trade {
-  border-color: var(--entity-trade-border);
-  background-color: var(--entity-trade-bg);
+  --active-alert-card-bg: var(--alert-card-trade-bg);
+  --active-alert-card-border: var(--alert-card-trade-border);
+  --active-alert-card-text: var(--alert-card-trade-text);
+  border-color: var(--active-alert-card-border);
+  background-color: var(--active-alert-card-bg);
 }
 
 .active-alerts__card--trade .linked-object-card-title {
@@ -570,7 +573,7 @@ tt-section .dashboard-section__body .info-summary {
 }
 
 .active-alerts__card--trade .linked-object-card-type {
-  color: var(--entity-trade-text);
+  color: var(--active-alert-card-text);
 }
 
 .active-alerts__card--account {
@@ -587,8 +590,11 @@ tt-section .dashboard-section__body .info-summary {
 }
 
 .active-alerts__card--ticker {
-  border-color: var(--entity-ticker-border);
-  background-color: var(--entity-ticker-bg);
+  --active-alert-card-bg: var(--alert-card-ticker-bg);
+  --active-alert-card-border: var(--alert-card-ticker-border);
+  --active-alert-card-text: var(--alert-card-ticker-text);
+  border-color: var(--active-alert-card-border);
+  background-color: var(--active-alert-card-bg);
 }
 
 .active-alerts__card--ticker .linked-object-card-title {
@@ -596,7 +602,7 @@ tt-section .dashboard-section__body .info-summary {
 }
 
 .active-alerts__card--ticker .linked-object-card-type {
-  color: var(--entity-ticker-text);
+  color: var(--active-alert-card-text);
 }
 
 .active-alerts__card-header {

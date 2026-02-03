@@ -1,7 +1,7 @@
 # 🗂️ TikTrack Master Documentation Index (D15)
 **Last Updated:** 2026-02-02
-**Status:** ✅ **REORGANIZED & UNIFIED - FOLDER STRUCTURE FIXED - ARCHITECT GUIDELINES v1.5 - VALIDATION FRAMEWORK COMPLETE - TEAM 51 ONBOARDED - MODULAR FOOTER APPROVED - LEGO REFACTOR PLAN V2 - FLUID DESIGN MANDATE - FINAL GOVERNANCE LOCK - BATCH 1 COMPLETE - TEAM ROLES DEFINED**
-**Version:** v2.8 (Post-Reorganization + Architect Guidelines + Validation Framework + Team 51 + Modular Footer + LEGO Refactor Plan V2 + Fluid Design Mandate + Final Governance Lock + Batch 1 Closure + Team Roles Mandate)
+**Status:** ✅ **REORGANIZED & UNIFIED - FOLDER STRUCTURE FIXED - ARCHITECT GUIDELINES v1.5 - VALIDATION FRAMEWORK COMPLETE - TEAM 51 ONBOARDED - MODULAR FOOTER APPROVED - LEGO REFACTOR PLAN V2 - FLUID DESIGN MANDATE - FINAL GOVERNANCE LOCK - BATCH 1 COMPLETE - TEAM ROLES DEFINED - CSS LOADING ORDER DOCUMENTED**
+**Version:** v2.9 (Post-Reorganization + Architect Guidelines + Validation Framework + Team 51 + Modular Footer + LEGO Refactor Plan V2 + Fluid Design Mandate + Final Governance Lock + Batch 1 Closure + Team Roles Mandate + CSS Loading Order Documentation)
 
 ---
 ## 📂 עץ תיקיות (Directory Tree)
@@ -74,6 +74,7 @@ _COMMUNICATION/
 - [🎯 UNIFIED_HEADER_SPECIFICATION.md](./04-DESIGN_UX_UI/UNIFIED_HEADER_SPECIFICATION.md) - מפרט טכני מפורט של אלמנט ראש הדף
 - [📚 SYSTEM_WIDE_DESIGN_PATTERNS.md](./04-DESIGN_UX_UI/SYSTEM_WIDE_DESIGN_PATTERNS.md) - תובנות מערכתיות ומבנים כלליים (תבנית עמוד, קונטיינרים, כרטיסים, **פוטר מודולרי**, פונטים, צבעים)
 - [🗂️ CSS_CLASSES_INDEX.md](./04-DESIGN_UX_UI/CSS_CLASSES_INDEX.md) - אינדקס מחלקות CSS - מפה למפתח לשימוש חוזר ולמניעת כפילויות
+- [📋 CSS_LOADING_ORDER.md](./04-DESIGN_UX_UI/CSS_LOADING_ORDER.md) - מדריך מפורט לסדר טעינת CSS (ITCSS, סדר טעינה קריטי, דוגמאות שימוש, בעיות נפוצות) 🔴 **CRITICAL**
 - [📊 DASHBOARD_WIDGETS_GUIDE.md](./04-DESIGN_UX_UI/DASHBOARD_WIDGETS_GUIDE.md) - מדריך מקיף לדשבורד וויגיטים - מבנה, עיצוב, פונקציונליות, וכל הדיוקים שבוצעו
 - [📜 TT2_RESPONSIVE_FLUID_DESIGN.md](./04-DESIGN_UX_UI/TT2_RESPONSIVE_FLUID_DESIGN.md) - אמנת רספונסיביות דינמית (Fluid Design, ללא media queries) 🛡️ **MANDATORY**
 

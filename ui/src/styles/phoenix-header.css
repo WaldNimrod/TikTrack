@@ -75,8 +75,9 @@
 
 #unified-header .header-container {
   margin: 0 auto;
-  padding: 0 10px; /* 10px padding from sides only */
+  padding: clamp(12px, 2vw, 16px) clamp(10px, 1.5vw, 16px); /* Fluid padding - replaces Media Query */
   display: flex;
+  flex-wrap: wrap; /* Fluid Design - wrap when needed */
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -197,7 +198,7 @@
 #unified-header .tiktrack-nav-list {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: clamp(0.5rem, 1vw, 1rem); /* Fluid gap - replaces Media Query */
   list-style: none;
   margin: 0;
   padding: 0;
@@ -223,10 +224,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.5rem; /* Reduced padding - smaller, more delicate menu */
+  padding: clamp(0.4rem, 1vw, 0.5rem) clamp(0.8rem, 1.5vw, 1rem); /* Fluid padding - replaces Media Query */
   color: #26baac;
   text-decoration: none;
   border-radius: 8px;
+  font-size: clamp(14px, 2vw, 16px); /* Fluid font size - replaces Media Query */
   transition: all 0.2s ease;
   font-weight: 400;
   font-size: 1rem; /* 16px - Main navigation menu size */
@@ -575,10 +577,12 @@
 /* Filters Container - Same structure as header-container */
 #unified-header .header-filters .filters-container {
   display: flex;
-  gap: var(--spacing-md, 16px);
+  flex-wrap: wrap; /* Fluid Design - wrap when needed */
+  gap: clamp(0.75rem, 1.5vw, 1rem); /* Fluid gap - replaces Media Query */
   max-width: var(--container-xl, 1400px);
   margin: 0 auto;
-  padding: 20px 20px 0 20px;
+  padding: clamp(20px, 3vw, 24px) clamp(16px, 2vw, 20px) 0 clamp(16px, 2vw, 20px); /* Fluid padding - replaces Media Query */
+  justify-content: space-between; /* Fluid Design - space between items */
   box-sizing: border-box;
   overflow: visible;
   direction: rtl;
@@ -611,7 +615,8 @@
   color: #1d1d1f;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 100px;
+  min-width: clamp(100px, 15vw, 120px); /* Fluid min-width - replaces Media Query */
+  font-size: clamp(0.85rem, 1.5vw, 1rem); /* Fluid font size - replaces Media Query */
   justify-content: space-between;
   box-sizing: border-box;
   height: fit-content;
@@ -996,58 +1001,21 @@
   white-space: nowrap;
 }
 
-/* Responsive Styles - Exact copy from original */
-@media (max-width: 768px) {
-  #unified-header .header-container {
-    flex-wrap: wrap;
-    padding: 12px 16px;
-  }
+/* REMOVED: Media Query - Fluid Design Mandate requires no media queries for layout */
+/* All responsive styles have been replaced with clamp() functions in the respective selectors above */
 
-  #unified-header .tiktrack-nav-list {
-    gap: 0.5rem;
-  }
-
-  #unified-header .tiktrack-nav-link {
-    padding: 0.4rem 0.8rem;
-    font-size: 14px;
-  }
-
-  #unified-header .filters-container {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    padding: 20px 16px 0 16px; /* Top padding 20px, side padding 16px, bottom padding 0 */
-    justify-content: space-between;
-  }
-
-  #unified-header .filter-toggle {
-    min-width: 100px;
-    font-size: 0.85rem;
-  }
-}
-
-/* Main Content Container - EXACT COPY FROM LEGACY _layout.css */
+/* Main Content Container - Fluid Design (replaces Media Queries) */
 .main-content {
   width: 100%;
-  max-width: var(--container-xl, 1400px);
+  max-width: min(100%, 1400px); /* Fluid Design - uses min() instead of Media Queries */
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* Responsive breakpoints - EXACT COPY FROM LEGACY */
-@media (min-width: 768px) {
-  .main-content {
-    max-width: var(--container-lg, 1200px);
-    padding: 0;
-  }
-}
-
-@media (min-width: 1200px) {
-  .main-content {
-    max-width: var(--container-xl, 1400px);
-  }
-}
+/* REMOVED: Media Queries - Fluid Design Mandate requires no media queries for layout */
+/* Responsive behavior is now handled by min() function above */
 
 /* Main Viewport */
 .viewport-main {

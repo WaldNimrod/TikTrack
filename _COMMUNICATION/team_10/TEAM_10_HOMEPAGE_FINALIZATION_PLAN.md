@@ -14,10 +14,27 @@
 **מטרה:** השלמת כל התיקונים הנדרשים לדף הבית (D15_INDEX) תוך עמידה מלאה ומדויקת בכל הסטנדרטים שלנו, ITCSS, Fluid Design, ו-CSS Variables (SSOT).
 
 **מצב נוכחי:**
-- ✅ רוב התיקונים הושלמו (11 מתוך 13)
-- ⚠️ 2 פעולות נדרשות נוספות:
-  1. הסרת Media Query נוסף (שורה 257)
-  2. הגדרת Entity Colors ב-`phoenix-base.css` (לפי הבהרת המשתמש)
+- ✅ **כל המשימות הושלמו על ידי Team 40** (2026-02-02)
+- ✅ דוח סיום: `TEAM_40_TO_TEAM_10_HOMEPAGE_FINALIZATION_COMPLETE.md`
+- ⏳ **בדיקות סופיות:** Team 50 מוכן להתחיל
+
+---
+
+## 🌓 הבהרה חשובה: Dark Mode vs Light Mode
+
+### **מצב נוכחי:**
+- ✅ **ברירת המחדל:** Light Mode (לבן) - זהו העיצוב הנוכחי והמחייב
+- ⏳ **Dark Mode:** יגיע בהמשך - התמיכה הטכנית נשמרת ב-`phoenix-base.css`
+
+### **Media Queries מותרים:**
+- ✅ **Dark Mode:** Media Query עבור `@media (prefers-color-scheme: dark)` הוא **תקין ונכון**
+- ✅ **מיקום:** `ui/src/styles/phoenix-base.css` (שורה ~310)
+- ✅ **הערה:** Dark Mode יגיע בהמשך, ולכן התמיכה הטכנית נשמרת. העיצוב הנוכחי הוא Light Mode (לבן) כפי שמוגדר ברירת המחדל.
+
+### **Media Queries שדורשים החלטה:**
+- ⚠️ **phoenix-header.css:** נמצאו 3 Media Queries שאינם Dark Mode (שורות 1000, 1039, 1046)
+- ⚠️ **סטטוס:** Media Queries אלו הם חלק מ-"EXACT COPY FROM LEGACY" ודורשים החלטה אדריכלית
+- 📋 **המלצה:** Media Queries אלו מפרים את ה-Fluid Design Mandate, אך הם חלק מ-Legacy Support
 
 ---
 
@@ -227,18 +244,18 @@ color: var(--entity-trade-color);
 
 | # | משימה | צוות | סטטוס | דדליין |
 |---|-------|------|--------|--------|
-| 1.1 | הסרת Media Query מ-`.col-md-6` | Team 40 | ⏳ Pending | מיידי |
-| 1.2 | סריקת Media Queries נוספים | Team 40 | ⏳ Pending | מיידי |
-| 2.1 | זיהוי Entity Colors | Team 40 | ⏳ Pending | מיידי |
-| 2.2 | הגדרת Entity Colors ב-`phoenix-base.css` | Team 40 | ⏳ Pending | מיידי |
-| 2.3 | עדכון קבצי CSS להסרת Fallbacks | Team 40 | ⏳ Pending | מיידי |
-| 3.1 | בדיקת סדר טעינת CSS | Team 40 | ⏳ Pending | מיידי |
-| 3.2 | בדיקת הפרדת Layers | Team 40 | ⏳ Pending | מיידי |
-| 4.1 | בדיקת Fluid Design | Team 50 | ⏳ Pending | לאחר 1-3 |
-| 4.2 | בדיקת CSS Variables | Team 50 | ⏳ Pending | לאחר 1-3 |
-| 4.3 | בדיקת ITCSS | Team 50 | ⏳ Pending | לאחר 1-3 |
-| 4.4 | בדיקת Fidelity | Team 50 | ⏳ Pending | לאחר 1-3 |
-| 4.5 | בדיקת Standards Compliance | Team 50 | ⏳ Pending | לאחר 1-3 |
+| 1.1 | הסרת Media Query מ-`.col-md-6` | Team 40 | ✅ Completed | 2026-02-02 |
+| 1.2 | סריקת Media Queries נוספים | Team 40 | ✅ Completed | 2026-02-02 |
+| 2.1 | זיהוי Entity Colors | Team 40 | ✅ Completed | 2026-02-02 |
+| 2.2 | הגדרת Entity Colors ב-`phoenix-base.css` | Team 40 | ✅ Completed | 2026-02-02 |
+| 2.3 | עדכון קבצי CSS להסרת Fallbacks | Team 40 | ✅ Completed | 2026-02-02 |
+| 3.1 | בדיקת סדר טעינת CSS | Team 40 | ✅ Completed | 2026-02-02 |
+| 3.2 | בדיקת הפרדת Layers | Team 40 | ✅ Completed | 2026-02-02 |
+| 4.1 | בדיקת Fluid Design | Team 50 | ✅ Ready | כעת |
+| 4.2 | בדיקת CSS Variables | Team 50 | ✅ Ready | כעת |
+| 4.3 | בדיקת ITCSS | Team 50 | ✅ Ready | כעת |
+| 4.4 | בדיקת Fidelity (Light Mode) | Team 50 | ✅ Ready | כעת |
+| 4.5 | בדיקת Standards Compliance | Team 50 | ✅ Ready | כעת |
 
 ---
 
@@ -260,9 +277,15 @@ color: var(--entity-trade-color);
 
 ## 📋 צעדים הבאים
 
-1. **Team 40:** ביצוע שלבים 1-3 (תיקון Fluid Design, הגדרת Entity Colors, בדיקת ITCSS)
-2. **Team 50:** ביצוע שלב 4 (בדיקות סופיות) לאחר סיום שלבים 1-3
-3. **Team 10:** אישור סופי והעברת סטטוס ל-APPROVED
+1. ✅ **Team 40:** המשימות העיקריות הושלמו (2026-02-02)
+2. 🔴 **Team 40:** תיקון Media Queries ב-phoenix-header.css - **BLOCKING** (הודעה: `TEAM_10_TO_TEAM_40_MEDIA_QUERIES_FINAL_FIX.md`)
+   - הסרת 3 Media Queries שאינם Dark Mode
+   - החלפה ב-Fluid Design (clamp, min, max)
+   - בדיקות Responsiveness, Fluid Design, ו-Visual Fidelity
+3. **Team 50:** ביצוע שלב 4 (בדיקות סופיות) - **לאחר סיום Team 40**
+   - בדיקות מתמקדות ב-Light Mode (ברירת המחדל)
+   - Dark Mode יגיע בהמשך ולא נדרש לבדוק בשלב זה
+4. **Team 10:** אישור סופי והעברת סטטוס ל-APPROVED (אם כל הבדיקות עברו)
 
 ---
 
@@ -276,5 +299,5 @@ log_entry | [Team 10] | FINAL_QA | PENDING | 2026-02-02
 ---
 
 **Team 10 (The Gateway) - "מערכת העצבים"**  
-**Date:** 2026-02-02  
-**Status:** 🟡 **PLAN CREATED - AWAITING IMPLEMENTATION**
+**Date:** 2026-02-02 (עודכן עם הבהרות Dark Mode ו-Team 40 Completion)  
+**Status:** ✅ **TEAM 40 COMPLETE → READY FOR TEAM 50 QA**

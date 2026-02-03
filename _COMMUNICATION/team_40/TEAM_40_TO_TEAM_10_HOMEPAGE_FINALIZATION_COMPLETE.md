@@ -58,7 +58,7 @@
 - ✅ Media Query שהוסר: `.col-md-6` (שורה 257)
 
 #### ⚠️ **phoenix-header.css:**
-- ⚠️ **נמצאו 3 Media Queries שאינם Dark Mode:**
+- ⚠️ **נמצאו 3 Media Queries שאינם Dark Mode (responsive breakpoints):**
   1. `@media (max-width: 768px)` - שורה 1000 (Responsive Styles)
   2. `@media (min-width: 768px)` - שורה 1039 (Main Content Container)
   3. `@media (min-width: 1200px)` - שורה 1046 (Main Content Container)
@@ -67,12 +67,15 @@
 
 **הערה:** Media Queries אלו הם חלק מ-"EXACT COPY FROM LEGACY" ולכן דורשים החלטה אדריכלית האם להסיר אותם או לשמור אותם כחלק מ-Legacy Support.
 
+**הבהרה:** Media Query עבור Dark Mode (`@media (prefers-color-scheme: dark)`) ב-`phoenix-base.css` הוא תקין ונכון - Dark Mode יגיע בהמשך, ולכן התמיכה הטכנית נשמרת.
+
 #### ✅ **phoenix-components.css:**
 - ✅ אין Media Queries (חוץ מ-Dark Mode)
 - ✅ הערה בקובץ מציינת: "NO media queries for layout (removed @media (min-width: 1024px))"
 
 #### ✅ **phoenix-base.css:**
-- ✅ Media Queries רק עבור Dark Mode (`@media (prefers-color-scheme: dark)`) ✅
+- ✅ Media Query עבור Dark Mode (`@media (prefers-color-scheme: dark)`) ✅
+- ✅ **הערה:** Dark Mode יגיע בהמשך, ולכן התמיכה הטכנית נשמרת. העיצוב הנוכחי הוא Light Mode (לבן) כפי שמוגדר ברירת המחדל.
 
 ---
 

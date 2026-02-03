@@ -3,16 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.8]</title>
-  <!-- CSS Loading Order: Pico CSS FIRST, then base, then components, then header, then tables -->
+  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.9]</title>
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================
+       Linking to LIVE CSS files in system: ui/src/styles/
+       All CSS files are loaded from the actual system files.
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  <link rel="stylesheet" href="../phoenix-base.css">
-  <link rel="stylesheet" href="../phoenix-components.css">
-  <link rel="stylesheet" href="../phoenix-header.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- Additional CSS files (if needed) -->
+  <!-- Note: These may need to be added to system or linked from staging -->
   <link rel="stylesheet" href="../phoenix-cards.css">
   <link rel="stylesheet" href="../phoenix-tables.css">
   <link rel="stylesheet" href="../account-movements-summary-cards.css">
-  <link rel="stylesheet" href="../D15_DASHBOARD_STYLES.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* ============================================
@@ -506,9 +524,11 @@
 </head>
 <body class="trading-accounts-page context-trading">
   <!--
+    ============================================
     Phoenix-Blueprint-Ver: v1.0.0 | Trading Accounts Page Blueprint
+    ============================================
     Sync-Time: 2026-02-02 12:00:00 IST
-    Version-Tracker: v1.0.8 (Fixed: action menu delay + padding 4px, quantity/percent font consistency, portfolio toggle JS + CSS)
+    Version-Tracker: v1.0.9 (Updated to V2 Workflow - Live CSS files, explicit comments)
     Team: Team 31 (Blueprint)
     Status: ✅ BLUEPRINT READY FOR TEAM 30
     Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
@@ -527,6 +547,37 @@
     - Convert HTML to JSX
     - Implement React components based on this structure
     - Use PhoenixFilterContext for global filters integration
+    
+    ============================================
+    CSS File Hierarchy (CRITICAL)
+    ============================================
+    | Component | CSS File | Notes |
+    |-----------|----------|-------|
+    | `tt-section` | `phoenix-components.css` | Transparent background |
+    | `.index-section__header` | `phoenix-components.css` | White card with background |
+    | `.index-section__body` | `phoenix-components.css` | White card with background |
+    | UnifiedHeader | `phoenix-header.css` | All header styles |
+    | Tables | `phoenix-tables.css` | All table styles (staging) |
+    | Dashboard widgets | `D15_DASHBOARD_STYLES.css` | Dashboard-specific styles |
+    | Cards | `phoenix-cards.css` | Card components (staging) |
+    
+    ============================================
+    Section Structure (CRITICAL)
+    ============================================
+    **CRITICAL:** `tt-section` is transparent. Background is on header and body separately.
+    
+    Structure:
+    - `tt-section` - **transparent** (no background/border/shadow)
+    - `.index-section__header` - Separate white card with background, border, shadow
+    - `.index-section__body` - Separate white card with background, border, shadow
+    
+    CSS:
+    - Base styles: `phoenix-components.css`
+    - `tt-section`: `background: transparent;`
+    - `.index-section__header`: `background: var(--apple-bg-elevated, #ffffff);`
+    - `.index-section__body`: `background: var(--apple-bg-elevated, #ffffff);`
+    
+    ============================================
   -->
 
   <!-- ============================================
@@ -784,12 +835,15 @@
                Filters: None (uses global filters only)
                ============================================ -->
           
+          <!-- ============================================
+               CRITICAL: tt-section is transparent. Background is on header and body separately.
+               ============================================ -->
           <tt-section data-section="summary-alerts">
-            <!-- Section Header -->
+            <!-- Section Header - White card with background -->
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="../../../../ui/public/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.8]</span></h1>
+                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.9]</span></h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">3 התראות פעילות</span>
@@ -1466,6 +1520,7 @@
                The actual implementation will come later - this is placeholder content.
                ============================================ -->
           
+          <!-- CRITICAL: tt-section is transparent. Background is on header and body separately -->
           <tt-section data-section="account-movements-summary">
             <!-- Section Header -->
             <div class="index-section__header">
@@ -2133,6 +2188,7 @@
                Filters: Yes (Account - Internal Filter)
                ============================================ -->
           
+          <!-- CRITICAL: tt-section is transparent. Background is on header and body separately -->
           <tt-section data-section="positions-by-account">
             <!-- Section Header -->
             <div class="index-section__header">

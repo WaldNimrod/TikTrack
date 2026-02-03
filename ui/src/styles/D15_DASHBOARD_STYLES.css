@@ -811,13 +811,14 @@ tt-section .dashboard-section__body .info-summary {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-lg, 24px);
+  justify-content: flex-start; /* Text at start (right in RTL) */
 }
 
 .index-section__body .info-summary .info-summary__row,
 .dashboard-section__body .info-summary .info-summary__row,
 tt-section .index-section__body .info-summary .info-summary__row,
 tt-section .dashboard-section__body .info-summary .info-summary__row {
-  justify-content: center;
+  justify-content: flex-start; /* Text at start (right in RTL) */
   width: 100%;
 }
 
@@ -829,7 +830,7 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
 }
 
 .info-summary__row .portfolio-summary__toggle-btn {
-  margin-inline-start: auto;
+  margin-inline-start: auto; /* Button at end (left in RTL) */
 }
 
 .info-summary strong {
@@ -1400,6 +1401,7 @@ tt-section-row {
   container-name: dashboard-row;
   margin-block-end: var(--spacing-md, 16px);
 }
+
 
 tt-section-row:last-child {
   margin-block-end: 0;

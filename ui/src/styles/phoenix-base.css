@@ -172,6 +172,11 @@
   --color-success-lighter: #6ee7b7;
   --color-success-dark: #059669;
   --color-success-darker: #047857;
+  --color-success-bg: #e6f7f5; /* Light green background for success messages */
+  
+  /* ===== Error Colors (Apple Design System) ===== */
+  --color-error-red: var(--apple-red, #FF3B30); /* Alias for Apple red - error/destructive actions */
+  --color-error-red-dark: var(--apple-red-dark, #D70015); /* Darker shade for hover states */
   
   --color-warning: #f59e0b;
   --color-warning-light: #fbbf24;

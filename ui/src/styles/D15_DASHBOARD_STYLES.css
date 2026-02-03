@@ -1669,10 +1669,10 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
 
 /* Logout Button */
 .btn-logout {
-  background-color: var(--color-error-red, var(--apple-red, #FF3B30)) !important;
+  background-color: var(--color-error-red) !important;
   color: white !important;
 }
 
 .btn-logout:hover {
-  background-color: var(--color-error-red-dark, var(--apple-red-dark, #D70015)) !important;
+  background-color: var(--color-error-red-dark) !important;
 }

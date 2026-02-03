@@ -254,12 +254,8 @@ body.profile-page {
   padding-inline: var(--spacing-sm, 8px);
 }
 
-@media (min-width: 768px) {
-  .col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-  }
-}
+/* REMOVED: Media Query - Fluid Design Mandate requires no media queries for layout */
+/* Use Grid with auto-fit/auto-fill instead of Media Query for responsive behavior */
 
 /* ============================================
    Utility Classes (for Profile Page)
@@ -370,11 +366,11 @@ body.profile-page {
 /* Widget-specific entity colors - using alt attribute selectors */
 /* Ticker Chart Widget - Ticker color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+  border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__title-icon {
-  color: var(--entity-ticker-color, #17a2b8);
+  color: var(--entity-ticker-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header {
@@ -387,20 +383,20 @@ body.profile-page {
 
 /* Ticker List Widget - Ticker color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
-  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+  border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
-  color: var(--entity-ticker-color, #17a2b8);
+  color: var(--entity-ticker-color);
 }
 
 /* Tag Widget - Research color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-research-color, #9c27b0);
+  border-inline-start: 3px solid var(--entity-research-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__title-icon {
-  color: var(--entity-research-color, #9c27b0);
+  color: var(--entity-research-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header {
@@ -413,11 +409,11 @@ body.profile-page {
 
 /* Recent Trades Widget - Trade color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__title-icon {
-  color: var(--entity-trade-color, #26baac);
+  color: var(--entity-trade-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-trade-color, #26baac);
+  border-inline-start: 3px solid var(--entity-trade-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
@@ -430,11 +426,11 @@ body.profile-page {
 
 /* Pending Actions Widget - Execution color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__title-icon {
-  color: var(--entity-execution-color, #ff9800);
+  color: var(--entity-execution-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-execution-color, #ff9800);
+  border-inline-start: 3px solid var(--entity-execution-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__header {
@@ -447,11 +443,11 @@ body.profile-page {
 
 /* Ticker List Widget - Ticker color (Type 2 with tabs) */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
-  color: var(--entity-ticker-color, #17a2b8);
+  color: var(--entity-ticker-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-ticker-color, #17a2b8);
+  border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
@@ -553,11 +549,8 @@ tt-section .dashboard-section__body .info-summary {
   max-width: 100%;
 }
 
-@media (min-width: 1200px) {
-  .active-alerts__list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* REMOVED: Media Query - Fluid Design Mandate requires no media queries for layout */
+/* Grid with auto-fit already handles responsiveness automatically */
 
 .active-alerts__card {
   background: var(--apple-bg-elevated, #ffffff);

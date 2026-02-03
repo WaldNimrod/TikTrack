@@ -13,7 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import UnifiedHeader from '../../../../components/core/UnifiedHeader.jsx';
 import PageFooter from '../../../../components/core/PageFooter.jsx';
 import authService from '../../services/auth.js';
-import apiKeysService from '../../../../services/apiKeys.js';
+import apiKeysService from '../../services/apiKeys.js';
 import { audit } from '../../../../utils/audit.js';
 import { debugLog } from '../../../../utils/debug.js';
 

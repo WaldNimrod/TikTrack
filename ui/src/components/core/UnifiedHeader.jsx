@@ -335,27 +335,7 @@ const UnifiedHeader = () => {
                   <div className="type-filter-item" data-value="הכול" onClick={() => handleFilterSelect('type', 'הכול')}>
                     <span className="option-text">הכול</span>
                   </div>
-                  <div className="type-filter-item" data-value="Long" onClick={() => handleFilterSelect('type', 'Long')}>
-                    <span className="option-text">Long</span>
-                  </div>
-                  <div className="type-filter-item" data-value="Short" onClick={() => handleFilterSelect('type', 'Short')}>
-                    <span className="option-text">Short</span>
-                  </div>
-                  <div className="type-filter-item" data-value="מניות" onClick={() => handleFilterSelect('type', 'מניות')}>
-                    <span className="option-text">מניות</span>
-                  </div>
-                  <div className="type-filter-item" data-value="אופציות" onClick={() => handleFilterSelect('type', 'אופציות')}>
-                    <span className="option-text">אופציות</span>
-                  </div>
-                  <div className="type-filter-item" data-value="חוזים עתידיים" onClick={() => handleFilterSelect('type', 'חוזים עתידיים')}>
-                    <span className="option-text">חוזים עתידיים</span>
-                  </div>
-                  <div className="type-filter-item" data-value="קרנות" onClick={() => handleFilterSelect('type', 'קרנות')}>
-                    <span className="option-text">קרנות</span>
-                  </div>
-                  <div className="type-filter-item" data-value="אגרות חוב" onClick={() => handleFilterSelect('type', 'אגרות חוב')}>
-                    <span className="option-text">אגרות חוב</span>
-                  </div>
+                  {/* TODO: Add investment type options when defined in system specification */}
                 </div>
               </div>
             </div>
@@ -418,14 +398,16 @@ const UnifiedHeader = () => {
               </button>
             </div>
 
-            <div className="filter-user-section" id="filterUserSection">
-              <Link to="/user_profile" className="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש">
-                <svg className="user-icon" width="19.2" height="19.2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </Link>
-            </div>
+          </div>
+
+          {/* User Profile Link - Moved to END of filters-container (RTL: left side) */}
+          <div className="filter-user-section" id="filterUserSection">
+            <Link to="/user_profile" className="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש">
+              <svg className="user-icon" width="19.2" height="19.2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </Link>
           </div>
           
           <div className="filter-toggle-section filter-toggle-main">

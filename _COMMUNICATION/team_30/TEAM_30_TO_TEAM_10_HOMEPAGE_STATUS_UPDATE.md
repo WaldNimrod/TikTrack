@@ -200,7 +200,7 @@
 - **כלי בדיקה:** `ui/blueprint-comparison.js`
 
 ### **מסמכים:**
-- **תהליך עבודה:** `documentation/05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
 - **הנחיות בלופרינט:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES.md`
 - **דוח Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_HOMEPAGE_DESIGN_FIXES_COMPLETE.md`
 - **דוח Team 40:** `_COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_HOMEPAGE_DESIGN_FIXES_COMPLETE.md`

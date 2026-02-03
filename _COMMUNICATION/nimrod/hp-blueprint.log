@@ -1,0 +1,598 @@
+blueprint-validation.js:220 
+============================================================
+blueprint-validation.js:221 🔍 BLUEPRINT VALIDATION RESULTS
+blueprint-validation.js:222 ============================================================
+blueprint-validation.js:230 
+⚠️ WARNINGS: 1
+reportResults @ blueprint-validation.js:230
+blueprint-validation.js:231   ⚠️ Found 1 inline scripts (Clean Slate Rule violation)
+(anonymous) @ blueprint-validation.js:231
+blueprint-validation.js:235 
+✅ INFO: 24
+blueprint-validation.js:236   ✅ top: Transparent (correct)
+blueprint-validation.js:236   ✅ top: Header has background (correct)
+blueprint-validation.js:236   ✅ top: Body has background (correct)
+blueprint-validation.js:236   ✅ main: Transparent (correct)
+blueprint-validation.js:236   ✅ main: Header has background (correct)
+blueprint-validation.js:236   ✅ main: Body has background (correct)
+blueprint-validation.js:236   ✅ portfolio: Transparent (correct)
+blueprint-validation.js:236   ✅ portfolio: Header has background (correct)
+blueprint-validation.js:236   ✅ portfolio: Body has background (correct)
+blueprint-validation.js:236   ✅ Unified Header found
+blueprint-validation.js:236   ✅ Header top found
+blueprint-validation.js:236   ✅ Header filters found
+blueprint-validation.js:236   ✅ Dropdown menu 0: Aligned correctly
+blueprint-validation.js:236   ✅ Dropdown menu 1: Aligned correctly
+blueprint-validation.js:236   ✅ Dropdown menu 2: Aligned correctly
+blueprint-validation.js:236   ✅ Dropdown menu 3: Aligned correctly
+blueprint-validation.js:236   ✅ Dropdown menu 4: Aligned correctly
+blueprint-validation.js:236   ✅ Dropdown menu 5: Aligned correctly
+blueprint-validation.js:236   ✅ Found 4 filter toggles
+blueprint-validation.js:236   ✅ CSS file loaded: phoenix-base.css
+blueprint-validation.js:236   ✅ CSS file loaded: phoenix-components.css
+blueprint-validation.js:236   ✅ CSS file loaded: phoenix-header.css
+blueprint-validation.js:236   ✅ Found 9 external JavaScript files
+blueprint-validation.js:236   ✅ Footer loader script found
+blueprint-validation.js:239 
+============================================================
+blueprint-validation.js:244 ⚠️ BLUEPRINT VALIDATION PASSED WITH WARNINGS
+blueprint-validation.js:249 ============================================================
+
+/**
+ * Blueprint Comparison Script
+ * 
+ * This script compares the actual rendered page with the blueprint specifications.
+ * Run this in the browser console (F12) on http://localhost:8080/
+ * 
+ * Usage:
+ * 1. Open http://localhost:8080/ in your browser
+ * 2. Open DevTools (F12) → Console
+ * 3. Copy and paste this entire script
+ * 4. Press Enter
+ * 
+ * The script will output detailed comparison results.
+ */
+
+(function() {
+  'use strict';
+
+  console.log('%c🔍 Blueprint Comparison Script Started', 'color: #26baac; font-size: 16px; font-weight: bold;');
+  console.log('='.repeat(80));
+
+  const results = {
+    errors: [],
+    warnings: [],
+    info: [],
+    summary: {
+      total: 0,
+      passed: 0,
+      failed: 0
+    }
+  };
+
+  /**
+   * Get computed styles for an element
+   */
+  function getComputedStyles(element) {
+    if (!element) return null;
+    return window.getComputedStyle(element);
+  }
+
+  /**
+   * Compare CSS values (handles different formats)
+   */
+  function compareCSSValue(actual, expected, property) {
+    // Normalize values
+    const normalize = (val) => {
+      if (!val) return '';
+      return val.toString().trim().toLowerCase().replace(/\s+/g, ' ');
+    };
+
+    const actualNorm = normalize(actual);
+    const expectedNorm = normalize(expected);
+
+    // Handle rem to px conversion (approximate)
+    const remToPx = (val) => {
+      const match = val.match(/([\d.]+)rem/);
+      if (match) {
+        return parseFloat(match[1]) * 16;
+      }
+      return null;
+    };
+
+    // Exact match
+    if (actualNorm === expectedNorm) return true;
+
+    // Check if both are rem values that convert to same px
+    const actualPx = remToPx(actualNorm);
+    const expectedPx = remToPx(expectedNorm);
+    if (actualPx !== null && expectedPx !== null && Math.abs(actualPx - expectedPx) < 0.1) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Check dropdown menu spacing
+   */
+  function checkDropdownSpacing() {
+    console.log('\n%c📋 Checking Dropdown Menu Spacing', 'color: #ff9500; font-weight: bold;');
+    
+    const dropdownMenus = document.querySelectorAll('#unified-header .tiktrack-dropdown-menu');
+    const dropdownItems = document.querySelectorAll('#unified-header .tiktrack-dropdown-item');
+    const separators = document.querySelectorAll('#unified-header .separator');
+
+    // Check dropdown menu padding
+    if (dropdownMenus.length > 0) {
+      const menu = dropdownMenus[0];
+      const styles = getComputedStyles(menu);
+      const paddingTop = styles.paddingTop;
+      const paddingBottom = styles.paddingBottom;
+      
+      // Expected: 0.0625rem (1px)
+      const expectedPadding = '0.0625rem';
+      const expectedPaddingPx = '1px';
+      
+      const topMatch = compareCSSValue(paddingTop, expectedPadding, 'padding-top') || 
+                       compareCSSValue(paddingTop, expectedPaddingPx, 'padding-top');
+      const bottomMatch = compareCSSValue(paddingBottom, expectedPadding, 'padding-bottom') || 
+                          compareCSSValue(paddingBottom, expectedPaddingPx, 'padding-bottom');
+
+      results.summary.total++;
+      if (topMatch && bottomMatch) {
+        results.summary.passed++;
+        console.log('✅ Dropdown menu padding:', paddingTop, '/', paddingBottom);
+      } else {
+        results.summary.failed++;
+        results.errors.push({
+          element: 'Dropdown Menu',
+          property: 'padding',
+          actual: `${paddingTop} / ${paddingBottom}`,
+          expected: `${expectedPadding} / ${expectedPadding}`
+        });
+        console.log('❌ Dropdown menu padding:', paddingTop, '/', paddingBottom, 'Expected:', expectedPadding);
+      }
+    }
+
+    // Check dropdown item padding
+    if (dropdownItems.length > 0) {
+      const item = dropdownItems[0];
+      const styles = getComputedStyles(item);
+      const padding = styles.padding;
+      const paddingTop = styles.paddingTop;
+      const paddingRight = styles.paddingRight;
+      const paddingBottom = styles.paddingBottom;
+      const paddingLeft = styles.paddingLeft;
+
+      // Expected: 0.0625rem 1rem 0.0625rem 0.25rem (RTL)
+      // In RTL: padding-right is actually left, padding-left is actually right
+      const expectedTop = '0.0625rem';
+      const expectedRight = '1rem'; // This is actually left in RTL
+      const expectedBottom = '0.0625rem';
+      const expectedLeft = '0.25rem'; // This is actually right in RTL
+
+      const topMatch = compareCSSValue(paddingTop, expectedTop, 'padding-top');
+      const rightMatch = compareCSSValue(paddingRight, expectedRight, 'padding-right');
+      const bottomMatch = compareCSSValue(paddingBottom, expectedBottom, 'padding-bottom');
+      const leftMatch = compareCSSValue(paddingLeft, expectedLeft, 'padding-left');
+
+      results.summary.total++;
+      if (topMatch && rightMatch && bottomMatch && leftMatch) {
+        results.summary.passed++;
+        console.log('✅ Dropdown item padding:', padding);
+      } else {
+        results.summary.failed++;
+        results.errors.push({
+          element: 'Dropdown Item',
+          property: 'padding',
+          actual: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`,
+          expected: `${expectedTop} ${expectedRight} ${expectedBottom} ${expectedLeft}`
+        });
+        console.log('❌ Dropdown item padding:', padding);
+        console.log('   Top:', paddingTop, 'Expected:', expectedTop, topMatch ? '✅' : '❌');
+        console.log('   Right:', paddingRight, 'Expected:', expectedRight, rightMatch ? '✅' : '❌');
+        console.log('   Bottom:', paddingBottom, 'Expected:', expectedBottom, bottomMatch ? '✅' : '❌');
+        console.log('   Left:', paddingLeft, 'Expected:', expectedLeft, leftMatch ? '✅' : '❌');
+      }
+    }
+
+    // Check separator margin and shadow
+    if (separators.length > 0) {
+      const separator = separators[0];
+      const styles = getComputedStyles(separator);
+      const height = styles.height;
+      const marginTop = styles.marginTop;
+      const marginBottom = styles.marginBottom;
+      const boxShadow = styles.boxShadow;
+
+      // Expected: height: 1px, margin: 0.0625rem 0, box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05)
+      const expectedHeight = '1px';
+      const expectedMargin = '0.0625rem';
+      const expectedShadow = 'rgba(0, 0, 0, 0.05)';
+
+      const heightMatch = compareCSSValue(height, expectedHeight, 'height');
+      const marginTopMatch = compareCSSValue(marginTop, expectedMargin, 'margin-top');
+      const marginBottomMatch = compareCSSValue(marginBottom, expectedMargin, 'margin-bottom');
+      const shadowMatch = boxShadow.includes('0.05') || boxShadow.includes('rgba(0, 0, 0, 0.05)');
+
+      results.summary.total++;
+      if (heightMatch && marginTopMatch && marginBottomMatch && shadowMatch) {
+        results.summary.passed++;
+        console.log('✅ Separator styles:', { height, marginTop, marginBottom, boxShadow });
+      } else {
+        results.summary.failed++;
+        results.errors.push({
+          element: 'Separator',
+          property: 'height/margin/shadow',
+          actual: `height: ${height}, margin: ${marginTop}/${marginBottom}, shadow: ${boxShadow}`,
+          expected: `height: ${expectedHeight}, margin: ${expectedMargin}, shadow: ${expectedShadow}`
+        });
+        console.log('❌ Separator styles:');
+        console.log('   Height:', height, 'Expected:', expectedHeight, heightMatch ? '✅' : '❌');
+        console.log('   Margin Top:', marginTop, 'Expected:', expectedMargin, marginTopMatch ? '✅' : '❌');
+        console.log('   Margin Bottom:', marginBottom, 'Expected:', expectedMargin, marginBottomMatch ? '✅' : '❌');
+        console.log('   Box Shadow:', boxShadow, shadowMatch ? '✅' : '❌');
+      }
+    }
+  }
+
+  /**
+   * Check filter user section position
+   */
+  function checkFilterUserPosition() {
+    console.log('\n%c👤 Checking Filter User Section Position', 'color: #ff9500; font-weight: bold;');
+    
+    const userSection = document.querySelector('#unified-header .filter-user-section');
+    if (!userSection) {
+      results.summary.total++;
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Filter User Section',
+        property: 'existence',
+        actual: 'Not found',
+        expected: 'Should exist'
+      });
+      console.log('❌ Filter user section not found');
+      return;
+    }
+
+    const styles = getComputedStyles(userSection);
+    const order = styles.order;
+    const marginLeft = styles.marginLeft;
+    const marginRight = styles.marginRight;
+    const marginInlineStart = styles.marginInlineStart;
+
+    // Expected: order: 999, margin-inline-start: auto
+    const expectedOrder = '999';
+    const orderMatch = order === expectedOrder;
+
+    results.summary.total++;
+    if (orderMatch && (marginInlineStart === 'auto' || marginLeft === 'auto' || marginRight === 'auto')) {
+      results.summary.passed++;
+      console.log('✅ Filter user section position:', { order, marginInlineStart, marginLeft, marginRight });
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Filter User Section',
+        property: 'position',
+        actual: `order: ${order}, margin-inline-start: ${marginInlineStart}`,
+        expected: 'order: 999, margin-inline-start: auto'
+      });
+      console.log('❌ Filter user section position:');
+      console.log('   Order:', order, 'Expected:', expectedOrder, orderMatch ? '✅' : '❌');
+      console.log('   Margin inline start:', marginInlineStart, 'Expected: auto');
+    }
+  }
+
+  /**
+   * Check investment type filter options
+   */
+  function checkInvestmentTypeFilter() {
+    console.log('\n%c💰 Checking Investment Type Filter Options', 'color: #ff9500; font-weight: bold;');
+    
+    const typeFilterItems = document.querySelectorAll('#unified-header .type-filter-item');
+    const expectedOptions = ['הכול'];
+    const actualOptions = Array.from(typeFilterItems).map(item => {
+      const textSpan = item.querySelector('.option-text');
+      return textSpan ? textSpan.textContent.trim() : '';
+    }).filter(text => text);
+
+    results.summary.total++;
+    if (actualOptions.length === 1 && actualOptions[0] === 'הכול') {
+      results.summary.passed++;
+      console.log('✅ Investment type filter options:', actualOptions);
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Investment Type Filter',
+        property: 'options',
+        actual: actualOptions.join(', '),
+        expected: expectedOptions.join(', ')
+      });
+      console.log('❌ Investment type filter options:', actualOptions, 'Expected:', expectedOptions);
+    }
+  }
+
+  /**
+   * Check alert bell visibility and position
+   */
+  function checkAlertBell() {
+    console.log('\n%c🔔 Checking Alert Bell', 'color: #ff9500; font-weight: bold;');
+    
+    const alertBtn = document.querySelector('.index-section__header-alert-btn');
+    if (!alertBtn) {
+      results.summary.total++;
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Alert Bell Button',
+        property: 'existence',
+        actual: 'Not found',
+        expected: 'Should exist when section is closed and alerts exist'
+      });
+      console.log('❌ Alert bell button not found');
+      return;
+    }
+
+    const styles = getComputedStyles(alertBtn);
+    const margin = styles.margin;
+    const marginBottom = styles.marginBottom;
+    const display = styles.display;
+
+    // Expected: margin: 0, margin-bottom: 0
+    const marginMatch = margin === '0px' || margin === '0';
+    const marginBottomMatch = marginBottom === '0px' || marginBottom === '0';
+
+    results.summary.total++;
+    if (marginMatch && marginBottomMatch) {
+      results.summary.passed++;
+      console.log('✅ Alert bell margin:', { margin, marginBottom });
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Alert Bell Button',
+        property: 'margin',
+        actual: `margin: ${margin}, margin-bottom: ${marginBottom}`,
+        expected: 'margin: 0, margin-bottom: 0'
+      });
+      console.log('❌ Alert bell margin:', { margin, marginBottom });
+    }
+  }
+
+  /**
+   * Check info summary layout
+   */
+  function checkInfoSummaryLayout() {
+    console.log('\n%c📊 Checking Info Summary Layout', 'color: #ff9500; font-weight: bold;');
+    
+    const infoSummaryRow = document.querySelector('.info-summary__row');
+    if (!infoSummaryRow) {
+      console.log('⚠️ Info summary row not found');
+      return;
+    }
+
+    const styles = getComputedStyles(infoSummaryRow);
+    const justifyContent = styles.justifyContent;
+
+    // Expected: justify-content: flex-start (text at start, button at end)
+    const expectedJustify = 'flex-start';
+    const justifyMatch = justifyContent === expectedJustify || justifyContent === 'start';
+
+    results.summary.total++;
+    if (justifyMatch) {
+      results.summary.passed++;
+      console.log('✅ Info summary row justify-content:', justifyContent);
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Info Summary Row',
+        property: 'justify-content',
+        actual: justifyContent,
+        expected: expectedJustify
+      });
+      console.log('❌ Info summary row justify-content:', justifyContent, 'Expected:', expectedJustify);
+    }
+
+    // Check toggle button position
+    const toggleBtn = document.querySelector('.info-summary__row .portfolio-summary__toggle-btn');
+    if (toggleBtn) {
+      const btnStyles = getComputedStyles(toggleBtn);
+      const marginLeft = btnStyles.marginLeft;
+      const marginRight = btnStyles.marginRight;
+      const marginInlineStart = btnStyles.marginInlineStart;
+
+      // Expected: margin-inline-start: auto (button at end)
+      const marginMatch = marginInlineStart === 'auto' || marginLeft === 'auto' || marginRight === 'auto';
+
+      results.summary.total++;
+      if (marginMatch) {
+        results.summary.passed++;
+        console.log('✅ Toggle button margin:', { marginInlineStart, marginLeft, marginRight });
+      } else {
+        results.summary.failed++;
+        results.errors.push({
+          element: 'Toggle Button',
+          property: 'margin-inline-start',
+          actual: `margin-inline-start: ${marginInlineStart}`,
+          expected: 'margin-inline-start: auto'
+        });
+        console.log('❌ Toggle button margin:', { marginInlineStart, marginLeft, marginRight });
+      }
+    }
+  }
+
+  /**
+   * Check active alerts design
+   */
+  function checkActiveAlertsDesign() {
+    console.log('\n%c🚨 Checking Active Alerts Design', 'color: #ff9500; font-weight: bold;');
+    
+    const alertsList = document.querySelector('.active-alerts__list');
+    if (!alertsList) {
+      console.log('⚠️ Active alerts list not found');
+      return;
+    }
+
+    const styles = getComputedStyles(alertsList);
+    const display = styles.display;
+    const gridTemplateColumns = styles.gridTemplateColumns;
+
+    // Expected: grid layout with max 3 columns
+    const isGrid = display === 'grid';
+    const hasThreeColumns = gridTemplateColumns.includes('repeat(3') || gridTemplateColumns.includes('1fr 1fr 1fr');
+
+    results.summary.total++;
+    if (isGrid) {
+      results.summary.passed++;
+      console.log('✅ Active alerts list is grid:', { display, gridTemplateColumns });
+    } else {
+      results.summary.failed++;
+      results.errors.push({
+        element: 'Active Alerts List',
+        property: 'display',
+        actual: display,
+        expected: 'grid'
+      });
+      console.log('❌ Active alerts list display:', display, 'Expected: grid');
+    }
+
+    // Check alert cards
+    const alertCards = document.querySelectorAll('.active-alerts__card');
+    if (alertCards.length > 0) {
+      const card = alertCards[0];
+      const cardStyles = getComputedStyles(card);
+      const backgroundColor = cardStyles.backgroundColor;
+      const borderColor = cardStyles.borderColor;
+      const borderRadius = cardStyles.borderRadius;
+      const padding = cardStyles.padding;
+
+      console.log('📋 Alert card styles:', {
+        backgroundColor,
+        borderColor,
+        borderRadius,
+        padding
+      });
+    }
+  }
+
+  /**
+   * Print summary
+   */
+  function printSummary() {
+    console.log('\n' + '='.repeat(80));
+    console.log('%c📊 SUMMARY', 'color: #26baac; font-size: 16px; font-weight: bold;');
+    console.log('='.repeat(80));
+    console.log(`Total checks: ${results.summary.total}`);
+    console.log(`%c✅ Passed: ${results.summary.passed}`, 'color: green; font-weight: bold;');
+    console.log(`%c❌ Failed: ${results.summary.failed}`, 'color: red; font-weight: bold;');
+    
+    if (results.errors.length > 0) {
+      console.log('\n%c❌ ERRORS:', 'color: red; font-weight: bold; font-size: 14px;');
+      results.errors.forEach((error, index) => {
+        console.log(`\n${index + 1}. ${error.element} - ${error.property}`);
+        console.log('   Actual:', error.actual);
+        console.log('   Expected:', error.expected);
+      });
+    }
+
+    if (results.warnings.length > 0) {
+      console.log('\n%c⚠️ WARNINGS:', 'color: orange; font-weight: bold; font-size: 14px;');
+      results.warnings.forEach((warning, index) => {
+        console.log(`${index + 1}. ${warning}`);
+      });
+    }
+
+    console.log('\n' + '='.repeat(80));
+  }
+
+  // Run all checks
+  try {
+    checkDropdownSpacing();
+    checkFilterUserPosition();
+    checkInvestmentTypeFilter();
+    checkAlertBell();
+    checkInfoSummaryLayout();
+    checkActiveAlertsDesign();
+    printSummary();
+  } catch (error) {
+    console.error('❌ Error running comparison:', error);
+  }
+
+  // Return results for programmatic access
+  return results;
+})();
+
+VM234:19 🔍 Blueprint Comparison Script Started
+VM234:20 ================================================================================
+VM234:80 
+📋 Checking Dropdown Menu Spacing
+VM234:114 ❌ Dropdown menu padding: 7.36px / 7.36px Expected: 0.0625rem
+VM234:152 ❌ Dropdown item padding: 7.36px 14.72px
+VM234:153    Top: 7.36px Expected: 0.0625rem ❌
+VM234:154    Right: 14.72px Expected: 1rem ❌
+VM234:155    Bottom: 7.36px Expected: 0.0625rem ❌
+VM234:156    Left: 14.72px Expected: 0.25rem ❌
+VM234:191 ❌ Separator styles:
+VM234:192    Height: 29.4375px Expected: 1px ❌
+VM234:193    Margin Top: 7.36px Expected: 0.0625rem ❌
+VM234:194    Margin Bottom: 7.36px Expected: 0.0625rem ❌
+VM234:195    Box Shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px ❌
+VM234:204 
+👤 Checking Filter User Section Position
+VM234:242 ❌ Filter user section position:
+VM234:243    Order: 999 Expected: 999 ✅
+VM234:244    Margin inline start: 527.719px Expected: auto
+VM234:252 
+💰 Checking Investment Type Filter Options
+VM234:273 ❌ Investment type filter options: (8) ['הכול', 'Long', 'Short', 'מניות', 'אופציות', 'חוזים עתידיים', 'קרנות', 'אגרות חוב'] Expected: ['הכול']
+VM234:281 
+🔔 Checking Alert Bell
+VM234:309 ✅ Alert bell margin: {margin: '0px', marginBottom: '0px'}
+VM234:326 
+📊 Checking Info Summary Layout
+VM234:353 ❌ Info summary row justify-content: center Expected: flex-start
+VM234:379 ❌ Toggle button margin: {marginInlineStart: '0px', marginLeft: '0px', marginRight: '0px'}
+VM234:388 
+🚨 Checking Active Alerts Design
+VM234:407 ✅ Active alerts list is grid: {display: 'grid', gridTemplateColumns: '395.664px 395.664px 395.664px'}
+VM234:429 📋 Alert card styles: {backgroundColor: 'rgba(38, 186, 172, 0.1)', borderColor: 'rgba(38, 186, 172, 0.3)', borderRadius: '8px', padding: '16px'}
+VM234:442 
+================================================================================
+VM234:443 📊 SUMMARY
+VM234:444 ================================================================================
+VM234:445 Total checks: 9
+VM234:446 ✅ Passed: 2
+VM234:447 ❌ Failed: 7
+VM234:450 
+❌ ERRORS:
+VM234:452 
+1. Dropdown Menu - padding
+VM234:453    Actual: 7.36px / 7.36px
+VM234:454    Expected: 0.0625rem / 0.0625rem
+VM234:452 
+2. Dropdown Item - padding
+VM234:453    Actual: 7.36px 14.72px 7.36px 14.72px
+VM234:454    Expected: 0.0625rem 1rem 0.0625rem 0.25rem
+VM234:452 
+3. Separator - height/margin/shadow
+VM234:453    Actual: height: 29.4375px, margin: 7.36px/7.36px, shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px
+VM234:454    Expected: height: 1px, margin: 0.0625rem, shadow: rgba(0, 0, 0, 0.05)
+VM234:452 
+4. Filter User Section - position
+VM234:453    Actual: order: 999, margin-inline-start: 527.719px
+VM234:454    Expected: order: 999, margin-inline-start: auto
+VM234:452 
+5. Investment Type Filter - options
+VM234:453    Actual: הכול, Long, Short, מניות, אופציות, חוזים עתידיים, קרנות, אגרות חוב
+VM234:454    Expected: הכול
+VM234:452 
+6. Info Summary Row - justify-content
+VM234:453    Actual: center
+VM234:454    Expected: flex-start
+VM234:452 
+7. Toggle Button - margin-inline-start
+VM234:453    Actual: margin-inline-start: 0px
+VM234:454    Expected: margin-inline-start: auto
+VM234:465 
+================================================================================
+{errors: Array(7), warnings: Array(0), info: Array(0), summary: {…}}

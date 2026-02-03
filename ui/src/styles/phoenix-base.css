@@ -195,6 +195,34 @@
   --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
   
+  /* ===== Entity Colors (Temporary - Matching Specification) ===== */
+  /* NOTE: These are temporary values matching the specification until the system is complete */
+  /* These values ensure the interface is defined accurately with the correct variables */
+  
+  /* Trade Entity */
+  --entity-trade-color: #26baac; /* Turquoise - matches brand primary */
+  --entity-trade-border: var(--apple-border-light, #e5e5e5);
+  --entity-trade-bg: var(--apple-bg-elevated, #ffffff);
+  --entity-trade-text: var(--apple-text-primary, #1d1d1f);
+  
+  /* Ticker Entity */
+  --entity-ticker-color: #17a2b8; /* Cyan */
+  --entity-ticker-border: var(--apple-border-light, #e5e5e5);
+  --entity-ticker-bg: var(--apple-bg-elevated, #ffffff);
+  --entity-ticker-text: var(--apple-text-primary, #1d1d1f);
+  
+  /* Trading Account Entity */
+  --entity-trading-account-color: #28a745; /* Green */
+  --entity-trading-account-border: var(--apple-border-light, #e5e5e5);
+  --entity-trading-account-bg: var(--apple-bg-elevated, #ffffff);
+  --entity-trading-account-text: var(--apple-text-primary, #1d1d1f);
+  
+  /* Research Entity */
+  --entity-research-color: #9c27b0; /* Violet */
+  
+  /* Execution Entity */
+  --entity-execution-color: #ff9800; /* Orange */
+  
   /* ===== Additional Typography Variables ===== */
   --font-hebrew: 'Noto Sans Hebrew', sans-serif;
   --font-mono: 'Courier New', monospace;

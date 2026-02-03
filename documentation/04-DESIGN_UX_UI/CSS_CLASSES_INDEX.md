@@ -4,8 +4,8 @@
 **אחריות:** Team 40 (UI Assets & Design)  
 **תוקף:** מחייב לכל המערכת  
 **תאריך עדכון:** 2026-02-02  
-**גרסה:** v1.2  
-**עדכון אחרון:** Task 2.6 - Fluid Design Mandate (הסרת media queries, שימוש ב-clamp/min/max)
+**גרסה:** v1.3  
+**עדכון אחרון:** Task 3.1.6 - Template V3 Implementation (מבנה סקשנים שקוף, UnifiedHeader, עמודי Auth override)
 
 ---
 
@@ -75,14 +75,22 @@
   - `padding-inline: var(--grid-gutter)`
   - `overflow-x: hidden !important`
 
-#### **`tt-section`**
+#### **`tt-section`** 🛡️ **As Made (2026-02-02)**
 - **קובץ:** `phoenix-components.css`
 - **ITCSS Layer:** Objects
-- **תפקיד:** יחידת תוכן עצמאית
+- **תפקיד:** יחידת תוכן עצמאית - **שקוף ללא רקע**
 - **שימוש:** כל קונטיינר תוכן
 - **מאפיינים:**
-  - `background: transparent`
+  - `background: transparent !important` - **CRITICAL: שקוף, רקע נמצא על header/body**
+  - `border: none !important` - אין border (header/body יש להם)
+  - `border-radius: 0 !important` - אין border-radius (header/body יש להם)
+  - `box-shadow: none !important` - אין shadow (header/body יש להם)
   - `margin-block-start/end: var(--grid-gutter)`
+  - `overflow-x: hidden !important`
+
+**🛡️ CRITICAL - מבנה סקשנים:**
+- `tt-section` הוא שקוף - הרקע נמצא על `.index-section__header` ו-`.index-section__body`
+- עמודי Auth דורשים override ספציפי ב-`D15_IDENTITY_STYLES.css` (ראה למטה)
 
 #### **`tt-section-row`**
 - **קובץ:** `phoenix-components.css`
@@ -273,51 +281,59 @@
 
 ### **5. כותרות קונטיינרים (Container Headers)** (ITCSS: Components Layer)
 
-#### **`.index-section__header` / `.dashboard-section__header`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
-- **תפקיד:** כותרת קונטיינר ראשי
-- **שימוש:** כל קונטיינר תוכן
+#### **`.index-section__header` / `.dashboard-section__header`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
+- **תפקיד:** כותרת קונטיינר ראשי - **כרטיס לבן נפרד**
+- **שימוש:** כל קונטיינר תוכן (בתוך `tt-section` שקוף)
 - **מבנה:** 3 חלקים (Title | Subtitle | Actions)
 - **מאפיינים:**
-  - `height: 60px !important`
+  - `height: 60px !important` (קבוע, לא ניתן לשנות)
   - `flex-wrap: nowrap !important`
-  - `align-items: center`
-  - `padding: 0 var(--spacing-lg)`
+  - `align-items: center` - **CRITICAL: כל האלמנטים מיושרים לאמצע**
+  - `justify-content: space-between` - **CRITICAL: מבנה 3 חלקים**
+  - `padding: 0 var(--spacing-lg, 24px)` - רק אופקי, אין אנכי
+  - `background: var(--apple-bg-elevated, #ffffff)` - רקע לבן
+  - `border: 1px solid var(--apple-border-light, #e5e5e5)`
+  - `border-radius: 8px`
+  - `box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1))`
+  - `border-inline-start: 3px solid var(--color-brand)` - צבע ישות
+  - `border-block-end: 3px solid var(--color-brand)` - צבע ישות
+  - `margin-block-end: var(--spacing-xs, 4px)` - רווח קטן אפור
 
-#### **`.index-section__header-title`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__header-title`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** חלק 1 - כותרת עם איקון
 - **מאפיינים:**
   - `flex-shrink: 0`
   - `display: flex`
   - `align-items: center`
 
-#### **`.index-section__header-meta`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__header-meta`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** חלק 2 - כותרת משנה (מרכז)
 - **מאפיינים:**
   - `flex: 1`
   - `justify-content: center`
   - `align-items: center`
 
-#### **`.index-section__header-count`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__header-count`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** טקסט כותרת משנה
 - **מאפיינים:**
   - `text-align: center`
   - `opacity: 0.8`
   - `color: var(--color-brand)`
 
-#### **`.index-section__header-actions`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__header-actions`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** חלק 3 - אזור כפתורים
 - **מאפיינים:**
   - `flex-shrink: 0`
   - `justify-content: flex-end`
   - `align-items: center`
 
-#### **`.index-section__header-toggle-btn`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__header-toggle-btn`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** כפתור סגירת סקשן
 - **מאפיינים:**
   - `width: 32px`
@@ -328,13 +344,15 @@
 
 ### **6. גופי קונטיינרים (Container Bodies)** (ITCSS: Components Layer)
 
-#### **`.index-section__body` / `.dashboard-section__body`**
-- **קובץ:** `D15_DASHBOARD_STYLES.css`
+#### **`.index-section__body` / `.dashboard-section__body`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-components.css` ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 - **תפקיד:** גוף קונטיינר (כרטיס לבן נפרד)
 - **מאפיינים:**
-  - `background: var(--apple-bg-elevated)`
+  - `background: var(--apple-bg-elevated, #ffffff)` - רקע לבן
+  - `border: 1px solid var(--apple-border-light, #e5e5e5)`
   - `border-radius: 8px`
-  - `padding: var(--spacing-lg)`
+  - `box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1))`
+  - `padding: var(--spacing-lg, 24px)`
 
 ---
 
@@ -437,6 +455,49 @@
   - `font-size: 1rem !important`
   - `font-weight: 300 !important`
   - `color: #26baac !important`
+
+#### **`.filter-toggle:hover`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **תפקיד:** התנהגות מעבר עכבר על פילטרים
+- **מאפיינים:**
+  - `border-color: var(--header-brand, #26baac)` - רק צבע משני
+  - `color: var(--header-brand, #26baac)` - רק צבע משני
+  - `background: white` - **CRITICAL: ללא שינוי רקע**
+  - **ללא shadow** - רק שינוי צבע
+
+#### **`.tiktrack-dropdown-menu`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **תפקיד:** תפריט משנה
+- **יישור:** `inset-inline-end: 0; inset-inline-start: auto;` - מיושר לתחילת הכפתור, הולך שמאלה
+- **מאפיינים:**
+  - `padding: 0.25rem 0;` - ריווח מופחת (היה `0.5rem 0`)
+  - `top: calc(100% + 3px);`
+  - התנהגות: נפתח במעבר עכבר (hover-based)
+
+#### **`.tiktrack-dropdown-item`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **תפקיד:** פריט בתפריט משנה
+- **מאפיינים:**
+  - `padding: 0.25rem 0.5rem;` - ריווח מופחת (היה `0.5rem 1rem`)
+
+#### **`.separator`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **תפקיד:** קו מפריד בתפריט משנה
+- **מאפיינים:**
+  - `height: 1px;` - דק מאוד
+  - `margin: 0.25rem 0;` - ריווח מופחת (היה `0.5rem 0`)
+  - `box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);` - צל עדין מאוד
+
+#### **`body.auth-layout-root tt-section`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `D15_IDENTITY_STYLES.css`
+- **תפקיד:** Override ספציפי לעמודי Auth
+- **מאפיינים:**
+  - `background: var(--apple-bg-elevated, #ffffff) !important;` - רקע לבן
+  - `border: 1px solid var(--apple-border-light, #e5e5e5) !important;`
+  - `box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15)) !important;`
+  - `padding: var(--spacing-xl, 32px);`
+  - `border-radius: 12px;`
+- **סיבה:** עמודי Auth משתמשים ב-`tt-section` ישירות ללא `index-section__header`/`index-section__body`
 
 ---
 
@@ -583,13 +644,13 @@ overflow-x: auto;
 | `.page-wrapper` | phoenix-base.css | Elements | כל עמוד | - |
 | `.page-container` | phoenix-base.css | Elements | כל עמוד | - |
 | `tt-container` | phoenix-components.css | Objects | כל עמוד | - |
-| `tt-section` | phoenix-components.css | Objects | כל קונטיינר | - |
+| `tt-section` | phoenix-components.css | Objects | כל קונטיינר | - | 🛡️ **שקוף - רקע על header/body**
 | `.auth-layout-root` | D15_IDENTITY_STYLES.css | Components | עמודי Auth | 100vh |
 | `.auth-header` | D15_IDENTITY_STYLES.css | Components | עמודי Auth | - |
 | `.btn-auth-primary` | D15_IDENTITY_STYLES.css | Components | כפתורי Auth | - |
 | `.form-group` | phoenix-base.css | Elements | כל טופס | - |
 | `.form-control` | phoenix-base.css | Elements | כל טופס | - |
-| `.index-section__header` | D15_DASHBOARD_STYLES.css | Components | כותרת קונטיינר | 60px |
+| `.index-section__header` | phoenix-components.css | Components | כותרת קונטיינר | 60px | ⚠️ **הועבר מ-D15_DASHBOARD_STYLES.css**
 | `.widget-placeholder__header-title-row` | D15_DASHBOARD_STYLES.css | Components | כותרת וויגיט | 40px |
 | `#unified-header` | phoenix-header.css | Components | Header | 120px |
 | `.header-top` | phoenix-header.css | Components | שורה עליונה | 60px |

@@ -3,8 +3,8 @@
 **מיקום:** `documentation/04-DESIGN_UX_UI/`  
 **אחריות:** Team 40 (UI Assets & Design)  
 **תוקף:** מחייב לכל המערכת  
-**תאריך עדכון:** 2026-02-01  
-**גרסה:** v1.0
+**תאריך עדכון:** 2026-02-02  
+**גרסה:** v1.1 (עודכן עם As Made - Filter Hover, Dropdown Menus)
 
 ---
 
@@ -165,6 +165,73 @@
 - `.filters-container` - קונטיינר פילטרים פנימי
 - `.filter-group` - קבוצת פילטרים
 - `.filter-toggle-section` - אזור כפתור הצגה/הסתרה
+
+---
+
+## 🎨 חלק 3: תפריטי משנה (Dropdown Menus) 🛡️ **As Made (2026-02-02)**
+
+### **3.1 מבנה תפריטי משנה**
+
+**יישור:**
+- תפריטי משנה מיושרים לתחילת הכפתור (ימין ב-RTL)
+- הולכים שמאלה משם (`inset-inline-end: 0; inset-inline-start: auto;`)
+
+**ריווח מופחת:**
+- `.tiktrack-dropdown-menu`: `padding: 0.25rem 0;` (היה `0.5rem 0`)
+- `.tiktrack-dropdown-item`: `padding: 0.25rem 0.5rem;` (היה `0.5rem 1rem`)
+- `.separator`: `margin: 0.25rem 0;` (היה `0.5rem 0`)
+
+**קו מפריד:**
+- `height: 1px;`
+- `box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);` - צל עדין מאוד
+
+**התנהגות:**
+- תפריטי משנה נפתחים במעבר עכבר (hover-based)
+- JavaScript: `useEffect` hooks עם `mouseenter`/`mouseleave` events
+
+**קוד CSS:**
+```css
+#unified-header .tiktrack-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 3px);
+  inset-inline-end: 0; /* Aligned to start of button (right in RTL) */
+  inset-inline-start: auto; /* Goes left from there */
+  padding: 0.25rem 0; /* Half padding - tighter spacing */
+  /* ... */
+}
+
+#unified-header .tiktrack-dropdown-item {
+  padding: 0.25rem 0.5rem; /* Half padding - tighter spacing */
+  /* ... */
+}
+
+#unified-header .separator {
+  height: 1px; /* Very thin - 1px */
+  margin: 0.25rem 0; /* Half margin - tighter spacing */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05); /* Subtle shadow - very delicate */
+}
+```
+
+---
+
+## 🎨 חלק 4: פילטרים (Filters) 🛡️ **As Made (2026-02-02)**
+
+### **4.1 התנהגות מעבר עכבר (Hover)**
+
+**מעבר עכבר על פילטרים:**
+- רק צבע משני (`border-color`, `color`)
+- ללא רקע (`background: white;`)
+- ללא shadow
+
+**קוד CSS:**
+```css
+#unified-header .filter-toggle:hover {
+  border-color: var(--header-brand, #26baac);
+  color: var(--header-brand, #26baac);
+  background: white; /* No background change */
+  /* No shadow on hover - only color change */
+}
+```
 
 ---
 

@@ -13,7 +13,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../cubes/identity/components/auth/ProtectedRoute';
 
 // Public Routes (imported by Team 30)
-import IndexPage from '../components/IndexPage';
+import HomePage from '../components/HomePage';
 import LoginForm from '../cubes/identity/components/auth/LoginForm';
 import RegisterForm from '../cubes/identity/components/auth/RegisterForm';
 import PasswordResetFlow from '../cubes/identity/components/auth/PasswordResetFlow';
@@ -45,7 +45,7 @@ const AppRouter = () => {
     >
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<IndexPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/reset-password" element={<PasswordResetFlow />} />

@@ -191,7 +191,8 @@ tt-container {
 }
 ```
 
-### **2.3 tt-section**
+### **2.3 tt-section** 🛡️ **CRITICAL - As Made (2026-02-02)**
+
 - **תפקיד:** יחידת תוכן עצמאית
 - **רקע:** שקוף (`transparent`) - Header/Body הם כרטיסים נפרדים
 - **ריווח:** `margin-block-start/end: var(--grid-gutter, var(--spacing-md))`
@@ -200,9 +201,9 @@ tt-container {
 ```css
 tt-section {
   display: block;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
+  background: transparent !important; /* CRITICAL: Transparent - header and body are separate white cards */
+  border: none !important; /* No border - header and body have their own borders */
+  border-radius: 0 !important; /* No border-radius - header and body have their own */
   margin-block-start: var(--grid-gutter, var(--spacing-md));
   margin-block-end: var(--grid-gutter, var(--spacing-md));
   overflow-x: hidden !important;
@@ -214,6 +215,25 @@ tt-section {
 ```
 
 **⚠️ חשוב:** הרווח בין Header לקונטיינר הראשון זהה לרווח בין קונטיינרים.
+
+**🛡️ CRITICAL - מבנה סקשנים:**
+- `tt-section` הוא אלמנט שקוף ללא רקע/border/shadow
+- `.index-section__header` - כרטיס לבן נפרד עם רקע, border, shadow
+- `.index-section__body` - כרטיס לבן נפרד עם רקע, border, shadow
+- **מיקום סגנונות:** `phoenix-components.css` (לא ב-D15_DASHBOARD_STYLES.css)
+
+**🛡️ CRITICAL - עמודי Auth Override:**
+עמודי Auth דורשים override ספציפי ב-`D15_IDENTITY_STYLES.css`:
+```css
+body.auth-layout-root tt-section {
+  background: var(--apple-bg-elevated, #ffffff) !important;
+  border: 1px solid var(--apple-border-light, #e5e5e5) !important;
+  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15)) !important;
+  padding: var(--spacing-xl, 32px);
+  border-radius: 12px;
+}
+```
+**סיבה:** עמודי Auth משתמשים ב-`tt-section` ישירות ללא `index-section__header`/`index-section__body`.
 
 ### **2.4 tt-section-row**
 - **תפקיד:** חלוקה פנימית ל-Flex/Grid alignment
@@ -233,30 +253,45 @@ tt-section {
 
 **ביניהם:** רווח קטן אפור (רקע העמוד)
 
-### **3.2 Header Card:**
+### **3.2 Header Card:** 🛡️ **As Made (2026-02-02)**
 ```css
 .index-section__header {
-  background: var(--apple-bg-elevated, #ffffff);
+  display: flex;
+  align-items: center; /* CRITICAL: All elements aligned to middle vertically */
+  justify-content: space-between; /* CRITICAL: 3-part layout */
+  padding: 0 var(--spacing-lg, 24px); /* No vertical padding - fixed height handles spacing */
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px;
-  margin-block-end: var(--spacing-xs, 4px); /* Gap for gray spacing */
+  margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
-  height: 60px !important; /* Fixed height */
-  /* ... */
+  /* Subtle entity color accent on left border */
+  border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
+  /* Entity color accent on bottom border */
+  border-block-end: 3px solid var(--color-brand, var(--entity-trade-color));
+  height: 60px !important; /* CRITICAL: Fixed height - cannot break or stretch */
+  min-height: 60px;
+  max-height: 60px;
 }
 ```
 
-### **3.3 Body Card:**
+**מבנה 3 חלקים:**
+1. **Title** (תחילת השורה) - Title | Icon | Text | Meta | Count
+2. **Subtitle** (מרכז) - תוכן ממורכז
+3. **Actions** (סוף השורה) - כפתורים ופעולות
+
+### **3.3 Body Card:** 🛡️ **As Made (2026-02-02)**
 ```css
 .index-section__body {
-  background: var(--apple-bg-elevated, #ffffff);
+  background: var(--apple-bg-elevated, #ffffff); /* White background */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 8px;
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
   padding: var(--spacing-lg, 24px);
-  /* ... */
 }
 ```
+
+**מיקום סגנונות:** `phoenix-components.css` (הועבר מ-D15_DASHBOARD_STYLES.css)
 
 **⚠️ קריטי:** רק כרטיסי התוכן לבנים. רקע העמוד תמיד אפור.
 

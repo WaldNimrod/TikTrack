@@ -8,10 +8,10 @@
  */
 
 import axios from 'axios';
-import { apiToReact, reactToApi } from '../cubes/shared/utils/transformers.js';
-import { audit } from '../utils/audit.js';
-import { debugLog } from '../utils/debug.js';
-import authService from '../cubes/identity/services/auth.js';
+import { apiToReact, reactToApi } from '../../shared/utils/transformers.js';
+import { audit } from '../../../utils/audit.js';
+import { debugLog } from '../../../utils/debug.js';
+import authService from './auth.js';
 
 // API Base URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';

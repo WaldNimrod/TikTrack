@@ -307,7 +307,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 180px; /* Smaller width - match legacy */
   max-width: 200px;
-  padding: 0.25rem 0; /* Half padding - tighter spacing */
+  padding: 0.0625rem 0 !important; /* CRITICAL: Much less padding - half of 0.125rem for tighter spacing - !important to override any other rules */
+  padding-top: 0.0625rem !important;
+  padding-bottom: 0.0625rem !important;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -316,6 +318,7 @@
   list-style: none;
   display: flex; /* Use flex to ensure vertical stacking */
   flex-direction: column; /* Stack items vertically */
+  gap: 0 !important; /* CRITICAL: No gap between items - spacing comes from padding only */
 }
 
 /* Dropdown menu visible on hover - EXACT from blueprint */
@@ -332,6 +335,8 @@
   list-style: none;
   display: block; /* Force block display - items stack vertically, specificity handles override */
   width: 100%;
+  margin: 0; /* CRITICAL: No margin between items - spacing comes from padding */
+  padding: 0; /* CRITICAL: No padding on li - padding is on the link */
 }
 
 #unified-header .tiktrack-dropdown-menu li a {
@@ -354,7 +359,11 @@
 
 #unified-header .tiktrack-dropdown-item {
   display: block;
-  padding: 0.25rem 0.5rem; /* Half padding - tighter spacing (was 0.5rem 1rem) */
+  padding: 0.0625rem 1rem 0.0625rem 0.25rem !important; /* CRITICAL: Much less vertical spacing (half of 0.125rem), more padding from right (RTL) - !important to override any other rules */
+  padding-top: 0.0625rem !important;
+  padding-right: 1rem !important; /* RTL: this is actually left */
+  padding-bottom: 0.0625rem !important;
+  padding-left: 0.25rem !important; /* RTL: this is actually right */
   color: #29a6a8;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -369,10 +378,12 @@
 }
 
 #unified-header .separator {
-  height: 1px; /* Very thin - 1px */
+  height: 1px !important; /* CRITICAL: Very thin - 1px exactly - !important to override any other rules */
   background: #e5e5e5;
-  margin: 0.25rem 0; /* Half margin - tighter spacing (was 0.5rem 0) */
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05); /* Subtle shadow - very delicate */
+  margin: 0.0625rem 0 !important; /* CRITICAL: Much less margin - half of 0.125rem for tighter spacing - !important to override any other rules */
+  margin-top: 0.0625rem !important;
+  margin-bottom: 0.0625rem !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) !important; /* CRITICAL: Subtle shadow - very delicate - !important to override any other rules */
 }
 
 /* Dropdown Submenu (Level 3) - Exact copy from original */
@@ -932,10 +943,15 @@
   display: inline-block;
 }
 
-/* User Avatar Badge - Direct child of filters-container, aligned to end (left in RTL) */
+/* User Avatar Badge - Direct child of filters-container, aligned to end (left in RTL) - LAST in order */
+#unified-header .header-filters .filters-container .filter-user-section {
+  order: 999 !important; /* Last in order - appears at end (left in RTL) - !important to override any other rules */
+  margin-inline-start: auto !important; /* Push to end (left in RTL) - !important to override any other rules */
+  margin-left: auto !important; /* Fallback for browsers that don't support margin-inline-start */
+  margin-right: 0 !important; /* Reset right margin */
+}
+
 #unified-header .header-filters .filters-container .user-profile-link {
-  order: 3;
-  margin-inline-end: auto;
   text-decoration: none;
 }
 

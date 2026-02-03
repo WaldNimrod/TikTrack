@@ -1,12 +1,12 @@
 # 📋 קריטריוני בדיקת קוד | Team 40
 
-**From:** Team 40 (UI Assets & Design)  
+**From:** Team 40 (UI Assets & Design) - "שומרי ה-DNA"  
 **To:** Team 30 (Frontend), Team 10 (The Gateway)  
 **Date:** 2026-02-02  
 **Session:** SESSION_01 - Phase 1.6  
 **Subject:** CODE_VALIDATION_CRITERIA | Status: 🛡️ **MANDATORY**  
 **Purpose:** קריטריוני בדיקת קוד לולידציה של Components  
-**Version:** v1.1 (עודכן עם Final Governance Lock)
+**Version:** v1.2 (עודכן עם Batch 1 Closure & חוקי ברזל)
 
 ---
 
@@ -35,7 +35,9 @@
 #### **1.1 CSS Variables Usage**
 - ✅ **חובה:** שימוש ב-CSS Variables מ-`phoenix-base.css` בלבד
 - ❌ **אסור:** ערכים hardcoded (צבעים, ריווחים, וכו')
+- ❌ **אסור:** Inline styles (`style={{ ... }}`)
 - ✅ **מותר:** CSS Variables בלבד
+- ✅ **מותר:** CSS Classes בלבד
 
 **דוגמאות:**
 ```css
@@ -50,9 +52,35 @@ padding: 16px;
 border-radius: 10px;
 ```
 
+```jsx
+/* ✅ נכון - CSS Classes */
+<div className="phoenix-button phoenix-button--primary">
+  Click me
+</div>
+
+/* ❌ שגוי - Inline styles */
+<div style={{ color: '#1d1d1f', background: '#ffffff' }}>
+  Click me
+</div>
+```
+
+**בדיקה:**
+```bash
+# חיפוש inline styles
+grep -r "style=\{" ui/src/cubes/identity/components/
+```
+
 #### **1.2 Palette Spec Compliance**
 - ✅ **חובה:** עמידה ב-`TT2_MASTER_PALETTE_SPEC.md`
 - ✅ **חובה:** שימוש בצבעים מהפלטה בלבד
+- ❌ **אסור:** ערכי צבע hardcoded (`#ffffff`, `rgb()`, `rgba()`)
+- ✅ **חובה:** כל הצבעים דרך CSS Variables בלבד
+
+**בדיקה:**
+```bash
+# חיפוש ערכי צבע hardcoded
+grep -r "#[0-9a-fA-F]\{3,6\}\|rgb(\|rgba(" ui/src/cubes/identity/components/
+```
 - ❌ **אסור:** צבעים חדשים שלא בפלטה
 
 **צבעים מותרים:**
@@ -608,12 +636,14 @@ cubes/identity/scripts/
 - [ ] ✅ משתמש במחלקות מ-`CSS_CLASSES_INDEX.md`
 - [ ] ✅ משתמש ב-CSS Variables מ-`phoenix-base.css` בלבד
 - [ ] ✅ אין ערכים hardcoded (צבעים, ריווחים)
+- [ ] ✅ אין inline styles (`style={{ ... }}`)
 - [ ] ✅ ARIA attributes נכונים (`role`, `aria-label`, `aria-live`)
 - [ ] ✅ עומד ב-BEM Naming Convention
 - [ ] ✅ אין מחלקות כפולות
 
 **בדיקות שבוצעו:**
 - [ ] חיפוש ערכים hardcoded: _______________
+- [ ] חיפוש inline styles: _______________
 - [ ] חיפוש מחלקות CSS: _______________
 - [ ] חיפוש ARIA attributes: _______________
 
@@ -817,8 +847,8 @@ log_entry | [Team 40] | VALIDATION_METHODS | CODE_BASED | 2026-02-01
 
 ---
 
-**Team 40 (UI Assets & Design)**  
+**Team 40 (UI Assets & Design) - "שומרי ה-DNA"**  
 **Date:** 2026-02-02  
-**Version:** v1.1  
+**Version:** v1.2  
 **Status:** 🛡️ **MANDATORY CODE VALIDATION CRITERIA**  
-**עדכון אחרון:** Final Governance Lock - הוספת קריטריונים ל-Fluid Design ו-Clean Slate Rule
+**עדכון אחרון:** Batch 1 Closure - הוספת חוקי ברזל (אין inline styles, אין ערכי צבע hardcoded)

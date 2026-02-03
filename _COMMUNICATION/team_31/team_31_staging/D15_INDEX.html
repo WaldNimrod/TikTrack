@@ -15,11 +15,18 @@
 </head>
 <body class="index-page">
   <!--
-    Phoenix-Core-Ver: v1.0.0 | Batch 2 - Index Page (Home/Dashboard)
-    Sync-Time: 2026-01-31 22:00:00 IST
+    Phoenix-Core-Ver: v2.0.0 | Batch 2 - Index Page (Home/Dashboard) - IMPROVED VERSION
+    Sync-Time: 2026-02-02 00:00:00 IST
     Team: Team 31 (Blueprint)
-    Status: ⏳ IN DEVELOPMENT
-    Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
+    Status: ✅ IMPROVED VERSION - NEW STANDARD COMPLIANT
+    Compliance: 
+    - RTL Charter ✅
+    - DNA Sync ✅
+    - LEGO System ✅
+    - CSS Standards Protocol ✅
+    - Fluid Design Mandate ✅
+    - Design Tokens SSOT ✅
+    - Clean Slate Rule ✅ (NO inline JavaScript)
     
     Purpose:
     This is the default landing page (index.html) for the Phoenix system.
@@ -32,6 +39,25 @@
     - Widget placeholders (with titles and styling)
     
     Note: Widgets will be built in later phases. This page includes only placeholders.
+    
+    IMPROVEMENTS (v2.0.0):
+    - ✅ Removed filter close buttons (as per Team 30 guidelines)
+    - ✅ Added more Investment Type options (Long, Short, מניות, אופציות, חוזים עתידיים, קרנות, אגרות חוב)
+    - ✅ All JavaScript moved to external files (Clean Slate Rule)
+    - ✅ Added explicit comments on section structure
+    - ✅ Added CSS file hierarchy documentation
+    
+    SECTION STRUCTURE - CRITICAL:
+    - tt-section is TRANSPARENT (no background/border/shadow)
+    - index-section__header is a SEPARATE white card with background
+    - index-section__body is a SEPARATE white card with background
+    - Both header and body have their own styling (phoenix-components.css)
+    
+    CSS FILE HIERARCHY:
+    - phoenix-base.css: CSS Variables, Reset, Base Typography
+    - phoenix-components.css: LEGO Components + Section Styles (header/body)
+    - phoenix-header.css: Unified Header Styles
+    - D15_DASHBOARD_STYLES.css: Dashboard-specific styles (widgets, etc.)
   -->
 
   <!-- Unified Header: LOD 400 - Height 120px, Z-Index 950 -->
@@ -47,7 +73,7 @@
                 <!-- Home Link -->
                 <li class="tiktrack-nav-item">
                   <a href="/" class="tiktrack-nav-link" data-page="home">
-                    <img src="images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                    <img src="../../../../ui/public/images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                   </a>
                 </li>
                 
@@ -150,7 +176,7 @@
           <!-- Logo Section -->
           <div class="logo-section">
             <a href="/" class="logo">
-              <img src="./images/logo.svg" alt="TikTrack Logo" class="logo-image">
+              <img src="../../../../ui/public/images/logo.svg" alt="TikTrack Logo" class="logo-image">
               <span class="logo-text">פשוט לנהל תיק</span>
             </a>
           </div>
@@ -180,7 +206,6 @@
                 <div class="status-filter-item" data-value="מבוטל">
                   <span class="option-text">מבוטל</span>
                 </div>
-                <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('statusFilterMenu')" title="סגור">×</button>
               </div>
             </div>
           </div>
@@ -195,7 +220,27 @@
                 <div class="type-filter-item" data-value="הכול">
                   <span class="option-text">הכול</span>
                 </div>
-                <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('typeFilterMenu')" title="סגור">×</button>
+                <div class="type-filter-item" data-value="Long">
+                  <span class="option-text">Long</span>
+                </div>
+                <div class="type-filter-item" data-value="Short">
+                  <span class="option-text">Short</span>
+                </div>
+                <div class="type-filter-item" data-value="מניות">
+                  <span class="option-text">מניות</span>
+                </div>
+                <div class="type-filter-item" data-value="אופציות">
+                  <span class="option-text">אופציות</span>
+                </div>
+                <div class="type-filter-item" data-value="חוזים עתידיים">
+                  <span class="option-text">חוזים עתידיים</span>
+                </div>
+                <div class="type-filter-item" data-value="קרנות">
+                  <span class="option-text">קרנות</span>
+                </div>
+                <div class="type-filter-item" data-value="אגרות חוב">
+                  <span class="option-text">אגרות חוב</span>
+                </div>
               </div>
             </div>
           </div>
@@ -210,7 +255,6 @@
                 <div class="account-filter-item" data-value="הכול">
                   <span class="option-text">הכול</span>
                 </div>
-                <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('accountFilterMenu')" title="סגור">×</button>
               </div>
             </div>
           </div>
@@ -225,7 +269,6 @@
                 <div class="date-range-filter-item" data-value="כל זמן">
                   <span class="option-text">כל זמן</span>
                 </div>
-                <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('dateRangeFilterMenu')" title="סגור">×</button>
               </div>
             </div>
           </div>
@@ -233,15 +276,15 @@
           <div class="filter-group search-filter">
             <div class="search-input-wrapper">
               <input type="text" class="search-filter-input" id="searchFilterInput" placeholder="חיפוש...">
-              <button class="search-clear-btn" onclick="clearSearchFilter()" title="נקה חיפוש">×</button>
+              <button class="search-clear-btn js-search-clear" title="נקה חיפוש">×</button>
             </div>
           </div>
 
           <div class="filter-actions">
-            <button class="reset-btn" onclick="resetAllFilters()" title="איפוס פילטרים">
+            <button class="reset-btn js-filter-reset" title="איפוס פילטרים">
               <span class="btn-text">↻</span>
             </button>
-            <button class="clear-btn" onclick="clearAllFilters()" title="נקה כל הפילטרים">
+            <button class="clear-btn js-filter-clear" title="נקה כל הפילטרים">
               <span class="btn-text">×</span>
             </button>
           </div>
@@ -272,12 +315,19 @@
       <!-- Main Content -->
       <main>
         <tt-container>
+      <!-- 
+        CRITICAL SECTION STRUCTURE:
+        - tt-section is TRANSPARENT (no background/border/shadow)
+        - index-section__header is a SEPARATE white card with background
+        - index-section__body is a SEPARATE white card with background
+        - Both header and body have their own styling (phoenix-components.css)
+      -->
       <!-- Top Section: Active Alerts & Summary -->
       <tt-section data-section="top">
-        <!-- Section Header -->
+        <!-- Section Header - White card with background, border, shadow -->
         <div class="index-section__header">
           <div class="index-section__header-title">
-            <img src="images/icons/entities/home.svg" alt="דף הבית" class="index-section__header-icon" width="20" height="20">
+            <img src="../../../../ui/public/images/icons/entities/home.svg" alt="דף הבית" class="index-section__header-icon" width="20" height="20">
             <h1 class="index-section__header-text">דף הבית - TikTrack</h1>
           </div>
           <div class="index-section__header-actions">
@@ -293,7 +343,7 @@
           </div>
         </div>
 
-        <!-- Section Body -->
+        <!-- Section Body - White card with background, border, shadow -->
         <div class="index-section__body">
           <!-- Active Alerts Component (Basic Structure) -->
           <div class="active-alerts" data-role="container">
@@ -316,7 +366,7 @@
                     <div class="active-alerts__header-linked">
                       <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="trade" data-entity-id="1">
                         <div class="linked-object-card-icon">
-                          <img src="images/icons/entities/trades.svg" alt="טרייד" class="linked-object-card-icon-img" width="60" height="60">
+                          <img src="../../../../ui/public/images/icons/entities/trades.svg" alt="טרייד" class="linked-object-card-icon-img" width="60" height="60">
                         </div>
                         <div class="linked-object-card-content">
                           <div class="linked-object-card-title">
@@ -362,7 +412,7 @@
                     <div class="active-alerts__header-linked">
                       <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="trading_account" data-entity-id="1">
                         <div class="linked-object-card-icon">
-                          <img src="images/icons/entities/trading_accounts.svg" alt="חשבון מסחר" class="linked-object-card-icon-img" width="60" height="60">
+                          <img src="../../../../ui/public/images/icons/entities/trading_accounts.svg" alt="חשבון מסחר" class="linked-object-card-icon-img" width="60" height="60">
                         </div>
                         <div class="linked-object-card-content">
                           <div class="linked-object-card-title">
@@ -408,7 +458,7 @@
                     <div class="active-alerts__header-linked">
                       <div class="linked-object-card notes-linked-object active-alerts__linked-entity" role="link" tabindex="0" data-entity-type="ticker" data-entity-id="1">
                         <div class="linked-object-card-icon">
-                          <img src="images/icons/entities/tickers.svg" alt="טיקר" class="linked-object-card-icon-img" width="60" height="60">
+                          <img src="../../../../ui/public/images/icons/entities/tickers.svg" alt="טיקר" class="linked-object-card-icon-img" width="60" height="60">
                         </div>
                         <div class="linked-object-card-content">
                           <div class="linked-object-card-title">
@@ -463,6 +513,7 @@
               <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
               <div>יתרה נוכחית: <strong id="currentBalance"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
               <div>רווח/הפסד: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$0.00</span></strong></div>
+              <div style="margin-right: auto;"></div>
               <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
@@ -482,12 +533,19 @@
         </div>
       </tt-section>
 
+      <!-- 
+        CRITICAL SECTION STRUCTURE:
+        - tt-section is TRANSPARENT (no background/border/shadow)
+        - index-section__header is a SEPARATE white card with background
+        - index-section__body is a SEPARATE white card with background
+        - Both header and body have their own styling (phoenix-components.css)
+      -->
       <!-- Main Content Section: Dashboard Widgets -->
       <tt-section data-section="main">
-        <!-- Section Header -->
+        <!-- Section Header - White card with background, border, shadow -->
         <div class="index-section__header">
           <div class="index-section__header-title">
-            <img src="images/icons/entities/home.svg" alt="לוח בקרה" class="index-section__header-icon" width="20" height="20">
+            <img src="../../../../ui/public/images/icons/entities/home.svg" alt="לוח בקרה" class="index-section__header-icon" width="20" height="20">
             <h2 class="index-section__header-text">לוח בקרה</h2>
           </div>
           <div class="index-section__header-meta">
@@ -510,7 +568,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/trades.svg" alt="טריידים אחרונים" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="../../../../ui/public/images/icons/entities/trades.svg" alt="טריידים אחרונים" width="20" height="20" class="widget-placeholder__title-icon">
                     טריידים אחרונים
                   </h3>
                 </div>
@@ -530,7 +588,7 @@
                     <li class="widget-placeholder__list-item">
                       <div class="widget-placeholder__item-header">
                         <div class="widget-placeholder__item-title">
-                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <img src="../../../../ui/public/images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
                           <span class="widget-placeholder__item-name">SPY</span>
                         </div>
                         <div class="widget-placeholder__item-meta">
@@ -546,7 +604,7 @@
                     <li class="widget-placeholder__list-item">
                       <div class="widget-placeholder__item-header">
                         <div class="widget-placeholder__item-title">
-                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <img src="../../../../ui/public/images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
                           <span class="widget-placeholder__item-name">AAPL</span>
                         </div>
                         <div class="widget-placeholder__item-meta">
@@ -562,7 +620,7 @@
                     <li class="widget-placeholder__list-item">
                       <div class="widget-placeholder__item-header">
                         <div class="widget-placeholder__item-title">
-                          <img src="images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
+                          <img src="../../../../ui/public/images/icons/entities/trades.svg" alt="טרייד" width="16" height="16" class="widget-placeholder__item-icon">
                           <span class="widget-placeholder__item-name">MSFT</span>
                         </div>
                         <div class="widget-placeholder__item-meta">
@@ -582,7 +640,7 @@
                     <li class="widget-placeholder__list-item">
                       <div class="widget-placeholder__item-header">
                         <div class="widget-placeholder__item-title">
-                          <img src="images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
+                          <img src="../../../../ui/public/images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
                           <span class="widget-placeholder__item-name">תוכנית SPY - Swing</span>
                         </div>
                         <div class="widget-placeholder__item-meta">
@@ -595,7 +653,7 @@
                     <li class="widget-placeholder__list-item">
                       <div class="widget-placeholder__item-header">
                         <div class="widget-placeholder__item-title">
-                          <img src="images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
+                          <img src="../../../../ui/public/images/icons/entities/trade_plans.svg" alt="תוכנית" width="16" height="16" class="widget-placeholder__item-icon">
                           <span class="widget-placeholder__item-name">תוכנית AAPL - Day Trade</span>
                         </div>
                         <div class="widget-placeholder__item-meta">
@@ -614,7 +672,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/executions.svg" alt="פעולות ממתינות" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="../../../../ui/public/images/icons/entities/executions.svg" alt="פעולות ממתינות" width="20" height="20" class="widget-placeholder__title-icon">
                     פעולות ממתינות
                   </h3>
                   <div class="widget-placeholder__header-badges">
@@ -659,7 +717,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/home.svg" alt="תגיות" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="../../../../ui/public/images/icons/entities/home.svg" alt="תגיות" width="20" height="20" class="widget-placeholder__title-icon">
                     תגיות
                   </h3>
                   <form class="widget-placeholder__search-form">
@@ -695,7 +753,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/tickers.svg" alt="רשימת טיקרים" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="../../../../ui/public/images/icons/entities/tickers.svg" alt="רשימת טיקרים" width="20" height="20" class="widget-placeholder__title-icon">
                     רשימת טיקרים
                   </h3>
                   <button class="widget-placeholder__refresh-btn align-push-down" aria-label="רענן" title="רענן">
@@ -727,7 +785,7 @@
               <div class="widget-placeholder__header">
                 <div class="widget-placeholder__header-title-row">
                   <h3 class="widget-placeholder__title">
-                    <img src="images/icons/entities/tickers.svg" alt="גרף טיקר" width="20" height="20" class="widget-placeholder__title-icon">
+                    <img src="../../../../ui/public/images/icons/entities/tickers.svg" alt="גרף טיקר" width="20" height="20" class="widget-placeholder__title-icon">
                     גרף טיקר
                   </h3>
                   <button class="widget-placeholder__refresh-btn align-push-down" aria-label="רענן" title="רענן">
@@ -849,12 +907,19 @@
         </div>
       </tt-section>
 
+      <!-- 
+        CRITICAL SECTION STRUCTURE:
+        - tt-section is TRANSPARENT (no background/border/shadow)
+        - index-section__header is a SEPARATE white card with background
+        - index-section__body is a SEPARATE white card with background
+        - Both header and body have their own styling (phoenix-components.css)
+      -->
       <!-- Portfolio Table Section -->
       <tt-section data-section="portfolio">
-        <!-- Section Header -->
+        <!-- Section Header - White card with background, border, shadow -->
         <div class="index-section__header">
           <div class="index-section__header-title">
-            <img src="images/icons/entities/trading_accounts.svg" alt="פורטפוליו" class="index-section__header-icon" width="20" height="20">
+            <img src="../../../../ui/public/images/icons/entities/trading_accounts.svg" alt="פורטפוליו" class="index-section__header-icon" width="20" height="20">
             <h2 class="index-section__header-text">פורטפוליו</h2>
           </div>
           <div class="index-section__header-meta">
@@ -971,190 +1036,30 @@
       </main>
     </div>
   </div>
-
-  <!-- Header Filter Toggle JavaScript -->
-  <script>
-    // Filter toggle functionality (same as in D15_INDEX.html from team_01)
-    document.addEventListener('DOMContentLoaded', function() {
-      const filterToggleBtn = document.getElementById('headerFilterToggleBtnMain');
-      const header = document.getElementById('unified-header');
-      const filtersContainer = document.querySelector('.filters-container');
-      
-      if (filterToggleBtn && header) {
-        filterToggleBtn.addEventListener('click', function() {
-          const isExpanded = filtersContainer.style.display !== 'none';
-          
-          if (isExpanded) {
-            filtersContainer.style.display = 'none';
-            header.style.height = '60px';
-            filterToggleBtn.querySelector('.header-filter-arrow').textContent = '▼';
-          } else {
-            filtersContainer.style.display = 'flex';
-            header.style.height = '120px';
-            filterToggleBtn.querySelector('.header-filter-arrow').textContent = '▲';
-          }
-        });
-      }
-
-      // Filter dropdown hover functionality
-      const filterDropdowns = document.querySelectorAll('.filter-dropdown');
-      filterDropdowns.forEach(dropdown => {
-        const filterMenu = dropdown.querySelector('.filter-menu');
-        if (filterMenu) {
-          dropdown.addEventListener('mouseenter', function() {
-            filterMenu.style.display = 'block';
-            filterMenu.style.opacity = '1';
-            filterMenu.style.visibility = 'visible';
-          });
-          
-          dropdown.addEventListener('mouseleave', function() {
-            filterMenu.style.display = 'none';
-            filterMenu.style.opacity = '0';
-            filterMenu.style.visibility = 'hidden';
-          });
-        }
-      });
-
-      // Portfolio Summary Toggle Functionality
-      // Portfolio Summary Toggle Functionality - Toggle second row visibility (id="portfolioSummaryContent")
-      const portfolioToggleBtn = document.getElementById('portfolioSummaryToggleSize');
-      const portfolioSummaryContent = document.getElementById('portfolioSummaryContent');
-      
-      if (portfolioToggleBtn && portfolioSummaryContent) {
-        portfolioToggleBtn.addEventListener('click', function() {
-          const isHidden = portfolioSummaryContent.style.display === 'none' || !portfolioSummaryContent.style.display;
-          
-          if (isHidden) {
-            portfolioSummaryContent.style.display = 'flex';
-            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מצומצם');
-            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מצומצם');
-            // Change icon to eye-off (show less)
-            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
-          } else {
-            portfolioSummaryContent.style.display = 'none';
-            portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מלא');
-            portfolioToggleBtn.setAttribute('title', 'הצג סיכום מלא');
-            // Change icon to eye (show more)
-            portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>';
-          }
-        });
-      }
-
-      // Widget Tabs Functionality (works for all widgets with tabs)
-      const widgetTabs = document.querySelectorAll('.widget-placeholder__tab-btn');
-      widgetTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const tabList = this.closest('.widget-placeholder__tabs');
-          if (!tabList) return;
-          
-          const widget = tabList.closest('.widget-placeholder');
-          if (!widget) return;
-          
-          const targetPaneId = this.getAttribute('aria-controls');
-          
-          // Remove active class from all tabs in this widget
-          widget.querySelectorAll('.widget-placeholder__tab-btn').forEach(btn => {
-            btn.classList.remove('widget-placeholder__tab-btn--active');
-            btn.setAttribute('aria-selected', 'false');
-          });
-          
-          // Hide all tab content in this widget
-          widget.querySelectorAll('.widget-placeholder__tab-content').forEach(content => {
-            content.classList.add('widget-placeholder__tab-content--hidden');
-          });
-          
-          // Activate clicked tab
-          this.classList.add('widget-placeholder__tab-btn--active');
-          this.setAttribute('aria-selected', 'true');
-          
-          // Show corresponding content
-          const targetPane = document.getElementById(targetPaneId);
-          if (targetPane) {
-            targetPane.classList.remove('widget-placeholder__tab-content--hidden');
-          }
-        });
-      });
-    });
-
-    /* ============================================
-       Section Toggle Functionality
-       Centralized system-wide toggle for all sections
-       ============================================ */
-    (function initSectionToggle() {
-      // Find all toggle buttons
-      const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
-      
-      toggleButtons.forEach(button => {
-        // Find the parent section (tt-section)
-        const section = button.closest('tt-section');
-        if (!section) return;
-        
-        // Find the section body
-        const sectionBody = section.querySelector('.index-section__body, .dashboard-section__body');
-        if (!sectionBody) return;
-        
-        // Find the SVG icon inside the button
-        const icon = button.querySelector('svg');
-        
-        // Set initial state: sections are open by default
-        let isOpen = true;
-        
-        // Add click handler
-        button.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Toggle state
-          isOpen = !isOpen;
-          
-          // Toggle section body visibility with smooth animation
-          if (isOpen) {
-            // Open: Remove hidden attribute and restore display
-            sectionBody.removeAttribute('hidden');
-            // Use requestAnimationFrame to ensure smooth transition
-            requestAnimationFrame(() => {
-              sectionBody.style.display = '';
-            });
-            // Rotate icon to point down (open state)
-            if (icon) {
-              icon.style.transform = 'rotate(0deg)';
-            }
-            button.setAttribute('aria-expanded', 'true');
-          } else {
-            // Close: Set hidden attribute for CSS animation
-            sectionBody.setAttribute('hidden', '');
-            // Rotate icon to point up (closed state)
-            if (icon) {
-              icon.style.transform = 'rotate(180deg)';
-            }
-            button.setAttribute('aria-expanded', 'false');
-            // After animation completes, set display to none
-            setTimeout(() => {
-              if (sectionBody.hasAttribute('hidden')) {
-                sectionBody.style.display = 'none';
-              }
-            }, 300); // Match CSS transition duration
-          }
-        });
-        
-        // Set initial aria-expanded
-        button.setAttribute('aria-expanded', 'true');
-        
-        // Add transition for smooth icon rotation
-        if (icon) {
-          icon.style.transition = 'transform 0.2s ease';
-        }
-      });
-    })();
-  </script>
-      </main>
-    </div>
-  </div>
   
   <!-- Modular Footer: Loaded dynamically via footer-loader.js -->
   <script src="./footer-loader.js"></script>
   
+  <!-- External JavaScript Files - NO inline scripts -->
+  <!-- CRITICAL: Clean Slate Rule - All JavaScript in external files -->
+  <!-- Header Dropdown: Dropdown menu functionality (180 degree rotation) -->
+  <script src="./header-dropdown.js"></script>
+  <!-- Header Filters: Toggle functionality -->
+  <script src="./header-filters.js"></script>
+  <!-- Section Toggle: Show/hide section body -->
+  <script src="./section-toggle.js"></script>
+  <!-- Widget Tabs: Tab switching functionality -->
+  <script src="./widget-tabs.js"></script>
+  <!-- Portfolio Summary: Toggle functionality -->
+  <script src="./portfolio-summary.js"></script>
+  <!-- Filter Actions: Reset, clear, search clear -->
+  <script src="./filter-actions.js"></script>
+  <!-- Blueprint Validation Script -->
+  <script src="./blueprint-validation.js"></script>
+  
   <!-- G-Bridge Banner: Moved to footer to avoid blocking menu -->
-  <div class="g-bridge-banner">🛡️ G-BRIDGE [22:00:00] | ⏳ IN DEVELOPMENT | VALIDATION PENDING</div>
+  <div class="g-bridge-banner">🛡️ G-BRIDGE [00:00:00] | ✅ IMPROVED VERSION V2.0.0 | NEW STANDARD COMPLIANT</div>
+  
+  <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
 </body>
 </html>

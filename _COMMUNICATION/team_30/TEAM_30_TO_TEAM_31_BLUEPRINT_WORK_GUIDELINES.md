@@ -331,7 +331,7 @@
 - **תבנית V3:** `ui/src/components/HomePage.jsx` (דוגמה ליישום)
 - **קבצי CSS:** `ui/src/styles/` (phoenix-base.css, phoenix-components.css, phoenix-header.css, D15_DASHBOARD_STYLES.css)
 - **תמונות:** `ui/public/images/` (אייקונים ולוגו)
-- **תהליך עבודה:** `documentation/05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
 
 ---
 

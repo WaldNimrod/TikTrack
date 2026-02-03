@@ -139,7 +139,7 @@
 
 | עמוד | תיאור | סטטוס | שלב עבודה | תת-משימות | הערות |
 |------|-------|--------|-----------|-----------|-------|
-| **D16_ACCTS_VIEW** | ניהול חשבונות | 🔄 **BLUEPRINT READY** | Phase 1.6 | Blueprint Ready<br>Rebuild Pending | Blueprint: ✅ Ready (Team 01 + Team 31)<br>Status: Awaiting CSS Refactor + Template Update |
+| **D16_ACCTS_VIEW** | ניהול חשבונות | 🟢 **READY TO START** | Phase 1.6 | Blueprint Ready<br>Stage 2 Complete | Blueprint: ✅ Ready (Team 01 + Team 31)<br>Stage 2: ✅ Complete & Approved (2026-02-02)<br>Status: Ready to start implementation |
 | **D18_BRKRS_VIEW** | ניהול ברוקרים | ⏸️ **PENDING** | Future | - | Not started |
 | **D21_CASH_VIEW** | תזרים מזומנים | ⏸️ **PENDING** | Future | - | Not started |
 
@@ -192,15 +192,15 @@
     - ✅ כל הוויגיטים עם תוכן דמה
     - ✅ פונקציונליות מלאה (Section Toggle, Portfolio Summary, Widget Tabs)
     - ✅ **APPROVED** - דף הבית אושר על ידי Team 50 (100% תקין) - 2026-02-02
-  - שלב 2: תיקון היררכיית CSS ✅ **COMPLETE** (2026-02-02)
+  - שלב 2: תיקון היררכיית CSS ✅ **COMPLETE & APPROVED** (2026-02-02)
     - ✅ CSS Audit Complete (Tasks 2.1 & 2.2) - 2026-02-01
     - ✅ Approval Given (Task 2.3) - 2026-02-01
     - ✅ Implementation Complete (Task 2.3) - 2026-02-02 (Team 40)
     - ✅ CSS_CLASSES_INDEX.md Updated (Task 2.4) - 2026-02-02 (Team 40)
     - ✅ Components Library Complete (Task 2.5) - 2026-02-02 (Team 30 - AuthForm)
-    - ⏳ **Final QA Pending** - Team 50 מבצע ולידציה סופית מקיפה
-  - שלב 3: בנייה מחדש של עמודים קיימים ⏸️ PENDING (After Stage 2 QA Approval)
-  - שלב 4: מעבר ל-D16_ACCTS_VIEW ⏸️ PENDING (After Stage 2 QA Approval)
+    - ✅ **Final QA Complete** - Team 50 אישר את כל העמודים (100% APPROVED) - 2026-02-02
+  - שלב 3: בנייה מחדש של עמודים קיימים ⏸️ PENDING (Optional - לפי צורך)
+  - שלב 4: מעבר ל-D16_ACCTS_VIEW 🟢 **READY TO START** (After Stage 2 Approval)
 
 ---
 

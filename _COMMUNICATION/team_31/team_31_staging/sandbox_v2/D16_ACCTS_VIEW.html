@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.12]</title>
+  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.13]</title>
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        ============================================
@@ -465,6 +465,21 @@
       background: var(--apple-bg-secondary, #f5f5f7);
     }
     
+    /* CRITICAL: Second row display - flex layout */
+    .info-summary__row--second {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md, 16px);
+      margin: 0;
+      padding: var(--spacing-sm, 8px) 0;
+      border-top: 1px solid var(--apple-border-light, #e5e5e5);
+    }
+    
+    .info-summary__row--second span {
+      margin: 0;
+      padding: 0;
+    }
+    
     /* CRITICAL: Remove default margin-bottom of 14.720px from active-alerts__mark_read */
     .active-alerts__mark_read {
       margin: 0 !important; /* Remove default margin-bottom of 14.720px */
@@ -548,6 +563,24 @@
     .btn.btn-view-alert {
       margin: 0 !important; /* Remove default margin-bottom of 14.720px */
       padding: 0;
+      align-self: flex-start !important; /* Align to top */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* CRITICAL: Ensure active-alerts__details container aligns to top */
+    .active-alerts__details {
+      display: flex;
+      align-items: flex-start !important; /* Align to top */
+      justify-content: flex-end;
+    }
+    
+    /* CRITICAL: Ensure active-alerts__details container aligns items to top */
+    .active-alerts__details {
+      display: flex;
+      align-items: flex-start; /* Align to top */
+      justify-content: flex-end;
     }
       margin: 0 !important; /* Remove default margin-bottom of 14.720px */
       padding: 0;
@@ -796,7 +829,7 @@
     Phoenix-Blueprint-Ver: v1.0.0 | Trading Accounts Page Blueprint
     ============================================
     Sync-Time: 2026-02-02 12:00:00 IST
-    Version-Tracker: v1.0.12 (Fixed: margin spacing for active-alerts__title-trigger and btn-view-alert, account movements summary cards layout, internal filters width, badges for account dates, current price column format, P/L column format, added account-value and holdings-value columns)
+    Version-Tracker: v1.0.13 (Fixed: btn-view-alert vertical alignment to top, restored portfolio summary second row toggle functionality)
     Team: Team 31 (Blueprint)
     Status: ✅ BLUEPRINT READY FOR TEAM 30
     Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
@@ -1165,7 +1198,7 @@
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="../../../../ui/public/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.12]</span></h1>
+                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.13]</span></h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">3 התראות פעילות</span>
@@ -1352,16 +1385,20 @@
                       <div>חשבונות פעילים: <strong id="activeAccounts">2</strong></div>
                       <div>יתרה כוללת: <strong id="totalBalance"><span class="numeric-value-positive" dir="ltr">$196,700.42</span></strong></div>
                       <div>רווח/הפסד כולל: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$2,450.30</span></strong></div>
-                      <button class="portfolio-summary__toggle-btn" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
-                        <!-- Note: Toggle functionality removed - second row doesn't exist in actual page -->
+                      <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
                           <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
                         </svg>
                       </button>
                     </div>
-                    <!-- Second Row: Portfolio Summary (REMOVED - not in actual page) -->
-                    <!-- Note: This row was removed as it doesn't exist in the actual page -->
+                    <!-- Second Row: Portfolio Summary (hidden by default) -->
+                    <div class="info-summary__row info-summary__row--second" id="portfolioSummaryContent" style="display: none;">
+                      <span>פוזיציות פעילות: 5</span>
+                      <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$196,700.42</span></span>
+                      <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$98,350.21</span></span>
+                      <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$2,450.30</span></span>
+                    </div>
                   </div>
                   
                 </div>
@@ -3313,12 +3350,68 @@
     console.log('✅ [Table Sort] Script COMPLETED!');
   </script>
   
+  <!-- Portfolio Summary Toggle JavaScript -->
+  <script>
+    /* ============================================
+       Portfolio Summary Toggle Functionality
+       Toggles the second row of info-summary on button click
+       ============================================ */
+    function initPortfolioSummaryToggle() {
+      const toggleButton = document.getElementById('portfolioSummaryToggleSize');
+      const summaryContent = document.getElementById('portfolioSummaryContent');
+      
+      if (!toggleButton || !summaryContent) {
+        console.warn('⚠️ [Portfolio Summary Toggle] Elements not found');
+        return;
+      }
+      
+      console.log('🔍 [Portfolio Summary Toggle] Initializing...', {
+        hasButton: !!toggleButton,
+        hasContent: !!summaryContent
+      });
+      
+      toggleButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isHidden = summaryContent.style.display === 'none' || 
+                        summaryContent.style.display === '' ||
+                        window.getComputedStyle(summaryContent).display === 'none';
+        
+        console.log('🖱️ [Portfolio Summary Toggle] Clicked!', {
+          isHidden: isHidden,
+          currentDisplay: summaryContent.style.display,
+          computedDisplay: window.getComputedStyle(summaryContent).display
+        });
+        
+        if (isHidden) {
+          summaryContent.style.display = 'flex';
+          toggleButton.setAttribute('aria-expanded', 'true');
+          toggleButton.setAttribute('title', 'הסתר סיכום מלא');
+          console.log('✅ [Portfolio Summary Toggle] Showing second row');
+        } else {
+          summaryContent.style.display = 'none';
+          toggleButton.setAttribute('aria-expanded', 'false');
+          toggleButton.setAttribute('title', 'הצג סיכום מלא');
+          console.log('✅ [Portfolio Summary Toggle] Hiding second row');
+        }
+      });
+      
+      console.log('✅ [Portfolio Summary Toggle] Event listener attached');
+    }
+    
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPortfolioSummaryToggle);
+    } else {
+      // DOM already loaded
+      initPortfolioSummaryToggle();
+    }
+  </script>
+  
   <!-- G-Bridge Banner: Fixed to bottom -->
   <div class="g-bridge-banner">🛡️ G-BRIDGE v2.1 [2026-02-01] | ✅ APPROVED | FIDELITY READY</div>
   
   <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
-  
-  <!-- Portfolio Summary Toggle Functionality - REMOVED -->
-  <!-- Note: Second row (portfolioSummaryContent) was removed as it doesn't exist in the actual page -->
 </body>
 </html>

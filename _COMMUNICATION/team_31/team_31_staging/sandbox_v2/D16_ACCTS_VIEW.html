@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.9]</title>
+  <title>חשבונות מסחר | TikTrack Phoenix - Blueprint [v1.0.12]</title>
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        ============================================
@@ -27,15 +27,61 @@
   <link rel="stylesheet" href="../../../../ui/src/styles/D15_DASHBOARD_STYLES.css">
   
   <!-- Additional CSS files (if needed) -->
-  <!-- Note: These may need to be added to system or linked from staging -->
-  <link rel="stylesheet" href="../phoenix-cards.css">
-  <link rel="stylesheet" href="../phoenix-tables.css">
-  <link rel="stylesheet" href="../account-movements-summary-cards.css">
+  <!-- Note: These files are in staging - check if they exist before linking -->
+  <!-- <link rel="stylesheet" href="../phoenix-cards.css"> -->
+  <!-- <link rel="stylesheet" href="../phoenix-tables.css"> -->
+  <!-- <link rel="stylesheet" href="../account-movements-summary-cards.css"> -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* ============================================
        COMPREHENSIVE FIXES: All styling issues from source CSS differences
        ============================================ */
+    
+    /* ============================================
+       SYSTEM-WIDE DEFAULT: Zero spacing (margin/padding) by default
+       ============================================
+       CRITICAL: This is a fundamental system-wide rule.
+       All elements have margin: 0 and padding: 0 by default.
+       Spacing must be applied explicitly using standard spacing classes.
+       ============================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* ============================================
+       STANDARD SPACING CLASSES (CRITICAL - USE THESE FOR CONSISTENCY)
+       ============================================
+       These classes provide consistent spacing throughout the system.
+       Use these instead of inline margins/padding.
+       
+       Classes:
+       - .spacing-xs: 2px   (Very small)
+       - .spacing-sm: 4px   (Small)
+       - .spacing-md: 8px   (Regular)
+       - .spacing-lg: 10px  (Large)
+       - .spacing-xl: 12px  (Very large)
+       
+       Usage:
+       - .padding-xs: padding: 2px
+       - .padding-sm: padding: 4px
+       - .margin-xs: margin: 2px
+       - .margin-sm: margin: 4px
+       ============================================ */
+    .spacing-xs, .padding-xs { padding: 2px; }
+    .spacing-sm, .padding-sm { padding: 4px; }
+    .spacing-md, .padding-md { padding: 8px; }
+    .spacing-lg, .padding-lg { padding: 10px; }
+    .spacing-xl, .padding-xl { padding: 12px; }
+    
+    .margin-xs { margin: 2px; }
+    .margin-sm { margin: 4px; }
+    .margin-md { margin: 8px; }
+    .margin-lg { margin: 10px; }
+    .margin-xl { margin: 12px; }
+    
+    /* Re-apply spacing only where explicitly needed via CSS classes */
     
     /* 1. ALL NUMERIC COLUMNS - Center aligned by default */
     .phoenix-table__cell--numeric,
@@ -43,9 +89,11 @@
     .phoenix-table__cell.col-balance,
     .phoenix-table__cell.col-amount,
     .phoenix-table__cell.col-total-pl,
+    /* CRITICAL: Current price column - center aligned, always shows price + daily change */
     .phoenix-table__cell.col-current_price,
     .phoenix-table__cell.col-avg-price,
     .phoenix-table__cell.col-market-value,
+    /* CRITICAL: P/L column - always shows numeric value + percentage, one decimal place */
     .phoenix-table__cell.col-unrealized-pl,
     .phoenix-table__cell.col-percent-account,
     .phoenix-table__cell.col-quantity,
@@ -150,13 +198,13 @@
     
     .table-actions-menu {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      inset-inline-end: 100%;
+      top: 0;
+      /* RTL: Menu opens to the right (end) of button, move 2-3px left (towards end of line) */
+      inset-inline-end: calc(100% + 1px); /* Very close to trigger button - moved 2-3px left from 4px */
       display: flex;
       flex-direction: row;
       gap: 3px;
-      padding: 4px; /* Padding 4px for container */
+      padding: 4px; /* Padding 4px for container only - using standard spacing-sm */
       background: var(--apple-bg-primary, #FFFFFF);
       border: 1px solid var(--apple-border-light, #E5E5EA);
       border-radius: var(--apple-radius-small, 6px);
@@ -166,8 +214,8 @@
       visibility: hidden;
       pointer-events: none;
       transition: opacity 0.2s ease, visibility 0.2s ease;
-      transition-delay: 0.15s; /* Delay for closing */
-      margin-inline-end: 4px;
+      transition-delay: 0.5s; /* Increased delay for closing - easier to catch */
+      margin: 0; /* No margin */
     }
     
     .table-actions-tooltip:hover .table-actions-menu,
@@ -187,7 +235,7 @@
     
     /* Delay closing when mouse leaves */
     .table-actions-tooltip:not(:hover):not(:focus-within) .table-actions-menu {
-      transition-delay: 0.15s; /* Delay before closing */
+      transition-delay: 0.5s; /* Increased delay before closing - easier to catch */
     }
     
     .table-actions-trigger {
@@ -217,6 +265,7 @@
       width: 28px;
       height: 28px;
       padding: 0;
+      margin: 0;
       border: 1px solid var(--apple-border-light, #E5E5EA);
       background: var(--apple-bg-primary, #FFFFFF);
       color: var(--apple-text-secondary, #3C3C43);
@@ -331,7 +380,8 @@
       justify-content: center;
       min-width: 32px;
       height: 25px;
-      padding: 0 var(--spacing-xs, 4px);
+      padding: 0;
+      margin: 0;
       border: 1px solid var(--apple-border-light, #E5E5EA);
       border-radius: var(--apple-radius-small, 6px);
       background: var(--apple-bg-primary, #FFFFFF);
@@ -401,6 +451,7 @@
       width: 32px;
       height: 32px;
       padding: 0;
+      margin: 0; /* CRITICAL: Remove default margin-bottom of 14.720px */
       background: transparent;
       border: 1px solid var(--apple-border-light, #e5e5e5);
       border-radius: 4px;
@@ -414,25 +465,242 @@
       background: var(--apple-bg-secondary, #f5f5f7);
     }
     
-    .info-summary__row--second {
-      display: none; /* Hidden by default */
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--spacing-lg, 24px);
-      justify-content: flex-start;
-      width: 100%;
-      margin-top: var(--spacing-md, 16px);
+    /* CRITICAL: Remove default margin-bottom of 14.720px from active-alerts__mark_read */
+    .active-alerts__mark_read {
+      margin: 0 !important; /* Remove default margin-bottom of 14.720px */
+      padding: 0;
     }
     
-    /* When JS sets display: flex, override the default */
-    .info-summary__row--second[style*="flex"] {
-      display: flex !important;
+    /* CRITICAL: Account by Dates - Badges with color by positive/negative */
+    .phoenix-table__cell.col-type[data-type-positive="true"] {
+      color: var(--apple-green, #34C759);
     }
     
-    /* Also support when style attribute is removed or changed */
-    .info-summary__row--second:not([style*="none"]) {
+    .phoenix-table__cell.col-type[data-type-positive="false"] {
+      color: var(--apple-red, #FF3B30);
+    }
+    
+    /* CRITICAL: Account by Dates - Badge with color spectrum for operation types */
+    .phoenix-table__cell.col-subtype {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid currentColor;
+    }
+    
+    .phoenix-table__cell.col-subtype[data-type-positive="true"] {
+      background: rgba(52, 199, 89, 0.1);
+      border-color: var(--apple-green, #34C759);
+      color: var(--apple-green, #34C759);
+    }
+    
+    .phoenix-table__cell.col-subtype[data-type-positive="false"] {
+      background: rgba(255, 59, 48, 0.1);
+      border-color: var(--apple-red, #FF3B30);
+      color: var(--apple-red, #FF3B30);
+    }
+    
+    /* CRITICAL: Current price display - always shows price + daily change */
+    .current-price-display {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin: 0;
+      padding: 0;
     }
+    
+    .current-price-display .numeric-value-positive,
+    .current-price-display .numeric-value-negative {
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* CRITICAL: P/L column - always shows numeric value + percentage, one decimal place */
+    .phoenix-table__cell.col-unrealized-pl .pl-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .phoenix-table__cell.col-unrealized-pl .pl-value {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .phoenix-table__cell.col-unrealized-pl .pl-percentage {
+      margin: 0;
+      padding: 0;
+      font-size: 0.85em;
+    }
+    
+    /* CRITICAL: Remove default margin-bottom of 14.720px from active-alerts__title-trigger */
+    .active-alerts__title-trigger {
+      margin: 0 !important; /* Remove default margin-bottom of 14.720px */
+      padding: 0;
+    }
+    
+    /* CRITICAL: Remove default margin-bottom of 14.720px from btn-view-alert */
+    .btn.btn-view-alert {
+      margin: 0 !important; /* Remove default margin-bottom of 14.720px */
+      padding: 0;
+    }
+      margin: 0 !important; /* Remove default margin-bottom of 14.720px */
+      padding: 0;
+    }
+    
+    /* 9. ACCOUNT MOVEMENTS SUMMARY CARDS - Fix broken card layout */
+    /* CRITICAL: Account Movements Summary Cards - Grid layout for cards */
+    .account-movements-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md, 16px);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .summary-card {
+      margin: 0;
+      padding: var(--spacing-md, 16px);
+      background: var(--apple-bg-elevated, #ffffff);
+      border: 1px solid var(--apple-border-light, #e5e5e5);
+      border-radius: var(--apple-radius-medium, 10px);
+    }
+    
+    /* CRITICAL: Internal filters - remove width: 100% that breaks layout */
+    .phoenix-table-filters {
+      width: auto !important; /* Remove 100% width */
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm, 8px);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .phoenix-table-filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs, 4px);
+      margin: 0;
+      padding: 0;
+      width: auto !important; /* Remove 100% width */
+    }
+    
+    .phoenix-table-filter-select,
+    .phoenix-table-filter-input {
+      width: auto !important; /* Remove 100% width */
+      min-width: 150px;
+      margin: 0;
+      padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    }
+      margin: 0;
+      padding: 0;
+    }
+    
+    .summary-card {
+      margin: 0;
+      padding: var(--spacing-md, 16px);
+      background: var(--apple-bg-elevated, #ffffff);
+      border: 1px solid var(--apple-border-light, #e5e5e5);
+      border-radius: var(--apple-radius-medium, 10px);
+    }
+    
+    /* 10. INTERNAL FILTERS - Fix width 100% issue */
+    .phoenix-table-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md, 16px);
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      width: auto; /* Not 100% - let content determine width */
+    }
+    
+    .phoenix-table-filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs, 8px);
+      margin: 0;
+      padding: 0;
+      width: auto; /* Not 100% - let content determine width */
+    }
+    
+    .phoenix-table-filter-select,
+    .phoenix-table-filter-input {
+      width: auto; /* Not 100% - let content determine width */
+      min-width: 150px; /* Minimum width for usability */
+    }
+    
+    /* 11. POSITIONS TABLE - Current price column center aligned + format */
+    .phoenix-table__cell.col-current_price {
+      text-align: center !important;
+    }
+    
+    /* Current price format: price + daily change (e.g., 100.34$(+3.22%)) */
+    .phoenix-table__cell.col-current_price .current-price-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    
+    /* 12. ACCOUNT BY DATES - Badges for operation types */
+    .phoenix-table__cell.col-type,
+    .phoenix-table__cell.col-subtype {
+      /* Badges will be styled based on data-type-positive attribute */
+    }
+    
+    /* Positive operation type badge (green) */
+    .phoenix-table__cell[data-type-positive="true"] .operation-type-badge {
+      background: rgba(52, 199, 89, 0.1) !important;
+      border: 1px solid var(--apple-green, #34C759) !important;
+      color: var(--apple-green, #34C759) !important;
+      padding: 2px 8px !important;
+      border-radius: 4px !important;
+      display: inline-block !important;
+    }
+    
+    /* Negative operation type badge (red) */
+    .phoenix-table__cell[data-type-positive="false"] .operation-type-badge {
+      background: rgba(255, 59, 48, 0.1) !important;
+      border: 1px solid var(--apple-red, #FF3B30) !important;
+      color: var(--apple-red, #FF3B30) !important;
+      padding: 2px 8px !important;
+      border-radius: 4px !important;
+      display: inline-block !important;
+    }
+    
+    /* Operation type color palette badges */
+    .operation-type-badge[data-operation-type="deposit"] {
+      background: rgba(52, 199, 89, 0.1) !important;
+      border-color: var(--apple-green, #34C759) !important;
+      color: var(--apple-green, #34C759) !important;
+    }
+    
+    .operation-type-badge[data-operation-type="withdrawal"] {
+      background: rgba(255, 59, 48, 0.1) !important;
+      border-color: var(--apple-red, #FF3B30) !important;
+      color: var(--apple-red, #FF3B30) !important;
+    }
+    
+    .operation-type-badge[data-operation-type="transfer"] {
+      background: rgba(0, 122, 255, 0.1) !important;
+      border-color: var(--apple-blue, #007AFF) !important;
+      color: var(--apple-blue, #007AFF) !important;
+    }
+    
+    .operation-type-badge[data-operation-type="execution"] {
+      background: rgba(255, 149, 0, 0.1) !important;
+      border-color: var(--apple-orange, #FF9500) !important;
+      color: var(--apple-orange, #FF9500) !important;
+    }
+    
+    /* Second row removed - doesn't exist in actual page */
     
     .info-summary strong {
       color: var(--apple-text-primary, #1d1d1f);
@@ -528,7 +796,7 @@
     Phoenix-Blueprint-Ver: v1.0.0 | Trading Accounts Page Blueprint
     ============================================
     Sync-Time: 2026-02-02 12:00:00 IST
-    Version-Tracker: v1.0.9 (Updated to V2 Workflow - Live CSS files, explicit comments)
+    Version-Tracker: v1.0.12 (Fixed: margin spacing for active-alerts__title-trigger and btn-view-alert, account movements summary cards layout, internal filters width, badges for account dates, current price column format, P/L column format, added account-value and holdings-value columns)
     Team: Team 31 (Blueprint)
     Status: ✅ BLUEPRINT READY FOR TEAM 30
     Compliance: RTL Charter ✅ | DNA Sync ✅ | LEGO System ✅ | CSS Standards Protocol ✅
@@ -576,6 +844,60 @@
     - `tt-section`: `background: transparent;`
     - `.index-section__header`: `background: var(--apple-bg-elevated, #ffffff);`
     - `.index-section__body`: `background: var(--apple-bg-elevated, #ffffff);`
+    
+    ============================================
+    SYSTEM-WIDE DEFAULT RULES (CRITICAL - MUST IMPLEMENT)
+    ============================================
+    **CRITICAL:** These are fundamental system-wide rules that MUST be implemented
+    in the actual system CSS files. These rules ensure consistency and prevent
+    spacing issues throughout the application.
+    
+    1. **Zero Spacing Default:**
+       ```css
+       * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+       }
+       ```
+       All elements have margin: 0 and padding: 0 by default.
+       Spacing must be applied explicitly using standard spacing classes.
+    
+    2. **Standard Spacing Classes:**
+       These classes provide consistent spacing throughout the system.
+       Use these instead of inline margins/padding or hardcoded values.
+       
+       Classes:
+       - .spacing-xs / .padding-xs: 2px   (Very small)
+       - .spacing-sm / .padding-sm: 4px   (Small)
+       - .spacing-md / .padding-md: 8px   (Regular)
+       - .spacing-lg / .padding-lg: 10px  (Large)
+       - .spacing-xl / .padding-xl: 12px  (Very large)
+       
+       Implementation:
+       ```css
+       .spacing-xs, .padding-xs { padding: 2px; }
+       .spacing-sm, .padding-sm { padding: 4px; }
+       .spacing-md, .padding-md { padding: 8px; }
+       .spacing-lg, .padding-lg { padding: 10px; }
+       .spacing-xl, .padding-xl { padding: 12px; }
+       
+       .margin-xs { margin: 2px; }
+       .margin-sm { margin: 4px; }
+       .margin-md { margin: 8px; }
+       .margin-lg { margin: 10px; }
+       .margin-xl { margin: 12px; }
+       ```
+    
+    3. **Cleanup Required:**
+       - Remove all hardcoded margin-bottom values (e.g., 14.720px)
+       - Remove duplicate spacing definitions
+       - Use standard spacing classes instead of inline styles
+       - Ensure all buttons and interactive elements have margin: 0 and padding: 0
+         unless explicitly styled with spacing classes
+    
+    **IMPORTANT:** Team 30 must implement these rules in the system CSS files
+    and clean up old duplicate spacing definitions.
     
     ============================================
   -->
@@ -843,7 +1165,7 @@
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="../../../../ui/public/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.9]</span></h1>
+                <h1 class="index-section__header-text">חשבונות מסחר <span style="font-size: 0.7em; color: var(--apple-text-secondary, #3C3C43); font-weight: normal;">[v1.0.12]</span></h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">3 התראות פעילות</span>
@@ -1030,20 +1352,16 @@
                       <div>חשבונות פעילים: <strong id="activeAccounts">2</strong></div>
                       <div>יתרה כוללת: <strong id="totalBalance"><span class="numeric-value-positive" dir="ltr">$196,700.42</span></strong></div>
                       <div>רווח/הפסד כולל: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">+$2,450.30</span></strong></div>
-                      <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                      <button class="portfolio-summary__toggle-btn" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                        <!-- Note: Toggle functionality removed - second row doesn't exist in actual page -->
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
                           <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
                         </svg>
                       </button>
                     </div>
-                    <!-- Second Row: Portfolio Summary (hidden by default) -->
-                    <div class="info-summary__row info-summary__row--second" id="portfolioSummaryContent" style="display: none;">
-                      <span>פוזיציות פעילות: 5</span>
-                      <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$196,700.42</span></span>
-                      <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$98,350.21</span></span>
-                      <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">+$2,450.30</span></span>
-                    </div>
+                    <!-- Second Row: Portfolio Summary (REMOVED - not in actual page) -->
+                    <!-- Note: This row was removed as it doesn't exist in the actual page -->
                   </div>
                   
                 </div>
@@ -1133,7 +1451,25 @@
                               </svg>
                             </span>
                           </th>
-                          <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="status" data-sort-type="string" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
+                          <th class="phoenix-table__header col-account-value js-table-sort-trigger" data-sortable="true" data-sort-key="account_value" data-sort-type="numeric" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שווי חשבון</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-holdings-value js-table-sort-trigger" data-sortable="true" data-sort-key="holdings_value" data-sort-type="numeric" data-column-index="6" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שווי אחזקות</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="status" data-sort-type="string" data-column-index="7" role="columnheader" aria-sort="none" tabindex="0">
                             <span class="phoenix-table__header-text">סטטוס</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1142,7 +1478,7 @@
                               </svg>
                             </span>
                           </th>
-                          <th class="phoenix-table__header col-updated js-table-sort-trigger" data-sortable="true" data-sort-key="updated" data-sort-type="date" data-column-index="6" role="columnheader" aria-sort="none" tabindex="0">
+                          <th class="phoenix-table__header col-updated js-table-sort-trigger" data-sortable="true" data-sort-key="updated" data-sort-type="date" data-column-index="8" role="columnheader" aria-sort="none" tabindex="0">
                             <span class="phoenix-table__header-text">עודכן</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1167,6 +1503,12 @@
                           <td class="phoenix-table__cell col-positions phoenix-table__cell--numeric" data-field="positions">5</td>
                           <td class="phoenix-table__cell col-total-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="total_pl" data-currency="USD">
                             <span class="numeric-value-positive" dir="ltr">+$2,450.30</span>
+                          </td>
+                          <td class="phoenix-table__cell col-account-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="account_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$142,500.42</span>
+                          </td>
+                          <td class="phoenix-table__cell col-holdings-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="holdings_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$98,250.00</span>
                           </td>
                           <td class="phoenix-table__cell col-status phoenix-table__cell--status" data-field="status">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>
@@ -1272,6 +1614,12 @@
                           <td class="phoenix-table__cell col-total-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="total_pl" data-currency="USD">
                             <span class="numeric-value-negative" dir="ltr">-$1,250.80</span>
                           </td>
+                          <td class="phoenix-table__cell col-account-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="account_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$87,320.15</span>
+                          </td>
+                          <td class="phoenix-table__cell col-holdings-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="holdings_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$65,200.00</span>
+                          </td>
                           <td class="phoenix-table__cell col-status phoenix-table__cell--status" data-field="status">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>
                           </td>
@@ -1323,6 +1671,12 @@
                           <td class="phoenix-table__cell col-positions phoenix-table__cell--numeric" data-field="positions">3</td>
                           <td class="phoenix-table__cell col-total-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="total_pl" data-currency="USD">
                             <span class="numeric-value-positive" dir="ltr">+$450.25</span>
+                          </td>
+                          <td class="phoenix-table__cell col-account-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="account_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$10,000.00</span>
+                          </td>
+                          <td class="phoenix-table__cell col-holdings-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="holdings_value" data-currency="USD">
+                            <span class="numeric-value-positive" dir="ltr">$7,500.00</span>
                           </td>
                           <td class="phoenix-table__cell col-status phoenix-table__cell--status" data-field="status">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">לא פעיל</span>
@@ -1376,6 +1730,12 @@
                           <td class="phoenix-table__cell col-total-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="total_pl" data-currency="USDT">
                             <span class="numeric-value-positive" dir="ltr">+₮1,200.50</span>
                           </td>
+                          <td class="phoenix-table__cell col-account-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="account_value" data-currency="USDT">
+                            <span class="numeric-value-positive" dir="ltr">₮25,450.00</span>
+                          </td>
+                          <td class="phoenix-table__cell col-holdings-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="holdings_value" data-currency="USDT">
+                            <span class="numeric-value-positive" dir="ltr">₮18,200.00</span>
+                          </td>
                           <td class="phoenix-table__cell col-status phoenix-table__cell--status" data-field="status">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>
                           </td>
@@ -1427,6 +1787,12 @@
                           <td class="phoenix-table__cell col-positions phoenix-table__cell--numeric" data-field="positions">7</td>
                           <td class="phoenix-table__cell col-total-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="total_pl" data-currency="EUR">
                             <span class="numeric-value-negative" dir="ltr">-€320.15</span>
+                          </td>
+                          <td class="phoenix-table__cell col-account-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="account_value" data-currency="EUR">
+                            <span class="numeric-value-positive" dir="ltr">€45,230.75</span>
+                          </td>
+                          <td class="phoenix-table__cell col-holdings-value phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="holdings_value" data-currency="EUR">
+                            <span class="numeric-value-positive" dir="ltr">€38,500.00</span>
                           </td>
                           <td class="phoenix-table__cell col-status phoenix-table__cell--status" data-field="status">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>
@@ -2240,7 +2606,7 @@
                               </svg>
                             </span>
                           </th>
-                          <th class="phoenix-table__header col-ticker js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
+                          <th class="phoenix-table__header col-current_price js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
                             <span class="phoenix-table__header-text">נוכחי</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2314,8 +2680,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/AAPL" class="ticker-link">AAPL</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$155.75</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-positive" dir="ltr">$155.34</span>
+                              <span class="numeric-value-positive" dir="ltr" style="font-size: 0.85em;">(+3.22%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--long">Long</span>
@@ -2328,7 +2697,10 @@
                             <span class="numeric-value-positive" dir="ltr">$15,575.00</span>
                           </td>
                           <td class="phoenix-table__cell col-unrealized-pl phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="unrealized_pl" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">+$550.00</span>
+                            <div class="pl-display">
+                              <span class="pl-value numeric-value-positive" dir="ltr">+$550.0</span>
+                              <span class="pl-percentage numeric-value-positive" dir="ltr">(+3.5%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-percent-account phoenix-table__cell--numeric" data-field="percent_account">10.9%</td>
                           <td class="phoenix-table__cell col-actions phoenix-table__cell--actions" data-field="actions">
@@ -2373,8 +2745,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/MSFT" class="ticker-link">MSFT</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$380.50</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-positive" dir="ltr">$380.50</span>
+                              <span class="numeric-value-positive" dir="ltr" style="font-size: 0.85em;">(+2.15%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--long">Long</span>
@@ -2432,8 +2807,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/TSLA" class="ticker-link">TSLA</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$245.30</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-negative" dir="ltr">$245.30</span>
+                              <span class="numeric-value-negative" dir="ltr" style="font-size: 0.85em;">(-1.88%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--short">Short</span>
@@ -2550,8 +2928,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/NVDA" class="ticker-link">NVDA</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$520.75</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-positive" dir="ltr">$520.75</span>
+                              <span class="numeric-value-positive" dir="ltr" style="font-size: 0.85em;">(+2.10%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--long">Long</span>
@@ -2609,8 +2990,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/SPY" class="ticker-link">SPY</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$485.20</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-positive" dir="ltr">$485.20</span>
+                              <span class="numeric-value-positive" dir="ltr" style="font-size: 0.85em;">(+1.45%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--short">Short</span>
@@ -2668,8 +3052,11 @@
                           <td class="phoenix-table__cell col-symbol" data-field="symbol">
                             <a href="/ticker/AMZN" class="ticker-link">AMZN</a>
                           </td>
-                          <td class="phoenix-table__cell col-ticker phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
-                            <span class="numeric-value-positive" dir="ltr">$165.80</span>
+                          <td class="phoenix-table__cell col-current_price phoenix-table__cell--numeric phoenix-table__cell--currency" data-field="current_price" data-currency="USD">
+                            <div class="current-price-display">
+                              <span class="numeric-value-positive" dir="ltr">$165.80</span>
+                              <span class="numeric-value-positive" dir="ltr" style="font-size: 0.85em;">(+0.92%)</span>
+                            </div>
                           </td>
                           <td class="phoenix-table__cell col-side phoenix-table__cell--status" data-field="side">
                             <span class="phoenix-table__status-badge phoenix-table__status-badge--long">Long</span>
@@ -2931,77 +3318,7 @@
   
   <script>window.onload=()=>{ if(window.lucide) lucide.createIcons(); };</script>
   
-  <!-- Portfolio Summary Toggle Functionality - Toggle second row visibility -->
-  <script>
-    (function() {
-      // Wait for DOM to be ready
-      function initPortfolioToggle() {
-        const portfolioToggleBtn = document.getElementById('portfolioSummaryToggleSize');
-        const portfolioSummaryContent = document.getElementById('portfolioSummaryContent');
-        
-        console.log('🔍 [Portfolio Toggle] Initializing...', {
-          hasButton: !!portfolioToggleBtn,
-          hasContent: !!portfolioSummaryContent
-        });
-        
-        if (portfolioToggleBtn && portfolioSummaryContent) {
-          portfolioToggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isHidden = portfolioSummaryContent.style.display === 'none' || 
-                             !portfolioSummaryContent.style.display ||
-                             portfolioSummaryContent.style.display === '';
-            
-            console.log('🖱️ [Portfolio Toggle] Clicked!', {
-              isHidden: isHidden,
-              currentDisplay: portfolioSummaryContent.style.display
-            });
-            
-            if (isHidden) {
-              // Remove inline style to let CSS handle it, or set to flex explicitly
-              portfolioSummaryContent.style.display = 'flex';
-              portfolioSummaryContent.removeAttribute('hidden');
-              portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מצומצם');
-              portfolioToggleBtn.setAttribute('title', 'הצג סיכום מצומצם');
-              portfolioToggleBtn.setAttribute('aria-expanded', 'true');
-              // Change icon to eye-off (show less)
-              portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
-              console.log('✅ [Portfolio Toggle] Opened second row', portfolioSummaryContent.style.display);
-            } else {
-              portfolioSummaryContent.style.display = 'none';
-              portfolioSummaryContent.setAttribute('hidden', '');
-              portfolioToggleBtn.setAttribute('aria-label', 'הצג סיכום מלא');
-              portfolioToggleBtn.setAttribute('title', 'הצג סיכום מלא');
-              portfolioToggleBtn.setAttribute('aria-expanded', 'false');
-              // Change icon to eye (show more)
-              portfolioToggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>';
-              console.log('✅ [Portfolio Toggle] Closed second row', portfolioSummaryContent.style.display);
-            }
-          });
-          
-          console.log('✅ [Portfolio Toggle] Event listener attached');
-        } else {
-          console.error('❌ [Portfolio Toggle] Elements not found!', {
-            button: portfolioToggleBtn,
-            content: portfolioSummaryContent
-          });
-        }
-      }
-      
-      // Try multiple times to ensure DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPortfolioToggle);
-      } else {
-        // DOM already loaded
-        setTimeout(initPortfolioToggle, 100);
-      }
-      
-      // Also try on window load as fallback
-      window.addEventListener('load', function() {
-        setTimeout(initPortfolioToggle, 200);
-      });
-    })();
-  </script>
+  <!-- Portfolio Summary Toggle Functionality - REMOVED -->
+  <!-- Note: Second row (portfolioSummaryContent) was removed as it doesn't exist in the actual page -->
 </body>
 </html>

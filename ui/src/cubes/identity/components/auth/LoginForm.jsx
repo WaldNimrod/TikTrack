@@ -186,12 +186,12 @@ const LoginForm = () => {
     
     // Validate form
     if (!validateForm()) {
-      audit.log('Auth', 'Login form validation failed', { fieldErrors });
+      debugLog('Auth', 'Login form validation failed', { fieldErrors });
       return;
     }
     
     setIsLoading(true);
-    audit.log('Auth', 'Login form submitted', { 
+    debugLog('Auth', 'Login form submitted', { 
       usernameOrEmail: formData.usernameOrEmail,
       rememberMe: formData.rememberMe 
     });
@@ -211,7 +211,7 @@ const LoginForm = () => {
       }
       
       // Redirect to dashboard (only on success, not on error)
-      audit.log('Auth', 'Redirecting to dashboard');
+      debugLog('Auth', 'Redirecting to dashboard');
       navigate('/dashboard');
       
     } catch (err) {

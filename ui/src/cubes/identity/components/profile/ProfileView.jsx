@@ -88,7 +88,7 @@ const ProfileView = () => {
           lastName: user.lastName || '',
           icon: user.icon || '',
         });
-        audit.log('ProfileView', 'User data loaded', { userId: user.externalUlids });
+        debugLog('ProfileView', 'User data loaded', { userId: user.externalUlids });
       } catch (error) {
         audit.error('ProfileView', 'Failed to load user data', error);
         // Redirect to login if unauthorized
@@ -112,7 +112,7 @@ const ProfileView = () => {
         setIsLoadingApiKeys(true);
         const keys = await apiKeysService.list();
         setApiKeys(keys);
-        audit.log('ProfileView', 'API keys loaded', { count: keys.length });
+        debugLog('ProfileView', 'API keys loaded', { count: keys.length });
       } catch (error) {
         audit.error('ProfileView', 'Failed to load API keys', error);
       } finally {
@@ -141,7 +141,7 @@ const ProfileView = () => {
     setIsUpdatingInfo(true);
     try {
       await authService.updateUser(userInfoForm);
-      audit.log('ProfileView', 'User info updated');
+      debugLog('ProfileView', 'User info updated');
       // Reload user data
       const user = await authService.getCurrentUser();
       setUserData(user);
@@ -167,7 +167,7 @@ const ProfileView = () => {
         old_password: passwordForm.currentPassword,
         new_password: passwordForm.newPassword,
       });
-      audit.log('ProfileView', 'Password updated');
+      debugLog('ProfileView', 'Password updated');
       // Clear form
       setPasswordForm({
         currentPassword: '',
@@ -189,7 +189,7 @@ const ProfileView = () => {
     setIsSavingApiKeys(true);
     try {
       // TODO: Implement API keys save when endpoint is available
-      audit.log('ProfileView', 'API keys save requested');
+      debugLog('ProfileView', 'API keys save requested');
     } catch (error) {
       audit.error('ProfileView', 'Failed to save API keys', error);
     } finally {
@@ -204,7 +204,7 @@ const ProfileView = () => {
     try {
       await authService.logout();
       navigate('/login');
-      audit.log('ProfileView', 'User logged out');
+      debugLog('ProfileView', 'User logged out');
     } catch (error) {
       audit.error('ProfileView', 'Logout error', error);
       // Navigate anyway
@@ -283,10 +283,6 @@ const ProfileView = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['section-0'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>
@@ -439,7 +435,7 @@ const ProfileView = () => {
                     {/* Action Buttons Row */}
                     <tt-section-row>
                       <div className="col-12">
-                        <div className="d-flex justify-content-end" style={{ gap: 'var(--spacing-md, 16px)', marginTop: 'var(--spacing-md, 16px)' }}>
+                        <div className="d-flex justify-content-end action-buttons-row">
                           <button
                             type="button"
                             className="btn btn-primary"
@@ -449,9 +445,8 @@ const ProfileView = () => {
                           </button>
                           <button
                             type="button"
-                            className="btn btn-primary"
+                            className="btn btn-primary btn-logout"
                             onClick={handleLogout}
-                            style={{ backgroundColor: 'var(--apple-red, #FF3B30)' }}
                           >
                             התנתק
                           </button>
@@ -493,10 +488,6 @@ const ProfileView = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['section-1'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>
@@ -606,10 +597,6 @@ const ProfileView = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['section-3'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>

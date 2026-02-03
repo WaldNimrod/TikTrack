@@ -189,14 +189,14 @@ const PasswordResetFlow = () => {
     setFieldErrors({});
     
     if (!validateRequestForm()) {
-      audit.log('Auth', 'Password reset request validation failed', { fieldErrors });
+      debugLog('Auth', 'Password reset request validation failed', { fieldErrors });
       return;
     }
     
     setIsLoading(true);
     const detectedMethod = detectMethod(requestData.identifier);
     
-    audit.log('Auth', 'Password reset request started', { 
+    debugLog('Auth', 'Password reset request started', { 
       method: detectedMethod,
       identifier: requestData.identifier 
     });
@@ -208,7 +208,7 @@ const PasswordResetFlow = () => {
       );
       
       setSuccess(true);
-      audit.log('Auth', 'Password reset request successful');
+      debugLog('Auth', 'Password reset request successful');
       
       // Show success message
       setTimeout(() => {
@@ -238,14 +238,14 @@ const PasswordResetFlow = () => {
     setFieldErrors({});
     
     if (!validateVerifyForm()) {
-      audit.log('Auth', 'Password reset verify validation failed', { fieldErrors });
+      debugLog('Auth', 'Password reset verify validation failed', { fieldErrors });
       return;
     }
     
     setIsLoading(true);
     const currentMethod = resetToken ? 'EMAIL' : 'SMS';
     
-    audit.log('Auth', 'Password reset verify started', { method: currentMethod });
+    debugLog('Auth', 'Password reset verify started', { method: currentMethod });
     
     try {
       const resetPayload = {
@@ -259,7 +259,7 @@ const PasswordResetFlow = () => {
       await authService.verifyPasswordReset(resetPayload);
       
       setSuccess(true);
-      audit.log('Auth', 'Password reset verify successful');
+      debugLog('Auth', 'Password reset verify successful');
       
       // Redirect to login after 2 seconds
       setTimeout(() => {

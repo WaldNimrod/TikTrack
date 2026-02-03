@@ -1654,3 +1654,25 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
   font-size: 0.75rem;
   line-height: 1.4;
 }
+
+/* ============================================
+   ProfileView Specific Styles
+   ============================================ */
+
+/* Action Buttons Row */
+.action-buttons-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md, 16px);
+  margin-top: var(--spacing-md, 16px);
+}
+
+/* Logout Button */
+.btn-logout {
+  background-color: var(--color-error-red, var(--apple-red, #FF3B30)) !important;
+  color: white !important;
+}
+
+.btn-logout:hover {
+  background-color: var(--color-error-red-dark, var(--apple-red-dark, #D70015)) !important;
+}

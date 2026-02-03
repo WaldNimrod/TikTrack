@@ -105,7 +105,7 @@ const PasswordChangeForm = () => {
     setFieldErrors(errors);
     
     if (!isValid) {
-      audit.log('PasswordChangeForm', 'Form validation failed', { fieldErrors: errors });
+      debugLog('PasswordChangeForm', 'Form validation failed', { fieldErrors: errors });
     }
     
     return isValid;
@@ -128,7 +128,7 @@ const PasswordChangeForm = () => {
     }
     
     setIsLoading(true);
-    audit.log('PasswordChangeForm', 'Password change started');
+    debugLog('PasswordChangeForm', 'Password change started');
     
     try {
       // Transform to API format (snake_case)
@@ -143,7 +143,7 @@ const PasswordChangeForm = () => {
       await authService.changePassword(payload);
       
       // Success
-      audit.log('PasswordChangeForm', 'Password changed successfully');
+      debugLog('PasswordChangeForm', 'Password changed successfully');
       setSuccess('הסיסמה עודכנה בהצלחה');
       
       // Clear form
@@ -215,7 +215,7 @@ const PasswordChangeForm = () => {
             
             {/* Success Message */}
             {success && (
-              <div className="auth-form__success js-success-feedback js-password-change-success" role="alert" style={{ color: 'var(--color-brand)', padding: '0.75rem 1rem', backgroundColor: '#e6f7f5', border: '1px solid var(--color-brand)', borderRadius: '8px', marginBottom: 'var(--spacing-md, 16px)', textAlign: 'center' }}>
+              <div className="auth-form__success js-success-feedback js-password-change-success" role="alert">
                 {success}
               </div>
             )}
@@ -225,7 +225,7 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="currentPassword">
             סיסמה נוכחית:
           </label>
-          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+          <div className="password-input-wrapper">
             <input
               type={showCurrentPassword ? "text" : "password"}
               id="currentPassword"
@@ -236,27 +236,12 @@ const PasswordChangeForm = () => {
               value={formData.currentPassword}
               onChange={handleInputChange}
               disabled={isLoading}
-              style={{ paddingRight: '40px' }}
             />
             <button
               type="button"
               className="password-toggle js-password-toggle-current"
               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
               aria-label={showCurrentPassword ? "הסתר סיסמה" : "הצג סיסמה"}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--color-30)',
-              }}
               disabled={isLoading}
             >
               {showCurrentPassword ? (
@@ -282,7 +267,7 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="newPassword">
             סיסמה חדשה:
           </label>
-          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+          <div className="password-input-wrapper">
             <input
               type={showNewPassword ? "text" : "password"}
               id="newPassword"
@@ -293,27 +278,12 @@ const PasswordChangeForm = () => {
               value={formData.newPassword}
               onChange={handleInputChange}
               disabled={isLoading}
-              style={{ paddingRight: '40px' }}
             />
             <button
               type="button"
               className="password-toggle js-password-toggle-new"
               onClick={() => setShowNewPassword(!showNewPassword)}
               aria-label={showNewPassword ? "הסתר סיסמה" : "הצג סיסמה"}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--color-30)',
-              }}
               disabled={isLoading}
             >
               {showNewPassword ? (
@@ -339,7 +309,7 @@ const PasswordChangeForm = () => {
           <label className="form-label" htmlFor="confirmPassword">
             אימות סיסמה:
           </label>
-          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+          <div className="password-input-wrapper">
             <input
               type={showConfirmPassword ? "text" : "password"}
               id="confirmPassword"
@@ -350,27 +320,12 @@ const PasswordChangeForm = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               disabled={isLoading}
-              style={{ paddingRight: '40px' }}
             />
             <button
               type="button"
               className="password-toggle js-password-toggle-confirm"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               aria-label={showConfirmPassword ? "הסתר סיסמה" : "הצג סיסמה"}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--color-30)',
-              }}
               disabled={isLoading}
             >
               {showConfirmPassword ? (
@@ -402,7 +357,7 @@ const PasswordChangeForm = () => {
           </form>
 
           {/* Navigation Links */}
-          <div className="auth-footer-zone" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <div className="auth-footer-zone">
             <Link to="/profile" className="auth-link js-back-to-profile-link">
               חזרה לפרופיל
             </Link>

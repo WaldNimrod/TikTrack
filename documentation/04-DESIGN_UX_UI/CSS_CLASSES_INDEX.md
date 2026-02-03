@@ -4,8 +4,8 @@
 **אחריות:** Team 40 (UI Assets & Design)  
 **תוקף:** מחייב לכל המערכת  
 **תאריך עדכון:** 2026-02-02  
-**גרסה:** v1.3  
-**עדכון אחרון:** Task 3.1.6 - Template V3 Implementation (מבנה סקשנים שקוף, UnifiedHeader, עמודי Auth override)
+**גרסה:** v1.4  
+**עדכון אחרון:** Stage 2.4 - CSS Classes Index Update (Media Queries removal, Entity Colors, Fluid Design)
 
 ---
 
@@ -22,23 +22,41 @@
 
 ### **סדר טעינה (קריטי!):**
 1. **Pico CSS** (CDN) - Reset & Base (Generic Layer)
-2. **phoenix-base.css** - Variables & Base Styles (Settings + Generic + Elements Layers)
+2. **phoenix-base.css** - Variables & Base Styles (Settings + Generic + Elements Layers) - **SSOT למשתני CSS**
 3. **phoenix-components.css** - LEGO Components (Objects Layer)
-4. **phoenix-tables.css** - Tables System (Components Layer) ⚠️ **נדרש להעברה מסטייג'ינג**
-5. **phoenix-header.css** - Unified Header (Components Layer)
-6. **D15_IDENTITY_STYLES.css** - Auth Pages Styles (Components Layer)
-7. **D15_DASHBOARD_STYLES.css** - Dashboard Pages Styles (Components Layer)
+4. **phoenix-header.css** - Unified Header (Components Layer) - **Fluid Design ✅**
+5. **D15_IDENTITY_STYLES.css** - Auth Pages Styles (Components Layer)
+6. **D15_DASHBOARD_STYLES.css** - Dashboard Pages Styles (Components Layer)
+
+**הערה:** `phoenix-tables.css` לא קיים כרגע - יועבר מסטייג'ינג בעתיד.
 
 **📋 תיעוד מפורט:** `documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md`  
 **🔧 כלי בדיקה:** `npm run check:css` (הרץ `check-css-loading.js` בקונסולת הדפדפן)
 
 ### **ITCSS Layers:**
-- **Settings:** CSS Variables (phoenix-base.css)
+- **Settings:** CSS Variables (phoenix-base.css) - **SSOT לכל המשתנים**
 - **Generic:** Reset & Base (Pico CSS + phoenix-base.css)
 - **Elements:** HTML Elements (phoenix-base.css)
 - **Objects:** LEGO Components (phoenix-components.css)
 - **Components:** Page-specific Components (phoenix-tables.css, phoenix-header.css, D15_IDENTITY_STYLES.css, D15_DASHBOARD_STYLES.css)
 - **Trumps:** Overrides (if needed)
+
+### **🛡️ Fluid Design Mandate:**
+- ✅ **אין Media Queries** (חוץ מ-Dark Mode: `@media (prefers-color-scheme: dark)`)
+- ✅ **שימוש בלעדי ב-`clamp()`, `min()`, `max()`** ל-typography ו-spacing
+- ✅ **Grid עם `auto-fit` / `auto-fill`** ל-layout
+- ✅ **כל הערכים דינמיים** - אין breakpoints קבועים
+
+### **🎨 Entity Colors (SSOT):**
+כל ה-Entity Colors מוגדרים ב-`phoenix-base.css` בלבד:
+- `--entity-trade-color` (#26baac)
+- `--entity-trade-border`, `--entity-trade-bg`, `--entity-trade-text`
+- `--entity-ticker-color` (#17a2b8)
+- `--entity-ticker-border`, `--entity-ticker-bg`, `--entity-ticker-text`
+- `--entity-trading-account-color` (#28a745)
+- `--entity-trading-account-border`, `--entity-trading-account-bg`, `--entity-trading-account-text`
+- `--entity-research-color` (#9c27b0)
+- `--entity-execution-color` (#ff9800)
 
 ---
 
@@ -423,44 +441,260 @@
 
 #### **`#unified-header`**
 - **קובץ:** `phoenix-header.css`
-- **תפקיד:** Header ראשי
+- **ITCSS Layer:** Components
+- **תפקיד:** Header ראשי - מופיע בכל העמודים (חוץ מעמודי Auth)
 - **מאפיינים:**
-  - `height: 120px !important`
+  - `height: 120px !important` (60px + 60px)
   - `z-index: 950`
   - `position: sticky`
+  - `background: var(--apple-bg-elevated, #ffffff)`
+
+#### **`.header-content`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קונטיינר תוכן Header
+- **מאפיינים:**
+  - `display: flex`
+  - `flex-direction: column`
+  - `position: relative`
 
 #### **`.header-top`**
 - **קובץ:** `phoenix-header.css`
-- **תפקיד:** שורה עליונה של Header
+- **ITCSS Layer:** Components
+- **תפקיד:** שורה עליונה של Header (60px)
 - **מאפיינים:**
-  - `height: 60px`
-  - `border-bottom: 1px solid`
+  - `height: 60px !important`
+  - `border-bottom: 1px solid var(--apple-border-light)`
+  - `direction: rtl`
 
-#### **`.header-container`**
+#### **`.header-container`** 🛡️ **Fluid Design (2026-02-02)**
 - **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
 - **תפקיד:** קונטיינר Header
 - **מאפיינים:**
   - `max-width: 1400px`
   - `margin: 0 auto`
-  - `padding: 0 10px`
+  - `padding: clamp(12px, 2vw, 16px) clamp(10px, 1.5vw, 16px)` - **Fluid padding**
+  - `flex-wrap: wrap` - **Fluid Design - wrap when needed**
+
+#### **`.logo-section`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** אזור לוגו
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `direction: ltr`
+  - `order: 3`
+
+#### **`.logo`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קישור לוגו
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `text-decoration: none`
 
 #### **`.logo-image`**
 - **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
 - **תפקיד:** תמונת לוגו
 - **מאפיינים:**
-  - `width: 125px !important`
-  - `height: 37.5px !important`
+  - `width: 125px`
+  - `height: 37.5px`
+  - `object-fit: contain`
 
 #### **`.logo-text`**
 - **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
 - **תפקיד:** טקסט סלוגן
 - **מאפיינים:**
   - `font-size: 1rem !important`
   - `font-weight: 300 !important`
   - `color: #26baac !important`
+  - `direction: ltr !important`
+
+#### **`.user-zone`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** אזור משתמש
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `gap: var(--spacing-md)`
+
+#### **`.user-info`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** מידע משתמש
+- **מאפיינים:**
+  - `display: flex`
+  - `flex-direction: column`
+  - `align-items: flex-end`
+
+#### **`.u-name`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** שם משתמש
+- **מאפיינים:**
+  - `font-weight: 700`
+  - `color: var(--color-text-main)`
+
+#### **`.u-role`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** תפקיד משתמש
+- **מאפיינים:**
+  - `font-size: 0.5625rem`
+  - `text-transform: uppercase`
+
+#### **`.u-avatar`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** תמונת פרופיל משתמש
+- **מאפיינים:**
+  - `width: 36px`
+  - `height: 36px`
+  - `border-radius: 50%`
+
+#### **`.header-nav`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** אזור ניווט
+- **מאפיינים:**
+  - `display: flex`
+  - `flex: 1`
+  - `direction: rtl`
+  - `order: 1`
+
+#### **`.main-nav`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** ניווט ראשי
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `gap: 1rem`
+
+#### **`.tiktrack-nav-list`** 🛡️ **Fluid Design (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** רשימת ניווט
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `gap: clamp(0.5rem, 1vw, 1rem)` - **Fluid gap**
+
+#### **`.tiktrack-nav-item`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** פריט ניווט
+- **מאפיינים:**
+  - `position: relative`
+
+#### **`.tiktrack-nav-link`** 🛡️ **Fluid Design (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קישור ניווט
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `padding: clamp(0.4rem, 1vw, 0.5rem) clamp(0.8rem, 1.5vw, 1rem)` - **Fluid padding**
+  - `font-size: clamp(14px, 2vw, 16px)` - **Fluid font size**
+  - `color: #26baac`
+
+#### **`.nav-text`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** טקסט ניווט
+- **מאפיינים:**
+  - `font-size: inherit`
+  - `line-height: 1.4`
+
+#### **`.nav-icon`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** איקון ניווט
+- **מאפיינים:**
+  - `width: 16px`
+  - `height: 16px`
+
+#### **`.tiktrack-dropdown-menu`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** תפריט משנה
+- **יישור:** `inset-inline-end: 0; inset-inline-start: auto;` - מיושר לתחילת הכפתור, הולך שמאלה
+- **מאפיינים:**
+  - `padding: 0.25rem 0;` - ריווח מופחת
+  - `top: calc(100% + 3px);`
+  - התנהגות: נפתח במעבר עכבר (hover-based)
+
+#### **`.tiktrack-dropdown-item`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** פריט בתפריט משנה
+- **מאפיינים:**
+  - `padding: 0.25rem 0.5rem;` - ריווח מופחת
+
+#### **`.tiktrack-dropdown-arrow`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** חץ תפריט משנה
+- **מאפיינים:**
+  - `transition: transform 0.2s ease`
+
+#### **`.separator`** 🛡️ **As Made (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קו מפריד בתפריט משנה
+- **מאפיינים:**
+  - `height: 1px;` - דק מאוד
+  - `margin: 0.25rem 0;` - ריווח מופחת
+  - `box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);` - צל עדין מאוד
+
+#### **`.header-filters`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** אזור פילטרים (שורה תחתונה, 60px)
+- **מאפיינים:**
+  - `height: 60px`
+  - `border-top: 1px solid var(--apple-border-light)`
+  - `direction: rtl`
+
+#### **`.filters-container`** 🛡️ **Fluid Design (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קונטיינר פילטרים
+- **מאפיינים:**
+  - `display: flex`
+  - `flex-wrap: wrap` - **Fluid Design**
+  - `gap: clamp(0.75rem, 1.5vw, 1rem)` - **Fluid gap**
+  - `padding: clamp(20px, 3vw, 24px) clamp(16px, 2vw, 20px) 0 clamp(16px, 2vw, 20px)` - **Fluid padding**
+  - `justify-content: space-between` - **Fluid Design**
+
+#### **`.filter-group`**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קבוצת פילטרים
+- **מאפיינים:**
+  - `display: flex`
+  - `position: relative`
+
+#### **`.filter-toggle`** 🛡️ **Fluid Design (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** כפתור פילטר
+- **מאפיינים:**
+  - `display: flex`
+  - `align-items: center`
+  - `min-width: clamp(100px, 15vw, 120px)` - **Fluid min-width**
+  - `font-size: clamp(0.85rem, 1.5vw, 1rem)` - **Fluid font size**
+  - `padding: 0.125rem 0.6rem`
 
 #### **`.filter-toggle:hover`** 🛡️ **As Made (2026-02-02)**
 - **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
 - **תפקיד:** התנהגות מעבר עכבר על פילטרים
 - **מאפיינים:**
   - `border-color: var(--header-brand, #26baac)` - רק צבע משני
@@ -468,28 +702,42 @@
   - `background: white` - **CRITICAL: ללא שינוי רקע**
   - **ללא shadow** - רק שינוי צבע
 
-#### **`.tiktrack-dropdown-menu`** 🛡️ **As Made (2026-02-02)**
+#### **`.filter-menu`**
 - **קובץ:** `phoenix-header.css`
-- **תפקיד:** תפריט משנה
-- **יישור:** `inset-inline-end: 0; inset-inline-start: auto;` - מיושר לתחילת הכפתור, הולך שמאלה
+- **ITCSS Layer:** Components
+- **תפקיד:** תפריט פילטר
 - **מאפיינים:**
-  - `padding: 0.25rem 0;` - ריווח מופחת (היה `0.5rem 0`)
-  - `top: calc(100% + 3px);`
-  - התנהגות: נפתח במעבר עכבר (hover-based)
+  - `position: absolute`
+  - `background: white`
+  - `border: 1px solid var(--apple-border-light)`
 
-#### **`.tiktrack-dropdown-item`** 🛡️ **As Made (2026-02-02)**
+#### **`.filter-toggle-section`**
 - **קובץ:** `phoenix-header.css`
-- **תפקיד:** פריט בתפריט משנה
+- **ITCSS Layer:** Components
+- **תפקיד:** אזור כפתור toggle פילטרים
 - **מאפיינים:**
-  - `padding: 0.25rem 0.5rem;` - ריווח מופחת (היה `0.5rem 1rem`)
+  - `display: flex`
+  - `align-items: center`
 
-#### **`.separator`** 🛡️ **As Made (2026-02-02)**
+#### **`.filter-toggle-main`**
 - **קובץ:** `phoenix-header.css`
-- **תפקיד:** קו מפריד בתפריט משנה
+- **ITCSS Layer:** Components
+- **תפקיד:** כפתור toggle פילטרים ראשי
 - **מאפיינים:**
-  - `height: 1px;` - דק מאוד
-  - `margin: 0.25rem 0;` - ריווח מופחת (היה `0.5rem 0`)
-  - `box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);` - צל עדין מאוד
+  - `position: absolute`
+  - `bottom: -24px`
+  - `inset-inline-start: 50%`
+  - `transform: translateX(-50%)`
+
+#### **`.main-content`** 🛡️ **Fluid Design (2026-02-02)**
+- **קובץ:** `phoenix-header.css`
+- **ITCSS Layer:** Components
+- **תפקיד:** קונטיינר תוכן ראשי
+- **מאפיינים:**
+  - `width: 100%`
+  - `max-width: min(100%, 1400px)` - **Fluid Design - uses min() instead of Media Queries**
+  - `margin: 0 auto`
+  - `padding: 0`
 
 #### **`body.auth-layout-root tt-section`** 🛡️ **As Made (2026-02-02)**
 - **קובץ:** `D15_IDENTITY_STYLES.css`
@@ -607,14 +855,34 @@
 5. **Components** (`phoenix-tables.css`, `phoenix-header.css`, `D15_IDENTITY_STYLES.css`, `D15_DASHBOARD_STYLES.css`) - בינונית-גבוהה
 6. **Trumps** (Overrides) - גבוהה ביותר
 
-### **עקרון 3: CSS Variables בלבד**
+### **עקרון 3: CSS Variables בלבד (SSOT)**
 ```css
 /* ✅ נכון */
 color: var(--apple-text-primary);
+color: var(--entity-trade-color);
 
 /* ❌ שגוי */
 color: #1d1d1f;
+color: #26baac;
 ```
+
+**חוק ברזל:** כל הצבעים חייבים להיות מוגדרים ב-`phoenix-base.css` בלבד (SSOT).
+
+### **עקרון 3.1: Fluid Design - אין Media Queries**
+```css
+/* ✅ נכון - Fluid Design */
+padding: clamp(12px, 2vw, 16px);
+font-size: clamp(14px, 2vw, 16px);
+max-width: min(100%, 1400px);
+gap: clamp(0.5rem, 1vw, 1rem);
+
+/* ❌ שגוי - Media Queries אסורים */
+@media (min-width: 768px) {
+  padding: 16px;
+}
+```
+
+**חוק ברזל:** Media Queries מותרים **רק** עבור Dark Mode (`@media (prefers-color-scheme: dark)`).
 
 ### **עקרון 4: Fixed Heights עם !important**
 ```css
@@ -730,7 +998,12 @@ overflow-x: auto;
 ---
 
 **Team 40 (UI Assets & Design)**  
-**Date:** 2026-02-02 (עודכן עם Fluid Design Mandate)  
+**Date:** 2026-02-02 (עודכן עם Fluid Design Mandate, Entity Colors, Media Queries removal)  
 **Status:** ✅ **MANDATORY INDEX - ALL DEVELOPERS MUST USE**
 
-**עדכון אחרון:** 2026-02-02 - הוספת קישור ל-Fluid Design Charter
+**עדכון אחרון:** 2026-02-02 - Stage 2.4 Completion:
+- ✅ הוספת Entity Colors documentation
+- ✅ הוספת Fluid Design Mandate (clamp(), min(), max())
+- ✅ עדכון Media Queries policy (רק Dark Mode מותר)
+- ✅ עדכון Header Container עם Fluid Design
+- ✅ עדכון ITCSS Layers עם SSOT information

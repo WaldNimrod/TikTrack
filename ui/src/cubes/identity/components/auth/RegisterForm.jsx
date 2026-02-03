@@ -127,12 +127,12 @@ const RegisterForm = () => {
     
     // Validate form
     if (!validateForm()) {
-      audit.log('Auth', 'Register form validation failed', { fieldErrors });
+      debugLog('Auth', 'Register form validation failed', { fieldErrors });
       return;
     }
     
     setIsLoading(true);
-    audit.log('Auth', 'Register form submitted', { 
+    debugLog('Auth', 'Register form submitted', { 
       email: formData.email,
       username: formData.username 
     });
@@ -154,7 +154,7 @@ const RegisterForm = () => {
       debugLog('Auth', 'Register successful', { userId: response.user?.externalUlids });
       
       // Redirect to dashboard or login
-      audit.log('Auth', 'Redirecting after registration');
+      debugLog('Auth', 'Redirecting after registration');
       navigate('/dashboard');
       
     } catch (err) {

@@ -189,6 +189,92 @@ tests/
 
 ---
 
+### 6. Frontend Development Testing Tools (Team 30)
+
+**קטגוריה:** כלי בדיקה לפיתוח Frontend  
+**אחריות:** Team 30 (Frontend Execution)  
+**תאריך יצירה:** 2026-02-02
+
+#### 6.1 CSS Loading Checker
+
+**קובץ:** `ui/check-css-loading.js`  
+**סוג:** כלי בדיקה אוטומטי (Browser Console)  
+**תפקיד:** בודק שכל קבצי ה-CSS נטענים בסדר הנכון
+
+**שימוש:**
+1. פתח `http://localhost:8080/` בדפדפן
+2. פתח DevTools (F12) → Console
+3. העתק והדבק את התוכן של `check-css-loading.js`
+4. לחץ Enter
+
+**או:** `npm run check:css` (מציג הוראות)
+
+**בדיקות שבוצעות:**
+- ✅ בדיקת סדר טעינת CSS (Pico → phoenix-base → phoenix-components → phoenix-header → page-specific)
+- ✅ בדיקת קבצי CSS חסרים
+- ✅ בדיקת כפילויות בטעינת CSS
+- ✅ בדיקת זמינות CSS Variables (--apple-blue, --spacing-md, וכו')
+- ✅ בדיקת דרישות CSS ספציפיות לעמוד (Auth/Dashboard)
+
+**תוצאות:**
+- דוח מפורט על כל הבדיקות
+- רשימת שגיאות (errors)
+- רשימת אזהרות (warnings)
+- סיכום כולל (passed/failed)
+
+**תיעוד:**
+- **מדריך שימוש:** `documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+#### 6.2 Blueprint Comparison Tool
+
+**קובץ:** `ui/blueprint-comparison.js`  
+**סוג:** כלי בדיקה אוטומטי (Browser Console)  
+**תפקיד:** משווה את העמוד בפועל לבלופרינט (DOM structure, CSS styles)
+
+**שימוש:**
+1. פתח `http://localhost:8080/` בדפדפן
+2. פתח DevTools (F12) → Console
+3. העתק והדבק את התוכן של `blueprint-comparison.js`
+4. לחץ Enter
+
+**בדיקות שבוצעות:**
+- ✅ בדיקת טעינת CSS (בסיסית)
+- ✅ בדיקת מבנה DOM (page-wrapper, page-container, tt-container, tt-section)
+- ✅ בדיקת CSS Variables availability
+- ✅ בדיקת Dropdown Menu Spacing
+- ✅ בדיקת Filter User Section Position
+- ✅ בדיקת Investment Type Filter Options
+- ✅ בדיקת Active Alerts Structure & Design
+- ✅ בדיקת Info Summary Structure & Design
+- ✅ בדיקת Widget Placeholders Structure & Design
+- ✅ בדיקת Portfolio Section Header Filters
+
+**תוצאות:**
+- דוח מפורט על כל הבדיקות
+- השוואת ערכים בפועל מול צפוי
+- רשימת שגיאות (errors)
+- רשימת אזהרות (warnings)
+- סיכום כולל (passed/failed)
+
+**תיעוד:**
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
+- **הנחיות בלופרינט:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md`
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+**גרסה:** Enhanced (עודכן עם בדיקת CSS loading ו-DOM structure)
+
+---
+
+**סה"כ כלי בדיקה Frontend:** 2
+
+---
+
 ## 📊 סיכום כללי
 
 ### סטטיסטיקות בדיקות
@@ -201,7 +287,8 @@ tests/
 | **API Keys Management Flow** | 12 | ✅ 12/12 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
 | **Error Handling & Security** | 11 | ✅ 11/11 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
 | **Validation Comprehensive** | 20+ | ✅ 12/18 | ⚠️ 1 Failed | ⏸️ Pending | ⚠️ **1 Issue** |
-| **Total** | **75+** | **65/75+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **2 Issues** |
+| **Frontend Testing Tools** | 2 | ✅ 2/2 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Total** | **77+** | **67/77+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **2 Issues** |
 
 ---
 
@@ -217,6 +304,12 @@ tests/
 - **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
+
+### כלי בדיקה Frontend (Team 30)
+
+- **CSS Loading Checker:** `ui/check-css-loading.js`
+- **Blueprint Comparison Tool:** `ui/blueprint-comparison.js`
+- **npm Script:** `npm run check:css` (מציג הוראות לשימוש)
 
 ### דוחות QA
 
@@ -304,8 +397,8 @@ tests/
 
 **אינדקס זה מתעדכן באופן שוטף עם כל בדיקה חדשה.**
 
-**Last Updated:** 2026-01-31  
-**Maintained By:** Team 50 (QA)  
+**Last Updated:** 2026-02-02  
+**Maintained By:** Team 50 (QA) + Team 30 (Frontend Testing Tools)  
 **Next Update:** After Team 30 fixes LoginForm error display
 
 ---

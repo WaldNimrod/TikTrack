@@ -19,7 +19,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { audit } from '../../../../utils/audit.js';
-import { DEBUG_MODE } from '../../../../utils/debug.js';
+import { DEBUG_MODE, debugLog } from '../../../../utils/debug.js';
 
 /**
  * AuthErrorHandler Component
@@ -77,7 +77,7 @@ const AuthErrorHandler = ({
               const hasHebrew = /[\u0590-\u05FF]/.test(currentText);
               
               if (!hasHebrew && DEBUG_MODE) {
-                audit.log('AuthErrorHandler', 'Warning: Error message is not in Hebrew', { error });
+                debugLog('AuthErrorHandler', 'Warning: Error message is not in Hebrew', { error });
               }
             }
             
@@ -85,7 +85,7 @@ const AuthErrorHandler = ({
             errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             
             if (DEBUG_MODE) {
-              audit.log('AuthErrorHandler', 'Error element made visible', {
+              debugLog('AuthErrorHandler', 'Error element made visible', {
                 found: true,
                 text: errorElement.textContent,
                 errorState: error,
@@ -117,9 +117,7 @@ const AuthErrorHandler = ({
         aria-live="polite"
         aria-hidden={!error}
         data-testid={testId}
-        style={{
-          display: error ? 'block' : 'none'
-        }}
+        hidden={!error}
       >
         {error}
       </div>

@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../../../utils/audit.js';
+import { debugLog } from '../../../../utils/debug.js';
 
 /**
  * ProtectedRoute Component
@@ -34,7 +35,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
      */
     const checkAuth = async () => {
       setIsChecking(true);
-      audit.log('Auth', 'ProtectedRoute: Checking authentication status');
+      debugLog('Auth', 'ProtectedRoute: Checking authentication status');
 
       try {
         // Check if access token exists
@@ -43,7 +44,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
         if (!hasToken) {
           setIsAuthenticated(false);
           setIsChecking(false);
-          audit.log('Auth', 'ProtectedRoute: No access token found');
+          debugLog('Auth', 'ProtectedRoute: No access token found');
           return;
         }
 
@@ -51,15 +52,15 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
         try {
           await authService.getCurrentUser();
           setIsAuthenticated(true);
-          audit.log('Auth', 'ProtectedRoute: User authenticated');
+          debugLog('Auth', 'ProtectedRoute: User authenticated');
         } catch (error) {
           // Token might be expired, try to refresh
-          audit.log('Auth', 'ProtectedRoute: Token validation failed, attempting refresh');
+          debugLog('Auth', 'ProtectedRoute: Token validation failed, attempting refresh');
           
           try {
             await authService.refreshToken();
             setIsAuthenticated(true);
-            audit.log('Auth', 'ProtectedRoute: Token refreshed successfully');
+            debugLog('Auth', 'ProtectedRoute: Token refreshed successfully');
           } catch (refreshError) {
             // Refresh failed - user needs to login
             setIsAuthenticated(false);
@@ -88,7 +89,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
       <div className="auth-layout-root" dir="rtl">
         <tt-container>
           <tt-section>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <div className="auth-loading-state">
               <p>בודק הרשאות...</p>
             </div>
           </tt-section>
@@ -99,7 +100,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
 
   // If authentication is required and user is not authenticated, redirect to login
   if (requireAuth && !isAuthenticated) {
-    audit.log('Auth', 'ProtectedRoute: Redirecting to login');
+    debugLog('Auth', 'ProtectedRoute: Redirecting to login');
     return <Navigate to="/login" replace />;
   }
 

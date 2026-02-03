@@ -410,3 +410,9 @@ button.btn-auth-primary:hover {
   margin-top: 1.5rem;
   text-align: center;
 }
+
+/* Auth Loading State */
+.auth-loading-state {
+  text-align: center;
+  padding: 2rem;
+}

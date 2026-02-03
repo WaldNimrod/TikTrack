@@ -282,10 +282,16 @@ color: var(--entity-trade-color);
    - הסרת 3 Media Queries שאינם Dark Mode
    - החלפה ב-Fluid Design (clamp, min, max)
    - בדיקות Responsiveness, Fluid Design, ו-Visual Fidelity
-3. **Team 50:** ביצוע שלב 4 (בדיקות סופיות) - **לאחר סיום Team 40**
+3. ⚠️ **Team 30:** תיקון בעיות QA - **IN PROGRESS** (הודעה: `TEAM_50_TO_TEAM_30_HOMEPAGE_QA_ISSUES.md`)
+   - תיקון Inline Styles ב-`HomePage.jsx`
+   - תיקון Audit Trail (הגנה ב-`DEBUG_MODE`)
+   - **הערה:** Team 50 ביצע בדיקות לפני התיקונים האחרונים - יתכן וחלק כבר סודר
+4. ⏸️ **Team 50:** בדיקה חוזרת מקיפה - **PENDING** (לאחר סיום תיקוני Team 30)
    - בדיקות מתמקדות ב-Light Mode (ברירת המחדל)
-   - Dark Mode יגיע בהמשך ולא נדרש לבדוק בשלב זה
-4. **Team 10:** אישור סופי והעברת סטטוס ל-APPROVED (אם כל הבדיקות עברו)
+   - וידוא שכל הבעיות תוקנו
+   - בדיקות ידניות (Fidelity, G-Bridge, Visual)
+   - הגשת דוח עדכני (`TEAM_50_TO_TEAM_10_HOMEPAGE_QA_REVISED.md`)
+5. **Team 10:** אישור סופי והעברת סטטוס ל-APPROVED (אם כל הבדיקות עברו)
 
 ---
 

@@ -245,6 +245,25 @@ tt-section-row > * {
   background: var(--apple-bg-secondary, #f5f5f7);
 }
 
+/* Toggle Icon - Base styles with transition */
+.index-section__header-toggle-btn svg,
+.dashboard-section__header-toggle-btn svg {
+  transition: transform 0.2s ease;
+  transform: rotate(180deg); /* Default: closed (arrow down) */
+}
+
+/* Toggle Icon - Open state (arrow up) */
+.index-section__header-toggle-btn[aria-expanded="true"] svg,
+.dashboard-section__header-toggle-btn[aria-expanded="true"] svg {
+  transform: rotate(0deg);
+}
+
+/* Toggle Icon - Closed state (arrow down) */
+.index-section__header-toggle-btn[aria-expanded="false"] svg,
+.dashboard-section__header-toggle-btn[aria-expanded="false"] svg {
+  transform: rotate(180deg);
+}
+
 /* Alert Bell Button - Only shown when section is closed and there are alerts */
 .index-section__header-alert-btn {
   display: flex;

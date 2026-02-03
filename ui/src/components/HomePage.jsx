@@ -125,10 +125,6 @@ const HomePage = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['top'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>
@@ -368,7 +364,7 @@ const HomePage = () => {
                             </div>
                           </article>
                         </div>
-                        <div className="active-alerts__empty is-hidden" data-role="empty-state" style={{ display: 'none' }}>
+                        <div className="active-alerts__empty is-hidden" data-role="empty-state">
                           <span className="active-alerts__empty-icon" aria-hidden="true">🔕</span>
                           <span className="active-alerts__empty-text">אין התראות חדשות</span>
                         </div>
@@ -449,10 +445,6 @@ const HomePage = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['main'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>
@@ -578,7 +570,7 @@ const HomePage = () => {
                             </div>
                           )}
                           {activeTabs['recentTrades'] === 'recentPlansPane' && (
-                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="recentPlansPane" role="tabpanel" style={{ display: 'none' }}>
+                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="recentPlansPane" role="tabpanel">
                               <ul className="widget-placeholder__list">
                                 {/* Example Plan Item 1 */}
                                 <li className="widget-placeholder__list-item">
@@ -696,17 +688,17 @@ const HomePage = () => {
                             </div>
                           )}
                           {activeTabs['pendingActions'] === 'pendingAssignTradesPane' && (
-                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingAssignTradesPane" role="tabpanel" style={{ display: 'none' }}>
+                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingAssignTradesPane" role="tabpanel">
                               <p className="widget-placeholder__text">אין טריידים הזקוקים לשיוך</p>
                             </div>
                           )}
                           {activeTabs['pendingActions'] === 'pendingCreatePlansPane' && (
-                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreatePlansPane" role="tabpanel" style={{ display: 'none' }}>
+                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreatePlansPane" role="tabpanel">
                               <p className="widget-placeholder__text">אין הצעות ליצירת תוכניות</p>
                             </div>
                           )}
                           {activeTabs['pendingActions'] === 'pendingCreateTradesPane' && (
-                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreateTradesPane" role="tabpanel" style={{ display: 'none' }}>
+                            <div className="widget-placeholder__tab-content widget-placeholder__tab-content--hidden" id="pendingCreateTradesPane" role="tabpanel">
                               <p className="widget-placeholder__text">אין אשכולות ליצירת טרייד</p>
                             </div>
                           )}
@@ -1046,10 +1038,6 @@ const HomePage = () => {
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2"
-                        style={{ 
-                          transform: openSections['portfolio'] ? 'rotate(0deg)' : 'rotate(180deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
                       >
                         <path d="M6 9l6 6l6 -6"></path>
                       </svg>

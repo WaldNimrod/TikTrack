@@ -18,8 +18,9 @@
 
 #### **1.1 routes.json קיים ונכון** ✅
 - **מיקום:** `ui/public/routes.json` ✅
-- **מבנה:** תקין עם `version`, `base_url`, `api_url`, `routes`, `public_routes` ✅
-- **תוכן:** כולל routes ל-auth ו-financial ✅
+- **מבנה:** תקין עם `version`, `frontend`, `backend`, `routes`, `public_routes` ✅
+- **תוכן:** כולל routes ל-auth, financial, planning, ו-research ✅
+- **הערה:** המבנה האמיתי הוא `version`, `frontend` (port), `backend` (port), `routes` (object), `public_routes` (array) - לא `base_url`/`api_url`
 
 #### **1.2 auth-guard.js טוען routes** ✅
 - **קוד:** שורות 126-150 ב-`authGuard.js` ✅

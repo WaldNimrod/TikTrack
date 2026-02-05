@@ -1,8 +1,15 @@
 # 🧪 נוהל עבודה לבדיקות QA - Team 50 (QA & Fidelity)
 
-**מיקום:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/`  
-**אחריות ואכיפה:** Team 50 (QA)  
-**תאריך:** 2026-01-31  
+**id:** `TEAM_50_QA_WORKFLOW_PROTOCOL`  
+**owner:** Team 50 (QA & Fidelity)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
+
+---
+
+**מיקום:** `documentation/09-GOVERNANCE/standards/`  
 **סטטוס:** ✅ נוהל מחייב
 
 ---

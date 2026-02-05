@@ -1,6 +1,14 @@
 # 📊 Official Page Tracker - TikTrack Phoenix
 
-**Last Updated:** 2026-02-05  
+**id:** `TT2_OFFICIAL_PAGE_TRACKER`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.5
+
+---
+
 **Status:** ✅ **P0 RED CLEANUP COMPLETE - AWAITING RE-AUDIT**
 
 ---

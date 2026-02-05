@@ -1,9 +1,16 @@
 # 📘 מדריך מפתח: Validation Framework - Phoenix
 
+**id:** `TT2_VALIDATION_DEVELOPER_GUIDE`  
+**owner:** Team 30 (Frontend Execution) + Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-01  
+**version:** v1.0
+
+---
+
 **פרויקט:** פיניקס (TikTrack V2)  
 **תפקיד:** מדריך מפורט למפתחים עתידיים  
-**תאריך:** 2026-02-01  
-**גרסה:** v1.0  
 **סטטוס:** ✅ **COMPLETE - READY FOR USE**
 
 ---

@@ -1,10 +1,16 @@
 # אינדקס מחלקות CSS - מפה למפתח
 
+**id:** `CSS_CLASSES_INDEX`  
+**owner:** Team 40 (UI Assets & Design)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-02  
+**version:** v1.4
+
+---
+
 **מיקום:** `documentation/04-DESIGN_UX_UI/`  
-**אחריות:** Team 40 (UI Assets & Design)  
 **תוקף:** מחייב לכל המערכת  
-**תאריך עדכון:** 2026-02-02  
-**גרסה:** v1.4  
 **עדכון אחרון:** Stage 2.4 - CSS Classes Index Update (Media Queries removal, Entity Colors, Fluid Design)
 
 ---

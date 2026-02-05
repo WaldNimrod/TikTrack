@@ -1,9 +1,16 @@
 # 🎨 פרוטוקול סטנדרטים ובקרת איכות CSS (v1.0)
 
+**id:** `TT2_CSS_STANDARDS_PROTOCOL`  
+**owner:** Team 31 (Blueprint)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
+
+---
+
 **פרויקט:** פיניקס (TikTrack V2)  
 **תפקיד:** אבטחת איכות אדריכלית (LOD 400)  
-**תאריך:** 2026-01-31  
-**צוות:** Team 31 (Blueprint)  
 **סטטוס:** ✅ נוהל מחייב
 
 ---

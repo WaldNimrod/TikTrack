@@ -1,10 +1,15 @@
 # 📋 Team 50 QA Report Template
 
-**Purpose:** Standard template for all QA reports to ensure consistent format, clear team separation, and comprehensive overview.
+**id:** `TEAM_50_QA_REPORT_TEMPLATE`  
+**owner:** Team 50 (QA & Fidelity)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
 
-**Version:** 1.0  
-**Last Updated:** 2026-01-31  
-**Maintained By:** Team 50 (QA)
+---
+
+**Purpose:** Standard template for all QA reports to ensure consistent format, clear team separation, and comprehensive overview.
 
 ---
 

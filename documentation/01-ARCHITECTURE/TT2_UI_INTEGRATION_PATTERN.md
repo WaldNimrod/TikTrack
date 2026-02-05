@@ -1,5 +1,14 @@
 # 🏗️ UI Integration Pattern
 
+**id:** `TT2_UI_INTEGRATION_PATTERN`  
+**owner:** Team 30 (Frontend Execution)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+---
+
 - Shell Assembly: Context Resolver > Theme Injection > Shell > View.
 - Data Sync: React Context (PhoenixFilterContext) + API Service Wrapper + Hybrid Bridge.
 - Validation: 100% Match to Legacy fields required.

@@ -1,10 +1,16 @@
 # 🎯 תשתית ולידציה לטפסים - Phoenix Form Validation Framework (v1.2)
 
+**id:** `TT2_FORM_VALIDATION_FRAMEWORK`  
+**owner:** Team 30 (Frontend Execution) + Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-01  
+**version:** v1.2
+
+---
+
 **פרויקט:** פיניקס (TikTrack V2)  
 **תפקיד:** תשתית ולידציה מרכזית לכל הטפסים במערכת  
-**תאריך:** 2026-02-01  
-**עודכן:** 2026-02-01  
-**צוות:** Team 30 (Frontend) → Team 10 (The Gateway)  
 **סטטוס:** ✅ **מימוש הושלם - מוכן לשימוש - Backend & Frontend Complete - Ready for QA Testing**
 
 ---

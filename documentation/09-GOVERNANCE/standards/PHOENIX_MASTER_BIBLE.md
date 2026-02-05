@@ -1,6 +1,17 @@
 # 🛡️ ספר החוקים המאסטר: פרויקט הפניקס (v2.7)
-**בעל החזון:** נמרוד ולד | **אדריכלות:** Gemini | **ביצוע:** Cursor
+
+**id:** `PHOENIX_MASTER_BIBLE`  
+**owner:** Team 10 (The Gateway) + Architect (Gemini Bridge)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-02  
+**version:** v2.7
+
+---
+
+**בעל החזון:** נמרוד ולד | **אדריכלות:** Gemini | **ביצוע:** Cursor  
 **עודכן:** 2026-02-02 (ריענון נהלים ומשמעת אדריכלית v1.5 + Final Governance Lock v2.0)
+
 ---
 ## 1. המבנה הארגוני
 * **אדריכל ראשי:** נמרוד ולד (חזון ובקרה סופית).

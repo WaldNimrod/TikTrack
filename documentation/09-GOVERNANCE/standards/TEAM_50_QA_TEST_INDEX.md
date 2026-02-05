@@ -1,8 +1,15 @@
 # 🧪 אינדקס בדיקות QA - Team 50
 
-**מיקום:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/`  
-**אחריות:** Team 50 (QA)  
-**תאריך:** 2026-01-31  
+**id:** `TEAM_50_QA_TEST_INDEX`  
+**owner:** Team 50 (QA & Fidelity)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
+
+---
+
+**מיקום:** `documentation/09-GOVERNANCE/standards/`  
 **סטטוס:** ✅ **MAINTAINED**
 
 ---

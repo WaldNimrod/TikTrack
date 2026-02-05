@@ -1,7 +1,18 @@
-# 🗂️ TikTrack Master Documentation Index (D15)
-**Last Updated:** 2026-02-04
-**Status:** ✅ **REORGANIZED & UNIFIED - FOLDER STRUCTURE FIXED - ARCHITECT GUIDELINES v1.5 - VALIDATION FRAMEWORK COMPLETE - TEAM 51 ONBOARDED - MODULAR FOOTER APPROVED - LEGO REFACTOR PLAN V2 - FLUID DESIGN MANDATE - FINAL GOVERNANCE LOCK - BATCH 1 COMPLETE - TEAM ROLES DEFINED - CSS LOADING ORDER DOCUMENTED - INFRASTRUCTURE TOOLS COMPLETE - D15_INDEX APPROVED - STAGE_2_COMPLETION_MANDATE - P0_P1_P2_COMPLETE - ARCHITECT_MANDATE_IMPLEMENTED**
-**Version:** v2.12 (Post-Reorganization + Architect Guidelines + Validation Framework + Team 51 + Modular Footer + LEGO Refactor Plan V2 + Fluid Design Mandate + Final Governance Lock + Batch 1 Closure + Team Roles Mandate + CSS Loading Order Documentation + Infrastructure Tools Complete + D15_INDEX Approved + Stage 2 Completion Mandate + P0/P1/P2 Complete + Architect Mandate Implemented)
+# ⚠️ DEPRECATED - TikTrack Master Documentation Index (D15)
+
+**⚠️ זהו אינדקס DEPRECATED - אין להשתמש בו יותר!**
+
+**האינדקס המאוחד היחיד (SSOT) הוא:** [`documentation/00-MANAGEMENT/00_MASTER_INDEX.md`](./00-MANAGEMENT/00_MASTER_INDEX.md)
+
+**מקור:** Phase 1.7 - Documentation Integrity Mandate (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`)  
+**תאריך הפסקה:** 2026-02-05  
+**מחליף:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+
+---
+
+**Last Updated:** 2026-02-04  
+**Status:** ❌ **DEPRECATED - DO NOT USE**  
+**Version:** v2.12 (DEPRECATED)
 
 ---
 ## 📂 עץ תיקיות (Directory Tree)

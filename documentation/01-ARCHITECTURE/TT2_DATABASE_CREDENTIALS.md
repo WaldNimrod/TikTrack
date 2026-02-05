@@ -1,11 +1,17 @@
 # 🔐 Database Credentials Configuration - TikTrack Phoenix
 
-**Version:** 1.0  
+**id:** `TT2_DATABASE_CREDENTIALS`  
+**owner:** Team 60 (DevOps & Platform)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
+
+---
+
 **Date:** 2026-01-31  
 **Session:** SESSION_01  
-**Status:** ✅ **CONFIGURED**  
-**Maintained by:** Team 60 (DevOps & Platform)  
-**Last Updated:** 2026-01-31
+**Status:** ✅ **CONFIGURED**
 
 ---
 

@@ -1,8 +1,11 @@
 # 📊 Dashboard & Widgets Implementation Guide
 
-**Version:** 1.0  
-**Last Updated:** 2026-01-31  
-**Team:** Team 31 (Blueprint)
+**id:** `DASHBOARD_WIDGETS_GUIDE`  
+**owner:** Team 31 (Blueprint)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
 
 ---
 

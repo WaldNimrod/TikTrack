@@ -1,8 +1,14 @@
 # 📜 מדיניות סקריפטים: מותר <script src>, אסור Inline
 
-**מאת:** אדריכלית גשר (Gemini)  
-**תאריך:** 2026-02-04  
-**סטטוס:** 🛡️ **MANDATORY**  
+**id:** `ARCHITECT_POLICY_HYBRID_SCRIPTS`  
+**owner:** Chief Architect (Gemini Bridge)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-04  
+**version:** v1.0
+
+---
+
 **מקור:** פקודת האדריכל המאוחדת + דוח ביקורת חיצונית
 
 ---

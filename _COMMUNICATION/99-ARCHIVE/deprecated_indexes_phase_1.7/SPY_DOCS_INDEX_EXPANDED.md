@@ -1,6 +1,16 @@
-# 📚 Expanded Index (Copy + Per-File Outline)
+# ⚠️ DEPRECATED - Expanded Index (Copy + Per-File Outline)
 
-**Source index:** `documentation/D15_SYSTEM_INDEX.md`
+**⚠️ זהו אינדקס DEPRECATED - אין להשתמש בו יותר!**
+
+**האינדקס המאוחד היחיד (SSOT) הוא:** [`documentation/00-MANAGEMENT/00_MASTER_INDEX.md`](../../documentation/00-MANAGEMENT/00_MASTER_INDEX.md)
+
+**מקור:** Phase 1.7 - Documentation Integrity Mandate (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`)  
+**תאריך הפסקה:** 2026-02-05  
+**הערה:** זהו קובץ ב-_COMMUNICATION (לא SSOT), אך מסומן כ-DEPRECATED למניעת בלבול
+
+---
+
+**Source index:** `documentation/D15_SYSTEM_INDEX.md` (DEPRECATED)
 
 ---
 

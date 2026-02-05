@@ -1,5 +1,14 @@
 # 🏛️ TikTrack V2: Master Blueprint
 
+**id:** `TT2_MASTER_BLUEPRINT`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.5
+
+---
+
 - Stack: React 18, TS, Vite, FastAPI, PostgreSQL.
 - IDs: Hybrid Strategy (ULID for External, BIGINT for Internal).
 - Time: Global UTC.

@@ -93,6 +93,8 @@ window.PhoenixBridge.clearFilters();
 2. **React → HTML Shell:** React Context calls `window.PhoenixBridge.setFilter()` → Bridge updates its state and UI
 3. **Bidirectional Sync:** Both sides stay in sync through Bridge events
 
+**הערה:** שם האירוע הוא `phoenix-filter-change` (לא `phoenix-bridge-filter-update`).
+
 ---
 
 ## 📊 סיכום כללי
@@ -132,7 +134,7 @@ window.PhoenixBridge.clearFilters();
 ### **שלב 3: State SSOT**
 - ✅ אין שימוש ב-Zustand בקוד
 - ✅ `PhoenixFilterContext` מחובר ל-PhoenixBridge
-- ✅ יש Listener לאירועי Bridge (`phoenix-bridge-filter-update`)
+- ✅ יש Listener לאירועי Bridge (`phoenix-filter-change`)
 - ✅ כל ה-State מנוהל דרך React Context
 
 ---

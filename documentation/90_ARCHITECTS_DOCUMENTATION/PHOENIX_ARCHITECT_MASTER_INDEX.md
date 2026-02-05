@@ -1,5 +1,8 @@
-# 🏰 אינדקס אדריכל מרכזי (v2.10.5)
-## 📂 Phase 1.6 - Quality Assurance (LOCKED)
-- ARCHITECT_DRIFT_FIX_MANDATE.md - תיקון זחילת שמות (NEW).
-- routes.json - SSOT Paths v1.1.2 (UPDATED).
-- SPY_REPORT_90_02.md - דוח המרגל על זחילת שמות.
+# 🏰 אינדקס אדריכל מרכזי (v2.13.0)
+## 📂 Phase 2: Financial Core (ACTIVE 🟢)
+- D16_ACCTS_VIEW - ניהול חשבונות (In Progress).
+- FIX_transformers.js - חוזה נתונים מוקשח.
+
+## 📂 Phase 1: Foundations (LOCKED 🔒)
+- ARCHITECT_BATCH_1_FINAL_SEAL.md - חותמת נעילה סופית.
+- documentation/00-MANAGEMENT/00_MASTER_INDEX.md - ה-Registry המאוחד.

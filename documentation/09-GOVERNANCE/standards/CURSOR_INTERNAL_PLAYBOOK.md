@@ -1,5 +1,14 @@
 # ⚔️ ספר הנהלים לקבלן המבצע - Cursor Playbook (v2.3)
 
+**id:** `CURSOR_INTERNAL_PLAYBOOK`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-01  
+**version:** v2.3
+
+---
+
 **מיקום:** 09-GOVERNANCE/standards/  
 **אחריות ואכיפה:** צוות 10 (The Gateway)  
 **עודכן:** 2026-02-01 (ריענון נהלים ומשמעת אדריכלית v1.5)

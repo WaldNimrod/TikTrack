@@ -1,9 +1,16 @@
 # תבנית כותרת קונטיינר - הנחיות מחייבות
 
+**id:** `CONTAINER_HEADER_STRUCTURE_GUIDELINES`  
+**owner:** Team 40 (UI Assets & Design)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-01  
+**version:** v1.0
+
+---
+
 **מיקום:** `documentation/04-DESIGN_UX_UI/`  
-**אחריות:** Team 40 (UI Assets & Design)  
-**תוקף:** מחייב לכל המערכת  
-**תאריך עדכון:** 2026-02-01
+**תוקף:** מחייב לכל המערכת
 
 ---
 

@@ -1,9 +1,11 @@
 # 📜 אמנת רספונסיביות דינמית - Phoenix v2.0
 
-**תאריך:** 2026-02-02  
-**מקור:** Chief Architect (Gemini)  
-**סטטוס:** 🛡️ **MANDATORY**  
-**גרסה:** 1.0.0
+**id:** `TT2_RESPONSIVE_FLUID_DESIGN`  
+**owner:** Chief Architect (Gemini Bridge)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-02  
+**version:** v1.0.0
 
 ---
 

@@ -1,10 +1,16 @@
 # 📋 סדר טעינת CSS - מדריך מפורט
 
+**id:** `CSS_LOADING_ORDER`  
+**owner:** Team 10 (The Gateway) + Team 40 (UI Assets & Design)  
+**status:** 🔒 **SSOT - MANDATORY**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-02  
+**version:** v1.0
+
+---
+
 **מיקום:** `documentation/04-DESIGN_UX_UI/`  
-**אחריות:** Team 10 (עם Team 40)  
 **תוקף:** מחייב לכל המערכת  
-**תאריך יצירה:** 2026-02-02  
-**גרסה:** v1.0  
 **סטטוס:** ✅ **ACTIVE - MANDATORY**
 
 ---

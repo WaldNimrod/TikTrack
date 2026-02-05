@@ -1,4 +1,16 @@
-# 📑 אינדקס תיעוד מרכזי (v6.1)
+# ⚠️ DEPRECATED - אינדקס תיעוד מרכזי
+
+**⚠️ זהו אינדקס DEPRECATED - אין להשתמש בו יותר!**
+
+**האינדקס המאוחד היחיד (SSOT) הוא:** [`documentation/00-MANAGEMENT/00_MASTER_INDEX.md`](../00-MANAGEMENT/00_MASTER_INDEX.md)
+
+**מקור:** Phase 1.7 - Documentation Integrity Mandate (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`)  
+**תאריך הפסקה:** 2026-02-05  
+**מחליף:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+
+---
+
+**Version:** v6.1 (DEPRECATED)
 
 ## נהלים חדשים:
 - **CSS-01** | `TT2_CSS_STANDARDS_PROTOCOL.md` | פרוטוקול סטנדרטים ובקרת איכות CSS (ITCSS + BEM, Fluid Design) | **נוהל מחייב**

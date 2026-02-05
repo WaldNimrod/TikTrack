@@ -1,3 +1,216 @@
-# 📑 TikTrack Master Index
-1. 01_System_Blueprint.md
-2. 00_AUDIT_MANUAL.md
+# 🗂️ TikTrack Master Documentation Index
+
+**id:** `D15_MASTER_INDEX`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
+**supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
+**last_updated:** 2026-02-05  
+**version:** v3.0 (Phase 1.7 - Documentation Integrity)
+
+---
+
+## 📢 Executive Summary
+
+זהו האינדקס המאוחד היחיד (SSOT) לכל התיעוד במערכת TikTrack Phoenix. כל האינדקסים האחרים מסומנים כ-DEPRECATED.
+
+**מקור:** Phase 1.7 - Documentation Integrity Mandate (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`)
+
+---
+
+## 📂 עץ תיקיות (Directory Tree)
+
+```
+documentation/
+├── 00-MANAGEMENT/          (Management & Master Index)
+├── 01-ARCHITECTURE/        (ADRs & Blueprints)
+├── 02-DEVELOPMENT/         (Development Guides)
+├── 03-PRODUCT_&_BUSINESS/  (Product & Business Logic)
+├── 04-DESIGN_UX_UI/        (Design & UX Guidelines)
+├── 05-PROCEDURES/          (Operational Procedures)
+├── 06-ENGINEERING/         (Engineering & Database)
+├── 07-CONTRACTS/           (API Contracts & Schemas)
+├── 08-REPORTS/             (Reports & Artifacts)
+│   └── artifacts_SESSION_01/
+├── 09-GOVERNANCE/          (Governance & Standards)
+│   └── standards/
+│       ├── PHOENIX_MASTER_BIBLE.md
+│       ├── CURSOR_INTERNAL_PLAYBOOK.md
+│       ├── TEAM_50_QA_REPORT_TEMPLATE.md
+│       ├── TEAM_50_QA_WORKFLOW_PROTOCOL.md
+│       └── TEAM_50_QA_TEST_INDEX.md
+├── 10-POLICIES/            (Policies & Protocols)
+├── 90_Architects_documentation/  (READ ONLY - Architect only)
+└── 99-ARCHIVE/             (Archived Files)
+
+_COMMUNICATION/
+├── README_COMMUNICATION.md  (long-term reference)
+├── team_01/
+├── team_02/
+├── team_10/                 (The Gateway)
+├── team_20/                 (Backend)
+├── team_30/                 (Frontend)
+├── team_31/                 (Shared Components)
+├── team_40/                 (UI/Design)
+├── team_50/                 (QA)
+├── team_60/                 (DevOps)
+├── 90_Architects_communication/  (READ ONLY - Architect only)
+└── [staging folders, cursor_messages, etc.]
+```
+
+---
+
+## 🚀 מסמכי יסוד (Foundations)
+
+- [📖 PHOENIX_MASTER_BIBLE.md](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md) - ספר החוקים המאסטר
+- [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](../09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md) - מדריך עבודה פנימי
+- [🏛️ PHOENIX_ORGANIZATIONAL_STRUCTURE.md](./PHOENIX_ORGANIZATIONAL_STRUCTURE.md) - מבנה ארגוני
+
+---
+
+## 🧪 נוהלי QA (Team 50 & Team 51)
+
+- [🧪 TEAM_50_QA_WORKFLOW_PROTOCOL.md](../09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md) - נוהל עבודה לבדיקות QA (Code Review → Selenium → Visual Validation)
+- [📋 TEAM_50_QA_REPORT_TEMPLATE.md](../09-GOVERNANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md) - תבנית דוח QA סטנדרטית
+- [📊 TEAM_50_QA_TEST_INDEX.md](../09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md) - אינדקס בדיקות QA מפורט
+- ⚠️ **TEAM_51_ONBOARDING_COMPREHENSIVE.md** - חבילת אונבורדינג מקיפה לצוות 51 (QA Remote) - נמצא ב-`_COMMUNICATION/team_51/` (לא SSOT - Communication בלבד)
+
+---
+
+## 🏗️ תשתיות (Infrastructure)
+
+- [🏗️ TT2_INFRASTRUCTURE_GUIDE.md](../01-ARCHITECTURE/TT2_INFRASTRUCTURE_GUIDE.md) - מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment)
+- [🔐 TT2_DATABASE_CREDENTIALS.md](../01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md) - הגדרת Database Credentials (שם DB, משתמש, הוראות הגדרה)
+- [🏛️ TT2_MASTER_BLUEPRINT.md](../01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
+
+---
+
+## 🧱 ארכיטקטורת LEGO מודולרית (LEGO Modular Architecture)
+
+- [🧱 TT2_SECTION_ARCHITECTURE_SPEC.md](../01-ARCHITECTURE/TT2_SECTION_ARCHITECTURE_SPEC.md) - LEGO System Spec (TtSection > TtSectionRow > TtSectionCol)
+- [🧱 TT2_BACKEND_LEGO_SPEC.md](../01-ARCHITECTURE/TT2_BACKEND_LEGO_SPEC.md) - Backend LEGO Architecture (Atoms → Molecules → Organisms/Modular Cubes)
+- [📦 TT2_BACKEND_CUBE_INVENTORY.md](../01-ARCHITECTURE/TT2_BACKEND_CUBE_INVENTORY.md) - אינוונטר קוביות Backend (17 קוביות)
+- [📊 TT2_TABLES_REACT_FRAMEWORK.md](../01-ARCHITECTURE/TT2_TABLES_REACT_FRAMEWORK.md) - מערכת טבלאות React (PhoenixTable, PhoenixFilterContext, Hooks, Transformation Layer) ✅ **As Made**
+- [🏗️ תוכנית CSS & Blueprint Refactor V2](../02-DEVELOPMENT/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md) - תוכנית בנייה מחדש לפי ארכיטקטורת LEGO מודולרית ✅ **SSOT**
+- [🔍 בדיקת התאמה לארכיטקטורת LEGO](../02-DEVELOPMENT/TEAM_10_LEGO_ARCHITECTURE_VALIDATION.md) - בדיקת התאמה לארכיטקטורה מודולרית ✅ **SSOT**
+
+---
+
+## 🔄 Routes SSOT & Data Transformation
+
+- [🗺️ Routes SSOT (routes.json v1.1.2)](../../ui/public/routes.json) - מקור אמת יחיד לנתיבי המערכת (Frontend: 8080, Backend: 8082, Routes Hierarchy) ✅ **P1 Complete**
+- [🔄 Transformers Hardened v1.2](../../ui/src/cubes/shared/utils/transformers.js) - המרת נתונים מוקשחת עם המרת מספרים כפויה לשדות כספיים ✅ **P2 Complete**
+- [🔗 Bridge Integration](../../ui/src/cubes/shared/contexts/PhoenixFilterContext.jsx) - חיבור React Context ל-PhoenixBridge עם Listener ל-`phoenix-filter-change` event ✅ **P1 Complete**
+
+---
+
+## 🎨 עיצוב ו-Fidelity (Design & Fidelity)
+
+- [🎨 TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md](../09-GOVERNANCE/standards/TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md) - נוהל תיקון בעיות fidelity מול Blueprint (מתי ואיך לתקן)
+- [📐 CONTAINER_HEADER_STRUCTURE_GUIDELINES.md](../04-DESIGN_UX_UI/CONTAINER_HEADER_STRUCTURE_GUIDELINES.md) - הנחיות מבנה כותרות קונטיינרים (3 חלקים, גובה קבוע)
+- [🎯 UNIFIED_HEADER_SPECIFICATION.md](../04-DESIGN_UX_UI/UNIFIED_HEADER_SPECIFICATION.md) - מפרט טכני מפורט של אלמנט ראש הדף
+- [📚 SYSTEM_WIDE_DESIGN_PATTERNS.md](../04-DESIGN_UX_UI/SYSTEM_WIDE_DESIGN_PATTERNS.md) - תובנות מערכתיות ומבנים כלליים (תבנית עמוד, קונטיינרים, כרטיסים, **פוטר מודולרי**, פונטים, צבעים)
+- [🗂️ CSS_CLASSES_INDEX.md](../04-DESIGN_UX_UI/CSS_CLASSES_INDEX.md) - אינדקס מחלקות CSS - מפה למפתח לשימוש חוזר ולמניעת כפילויות
+- [📋 CSS_LOADING_ORDER.md](../04-DESIGN_UX_UI/CSS_LOADING_ORDER.md) - מדריך מפורט לסדר טעינת CSS (ITCSS, סדר טעינה קריטי, דוגמאות שימוש, בעיות נפוצות) 🔴 **CRITICAL**
+- [📊 DASHBOARD_WIDGETS_GUIDE.md](../04-DESIGN_UX_UI/DASHBOARD_WIDGETS_GUIDE.md) - מדריך מקיף לדשבורד וויגיטים - מבנה, עיצוב, פונקציונליות, וכל הדיוקים שבוצעו
+- [📜 TT2_RESPONSIVE_FLUID_DESIGN.md](../04-DESIGN_UX_UI/TT2_RESPONSIVE_FLUID_DESIGN.md) - אמנת רספונסיביות דינמית (Fluid Design, ללא media queries) 🛡️ **MANDATORY**
+
+---
+
+## ✅ ולידציה וטפסים (Validation & Forms)
+
+- [🎯 TT2_FORM_VALIDATION_FRAMEWORK.md](../10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md) - תשתית ולידציה מרכזית לכל הטפסים במערכת (PhoenixSchema, Error Handling, Client + Server Validation)
+- [📘 TT2_VALIDATION_DEVELOPER_GUIDE.md](../02-DEVELOPMENT/TT2_VALIDATION_DEVELOPER_GUIDE.md) - מדריך מפורט למפתחים עתידיים (יצירת Schemas, Error Handling, Best Practices)
+
+---
+
+## 📊 מטריצת עמודים מרכזית (Official Page Tracker)
+
+- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10) ✅ **Updated 2026-02-05 - P0/P1/P2 Complete, Batch 2 Ready**
+
+---
+
+## 🛡️ הנחיות אדריכליות (Architect Guidelines)
+
+- [🛡️ PHOENIX_MASTER_BIBLE](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md) - ספר החוקים המאסטר (ריענון נהלים v1.5 + Final Governance Lock v2.0 + Batch 1 Closure Mandate) 🛡️ **MANDATORY**
+- [🛡️ ריענון נהלים ומשמעת אדריכלית v1.5](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#3-ריענון-נהלים-ומשמעת-אדריכלית-v15--חובה) - הנחיות מחייבות מהאדריכלית (ניהול קבצים, G-Bridge, Transformation Layer)
+- [🛡️ Final Governance Lock v2.0](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#6-final-governance-lock-v20--mandatory) - נעילה ארכיטקטונית כוללת (מבנה תיקיות, Fluid Design, Design Tokens, משמעת סקריפטים) 🛡️ **FINAL LOCK**
+- [🛡️ הגדרות תפקיד ומשילות לכל צוות](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#5-הגדרות-תפקיד-ומשילות-לכל-צוות--batch-1-closure-mandate) - הגדרות תפקיד ומשילות לכל צוות (Batch 1 Closure Mandate) 🛡️ **MANDATORY - FOUNDATION SEAL**
+- ⚠️ **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/90_Architects_comunication/` (לא SSOT - Communication בלבד):
+  - `ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - פוטר מודולרי
+  - `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - Final Governance Lock
+  - `ARCHITECT_RESPONSIVE_CHARTER.md` - אמנת רספונסיביות
+  - `ARCHITECT_BATCH_1_FINAL_SUMMARY.md` - Batch 1 Closure
+
+---
+
+## 🔄 תהליכי פיתוח (Development Processes)
+
+- [🔄 CSS & Blueprint Refactor V2 - תוכנית בנייה מחדש](../02-DEVELOPMENT/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md) - תוכנית מלאה לבנייה מחדש לפי ארכיטקטורת LEGO מודולרית (⚠️ כלל ברזל: אין סקריפטים בתוך העמוד) ✅ **SSOT**
+- [📋 תהליך עבודה עם בלופרינטים](../05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md) - תהליך עבודה מעודכן v2.0 עם checklist לבדיקת CSS ו-DOM ✅ **SSOT**
+
+---
+
+## 🔒 Architect Mandate Implementation Status
+
+**Last Updated:** 2026-02-05
+
+### **P0/P1/P2 Complete:**
+- ✅ **Port Unification:** Frontend (8080), Backend (8082)
+- ✅ **Routes SSOT:** `routes.json` v1.1.2
+- ✅ **Transformers Hardened:** v1.2 (Forced number conversion for financial fields)
+- ✅ **Bridge Integration:** HTML Shell ↔ React Content
+- ✅ **Security:** Masked Log (Token leakage prevention)
+- ✅ **Scripts Policy:** Hybrid Scripts Policy (Allowed `<script src>`, Forbidden inline)
+- ✅ **Naming Resolution:** Plural enforcement (trades, trading_accounts)
+- ✅ **Drift Fix:** trade_plans reverted per DB schema
+
+### **Batch Status:**
+- ✅ **Batch 1:** Identity & Auth - COMPLETE (2026-02-02)
+- 🟡 **Batch 2:** Financial Core - AWAITING RE-AUDIT (2026-02-05)
+
+---
+
+## 📋 סטטוס נוכחי
+
+### 🚀 סטטוס סשן נוכחי: SESSION_01 (🟢 OPEN)
+### 🛡️ הנחיות אדריכליות: v1.5 (✅ ACKNOWLEDGED & IMPLEMENTED)
+### 🎉 Batch 1 Status: ✅ **COMPLETE END-TO-END** (2026-02-02)
+### 🛡️ Team Roles: ✅ **DEFINED & MANDATORY** (Batch 1 Closure Mandate)
+### 🛠️ Infrastructure Tools: ✅ **COMPLETE** (2026-02-02) - כלי בדיקה ותיעוד מוכנים
+### 🔒 Architect Mandate Implementation: ✅ **P0/P1/P2 COMPLETE** (2026-02-04)
+  - ✅ **P0:** Port Unification (8080/8082), Proxy Fix, Scripts Policy
+  - ✅ **P1:** Routes SSOT (routes.json v1.1.2), Security Masked Log, State SSOT (Bridge Integration)
+  - ✅ **P2:** FIX Files (transformers.js Hardened v1.2), D16 Cleanup, Documentation Update
+### 📚 Documentation Integrity: ✅ **PHASE 1.7 COMPLETE** (2026-02-05)
+  - ✅ **Unified Index:** `00_MASTER_INDEX.md` is now SSOT
+  - ✅ **Deprecated Indexes:** All other indexes marked as DEPRECATED and archived
+  - ✅ **Archive Location:** `documentation/99-ARCHIVE/deprecated_indexes_phase_1.7/` and `_COMMUNICATION/99-ARCHIVE/deprecated_indexes_phase_1.7/`
+
+---
+
+## ⚠️ אינדקסים מבוטלים (Deprecated Indexes)
+
+**הערה חשובה:** כל האינדקסים הבאים מסומנים כ-DEPRECATED והועברו לארכיון. השתמשו רק ב-`00_MASTER_INDEX.md` כמקור האמת היחיד.
+
+- ❌ `documentation/D15_SYSTEM_INDEX.md` - **DEPRECATED & ARCHIVED** → `documentation/99-ARCHIVE/deprecated_indexes_phase_1.7/D15_SYSTEM_INDEX.md`
+- ❌ `documentation/90_ARCHITECTS_DOCUMENTATION/PHOENIX_ARCHITECT_MASTER_INDEX.md` - **DEPRECATED & ARCHIVED** → `documentation/99-ARCHIVE/deprecated_indexes_phase_1.7/PHOENIX_ARCHITECT_MASTER_INDEX.md`
+- ❌ `documentation/10-POLICIES/TT2_MASTER_DOCUMENTATION_INDEX.md` - **DEPRECATED & ARCHIVED** → `documentation/99-ARCHIVE/deprecated_indexes_phase_1.7/TT2_MASTER_DOCUMENTATION_INDEX.md`
+- ❌ `_COMMUNICATION/team_90/SPY_DOCS_INDEX_EXPANDED.md` - **DEPRECATED & ARCHIVED** → `_COMMUNICATION/99-ARCHIVE/deprecated_indexes_phase_1.7/SPY_DOCS_INDEX_EXPANDED.md`
+
+---
+
+## 📚 טקסונומיה קשיחה (Hard Taxonomy)
+
+לפי פקודת האדריכל (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`):
+
+1. **01-ARCHITECTURE:** החלטות (ADRs) ובלופרינטים
+2. **09-GOVERNANCE:** פרוטוקולים מחייבים (RTL, DNA)
+3. **_COMMUNICATION:** טיוטות ודיווחים בלבד. לעולם לא SSOT
+
+---
+
+**Team 10 (The Gateway)**  
+**תאריך:** 2026-02-05  
+**סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
+
+**log_entry | [Team 10] | DOCS_INTEGRITY | MASTER_INDEX_UNIFIED | BLUE | 2026-02-05**

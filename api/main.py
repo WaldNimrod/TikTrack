@@ -17,7 +17,7 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 
 logging.basicConfig(level=logging.INFO)
@@ -59,18 +59,16 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS middleware
-# In development, allow localhost:8080 (Frontend) and localhost:8082 (Backend docs)
+# Port Unification (P0): Only allow Frontend on port 8080
 # In production, set ALLOWED_ORIGINS environment variable (comma-separated)
 if os.getenv("ALLOWED_ORIGINS"):
     # Production: Use environment variable
     allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS").split(",")]
 else:
-    # Development: Allow localhost origins
+    # Development: Allow only Frontend on port 8080 (per Port Unification mandate)
     allowed_origins = [
-        "http://localhost:8080",  # Frontend
-        "http://localhost:8082",   # Backend docs
+        "http://localhost:8080",  # Frontend (Vite) - Single Source of Truth
         "http://127.0.0.1:8080",  # Frontend (alternative)
-        "http://127.0.0.1:8082",  # Backend docs (alternative)
     ]
 
 app.add_middleware(
@@ -86,6 +84,9 @@ app.add_middleware(
 app.include_router(auth.router, prefix=settings.api_v1_prefix)
 app.include_router(users.router, prefix=settings.api_v1_prefix)
 app.include_router(api_keys.router, prefix=settings.api_v1_prefix)
+app.include_router(trading_accounts.router, prefix=settings.api_v1_prefix)
+app.include_router(cash_flows.router, prefix=settings.api_v1_prefix)
+app.include_router(positions.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health")

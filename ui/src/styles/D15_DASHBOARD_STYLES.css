@@ -42,6 +42,18 @@ body.profile-page {
    ============================================ */
 
 /* ============================================
+   Info Summary Styles (Trading Accounts View)
+   ============================================ */
+
+.info-summary__row--second {
+  display: none;
+}
+
+.info-summary__row--second.is-expanded {
+  display: flex;
+}
+
+/* ============================================
    Card Styles (for Profile Page)
    ============================================ */
 
@@ -409,11 +421,11 @@ body.profile-page {
 
 /* Recent Trades Widget - Trade color */
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__title-icon {
-  color: var(--entity-trade-color);
+  color: var(--entity-trades-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
-  border-inline-start: 3px solid var(--entity-trade-color);
+  border-inline-start: 3px solid var(--entity-trades-color);
 }
 
 .widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
@@ -554,25 +566,25 @@ tt-section .dashboard-section__body .info-summary {
 
 .active-alerts__card {
   background: var(--apple-bg-elevated, #ffffff);
-  border: 1px solid var(--entity-trade-border);
+  border: 1px solid var(--entity-trades-border);
   border-radius: 8px;
   padding: var(--spacing-md, 16px);
-  background-color: var(--entity-trade-bg);
+  background-color: var(--entity-trades-bg);
 }
 
-.active-alerts__card--trade {
-  --active-alert-card-bg: var(--alert-card-trade-bg);
-  --active-alert-card-border: var(--alert-card-trade-border);
-  --active-alert-card-text: var(--alert-card-trade-text);
+.active-alerts__card--trades {
+  --active-alert-card-bg: var(--alert-card-trades-bg);
+  --active-alert-card-border: var(--alert-card-trades-border);
+  --active-alert-card-text: var(--alert-card-trades-text);
   border-color: var(--active-alert-card-border);
   background-color: var(--active-alert-card-bg);
 }
 
-.active-alerts__card--trade .linked-object-card-title {
-  color: var(--entity-trade-color);
+.active-alerts__card--trades .linked-object-card-title {
+  color: var(--entity-trades-color);
 }
 
-.active-alerts__card--trade .linked-object-card-type {
+.active-alerts__card--trades .linked-object-card-type {
   color: var(--active-alert-card-text);
 }
 
@@ -991,8 +1003,8 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
 }
 
 .widget-placeholder__tab-btn--active {
-  color: var(--color-brand, var(--entity-trade-color));
-  border-bottom-color: var(--color-brand, var(--entity-trade-color));
+  color: var(--color-brand, var(--entity-trades-color));
+  border-bottom-color: var(--color-brand, var(--entity-trades-color));
   background: var(--apple-bg-elevated, #ffffff);
   font-weight: 600;
 }
@@ -1074,7 +1086,7 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
   min-width: 24px;
   height: 24px;
   padding: 0 var(--spacing-xs, 8px);
-  background: var(--color-brand, var(--entity-trade-color));
+  background: var(--color-brand, var(--entity-trades-color));
   color: white;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -1262,8 +1274,8 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
   padding: 0;
   margin: 0;
   margin-block-end: 0;
-  background: var(--color-brand, var(--entity-trade-color));
-  border: 1px solid var(--color-brand, var(--entity-trade-color));
+  background: var(--color-brand, var(--entity-trades-color));
+  border: 1px solid var(--color-brand, var(--entity-trades-color));
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -1273,7 +1285,7 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
 }
 
 .widget-placeholder__search-btn:hover {
-  background: var(--color-brand-hover, var(--entity-trade-text));
+  background: var(--color-brand-hover, var(--entity-trades-text));
 }
 
 .widget-placeholder__refresh-btn {
@@ -1334,9 +1346,9 @@ tt-section .dashboard-section__body .info-summary .info-summary__row {
 }
 
 .widget-placeholder__tag-btn:hover {
-  background: var(--color-brand, var(--entity-trade-color));
+  background: var(--color-brand, var(--entity-trades-color));
   color: white;
-  border-color: var(--color-brand, var(--entity-trade-color));
+  border-color: var(--color-brand, var(--entity-trades-color));
 }
 
 .widget-placeholder__chart-grid {
@@ -1549,12 +1561,12 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
 }
 
 .portfolio-filter-select:hover {
-  border-color: var(--color-brand, var(--entity-trade-color));
+  border-color: var(--color-brand, var(--entity-trades-color));
 }
 
 .portfolio-filter-select:focus {
   outline: none;
-  border-color: var(--color-brand, var(--entity-trade-color));
+  border-color: var(--color-brand, var(--entity-trades-color));
   box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
 }
 

@@ -37,7 +37,7 @@ This directory contains documentation for the TikTrack Phoenix Frontend infrastr
 
 ### **Available Scripts:**
 ```bash
-npm run dev      # Start development server (port 3000)
+npm run dev      # Start development server (port 8080)
 npm run build    # Build for production
 npm run preview  # Preview production build
 npm run lint     # Run ESLint
@@ -45,8 +45,8 @@ npm run lint     # Run ESLint
 
 ### **Vite Configuration:**
 - **File:** `ui/vite.config.js`
-- **Dev Server Port:** 3000
-- **API Proxy:** `/api` → `http://localhost:8080`
+- **Dev Server Port:** 8080 (Port Unification - Single Source of Truth)
+- **API Proxy:** `/api` → `http://localhost:8082` (Backend API)
 - **Build Output:** `dist/`
 - **Source Maps:** Enabled
 
@@ -80,7 +80,7 @@ const appName = import.meta.env.VITE_APP_NAME;
 - `VITE_APP_ENV` - Environment (development/production)
 
 ### **Default Values:**
-- **Development:** `http://localhost:8080/api/v1`
+- **Development:** `http://localhost:8082/api/v1` (Backend API port)
 - **Production:** `https://api.tiktrack.com/api/v1`
 
 ---
@@ -188,13 +188,13 @@ CSS files are imported in `ui/src/main.jsx` in the exact order listed above.
 ## 🔗 Integration Points
 
 ### **With Team 20 (Backend):**
-- **API Base URL:** `http://localhost:8080/api/v1` (Development)
-- **Port:** 8080 (Backend)
-- **CORS:** Backend handles CORS (no frontend changes needed)
-- **Proxy:** Vite proxy configured for `/api` → `http://localhost:8080`
+- **API Base URL:** `http://localhost:8082/api/v1` (Development)
+- **Port:** 8082 (Backend API - Port Unification)
+- **CORS:** Backend allows only `http://localhost:8080` (Frontend)
+- **Proxy:** Vite proxy configured for `/api` → `http://localhost:8082`
 
 ### **With Team 30 (Frontend):**
-- **Port:** 3000 (Frontend Dev Server)
+- **Port:** 8080 (Frontend Dev Server - Port Unification)
 - **Components:** Team 30 creates components, Team 60 provides infrastructure
 - **Router:** Team 60 provides skeleton, Team 30 adds routes/components
 
@@ -227,8 +227,8 @@ CSS files are imported in `ui/src/main.jsx` in the exact order listed above.
    ```
 
 4. **Access Application:**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8080/api/v1`
+   - Frontend: `http://localhost:8080` (Port Unification)
+   - Backend API: `http://localhost:8082/api/v1` (Port Unification)
 
 ### **Build for Production:**
 
@@ -267,9 +267,9 @@ Output will be in `ui/dist/` directory.
 - Clear cache: `rm -rf node_modules/.vite`
 
 ### **Proxy Issues:**
-- Verify backend is running on port 8080
-- Check `vite.config.js` proxy configuration
-- Ensure backend CORS is configured correctly
+- Verify backend is running on port 8082
+- Check `vite.config.js` proxy configuration (`/api` → `http://localhost:8082`)
+- Ensure backend CORS is configured correctly (allows only `http://localhost:8080`)
 
 ### **Environment Variables Not Loading:**
 - Verify variable has `VITE_` prefix

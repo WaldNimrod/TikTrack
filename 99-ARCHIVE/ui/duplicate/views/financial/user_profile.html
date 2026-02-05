@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פרופיל משתמש | TikTrack Phoenix</title>
+  
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="user-profile-page context-user">
+  
+  <!-- ============================================
+       UNIFIED HEADER + GLOBAL FILTER
+       ============================================ -->
+  <!-- Auth Guard: Check authentication before loading page -->
+  <script src="/src/views/financial/authGuard.js"></script>
+  
+  <!-- Header will be loaded dynamically via headerLoader.js -->
+  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
+  <script src="/src/components/core/phoenixFilterBridge.js"></script>
+  <script src="/src/components/core/headerLoader.js"></script>
+
+  <!-- ============================================
+       PAGE WRAPPER + CONTAINER STRUCTURE
+       ============================================
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section
+       ============================================ -->
+  
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main data-context="settings">
+        <tt-container>
+          
+          <!-- Section 0: מידע אישי וסטטוס אימות -->
+          <tt-section data-section="section-0">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="/images/icons/entities/user.svg" alt="מידע" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">מידע</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">מידע אישי וסטטוס אימות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר" aria-expanded="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="index-section__body">
+              <tt-section-row>
+                <!-- User Info Card -->
+                <div class="col-md-6">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0 text-muted">פרטי משתמש</h6>
+                    </div>
+                    <div class="card-body">
+                      <form id="userInfoForm">
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label class="form-label" for="profileUsername">שם משתמש</label>
+                            <input type="text" id="profileUsername" class="form-control" readonly>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="profileEmail">אימייל</label>
+                            <div class="input-group">
+                              <input type="email" id="profileEmail" class="form-control" placeholder="הכנס כתובת אימייל">
+                              <span class="input-group-text" id="emailVerificationBadge">
+                                <span id="emailVerificationStatus" class="badge">טוען...</span>
+                              </span>
+                            </div>
+                            <div class="mt-2">
+                              <button type="button" class="btn btn-sm btn-outline-secondary" id="resendEmailVerificationBtn">
+                                שלח הודעה חוזרת לאימייל
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="phoneNumber">טלפון</label>
+                            <div class="input-group">
+                              <input type="tel" id="phoneNumber" class="form-control" placeholder="05x-xxxxxxx">
+                              <span class="input-group-text" id="phoneVerificationBadge">
+                                <span id="phoneVerificationStatus" class="badge">טוען...</span>
+                              </span>
+                            </div>
+                            <div class="mt-2">
+                              <button type="button" class="btn btn-sm btn-outline-secondary" id="resendPhoneVerificationBtn">
+                                שלח הודעה חוזרת לטלפון
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileFirstName">שם פרטי</label>
+                            <input type="text" id="profileFirstName" class="form-control" placeholder="הכנס שם פרטי">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileLastName">שם משפחה</label>
+                            <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="profileIcon">אייקון משתמש</label>
+                            <input type="text" id="profileIcon" class="form-control" placeholder="למשל: user">
+                            <small class="form-text text-muted">הזינו שם אייקון מתוך IconSystem</small>
+                          </div>
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-primary" id="updateInfoBtn">
+                                <span id="updateInfoBtnText">עדכן פרטים</span>
+                                <span id="updateInfoBtnSpinner" class="btn-spinner d-none">⏳ מעדכן...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password Change Card -->
+                <div class="col-md-6">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0 text-muted">שינוי סיסמה</h6>
+                    </div>
+                    <div class="card-body">
+                      <form id="passwordForm">
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label class="form-label" for="currentPassword">סיסמה נוכחית</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="הכנס סיסמה נוכחית" required>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="newPassword">סיסמה חדשה</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="הכנס סיסמה חדשה (מינימום 6 תווים)" required minlength="6">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="confirmNewPassword">אימות סיסמה חדשה</label>
+                            <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
+                          </div>
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
+                                <span id="updatePasswordBtnText">עדכן סיסמה</span>
+                                <span id="updatePasswordBtnSpinner" class="btn-spinner d-none">⏳ מעדכן...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+              
+              <!-- Action Buttons Row -->
+              <tt-section-row>
+                <div class="col-12">
+                  <div class="d-flex justify-content-end action-buttons-row">
+                    <button type="button" class="btn btn-primary" id="changePasswordBtn">
+                      עדכן סיסמה
+                    </button>
+                    <button type="button" class="btn btn-primary btn-logout" id="logoutBtn">
+                      התנתק
+                    </button>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- Section 1: עריכת פרטי משתמש -->
+          <tt-section data-section="section-1">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="/images/icons/entities/user.svg" alt="עריכת פרטי משתמש" class="index-section__header-icon" width="35" height="35">
+                <h2 class="index-section__header-text">עריכת פרטי משתמש</h2>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">ניהול העדפות ומידע אישי</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר" aria-expanded="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <form id="userInfoForm2">
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileEmail2">אימייל</label>
+                            <input type="email" id="profileEmail2" class="form-control" placeholder="הכנס כתובת אימייל">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileIcon2">אייקון משתמש</label>
+                            <input type="text" id="profileIcon2" class="form-control" placeholder="למשל: user">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileFirstName2">שם פרטי</label>
+                            <input type="text" id="profileFirstName2" class="form-control" placeholder="הכנס שם פרטי">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="profileLastName2">שם משפחה</label>
+                            <input type="text" id="profileLastName2" class="form-control" placeholder="הכנס שם משפחה">
+                          </div>
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-primary" id="updateInfoBtn2">
+                                <span id="updateInfoBtn2Text">עדכן פרטים</span>
+                                <span id="updateInfoBtn2Spinner" class="btn-spinner d-none">⏳ מעדכן...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- Section 3: מפתחות API -->
+          <tt-section data-section="section-3">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="/images/icons/entities/trading_accounts.svg" alt="מפתחות API" class="index-section__header-icon" width="35" height="35">
+                <h2 class="index-section__header-text">מפתחות API</h2>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">ניהול מפתחות API לחיבורים חיצוניים</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר" aria-expanded="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <form id="aiAnalysisSettingsForm">
+                        <div class="row g-3">
+                          <!-- Column 1: Controls -->
+                          <div class="col-md-6">
+                            <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
+                            <select id="aiDefaultProvider" class="form-select" required>
+                              <option value="gemini">Gemini (מומלץ למתחילים)</option>
+                              <option value="perplexity">Perplexity</option>
+                            </select>
+                            <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
+                            
+                            <!-- Gemini API Key -->
+                            <div class="mt-3">
+                              <label class="form-label" for="geminiApiKey">Gemini API Key</label>
+                              <div class="input-group">
+                                <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
+                                  <span id="toggleGeminiKeyIcon">👁️</span>
+                                </button>
+                              </div>
+                              <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                              
+                              <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="validateGeminiBtn">
+                                  <span id="validateGeminiBtnText">בדוק</span>
+                                  <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <!-- Perplexity API Key -->
+                            <div class="mt-3">
+                              <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
+                              <div class="input-group">
+                                <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
+                                  <span id="togglePerplexityKeyIcon">👁️</span>
+                                </button>
+                              </div>
+                              <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                              
+                              <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="validatePerplexityBtn">
+                                  <span id="validatePerplexityBtnText">בדוק</span>
+                                  <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Column 2: Help Panel -->
+                          <div class="col-md-6">
+                            <label class="form-label">איפה להשיג מפתח API?</label>
+                            <div class="alert alert-info mb-0">
+                              <div class="mb-2">
+                                <strong>Gemini:</strong><br>
+                                <small>
+                                  1. עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a><br>
+                                  2. לחץ על "Get API Key"<br>
+                                  3. העתק את המפתח
+                                </small>
+                              </div>
+                              <div>
+                                <strong>Perplexity:</strong><br>
+                                <small>
+                                  1. עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a><br>
+                                  2. התחבר או צור חשבון<br>
+                                  3. עבור ל-"API Keys"<br>
+                                  4. לחץ על "Create API Key"<br>
+                                  5. העתק את המפתח
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                              <button type="submit" class="btn btn-success" id="saveAiAnalysisBtn">
+                                <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
+                                <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+          
+        </tt-container>
+      </main>
+    </div>
+  </div>
+  
+<!-- Modular Footer: Loaded dynamically via footerLoader.js -->
+<script src="/src/views/financial/footerLoader.js"></script>
+  
+  <!-- External JavaScript Files - NO inline scripts -->
+  <!-- CRITICAL: Clean Slate Rule - All JavaScript in external files -->
+  
+  <!-- Navigation Handler: Handle navigation link clicks -->
+  <script src="/src/views/financial/navigationHandler.js"></script>
+  
+  <!-- Header Dropdown: Dropdown menu functionality -->
+  <script src="/src/views/financial/headerDropdown.js"></script>
+  
+  <!-- Header Filters: Toggle functionality -->
+  <script src="/src/views/financial/headerFilters.js"></script>
+  
+  <!-- Section Toggle: Show/hide section body -->
+  <script src="/src/views/financial/sectionToggle.js"></script>
+  
+  <!-- D16 Header Links: Dynamic header links based on authentication -->
+  <script src="/src/views/financial/d16HeaderLinks.js"></script>
+  
+  <!-- User Profile Logic: Load user data and handle form interactions -->
+  <script src="/src/views/financial/userProfile.js"></script>
+</body>
+</html>

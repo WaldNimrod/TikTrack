@@ -189,7 +189,44 @@ tests/
 
 ---
 
-### 6. Frontend Development Testing Tools (Team 30)
+### 6. Frontend Routing & HTML Pages Testing (Team 30)
+
+**קטגוריה:** בדיקות Routing ו-HTML Pages  
+**אחריות:** Team 30 (Frontend Execution)  
+**תאריך יצירה:** 2026-02-03
+
+#### 6.1 Trading Accounts Routing Test
+
+**קובץ:** `tests/trading-accounts-routing.test.js`  
+**סוג:** בדיקת Selenium אוטומטית  
+**תפקיד:** בודק ש-routing של עמודים HTML עובד נכון
+
+**תרחישי בדיקה:**
+- ✅ Trading Accounts Route Serves HTML - בודק שהנתיב `/trading_accounts` משרת קובץ HTML
+- ✅ Trading Accounts with Debug Mode - בודק ש-Debug Mode עובד עם `?debug=true`
+- ✅ Trading Accounts without Authentication - בודק ש-redirect ל-login מתבצע נכון
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת קובץ HTML (לא React Router redirect)
+- בדיקת Auth Guard execution
+- בדיקת Debug Mode functionality
+- בדיקת Authentication redirect
+
+**שימוש:**
+```bash
+cd tests
+npm install
+npm run test:routing
+```
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_SELENIUM_TEST_ADDED.md`
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 7. Frontend Development Testing Tools (Team 30)
 
 **קטגוריה:** כלי בדיקה לפיתוח Frontend  
 **אחריות:** Team 30 (Frontend Execution)  
@@ -273,6 +310,8 @@ tests/
 
 **סה"כ כלי בדיקה Frontend:** 2
 
+**סה"כ בדיקות Routing:** 1 (3 תרחישים)
+
 ---
 
 ## 📊 סיכום כללי
@@ -288,7 +327,8 @@ tests/
 | **Error Handling & Security** | 11 | ✅ 11/11 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
 | **Validation Comprehensive** | 20+ | ✅ 12/18 | ⚠️ 1 Failed | ⏸️ Pending | ⚠️ **1 Issue** |
 | **Frontend Testing Tools** | 2 | ✅ 2/2 | ✅ Active | ✅ Ready | ✅ **Complete** |
-| **Total** | **77+** | **67/77+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **2 Issues** |
+| **Frontend Routing Tests** | 3 | ✅ 3/3 | ⏸️ Ready | ⏸️ Pending | ✅ **Complete** |
+| **Total** | **80+** | **70/80+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **2 Issues** |
 
 ---
 
@@ -302,6 +342,7 @@ tests/
 - **API Keys:** `tests/api-keys.test.js`
 - **Error Handling:** `tests/error-handling.test.js`
 - **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
+- **Trading Accounts Routing:** `tests/trading-accounts-routing.test.js` (Team 30)
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
 
@@ -397,9 +438,9 @@ tests/
 
 **אינדקס זה מתעדכן באופן שוטף עם כל בדיקה חדשה.**
 
-**Last Updated:** 2026-02-02  
+**Last Updated:** 2026-02-03  
 **Maintained By:** Team 50 (QA) + Team 30 (Frontend Testing Tools)  
-**Next Update:** After Team 30 fixes LoginForm error display
+**Next Update:** After routing issues resolved
 
 ---
 

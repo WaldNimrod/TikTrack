@@ -1,89 +1,57 @@
 /**
- * AppRouter - React Router Core Infrastructure
- * --------------------------------------------
- * Main router setup for TikTrack Phoenix Frontend
+ * AppRouter - React Router Configuration
+ * --------------------------------------
+ * Main router configuration for TikTrack Phoenix Frontend
  * 
- * @description Provides routing infrastructure for Public and Protected routes
- * @legacyReference Legacy routing system
- * @infrastructure Team 60 - Router skeleton (Team 30 adds components/logic)
+ * @description Defines all routes and navigation structure
+ * @infrastructure Team 60 - Router setup
  */
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from '../cubes/identity/components/auth/ProtectedRoute';
+import ProtectedRoute from '../cubes/identity/components/auth/ProtectedRoute.jsx';
+import HomePage from '../components/HomePage.jsx';
 
-// Public Routes (imported by Team 30)
-import HomePage from '../components/HomePage';
-import LoginForm from '../cubes/identity/components/auth/LoginForm';
-import RegisterForm from '../cubes/identity/components/auth/RegisterForm';
-import PasswordResetFlow from '../cubes/identity/components/auth/PasswordResetFlow';
-
-// Protected Routes (will be imported by Team 30)
-import ProfileView from '../cubes/identity/components/profile/ProfileView';
-import PasswordChangeForm from '../cubes/identity/components/profile/PasswordChangeForm';
-// import Dashboard from '../views/Dashboard';
-// import AccountsView from '../views/financial/D16_ACCTS_VIEW';
-// import BrokersView from '../views/financial/D18_BRKRS_VIEW';
-// import CashView from '../views/financial/D21_CASH_VIEW';
+// Auth components (lazy loaded for better performance)
+import LoginForm from '../cubes/identity/components/auth/LoginForm.jsx';
+import RegisterForm from '../cubes/identity/components/auth/RegisterForm.jsx';
+import PasswordResetFlow from '../cubes/identity/components/auth/PasswordResetFlow.jsx';
+import ProfileView from '../cubes/identity/components/profile/ProfileView.jsx';
 
 /**
  * AppRouter Component
  * 
- * @description Main router component with route definitions
- * - Public routes: /login, /register, /reset-password
- * - Protected routes: /profile, /dashboard, /accounts, /brokers, /cash
- * - Default redirect: / -> /login
- * - 404 fallback: * -> /login
+ * @description Main router component that defines all application routes
  */
 const AppRouter = () => {
   return (
-    <BrowserRouter
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
+    <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
+        {/* Public Routes - No authentication required */}
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/reset-password" element={<PasswordResetFlow />} />
         
-        {/* Protected Routes */}
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <ProfileView />
-          </ProtectedRoute>
-        } />
-        <Route path="/profile/password" element={
-          <ProtectedRoute>
-            <PasswordChangeForm />
-          </ProtectedRoute>
-        } />
-        {/* TODO: Team 30 - Uncomment and import actual components */}
-        {/* <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } /> */}
-        {/* <Route path="/accounts" element={
-          <ProtectedRoute>
-            <AccountsView />
-          </ProtectedRoute>
-        } /> */}
-        {/* <Route path="/brokers" element={
-          <ProtectedRoute>
-            <BrokersView />
-          </ProtectedRoute>
-        } /> */}
-        {/* <Route path="/cash" element={
-          <ProtectedRoute>
-            <CashView />
-          </ProtectedRoute>
-        } /> */}
+        {/* Protected Routes - Authentication required */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
         
-        {/* 404 fallback */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfileView />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Default redirect - redirect to home if authenticated, otherwise to login */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

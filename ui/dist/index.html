@@ -17,10 +17,15 @@
   
   <!-- 1. Pico CSS FIRST (Framework) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  <script type="module" crossorigin src="/assets/index-BBcxCZa6.js"></script>
+  
+  <!-- Header Loader - Loads unified-header.html dynamically for all pages (React and HTML) -->
+  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
+  <script src="/src/components/core/phoenixFilterBridge.js"></script>
+  <script src="/src/components/core/headerLoader.js"></script>
+  <script type="module" crossorigin src="/assets/index-B66ywQoG.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/react-vendor-BU6DfcCG.js">
   <link rel="modulepreload" crossorigin href="/assets/axios-vendor-D5GkNzM3.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-Ca4UGMvg.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-BLz1z-Pw.css">
 </head>
 <body>
   <div id="root"></div>

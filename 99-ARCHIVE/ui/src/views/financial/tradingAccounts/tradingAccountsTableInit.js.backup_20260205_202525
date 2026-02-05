@@ -1,0 +1,77 @@
+/**
+ * Trading Accounts Table Initialization - Initialize table managers
+ * -----------------------------------------------------------------
+ * אתחול Table Managers עבור כל הטבלאות ב-Trading Accounts View
+ * Clean Slate Rule: כל ה-JavaScript בקובץ חיצוני
+ */
+
+(function initTradingAccountsTables() {
+  'use strict';
+  
+  /**
+   * Initialize all table managers
+   */
+  function initializeTableManagers() {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        initTables();
+      });
+    } else {
+      initTables();
+    }
+  }
+  
+  /**
+   * Initialize individual tables
+   */
+  function initTables() {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:28',message:'initTables entry',data:{readyState:document.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    
+    // Initialize Sort and Filter Managers for each table
+    const accountsTable = document.querySelector('#accountsTable');
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:31',message:'accountsTable found',data:{found:!!accountsTable,hasSortManager:!!window.PhoenixTableSortManager,hasFilterManager:!!window.PhoenixTableFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    if (accountsTable && window.PhoenixTableSortManager && window.PhoenixTableFilterManager) {
+      const accountsSortManager = new window.PhoenixTableSortManager(accountsTable);
+      const accountsFilterManager = new window.PhoenixTableFilterManager(accountsTable);
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:34',message:'accountsTable managers created',data:{sortManagerCreated:!!accountsSortManager,filterManagerCreated:!!accountsFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
+    }
+    
+    const accountActivityTable = document.querySelector('#accountActivityTable');
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:37',message:'accountActivityTable found',data:{found:!!accountActivityTable,hasSortManager:!!window.PhoenixTableSortManager,hasFilterManager:!!window.PhoenixTableFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    if (accountActivityTable && window.PhoenixTableSortManager && window.PhoenixTableFilterManager) {
+      const activitySortManager = new window.PhoenixTableSortManager(accountActivityTable);
+      const activityFilterManager = new window.PhoenixTableFilterManager(accountActivityTable);
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:40',message:'accountActivityTable managers created',data:{sortManagerCreated:!!activitySortManager,filterManagerCreated:!!activityFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+    }
+    
+    const positionsTable = document.querySelector('#positionsTable');
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:43',message:'positionsTable found',data:{found:!!positionsTable,hasSortManager:!!window.PhoenixTableSortManager,hasFilterManager:!!window.PhoenixTableFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    if (positionsTable && window.PhoenixTableSortManager && window.PhoenixTableFilterManager) {
+      const positionsSortManager = new window.PhoenixTableSortManager(positionsTable);
+      const positionsFilterManager = new window.PhoenixTableFilterManager(positionsTable);
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:46',message:'positionsTable managers created',data:{sortManagerCreated:!!positionsSortManager,filterManagerCreated:!!positionsFilterManager},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+    }
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/0dbbb652-3522-4af0-82c9-6393fa068659',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'tradingAccountsTableInit.js:48',message:'initTables exit',data:{tablesInitialized:3},timestamp:Date.now(),sessionId:'debug-session',runId:'runtime-test',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+  }
+  
+  // Auto-initialize
+  initializeTableManagers();
+})();

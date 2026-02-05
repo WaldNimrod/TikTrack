@@ -1,0 +1,25 @@
+{
+  "version": "1.1.2",
+  "frontend": 8080,
+  "backend": 8082,
+  "routes": {
+    "auth": {
+      "login": "/login.html",
+      "register": "/register.html"
+    },
+    "financial": {
+      "trading_accounts": "/trading_accounts.html"
+    },
+    "planning": {
+      "trade_plans": "/trade_plans.html"
+    },
+    "research": {
+      "trades_history": "/trades_history.html"
+    }
+  },
+  "public_routes": [
+    "/login",
+    "/register",
+    "/reset-password"
+  ]
+}

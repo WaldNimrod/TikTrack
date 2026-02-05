@@ -3,14 +3,14 @@
  * --------------------------------------------
  * עמוד ניהול פרופיל המשתמש המחובר
  * 
- * @description תבנית V3 מבוססת על הבלופרינט המלא עם UnifiedHeader
+ * @description תבנית V3 מבוססת על הבלופרינט המלא
+ * Header נטען דינמית דרך headerLoader.js
  * @legacyReference Legacy.user.profile()
  * @blueprintSource _COMMUNICATION/team_31/team_31_staging/sandbox_v2/D15_PAGE_TEMPLATE_V3.html
  */
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import UnifiedHeader from '../../../../components/core/UnifiedHeader.jsx';
 import PageFooter from '../../../../components/core/PageFooter.jsx';
 import authService from '../../services/auth.js';
 import apiKeysService from '../../services/apiKeys.js';
@@ -222,7 +222,8 @@ const ProfileView = () => {
   if (isLoadingUser) {
     return (
       <>
-        <UnifiedHeader />
+        {/* Unified Header - Loaded dynamically via headerLoader.js */}
+        {/* Header is injected at the beginning of <body> by headerLoader.js */}
         <div className="page-wrapper">
           <div className="page-container">
             <main data-context="settings">
@@ -241,8 +242,8 @@ const ProfileView = () => {
 
   return (
     <>
-      {/* Unified Header */}
-      <UnifiedHeader />
+      {/* Unified Header - Loaded dynamically via headerLoader.js */}
+      {/* Header is injected at the beginning of <body> by headerLoader.js */}
       
       {/* Page Wrapper: Full-width gray background (EXACT from login page) */}
       <div className="page-wrapper">

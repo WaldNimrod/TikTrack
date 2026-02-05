@@ -146,54 +146,6 @@ const container = document.querySelector('tt-container');  // שגיאה!
 
 **חוק:** כל JS selector חייב להיות עם `js-` prefix, ללא קשר ל-CSS classes.
 
-#### **טבלאות React (PhoenixTable):**
-
-למרות השימוש ב-React, חובה להוסיף Class עם תחילית `js-` לכל אלמנט אינטראקטיבי בטבלאות לצורך ולידציית G-Bridge ובדיקות Selenium:
-
-```jsx
-// ✅ נכון - JS Selectors בטבלאות React
-<table className="phoenix-table js-table">
-  <thead className="phoenix-table__head">
-    <tr>
-      <th 
-        className="phoenix-table__header js-table-sort-trigger"
-        onClick={handleSort}
-      >
-        <span className="phoenix-table__header-text">שם חשבון</span>
-        <span className="phoenix-table__sort-indicator js-sort-indicator">
-          <svg className="phoenix-table__sort-icon js-sort-icon" />
-        </span>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    {/* שורות טבלה */}
-  </tbody>
-</table>
-
-{error && (
-  <div className="phoenix-table__error js-table-error" role="alert">
-    {error}
-  </div>
-)}
-
-{loading && (
-  <div className="phoenix-table__loading js-table-loading">
-    טוען נתונים...
-  </div>
-)}
-```
-
-**JS Selectors בטבלאות:**
-- `.js-table` - טבלה
-- `.js-table-sort-trigger` - טריגר סידור
-- `.js-sort-indicator` - אינדיקטור סידור
-- `.js-sort-icon` - אייקון סידור
-- `.js-table-error` - הודעת שגיאה
-- `.js-table-loading` - מצב טעינה
-
-**קישור למסמך מלא:** `documentation/01-ARCHITECTURE/TT2_TABLES_REACT_FRAMEWORK.md`
-
 ---
 
 ### ג. Naming Conventions Summary
@@ -201,12 +153,53 @@ const container = document.querySelector('tt-container');  // שגיאה!
 | Context | Convention | Example | Status |
 |---------|-----------|---------|--------|
 | **API Layer (OpenAPI)** | `snake_case` | `external_ulids`, `phone_numbers` | ✅ חובה |
-| **React Components** | `camelCase` | `externalUlids`, `phoneNumbers` | ✅ חובה |
+| **React Components** | `PascalCase.jsx` | `HomePage.jsx`, `LoginForm.jsx` | ✅ חובה |
+| **JavaScript Files** | `camelCase.js` | `headerLoader.js`, `authGuard.js` | ✅ חובה |
+| **HTML Files** | `snake_case.html` | `trading_accounts.html`, `user_profile.html` | ✅ חובה |
+| **CSS Files** | `kebab-case.css` | `phoenix-base.css`, `phoenix-components.css` | ✅ חובה |
 | **CSS Classes (BEM)** | `kebab-case` | `auth-form__button--primary` | ✅ חובה |
 | **JS Selectors** | `kebab-case` + `js-` prefix | `js-login-trigger` | ✅ חובה |
 | **Manager Classes** | `PascalCase` | `AuthManager`, `ApiKeyManager` | ✅ חובה |
 | **Functions/Variables (Data)** | `snake_case` (API) / `camelCase` (React) | `user_account_id` (API) / `userAccountId` (React) | ✅ חובה |
 | **Functions/Variables (Logic)** | `camelCase` | `handleSubmit`, `validateForm` | ✅ חובה |
+
+#### 📋 כללי שמות קבצים מפורטים:
+
+**React Components:**
+- ✅ `PascalCase.jsx` - כל רכיב React חייב להיות ב-PascalCase
+- ✅ דוגמאות: `HomePage.jsx`, `LoginForm.jsx`, `ProfileView.jsx`, `PasswordResetFlow.jsx`
+- ❌ לא נכון: `homePage.jsx`, `login-form.jsx`, `profile_view.jsx`
+
+**JavaScript Files:**
+- ✅ `camelCase.js` - כל קובץ JavaScript חייב להיות ב-camelCase
+- ✅ דוגמאות: `headerLoader.js`, `authGuard.js`, `navigationHandler.js`, `tradingAccountsDataLoader.js`
+- ❌ לא נכון: `header-loader.js`, `auth-guard.js`, `d16DataLoader.js` (תחילית לא ברורה)
+
+**HTML Files:**
+- ✅ `snake_case.html` - כל קובץ HTML חייב להיות ב-snake_case
+- ✅ דוגמאות: `trading_accounts.html`, `brokers_fees.html`, `cash_flows.html`
+- ❌ לא נכון: `tradingAccounts.html`, `brokers-fees.html`, `cashFlows.html`
+
+**CSS Files:**
+- ✅ `kebab-case.css` - כל קובץ CSS חייב להיות ב-kebab-case
+- ✅ דוגמאות: `phoenix-base.css`, `phoenix-components.css`, `phoenix-header.css`
+- ❌ לא נכון: `phoenixBase.css`, `phoenix_components.css`
+
+#### 🚫 איסורים חשובים:
+
+1. **אין קיצורים לא ברורים:**
+   - ❌ `d16DataLoader.js` → ✅ `tradingAccountsDataLoader.js`
+   - ❌ `d16FiltersIntegration.js` → ✅ `tradingAccountsFiltersIntegration.js`
+   - ❌ `d16TableInit.js` → ✅ `tradingAccountsTableInit.js`
+
+2. **אין תחיליות מיותרות:**
+   - ❌ `d16HeaderHandlers.js` → ✅ `tradingAccountsHeaderHandlers.js` (אם ספציפי) או `headerFilterHandlers.js` (אם גנרי)
+
+3. **שמות חייבים להיות אינטואיטיביים:**
+   - ✅ `portfolioSummaryToggle.js` (ברור שזה toggle)
+   - ✅ `sectionToggleHandler.js` (ברור שזה handler)
+   - ❌ `portfolioSummary.js` (לא ברור שזה toggle)
+   - ❌ `sectionToggle.js` (לא ברור שזה handler)
 
 ---
 
@@ -455,29 +448,93 @@ class AuthManager {
 
 ```
 ui/src/
-├── services/          # API services (snake_case for API calls)
-│   ├── auth.js
-│   ├── apiKeys.js
-│   └── users.js
-├── managers/          # Business logic managers (PascalCase classes)
-│   ├── AuthManager.js
-│   ├── ApiKeyManager.js
-│   └── UserManager.js
-├── utils/             # Utility functions (camelCase)
+├── components/        # React components גנריים (PascalCase.jsx)
+│   ├── core/         # רכיבי ליבה משותפים (JavaScript handlers)
+│   │   ├── PageFooter.jsx
+│   │   ├── headerLoader.js      # JavaScript loader (camelCase.js)
+│   │   └── phoenixFilterBridge.js
+├── views/            # עמודים סטטיים (HTML)
+│   ├── shared/       # HTML Templates שטוענים ל-views (גנריים)
+│   │   ├── unified-header.html  # HTML template (snake_case.html)
+│   │   ├── footer.html          # HTML template (snake_case.html)
+│   │   └── footerLoader.js      # JavaScript loader
+│   └── HomePage.jsx
+├── cubes/            # מודולים עסקיים (Cubes Architecture)
+│   ├── identity/     # מודול זהות
+│   │   ├── components/
+│   │   │   ├── auth/
+│   │   │   │   ├── LoginForm.jsx
+│   │   │   │   └── RegisterForm.jsx
+│   │   │   └── profile/
+│   │   │       └── ProfileView.jsx
+│   │   ├── hooks/
+│   │   │   └── useAuthValidation.js
+│   │   └── services/
+│   │       ├── auth.js
+│   │       └── apiKeys.js
+│   └── shared/       # מודול משותף
+│       ├── components/
+│       │   └── tables/
+│       │       └── PhoenixTable.jsx
+│       ├── contexts/
+│       │   └── PhoenixFilterContext.jsx
+│       ├── hooks/
+│       │   ├── usePhoenixTableData.js
+│       │   ├── usePhoenixTableFilter.js
+│       │   └── usePhoenixTableSort.js
+│       ├── PhoenixTableFilterManager.js
+│       ├── PhoenixTableSortManager.js
+│       ├── tableFormatters.js
+│       └── utils/
+│           └── transformers.js
+├── views/            # עמודים סטטיים (HTML)
+│   ├── shared/       # HTML Templates שטוענים ל-views (גנריים)
+│   │   ├── unified-header.html  # HTML template
+│   │   ├── footer.html          # HTML template
+│   │   └── footerLoader.js      # JavaScript loader
+│   └── financial/    # עמודים פיננסיים
+│       ├── tradingAccounts/  # מודול trading accounts
+│       │   ├── trading_accounts.html
+│       │   ├── tradingAccountsDataLoader.js
+│       │   ├── tradingAccountsFiltersIntegration.js
+│       │   ├── tradingAccountsHeaderHandlers.js
+│       │   └── tradingAccountsTableInit.js
+│       ├── brokersFees/     # מודול brokers fees
+│       │   └── brokers_fees.html
+│       └── cashFlows/       # מודול cash flows
+│           └── cash_flows.html
+├── logic/            # לוגיקה עסקית
+│   ├── errorCodes.js
+│   └── schemas/
+│       ├── authSchema.js
+│       └── userSchema.js
+├── utils/            # Utility functions (camelCase)
 │   ├── transformers.js  # apiToReact, reactToApi
 │   ├── errorHandler.js
 │   ├── debug.js       # DEBUG_MODE, debugLog
 │   └── audit.js       # PhoenixAudit class
-├── components/        # React components (PascalCase)
-│   ├── auth/
-│   │   ├── LoginForm.jsx
-│   │   └── RegisterForm.jsx
-│   └── common/
-│       └── ErrorBoundary.jsx
-└── hooks/            # Custom React hooks (camelCase with 'use' prefix)
-    ├── useAuth.js
-    └── useApiKeys.js
+├── router/           # React Router
+│   └── AppRouter.jsx
+└── main.jsx          # Entry point
 ```
+
+#### 📋 כללי ארגון תיקיות:
+
+1. **הפרדה בין קבצים גנריים לספציפיים:**
+   - קבצים גנריים → `shared/` או `core/`
+   - קבצים ספציפיים → תיקיית מודול (למשל `tradingAccounts/`)
+
+2. **ארגון לפי מודולים:**
+   - כל מודול עסקי בתיקייה נפרדת
+   - קבצים ספציפיים למודול בתוך התיקייה שלו
+
+3. **אין קבצים מיותרים:**
+   - כל קובץ חייב להיות בשימוש
+   - קבצים לא בשימוש → `99-ARCHIVE/ui/`
+
+4. **אין כפילויות:**
+   - כל פונקציונליות → קובץ אחד בלבד
+   - אין שני קבצים עם אותה מטרה
 
 ---
 
@@ -781,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
 - [ ] כל API responses עוברים דרך `apiToReact` (camelCase)
 - [ ] כל JS selectors משתמשים ב-`js-` prefix
 - [ ] אין שימוש ב-BEM classes כ-JS selectors
-- [ ] טבלאות React משתמשות ב-`js-` prefixed selectors (`.js-table`, `.js-table-sort-trigger`, `.js-sort-indicator`, `.js-sort-icon`, `.js-table-error`, `.js-table-loading`)
 - [ ] כל פונקציות מתועדות ב-JSDoc עם `@legacyReference`
 - [ ] Audit Trail מיושם בכל המודולים
 - [ ] כל האיקונים הם SVG inline פשוטים (אין ספריות חיצוניות)
@@ -813,14 +869,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ---
 
-**Last Updated:** 2026-01-31  
-**Version:** v1.5 (Added Icon Standards)  
+**Last Updated:** 2026-02-04  
+**Version:** v1.6 (Added File Naming & Folder Structure Standards)  
 **Maintained By:** Team 10 (The Gateway)  
 **Approved By:** Chief Architect - Phoenix v252
 
 ---
 
 ## 8. היסטוריית עדכונים
+
+### v1.6 (2026-02-04)
+- ✅ **הוסף:** כללי שמות קבצים מפורטים (React Components, JavaScript, HTML, CSS)
+- ✅ **הוסף:** איסורים על קיצורים לא ברורים ותחיליות מיותרות
+- ✅ **הוסף:** מבנה תיקיות מפורט עם הפרדה בין גנרי לספציפי
+- ✅ **הוסף:** כללי ארגון תיקיות (הפרדה לפי מודולים, אין כפילויות, אין קבצים מיותרים)
+- ✅ **עודכן:** Naming Conventions Summary עם דוגמאות לכל סוג קובץ
 
 ### v1.5 (2026-01-31)
 - ✅ **הוסף:** סעיף ד' - איקונים אחידים (Icon Standards)

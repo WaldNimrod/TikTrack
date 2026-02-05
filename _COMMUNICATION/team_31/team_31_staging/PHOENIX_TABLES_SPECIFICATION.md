@@ -4,8 +4,11 @@
 **אחריות:** Team 31 (Blueprint) → Team 10 (Gateway) → Architect Review  
 **תוקף:** מחייב לכל המערכת  
 **תאריך יצירה:** 2026-02-01  
-**גרסה:** v1.0.0 (Draft for Architect Review)  
-**סטטוס:** ⏳ **PENDING ARCHITECT APPROVAL**
+**תאריך עדכון אחרון:** 2026-02-02  
+**גרסה:** v1.1.0 (Updated with D16_ACCTS_VIEW implementation details)  
+**סטטוס:** ✅ **APPROVED - BASED ON D16_ACCTS_VIEW BLUEPRINT**
+
+**⚠️ חשוב:** מסמך זה עודכן בהתאם לבלופרינט המאושר של עמוד D16_ACCTS_VIEW (v1.0.13). זהו התבנית הסופית והמאושרת לכל הטבלאות במערכת.
 
 ---
 
@@ -161,12 +164,49 @@
 
 .phoenix-table__cell--numeric {
   font-family: var(--font-family-mono, 'SFMono-Regular', Consolas, monospace);
-  text-align: left; /* RTL: numbers align left */
+  text-align: center !important; /* ⚠️ CRITICAL: Center aligned, not left/right */
   letter-spacing: 0.5px;
+}
+
+/* ⚠️ CRITICAL: All numeric columns MUST be center-aligned */
+.phoenix-table__cell--numeric,
+.phoenix-table__cell--currency,
+.phoenix-table__cell.col-balance,
+.phoenix-table__cell.col-amount,
+.phoenix-table__cell.col-total-pl,
+.phoenix-table__cell.col-current_price,
+.phoenix-table__cell.col-avg-price,
+.phoenix-table__cell.col-market-value,
+.phoenix-table__cell.col-unrealized-pl,
+.phoenix-table__cell.col-percent-account,
+.phoenix-table__cell.col-quantity,
+.phoenix-table__cell.col-positions,
+.phoenix-table__cell.col-account-value,
+.phoenix-table__cell.col-holdings-value {
+  text-align: center !important;
+}
+
+/* ⚠️ CRITICAL: All column headers MUST be center-aligned */
+.phoenix-table__header {
+  text-align: center;
 }
 ```
 
 ### 3.3 ריווח (Spacing)
+
+**⚠️ קריטי - כלל מערכתי יסודי:**
+
+ברירת מחדל מערכתית - כל האלמנטים מקבלים `margin: 0` ו-`padding: 0`:
+
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+```
+
+**ריווח חייב להיות מוחל במפורש באמצעות מחלקות ריווח סטנדרטיות:**
 
 ```css
 .phoenix-table__header,
@@ -178,6 +218,18 @@
   border-bottom: none;
 }
 ```
+
+**מחלקות ריווח סטנדרטיות:**
+- `.spacing-xs` / `.padding-xs`: `2px`
+- `.spacing-sm` / `.padding-sm`: `4px`
+- `.spacing-md` / `.padding-md`: `8px`
+- `.spacing-lg` / `.padding-lg`: `10px`
+- `.spacing-xl` / `.padding-xl`: `12px`
+- `.margin-xs`: `2px`
+- `.margin-sm`: `4px`
+- `.margin-md`: `8px`
+- `.margin-lg`: `10px`
+- `.margin-xl`: `12px`
 
 ### 3.4 גבהים קבועים
 
@@ -335,6 +387,38 @@ class PhoenixTableSortManager {
 </div>
 ```
 
+**⚠️ קריטי - רוחב פילטרים:**
+- אין `width: 100%` - יש להשתמש ב-`width: auto` עם `min-width` מתאים
+- יישום:
+```css
+.phoenix-table-filters {
+  width: auto !important; /* Remove 100% width */
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 8px);
+  margin: 0;
+  padding: 0;
+}
+
+.phoenix-table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  margin: 0;
+  padding: 0;
+  width: auto !important; /* Remove 100% width */
+}
+
+.phoenix-table-filter-select,
+.phoenix-table-filter-input {
+  width: auto !important; /* Remove 100% width */
+  min-width: 150px;
+  margin: 0;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+}
+```
+
 ### 5.3 מנגנון סינון משולב
 
 **כל טבלה חייבת לממש:**
@@ -390,21 +474,26 @@ class PhoenixTableFilterManager {
 
 **טבלה:** ניהול חשבונות מסחר (Container 1)
 
-| עמודה | שם שדה (Backend) | טיפוס | פורמט תצוגה | סידור | פילטר |
-|:---|:---|:---|:---|:---|:---|
-| **שם חשבון** | `display_names` | `String` | טקסט רגיל | כן (string) | כן (חיפוש) |
-| **ברוקר** | `broker_names` | `String` | טקסט רגיל | כן (string) | כן (dropdown) |
-| **יתרה** | `available_amounts` (מ-Balances) | `NUMERIC(20,8)` | מטבע + סכום | כן (numeric) | לא |
-| **מטבע** | `currency_codes` (מ-Balances) | `VARCHAR(3)` | קוד מטבע (USD, EUR, ILS) | כן (string) | כן (dropdown) |
-| **סטטוס** | `is_active_statuses` | `Boolean` | תגית צבעונית | כן (boolean) | כן (dropdown) |
-| **תאריך יצירה** | `created_at_times` | `TIMESTAMP` | DD/MM/YYYY | כן (date) | לא |
-| **פעולות** | - | - | כפתורים (ערוך/מחק) | לא | לא |
+| עמודה | שם שדה (Backend) | טיפוס | פורמט תצוגה | סידור | פילטר | יישור |
+|:---|:---|:---|:---|:---|:---|:---|
+| **שם חשבון** | `display_names` | `String` | טקסט רגיל | כן (string) | כן (חיפוש) | שמאל (RTL) |
+| **מטבע** | `currency_codes` (מ-Balances) | `VARCHAR(3)` | קוד מטבע (USD, EUR, ILS) | כן (string) | כן (dropdown) | מרכז |
+| **יתרה** | `available_amounts` (מ-Balances) | `NUMERIC(20,8)` | מטבע + סכום | כן (numeric) | לא | **מרכז** ⚠️ |
+| **פוזיציות** | `positions_count` | `Integer` | מספר שלם | כן (numeric) | לא | **מרכז** ⚠️ |
+| **רווח/הפסד** | `total_pl` | `NUMERIC(20,8)` | מטבע + סכום | כן (numeric) | לא | **מרכז** ⚠️ |
+| **שווי חשבון** | `account_value` | `NUMERIC(20,8)` | מטבע + סכום | כן (numeric) | לא | **מרכז** ⚠️ |
+| **שווי אחזקות** | `holdings_value` | `NUMERIC(20,8)` | מטבע + סכום | כן (numeric) | לא | **מרכז** ⚠️ |
+| **סטטוס** | `is_active_statuses` | `Boolean` | תגית צבעונית | כן (boolean) | כן (dropdown) | מרכז |
+| **עודכן** | `updated_at_times` | `TIMESTAMP` | DD/MM/YYYY | כן (date) | לא | מרכז |
+| **פעולות** | - | - | תפריט פעולות (4 כפתורים) | לא | לא | מרכז |
+
+**⚠️ קריטי:** כל העמודות המספריות **חייבות** להיות מיושרות **למרכז** (`text-align: center`), לא ימין/שמאל!
 
 ### 6.2 פורמט תצוגה מפורט
 
 #### **יתרה (available_amounts)**
 - **פורמט:** `$1,234.56` או `€1,234.56` או `₪1,234.56`
-- **יישור:** ימין (RTL: שמאל)
+- **יישור:** **מרכז** ⚠️ (לא ימין/שמאל)
 - **פונט:** Monospace
 - **צבע:** 
   - חיובי: `var(--apple-text-primary, #000000)`
@@ -632,6 +721,11 @@ class PhoenixTableFilterManager {
 - [ ] דוגמאות קוד מלאות
 - [ ] תוכנית מימוש מפורטת
 - [ ] המלצות ותוספות מתועדות
+- [ ] ברירות מחדל מערכתיות מתועדות (ריווח, יישור)
+- [ ] פורמטי תצוגה מיוחדים מתועדים (נוכחי, P/L)
+- [ ] עיצוב באגטים מתועד
+- [ ] תפריט פעולות מתועד
+- [ ] פילטרים פנימיים מתועדים (רוחב, יישור)
 
 ---
 
@@ -642,10 +736,99 @@ class PhoenixTableFilterManager {
 - `documentation/01-ARCHITECTURE/LOGIC/WP_20_08_C_FIELD_MAP_TRADING_ACCOUNTS.md` - מפרט שדות חשבונות מסחר
 - `documentation/01-ARCHITECTURE/LOGIC/WP_20_08_FIELD_MAP_CASH_FLOWS.md` - מפרט שדות תנועות מזומן
 - `_COMMUNICATION/team_31/team_31_staging/phoenix-components.css` - קובץ CSS מרכיבים
+- `_COMMUNICATION/team_31/team_31_staging/sandbox_v2/D16_ACCTS_VIEW.html` - **בלופרינט מאושר - תבנית סופית לכל הטבלאות** ⚠️
+- `_COMMUNICATION/team_31/team_31_staging/sandbox_v2/TEAM_31_TO_TEAM_10_30_D16_ACCTS_VIEW_IMPLEMENTATION_REQUEST.md` - הודעה למימוש
+
+---
+
+---
+
+## 🆕 11. עדכונים מ-D16_ACCTS_VIEW Blueprint (v1.0.13)
+
+### 11.1 ברירות מחדל מערכתיות
+
+**ריווח (Spacing):**
+- כל האלמנטים מקבלים `margin: 0` ו-`padding: 0` כברירת מחדל
+- ריווח חייב להיות מוחל במפורש באמצעות מחלקות ריווח סטנדרטיות
+- אין `margin-bottom: 14.720px` - יש לבטל ל-`0`
+
+**יישור עמודות:**
+- כל העמודות המספריות: `text-align: center` (לא ימין/שמאל)
+- כל כותרות העמודות: `text-align: center`
+
+### 11.2 פורמטי תצוגה מיוחדים
+
+**עמודת נוכחי (`col-current_price`):**
+- תמיד מציג מחיר + שינוי יומי בפורמט: `$155.34(+3.22%)`
+- מבנה: `<div class="current-price-display">` עם שני `<span>` נפרדים
+- יישור: למרכז
+
+**עמודת P/L (`col-unrealized-pl`):**
+- תמיד מציג ערך מספרי + אחוז, סיפרה אחת אחרי הנקודה: `+$550.0(+3.5%)`
+- מבנה: `<div class="pl-display">` עם שני `<span>` נפרדים
+- יישור: למרכז
+
+### 11.3 באגטים (Badges)
+
+**עיצוב סטנדרטי:**
+- רקע: `rgba(color, 0.3)` (0.3 alpha)
+- מסגרת: `1px solid` עם אותו צבע
+- צבע טקסט: צבע מלא בהתאם לסוג
+- פדינג: `2px 8px`
+- border-radius: `4px`
+
+**באגטים לפי חיובי/שלילי:**
+- סוג פעולה (`col-type`): צבע ירוק/אדום לפי `data-type-positive`
+- תת-סוג פעולה (`col-subtype`): באגט עם מניפת צבעים (רקע 0.1 alpha, מסגרת, צבע טקסט)
+
+### 11.4 תפריט פעולות (Action Menu)
+
+**מאפיינים קריטיים:**
+- נפתח במעבר עכבר (hover) - **לא** מוצג קבוע
+- דיליי לסגירה: `0.5s` (לא `0.3s`)
+- פדינג לקונטיינר: `4px`
+- מיקום: `inset-inline-end: calc(100% + 1px)` (צמוד מאוד לכפתור)
+- כפתורים: `margin: 0`, `padding: 0` - רק פדינג לקונטיינר
+
+### 11.5 פילטרים פנימיים
+
+**מאפיינים:**
+- אין `width: 100%` - יש להשתמש ב-`width: auto` עם `min-width` מתאים
+- מבנה: `.phoenix-table-filters` עם `.phoenix-table-filter-group`
+- יישור: `display: flex` עם `align-items: center`
+
+### 11.6 אלמנט חלוקה לעמודים (Pagination)
+
+**מאפיינים:**
+- כפתורים ומספר עמוד: `margin: 0`, `padding: 0`
+- אין `margin-bottom: 14.7px` - יש לבטל ל-`0`
+
+### 11.7 מצבי מעבר עכבר (Hover States)
+
+**ברירת מחדל:**
+- מעבר עכבר על אלמנטים (כמו כפתורי סידור) משנה את צבע הטקסט לצבע משני (`--apple-text-secondary`)
+- **ללא** מסגרת
+- **ללא** צבע ירוק/outline
+
+### 11.8 עמודות בטבלת חשבונות מסחר
+
+**עמודות חובה:**
+1. שם החשבון מסחר (`col-name`)
+2. מטבע (`col-currency`)
+3. יתרה (`col-balance`)
+4. פוזיציות (`col-positions`)
+5. רווח/הפסד (`col-total-pl`)
+6. **שווי חשבון (`col-account-value`)** ⚠️ **חדש - חובה**
+7. **שווי אחזקות (`col-holdings-value`)** ⚠️ **חדש - חובה**
+8. סטטוס (`col-status`)
+9. עודכן (`col-updated`)
+10. פעולות (`col-actions`)
 
 ---
 
 **Team 31 (Blueprint)**  
-**Date:** 2026-02-01  
-**Status:** ⏳ **PENDING ARCHITECT APPROVAL**  
-**Next Step:** העברה לצוות 10 ולאדריכל לאישור
+**Date Created:** 2026-02-01  
+**Last Updated:** 2026-02-02  
+**Version:** v1.1.0  
+**Status:** ✅ **APPROVED - BASED ON D16_ACCTS_VIEW BLUEPRINT**  
+**Next Step:** מימוש על ידי Team 30 בהתאם לבלופרינט המאושר

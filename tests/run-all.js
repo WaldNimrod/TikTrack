@@ -13,7 +13,8 @@ const tests = [
   { name: 'Authentication Flow', file: 'auth-flow.test.js' },
   { name: 'User Management Flow', file: 'user-management.test.js' },
   { name: 'API Keys Management Flow', file: 'api-keys.test.js' },
-  { name: 'Error Handling & Security', file: 'error-handling.test.js' }
+  { name: 'Error Handling & Security', file: 'error-handling.test.js' },
+  { name: 'Trading Accounts Routing', file: 'trading-accounts-routing.test.js' }
 ];
 
 async function checkInfrastructure() {

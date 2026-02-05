@@ -1,3 +1,5 @@
-# 🏰 אינדקס אדריכל מרכזי
-נתיב דוקומנטציה: 1LLZb_wFTuA8a7qfrF62Ksi1VBUu8ZWd6
-סטטוס: INITIALIZED
+# 🏰 אינדקס אדריכל מרכזי (v2.10.5)
+## 📂 Phase 1.6 - Quality Assurance (LOCKED)
+- ARCHITECT_DRIFT_FIX_MANDATE.md - תיקון זחילת שמות (NEW).
+- routes.json - SSOT Paths v1.1.2 (UPDATED).
+- SPY_REPORT_90_02.md - דוח המרגל על זחילת שמות.

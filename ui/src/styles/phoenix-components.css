@@ -116,9 +116,9 @@ tt-section-row > * {
   margin-block-end: var(--spacing-xs, 4px); /* Small gap for gray spacing */
   box-shadow: var(--apple-shadow-light, 0 1px 3px rgba(0, 0, 0, 0.1));
   /* Subtle entity color accent on left border */
-  border-inline-start: 3px solid var(--color-brand, var(--entity-trade-color));
+  border-inline-start: 3px solid var(--color-brand, var(--entity-trades-color));
   /* Entity color accent on bottom border */
-  border-block-end: 3px solid var(--color-brand, var(--entity-trade-color));
+  border-block-end: 3px solid var(--color-brand, var(--entity-trades-color));
   height: 60px; /* CRITICAL: Fixed height - cannot break or stretch */
   min-height: 60px;
   max-height: 60px;
@@ -174,7 +174,7 @@ tt-section-row > * {
   width: 35px;
   height: 35px;
   padding-top: 3px;
-  color: var(--color-brand, var(--entity-trade-color));
+  color: var(--color-brand, var(--entity-trades-color));
 }
 
 .dashboard-section__header-text,
@@ -201,7 +201,7 @@ tt-section-row > * {
 .index-section__header-meta .index-section__header-count,
 .dashboard-section__header-meta .dashboard-section__header-count {
   font-size: var(--font-size-base, 0.92rem);
-  color: var(--color-brand, var(--entity-trade-color)); /* Primary color */
+  color: var(--color-brand, var(--entity-trades-color)); /* Primary color */
   opacity: 0.8; /* 0.8 opacity */
   text-align: center; /* Centered */
   font-weight: 500; /* Subtitle style */
@@ -349,7 +349,7 @@ body .page-wrapper .page-container main {
    ============================================
    MODULAR FOOTER STRATEGY (Approved by Chief Architect):
    - Content: footer.html (single source of truth)
-   - Loader: footer-loader.js (dynamic injection)
+   - Loader: footerLoader.js (dynamic injection)
    - Styles: THIS FILE (phoenix-components.css)
    
    IMPORTANT:
@@ -363,7 +363,8 @@ body .page-wrapper .page-container main {
   width: 100vw; /* CRITICAL: Always 100% viewport width - edge to edge */
   max-width: 100vw; /* Ensure never exceeds viewport */
   min-height: 200px; /* Minimum height - grows with content */
-  background: var(--apple-bg-footer, #2C2C2E); /* Dark gray - defined in phoenix-base.css CSS Variables */
+  /* Footer background adapts to theme - can be light or dark */
+  background: var(--apple-bg-footer, var(--apple-bg-secondary, #F2F2F7)); /* Light gray by default, dark if --apple-bg-footer is set */
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15); /* Stronger separator shadow above footer */
   margin: 0; /* CRITICAL: Reset all margins */
   margin-top: var(--spacing-lg, 24px) !important; /* CRITICAL: Match spacing above form (24px) - must override margin: 0 */
@@ -373,7 +374,10 @@ body .page-wrapper .page-container main {
   margin-block-start: var(--spacing-lg, 24px) !important; /* CRITICAL: Match spacing above form (24px) */
   padding: var(--spacing-lg, 24px); /* Padding for content */
   box-sizing: border-box;
-  color: #FFFFFF; /* White text */
+  /* CRITICAL: Text color adapts to footer background */
+  /* If footer is dark (--apple-bg-footer is dark), use white text */
+  /* If footer is light (--apple-bg-footer is light), use dark text */
+  color: var(--text-primary, #1c1e21); /* Dark text by default - adapts if footer background changes */
   /* CRITICAL: Footer MUST stay at bottom - sticky footer behavior */
   /* Footer is pushed to bottom by flex: 1 on page-container and main */
   /* CRITICAL: Footer always full width, edge to edge, regardless of parent container */
@@ -406,7 +410,8 @@ body .page-wrapper .page-container main {
 
 /* Footer Title */
 .page-footer__title {
-  color: #FFFFFF;
+  /* Inherit color from .page-footer - adapts to footer background */
+  color: inherit;
   font-size: var(--font-size-base, 16px);
   font-weight: 600;
   margin: 0 0 var(--spacing-md, 16px) 0;
@@ -414,7 +419,8 @@ body .page-wrapper .page-container main {
 
 /* Footer Text */
 .page-footer__text {
-  color: #FFFFFF;
+  /* Inherit color from .page-footer - adapts to footer background */
+  color: inherit;
   font-size: var(--font-size-sm, 14px);
   margin: 0 0 var(--spacing-sm, 8px) 0;
   line-height: 1.5;
@@ -422,7 +428,8 @@ body .page-wrapper .page-container main {
 
 /* Footer Link */
 .page-footer__link {
-  color: #FFFFFF;
+  /* Inherit color from .page-footer - adapts to footer background */
+  color: inherit;
   text-decoration: none;
   transition: opacity 0.2s ease;
 }
@@ -430,4 +437,875 @@ body .page-wrapper .page-container main {
 .page-footer__link:hover {
   opacity: 0.8;
   text-decoration: underline;
+}
+
+/* ============================================
+   TABLES SYSTEM
+   ============================================
+   Complete table styling system for Phoenix v2.0
+   Based on approved blueprint: trading_accounts.html (v1.0.13)
+   
+   CRITICAL RULES:
+   - All values MUST use CSS Variables (no hardcoded colors/spacing)
+   - All numeric columns: text-align: center
+   - All headers: text-align: center
+   - Zero spacing default: margin: 0, padding: 0 (apply via classes)
+   - Fluid Design: Use clamp() for responsive (no media queries except dark mode)
+   
+   Naming Convention:
+   - All classes prefixed with: phoenix-table-*
+   - BEM methodology: .phoenix-table__header, .phoenix-table__cell
+   ============================================ */
+
+/* ============================================
+   STANDARD SPACING CLASSES
+   ============================================
+   These classes provide consistent spacing throughout the system.
+   Use these instead of inline margins/padding.
+   
+   NOTE: Zero spacing default is handled in phoenix-base.css.
+   These classes provide explicit spacing where needed.
+   ============================================ */
+.spacing-xs, .padding-xs { padding: 2px; }
+.spacing-sm, .padding-sm { padding: 4px; }
+.spacing-md, .padding-md { padding: 8px; }
+.spacing-lg, .padding-lg { padding: 10px; }
+.spacing-xl, .padding-xl { padding: 12px; }
+
+.margin-xs { margin: 2px; }
+.margin-sm { margin: 4px; }
+.margin-md { margin: 8px; }
+.margin-lg { margin: 10px; }
+.margin-xl { margin: 12px; }
+
+/* ============================================
+   TABLE STRUCTURE
+   ============================================ */
+
+/* Table Wrapper - Outer container */
+.phoenix-table-wrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  margin: 0;
+  padding: 0;
+}
+
+/* Table - Main table element */
+.phoenix-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-medium, 10px);
+  overflow: hidden;
+}
+
+/* Table Head */
+.phoenix-table__head {
+  display: table-header-group;
+  background: var(--apple-bg-secondary, #f2f2f7);
+}
+
+/* Table Body */
+.phoenix-table__body {
+  display: table-row-group;
+}
+
+/* Table Row */
+.phoenix-table__row {
+  display: table-row;
+  border-block-end: 1px solid var(--apple-border-light, #e5e5ea);
+  transition: background-color 0.2s ease;
+}
+
+.phoenix-table__row:hover {
+  background: var(--apple-bg-secondary, #f2f2f7);
+}
+
+.phoenix-table__row:last-child {
+  border-block-end: none;
+}
+
+/* Table Header Cell */
+.phoenix-table__header {
+  display: table-cell;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  text-align: center; /* CRITICAL: All headers center aligned */
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--apple-text-secondary, #3c3c43);
+  vertical-align: middle;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: transparent;
+}
+
+/* Sortable Header */
+.phoenix-table__header[data-sortable="true"],
+.phoenix-table__header.js-table-sort-trigger {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.phoenix-table__header[data-sortable="true"]:hover,
+.phoenix-table__header.js-table-sort-trigger:hover {
+  color: var(--apple-text-secondary, #3c3c43) !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Active Sort State */
+.phoenix-table__header[data-sortable="true"][aria-sort="ascending"],
+.phoenix-table__header[data-sortable="true"][aria-sort="descending"] {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+/* Header Text */
+.phoenix-table__header-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+/* Sort Indicator */
+.phoenix-table__sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: var(--spacing-xs, 4px);
+}
+
+/* Sort Icon */
+.phoenix-table__sort-icon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.phoenix-table__header[aria-sort="ascending"] .phoenix-table__sort-icon,
+.phoenix-table__header[aria-sort="descending"] .phoenix-table__sort-icon {
+  opacity: 1;
+}
+
+/* Table Cell */
+.phoenix-table__cell {
+  display: table-cell;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  font-size: var(--font-size-base, 14px);
+  font-weight: var(--font-weight-normal, 400);
+  color: var(--apple-text-primary, #1d1d1f);
+  vertical-align: middle;
+  border: none;
+  margin: 0;
+}
+
+/* Numeric Cell - Center aligned */
+.phoenix-table__cell--numeric,
+.phoenix-table__cell--currency,
+.phoenix-table__cell.col-balance,
+.phoenix-table__cell.col-amount,
+.phoenix-table__cell.col-total-pl,
+.phoenix-table__cell.col-current_price,
+.phoenix-table__cell.col-avg-price,
+.phoenix-table__cell.col-market-value,
+.phoenix-table__cell.col-unrealized-pl,
+.phoenix-table__cell.col-percent-account,
+.phoenix-table__cell.col-quantity,
+.phoenix-table__cell.col-positions,
+.phoenix-table__cell.col-account-value,
+.phoenix-table__cell.col-holdings-value {
+  text-align: center !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* Numeric Headers - Center aligned */
+.phoenix-table__header.col-amount,
+.phoenix-table__header.col-balance,
+.phoenix-table__header.col-total-pl,
+.phoenix-table__header.col-current_price,
+.phoenix-table__header.col-avg-price,
+.phoenix-table__header.col-market-value,
+.phoenix-table__header.col-unrealized-pl,
+.phoenix-table__header.col-percent-account,
+.phoenix-table__header.col-quantity,
+.phoenix-table__header.col-positions,
+.phoenix-table__header.col-account-value,
+.phoenix-table__header.col-holdings-value {
+  text-align: center !important;
+}
+
+/* Date Cell */
+.phoenix-table__cell--date {
+  text-align: center;
+}
+
+/* Status Cell */
+.phoenix-table__cell--status {
+  text-align: center;
+}
+
+/* Actions Cell */
+.phoenix-table__cell--actions {
+  text-align: center;
+  width: 60px;
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================
+   Badges with transparent background (0.1-0.3 alpha), border, colored text
+   ============================================ */
+
+/* Base Badge */
+.phoenix-table__status-badge,
+.status-badge {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid currentColor !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-medium, 500);
+  white-space: nowrap;
+}
+
+/* Active Status - Green */
+.phoenix-table__status-badge--active,
+.status-badge[data-status-category="active"] {
+  background: rgba(52, 199, 89, 0.1) !important;
+  border: 1px solid var(--apple-green, #34c759) !important;
+  color: var(--apple-green, #34c759) !important;
+}
+
+/* Long Position - Green */
+.phoenix-table__status-badge--long {
+  background: rgba(52, 199, 89, 0.1) !important;
+  border: 1px solid var(--apple-green, #34c759) !important;
+  color: var(--apple-green, #34c759) !important;
+}
+
+/* Short Position - Red */
+.phoenix-table__status-badge--short {
+  background: rgba(255, 59, 48, 0.1) !important;
+  border: 1px solid var(--apple-red, #ff3b30) !important;
+  color: var(--apple-red, #ff3b30) !important;
+}
+
+/* Inactive Status - Gray */
+.phoenix-table__status-badge--inactive {
+  background: rgba(142, 142, 147, 0.1) !important;
+  border: 1px solid var(--apple-gray-6, #8e8e93) !important;
+  color: var(--apple-gray-6, #8e8e93) !important;
+}
+
+/* Count Badge - Primary Color */
+.active-alerts__count-badge {
+  background: rgba(0, 122, 255, 0.1) !important;
+  border: 1px solid rgba(0, 122, 255, 0.3) !important;
+  color: var(--apple-blue, #007aff) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+}
+
+/* ============================================
+   TABLE ACTIONS MENU
+   ============================================
+   Dropdown menu that appears on hover
+   CRITICAL: Opens on hover, delay 0.5s for closing
+   ============================================ */
+
+/* Actions Tooltip Container */
+.table-actions-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Actions Menu - Dropdown */
+.table-actions-menu {
+  position: absolute;
+  top: 0;
+  inset-inline-end: calc(100% + 1px); /* Very close to trigger button */
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  padding: 4px; /* CRITICAL: Padding 4px for container only */
+  background: var(--apple-bg-primary, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-small, 6px);
+  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15));
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition-delay: 0.5s; /* CRITICAL: Delay for closing - easier to catch */
+  margin: 0;
+}
+
+.table-actions-tooltip:hover .table-actions-menu,
+.table-actions-tooltip:focus-within .table-actions-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s; /* No delay on open */
+}
+
+.table-actions-menu:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s; /* No delay when hovering menu */
+}
+
+/* Delay closing when mouse leaves */
+.table-actions-tooltip:not(:hover):not(:focus-within) .table-actions-menu {
+  transition-delay: 0.5s; /* Increased delay before closing */
+}
+
+/* Actions Trigger Button */
+.table-actions-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--apple-text-secondary, #3c3c43);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.table-actions-trigger:hover {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  color: var(--apple-text-primary, #000000);
+}
+
+/* Action Button */
+.table-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0; /* CRITICAL: No padding for buttons themselves */
+  margin: 0;
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-secondary, #3c3c43);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.table-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.table-action-btn:hover {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  border-color: currentColor;
+}
+
+/* Action Button Colors */
+.table-action-btn[aria-label*="צפה"],
+.table-action-btn.js-action-view {
+  color: var(--color-brand, #26baac);
+  border-color: var(--color-brand, #26baac);
+}
+
+.table-action-btn[aria-label*="ערוך"],
+.table-action-btn.js-action-edit {
+  color: var(--apple-blue, #007aff);
+  border-color: var(--apple-blue, #007aff);
+}
+
+.table-action-btn[aria-label*="ביטול"],
+.table-action-btn.js-action-cancel {
+  color: var(--apple-orange, #ff9500);
+  border-color: var(--apple-orange, #ff9500);
+}
+
+.table-action-btn[aria-label*="מחק"],
+.table-action-btn.js-action-delete {
+  color: var(--apple-red, #ff3b30);
+  border-color: var(--apple-red, #ff3b30);
+}
+
+/* ============================================
+   SPECIAL DISPLAY FORMATS
+   ============================================ */
+
+/* Current Price Display - Price + Daily Change */
+.current-price-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+}
+
+.current-price-display .numeric-value-positive,
+.current-price-display .numeric-value-negative {
+  margin: 0;
+  padding: 0;
+}
+
+/* P/L Display - Value + Percentage */
+.phoenix-table__cell.col-unrealized-pl .pl-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+}
+
+.phoenix-table__cell.col-unrealized-pl .pl-value {
+  margin: 0;
+  padding: 0;
+}
+
+.phoenix-table__cell.col-unrealized-pl .pl-percentage {
+  margin: 0;
+  padding: 0;
+  font-size: 0.85em;
+}
+
+/* ============================================
+   OPERATION TYPE BADGES
+   ============================================ */
+
+/* Positive Operation Type - Green */
+.phoenix-table__cell.col-type[data-type-positive="true"],
+.phoenix-table__cell.col-subtype[data-type-positive="true"] {
+  color: var(--apple-green, #34c759);
+}
+
+.phoenix-table__cell.col-subtype[data-type-positive="true"] {
+  background: rgba(52, 199, 89, 0.1);
+  border-color: var(--apple-green, #34c759);
+  border: 1px solid var(--apple-green, #34c759);
+  border-radius: 4px;
+  padding: 2px 8px;
+  display: inline-block;
+}
+
+/* Negative Operation Type - Red */
+.phoenix-table__cell.col-type[data-type-positive="false"],
+.phoenix-table__cell.col-subtype[data-type-positive="false"] {
+  color: var(--apple-red, #ff3b30);
+}
+
+.phoenix-table__cell.col-subtype[data-type-positive="false"] {
+  background: rgba(255, 59, 48, 0.1);
+  border-color: var(--apple-red, #ff3b30);
+  border: 1px solid var(--apple-red, #ff3b30);
+  border-radius: 4px;
+  padding: 2px 8px;
+  display: inline-block;
+}
+
+/* Operation Type Badge - Color Palette */
+.operation-type-badge[data-operation-type="deposit"] {
+  background: rgba(52, 199, 89, 0.1) !important;
+  border-color: var(--apple-green, #34c759) !important;
+  color: var(--apple-green, #34c759) !important;
+}
+
+.operation-type-badge[data-operation-type="withdrawal"] {
+  background: rgba(255, 59, 48, 0.1) !important;
+  border-color: var(--apple-red, #ff3b30) !important;
+  color: var(--apple-red, #ff3b30) !important;
+}
+
+.operation-type-badge[data-operation-type="transfer"] {
+  background: rgba(0, 122, 255, 0.1) !important;
+  border-color: var(--apple-blue, #007aff) !important;
+  color: var(--apple-blue, #007aff) !important;
+}
+
+.operation-type-badge[data-operation-type="execution"] {
+  background: rgba(255, 149, 0, 0.1) !important;
+  border-color: var(--apple-orange, #ff9500) !important;
+  color: var(--apple-orange, #ff9500) !important;
+}
+
+.operation-type-badge {
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  border: 1px solid currentColor;
+}
+
+/* ============================================
+   INTERNAL FILTERS
+   ============================================
+   Filters within table sections
+   CRITICAL: width: auto (not 100%)
+   ============================================ */
+
+.phoenix-table-filters {
+  width: auto !important; /* CRITICAL: Remove 100% width */
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 8px);
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.phoenix-table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  margin: 0;
+  padding: 0;
+  width: auto !important; /* CRITICAL: Remove 100% width */
+}
+
+.phoenix-table-filter-select,
+.phoenix-table-filter-input {
+  width: auto !important; /* CRITICAL: Remove 100% width */
+  min-width: 150px;
+  margin: 0;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-primary, #000000);
+  font-size: var(--font-size-base, 14px);
+}
+
+.phoenix-table-filter-select:hover,
+.phoenix-table-filter-input:hover {
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-filter-select:focus,
+.phoenix-table-filter-input:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PAGINATION
+   ============================================
+   Table pagination controls
+   CRITICAL: margin: 0, padding: 0 for buttons
+   ============================================ */
+
+.phoenix-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md, 16px);
+  padding: 5px var(--spacing-md, 16px);
+  background: rgba(242, 242, 247, 0.3);
+  border-block-start: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: 0 0 var(--apple-radius-medium, 10px) var(--apple-radius-medium, 10px);
+  color: var(--apple-text-secondary, #3c3c43);
+}
+
+.phoenix-table-pagination__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.phoenix-table-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+  white-space: nowrap;
+}
+
+.phoenix-table-pagination__page-size {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+}
+
+.phoenix-table-pagination__page-size-label {
+  color: var(--apple-text-secondary, #3c3c43);
+  opacity: 0.5;
+}
+
+.phoenix-table-pagination__page-size-select {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-primary, #000000);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.phoenix-table-pagination__page-size-select:hover {
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__page-size-select:focus {
+  outline: 2px solid var(--color-brand, #26baac);
+  outline-offset: 2px;
+}
+
+.phoenix-table-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  white-space: nowrap;
+}
+
+.phoenix-table-pagination__button,
+.phoenix-table-pagination__page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 25px;
+  padding: 0; /* CRITICAL: margin: 0, padding: 0 */
+  margin: 0;
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-small, 6px);
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-primary, #000000);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.phoenix-table-pagination__button:hover:not(:disabled),
+.phoenix-table-pagination__page-number:hover {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.phoenix-table-pagination__page-number--active {
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--color-brand, #26baac);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__page-number--active:hover {
+  background: var(--apple-bg-primary, #ffffff);
+  border-color: var(--color-brand-hover, #1e968a);
+  color: var(--color-brand-hover, #1e968a);
+}
+
+.phoenix-table-pagination__button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================
+   ACCOUNT MOVEMENTS SUMMARY CARDS
+   ============================================
+   Grid layout for summary cards
+   ============================================ */
+
+.account-movements-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md, 16px);
+  margin: 0;
+  padding: 0;
+}
+
+.summary-card {
+  margin: 0;
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: var(--apple-radius-medium, 10px);
+}
+
+/* ============================================
+   INFO SUMMARY ROWS
+   ============================================
+   Portfolio summary display with toggle
+   ============================================ */
+
+.info-summary__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-lg, 24px);
+}
+
+.info-summary__row--first {
+  justify-content: flex-start !important; /* Text to start of line */
+  width: 100%;
+}
+
+.info-summary__row--first > div,
+.info-summary__row--first > span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+}
+
+/* Toggle button aligned to end (right in RTL) */
+.info-summary__row--first .portfolio-summary__toggle-btn {
+  margin-inline-start: auto !important; /* Push to end */
+}
+
+.portfolio-summary__toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0 !important; /* CRITICAL: Remove default margin-bottom of 14.720px */
+  background: transparent;
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--apple-text-primary, #1d1d1f);
+  flex-shrink: 0;
+}
+
+.portfolio-summary__toggle-btn:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+/* CRITICAL: Second row display - flex layout */
+.info-summary__row--second {
+  display: none; /* CRITICAL: Hidden by default - JavaScript will show via class toggle */
+  flex-wrap: wrap;
+  gap: var(--spacing-md, 16px);
+  margin: 0;
+  padding: var(--spacing-sm, 8px) 0;
+  border-top: 1px solid var(--apple-border-light, #e5e5ea);
+}
+
+/* CRITICAL: Show second row when visible class is added */
+.info-summary__row--second.visible,
+.info-summary__row--second[data-visible="true"] {
+  display: flex;
+}
+
+.info-summary__row--second span {
+  margin: 0;
+  padding: 0;
+}
+
+.info-summary strong {
+  color: var(--apple-text-primary, #1d1d1f);
+  font-weight: 600;
+}
+
+/* ============================================
+   ACTIVE ALERTS FIXES
+   ============================================
+   Remove default margins that cause misalignment
+   ============================================ */
+
+/* CRITICAL: Remove default margin-bottom of 14.720px from active-alerts__mark_read */
+.active-alerts__mark_read {
+  margin: 0 !important;
+  padding: 0;
+}
+
+/* CRITICAL: Remove default margin-bottom of 14.720px from active-alerts__title-trigger */
+.active-alerts__title-trigger {
+  margin: 0 !important;
+  padding: 0;
+}
+
+/* CRITICAL: Remove default margin-bottom of 14.720px from btn-view-alert */
+.btn.btn-view-alert {
+  margin: 0 !important;
+  padding: 0;
+  align-self: flex-start !important; /* Align to top */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CRITICAL: Ensure active-alerts__details container aligns to top */
+.active-alerts__details {
+  display: flex;
+  align-items: flex-start !important; /* Align to top */
+  justify-content: flex-end;
+}
+
+/* ============================================
+   STICKY COLUMNS
+   ============================================
+   ARCHITECT MANDATE: Sticky Columns for context preservation
+   Required for: col-name, col-symbol, col-actions
+   ============================================ */
+
+/* Sticky Column - שם החשבון (ראשונה מימין ב-RTL) */
+.phoenix-table__header.col-name,
+.phoenix-table__cell.col-name {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+.phoenix-table__header.col-name {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
+}
+
+/* Sticky Column - סמל (לטבלת פוזיציות, ראשונה מימין ב-RTL) */
+.phoenix-table__header.col-symbol,
+.phoenix-table__cell.col-symbol {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+.phoenix-table__header.col-symbol {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
+}
+
+/* Sticky Column - פעולות (אחרונה משמאל ב-RTL) */
+.phoenix-table__header.col-actions,
+.phoenix-table__cell.col-actions {
+  position: sticky;
+  inset-inline-end: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+.phoenix-table__header.col-actions {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
 }

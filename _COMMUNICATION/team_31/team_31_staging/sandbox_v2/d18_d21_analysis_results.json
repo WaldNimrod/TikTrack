@@ -1,0 +1,31 @@
+{
+  "d18": {
+    "legacy_files": [],
+    "db_schema": {},
+    "api_spec": {},
+    "field_maps": [],
+    "ui_files": []
+  },
+  "d21": {
+    "legacy_files": [],
+    "db_schema": {},
+    "api_spec": {},
+    "field_maps": [],
+    "ui_files": []
+  },
+  "common_patterns": {},
+  "recommendations": [
+    {
+      "page": "BOTH",
+      "type": "template",
+      "recommendation": "Use D15_PAGE_TEMPLATE_V3.html as base template",
+      "priority": "CRITICAL"
+    },
+    {
+      "page": "BOTH",
+      "type": "tables",
+      "recommendation": "Follow D16_ACCTS_VIEW.html as table template (Phoenix Tables System)",
+      "priority": "CRITICAL"
+    }
+  ]
+}

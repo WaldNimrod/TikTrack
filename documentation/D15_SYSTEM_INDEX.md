@@ -1,7 +1,7 @@
 # 🗂️ TikTrack Master Documentation Index (D15)
-**Last Updated:** 2026-02-03
-**Status:** ✅ **REORGANIZED & UNIFIED - FOLDER STRUCTURE FIXED - ARCHITECT GUIDELINES v1.5 - VALIDATION FRAMEWORK COMPLETE - TEAM 51 ONBOARDED - MODULAR FOOTER APPROVED - LEGO REFACTOR PLAN V2 - FLUID DESIGN MANDATE - FINAL GOVERNANCE LOCK - BATCH 1 COMPLETE - TEAM ROLES DEFINED - CSS LOADING ORDER DOCUMENTED - INFRASTRUCTURE TOOLS COMPLETE - D15_INDEX APPROVED - STAGE_2_COMPLETE_APPROVED - BATCH_1_CLOSURE_MANDATE_IMPLEMENTED - EXTERNAL_AUDIT_KIT_READY**
-**Version:** v2.13 (Post-Reorganization + Architect Guidelines + Validation Framework + Team 51 + Modular Footer + LEGO Refactor Plan V2 + Fluid Design Mandate + Final Governance Lock + Batch 1 Closure + Team Roles Mandate + CSS Loading Order Documentation + Infrastructure Tools Complete + D15_INDEX Approved + Stage 2 Complete & Approved + Batch 1 Closure Mandate Implemented + External Audit Kit Ready)
+**Last Updated:** 2026-02-04
+**Status:** ✅ **REORGANIZED & UNIFIED - FOLDER STRUCTURE FIXED - ARCHITECT GUIDELINES v1.5 - VALIDATION FRAMEWORK COMPLETE - TEAM 51 ONBOARDED - MODULAR FOOTER APPROVED - LEGO REFACTOR PLAN V2 - FLUID DESIGN MANDATE - FINAL GOVERNANCE LOCK - BATCH 1 COMPLETE - TEAM ROLES DEFINED - CSS LOADING ORDER DOCUMENTED - INFRASTRUCTURE TOOLS COMPLETE - D15_INDEX APPROVED - STAGE_2_COMPLETION_MANDATE - P0_P1_P2_COMPLETE - ARCHITECT_MANDATE_IMPLEMENTED**
+**Version:** v2.12 (Post-Reorganization + Architect Guidelines + Validation Framework + Team 51 + Modular Footer + LEGO Refactor Plan V2 + Fluid Design Mandate + Final Governance Lock + Batch 1 Closure + Team Roles Mandate + CSS Loading Order Documentation + Infrastructure Tools Complete + D15_INDEX Approved + Stage 2 Completion Mandate + P0/P1/P2 Complete + Architect Mandate Implemented)
 
 ---
 ## 📂 עץ תיקיות (Directory Tree)
@@ -68,6 +68,11 @@ _COMMUNICATION/
 - [🏗️ תוכנית CSS & Blueprint Refactor V2](../_COMMUNICATION/team_10/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md) - תוכנית בנייה מחדש לפי ארכיטקטורת LEGO מודולרית
 - [🔍 בדיקת התאמה לארכיטקטורת LEGO](../_COMMUNICATION/team_10/TEAM_10_LEGO_ARCHITECTURE_VALIDATION.md) - בדיקת התאמה לארכיטקטורה מודולרית
 
+## 🔄 Routes SSOT & Data Transformation
+- [🗺️ Routes SSOT (routes.json v1.1.1)](../ui/public/routes.json) - מקור אמת יחיד לנתיבי המערכת (Frontend: 8080, Backend: 8082, Routes Hierarchy) ✅ **P1 Complete**
+- [🔄 Transformers Hardened v1.2](../ui/src/cubes/shared/utils/transformers.js) - המרת נתונים מוקשחת עם המרת מספרים כפויה לשדות כספיים (`balance`, `price`, `amount`, `total`, `value`, `quantity`, `cost`, `fee`, `commission`, `profit`, `loss`, `equity`, `margin`) ✅ **P2 Complete**
+- [🔗 Bridge Integration](../ui/src/cubes/shared/contexts/PhoenixFilterContext.jsx) - חיבור React Context ל-PhoenixBridge עם Listener ל-`phoenix-filter-change` event ✅ **P1 Complete**
+
 ## 🎨 עיצוב ו-Fidelity (Design & Fidelity)
 - [🎨 TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md](./09-GOVERNANCE/standards/TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md) - נוהל תיקון בעיות fidelity מול Blueprint (מתי ואיך לתקן)
 - [📐 CONTAINER_HEADER_STRUCTURE_GUIDELINES.md](./04-DESIGN_UX_UI/CONTAINER_HEADER_STRUCTURE_GUIDELINES.md) - הנחיות מבנה כותרות קונטיינרים (3 חלקים, גובה קבוע)
@@ -83,7 +88,7 @@ _COMMUNICATION/
 - [📘 TT2_VALIDATION_DEVELOPER_GUIDE.md](./02-DEVELOPMENT/TT2_VALIDATION_DEVELOPER_GUIDE.md) - מדריך מפורט למפתחים עתידיים (יצירת Schemas, Error Handling, Best Practices)
 
 ## 📊 מטריצת עמודים מרכזית (Official Page Tracker)
-- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](./01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10)
+- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](./01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10) ✅ **Updated 2026-02-04 - P0/P1/P2 Complete, Batch 2 Ready**
 
 ## 🛡️ הנחיות אדריכליות (Architect Guidelines)
 - [🛡️ PHOENIX_MASTER_BIBLE](./09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md) - ספר החוקים המאסטר (ריענון נהלים v1.5 + Final Governance Lock v2.0 + Batch 1 Closure Mandate) 🛡️ **MANDATORY**
@@ -94,13 +99,6 @@ _COMMUNICATION/
 - [🛡️ Final Governance Lock](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md) - החלטה אדריכלית סופית (מבנה תיקיות, Fluid Design, Design Tokens, משמעת סקריפטים) 🛡️ **MANDATORY - FINAL LOCK**
 - [🛡️ אמנת רספונסיביות דינמית](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_RESPONSIVE_CHARTER.md) - אמנת רספונסיביות (Fluid Design, Grid auto-fit/auto-fill) 🛡️ **MANDATORY**
 - [🛡️ Batch 1 Closure & Governance Mandate](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_BATCH_1_FINAL_SUMMARY.md) - פסיקת האדריכל: נעילת קוביית Identity והגדרות תפקיד לכל צוות 🛡️ **MANDATORY - FOUNDATION SEAL**
-- [🛡️ Batch 1 Closure Mandate (2026-02-03)](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_BATCH_1_CLOSURE_MANDATE.md) - פסיקת האדריכל: סיכום מודול Identity ודגשי המשילות לכל צוות 🛡️ **LOCKED**
-- [📦 Evaluation Kit Instructions](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_EVALUATION_KIT_INSTRUCTIONS.md) - הנחיה: הכנת חבילת הערכה חיצונית (Audit Readiness) 📦 **READY FOR EXTERNAL AUDIT**
-- [📦 External Audit Kit](../_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/README.md) - חבילת הערכה חיצונית v1.0 (Technical + Product + Marketing) 📦 **100% COMPLETE - READY FOR EXTERNAL AUDIT** 🎉
-- [📊 External Audit Progress Report](../_COMMUNICATION/team_10/TEAM_10_TO_ARCHITECT_EXTERNAL_AUDIT_PROGRESS_REPORT.md) - דוח התקדמות מפורט לאדריכל (100% הושלם במלואו) 📊 **COMPLETE** 🎉
-- [🎉 External Audit Complete](../_COMMUNICATION/team_10/TEAM_10_EXTERNAL_AUDIT_COMPLETE.md) - הודעה חגיגית על השלמת כל המשימות 🎉 **ALL TASKS COMPLETE**
-- [📋 External Audit Improvement Plan](../_COMMUNICATION/team_10/TEAM_10_EXTERNAL_AUDIT_IMPROVEMENT_PLAN.md) - תוכנית עבודה מסודרת להשלמת כל התיקונים והשיפורים 📋 **IN PROGRESS**
-- [📡 Remaining Tasks Urgent](../_COMMUNICATION/team_10/TEAM_10_TO_ALL_TEAMS_REMAINING_TASKS_URGENT.md) - הודעה דחופה לצוותים על משימות נותרות 📡 **CRITICAL**
 
 ## 🔄 תהליכי פיתוח (Development Processes)
 - [🔄 CSS & Blueprint Refactor V2 - תוכנית בנייה מחדש](../_COMMUNICATION/team_10/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md) - תוכנית מלאה לבנייה מחדש לפי ארכיטקטורת LEGO מודולרית (⚠️ כלל ברזל: אין סקריפטים בתוך העמוד)
@@ -108,9 +106,8 @@ _COMMUNICATION/
 - [🔴 השלמת שלב 2 - הכנה ל-D16_ACCTS_VIEW](../_COMMUNICATION/team_10/TEAM_10_TO_ALL_TEAMS_STAGE_2_COMPLETION_MANDATE.md) - הודעה מרכזית להשלמת כל המשימות הפתוחות בשלב 2 לפני מעבר ל-D16_ACCTS_VIEW 🔴 **CRITICAL**
   - [Team 40 - עדכון CSS_CLASSES_INDEX.md](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_40_STAGE_2_COMPLETION_TASKS.md) ✅ **COMPLETE**
   - [Team 30 - השלמת AuthForm Component](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_STAGE_2_COMPLETION_TASKS.md) ✅ **COMPLETE**
-  - [Team 50 - בדיקה סופית מקיפה](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_STAGE_2_FINAL_QA.md) ✅ **COMPLETE & APPROVED**
-  - [🟢 עדכון סטטוס - שלב 2 מוכן לולידציה](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_STAGE_2_QA_STATUS_UPDATE.md) - עדכון על השלמת כל המשימות והכנה לולידציה סופית ✅ **COMPLETE**
-  - [🎉 הודעה חגיגית - השלמת שלב 2](../_COMMUNICATION/team_10/TEAM_10_TO_ALL_TEAMS_STAGE_2_COMPLETE_CELEBRATION.md) - הודעה חגיגית על השלמת שלב 2 במלואו ואישורו 🎉 **STAGE 2 COMPLETE**
+  - [Team 50 - בדיקה סופית מקיפה](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_STAGE_2_FINAL_QA.md) ⏳ **IN PROGRESS**
+  - [🟢 עדכון סטטוס - שלב 2 מוכן לולידציה](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_STAGE_2_QA_STATUS_UPDATE.md) - עדכון על השלמת כל המשימות והכנה לולידציה סופית 🟢 **READY FOR QA**
 - [📋 הנחיות עבודה לצוות הבלופרינט](../_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md) - הנחיות מפורטות V2 עם דרישות מפורשות ✅
 - [📡 תשובות להבהרות Team 30](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_CLARIFICATIONS_RESPONSE.md) - תשובות מפורטות לשאלות Team 30 ✅
 - [✅ אישור השלמת תשתית Team 30](../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_INFRASTRUCTURE_APPROVAL.md) - אישור כל משימות התשתית ✅
@@ -153,3 +150,7 @@ _COMMUNICATION/
 ### 🎉 Batch 1 Status: ✅ **COMPLETE END-TO-END** (2026-02-02)
 ### 🛡️ Team Roles: ✅ **DEFINED & MANDATORY** (Batch 1 Closure Mandate)
 ### 🛠️ Infrastructure Tools: ✅ **COMPLETE** (2026-02-02) - כלי בדיקה ותיעוד מוכנים
+### 🔒 Architect Mandate Implementation: ✅ **P0/P1/P2 COMPLETE** (2026-02-04)
+  - ✅ **P0:** Port Unification (8080/8082), Proxy Fix, Scripts Policy
+  - ✅ **P1:** Routes SSOT (routes.json v1.1.1), Security Masked Log, State SSOT (Bridge Integration)
+  - ✅ **P2:** FIX Files (transformers.js Hardened v1.2), D16 Cleanup, Documentation Update

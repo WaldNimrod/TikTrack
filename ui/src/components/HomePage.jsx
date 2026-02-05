@@ -3,13 +3,13 @@
  * --------------------------------------------
  * עמוד הבית הראשי של המערכת עם וויגיטים ותוכן דמה
  * 
- * @description תבנית V3 מבוססת על הבלופרינט המלא עם UnifiedHeader
+ * @description תבנית V3 מבוססת על הבלופרינט המלא
+ * Header נטען דינמית דרך headerLoader.js
  * @blueprintSource _COMMUNICATION/team_01/team_01_staging/D15_INDEX.html
  * @standard JS Standards Protocol ✅ | CSS Standards Protocol ✅ | No-Inline Scripts ✅
  */
 
 import React, { useState, useEffect } from 'react';
-import UnifiedHeader from './core/UnifiedHeader.jsx';
 import PageFooter from './core/PageFooter.jsx';
 import { debugLog } from '../utils/debug.js';
 
@@ -76,8 +76,8 @@ const HomePage = () => {
 
   return (
     <>
-      {/* Unified Header */}
-      <UnifiedHeader />
+      {/* Unified Header - Loaded dynamically via headerLoader.js */}
+      {/* Header is injected at the beginning of <body> by headerLoader.js */}
       
       {/* Page Wrapper: Full-width gray background */}
       <div className="page-wrapper">
@@ -156,10 +156,10 @@ const HomePage = () => {
                         <div className="active-alerts__list" data-role="list" role="list">
                           {/* Alert Card 1: Trade Alert */}
                           <article 
-                            className="active-alerts__card active-alerts__card--trade" 
+                            className="active-alerts__card active-alerts__card--trades" 
                             role="listitem" 
                             data-alert-id="1" 
-                            data-entity-type="trade"
+                            data-entity-type="trades"
                           >
                             <div className="active-alerts__card-header">
                               <div className="active-alerts__header-linked">
@@ -167,7 +167,7 @@ const HomePage = () => {
                                   className="linked-object-card notes-linked-object active-alerts__linked-entity" 
                                   role="link" 
                                   tabIndex="0" 
-                                  data-entity-type="trade" 
+                                  data-entity-type="trades" 
                                   data-entity-id="1"
                                 >
                                   <div className="linked-object-card-icon">
@@ -185,7 +185,7 @@ const HomePage = () => {
                                       <span className="linked-object-card-name">טרייד 1</span>
                                     </div>
                                     <div className="linked-object-card-meta">
-                                      <span className="status-badge" data-status-category="open" data-entity="trade">פתוח</span>
+                                      <span className="status-badge" data-status-category="open" data-entity="trades">פתוח</span>
                                     </div>
                                   </div>
                                 </div>
@@ -229,7 +229,7 @@ const HomePage = () => {
                             className="active-alerts__card active-alerts__card--account" 
                             role="listitem" 
                             data-alert-id="2" 
-                            data-entity-type="trading_account"
+                            data-entity-type="trading_accounts"
                           >
                             <div className="active-alerts__card-header">
                               <div className="active-alerts__header-linked">
@@ -237,7 +237,7 @@ const HomePage = () => {
                                   className="linked-object-card notes-linked-object active-alerts__linked-entity" 
                                   role="link" 
                                   tabIndex="0" 
-                                  data-entity-type="trading_account" 
+                                  data-entity-type="trading_accounts" 
                                   data-entity-id="1"
                                 >
                                   <div className="linked-object-card-icon">
@@ -255,7 +255,7 @@ const HomePage = () => {
                                       <span className="linked-object-card-name">חשבון 1</span>
                                     </div>
                                     <div className="linked-object-card-meta">
-                                      <span className="status-badge" data-status-category="active" data-entity="trading_account">פעיל</span>
+                                      <span className="status-badge" data-status-category="active" data-entity="trading_accounts">פעיל</span>
                                     </div>
                                   </div>
                                 </div>
@@ -730,8 +730,8 @@ const HomePage = () => {
                               />
                               <select className="widget-placeholder__search-select" id="tagWidgetSearchEntityFilter">
                                 <option value="">כל היישויות</option>
-                                <option value="trade">טריידים</option>
-                                <option value="trade_plan">תכניות</option>
+                                <option value="trades">טריידים</option>
+                                <option value="trade_plans">תכניות</option>
                                 <option value="ticker">טיקרים</option>
                               </select>
                               <button type="submit" className="widget-placeholder__search-btn" aria-label="חפש">

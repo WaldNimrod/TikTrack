@@ -14,7 +14,7 @@ import { debugLog } from '../../../utils/debug.js';
 import authService from './auth.js';
 
 // API Base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 // Create axios instance with auth
 const apiClient = axios.create({

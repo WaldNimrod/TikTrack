@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חשבונות מסחר | TikTrack Phoenix</title>
+  
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="trading-accounts-page context-trading">
+  
+  <!-- ============================================
+       UNIFIED HEADER + GLOBAL FILTER
+       ============================================ -->
+  <!-- Auth Guard: Check authentication before loading page -->
+  <script src="/src/components/core/authGuard.js"></script>
+  
+  <!-- Header will be loaded dynamically via headerLoader.js -->
+  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
+  <script src="/src/components/core/phoenixFilterBridge.js"></script>
+  <script src="/src/components/core/headerLoader.js"></script>
+
+  <!-- ============================================
+       PAGE WRAPPER + CONTAINER STRUCTURE
+       ============================================
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section
+       ============================================ -->
+  
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        <tt-container>
+          
+          <!-- ============================================
+               CONTAINER 0: סיכום מידע והתראות פעילות
+               ============================================
+               Content: Active Alerts + Summary Information
+               Filters: None (uses global filters only)
+               ============================================ -->
+          
+          <tt-section data-section="summary-alerts">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">חשבונות מסחר</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">0 התראות פעילות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- TODO: Container 0 Content - Active Alerts + Summary Information -->
+                  <div class="info-summary" id="summaryStats">
+                    <div class="info-summary__row info-summary__row--first">
+                      <div>סה"כ חשבונות: <strong id="totalAccounts">0</strong></div>
+                      <div>חשבונות פעילים: <strong id="activeAccounts">0</strong></div>
+                      <div>יתרה כוללת: <strong id="totalBalance"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                      <div>רווח/הפסד כולל: <strong id="totalPnL"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                      <button class="portfolio-summary__toggle-btn" id="portfolioSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="info-summary__row info-summary__row--second" id="portfolioSummaryContent">
+                      <span>פוזיציות פעילות: 0</span>
+                      <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                      <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                      <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- ============================================
+               CONTAINER 1: ניהול חשבונות מסחר
+               ============================================
+               Content: Table (FIRST TABLE TO IMPLEMENT)
+               Filters: None (uses global filters only)
+               ============================================ -->
+          
+          <tt-section data-section="trading-accounts-management">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="חשבונות מסחר" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">ניהול חשבונות מסחר</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">0 חשבונות פעילים</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- TODO: Container 1 Content - Trading Accounts Table (10 columns) -->
+                  <div class="phoenix-table-wrapper">
+                    <table id="accountsTable" class="phoenix-table js-table" data-table-type="trading_accounts" role="table" aria-label="ניהול חשבונות מסחר">
+                      <thead class="phoenix-table__head" role="rowgroup">
+                        <tr class="phoenix-table__row" role="row">
+                          <th class="phoenix-table__header col-name js-table-sort-trigger" data-sortable="true" data-sort-key="name" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שם החשבון מסחר</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                            <!-- Sticky column - CSS יטופל ב-phoenix-components.css -->
+                          </th>
+                          <th class="phoenix-table__header col-currency js-table-sort-trigger" data-sortable="true" data-sort-key="currency" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">מטבע</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-balance js-table-sort-trigger" data-sortable="true" data-sort-key="balance" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">יתרה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-positions js-table-sort-trigger" data-sortable="true" data-sort-key="positions" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">פוזיציות</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-total-pl js-table-sort-trigger" data-sortable="true" data-sort-key="total_pl" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">רווח/הפסד</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-account-value js-table-sort-trigger" data-sortable="true" data-sort-key="account_value" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שווי חשבון</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-holdings-value js-table-sort-trigger" data-sortable="true" data-sort-key="holdings_value" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שווי אחזקות</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="status" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סטטוס</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-updated js-table-sort-trigger" data-sortable="true" data-sort-key="updated" data-sort-type="date" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">עודכן</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
+                            <span class="phoenix-table__header-text">פעולות</span>
+                            <!-- Sticky column - CSS יטופל ב-phoenix-components.css -->
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="phoenix-table__body" role="rowgroup">
+                        <!-- TODO: Table rows will be populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <!-- Table Pagination -->
+                  <div class="phoenix-table-pagination">
+                    <div class="phoenix-table-pagination__info">
+                      <span>מציג 0-0 מתוך 0 רשומות</span>
+                    </div>
+                    <div class="phoenix-table-pagination__controls">
+                      <div class="phoenix-table-pagination__page-size">
+                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="accountsTable">
+                          <option value="10">10</option>
+                          <option value="25" selected>25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                      <div class="phoenix-table-pagination__pages">
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"></path>
+                          </svg>
+                        </button>
+                        <button class="phoenix-table-pagination__page-number phoenix-table-pagination__page-number--active">1</button>
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- ============================================
+               CONTAINER 2: סיכום תנועות לחשבון
+               ============================================
+               Content: Summary Cards (NOT a table)
+               Filters: Yes (Date Range - Internal Filter)
+               ============================================ -->
+          
+          <tt-section data-section="account-movements-summary">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/cash_flows.svg" alt="תנועות" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">סיכום תנועות לחשבון</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">0 תנועות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- TODO: Container 2 Content - Summary Cards + Internal Filters -->
+                  <div class="phoenix-table-filters">
+                    <div class="phoenix-table-filter-group">
+                      <label class="phoenix-table-filter-label">טווח תאריכים:</label>
+                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_from" id="movementsDateFrom">
+                      <span>עד</span>
+                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_to" id="movementsDateTo">
+                    </div>
+                  </div>
+                  
+                  <div class="account-movements-summary-cards">
+                    <!-- TODO: Summary cards will be populated dynamically -->
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- ============================================
+               CONTAINER 3: דף חשבון לתאריכים
+               ============================================
+               Content: Table
+               Filters: Yes (Dates + Account - Internal Filters)
+               ============================================ -->
+          
+          <tt-section data-section="account-by-dates">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="חשבון לתאריכים" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">דף חשבון לתאריכים</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">0 רשומות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- TODO: Container 3 Content - Cash Flows Table (8 columns) + Internal Filters -->
+                  <div class="phoenix-table-filters">
+                    <div class="phoenix-table-filter-group">
+                      <label class="phoenix-table-filter-label">חשבון:</label>
+                      <select class="phoenix-table-filter-select js-table-filter" data-filter-key="account" id="accountByDatesSelect">
+                        <option value="">כל החשבונות</option>
+                      </select>
+                    </div>
+                    <div class="phoenix-table-filter-group">
+                      <label class="phoenix-table-filter-label">תאריכים:</label>
+                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_from" id="accountByDatesDateFrom">
+                      <span>עד</span>
+                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_to" id="accountByDatesDateTo">
+                    </div>
+                  </div>
+                  
+                  <div class="phoenix-table-wrapper">
+                    <table id="accountActivityTable" class="phoenix-table js-table" role="table" aria-label="דף חשבון לתאריכים">
+                      <thead class="phoenix-table__head" role="rowgroup">
+                        <tr class="phoenix-table__row" role="row">
+                          <th class="phoenix-table__header col-date js-table-sort-trigger" data-sortable="true" data-sort-key="date" data-sort-type="date" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">תאריך פעולה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="type" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סוג פעולה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-subtype js-table-sort-trigger" data-sortable="true" data-sort-key="subtype" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">תת-סוג פעולה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-account js-table-sort-trigger" data-sortable="true" data-sort-key="account" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">חשבון</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-amount js-table-sort-trigger" data-sortable="true" data-sort-key="amount" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סכום</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-currency js-table-sort-trigger" data-sortable="true" data-sort-key="currency" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">מטבע</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="status" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סטטוס</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
+                            <span class="phoenix-table__header-text">פעולות</span>
+                            <!-- Sticky column - CSS יטופל ב-phoenix-components.css -->
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="phoenix-table__body" role="rowgroup">
+                        <!-- TODO: Table rows will be populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <!-- Table Pagination -->
+                  <div class="phoenix-table-pagination">
+                    <div class="phoenix-table-pagination__info">
+                      <span>מציג 0-0 מתוך 0 רשומות</span>
+                    </div>
+                    <div class="phoenix-table-pagination__controls">
+                      <div class="phoenix-table-pagination__page-size">
+                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="accountActivityTable">
+                          <option value="10">10</option>
+                          <option value="25" selected>25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                      <div class="phoenix-table-pagination__pages">
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"></path>
+                          </svg>
+                        </button>
+                        <button class="phoenix-table-pagination__page-number phoenix-table-pagination__page-number--active">1</button>
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+          <!-- ============================================
+               CONTAINER 4: פוזיציות לפי חשבון
+               ============================================
+               Content: Table
+               Filters: Yes (Account - Internal Filter)
+               ============================================ -->
+          
+          <tt-section data-section="positions-by-account">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/trades.svg" alt="פוזיציות" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">פוזיציות לפי חשבון</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">0 פוזיציות פעילות</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- TODO: Container 4 Content - Positions Table (9 columns) + Internal Filters -->
+                  <div class="phoenix-table-filters">
+                    <div class="phoenix-table-filter-group">
+                      <label class="phoenix-table-filter-label">חשבון:</label>
+                      <select class="phoenix-table-filter-select js-table-filter" data-filter-key="account" id="positionsAccountSelect">
+                        <option value="">כל החשבונות</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="phoenix-table-wrapper">
+                    <table id="positionsTable" class="phoenix-table js-table" role="table" aria-label="פוזיציות לפי חשבון">
+                      <thead class="phoenix-table__head" role="rowgroup">
+                        <tr class="phoenix-table__row" role="row">
+                          <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סמל</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                            <!-- Sticky column - CSS יטופל ב-phoenix-components.css -->
+                          </th>
+                          <th class="phoenix-table__header col-quantity js-table-sort-trigger" data-sortable="true" data-sort-key="quantity" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">כמות</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-avg-price js-table-sort-trigger" data-sortable="true" data-sort-key="avg_price" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">מחיר ממוצע</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-current_price js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">נוכחי</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-market-value js-table-sort-trigger" data-sortable="true" data-sort-key="market_value" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">שווי שוק</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-unrealized-pl js-table-sort-trigger" data-sortable="true" data-sort-key="unrealized_pl" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">P/L לא ממומש</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-percent-account js-table-sort-trigger" data-sortable="true" data-sort-key="percent_account" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">אחוז מהחשבון</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="status" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סטטוס</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
+                            <span class="phoenix-table__header-text">פעולות</span>
+                            <!-- Sticky column - CSS יטופל ב-phoenix-components.css -->
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="phoenix-table__body" role="rowgroup">
+                        <!-- TODO: Table rows will be populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <!-- Table Pagination -->
+                  <div class="phoenix-table-pagination">
+                    <div class="phoenix-table-pagination__info">
+                      <span>מציג 0-0 מתוך 0 רשומות</span>
+                    </div>
+                    <div class="phoenix-table-pagination__controls">
+                      <div class="phoenix-table-pagination__page-size">
+                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="positionsTable">
+                          <option value="10">10</option>
+                          <option value="25" selected>25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                      <div class="phoenix-table-pagination__pages">
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"></path>
+                          </svg>
+                        </button>
+                        <button class="phoenix-table-pagination__page-number phoenix-table-pagination__page-number--active">1</button>
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+          
+        </tt-container>
+      </main>
+    </div>
+  </div>
+  
+<!-- Modular Footer: Loaded dynamically via footerLoader.js -->
+<script src="/src/views/shared/footerLoader.js"></script>
+  
+  <!-- External JavaScript Files - NO inline scripts -->
+  <!-- CRITICAL: Clean Slate Rule - All JavaScript in external files -->
+  
+  <!-- Navigation Handler: Handle navigation link clicks -->
+  <script src="/src/components/core/navigationHandler.js"></script>
+  
+  <!-- Header Dropdown: Dropdown menu functionality -->
+  <script src="/src/components/core/headerDropdown.js"></script>
+  
+  <!-- Header Filters: Toggle functionality -->
+  <script src="/src/components/core/headerFilters.js"></script>
+  
+  <!-- Section Toggle: Show/hide section body -->
+  <script src="/src/components/core/sectionToggleHandler.js"></script>
+  
+  <!-- Portfolio Summary Toggle -->
+  <script src="/src/views/financial/shared/portfolioSummaryToggle.js"></script>
+  
+  <!-- Table Management Classes -->
+  <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+  <script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
+  <script src="/src/cubes/shared/tableFormatters.js"></script>
+  
+  <!-- Trading Accounts Data Loader: Load data from API -->
+  <script src="/src/views/financial/tradingAccounts/tradingAccountsDataLoader.js"></script>
+  
+  <!-- Trading Accounts Filters Integration: Connect filters to data loading -->
+  <script src="/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js"></script>
+  
+  <!-- Trading Accounts Header Handlers: Event handlers for header filters -->
+  <script src="/src/views/financial/tradingAccounts/tradingAccountsHeaderHandlers.js"></script>
+  
+  <!-- Trading Accounts Table Initialization: Initialize table managers -->
+  <script src="/src/views/financial/tradingAccounts/tradingAccountsTableInit.js"></script>
+  
+  <!-- Header Links Updater: Dynamic header links based on authentication -->
+  <script src="/src/components/core/headerLinksUpdater.js"></script>
+</body>
+</html>

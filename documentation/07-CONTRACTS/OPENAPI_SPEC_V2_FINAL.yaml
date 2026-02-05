@@ -28,9 +28,184 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
   /trading_accounts:
     get:
-      summary: "List all trading accounts (Plural)"
+      summary: "List all trading accounts"
+      description: "Get trading accounts for current user with calculated fields (positions_count, total_pl, account_value, holdings_value)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: "Filter by is_active status"
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          description: "Search by account_name (partial match)"
+          schema:
+            type: string
       responses:
-        '200': { description: "Success" }
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingAccountListResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /cash_flows:
+    get:
+      summary: "List all cash flows"
+      description: "Get cash flows for current user with filters and summary statistics"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: trading_account_id
+          in: query
+          description: "Filter by trading account ULID"
+          schema:
+            type: string
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+        - name: date_from
+          in: query
+          description: "Filter by transaction_date >= date_from"
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: "Filter by transaction_date <= date_to"
+          schema:
+            type: string
+            format: date
+        - name: flow_type
+          in: query
+          description: "Filter by flow_type"
+          schema:
+            type: string
+            enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER]
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashFlowListResponse'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    /summary:
+      get:
+        summary: "Get cash flows summary only"
+        description: "Get cash flows summary statistics without list of transactions"
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: trading_account_id
+            in: query
+            description: "Filter by trading account ULID"
+            schema:
+              type: string
+              pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          - name: date_from
+            in: query
+            description: "Filter by transaction_date >= date_from"
+            schema:
+              type: string
+              format: date
+          - name: date_to
+            in: query
+            description: "Filter by transaction_date <= date_to"
+            schema:
+              type: string
+              format: date
+        responses:
+          '200':
+            description: "Success"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CashFlowListResponse'
+          '400':
+            description: "Bad Request"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: "Unauthorized"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: "Internal Server Error"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /positions:
+    get:
+      summary: "List all positions"
+      description: "Get positions for current user (aggregated from trades by ticker_id and trading_account_id)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: trading_account_id
+          in: query
+          description: "Filter by trading account ULID"
+          schema:
+            type: string
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionListResponse'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /trades:
     get:
       summary: "Hierarchical Trades View"
@@ -49,6 +224,11 @@ paths:
         '200': { description: "Success" }
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     UserResponse:
       type: object
@@ -67,3 +247,255 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TradeResponse'
+    TradingAccountResponse:
+      type: object
+      required:
+        - external_ulid
+        - display_name
+        - currency
+        - balance
+        - positions_count
+        - total_pl
+        - account_value
+        - holdings_value
+        - is_active
+        - updated_at
+      properties:
+        external_ulid:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "External ULID identifier"
+        display_name:
+          type: string
+          description: "Account display name"
+        broker:
+          type: string
+          nullable: true
+          description: "Broker name"
+        currency:
+          type: string
+          description: "Account currency"
+        balance:
+          type: number
+          format: decimal
+          description: "Current cash balance"
+        positions_count:
+          type: integer
+          description: "Number of open positions"
+        total_pl:
+          type: number
+          format: decimal
+          description: "Total unrealized P/L"
+        account_value:
+          type: number
+          format: decimal
+          description: "Total account value (cash + holdings)"
+        holdings_value:
+          type: number
+          format: decimal
+          description: "Total holdings value"
+        is_active:
+          type: boolean
+          description: "Account active status"
+        updated_at:
+          type: string
+          format: date-time
+          description: "Last update timestamp"
+    TradingAccountListResponse:
+      type: object
+      required:
+        - data
+        - total
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradingAccountResponse'
+        total:
+          type: integer
+          description: "Total count"
+    CashFlowResponse:
+      type: object
+      required:
+        - external_ulid
+        - transaction_date
+        - flow_type
+        - trading_account_id
+        - account_name
+        - amount
+        - currency
+      properties:
+        external_ulid:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "External ULID identifier"
+        transaction_date:
+          type: string
+          format: date
+          description: "Transaction date"
+        flow_type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER]
+          description: "Flow type"
+        subtype:
+          type: string
+          nullable: true
+          description: "Flow subtype (from metadata)"
+        trading_account_id:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "Trading account ULID"
+        account_name:
+          type: string
+          description: "Trading account name"
+        amount:
+          type: number
+          format: decimal
+          description: "Transaction amount"
+        currency:
+          type: string
+          description: "Currency"
+        status:
+          type: string
+          nullable: true
+          description: "Status (VERIFIED, PENDING, from metadata)"
+        description:
+          type: string
+          nullable: true
+          description: "Transaction description"
+    CashFlowSummaryResponse:
+      type: object
+      required:
+        - total_deposits
+        - total_withdrawals
+        - net_flow
+      properties:
+        total_deposits:
+          type: number
+          format: decimal
+          description: "Total deposits"
+        total_withdrawals:
+          type: number
+          format: decimal
+          description: "Total withdrawals"
+        net_flow:
+          type: number
+          format: decimal
+          description: "Net cash flow"
+    CashFlowListResponse:
+      type: object
+      required:
+        - data
+        - total
+        - summary
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashFlowResponse'
+        total:
+          type: integer
+          description: "Total count"
+        summary:
+          $ref: '#/components/schemas/CashFlowSummaryResponse'
+    PositionResponse:
+      type: object
+      required:
+        - external_ulid
+        - symbol
+        - ticker_id
+        - quantity
+        - avg_price
+        - current_price
+        - daily_change
+        - daily_change_percent
+        - market_value
+        - unrealized_pl
+        - unrealized_pl_percent
+        - percent_of_account
+        - status
+        - direction
+      properties:
+        external_ulid:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "External ULID identifier (ticker_id)"
+        symbol:
+          type: string
+          description: "Ticker symbol"
+        ticker_id:
+          type: string
+          pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+          description: "Ticker ULID"
+        quantity:
+          type: number
+          format: decimal
+          description: "Total quantity (aggregated)"
+        avg_price:
+          type: number
+          format: decimal
+          description: "Average entry price"
+        current_price:
+          type: number
+          format: decimal
+          description: "Current market price"
+        daily_change:
+          type: number
+          format: decimal
+          description: "Daily price change"
+        daily_change_percent:
+          type: number
+          format: decimal
+          description: "Daily price change percentage"
+        market_value:
+          type: number
+          format: decimal
+          description: "Current market value (quantity * current_price)"
+        unrealized_pl:
+          type: number
+          format: decimal
+          description: "Unrealized P/L"
+        unrealized_pl_percent:
+          type: number
+          format: decimal
+          description: "Unrealized P/L percentage"
+        percent_of_account:
+          type: number
+          format: decimal
+          description: "Percentage of account value"
+        status:
+          type: string
+          description: "Position status (OPEN, CLOSED, etc.)"
+        direction:
+          type: string
+          enum: [LONG, SHORT]
+          description: "Trade direction"
+    PositionListResponse:
+      type: object
+      required:
+        - data
+        - total
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PositionResponse'
+        total:
+          type: integer
+          description: "Total count"
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+        - error_code
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: object
+          description: "Error details"
+        error_code:
+          type: string
+          description: "Machine-readable error code"

@@ -1,5 +1,12 @@
 # 🏗️ הגדרת צוות 60 (DevOps & Platform) - פרויקט פיניקס v2.4
 
+**id:** `TT2_TEAM_60_DEFINITION`  
+**owner:** Team 60 (DevOps & Platform)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.4
+
 **Date:** 2026-01-31  
 **Session:** SESSION_01  
 **Source:** החלטה אדריכלית רשמית - Chief Architect
@@ -58,7 +65,7 @@
 
 ### **עם צוות 20 (Backend):**
 - תיאום על API Base URLs
-- תיאום על Ports (8080 Backend, 3000 Frontend)
+- תיאום על Ports (Frontend: 8080, Backend: 8082)
 - תיאום על CORS configuration
 
 ### **עם צוות 30 (Frontend):**

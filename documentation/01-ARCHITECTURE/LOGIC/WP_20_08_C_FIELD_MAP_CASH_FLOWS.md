@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: תנועות מזומן (Cash Flows)
 
+**id:** `WP_20_08_C_FIELD_MAP_CASH_FLOWS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.08.C | **משימה:** יומן תנועות הון
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

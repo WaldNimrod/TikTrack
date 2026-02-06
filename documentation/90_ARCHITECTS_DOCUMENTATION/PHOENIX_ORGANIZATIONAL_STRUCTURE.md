@@ -1,5 +1,14 @@
 # 🏛️ מבנה ארגוני והגדרת צוותים (v2.4)
 
+**id:** `PHOENIX_ORGANIZATIONAL_STRUCTURE`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.4
+
+---
+
 ## 2. הסביבה הקבלנית (Cursor)
 | צוות | תפקיד | אחריות |
 | :--- | :--- | :--- |

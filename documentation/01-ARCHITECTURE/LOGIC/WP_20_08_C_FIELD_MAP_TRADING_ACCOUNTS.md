@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: חשבונות מסחר (Trading Accounts)
 
+**id:** `WP_20_08_C_FIELD_MAP_TRADING_ACCOUNTS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.08.C | **סטנדרט:** Plural Standard (G-10) | **דיוק:** DECIMAL(20, 8)
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

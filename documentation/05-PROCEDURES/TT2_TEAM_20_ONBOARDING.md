@@ -1,5 +1,14 @@
 # 🚀 חבילת אונבורדינג: צוות 20 (Backend Lego)
 
+**id:** `TT2_TEAM_20_ONBOARDING`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+---
+
 **תפקיד:** אדריכלי תשתיות ולוגיקה עסקית.
 
 ### חוקי ברזל לביצוע:

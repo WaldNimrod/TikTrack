@@ -1,5 +1,12 @@
 # 🎯 פרוטוקול סטנדרטים ובקרת איכות JavaScript (v1.4)
 
+**id:** `TT2_JS_STANDARDS_PROTOCOL`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.4
+
 **פרויקט:** פיניקס (TikTrack V2)  
 **תפקיד:** אבטחת איכות אדריכלית (LOD 400)  
 **תאריך:** 2026-01-31  

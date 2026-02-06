@@ -235,10 +235,10 @@ p {
 
 ## 🔗 קישורים רלוונטיים
 
-- [החלטה אדריכלית - LEGO Cubes & Fluidity](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES.md)
-- [אמנת רספונסיביות - מקור](../_COMMUNICATION/90_Architects_comunication/ARCHITECT_RESPONSIVE_CHARTER.md)
 - [CSS Classes Index](./CSS_CLASSES_INDEX.md)
-- [תוכנית עבודה - שלב 2.6](../_COMMUNICATION/team_10/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md#שלב-26-יישום-fluid-design---הסרת-media-queries)
+
+**הערה:** החלטות אדריכליות וצ'רטרים נמצאים ב-`_COMMUNICATION/` (COMMUNICATION ONLY - NOT SSOT).  
+תוכניות עבודה נמצאות ב-`documentation/02-DEVELOPMENT/` (SSOT).
 
 ---
 

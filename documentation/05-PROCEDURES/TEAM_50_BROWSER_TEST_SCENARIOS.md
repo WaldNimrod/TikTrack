@@ -1,9 +1,19 @@
 # 🧪 תרחישי בדיקה בדפדפן - Team 50 (QA)
 
+**id:** `TEAM_50_BROWSER_TEST_SCENARIOS`  
+**owner:** Team 50 (QA & Fidelity)  
+**status:** ⚠️ **NON-SSOT** - מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05 (תיקון הפניות ל-`_COMMUNICATION` - NON-SSOT compliance)  
+**version:** v1.1
+
+---
+
 **מיקום:** `documentation/05-PROCEDURES/`  
 **אחריות:** Team 50 (QA & Fidelity)  
-**תאריך:** 2026-02-03  
-**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+**תאריך יצירה:** 2026-02-03  
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**  
+**⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
 
 ---
 
@@ -1465,22 +1475,30 @@
 - **QA Report Template:** `documentation/09-GOVERNANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md`
 
 ### תקשורת - Header & Footer:
-- **Header & Footer QA Start:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_HEADER_QA_START.md`
-- **Header Implementation Complete:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_HEADER_IMPLEMENTATION_COMPLETE.md`
-- **Footer Standardization:** `_COMMUNICATION/team_10/TEAM_10_TO_ALL_TEAMS_FOOTER_STANDARDIZATION_FULL.md`
+> ⚠️ **NON-SSOT:** קבצים אלה הם תקשורת פנימית בלבד ואינם חלק מה-SSOT. להתייחסות בלבד.
+
+- **Header & Footer QA Start:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_HEADER_QA_START.md` (Communication only)
+- **Header Implementation Complete:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_HEADER_IMPLEMENTATION_COMPLETE.md` (Communication only)
+- **Footer Standardization:** `_COMMUNICATION/team_10/TEAM_10_TO_ALL_TEAMS_FOOTER_STANDARDIZATION_FULL.md` (Communication only)
 
 ### תקשורת - Routing:
-- **Static HTML Routing Documentation:** `_COMMUNICATION/team_10/TEAM_10_STATIC_HTML_ROUTING_DOCUMENTATION.md`
-- **Static HTML Routing Fix:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_STATIC_HTML_ROUTING_FIX.md`
+> ⚠️ **NON-SSOT:** קבצים אלה הם תקשורת פנימית בלבד ואינם חלק מה-SSOT. להתייחסות בלבד.
+
+- **Static HTML Routing Documentation:** `_COMMUNICATION/team_10/TEAM_10_STATIC_HTML_ROUTING_DOCUMENTATION.md` (Communication only)
+- **Static HTML Routing Fix:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_STATIC_HTML_ROUTING_FIX.md` (Communication only)
 
 ### תקשורת - Auth Guard:
-- **Auth Guard Fix Plan:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_AUTH_GUARD_FIX_PLAN.md`
-- **Auth Guard Urgent Fix:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_URGENT_FIX_AUTH_GUARD.md`
+> ⚠️ **NON-SSOT:** קבצים אלה הם תקשורת פנימית בלבד ואינם חלק מה-SSOT. להתייחסות בלבד.
+
+- **Auth Guard Fix Plan:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_AUTH_GUARD_FIX_PLAN.md` (Communication only)
+- **Auth Guard Urgent Fix:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_URGENT_FIX_AUTH_GUARD.md` (Communication only)
 
 ### החלטות אדריכליות:
-- **Header Architecture Decision:** `_COMMUNICATION/90_Architects_comunication/TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md`
-- **Filter Bridge Spec:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_FILTER_BRIDGE_SPEC_V2.md`
-- **Footer Strategy:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md`
+> ⚠️ **NON-SSOT:** קבצים אלה הם תקשורת פנימית בלבד ואינם חלק מה-SSOT. להתייחסות בלבד.
+
+- **Header Architecture Decision:** `_COMMUNICATION/90_Architects_comunication/TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md` (Communication only)
+- **Filter Bridge Spec:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_FILTER_BRIDGE_SPEC_V2.md` (Communication only)
+- **Footer Strategy:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` (Communication only)
 
 ---
 

@@ -50,7 +50,7 @@
 - **Existing Structure:** Found `ui/src/layout/global_page_template.jsx` with CSS variables
 - **Current Variables:** `--color-1` through `--color-50`, `--legacy-turquoise`, `--font-main`, `--shadow-sm`
 - **No Design Tokens Directory:** No `design-tokens/` folder exists yet - **TO BE CREATED**
-- **Legacy Styles:** Found some CSS files in `_COMMUNICATION/team_10_staging/` (reference only)
+- **Legacy Styles:** Found some CSS files in `_COMMUNICATION/team_10_staging/` (reference only) ⚠️ **NON-SSOT:** Communication only - staging reference
 
 ### Design Tokens Requirements (from GIN_004):
 - **Structure:** JSONB with `version`, `theme`, `icon`, `badge`, `chart`, `custom` sections

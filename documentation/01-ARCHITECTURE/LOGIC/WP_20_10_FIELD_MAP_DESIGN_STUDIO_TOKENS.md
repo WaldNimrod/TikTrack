@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: משילות עיצוב (Design Studio Tokens)
 
+**id:** `WP_20_10_FIELD_MAP_DESIGN_STUDIO_TOKENS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.10 | **סטטוס:** Visual Governance
 
 ## 1. אסטרטגיית מזהים

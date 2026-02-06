@@ -5,6 +5,16 @@
 **סטטוס:** ✅ **ACTIVE WORKFLOW**  
 **מטרה:** נוהל עבודה מקיף ומעודכן ליצירת בלופרינטים אופטימליים
 
+**⚠️ כלל קריטי - Blueprint = תבנית עיצובית בלבד:**
+- **מטרה:** יצירת ממשק מדויק ויזואלית ומבחינת CSS
+- **מידע:** שימוש במידע דמה (mock data) בלבד
+- **לא מתעסקים עם:** מהיכן מגיע המידע, איך הוא מחושב, או איך הוא נשמר
+- **רק עיצוב:** תבנית עיצובית מדויקת ונקייה בלבד
+
+**📁 תיקיית Legacy:**
+- **מיקום:** `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/`
+- **תכולה:** כל קבצי ה-Legacy - כולל HTML, CSS, ו-JavaScript
+
 **⚠️ כללי שמות קבצים חשובים:**
 - ✅ כל קבצי הבלופרינט מסתיימים ב-`_BLUEPRINT.html`
 - ❌ **אין שימוש בתחיליות D15, D16, D21 וכו'** - זה מפריע ויוצר בעיות
@@ -20,45 +30,101 @@
 ## 📊 מטריצת עמודים - רשימה רשמית
 
 **⚠️ כללי מטריצה:**
-- **#** - מספור פנימי לניהול (יוסדר לפי סדר עבודה וחבילות)
+- **#** - מספור פנימי לניהול (לפי סדר עבודה וחבילות)
+- **שלב** - שלב בתוכנית היישום
 - **שם מדויק** - שם רשמי לפי הרשימה הרשמית בתיעוד (snake_case)
 - **קובץ Blueprint** - שם קובץ מדויק עם סיומת `_BLUEPRINT.html`
 - **סטטוס** - עדכון רק בהוראה מפורשת
 
-### **מניפסט 40 העמודים המלא**
+### **עמודים שהושלמו**
 
-| # | שם מדויק | קובץ Blueprint | סטטוס | הערות |
-|---|----------|----------------|-------|-------|
-| **1-15: Core Analytics (Dash, Trades, Plans)** |
-| - | - | - | ⏳ ממתין להגדרת חבילות | - |
-| **16-27: Data Hub (Accounts, Import, Playbooks)** |
-| - | trading_accounts | trading_accounts_BLUEPRINT.html | ✅ הושלם | תבנית טבלאות |
-| - | brokers_fees | brokers_fees_BLUEPRINT.html | ✅ הושלם | - |
-| - | cash_flows | cash_flows_BLUEPRINT.html | ✅ הושלם | - |
-| - | api_keys | api_keys_BLUEPRINT.html | ⏳ לא התחיל | - |
-| - | securities | securities_BLUEPRINT.html | ⏳ לא התחיל | - |
-| **28-36: Engineering Console (Pulse, Tasker, Designer)** |
-| - | - | - | ⏳ ממתין להגדרת חבילות | - |
-| **37-40: Future Prototypes** |
-| - | - | - | ⏳ ממתין להגדרת חבילות | - |
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| 1 | - | home / index | index_BLUEPRINT.html | ✅ הושלם | דף הבית/דשבורד |
+| 2 | - | login | login_BLUEPRINT.html | ✅ הושלם | עמוד התחברות |
+| 3 | - | register | register_BLUEPRINT.html | ✅ הושלם | עמוד הרשמה |
+| 4 | - | reset_password | reset_password_BLUEPRINT.html | ✅ הושלם | איפוס סיסמה |
+| 5 | - | user_profile | user_profile_BLUEPRINT.html<br>user_profile_view_BLUEPRINT.html | ✅ הושלם | **2 גרסאות** |
+| 6 | - | trading_accounts | trading_accounts_BLUEPRINT.html | ✅ הושלם | תבנית טבלאות |
+| 7 | - | brokers_fees | brokers_fees_BLUEPRINT.html | ✅ הושלם | - |
+| 8 | - | cash_flows | cash_flows_BLUEPRINT.html | ✅ הושלם | - |
 
-### **עמודים נוספים (לא במניפסט הרשמי)**
+### **שלב 1: עמוד ניהול טיקרים**
 
-| # | שם מדויק | קבצי Blueprint | סטטוס | הערות |
-|---|----------|----------------|-------|-------|
-| - | home / index | index_BLUEPRINT.html | ✅ הושלם | דף הבית/דשבורד |
-| - | login | login_BLUEPRINT.html | ✅ הושלם | עמוד התחברות |
-| - | register | register_BLUEPRINT.html | ✅ הושלם | עמוד הרשמה |
-| - | reset_password | reset_password_BLUEPRINT.html | ✅ הושלם | איפוס סיסמה |
-| - | user_profile | user_profile_BLUEPRINT.html<br>user_profile_view_BLUEPRINT.html | ✅ הושלם | **שתי גרסאות:** user_profile_BLUEPRINT.html, user_profile_view_BLUEPRINT.html |
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| 9 | 1 | tickers | tickers_BLUEPRINT.html | ⏳ לא התחיל | ניהול טיקרים |
 
-### **סיכום סטטוס**
+### **שלב 2: השלמת כל עמודי תפריט "נתונים"**
 
-- ✅ **הושלמו:** 8 עמודים (index, login, register, reset_password, user_profile - 2 גרסאות, trading_accounts, brokers_fees, cash_flows)
-- ⏳ **לא התחילו:** 32 עמודים
-- 📊 **סה"כ:** 40 עמודים רשמיים + 5 עמודי Auth/Profile (user_profile עם 2 גרסאות)
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| 10 | 2 | alerts | alerts_BLUEPRINT.html | ⏳ לא התחיל | התראות |
+| 11 | 2 | notes | notes_BLUEPRINT.html | ⏳ לא התחיל | הערות |
+| 12 | 2 | trading_accounts | trading_accounts_BLUEPRINT.html | ✅ הושלם | חשבונות מסחר |
+| 13 | 2 | brokers_fees | brokers_fees_BLUEPRINT.html | ✅ הושלם | ברוקרים ועמלות |
+| 14 | 2 | user_ticker | user_ticker_BLUEPRINT.html | ⏳ לא התחיל | הטיקרים שלי |
+| 15 | 2 | executions | executions_BLUEPRINT.html | ⏳ לא התחיל | ביצועים |
+| 16 | 2 | cash_flows | cash_flows_BLUEPRINT.html | ✅ הושלם | תזרימי מזומנים |
 
-**⚠️ הערה:** המטריצה תוסדר לפי סדר עבודה וחבילות שיוגדרו בהמשך. המספור הפנימי (#) יוסדר בהתאם.
+### **שלב 3: השלמת עמודים - תכנון, טריידים, רשימות צפייה**
+
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| 17 | 3 | trade_plans | trade_plans_BLUEPRINT.html | ⏳ לא התחיל | תכנון טריידים |
+| 18 | 3 | trades | trades_BLUEPRINT.html | ⏳ לא התחיל | טריידים |
+| 19 | 3 | watch_lists | watch_lists_BLUEPRINT.html | ⏳ לא התחיל | רשימות צפייה |
+
+### **שלב 4: השלמת עמודי הגדרות והניהול**
+
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| **הגדרות (Settings)** |
+| 20 | 4 | user_profile | user_profile_BLUEPRINT.html<br>user_profile_view_BLUEPRINT.html | ✅ הושלם | פרופיל משתמש (2 גרסאות) |
+| 21 | 4 | data_import | data_import_BLUEPRINT.html | ⏳ לא התחיל | ייבוא נתונים |
+| 22 | 4 | tag_management | tag_management_BLUEPRINT.html | ⏳ לא התחיל | ניהול תגיות |
+| 23 | 4 | preferences | preferences_BLUEPRINT.html | ⏳ לא התחיל | העדפות |
+| **ניהול (Management)** |
+| 24 | 4 | system_management | system_management_BLUEPRINT.html | ⏳ לא התחיל | ניהול מערכת |
+| 25 | 4 | management | management_BLUEPRINT.html | ⏳ לא התחיל | ניהול (עמוד ראשי) |
+
+### **שלב 5: השלמת כל העמודים המתקדמים הנותרים**
+
+| # | שלב | שם מדויק | קובץ Blueprint | סטטוס | הערות |
+|---|-----|----------|----------------|-------|-------|
+| **תכנון (Trade Plans)** |
+| 26 | 5 | ai_analysis | ai_analysis_BLUEPRINT.html | ⏳ לא התחיל | אנליזת AI |
+| **מעקב (Trades)** |
+| 27 | 5 | ticker_dashboard | ticker_dashboard_BLUEPRINT.html | ⏳ לא התחיל | דשבורד טיקר |
+| 28 | 5 | trading_journal | trading_journal_BLUEPRINT.html | ⏳ לא התחיל | יומן מסחר |
+| **מחקר (Research)** |
+| 29 | 5 | strategy-analysis | strategy_analysis_BLUEPRINT.html | ⏳ לא התחיל | ניתוח אסטרטגיות |
+| 30 | 5 | trades_history | trades_history_BLUEPRINT.html | ⏳ לא התחיל | היסטוריית טרייד |
+| 31 | 5 | portfolio-state | portfolio_state_BLUEPRINT.html | ⏳ לא התחיל | מצב תיק היסטורי |
+| **עמודים נוספים** |
+| 32 | 5 | research | research_BLUEPRINT.html | ⏳ לא התחיל | מחקר (עמוד ראשי) |
+| 33 | 5 | api_keys | api_keys_BLUEPRINT.html | ⏳ לא התחיל | מפתחות API |
+| 34 | 5 | securities | securities_BLUEPRINT.html | ⏳ לא התחיל | ניירות ערך |
+
+### **סיכום סטטוס לפי שלבים**
+
+| שלב | עמודים חדשים | עמודים קיימים | סה"כ | סטטוס |
+|-----|--------------|---------------|------|-------|
+| **הושלמו** | - | 8 | 8 | ✅ הושלם |
+| **שלב 1** | 1 | 0 | 1 | ⏳ לא התחיל |
+| **שלב 2** | 5 | 2 | 7 | ⏳ לא התחיל |
+| **שלב 3** | 3 | 0 | 3 | ⏳ לא התחיל |
+| **שלב 4** | 5 | 1 | 6 | ⏳ לא התחיל |
+| **שלב 5** | 9 | 0 | 9 | ⏳ לא התחיל |
+| **סה"כ** | **23** | **8** | **34** | - |
+
+### **סיכום כללי**
+
+- ✅ **הושלמו:** 8 עמודים
+- ⏳ **לא התחילו:** 23 עמודים
+- 📊 **סה"כ:** 34 עמודים
+
+**⚠️ הערה:** המטריצה מסודרת לפי סדר עבודה וחבילות. המספור הפנימי (#) מסודר לפי סדר העבודה.
 
 ---
 
@@ -67,15 +133,23 @@
 ### **שלב 1: מחקר וניתוח מקיף** 🔍
 
 #### **1.1 סקירת Legacy Files**
-- **מיקום:** `_COMMUNICATION/team_01/team_01_staging/`
+- **מיקום:** `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/`
+- **⚠️ חשוב:** זו התיקייה המרכזית של כל קבצי ה-Legacy - כולל HTML, CSS, ו-JavaScript!
 - **פעולות:**
   - ✅ קריאה וניתוח של קובץ HTML Legacy לעמוד המטרה
   - ✅ לימוד כל קבצי DOM בתיקיית Legacy
   - ✅ תיעוד מבנה, קומפוננטות וסגנונות
   - ✅ זיהוי כל מחלקות CSS, IDs ו-data attributes
-  - ✅ זיהוי תלויות JavaScript או אינטראקציות
+  - ✅ זיהוי תלויות JavaScript או אינטראקציות (למטרות עיצוב בלבד)
 
 **לקח חשוב:** סקירה מקיפה של Legacy חוסכת זמן רב בהמשך.
+
+**⚠️ כלל קריטי - Blueprint = תבנית עיצובית בלבד:**
+- אנחנו יוצרים ממשק מדויק ויזואלית ומבחינת CSS
+- אנחנו משתמשים במידע דמה (mock data) בלבד
+- אנחנו לא מתעסקים עם מהיכן מגיע המידע או איך הוא מחושב
+- אנחנו לא מתעסקים עם API endpoints, JOINs, או חישובים
+- המטרה: תבנית עיצובית מדויקת ונקייה בלבד
 
 #### **1.2 בדיקת DB Schema**
 - **מיקום:** `documentation/05-DEVELOPMENT_&_CONTRACTS/OPENAPI_SPEC_V2.5.2.yaml`
@@ -135,6 +209,15 @@
 
 ### **שלב 3: יצירת בלופרינט** 🏗️
 
+**⚠️ כלל קריטי - Blueprint = תבנית עיצובית בלבד:**
+- **מטרה:** יצירת ממשק מדויק ויזואלית ומבחינת CSS
+- **מידע:** שימוש במידע דמה (mock data) בלבד
+- **לא מתעסקים עם:**
+  - מהיכן מגיע המידע (API, DB, JOINs)
+  - איך המידע מחושב (חישובים, לוגיקה)
+  - איך המידע נשמר (POST, PUT, DELETE)
+- **רק עיצוב:** תבנית עיצובית מדויקת ונקייה בלבד
+
 #### **3.1 בסיס: trading_accounts_BLUEPRINT.html**
 - **חשיבות קריטית:** trading_accounts הוא התבנית לכל הטבלאות במערכת
 - **פעולות:**
@@ -142,6 +225,7 @@
   - ✅ שמירה על מבנה HTML זהה
   - ✅ שמירה על מחלקות CSS זהה
   - ✅ התאמה לשדות ספציפיים
+  - ✅ הוספת מידע דמה (mock data) בלבד
 - **⚠️ כללי שמות קבצים:**
   - ✅ שם קובץ מסתיים ב-`_BLUEPRINT.html`
   - ❌ אין שימוש בתחיליות D15, D16, D21 וכו'

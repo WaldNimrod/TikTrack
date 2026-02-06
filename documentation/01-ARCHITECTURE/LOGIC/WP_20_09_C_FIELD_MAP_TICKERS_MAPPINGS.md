@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: טיקרים ומיפויים (Tickers & Mappings)
 
+**id:** `WP_20_09_C_FIELD_MAP_TICKERS_MAPPINGS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.09.C | **סטטוס:** סגירת פערים | **דיוק:** 20,8
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

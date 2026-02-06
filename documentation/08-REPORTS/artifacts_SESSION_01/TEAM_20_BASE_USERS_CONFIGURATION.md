@@ -98,7 +98,9 @@ Configured three permanent infrastructure base users and removed temporary admin
 - User summary table
 
 ### **2. Communication to Team 10**
-**File:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_BASE_USERS_CONFIGURED.md`
+> ⚠️ **NON-SSOT:** Communication only - internal team message
+
+**File:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_BASE_USERS_CONFIGURED.md` (Communication only)
 
 **Contents:**
 - Summary of changes

@@ -220,7 +220,9 @@
 - `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_D16_ACCTS_VIEW_QA_REPORT.md`
 
 **הודעות לצוותים:**
-- `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_30_D16_ACCTS_VIEW_QA_ISSUES.md`
+> ⚠️ **NON-SSOT:** Communication only - internal team messages
+
+- `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_30_D16_ACCTS_VIEW_QA_ISSUES.md` (Communication only)
 
 **קבצים שנבדקו:**
 - `ui/src/views/financial/D16_ACCTS_VIEW.html`

@@ -1,6 +1,13 @@
 # 📑 GIN-2026-008: הבהרות טכניות סופיות - פייז 1 (Identity & JWT)
 
-**סטטוס:** ✅ LOCKED & FINAL DECISION
+**id:** `GIN_2026_008_TECHNICAL_CLARIFICATIONS`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+**סטטוס:** ✅ LOCKED & FINAL DECISION  
 **תאריך:** 2026-01-31
 
 ---

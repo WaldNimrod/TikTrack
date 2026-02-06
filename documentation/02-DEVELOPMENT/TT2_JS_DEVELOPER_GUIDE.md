@@ -1,9 +1,15 @@
 # 📘 מדריך מפתח: JavaScript וצד-לקוח - פרויקט פיניקס
 
+**id:** `TT2_JS_DEVELOPER_GUIDE`  
+**owner:** Team 30 (Frontend Execution)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.4
+
 **פרויקט:** פיניקס (TikTrack V2)  
 **קהל יעד:** מפתחי Frontend (Team 30)  
-**תאריך:** 2026-01-31  
-**גרסה:** 1.4
+**תאריך:** 2026-01-31
 
 ---
 

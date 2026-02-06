@@ -9,7 +9,12 @@
  * - קונטיינר 2: כרטיסי סיכום תנועות
  * - קונטיינר 3: טבלת תנועות
  * - קונטיינר 4: טבלת פוזיציות
+ * 
+ * @version v1.2 - Hardened: Uses centralized FIX_transformers.js (v1.2) for all transformations
  */
+
+// Import centralized transformers (FIX_transformers.js v1.2)
+import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
 // API Base URL - Use Vite proxy (configured in vite.config.js)
 // Vite proxy: /api -> http://localhost:8082
@@ -25,23 +30,6 @@ function getAuthHeader() {
 }
 
 /**
- * Transform API response (snake_case) to camelCase
- */
-function apiToReact(data) {
-  if (Array.isArray(data)) {
-    return data.map(apiToReact);
-  }
-  if (data !== null && typeof data === 'object') {
-    return Object.keys(data).reduce((acc, key) => {
-      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-      acc[camelKey] = apiToReact(data[key]);
-      return acc;
-    }, {});
-  }
-  return data;
-}
-
-/**
  * Fetch Trading Accounts
  */
 async function fetchTradingAccounts(filters = {}) {
@@ -53,12 +41,8 @@ async function fetchTradingAccounts(filters = {}) {
     const url = `${API_BASE_URL}/trading_accounts${params.toString() ? '?' + params.toString() : ''}`;
     const authHeader = getAuthHeader();
     
-    // Debug logging
-    console.log('[Trading Accounts Data Loader] Fetching trading accounts:', {
-      url,
-      hasToken: !!authHeader.Authorization,
-      tokenPreview: authHeader.Authorization ? authHeader.Authorization.substring(0, 20) + '...' : 'none'
-    });
+    // Debug logging removed - security compliance
+    // Use maskedLog if debug logging is required
     
     const response = await fetch(url, {
       headers: {

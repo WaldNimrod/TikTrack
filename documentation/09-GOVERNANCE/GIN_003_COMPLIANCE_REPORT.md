@@ -1,5 +1,12 @@
 # GIN-2026-003: דוח Compliance - הוכחות מימוש לוגי וביצועי
 
+**id:** `GIN_003_COMPLIANCE_REPORT`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **תאריך:** 2026-01-26  
 **מזהה:** GIN-2026-003 Response  
 **צוות:** Team B - Architecture & Ground Truth Validation  

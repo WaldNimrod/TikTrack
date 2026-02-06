@@ -44,7 +44,7 @@
 ### שלב 1: קבלת בלופרינט מצוות 31
 
 #### 1.1 בדיקת מבנה הבלופרינט
-- [ ] **מיקום:** `_COMMUNICATION/team_31/team_31_staging/D15_*.html`
+- [ ] **מיקום:** `_COMMUNICATION/team_31/team_31_staging/D15_*.html` ⚠️ **NON-SSOT:** Communication only - staging folder
 - [ ] **מבנה HTML:** בדיקת מבנה HTML תואם לתבנית V3
 - [ ] **קישורי CSS:** וידוא שהבלופרינט מקשר לקבצי ה-CSS הקיימים בסדר הנכון:
   ```html
@@ -97,7 +97,7 @@
 - [ ] **קובץ:** `ui/blueprint-comparison.js`
 - [ ] **שימוש:** העתקת הקובץ לקונסולת הדפדפן
 - [ ] **הרצה:** הרצת הסקריפט על הבלופרינט ועל העמוד בפועל
-- [ ] **תיעוד:** שמירת הלוגים ב-`_COMMUNICATION/nimrod/`
+- [ ] **תיעוד:** שמירת הלוגים ב-`_COMMUNICATION/nimrod/` ⚠️ **NON-SSOT:** Communication only - log storage
 
 #### 2.4 ניתוח תוצאות
 - [ ] **השוואת לוגים:** השוואה בין `hp-blueprint-*.log` ל-`hp-8080-*.log`

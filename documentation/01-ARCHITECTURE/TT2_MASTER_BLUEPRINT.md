@@ -21,7 +21,7 @@
 
 ### **P0/P1/P2 Complete:**
 - ✅ **Port Unification:** Frontend (8080), Backend (8082)
-- ✅ **Routes SSOT:** `routes.json` v1.1.1
+- ✅ **Routes SSOT:** `routes.json` v1.1.2
 - ✅ **Transformers Hardened:** v1.2 (Forced number conversion for financial fields)
 - ✅ **Bridge Integration:** HTML Shell ↔ React Content
 - ✅ **Security:** Masked Log (Token leakage prevention)

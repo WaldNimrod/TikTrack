@@ -1,5 +1,12 @@
 # ⚓ מדריך אדריכלי: אסטרטגיית ניווט - קישורים סטנדרטיים במבנה היברידי
 
+**id:** `PHOENIX_NAVIGATION_STRATEGY`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **מאת:** Chief Architect (Gemini)  
 **תאריך:** 2026-02-04  
 **סטטוס:** 🔒 **LOCKED - MANDATORY**  

@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: משתמשים ופרופילים (Users & Profiles)
 
+**id:** `WP_20_07_C_FIELD_MAP_USERS_PROFILES`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.07.C | **עדכון:** Identity Tiers (Bronze-Platinum) + Admin Duplicate Email/Phone Exception
 
 ## 1. אסטרטגיית מזהים

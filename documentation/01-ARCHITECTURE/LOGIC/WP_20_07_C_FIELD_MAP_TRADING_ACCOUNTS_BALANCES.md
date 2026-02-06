@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: יתרות חשבונות מסחר (Balances)
 
+**id:** `WP_20_07_C_FIELD_MAP_TRADING_ACCOUNTS_BALANCES`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.07.C | **משימה:** Separated Balance Model (Multi-Currency)
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

@@ -1,5 +1,12 @@
 # GIN-2026-004: התאמת סכימה לבלופרינט ממשק (V2.5)
 
+**id:** `GIN_004_UI_ALIGNMENT_SPEC`  
+**owner:** Team 40 (UI Assets & Design)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.5
+
 **תאריך:** 2026-01-26  
 **מזהה:** GIN-2026-004 Response  
 **גרסה:** V2.5 - UI Alignment (Blueprint D24, D25)  

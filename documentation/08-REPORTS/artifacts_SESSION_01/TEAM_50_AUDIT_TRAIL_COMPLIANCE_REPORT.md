@@ -498,7 +498,7 @@ if (DEBUG_MODE) {
 
 ## 🔗 Related Documents
 
-- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_BATCH_1_CLOSURE.md` - Original mandate
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_BATCH_1_CLOSURE.md` - Original mandate ⚠️ **NON-SSOT:** Communication only
 - `ui/src/utils/audit.js` - Audit Trail System
 - `ui/src/utils/debug.js` - Debug Mode
 

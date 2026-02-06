@@ -1,5 +1,14 @@
 # 🛡️ פרוטוקול בקרת איכות - חמשת השלבים (The Fortress SOP)
 
+**id:** `FORTRESS_SOP_V252`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v2.52
+
+---
+
 ### 1. Physical Integrity
 נוכחות ושלמות הקבצים בסטייג'ינג.
 

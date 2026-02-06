@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: חשבונות מסחר (Trading Accounts)
 
+**id:** `WP_20_07_FIELD_MAP_TRADING_ACCOUNTS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.07 | **סטטוס:** סגירת 100% פערים | **סטנדרט:** Plural Standard (G-10)
 
 ## 1. סכימת מסד נתונים (Trading Accounts)

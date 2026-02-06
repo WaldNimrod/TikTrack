@@ -9,7 +9,7 @@
 
 ---
 
-**Status:** ✅ **P0 RED CLEANUP COMPLETE - AWAITING RE-AUDIT**
+**Status:** 🛑 **CRITICAL_FIX - Trading Accounts Governance Failure**
 
 ---
 
@@ -28,12 +28,12 @@
 - ✅ עדכון מדיניות סקריפטים (`PHOENIX_MASTER_BIBLE.md`)
 
 ### **P1 - יציבות ארכיטקטונית** ✅ **COMPLETE**
-- ✅ Routes SSOT (`routes.json` v1.1.1)
+- ✅ Routes SSOT (`routes.json` v1.1.2)
 - ✅ Security Masked Log (מניעת דליפת טוקנים)
 - ✅ State SSOT (Bridge Integration)
 
 ### **P2 - ניקוי וניטור** ✅ **COMPLETE**
-- ✅ החלפת קבצי FIX (`transformers.js` Hardened v1.2, `routes.json` v1.1.1)
+- ✅ החלפת קבצי FIX (`transformers.js` Hardened v1.2, `routes.json` v1.1.2)
 - ✅ ניקוי תגיות D16 מהערות ולוגים
 - ✅ עדכון תיעוד
 
@@ -48,7 +48,7 @@
 | D15.P | D15_RESET_PWD.html | שחזור סיסמה | **5. APPROVED** ✅ | Team 30/50 | Batch 1 Complete |
 | D15.I | D15_INDEX.html | דאשבורד | **4. FIDELITY** 🔵 | Team 30 | Batch 1 Complete |
 | D15.V | D15_PROF_VIEW.html | פרופיל | **4. FIDELITY** 🔵 | Team 10/20 | Batch 1 Complete |
-| D16 | trading_accounts.html | חשבונות מסחר | **⏳ AWAITING RE-AUDIT** | Team 30 | Batch 2 - P0 RED CLEANUP COMPLETE |
+| D16 | trading_accounts.html | חשבונות מסחר | **🛑 CRITICAL_FIX** | Team 30 | Batch 2 - כשל משילות - תיקון Transformers ולוגים נדרש |
 | D18 | brokers_fees.html | עמלות ברוקרים | **2. PLANNED** ⏳ | Team 30 | Batch 2 - Financial Core |
 | D21 | cash_flows.html | תזרים מזומנים | **2. PLANNED** ⏳ | Team 30 | Batch 2 - Financial Core |
 
@@ -67,10 +67,10 @@
 
 ---
 
-### **Batch 2: Financial Core** ⏳ **AWAITING RE-AUDIT**
+### **Batch 2: Financial Core** 🛑 **CRITICAL_FIX - BLOCKED**
 
 **עמודים מתוכננים:**
-- ⏳ D16 - Trading Accounts (AWAITING RE-AUDIT - P0 RED CLEANUP COMPLETE)
+- 🛑 D16 - Trading Accounts (CRITICAL_FIX - כשל משילות במודול - תיקון Transformers ולוגים נדרש)
 - ⏳ D18 - Brokers Fees (Planned)
 - ⏳ D21 - Cash Flows (Planned)
 
@@ -81,7 +81,7 @@
 - ⏳ ממתין לביקורת חוזרת של האדריכל
 
 **תשתית מוכנה:**
-- ✅ Routes SSOT (`routes.json` v1.1.1)
+- ✅ Routes SSOT (`routes.json` v1.1.2)
 - ✅ Transformers Hardened v1.2 (המרת מספרים כפויה)
 - ✅ Bridge Integration (HTML ↔ React)
 - ✅ Security Masked Log
@@ -108,9 +108,9 @@
 ## 🔄 עדכונים אחרונים
 
 **2026-02-05:**
-- ✅ ניקוי רעלים P0 אדום - הושלם
-- ✅ כל הקריטריונים אומתו
-- ⏳ ממתין לביקורת חוזרת של האדריכל
+- 🛑 כשל משילות במודול Trading Accounts - Phase 2 Kickoff מבוטל זמנית
+- 🛑 סטטוס D16 שונה ל-CRITICAL_FIX
+- 🛑 תיקון Transformers ולוגים נדרש (Team 30)
 
 **2026-02-04:**
 - ✅ עדכון סטטוס P0/P1/P2 Complete
@@ -121,6 +121,6 @@
 
 **Team 10 (The Gateway)**  
 **תאריך:** 2026-02-05  
-**סטטוס:** ✅ **P0 RED CLEANUP COMPLETE - AWAITING RE-AUDIT**
+**סטטוס:** 🛑 **CRITICAL_FIX - Trading Accounts Governance Failure**
 
-**log_entry | [Team 10] | PAGE_TRACKER | P0_RED_CLEANUP_COMPLETE | GREEN | 2026-02-05**
+**log_entry | [Team 10] | PAGE_TRACKER | CRITICAL_FIX_TRADING_ACCOUNTS | RED | 2026-02-05**

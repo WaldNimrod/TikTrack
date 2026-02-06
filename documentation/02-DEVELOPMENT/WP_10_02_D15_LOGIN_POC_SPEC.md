@@ -1,5 +1,12 @@
 # 🚨 פקודת תיקון: שחזור הנדסי עמוד לוגין (D-15)
 
+**id:** `WP_10_02_D15_LOGIN_POC_SPEC`  
+**owner:** Team 30 (Frontend Execution)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v3.0
+
 **סטטוס:** REJECTED - כשל בהלימה ויזואלית ⚠️ | **צוות:** 10 | **גרסה:** 3.0 (Pixel-Perfect Mandatory)
 
 ---

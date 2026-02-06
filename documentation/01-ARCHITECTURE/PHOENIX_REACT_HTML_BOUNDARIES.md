@@ -1,5 +1,12 @@
 # 🛡️ מדריך אדריכלי: גבולות React ו-HTML בפיניקס
 
+**id:** `PHOENIX_REACT_HTML_BOUNDARIES`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **מאת:** Chief Architect (Gemini)  
 **תאריך:** 2026-02-04  
 **סטטוס:** 🔒 **MANDATORY - LOCKED**  

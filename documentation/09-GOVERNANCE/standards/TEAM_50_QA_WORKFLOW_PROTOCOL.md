@@ -4,8 +4,9 @@
 **owner:** Team 50 (QA & Fidelity)  
 **status:** 🔒 **SSOT - MANDATORY**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-01-31  
-**version:** v1.0
+**last_updated:** 2026-02-05 (תיקון הפניות ל-`_COMMUNICATION` - NON-SSOT compliance)  
+**version:** v1.1  
+**⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
 
 ---
 
@@ -320,12 +321,12 @@
 ### CSS Standards
 
 - **נוהל מחייב:** `documentation/07-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`
-- **הודעה לצוות 30:** `_COMMUNICATION/TEAM_30_CSS_STANDARDS_PROTOCOL_MANDATORY.md`
+- **הודעה לצוות 30:** `_COMMUNICATION/TEAM_30_CSS_STANDARDS_PROTOCOL_MANDATORY.md` ⚠️ **NON-SSOT - Communication only**
 
 ### JavaScript Standards
 
 - **נוהל מחייב:** `documentation/07-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md`
-- **הודעה לצוות 30:** `_COMMUNICATION/TEAM_30_JS_STANDARDS_PROTOCOL_MANDATORY.md`
+- **הודעה לצוות 30:** `_COMMUNICATION/TEAM_30_JS_STANDARDS_PROTOCOL_MANDATORY.md` ⚠️ **NON-SSOT - Communication only**
 
 ### QA Standards
 

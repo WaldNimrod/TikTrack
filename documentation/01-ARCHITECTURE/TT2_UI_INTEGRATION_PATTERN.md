@@ -15,7 +15,7 @@
 
 ## 🔄 Routes SSOT (Single Source of Truth)
 
-**Location:** `ui/public/routes.json` (v1.1.1)
+**Location:** `ui/public/routes.json` (v1.1.2)
 
 Routes SSOT provides a centralized, runtime-accessible configuration for all application routes.
 

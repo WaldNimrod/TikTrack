@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: רשומות ביצוע (Executions)
 
+**id:** `WP_20_09_C_FIELD_MAP_EXECUTIONS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.09.C | **משימה:** רישום ביצועים אטומיים | **דיוק:** DECIMAL(20, 8)
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

@@ -146,8 +146,8 @@
 
 ### **דוחות:**
 - **דוח QA ראשוני:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_HOMEPAGE_FINAL_QA_REPORT.md`
-- **הודעה ל-Team 30:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_30_HOMEPAGE_QA_ISSUES.md`
-- **דוח תיקונים מ-Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_50_QA_ISSUES_FIXED.md`
+- **הודעה ל-Team 30:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_30_HOMEPAGE_QA_ISSUES.md` ⚠️ **NON-SSOT:** Communication only
+- **דוח תיקונים מ-Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_50_QA_ISSUES_FIXED.md` ⚠️ **NON-SSOT:** Communication only
 - **דוח זה:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_HOMEPAGE_RE_QA_REPORT.md`
 
 ### **קבצים:**

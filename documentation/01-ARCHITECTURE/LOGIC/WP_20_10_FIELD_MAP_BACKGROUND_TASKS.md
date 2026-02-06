@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: משימות רקע (Background Tasks)
 
+**id:** `WP_20_10_FIELD_MAP_BACKGROUND_TASKS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.10 | **משימה:** Workers & Scheduling
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

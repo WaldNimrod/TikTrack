@@ -1,5 +1,12 @@
 # מדיניות: Admin Duplicate Email/Phone Exception
 
+**id:** `WP_20_07_C_ADMIN_DUPLICATE_EMAIL_PHONE_POLICY`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **תאריך:** 2026-02-01  
 **סשן:** S20.07.C | **עדכון:** Admin Dual Identity Support  
 **סטטוס:** ✅ **מאושר ויושם**

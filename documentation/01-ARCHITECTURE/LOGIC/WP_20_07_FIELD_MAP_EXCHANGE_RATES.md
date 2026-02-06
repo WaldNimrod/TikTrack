@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: שערי חליפין (Exchange Rates)
 
+**id:** `WP_20_07_FIELD_MAP_EXCHANGE_RATES`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.07 | **סטטוס:** דיוק Forex (20,8) | **סטנדרט:** Identity Strategy
 
 ## 1. סכימת מסד נתונים (Exchange Rates)

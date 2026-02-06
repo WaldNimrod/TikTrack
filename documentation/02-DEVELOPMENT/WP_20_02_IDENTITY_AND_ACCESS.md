@@ -1,4 +1,13 @@
-# 🧊 משימה 20.2: תכנון שכבת הזהות והגישה (Identity Brick) 
+# 🧊 משימה 20.2: תכנון שכבת הזהות והגישה (Identity Brick)
+
+**id:** `WP_20_02_IDENTITY_AND_ACCESS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+---
 
 **צוות מבצע:** 20 | **קדימות:** P0 (The Master Brick) 
 

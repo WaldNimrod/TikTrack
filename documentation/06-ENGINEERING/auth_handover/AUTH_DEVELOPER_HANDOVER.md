@@ -1,5 +1,14 @@
 # 📖 תיעוד טכני: רכיבי אימות (Auth Core) - פרויקט פיניקס
 
+**id:** `AUTH_DEVELOPER_HANDOVER`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+---
+
 ## 🏗️ מבנה אדריכלי
 הקבצים המצורפים (Login, Register, Reset) הם תוצרי ה-Blueprint שאושרו ברמת LOD 400.
 הם מהווים את ה-Source of Truth (SSOT) עבור צוות 30 (Frontend Execution).

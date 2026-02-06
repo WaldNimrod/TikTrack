@@ -1,5 +1,12 @@
 # 🔍 PHOENIX SANITY REPORT V1 - נספח ב' (צוות B)
 
+**id:** `PHOENIX_SANITY_REPORT_V1_TEAM_B`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **תאריך:** 2026-01-26  
 **מזהה דוח:** GIN-2026-007 Response (Team B Compliance Audit)  
 **צוות:** Team B (Cursor UX-UI - Local Architecture)  

@@ -4,8 +4,9 @@
 **owner:** Team 50 (QA & Fidelity)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-01-31  
-**version:** v1.0
+**last_updated:** 2026-02-05 (תיקון הפניות ל-`_COMMUNICATION` - NON-SSOT compliance)  
+**version:** v1.1  
+**⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
 
 ---
 
@@ -158,7 +159,7 @@ tests/
 
 **קובץ בדיקות:** `tests/validation-comprehensive.test.js`  
 **דוח QA:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`  
-**משימה:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`
+**משימה:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md` ⚠️ **NON-SSOT - Communication only**
 
 **תרחישי בדיקה:**
 
@@ -227,7 +228,7 @@ npm run test:routing
 ```
 
 **תיעוד:**
-- **דוח:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_SELENIUM_TEST_ADDED.md`
+- **דוח:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_SELENIUM_TEST_ADDED.md` ⚠️ **NON-SSOT - Communication only**
 
 **סטטוס:** ✅ **ACTIVE - READY FOR USE**
 
@@ -268,7 +269,7 @@ npm run test:routing
 
 **תיעוד:**
 - **מדריך שימוש:** `documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md`
-- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md` ⚠️ **NON-SSOT - Communication only**
 
 **סטטוס:** ✅ **ACTIVE - READY FOR USE**
 
@@ -306,8 +307,8 @@ npm run test:routing
 - סיכום כולל (passed/failed)
 
 **תיעוד:**
-- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
-- **הנחיות בלופרינט:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md` ⚠️ **NON-SSOT - Communication only**
+- **הנחיות בלופרינט:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md` ⚠️ **NON-SSOT - Communication only**
 
 **סטטוס:** ✅ **ACTIVE - READY FOR USE**
 

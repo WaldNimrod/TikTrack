@@ -316,7 +316,9 @@
 - `ui/src/styles/phoenix-components.css`
 
 **בלופרינט:**
-- `_COMMUNICATION/team_31/team_31_staging/sandbox_v2/D16_ACCTS_VIEW.html` (v1.0.13)
+> ⚠️ **NON-SSOT:** Communication only - staging blueprint reference
+
+- `_COMMUNICATION/team_31/team_31_staging/sandbox_v2/D16_ACCTS_VIEW.html` (v1.0.13) (Communication only)
 
 ---
 

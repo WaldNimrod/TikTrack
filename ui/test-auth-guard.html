@@ -47,147 +47,44 @@
   <div class="test-section">
     <h2>Test 1: Debug Mode</h2>
     <p>Enable debug mode to prevent redirects:</p>
-    <button class="test-button" onclick="enableDebugMode()">Enable Debug Mode</button>
-    <button class="test-button" onclick="disableDebugMode()">Disable Debug Mode</button>
-    <button class="test-button" onclick="checkDebugMode()">Check Debug Mode Status</button>
+    <button class="test-button" data-action="enableDebugMode">Enable Debug Mode</button>
+    <button class="test-button" data-action="disableDebugMode">Disable Debug Mode</button>
+    <button class="test-button" data-action="checkDebugMode">Check Debug Mode Status</button>
   </div>
   
   <div class="test-section">
     <h2>Test 2: Token Management</h2>
     <p>Test token storage and retrieval:</p>
-    <button class="test-button" onclick="setTestToken()">Set Test Token</button>
-    <button class="test-button" onclick="removeToken()">Remove Token</button>
-    <button class="test-button" onclick="checkToken()">Check Token</button>
+    <button class="test-button" data-action="setTestToken">Set Test Token</button>
+    <button class="test-button" data-action="removeToken">Remove Token</button>
+    <button class="test-button" data-action="checkToken">Check Token</button>
   </div>
   
   <div class="test-section">
     <h2>Test 3: Auth Guard Functions</h2>
     <p>Test Auth Guard exported functions:</p>
-    <button class="test-button" onclick="testIsAuthenticated()">Test isAuthenticated()</button>
-    <button class="test-button" onclick="testCheck()">Test check()</button>
-    <button class="test-button" onclick="testLogWithTimestamp()">Test logWithTimestamp()</button>
+    <button class="test-button" data-action="testIsAuthenticated">Test isAuthenticated()</button>
+    <button class="test-button" data-action="testCheck">Test check()</button>
+    <button class="test-button" data-action="testLogWithTimestamp">Test logWithTimestamp()</button>
   </div>
   
   <div class="test-section">
     <h2>Test 4: Navigation</h2>
     <p>Test navigation to protected pages:</p>
-    <button class="test-button" onclick="navigateToTradingAccounts()">Navigate to /trading_accounts</button>
-    <button class="test-button" onclick="navigateToTradingAccountsDebug()">Navigate to /trading_accounts?debug=true</button>
+    <button class="test-button" data-action="navigateToTradingAccounts">Navigate to /trading_accounts</button>
+    <button class="test-button" data-action="navigateToTradingAccountsDebug">Navigate to /trading_accounts?debug=true</button>
   </div>
   
   <div class="test-section">
     <h2>Log Output</h2>
     <div id="logOutput" class="log-output">Logs will appear here...</div>
-    <button class="test-button" onclick="clearLogs()">Clear Logs</button>
+    <button class="test-button" data-action="clearLogs">Clear Logs</button>
   </div>
 
   <!-- Load Auth Guard -->
-  <script src="src/views/financial/authGuard.js"></script>
+  <script src="src/components/core/authGuard.js"></script>
   
-  <script>
-    // Capture console.log for display
-    const originalLog = console.log;
-    const logOutput = document.getElementById('logOutput');
-    
-    console.log = function(...args) {
-      originalLog.apply(console, args);
-      if (args[0] && args[0].includes && args[0].includes('Auth Guard')) {
-        logOutput.textContent += args.join(' ') + '\n';
-        logOutput.scrollTop = logOutput.scrollHeight;
-      }
-    };
-    
-    function enableDebugMode() {
-      localStorage.setItem('auth_guard_debug', 'true');
-      log('Debug mode enabled');
-    }
-    
-    function disableDebugMode() {
-      localStorage.removeItem('auth_guard_debug');
-      log('Debug mode disabled');
-    }
-    
-    function checkDebugMode() {
-      const debug = localStorage.getItem('auth_guard_debug') === 'true';
-      log('Debug mode status: ' + (debug ? 'ENABLED' : 'DISABLED'));
-      if (window.AuthGuard) {
-        log('AuthGuard.debugMode: ' + window.AuthGuard.debugMode);
-      }
-    }
-    
-    function setTestToken() {
-      localStorage.setItem('access_token', 'test_token_' + Date.now());
-      log('Test token set');
-    }
-    
-    function removeToken() {
-      localStorage.removeItem('access_token');
-      sessionStorage.removeItem('access_token');
-      log('Token removed');
-    }
-    
-    function checkToken() {
-      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-      log('Token exists: ' + !!token);
-      if (token) {
-        log('Token length: ' + token.length);
-        log('Token preview: ' + token.substring(0, 30) + '...');
-      }
-    }
-    
-    function testIsAuthenticated() {
-      if (window.AuthGuard && window.AuthGuard.isAuthenticated) {
-        const result = window.AuthGuard.isAuthenticated();
-        log('isAuthenticated() result: ' + result);
-      } else {
-        log('ERROR: AuthGuard.isAuthenticated not available');
-      }
-    }
-    
-    function testCheck() {
-      if (window.AuthGuard && window.AuthGuard.check) {
-        log('Calling check()...');
-        window.AuthGuard.check();
-      } else {
-        log('ERROR: AuthGuard.check not available');
-      }
-    }
-    
-    function testLogWithTimestamp() {
-      if (window.AuthGuard && window.AuthGuard.logWithTimestamp) {
-        const result = window.AuthGuard.logWithTimestamp('Test log message', { test: 'data' });
-        log('logWithTimestamp() returned: ' + JSON.stringify(result));
-      } else {
-        log('ERROR: AuthGuard.logWithTimestamp not available');
-      }
-    }
-    
-    function navigateToTradingAccounts() {
-      window.location.href = '/trading_accounts';
-    }
-    
-    function navigateToTradingAccountsDebug() {
-      window.location.href = '/trading_accounts?debug=true';
-    }
-    
-    function clearLogs() {
-      logOutput.textContent = '';
-    }
-    
-    function log(message) {
-      const timestamp = new Date().toISOString();
-      logOutput.textContent += `[${timestamp}] ${message}\n`;
-      logOutput.scrollTop = logOutput.scrollHeight;
-    }
-    
-    // Initial log
-    log('Test page loaded. Auth Guard should be initialized.');
-    if (window.AuthGuard) {
-      log('AuthGuard object available: ' + !!window.AuthGuard);
-      log('AuthGuard.debugMode: ' + window.AuthGuard.debugMode);
-    } else {
-      log('WARNING: AuthGuard object not available');
-    }
-  </script>
+  <!-- Load Test Handlers (External JS - Policy Compliance) -->
+  <script src="test/test-auth-guard-handlers.js"></script>
 </body>
 </html>

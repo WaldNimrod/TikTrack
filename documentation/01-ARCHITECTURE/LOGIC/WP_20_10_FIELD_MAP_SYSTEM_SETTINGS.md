@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: הגדרות מערכת (System Settings)
 
+**id:** `WP_20_10_FIELD_MAP_SYSTEM_SETTINGS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.10 | **משימה:** WP-20.10 | **סטנדרט:** Identity Strategy (BIGINT/ULID)
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

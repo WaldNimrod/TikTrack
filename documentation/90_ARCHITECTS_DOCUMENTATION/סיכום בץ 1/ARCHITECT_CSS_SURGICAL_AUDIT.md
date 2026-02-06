@@ -1,5 +1,12 @@
 # 🏰 דוח ביקורת CSS כירורגי: חבילה 1
 
+**id:** `ARCHITECT_CSS_SURGICAL_AUDIT`  
+**owner:** Team 40 (UI Assets & Design)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סטטוס:** 🟡 דורש דיוקים (Refinement Needed)
 
 ## 1. ממצאים חיוביים (The Wins)

@@ -1,8 +1,8 @@
-# 🏰 אינדקס אדריכל מרכזי (v2.13.0)
+# 🏰 אינדקס אדריכל מרכזי (v2.15.1)
 ## 📂 Phase 2: Financial Core (ACTIVE 🟢)
-- D16_ACCTS_VIEW - ניהול חשבונות (In Progress).
-- FIX_transformers.js - חוזה נתונים מוקשח.
+- ARCHITECT_PHASE_2_FULL_RELEASE_MANDATE.md - שחרור וחיזוק משילות (NEW).
+- TRADING_ACCOUNTS_VIEW - סטטוס: STABLE & VERIFIED.
 
 ## 📂 Phase 1: Foundations (LOCKED 🔒)
-- ARCHITECT_BATCH_1_FINAL_SEAL.md - חותמת נעילה סופית.
-- documentation/00-MANAGEMENT/00_MASTER_INDEX.md - ה-Registry המאוחד.
+- SPY_FULL_SYSTEM_SCAN_FINAL_GREEN.md - אישור סופי.
+- ARCHITECT_BATCH_1_FINAL_SEAL.md - חותמת נעילה.

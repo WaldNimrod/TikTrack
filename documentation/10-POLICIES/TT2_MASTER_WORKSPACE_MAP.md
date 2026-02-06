@@ -1,5 +1,14 @@
 # 🗺️ אמנת מרחב העבודה הנעול (Project Phoenix)
 
+**id:** `TT2_MASTER_WORKSPACE_MAP`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
+---
+
 ### 1. מבנה ה-Monorepo
 - /api: FastAPI Backend.
 - /ui: React/Vite Frontend.

@@ -1,5 +1,12 @@
 # 🗺️ Field Map LOD 400: מפתחות API מוצפנים (Credentials)
 
+**id:** `WP_20_07_C_FIELD_MAP_ENCRYPTED_CREDENTIALS`  
+**owner:** Team 20 (Backend Implementation)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-05  
+**version:** v1.0
+
 **סשן:** S20.07.C | **סטטוס:** Security Isolation
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)

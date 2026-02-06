@@ -52,7 +52,7 @@
 ## 🔗 Cross-References
 
 ### Related Documents
-- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md` - Task directive
+- `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md` - Task directive ⚠️ **NON-SSOT:** Communication only
 - `documentation/10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md` - Validation framework policy
 - `documentation/09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md` - Test index
 

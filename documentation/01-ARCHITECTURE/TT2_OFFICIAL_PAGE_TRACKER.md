@@ -48,9 +48,9 @@
 | D15.P | D15_RESET_PWD.html | שחזור סיסמה | **5. APPROVED** ✅ | Team 30/50 | Batch 1 Complete |
 | D15.I | D15_INDEX.html | דאשבורד | **4. FIDELITY** 🔵 | Team 30 | Batch 1 Complete |
 | D15.V | D15_PROF_VIEW.html | פרופיל | **4. FIDELITY** 🔵 | Team 10/20 | Batch 1 Complete |
-| D16 | trading_accounts.html | חשבונות מסחר | **🔒 LOCKED_FOR_UAI_REFIT** 🔒 | Team 30 | Phase 1.8 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor) |
-| D18 | brokers_fees.html | עמלות ברוקרים | **🔒 LOCKED_FOR_UAI_REFIT** 🔒 | Team 30 | Phase 1.8 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor) |
-| D21 | cash_flows.html | תזרים מזומנים | **🔒 LOCKED_FOR_UAI_REFIT** 🔒 | Team 30 | Phase 1.8 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor) |
+| D16 | trading_accounts.html | חשבונות מסחר | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
+| D18 | brokers_fees.html | עמלות ברוקרים | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
+| D21 | cash_flows.html | תזרים מזומנים | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
 
 ---
 
@@ -105,7 +105,8 @@
 - **1. DRAFT** 📝 - טיוטה ראשונית
 - **🛑 REJECTED_BY_SPY** 🛑 - נדחה על ידי Spy Team - נדרשים Interface Contracts
 - **🛑 PAUSED_FOR_INFRA** 🛑 - מוקפא לטובת Infrastructure Retrofit (Phase 1.8)
-- **🔒 LOCKED_FOR_UAI_REFIT** 🔒 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor)
+- **🔒 LOCKED_FOR_UAI_REFIT** 🔒 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor) - **DEPRECATED** (Phase 1.8 Complete)
+- **2. ACTIVE_DEV** 🟢 - בפיתוח פעיל (Phase 2 Active Development)
 - **✅ APPROVED_FOR_IMPLEMENTATION** ✅ - מאושר למימוש (מערכות הליבה)
 
 ---

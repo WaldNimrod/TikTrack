@@ -1,8 +1,10 @@
 # 📘 מדריך יישום מפורט: D18_BRKRS_VIEW ו-D21_CASH_VIEW
 
+**⚠️ הערה חשובה:** מסמך זה נוצר לפני תהליך התיקונים העמוק. יש לוודא עמידה בנהלים החדשים (transformers.js, קישורי SSOT).
+
 **מאת:** Team 31 (Blueprint)  
 **תאריך:** 2026-01-31  
-**גרסה:** v1.0.0  
+**גרסה:** v1.0.1 (Updated - Compliance Note Added)  
 **סטטוס:** ✅ **READY FOR IMPLEMENTATION**
 
 ---

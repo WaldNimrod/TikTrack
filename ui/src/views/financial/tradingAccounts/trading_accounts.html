@@ -9,11 +9,11 @@
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        ============================================ -->
   
-  <!-- 1. Pico CSS FIRST (Framework) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  
-  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <!-- 1. Phoenix Base Styles FIRST (Global defaults & DNA variables) - MUST BE FIRST -->
   <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 2. Pico CSS (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   
   <!-- 3. LEGO Components (Reusable components) -->
   <link rel="stylesheet" href="/src/styles/phoenix-components.css">
@@ -29,15 +29,15 @@
 <body class="trading-accounts-page context-trading">
   
   <!-- ============================================
-       UNIFIED HEADER + GLOBAL FILTER
+       UAI Entry Point (Unified App Init)
        ============================================ -->
-  <!-- Auth Guard: Check authentication before loading page -->
-  <script src="/src/components/core/authGuard.js"></script>
+  <!-- ✅ REQUIRED: Load config from external JS file BEFORE UAI -->
+  <script src="/src/views/financial/tradingAccounts/tradingAccountsPageConfig.js"></script>
   
-  <!-- Header will be loaded dynamically via headerLoader.js -->
-  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
-  <script src="/src/components/core/phoenixFilterBridge.js"></script>
-  <script src="/src/components/core/headerLoader.js"></script>
+  <!-- ✅ REQUIRED: Load UAI after config -->
+  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+  
+  <!-- Note: Auth Guard, PhoenixBridge, and Header are loaded automatically by UAI DOMStage -->
 
   <!-- ============================================
        PAGE WRAPPER + CONTAINER STRUCTURE

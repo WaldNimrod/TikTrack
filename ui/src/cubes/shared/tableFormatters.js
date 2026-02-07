@@ -284,6 +284,44 @@ function formatNumericValue(value, currency = null, decimals = 2) {
   return span;
 }
 
+/**
+ * formatCommissionValue - פורמט ערך עמלה
+ * 
+ * @description פורמט ערך עמלה לפי סוג העמלה (Tiered, Flat, Percentage, Fixed)
+ * @param {string|number} value - ערך העמלה (מחרוזת או מספר)
+ * @param {string} commissionType - סוג עמלה (tiered, flat, percentage, fixed)
+ * @returns {string} מחרוזת מפורמטת
+ * 
+ * @example
+ * formatCommissionValue('0.0035', 'tiered') // "0.0035 $ / Share"
+ * formatCommissionValue('0.02', 'flat') // "0.02 % / Volume"
+ * formatCommissionValue(10, 'fixed') // "$10.00"
+ */
+function formatCommissionValue(value, commissionType = '') {
+  if (!value) {
+    return '';
+  }
+  
+  const type = (commissionType || '').toLowerCase();
+  
+  // If value is already a formatted string, return as is
+  if (typeof value === 'string' && (value.includes('/') || value.includes('%') || value.includes('$'))) {
+    return value;
+  }
+  
+  // Format based on commission type
+  if (type === 'tiered') {
+    return `${value} $ / Share`;
+  } else if (type === 'flat' || type === 'percentage') {
+    return `${value} % / Volume`;
+  } else if (type === 'fixed') {
+    return formatCurrency(Number(value) || 0, 'USD', 2);
+  }
+  
+  // Default: return as string
+  return String(value);
+}
+
 // Export for use in modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -295,7 +333,8 @@ if (typeof module !== 'undefined' && module.exports) {
     formatPL,
     formatStatusBadge,
     formatOperationTypeBadge,
-    formatNumericValue
+    formatNumericValue,
+    formatCommissionValue
   };
 }
 
@@ -309,5 +348,6 @@ window.tableFormatters = {
   formatPL,
   formatStatusBadge,
   formatOperationTypeBadge,
-  formatNumericValue
+  formatNumericValue,
+  formatCommissionValue
 };

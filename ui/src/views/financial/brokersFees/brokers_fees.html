@@ -1,64 +1,252 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>ניהול ברוקרים ועמלות - TikTrack</title>
-    <link rel="stylesheet" href="./D15_IDENTITY_STYLES.css">
-</head>
-<body>
-  <!-- Auth Guard: Check authentication before loading page -->
-  <script src="/src/components/core/authGuard.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ברוקרים ועמלות | TikTrack Phoenix</title>
   
-  <!-- Header will be loaded dynamically via headerLoader.js -->
-  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
-  <script src="../../components/core/phoenixFilterBridge.js"></script>
-  <script src="../../components/core/headerLoader.js"></script>
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================ -->
+  
+  <!-- 1. Phoenix Base Styles FIRST (Global defaults & DNA variables) - MUST BE FIRST -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 2. Pico CSS (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 3. LEGO Components (Reusable components) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="brokers-fees-page context-trading">
+  
+  <!-- ============================================
+       UAI Entry Point (Unified App Init)
+       ============================================ -->
+  <!-- ✅ REQUIRED: Load config from external JS file BEFORE UAI -->
+  <script src="/src/views/financial/brokersFees/brokersFeesPageConfig.js"></script>
+  
+  <!-- ✅ REQUIRED: Load UAI after config -->
+  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+  
+  <!-- Note: Auth Guard, PhoenixBridge, and Header are loaded automatically by UAI DOMStage -->
 
-  <!-- Page Content -->
+  <!-- ============================================
+       PAGE WRAPPER + CONTAINER STRUCTURE
+       ============================================
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section
+       ============================================ -->
+  
   <div class="page-wrapper">
     <div class="page-container">
       <main>
         <tt-container>
-          <tt-section>
+          
+          <!-- ============================================
+               CONTAINER 0: סיכום מידע והתראות פעילות
+               ============================================
+               Content: Active Alerts + Summary Information
+               Filters: None (uses global filters only)
+               ============================================ -->
+          
+          <tt-section data-section="summary-alerts">
+            <!-- Section Header -->
             <div class="index-section__header">
-              <h2 class="index-section__header-title">הגדרות ברוקרים ועמלות:</h2>
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">ברוקרים ועמלות</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count" id="brokersCount">0 ברוקרים פעילים</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div class="index-section__content">
-              <table class="legacy-audit-table">
-                <thead>
-                  <tr>
-                    <th>ברוקר:</th>
-                    <th>סוג עמלה:</th>
-                    <th>ערך עמלה:</th>
-                    <th>מינימום לפעולה:</th>
-                    <th>פעולות:</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Interactive Brokers</td>
-                    <td>Tiered</td>
-                    <td>0.0035 $ / Share</td>
-                    <td>0.35 $</td>
-                    <td><button class="btn-link">ערוך</button></td>
-                  </tr>
-                  <tr>
-                    <td>Exante</td>
-                    <td>Flat</td>
-                    <td>0.02 % / Volume</td>
-                    <td>10.00 $</td>
-                    <td><button class="btn-link">ערוך</button></td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <!-- Summary Information -->
+                  <div class="info-summary" id="summaryStats">
+                    <!-- First Row: Summary Stats -->
+                    <div class="info-summary__row info-summary__row--first">
+                      <div>סה"כ ברוקרים: <strong id="totalBrokers">0</strong></div>
+                      <div>ברוקרים פעילים: <strong id="activeBrokers">0</strong></div>
+                      <div>עמלה ממוצעת לפעולה: <strong id="avgCommissionPerTrade"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                      <div>סה"כ עמלות קבועות לחודש: <strong id="monthlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                      <div>סה"כ עמלות קבועות לשנה: <strong id="yearlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
             </div>
           </tt-section>
+
+          <!-- ============================================
+               CONTAINER 1: ניהול ברוקרים ועמלות
+               ============================================
+               Content: Table (Brokers & Commissions)
+               Filters: None (uses global filters only)
+               ============================================ -->
+          
+          <tt-section data-section="brokers-management">
+            <!-- Section Header -->
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">הגדרות ברוקרים ועמלות</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count" id="tableBrokersCount">0 ברוקרים פעילים</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section Body -->
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  
+                  <!-- Table Wrapper -->
+                  <div class="phoenix-table-wrapper">
+                    <table id="brokersTable" class="phoenix-table js-table" data-table-type="brokers" role="table" aria-label="ניהול ברוקרים ועמלות">
+                      <thead class="phoenix-table__head" role="rowgroup">
+                        <tr class="phoenix-table__row" role="row">
+                          <th class="phoenix-table__header col-broker js-table-sort-trigger" data-sortable="true" data-sort-key="broker" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">ברוקר</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-commission-type js-table-sort-trigger" data-sortable="true" data-sort-key="commission_type" data-sort-type="string" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">סוג עמלה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-commission-value phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="commission_value" data-sort-type="string" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">ערך עמלה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-minimum phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="minimum" data-sort-type="numeric" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
+                            <span class="phoenix-table__header-text">מינימום לפעולה</span>
+                            <span class="phoenix-table__sort-indicator js-sort-indicator">
+                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 9l4 -4l4 4"></path>
+                                <path d="M8 15l4 4l4 -4"></path>
+                              </svg>
+                            </span>
+                          </th>
+                          <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
+                            <span class="phoenix-table__header-text">פעולות</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="phoenix-table__body" role="rowgroup" id="brokersTableBody">
+                        <!-- Table rows will be populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <!-- Table Pagination -->
+                  <div class="phoenix-table-pagination">
+                    <div class="phoenix-table-pagination__info">
+                      <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+                    </div>
+                    <div class="phoenix-table-pagination__controls">
+                      <div class="phoenix-table-pagination__page-size">
+                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="brokersTable">
+                          <option value="10">10</option>
+                          <option value="25" selected>25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                      <div class="phoenix-table-pagination__pages" id="paginationControls">
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="prevPageBtn" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"></path>
+                          </svg>
+                        </button>
+                        <div id="pageNumbers"></div>
+                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="nextPageBtn" disabled>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
         </tt-container>
       </main>
     </div>
   </div>
 
-<!-- Modular Footer: Loaded dynamically via footerLoader.js -->
-<script src="/src/views/shared/footerLoader.js"></script>
+  <!-- ============================================
+       JavaScript Files (External Only - Policy Compliance)
+       ============================================ -->
+  
+  <!-- Section Toggle Handler -->
+  <script src="/src/components/core/sectionToggleHandler.js"></script>
+  
+  <!-- Table Managers (Required for sorting and filtering) -->
+  <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+  <script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
+  
+  <!-- Table Formatters (Required for table formatting) -->
+  <script src="/src/cubes/shared/tableFormatters.js"></script>
+  
+  <!-- Brokers Fees Data Loader -->
+  <script type="module" src="/src/views/financial/brokersFees/brokersFeesDataLoader.js"></script>
+  
+  <!-- Brokers Fees Table Initialization -->
+  <script type="module" src="/src/views/financial/brokersFees/brokersFeesTableInit.js"></script>
+  
+  <!-- Brokers Fees Header Handlers -->
+  <script src="/src/views/financial/brokersFees/brokersFeesHeaderHandlers.js"></script>
+  
+  <!-- Footer Loader -->
+  <script src="/src/views/shared/footerLoader.js"></script>
+  
+  <!-- Lucide Icons Initialization (External JS - Policy Compliance) -->
+  <script src="/src/views/financial/brokersFees/brokersFeesLucideInit.js"></script>
 </body>
 </html>

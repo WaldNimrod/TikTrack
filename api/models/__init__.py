@@ -11,6 +11,7 @@ from .cash_flows import CashFlow
 from .trades import Trade
 from .tickers import Ticker
 from .ticker_prices import TickerPrice
+from .brokers_fees import BrokerFee
 
 __all__ = [
     "User",
@@ -26,4 +27,5 @@ __all__ = [
     "Trade",
     "Ticker",
     "TickerPrice",
+    "BrokerFee",
 ]

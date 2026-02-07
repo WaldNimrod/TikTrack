@@ -10,10 +10,10 @@
  * - קונטיינר 3: טבלת תנועות
  * - קונטיינר 4: טבלת פוזיציות
  * 
- * @version v1.2 - Hardened: Uses centralized FIX_transformers.js (v1.2) for all transformations
+ * @version v1.2 - Hardened: Uses centralized transformers.js (v1.2) for all transformations
  */
 
-// Import centralized transformers (FIX_transformers.js v1.2)
+// Import centralized transformers (transformers.js v1.2)
 import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
 // API Base URL - Use Vite proxy (configured in vite.config.js)

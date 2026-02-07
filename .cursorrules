@@ -27,6 +27,25 @@ Before performing any task, you MUST:
 - **Identity:** External IDs = ULID strings only.
 - **Precision:** Decimal(20,8) for money.
 
+## 📚 KNOWLEDGE PROMOTION PROTOCOL (MANDATORY - ACTIVE 2026-02-06)
+**CRITICAL:** Only Team 10 (The Gateway) is authorized to write to `documentation/` directory.
+
+### **For Teams 20, 30, 40, 50, 51, 60:**
+- ❌ **FORBIDDEN:** Creating or updating files directly in `documentation/`
+- ✅ **MANDATORY:** All output MUST be written to `_COMMUNICATION/team_[ID]/`
+- ✅ **MANDATORY:** Use proper completion report formats:
+  - `TEAM_[ID]_[BATCH]_COMPLETION_REPORT.md`
+  - `TEAM_[ID]_[FEATURE]_COMPLETION.md`
+- ✅ **MANDATORY:** Team 10 will perform "Promotion" (Consolidation) at end of each batch/phase
+- 📋 **Reference:** `_COMMUNICATION/team_10/TEAM_10_KNOWLEDGE_PROMOTION_WORKFLOW.md`
+
+### **Consolidation Process (Team 10 only):**
+1. Collect communication reports from `_COMMUNICATION/team_[ID]/`
+2. Identify critical knowledge (decisions, patterns, lessons learned)
+3. Create/update SSOT documents in `documentation/` with full metadata
+4. Update master indexes
+5. Archive communication reports to `_COMMUNICATION/99-ARCHIVE/`
+
 ## 🏁 TASK COMPLETION
-- Create an Evidence log in /05-REPORTS/artifacts/.
-- Notify Team 10 for Index update.
+- Create an Evidence log in `_COMMUNICATION/team_[ID]/` (NOT in `documentation/`)
+- Notify Team 10 for Consolidation and Index update.

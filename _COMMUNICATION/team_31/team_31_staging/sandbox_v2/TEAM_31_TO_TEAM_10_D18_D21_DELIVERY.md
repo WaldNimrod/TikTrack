@@ -1,5 +1,7 @@
 # 📡 הודעה: Team 31 → Team 10 | D18_BRKRS_VIEW ו-D21_CASH_VIEW - מוכנים למסירה
 
+**⚠️ הערה חשובה:** מסמך זה נוצר לפני תהליך התיקונים העמוק. יש לוודא עמידה בנהלים החדשים (transformers.js, קישורי SSOT).
+
 **From:** Team 31 (Blueprint)  
 **To:** Team 10 (The Gateway)  
 **Date:** 2026-01-31  

@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-05  
-**version:** v3.0 (Phase 1.7 - Documentation Integrity)
+**last_updated:** 2026-02-06  
+**version:** v3.3 (Knowledge Promotion Phase 2 Complete)
 
 ---
 
@@ -98,7 +98,7 @@ _COMMUNICATION/
 ## 🔄 Routes SSOT & Data Transformation
 
 - [🗺️ Routes SSOT (routes.json v1.1.2)](../../ui/public/routes.json) - מקור אמת יחיד לנתיבי המערכת (Frontend: 8080, Backend: 8082, Routes Hierarchy) ✅ **P1 Complete**
-- [🔄 Transformers Hardened v1.2](../../ui/src/cubes/shared/utils/transformers.js) - המרת נתונים מוקשחת עם המרת מספרים כפויה לשדות כספיים ✅ **P2 Complete**
+- [🔄 Transformers Hardened v1.2](../../ui/src/cubes/shared/utils/transformers.js) - המרת נתונים מוקשחת עם המרת מספרים כפויה לשדות כספיים (`transformers.js` - לא `FIX_transformers.js`) ✅ **P2 Complete**
 - [🔗 Bridge Integration](../../ui/src/cubes/shared/contexts/PhoenixFilterContext.jsx) - חיבור React Context ל-PhoenixBridge עם Listener ל-`phoenix-filter-change` event ✅ **P1 Complete**
 
 ---
@@ -147,6 +147,10 @@ _COMMUNICATION/
 
 - [🔄 CSS & Blueprint Refactor V2 - תוכנית בנייה מחדש](../02-DEVELOPMENT/TEAM_10_CSS_BLUEPRINT_REFACTOR_PLAN_V2.md) - תוכנית מלאה לבנייה מחדש לפי ארכיטקטורת LEGO מודולרית (⚠️ כלל ברזל: אין סקריפטים בתוך העמוד) ✅ **SSOT**
 - [📋 תהליך עבודה עם בלופרינטים](../05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md) - תהליך עבודה מעודכן v2.0 עם checklist לבדיקת CSS ו-DOM ✅ **SSOT**
+- [📚 פרוטוקול קידום ידע (Knowledge Promotion Protocol)](../05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md) - נוהל Consolidation: זיקוק דוחות תקשורת למסמכי SSOT (Team 10 בלבד רשאי לכתוב ל-`documentation/`) ✅ **SSOT - ACTIVE**
+- [🚀 תוכנית מימוש Phase 2 (Financial Core)](../01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md) - תוכנית מימוש מלא לחבילה 2: Financial Core (D16, D18, D21) ✅ **SSOT - LOCKED**
+- [📡 הודעה מרוכזת Phase 2 לכל הצוותים](../01-ARCHITECTURE/TT2_PHASE_2_ALL_TEAMS_MANDATE.md) - הודעה מרוכזת לכל הצוותים: חיזוק משילות, חובת למידה חוזרת, משימות ראשונות ✅ **SSOT - LOCKED**
+- [📊 סיכום Phase 2 Release](../08-REPORTS/TT2_PHASE_2_RELEASE_SUMMARY.md) - סיכום Phase 2 Release: הושלם בהצלחה, רשימת עמודים, משימות לכל צוות ✅ **SSOT - ACTIVE**
 
 ---
 
@@ -166,7 +170,7 @@ _COMMUNICATION/
 
 ### **Batch Status:**
 - ✅ **Batch 1:** Identity & Auth - COMPLETE (2026-02-02)
-- 🟡 **Batch 2:** Financial Core - AWAITING RE-AUDIT (2026-02-05)
+- 🟢 **Batch 2:** Financial Core - PHASE 2 RELEASED (2026-02-06)
 
 ---
 
@@ -210,7 +214,7 @@ _COMMUNICATION/
 ---
 
 **Team 10 (The Gateway)**  
-**תאריך:** 2026-02-05  
+**תאריך:** 2026-02-06  
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
-**log_entry | [Team 10] | DOCS_INTEGRITY | MASTER_INDEX_UNIFIED | BLUE | 2026-02-05**
+**log_entry | [Team 10] | PHASE_2_REFINED | MASTER_INDEX_UPDATED | GREEN | 2026-02-06**

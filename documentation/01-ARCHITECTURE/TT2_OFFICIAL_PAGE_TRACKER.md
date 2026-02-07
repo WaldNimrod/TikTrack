@@ -5,11 +5,11 @@
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
 **last_updated:** 2026-02-07  
-**version:** v3.5 (Phase 1.8 - Final Resolution - Execution Mode)
+**version:** v3.6 (Phase 2 - Active Development - Knowledge Promotion Complete)
 
 ---
 
-**Status:** 🔴 **PHASE 1.8 - EXECUTION MODE - UAI CORE REFACTOR (48H)**
+**Status:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - FINANCIAL CORE**
 
 ---
 
@@ -67,12 +67,12 @@
 
 ---
 
-### **Batch 2: Financial Core** 🔒 **LOCKED_FOR_UAI_REFIT**
+### **Batch 2: Financial Core** 🟢 **ACTIVE_DEVELOPMENT**
 
 **עמודים:**
-- 🔒 D16 - Trading Accounts (**LOCKED_FOR_UAI_REFIT** - ממתין לסיום UAI Core Refactor)
-- 🔒 D18 - Brokers Fees (**LOCKED_FOR_UAI_REFIT** - ממתין לסיום UAI Core Refactor)
-- 🔒 D21 - Cash Flows (**LOCKED_FOR_UAI_REFIT** - ממתין לסיום UAI Core Refactor)
+- 🟢 D16 - Trading Accounts (**ACTIVE_DEV** - Phase 2 Active Development)
+- 🟢 D18 - Brokers Fees (**ACTIVE_DEV** - Phase 2 Active Development)
+- 🟢 D21 - Cash Flows (**ACTIVE_DEV** - Phase 2 Active Development)
 
 **✅ ניקוי רעלים:**
 - ✅ ניקוי פורט 7246 - הושלם
@@ -110,49 +110,74 @@
 
 ---
 
-## 🚨 Phase 1.8: Infrastructure Retrofit
+## ✅ Phase 1.8: Infrastructure Retrofit - COMPLETE
 
-**סטטוס:** 🚨 **ACTIVE - CONTRACTS LOCK (48 שעות)**
+**סטטוס:** ✅ **COMPLETE - SYSTEM STABLE**
 
-### **שלב 1: UAI Core Refactor** 🔴 **CRITICAL - 48 HOURS**
-- [ ] ריפקטור מלא של UAI Core (Team 30)
-- [ ] בדיקת תקינות כל השלבים
-- [ ] בדיקת Integration מלאה
-- [ ] Deadline: 48 שעות
+### **שלב 1: UAI Core Refactor** ✅ **COMPLETE**
+- [x] ריפקטור מלא של UAI Core (Team 30) ✅
+- [x] בדיקת תקינות כל השלבים ✅
+- [x] בדיקת Integration מלאה ✅
+- [x] Deadline: 48 שעות ✅ **MET**
 
-### **שלב 2: נעילת חוזים** 🔴 **CRITICAL**
-- [ ] PDSC Boundary Contract - השלמה (Team 20+30)
-- [ ] UAI External JS Contract - תיקון (Team 30)
-- [ ] הגשה ל-Team 90 לביקורת
+### **שלב 2: נעילת חוזים** ✅ **COMPLETE**
+- [x] PDSC Boundary Contract - השלמה (Team 20+30) ✅
+- [x] UAI External JS Contract - תיקון (Team 30) ✅
+- [x] הגשה ל-Team 90 לביקורת ✅
+- [x] תיקונים קריטיים (CSS Order, Legacy Fallback) ✅
 
-### **שלב 2: בניית המנוע**
-- [ ] PDSC Server (Team 20)
-- [ ] UAI Engine + PDSC Client (Team 30)
-- [ ] CSS Layering (Team 40)
+### **שלב 2: בניית המנוע** ✅ **COMPLETE**
+- [x] PDSC Server (Team 20) ✅
+- [x] UAI Engine + PDSC Client (Team 30) ✅
+- [x] CSS Layering (Team 40) ✅
 
-### **שלב 3: הסבה (Retrofit)**
-- [ ] Dashboard (D15_INDEX) - פיילוט
-- [ ] Profile (D15_PROF_VIEW)
-- [ ] Trading Accounts (D16) - **נעול ל-UAI Refit**
-- [ ] Brokers Fees (D18) - **נעול ל-UAI Refit**
-- [ ] Cash Flows (D21) - **נעול ל-UAI Refit**
+### **שלב 3: הסבה (Retrofit)** ✅ **COMPLETE**
+- [x] Dashboard (D15_INDEX) - פיילוט ✅
+- [x] Profile (D15_PROF_VIEW) ✅
+- [x] Trading Accounts (D16) - ✅ **READY FOR PHASE 2**
+- [x] Brokers Fees (D18) - ✅ **READY FOR PHASE 2**
+- [x] Cash Flows (D21) - ✅ **READY FOR PHASE 2**
 
 ### **מערכות הליבה - סטטוס:**
-- ✅ **UAI** - `APPROVED_FOR_IMPLEMENTATION`
-- ✅ **PDSC** - `APPROVED_FOR_IMPLEMENTATION`
-- ✅ **EFR** - `APPROVED_FOR_IMPLEMENTATION`
-- ✅ **GED** - `APPROVED_FOR_IMPLEMENTATION`
+- ✅ **UAI** - `APPROVED_FOR_IMPLEMENTATION` ✅ **STABLE**
+- ✅ **PDSC** - `APPROVED_FOR_IMPLEMENTATION` ✅ **STABLE**
+- ✅ **EFR** - `APPROVED_FOR_IMPLEMENTATION` ✅ **STABLE**
+- ✅ **CSS Load Verification** - `APPROVED_FOR_IMPLEMENTATION` ✅ **STABLE**
+
+---
+
+## 🟢 Phase 2: Financial Core - ACTIVE DEVELOPMENT
+
+**סטטוס:** 🟢 **ACTIVE_DEVELOPMENT**
+
+**עמודים בפיתוח:**
+- 🟢 D16 - Trading Accounts (**ACTIVE_DEV**)
+- 🟢 D18 - Brokers Fees (**ACTIVE_DEV**)
+- 🟢 D21 - Cash Flows (**ACTIVE_DEV**)
+
+**תשתית מוכנה:**
+- ✅ UAI Engine (100% integration)
+- ✅ PDSC Hybrid (Boundary Contract locked)
+- ✅ CSS Load Verification (enforced)
+- ✅ Transformers v1.2 Hardened (SSOT)
+- ✅ Routes SSOT (v1.1.2)
 
 ---
 
 ## 🔄 עדכונים אחרונים
 
+**2026-02-07 (Knowledge Promotion - Phase 1.8 → Phase 2):**
+- ✅ **Phase 1.8 הושלם** - System Stable, כל התיקונים הקריטיים בוצעו
+- ✅ **Knowledge Promotion** - 5 Specs הועברו ל-SSOT (`documentation/01-ARCHITECTURE/`)
+- 🟢 **Phase 2 Active Development** - D16/D18/D21 במצב `ACTIVE_DEV`
+- ✅ **תשתית מוכנה** - UAI, PDSC, CSS Verification - כל המערכות יציבות
+- 📋 **הבית נקי** - אפשר להתחיל לבנות את הליבה הפיננסית
+
 **2026-02-07 (עדכון מאוחר - Phase 1.8 Final Resolution):**
 - 🔒 **החלטות סופיות ננעלו** - עוברים מ-'דיון' ל-'ביצוע'
-- 🔴 **UAI Core Refactor** - Deadline 48 שעות (Team 30)
-- 🔒 **D16/D18/D21 נעולים** - `LOCKED_FOR_UAI_REFIT` עד סיום UAI Core Refactor
-- ✅ **מערכות הליבה** - `APPROVED_FOR_IMPLEMENTATION`
-- 📋 **תוכנית מימוש מעודכנת** - בהתאם להחלטות הסופיות
+- ✅ **UAI Core Refactor** - הושלם (Team 30)
+- ✅ **תיקונים קריטיים** - CSS Order + Legacy Fallback תוקנו
+- ✅ **מערכות הליבה** - `APPROVED_FOR_IMPLEMENTATION` → `STABLE`
 
 **2026-02-07 (עדכון מאוחר - Phase 1.8):**
 - 🚨 **PHASE 1.8 - INFRASTRUCTURE RETROFIT** - הוכרז

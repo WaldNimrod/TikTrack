@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-06  
-**version:** v3.3 (Knowledge Promotion Phase 2 Complete)
+**last_updated:** 2026-02-07  
+**version:** v3.4 (Phase 1.8 Complete - Core Systems SSOT Added)
 
 ---
 
@@ -103,6 +103,28 @@ _COMMUNICATION/
 
 ---
 
+## 🏗️ Core Systems - Phase 1.8 (Infrastructure Retrofit)
+
+**סטטוס:** ✅ **COMPLETE - SYSTEM STABLE** (2026-02-07)
+
+### **UAI (Unified App Init) - Lifecycle Engine** ✅
+- [🔧 TT2_UAI_CONFIG_CONTRACT.md](../01-ARCHITECTURE/TT2_UAI_CONFIG_CONTRACT.md) - JSON Schema Contract מחייב לכל עמוד (pageType, dataLoader, tables, lifecycle hooks) ✅ **SSOT - Phase 1.8**
+- [🔧 UAI Core Files](../../ui/src/components/core/UnifiedAppInit.js) - UnifiedAppInit.js + 5 Stages (DOM, Bridge, Data, Render, Ready) ✅ **STABLE**
+
+### **PDSC (Phoenix Data Service Core) - Hybrid Architecture** ✅
+- [🤝 TT2_PDSC_BOUNDARY_CONTRACT.md](../01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md) - Shared Boundary Contract בין Backend (Source of Truth) ל-Frontend (Implementation) ✅ **SSOT - Phase 1.8**
+- [🔧 PDSC Client](../../ui/src/components/core/Shared_Services.js) - Shared_Services.js - Unified API client עם routes.json SSOT ✅ **STABLE**
+
+### **EFR (Entity Field Renderer) - Field Mapping & Rendering** ✅
+- [📊 TT2_EFR_LOGIC_MAP.md](../01-ARCHITECTURE/TT2_EFR_LOGIC_MAP.md) - SSOT Field Mapping Table (Backend snake_case → Frontend camelCase → EFR Renderer) ✅ **SSOT - Phase 1.8**
+- [🔒 TT2_EFR_HARDENED_TRANSFORMERS_LOCK.md](../01-ARCHITECTURE/TT2_EFR_HARDENED_TRANSFORMERS_LOCK.md) - Lock Specification על transformers.js v1.2 כבסיס היחיד להמרת נתונים ✅ **SSOT - Phase 1.8**
+
+### **CSS Load Verification - DNA Variables Enforcement** ✅
+- [✅ TT2_CSS_LOAD_VERIFICATION_SPEC.md](../01-ARCHITECTURE/TT2_CSS_LOAD_VERIFICATION_SPEC.md) - CSS Load Order Verification (phoenix-base.css ראשון, משתנים קריטיים) ✅ **SSOT - Phase 1.8**
+- [🔧 CSS Load Verifier](../../ui/src/components/core/cssLoadVerifier.js) - CSSLoadVerifier class - אכיפת סדר טעינה ב-DOMStage ✅ **STABLE**
+
+---
+
 ## 🎨 עיצוב ו-Fidelity (Design & Fidelity)
 
 - [🎨 TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md](../09-GOVERNANCE/standards/TT2_DESIGN_FIDELITY_FIX_PROTOCOL.md) - נוהל תיקון בעיות fidelity מול Blueprint (מתי ואיך לתקן)
@@ -189,6 +211,11 @@ _COMMUNICATION/
   - ✅ **Unified Index:** `00_MASTER_INDEX.md` is now SSOT
   - ✅ **Deprecated Indexes:** All other indexes marked as DEPRECATED and archived
   - ✅ **Archive Location:** `documentation/99-ARCHIVE/deprecated_indexes_phase_1.7/` and `_COMMUNICATION/99-ARCHIVE/deprecated_indexes_phase_1.7/`
+### 🏗️ Phase 1.8 Infrastructure Retrofit: ✅ **COMPLETE** (2026-02-07)
+  - ✅ **Core Systems:** UAI, PDSC, EFR, CSS Verification - כל המערכות יציבות
+  - ✅ **Knowledge Promotion:** 5 Specs הועברו ל-SSOT (`documentation/01-ARCHITECTURE/`)
+  - ✅ **System Status:** STABLE - מוכן ל-Phase 2 Active Development
+  - ✅ **Page Tracker:** עודכן ל-v3.6 (Phase 2 Active Development)
 
 ---
 
@@ -214,7 +241,7 @@ _COMMUNICATION/
 ---
 
 **Team 10 (The Gateway)**  
-**תאריך:** 2026-02-06  
+**תאריך:** 2026-02-07  
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
-**log_entry | [Team 10] | PHASE_2_REFINED | MASTER_INDEX_UPDATED | GREEN | 2026-02-06**
+**log_entry | [Team 10] | PHASE_1_8_COMPLETE | MASTER_INDEX_UPDATED | GREEN | 2026-02-07**

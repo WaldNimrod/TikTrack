@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-06  
-**version:** v1.0 (Header Unification Mandate)
+**last_updated:** 2026-02-07  
+**version:** v1.1 (Phase 1.8 - Core Systems Added)
 
 ---
 
@@ -131,25 +131,99 @@
 
 ---
 
+## 🏗️ Core Systems - Phase 1.8 (Infrastructure Retrofit)
+
+### **8. UnifiedAppInit.js** ✅ **SSOT - CORE**
+
+**מיקום:** `ui/src/components/core/UnifiedAppInit.js`
+
+**סטטוס:** 🔒 **SSOT - CORE** (מקור אמת ל-UAI Lifecycle)
+
+**תיאור:** Controller ראשי לניהול Lifecycle של עמודים ב-5 שלבים (DOM → Bridge → Data → Render → Ready).
+
+**גרסה:** v1.0.0
+
+**Spec:** [TT2_UAI_CONFIG_CONTRACT.md](./TT2_UAI_CONFIG_CONTRACT.md)
+
+---
+
+### **9. Shared_Services.js (PDSC Client)** ✅ **SSOT - CORE**
+
+**מיקום:** `ui/src/components/core/Shared_Services.js`
+
+**סטטוס:** 🔒 **SSOT - CORE** (מקור אמת ל-PDSC Client)
+
+**תיאור:** Unified API client עם routes.json SSOT, transformers.js v1.2, error handling לפי PDSC Schema.
+
+**גרסה:** v1.0.0
+
+**Spec:** [TT2_PDSC_BOUNDARY_CONTRACT.md](./TT2_PDSC_BOUNDARY_CONTRACT.md)
+
+---
+
+### **10. cssLoadVerifier.js** ✅ **SSOT - CORE**
+
+**מיקום:** `ui/src/components/core/cssLoadVerifier.js`
+
+**סטטוס:** 🔒 **SSOT - CORE** (מקור אמת ל-CSS Load Verification)
+
+**תיאור:** CSS Load Order Verification - וידוא ש-phoenix-base.css נטען ראשון ומשתני CSS זמינים.
+
+**גרסה:** v1.1.0
+
+**Spec:** [TT2_CSS_LOAD_VERIFICATION_SPEC.md](./TT2_CSS_LOAD_VERIFICATION_SPEC.md)
+
+---
+
+### **11. UAI Stages** ✅ **SSOT - CORE**
+
+**מיקום:** `ui/src/components/core/stages/`
+
+**סטטוס:** 🔒 **SSOT - CORE** (מקור אמת ל-UAI Stages)
+
+**קבצים:**
+- `DOMStage.js` - Stage 1: DOM Ready + CSS Verification
+- `BridgeStage.js` - Stage 2: PhoenixBridge Initialization
+- `DataStage.js` - Stage 3: Data Loading (PDSC Client)
+- `RenderStage.js` - Stage 4: UI Rendering
+- `ReadyStage.js` - Stage 5: Finalization
+- `StageBase.js` - Base class לכל השלבים
+
+**גרסה:** v1.0.0
+
+**Spec:** [TT2_UAI_CONFIG_CONTRACT.md](./TT2_UAI_CONFIG_CONTRACT.md)
+
+---
+
 ## 📋 Page-Specific Configurations
 
 ### **D18 - Brokers Fees**
 
-**קובץ Config:** `ui/src/views/financial/brokersFees/brokersFeesHeaderConfig.js`
+**קובץ Config:** `ui/src/views/financial/brokersFees/brokersFeesPageConfig.js`
 
-**סטטוס:** ⏳ **PENDING** (Header Unification Mandate)
+**סטטוס:** ✅ **COMPLETE** (Phase 1.8)
 
-**תיאור:** קונפיגורציה ייעודית ל-D18. משתמש ב-`PhoenixHeaderHandlersBase` לליבה המשותפת.
+**תיאור:** UAI Page Config ל-D18. משתמש ב-UAI Engine + PDSC Client.
 
 ---
 
 ### **D21 - Cash Flows**
 
-**קובץ Config:** `ui/src/views/financial/cashFlows/cashFlowsHeaderConfig.js`
+**קובץ Config:** `ui/src/views/financial/cashFlows/cashFlowsPageConfig.js`
 
-**סטטוס:** ⏳ **PENDING** (Header Unification Mandate)
+**סטטוס:** ✅ **COMPLETE** (Phase 1.8)
 
-**תיאור:** קונפיגורציה ייעודית ל-D21. משתמש ב-`PhoenixHeaderHandlersBase` לליבה המשותפת.
+**תיאור:** UAI Page Config ל-D21. משתמש ב-UAI Engine + PDSC Client.
+
+---
+
+### **D16 - Trading Accounts**
+
+**קובץ Config:** `ui/src/views/financial/tradingAccounts/tradingAccountsPageConfig.js`
+
+**סטטוס:** ✅ **COMPLETE** (Phase 1.8)
+
+**תיאור:** UAI Page Config ל-D16. משתמש ב-UAI Engine + PDSC Client.
 
 ---
 
@@ -171,12 +245,16 @@
 
 ## 📊 עדכונים אחרונים
 
+**2026-02-07 (Phase 1.8 Complete):**
+- ✅ הוספת Core Systems (UAI, PDSC Client, CSS Verification)
+- ✅ הוספת UAI Stages (5 stages + StageBase)
+- ✅ הוספת Page Configs (D16, D18, D21)
+- ✅ עדכון Specs (TT2_UAI_CONFIG_CONTRACT, TT2_PDSC_BOUNDARY_CONTRACT, TT2_CSS_LOAD_VERIFICATION_SPEC)
+
 **2026-02-06:**
 - ✅ יצירת Registry (Header Unification Mandate)
 - ✅ הוספת `phoenixHeaderHandlersBase.js` (SSOT - CORE)
 - ✅ הוספת `baseDataLoader.js` (SSOT - CORE)
-- ⏳ D18 Config - PENDING
-- ⏳ D21 Config - PENDING
 
 ---
 
@@ -189,7 +267,7 @@
 ---
 
 **Team 10 (The Gateway)**  
-**תאריך:** 2026-02-06  
+**תאריך:** 2026-02-07  
 **סטטוס:** 🔒 **SSOT - ACTIVE**
 
-**log_entry | [Team 10] | SSOT_REGISTRY | CREATED | GREEN | 2026-02-06**
+**log_entry | [Team 10] | SSOT_REGISTRY | PHASE_1_8_UPDATED | GREEN | 2026-02-07**

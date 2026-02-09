@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-07  
-**version:** v3.4 (Phase 1.8 Complete - Core Systems SSOT Added)
+**last_updated:** 2026-02-09  
+**version:** v3.7 (Gate B GREEN — תיעוד תהליך + ארטיפקטים)
 
 ---
 
@@ -64,6 +64,7 @@ _COMMUNICATION/
 - [📖 PHOENIX_MASTER_BIBLE.md](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md) - ספר החוקים המאסטר
 - [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](../09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md) - מדריך עבודה פנימי
 - [🏛️ PHOENIX_ORGANIZATIONAL_STRUCTURE.md](./PHOENIX_ORGANIZATIONAL_STRUCTURE.md) - מבנה ארגוני
+- [🤝 TT2_SLA_TEAMS_30_40.md](../05-PROCEDURES/TT2_SLA_TEAMS_30_40.md) - אמנת שירות צוות 30 (Frontend) ↔ 40 (UI Assets) — Presentational vs Container ✅ **מחייב**
 
 ---
 
@@ -72,6 +73,8 @@ _COMMUNICATION/
 - [🧪 TEAM_50_QA_WORKFLOW_PROTOCOL.md](../09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md) - נוהל עבודה לבדיקות QA (Code Review → Selenium → Visual Validation)
 - [📋 TEAM_50_QA_REPORT_TEMPLATE.md](../09-GOVERNANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md) - תבנית דוח QA סטנדרטית
 - [📊 TEAM_50_QA_TEST_INDEX.md](../09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md) - אינדקס בדיקות QA מפורט
+- [👤 QA Test User Seed (README)](../../scripts/README_SEED_QA_USER.md) - משתמש QA קבוע ל-Gate B Runtime/E2E (TikTrackAdmin / 4181); הרצת `python3 scripts/seed_qa_test_user.py` אחרי איפוס DB ✅ **תעוד קבוע**
+- [📋 TT2_QA_SEED_USER_PROCEDURE.md](../05-PROCEDURES/TT2_QA_SEED_USER_PROCEDURE.md) - נוהל קצר + הפניה ל-README המלא
 - ⚠️ **TEAM_51_ONBOARDING_COMPREHENSIVE.md** - חבילת אונבורדינג מקיפה לצוות 51 (QA Remote) - נמצא ב-`_COMMUNICATION/team_51/` (לא SSOT - Communication בלבד)
 
 ---
@@ -80,6 +83,7 @@ _COMMUNICATION/
 
 - [🏗️ TT2_INFRASTRUCTURE_GUIDE.md](../01-ARCHITECTURE/TT2_INFRASTRUCTURE_GUIDE.md) - מדריך מקיף לתשתיות המערכת (Frontend, Backend, Database, Environment, Deployment)
 - [🔐 TT2_DATABASE_CREDENTIALS.md](../01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md) - הגדרת Database Credentials (שם DB, משתמש, הוראות הגדרה)
+- [👤 QA Test User Seed](../../scripts/README_SEED_QA_USER.md) - סקריפט Seed למשתמש QA קבוע (Gate B Runtime/E2E); הרצה אחרי DB reset
 - [🏛️ TT2_MASTER_BLUEPRINT.md](../01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
 
 ---
@@ -216,6 +220,18 @@ _COMMUNICATION/
   - ✅ **Knowledge Promotion:** 5 Specs הועברו ל-SSOT (`documentation/01-ARCHITECTURE/`)
   - ✅ **System Status:** STABLE - מוכן ל-Phase 2 Active Development
   - ✅ **Page Tracker:** עודכן ל-v3.6 (Phase 2 Active Development)
+### 🧭 Gate B (Contract↔Runtime): ✅ **GREEN** (2026-02-09)
+  - ✅ **סגירה:** Team 90 — ריצה מלאה לפי SOP-010 (Runtime + E2E, 0 SEVERE)
+  - 📄 **סטטוס תהליך (SSOT):** [GATE_B_STATUS.md](../05-REPORTS/GATE_B_STATUS.md)
+  - 📁 **ארטיפקטים:** [documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/](../05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/) — דוח חתום, screenshots, logs, test_summary
+
+---
+
+## 📁 דוחות ו-Gate B (Reports & Artifacts)
+
+- [🧭 GATE_B_STATUS.md](../05-REPORTS/GATE_B_STATUS.md) - סטטוס Gate B (GREEN) + קישורים לארטיפקטים ✅ **SSOT**
+- [✅ TEAM_50_GATE_B_SIGNED_QA_REPORT.md](../05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/TEAM_50_GATE_B_SIGNED_QA_REPORT.md) - דוח QA חתום (Phase 2 E2E)
+- **תיקיית ארטיפקטים:** `documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/` — console_logs, network_logs, test_summary, screenshots (D16, D18, D21)
 
 ---
 
@@ -241,7 +257,7 @@ _COMMUNICATION/
 ---
 
 **Team 10 (The Gateway)**  
-**תאריך:** 2026-02-07  
+**תאריך:** 2026-02-09  
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
-**log_entry | [Team 10] | PHASE_1_8_COMPLETE | MASTER_INDEX_UPDATED | GREEN | 2026-02-07**
+**log_entry | [Team 10] | GATE_B_GREEN | MASTER_INDEX_UPDATED | 2026-02-09**

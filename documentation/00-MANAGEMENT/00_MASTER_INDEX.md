@@ -147,6 +147,7 @@ _COMMUNICATION/
 - [📋 CSS_LOADING_ORDER.md](../04-DESIGN_UX_UI/CSS_LOADING_ORDER.md) - מדריך מפורט לסדר טעינת CSS (ITCSS, סדר טעינה קריטי, דוגמאות שימוש, בעיות נפוצות) 🔴 **CRITICAL**
 - [📊 DASHBOARD_WIDGETS_GUIDE.md](../04-DESIGN_UX_UI/DASHBOARD_WIDGETS_GUIDE.md) - מדריך מקיף לדשבורד וויגיטים - מבנה, עיצוב, פונקציונליות, וכל הדיוקים שבוצעו
 - [📜 TT2_RESPONSIVE_FLUID_DESIGN.md](../04-DESIGN_UX_UI/TT2_RESPONSIVE_FLUID_DESIGN.md) - אמנת רספונסיביות דינמית (Fluid Design, ללא media queries) 🛡️ **MANDATORY**
+- [🎨 DNA_COLOR_PALETTE_DOCUMENTATION.md](../01-ARCHITECTURE/DNA_COLOR_PALETTE_DOCUMENTATION.md) - תיעוד מקיף לפלטת הצבעים DNA (63 משתנים, מבנה, פילוסופיה, מימוש, מיפוי Apple Colors) ✅ **SSOT**
 
 ---
 

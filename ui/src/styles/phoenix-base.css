@@ -41,9 +41,8 @@
    ============================================ */
 
 :root {
-  /* ===== Apple Design System Variables (Exact from original) ===== */
-  --apple-blue: #007AFF;
-  --apple-blue-dark: #0056CC;
+  /* ===== Apple Design System Variables (Legacy - Kept for compatibility) ===== */
+  /* NOTE: These are kept for backward compatibility but will be overridden by palette mappings below */
   --logo-orange: #ff9e04;
   --apple-gray-1: #F2F2F7;
   --apple-gray-2: #E5E5EA;
@@ -56,32 +55,15 @@
   --apple-gray-9: #3A3A3C;
   --apple-gray-10: #2C2C2E;
   --apple-gray-11: #1C1C1E;
-  --apple-red: #FF3B30;
-  --apple-red-dark: #D70015;
-  --apple-green: #34C759;
-  --apple-green-dark: #248A3D;
-  --apple-orange: #FF9500;
-  --apple-orange-dark: #CC7700;
   --apple-yellow: #FFCC02;
   --apple-purple: #AF52DE;
   --apple-pink: #FF2D92;
-  
-  /* ===== Backgrounds (Exact from original) ===== */
-  --apple-bg-primary: #FFFFFF;
-  --apple-bg-secondary: #F2F2F7;
   --apple-bg-tertiary: #FFFFFF;
-  --apple-bg-elevated: #FFFFFF;
   --apple-bg-footer: #2C2C2E; /* Dark gray for footer - clear separation (lighter than black) */
-  
-  /* ===== Text Colors (Exact from original) ===== */
-  --apple-text-primary: #000000;
-  --apple-text-secondary: #3C3C43;
   --apple-text-tertiary: #3C3C4399;
   --apple-text-quaternary: #3C3C434D;
   
-  /* ===== Borders (Exact from original) ===== */
-  --apple-border: #C6C6C8;
-  --apple-border-light: #E5E5EA;
+  /* NOTE: Apple colors (blue, red, green, orange, backgrounds, text, borders) are mapped to palette below */
   
   /* ===== Shadows (Exact from original) ===== */
   --apple-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -147,44 +129,171 @@
   --font-main: var(--font-family-primary);
   --grid-gutter: var(--spacing-md);
   
-  /* ===== Brand Colors (from TT2_MASTER_PALETTE_SPEC) ===== */
+  /* ============================================
+     DNA COLOR SYSTEM - 63 Variables (SSOT)
+     Structure: Brand | Entity | Message & Status | Investment Types | Numeric Values | Base Colors | Border Colors
+     ============================================ */
+  
+  /* ===== 1. Brand Colors (6 variables) ===== */
+  /* Primary Brand - Turquoise */
   --color-primary: #26baac;
   --color-primary-light: #4dd4c4;
-  --color-primary-lighter: #7ee8dc;
   --color-primary-dark: #1e968a;
-  --color-primary-darker: #167268;
   
+  /* Secondary Brand - Orange */
   --color-secondary: #fc5a06;
   --color-secondary-light: #ff7a33;
-  --color-secondary-lighter: #ff9a66;
   --color-secondary-dark: #c84805;
-  --color-secondary-darker: #943604;
   
-  /* ===== Semantic Colors ===== */
-  --color-error: #ef4444;
-  --color-error-light: #f87171;
-  --color-error-lighter: #fca5a5;
-  --color-error-dark: #dc2626;
-  --color-error-darker: #b91c1c;
+  /* ===== 2. Entity Colors (27 variables - 9 entities × 3 variants) ===== */
+  /* Trade Entity */
+  --entity-trade-light: #7ee8dc;
+  --entity-trade: #26baac;
+  --entity-trade-dark: #1e968a;
   
-  --color-success: #10b981;
-  --color-success-light: #34d399;
-  --color-success-lighter: #6ee7b7;
-  --color-success-dark: #059669;
-  --color-success-darker: #047857;
-  --color-success-bg: #e6f7f5; /* Light green background for success messages */
+  /* Trade Plan Entity */
+  --entity-trade_plan-light: #c3e6cb;
+  --entity-trade_plan: #28a745;
+  --entity-trade_plan-dark: #155724;
   
-  /* ===== Error Colors (Apple Design System) ===== */
-  --color-error-red: var(--apple-red, #FF3B30); /* Alias for Apple red - error/destructive actions */
-  --color-error-red-dark: var(--apple-red-dark, #D70015); /* Darker shade for hover states */
+  /* Execution Entity */
+  --entity-execution-light: #bee5eb;
+  --entity-execution: #17a2b8;
+  --entity-execution-dark: #0c5460;
   
-  --color-warning: #f59e0b;
-  --color-warning-light: #fbbf24;
-  --color-warning-lighter: #fcd34d;
-  --color-warning-dark: #d97706;
-  --color-warning-darker: #b45309;
+  /* Trading Account Entity */
+  --entity-trading_account-light: #c3e6cb;
+  --entity-trading_account: #28a745;
+  --entity-trading_account-dark: #155724;
   
-  /* ===== Legacy Color Scale (for backward compatibility) ===== */
+  /* Cash Flow Entity */
+  --entity-cash_flow-light: #ffe5d3;
+  --entity-cash_flow: #ff9800;
+  --entity-cash_flow-dark: #e68900;
+  
+  /* Ticker Entity */
+  --entity-ticker-light: #c5f4ea;
+  --entity-ticker: #17a2b8;
+  --entity-ticker-dark: #138496;
+  
+  /* Alert Entity */
+  --entity-alert-light: #f5c6cb;
+  --entity-alert: #dc3545;
+  --entity-alert-dark: #b02a37;
+  
+  /* Note Entity */
+  --entity-note-light: #e2e3e5;
+  --entity-note: #6c757d;
+  --entity-note-dark: #383d41;
+  
+  /* Research Entity */
+  --entity-research-light: #e2d9f3;
+  --entity-research: #9c27b0;
+  --entity-research-dark: #7b1fa2;
+  
+  /* ===== 3. Message & Status Colors (12 variables - 4 types × 3 variants) ===== */
+  /* Info Messages */
+  --message-info-light: #bee5eb;
+  --message-info: #17a2b8;
+  --message-info-dark: #0c5460;
+  
+  /* Warning Messages */
+  --message-warning-light: #fcd34d;
+  --message-warning: #f59e0b;
+  --message-warning-dark: #d97706;
+  
+  /* Error Messages */
+  --message-error-light: #fca5a5;
+  --message-error: #ef4444;
+  --message-error-dark: #dc2626;
+  
+  /* Success Messages */
+  --message-success-light: #6ee7b7;
+  --message-success: #10b981;
+  --message-success-dark: #059669;
+  
+  /* ===== 4. Investment Type Colors (3 variables - Color Scale) ===== */
+  --investment-trade-color: #0d9488; /* טרייד - Dark Turquoise */
+  --investment-investment-color: #14b8a6; /* השקעה - Medium Turquoise */
+  --investment-passive-color: #5eead4; /* פאסיבי - Light Turquoise */
+  
+  /* ===== 5. Numeric Value Colors (9 variables - 3 types × 3 variants) ===== */
+  /* Positive Values */
+  --numeric-positive-light: rgba(40, 167, 69, 0.2);
+  --numeric-positive: #28a745;
+  --numeric-positive-dark: #1e7e34;
+  
+  /* Negative Values */
+  --numeric-negative-light: rgba(220, 53, 69, 0.2);
+  --numeric-negative: #dc3545;
+  --numeric-negative-dark: #b02a37;
+  
+  /* Zero Values */
+  --numeric-zero-light: rgba(108, 117, 125, 0.2);
+  --numeric-zero: #6c757d;
+  --numeric-zero-dark: #383d41;
+  
+  /* ===== 6. Base Colors (4 variables) ===== */
+  --color-background: #ffffff;
+  --color-background-secondary: #F2F2F7;
+  --color-text: #1c1e21;
+  --color-text-secondary: #86868b; /* Distinct gray - clearly different from primary text */
+  
+  /* ===== 7. Border Colors (2 variables) ===== */
+  --color-border: #C6C6C8;
+  --color-border-light: #E5E5EA;
+  
+  /* ===== Legacy Compatibility (Backward Compatibility) ===== */
+  /* These variables maintain backward compatibility with existing code */
+  --color-error: var(--message-error);
+  --color-error-light: var(--message-error-light);
+  --color-error-dark: var(--message-error-dark);
+  --color-success: var(--message-success);
+  --color-success-light: var(--message-success-light);
+  --color-success-dark: var(--message-success-dark);
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-warning: var(--message-warning);
+  --color-warning-light: var(--message-warning-light);
+  --color-warning-dark: var(--message-warning-dark);
+  --color-error-red: var(--message-error);
+  --color-error-red-dark: var(--message-error-dark);
+  
+  /* ===== Apple Colors Mapping to Palette (SSOT) ===== */
+  /* Apple colors are mapped to Message colors - palette is the source of truth */
+  --apple-blue: var(--message-info);
+  --apple-blue-dark: var(--message-info-dark);
+  --apple-red: var(--message-error);
+  --apple-red-dark: var(--message-error-dark);
+  --apple-green: var(--message-success);
+  --apple-green-dark: var(--message-success-dark);
+  --apple-orange: var(--message-warning);
+  --apple-orange-dark: var(--message-warning-dark);
+  
+  /* Apple Background/Text/Border Mapping to Palette */
+  --apple-bg-primary: var(--color-background);
+  --apple-bg-secondary: var(--color-background-secondary);
+  --apple-bg-elevated: var(--color-background);
+  --apple-text-primary: var(--color-text);
+  --apple-text-secondary: var(--color-primary-dark, #1e968a);
+  --apple-border: var(--color-border);
+  --apple-border-light: var(--color-border-light);
+  
+  /* Legacy Entity Colors (for backward compatibility) */
+  --entity-trades-color: var(--entity-trade);
+  --entity-ticker-color: var(--entity-ticker);
+  --entity-trading-account-color: var(--entity-trading_account);
+  --entity-research-color: var(--entity-research);
+  --entity-execution-color: var(--entity-execution);
+  --entity-trades-bg-alpha: rgba(38, 186, 172, 0.1);
+  --entity-ticker-bg-alpha: rgba(23, 162, 184, 0.1);
+  --alert-card-trades-bg: rgba(38, 186, 172, 0.1);
+  --alert-card-trades-border: rgba(38, 186, 172, 0.3);
+  --alert-card-trades-text: #1a8f83;
+  --alert-card-ticker-bg: rgba(23, 162, 184, 0.1);
+  --alert-card-ticker-border: rgba(23, 162, 184, 0.3);
+  --alert-card-ticker-text: #138496;
+  
+  /* Legacy Color Scale (for backward compatibility) */
   --color-1: #ffffff;
   --color-5: #f4f7f9;
   --color-10: #eef2f5;
@@ -194,52 +303,11 @@
   --color-45: #334155;
   --color-50: #1c1e21;
   
-  /* ===== Text Colors (Semantic) ===== */
-  --text-primary: #1c1e21;
+  /* Legacy Text Colors (for backward compatibility) */
+  --text-primary: var(--color-text);
   --text-secondary: #4b4f56;
   --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
-  
-  /* ===== Entity Colors (Temporary - Matching Specification) ===== */
-  /* NOTE: These are temporary values matching the specification until the system is complete */
-  /* These values ensure the interface is defined accurately with the correct variables */
-  
-  /* Trades Entity (Plural) */
-  --entity-trades-color: #26baac; /* Turquoise - matches brand primary */
-  --entity-trades-border: var(--apple-border-light, #e5e5e5);
-  --entity-trades-bg: var(--apple-bg-elevated, #ffffff);
-  --entity-trades-text: var(--apple-text-primary, #1d1d1f);
-  
-  /* Ticker Entity */
-  --entity-ticker-color: #17a2b8; /* Cyan */
-  --entity-ticker-border: var(--apple-border-light, #e5e5e5);
-  --entity-ticker-bg: var(--apple-bg-elevated, #ffffff);
-  --entity-ticker-text: var(--apple-text-primary, #1d1d1f);
-  
-  /* Entity Background Colors with Alpha (for badges and transparent backgrounds) */
-  --entity-trades-bg-alpha: rgba(38, 186, 172, 0.1);
-  --entity-ticker-bg-alpha: rgba(23, 162, 184, 0.1);
-  
-  /* Alert Card Entity Colors (for active alerts with transparency) */
-  --alert-card-trades-bg: rgba(38, 186, 172, 0.1);
-  --alert-card-trades-border: rgba(38, 186, 172, 0.3);
-  --alert-card-trades-text: #1a8f83;
-  
-  --alert-card-ticker-bg: rgba(23, 162, 184, 0.1);
-  --alert-card-ticker-border: rgba(23, 162, 184, 0.3);
-  --alert-card-ticker-text: #138496;
-  
-  /* Trading Account Entity */
-  --entity-trading-account-color: #28a745; /* Green */
-  --entity-trading-account-border: var(--apple-border-light, #e5e5e5);
-  --entity-trading-account-bg: var(--apple-bg-elevated, #ffffff);
-  --entity-trading-account-text: var(--apple-text-primary, #1d1d1f);
-  
-  /* Research Entity */
-  --entity-research-color: #9c27b0; /* Violet */
-  
-  /* Execution Entity */
-  --entity-execution-color: #ff9800; /* Orange */
   
   /* ===== Additional Typography Variables ===== */
   --font-hebrew: 'Noto Sans Hebrew', sans-serif;
@@ -602,55 +670,102 @@ textarea::placeholder {
   font-weight: 300; /* Match input font-weight */
 }
 
-/* Buttons - Base Styles (Smaller default - screen space is valuable, reduced vertical padding) */
+/* ============================================
+   Buttons - Base Styles (DNA Button System)
+   ============================================
+   SSOT: All button styles start here
+   Rules:
+   - White background, colored text
+   - Border: Always same color as text (currentColor)
+   - Padding: Half of current spacing values (calc(var(--spacing-*) / 2))
+   - Margin below: Always 0 (margin-block-end: 0)
+   - Hover: adds shadow + inverts colors (background ↔ text), border unchanged (currentColor follows text)
+   - Width: fit-content (never smaller than text)
+   - Subtle rounded corners
+   - Icon always before text (if exists)
+   ============================================ */
+
 button,
 .btn {
-  background-color: #ffffff;
-  color: unset;
-  border-color: unset;
-  border-radius: 4px; /* Smaller border-radius - match filter dropdown */
-  padding: 0.125rem 0.6rem; /* Reduced vertical padding (2px top/bottom) - must fit in tight containers */
-  /* font-size inherited from * selector - SINGLE SOURCE OF TRUTH */
-  font-weight: 300; /* Match filter dropdown */
-  line-height: 1.2; /* Tighter line-height - match filter dropdown */
-  text-align: center;
-  text-decoration: none;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
+  /* Base Colors */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-primary, #1d1d1f);
+  /* Border: Always same color as text */
+  border: 1px solid currentColor;
+  
+  /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
+  gap: var(--spacing-xs, 8px); /* Space between icon and text */
   width: auto;
-  margin-inline-end: 0.5rem;
+  min-width: fit-content; /* Never smaller than text content */
+  height: fit-content;
   box-sizing: border-box;
-  /* font-family inherited from * selector - SINGLE SOURCE OF TRUTH */
-  min-height: auto; /* Remove default min-height - allow smaller buttons */
-  min-width: auto; /* Remove default min-width - allow smaller buttons */
-  height: fit-content; /* Fit content height - no fixed height */
-  /* Reduced vertical padding to fit within tight container heights (e.g., 60px filter container) */
+  
+  /* Spacing - Half of current (was: var(--spacing-sm, 8px) var(--spacing-md, 16px)) */
+  padding: calc(var(--spacing-sm, 8px) / 2) calc(var(--spacing-md, 16px) / 2);
+  
+  /* Margin - Always 0 below button */
+  margin-block-end: 0;
+  margin-inline-end: 0.5rem; /* Keep horizontal spacing */
+  
+  /* Typography */
+  font-family: var(--font-family-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--font-size-sm, 14px); /* Smaller font size to match page text */
+  font-weight: var(--font-weight-normal, 400);
+  line-height: var(--line-height-normal, 1.4);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* Visual */
+  border-radius: var(--apple-radius-small, 6px); /* Subtle rounded corners */
+  
+  /* Behavior */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  
+  /* Icon positioning - always before text */
+  flex-direction: row;
 }
 
+/* Icon inside button - always before text */
+button svg,
+.btn svg,
+button .icon,
+.btn .icon {
+  order: -1; /* Icon always comes before text */
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+}
+
+/* Hover State - Adds shadow + inverts colors (background ↔ text), border unchanged */
 button:hover,
 .btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* Color inversion handled by specific button variants */
 }
 
+/* Focus State - Primary border + Secondary glow effect */
 button:focus,
 .btn:focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25);
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
+/* Active State */
 button:active,
 .btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Disabled State */
 button:disabled,
 .btn:disabled {
   opacity: 0.65;

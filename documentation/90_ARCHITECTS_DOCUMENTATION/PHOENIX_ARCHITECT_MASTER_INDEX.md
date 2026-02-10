@@ -1,9 +1,8 @@
-# 🏰 אינדקס אדריכל מרכזי (v2.95.1)
-## 📜 חוקי יסוד (Permanent Governance 🔒)
-- ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md - (ADR-012 - MASTER).
-- TT2_SLA_TEAMS_30_40_OFFICIAL.md - אמנת שירות פרונטאנד (LOCKED).
-- [SSOT EXPANSION] - Internal Filters now integrated into UAI Contract v2.0.
+# 🏰 אינדקס אדריכל מרכזי (v4.0.0)
+## 📜 חוקי יסוד (LOCKED 🔒)
+- ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md - פסיקה סופית (ADR-013).
+- TT2_SLA_TEAMS_30_40_OFFICIAL.md - אמנת שירות פרונטאנד.
 
-## 📂 Phase 3: Trading Core (AWAITING START 🚀)
-- Blueprints by Team 31: COMPLETE.
-- Awaiting Phase 2 Final Sign-off by G-Lead.
+## 📂 Phase 2 Closure (Step 1: Mapping ACTIVE 🏁)
+- ARCHITECT_PRE_CODING_MANDATE.md - מנדט מיפוי מקדים.
+- [Status] - Awaiting mapping files from Teams 20, 30, 40.

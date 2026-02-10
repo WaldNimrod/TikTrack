@@ -239,25 +239,39 @@ body.auth-layout-root form .form-group:first-child,
   margin-block-start: var(--spacing-sm, 8px); /* Small spacing after logo */
 }
 
+/* Auth Primary Button (Special case - full width, larger, for auth pages) */
 .btn-auth-primary,
 button.btn-auth-primary {
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--color-primary, #26baac);
+  border: 1px solid currentColor; /* Border same color as text */
+  
+  /* Special sizing for auth pages */
   width: 100%;
-  padding: 0.75rem;
-  background: #26baac;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  /* Padding: Half of current (was: var(--spacing-md, 16px)) */
+  padding: calc(var(--spacing-md, 16px) / 2);
+  border-radius: var(--apple-radius-medium, 10px);
+  font-size: var(--font-size-lg, 18px);
+  font-weight: var(--font-weight-semibold, 600);
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-auth-primary:hover,
 button.btn-auth-primary:hover {
-  background: #1f9a8e;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(38, 186, 172, 0.3);
+  /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
+  background-color: var(--color-primary, #26baac);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base) */
+}
+
+.btn-auth-primary:focus,
+button.btn-auth-primary:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
 .form-options {

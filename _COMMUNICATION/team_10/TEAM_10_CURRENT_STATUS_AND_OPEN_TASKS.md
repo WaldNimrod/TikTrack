@@ -62,6 +62,9 @@
 | **סיום מיגרציה (60, 20, 30)** | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md`, `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md`, `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md` |
 | **סגירת סעיף 6 — Trading Accounts CRUD** | `_COMMUNICATION/team_10/TEAM_10_TO_TEAMS_20_30_SECTION_6_CLOSURE_TRADING_ACCOUNTS_CRUD.md` |
 | **אימות Trading Accounts CRUD (D16) — בדיקה חוזרת** | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md` |
+| **תוכנית עבודה — Visual Gaps** | `_COMMUNICATION/team_10/TEAM_10_VISUAL_GAPS_WORK_PLAN.md` |
+| **שאלות לאדריכל — Visual Gaps** | `_COMMUNICATION/team_10/TEAM_10_TO_ARCHITECT_VISUAL_GAPS_OPEN_QUESTIONS.md` |
+| **דוח השלמה — מידע משלים (7 פריטים)** | `_COMMUNICATION/team_10/TEAM_10_VISUAL_GAPS_SUPPLEMENT_INFO_REPORT.md` |
 
 ---
 
@@ -81,6 +84,19 @@
 | Trading Accounts CRUD (D16) | ✅ **הושלם ואומת** — endpoints (20), UI (30), QA recheck (50) עבר. ראה `TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md`. |
 
 כל המשימות שמופיעות במסמך — **הושלמו ואומתו**.
+
+---
+
+## 7. סבב הבא — חוסרים ויזואליים (Visual Gaps)
+
+**מקור:** Team 90 — `TEAM_90_TO_TEAM_10_ADDITIONAL_VISUAL_GAPS_TASKS.md`.
+
+| מסמך | תוכן |
+|------|--------|
+| **תוכנית עבודה** | `_COMMUNICATION/team_10/TEAM_10_VISUAL_GAPS_WORK_PLAN.md` — משימות מפורטות, חלוקת תפקידים, סדר ביצוע, שערים, דיוק עיצוב. |
+| **שאלות להחלטת אדריכל** | `_COMMUNICATION/team_10/TEAM_10_TO_ARCHITECT_VISUAL_GAPS_OPEN_QUESTIONS.md` — מקור רשימת ברוקרים, Rich Text, entity colors, מחלקות כפתורים. |
+
+**סטטוס:** ממתין להחלטות אדריכל על השאלות הפתוחות; לאחר מכן הפעלת צוותים לפי התוכנית.
 
 ---
 

@@ -821,7 +821,9 @@ body .page-wrapper .page-container main {
   height: 28px;
   padding: 0; /* CRITICAL: No padding for buttons themselves */
   margin: 0;
-  border: 1px solid var(--apple-border-light, #e5e5ea);
+  margin-block-end: 0; /* Always 0 margin below */
+  /* Border: Always same color as text */
+  border: 1px solid currentColor;
   background: var(--apple-bg-primary, #ffffff);
   color: var(--apple-text-secondary, #3c3c43);
   cursor: pointer;
@@ -836,32 +838,40 @@ body .page-wrapper .page-container main {
 
 .table-action-btn:hover {
   background: var(--apple-bg-secondary, #f2f2f7);
-  border-color: currentColor;
+  /* border-color: currentColor (inherited from base - follows text color) */
+}
+
+.table-action-btn:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
 /* Action Button Colors */
+/* Note: border-color removed - using currentColor (same as text) */
 .table-action-btn[aria-label*="צפה"],
 .table-action-btn.js-action-view {
   color: var(--color-brand, #26baac);
-  border-color: var(--color-brand, #26baac);
+  /* border-color: currentColor (inherited from base) */
 }
 
 .table-action-btn[aria-label*="ערוך"],
 .table-action-btn.js-action-edit {
-  color: var(--apple-blue, #007aff);
-  border-color: var(--apple-blue, #007aff);
+  color: var(--message-warning, #f59e0b);
+  /* border-color: currentColor (inherited from base) */
 }
 
 .table-action-btn[aria-label*="ביטול"],
 .table-action-btn.js-action-cancel {
   color: var(--apple-orange, #ff9500);
-  border-color: var(--apple-orange, #ff9500);
+  /* border-color: currentColor (inherited from base) */
 }
 
 .table-action-btn[aria-label*="מחק"],
 .table-action-btn.js-action-delete {
   color: var(--apple-red, #ff3b30);
-  border-color: var(--apple-red, #ff3b30);
+  /* border-color: currentColor (inherited from base) */
 }
 
 /* ============================================
@@ -1102,7 +1112,9 @@ body .page-wrapper .page-container main {
   height: 25px;
   padding: 0; /* CRITICAL: margin: 0, padding: 0 */
   margin: 0;
-  border: 1px solid var(--apple-border-light, #e5e5ea);
+  margin-block-end: 0; /* Always 0 margin below */
+  /* Border: Always same color as text */
+  border: 1px solid currentColor;
   border-radius: var(--apple-radius-small, 6px);
   background: var(--apple-bg-primary, #ffffff);
   color: var(--apple-text-primary, #000000);
@@ -1111,10 +1123,22 @@ body .page-wrapper .page-container main {
   white-space: nowrap;
 }
 
+/* Pagination button - icons only, hide text */
+.phoenix-table-pagination__button {
+  font-size: 0; /* Hide text, show only icons */
+}
+
 .phoenix-table-pagination__button:hover:not(:disabled),
 .phoenix-table-pagination__page-number:hover {
   background: var(--apple-bg-secondary, #f2f2f7);
   border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-table-pagination__button:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
 .phoenix-table-pagination__button:disabled {

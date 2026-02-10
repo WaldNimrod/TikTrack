@@ -161,80 +161,142 @@ body.profile-page {
 }
 
 /* ============================================
-   Button Styles (for Profile Page)
+   Button Variants (extends base styles from phoenix-base.css)
+   ============================================
+   NOTE: Base button styles (.btn) are defined in phoenix-base.css
+   These are variant-specific styles only
    ============================================ */
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
-  font-size: var(--font-size-base, 16px);
-  font-weight: 500;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
+/* Button Variants - Extend base styles from phoenix-base.css */
+/* Rule: White background, border same color as text, colored text */
+/* Hover: Inverts colors (background ↔ text), adds shadow, border unchanged */
 
+/* Primary Button */
 .btn-primary {
-  background: var(--context-primary, #475569);
-  color: white;
-  border-color: var(--context-primary, #475569);
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--context-primary, #475569);
+  border: 1px solid currentColor; /* Border same color as text */
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-primary:hover {
-  background: #334155;
-  border-color: #334155;
+  /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
+  background-color: var(--context-primary, #475569);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base - currentColor follows text color) */
 }
 
-.btn-warning {
-  background: var(--apple-orange, #FF9500);
-  color: white;
-  border-color: var(--apple-orange, #FF9500);
+.btn-primary:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
-.btn-warning:hover {
-  background: var(--apple-orange-dark, #CC7700);
-  border-color: var(--apple-orange-dark, #CC7700);
-}
-
+/* Success Button */
 .btn-success {
-  background: var(--apple-green, #34C759);
-  color: white;
-  border-color: var(--apple-green, #34C759);
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-green, #34C759);
+  border: 1px solid currentColor; /* Border same color as text */
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-success:hover {
-  background: var(--apple-green-dark, #248A3D);
-  border-color: var(--apple-green-dark, #248A3D);
+  /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
+  background-color: var(--apple-green, #34C759);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base - currentColor follows text color) */
 }
 
+.btn-success:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
+}
+
+/* Warning Button */
+.btn-warning {
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-orange, #FF9500);
+  border: 1px solid currentColor; /* Border same color as text */
+  margin-block-end: 0; /* Always 0 margin below */
+}
+
+.btn-warning:hover {
+  /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
+  background-color: var(--apple-orange, #FF9500);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base - currentColor follows text color) */
+}
+
+.btn-warning:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
+}
+
+/* Secondary Button */
 .btn-secondary {
-  background: var(--apple-bg-secondary, #F2F2F7);
-  color: var(--apple-text-primary, #1d1d1f);
-  border-color: var(--apple-border-light, #e5e5e5);
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--color-secondary, #fc5a06);
+  border: 1px solid currentColor; /* Border same color as text */
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-secondary:hover {
-  background: var(--apple-bg-tertiary, #e5e5e5);
+  /* Hover: Invert colors - secondary background, white text, add shadow, border unchanged */
+  background-color: var(--color-secondary, #fc5a06);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base - currentColor follows text color) */
 }
 
+.btn-secondary:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
+}
+
+/* Outline Secondary Button (Default - Reversed: filled with background color, text in primary) */
 .btn-outline-secondary {
-  background: transparent;
-  color: var(--apple-text-secondary, #86868b);
-  border-color: var(--apple-border-light, #e5e5e5);
+  /* Base: Primary background, white text, primary border */
+  background-color: var(--color-primary, #26baac);
+  color: var(--color-background, #ffffff);
+  border: 1px solid var(--color-primary, #26baac);
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-outline-secondary:hover {
-  background: var(--apple-bg-secondary, #F2F2F7);
-  color: var(--apple-text-primary, #1d1d1f);
+  /* Hover: Invert colors - white background, primary text, add shadow, border unchanged */
+  background-color: var(--color-background, #ffffff);
+  color: var(--color-primary, #26baac);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base) */
 }
 
+.btn-outline-secondary:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
+}
+
+/* Small Button Variant */
 .btn-sm {
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  /* Padding: Half of current (was: var(--spacing-xs, 4px) var(--spacing-sm, 8px)) */
+  padding: calc(var(--spacing-xs, 4px) / 2) calc(var(--spacing-sm, 8px) / 2);
   font-size: var(--font-size-sm, 14px);
+  /* All other styles inherited from base .btn */
 }
 
 .btn-spinner {
@@ -692,23 +754,35 @@ tt-section .dashboard-section__body .info-summary {
   flex-shrink: 0;
 }
 
+/* Alert View Button (Icon-only variant) */
 .btn-view-alert {
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff);
+  color: var(--apple-text-secondary, #86868b);
+  border: 1px solid currentColor; /* Border same color as text */
+  /* Icon-only sizing with side padding */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  color: var(--apple-text-primary, #1d1d1f);
+  padding: 0 var(--spacing-xs, 8px); /* Add horizontal padding */
+  margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-view-alert:hover {
-  background: var(--apple-bg-secondary, #f5f5f7);
+  /* Hover: Invert colors - dark background, white text, add shadow, border unchanged */
+  background-color: var(--apple-text-secondary, #86868b);
+  color: var(--apple-bg-primary, #ffffff);
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
+  /* border-color unchanged (inherited from base) */
+}
+
+.btn-view-alert:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none;
+  border-color: var(--color-primary, #26baac);
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25); /* Secondary color glow */
 }
 
 .active-alerts__card-body {
@@ -1679,12 +1753,26 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
   margin-top: var(--spacing-md, 16px);
 }
 
-/* Logout Button */
+/* Logout Button (Destructive Action) */
 .btn-logout {
-  background-color: var(--color-error-red) !important;
-  color: white !important;
+  /* Base: White background, colored text, border same color as text */
+  background-color: var(--apple-bg-primary, #ffffff) !important;
+  color: var(--color-error-red, #FF3B30) !important;
+  border: 1px solid currentColor !important; /* Border same color as text */
+  margin-block-end: 0 !important; /* Always 0 margin below */
 }
 
 .btn-logout:hover {
-  background-color: var(--color-error-red-dark) !important;
+  /* Hover: Invert colors - red background, white text, add shadow, border unchanged */
+  background-color: var(--color-error-red, #FF3B30) !important;
+  color: var(--apple-bg-primary, #ffffff) !important;
+  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1)) !important;
+  /* border-color unchanged (inherited from base - currentColor follows text color) */
+}
+
+.btn-logout:focus {
+  /* Focus: Primary border + secondary glow effect */
+  outline: none !important;
+  border-color: var(--color-primary, #26baac) !important;
+  box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25) !important; /* Secondary color glow */
 }

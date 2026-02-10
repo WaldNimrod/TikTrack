@@ -70,7 +70,8 @@
 - **תצוגת נתונים:** אומתה — השלמה ב' (תצוגה) **הושלמה**.  
 - **פער Backend (Brokers Fees POST 500):** ✅ **נסגר ואומת** — Team 20 תיקן; Team 50 אימת (POST 201, PUT 200, DELETE 204). ראה `TEAM_20_TO_TEAM_10_BROKERS_FEES_CREATE_500_FIXED.md`, `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BROKERS_FEES_FIX_VERIFIED.md`.  
 - **פער Frontend (UI CRUD handlers):** ✅ **נסגר** — Team 30 מימש; ראה `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_CRUD_HANDLERS_COMPLETE.md`.  
-- **ולידציה QA — CRUD D18/D21:** ✅ **אומת** — Team 30 תיקן גם שגיאת 422 בשמירת טופס (commissionType ב-transformers); Team 50 הריץ 36 בדיקות E2E — כולן עברו. ראה `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md`.
+- **אישור סופי QA — CRUD D18/D21:** ✅ **אומת** — דוח מלא Team 50: `TEAM_50_TO_TEAM_10_CRUD_VALIDATION_FULL_REPORT.md` (כל הבדיקות עברו); לאחר מכן תיקון 422 בשמירת טופס — אומת: `TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md` (36 E2E עברו).  
+- **מיגרציית commission_value → NUMERIC:** ✅ **הושלמה ואומתה** — 60, 20, 30 דיווחו השלמה; Team 50 אימת (כולל E2E לאחר תיקון 422).
 
 ---
 

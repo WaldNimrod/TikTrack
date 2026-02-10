@@ -16,9 +16,14 @@ import logging
 
 from ..models.trading_accounts import TradingAccount
 from ..models.trades import Trade
-from ..utils.identity import uuid_to_ulid
+from ..utils.identity import uuid_to_ulid, ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-from ..schemas.trading_accounts import TradingAccountResponse, TradingAccountSummaryResponse
+from ..schemas.trading_accounts import (
+    TradingAccountResponse,
+    TradingAccountSummaryResponse,
+    TradingAccountCreateRequest,
+    TradingAccountUpdateRequest
+)
 
 logger = logging.getLogger(__name__)
 
@@ -217,6 +222,392 @@ class TradingAccountService:
             total_unrealized_pl=total_unrealized_pl,
             total_positions=total_positions
         )
+    
+    async def get_trading_account_by_id(
+        self,
+        user_id: uuid.UUID,
+        trading_account_id: str,
+        db: AsyncSession
+    ) -> TradingAccountResponse:
+        """
+        Get single trading account by ID.
+        
+        Args:
+            user_id: User UUID
+            trading_account_id: Trading account ULID
+            db: Database session
+            
+        Returns:
+            TradingAccountResponse
+            
+        Raises:
+            HTTPExceptionWithCode: If trading account not found or access denied
+        """
+        try:
+            account_uuid = ulid_to_uuid(trading_account_id)
+        except Exception as e:
+            logger.warning(f"Invalid trading_account_id ULID: {trading_account_id}")
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail="Invalid trading_account_id format",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+            )
+        
+        stmt = select(TradingAccount).where(
+            and_(
+                TradingAccount.id == account_uuid,
+                TradingAccount.user_id == user_id,
+                TradingAccount.deleted_at.is_(None)
+            )
+        )
+        
+        result = await db.execute(stmt)
+        account = result.scalar_one_or_none()
+        
+        if not account:
+            raise HTTPExceptionWithCode(
+                status_code=404,
+                detail="Trading account not found",
+                error_code=ErrorCodes.USER_NOT_FOUND
+            )
+        
+        # Calculate positions_count and total_pl
+        account_ids = [account.id]
+        trade_stats_stmt = select(
+            Trade.trading_account_id,
+            func.count(Trade.id).label("positions_count"),
+            func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("total_pl"),
+            func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("holdings_value")
+        ).where(
+            and_(
+                Trade.trading_account_id.in_(account_ids),
+                Trade.user_id == user_id,
+                cast(Trade.status, String) != "CLOSED",
+                Trade.deleted_at.is_(None)
+            )
+        ).group_by(Trade.trading_account_id)
+        
+        trade_stats_result = await db.execute(trade_stats_stmt)
+        trade_stats_row = trade_stats_result.first()
+        
+        stats = {
+            "positions_count": trade_stats_row.positions_count or 0 if trade_stats_row else 0,
+            "total_pl": trade_stats_row.total_pl or Decimal("0") if trade_stats_row else Decimal("0"),
+            "holdings_value": trade_stats_row.holdings_value or Decimal("0") if trade_stats_row else Decimal("0")
+        }
+        
+        account_value = account.cash_balance + stats["holdings_value"]
+        
+        return TradingAccountResponse(
+            external_ulid=uuid_to_ulid(account.id),
+            account_name=account.account_name,
+            broker=account.broker,
+            currency=account.currency,
+            cash_balance=account.cash_balance,
+            positions_count=stats["positions_count"],
+            total_pl=stats["total_pl"],
+            account_value=account_value,
+            holdings_value=stats["holdings_value"],
+            is_active=account.is_active,
+            updated_at=account.updated_at
+        )
+    
+    async def create_trading_account(
+        self,
+        user_id: uuid.UUID,
+        db: AsyncSession,
+        account_name: str,
+        initial_balance: Decimal,
+        currency: str = "USD",
+        broker: Optional[str] = None,
+        account_number: Optional[str] = None,
+        is_active: bool = True,
+        external_account_id: Optional[str] = None,
+        account_metadata: Optional[dict] = None
+    ) -> TradingAccountResponse:
+        """
+        Create new trading account.
+        
+        Args:
+            user_id: User UUID
+            db: Database session
+            account_name: Account display name
+            initial_balance: Initial account balance
+            currency: Currency code (default: USD)
+            broker: Broker name (optional)
+            account_number: Account number (optional)
+            is_active: Account active status (default: True)
+            external_account_id: External account ID (optional)
+            account_metadata: Additional metadata (optional)
+            
+        Returns:
+            TradingAccountResponse
+            
+        Raises:
+            HTTPExceptionWithCode: If account name already exists for user
+        """
+        # Check for duplicate account name (unique constraint)
+        stmt_check = select(TradingAccount).where(
+            and_(
+                TradingAccount.user_id == user_id,
+                TradingAccount.account_name == account_name.strip(),
+                TradingAccount.deleted_at.is_(None)
+            )
+        )
+        result_check = await db.execute(stmt_check)
+        existing = result_check.scalar_one_or_none()
+        
+        if existing:
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail=f"Trading account with name '{account_name}' already exists",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+            )
+        
+        # Create new trading account
+        new_account = TradingAccount(
+            user_id=user_id,
+            account_name=account_name.strip(),
+            broker=broker.strip() if broker else None,
+            account_number=account_number.strip() if account_number else None,
+            initial_balance=initial_balance,
+            cash_balance=initial_balance,  # Start with initial balance
+            currency=currency.upper(),
+            is_active=is_active,
+            external_account_id=external_account_id.strip() if external_account_id else None,
+            created_by=user_id,
+            updated_by=user_id,
+            account_metadata=account_metadata or {}
+        )
+        
+        db.add(new_account)
+        await db.commit()
+        await db.refresh(new_account)
+        
+        # Return response with calculated fields (positions_count = 0 for new account)
+        return TradingAccountResponse(
+            external_ulid=uuid_to_ulid(new_account.id),
+            account_name=new_account.account_name,
+            broker=new_account.broker,
+            currency=new_account.currency,
+            cash_balance=new_account.cash_balance,
+            positions_count=0,
+            total_pl=Decimal("0"),
+            account_value=new_account.cash_balance,
+            holdings_value=Decimal("0"),
+            is_active=new_account.is_active,
+            updated_at=new_account.updated_at
+        )
+    
+    async def update_trading_account(
+        self,
+        user_id: uuid.UUID,
+        trading_account_id: str,
+        db: AsyncSession,
+        account_name: Optional[str] = None,
+        broker: Optional[str] = None,
+        account_number: Optional[str] = None,
+        initial_balance: Optional[Decimal] = None,
+        currency: Optional[str] = None,
+        is_active: Optional[bool] = None,
+        external_account_id: Optional[str] = None,
+        account_metadata: Optional[dict] = None
+    ) -> TradingAccountResponse:
+        """
+        Update existing trading account.
+        
+        Args:
+            user_id: User UUID
+            trading_account_id: Trading account ULID
+            db: Database session
+            account_name: Account display name (optional)
+            broker: Broker name (optional)
+            account_number: Account number (optional)
+            initial_balance: Initial account balance (optional)
+            currency: Currency code (optional)
+            is_active: Account active status (optional)
+            external_account_id: External account ID (optional)
+            account_metadata: Additional metadata (optional)
+            
+        Returns:
+            TradingAccountResponse
+            
+        Raises:
+            HTTPExceptionWithCode: If trading account not found or access denied
+        """
+        try:
+            account_uuid = ulid_to_uuid(trading_account_id)
+        except Exception as e:
+            logger.warning(f"Invalid trading_account_id ULID: {trading_account_id}")
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail="Invalid trading_account_id format",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+            )
+        
+        stmt = select(TradingAccount).where(
+            and_(
+                TradingAccount.id == account_uuid,
+                TradingAccount.user_id == user_id,
+                TradingAccount.deleted_at.is_(None)
+            )
+        )
+        
+        result = await db.execute(stmt)
+        account = result.scalar_one_or_none()
+        
+        if not account:
+            raise HTTPExceptionWithCode(
+                status_code=404,
+                detail="Trading account not found",
+                error_code=ErrorCodes.USER_NOT_FOUND
+            )
+        
+        # Update fields if provided
+        if account_name is not None:
+            # Check for duplicate account name (if changed)
+            if account_name.strip() != account.account_name:
+                stmt_check = select(TradingAccount).where(
+                    and_(
+                        TradingAccount.user_id == user_id,
+                        TradingAccount.account_name == account_name.strip(),
+                        TradingAccount.id != account_uuid,
+                        TradingAccount.deleted_at.is_(None)
+                    )
+                )
+                result_check = await db.execute(stmt_check)
+                existing = result_check.scalar_one_or_none()
+                
+                if existing:
+                    raise HTTPExceptionWithCode(
+                        status_code=400,
+                        detail=f"Trading account with name '{account_name}' already exists",
+                        error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+                    )
+            account.account_name = account_name.strip()
+        
+        if broker is not None:
+            account.broker = broker.strip() if broker else None
+        
+        if account_number is not None:
+            account.account_number = account_number.strip() if account_number else None
+        
+        if initial_balance is not None:
+            account.initial_balance = initial_balance
+        
+        if currency is not None:
+            account.currency = currency.upper()
+        
+        if is_active is not None:
+            account.is_active = is_active
+        
+        if external_account_id is not None:
+            account.external_account_id = external_account_id.strip() if external_account_id else None
+        
+        if account_metadata is not None:
+            # Merge with existing metadata
+            existing_metadata = account.account_metadata or {}
+            existing_metadata.update(account_metadata)
+            account.account_metadata = existing_metadata
+        
+        # Update updated_by
+        account.updated_by = user_id
+        
+        await db.commit()
+        await db.refresh(account)
+        
+        # Calculate positions_count and total_pl for response
+        account_ids = [account.id]
+        trade_stats_stmt = select(
+            Trade.trading_account_id,
+            func.count(Trade.id).label("positions_count"),
+            func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("total_pl"),
+            func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("holdings_value")
+        ).where(
+            and_(
+                Trade.trading_account_id.in_(account_ids),
+                Trade.user_id == user_id,
+                cast(Trade.status, String) != "CLOSED",
+                Trade.deleted_at.is_(None)
+            )
+        ).group_by(Trade.trading_account_id)
+        
+        trade_stats_result = await db.execute(trade_stats_stmt)
+        trade_stats_row = trade_stats_result.first()
+        
+        stats = {
+            "positions_count": trade_stats_row.positions_count or 0 if trade_stats_row else 0,
+            "total_pl": trade_stats_row.total_pl or Decimal("0") if trade_stats_row else Decimal("0"),
+            "holdings_value": trade_stats_row.holdings_value or Decimal("0") if trade_stats_row else Decimal("0")
+        }
+        
+        account_value = account.cash_balance + stats["holdings_value"]
+        
+        return TradingAccountResponse(
+            external_ulid=uuid_to_ulid(account.id),
+            account_name=account.account_name,
+            broker=account.broker,
+            currency=account.currency,
+            cash_balance=account.cash_balance,
+            positions_count=stats["positions_count"],
+            total_pl=stats["total_pl"],
+            account_value=account_value,
+            holdings_value=stats["holdings_value"],
+            is_active=account.is_active,
+            updated_at=account.updated_at
+        )
+    
+    async def delete_trading_account(
+        self,
+        user_id: uuid.UUID,
+        trading_account_id: str,
+        db: AsyncSession
+    ) -> None:
+        """
+        Soft delete trading account.
+        
+        Args:
+            user_id: User UUID
+            trading_account_id: Trading account ULID
+            db: Database session
+            
+        Raises:
+            HTTPExceptionWithCode: If trading account not found or access denied
+        """
+        try:
+            account_uuid = ulid_to_uuid(trading_account_id)
+        except Exception as e:
+            logger.warning(f"Invalid trading_account_id ULID: {trading_account_id}")
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail="Invalid trading_account_id format",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+            )
+        
+        stmt = select(TradingAccount).where(
+            and_(
+                TradingAccount.id == account_uuid,
+                TradingAccount.user_id == user_id,
+                TradingAccount.deleted_at.is_(None)
+            )
+        )
+        
+        result = await db.execute(stmt)
+        account = result.scalar_one_or_none()
+        
+        if not account:
+            raise HTTPExceptionWithCode(
+                status_code=404,
+                detail="Trading account not found",
+                error_code=ErrorCodes.USER_NOT_FOUND
+            )
+        
+        # Soft delete
+        from datetime import datetime, timezone
+        account.deleted_at = datetime.now(timezone.utc)
+        account.updated_by = user_id
+        
+        await db.commit()
 
 
 # Singleton instance

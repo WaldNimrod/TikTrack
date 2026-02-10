@@ -22,7 +22,9 @@
 | **צוות 90 — בדיקות עצמאיות + רספונסיביות** | אומת (Runtime, E2E, Responsive). |
 | **השלמה א' — רספונסיביות** | ✅ אומת (Team 90). |
 | **השלמה ב' — נתוני בדיקה** | צוות 60: גיבוי + seed הושלמו. צוות 50: ולידציה — **תצוגה אומתה** (D16, D18, D21 מציגים נתונים). Team 10: תיעוד ממצאים והודעות מעקב. |
-| **ולידציה QA — CRUD D18/D21 + תיקון 422** | ✅ **אומת** — Team 30 תיקן שגיאת 422 (commissionType/transformers); Team 50 הריץ 36 בדיקות E2E — כולן עברו, כולל CRUD_D18_FormSave. ראה `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md`. |
+| **ולידציה QA — CRUD D18/D21 (אישור סופי)** | ✅ **אומת** — דוח מלא: `TEAM_50_TO_TEAM_10_CRUD_VALIDATION_FULL_REPORT.md` (כל הבדיקות עברו, כולל CRUD Brokers Fees ו-Cash Flows). לאחר מכן תיקון 422 בשמירת טופס D18 — אומת: `TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md` (36 E2E עברו, כולל CRUD_D18_FormSave). |
+| **מיגרציית commission_value → NUMERIC** | ✅ **הושלמה ואומתה** — 60 (DDL), 20 (Model/Schema), 30 (UI) דיווחו השלמה; Team 50 אימת (כולל תיקון 422). ראה דיווחי _COMMISSION_VALUE_MIGRATION_COMPLETE (team_60, team_20, team_30) + `TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md`. |
+| **Trading Accounts CRUD (D16)** | ✅ **הושלם ואומת** — Team 20 (endpoints), Team 30 (UI) דיווחו השלמה; Team 50 בדיקה חוזרת — כל הבדיקות עברו (CRUD_Buttons_D16, CRUD_D16_FormSave). ראה `TEAM_20/30_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_COMPLETE.md`, `TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md`. |
 
 ---
 
@@ -32,11 +34,11 @@
 |---|--------|--------|--------|
 | **1** | **תיקון Brokers Fees Create (POST 500)** | Team 20 + 50 | ✅ **הושלם ואומת** — Team 20 תיקן; Team 50 אימת (POST 201, PUT 200, DELETE 204). ראה `TEAM_50_TO_TEAM_10_BROKERS_FEES_FIX_VERIFIED.md`. |
 | **2** | **מימוש UI handlers להוספה/עריכה/מחיקה (D18, D21)** | Team 30 | ✅ **הושלם** — ראה `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_CRUD_HANDLERS_COMPLETE.md`. |
-| **3** | **ולידציה QA — CRUD D18/D21 (+ תיקון 422)** | **Team 50** | ✅ **הושלם ואומת** — 36 בדיקות E2E עברו; CRUD_D18_FormSave (שמירת טופס) ללא 422. ראה `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md`. |
-| **4** | **(אופציונלי) Trading Accounts CRUD** | Team 20 + 30 | אין כרגע endpoints; אם נדרש — להגדיר ב-API ואז בממשק. |
-| **5** | **מיגרציית commission_value → NUMERIC** | Team 60 → 20 → 30 | ✅ **החלטות Gateway נרשמו**; **Go נשלח**. ממתין לביצוע (DDL → Backend → Frontend). ראה `TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md`, `TEAM_10_TO_TEAMS_20_30_60_COMMISSION_VALUE_MIGRATION_GO.md`. |
+| **3** | **ולידציה QA — CRUD D18/D21 (אישור סופי Team 50)** | **Team 50** | ✅ **הושלם ואומת** — דוח ולידציה מלא + אימות תיקון 422 (36 E2E עברו). |
+| **4** | **Trading Accounts CRUD (D16)** | Team 20 + 30 + 50 | ✅ **הושלם ואומת** — endpoints (20), UI (30), בדיקה חוזרת (50): CRUD_Buttons_D16, CRUD_D16_FormSave — PASS. ראה `TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md`. |
+| **5** | **מיגרציית commission_value → NUMERIC** | Team 60 → 20 → 30 | ✅ **הושלם ואומת** — DDL (60), Backend (20), Frontend (30) בוצעו; Team 50 אימת. |
 
-**סיכום:** פערי Backend, Frontend ו־QA (משימות 1–3) **נסגרו**. מיגרציית commission_value — החלטות ו־go הושלמו; ממתין לביצוע צוותים 60 → 20 → 30.
+**סיכום:** כל המשימות הרשומות — **נסגרו ואומתו**. **סעיף 6 נסגר** — אין משימות פתוחות.
 
 ---
 
@@ -55,28 +57,32 @@
 | **מבנה ארגוני** | `documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` (סעיף 2) |
 | **החלטות commission_value** | `_COMMUNICATION/team_10/TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md` |
 | **Go מיגרציה 20/30/60** | `_COMMUNICATION/team_10/TEAM_10_TO_TEAMS_20_30_60_COMMISSION_VALUE_MIGRATION_GO.md` |
+| **אישור סופי QA — CRUD (דוח מלא)** | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_CRUD_VALIDATION_FULL_REPORT.md` |
 | **אימות תיקון 422 (commission_value)** | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md` |
+| **סיום מיגרציה (60, 20, 30)** | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md`, `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md`, `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_COMMISSION_VALUE_MIGRATION_COMPLETE.md` |
+| **סגירת סעיף 6 — Trading Accounts CRUD** | `_COMMUNICATION/team_10/TEAM_10_TO_TEAMS_20_30_SECTION_6_CLOSURE_TRADING_ACCOUNTS_CRUD.md` |
+| **אימות Trading Accounts CRUD (D16) — בדיקה חוזרת** | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md` |
 
 ---
 
 ## 5. תשובה ישירה: האם מאפסים?
 
 **לא.** הסטטוס והמשימות הפתוחות **לא** מתאפסים — הם מתועדים כאן וברשימת המסמכים למעלה.  
-**מה הושלם לאחרונה:** Team 50 אימת תיקון 422 (שמירת טופס D18 ללא 422); 36 בדיקות E2E עברו. **הבא ברשימת המשימות הפתוחות:** ראה סעיף 6 למטה.
+**מה הושלם לאחרונה:** Trading Accounts CRUD (D16) — Team 50 בדיקה חוזרת עברה (CRUD_Buttons_D16, CRUD_D16_FormSave — PASS). **סעיף 6 נסגר** — אין משימות פתוחות.
 
 ---
 
 ## 6. משימות פתוחות — לפי סדר עדיפות
 
-מה שנותר **פתוח** (לא הושלם) בתוכניות העבודה והמשימות:
+**אין משימות פתוחות.** סעיף 6 נסגר.
 
-| סדר | משימה | אחראי | הערה |
-|-----|--------|--------|------|
-| **1** | **מיגרציית commission_value → NUMERIC** | Team 60 → 20 → 30 | החלטות ו־Go הושלמו; **ביצוע:** DDL (60) → Model/Schema (20) → UI (30) → אחר כך E2E (50). |
-| **2** | **(אופציונלי) Trading Accounts CRUD** | Team 20 + 30 | אין endpoints כרגע; אם נדרש — להגדיר ב-API ואז בממשק. |
+| פריט | סטטוס |
+|------|--------|
+| Trading Accounts CRUD (D16) | ✅ **הושלם ואומת** — endpoints (20), UI (30), QA recheck (50) עבר. ראה `TEAM_50_TO_TEAM_10_TRADING_ACCOUNTS_CRUD_QA_RECHECK_PASSED.md`. |
 
-**כל השאר (POST 500, CRUD handlers, QA CRUD + 422):** סומנו כהושלמו ואומתו.
+כל המשימות שמופיעות במסמך — **הושלמו ואומתו**.
 
 ---
 
-**log_entry | [Team 10] | CURRENT_STATUS_AND_OPEN_TASKS | UPDATED | 2026-02-10**
+**log_entry | [Team 10] | CURRENT_STATUS_AND_OPEN_TASKS | UPDATED | 2026-02-10**  
+**log_entry | [Team 10] | SECTION_6_CLOSED | TRADING_ACCOUNTS_CRUD_VERIFIED | 2026-02-10**

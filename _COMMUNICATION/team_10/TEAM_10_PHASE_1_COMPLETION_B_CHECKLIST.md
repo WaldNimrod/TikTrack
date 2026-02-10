@@ -46,9 +46,10 @@
 | 4 | **ולידציה בממשק** | **Team 50 (QA)** | ✅ **הושלם** — דיווח: `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_PHASE_1_COMPLETION_B_VALIDATION_DONE.md`. תצוגה מאומתת. |
 | 5 | **תיעוד סגירה** | **Team 10** | ✅ בוצע — ממצאים ופערים תועדו; הודעות מעקב נשלחו. |
 
-**פערים שהתגלו (מעקב):** תצוגת נתונים אומתה; **נותרו בעיות משמעותיות** — תיעוד והודעות צוותים:
-- **Backend:** `POST /api/v1/brokers_fees` מחזיר 500 → הודעה ל-Team 20: `TEAM_10_TO_TEAM_20_BROKERS_FEES_CREATE_500_FIX.md`.
-- **Frontend:** כפתורי ערוך/מחק/הוסף עם TODO — handlers לא ממומשים → הודעה ל-Team 30: `TEAM_10_TO_TEAM_30_UI_CRUD_HANDLERS_PHASE_1.md`.
+**פערים שהתגלו (מעקב):** תצוגת נתונים אומתה. **פערים נסגרו:**
+- **Backend (POST 500):** תוקן ואומת — `TEAM_50_TO_TEAM_10_BROKERS_FEES_FIX_VERIFIED.md`.
+- **Frontend (CRUD handlers):** ממומש — `TEAM_30_TO_TEAM_10_CRUD_HANDLERS_COMPLETE.md`.
+- **שגיאת 422 בשמירת טופס D18:** תוקן (Team 30, transformers) ואומת (Team 50, 36 E2E עברו) — `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_COMMISSION_VALUE_422_FIX_VERIFIED.md`.
 - **סיכום ממצאים:** `TEAM_10_PHASE_1_COMPLETION_B_FINDINGS_AND_FOLLOWUP.md`.
 
 ---

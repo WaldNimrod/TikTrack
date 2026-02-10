@@ -98,3 +98,53 @@ class TradingAccountListResponse(BaseModel):
                 "total": 1
             }
         }
+
+
+class TradingAccountCreateRequest(BaseModel):
+    """Trading Account create request schema."""
+    account_name: str = Field(..., description="Account display name", max_length=100)
+    broker: Optional[str] = Field(None, description="Broker name", max_length=100)
+    account_number: Optional[str] = Field(None, description="Account number", max_length=50)
+    initial_balance: Decimal = Field(..., description="Initial account balance", ge=0)
+    currency: str = Field(default="USD", description="Account currency (ISO 3-letter)", max_length=3)
+    is_active: bool = Field(default=True, description="Account active status")
+    external_account_id: Optional[str] = Field(None, description="External account ID", max_length=100)
+    account_metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "account_name": "חשבון מסחר מרכזי (IBKR)",
+                "broker": "Interactive Brokers",
+                "account_number": "U1234567",
+                "initial_balance": 100000.00,
+                "currency": "USD",
+                "is_active": True,
+                "external_account_id": "IBKR_ACC_123",
+                "account_metadata": {
+                    "account_type": "MARGIN",
+                    "country": "US"
+                }
+            }
+        }
+
+
+class TradingAccountUpdateRequest(BaseModel):
+    """Trading Account update request schema."""
+    account_name: Optional[str] = Field(None, description="Account display name", max_length=100)
+    broker: Optional[str] = Field(None, description="Broker name", max_length=100)
+    account_number: Optional[str] = Field(None, description="Account number", max_length=50)
+    initial_balance: Optional[Decimal] = Field(None, description="Initial account balance", ge=0)
+    currency: Optional[str] = Field(None, description="Account currency (ISO 3-letter)", max_length=3)
+    is_active: Optional[bool] = Field(None, description="Account active status")
+    external_account_id: Optional[str] = Field(None, description="External account ID", max_length=100)
+    account_metadata: Optional[dict] = Field(None, description="Additional metadata")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "account_name": "חשבון מסחר מעודכן",
+                "broker": "TD Ameritrade",
+                "is_active": False
+            }
+        }

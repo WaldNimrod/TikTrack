@@ -27,6 +27,9 @@
   <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
   <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
   
+  <!-- 6. Modal Styles (for CRUD forms) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
+  
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="trading-accounts-page context-trading">
@@ -127,6 +130,13 @@
                 <span class="index-section__header-count">0 חשבונות פעילים</span>
               </div>
               <div class="index-section__header-actions">
+                <button class="index-section__header-action-btn js-add-trading-account" aria-label="הוסף חשבון מסחר">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>הוסף חשבון</span>
+                </button>
                 <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9l6 6l6 -6"></path>
@@ -683,8 +693,8 @@
   <!-- Trading Accounts Header Handlers: Event handlers for header filters -->
   <script src="/src/views/financial/tradingAccounts/tradingAccountsHeaderHandlers.js"></script>
   
-  <!-- Trading Accounts Table Initialization: Initialize table managers -->
-  <script src="/src/views/financial/tradingAccounts/tradingAccountsTableInit.js"></script>
+  <!-- Trading Accounts Table Initialization: Initialize table managers and CRUD handlers -->
+  <script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsTableInit.js"></script>
   
   <!-- Header Links Updater: Dynamic header links based on authentication -->
   <script src="/src/components/core/headerLinksUpdater.js"></script>

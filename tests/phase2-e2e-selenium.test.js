@@ -729,6 +729,127 @@ async function testCRUDButtonsD21() {
 }
 
 /**
+ * Test: D16 — כפתור "הוסף חשבון" פותח מודל טופס (Trading Accounts CRUD QA)
+ */
+async function testCRUDButtonsD16() {
+  const driver = await createDriver();
+  const testName = 'CRUD_Buttons_D16';
+  try {
+    logger.log(testName, 'START', { message: 'Click Add trading account; verify modal form opens' });
+    const loggedIn = await login(driver);
+    if (!loggedIn) {
+      logger.log(testName, 'SKIP', { message: 'Cannot proceed without login' });
+      return;
+    }
+    await driver.get(`${TEST_CONFIG.frontendUrl}/trading_accounts.html`);
+    await driver.sleep(5000);
+    const addBtn = await driver.wait(until.elementLocated(By.css('.js-add-trading-account')), 10000).catch(() => null);
+    if (!addBtn) {
+      logger.log(testName, 'FAIL', { message: 'Add trading account button not found' });
+      return;
+    }
+    await driver.wait(until.elementIsVisible(addBtn), 5000).catch(() => {});
+    await driver.executeScript('arguments[0].scrollIntoView({block:"center"});', addBtn);
+    await driver.sleep(500);
+    await addBtn.click();
+    const modal = await driver.wait(until.elementLocated(By.id('phoenix-modal')), 8000).catch(() => null);
+    const form = modal ? await driver.findElement(By.id('tradingAccountForm')).catch(() => null) : null;
+    let alertText = null;
+    try {
+      const alert = await driver.wait(until.alertIsPresent(), 1500);
+      alertText = await alert.getText();
+      await alert.accept();
+    } catch {
+      // No alert expected when modal is used
+    }
+    if (modal && form && !alertText) {
+      logger.log(testName, 'PASS', {
+        message: 'Add trading account opens modal form (D16 CRUD QA)',
+        modalVisible: true,
+        formPresent: true
+      });
+      artifacts.consoleLogs.push({ test: testName, addTradingAccountModalOpened: true });
+      const cancelBtn = await driver.findElement(By.css('.phoenix-modal__cancel-btn')).catch(() => null);
+      if (cancelBtn) await cancelBtn.click();
+    } else if (alertText) {
+      logger.log(testName, 'FAIL', {
+        message: 'Add trading account showed error alert instead of modal',
+        alertText: alertText.substring(0, 80)
+      });
+    } else {
+      logger.log(testName, 'FAIL', {
+        message: 'Add trading account: modal or form not found',
+        modalFound: !!modal,
+        formFound: !!form
+      });
+    }
+  } catch (error) {
+    logger.error(testName, error);
+    artifacts.errors.push({ test: testName, error: error.message });
+  } finally {
+    await driver.quit();
+  }
+}
+
+/**
+ * Test: D16 — מילוי טופס הוספת חשבון מסחר ושמירה (Trading Accounts CRUD QA)
+ */
+async function testCRUDD16FormSave() {
+  const driver = await createDriver();
+  const testName = 'CRUD_D16_FormSave';
+  try {
+    logger.log(testName, 'START', { message: 'Fill trading account form and save; verify no error' });
+    const loggedIn = await login(driver);
+    if (!loggedIn) {
+      logger.log(testName, 'SKIP', { message: 'Cannot proceed without login' });
+      return;
+    }
+    await driver.get(`${TEST_CONFIG.frontendUrl}/trading_accounts.html`);
+    await driver.sleep(5000);
+    const addBtn = await driver.wait(until.elementLocated(By.css('.js-add-trading-account')), 10000);
+    await driver.wait(until.elementIsVisible(addBtn), 5000).catch(() => {});
+    await driver.executeScript('arguments[0].scrollIntoView({block:"center"});', addBtn);
+    await driver.sleep(500);
+    await addBtn.click();
+    await driver.wait(until.elementLocated(By.id('tradingAccountForm')), 8000);
+    await driver.sleep(500);
+    const accountName = 'QA E2E Account ' + Date.now();
+    await driver.findElement(By.id('accountName')).clear();
+    await driver.findElement(By.id('accountName')).sendKeys(accountName);
+    await driver.findElement(By.id('initialBalance')).clear();
+    await driver.findElement(By.id('initialBalance')).sendKeys('1000');
+    await driver.sleep(500);
+    const saveBtn = await driver.findElement(By.css('.phoenix-modal__save-btn'));
+    await saveBtn.click();
+    await driver.sleep(4000);
+    let alertText = null;
+    try {
+      const alert = await driver.wait(until.alertIsPresent(), 2000);
+      alertText = await alert.getText();
+      await alert.accept();
+    } catch {
+      // No alert = success
+    }
+    const modalStillOpen = await driver.findElement(By.id('phoenix-modal')).catch(() => null);
+    if (alertText) {
+      logger.log(testName, 'FAIL', { message: 'Save showed alert', alertText: alertText.substring(0, 60) });
+      artifacts.consoleLogs.push({ test: testName, saveAlert: alertText });
+    } else if (modalStillOpen) {
+      logger.log(testName, 'FAIL', { message: 'Modal still open after save' });
+    } else {
+      logger.log(testName, 'PASS', {
+        message: 'Trading account form save succeeded; no alert; modal closed'
+      });
+    }
+  } catch (error) {
+    logger.error(testName, error);
+    artifacts.errors.push({ test: testName, error: error.message });
+  } finally {
+    await driver.quit();
+  }
+}
+
+/**
  * Test: D18 — מילוי טופס הוספת ברוקר ושמירה (CRUD Forms QA Phase 1)
  */
 async function testCRUDD18FormSave() {
@@ -970,6 +1091,8 @@ async function runTests() {
       await testD18BrokersFees();
       await testD21CashFlows();
       await testCRUDTradingAccounts();
+      await testCRUDButtonsD16();
+      await testCRUDD16FormSave();
       await testCRUDBrokersFees();
       await testCRUDCashFlows();
       await testCRUDButtonsD18();

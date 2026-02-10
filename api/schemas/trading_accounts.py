@@ -48,6 +48,30 @@ class TradingAccountResponse(BaseModel):
         }
 
 
+class TradingAccountSummaryResponse(BaseModel):
+    """Trading Account summary schema."""
+    total_accounts: int = Field(..., description="Total number of trading accounts")
+    active_accounts: int = Field(..., description="Number of active trading accounts")
+    total_account_value: Decimal = Field(..., description="Total account value across all accounts")
+    total_cash_balance: Decimal = Field(..., description="Total cash balance across all accounts")
+    total_holdings_value: Decimal = Field(..., description="Total holdings value across all accounts")
+    total_unrealized_pl: Decimal = Field(..., description="Total unrealized P/L across all accounts")
+    total_positions: int = Field(..., description="Total number of open positions across all accounts")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "total_accounts": 5,
+                "active_accounts": 3,
+                "total_account_value": "500000.00",
+                "total_cash_balance": "450000.00",
+                "total_holdings_value": "50000.00",
+                "total_unrealized_pl": "2500.50",
+                "total_positions": 15
+            }
+        }
+
+
 class TradingAccountListResponse(BaseModel):
     """Trading Accounts list response schema."""
     data: List[TradingAccountResponse] = Field(..., description="List of trading accounts")

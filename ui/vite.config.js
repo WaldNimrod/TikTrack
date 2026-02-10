@@ -29,24 +29,52 @@ let routeToHtmlMap = {};
 if (fs.existsSync(routesPath)) {
   try {
     const routesConfig = JSON.parse(fs.readFileSync(routesPath, 'utf-8'));
-    routeToHtmlMap = routesConfig.routes || {};
+    // Gate B Fix: Extract routes from nested structure (routes.financial, routes.planning, etc.)
+    routeToHtmlMap = {};
+    
+    // Flatten nested routes structure
+    if (routesConfig.routes) {
+      Object.keys(routesConfig.routes).forEach(category => {
+        const categoryRoutes = routesConfig.routes[category];
+        if (typeof categoryRoutes === 'object') {
+          Object.keys(categoryRoutes).forEach(routeKey => {
+            const routePath = categoryRoutes[routeKey];
+            // Map both with and without .html extension
+            routeToHtmlMap[routePath] = routePath; // Direct mapping
+            // Also map clean route (without .html) to HTML file
+            if (routePath.endsWith('.html')) {
+              const cleanRoute = routePath.replace('.html', '');
+              routeToHtmlMap[cleanRoute] = routePath;
+            }
+          });
+        }
+      });
+    }
+    
     console.log('[Vite Config] ✅ Loaded routes from routes.json:', Object.keys(routeToHtmlMap).length, 'routes');
+    console.log('[Vite Config] Route mappings:', routeToHtmlMap);
   } catch (error) {
     console.warn('[Vite Config] ⚠️ Failed to parse routes.json, using fallback:', error.message);
     // Fallback to default routes
     routeToHtmlMap = {
-      '/trading_accounts': '/views/financial/tradingAccounts/trading_accounts.html',
-      '/brokers_fees': '/views/financial/brokersFees/brokers_fees.html',
-      '/cash_flows': '/views/financial/cashFlows/cash_flows.html',
+      '/trading_accounts': '/trading_accounts.html',
+      '/trading_accounts.html': '/trading_accounts.html',
+      '/brokers_fees': '/brokers_fees.html',
+      '/brokers_fees.html': '/brokers_fees.html',
+      '/cash_flows': '/cash_flows.html',
+      '/cash_flows.html': '/cash_flows.html',
     };
   }
 } else {
   console.warn('[Vite Config] ⚠️ routes.json not found at', routesPath, '- using fallback');
   // Fallback to default routes
   routeToHtmlMap = {
-    '/trading_accounts': '/views/financial/tradingAccounts/trading_accounts.html',
-    '/brokers_fees': '/views/financial/brokersFees/brokers_fees.html',
-    '/cash_flows': '/views/financial/cashFlows/cash_flows.html',
+    '/trading_accounts': '/trading_accounts.html',
+    '/trading_accounts.html': '/trading_accounts.html',
+    '/brokers_fees': '/brokers_fees.html',
+    '/brokers_fees.html': '/brokers_fees.html',
+    '/cash_flows': '/cash_flows.html',
+    '/cash_flows.html': '/cash_flows.html',
   };
 }
 
@@ -79,17 +107,30 @@ const htmlPagesPlugin = () => {
           console.log(`[HTML Plugin] Full URL: ${req.url}`);
         }
         
-        // Check if this is a mapped clean route
+        // Gate B Fix: Check if this is a mapped clean route (from routeToHtmlMap)
         if (routeToHtmlMap[url]) {
           const htmlPath = routeToHtmlMap[url];
-          // Remove leading slash from htmlPath for path.join
-          const htmlPathNormalized = htmlPath.startsWith('/') ? htmlPath.substring(1) : htmlPath;
+          // Gate B Fix: Map routes.json paths (e.g., /trading_accounts.html) to actual file paths
+          // routes.json has paths like /trading_accounts.html, but files are in /views/financial/...
+          let actualFilePath = htmlPath;
+          
+          // If htmlPath is just a filename (e.g., /trading_accounts.html), find the actual file location
+          if (htmlPath.startsWith('/') && htmlPath.includes('.html') && !htmlPath.includes('/views/')) {
+            // Map common routes to their actual file locations
+            const routeToFileMap = {
+              '/trading_accounts.html': '/views/financial/tradingAccounts/trading_accounts.html',
+              '/brokers_fees.html': '/views/financial/brokersFees/brokers_fees.html',
+              '/cash_flows.html': '/views/financial/cashFlows/cash_flows.html',
+            };
+            actualFilePath = routeToFileMap[htmlPath] || htmlPath;
+          }
+          
+          // Remove leading slash from actualFilePath for path.join
+          const htmlPathNormalized = actualFilePath.startsWith('/') ? actualFilePath.substring(1) : actualFilePath;
           const filePath = path.join(__dirname, 'src', htmlPathNormalized);
           
-          console.log(`[HTML Plugin] ✅ Mapped route: ${url} -> ${htmlPath}`);
-          console.log(`[HTML Plugin] Normalized path: ${htmlPathNormalized}`);
+          console.log(`[HTML Plugin] ✅ Mapped route: ${url} -> ${htmlPath} -> ${actualFilePath}`);
           console.log(`[HTML Plugin] File path: ${filePath}`);
-          console.log(`[HTML Plugin] __dirname: ${__dirname}`);
           console.log(`[HTML Plugin] File exists: ${fs.existsSync(filePath)}`);
           
           if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
@@ -97,7 +138,7 @@ const htmlPagesPlugin = () => {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.setHeader('Cache-Control', 'no-cache');
             res.end(content);
-            console.log(`[HTML Plugin] ✅✅✅ SERVED: ${url} -> ${htmlPath}`);
+            console.log(`[HTML Plugin] ✅✅✅ SERVED: ${url} -> ${actualFilePath}`);
             return; // Don't call next() - request handled
           } else {
             console.log(`[HTML Plugin] ❌ File not found!`);
@@ -121,18 +162,26 @@ const htmlPagesPlugin = () => {
           }
         }
         
-        // Check for direct HTML file requests
+        // Gate B Fix: Check for direct HTML file requests (e.g., /trading_accounts.html)
         if (url.endsWith('.html') && !url.includes('/node_modules/') && !url.includes('/dist/')) {
-          const urlNormalized = url.startsWith('/') ? url.substring(1) : url;
-          const filePath = path.join(__dirname, 'src', urlNormalized);
+          // Try to find the file in src/views/financial/...
+          const htmlFileName = url.split('/').pop(); // e.g., trading_accounts.html
+          const possiblePaths = [
+            path.join(__dirname, 'src', 'views', 'financial', 'tradingAccounts', htmlFileName),
+            path.join(__dirname, 'src', 'views', 'financial', 'brokersFees', htmlFileName),
+            path.join(__dirname, 'src', 'views', 'financial', 'cashFlows', htmlFileName),
+            path.join(__dirname, 'src', url.substring(1)), // Direct path from URL
+          ];
           
-          if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            const content = fs.readFileSync(filePath, 'utf-8');
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'no-cache');
-            res.end(content);
-            console.log(`[HTML Plugin] ✅✅✅ SERVED DIRECT: ${url}`);
-            return; // Don't call next() - request handled
+          for (const filePath of possiblePaths) {
+            if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+              const content = fs.readFileSync(filePath, 'utf-8');
+              res.setHeader('Content-Type', 'text/html; charset=utf-8');
+              res.setHeader('Cache-Control', 'no-cache');
+              res.end(content);
+              console.log(`[HTML Plugin] ✅✅✅ SERVED DIRECT: ${url} -> ${filePath}`);
+              return; // Don't call next() - request handled
+            }
           }
         }
         

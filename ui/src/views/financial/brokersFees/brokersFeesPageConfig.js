@@ -31,10 +31,10 @@ window.UAI.config = {
   // Components
   components: ['table', 'filter', 'summary', 'pagination', 'actions'],
   
-  // Filters
+  // Filters (SSOT v1.2.0 — Filter Keys Lock: D18 internal = broker, commissionType; global = search)
   filters: {
-    internal: [],
-    global: ['broker', 'commissionType', 'search']
+    internal: ['broker', 'commissionType'],
+    global: ['search']
   },
   
   // Tables

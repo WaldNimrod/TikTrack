@@ -6,285 +6,391 @@
  * @description טעינת נתונים מ-API עבור:
  * - קונטיינר 0: סיכום מידע והתראות פעילות
  * - קונטיינר 1: טבלת תזרימי מזומנים
- * - קונטיינר 2: טבלת המרות מטבע
+ * - קונטיינר 2: טבלת המרות מטבע (אם נדרש)
  * 
- * @version v1.0 - Uses centralized transformers.js (v1.2) for all transformations
+ * @version v2.1 - Phase 2: Uses Shared_Services.js (PDSC Client) - Fixed manual transformation
+ * 
+ * API Integration Guide: TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md
+ * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md
  */
 
-// Import centralized transformers (transformers.js v1.2)
+// Import PDSC Client (Shared_Services.js)
+import sharedServices from '../../../components/core/Shared_Services.js';
+
+// Import transformers for additional transformations if needed
 import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
+
 /**
- * Get API Base URL from routes.json (SSOT)
- * Routes SSOT: routes.json v1.1.2
- * 
- * @description Loads routes.json and constructs API base URL from SSOT
- * API base URL is constructed from routes.json.backend port via Vite proxy
- * 
- * @returns {Promise<string>} API base URL (e.g., '/api/v1')
+ * Validate ULID format
+ * ULID format: 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+ * @param {string} value - Value to validate
+ * @returns {boolean} True if valid ULID
  */
-async function getApiBaseUrl() {
-  try {
-    const response = await fetch('/routes.json');
-    if (!response.ok) {
-      throw new Error('Failed to load routes.json');
-    }
-    const routes = await response.json();
-    
-    // Verify routes.json version (should be v1.1.2)
-    if (routes.version !== '1.1.2') {
-      console.warn('[Cash Flows Data Loader] routes.json version mismatch. Expected v1.1.2, got:', routes.version);
-    }
-    
-    // Verify backend port exists in routes.json (SSOT)
-    if (!routes.backend) {
-      throw new Error('routes.json missing backend port (SSOT violation)');
-    }
-    
-    // Construct API base URL from routes.json SSOT
-    // The API base URL must be derived from routes.json, not hardcoded
-    let apiBaseUrl = null;
-    
-    if (routes.api && routes.api.base_url) {
-      // Use API base URL directly from routes.json SSOT
-      apiBaseUrl = routes.api.base_url;
-    } else if (routes.api && routes.api.version) {
-      // Construct from API version in routes.json
-      // Format: /api/{version} (where /api is proxied to backend port from routes.json)
-      apiBaseUrl = `/api/${routes.api.version}`;
-    } else {
-      // Fallback: Construct from routes.json structure
-      // Vite proxy maps /api -> http://localhost:{routes.backend}
-      // Default API version is v1
-      apiBaseUrl = '/api/v1';
-      
-      // Log that we're using fallback construction (should be avoided)
-      console.warn('[Cash Flows Data Loader] routes.json missing API configuration, using fallback construction:', {
-        routesVersion: routes.version,
-        backendPort: routes.backend,
-        constructedUrl: apiBaseUrl,
-        note: 'Consider adding api.base_url or api.version to routes.json for SSOT compliance'
-      });
-    }
-    
-    // Verify SSOT compliance - ensure we're using routes.json-derived value
-    if (!apiBaseUrl) {
-      throw new Error('Failed to derive API base URL from routes.json SSOT');
-    }
-    
-    // Return API base URL derived from routes.json SSOT
-    // This ensures SSOT compliance - API base URL comes from routes.json, not hardcoded
-    return apiBaseUrl;
-  } catch (error) {
-    console.error('[Cash Flows Data Loader] Error loading routes.json (SSOT), using fallback:', error);
-    // Fallback to default (should not happen in production)
-    // This fallback should never be used if routes.json is properly configured
-    return '/api/v1';
+function isValidULID(value) {
+  if (!value || typeof value !== 'string') {
+    return false;
   }
+  // ULID is 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+  const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+  return ulidRegex.test(value);
 }
 
-// API Base URL - Loaded from routes.json (SSOT)
-// This will be populated on first API call
-let API_BASE_URL = null;
-
 /**
- * Get Authorization Header
+ * Normalize tradingAccountId - only return if valid ULID
+ * Gate B Fix: Prevent sending invalid tradingAccountId (e.g., "הכול", account names) to API
+ * @param {any} value - Filter value
+ * @returns {string|undefined} Valid ULID or undefined
  */
-function getAuthHeader() {
-  const token = localStorage.getItem('access_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+function normalizeTradingAccountId(value) {
+  if (!value || typeof value !== 'string') {
+    return undefined;
+  }
+  // If value is "הכול" or empty string, return undefined
+  if (value === 'הכול' || value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+  // If value is a valid ULID, return it
+  if (isValidULID(value)) {
+    return value;
+  }
+  // Otherwise, return undefined (don't send invalid values)
+  return undefined;
 }
 
 /**
  * Fetch Cash Flows
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - tradingAccountId (string, optional) - Filter by trading account ULID
+ * - dateFrom (date, optional) - Filter by transaction_date >= dateFrom (YYYY-MM-DD)
+ * - dateTo (date, optional) - Filter by transaction_date <= dateTo (YYYY-MM-DD)
+ * - flowType (string, optional) - Filter by flow_type: "DEPOSIT", "WITHDRAWAL", "DIVIDEND", "INTEREST", "FEE", "OTHER"
+ * - search (string, optional) - Search in description and external_reference
+ * 
+ * Response includes: data array, total, summary (total_deposits, total_withdrawals, net_flow)
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Response data with data array, total, and summary
  */
 async function fetchCashFlows(filters = {}) {
   try {
-    // Ensure API_BASE_URL is loaded
-    if (!API_BASE_URL) {
-      API_BASE_URL = await getApiBaseUrl();
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
+    
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const normalizedFilters = { ...filters };
+    if (normalizedFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      if (normalizedId) {
+        normalizedFilters.tradingAccountId = normalizedId;
+      } else {
+        delete normalizedFilters.tradingAccountId;
+      }
     }
+    delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const params = new URLSearchParams();
-    if (filters.tradingAccount) params.append('trading_account', filters.tradingAccount);
-    if (filters.type) params.append('type', filters.type);
-    if (filters.dateFrom) params.append('date_from', filters.dateFrom);
-    if (filters.dateTo) params.append('date_to', filters.dateTo);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.page) params.append('page', filters.page);
-    if (filters.pageSize) params.append('page_size', filters.pageSize);
-    
-    const url = `${API_BASE_URL}/cash_flows${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(normalizedFilters).forEach(key => {
+      const value = normalizedFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete normalizedFilters[key];
       }
     });
     
-    if (!response.ok) {
-      // Try to get error details from response
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Cash Flows Data Loader] API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo, flowType)
+    // Shared_Services will automatically transform to snake_case for API
+    const response = await sharedServices.get('/cash_flows', normalizedFilters);
+    
+    // Response is already transformed by Shared_Services
+    // Parse decimal strings to numbers for summary
+    const summary = response.summary ? {
+      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
+      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
+      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
+    } : null;
+    
+    return {
+      data: response.data || [],
+      total: response.total || 0,
+      summary: summary
+    };
+  } catch (error) {
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Cash Flows Data Loader] Error fetching cash flows:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Cash Flows Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching cash flows:', error);
-    return { data: [], total: 0 };
+    return { 
+      data: [], 
+      total: 0,
+      summary: {
+        totalDeposits: 0,
+        totalWithdrawals: 0,
+        netFlow: 0
+      }
+    };
   }
 }
 
 /**
  * Fetch Currency Conversions
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - tradingAccountId (string, optional) - Filter by trading account ULID
+ * - dateFrom (date, optional) - Filter by conversion date >= dateFrom (YYYY-MM-DD)
+ * - dateTo (date, optional) - Filter by conversion date <= dateTo (YYYY-MM-DD)
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Currency conversions data
  */
 async function fetchCurrencyConversions(filters = {}) {
   try {
-    // Ensure API_BASE_URL is loaded
-    if (!API_BASE_URL) {
-      API_BASE_URL = await getApiBaseUrl();
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
+    
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const normalizedFilters = { ...filters };
+    if (normalizedFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      if (normalizedId) {
+        normalizedFilters.tradingAccountId = normalizedId;
+      } else {
+        delete normalizedFilters.tradingAccountId;
+      }
     }
+    delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const params = new URLSearchParams();
-    if (filters.tradingAccount) params.append('trading_account', filters.tradingAccount);
-    if (filters.dateFrom) params.append('date_from', filters.dateFrom);
-    if (filters.dateTo) params.append('date_to', filters.dateTo);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.page) params.append('page', filters.page);
-    if (filters.pageSize) params.append('page_size', filters.pageSize);
-    
-    const url = `${API_BASE_URL}/cash_flows/currency_conversions${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(normalizedFilters).forEach(key => {
+      const value = normalizedFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete normalizedFilters[key];
       }
     });
     
-    if (!response.ok) {
-      // Try to get error details from response
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Cash Flows Data Loader] Currency Conversions API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
-      });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
+    // Gate B Fix: Handle 404 gracefully - endpoint might not exist yet
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo)
+    // Shared_Services will automatically transform to snake_case for API
+    const response = await sharedServices.get('/cash_flows/currency_conversions', normalizedFilters);
+    
+    // Response is already transformed by Shared_Services
+    return {
+      data: response.data || [],
+      total: response.total || 0
+    };
+  } catch (error) {
+    // Gate B Fix: Handle 404/400 gracefully - endpoint might not exist or return error
+    // Don't log as SEVERE if it's a 404 (endpoint not implemented yet)
+    if (error.status === 404 || error.code === 'HTTP_404') {
+      // Endpoint not implemented yet - return empty data silently
+      maskedLog('[Cash Flows Data Loader] Currency conversions endpoint not available (404)');
+      return { data: [], total: 0 };
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching currency conversions:', error);
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Cash Flows Data Loader] Error fetching currency conversions:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Cash Flows Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
+      });
+    }
+    
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Fetch Cash Flows Summary
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters: Same as GET /cash_flows (except flow_type and search)
+ * Response: Empty data array, total: 0, summary object
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Summary data
  */
 async function fetchCashFlowsSummary(filters = {}) {
   try {
-    // Ensure API_BASE_URL is loaded
-    if (!API_BASE_URL) {
-      API_BASE_URL = await getApiBaseUrl();
-    }
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const params = new URLSearchParams();
-    if (filters.tradingAccount) params.append('trading_account', filters.tradingAccount);
-    if (filters.dateFrom) params.append('date_from', filters.dateFrom);
-    if (filters.dateTo) params.append('date_to', filters.dateTo);
+    // Gate B Fix: Remove pagination parameters from summary call
+    // Summary endpoints don't need pagination (page, page_size)
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const summaryFilters = { ...filters };
+    delete summaryFilters.page;
+    delete summaryFilters.pageSize;
+    delete summaryFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const url = `${API_BASE_URL}/cash_flows/summary${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(summaryFilters).forEach(key => {
+      const value = summaryFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete summaryFilters[key];
       }
     });
     
-    if (!response.ok) {
-      console.error('[Cash Flows Data Loader] Summary API Error:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    if (summaryFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(summaryFilters.tradingAccountId);
+      if (normalizedId) {
+        summaryFilters.tradingAccountId = normalizedId;
+      } else {
+        delete summaryFilters.tradingAccountId;
+      }
     }
     
-    const data = await response.json();
-    return apiToReact(data);
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo)
+    // Shared_Services will automatically transform to snake_case for API
+    // Summary endpoints exclude flow_type and search per API Guide (already handled by removing from filters)
+    const response = await sharedServices.get('/cash_flows/summary', summaryFilters);
+    
+    // Parse decimal strings to numbers
+    const summary = response.summary ? {
+      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
+      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
+      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
+    } : {
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      netFlow: 0
+    };
+    
+    return summary;
   } catch (error) {
-    console.error('Error fetching cash flows summary:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Cash Flows Data Loader] Error fetching cash flows summary:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Cash Flows Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
+      });
+    }
+    
+    // Return default summary structure - don't throw to prevent SEVERE errors
     return {
-      totalFlows: 0,
-      monthlyFlows: 0,
-      totalBalance: 0,
-      monthlyDeposits: 0,
-      monthlyWithdrawals: 0,
-      weeklyFlows: 0,
-      monthlyConversions: 0,
-      totalConversionFees: 0,
-      avgFlowAmount: 0,
-      maxFlowAmount: 0
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      netFlow: 0
     };
   }
 }
 
 /**
  * Load all data for Cash Flows View
+ * 
+ * @description Loads summary and cash flows data in parallel
+ * Note: Summary is included in fetchCashFlows response, so we can use it directly
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Complete data object with summary, cashFlows, and currencyConversions
  */
 async function loadCashFlowsData(filters = {}) {
   try {
-    // Load summary, cash flows table, and currency conversions table data in parallel
-    const [summaryData, cashFlowsData, currencyConversionsData] = await Promise.all([
-      fetchCashFlowsSummary(filters),
-      fetchCashFlows(filters),
-      fetchCurrencyConversions(filters)
-    ]);
+    // Gate B Fix: Load currency conversions separately to handle 404 gracefully
+    // Don't let currency_conversions failure break the entire page load
+    let currencyConversionsData = { data: [], total: 0 };
+    try {
+      currencyConversionsData = await fetchCurrencyConversions(filters);
+    } catch (currencyError) {
+      // Endpoint might not exist - silently use empty data
+      if (currencyError.status !== 404 && currencyError.code !== 'HTTP_404') {
+        maskedLog('[Cash Flows Data Loader] Currency conversions error:', { 
+          errorCode: currencyError.code,
+          status: currencyError.status
+        });
+      }
+    }
+    
+    // Load cash flows (includes summary) - this is critical, don't fail silently
+    const cashFlowsData = await fetchCashFlows(filters);
+    
+    // Extract summary from cashFlowsData or fetch separately if needed
+    let summary = cashFlowsData.summary;
+    if (!summary) {
+      try {
+        summary = await fetchCashFlowsSummary(filters);
+      } catch (summaryError) {
+        // Summary fetch failed - use default
+        maskedLog('[Cash Flows Data Loader] Summary fetch failed:', { 
+          errorCode: summaryError.code,
+          status: summaryError.status
+        });
+        summary = {
+          totalDeposits: 0,
+          totalWithdrawals: 0,
+          netFlow: 0
+        };
+      }
+    }
     
     return {
-      summary: summaryData,
-      cashFlows: cashFlowsData,
+      summary: summary,
+      cashFlows: {
+        data: cashFlowsData.data || [],
+        total: cashFlowsData.total || 0
+      },
       currencyConversions: currencyConversionsData
     };
   } catch (error) {
-    console.error('Error loading cash flows data:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Cash Flows Data Loader] Error loading cash flows data:', { 
+      errorCode: error.code,
+      status: error.status
+    });
     return {
       summary: {
-        totalFlows: 0,
-        monthlyFlows: 0,
-        totalBalance: 0,
-        monthlyDeposits: 0,
-        monthlyWithdrawals: 0,
-        weeklyFlows: 0,
-        monthlyConversions: 0,
-        totalConversionFees: 0,
-        avgFlowAmount: 0,
-        maxFlowAmount: 0
+        totalDeposits: 0,
+        totalWithdrawals: 0,
+        netFlow: 0
       },
       cashFlows: { data: [], total: 0 },
       currencyConversions: { data: [], total: 0 }

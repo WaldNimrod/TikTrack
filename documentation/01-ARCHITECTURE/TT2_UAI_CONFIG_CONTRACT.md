@@ -5,7 +5,7 @@
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** `TEAM_30_UAI_CONFIG_CONTRACT.md` (promoted from Communication)  
 **last_updated:** 2026-02-07  
-**version:** v1.1.0 (Promoted to SSOT)
+**version:** v1.2.0 (Gate B — SSOT Expanded: Global + Internal Filters Locked)
 
 ---
 
@@ -100,22 +100,19 @@
     },
     "filters": {
       "type": "object",
-      "description": "Filter configuration",
+      "description": "Filter configuration. See § Filter Keys Lock (by page) for allowed values per pageType.",
       "properties": {
         "internal": {
           "type": "array",
-          "description": "Internal filters (date, account, type, search)",
-          "items": {
-            "type": "string",
-            "enum": ["date", "account", "type", "search"]
-          }
+          "description": "Internal filters — page-specific keys only (see § Internal Filters per page)",
+          "items": { "type": "string" }
         },
         "global": {
           "type": "array",
-          "description": "Global filters from header",
+          "description": "Global filters from header — locked enum only",
           "items": {
             "type": "string",
-            "enum": ["tradingAccount", "dateRange", "status", "investmentType", "search"]
+            "enum": ["status", "investmentType", "tradingAccount", "dateRange", "search"]
           }
         }
       }
@@ -191,6 +188,79 @@
   }
 }
 ```
+
+---
+
+## 🔒 Filter Keys Lock (by page) — Gate B SSOT Expanded
+
+**Policy (locked):** No Option B. SSOT recognizes filter keys as they exist in code. Configs and code align to this SSOT.
+
+### Global Filters (locked — all pages)
+
+| Key (camelCase in config) | Description |
+|---------------------------|-------------|
+| `status` | Account/record status |
+| `investmentType` | Investment type (UI) |
+| `tradingAccount` | Trading account (header); API key `tradingAccountId` in requests |
+| `dateRange` | Date range; API keys `dateFrom`, `dateTo` in requests |
+| `search` | Free-text search |
+
+**Config:** Every page that uses header filters must declare only these five in `filters.global`. No removal of filters; only alignment of keys.
+
+### Internal Filters per page (exact keys in code)
+
+#### D16 — Trading Accounts (`pageType: 'tradingAccounts'`)
+
+**Keys in code (locked):**  
+`status`, `tradingAccountId`, `dateFrom`, `dateTo`, `search`  
+UI also exposes `investmentType` — if used, must be in SSOT (global).
+
+**Config must declare:**
+- `filters.global`: `['status', 'investmentType', 'tradingAccount', 'dateRange', 'search']`
+- `filters.internal`: `[]` (all filter keys are global/header for D16)
+
+**Mapping (code ↔ API):**  
+`tradingAccountId` → API `trading_account_id`; `dateFrom`/`dateTo` → API `date_from`/`date_to`.
+
+---
+
+#### D18 — Brokers Fees (`pageType: 'brokersFees'`)
+
+**Keys in code (locked):**  
+`broker`, `commissionType`, `search`
+
+**Config must declare:**
+- `filters.global`: `['search']`
+- `filters.internal`: `['broker', 'commissionType']`
+
+**Mapping:**  
+DataLoader/Header use `broker`, `commissionType`; API receives snake_case per PDSC.
+
+---
+
+#### D21 — Cash Flows (`pageType: 'cashFlows'`)
+
+**Keys in code (locked):**  
+`tradingAccountId`, `dateFrom`, `dateTo`, `flowType`, `search`  
+Tables also use `type` / `tradingAccount` — **must unify:** use `flowType` (not `type`) and `tradingAccountId` (not `tradingAccount`) consistently in filter payloads.
+
+**Config must declare:**
+- `filters.global`: `['tradingAccount', 'dateRange', 'search']`
+- `filters.internal`: `['flowType']` (and align UI/code to `dateFrom`/`dateTo` ↔ dateRange, `tradingAccountId` ↔ tradingAccount)
+
+**Mapping:**  
+Unify `type` ↔ `flowType`; `tradingAccount` ↔ `tradingAccountId`; `dateFrom`/`dateTo` for date range.
+
+---
+
+## 🔒 Endpoint Decision — trading_accounts/summary (LOCKED)
+
+**Status:** 🔒 **LOCKED**  
+**Decision (Architect / Team 10):** **REQUIRED** — אין אופציה להסרה או לאלטרנטיבה.
+
+- **Endpoint:** `GET /api/v1/trading_accounts/summary` is **REQUIRED** in SSOT.
+- **Backend:** Implemented (Team 20). Must remain available and documented.
+- **Config/Docs:** Trading Accounts page **must** declare `trading_accounts/summary` in `dataEndpoints` and `summary.endpoint`. All Docs and Mandates must include it. No removal, no alternative.
 
 ---
 
@@ -624,3 +694,13 @@ class RenderStage {
 **Deadline:** 2026-02-07 (12 hours)
 
 **log_entry | [Team 30] | UAI_CONFIG_CONTRACT | CRITICAL_FIXES_APPLIED | v1.1.0 | 2026-02-07**
+
+---
+
+### **Gate B — SSOT Expanded (v1.2.0)** ✅
+- **Global Filters (locked):** status, investmentType, tradingAccount, dateRange, search
+- **Internal Filters per page:** D16 / D18 / D21 — explicit lists and mapping (see § Filter Keys Lock)
+- **Endpoint decision:** trading_accounts/summary REQUIRED (Backend implemented)
+- **Policy:** No Option B; configs align to SSOT
+
+**log_entry | [Team 10] | UAI_CONFIG_CONTRACT | GATE_B_SSOT_EXPANDED | v1.2.0 | 2026-02-07**

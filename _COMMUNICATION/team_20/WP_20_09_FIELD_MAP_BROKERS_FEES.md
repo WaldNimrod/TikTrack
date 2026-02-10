@@ -20,7 +20,7 @@
 
 ## 2. סכימת מסד נתונים (Brokers Fees Schema)
 
-**הערה:** טבלת DB טרם נוצרה. נדרש תיאום עם Team 60 ליצירת הטבלה.
+**הערה:** טבלת DB נוצרה על ידי Team 60. `commission_value` עודכן ל-`NUMERIC(20, 6)` (מיגרציה הושלמה 2026-02-10).
 
 ### שדות מוצעים (לפי הבלופרינט והמנדט):
 
@@ -30,8 +30,8 @@
 | `user_id` | `UUID (FK)` | `ULID` | קישור למשתמש (REFERENCES user_data.users) |
 | `broker` | `VARCHAR(100)` | `String` | שם הברוקר (למשל: "Interactive Brokers", "IBKR") |
 | `commission_type` | `VARCHAR(20)` | `String` | סוג עמלה: `TIERED` או `FLAT` |
-| `commission_value` | `VARCHAR(255)` | `String` | ערך העמלה (למשל: "0.0035 $ / Share") |
-| `minimum` | `NUMERIC(20, 8)` | `Decimal` | מינימום לפעולה (USD) |
+| `commission_value` | `NUMERIC(20, 6)` | `Decimal` | ערך העמלה (מספרי, >= 0) |
+| `minimum` | `NUMERIC(20, 6)` | `Decimal` | מינימום לפעולה (USD) |
 | `created_at` | `TIMESTAMPTZ` | `DateTime` | תאריך יצירה |
 | `updated_at` | `TIMESTAMPTZ` | `DateTime` | תאריך עדכון אחרון |
 | `deleted_at` | `TIMESTAMPTZ` | `DateTime` | תאריך מחיקה (Soft Delete) |
@@ -55,14 +55,14 @@ CREATE TYPE user_data.commission_type AS ENUM ('TIERED', 'FLAT');
       "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
       "broker": "Interactive Brokers",
       "commission_type": "TIERED",
-      "commission_value": "0.0035 $ / Share",
+      "commission_value": 0.0035,
       "minimum": 0.35
     },
     {
       "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
       "broker": "TD Ameritrade",
       "commission_type": "FLAT",
-      "commission_value": "$0.00",
+      "commission_value": 0.00,
       "minimum": 0.00
     }
   ],

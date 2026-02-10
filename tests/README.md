@@ -26,6 +26,15 @@ This directory contains Selenium-based automated integration tests for Phase 1.5
 3. **Chrome browser** installed
 4. **Node.js** v18+ installed
 
+**אם השרת לא פועל — איתחול חובה:** לפני הרצת בדיקות, להריץ איתחול שרתים (עצירה + הפעלה):
+
+```bash
+# מתוך שורש הפרויקט
+./scripts/init-servers-for-qa.sh
+```
+
+לאחר סיום האיתחול Backend ו-Frontend רצים ברקע; אז להריץ את הבדיקות.
+
 ### Installation
 
 ```bash

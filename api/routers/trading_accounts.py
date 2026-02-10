@@ -16,7 +16,7 @@ from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
 from ..services.trading_accounts import get_trading_account_service
-from ..schemas.trading_accounts import TradingAccountListResponse
+from ..schemas.trading_accounts import TradingAccountListResponse, TradingAccountSummaryResponse
 
 logger = logging.getLogger(__name__)
 
@@ -61,5 +61,43 @@ async def get_trading_accounts(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch trading accounts",
+            error_code=ErrorCodes.SERVER_ERROR
+        )
+
+
+@router.get("/summary", response_model=TradingAccountSummaryResponse)
+async def get_trading_accounts_summary(
+    status: Optional[bool] = Query(None, description="Filter by is_active status"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get trading accounts summary statistics.
+    
+    Returns summary statistics:
+    - total_accounts: Total number of trading accounts
+    - active_accounts: Number of active trading accounts
+    - total_account_value: Total account value across all accounts
+    - total_cash_balance: Total cash balance across all accounts
+    - total_holdings_value: Total holdings value across all accounts
+    - total_unrealized_pl: Total unrealized P/L across all accounts
+    - total_positions: Total number of open positions across all accounts
+    
+    Query Parameters:
+    - status: Filter by is_active (true/false) (optional)
+    """
+    try:
+        service = get_trading_account_service()
+        summary = await service.get_trading_accounts_summary(
+            user_id=current_user.id,
+            db=db,
+            status=status
+        )
+        return summary
+    except Exception as e:
+        logger.error(f"Error fetching trading accounts summary: {str(e)}", exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch trading accounts summary",
             error_code=ErrorCodes.SERVER_ERROR
         )

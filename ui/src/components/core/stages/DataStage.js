@@ -9,6 +9,7 @@
 
 import { StageBase } from './StageBase.js';
 import sharedServices from '../Shared_Services.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class DataStage extends StageBase {
   constructor() {
@@ -51,7 +52,7 @@ export class DataStage extends StageBase {
         await this.fetchDataViaSharedServices(config);
       } else {
         // No data loader configured - skip data loading
-        console.log('[Data Stage] No data loader or apiEndpoint configured, skipping data loading');
+        maskedLog('[Data Stage] No data loader or apiEndpoint configured, skipping data loading');
       }
       
       // Store data in global state
@@ -83,25 +84,68 @@ export class DataStage extends StageBase {
       const response = await sharedServices.get(config.apiEndpoint, filters);
       this.data = response.data || response;
       
-      console.log('[Data Stage] Data loaded via Shared Services:', Object.keys(this.data));
+      maskedLog('[Data Stage] Data loaded via Shared Services:', { dataKeys: Object.keys(this.data) });
     } catch (error) {
       throw new Error(`Failed to fetch data via Shared Services: ${error.message}`);
     }
   }
   
   /**
-   * Load data loader script
+   * Load data loader script using dynamic import (ES Module)
    * @param {string} loaderPath - Path to data loader script
    * @returns {Promise<void>}
    */
   async loadDataLoader(loaderPath) {
     try {
-      // Load the data loader script
-      await this.loadScript(loaderPath);
+      // Use dynamic import for ES modules instead of loadScript()
+      // Convert relative path to absolute URL if needed
+      let importPath = loaderPath;
       
-      // Data loader should export a function or set a global function
-      // The loader will be called in fetchData()
-      console.log('[Data Stage] Data loader loaded:', loaderPath);
+      // If path is relative, convert to absolute URL
+      if (!loaderPath.startsWith('/') && !loaderPath.startsWith('http://') && !loaderPath.startsWith('https://')) {
+        // Relative path - convert to absolute URL
+        const baseUrl = window.location.origin;
+        const currentPath = window.location.pathname;
+        const baseDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
+        
+        // Handle relative paths (./ or ../)
+        if (loaderPath.startsWith('./')) {
+          importPath = `${baseUrl}${baseDir}/${loaderPath.substring(2)}`;
+        } else if (loaderPath.startsWith('../')) {
+          // For ../ paths, resolve relative to current directory
+          const pathParts = baseDir.split('/').filter(p => p);
+          const loaderParts = loaderPath.split('/').filter(p => p && p !== '.');
+          
+          for (const part of loaderParts) {
+            if (part === '..') {
+              pathParts.pop();
+            } else {
+              pathParts.push(part);
+            }
+          }
+          
+          importPath = `${baseUrl}/${pathParts.join('/')}`;
+        } else {
+          // Assume relative to src root
+          importPath = `${baseUrl}/src/${loaderPath}`;
+        }
+      } else if (loaderPath.startsWith('/')) {
+        // Absolute path - prepend origin
+        importPath = `${window.location.origin}${loaderPath}`;
+      }
+      
+      // Ensure path ends with .js if not already
+      if (!importPath.endsWith('.js') && !importPath.includes('?')) {
+        importPath += '.js';
+      }
+      
+      // Dynamic import for ES modules
+      const module = await import(importPath);
+      
+      // Store the module for later use
+      this.loaders[loaderPath] = module;
+      
+      maskedLog('[Data Stage] Data loader loaded (ES Module):', { loaderPath, importPath });
     } catch (error) {
       throw new Error(`Failed to load data loader: ${loaderPath} - ${error.message}`);
     }
@@ -128,7 +172,7 @@ export class DataStage extends StageBase {
         // If no loader function found, try using Shared Services directly
         // This allows pages to use PDSC Client without custom data loaders
         if (config.apiEndpoint) {
-          console.log('[Data Stage] Using Shared Services for data loading');
+          maskedLog('[Data Stage] Using Shared Services for data loading');
           const response = await sharedServices.get(config.apiEndpoint, filters);
           this.data = response.data || response;
         } else {
@@ -146,42 +190,81 @@ export class DataStage extends StageBase {
         }
       }
       
-      console.log('[Data Stage] Data loaded successfully:', Object.keys(this.data));
+      maskedLog('[Data Stage] Data loaded successfully:', { dataKeys: Object.keys(this.data) });
     } catch (error) {
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
   }
   
   /**
-   * Find loader function from loaded script
+   * Find loader function from loaded ES module
+   * Gate B Fix: Support ES module exports (named exports like loadCashFlowsData, loadBrokersFeesData)
    * @param {string} pageType - Page type
    * @param {string} loaderPath - Loader script path
    * @returns {Function|Object|null} Loader function or object
    */
   findLoaderFunction(pageType, loaderPath) {
-    // Try common patterns for data loader functions
-    const functionName = this.getLoaderFunctionName(pageType);
+    // Check if module was loaded via dynamic import
+    if (this.loaders[loaderPath]) {
+      const module = this.loaders[loaderPath];
+      
+      // Try default export first
+      if (module.default && typeof module.default === 'function') {
+        return module.default;
+      }
+      
+      // Try named export based on page type (e.g., loadCashFlowsData, loadBrokersFeesData)
+      const functionName = this.getLoaderFunctionName(pageType);
+      if (module[functionName] && typeof module[functionName] === 'function') {
+        return module[functionName];
+      }
+      
+      // Try common export names
+      if (module.loadData && typeof module.loadData === 'function') {
+        return module.loadData;
+      }
+      
+      // Return the module itself if it has a loadData method
+      if (typeof module === 'object' && module.loadData) {
+        return module;
+      }
+    }
     
-    // Check global scope
+    // Fallback: Check global scope (for legacy loaders like TradingAccountsDataLoader)
+    const functionName = this.getLoaderFunctionName(pageType);
     if (window[functionName]) {
       return window[functionName];
     }
     
-    // Check if loader exports a default function
-    // (This would require dynamic import, which is more complex)
-    // For now, we rely on global functions set by the loader scripts
+    // Fallback: Check for global objects (e.g., window.TradingAccountsDataLoader)
+    if (pageType === 'tradingAccounts' && window.TradingAccountsDataLoader) {
+      return window.TradingAccountsDataLoader.loadAllContainers || window.TradingAccountsDataLoader;
+    }
     
     return null;
   }
   
   /**
    * Get expected loader function name from page type
+   * Gate B Fix: Map page types to actual exported function names
    * @param {string} pageType - Page type
    * @returns {string} Function name
    */
   getLoaderFunctionName(pageType) {
-    // Convert pageType to camelCase function name
-    // e.g., "cashFlows" -> "loadCashFlowsData"
+    // Map page types to actual exported function names
+    const functionMap = {
+      'cashFlows': 'loadCashFlowsData',
+      'brokersFees': 'loadBrokersFeesData',
+      'tradingAccounts': 'loadTradingAccountsData'
+    };
+    
+    // Return mapped function name or generate default
+    if (functionMap[pageType]) {
+      return functionMap[pageType];
+    }
+    
+    // Fallback: Convert pageType to camelCase function name
+    // e.g., "otherPage" -> "loadOtherPageData"
     const capitalized = pageType.charAt(0).toUpperCase() + pageType.slice(1);
     return `load${capitalized}Data`;
   }

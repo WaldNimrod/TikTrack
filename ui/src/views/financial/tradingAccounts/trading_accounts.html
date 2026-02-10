@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>חשבונות מסחר | TikTrack Phoenix</title>
   
+  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+  
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        ============================================ -->
   
-  <!-- 1. Phoenix Base Styles FIRST (Global defaults & DNA variables) - MUST BE FIRST -->
-  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
-  
-  <!-- 2. Pico CSS (Framework) -->
+  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
   
   <!-- 3. LEGO Components (Reusable components) -->
   <link rel="stylesheet" href="/src/styles/phoenix-components.css">
@@ -61,7 +64,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/home.svg" alt="סיכום" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">חשבונות מסחר</h1>
               </div>
               <div class="index-section__header-meta">
@@ -117,7 +120,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="חשבונות מסחר" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/trading_accounts.svg" alt="חשבונות מסחר" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">ניהול חשבונות מסחר</h1>
               </div>
               <div class="index-section__header-meta">
@@ -281,7 +284,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/cash_flows.svg" alt="תנועות" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/cash_flows.svg" alt="תנועות" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">סיכום תנועות לחשבון</h1>
               </div>
               <div class="index-section__header-meta">
@@ -329,7 +332,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="חשבון לתאריכים" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/trading_accounts.svg" alt="חשבון לתאריכים" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">דף חשבון לתאריכים</h1>
               </div>
               <div class="index-section__header-meta">
@@ -489,7 +492,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/trades.svg" alt="פוזיציות" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/trades.svg" alt="פוזיציות" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">פוזיציות לפי חשבון</h1>
               </div>
               <div class="index-section__header-meta">
@@ -673,11 +676,9 @@
   <script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
   <script src="/src/cubes/shared/tableFormatters.js"></script>
   
-  <!-- Trading Accounts Data Loader: Load data from API -->
-  <script src="/src/views/financial/tradingAccounts/tradingAccountsDataLoader.js"></script>
-  
   <!-- Trading Accounts Filters Integration: Connect filters to data loading -->
-  <script src="/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js"></script>
+  <!-- Note: tradingAccountsDataLoader.js is loaded dynamically by UAI DataStage -->
+  <script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js"></script>
   
   <!-- Trading Accounts Header Handlers: Event handlers for header filters -->
   <script src="/src/views/financial/tradingAccounts/tradingAccountsHeaderHandlers.js"></script>

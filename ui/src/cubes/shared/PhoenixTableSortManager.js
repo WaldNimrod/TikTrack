@@ -65,7 +65,7 @@ class PhoenixTableSortManager {
       });
     });
 
-    console.log(`[PhoenixTableSortManager] Initialized for table: ${this.table.id || 'unnamed'}`);
+    maskedLog(`[PhoenixTableSortManager] Initialized for table: ${this.table.id || 'unnamed'}`);
   }
 
   /**
@@ -131,7 +131,7 @@ class PhoenixTableSortManager {
     // ביצוע סידור
     this.applySort(sortType);
 
-    console.log('[PhoenixTableSortManager] Sort changed', {
+    maskedLog('[PhoenixTableSortManager] Sort changed', {
       key: sortKey,
       direction: isSecondary ? this.sortState.secondary.direction : this.sortState.primary.direction,
       isSecondary,
@@ -333,7 +333,7 @@ class PhoenixTableSortManager {
     };
     this.updateUI();
     this.applySort();
-    console.log('[PhoenixTableSortManager] Sort cleared');
+    maskedLog('[PhoenixTableSortManager] Sort cleared');
   }
 
   /**

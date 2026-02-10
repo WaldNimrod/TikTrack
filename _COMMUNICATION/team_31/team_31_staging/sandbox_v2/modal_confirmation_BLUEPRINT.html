@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מודול אישור/אזהרה | TikTrack Phoenix - Blueprint [v1.0.0]</title>
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================
+       Linking to LIVE CSS files in system: ui/src/styles/
+       All CSS files are loaded from the actual system files.
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-modal.css">
+  
+  <style>
+    /* ============================================
+       BLUEPRINT-SPECIFIC STYLES
+       ============================================
+       Additional styles for blueprint demonstration
+       ============================================ */
+    
+    /* Page wrapper for blueprint demo */
+    body {
+      background: var(--apple-bg-secondary, #f5f5f7);
+      padding: var(--spacing-lg, 24px);
+      min-height: 100vh;
+    }
+    
+    /* Demo trigger buttons */
+    .demo-trigger-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md, 16px);
+      margin-bottom: var(--spacing-lg, 24px);
+    }
+    
+    .demo-trigger-btn {
+      padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+      background: var(--color-brand, #26baac);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: var(--font-size-base, 0.92rem);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .demo-trigger-btn:hover {
+      background: var(--color-brand-dark, #1fa89a);
+    }
+    
+    .demo-trigger-btn--danger {
+      background: var(--apple-red, #FF3B30);
+    }
+    
+    .demo-trigger-btn--danger:hover {
+      background: #E6342A;
+    }
+    
+    .demo-trigger-btn--warning {
+      background: var(--apple-orange, #FF9500);
+    }
+    
+    .demo-trigger-btn--warning:hover {
+      background: #E68500;
+    }
+    
+    /* Modal size variants */
+    .phoenix-modal--small {
+      max-width: 400px;
+    }
+    
+    /* Confirmation modal header variants */
+    .phoenix-modal__header--danger {
+      background: var(--apple-red, #FF3B30);
+      color: white;
+    }
+    
+    .phoenix-modal__header--danger .phoenix-modal__title {
+      color: white;
+    }
+    
+    .phoenix-modal__header--danger .phoenix-modal__close {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+    
+    .phoenix-modal__header--danger .phoenix-modal__close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .phoenix-modal__header--warning {
+      background: var(--apple-orange, #FF9500);
+      color: white;
+    }
+    
+    .phoenix-modal__header--warning .phoenix-modal__title {
+      color: white;
+    }
+    
+    .phoenix-modal__header--warning .phoenix-modal__close {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+    
+    .phoenix-modal__header--warning .phoenix-modal__close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .phoenix-modal__header--info {
+      background: var(--color-primary, #007AFF);
+      color: white;
+    }
+    
+    .phoenix-modal__header--info .phoenix-modal__title {
+      color: white;
+    }
+    
+    .phoenix-modal__header--info .phoenix-modal__close {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+    
+    .phoenix-modal__header--info .phoenix-modal__close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Confirmation message */
+    .confirmation-message {
+      font-size: var(--font-size-base, 0.92rem);
+      color: var(--apple-text-primary, #1d1d1f);
+      line-height: 1.6;
+    }
+    
+    .confirmation-message--centered {
+      text-align: center;
+    }
+    
+    /* Confirmation icon */
+    .confirmation-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--spacing-lg, 24px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .confirmation-icon--danger {
+      background: rgba(255, 59, 48, 0.1);
+      color: var(--apple-red, #FF3B30);
+    }
+    
+    .confirmation-icon--warning {
+      background: rgba(255, 149, 0, 0.1);
+      color: var(--apple-orange, #FF9500);
+    }
+    
+    .confirmation-icon--info {
+      background: rgba(0, 122, 255, 0.1);
+      color: var(--color-primary, #007AFF);
+    }
+    
+    /* Confirmation button variants */
+    .phoenix-modal__confirm-btn--danger {
+      background: var(--apple-red, #FF3B30);
+      color: white;
+    }
+    
+    .phoenix-modal__confirm-btn--danger:hover {
+      background: #E6342A;
+    }
+    
+    .phoenix-modal__confirm-btn--warning {
+      background: var(--apple-orange, #FF9500);
+      color: white;
+    }
+    
+    .phoenix-modal__confirm-btn--warning:hover {
+      background: #E68500;
+    }
+    
+    /* Hidden elements - replaces inline style */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- ============================================
+       DEMO TRIGGER BUTTONS
+       ============================================
+       These buttons are for blueprint demonstration only
+       ============================================ -->
+  
+  <div class="demo-trigger-buttons">
+    <button class="demo-trigger-btn demo-trigger-btn--danger" data-action="open-modal" data-modal-id="deleteConfirmationModal">
+      פתח מודול אישור מחיקה
+    </button>
+    <button class="demo-trigger-btn demo-trigger-btn--warning" data-action="open-modal" data-modal-id="warningModal">
+      פתח מודול אזהרה
+    </button>
+    <button class="demo-trigger-btn" data-action="open-modal" data-modal-id="infoModal">
+      פתח מודול מידע
+    </button>
+  </div>
+  
+  <!-- ============================================
+       MODAL 1: DELETE CONFIRMATION (Danger)
+       ============================================
+       Example: Delete confirmation dialog
+       Type: Danger (Red)
+       ============================================ -->
+  
+  <!-- NOTE: For blueprint demo, modal is shown by default. In production, Team 30 will control visibility -->
+  <div class="phoenix-modal-backdrop" id="deleteConfirmationModalBackdrop">
+    <div class="phoenix-modal phoenix-modal--small" id="deleteConfirmationModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header phoenix-modal__header--danger">
+        <h2 class="phoenix-modal__title">מחיקת ברוקר</h2>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="deleteConfirmationModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        <div class="confirmation-icon confirmation-icon--danger">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <div class="confirmation-message confirmation-message--centered">
+          האם אתה בטוח שברצונך למחוק את הברוקר <strong>"Interactive Brokers"</strong>?
+          <br><br>
+          פעולה זו לא ניתנת לביטול.
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="close-modal" data-modal-id="deleteConfirmationModal">
+          ביטול
+        </button>
+        <button type="button" class="phoenix-modal__save-btn phoenix-modal__confirm-btn--danger" data-action="confirm-delete">
+          מחק
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       MODAL 2: WARNING (Warning)
+       ============================================
+       Example: Warning dialog
+       Type: Warning (Orange)
+       ============================================ -->
+  
+  <div class="phoenix-modal-backdrop hidden" id="warningModalBackdrop">
+    <div class="phoenix-modal phoenix-modal--small" id="warningModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header phoenix-modal__header--warning">
+        <h2 class="phoenix-modal__title">אזהרה</h2>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="warningModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        <div class="confirmation-icon confirmation-icon--warning">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v4M12 17h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+          </svg>
+        </div>
+        <div class="confirmation-message confirmation-message--centered">
+          יש לך תזרימי מזומנים פעילים הקשורים לברוקר זה.
+          <br><br>
+          מחיקת הברוקר עלולה להשפיע על הדוחות והניתוחים שלך.
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="close-modal" data-modal-id="warningModal">
+          הבנתי
+        </button>
+        <button type="button" class="phoenix-modal__save-btn phoenix-modal__confirm-btn--warning" data-action="confirm-warning">
+          המשך בכל זאת
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       MODAL 3: INFO (Info)
+       ============================================
+       Example: Information dialog
+       Type: Info (Blue)
+       ============================================ -->
+  
+  <div class="phoenix-modal-backdrop hidden" id="infoModalBackdrop">
+    <div class="phoenix-modal phoenix-modal--small" id="infoModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header phoenix-modal__header--info">
+        <h2 class="phoenix-modal__title">מידע</h2>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="infoModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        <div class="confirmation-icon confirmation-icon--info">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4M12 8h.01"></path>
+          </svg>
+        </div>
+        <div class="confirmation-message confirmation-message--centered">
+          התזרים נשמר בהצלחה!
+          <br><br>
+          התזרים נוסף לחשבון המסחר שלך ועדכן את יתרת החשבון.
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__save-btn" data-action="close-modal" data-modal-id="infoModal">
+          אישור
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       NOTE: Modal Logic
+       ============================================
+       CRITICAL FOR TEAM 30: Modal opening/closing logic must be implemented
+       using external JavaScript. Use data-action attributes for event handlers.
+       
+       Modal should be opened by setting backdrop display to 'flex'
+       Modal should be closed by setting backdrop display to 'none'
+       
+       Confirmation modals should call callback functions on confirm/cancel
+       ============================================ -->
+  
+</body>
+</html>

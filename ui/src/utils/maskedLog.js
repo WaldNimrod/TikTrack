@@ -80,6 +80,11 @@ export function maskedLog(message, data = {}) {
   return maskedData;
 }
 
+// Expose for classic scripts (PhoenixTableFilterManager, PhoenixTableSortManager) loaded via <script src>
+if (typeof window !== 'undefined') {
+  window.maskedLog = maskedLog;
+}
+
 /**
  * Masked Log with Timestamp
  * 

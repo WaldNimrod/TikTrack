@@ -978,11 +978,35 @@
   height: 19.2px; /* 24px - 20% = 19.2px */
   color: var(--apple-text-primary, #1d1d1f);
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+/* Gate B Fix: User icon colors based on authentication state */
+#unified-header .header-filters .filters-container .user-profile-link .user-icon.user-icon--alert {
+  color: var(--apple-system-red, #ff3b30); /* Alert color - not logged in */
+}
+
+#unified-header .header-filters .filters-container .user-profile-link .user-icon.user-icon--success {
+  color: var(--apple-system-green, #34c759); /* Success color - logged in */
 }
 
 #unified-header .header-filters .filters-container .user-profile-link:hover .user-icon {
   opacity: 0.7;
+}
+
+/* Gate B Fix: User profile link colors based on authentication state */
+#unified-header .header-filters .filters-container .user-profile-link.user-profile-link--alert {
+  /* Alert state styling (not logged in) */
+  border: 1px solid var(--apple-system-red, #ff3b30);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+#unified-header .header-filters .filters-container .user-profile-link.user-profile-link--success {
+  /* Success state styling (logged in) */
+  border: 1px solid var(--apple-system-green, #34c759);
+  border-radius: 4px;
+  padding: 4px;
 }
 
 #unified-header .auth-toggle-btn {

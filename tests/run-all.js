@@ -14,7 +14,9 @@ const tests = [
   { name: 'User Management Flow', file: 'user-management.test.js' },
   { name: 'API Keys Management Flow', file: 'api-keys.test.js' },
   { name: 'Error Handling & Security', file: 'error-handling.test.js' },
-  { name: 'Trading Accounts Routing', file: 'trading-accounts-routing.test.js' }
+  { name: 'Trading Accounts Routing', file: 'trading-accounts-routing.test.js' },
+  { name: 'Phase 2 Runtime Tests', file: 'phase2-runtime.test.js', type: 'node' },
+  { name: 'Phase 2 E2E Selenium Tests (SOP-010)', file: 'phase2-e2e-selenium.test.js', type: 'selenium' }
 ];
 
 async function checkInfrastructure() {

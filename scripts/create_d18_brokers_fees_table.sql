@@ -31,7 +31,7 @@ CREATE TABLE user_data.brokers_fees (
     broker VARCHAR(100) NOT NULL,
     commission_type user_data.commission_type NOT NULL,
     commission_value VARCHAR(255) NOT NULL,
-    minimum NUMERIC(20, 8) NOT NULL DEFAULT 0,
+    minimum NUMERIC(20, 6) NOT NULL DEFAULT 0,
     
     -- Timestamps
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -85,7 +85,7 @@ COMMENT ON COLUMN user_data.brokers_fees.commission_value IS
     'Commission value as string (e.g., "0.0035 $ / Share", "$0.00", "0.1%")';
 
 COMMENT ON COLUMN user_data.brokers_fees.minimum IS 
-    'Minimum commission per transaction in USD (NUMERIC(20,8) for precision)';
+    'Minimum commission per transaction in USD (NUMERIC(20,6) for precision - per SSOT)';
 
 COMMENT ON COLUMN user_data.brokers_fees.created_at IS 
     'Timestamp when record was created';

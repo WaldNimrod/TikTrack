@@ -32,9 +32,9 @@ window.UAI.config = {
   // Components
   components: ['table', 'filter', 'summary', 'pagination', 'actions'],
   
-  // Filters
+  // Filters (SSOT v1.2.0 — Filter Keys Lock: D21 internal = flowType; global = tradingAccount, dateRange, search)
   filters: {
-    internal: ['date', 'account', 'type', 'search'],
+    internal: ['flowType'],
     global: ['tradingAccount', 'dateRange', 'search']
   },
   

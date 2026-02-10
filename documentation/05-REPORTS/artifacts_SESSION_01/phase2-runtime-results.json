@@ -1,0 +1,20 @@
+{
+  "passed": [
+    "Login successful - token received",
+    "D16 - Trading Accounts: phoenix-base.css referenced",
+    "D16 - Trading Accounts: Page loads successfully (HTTP 200)",
+    "D18 - Brokers Fees: phoenix-base.css referenced",
+    "D18 - Brokers Fees: Page loads successfully (HTTP 200)",
+    "D21 - Cash Flows: phoenix-base.css referenced",
+    "D21 - Cash Flows: Page loads successfully (HTTP 200)",
+    "D16 API: /api/v1/trading_accounts - Success (200)",
+    "D16 Summary API: /api/v1/trading_accounts/summary - Success (200)",
+    "D18 API: /api/v1/brokers_fees - Success (200)",
+    "D18 Summary API: /api/v1/brokers_fees/summary - Success (200)",
+    "D21 API: /api/v1/cash_flows - Success (200)",
+    "D21 Summary API: /api/v1/cash_flows/summary - Success (200)"
+  ],
+  "failed": [],
+  "warnings": [],
+  "timestamp": "2026-02-09T20:06:15.735Z"
+}

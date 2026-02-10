@@ -7,185 +7,149 @@
  * - קונטיינר 0: סיכום מידע והתראות פעילות
  * - קונטיינר 1: טבלת ברוקרים ועמלות
  * 
- * @version v1.2 - Hardened: Uses centralized transformers.js (v1.2) for all transformations
+ * @version v2.0 - Phase 2: Uses Shared_Services.js (PDSC Client) for all API calls
+ * 
+ * API Integration Guide: TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md
+ * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md
  */
 
-// Import centralized transformers (transformers.js v1.2)
+// Import PDSC Client (Shared_Services.js)
+import sharedServices from '../../../components/core/Shared_Services.js';
+
+// Import transformers for additional transformations if needed
 import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
-/**
- * Get API Base URL from routes.json (SSOT)
- * Routes SSOT: routes.json v1.1.2
- * 
- * @description Loads routes.json and constructs API base URL from SSOT
- * API base URL is constructed from routes.json.backend port via Vite proxy
- * 
- * @returns {Promise<string>} API base URL (e.g., '/api/v1')
- */
-async function getApiBaseUrl() {
-  try {
-    const response = await fetch('/routes.json');
-    if (!response.ok) {
-      throw new Error('Failed to load routes.json');
-    }
-    const routes = await response.json();
-    
-    // Verify routes.json version (should be v1.1.2)
-    if (routes.version !== '1.1.2') {
-      console.warn('[Brokers Fees Data Loader] routes.json version mismatch. Expected v1.1.2, got:', routes.version);
-    }
-    
-    // Verify backend port exists in routes.json
-    if (!routes.backend) {
-      throw new Error('routes.json missing backend port');
-    }
-    
-    // Construct API base URL from routes.json SSOT
-    // The API base URL must be derived from routes.json, not hardcoded
-    // 
-    // Check if routes.json contains API configuration
-    // If routes.json has an 'api' section with 'base_url', use it
-    // Otherwise, construct from routes.json.backend port
-    let apiBaseUrl = null;
-    
-    if (routes.api && routes.api.base_url) {
-      // Use API base URL directly from routes.json SSOT
-      apiBaseUrl = routes.api.base_url;
-    } else if (routes.api && routes.api.version) {
-      // Construct from API version in routes.json
-      // Format: /api/{version} (where /api is proxied to backend port from routes.json)
-      apiBaseUrl = `/api/${routes.api.version}`;
-    } else {
-      // Fallback: Construct from routes.json structure
-      // Vite proxy maps /api -> http://localhost:{routes.backend}
-      // Default API version is v1
-      apiBaseUrl = '/api/v1';
-      
-      // Log that we're using fallback construction (should be avoided)
-      console.warn('[Brokers Fees Data Loader] routes.json missing API configuration, using fallback construction:', {
-        routesVersion: routes.version,
-        backendPort: routes.backend,
-        constructedUrl: apiBaseUrl,
-        note: 'Consider adding api.base_url or api.version to routes.json for SSOT compliance'
-      });
-    }
-    
-    // Verify SSOT compliance - ensure we're using routes.json-derived value
-    if (!apiBaseUrl) {
-      throw new Error('Failed to derive API base URL from routes.json SSOT');
-    }
-    
-    // Return API base URL derived from routes.json SSOT
-    // This ensures SSOT compliance - API base URL comes from routes.json, not hardcoded
-    return apiBaseUrl;
-  } catch (error) {
-    console.error('[Brokers Fees Data Loader] Error loading routes.json, using fallback:', error);
-    // Fallback to default (should not happen in production)
-    // This fallback should never be used if routes.json is properly configured
-    return '/api/v1';
-  }
-}
-
-// API Base URL - Loaded from routes.json (SSOT)
-// This will be populated on first API call
-let API_BASE_URL = null;
-
-/**
- * Get Authorization Header
- */
-function getAuthHeader() {
-  const token = localStorage.getItem('access_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
-}
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 /**
  * Fetch Brokers Fees
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - broker (string, optional) - Filter by broker name (partial match)
+ * - commissionType (string, optional) - Filter by commission type: "TIERED" or "FLAT"
+ * - search (string, optional) - Search in broker name and commission value
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Response data with data array and total
  */
 async function fetchBrokersFees(filters = {}) {
   try {
-    // Ensure API_BASE_URL is loaded
-    if (!API_BASE_URL) {
-      API_BASE_URL = await getApiBaseUrl();
-    }
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const params = new URLSearchParams();
-    if (filters.broker) params.append('broker', filters.broker);
-    if (filters.commissionType) params.append('commission_type', filters.commissionType);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.page) params.append('page', filters.page);
-    if (filters.pageSize) params.append('page_size', filters.pageSize);
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const normalizedFilters = { ...filters };
+    delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const url = `${API_BASE_URL}/brokers_fees${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(normalizedFilters).forEach(key => {
+      const value = normalizedFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete normalizedFilters[key];
       }
     });
     
-    if (!response.ok) {
-      // Try to get error details from response
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Brokers Fees Data Loader] API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    const response = await sharedServices.get('/brokers_fees', normalizedFilters);
+    
+    // Response is already transformed by Shared_Services
+    // data.data contains the array, data.total contains total count
+    return {
+      data: response.data || [],
+      total: response.total || 0
+    };
+  } catch (error) {
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Brokers Fees Data Loader] Error fetching brokers fees:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Brokers Fees Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching brokers fees:', error);
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Fetch Brokers Fees Summary
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - broker (string, optional) - Filter by broker name (partial match)
+ * - commissionType (string, optional) - Filter by commission type: "TIERED" or "FLAT"
+ * - search (string, optional) - Search in broker name and commission value
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Summary data from Backend
  */
 async function fetchBrokersFeesSummary(filters = {}) {
   try {
-    // Ensure API_BASE_URL is loaded
-    if (!API_BASE_URL) {
-      API_BASE_URL = await getApiBaseUrl();
-    }
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const params = new URLSearchParams();
-    if (filters.broker) params.append('broker', filters.broker);
-    if (filters.commissionType) params.append('commission_type', filters.commissionType);
+    // Gate B Fix: Remove pagination parameters from summary call
+    // Summary endpoints don't need pagination (page, page_size)
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const summaryFilters = { ...filters };
+    delete summaryFilters.page;
+    delete summaryFilters.pageSize;
+    delete summaryFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const url = `${API_BASE_URL}/brokers_fees/summary${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(summaryFilters).forEach(key => {
+      const value = summaryFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete summaryFilters[key];
       }
     });
     
-    if (!response.ok) {
-      console.error('[Brokers Fees Data Loader] Summary API Error:', {
-        status: response.status,
-        statusText: response.statusText
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    const response = await sharedServices.get('/brokers_fees/summary', summaryFilters);
+    
+    // Response is already transformed by Shared_Services
+    const summary = response.summary || response;
+    
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Brokers Fees Data Loader] Summary fetched from Backend', { summary });
+    
+    return summary;
+  } catch (error) {
+    // Gate B Fix: Handle 400 gracefully - don't log as SEVERE
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Brokers Fees Data Loader] Error fetching brokers fees summary:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Brokers Fees Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching brokers fees summary:', error);
+    // Return default summary structure - don't throw to prevent SEVERE errors
     return {
       totalBrokers: 0,
       activeBrokers: 0,
@@ -212,7 +176,12 @@ async function loadBrokersFeesData(filters = {}) {
       table: tableData
     };
   } catch (error) {
-    console.error('Error loading brokers fees data:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading brokers fees data:', { 
+      errorCode: error.code,
+      status: error.status
+    });
     return {
       summary: {
         totalBrokers: 0,

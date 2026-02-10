@@ -12,13 +12,16 @@ from datetime import datetime
 from typing import Optional
 from decimal import Decimal
 from sqlalchemy import (
-    String, ForeignKey, Numeric, CheckConstraint, TIMESTAMP
+    String, ForeignKey, Numeric, CheckConstraint, TIMESTAMP, Enum
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from .base import Base
+
+# DB uses user_data.commission_type ENUM (create_d18_brokers_fees_table.sql) — do not create_type
+commission_type_enum = Enum('TIERED', 'FLAT', name='commission_type', schema='user_data', create_type=False)
 
 
 class BrokerFee(Base):
@@ -59,19 +62,17 @@ class BrokerFee(Base):
     )
     
     commission_type: Mapped[str] = mapped_column(
-        String(20),
+        commission_type_enum,
         nullable=False
-        # Note: Using String instead of ENUM for now
-        # If ENUM type exists in DB, can use: Enum(CommissionType, name="commission_type", schema="user_data", create_type=False)
     )
     
-    commission_value: Mapped[str] = mapped_column(
-        String(255),
+    commission_value: Mapped[Decimal] = mapped_column(
+        Numeric(20, 6),
         nullable=False
     )
     
     minimum: Mapped[Decimal] = mapped_column(
-        Numeric(20, 8),
+        Numeric(20, 6),
         nullable=False,
         default=Decimal("0.00"),
         server_default="0"

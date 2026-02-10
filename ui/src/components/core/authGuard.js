@@ -42,7 +42,7 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
     if (data) {
       maskedLogWithTimestamp(`Auth Guard: ${message}`, data);
     } else {
-      console.log(`[${timestamp}] Auth Guard: ${message}`);
+      maskedLogWithTimestamp(`Auth Guard: ${message}`);
     }
     
     return logEntry;
@@ -55,8 +55,8 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
   const debugMode = urlParams.get('debug') === 'true' || localStorage.getItem('auth_guard_debug') === 'true';
   
   if (debugMode) {
-    console.log('🔍 Auth Guard: DEBUG MODE ENABLED - No redirects will occur');
-    console.log('🔍 Auth Guard: Add ?debug=true to URL or set localStorage.auth_guard_debug=true');
+    maskedLog('🔍 Auth Guard: DEBUG MODE ENABLED - No redirects will occur');
+    maskedLog('🔍 Auth Guard: Add ?debug=true to URL or set localStorage.auth_guard_debug=true');
     // Also log with timestamp for consistency
     logWithTimestamp('🔍 DEBUG MODE ENABLED - No redirects will occur');
   }

@@ -18,12 +18,13 @@ export const TEST_CONFIG = {
   headless: process.env.HEADLESS === 'true' || false,
 };
 
-// Test Users
+// Test Users: default TikTrackAdmin/4181 (QA seed — scripts/seed_qa_test_user.py, TEAM_60_QA_TEST_USER_SEEDED)
+// Override via PHASE2_TEST_USERNAME, PHASE2_TEST_PASSWORD
 export const TEST_USERS = {
   admin: {
-    username: 'admin',
-    password: 'Admin123456!', // Minimum 8 characters, meets password requirements
-    email: 'admin@example.com' // Valid email domain (not .local)
+    username: process.env.PHASE2_TEST_USERNAME || 'TikTrackAdmin',
+    password: process.env.PHASE2_TEST_PASSWORD || '4181',
+    email: 'qatest@tiktrack.com'
   },
   testUser: {
     username: `testuser_${Date.now()}`,
@@ -62,6 +63,7 @@ export async function createDriver() {
   const driver = await new Builder()
     .forBrowser('chrome')
     .setChromeOptions(options)
+    .setLoggingPrefs({ performance: 'ALL', browser: 'ALL' })
     .build();
   
   // Set timeouts

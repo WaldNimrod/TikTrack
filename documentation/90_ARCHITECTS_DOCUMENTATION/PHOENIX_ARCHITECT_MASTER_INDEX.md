@@ -1,9 +1,9 @@
-# 🏰 אינדקס אדריכל מרכזי (v2.28.0)
-## 📂 Phase 2: Financial Core (ACTIVE 🟢)
-- ARCHITECT_PHASE_2_FULL_KICKOFF_MANDATE.md - פתיחת פיתוח וקידום ידע (NEW).
-- [Core Assets] - UnifiedAppInit.js, Shared_Services.js, EFR.
-- [Work Scope] - Brokers Fees (D18), Cash Flows (D21).
+# 🏰 אינדקס אדריכל מרכזי (v2.95.1)
+## 📜 חוקי יסוד (Permanent Governance 🔒)
+- ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md - (ADR-012 - MASTER).
+- TT2_SLA_TEAMS_30_40_OFFICIAL.md - אמנת שירות פרונטאנד (LOCKED).
+- [SSOT EXPANSION] - Internal Filters now integrated into UAI Contract v2.0.
 
-## 📂 Phase 1.8: Infrastructure Retrofit (LOCKED 🔒)
-- SPY_PHASE_1_8_FINAL_VERIFICATION_REPORT.md - דוח אימות ירוק.
-- [Status] - Retrofit Complete & Verified.
+## 📂 Phase 3: Trading Core (AWAITING START 🚀)
+- Blueprints by Team 31: COMPLETE.
+- Awaiting Phase 2 Final Sign-off by G-Lead.

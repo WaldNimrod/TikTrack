@@ -17,7 +17,7 @@ window.UAI.config = {
   requiresAuth: true,
   requiresHeader: true,
   
-  // Data configuration
+  // Data configuration (SSOT v1.2.0: trading_accounts/summary REQUIRED - Backend implemented)
   dataEndpoints: [
     'trading_accounts',
     'trading_accounts/summary'
@@ -31,10 +31,10 @@ window.UAI.config = {
   // Components
   components: ['table', 'filter', 'summary', 'pagination', 'actions'],
   
-  // Filters
+  // Filters (SSOT v1.2.0 — Filter Keys Lock: D16 all global, no internal)
   filters: {
-    internal: ['status', 'broker', 'search'],
-    global: ['tradingAccount', 'dateRange', 'search']
+    internal: [],
+    global: ['status', 'investmentType', 'tradingAccount', 'dateRange', 'search']
   },
   
   // Tables
@@ -48,7 +48,7 @@ window.UAI.config = {
     }
   ],
   
-  // Summary
+  // Summary (SSOT v1.2.0: endpoint REQUIRED - Backend implemented)
   summary: {
     enabled: true,
     toggleEnabled: false,

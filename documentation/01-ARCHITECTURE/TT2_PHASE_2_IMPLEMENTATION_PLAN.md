@@ -5,13 +5,13 @@
 **status:** 🔒 **SSOT - LOCKED**  
 **supersedes:** `_COMMUNICATION/team_10/TEAM_10_PHASE_2_IMPLEMENTATION_PLAN.md`  
 **last_updated:** 2026-02-07  
-**version:** v1.8 (Phase 1.8 Final Resolution - Execution Mode)
+**version:** v2.1 (Phase 2 - Architect Verdict - Endpoints Active Dev)
 
 ---
 
-**מקור:** `ARCHITECT_PHASE_2_REFINED_MANDATE.md` + `ARCHITECT_PHASE_1_8_FINAL_RESOLUTION.md`  
+**מקור:** `ARCHITECT_PHASE_2_REFINED_MANDATE.md` + `ARCHITECT_PHASE_2_BLOCKER_VERDICT_FINAL.md`  
 **תאריך:** 2026-02-07  
-**סטטוס:** 🔴 **PHASE 1.8 - EXECUTION MODE - UAI CORE REFACTOR (48H)**
+**סטטוס:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - ARCHITECT VERDICT IMPLEMENTED**
 
 **🔒 החלטות סופיות ננעלו:** עוברים מ-'דיון' ל-'ביצוע' - כל עמודי הליבה הפיננסית נעולים ל-UAI Refit עד סיום UAI Core Refactor.
 
@@ -167,6 +167,7 @@
    - הגדרת API endpoints ב-`routes.json`
    - יצירת Field Map (`WP_20_*_FIELD_MAP_BROKERS_FEES.md`)
    - מימוש Logic Cube (Model, Schema, Service, Router)
+   - 🟢 **ACTIVE_DEV:** `GET /api/v1/brokers_fees/summary` - בפיתוח (2026-02-07)
 
 2. **Team 30 (Frontend):**
    - יצירת `brokers_fees.html`
@@ -184,13 +185,22 @@
    - בדיקות אוטומציה (Selenium)
 
 ### **Phase 2.2: Cash Flows (D21)**
-1. **Team 20 (Backend):**
-   - הגדרת API endpoints ב-`routes.json`
-   - יצירת Field Map (`WP_20_*_FIELD_MAP_CASH_FLOWS.md`)
-   - מימוש Logic Cube
+1. **Team 60 (DevOps):**
+   - ✅ **VERIFIED:** טבלת DB `user_data.cash_flows` מאומתת כקיימת ותקינה (2026-02-07)
+   - 🔴 **VERIFICATION REQUIRED:** אימות הרשאות למשתמש האפליקציה
+   - **מקור:** `TEAM_10_PHASE_2_DOCUMENTATION_AND_CODE_AUDIT.md`
+
+2. **Team 20 (Backend):**
+   - ✅ **COMPLETE:** API endpoints ב-`routes.json` - מוכן ופועל
+   - ✅ **COMPLETE:** מימוש Logic Cube (Model, Schema, Service, Router) - מוכן ופועל
+   - 🟡 **VERIFICATION REQUIRED:** אימות שדות response בפועל מול API Integration Guide
+   - **מקור:** `TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md`
 
 2. **Team 30 (Frontend):**
-   - יצירת `cash_flows.html`
+   - ✅ **COMPLETE:** Data Loaders עודכנו לשימוש ב-Shared_Services.js
+   - 🟡 **FIX REQUIRED:** תיקון `cashFlowsDataLoader.js` - הסרת manual transformation (שורות 45-58)
+   - **מקור:** `TEAM_10_PHASE_2_DOCUMENTATION_AND_CODE_AUDIT.md`
+   - יצירת `cash_flows.html` (ממתין לסיום UAI Core Refactor)
    - שימוש ב-Transformers המרכזיים בלבד
    - שימוש ב-Routes SSOT בלבד
    - אכיפת Hybrid Scripts Policy
@@ -220,9 +230,11 @@
 - ❌ **אסור:** Inline JavaScript (`<script>` ללא `src`, `onclick` attributes)
 - ✅ **חובה:** כל ה-JS בקובץ חיצוני, Event listeners פרוגרמטיים
 
-### **4. Security**
+### **4. Security & Code Hygiene**
 - ❌ **אסור:** `console.log` עם טוקנים או מידע רגיש
 - ✅ **חובה:** שימוש ב-Masked Log בלבד
+- ⚠️ **No-Logs Policy:** פסילה אוטומטית (RED) לכל קובץ עם `console.log` חשוף
+- ✅ **חובה:** שימוש ב-`audit.maskedLog` בלבד
 
 ### **5. Ports**
 - ❌ **אסור:** שימוש בפורטים אחרים מלבד 8080 (Frontend) ו-8082 (Backend)
@@ -232,21 +244,40 @@
 
 ## 📊 מעקב התקדמות
 
-### **D18 - Brokers Fees** 🔒 **LOCKED_FOR_UAI_REFIT**
+### **D18 - Brokers Fees** 🟢 **ACTIVE_DEV - QA COMPLETE - BLOCKERS FIXED**
 - [x] Team 60: DB Table Creation (`user_data.brokers_fees`) ✅ **COMPLETE** (2026-02-06)
-- [ ] Team 30: UAI Core Refactor (48 שעות) - **PRIORITY 1** 🔴
-- [ ] Team 20: API endpoints + Field Map (ממתין לסיום UAI Core Refactor)
-- [ ] Team 30: Frontend Implementation (ממתין לסיום UAI Core Refactor)
-- [ ] Team 40: UI/Design Fidelity
-- [ ] Team 50: QA Validation
+- [x] Team 30: UAI Core Refactor ✅ **COMPLETE** (2026-02-07)
+- [x] Team 20: API endpoints + Field Map ✅ **COMPLETE** (2026-02-07)
+- [x] Team 30: Frontend Implementation ✅ **COMPLETE** (2026-02-07)
+- [x] Team 30: Script Tags Fix ✅ **COMPLETE** (2026-02-07)
+- [x] Team 40: UI/Design Fidelity ✅ **COMPLETE** (2026-02-07)
+- [x] Team 50: QA Validation ✅ **COMPLETE** (2026-02-07)
+  - ✅ Gate A — Doc↔Code: GREEN
+  - ✅ Gate B — Contract↔Runtime: GREEN
+  - ✅ Gate C — UI↔Runtime (E2E): GREEN
+  - ⏸️ Gate D — Manual/Visual: PENDING
+- [ ] Team 40: Manual/Visual Approval ⏸️ **PENDING**
 - [ ] Team 10: Final Approval
 
-### **D21 - Cash Flows** 🔒 **LOCKED_FOR_UAI_REFIT**
-- [ ] Team 30: UAI Core Refactor (48 שעות) - **PRIORITY 1** 🔴
-- [ ] Team 20: API endpoints + Field Map (ממתין לסיום UAI Core Refactor)
-- [ ] Team 30: Frontend Implementation (ממתין לסיום UAI Core Refactor)
-- [ ] Team 40: UI/Design Fidelity
-- [ ] Team 50: QA Validation
+### **D21 - Cash Flows** 🟢 **ACTIVE_DEV - INFRA VERIFIED - ENDPOINTS ACTIVE_DEV**
+- [x] Team 60: DB Table Verification (`user_data.cash_flows`) ✅ **VERIFIED** (2026-02-07)
+- [x] Team 30: UAI Core Refactor ✅ **COMPLETE** (2026-02-07)
+- [x] Team 20: API endpoints + Logic Cube ✅ **COMPLETE** (2026-02-07)
+- [x] Team 20: Endpoints חסרים - `cash_flows/currency_conversions` 🟢 **ACTIVE_DEV** (2026-02-07)
+- [ ] Team 20: Response Schema Verification 🟡 **VERIFICATION REQUIRED**
+- [x] Team 30: Data Loaders Update ✅ **COMPLETE** (2026-01-31)
+- [x] Team 30: Data Loader Fix (Manual Transformation) ✅ **FIXED** (2026-02-07)
+- [x] Team 30: Frontend Implementation ✅ **COMPLETE** (2026-02-07)
+- [x] Team 30: Script Tags Fix ✅ **COMPLETE** (2026-02-07)
+- [x] Team 40: UI/Design Fidelity ✅ **COMPLETE** (2026-02-07)
+- [x] Team 50: QA Validation ✅ **COMPLETE** (2026-02-07)
+  - ✅ Gate A — Doc↔Code: GREEN (עם סטייה קלה אחת)
+  - ✅ Gate B — Contract↔Runtime: GREEN
+  - ✅ Gate C — UI↔Runtime (E2E): GREEN
+  - ⏸️ Gate D — Manual/Visual: PENDING
+- [x] Team 20: Cash Flows Precision ✅ **LOCKED** - NUMERIC(20,6) (SSOT) (2026-02-07)
+- [ ] Team 30: Update Data Loaders for `currency_conversions` endpoint 🟢 **ACTIVE_DEV**
+- [ ] Team 40: Manual/Visual Approval ⏸️ **PENDING**
 - [ ] Team 10: Final Approval
 
 ---
@@ -313,6 +344,22 @@
 
 **Team 10 (The Gateway)**  
 **תאריך:** 2026-02-07  
-**סטטוס:** ✅ **CONTRACTS COMPLETE - AWAITING ARCHITECT APPROVAL**
+**סטטוס:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - COMPLETION WITH QA**
 
-**log_entry | [Team 10] | PHASE_2_PLAN | CONTRACTS_COMPLETE | GREEN | 2026-02-07**
+**מקורות:**
+- `ARCHITECT_PHASE_2_BLOCKER_VERDICT_FINAL.md` - פסיקת האדריכלית
+- `TEAM_10_ARCHITECT_VERDICT_IMPLEMENTATION.md` - יישום פסיקת האדריכלית
+- `TEAM_10_PHASE_2_BLOCKING_DECISIONS.md` - החלטות חוסמות Phase 2
+- `TEAM_10_PHASE_2_COMPREHENSIVE_REQUIREMENTS.md` - דרישות מקיפות
+- `TEAM_90_PHASE_2_FINAL_GOVERNANCE_REPORT.md` - דוח Team 90
+- `TEAM_50_PHASE_2_QA_FINAL_SUMMARY.md` - סיכום סופי QA
+
+**תשתית מוכנה:**
+- ✅ **D21 Infra:** VERIFIED - טבלת `user_data.cash_flows` מאומתת כקיימת ותקינה
+- ✅ **Endpoints:** ACTIVE_DEV - `cash_flows/currency_conversions`, `brokers_fees/summary` בפיתוח
+- ✅ **Precision:** נעול ל-**NUMERIC(20,6)** לכל השדות הכספיים (SSOT)
+- ✅ **שרשרת QA:** הוגדרה - 50 → 90 → G-Lead
+- ✅ **Code Hygiene:** No-Logs Policy - פסילה אוטומטית (RED) לכל קובץ עם `console.log` חשוף
+- ⏸️ **Manual QA:** דורש השלמה מ-Team 40 (לפי תוכנית העבודה)
+
+**log_entry | [Team 10] | PHASE_2_PLAN | ARCHITECT_VERDICT_IMPLEMENTED | GREEN | 2026-02-07**

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מודול פרטי טרייד/תוכנית טרייד מלא | TikTrack Phoenix - Blueprint [v1.0.0]</title>
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================
+       Linking to LIVE CSS files in system: ui/src/styles/
+       All CSS files are loaded from the actual system files.
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-modal.css">
+  
+  <style>
+    /* ============================================
+       BLUEPRINT-SPECIFIC STYLES
+       ============================================
+       Additional styles for blueprint demonstration
+       ============================================ */
+    
+    /* Page wrapper for blueprint demo */
+    body {
+      background: var(--apple-bg-secondary, #f5f5f7);
+      padding: var(--spacing-lg, 24px);
+      min-height: 100vh;
+    }
+    
+    /* Demo trigger buttons */
+    .demo-trigger-btn {
+      margin-bottom: var(--spacing-md, 12px);
+      margin-left: var(--spacing-md, 12px);
+      padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+      background: var(--color-brand, #26baac);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: var(--font-size-base, 0.92rem);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-block;
+    }
+    
+    .demo-trigger-btn:hover {
+      background: var(--color-brand-dark, #1fa89a);
+    }
+    
+    .demo-trigger-btn--secondary {
+      background: var(--apple-bg-secondary, #f5f5f7);
+      color: var(--apple-text-primary, #1d1d1f);
+      border: 1px solid var(--apple-border-light, #e5e5e5);
+    }
+    
+    .demo-trigger-btn--secondary:hover {
+      background: var(--apple-bg-tertiary, #e5e5e5);
+    }
+    
+    /* Modal size - extra large for full details */
+    .phoenix-modal--xl {
+      max-width: 1000px;
+    }
+    
+    /* Details view styles */
+    .details-section {
+      margin-bottom: var(--spacing-xl, 32px);
+    }
+    
+    .details-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .details-section__title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--apple-text-primary, #1d1d1f);
+      margin-bottom: var(--spacing-md, 16px);
+      padding-bottom: var(--spacing-sm, 8px);
+      border-bottom: 2px solid var(--apple-border-light, #e5e5e5);
+    }
+    
+    .details-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--spacing-md, 16px);
+      padding: var(--spacing-sm, 8px) 0;
+      border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+    }
+    
+    .details-row:last-child {
+      border-bottom: none;
+    }
+    
+    .details-row__label {
+      font-weight: 600;
+      color: var(--apple-text-secondary, #8e8e93);
+      font-size: 0.875rem;
+    }
+    
+    .details-row__value {
+      color: var(--apple-text-primary, #1d1d1f);
+      font-size: var(--font-size-base, 0.92rem);
+    }
+    
+    .details-row__value--numeric {
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      text-align: left;
+      direction: ltr;
+      display: inline-block;
+    }
+    
+    .details-row__value--numeric-positive {
+      color: var(--apple-green, #34C759);
+      font-weight: 600;
+    }
+    
+    .details-row__value--numeric-negative {
+      color: var(--apple-red, #FF3B30);
+      font-weight: 600;
+    }
+    
+    .details-row__value--badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .details-row__value--badge-long {
+      background: rgba(52, 199, 89, 0.1);
+      color: var(--apple-green, #34C759);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+    }
+    
+    .details-row__value--badge-short {
+      background: rgba(255, 59, 48, 0.1);
+      color: var(--apple-red, #FF3B30);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+    }
+    
+    .details-row__value--badge-status-open,
+    .details-row__value--badge-status-active {
+      background: rgba(52, 199, 89, 0.1);
+      color: var(--apple-green, #34C759);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+    }
+    
+    .details-row__value--badge-status-closed {
+      background: rgba(142, 142, 147, 0.1);
+      color: var(--apple-text-secondary, #8e8e93);
+      border: 1px solid rgba(142, 142, 147, 0.3);
+    }
+    
+    .details-row__value--badge-status-cancelled {
+      background: rgba(255, 59, 48, 0.1);
+      color: var(--apple-red, #FF3B30);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+    }
+    
+    .details-row__value--link {
+      color: var(--color-brand, #26baac);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .details-row__value--link:hover {
+      text-decoration: underline;
+    }
+    
+    /* Two-column grid for related fields */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md, 16px);
+    }
+    
+    .details-grid .details-row {
+      grid-template-columns: 1fr;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .details-grid .details-row__label {
+      margin-bottom: var(--spacing-xs, 4px);
+    }
+    
+    /* Tags display */
+    .details-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs, 4px);
+    }
+    
+    .details-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      background: var(--apple-bg-secondary, #f5f5f7);
+      color: var(--apple-text-primary, #1d1d1f);
+      border: 1px solid var(--apple-border-light, #e5e5e5);
+    }
+    
+    /* Metadata display */
+    .details-metadata {
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      font-size: 0.8125rem;
+      color: var(--apple-text-secondary, #8e8e93);
+      background: var(--apple-bg-secondary, #f5f5f7);
+      padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    /* Hidden elements - replaces inline style */
+    .hidden {
+      display: none !important;
+    }
+    
+    /* Code element styling - replaces inline style */
+    code {
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      font-size: 0.875rem;
+    }
+    
+    /* Action buttons in header */
+    .modal-header-actions {
+      display: flex;
+      gap: var(--spacing-sm, 8px);
+      margin-right: var(--spacing-md, 16px);
+    }
+    
+    .modal-header-actions__btn {
+      padding: 6px 12px;
+      border: 1px solid var(--apple-border-light, #e5e5e5);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-header-actions__btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .details-row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xs, 4px);
+      }
+      
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-header-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-right: 0;
+        margin-top: var(--spacing-sm, 8px);
+      }
+      
+      .modal-header-actions__btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- ============================================
+       DEMO TRIGGER BUTTONS
+       ============================================
+       These buttons are for blueprint demonstration only
+       ============================================ -->
+  
+  <button class="demo-trigger-btn" data-action="open-modal" data-modal-id="tradeFullDetailsModal">
+    פתח מודול פרטי טרייד מלא
+  </button>
+  
+  <button class="demo-trigger-btn demo-trigger-btn--secondary" data-action="open-modal" data-modal-id="tradePlanFullDetailsModal">
+    פתח מודול פרטי תוכנית טרייד מלא
+  </button>
+  
+  <!-- ============================================
+       MODAL: FULL TRADE DETAILS
+       ============================================
+       Example: View complete Trade details with all fields
+       Mode: View (Read-Only)
+       ============================================ -->
+  
+  <!-- NOTE: For blueprint demo, modal is shown by default. In production, Team 30 will control visibility -->
+  <div class="phoenix-modal-backdrop" id="tradeFullDetailsModalBackdrop">
+    <div class="phoenix-modal phoenix-modal--xl" id="tradeFullDetailsModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md, 16px); flex: 1;">
+          <h2 class="phoenix-modal__title" id="tradeFullDetailsModalTitle">פרטי טרייד: AAPL Long</h2>
+          <div class="modal-header-actions">
+            <button class="modal-header-actions__btn" data-action="view-linked-items" data-entity-type="trade" data-entity-id="123">
+              🔗 פריטים מקושרים
+            </button>
+            <button class="modal-header-actions__btn" data-action="edit-trade" data-entity-id="123">
+              ✏️ ערוך
+            </button>
+          </div>
+        </div>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="tradeFullDetailsModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        
+        <!-- Basic Information Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">מידע בסיסי</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">טיקר</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-ticker" data-ticker-id="AAPL">AAPL - Apple Inc.</a>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">חשבון מסחר</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-account" data-account-id="456">חשבון מסחר מרכזי (IBKR)</a>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">צד</div>
+              <div class="details-row__value">
+                <span class="details-row__value--badge details-row__value--badge-long">LONG</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">סטטוס</div>
+              <div class="details-row__value">
+                <span class="details-row__value--badge details-row__value--badge-status-open">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quantity & Price Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">כמות ומחירים</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">כמות</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">100</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">מחיר כניסה ממוצע</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$175.50</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">מחיר יציאה ממוצע</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">-</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">ערך כניסה כולל</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$17,550.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stop Loss & Take Profit Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">Stop Loss & Take Profit</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">Stop Loss</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-negative">$170.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">Take Profit</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">$185.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- P&L Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">רווח והפסד (P&L)</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">רווח ממומש (Realized P&L)</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$0.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">רווח לא ממומש (Unrealized P&L)</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">$250.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">רווח כולל (Total P&L)</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">$250.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Fees Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">עמלות</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">עמלה</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$0.35</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">עמלות נוספות</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dates Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">תאריכים</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">תאריך כניסה</div>
+              <div class="details-row__value">20 בינואר 2026, 10:30</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">תאריך יציאה</div>
+              <div class="details-row__value">-</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Related Entities Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">ישויות קשורות</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">טרייד אב (Parent Trade)</div>
+              <div class="details-row__value">-</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">אסטרטגיה</div>
+              <div class="details-row__value">-</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">תוכנית מקור (Origin Plan)</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-trade-plan" data-plan-id="789">תכנון Long על AAPL</a>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">התראה מפעילה (Trigger Alert)</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-alert" data-alert-id="321">מחיר AAPL הגיע ל-$175.00</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tags & Metadata Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">תגיות ומטא-דאטה</h3>
+          
+          <div class="details-row">
+            <div class="details-row__label">תגיות</div>
+            <div class="details-row__value">
+              <div class="details-tags">
+                <span class="details-tag">טכני</span>
+                <span class="details-tag">אנליזה</span>
+                <span class="details-tag">לונג טווח</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-row">
+            <div class="details-row__label">מטא-דאטה</div>
+            <div class="details-row__value">
+              <span class="details-metadata">{"source": "manual", "notes": "Entry based on technical analysis"}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Audit Information Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">מידע ביקורת</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">נוצר על ידי</div>
+              <div class="details-row__value">משתמש: nimrod@example.com</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">עודכן על ידי</div>
+              <div class="details-row__value">משתמש: nimrod@example.com</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">נוצר ב</div>
+              <div class="details-row__value">20 בינואר 2026, 10:30</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">עודכן לאחרונה</div>
+              <div class="details-row__value">25 בינואר 2026, 14:20</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">גרסה</div>
+              <div class="details-row__value">
+                <span class="details-metadata">3</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">מזהה (ID)</div>
+              <div class="details-row__value">
+                <code class="details-metadata">01ARZ3NDEKTSV4RRFFQ69G5FAV</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="close-modal" data-modal-id="tradeFullDetailsModal">
+          סגור
+        </button>
+        <button type="button" class="phoenix-modal__save-btn" data-action="edit-trade" data-entity-id="123">
+          ערוך
+        </button>
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="view-linked-items" data-entity-type="trade" data-entity-id="123" style="background: var(--color-brand, #26baac); color: white;">
+          🔗 פריטים מקושרים
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       MODAL: FULL TRADE PLAN DETAILS
+       ============================================
+       Example: View complete Trade Plan details with all fields
+       Mode: View (Read-Only)
+       ============================================ -->
+  
+  <!-- NOTE: For blueprint demo, modal is shown by default. In production, Team 30 will control visibility -->
+  <div class="phoenix-modal-backdrop hidden" id="tradePlanFullDetailsModalBackdrop">
+    <div class="phoenix-modal phoenix-modal--xl" id="tradePlanFullDetailsModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md, 16px); flex: 1;">
+          <h2 class="phoenix-modal__title" id="tradePlanFullDetailsModalTitle">פרטי תוכנית טרייד: AAPL Long Plan</h2>
+          <div class="modal-header-actions">
+            <button class="modal-header-actions__btn" data-action="view-linked-items" data-entity-type="trade_plan" data-entity-id="789">
+              🔗 פריטים מקושרים
+            </button>
+            <button class="modal-header-actions__btn" data-action="edit-trade-plan" data-entity-id="789">
+              ✏️ ערוך
+            </button>
+          </div>
+        </div>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="tradePlanFullDetailsModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        
+        <!-- Basic Information Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">מידע בסיסי</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">טיקר</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-ticker" data-ticker-id="AAPL">AAPL - Apple Inc.</a>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">חשבון מסחר</div>
+              <div class="details-row__value">
+                <a href="#" class="details-row__value--link" data-action="view-account" data-account-id="456">חשבון מסחר מרכזי (IBKR)</a>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">צד</div>
+              <div class="details-row__value">
+                <span class="details-row__value--badge details-row__value--badge-long">LONG</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">סוג השקעה</div>
+              <div class="details-row__value">סווינג - מסחר לטווח קצר עד בינוני</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">סטטוס</div>
+              <div class="details-row__value">
+                <span class="details-row__value--badge details-row__value--badge-status-open">OPEN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Planned Values Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">ערכים מתוכננים</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">כמות מתוכננת</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">100</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">מחיר כניסה מתוכנן</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$175.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">סכום השקעה מתוכנן</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">$17,500.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">תאריך כניסה מתוכנן</div>
+              <div class="details-row__value">15 בינואר 2026, 09:00</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stop Loss & Take Profit Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">Stop Loss & Take Profit</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">Stop Loss</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-negative">$170.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">Stop Loss (%)</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-negative">-2.86%</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">Take Profit</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">$180.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">Take Profit (%)</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">+2.86%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Risk Summary Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">סיכום תוכנית</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">סיכון מקסימלי</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-negative">-$500.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">סיכוי מקסימלי</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric details-row__value--numeric-positive">+$500.00</span>
+              </div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">יחס סיכון/סיכוי</div>
+              <div class="details-row__value">
+                <span class="details-row__value--numeric">1:1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Conditions Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">תנאים</h3>
+          
+          <div class="details-row">
+            <div class="details-row__label">תנאים פעילים</div>
+            <div class="details-row__value">
+              <div class="details-tags">
+                <span class="details-tag">מחיר > $175.00</span>
+                <span class="details-tag">נפח > 1M</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tags & Notes Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">תגיות והערות</h3>
+          
+          <div class="details-row">
+            <div class="details-row__label">תגיות</div>
+            <div class="details-row__value">
+              <div class="details-tags">
+                <span class="details-tag">תכנון</span>
+                <span class="details-tag">טכני</span>
+                <span class="details-tag">לונג טווח</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-row">
+            <div class="details-row__label">הערות</div>
+            <div class="details-row__value">
+              <div style="background: var(--apple-bg-secondary, #f5f5f7); padding: var(--spacing-md, 16px); border-radius: 8px; font-size: 0.875rem; line-height: 1.6;">
+                תוכנית מסחר לטווח קצר-בינוני על בסיס ניתוח טכני. כניסה מתוכננת במחיר $175.00 עם Stop Loss ב-$170.00 ו-Take Profit ב-$180.00.
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Audit Information Section -->
+        <div class="details-section">
+          <h3 class="details-section__title">מידע ביקורת</h3>
+          
+          <div class="details-grid">
+            <div class="details-row">
+              <div class="details-row__label">נוצר על ידי</div>
+              <div class="details-row__value">משתמש: nimrod@example.com</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">עודכן על ידי</div>
+              <div class="details-row__value">משתמש: nimrod@example.com</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">נוצר ב</div>
+              <div class="details-row__value">15 בינואר 2026, 09:00</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">עודכן לאחרונה</div>
+              <div class="details-row__value">20 בינואר 2026, 12:30</div>
+            </div>
+            
+            <div class="details-row">
+              <div class="details-row__label">מזהה (ID)</div>
+              <div class="details-row__value">
+                <code class="details-metadata">01ARZ3NDEKTSV4RRFFQ69G5FAV</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="close-modal" data-modal-id="tradePlanFullDetailsModal">
+          סגור
+        </button>
+        <button type="button" class="phoenix-modal__save-btn" data-action="edit-trade-plan" data-entity-id="789">
+          ערוך
+        </button>
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="view-linked-items" data-entity-type="trade_plan" data-entity-id="789" style="background: var(--color-brand, #26baac); color: white;">
+          🔗 פריטים מקושרים
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       NOTE: Modal Logic
+       ============================================
+       CRITICAL FOR TEAM 30: Modal opening/closing logic must be implemented
+       using external JavaScript. Use data-action attributes for event handlers.
+       
+       Modal should be opened by setting backdrop display to 'flex'
+       Modal should be closed by setting backdrop display to 'none'
+       
+       For full details modal:
+       - Title should be dynamic: "פרטי טרייד: [Ticker] [Direction]" or "פרטי תוכנית טרייד: [Ticker] [Direction] Plan"
+       - All fields should be populated from API response
+       - Related entity links should navigate to respective detail modals
+       - "פריטים מקושרים" button should open the Linked Items modal
+       - Edit button should open the appropriate CRUD modal
+       - Numeric values should be formatted according to currency/precision rules
+       - Dates should be formatted according to user preferences
+       - Tags should be displayed as badges
+       - Metadata should be displayed as formatted JSON
+       - Empty values should display "-" or appropriate placeholder
+       ============================================ -->
+  
+</body>
+</html>

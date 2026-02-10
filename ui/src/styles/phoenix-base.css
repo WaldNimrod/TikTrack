@@ -216,6 +216,10 @@
   --entity-ticker-bg: var(--apple-bg-elevated, #ffffff);
   --entity-ticker-text: var(--apple-text-primary, #1d1d1f);
   
+  /* Entity Background Colors with Alpha (for badges and transparent backgrounds) */
+  --entity-trades-bg-alpha: rgba(38, 186, 172, 0.1);
+  --entity-ticker-bg-alpha: rgba(23, 162, 184, 0.1);
+  
   /* Alert Card Entity Colors (for active alerts with transparency) */
   --alert-card-trades-bg: rgba(38, 186, 172, 0.1);
   --alert-card-trades-border: rgba(38, 186, 172, 0.3);

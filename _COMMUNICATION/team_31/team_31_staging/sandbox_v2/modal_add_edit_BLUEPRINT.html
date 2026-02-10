@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מודול הוספה/עריכה - ברוקרים ועמלות | TikTrack Phoenix - Blueprint [v1.0.0]</title>
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       ============================================
+       Linking to LIVE CSS files in system: ui/src/styles/
+       All CSS files are loaded from the actual system files.
+       ============================================ -->
+  
+  <!-- 1. Pico CSS FIRST (Framework) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles - LIVE FILE -->
+  <link rel="stylesheet" href="../../../../ui/src/styles/phoenix-modal.css">
+  
+  <style>
+    /* ============================================
+       BLUEPRINT-SPECIFIC STYLES
+       ============================================
+       Additional styles for blueprint demonstration
+       ============================================ */
+    
+    /* Page wrapper for blueprint demo */
+    body {
+      background: var(--apple-bg-secondary, #f5f5f7);
+      padding: var(--spacing-lg, 24px);
+      min-height: 100vh;
+    }
+    
+    /* Demo trigger button */
+    .demo-trigger-btn {
+      margin-bottom: var(--spacing-lg, 24px);
+      padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+      background: var(--color-brand, #26baac);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: var(--font-size-base, 0.92rem);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .demo-trigger-btn:hover {
+      background: var(--color-brand-dark, #1fa89a);
+    }
+    
+    /* Modal size variants */
+    .phoenix-modal--large {
+      max-width: 800px;
+    }
+    
+    .phoenix-modal--small {
+      max-width: 400px;
+    }
+    
+    /* Required field indicator */
+    .form-label--required::after {
+      content: " *";
+      color: var(--color-error-red, #dc2626);
+    }
+    
+    /* Form help text */
+    .form-help-text {
+      font-size: 0.875rem;
+      color: var(--apple-text-secondary, #8e8e93);
+      margin-top: var(--spacing-xs, 4px);
+    }
+    
+    /* Form row layout */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg, 24px);
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Error state */
+    .form-group--error input,
+    .form-group--error select,
+    .form-group--error textarea {
+      border-color: var(--color-error-red, #dc2626);
+    }
+    
+    /* Hidden elements - replaces inline style */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- ============================================
+       DEMO TRIGGER BUTTON
+       ============================================
+       This button is for blueprint demonstration only
+       ============================================ -->
+  
+  <button class="demo-trigger-btn" data-action="open-modal" data-modal-id="brokerFeeModal">
+    פתח מודול הוספה/עריכה - ברוקרים ועמלות
+  </button>
+  
+  <!-- ============================================
+       MODAL: ADD/EDIT BROKER FEE (D18)
+       ============================================
+       Example: Brokers Fees CRUD Modal
+       Mode: Add / Edit
+       Entity: D18 - Brokers Fees
+       ============================================ -->
+  
+  <!-- NOTE: For blueprint demo, modal is shown by default. In production, Team 30 will control visibility -->
+  <div class="phoenix-modal-backdrop" id="brokerFeeModalBackdrop">
+    <div class="phoenix-modal" id="brokerFeeModal">
+      
+      <!-- Modal Header -->
+      <div class="phoenix-modal__header">
+        <h2 class="phoenix-modal__title" id="brokerFeeModalTitle">הוספת ברוקר חדש</h2>
+        <button class="phoenix-modal__close" aria-label="סגור" data-action="close-modal" data-modal-id="brokerFeeModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="phoenix-modal__body">
+        <form id="brokerFeeForm" data-entity-type="broker_fee">
+          
+          <!-- Broker Name -->
+          <div class="form-group">
+            <label for="brokerName" class="form-label form-label--required">שם ברוקר</label>
+            <input 
+              type="text" 
+              id="brokerName" 
+              name="broker" 
+              class="form-control" 
+              placeholder="לדוגמה: Interactive Brokers"
+              maxlength="100"
+              required
+              data-field="broker"
+            >
+            <div class="form-help-text">שם הברוקר (עד 100 תווים)</div>
+            <div class="form-error hidden" id="brokerNameError"></div>
+          </div>
+          
+          <!-- Commission Type -->
+          <div class="form-group">
+            <label for="commissionType" class="form-label form-label--required">סוג עמלה</label>
+            <select 
+              id="commissionType" 
+              name="commission_type" 
+              class="form-control" 
+              required
+              data-field="commission_type"
+            >
+              <option value="">בחר סוג עמלה...</option>
+              <option value="TIERED">TIERED - עמלה מדורגת</option>
+              <option value="FLAT">FLAT - עמלה קבועה</option>
+            </select>
+            <div class="form-help-text">בחר את סוג מבנה העמלה של הברוקר</div>
+            <div class="form-error" id="commissionTypeError" style="display: none;"></div>
+          </div>
+          
+          <!-- Commission Value -->
+          <div class="form-group">
+            <label for="commissionValue" class="form-label form-label--required">ערך עמלה</label>
+            <input 
+              type="text" 
+              id="commissionValue" 
+              name="commission_value" 
+              class="form-control" 
+              placeholder="לדוגמה: 0.0035 $ / Share"
+              maxlength="255"
+              required
+              data-field="commission_value"
+            >
+            <div class="form-help-text">ערך העמלה בפורמט טקסט (עד 255 תווים)</div>
+            <div class="form-error" id="commissionValueError" style="display: none;"></div>
+          </div>
+          
+          <!-- Minimum Commission -->
+          <div class="form-group">
+            <label for="minimumCommission" class="form-label form-label--required">מינימום עמלה (USD)</label>
+            <input 
+              type="number" 
+              id="minimumCommission" 
+              name="minimum" 
+              class="form-control" 
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              required
+              data-field="minimum"
+            >
+            <div class="form-help-text">עמלה מינימלית לכל פעולה בדולרים אמריקאיים</div>
+            <div class="form-error" id="minimumCommissionError" style="display: none;"></div>
+          </div>
+          
+        </form>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="phoenix-modal__footer">
+        <button type="button" class="phoenix-modal__cancel-btn" data-action="close-modal" data-modal-id="brokerFeeModal">
+          ביטול
+        </button>
+        <button type="button" class="phoenix-modal__save-btn" data-action="save-broker-fee" data-form-id="brokerFeeForm">
+          שמור
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ============================================
+       NOTE: Modal Logic
+       ============================================
+       CRITICAL FOR TEAM 30: Modal opening/closing logic must be implemented
+       using external JavaScript. Use data-action attributes for event handlers.
+       
+       Modal should be opened by setting backdrop display to 'flex'
+       Modal should be closed by setting backdrop display to 'none'
+       ============================================ -->
+  
+</body>
+</html>

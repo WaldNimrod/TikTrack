@@ -19,6 +19,7 @@ import { BridgeStage } from './stages/BridgeStage.js';
 import { DataStage } from './stages/DataStage.js';
 import { RenderStage } from './stages/RenderStage.js';
 import { ReadyStage } from './stages/ReadyStage.js';
+import { maskedLog } from '../../utils/maskedLog.js';
 
 /**
  * Unified App Init - Main Controller
@@ -118,7 +119,7 @@ export class UnifiedAppInit {
     const startTime = Date.now();
     
     try {
-      console.log('[UAI] Starting initialization...', {
+      maskedLog('[UAI] Starting initialization...', {
         pageType: this.config.pageType,
         requiresAuth: this.config.requiresAuth,
         requiresHeader: this.config.requiresHeader
@@ -127,30 +128,30 @@ export class UnifiedAppInit {
       // Stage 1: DOM
       this.currentStage = 'DOM';
       await this.stages.DOM.execute();
-      console.log('[UAI] DOM stage completed');
+      maskedLog('[UAI] DOM stage completed');
       
       // Stage 2: Bridge
       this.currentStage = 'Bridge';
       await this.stages.Bridge.execute();
-      console.log('[UAI] Bridge stage completed');
+      maskedLog('[UAI] Bridge stage completed');
       
       // Stage 3: Data
       this.currentStage = 'Data';
       await this.stages.Data.execute();
-      console.log('[UAI] Data stage completed');
+      maskedLog('[UAI] Data stage completed');
       
       // Stage 4: Render
       this.currentStage = 'Render';
       await this.stages.Render.execute();
-      console.log('[UAI] Render stage completed');
+      maskedLog('[UAI] Render stage completed');
       
       // Stage 5: Ready
       this.currentStage = 'Ready';
       await this.stages.Ready.execute();
-      console.log('[UAI] Ready stage completed');
+      maskedLog('[UAI] Ready stage completed');
       
       const duration = Date.now() - startTime;
-      console.log('[UAI] Initialization completed successfully', {
+      maskedLog('[UAI] Initialization completed successfully', {
         duration: `${duration}ms`,
         stages: ['DOM', 'Bridge', 'Data', 'Render', 'Ready']
       });

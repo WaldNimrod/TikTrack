@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ברוקרים ועמלות | TikTrack Phoenix</title>
   
+  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+  
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        ============================================ -->
   
-  <!-- 1. Phoenix Base Styles FIRST (Global defaults & DNA variables) - MUST BE FIRST -->
-  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
-  
-  <!-- 2. Pico CSS (Framework) -->
+  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
   
   <!-- 3. LEGO Components (Reusable components) -->
   <link rel="stylesheet" href="/src/styles/phoenix-components.css">
@@ -23,6 +26,9 @@
   
   <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
   <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles -->
+  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
   
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -61,7 +67,7 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">ברוקרים ועמלות</h1>
               </div>
               <div class="index-section__header-meta">
@@ -107,13 +113,18 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="../../../public/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
+                <img src="/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">הגדרות ברוקרים ועמלות</h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count" id="tableBrokersCount">0 ברוקרים פעילים</span>
               </div>
               <div class="index-section__header-actions">
+                <button class="index-section__header-action-btn js-add-broker-fee" aria-label="הוסף ברוקר" title="הוסף ברוקר חדש">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                  </svg>
+                </button>
                 <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9l6 6l6 -6"></path>
@@ -234,10 +245,8 @@
   <!-- Table Formatters (Required for table formatting) -->
   <script src="/src/cubes/shared/tableFormatters.js"></script>
   
-  <!-- Brokers Fees Data Loader -->
-  <script type="module" src="/src/views/financial/brokersFees/brokersFeesDataLoader.js"></script>
-  
   <!-- Brokers Fees Table Initialization -->
+  <!-- Note: brokersFeesDataLoader.js is loaded dynamically by UAI DataStage -->
   <script type="module" src="/src/views/financial/brokersFees/brokersFeesTableInit.js"></script>
   
   <!-- Brokers Fees Header Handlers -->

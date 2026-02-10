@@ -4,12 +4,12 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-07  
-**version:** v3.6 (Phase 2 - Active Development - Knowledge Promotion Complete)
+**last_updated:** 2026-02-09  
+**version:** v3.9 (ADR-010 — D21 Infra VERIFIED סופי)
 
 ---
 
-**Status:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - FINANCIAL CORE**
+**Status:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - ARCHITECT VERDICT IMPLEMENTED**
 
 ---
 
@@ -50,7 +50,7 @@
 | D15.V | D15_PROF_VIEW.html | פרופיל | **4. FIDELITY** 🔵 | Team 10/20 | Batch 1 Complete |
 | D16 | trading_accounts.html | חשבונות מסחר | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
 | D18 | brokers_fees.html | עמלות ברוקרים | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
-| D21 | cash_flows.html | תזרים מזומנים | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
+| D21 | cash_flows.html | תזרים מזומנים | **2. ACTIVE_DEV** 🟢 (Infra VERIFIED) | Team 30 | Phase 2 - Active Development; D21 Infra VERIFIED (ADR-010) |
 
 ---
 
@@ -149,12 +149,12 @@
 
 ## 🟢 Phase 2: Financial Core - ACTIVE DEVELOPMENT
 
-**סטטוס:** 🟢 **ACTIVE_DEVELOPMENT**
+**סטטוס:** 🟢 **ACTIVE DEVELOPMENT - ARCHITECT VERDICT IMPLEMENTED**
 
 **עמודים בפיתוח:**
 - 🟢 D16 - Trading Accounts (**ACTIVE_DEV**)
 - 🟢 D18 - Brokers Fees (**ACTIVE_DEV**)
-- 🟢 D21 - Cash Flows (**ACTIVE_DEV**)
+- 🟢 D21 - Cash Flows (**ACTIVE_DEV** - Infra VERIFIED)
 
 **תשתית מוכנה:**
 - ✅ UAI Engine (100% integration)
@@ -163,9 +163,43 @@
 - ✅ Transformers v1.2 Hardened (SSOT)
 - ✅ Routes SSOT (v1.1.2)
 
+**תשתית מוכנה:**
+- ✅ **D21 Infra:** VERIFIED - טבלת `user_data.cash_flows` מאומתת כקיימת ותקינה
+- ✅ **Endpoints:** ACTIVE_DEV - `cash_flows/currency_conversions`, `brokers_fees/summary` בפיתוח
+
+**שרשרת QA:**
+- **Layer 1 (Team 50):** QA טכני/פיתוח - החזרת ריג'קטים למפתחים עד ליישור קו פונקציונלי
+- **Layer 2 (Team 90):** בקרת משילות אדריכלית - וידוא עמידה בחוזים ו-SSOT (ה'פס הירוק')
+- **Layer 3 (G-Lead - נמרוד):** בדיקה ידנית סופית וחתימה (The Architect Seal)
+
 ---
 
 ## 🔄 עדכונים אחרונים
+
+**2026-02-09 (ADR-010 — סגירת Phase 2 / Debt Closure):**
+- ✅ **D21 Infra:** VERIFIED סופי — Page Tracker מעודכן בהתאם לפקודת האדריכלית (תוכנית סגירה מאוחדת).
+- 📋 **תוכנית עבודה:** [TT2_PHASE_2_CLOSURE_WORK_PLAN.md](../00-MANAGEMENT/TT2_PHASE_2_CLOSURE_WORK_PLAN.md) — 4 שלבים (Debt Closure → Phase Closure → G-Lead Approval → Team 90 Re-run).
+
+**2026-02-07 (Architect Verdict - Blockers Cleared):**
+- ✅ **D21 Infra:** VERIFIED - טבלת `user_data.cash_flows` מאומתת כקיימת ותקינה (Team 60)
+- ✅ **Endpoints:** ACTIVE_DEV - `cash_flows/currency_conversions`, `brokers_fees/summary` בפיתוח (Team 20)
+- ✅ **Precision:** נעול ל-**NUMERIC(20,6)** לכל השדות הכספיים (SSOT)
+- ✅ **שרשרת QA:** הוגדרה - 50 → 90 → G-Lead
+- ✅ **Code Hygiene:** No-Logs Policy - פסילה אוטומטית (RED) לכל קובץ עם `console.log` חשוף
+- 🟢 **סטטוס:** GREEN - חסמים קריטיים נפתרו, Endpoints בפיתוח
+
+**2026-02-07 (Phase 2 Blocking Decisions Required):**
+- 🔴 **Blocking Decisions:** 3 חסמים קריטיים דורשים החלטות/תיאום:
+  - 🔴 **Endpoints חסרים:** `cash_flows/currency_conversions`, `brokers_fees/summary` - דורש החלטת Architect
+  - 🔴 **תשתית D21:** יישור בקשת תשתית ל-SSOT ואימות - דורש אימות/יצירה מ-Team 60
+  - ⏸️ **Manual QA:** השלמת Manual QA completion report - דורש השלמה מ-Team 40
+- 🔴 **סטטוס:** RED - חסמים קריטיים דורשים החלטות לפני GREEN
+
+**2026-02-07 (Phase 2 Final Blockers Fixed):**
+- ✅ **Script Tags Fix:** תוקן D16/D18/D21 - Data Loaders הוסרו מה-HTML (נטענים דינמית על ידי UAI)
+- ✅ **QA Complete:** Gates A, B, C עברו בהצלחה (10/10 tests passed)
+- ⏸️ **Manual QA:** עדיין PENDING - נדרש השלמה מ-Team 40
+- 🟡 **Team 90 Report:** זיהה 2 חסמים קריטיים - תוקנו
 
 **2026-02-07 (Knowledge Promotion - Phase 1.8 → Phase 2):**
 - ✅ **Phase 1.8 הושלם** - System Stable, כל התיקונים הקריטיים בוצעו

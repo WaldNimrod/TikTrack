@@ -8,6 +8,7 @@
  */
 
 import { StageBase } from './StageBase.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class BridgeStage extends StageBase {
   constructor() {
@@ -62,7 +63,7 @@ export class BridgeStage extends StageBase {
         state: this.bridge.state
       });
       
-      console.log('[Bridge Stage] PhoenixBridge initialized successfully', {
+      maskedLog('[Bridge Stage] PhoenixBridge initialized successfully', {
         hasState: !!this.bridge.state,
         hasFilters: !!this.bridge.state?.filters
       });

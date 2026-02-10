@@ -4,6 +4,9 @@
  * מטפל בפילטרים גלובליים ופנימיים ומעדכן את הנתונים בהתאם
  */
 
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
+
 /**
  * Get Global Filters
  */
@@ -195,7 +198,11 @@ async function populateAccountSelects() {
       }
     });
   } catch (error) {
-    console.error('Error populating account selects:', error);
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error populating account selects:', { 
+      errorCode: error?.code,
+      status: error?.status
+    });
   }
 }
 

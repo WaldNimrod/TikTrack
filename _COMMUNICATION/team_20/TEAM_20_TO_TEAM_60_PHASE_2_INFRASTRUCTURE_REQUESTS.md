@@ -22,6 +22,26 @@
 
 ---
 
+## ⚠️ תיקונים לפי הערות ביקורת (Team 90)
+
+**תאריך תיקון:** 2026-02-07  
+**מקור:** הערות ביקורת מצוות הביקורת (Team 90)
+
+### **תיקונים שבוצעו:**
+
+1. ✅ **Precision של amount:** תוקן מ-`NUMERIC(20, 8)` ל-`NUMERIC(20, 6)` (תואם DDL v2.5 + ORM)
+2. ✅ **CHECK constraint על amount:** הוסר (לא מוגדר ב-DDL v2.5)
+3. ✅ **אינדקסים:** הוסרו אינדקסים נוספים (`idx_cash_flows_date`, `idx_cash_flows_external_ref`) - רק 3 אינדקסים לפי DDL v2.5
+4. ✅ **Trigger updated_at:** הוסר (מטופל ברמת ORM עם `onupdate=func.now()`)
+5. ✅ **הפניה לקובץ SQL:** עודכן להפניה ל-`PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` (SSOT)
+
+### **עקרון מנחה:**
+**⚠️ חובה:** כל המבנה חייב להיות תואם בדיוק ל-DDL v2.5 (SSOT). אין סטיות ללא אישור אדריכלי מפורש.
+
+**מקור SSOT:** `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` (שורות 974-1018)
+
+---
+
 ## ✅ סטטוס נוכחי
 
 ### **D18 - Brokers Fees:**
@@ -61,9 +81,11 @@ AND table_name = 'cash_flows';
 
 #### **1.2. אם הטבלה לא קיימת - יצירת טבלה:**
 
-**קובץ SQL מומלץ:** `scripts/create_d21_cash_flows_table.sql`
+**⚠️ חשוב:** יש ליצור את הטבלה בדיוק לפי DDL Schema v2.5 (SSOT).
 
-**מבנה נדרש (לפי DDL Schema v2.5):**
+**מקור SSOT:** `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` (שורות 974-1018)
+
+**מבנה נדרש (לפי DDL Schema v2.5 - SSOT):**
 
 ```sql
 -- ============================================
@@ -86,7 +108,7 @@ CREATE TABLE IF NOT EXISTS user_data.cash_flows (
     flow_type VARCHAR(20) NOT NULL CHECK (flow_type IN ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER')),
     
     -- Amount
-    amount NUMERIC(20, 8) NOT NULL CHECK (amount != 0),
+    amount NUMERIC(20, 6) NOT NULL,
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     
     -- Details
@@ -108,6 +130,7 @@ CREATE TABLE IF NOT EXISTS user_data.cash_flows (
 );
 
 -- Step 2: Create indexes for performance
+-- Note: Only 3 indexes as defined in DDL v2.5 (SSOT)
 -- Index on trading_account_id + transaction_date (most common filter)
 CREATE INDEX IF NOT EXISTS idx_cash_flows_account 
     ON user_data.cash_flows(trading_account_id, transaction_date DESC) 
@@ -123,19 +146,9 @@ CREATE INDEX IF NOT EXISTS idx_cash_flows_type
     ON user_data.cash_flows(flow_type) 
     WHERE deleted_at IS NULL;
 
--- Index on transaction_date (for date range queries)
-CREATE INDEX IF NOT EXISTS idx_cash_flows_date 
-    ON user_data.cash_flows(transaction_date DESC) 
-    WHERE deleted_at IS NULL;
-
--- Index on external_reference (for external system integration)
-CREATE INDEX IF NOT EXISTS idx_cash_flows_external_ref 
-    ON user_data.cash_flows(external_reference) 
-    WHERE deleted_at IS NULL AND external_reference IS NOT NULL;
-
--- Step 3: Add table and column comments
+-- Step 3: Add table comment (per DDL v2.5 SSOT)
 COMMENT ON TABLE user_data.cash_flows IS 
-    'Cash flows - Account deposits, withdrawals, dividends, interest, fees, and other transactions (D21)';
+    'Account deposits, withdrawals, dividends';
 
 COMMENT ON COLUMN user_data.cash_flows.id IS 
     'Primary key - UUID';
@@ -150,7 +163,7 @@ COMMENT ON COLUMN user_data.cash_flows.flow_type IS
     'Flow type: DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER';
 
 COMMENT ON COLUMN user_data.cash_flows.amount IS 
-    'Transaction amount in currency (NUMERIC(20,8) for precision)';
+    'Transaction amount in currency (NUMERIC(20,6) for precision - per DDL v2.5 SSOT)';
 
 COMMENT ON COLUMN user_data.cash_flows.currency IS 
     'Currency code (ISO 3-letter, default: USD)';
@@ -182,21 +195,8 @@ COMMENT ON COLUMN user_data.cash_flows.deleted_at IS
 COMMENT ON COLUMN user_data.cash_flows.metadata IS 
     'Additional metadata as JSONB';
 
--- Step 4: Create trigger for updated_at (auto-update on row change)
-CREATE OR REPLACE FUNCTION update_cash_flows_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_cash_flows_updated_at
-    BEFORE UPDATE ON user_data.cash_flows
-    FOR EACH ROW
-    EXECUTE FUNCTION update_cash_flows_updated_at();
-
--- Step 5: Verify table creation
+-- Step 4: Verify table creation
+-- Note: No trigger needed - updated_at is handled by ORM (onupdate=func.now())
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables 
@@ -268,7 +268,7 @@ ORDER BY table_name, grantee;
 | `user_id` | `UUID (FK)` | ✅ | קישור למשתמש |
 | `trading_account_id` | `UUID (FK)` | ✅ | קישור לחשבון מסחר |
 | `flow_type` | `VARCHAR(20)` | ✅ | סוג תנועה (DEPOSIT/WITHDRAWAL/DIVIDEND/INTEREST/FEE/OTHER) |
-| `amount` | `NUMERIC(20,8)` | ✅ | סכום התנועה |
+| `amount` | `NUMERIC(20,6)` | ✅ | סכום התנועה (לפי DDL v2.5 SSOT) |
 | `currency` | `VARCHAR(3)` | ✅ | מטבע (default: USD) |
 | `description` | `TEXT` | ❌ | תיאור התנועה |
 | `transaction_date` | `DATE` | ✅ | תאריך פעולה |
@@ -292,26 +292,19 @@ ORDER BY table_name, grantee;
 - [ ] הרצת `CREATE TABLE user_data.cash_flows`
 - [ ] אימות יצירה: `SELECT * FROM information_schema.tables WHERE table_name = 'cash_flows'`
 
-### **שלב 3: יצירת אינדקסים**
+### **שלב 3: יצירת אינדקסים (רק 3 אינדקסים לפי DDL v2.5)**
 - [ ] `idx_cash_flows_account` (trading_account_id + transaction_date)
 - [ ] `idx_cash_flows_user` (user_id + transaction_date)
 - [ ] `idx_cash_flows_type` (flow_type)
-- [ ] `idx_cash_flows_date` (transaction_date)
-- [ ] `idx_cash_flows_external_ref` (external_reference)
 - [ ] אימות: `SELECT indexname FROM pg_indexes WHERE tablename = 'cash_flows'`
 
-### **שלב 4: יצירת Trigger**
-- [ ] יצירת function `update_cash_flows_updated_at()`
-- [ ] יצירת trigger `trigger_cash_flows_updated_at`
-- [ ] אימות: `SELECT * FROM pg_trigger WHERE tgname = 'trigger_cash_flows_updated_at'`
-
-### **שלב 5: הרשאות**
+### **שלב 4: הרשאות**
 - [ ] GRANT על טבלה
 - [ ] GRANT USAGE על schema
 - [ ] GRANT על sequences (אם רלוונטי)
 - [ ] ALTER DEFAULT PRIVILEGES (אופציונלי)
 
-### **שלב 6: בדיקות אימות**
+### **שלב 5: בדיקות אימות**
 - [ ] בדיקת יצירת טבלה
 - [ ] בדיקת הרשאות (כמשתמש האפליקציה)
 - [ ] בדיקת INSERT/UPDATE/DELETE (כמשתמש האפליקציה)
@@ -418,52 +411,16 @@ SELECT COUNT(*) FROM user_data.cash_flows WHERE deleted_at IS NULL;
 DELETE FROM user_data.cash_flows WHERE flow_type = 'DEPOSIT';
 ```
 
-### **5. בדיקת Trigger**
-
+### **5. בדיקת updated_at (מטופל ברמת ORM)**
 ```sql
--- בדיקת קיום trigger
-SELECT 
-    tgname,
-    tgtype,
-    tgenabled
-FROM pg_trigger
-WHERE tgrelid = 'user_data.cash_flows'::regclass
-AND tgname = 'trigger_cash_flows_updated_at';
-
--- בדיקת פעולת trigger (updated_at auto-update)
--- יצירת רשומה
-INSERT INTO user_data.cash_flows (
-    user_id, 
-    trading_account_id, 
-    flow_type, 
-    amount, 
-    currency, 
-    transaction_date,
-    created_by,
-    updated_by
-)
-VALUES (
-    (SELECT id FROM user_data.users LIMIT 1),
-    (SELECT id FROM user_data.trading_accounts LIMIT 1),
-    'WITHDRAWAL',
-    500.00,
-    'USD',
-    CURRENT_DATE,
-    (SELECT id FROM user_data.users LIMIT 1),
-    (SELECT id FROM user_data.users LIMIT 1)
-) RETURNING id, updated_at;
-
--- המתנה 2 שניות
-SELECT pg_sleep(2);
-
--- עדכון (צריך לעדכן updated_at)
-UPDATE user_data.cash_flows 
-SET amount = 600.00
-WHERE flow_type = 'WITHDRAWAL'
-RETURNING id, updated_at;
-
--- ניקוי
-DELETE FROM user_data.cash_flows WHERE flow_type = 'WITHDRAWAL';
+-- הערה: updated_at מטופל ברמת ORM (onupdate=func.now())
+-- אין צורך ב-Trigger ברמת DB לפי DDL v2.5
+-- בדיקת שדה updated_at קיים
+SELECT column_name, data_type 
+FROM information_schema.columns
+WHERE table_schema = 'user_data'
+AND table_name = 'cash_flows'
+AND column_name = 'updated_at';
 ```
 
 ---
@@ -537,36 +494,53 @@ DELETE FROM user_data.cash_flows WHERE flow_type = 'WITHDRAWAL';
 - **D18 Table Creation:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_60_D18_BROKERS_FEES_TABLE_REQUEST.md`
 - **D18 Table Acknowledgment:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_60_D18_TABLE_ACKNOWLEDGMENT.md`
 
-### **DB Schema:**
+### **DB Schema (SSOT):**
 - **Full DDL:** `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` (שורות 974-1018)
+- **ORM Model:** `api/models/cash_flows.py`
+- **⚠️ חשוב:** יש ליצור את הטבלה בדיוק לפי DDL v2.5 - אין סטיות מ-SSOT
 
 ---
 
 ## 📝 הערות טכניות
 
-### **1. NUMERIC Precision:**
-- **החלטה:** `NUMERIC(20, 8)` עבור `amount`
-- **סיבה:** דיוק גבוה לסכומי כסף (20 ספרות כולל, 8 אחרי הנקודה)
-- **תואם:** סטנדרט `Decimal(20,8)` של הפרויקט
+### **1. NUMERIC Precision (SSOT):**
+- **SSOT:** `NUMERIC(20, 6)` עבור `amount` (DDL v2.5, שורה 985)
+- **ORM:** `Numeric(20, 6)` (api/models/cash_flows.py, שורה 63)
+- **סיבה:** דיוק לסכומי כסף (20 ספרות כולל, 6 אחרי הנקודה)
+- **⚠️ חשוב:** אין CHECK constraint על amount - לא מוגדר ב-DDL v2.5
 
 ### **2. CHECK Constraint על flow_type:**
-- **החלטה:** שימוש ב-CHECK constraint במקום ENUM
-- **סיבה:** גמישות יותר (קל להוסיף ערכים חדשים)
+- **SSOT:** CHECK constraint מוגדר ב-DDL v2.5 (שורה 982)
 - **ערכים מותרים:** DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER
+- **תואם:** ORM model (api/models/cash_flows.py, שורות 32-35)
 
-### **3. Soft Delete:**
+### **3. אינדקסים (SSOT):**
+- **SSOT:** רק 3 אינדקסים מוגדרים ב-DDL v2.5 (שורות 1006-1016):
+  - `idx_cash_flows_account` (trading_account_id + transaction_date)
+  - `idx_cash_flows_user` (user_id + transaction_date)
+  - `idx_cash_flows_type` (flow_type)
+- **⚠️ חשוב:** אין אינדקסים נוספים - לא מוגדרים ב-DDL v2.5
+- **Partial indexes:** כל האינדקסים עם `WHERE deleted_at IS NULL` לאופטימיזציה
+
+### **4. Soft Delete:**
 - **החלטה:** שימוש ב-`deleted_at` (Soft Delete)
 - **סיבה:** שמירת היסטוריה ומניעת אובדן נתונים
 - **אינדקס:** Partial indexes (`WHERE deleted_at IS NULL`) לאופטימיזציה
 
-### **4. Trigger for updated_at:**
-- **החלטה:** Trigger אוטומטי לעדכון `updated_at`
-- **סיבה:** הבטחת עדכון עקבי ללא תלות בקוד האפליקציה
+### **5. updated_at (SSOT):**
+- **SSOT:** אין Trigger ב-DDL v2.5
+- **ORM:** מטופל ברמת ORM עם `onupdate=func.now()` (api/models/cash_flows.py, שורה 98)
+- **⚠️ חשוב:** אין צורך ב-Trigger ברמת DB - מטופל ברמת ORM
 
-### **5. Foreign Keys:**
-- **user_id:** קישור ל-`user_data.users`
-- **trading_account_id:** קישור ל-`user_data.trading_accounts`
-- **created_by / updated_by:** קישור ל-`user_data.users` (audit trail)
+### **6. Foreign Keys:**
+- **user_id:** קישור ל-`user_data.users` (ON DELETE CASCADE)
+- **trading_account_id:** קישור ל-`user_data.trading_accounts` (ON DELETE CASCADE)
+- **created_by / updated_by:** קישור ל-`user_data.users` (audit trail, ON DELETE CASCADE)
+
+### **7. מקור SSOT:**
+- **DDL Schema:** `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` (שורות 974-1018)
+- **ORM Model:** `api/models/cash_flows.py`
+- **⚠️ חובה:** כל שינוי מהמבנה ב-DDL v2.5 דורש אישור אדריכלי מפורש
 
 ---
 

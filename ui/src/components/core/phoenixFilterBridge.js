@@ -21,6 +21,42 @@
 (function initPhoenixBridge() {
   'use strict';
   
+  /**
+   * Validate ULID format
+   * ULID format: 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+   * @param {string} value - Value to validate
+   * @returns {boolean} True if valid ULID
+   */
+  function isValidULID(value) {
+    if (!value || typeof value !== 'string') {
+      return false;
+    }
+    // ULID is 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+    const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+    return ulidRegex.test(value);
+  }
+  
+  /**
+   * Normalize tradingAccount filter - only send ULID if valid
+   * @param {any} value - Filter value
+   * @returns {string|null} Valid ULID or null
+   */
+  function normalizeTradingAccount(value) {
+    if (!value) {
+      return null;
+    }
+    // If value is "הכול" or empty string, return null
+    if (value === 'הכול' || value === '' || value === null || value === undefined) {
+      return null;
+    }
+    // If value is a valid ULID, return it
+    if (isValidULID(value)) {
+      return value;
+    }
+    // Otherwise, return null (don't send invalid values)
+    return null;
+  }
+  
   // The Registry: Global Bridge Object
   window.PhoenixBridge = {
     // State storage
@@ -134,8 +170,10 @@
       const urlParams = new URLSearchParams(window.location.search);
       
       // Load filters from URL
+      // Gate B Fix: Normalize tradingAccount from URL - only store if valid ULID
       if (urlParams.has('account_id') || urlParams.has('trading_account_id')) {
-        this.state.filters.tradingAccount = urlParams.get('account_id') || urlParams.get('trading_account_id');
+        const rawTradingAccount = urlParams.get('account_id') || urlParams.get('trading_account_id');
+        this.state.filters.tradingAccount = normalizeTradingAccount(rawTradingAccount);
       }
       if (urlParams.has('status')) {
         this.state.filters.status = urlParams.get('status');
@@ -165,6 +203,7 @@
      * 
      * @description
      * כאשר פילטר משתנה, עדכן את ה-URL Params
+     * Normalizes tradingAccount to ULID only - removes invalid values
      */
     updateUrlFromFilters() {
       const url = new URL(window.location);
@@ -178,22 +217,30 @@
       url.searchParams.delete('date_to');
       url.searchParams.delete('search');
       
-      // Add active filters
-      if (this.state.filters.tradingAccount) {
-        url.searchParams.set('trading_account_id', this.state.filters.tradingAccount);
+      // Normalize tradingAccount - only send if valid ULID
+      const normalizedTradingAccount = normalizeTradingAccount(this.state.filters.tradingAccount);
+      if (normalizedTradingAccount) {
+        url.searchParams.set('trading_account_id', normalizedTradingAccount);
       }
-      if (this.state.filters.status) {
+      
+      // Gate B Fix: Only set non-empty values to avoid sending empty strings
+      if (this.state.filters.status && String(this.state.filters.status).trim() !== '') {
         url.searchParams.set('status', this.state.filters.status);
       }
-      if (this.state.filters.investmentType) {
+      if (this.state.filters.investmentType && String(this.state.filters.investmentType).trim() !== '') {
         url.searchParams.set('investment_type', this.state.filters.investmentType);
       }
-      if (this.state.filters.dateRange.from && this.state.filters.dateRange.to) {
-        url.searchParams.set('date_from', this.state.filters.dateRange.from);
-        url.searchParams.set('date_to', this.state.filters.dateRange.to);
+      if (this.state.filters.dateRange && this.state.filters.dateRange.from && this.state.filters.dateRange.to) {
+        const dateFrom = String(this.state.filters.dateRange.from).trim();
+        const dateTo = String(this.state.filters.dateRange.to).trim();
+        if (dateFrom !== '' && dateTo !== '') {
+          url.searchParams.set('date_from', dateFrom);
+          url.searchParams.set('date_to', dateTo);
+        }
       }
-      if (this.state.filters.search) {
-        url.searchParams.set('search', this.state.filters.search);
+      // Gate B Fix: Only set search if it's not empty
+      if (this.state.filters.search && String(this.state.filters.search).trim() !== '') {
+        url.searchParams.set('search', this.state.filters.search.trim());
       }
       
       // Update URL without page reload
@@ -298,6 +345,7 @@
      * 
      * @description
      * עדכון פילטר יחיד + עדכון URL + שמירה ב-Storage
+     * Normalizes tradingAccount to ULID only - removes invalid values
      * 
      * @param {string} key - מפתח הפילטר
      * @param {any} value - ערך הפילטר
@@ -305,17 +353,33 @@
     setFilter(key, value) {
       if (key === 'dateRange' && typeof value === 'object') {
         this.state.filters.dateRange = value;
+      } else if (key === 'tradingAccount') {
+        // Normalize tradingAccount - only store valid ULID
+        this.state.filters.tradingAccount = normalizeTradingAccount(value);
+      } else if (key === 'search') {
+        // Gate B Fix: Normalize search - don't store empty strings
+        const trimmedValue = String(value || '').trim();
+        this.state.filters.search = trimmedValue !== '' ? trimmedValue : '';
       } else {
-        this.state.filters[key] = value;
+        // Gate B Fix: Normalize string values - don't store empty strings
+        if (typeof value === 'string' && value.trim() === '') {
+          this.state.filters[key] = '';
+        } else {
+          this.state.filters[key] = value;
+        }
       }
       
       this.updateUrlFromFilters();
       this.saveToStorage();
       this.applyFiltersToUI();
       
-      // Dispatch Custom Event
+      // Dispatch Custom Event with normalized filters
+      const normalizedFilters = { ...this.state.filters };
+      if (key === 'tradingAccount') {
+        normalizedFilters.tradingAccount = normalizeTradingAccount(value);
+      }
       window.dispatchEvent(new CustomEvent('phoenix-filter-change', {
-        detail: { key, value, filters: { ...this.state.filters } }
+        detail: { key, value, filters: normalizedFilters }
       }));
     },
     

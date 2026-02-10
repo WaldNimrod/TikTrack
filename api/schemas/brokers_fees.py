@@ -18,7 +18,7 @@ class BrokerFeeResponse(BaseModel):
     id: str = Field(..., description="External ULID identifier")
     broker: str = Field(..., description="Broker name", max_length=100)
     commission_type: str = Field(..., description="Commission type (TIERED or FLAT)")
-    commission_value: str = Field(..., description="Commission value (e.g., '0.0035 $ / Share')", max_length=255)
+    commission_value: Decimal = Field(..., description="Commission value (numeric)", ge=0)
     minimum: Decimal = Field(..., description="Minimum commission per transaction (USD)")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
@@ -37,7 +37,7 @@ class BrokerFeeResponse(BaseModel):
                 "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
                 "broker": "Interactive Brokers",
                 "commission_type": "TIERED",
-                "commission_value": "0.0035 $ / Share",
+                "commission_value": 0.0035,
                 "minimum": 0.35,
                 "created_at": "2026-01-31T10:00:00Z",
                 "updated_at": "2026-01-31T10:00:00Z"
@@ -49,7 +49,7 @@ class BrokerFeeCreateRequest(BaseModel):
     """Broker Fee create request schema."""
     broker: str = Field(..., description="Broker name", max_length=100)
     commission_type: str = Field(..., description="Commission type (TIERED or FLAT)")
-    commission_value: str = Field(..., description="Commission value (e.g., '0.0035 $ / Share')", max_length=255)
+    commission_value: Decimal = Field(..., description="Commission value (numeric)", ge=0)
     minimum: Decimal = Field(..., description="Minimum commission per transaction (USD)", ge=0)
     
     @field_validator('commission_type')
@@ -73,7 +73,7 @@ class BrokerFeeCreateRequest(BaseModel):
             "example": {
                 "broker": "Interactive Brokers",
                 "commission_type": "TIERED",
-                "commission_value": "0.0035 $ / Share",
+                "commission_value": 0.0035,
                 "minimum": 0.35
             }
         }
@@ -83,7 +83,7 @@ class BrokerFeeUpdateRequest(BaseModel):
     """Broker Fee update request schema."""
     broker: Optional[str] = Field(None, description="Broker name", max_length=100)
     commission_type: Optional[str] = Field(None, description="Commission type (TIERED or FLAT)")
-    commission_value: Optional[str] = Field(None, description="Commission value (e.g., '0.0035 $ / Share')", max_length=255)
+    commission_value: Optional[Decimal] = Field(None, description="Commission value (numeric)", ge=0)
     minimum: Optional[Decimal] = Field(None, description="Minimum commission per transaction (USD)", ge=0)
     
     @field_validator('commission_type')
@@ -107,8 +107,28 @@ class BrokerFeeUpdateRequest(BaseModel):
             "example": {
                 "broker": "Interactive Brokers",
                 "commission_type": "FLAT",
-                "commission_value": "$0.00",
+                "commission_value": 0.00,
                 "minimum": 0.00
+            }
+        }
+
+
+class BrokerFeeSummaryResponse(BaseModel):
+    """Broker Fee summary schema."""
+    total_brokers: int = Field(..., description="Total number of brokers")
+    active_brokers: int = Field(..., description="Number of active brokers")
+    avg_commission_per_trade: Decimal = Field(default=Decimal("0"), description="Average commission per trade")
+    monthly_fixed_commissions: Decimal = Field(default=Decimal("0"), description="Total monthly fixed commissions")
+    yearly_fixed_commissions: Decimal = Field(default=Decimal("0"), description="Total yearly fixed commissions")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "total_brokers": 5,
+                "active_brokers": 3,
+                "avg_commission_per_trade": 0.35,
+                "monthly_fixed_commissions": 50.00,
+                "yearly_fixed_commissions": 600.00
             }
         }
 
@@ -126,7 +146,7 @@ class BrokerFeeListResponse(BaseModel):
                         "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
                         "broker": "Interactive Brokers",
                         "commission_type": "TIERED",
-                        "commission_value": "0.0035 $ / Share",
+                        "commission_value": 0.0035,
                         "minimum": 0.35,
                         "created_at": "2026-01-31T10:00:00Z",
                         "updated_at": "2026-01-31T10:00:00Z"

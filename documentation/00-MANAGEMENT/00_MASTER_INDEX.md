@@ -5,13 +5,15 @@
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
 **last_updated:** 2026-02-09  
-**version:** v3.7 (Gate B GREEN — תיעוד תהליך + ארטיפקטים)
+**version:** v3.8 (מיסוד נהלים: QA Gates + Blueprint Handoff)
 
 ---
 
 ## 📢 Executive Summary
 
 זהו האינדקס המאוחד היחיד (SSOT) לכל התיעוד במערכת TikTrack Phoenix. כל האינדקסים האחרים מסומנים כ-DEPRECATED.
+
+**עקרון יסוד:** ה-SSOT וכל נהלי העבודה הם **תקוד קריטי וקבוע** — מחייבים, קבועים, ומתעדכנים רק דרך הנהלים המפורשים (קידום מידע, החלטות אדריכלית). ראה `CURSOR_INTERNAL_PLAYBOOK.md` עקרון יסוד.
 
 **מקור:** Phase 1.7 - Documentation Integrity Mandate (`ARCHITECT_DOCS_INTEGRITY_MANDATE.md`)
 
@@ -65,11 +67,17 @@ _COMMUNICATION/
 - [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](../09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md) - מדריך עבודה פנימי
 - [🏛️ PHOENIX_ORGANIZATIONAL_STRUCTURE.md](./PHOENIX_ORGANIZATIONAL_STRUCTURE.md) - מבנה ארגוני
 - [🤝 TT2_SLA_TEAMS_30_40.md](../05-PROCEDURES/TT2_SLA_TEAMS_30_40.md) - אמנת שירות צוות 30 (Frontend) ↔ 40 (UI Assets) — Presentational vs Container ✅ **מחייב**
+- [📜 TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md](../05-PROCEDURES/TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md) - דרישות מסירת בלופרינט (צוות 31 → 30/40) ✅ **מחייב**
+- [📋 TT2_PHASE_2_CLOSURE_WORK_PLAN.md](./TT2_PHASE_2_CLOSURE_WORK_PLAN.md) - תוכנית סגירת Phase 2 (4 שלבים: Debt Closure → Phase Closure → Team 90 Gate B → G-Lead) ✅ **פעיל**
+- [🏰 ADR_010_PHASE_2_UNIFIED_CLOSURE_MANDATE.md](./ADR_010_PHASE_2_UNIFIED_CLOSURE_MANDATE.md) - מנדט אדריכל מאוחד (ADR-010) ✅ **SSOT**
+- [📋 TT2_PHASE_2_CLOSURE_TASK_SPEC_SUPPLEMENT_REQUEST.md](./TT2_PHASE_2_CLOSURE_TASK_SPEC_SUPPLEMENT_REQUEST.md) - מידע משלים נדרש לסגירת משימות ב-100% (ללא ניחושים)
 
 ---
 
 ## 🧪 נוהלי QA (Team 50 & Team 51)
 
+- [📜 TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md) - פרוטוקול שערי איכות תלת-שכבתי (שער א' 50 / שער ב' 90 / שער ג' Visionary) ✅ **מחייב**
+- [💾 ARCHITECT_DATA_MANAGEMENT_SOP_011.md](../05-PROCEDURES/ARCHITECT_DATA_MANAGEMENT_SOP_011.md) - SOP-011 ניהול נתוני סביבה (Seeding) ✅ **SSOT**
 - [🧪 TEAM_50_QA_WORKFLOW_PROTOCOL.md](../09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md) - נוהל עבודה לבדיקות QA (Code Review → Selenium → Visual Validation)
 - [📋 TEAM_50_QA_REPORT_TEMPLATE.md](../09-GOVERNANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md) - תבנית דוח QA סטנדרטית
 - [📊 TEAM_50_QA_TEST_INDEX.md](../09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md) - אינדקס בדיקות QA מפורט
@@ -161,6 +169,7 @@ _COMMUNICATION/
 - [🛡️ ריענון נהלים ומשמעת אדריכלית v1.5](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#3-ריענון-נהלים-ומשמעת-אדריכלית-v15--חובה) - הנחיות מחייבות מהאדריכלית (ניהול קבצים, G-Bridge, Transformation Layer)
 - [🛡️ Final Governance Lock v2.0](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#6-final-governance-lock-v20--mandatory) - נעילה ארכיטקטונית כוללת (מבנה תיקיות, Fluid Design, Design Tokens, משמעת סקריפטים) 🛡️ **FINAL LOCK**
 - [🛡️ הגדרות תפקיד ומשילות לכל צוות](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#5-הגדרות-תפקיד-ומשילות-לכל-צוות--batch-1-closure-mandate) - הגדרות תפקיד ומשילות לכל צוות (Batch 1 Closure Mandate) 🛡️ **MANDATORY - FOUNDATION SEAL**
+- [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
 - ⚠️ **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/90_Architects_comunication/` (לא SSOT - Communication בלבד):
   - `ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - פוטר מודולרי
   - `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - Final Governance Lock
@@ -260,4 +269,4 @@ _COMMUNICATION/
 **תאריך:** 2026-02-09  
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
-**log_entry | [Team 10] | GATE_B_GREEN | MASTER_INDEX_UPDATED | 2026-02-09**
+**log_entry | [Team 10] | PROCESS_FORMALIZATION | MASTER_INDEX_UPDATED | 2026-02-09**

@@ -11,8 +11,19 @@
 /**
  * Financial fields that require forced number conversion
  * @constant {string[]}
+ * @description Fields that contain these keywords will be converted to numbers
+ * Note: 'minimum' is added because it's NUMERIC(20,6) in DB
  */
-const FINANCIAL_FIELDS = ['balance', 'price', 'amount', 'total', 'value', 'quantity', 'cost', 'fee', 'commission', 'profit', 'loss', 'equity', 'margin'];
+const FINANCIAL_FIELDS = ['balance', 'price', 'amount', 'total', 'value', 'quantity', 'cost', 'fee', 'commission', 'profit', 'loss', 'equity', 'margin', 'minimum'];
+
+/**
+ * Fields that should remain as strings (even if they contain financial keywords)
+ * @constant {string[]}
+ * @description These fields are VARCHAR/TEXT/ENUM in DB and should not be converted to numbers
+ * Note: commissionValue was removed (now NUMERIC(20,6) - should be converted to number)
+ * Note: commissionType is ENUM (TIERED/FLAT) - should remain as string
+ */
+const STRING_ONLY_FIELDS = ['description', 'notes', 'comment', 'message', 'name', 'title', 'label', 'commissionType', 'commission_type', 'type'];
 
 /**
  * Convert value to number for financial fields
@@ -21,6 +32,15 @@ const FINANCIAL_FIELDS = ['balance', 'price', 'amount', 'total', 'value', 'quant
  * @returns {number|null} - Converted number or null
  */
 function convertFinancialField(value, key) {
+  // Check if this field should remain as string (exclusions)
+  const isStringOnlyField = STRING_ONLY_FIELDS.some(field => 
+    key.toLowerCase() === field.toLowerCase()
+  );
+  
+  if (isStringOnlyField) {
+    return value; // Keep as-is (string)
+  }
+  
   // Check if this is a financial field (case-insensitive)
   const isFinancialField = FINANCIAL_FIELDS.some(field => 
     key.toLowerCase().includes(field.toLowerCase())

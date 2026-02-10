@@ -24,6 +24,8 @@
  * await verifier.verifyCSSLoadOrder();
  */
 
+import { maskedLog } from '../../utils/maskedLog.js';
+
 class CSSLoadVerifier {
   /**
    * Constructor
@@ -91,7 +93,7 @@ class CSSLoadVerifier {
       return false;
     }
 
-    console.log('✅ CSS Load Order Verified');
+    maskedLog('✅ CSS Load Order Verified');
     return true;
   }
 

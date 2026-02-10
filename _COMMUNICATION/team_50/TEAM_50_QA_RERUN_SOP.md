@@ -1,0 +1,62 @@
+# Team 50 — SOP: ריצת בדיקות + Feedback לצוותים
+
+**id:** `TEAM_50_QA_RERUN_SOP`  
+**purpose:** תהליך אופטימלי ומהיר לבדיקה חוזרת + העברת משוב מפורט
+
+---
+
+## תהליך (צעד־אחר־צעד)
+
+### 1. וידוא תשתית
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8082/health
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/
+```
+- אם לא 200 — להפעיל: `./scripts/start-backend.sh` | `./scripts/start-frontend.sh`
+- **Policy:** אתחול שרתים הוא self‑service. אין לערב את Team 60 אלא אם יש תקלה תשתיתית אמיתית.
+
+### 2. הרצת בדיקות
+```bash
+cd tests && npm run test:phase2        # Runtime
+cd tests && npm run test:phase2-e2e   # E2E
+```
+
+### 3. איסוף Evidence
+- `documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/console_logs.json`
+- `network_logs.json`
+- `test_summary.json`
+
+### 4. ניתוח כישלונות
+- לחפש `SEVERE` ב־console_logs
+- לזהות URL/endpoint שנכשל (400, 404, 500)
+- למַפּוֹת צוות אחראי: 20=Backend, 30=Frontend, 50=לוגיקת בדיקה
+
+### 5. יצירת Feedback
+- קובץ: `TEAM_50_GATE_B_FEEDBACK_TO_TEAMS.md`
+- לכל כישלון: תיאור, שגיאה מדויקת, צוות, פעולה נדרשת
+
+---
+
+## מיפוי צוותים
+
+| סוג בעיה | צוות |
+|----------|------|
+| API 4xx/5xx, endpoints | Team 20 |
+| Header, navigation, DOM, favicon | Team 30 |
+| לוגיקת בדיקה, false positives | Team 50 |
+
+---
+
+## פורמט Feedback
+
+```markdown
+## כישלון X: [שם] — [צוות]
+### תסמינים
+### שגיאה מזוהה (מלאה)
+### פעולה נדרשת
+### קובץ/אזור
+```
+
+---
+
+**log_entry | [Team 50] | SOP | QA_RERUN | 2026-02-07**

@@ -4,8 +4,8 @@
 **owner:** Team 50 (QA & Fidelity)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-05 (תיקון הפניות ל-`_COMMUNICATION` - NON-SSOT compliance)  
-**version:** v1.1  
+**last_updated:** 2026-02-07 (עדכון עם נוהל QA מחייב מצוות 90 - Automation-First + E2E חובה)  
+**version:** v1.2  
 **⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
 
 ---
@@ -234,7 +234,94 @@ npm run test:routing
 
 ---
 
-### 7. Frontend Development Testing Tools (Team 30)
+### 7. Phase 2 Runtime Testing (Phase 2 Financial Core)
+
+**קובץ בדיקות:** `tests/phase2-runtime.test.js`  
+**סוג:** בדיקת Runtime אוטומטית (HTTP requests)  
+**תפקיד:** בודק טעינת עמודים ו-API endpoints עבור Phase 2 Financial Core
+
+**תרחישי בדיקה:**
+- ✅ Login API - Successful authentication
+- ✅ D16 - Trading Accounts: Page loads (HTTP 200)
+- ✅ D18 - Brokers Fees: Page loads (HTTP 200)
+- ✅ D21 - Cash Flows: Page loads (HTTP 200)
+- ✅ D16 API: `/api/v1/trading_accounts` - Success (200)
+- ✅ D18 API: `/api/v1/brokers_fees` - Success (200)
+- ✅ D21 API: `/api/v1/cash_flows` - Success (200)
+- ✅ CSS Loading: phoenix-base.css referenced
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת קובץ HTML (HTTP 200)
+- בדיקת CSS loading order (phoenix-base.css)
+- בדיקת API endpoints עם authentication
+- בדיקת Infrastructure (Backend + Frontend servers)
+
+**שימוש:**
+```bash
+cd tests
+node phase2-runtime.test.js
+```
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_50/TEAM_50_PHASE_2_QA_COMPLETE.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 8. Phase 2 E2E Selenium Tests (SOP-010 Compliance)
+
+**קובץ בדיקות:** `tests/phase2-e2e-selenium.test.js`  
+**סוג:** בדיקת E2E אוטומטית (Selenium/Headless)  
+**תפקיד:** סימולציה טכנית מלאה - SOP-010 Compliance
+
+**SOP-010 Requirements:**
+- ✅ Selenium/Headless להרצות UI מלאות
+- ✅ CRUD E2E לכל endpoints (כולל summary/derivatives)
+- ✅ Security validation (Masked Log, token leakage, headers)
+- ✅ Routes SSOT compliance
+- ✅ Artifacts: logs, screenshots, HTML/JUnit report
+
+**תרחישי בדיקה:**
+- ✅ D16 - Trading Accounts: Page Load & Console Hygiene
+- ✅ D18 - Brokers Fees: Page Load & Console Hygiene
+- ✅ D21 - Cash Flows: Page Load & Console Hygiene
+- ✅ CRUD E2E - Trading Accounts API
+- ✅ CRUD E2E - Brokers Fees API
+- ✅ CRUD E2E - Cash Flows API (כולל summary)
+- ✅ Security Validation - Token Leakage
+- ✅ Routes SSOT Compliance
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת עמודים בדפדפן (Selenium)
+- בדיקת Console Hygiene (0 שגיאות, 0 אזהרות)
+- בדיקת Security Validation (Masked Log, Token Leakage)
+- בדיקת CRUD E2E - כל ה-endpoints
+- בדיקת Routes SSOT compliance
+- יצירת Artifacts: screenshots, console logs, network logs, errors
+
+**שימוש:**
+```bash
+cd tests
+npm run test:phase2-e2e
+```
+
+**Artifacts:**
+- Screenshots: `documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/`
+- Console logs: `console_logs.json`
+- Network logs: `network_logs.json`
+- Errors: `errors.json`
+- Test summary: `test_summary.json`
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_PHASE_2_QA_COMPLETE.md` ⚠️ **NON-SSOT - Communication only**
+- **SOP-010:** `_COMMUNICATION/team_90/SOP_010_MANUAL_INTENT_SIMULATION_PROTOCOL.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 9. Frontend Development Testing Tools (Team 30)
 
 **קטגוריה:** כלי בדיקה לפיתוח Frontend  
 **אחריות:** Team 30 (Frontend Execution)  
@@ -336,7 +423,9 @@ npm run test:routing
 | **Validation Comprehensive** | 20+ | ✅ 12/18 | ⚠️ 1 Failed | ⏸️ Pending | ⚠️ **1 Issue** |
 | **Frontend Testing Tools** | 2 | ✅ 2/2 | ✅ Active | ✅ Ready | ✅ **Complete** |
 | **Frontend Routing Tests** | 3 | ✅ 3/3 | ⏸️ Ready | ⏸️ Pending | ✅ **Complete** |
-| **Total** | **80+** | **70/80+** | **⏸️ Ready** | **⏸️ Pending** | ⚠️ **2 Issues** |
+| **Phase 2 Runtime Tests** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Phase 2 E2E Selenium (SOP-010)** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Total** | **96+** | **86/96+** | **✅ Active** | **⏸️ Pending** | ⚠️ **2 Issues** |
 
 ---
 
@@ -351,6 +440,8 @@ npm run test:routing
 - **Error Handling:** `tests/error-handling.test.js`
 - **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
 - **Trading Accounts Routing:** `tests/trading-accounts-routing.test.js` (Team 30)
+- **Phase 2 Runtime:** `tests/phase2-runtime.test.js` (Phase 2 Financial Core)
+- **Phase 2 E2E Selenium (SOP-010):** `tests/phase2-e2e-selenium.test.js` (Phase 2 Financial Core - SOP-010 Compliance)
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
 
@@ -379,11 +470,49 @@ npm run test:routing
 
 ## 📋 נוהלי עבודה
 
-### נוהל עבודה QA
+### נוהל עבודה QA (מחייב)
 
-**מסמך:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`
+**מסמך:** `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`  
+**מקור:** נוהל QA מחייב מצוות 90 (Spy) והאדריכלית הראשית  
+**סטטוס:** 🔒 **MANDATORY - נוהל קבוע ומחייב לכל הפרויקט**
 
-**שלבים:**
+**מפת נוהל QA (שלבים + דרישות):**
+
+#### 🧭 Gate A — Doc↔Code (אוטומטי, חובה)
+- **מטרה:** לוודא שכל Spec ב-SSOT תואם לקוד
+- **בדיקות:** התאמת endpoints, schemas, versions
+- **תוצר:** Doc/Code Matrix + דוח סטיות
+
+#### 🧭 Gate B — Contract↔Runtime (אוטומטי, חובה)
+- **מטרה:** לוודא שה-API חוזר בפועל לפי החוזים
+- **בדיקות:** Contract tests, Shared_Services בלבד, UAI config חיצוני
+- **תוצר:** ContractTestReport
+
+#### 🧭 Gate C — UI↔Runtime (E2E חובה)
+- **מטרה:** בדיקות E2E לכל הדפים הקריטיים
+- **בדיקות:** UAI stages, Filters, Pagination, CSS load order, Failure injection, Console Hygiene, Security
+- **תוצר:** E2EReport + screenshots
+
+#### 🧭 Gate D — Manual/Visual (רק בסוף)
+- **מטרה:** אישור חזותי ותפקודי סופי
+- **בדיקות:** תקינות UI מול SSOT, דיוק תאריכים/סכומים/labels, UX sanity
+- **תוצר:** ManualApproval
+
+**כללי חובה:**
+- ✅ **Automation-First:** אין קיצור דרך — כל מה שאפשר אוטומטי
+- ✅ **E2E חובה:** ללא E2E אין GREEN
+- ✅ **Manual רק בסוף:** ידני תמיד אחרי כל האוטומציות
+- ✅ **Zero-Deviation:** סטייה = RED מיידי
+- ✅ **בדיקות אבטחה חובה:** Masked Log + token leakage בכל Gate
+
+**תוצרים סופיים חובה:**
+1. DocCode Matrix (Gate A)
+2. ContractTestReport (Gate B)
+3. E2EReport (Gate C)
+4. ManualApproval (Gate D)
+5. QA Final Summary
+
+**שלבים Legacy (עדיין תקף):**
 1. Code Review (חובה ראשונית)
 2. Selenium Automation (חובה)
 3. Visual Validation (חובה)
@@ -446,9 +575,11 @@ npm run test:routing
 
 **אינדקס זה מתעדכן באופן שוטף עם כל בדיקה חדשה.**
 
-**Last Updated:** 2026-02-03  
+**Last Updated:** 2026-02-07  
 **Maintained By:** Team 50 (QA) + Team 30 (Frontend Testing Tools)  
-**Next Update:** After routing issues resolved
+**Next Update:** After Phase 2 manual tests completed (Gate D)
+
+**נוהל QA עודכן:** 2026-02-07 - נוהל QA מחייב מצוות 90 (Automation-First + E2E חובה) אומץ ותועד
 
 ---
 

@@ -14,6 +14,12 @@
  * // שמירת מצב (URL/LocalStorage)
  */
 
+// Loaded as classic script - use window.maskedLog if available, else safe console fallback (audit.maskedLog per JS Standards)
+const _log = (typeof window !== 'undefined' && window.maskedLog) || ((msg, data) => {
+  if (data && typeof data === 'object' && Object.keys(data).length > 0) console.log(msg, data);
+  else console.log(msg);
+});
+
 class PhoenixTableFilterManager {
   /**
    * @param {HTMLTableElement} tableElement - אלמנט הטבלה
@@ -47,7 +53,7 @@ class PhoenixTableFilterManager {
     // טעינת מצב פילטרים מ-LocalStorage או URL
     this.loadFilterState();
 
-    console.log(`[PhoenixTableFilterManager] Initialized for table: ${this.table.id || 'unnamed'}`);
+    _log(`[PhoenixTableFilterManager] Initialized for table: ${this.table.id || 'unnamed'}`);
   }
 
   /**
@@ -115,7 +121,7 @@ class PhoenixTableFilterManager {
       delete this.filters.global[filterKey];
     }
 
-    console.log('[PhoenixTableFilterManager] Global filter updated', {
+    _log('[PhoenixTableFilterManager] Global filter updated', {
       key: filterKey,
       value: filterValue,
       globalFilters: this.filters.global
@@ -141,7 +147,7 @@ class PhoenixTableFilterManager {
     // שמירת מצב פילטרים
     this.saveFilterState();
 
-    console.log('[PhoenixTableFilterManager] Local filter updated', {
+    _log('[PhoenixTableFilterManager] Local filter updated', {
       key: filterKey,
       value: filterValue,
       localFilters: this.filters.local
@@ -193,7 +199,7 @@ class PhoenixTableFilterManager {
     // עדכון מידע pagination (אם קיים)
     this.updatePaginationInfo(visibleCount, rows.length);
 
-    console.log('[PhoenixTableFilterManager] Filters applied', {
+    _log('[PhoenixTableFilterManager] Filters applied', {
       globalFilters: this.filters.global,
       localFilters: this.filters.local,
       additionalFilters,
@@ -372,7 +378,7 @@ class PhoenixTableFilterManager {
     // יישום פילטרים (רק גלובליים)
     this.applyFilters();
 
-    console.log('[PhoenixTableFilterManager] Local filters cleared');
+    _log('[PhoenixTableFilterManager] Local filters cleared');
   }
 
   /**

@@ -20,16 +20,20 @@
       e.preventDefault();
       e.stopPropagation();
       
-      const isHidden = summaryContent.style.display === 'none' || 
-                      summaryContent.style.display === '' ||
-                      window.getComputedStyle(summaryContent).display === 'none';
+      // Check if hidden using CSS classes or data attributes (Clean Slate Rule compliance)
+      const isHidden = !summaryContent.classList.contains('visible') && 
+                      summaryContent.getAttribute('data-visible') !== 'true';
       
       if (isHidden) {
-        summaryContent.style.display = 'flex';
+        // Show summary using CSS classes (Clean Slate Rule compliance)
+        summaryContent.classList.add('visible');
+        summaryContent.setAttribute('data-visible', 'true');
         toggleButton.setAttribute('aria-expanded', 'true');
         toggleButton.setAttribute('title', 'הסתר סיכום מלא');
       } else {
-        summaryContent.style.display = 'none';
+        // Hide summary using CSS classes (Clean Slate Rule compliance)
+        summaryContent.classList.remove('visible');
+        summaryContent.setAttribute('data-visible', 'false');
         toggleButton.setAttribute('aria-expanded', 'false');
         toggleButton.setAttribute('title', 'הצג סיכום מלא');
       }

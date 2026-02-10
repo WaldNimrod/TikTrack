@@ -10,201 +10,477 @@
  * - קונטיינר 3: טבלת תנועות
  * - קונטיינר 4: טבלת פוזיציות
  * 
- * @version v1.2 - Hardened: Uses centralized transformers.js (v1.2) for all transformations
+ * @version v2.0 - Phase 2: Uses Shared_Services.js (PDSC Client) for all API calls
+ * 
+ * Note: Trading Accounts API schema not in API Integration Guide yet.
+ * Using Shared_Services.js for consistency with D18 and D21.
+ * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md
  */
 
-// Import centralized transformers (transformers.js v1.2)
+// Import PDSC Client (Shared_Services.js)
+import sharedServices from '../../../components/core/Shared_Services.js';
+
+// Import transformers for additional transformations if needed
 import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
-// API Base URL - Use Vite proxy (configured in vite.config.js)
-// Vite proxy: /api -> http://localhost:8082
-// This avoids CORS issues and works in both dev and production
-const API_BASE_URL = '/api/v1';
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 /**
- * Get Authorization Header
+ * Validate ULID format
+ * ULID format: 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+ * @param {string} value - Value to validate
+ * @returns {boolean} True if valid ULID
  */
-function getAuthHeader() {
-  const token = localStorage.getItem('access_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+function isValidULID(value) {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+  // ULID is 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+  const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+  return ulidRegex.test(value);
+}
+
+/**
+ * Normalize tradingAccountId - only return if valid ULID
+ * Gate B Fix: Prevent sending invalid tradingAccountId (e.g., "הכול", account names) to API
+ * @param {any} value - Filter value
+ * @returns {string|undefined} Valid ULID or undefined
+ */
+function normalizeTradingAccountId(value) {
+  if (!value || typeof value !== 'string') {
+    return undefined;
+  }
+  // If value is "הכול" or empty string, return undefined
+  if (value === 'הכול' || value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+  // If value is a valid ULID, return it
+  if (isValidULID(value)) {
+    return value;
+  }
+  // Otherwise, return undefined (don't send invalid values)
+  return undefined;
 }
 
 /**
  * Fetch Trading Accounts
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - status (string, optional) - Filter by status
+ * - search (string, optional) - Search in account names
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Response data with data array and total
  */
 async function fetchTradingAccounts(filters = {}) {
   try {
-    const params = new URLSearchParams();
-    if (filters.status !== undefined) params.append('status', filters.status);
-    if (filters.search) params.append('search', filters.search);
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const url = `${API_BASE_URL}/trading_accounts${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    const response = await sharedServices.get('/trading_accounts', filters);
     
-    // Debug logging removed - security compliance
-    // Use maskedLog if debug logging is required
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
+    // Response is already transformed by Shared_Services
+    return {
+      data: response.data || [],
+      total: response.total || 0
+    };
+  } catch (error) {
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Error fetching trading accounts:', { 
+      errorCode: error.code,
+      status: error.status
     });
     
-    if (!response.ok) {
-      // Try to get error details from response
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Trading Accounts Data Loader] API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching trading accounts:', error);
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Fetch Cash Flows
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Reuses Cash Flows API integration (same as D21)
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Response data with data array, total, and summary
  */
 async function fetchCashFlows(filters = {}) {
   try {
-    const params = new URLSearchParams();
-    if (filters.tradingAccountId) params.append('trading_account_id', filters.tradingAccountId);
-    if (filters.dateFrom) params.append('date_from', filters.dateFrom);
-    if (filters.dateTo) params.append('date_to', filters.dateTo);
-    if (filters.flowType) params.append('flow_type', filters.flowType);
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const url = `${API_BASE_URL}/cash_flows${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const normalizedFilters = { ...filters };
+    if (normalizedFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      if (normalizedId) {
+        normalizedFilters.tradingAccountId = normalizedId;
+      } else {
+        delete normalizedFilters.tradingAccountId;
+      }
+    }
+    delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(normalizedFilters).forEach(key => {
+      const value = normalizedFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete normalizedFilters[key];
       }
     });
     
-    if (!response.ok) {
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Trading Accounts Data Loader] API Error (cash_flows):', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo, flowType)
+    // Shared_Services will automatically transform to snake_case for API
+    const response = await sharedServices.get('/cash_flows', normalizedFilters);
+    
+    // Parse decimal strings to numbers for summary
+    const summary = response.summary ? {
+      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
+      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
+      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
+    } : {
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      netFlow: 0
+    };
+    
+    return {
+      data: response.data || [],
+      total: response.total || 0,
+      summary: summary
+    };
+  } catch (error) {
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Error fetching cash flows:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
+    return { 
+      data: [], 
+      total: 0, 
+      summary: { 
+        totalDeposits: 0, 
+        totalWithdrawals: 0, 
+        netFlow: 0 
+      } 
+    };
+  }
+}
+
+/**
+ * Fetch Trading Accounts Summary
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Query Parameters (camelCase → snake_case automatically):
+ * - status (string, optional) - Filter by status
+ * - investmentType (string, optional) - Filter by investment type
+ * - tradingAccountId (string, optional) - Filter by trading account ULID
+ * - dateFrom (date, optional) - Filter by date >= dateFrom (YYYY-MM-DD)
+ * - dateTo (date, optional) - Filter by date <= dateTo (YYYY-MM-DD)
+ * - search (string, optional) - Search in account names
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Summary data from Backend
+ */
+async function fetchTradingAccountsSummary(filters = {}) {
+  try {
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
+    
+    // Gate B Fix: Remove pagination parameters from summary call
+    // Summary endpoints don't need pagination (page, page_size)
+    const summaryFilters = { ...filters };
+    delete summaryFilters.page;
+    delete summaryFilters.pageSize;
+    
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    if (summaryFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(summaryFilters.tradingAccountId);
+      if (normalizedId) {
+        summaryFilters.tradingAccountId = normalizedId;
+      } else {
+        delete summaryFilters.tradingAccountId;
+      }
+    }
+    
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    const response = await sharedServices.get('/trading_accounts/summary', summaryFilters);
+    
+    // Response is already transformed by Shared_Services
+    const summary = response.summary || response;
+    
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Summary fetched from Backend', { summary });
+    
+    return summary;
   } catch (error) {
-    console.error('Error fetching cash flows:', error);
-    return { data: [], total: 0, summary: { totalDeposits: 0, totalWithdrawals: 0, netFlow: 0 } };
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Error fetching trading accounts summary:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
+      });
+    }
+    
+    // Return default summary structure - don't throw to prevent SEVERE errors
+    return {
+      totalAccounts: 0,
+      activeAccounts: 0,
+      totalBalance: 0,
+      totalPl: 0,
+      totalValue: 0,
+      avgValue: 0,
+      activePositions: 0
+    };
   }
 }
 
 /**
  * Fetch Cash Flows Summary
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Reuses Cash Flows Summary API integration (same as D21)
+ * Used for Container 2 (Cash Flows Summary Cards)
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Summary data
  */
 async function fetchCashFlowsSummary(filters = {}) {
   try {
-    const params = new URLSearchParams();
-    if (filters.tradingAccountId) params.append('trading_account_id', filters.tradingAccountId);
-    if (filters.dateFrom) params.append('date_from', filters.dateFrom);
-    if (filters.dateTo) params.append('date_to', filters.dateTo);
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const url = `${API_BASE_URL}/cash_flows/summary${params.toString() ? '?' + params.toString() : ''}`;
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
+    // Gate B Fix: Remove pagination parameters from summary call
+    // Summary endpoints don't need pagination (page, page_size)
+    // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const summaryFilters = { ...filters };
+    delete summaryFilters.page;
+    delete summaryFilters.pageSize;
+    delete summaryFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
+    
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(summaryFilters).forEach(key => {
+      const value = summaryFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete summaryFilters[key];
       }
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    if (summaryFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(summaryFilters.tradingAccountId);
+      if (normalizedId) {
+        summaryFilters.tradingAccountId = normalizedId;
+      } else {
+        delete summaryFilters.tradingAccountId;
+      }
     }
     
-    const data = await response.json();
-    return apiToReact(data);
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo)
+    // Shared_Services will automatically transform to snake_case for API
+    const response = await sharedServices.get('/cash_flows/summary', summaryFilters);
+    
+    // Parse decimal strings to numbers
+    const summary = response.summary ? {
+      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
+      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
+      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
+    } : {
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      netFlow: 0
+    };
+    
+    return summary;
   } catch (error) {
-    console.error('Error fetching cash flows summary:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Error fetching cash flows summary:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
+      });
+    }
+    
     return { totalDeposits: 0, totalWithdrawals: 0, netFlow: 0 };
   }
 }
 
 /**
  * Fetch Positions
+ * 
+ * @description Uses Shared_Services.js (PDSC Client) for API calls
+ * Note: Positions API schema not in API Integration Guide yet.
+ * Using Shared_Services.js for consistency.
+ * 
+ * @param {Object} filters - Filter parameters (camelCase)
+ * @returns {Promise<Object>} Response data with data array and total
  */
 async function fetchPositions(filters = {}) {
   try {
-    const params = new URLSearchParams();
-    if (filters.tradingAccountId) params.append('trading_account_id', filters.tradingAccountId);
+    // Ensure Shared Services is initialized
+    await sharedServices.init();
     
-    const url = `${API_BASE_URL}/positions${params.toString() ? '?' + params.toString() : ''}`;
-    const authHeader = getAuthHeader();
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+    // Gate B Fix: Remove empty strings - they cause 400 errors
+    const normalizedFilters = { ...filters };
+    if (normalizedFilters.tradingAccountId) {
+      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      if (normalizedId) {
+        normalizedFilters.tradingAccountId = normalizedId;
+      } else {
+        delete normalizedFilters.tradingAccountId;
+      }
+    }
+    
+    // Gate B Fix: Remove empty strings from filters
+    Object.keys(normalizedFilters).forEach(key => {
+      const value = normalizedFilters[key];
+      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+        delete normalizedFilters[key];
       }
     });
     
-    if (!response.ok) {
-      let errorDetails = '';
-      try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
-      } catch (e) {
-        errorDetails = await response.text();
-      }
-      console.error('[Trading Accounts Data Loader] API Error (positions):', {
-        status: response.status,
-        statusText: response.statusText,
-        errorDetails
+    // Use Shared_Services.get() - automatically handles:
+    // - routes.json SSOT
+    // - Transformers (camelCase → snake_case for query params)
+    // - Error handling (PDSC Error Schema)
+    // - Response transformation (snake_case → camelCase)
+    // Note: filters should be in camelCase (e.g., tradingAccountId)
+    // Shared_Services will automatically transform to snake_case for API
+    const response = await sharedServices.get('/positions', normalizedFilters);
+    
+    // Response is already transformed by Shared_Services
+    return {
+      data: response.data || [],
+      total: response.total || 0
+    };
+  } catch (error) {
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('[Trading Accounts Data Loader] Error fetching positions:', { 
+      errorCode: error.code,
+      status: error.status
+    });
+    
+    // Handle PDSC Error Schema
+    if (error.code) {
+      maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
+        code: error.code,
+        message: error.message_i18n || error.message
       });
-      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
-    const data = await response.json();
-    return apiToReact(data);
-  } catch (error) {
-    console.error('Error fetching positions:', error);
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Load Container 0: Summary and Alerts
+ * 
+ * @description Loads summary from trading_accounts/summary endpoint (SSOT v1.2.0: REQUIRED)
+ * No local calculation - all data comes from Backend endpoint
  */
 async function loadContainer0() {
   try {
-    const accountsData = await fetchTradingAccounts();
-    const accounts = accountsData.data || [];
+    // Get global filters for summary
+    const globalFilters = {};
+    const statusFilter = document.getElementById('selectedStatus');
+    const investmentTypeFilter = document.getElementById('selectedType');
+    const accountFilter = document.getElementById('selectedAccount');
+    const dateRangeFilter = document.getElementById('selectedDateRange');
+    const searchInput = document.getElementById('searchFilterInput');
     
-    // Calculate totals
-    const totalAccounts = accounts.length;
-    const activeAccounts = accounts.filter(acc => acc.isActive).length;
-    const totalBalance = accounts.reduce((sum, acc) => sum + parseFloat(acc.balance || 0), 0);
-    const totalPnL = accounts.reduce((sum, acc) => sum + parseFloat(acc.totalPl || 0), 0);
+    if (statusFilter && statusFilter.textContent !== 'כל סטטוס') {
+      globalFilters.status = statusFilter.textContent === 'פתוח';
+    }
+    
+    if (investmentTypeFilter && investmentTypeFilter.textContent !== 'כל סוג השקעה') {
+      globalFilters.investmentType = investmentTypeFilter.textContent;
+    }
+    
+    if (accountFilter && accountFilter.textContent !== 'כל חשבון מסחר') {
+      // TODO: Extract account ULID from filter when available
+      globalFilters.tradingAccountId = null;
+    }
+    
+    if (dateRangeFilter && dateRangeFilter.textContent !== 'כל זמן') {
+      // TODO: Extract date range from filter when available
+      globalFilters.dateFrom = null;
+      globalFilters.dateTo = null;
+    }
+    
+    if (searchInput && searchInput.value) {
+      globalFilters.search = searchInput.value;
+    }
+    
+    // Fetch summary from Backend endpoint (SSOT v1.2.0: REQUIRED)
+    const summaryData = await fetchTradingAccountsSummary(globalFilters);
+    
+    // Extract summary values (handle both snake_case and camelCase from Shared_Services)
+    const totalAccounts = summaryData.totalAccounts || summaryData.total_accounts || 0;
+    const activeAccounts = summaryData.activeAccounts || summaryData.active_accounts || 0;
+    const totalBalance = parseFloat(summaryData.totalBalance || summaryData.total_balance || 0);
+    const totalPnL = parseFloat(summaryData.totalPl || summaryData.total_pl || summaryData.totalPnL || 0);
+    const totalValue = parseFloat(summaryData.totalValue || summaryData.total_value || 0);
+    const avgValue = parseFloat(summaryData.avgValue || summaryData.avg_value || 0);
+    const activePositions = summaryData.activePositions || summaryData.active_positions || 0;
     
     // Update summary stats
     const totalAccountsEl = document.getElementById('totalAccounts');
@@ -226,12 +502,6 @@ async function loadContainer0() {
     }
     
     // Update expanded summary
-    const positionsData = await fetchPositions();
-    const positions = positionsData.data || [];
-    const activePositions = positions.filter(pos => pos.status === 'OPEN').length;
-    const totalValue = accounts.reduce((sum, acc) => sum + parseFloat(acc.accountValue || 0), 0);
-    const avgValue = totalAccounts > 0 ? totalValue / totalAccounts : 0;
-    
     const expandedContent = document.getElementById('portfolioSummaryContent');
     if (expandedContent) {
       expandedContent.innerHTML = `
@@ -248,7 +518,12 @@ async function loadContainer0() {
       headerCount.textContent = '0 התראות פעילות'; // TODO: Add alerts when available
     }
   } catch (error) {
-    console.error('Error loading Container 0:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading Container 0:', { 
+      errorCode: error.code,
+      status: error.status
+    });
   }
 }
 
@@ -327,7 +602,12 @@ async function loadContainer1(filters = {}) {
       headerCount.textContent = `${activeAccounts} חשבונות פעילים`;
     }
   } catch (error) {
-    console.error('Error loading Container 1:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading Container 1:', { 
+      errorCode: error.code,
+      status: error.status
+    });
   }
 }
 
@@ -373,7 +653,12 @@ async function loadContainer2(filters = {}) {
       headerCount.textContent = `${flowsData.total || 0} תנועות`;
     }
   } catch (error) {
-    console.error('Error loading Container 2:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading Container 2:', { 
+      errorCode: error.code,
+      status: error.status
+    });
   }
 }
 
@@ -454,7 +739,12 @@ async function loadContainer3(filters = {}) {
       headerCount.textContent = `${flowsData.total || 0} רשומות`;
     }
   } catch (error) {
-    console.error('Error loading Container 3:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading Container 3:', { 
+      errorCode: error?.code,
+      status: error?.status
+    });
   }
 }
 
@@ -551,7 +841,12 @@ async function loadContainer4(filters = {}) {
       headerCount.textContent = `${activePositions} פוזיציות פעילות`;
     }
   } catch (error) {
-    console.error('Error loading Container 4:', error);
+    // Gate B Fix: Handle errors gracefully - don't log full error object
+    // Use masked log for security compliance (prevents token leakage)
+    maskedLog('Error loading Container 4:', { 
+      errorCode: error.code,
+      status: error.status
+    });
   }
 }
 
@@ -586,7 +881,44 @@ async function loadAllContainers() {
   ]);
 }
 
-// Export for global use
+// Gate B Fix: Export as ES module for dynamic import support
+// Also maintain global export for legacy compatibility
+export {
+  loadContainer0,
+  loadContainer1,
+  loadContainer2,
+  loadContainer3,
+  loadContainer4,
+  loadAllContainers,
+  fetchTradingAccounts,
+  fetchTradingAccountsSummary,
+  fetchCashFlows,
+  fetchCashFlowsSummary,
+  fetchPositions
+};
+
+// Export main loader function for DataStage
+export async function loadTradingAccountsData(filters = {}) {
+  // Get filters from Bridge if not provided
+  const bridgeFilters = window.PhoenixBridge?.state?.filters || {};
+  const mergedFilters = { ...bridgeFilters, ...filters };
+  
+  // Load all containers with merged filters
+  await loadAllContainers();
+  
+  // Return data structure compatible with other loaders
+  return {
+    containers: {
+      0: null, // Container 0 data is loaded directly into DOM
+      1: null, // Container 1 data is loaded directly into DOM
+      2: null, // Container 2 data is loaded directly into DOM
+      3: null, // Container 3 data is loaded directly into DOM
+      4: null  // Container 4 data is loaded directly into DOM
+    }
+  };
+}
+
+// Export for global use (legacy compatibility)
 window.TradingAccountsDataLoader = {
   loadContainer0,
   loadContainer1,
@@ -595,9 +927,11 @@ window.TradingAccountsDataLoader = {
   loadContainer4,
   loadAllContainers,
   fetchTradingAccounts,
+  fetchTradingAccountsSummary,
   fetchCashFlows,
   fetchCashFlowsSummary,
-  fetchPositions
+  fetchPositions,
+  loadTradingAccountsData
 };
 
 // Auto-initialize

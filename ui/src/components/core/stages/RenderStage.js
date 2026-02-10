@@ -8,6 +8,7 @@
  */
 
 import { StageBase } from './StageBase.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class RenderStage extends StageBase {
   constructor() {
@@ -36,9 +37,9 @@ export class RenderStage extends StageBase {
       const components = this.identifyComponents(config);
       
       if (components.length === 0) {
-        console.log('[Render Stage] No components identified for rendering');
+        maskedLog('[Render Stage] No components identified for rendering');
       } else {
-        console.log('[Render Stage] Components identified:', components);
+        maskedLog('[Render Stage] Components identified:', { components });
         
         // Load component initializers
         await this.loadComponentInitializers(components, config);
@@ -53,7 +54,7 @@ export class RenderStage extends StageBase {
         componentsCount: Object.keys(this.components).length
       });
       
-      console.log('[Render Stage] Rendering completed', {
+      maskedLog('[Render Stage] Rendering completed', {
         componentsInitialized: Object.keys(this.components).length
       });
       
@@ -152,7 +153,7 @@ export class RenderStage extends StageBase {
         }
         
         this.components.table = { initialized: true };
-        console.log('[Render Stage] Table initialized:', pageType);
+        maskedLog('[Render Stage] Table initialized:', { pageType });
       } else {
         console.warn('[Render Stage] Table init function not found for:', pageType);
       }

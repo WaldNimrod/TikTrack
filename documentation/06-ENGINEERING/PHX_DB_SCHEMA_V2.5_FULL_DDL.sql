@@ -1018,6 +1018,53 @@ CREATE INDEX idx_cash_flows_type
 COMMENT ON TABLE user_data.cash_flows IS 'Account deposits, withdrawals, dividends';
 
 -- ----------------------------------------------------------------------------
+-- ENUM Type: user_data.commission_type
+-- ----------------------------------------------------------------------------
+CREATE TYPE user_data.commission_type AS ENUM ('TIERED', 'FLAT');
+
+-- ----------------------------------------------------------------------------
+-- Table: user_data.brokers_fees
+-- ----------------------------------------------------------------------------
+CREATE TABLE user_data.brokers_fees (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES user_data.users(id) ON DELETE CASCADE,
+    
+    -- Broker Details
+    broker VARCHAR(100) NOT NULL,
+    commission_type user_data.commission_type NOT NULL,
+    commission_value VARCHAR(255) NOT NULL,
+    minimum NUMERIC(20, 6) NOT NULL DEFAULT 0,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ,
+    
+    -- Constraints
+    CONSTRAINT brokers_fees_minimum_check CHECK (minimum >= 0)
+);
+
+CREATE INDEX idx_brokers_fees_user_id 
+    ON user_data.brokers_fees(user_id);
+    
+CREATE INDEX idx_brokers_fees_broker 
+    ON user_data.brokers_fees(broker);
+    
+CREATE INDEX idx_brokers_fees_commission_type 
+    ON user_data.brokers_fees(commission_type);
+    
+CREATE INDEX idx_brokers_fees_deleted_at 
+    ON user_data.brokers_fees(deleted_at) 
+    WHERE deleted_at IS NULL;
+    
+CREATE INDEX idx_brokers_fees_user_deleted 
+    ON user_data.brokers_fees(user_id, deleted_at) 
+    WHERE deleted_at IS NULL;
+
+COMMENT ON TABLE user_data.brokers_fees IS 'Brokers fees and commission structures (D18) - Stores broker commission information per user';
+COMMENT ON COLUMN user_data.brokers_fees.minimum IS 'Minimum commission per transaction in USD (NUMERIC(20,6) for precision - per SSOT)';
+
+-- ----------------------------------------------------------------------------
 -- Table: user_data.alerts
 -- ----------------------------------------------------------------------------
 CREATE TABLE user_data.alerts (

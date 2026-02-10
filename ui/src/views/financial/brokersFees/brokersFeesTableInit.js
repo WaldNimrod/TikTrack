@@ -6,6 +6,11 @@
  */
 
 import { loadBrokersFeesData } from './brokersFeesDataLoader.js';
+import sharedServices from '../../../components/core/Shared_Services.js';
+import { showBrokerFeeFormModal } from './brokersFeesForm.js';
+
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 // Load table formatters (available via window.tableFormatters)
 // Ensure tableFormatters.js is loaded before this script
@@ -122,7 +127,11 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       updateTable(result.table.data);
       updatePagination();
     } catch (error) {
-      console.error('Error loading brokers fees data:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('Error loading brokers fees data:', { 
+        errorCode: error?.code,
+        status: error?.status
+      });
     }
   }
   
@@ -141,7 +150,11 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       updateTable(result.table.data);
       updatePagination();
     } catch (error) {
-      console.error('Error loading table data:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('Error loading table data:', { 
+        errorCode: error?.code,
+        status: error?.status
+      });
     }
   }
   
@@ -193,9 +206,12 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
     }
     
     data.forEach(broker => {
+      // Use externalUlid if available, otherwise use id
+      const brokerId = broker.externalUlid || broker.external_ulid || broker.id || '';
+      
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.setAttribute('data-broker-id', broker.id || '');
+      row.setAttribute('data-broker-id', brokerId);
       
       // Broker name
       const brokerCell = document.createElement('td');
@@ -213,10 +229,8 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       const commissionType = (broker.commissionType || '').toLowerCase();
       if (commissionType === 'tiered') {
         badge.className += ' commission-type-badge--tiered';
-        badge.style.cssText = 'background: rgba(38, 186, 172, 0.1); border: 1px solid var(--entity-trades-color, #26baac); color: var(--entity-trades-color, #26baac);';
       } else if (commissionType === 'flat') {
         badge.className += ' commission-type-badge--flat';
-        badge.style.cssText = 'background: rgba(23, 162, 184, 0.1); border: 1px solid var(--entity-ticker-color, #17a2b8); color: var(--entity-ticker-color, #17a2b8);';
       }
       badge.textContent = broker.commissionType || '';
       typeCell.appendChild(badge);
@@ -283,6 +297,20 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
     
     // Initialize action handlers
     initActionHandlers();
+    initAddButton();
+  }
+  
+  /**
+   * Initialize add button handler
+   */
+  function initAddButton() {
+    const addButton = document.querySelector('.js-add-broker-fee');
+    if (addButton) {
+      addButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleAddBrokerFee();
+      });
+    }
   }
   
   /**
@@ -297,9 +325,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const brokerId = this.getAttribute('data-broker-id');
-        // TODO: Implement view action
-        // Debug logging removed - security compliance
-        // Use maskedLog if debug logging is required
+        handleViewBrokerFee(brokerId);
       });
     });
     
@@ -307,9 +333,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const brokerId = this.getAttribute('data-broker-id');
-        // TODO: Implement edit action
-        // Debug logging removed - security compliance
-        // Use maskedLog if debug logging is required
+        handleEditBrokerFee(brokerId);
       });
     });
     
@@ -317,11 +341,229 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const brokerId = this.getAttribute('data-broker-id');
-        // TODO: Implement delete action
-        // Debug logging removed - security compliance
-        // Use maskedLog if debug logging is required
+        handleDeleteBrokerFee(brokerId);
       });
     });
+  }
+  
+  /**
+   * Handle view broker fee action
+   */
+  async function handleViewBrokerFee(brokerId) {
+    // Find broker fee in current table data
+    const brokerFee = tableData.data?.find(b => b.id === brokerId || b.externalUlid === brokerId);
+    if (brokerFee) {
+      showBrokerFeeModal(brokerFee, 'view');
+    } else {
+      // Try to fetch from API if not found in table
+      try {
+        await sharedServices.init();
+        const response = await sharedServices.get(`/brokers_fees/${brokerId}`);
+        showBrokerFeeModal(response.data || response, 'view');
+      } catch (error) {
+        maskedLog('[Brokers Fees] Error viewing broker fee:', {
+          errorCode: error.code,
+          status: error.status
+        });
+        alert('שגיאה בטעינת פרטי העמלה');
+      }
+    }
+  }
+  
+  /**
+   * Handle edit broker fee action
+   */
+  async function handleEditBrokerFee(brokerId) {
+    // Find broker fee in current table data
+    const brokerFee = tableData.data?.find(b => b.id === brokerId || b.externalUlid === brokerId);
+    if (brokerFee) {
+      showBrokerFeeModal(brokerFee, 'edit');
+    } else {
+      // Try to fetch from API if not found in table
+      try {
+        await sharedServices.init();
+        const response = await sharedServices.get(`/brokers_fees/${brokerId}`);
+        showBrokerFeeModal(response.data || response, 'edit');
+      } catch (error) {
+        maskedLog('[Brokers Fees] Error loading broker fee for edit:', {
+          errorCode: error.code,
+          status: error.status
+        });
+        alert('שגיאה בטעינת פרטי העמלה לעריכה');
+      }
+    }
+  }
+  
+  /**
+   * Handle delete broker fee action
+   */
+  async function handleDeleteBrokerFee(brokerId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק את העמלה?')) {
+      return;
+    }
+    
+    try {
+      await sharedServices.init();
+      await sharedServices.delete(`/brokers_fees/${brokerId}`);
+      // Reload table data
+      loadTableData();
+      maskedLog('[Brokers Fees] Broker fee deleted successfully', { brokerId });
+    } catch (error) {
+      maskedLog('[Brokers Fees] Error deleting broker fee:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה במחיקת העמלה');
+    }
+  }
+  
+  /**
+   * Handle add new broker fee action
+   */
+  function handleAddBrokerFee() {
+    // Show add modal/dialog with empty form
+    showBrokerFeeModal(null, 'add');
+  }
+  
+  /**
+   * Show broker fee modal (view/edit/add)
+   */
+  function showBrokerFeeModal(data, mode) {
+    if (mode === 'view') {
+      // View mode - show read-only modal
+      alert(`צפייה בעמלה:\n${JSON.stringify(data, null, 2)}`);
+    } else if (mode === 'edit') {
+      // Edit mode - show form with existing data
+      showBrokerFeeFormModal(data, function(formData, originalData) {
+        // Use form data directly (already in correct format)
+        handleSaveBrokerFee(originalData.externalUlid || originalData.id, formData);
+      });
+    } else if (mode === 'add') {
+      // Add mode - show empty form
+      showBrokerFeeFormModal(null, function(formData) {
+        handleSaveBrokerFee(null, formData);
+      });
+    }
+  }
+  
+  // Export for use by add button if exists
+  window.handleAddBrokerFee = handleAddBrokerFee;
+  
+  /**
+   * Handle save broker fee (create or update)
+   */
+  async function handleSaveBrokerFee(brokerId, brokerFeeData) {
+    try {
+      await sharedServices.init();
+      
+      // Prepare data for API (ensure camelCase format and numeric types)
+      // commissionValue is now numeric (not string) - convert to number if needed
+      const commissionValueRaw = brokerFeeData.commissionValue ?? brokerFeeData.commission_value ?? 0;
+      let commissionValue;
+      
+      if (typeof commissionValueRaw === 'string') {
+        // Try to parse string to number
+        const parsed = parseFloat(commissionValueRaw);
+        commissionValue = isNaN(parsed) ? 0 : parsed;
+      } else if (typeof commissionValueRaw === 'number') {
+        commissionValue = commissionValueRaw;
+      } else {
+        commissionValue = 0;
+      }
+      
+      // Ensure minimum is also a number
+      const minimum = typeof brokerFeeData.minimum === 'number' 
+        ? brokerFeeData.minimum 
+        : parseFloat(brokerFeeData.minimum) || 0;
+      
+      const apiData = {
+        broker: brokerFeeData.broker || brokerFeeData.brokerName || '',
+        commissionType: brokerFeeData.commissionType || brokerFeeData.commission_type || 'TIERED',
+        commissionValue: commissionValue,
+        minimum: minimum
+      };
+      
+      // Debug log (will be masked)
+      maskedLog('[Brokers Fees] Sending data to API:', {
+        broker: apiData.broker,
+        commissionType: apiData.commissionType,
+        commissionValue: apiData.commissionValue,
+        commissionValueType: typeof apiData.commissionValue,
+        minimum: apiData.minimum
+      });
+      
+      // Use externalUlid if available, otherwise use brokerId
+      const idToUse = brokerFeeData.externalUlid || brokerId;
+      
+      if (idToUse) {
+        // Update existing
+        await sharedServices.put(`/brokers_fees/${idToUse}`, apiData);
+        maskedLog('[Brokers Fees] Broker fee updated successfully', { brokerId: idToUse });
+      } else {
+        // Create new
+        await sharedServices.post('/brokers_fees', apiData);
+        maskedLog('[Brokers Fees] Broker fee created successfully');
+      }
+      
+      // Reload table data
+      loadTableData();
+    } catch (error) {
+      maskedLog('[Brokers Fees] Error saving broker fee:', {
+        errorCode: error.code,
+        status: error.status,
+        details: error.details
+      });
+      
+      // Show user-friendly error message
+      let errorMessage = 'שגיאה בשמירת העמלה';
+      
+      // Handle validation errors with field details
+      if (error.code === 'VALIDATION_FIELD_REQUIRED' || error.status === 422) {
+        // Try to extract detailed error information
+        let detailedMessage = error.message || '';
+        
+        // Check if error.details contains field-specific information
+        if (error.details) {
+          if (error.details.field) {
+            const fieldName = error.details.field === 'commission_value' ? 'ערך עמלה' :
+                            error.details.field === 'commission_type' ? 'סוג עמלה' :
+                            error.details.field === 'broker' ? 'שם ברוקר' :
+                            error.details.field === 'minimum' ? 'מינימום' :
+                            error.details.field;
+            detailedMessage = `שגיאה בשדה ${fieldName}: ${error.details.message || error.message || 'אנא מלא את השדה הנדרש'}`;
+          } else if (typeof error.details === 'object') {
+            // Check for Pydantic validation errors format
+            const detailKeys = Object.keys(error.details);
+            if (detailKeys.length > 0) {
+              const firstError = error.details[detailKeys[0]];
+              if (Array.isArray(firstError) && firstError.length > 0) {
+                detailedMessage = firstError[0];
+              } else if (typeof firstError === 'string') {
+                detailedMessage = firstError;
+              }
+            }
+          }
+        }
+        
+        if (detailedMessage && detailedMessage !== error.message) {
+          errorMessage = detailedMessage;
+        } else {
+          errorMessage = error.message || 'אנא מלא את כל השדות הנדרשים';
+        }
+      } else if (error.message_i18n || error.message) {
+        errorMessage = error.message_i18n || error.message;
+      }
+      
+      // Log full error for debugging (will be masked)
+      maskedLog('[Brokers Fees] Full error details:', {
+        code: error.code,
+        status: error.status,
+        message: error.message,
+        details: error.details
+      });
+      
+      alert(errorMessage);
+    }
   }
   
   /**

@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway) + Team 40 (UI Assets & Design)  
 **status:** 🔒 **SSOT - MANDATORY**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-02  
-**version:** v1.0
+**last_updated:** 2026-02-07  
+**version:** v1.1
 
 ---
 
@@ -27,6 +27,24 @@
 ## ⚠️ חוק ברזל: סדר הטעינה הוא קדוש
 
 **אין לשנות את סדר הטעינה!** כל שינוי יגרום לשבירת סגנונות.
+
+---
+
+## 🔒 דפי HTML סטטיים (לא React) — חובה יישור ל-SSOT
+
+**סטטוס:** Doc Alignment — מניעת drift בסדר טעינת CSS (2026-02-07)
+
+- **כל דפי HTML שאינם React** (כולל D16, D18, D21 וכל עמוד סטטיים עתידיים) **חייבים** ליישר את סדר טעינת ה-CSS **בדיוק** לפי ה-SSOT המפורט במסמך זה.
+- ה-SSOT עצמו תקין; הבעיה היא **ביישום בפועל** בדפי HTML — יש לוודא שכל קובץ HTML מציג את אותו סדר טעינה כמו בסעיף "📚 סדר טעינה מדויק" ובדוגמה "דוגמה 3: בלופרינט HTML".
+- **סדר מחייב בדפי HTML:**  
+  1. Pico CSS (CDN)  
+  2. phoenix-base.css  
+  3. phoenix-components.css (או מקביל לפי מבנה הפרויקט)  
+  4. phoenix-header.css  
+  5. Page-Specific CSS  
+- כל נהלי Blueprint / HTML pages **חייבים** להפנות למסמך זה (קריאת חובה). ראה `documentation/05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md` — חובה להפניה ל-`CSS_LOADING_ORDER.md`.
+
+**מטרה:** למנוע חזרה של drift בסדר טעינת CSS בדפי HTML עתידיים.
 
 ---
 
@@ -303,8 +321,9 @@ Array.from(document.styleSheets).forEach((sheet, index) => {
 - **CSS Classes Index:** `documentation/04-DESIGN_UX_UI/CSS_CLASSES_INDEX.md`
 - **כלי בדיקה:** `ui/check-css-loading.js`
 - **Blueprint Guidelines:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md`
+- **נוהל Blueprint/HTML pages (חובה להפניה למסמך זה):** `documentation/05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md`
 
 ---
 
-**עודכן על ידי:** Team 10 (עם Team 40) | 2026-02-02  
+**עודכן על ידי:** Team 10 (עם Team 40) | 2026-02-07 (v1.1 — סעיף דפי HTML סטטיים + יישור נוהל)  
 **סטטוס:** ✅ **ACTIVE - MANDATORY**

@@ -23,7 +23,9 @@
 
 ## גיבוי ל-GitHub
 
-יש לבצע commit ו-push של כל המסמכים והארטיפקטים הרלוונטיים (כולל GATE_B_STATUS.md, עדכוני 00_MASTER_INDEX, וארטיפקטי phase2-e2e-artifacts) לפי נהלי הפרויקט.
+**כלל גיבוי:** תיקיית `documentation/` **תמיד** נכללת בגיבוי. תיקיית `_COMMUNICATION/` **לא** נכללת בגיבוי.
+
+יש לבצע commit ו-push של כל השינויים ב-`documentation/` (כולל GATE_B_STATUS.md, עדכוני 00_MASTER_INDEX, וארטיפקטי phase2-e2e-artifacts) לפי נהלי הפרויקט.
 
 ---
 

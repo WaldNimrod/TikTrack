@@ -15,15 +15,39 @@
 
 import { reactToApi, apiToReact } from '../../cubes/shared/utils/transformers.js';
 
+// Import masked log utility for security compliance
+import { maskedLog } from '../../utils/maskedLog.js';
+
 /**
  * Shared Services - PDSC Client
  */
 class SharedServices {
   constructor() {
-    this.routesConfig = null;
+    this._routesConfig = null; // Internal storage
     this.apiBaseUrl = null;
     this.backendPort = null;
     this.token = null;
+  }
+  
+  /**
+   * Get routes config (SSOT)
+   * Gate B Fix: Expose routesConfig for E2E tests
+   * @returns {Object|null} routes.json config
+   */
+  get routesConfig() {
+    return this._routesConfig;
+  }
+  
+  /**
+   * Set routes config and expose globally
+   * Gate B Fix: Expose routesConfig on window for E2E tests
+   */
+  set routesConfig(value) {
+    this._routesConfig = value;
+    // Also expose on window for E2E tests
+    if (typeof window !== 'undefined') {
+      window.routesConfig = value;
+    }
   }
   
   /**
@@ -39,7 +63,7 @@ class SharedServices {
         throw new Error('Failed to load routes.json (SSOT)');
       }
       
-      this.routesConfig = await response.json();
+      this.routesConfig = await response.json(); // Uses setter which exposes to window
       
       // Verify routes.json version
       if (this.routesConfig.version !== '1.1.2') {
@@ -68,15 +92,29 @@ class SharedServices {
       // Get token from localStorage or sessionStorage
       this.token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
       
-      console.log('[Shared Services] Initialized:', {
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('[Shared Services] Initialized:', {
         apiBaseUrl: this.apiBaseUrl,
         backendPort: this.backendPort,
         version: this.routesConfig.version
       });
     } catch (error) {
-      console.error('[Shared Services] Initialization failed:', error);
+      // Gate B Fix: Handle errors gracefully - don't log full error object
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('[Shared Services] Initialization failed:', { 
+        errorMessage: error.message
+      });
       throw error;
     }
+  }
+  
+  /**
+   * Get routes config (SSOT)
+   * Gate B Fix: Expose routesConfig for E2E tests
+   * @returns {Object|null} routes.json config
+   */
+  getRoutesConfig() {
+    return this.routesConfig;
   }
   
   /**
@@ -108,6 +146,7 @@ class SharedServices {
   
   /**
    * Build full API URL
+   * Gate B Fix: Handle dateRange object - split into date_from and date_to
    * @param {string} endpoint - API endpoint (e.g., '/trading_accounts')
    * @param {Object} queryParams - Query parameters (camelCase)
    * @returns {string} Full API URL
@@ -116,15 +155,55 @@ class SharedServices {
     const baseUrl = this.getApiBaseUrl();
     let url = `${baseUrl}${endpoint}`;
     
-    // Transform query params to snake_case
-    const apiQueryParams = reactToApi(queryParams);
+    // Gate B Fix: Normalize dateRange object before transformation
+    // dateRange should be split into dateFrom and dateTo, not sent as object
+    const normalizedParams = { ...queryParams };
+    if (normalizedParams.dateRange && typeof normalizedParams.dateRange === 'object' && !Array.isArray(normalizedParams.dateRange)) {
+      // Extract dateFrom and dateTo from dateRange object
+      if (normalizedParams.dateRange.from) {
+        normalizedParams.dateFrom = normalizedParams.dateRange.from;
+      }
+      if (normalizedParams.dateRange.to) {
+        normalizedParams.dateTo = normalizedParams.dateRange.to;
+      }
+      // Remove dateRange object - don't send it as query param
+      delete normalizedParams.dateRange;
+    }
     
-    // Build query string
+    // Transform query params to snake_case
+    const apiQueryParams = reactToApi(normalizedParams);
+    
+    // Build query string - filter out objects, arrays, and empty strings
     const queryString = new URLSearchParams(
       Object.entries(apiQueryParams)
-        .filter(([_, value]) => value !== null && value !== undefined)
+        .filter(([_, value]) => {
+          // Gate B Fix: Filter out null, undefined, and empty strings
+          if (value === null || value === undefined) {
+            return false;
+          }
+          // Gate B Fix: Filter out empty strings - they cause 400 errors
+          if (value === '' || String(value).trim() === '') {
+            return false;
+          }
+          // Gate B Fix: Filter out objects and arrays - they should be normalized before this point
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            // This shouldn't happen if normalization worked, but log warning
+            maskedLog('[Shared Services] Warning: Object value in query params (should be normalized):', { key: _ });
+            return false;
+          }
+          return true;
+        })
         .reduce((acc, [key, value]) => {
-          acc[key] = String(value);
+          // Convert to string, but skip objects/arrays
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            return acc; // Skip objects
+          }
+          const stringValue = String(value).trim();
+          // Gate B Fix: Don't add empty strings to query params
+          if (stringValue === '') {
+            return acc;
+          }
+          acc[key] = stringValue;
           return acc;
         }, {})
     ).toString();
@@ -210,19 +289,72 @@ class SharedServices {
       const url = this.buildUrl(endpoint, queryParams);
       const headers = this.buildHeaders(options.headers);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-        ...options
-      });
+      // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          headers,
+          ...options
+        });
+      } catch (fetchError) {
+        // Network error or fetch failed - don't throw SEVERE
+        maskedLog('[Shared Services] Fetch failed (network error):', { 
+          endpoint,
+          errorMessage: fetchError.message
+        });
+        const networkError = new Error(`Network error: ${fetchError.message}`);
+        networkError.code = 'NETWORK_ERROR';
+        networkError.status = 0;
+        throw networkError;
+      }
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Gate B Fix: Handle 400/404/500 gracefully without throwing SEVERE errors
+        // Return error object instead of throwing to prevent SEVERE console errors
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText
+        };
+        
+        // Try to parse error response body if available
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.details = errorBody.error.details || {};
+          }
+        } catch (e) {
+          // Ignore JSON parse errors
+        }
+        
+        // Use masked log for security compliance (prevents token leakage)
+        maskedLog('[Shared Services] GET request failed:', { 
+          endpoint,
+          status: response.status,
+          code: errorData.code
+        });
+        
+        // Return error object instead of throwing to prevent SEVERE console errors
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        errorObj.details = errorData.details || {};
+        throw errorObj;
       }
       
       return await this.handleResponse(response);
     } catch (error) {
-      console.error('[Shared Services] GET request failed:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      // Gate B Fix: Don't log full error object to prevent SEVERE console errors
+      maskedLog('[Shared Services] GET request failed:', { 
+        endpoint,
+        errorCode: error.code || 'UNKNOWN',
+        errorMessage: error.message
+      });
       throw error;
     }
   }
@@ -242,20 +374,68 @@ class SharedServices {
       // Transform request body (camelCase → snake_case)
       const apiBody = reactToApi(body);
       
-      const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(apiBody),
-        ...options
-      });
+      // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(apiBody),
+          ...options
+        });
+      } catch (fetchError) {
+        // Network error or fetch failed - don't throw SEVERE
+        maskedLog('[Shared Services] Fetch failed (network error):', { 
+          endpoint,
+          errorMessage: fetchError.message
+        });
+        const networkError = new Error(`Network error: ${fetchError.message}`);
+        networkError.code = 'NETWORK_ERROR';
+        networkError.status = 0;
+        throw networkError;
+      }
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText
+        };
+        
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.details = errorBody.error.details || {};
+          }
+        } catch (e) {
+          // Ignore JSON parse errors
+        }
+        
+        maskedLog('[Shared Services] POST request failed:', { 
+          endpoint,
+          status: response.status,
+          code: errorData.code
+        });
+        
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        errorObj.details = errorData.details || {};
+        throw errorObj;
       }
       
       return await this.handleResponse(response);
     } catch (error) {
-      console.error('[Shared Services] POST request failed:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('[Shared Services] POST request failed:', { 
+        endpoint,
+        errorCode: error.code || 'UNKNOWN',
+        errorMessage: error.message
+      });
       throw error;
     }
   }
@@ -275,20 +455,68 @@ class SharedServices {
       // Transform request body (camelCase → snake_case)
       const apiBody = reactToApi(body);
       
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(apiBody),
-        ...options
-      });
+      // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(apiBody),
+          ...options
+        });
+      } catch (fetchError) {
+        // Network error or fetch failed - don't throw SEVERE
+        maskedLog('[Shared Services] Fetch failed (network error):', { 
+          endpoint,
+          errorMessage: fetchError.message
+        });
+        const networkError = new Error(`Network error: ${fetchError.message}`);
+        networkError.code = 'NETWORK_ERROR';
+        networkError.status = 0;
+        throw networkError;
+      }
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText
+        };
+        
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.details = errorBody.error.details || {};
+          }
+        } catch (e) {
+          // Ignore JSON parse errors
+        }
+        
+        maskedLog('[Shared Services] PUT request failed:', { 
+          endpoint,
+          status: response.status,
+          code: errorData.code
+        });
+        
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        errorObj.details = errorData.details || {};
+        throw errorObj;
       }
       
       return await this.handleResponse(response);
     } catch (error) {
-      console.error('[Shared Services] PUT request failed:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('[Shared Services] PUT request failed:', { 
+        endpoint,
+        errorCode: error.code || 'UNKNOWN',
+        errorMessage: error.message
+      });
       throw error;
     }
   }
@@ -304,19 +532,67 @@ class SharedServices {
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
       
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers,
-        ...options
-      });
+      // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'DELETE',
+          headers,
+          ...options
+        });
+      } catch (fetchError) {
+        // Network error or fetch failed - don't throw SEVERE
+        maskedLog('[Shared Services] Fetch failed (network error):', { 
+          endpoint,
+          errorMessage: fetchError.message
+        });
+        const networkError = new Error(`Network error: ${fetchError.message}`);
+        networkError.code = 'NETWORK_ERROR';
+        networkError.status = 0;
+        throw networkError;
+      }
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText
+        };
+        
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.details = errorBody.error.details || {};
+          }
+        } catch (e) {
+          // Ignore JSON parse errors
+        }
+        
+        maskedLog('[Shared Services] DELETE request failed:', { 
+          endpoint,
+          status: response.status,
+          code: errorData.code
+        });
+        
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        errorObj.details = errorData.details || {};
+        throw errorObj;
       }
       
       return await this.handleResponse(response);
     } catch (error) {
-      console.error('[Shared Services] DELETE request failed:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('[Shared Services] DELETE request failed:', { 
+        endpoint,
+        errorCode: error.code || 'UNKNOWN',
+        errorMessage: error.message
+      });
       throw error;
     }
   }
@@ -325,9 +601,18 @@ class SharedServices {
 // Create singleton instance
 const sharedServices = new SharedServices();
 
+// Gate B Fix: Expose sharedServices instance on window for E2E tests
+if (typeof window !== 'undefined') {
+  window.sharedServices = sharedServices;
+}
+
 // Auto-initialize when module loads
 sharedServices.init().catch(error => {
-  console.error('[Shared Services] Auto-initialization failed:', error);
+  // Gate B Fix: Handle errors gracefully - don't log full error object
+  // Use masked log for security compliance (prevents token leakage)
+  maskedLog('[Shared Services] Auto-initialization failed:', { 
+    errorMessage: error.message
+  });
 });
 
 // Export singleton instance

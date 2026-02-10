@@ -58,7 +58,35 @@
     });
   }
   
+  function closeFilterMenu(menuId) {
+    // Close specific filter menu
+    if (window.headerSystem?.filterManager?.closeFilter) {
+      window.headerSystem.filterManager.closeFilter(menuId);
+    } else {
+      // Fallback: close menu manually
+      const menu = document.getElementById(menuId);
+      if (menu) {
+        menu.style.display = 'none';
+        menu.style.opacity = '0';
+        menu.style.visibility = 'hidden';
+      }
+    }
+  }
+  
   function initFilterButtons() {
+    // Filter close buttons
+    const filterCloseBtns = document.querySelectorAll('.filter-close-btn.js-filter-close');
+    filterCloseBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const menuId = btn.getAttribute('data-filter-menu');
+        if (menuId) {
+          closeFilterMenu(menuId);
+        }
+      });
+    });
+    
     // Search clear button
     const searchClearBtn = document.querySelector('.search-clear-btn.js-search-clear');
     if (searchClearBtn) {

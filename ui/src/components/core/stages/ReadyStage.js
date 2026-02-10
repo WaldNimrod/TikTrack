@@ -8,6 +8,7 @@
  */
 
 import { StageBase } from './StageBase.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class ReadyStage extends StageBase {
   constructor() {
@@ -67,7 +68,7 @@ export class ReadyStage extends StageBase {
         window.UAIState.totalDuration = readyStage.endTime - domStage.startTime;
       }
       
-      console.log('[Ready Stage] Initialization finalized', {
+      maskedLog('[Ready Stage] Initialization finalized', {
         stages,
         totalDuration: window.UAIState.totalDuration ? `${window.UAIState.totalDuration}ms` : 'unknown'
       });
@@ -94,6 +95,6 @@ export class ReadyStage extends StageBase {
       timestamp: Date.now()
     });
     
-    console.log('[Ready Stage] Page ready signal emitted');
+    maskedLog('[Ready Stage] Page ready signal emitted');
   }
 }

@@ -11,8 +11,12 @@
     "test:errors": "node --experimental-modules error-handling.test.js",
     "test:password-change": "node --experimental-modules password-change.test.js",
     "test:routing": "node --experimental-modules trading-accounts-routing.test.js",
+    "test:phase2": "node phase2-runtime.test.js",
+    "test:phase2-e2e": "node phase2-e2e-selenium.test.js",
+    "test:phase2-e2e-rerun-failed": "PHASE2_E2E_ONLY_FAILED=1 node phase2-e2e-selenium.test.js",
+    "test:phase1-completion-b": "node phase1-completion-b-validation.test.js",
     "test:validation": "npx mocha validation-comprehensive.test.js --timeout 120000",
-    "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change && npm run test:routing"
+    "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change && npm run test:routing && npm run test:phase2 && npm run test:phase2-e2e"
   },
   "dependencies": {
     "selenium-webdriver": "^4.15.0",

@@ -9,6 +9,7 @@
 
 import { StageBase } from './StageBase.js';
 import { CSSLoadVerifier } from '../cssLoadVerifier.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class DOMStage extends StageBase {
   constructor() {
@@ -41,7 +42,7 @@ export class DOMStage extends StageBase {
       const cssVerifier = new CSSLoadVerifier({ strictMode: true });
       try {
         await cssVerifier.verifyCSSLoadOrder();
-        console.log('[DOM Stage] ✅ CSS Load Order Verified', {
+        maskedLog('[DOM Stage] ✅ CSS Load Order Verified', {
           baseCSSFile: cssVerifier.options.baseCSSFile,
           variablesChecked: cssVerifier.options.criticalVariables.length
         });

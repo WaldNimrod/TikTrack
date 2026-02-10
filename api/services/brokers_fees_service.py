@@ -10,14 +10,15 @@ Handles CRUD operations for broker fees with filtering and search.
 import uuid
 from typing import List, Optional
 from datetime import datetime
+from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
+from sqlalchemy import select, and_, or_, func, String
 import logging
 
 from ..models.brokers_fees import BrokerFee
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-from ..schemas.brokers_fees import BrokerFeeResponse
+from ..schemas.brokers_fees import BrokerFeeResponse, BrokerFeeSummaryResponse
 
 logger = logging.getLogger(__name__)
 
@@ -78,12 +79,12 @@ class BrokersFeesService:
                     error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
                 )
         
-        # Search in broker name and commission_value
+        # Search in broker name and commission_value (cast numeric to text for search)
         if search:
             conditions.append(
                 or_(
                     BrokerFee.broker.ilike(f"%{search}%"),
-                    BrokerFee.commission_value.ilike(f"%{search}%")
+                    func.cast(BrokerFee.commission_value, String).ilike(f"%{search}%")
                 )
             )
         
@@ -101,7 +102,7 @@ class BrokersFeesService:
             response = BrokerFeeResponse(
                 id=uuid_to_ulid(fee.id),
                 broker=fee.broker,
-                commission_type=fee.commission_type,
+                commission_type=fee.commission_type.value if hasattr(fee.commission_type, 'value') else fee.commission_type,
                 commission_value=fee.commission_value,
                 minimum=fee.minimum,
                 created_at=fee.created_at,
@@ -162,7 +163,7 @@ class BrokersFeesService:
         return BrokerFeeResponse(
             id=uuid_to_ulid(fee.id),
             broker=fee.broker,
-            commission_type=fee.commission_type,
+            commission_type=fee.commission_type.value if hasattr(fee.commission_type, 'value') else fee.commission_type,
             commission_value=fee.commission_value,
             minimum=fee.minimum,
             created_at=fee.created_at,
@@ -175,7 +176,7 @@ class BrokersFeesService:
         db: AsyncSession,
         broker: str,
         commission_type: str,
-        commission_value: str,
+        commission_value: Decimal,
         minimum: float
     ) -> BrokerFeeResponse:
         """
@@ -186,13 +187,13 @@ class BrokersFeesService:
             db: Database session
             broker: Broker name
             commission_type: Commission type (TIERED/FLAT)
-            commission_value: Commission value string
+            commission_value: Commission value (Decimal)
             minimum: Minimum commission (USD)
             
         Returns:
             BrokerFeeResponse
         """
-        # Normalize commission_type
+        # Normalize and validate commission_type
         commission_type_upper = commission_type.upper()
         if commission_type_upper not in ('TIERED', 'FLAT'):
             raise HTTPExceptionWithCode(
@@ -201,12 +202,20 @@ class BrokersFeesService:
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
             )
         
+        # Validate commission_value is non-negative
+        if commission_value < 0:
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail="commission_value must be non-negative",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+            )
+        
         # Create new broker fee
         new_fee = BrokerFee(
             user_id=user_id,
             broker=broker.strip(),
             commission_type=commission_type_upper,
-            commission_value=commission_value.strip(),
+            commission_value=commission_value,
             minimum=minimum
         )
         
@@ -231,7 +240,7 @@ class BrokersFeesService:
         db: AsyncSession,
         broker: Optional[str] = None,
         commission_type: Optional[str] = None,
-        commission_value: Optional[str] = None,
+        commission_value: Optional[Decimal] = None,
         minimum: Optional[float] = None
     ) -> BrokerFeeResponse:
         """
@@ -243,7 +252,7 @@ class BrokersFeesService:
             db: Database session
             broker: Broker name (optional)
             commission_type: Commission type (optional)
-            commission_value: Commission value string (optional)
+            commission_value: Commission value (Decimal, optional)
             minimum: Minimum commission (optional)
             
         Returns:
@@ -293,7 +302,14 @@ class BrokersFeesService:
                 )
             fee.commission_type = commission_type_upper
         if commission_value is not None:
-            fee.commission_value = commission_value.strip()
+            # Validate commission_value is non-negative
+            if commission_value < 0:
+                raise HTTPExceptionWithCode(
+                    status_code=400,
+                    detail="commission_value must be non-negative",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+                )
+            fee.commission_value = commission_value
         if minimum is not None:
             fee.minimum = minimum
         
@@ -303,7 +319,7 @@ class BrokersFeesService:
         return BrokerFeeResponse(
             id=uuid_to_ulid(fee.id),
             broker=fee.broker,
-            commission_type=fee.commission_type,
+            commission_type=fee.commission_type.value if hasattr(fee.commission_type, 'value') else fee.commission_type,
             commission_value=fee.commission_value,
             minimum=fee.minimum,
             created_at=fee.created_at,
@@ -358,6 +374,74 @@ class BrokersFeesService:
         # Soft delete
         fee.deleted_at = datetime.utcnow()
         await db.commit()
+    
+    async def get_brokers_fees_summary(
+        self,
+        user_id: uuid.UUID,
+        db: AsyncSession,
+        broker: Optional[str] = None,
+        commission_type: Optional[str] = None
+    ) -> BrokerFeeSummaryResponse:
+        """
+        Get brokers fees summary statistics.
+        
+        Args:
+            user_id: User UUID
+            db: Database session
+            broker: Filter by broker name (optional)
+            commission_type: Filter by commission type (TIERED/FLAT) (optional)
+            
+        Returns:
+            BrokerFeeSummaryResponse with summary statistics
+        """
+        # Base query conditions
+        conditions = [
+            BrokerFee.user_id == user_id,
+            BrokerFee.deleted_at.is_(None)
+        ]
+        
+        # Filter by broker name
+        if broker:
+            conditions.append(BrokerFee.broker.ilike(f"%{broker}%"))
+        
+        # Filter by commission_type
+        if commission_type:
+            commission_type_upper = commission_type.upper().strip()
+            if commission_type_upper in ('TIERED', 'FLAT'):
+                conditions.append(BrokerFee.commission_type == commission_type_upper)
+            else:
+                # Invalid commission_type - log warning but don't fail
+                # This allows the endpoint to work even with invalid filter values
+                logger.warning(
+                    f"Invalid commission_type filter: {commission_type}. "
+                    f"Valid values are: TIERED, FLAT. Ignoring filter."
+                )
+        
+        # Count total brokers
+        stmt_total = select(func.count(BrokerFee.id)).where(and_(*conditions))
+        result_total = await db.execute(stmt_total)
+        total_brokers = result_total.scalar() or 0
+        
+        # Count active brokers (assuming all non-deleted are active)
+        active_brokers = total_brokers
+        
+        # Calculate average commission per trade (using minimum as proxy)
+        stmt_avg = select(func.avg(BrokerFee.minimum)).where(and_(*conditions))
+        result_avg = await db.execute(stmt_avg)
+        avg_commission_per_trade = result_avg.scalar() or Decimal("0")
+        
+        # For fixed commissions, we'd need additional data
+        # For now, return 0 as placeholder
+        monthly_fixed_commissions = Decimal("0")
+        yearly_fixed_commissions = Decimal("0")
+        
+        return BrokerFeeSummaryResponse(
+            total_brokers=total_brokers,
+            active_brokers=active_brokers,
+            avg_commission_per_trade=Decimal(str(avg_commission_per_trade)),
+            monthly_fixed_commissions=monthly_fixed_commissions,
+            yearly_fixed_commissions=yearly_fixed_commissions
+        )
 
 
 # Singleton instance

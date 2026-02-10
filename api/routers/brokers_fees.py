@@ -21,7 +21,8 @@ from ..schemas.brokers_fees import (
     BrokerFeeResponse,
     BrokerFeeListResponse,
     BrokerFeeCreateRequest,
-    BrokerFeeUpdateRequest
+    BrokerFeeUpdateRequest,
+    BrokerFeeSummaryResponse
 )
 
 logger = logging.getLogger(__name__)
@@ -71,6 +72,99 @@ async def get_brokers_fees(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch broker fees",
+            error_code=ErrorCodes.SERVER_ERROR
+        )
+
+
+@router.get("/summary", response_model=BrokerFeeSummaryResponse)
+async def get_brokers_fees_summary(
+    broker: Optional[str] = Query(default=None, description="Filter by broker name"),
+    commission_type: Optional[str] = Query(default=None, description="Filter by commission type (TIERED/FLAT)"),
+    # Ignore pagination parameters (page, page_size) - summary endpoint doesn't use them
+    # These are included to prevent 400 errors when Frontend sends them
+    page: Optional[int] = Query(default=None, include_in_schema=False),
+    page_size: Optional[int] = Query(default=None, include_in_schema=False),
+    # Ignore additional parameters that Frontend may send but are not used by summary endpoint
+    # These are included to prevent 400 errors when Frontend sends invalid/unexpected parameters
+    # Using default=None explicitly to handle empty strings gracefully
+    date_range: Optional[str] = Query(default=None, include_in_schema=False),
+    search: Optional[str] = Query(default=None, include_in_schema=False),
+    date_from: Optional[str] = Query(default=None, include_in_schema=False),
+    date_to: Optional[str] = Query(default=None, include_in_schema=False),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get brokers fees summary statistics.
+    
+    Returns summary statistics:
+    - total_brokers: Total number of brokers
+    - active_brokers: Number of active brokers
+    - avg_commission_per_trade: Average commission per trade
+    - monthly_fixed_commissions: Total monthly fixed commissions
+    - yearly_fixed_commissions: Total yearly fixed commissions
+    
+    Query Parameters:
+    - broker: Filter by broker name (optional)
+    - commission_type: Filter by commission type (TIERED/FLAT) (optional)
+    - page: Ignored (pagination not applicable to summary)
+    - page_size: Ignored (pagination not applicable to summary)
+    """
+    # Log incoming request parameters for debugging (Team 90 requirement)
+    logger.info(
+        f"[DEBUG] Brokers fees summary request - user_id: {current_user.id}, "
+        f"broker: '{broker}' (type: {type(broker).__name__}), "
+        f"commission_type: '{commission_type}' (type: {type(commission_type).__name__}), "
+        f"page: {page}, page_size: {page_size}, "
+        f"date_range: '{date_range}', search: '{search}', "
+        f"date_from: '{date_from}', date_to: '{date_to}'"
+    )
+    
+    try:
+        # Normalize commission_type if provided (case-insensitive)
+        # Handle None, empty string, or whitespace-only strings as None
+        normalized_commission_type = None
+        if commission_type and commission_type.strip():
+            normalized_commission_type = commission_type.upper().strip()
+            if normalized_commission_type not in ('TIERED', 'FLAT'):
+                logger.warning(
+                    f"Invalid commission_type provided: {commission_type}. "
+                    f"Valid values are: TIERED, FLAT. Ignoring filter."
+                )
+                normalized_commission_type = None
+        
+        # Normalize broker if provided (trim whitespace)
+        # Handle None, empty string, or whitespace-only strings as None
+        normalized_broker = None
+        if broker and broker.strip():
+            normalized_broker = broker.strip()
+        
+        service = get_brokers_fees_service()
+        summary = await service.get_brokers_fees_summary(
+            user_id=current_user.id,
+            db=db,
+            broker=normalized_broker,
+            commission_type=normalized_commission_type
+        )
+        
+        logger.debug(
+            f"Brokers fees summary response - total_brokers: {summary.total_brokers}, "
+            f"active_brokers: {summary.active_brokers}"
+        )
+        
+        return summary
+    except HTTPExceptionWithCode:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Error fetching brokers fees summary - user_id: {current_user.id}, "
+            f"broker: {broker}, commission_type: {commission_type}, "
+            f"error: {str(e)}",
+            exc_info=True
+        )
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch brokers fees summary",
             error_code=ErrorCodes.SERVER_ERROR
         )
 

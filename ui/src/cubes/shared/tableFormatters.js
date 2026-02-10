@@ -298,28 +298,31 @@ function formatNumericValue(value, currency = null, decimals = 2) {
  * formatCommissionValue(10, 'fixed') // "$10.00"
  */
 function formatCommissionValue(value, commissionType = '') {
-  if (!value) {
+  if (value === null || value === undefined || value === '') {
     return '';
   }
   
   const type = (commissionType || '').toLowerCase();
   
-  // If value is already a formatted string, return as is
-  if (typeof value === 'string' && (value.includes('/') || value.includes('%') || value.includes('$'))) {
-    return value;
-  }
+  // Convert to number if it's a string (for backward compatibility)
+  // commission_value is now NUMERIC(20,6) - should be a number from API
+  const numValue = typeof value === 'string' && (value.includes('/') || value.includes('%') || value.includes('$'))
+    ? value // Already formatted string - return as is (backward compatibility)
+    : Number(value) || 0;
   
   // Format based on commission type
   if (type === 'tiered') {
-    return `${value} $ / Share`;
-  } else if (type === 'flat' || type === 'percentage') {
-    return `${value} % / Volume`;
+    return `${numValue} $ / Share`;
+  } else if (type === 'flat') {
+    return `${numValue} % / Volume`;
+  } else if (type === 'percentage') {
+    return `${numValue} % / Volume`;
   } else if (type === 'fixed') {
-    return formatCurrency(Number(value) || 0, 'USD', 2);
+    return formatCurrency(numValue, 'USD', 2);
   }
   
-  // Default: return as string
-  return String(value);
+  // Default: return as string with value
+  return String(numValue);
 }
 
 // Export for use in modules

@@ -63,16 +63,22 @@
 - **תוכן:** Schema מלא, field mappings, data types
 - **מוכנות:** ✅ **100%**
 
-### **3. Brokers Fees (D18)** ⚠️ **חסר Field Map**
-- **מיקום:** לא נמצא ב-`documentation/01-ARCHITECTURE/LOGIC/`
-- **סטטוס:** ⚠️ **חסר Field Map**
+### **3. Brokers Fees (D18)** ✅ **מוכן עם API Integration Guide**
+- **מיקום Field Map:** לא נמצא ב-`documentation/01-ARCHITECTURE/LOGIC/`
+- **סטטוס:** ✅ **מוכן עם API Integration Guide מ-Team 20**
 - **מידע קיים:**
   - ✅ DB Table: `user_data.brokers_fees` נוצרה (2026-02-06)
+  - ✅ API Integration Guide: `TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md` (מפורט)
+  - ✅ API Schema מפורט: כל ה-endpoints, request/response schemas
   - ✅ API Endpoint: `/brokers_fees` מוגדר ב-PDSC Contract
   - ✅ Page Config: `brokersFeesPageConfig.js` קיים
   - ✅ HTML File: `brokers_fees.html` קיים
-- **נדרש:** Field Map מפורט (`WP_20_08_C_FIELD_MAP_BROKERS_FEES.md`)
-- **מוכנות:** ⚠️ **50%** (יש תשתית, חסר Field Map)
+  - ✅ Data Loader: `brokersFeesDataLoader.js` קיים
+- **Schema מ-API Guide:**
+  - `id` (ULID), `broker` (string), `commission_type` ("TIERED" | "FLAT")
+  - `commission_value` (string), `minimum` (NUMERIC(20,8) as string)
+  - `created_at`, `updated_at` (ISO 8601)
+- **מוכנות:** ✅ **100%** (יש API Integration Guide מפורט עם כל ה-Schema)
 
 ---
 
@@ -150,13 +156,19 @@
 
 ---
 
-## ⚠️ חומרים חסרים
+## ✅ חומרים נוספים שקיבלנו
 
-### **1. Brokers Fees Field Map** ⚠️ **CRITICAL**
-- **חסר:** Field Map ל-Brokers Fees (D18)
-- **נדרש:** Schema מלא, field mappings, data types
-- **השפעה:** לא ניתן להתחיל פיתוח D18 ללא Field Map
-- **פעולה נדרשת:** יצירת Field Map או אישור מ-Team 20 על Schema
+### **1. API Integration Guide מ-Team 20** ✅ **COMPLETE**
+- **מיקום:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md`
+- **תוכן:**
+  - ✅ D18 - Brokers Fees API - Schema מפורט לכל endpoint
+  - ✅ D21 - Cash Flows API - Schema מפורט לכל endpoint
+  - ✅ Error Handling - PDSC Error Schema
+  - ✅ Data Transformation - Transformers guidelines
+  - ✅ Authentication - JWT token management
+  - ✅ דוגמאות שימוש מלאות (CRUD)
+  - ✅ Validation Rules
+- **מוכנות:** ✅ **100%** - מספק את כל המידע הדרוש
 
 ---
 
@@ -169,10 +181,10 @@
 - ✅ EFR Hardened Transformers Lock
 - ✅ CSS Load Verification Spec
 
-### **Field Maps:** ⚠️ **2/3 (67%)**
-- ✅ Trading Accounts (D16)
-- ✅ Cash Flows (D21)
-- ❌ Brokers Fees (D18) - **חסר**
+### **Field Maps:** ✅ **3/3 (100%)**
+- ✅ Trading Accounts (D16) - Field Map קיים
+- ✅ Cash Flows (D21) - Field Map קיים
+- ✅ Brokers Fees (D18) - **API Integration Guide עם Schema מפורט** (מחליף Field Map)
 
 ### **Blueprints:** ✅ **5/5 (100%)**
 - ✅ Master Blueprint
@@ -218,9 +230,9 @@
 
 ---
 
-## ✅ סיכום סופי
+## ✅ סיכום סופי - מעודכן עם API Integration Guide
 
-**מוכנות כוללת:** ⚠️ **93% (14/15)**
+**מוכנות כוללת:** ✅ **100% (15/15)**
 
 ### **מוכן להתקדם ב-100%:**
 - ✅ **D16 - Trading Accounts**
@@ -231,20 +243,21 @@
 
 - ✅ **D21 - Cash Flows**
   - ✅ Field Map קיים
+  - ✅ API Integration Guide מפורט מ-Team 20
   - ✅ כל ה-Specs זמינים
   - ✅ Base Assets מוכנים
   - ✅ מוכנות: **100%**
 
-### **מוכן להתקדם חלקית (50%):**
-- ⚠️ **D18 - Brokers Fees**
+- ✅ **D18 - Brokers Fees**
+  - ✅ API Integration Guide מפורט מ-Team 20 (מחליף Field Map)
+  - ✅ Schema מפורט לכל endpoint
   - ✅ תשתית קיימת (DB Table, API Endpoint, Page Config, HTML)
-  - ❌ חסר Field Map מפורט
-  - ⚠️ מוכנות: **50%**
-  - **המלצה:** ניתן להתחיל עבודה על UI/UX, אבל לא על Data Integration מלא ללא Field Map
+  - ✅ Data Loader קיים
+  - ✅ מוכנות: **100%**
 
 ### **המלצה סופית:**
-✅ **ניתן להתחיל בפיתוח D16 ו-D21 מיד.**  
-⚠️ **D18 - ניתן להתחיל עבודה על UI/UX, אבל Data Integration ממתין ל-Field Map.**
+✅ **ניתן להתחיל בפיתוח כל 3 העמודים (D16, D18, D21) מיד.**  
+✅ **API Integration Guide מ-Team 20 מספק את כל המידע הדרוש ל-D18.**
 
 ---
 

@@ -4,13 +4,24 @@
 **owner:** Team 30 (Frontend Execution) + Team 31 (Blueprint)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-05  
-**version:** v1.0.0
+**last_updated:** 2026-02-07  
+**version:** v1.0.1
 
 ---
 
 **Date:** 2026-01-31  
 **Status:** ✅ **ACTIVE**
+
+---
+
+## 📌 קריאת חובה — סדר טעינת CSS בדפי HTML
+
+**כל דפי HTML (לא React), כולל Blueprints ועמודים סטטיים (D16/D18/D21), חייבים ליישר את סדר טעינת ה-CSS בדיוק לפי ה-SSOT.**
+
+**מסמך מחייב:**  
+[**documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md**](../04-DESIGN_UX_UI/CSS_LOADING_ORDER.md) — סעיף "🔒 דפי HTML סטטיים (לא React)" וסדר הטעינה המדויק (Pico → phoenix-base.css → phoenix-components → phoenix-header → page-specific).
+
+אין לסטות מסדר זה; סטייה גורמת ל-drift ולביטול CSS Load Verification (UAI/DOMStage).
 
 ---
 

@@ -223,7 +223,9 @@ tt-section-row > * {
 }
 
 .dashboard-section__header-toggle-btn,
-.index-section__header-toggle-btn {
+.index-section__header-toggle-btn,
+.dashboard-section__header-action-btn,
+.index-section__header-action-btn {
   display: flex;
   align-items: center; /* CRITICAL: Aligned to middle */
   justify-content: center;
@@ -241,7 +243,9 @@ tt-section-row > * {
 }
 
 .dashboard-section__header-toggle-btn:hover,
-.index-section__header-toggle-btn:hover {
+.index-section__header-toggle-btn:hover,
+.dashboard-section__header-action-btn:hover,
+.index-section__header-action-btn:hover {
   background: var(--apple-bg-secondary, #f5f5f7);
 }
 
@@ -719,6 +723,19 @@ body .page-wrapper .page-container main {
   border-radius: 4px !important;
 }
 
+/* Commission Type Badges - D18 Brokers Fees */
+.commission-type-badge--tiered {
+  background: var(--entity-trades-bg-alpha, rgba(38, 186, 172, 0.1)) !important;
+  border: 1px solid var(--entity-trades-color, #26baac) !important;
+  color: var(--entity-trades-color, #26baac) !important;
+}
+
+.commission-type-badge--flat {
+  background: var(--entity-ticker-bg-alpha, rgba(23, 162, 184, 0.1)) !important;
+  border: 1px solid var(--entity-ticker-color, #17a2b8) !important;
+  color: var(--entity-ticker-color, #17a2b8) !important;
+}
+
 /* ============================================
    TABLE ACTIONS MENU
    ============================================
@@ -968,6 +985,7 @@ body .page-wrapper .page-container main {
   flex-wrap: wrap;
   gap: var(--spacing-sm, 8px);
   margin: 0;
+  margin-bottom: var(--spacing-md, 16px);
   padding: 0;
   align-items: center;
 }
@@ -1293,6 +1311,59 @@ body .page-wrapper .page-container main {
   background: var(--apple-bg-secondary, #f2f2f7);
   z-index: calc(var(--z-index-sticky, 200) + 1);
 }
+
+/* Sticky Column - ברוקר (לטבלת D18, ראשונה מימין ב-RTL) - Option D */
+.phoenix-table__header.col-broker,
+.phoenix-table__cell.col-broker {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+.phoenix-table__header.col-broker {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
+}
+
+/* Sticky Column - טרייד (לטבלת D21 Cash Flows, ראשונה מימין ב-RTL) - Option D */
+.phoenix-table__header.col-trade,
+.phoenix-table__cell.col-trade {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+.phoenix-table__header.col-trade {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
+}
+
+/* Sticky Column - תאריך (D16 Account Activity, D21 Currency Conversions - ראשונה מימין ב-RTL) - Option D */
+/* Note: col-date הוא Sticky רק כשהוא העמודה הראשונה בטבלה */
+#accountActivityTable .phoenix-table__header.col-date:first-child,
+#accountActivityTable .phoenix-table__cell.col-date:first-child,
+#currencyConversionsTable .phoenix-table__header.col-date:first-child,
+#currencyConversionsTable .phoenix-table__cell.col-date:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--apple-bg-elevated, #ffffff);
+  z-index: var(--z-index-sticky, 200);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header sticky עם רקע נפרד */
+#accountActivityTable .phoenix-table__header.col-date:first-child,
+#currencyConversionsTable .phoenix-table__header.col-date:first-child {
+  background: var(--apple-bg-secondary, #f2f2f7);
+  z-index: calc(var(--z-index-sticky, 200) + 1);
+}
+
 
 /* Sticky Column - פעולות (אחרונה משמאל ב-RTL) */
 .phoenix-table__header.col-actions,

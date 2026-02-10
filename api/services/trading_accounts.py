@@ -18,7 +18,7 @@ from ..models.trading_accounts import TradingAccount
 from ..models.trades import Trade
 from ..utils.identity import uuid_to_ulid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-from ..schemas.trading_accounts import TradingAccountResponse
+from ..schemas.trading_accounts import TradingAccountResponse, TradingAccountSummaryResponse
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +128,95 @@ class TradingAccountService:
             responses.append(response)
         
         return responses
+    
+    async def get_trading_accounts_summary(
+        self,
+        user_id: uuid.UUID,
+        db: AsyncSession,
+        status: Optional[bool] = None
+    ) -> TradingAccountSummaryResponse:
+        """
+        Get trading accounts summary statistics.
+        
+        Args:
+            user_id: User UUID
+            db: Database session
+            status: Filter by is_active (optional)
+            
+        Returns:
+            TradingAccountSummaryResponse with summary statistics
+        """
+        # Base query conditions
+        conditions = [
+            TradingAccount.user_id == user_id,
+            TradingAccount.deleted_at.is_(None)
+        ]
+        
+        if status is not None:
+            conditions.append(TradingAccount.is_active == status)
+        
+        # Count total accounts
+        stmt_total = select(func.count(TradingAccount.id)).where(and_(*conditions))
+        result_total = await db.execute(stmt_total)
+        total_accounts = result_total.scalar() or 0
+        
+        # Count active accounts
+        conditions_active = conditions + [TradingAccount.is_active == True]
+        stmt_active = select(func.count(TradingAccount.id)).where(and_(*conditions_active))
+        result_active = await db.execute(stmt_active)
+        active_accounts = result_active.scalar() or 0
+        
+        # Calculate totals: cash_balance, account_value
+        stmt_totals = select(
+            func.coalesce(func.sum(TradingAccount.cash_balance), Decimal("0")).label("total_cash_balance")
+        ).where(and_(*conditions))
+        result_totals = await db.execute(stmt_totals)
+        total_cash_balance = result_totals.scalar() or Decimal("0")
+        
+        # Get account IDs for trades calculations
+        stmt_accounts = select(TradingAccount.id).where(and_(*conditions))
+        result_accounts = await db.execute(stmt_accounts)
+        account_ids = [row[0] for row in result_accounts.all()]
+        
+        # Calculate totals from trades: holdings_value, total_pl, positions_count
+        total_holdings_value = Decimal("0")
+        total_unrealized_pl = Decimal("0")
+        total_positions = 0
+        
+        if account_ids:
+            trade_stats_stmt = select(
+                func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("total_pl"),
+                func.coalesce(func.sum(Trade.unrealized_pl), Decimal("0")).label("holdings_value"),
+                func.count(Trade.id).label("positions_count")
+            ).where(
+                and_(
+                    Trade.trading_account_id.in_(account_ids),
+                    Trade.user_id == user_id,
+                    cast(Trade.status, String) != "CLOSED",
+                    Trade.deleted_at.is_(None)
+                )
+            )
+            
+            trade_stats_result = await db.execute(trade_stats_stmt)
+            trade_stats_row = trade_stats_result.first()
+            
+            if trade_stats_row:
+                total_unrealized_pl = trade_stats_row.total_pl or Decimal("0")
+                total_holdings_value = trade_stats_row.holdings_value or Decimal("0")
+                total_positions = trade_stats_row.positions_count or 0
+        
+        # Calculate total_account_value = total_cash_balance + total_holdings_value
+        total_account_value = total_cash_balance + total_holdings_value
+        
+        return TradingAccountSummaryResponse(
+            total_accounts=total_accounts,
+            active_accounts=active_accounts,
+            total_account_value=total_account_value,
+            total_cash_balance=total_cash_balance,
+            total_holdings_value=total_holdings_value,
+            total_unrealized_pl=total_unrealized_pl,
+            total_positions=total_positions
+        )
 
 
 # Singleton instance

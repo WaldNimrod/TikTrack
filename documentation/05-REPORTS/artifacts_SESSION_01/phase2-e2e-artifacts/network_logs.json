@@ -2,16 +2,16 @@
   {
     "test": "CRUD_TradingAccounts",
     "apiCalls": 8,
-    "tableRows": 0
+    "tableRows": 3
   },
   {
     "test": "CRUD_BrokersFees",
     "apiCalls": 5,
-    "tableRows": 1
+    "tableRows": 7
   },
   {
     "test": "CRUD_CashFlows",
     "apiCalls": 6,
-    "tableRows": 1
+    "tableRows": 11
   }
 ]

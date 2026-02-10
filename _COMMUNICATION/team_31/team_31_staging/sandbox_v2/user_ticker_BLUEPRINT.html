@@ -436,7 +436,9 @@
     .info-summary__row--first > span {
       display: flex;
       align-items: center;
+      justify-content: center; /* CRITICAL: רשומות מידע מיושרות למרכז */
       gap: var(--spacing-xs, 8px);
+      text-align: center; /* CRITICAL: טקסט במרכז */
     }
     
     /* Toggle button aligned to end (right in RTL) */
@@ -765,6 +767,30 @@
     .filter-icon-btn,
     .table-action-btn {
       margin-bottom: 0 !important;
+    }
+    
+    /* CRITICAL: כפתורים פעילים - מסגרת וטקסט בצבע, רקע לבן */
+    .index-section__header-action-btn:not([style*="background: var(--apple-bg-secondary"]):not([style*="background: #F2F2F7"]) {
+      background: white !important;
+      color: var(--color-brand, #26baac) !important;
+      border: 2px solid var(--color-brand, #26baac) !important;
+    }
+    .index-section__header-action-btn:not([style*="background: var(--apple-bg-secondary"]):not([style*="background: #F2F2F7"]):hover {
+      background: white !important;
+      color: var(--color-brand, #26baac) !important;
+      border: 2px solid var(--color-brand, #26baac) !important;
+      box-shadow: 0 2px 8px rgba(38, 186, 172, 0.3) !important; /* צל */
+    }
+    
+    /* CRITICAL: כפתורי פעולות בטבלה - מסגרת וטקסט בצבע, רקע לבן */
+    .table-action-btn {
+      background: white !important;
+      border: 1px solid currentColor !important;
+    }
+    .table-action-btn:hover {
+      background: white !important;
+      border-color: currentColor !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important; /* צל */
     }
   </style>
   <!-- ============================================
@@ -1452,7 +1478,7 @@
                 <span class="index-section__header-count" id="userTickersCount">18 טיקרים</span>
               </div>
               <div class="index-section__header-actions">
-                <button class="index-section__header-action-btn" aria-label="הוסף טיקר" title="הוסף טיקר חדש" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--color-brand, #26baac); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin-bottom: 0;">
+                <button class="index-section__header-action-btn" aria-label="הוסף טיקר" title="הוסף טיקר חדש" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; color: var(--color-brand, #26baac); border: 2px solid var(--color-brand, #26baac); border-radius: 4px; cursor: pointer; font-weight: 600; margin-bottom: 0;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 5v14M5 12h14"></path>
                   </svg>

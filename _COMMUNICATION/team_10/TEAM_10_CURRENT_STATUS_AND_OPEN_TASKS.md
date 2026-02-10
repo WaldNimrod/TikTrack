@@ -87,18 +87,45 @@
 
 ---
 
-## 7. סבב הבא — חוסרים ויזואליים (Visual Gaps)
+## 7. סבב נוכחי — Visual Gaps + MAPPING_MODE (סגור)
 
-**מקור:** Team 90 — `TEAM_90_TO_TEAM_10_ADDITIONAL_VISUAL_GAPS_TASKS.md`.
+**מקור:** Team 90 — `TEAM_90_TO_TEAM_10_ADDITIONAL_VISUAL_GAPS_TASKS.md`; ADR‑013; מנדט Pre‑coding.
 
-| מסמך | תוכן |
+### 7.1 מה הושלם (סבב זה)
+
+| פריט | סטטוס |
 |------|--------|
-| **תוכנית עבודה** | `_COMMUNICATION/team_10/TEAM_10_VISUAL_GAPS_WORK_PLAN.md` — משימות מפורטות, חלוקת תפקידים, סדר ביצוע, שערים, דיוק עיצוב. |
-| **שאלות להחלטת אדריכל** | `_COMMUNICATION/team_10/TEAM_10_TO_ARCHITECT_VISUAL_GAPS_OPEN_QUESTIONS.md` — מקור רשימת ברוקרים, Rich Text, entity colors, מחלקות כפתורים. |
+| **MAPPING_MODE (Pre‑coding)** | ✅ **סגור** — צוות 90 אישר (MAPPING_OK + Hold). DATA_MAP_FINAL, CSS_RETROFIT_PLAN, DNA_BUTTON_SYSTEM/PALETTE_SSOT, ROUTES_MAP — מאושרים. |
+| **תיקון 7 ממצאים חוסמים (Team 90 Review)** | ✅ הושלם — 20 (DATA_MAP + ADMIN_ROLE_MAPPING), 30, 40 (DNA_PALETTE_SSOT, DNA_BUTTON_SYSTEM, CSS_RETROFIT + Admin), 10 (Routes). |
+| **Broker Mapping (פילטר)** | ✅ אומת; תיקון fallback; DATA_MAP_FINAL פר־משתמש + defaults JSON. |
+| **הודעת סגירת MAPPING_MODE** | ✅ `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md` — שלב 0 (Bridge) נוסף לתוכנית. |
 
-**סטטוס:** ממתין להחלטות אדריכל על השאלות הפתוחות; לאחר מכן הפעלת צוותים לפי התוכנית.
+### 7.2 משימות פעילות (סדר ביצוע)
+
+| שלב | נושא | סטטוס |
+|-----|------|--------|
+| **0** | **גשר React/HTML (Bridge)** — Lock Hybrid, Auth Redirect, routes.json↔React, Header אחיד | ⬜ פעיל (הבא) |
+| **1** | שער אוטנטיקציה (A/B/C/D) — Guards, Home containers, User Icon, Admin JWT | ⬜ ממתין |
+| **2** | Header Loader לפני React mount | ⬜ ממתין |
+| **3–7** | Select/Rich Text, כפתורים, צבע מודל, תקנון כפתורים, דף צבעים | ⬜ ממתין |
+| **שער א'** | Team 50 — הרצת בדיקות, 0 SEVERE | ⬜ ממתין |
+
+**מסמכי תזמור:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md`, `TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md`, `TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`.
+
+### 7.3 מסמכי מפתח (סבב Visual Gaps / MAPPING_MODE)
+
+| מטרה | מסמך |
+|------|------|
+| **תוכנית עבודה** | `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` |
+| **סדר עבודה עד שער א'** | `TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md` |
+| **סגירת MAPPING_MODE** | `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md` |
+| **משוב צוות 90 (Go + Hold)** | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_MAPPING_MODE_FEEDBACK_WITH_HOLD.md` |
+| **דוח Bridge (שלב 0)** | `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md` |
+| **דוח השלמת תיקונים** | `TEAM_10_MAPPING_MODE_BLOCKERS_COMPLETION_SUMMARY.md` |
+| **שאלות לאדריכל** | `TEAM_10_TO_ARCHITECT_VISUAL_GAPS_OPEN_QUESTIONS.md` |
+| **דוח השלמה (7 פריטים)** | `TEAM_10_VISUAL_GAPS_SUPPLEMENT_INFO_REPORT.md` |
 
 ---
 
 **log_entry | [Team 10] | CURRENT_STATUS_AND_OPEN_TASKS | UPDATED | 2026-02-10**  
-**log_entry | [Team 10] | SECTION_6_CLOSED | TRADING_ACCOUNTS_CRUD_VERIFIED | 2026-02-10**
+**log_entry | [Team 10] | MAPPING_MODE_CLOSED | BRIDGE_STEP_0_ACTIVE | 2026-02-10**

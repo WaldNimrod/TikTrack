@@ -28,13 +28,19 @@
 - **`.btn`** - מחלקה בסיסית לכל הכפתורים
 - **`button`** - תג HTML (מקבל את אותם סגנונות)
 
-### **2. CSS Variables (SSOT)**
-כל הצבעים מגיעים מ-`phoenix-base.css` (SSOT):
+### **2. CSS Variables (SSOT יחיד)**
+**SSOT רשמי:** `ui/src/styles/phoenix-base.css` (שורות 132-280) - **זהו המקור היחיד לאמת (SSOT)**
+
+כל הצבעים במערכת **חייבים** לבוא מ-`phoenix-base.css` בלבד. אין שימוש בצבעים מחוץ לפלטה.
+
+**משתני צבע עיקריים:**
 - `--color-primary` - צבע ראשי (#26baac)
 - `--color-secondary` - צבע משני (#fc5a06)
-- `--color-success` - הצלחה (#10b981)
-- `--color-error` / `--color-error-red` - שגיאה (#ef4444 / #FF3B30)
-- `--color-warning` - אזהרה (#f59e0b)
+- `--message-success` - הצלחה (#10b981) דרך `--apple-green`
+- `--message-error` - שגיאה (#ef4444) דרך `--color-error-red`
+- `--message-warning` - אזהרה (#f59e0b) דרך `--apple-orange`
+
+**⚠️ חשוב:** כל הצבעים מוגדרים ב-`phoenix-base.css` בלבד. קבצי CSS אחרים (`D15_DASHBOARD_STYLES.css`, `D15_IDENTITY_STYLES.css`) משתמשים במשתנים מהפלטה אך **לא מגדירים** צבעים חדשים.
 
 ### **3. Fluid Design**
 כל הכפתורים משתמשים ב-Fluid Design:
@@ -235,11 +241,14 @@ button,
 - `clamp()` ל-padding ו-font-size
 - Responsive אוטומטי
 
-### **4. CSS Variables (SSOT)**
-כל הצבעים מגיעים מ-`phoenix-base.css`:
+### **4. CSS Variables (SSOT יחיד)**
+**SSOT רשמי:** `ui/src/styles/phoenix-base.css` (שורות 132-280) - **מקור אמת יחיד**
+
+כל הצבעים במערכת **חייבים** לבוא מ-`phoenix-base.css` בלבד:
 - אין hardcoded colors
-- כל הצבעים דרך CSS Variables
-- SSOT: `phoenix-base.css`
+- כל הצבעים דרך CSS Variables מהפלטה
+- SSOT יחיד: `phoenix-base.css` (שורות 132-280)
+- ראה: `DNA_PALETTE_SSOT.md` למסמך SSOT רשמי
 
 ---
 
@@ -294,7 +303,8 @@ button,
 - ✅ מסמך זה הוא SSOT למחלקות כפתור במערכת
 - ✅ כל הצוותים חייבים להשתמש במחלקות אלה בלבד
 - ✅ אין ליצור מחלקות כפתור חדשות ללא אישור Team 40
-- ✅ כל הצבעים חייבים לבוא מ-CSS Variables (SSOT: `phoenix-base.css`)
+- ✅ כל הצבעים חייבים לבוא מ-CSS Variables (SSOT יחיד: `phoenix-base.css` שורות 132-280)
+- ✅ ראה `DNA_PALETTE_SSOT.md` למסמך SSOT רשמי לפלטת הצבעים
 
 **הבא:** יישום מחלקות כפתור בכל המודולים והטפסים
 

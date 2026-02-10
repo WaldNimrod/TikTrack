@@ -60,14 +60,15 @@
 
 | שלב | נושא | הערה |
 |-----|------|------|
-| **‑1** | **🔒 Pre‑coding Mapping (BLOCKING)** | **אין קידוד לפני:** DATA_MAP_FINAL.json (20/30), CSS_RETROFIT_PLAN (40), ROUTES_MAP A/B/C/D (10) + **אישור ויזואלי נמרוד**. ראה `ARCHITECT_PRE_CODING_MAPPING_MANDATE.md`. |
-| **0** | **שער אוטנטיקציה — 4 טיפוסים (A/B/C/D)** | **סעיף ראשון — חובה** לפני יתר המשימות; ADR‑013 LOCKED. |
-| 1 | Header תמיד אחרי Login → Home (משימה 7) | Header Loader לפני React mount — חסימת UX |
-| 2 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) |
-| 3 | סדר כפתורים במודל + RTL (משימה 3) | |
-| 4 | צבע כותרת מודל לפי Entity (משימה 4) | |
-| 5 | תקנון כפתורים גלובלי (משימה 5) | Team 40: **DNA_BUTTON_SYSTEM.md** תוך 24 שעות (ADR‑013) |
-| 6 | דף טבלת צבעים דינמית (משימה 6) | **/admin/design-system** (Type D) |
+| **‑1** | **Pre‑coding Mapping** | ✅ **סגור** — DATA_MAP_FINAL, CSS_RETROFIT_PLAN, DNA_BUTTON_SYSTEM/PALETTE_SSOT, ROUTES_MAP. ראה `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md`. |
+| **0** | **גשר React/HTML (Bridge)** | **שלב ראשון אחרי המיפוי** — Lock ל־Hybrid (HTML + React SPA), Auth Redirect, routes.json מול React, Header אחיד, React Tables. ראה `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`. |
+| **1** | **שער אוטנטיקציה — 4 טיפוסים (A/B/C/D)** | ADR‑013 LOCKED. |
+| 2 | Header תמיד אחרי Login → Home (משימה 7) | Header Loader לפני React mount — חסימת UX |
+| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) |
+| 4 | סדר כפתורים במודל + RTL (משימה 3) | |
+| 5 | צבע כותרת מודל לפי Entity (משימה 4) | |
+| 6 | תקנון כפתורים גלובלי (משימה 5) | DNA_BUTTON_SYSTEM (ADR‑013) |
+| 7 | דף טבלת צבעים דינמית (משימה 6) | **/admin/design-system** (Type D) |
 
 ---
 

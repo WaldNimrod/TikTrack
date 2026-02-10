@@ -8,7 +8,7 @@
   },
   "api_contract": {
     "endpoint": "GET /api/v1/reference/brokers",
-    "description": "Returns list of valid broker names for use in select dropdowns",
+    "description": "Returns list of valid broker names for use in select dropdowns. API returns brokers filtered by user_id/tenant. If no user-specific data exists, defaults JSON file is loaded.",
     "authentication": {
       "required": true,
       "type": "Bearer Token (JWT)"
@@ -129,7 +129,7 @@
       "select_population": "Select options will be populated dynamically from GET /api/v1/reference/brokers endpoint",
       "value_mapping": "Form will submit 'value' field from API response",
       "display_mapping": "UI will display 'label' field from API response",
-      "fallback_behavior": "If API fails, form must display an error message to the user. No fallback to manual text input is allowed. The select field must remain disabled until the API call succeeds. This ensures compliance with ADR-013: broker list source must be API-based only.",
+      "fallback_behavior": "If API fails, form must display an error message to the user. No fallback to manual text input is allowed. The select field must remain disabled until the API call succeeds. This ensures compliance with ADR-013: broker list source must be API-based only. Note: Backend will use defaults JSON if user has no broker-specific data, but Frontend should not implement client-side fallback to manual entry.",
       "caching": "Consider caching broker list in frontend (sessionStorage or memory) to reduce API calls and improve performance. Cache should be invalidated on page refresh or when explicitly needed."
     }
   },
@@ -188,37 +188,34 @@
         "common_abbreviation": "VAN"
       }
     ],
-    "notes": "This is an initial reference list. The actual API endpoint may return a different set based on backend implementation (e.g., distinct values from brokers_fees table, or a dedicated reference table)."
+    "notes": "This is an initial reference list for defaults JSON. The actual API endpoint returns user-specific brokers first (from user_data.brokers_fees WHERE user_id = current_user.id), and if empty, falls back to this defaults list. Each user sees only their own brokers plus defaults if they have none."
   },
   "backend_implementation_guidance": {
     "team_20_responsibilities": [
       "Implement GET /api/v1/reference/brokers endpoint",
       "Define response schema matching the contract above",
-      "Determine data source (distinct from brokers_fees table, or dedicated reference table)",
-      "Ensure authentication is required (JWT Bearer token)",
-      "Return brokers in consistent format (value/label structure)"
+      "Filter brokers by user_id/tenant (per-user data source)",
+      "If no user-specific brokers exist, load defaults from JSON file (defaults_brokers.json)",
+      "Ensure authentication is required (JWT Bearer token) - user_id extracted from JWT",
+      "Return brokers in consistent format (value/label structure)",
+      "No fallback to manual text input - API-based source only (ADR-013 compliance)"
     ],
-    "data_source_options": [
-      {
-        "option": "distinct_from_brokers_fees",
-        "description": "SELECT DISTINCT broker FROM user_data.brokers_fees WHERE deleted_at IS NULL",
-        "pros": "Uses existing data, reflects actual brokers in use",
-        "cons": "May not include all valid brokers, depends on user data"
-      },
-      {
-        "option": "dedicated_reference_table",
-        "description": "Create user_data.brokers_reference table with predefined list",
-        "pros": "Complete list, consistent across users, can be maintained",
-        "cons": "Requires new table and maintenance"
-      },
-      {
-        "option": "hybrid_approach",
-        "description": "Reference table + UNION with distinct from brokers_fees",
-        "pros": "Best of both worlds",
-        "cons": "More complex implementation"
-      }
-    ],
-    "recommendation": "Start with distinct_from_brokers_fees for MVP, consider reference table for future enhancement"
+    "data_source_logic": {
+      "primary_source": "User-specific brokers from user_data.brokers_fees table",
+      "query": "SELECT DISTINCT broker FROM user_data.brokers_fees WHERE user_id = :user_id AND deleted_at IS NULL",
+      "fallback_source": "Defaults JSON file (defaults_brokers.json)",
+      "fallback_trigger": "If primary query returns empty result (no user-specific brokers)",
+      "fallback_location": "api/data/defaults_brokers.json (or similar path)",
+      "fallback_content": "Contains the valid_brokers_list from this mapping file",
+      "implementation": "1. Query user-specific brokers from DB. 2. If empty, load defaults_brokers.json. 3. Return combined or defaults-only list.",
+      "no_manual_fallback": "No fallback to manual text input allowed - API-based source only (ADR-013 compliance)"
+    },
+    "defaults_file": {
+      "location": "api/data/defaults_brokers.json",
+      "structure": "Same as valid_brokers_list in this mapping file",
+      "purpose": "Fallback when user has no broker-specific data",
+      "maintenance": "Updated manually or via migration scripts when broker list changes"
+    }
   },
   "frontend_implementation_guidance": {
     "team_30_responsibilities": [

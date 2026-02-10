@@ -12,11 +12,13 @@
 הסדר להלן מגדיר **עד מתי** כל שלב ואת **המעבר לשער א'** (Team 50 — הרצת סוויטת בדיקות, 0 SEVERE). אין לדלג על שלב; מיפוי מאושר לפני קידוד.
 
 ```
-[שלב -1] MAPPING_MODE (מסירות + אישור נמרוד)
+[שלב -1] MAPPING_MODE — ✅ סגור
     ↓
-[שלב 0] שער אוטנטיקציה (A/B/C/D) — יישום
+[שלב 0] גשר React/HTML (Bridge) — השלמה ארכיטקטונית (דוח Team 90)
     ↓
-[שלב 1] Header Loader לפני React mount
+[שלב 1] שער אוטנטיקציה (A/B/C/D) — יישום
+    ↓
+[שלב 2] Header Loader לפני React mount
     ↓
 Team 10: אישור השלמה + מסירת קונטקסט ל־QA
     ↓
@@ -38,32 +40,49 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | 1.5 | איסוף מסירות, בדיקת שלמות | **Team 10** | רשימת מסירות מלאה |
 | 1.6 | **אישור ויזואלי נמרוד** על המיפוי | **נמרוד** | אישור לפתיחת קידוד |
 
-**יציאה משלב ‑1:** רק לאחר 1.1–1.6 — אז MAPPING_MODE נסגר ומתחילים קידוד.
+**יציאה משלב ‑1:** ✅ MAPPING_MODE נסגר (הודעה: `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md`).
 
 ---
 
-### שלב 0: שער אוטנטיקציה (4 טיפוסים A/B/C/D)
+### שלב 0: גשר React/HTML (Bridge)
+
+**מקור:** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md` (Team 90).
 
 | # | פעולה | אחראי | הערה |
 |---|--------|--------|------|
-| 0.1 | עדכון/יישום Guard + redirect לפי ROUTES_MAP (אורח → Home בעמודי C/D) | **Team 30** | לא ProtectedRoute על Home; redirect ל־Home (לא ל־/login) |
-| 0.2 | Home: שני containers — logged-out (שיווקי) / logged-in (נתונים) | **Team 30** | B) Shared |
-| 0.3 | User Icon: Success (logged-in) / Warning (logged-out); אסור שחור | **Team 30/40** | לפי SLA — 40 על מראה, 30 על לוגיקה |
-| 0.4 | Admin-only: בדיקת JWT role, redirect/403 ל־/admin/design-system | **Team 20 + 30** | מקור: שדה `role` ב־JWT |
-| 0.5 | וידוא עמודי A) Open ללא Header (login, register, reset-password) | **Team 30** | |
-| 0.6 | דיווח השלמה ל־Team 10 | **Team 30** | |
+| 0.1 | Lock ל־Hybrid Model (HTML pages + React SPA) | **לפי הדוח** | החלטה ארכיטקטונית |
+| 0.2 | Auth Redirect Rules לפי ADR‑013 | **Team 30** | |
+| 0.3 | יישור routes.json מול React routes | **Team 10 / 30** | SSOT אחיד |
+| 0.4 | נתיב Header אחיד | **Team 30/40** | |
+| 0.5 | החלטה מחייבת לגבי React Tables | **לפי הדוח** | |
+| 0.6 | דיווח השלמה ל־Team 10 | **צוות מוביל** | |
+
+**הערה:** שלב זה נוסף לפי דרישת צוות 90 (משוב MAPPING_MODE — Go with Hold).
+
+---
+
+### שלב 1: שער אוטנטיקציה (4 טיפוסים A/B/C/D)
+
+| # | פעולה | אחראי | הערה |
+|---|--------|--------|------|
+| 1.1 | עדכון/יישום Guard + redirect לפי ROUTES_MAP (אורח → Home בעמודי C/D) | **Team 30** | לא ProtectedRoute על Home; redirect ל־Home (לא ל־/login) |
+| 1.2 | Home: שני containers — logged-out (שיווקי) / logged-in (נתונים) | **Team 30** | B) Shared |
+| 1.3 | User Icon: Success (logged-in) / Warning (logged-out); אסור שחור | **Team 30/40** | לפי SLA — 40 על מראה, 30 על לוגיקה |
+| 1.4 | Admin-only: בדיקת JWT role, redirect/403 ל־/admin/design-system | **Team 20 + 30** | מקור: שדה `role` ב־JWT |
+| 1.5 | וידוא עמודי A) Open ללא Header (login, register, reset-password) | **Team 30** | |
+| 1.6 | דיווח השלמה ל־Team 10 | **Team 30** | |
 
 **רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` סעיף 4; ADR‑013.
 
 ---
 
-### שלב 1: Header תמיד אחרי Login → Home
+### שלב 2: Header תמיד אחרי Login → Home
 
 | # | פעולה | אחראי | הערה |
 |---|--------|--------|------|
-| 1.1 | Header Loader רץ **לפני** React mount (תיקון רגרסיה login → home) | **Team 30** | ADR‑013 |
-| 1.2 | וידוא Header מוצג בכל עמוד שאינו A) Open | **Team 30** | |
-| 1.3 | דיווח השלמה ל־Team 10 | **Team 30** | |
+| 2.1 | Header Loader רץ **לפני** React mount (תיקון רגרסיה login → home) | **Team 30** | ADR‑013 |
+| 2.2 | וידוא Header מוצג בכל עמוד שאינו A) Open | **Team 30** | |
+| 2.3 | דיווח השלמה ל־Team 10 | **Team 30** | |
 
 **רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` משימה 7.
 
@@ -101,9 +120,10 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 | שלב | תיאור קצר | סטטוס |
 |-----|------------|--------|
-| **‑1** | MAPPING_MODE: ROUTES_MAP (10), DATA_MAP_FINAL (20/30), CSS_RETROFIT_PLAN + DNA_BUTTON_SYSTEM (40), אישור נמרוד | ⬜ |
-| **0** | אוטנטיקציה: Guards, Home containers, User Icon, Admin JWT, עמודי Open בלי Header | ⬜ |
-| **1** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ⬜ |
+| **‑1** | MAPPING_MODE | ✅ סגור |
+| **0** | גשר React/HTML (Bridge) — דוח Team 90 | ⬜ |
+| **1** | אוטנטיקציה: Guards, Home containers, User Icon, Admin JWT, עמודי Open בלי Header | ⬜ |
+| **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ⬜ |
 | **G** | Team 10: אישור + קונטקסט ל־QA → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ⬜ |
 
 ---

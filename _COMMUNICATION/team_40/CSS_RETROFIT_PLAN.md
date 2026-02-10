@@ -46,6 +46,14 @@
 | **phoenix-base.css** | `ui/src/styles/phoenix-base.css` | ✅ **CSS Variables בלבד** | מכיל רק CSS Variables (SSOT) - אין צורך ב-Sticky retrofit |
 | **D15_IDENTITY_STYLES.css** | `ui/src/styles/D15_IDENTITY_STYLES.css` | ✅ **לא רלוונטי** | עמודי Auth (login/register/reset) - אין טבלאות או Sticky elements |
 
+### **🔵 Priority 4: עמודים חדשים (Admin-only)**
+
+| עמוד | Route | קובץ CSS | סטטוס | הערות |
+|------|-------|----------|-------|-------|
+| **Admin Design Dashboard** | `/admin/design-system` (Type D) | **קובץ חדש** (להגדרה) | ⚠️ **עמוד חדש** | עמוד Admin-only להצגת פלטת צבעים וכפתורים. **קובץ CSS:** יוגדר בעת יצירת העמוד (כנראה `D15_ADMIN_DESIGN_STYLES.css` או שימוש ב-`D15_DASHBOARD_STYLES.css`). |
+
+**הערה:** עמוד `/admin/design-system` הוא עמוד Type D (Admin-only) שטרם נוצר. בעת יצירתו, יש לוודא שימוש ב-Sticky system הקיים (`phoenix-components.css`) אם העמוד כולל טבלאות.
+
 ---
 
 ## 📋 פירוט Sticky Columns מיושם
@@ -128,6 +136,9 @@
 **קבצים לא רלוונטיים:**
 - ✅ `phoenix-base.css` - CSS Variables בלבד (SSOT)
 - ✅ `D15_IDENTITY_STYLES.css` - עמודי Auth (אין טבלאות)
+
+**עמודים חדשים:**
+- ⚠️ `/admin/design-system` (Type D) - עמוד חדש, קובץ CSS יוגדר בעת יצירת העמוד
 
 ---
 

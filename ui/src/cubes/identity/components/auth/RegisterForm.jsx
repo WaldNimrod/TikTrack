@@ -138,8 +138,8 @@ const RegisterForm = () => {
     });
     
     try {
-      // Prepare user data (camelCase for React)
-      // TEAM_10_PHONE_VALIDATION_DECISION: Send phone_number in E.164 normalized format
+      // Prepare user data — Backend expects username_or_email, phone_number in E.164
+      // TEAM_50_GATE_A: username_or_email (not username); phone_number normalized to E.164
       let phoneForApi = null;
       if (formData.phoneNumber?.trim()) {
         const phoneResult = validatePhoneNumber(formData.phoneNumber.trim());
@@ -150,10 +150,10 @@ const RegisterForm = () => {
       }
 
       const userData = {
-        username: formData.username.trim(),
+        usernameOrEmail: formData.username.trim(), // → username_or_email (API contract)
         email: formData.email.trim(),
         password: formData.password,
-        ...(phoneForApi && { phoneNumber: phoneForApi }),
+        ...(phoneForApi && { phoneNumber: phoneForApi }), // → phone_number (E.164)
       };
       
       // Call Auth Service

@@ -66,8 +66,8 @@ class LoginResponse(BaseModel):
 
 
 class RegisterRequest(BaseModel):
-    """User registration request schema."""
-    username: str = Field(..., min_length=3, max_length=50, description="Username")
+    """User registration request schema. Option B: username_or_email matches Frontend (reactToApi)."""
+    username_or_email: str = Field(..., min_length=3, max_length=50, description="Username or email address (used as username)")
     email: EmailStr = Field(..., description="Email address")
     password: str = Field(..., min_length=8, description="Password (min 8 characters)")
     phone_number: Optional[str] = Field(None, description="Phone number (optional)")
@@ -84,7 +84,7 @@ class RegisterRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "username": "johndoe",
+                "username_or_email": "johndoe",
                 "email": "john@example.com",
                 "password": "secure_password_123",
                 "phone_number": "+12025551234"
@@ -383,10 +383,11 @@ class JWTToken(BaseModel):
 
 
 class RefreshResponse(BaseModel):
-    """Refresh token response schema - returns new access token."""
+    """Refresh token response schema - returns new access token. Same structure as LoginResponse (Option B)."""
     access_token: str = Field(..., description="New JWT access token")
     token_type: str = Field(default="bearer", description="Token type")
     expires_at: datetime = Field(..., description="Token expiration timestamp")
+    user: "UserResponse" = Field(..., description="User information")
     # Note: refresh_token is sent in httpOnly cookie, not in response body
     refresh_token: Optional[str] = Field(None, description="New refresh token (internal use - sent in cookie)")
     refresh_expires_at: Optional[datetime] = Field(None, description="Refresh token expiration (internal use)")
@@ -396,7 +397,13 @@ class RefreshResponse(BaseModel):
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "token_type": "bearer",
-                "expires_at": "2026-02-01T12:00:00Z"
+                "expires_at": "2026-02-01T12:00:00Z",
+                "user": {
+                    "external_ulids": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                    "email": "user@example.com",
+                    "phone_numbers": "+12025551234",
+                    "user_tier_levels": "Bronze"
+                }
             }
         }
 
@@ -404,3 +411,4 @@ class RefreshResponse(BaseModel):
 # Update forward references
 LoginResponse.model_rebuild()
 RegisterResponse.model_rebuild()
+RefreshResponse.model_rebuild()

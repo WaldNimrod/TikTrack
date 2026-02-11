@@ -679,16 +679,17 @@ components:
 
     RegisterRequest:
       type: object
+      description: "Option B: username_or_email matches Frontend (reactToApi camelCase conversion)"
       required:
-        - username
+        - username_or_email
         - email
         - password
       properties:
-        username:
+        username_or_email:
           type: string
           minLength: 3
           maxLength: 50
-          description: "Username"
+          description: "Username or email address (used as username for new account)"
           example: "johndoe"
         email:
           type: string
@@ -725,6 +726,7 @@ components:
 
     RefreshResponse:
       type: object
+      description: "Same structure as LoginResponse/RegisterResponse (Option B - Auth Unified)"
       properties:
         access_token:
           type: string
@@ -736,6 +738,8 @@ components:
           type: string
           format: date-time
           description: "Token expiration timestamp"
+        user:
+          $ref: '#/components/schemas/UserResponse'
 
     # User Schemas
     UserResponse:

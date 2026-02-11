@@ -97,10 +97,10 @@ async def register(
     Creates new user account and returns access token + refresh token (in cookie).
     """
     try:
-        logger.info(f"Registration attempt started for: {request.username} ({request.email[:3] if request.email else 'N/A'}***)")
+        logger.info(f"Registration attempt started for: {request.username_or_email} ({request.email[:3] if request.email else 'N/A'}***)")
         
         # Validate input
-        if not request.username or not request.email or not request.password:
+        if not request.username_or_email or not request.email or not request.password:
             logger.warning("Registration attempt with missing required fields")
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -123,9 +123,9 @@ async def register(
         
         # Attempt registration
         try:
-            logger.debug(f"Attempting registration for user: {request.username}")
+            logger.debug(f"Attempting registration for user: {request.username_or_email}")
             register_response = await auth_service.register(
-                username=request.username,
+                username=request.username_or_email,
                 email=request.email,
                 password=request.password,
                 phone_number=request.phone_number,
@@ -134,7 +134,7 @@ async def register(
             logger.debug("Registration service call completed successfully")
         except AuthenticationError as e:
             # Log detailed error for debugging (will be removed in production)
-            logger.error(f"Registration failed for user: {request.username} (authentication error: {str(e)})", exc_info=True)
+            logger.error(f"Registration failed for user: {request.username_or_email} (authentication error: {str(e)})", exc_info=True)
             # Generic error message to prevent information leakage
             error_code = ErrorCodes.USER_ALREADY_EXISTS if "already exists" in str(e).lower() else ErrorCodes.USER_UPDATE_FAILED
             raise HTTPExceptionWithCode(
@@ -169,7 +169,7 @@ async def register(
         register_response.refresh_token = None
         register_response.refresh_expires_at = None
         
-        logger.info(f"Registration successful for user: {request.username}")
+        logger.info(f"Registration successful for user: {request.username_or_email}")
         return register_response
         
     except HTTPExceptionWithCode:

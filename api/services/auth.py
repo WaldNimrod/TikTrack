@@ -584,10 +584,14 @@ class AuthService:
         db.add(new_db_refresh_token)
         await db.commit()
         
+        # Option B: Same response structure as login/register (access_token, token_type, expires_at, user)
+        user_response = UserResponse.from_model(user)
+        
         return RefreshResponse(
             access_token=access_token,
             token_type="bearer",
             expires_at=expires_at,
+            user=user_response,
             refresh_token=new_refresh_token,  # Will be sent in httpOnly cookie
             refresh_expires_at=new_refresh_expires_at
         )

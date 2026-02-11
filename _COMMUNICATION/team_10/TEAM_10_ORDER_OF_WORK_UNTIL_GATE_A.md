@@ -115,11 +115,31 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 ## 4. מסמכי הודעות לצוותים (שפורסמו)
 
+### MAPPING_MODE (שלב ‑1 — סגור)
+
 | צוות | מסמך הודעה |
 |------|-------------|
 | **20 + 30** | `TEAM_10_TO_TEAMS_20_30_MAPPING_MODE_MANDATE.md` |
 | **40** | `TEAM_10_TO_TEAM_40_MAPPING_MODE_MANDATE.md` |
 | **כולם** | `TEAM_10_MAPPING_MODE_TASK_DISTRIBUTION.md` (חלוקת משימות מלאה) |
+
+### הנעה עד שער א' (שלבים 0, 1, 2 — 2026-01-30)
+
+| צוות | מסמך הודעה |
+|------|-------------|
+| **30** | `TEAM_10_TO_TEAM_30_GATE_A_KICKOFF_MANDATE.md` |
+| **20** | `TEAM_10_TO_TEAM_20_GATE_A_KICKOFF_MANDATE.md` |
+| **40** | `TEAM_10_TO_TEAM_40_GATE_A_KICKOFF_MANDATE.md` |
+| **50** | `TEAM_10_TO_TEAM_50_GATE_A_READINESS_NOTICE.md` |
+| **כולם** | `TEAM_10_TO_ALL_TEAMS_GATE_A_ORDER_KICKOFF.md` |
+
+### משימות Team 10 (G.1, G.2) + רשימת משימות עצמיות
+
+| מסמך | תיאור |
+|------|--------|
+| `TEAM_10_OWN_TASKS_MASTER_CHECKLIST.md` | רשימת כל המשימות שהוגדרו ל־Team 10 — ביצוע מסודר |
+| `TEAM_10_GATE_A_VERIFICATION_AND_SIGN_OFF.md` | G.1 — אימות השלמת שלבים 0, 1, 2; אישור לשער א' |
+| `TEAM_10_TO_TEAM_50_GATE_A_CONTEXT_HANDOFF.md` | G.2 — מסירת קונטקסט מפורט ל־Team 50 (תנאי להרצת שער א') |
 
 ---
 
@@ -128,10 +148,10 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | שלב | תיאור קצר | סטטוס |
 |-----|------------|--------|
 | **‑1** | MAPPING_MODE | ✅ סגור |
-| **0** | גשר React/HTML (Bridge) — דוח Team 90 | ⬜ |
-| **1** | אוטנטיקציה: Guards, Home containers, **Type B (Shared) רשמי** — שני containers באותו עמוד, אין Redirect ב‑B, User Icon, Admin JWT, עמודי Open בלי Header | ⬜ |
-| **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ⬜ |
-| **G** | Team 10: אישור + קונטקסט ל־QA → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ⬜ |
+| **0** | גשר React/HTML (Bridge) — דוח Team 90 | ✅ |
+| **1** | אוטנטיקציה: Guards, Home containers, **Type B (Shared) רשמי** — שני containers באותו עמוד, אין Redirect ב‑B, User Icon, Admin JWT, עמודי Open בלי Header | ✅ |
+| **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ✅ |
+| **G** | Team 10: אישור (G.1) + קונטקסט ל־QA (G.2) → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ✅ G.1+G.2 בוצעו; שער א' הורצה — `tests/gate-a-e2e.test.js`; 0 SEVERE; ראה `TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md` |
 
 ---
 

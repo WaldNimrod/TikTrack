@@ -91,9 +91,9 @@ const ProfileView = () => {
         debugLog('ProfileView', 'User data loaded', { userId: user.externalUlids });
       } catch (error) {
         audit.error('ProfileView', 'Failed to load user data', error);
-        // Redirect to login if unauthorized
+        // Redirect to home if unauthorized (per ADR-013)
         if (error.response?.status === 401) {
-          navigate('/login');
+          navigate('/');
         }
       } finally {
         setIsLoadingUser(false);
@@ -203,12 +203,12 @@ const ProfileView = () => {
   const handleLogout = async () => {
     try {
       await authService.logout();
-      navigate('/login');
+      navigate('/');
       debugLog('ProfileView', 'User logged out');
     } catch (error) {
       audit.error('ProfileView', 'Logout error', error);
       // Navigate anyway
-      navigate('/login');
+      navigate('/');
     }
   };
 

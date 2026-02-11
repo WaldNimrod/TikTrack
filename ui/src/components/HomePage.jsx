@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import PageFooter from './core/PageFooter.jsx';
 import { debugLog } from '../utils/debug.js';
+import authService from '../cubes/identity/services/auth.js';
 
 // Dashboard-specific styles (must load after phoenix-base.css, phoenix-components.css, phoenix-header.css)
 import '../styles/D15_DASHBOARD_STYLES.css';
@@ -20,8 +21,14 @@ import '../styles/D15_DASHBOARD_STYLES.css';
  * HomePage Component
  * 
  * @description עמוד בית ראשי עם התראות פעילות, סיכום, וויגיטים וטבלת פורטפוליו
+ * Type B (Shared): עמוד יחיד עם שני Containers - Guest (אורח) + Logged-in (מחובר)
+ * אין Redirect לאורח - אורח נשאר באותו route ורואה Guest Container
  */
 const HomePage = () => {
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   // Section toggle state
   const [openSections, setOpenSections] = useState({
     'top': true,
@@ -69,9 +76,42 @@ const HomePage = () => {
     debugLog('HomePage', `Widget tab changed`, { widgetId, tabPaneId });
   };
 
+  /**
+   * Check authentication status
+   * Type B (Shared): Check auth state to determine which container to show
+   */
   useEffect(() => {
+    const checkAuth = async () => {
+      setIsCheckingAuth(true);
+      try {
+        // Check if user has access token
+        const hasToken = authService.isAuthenticated();
+        
+        if (hasToken) {
+          // Try to verify token is valid by getting current user
+          try {
+            await authService.getCurrentUser();
+            setIsAuthenticated(true);
+            debugLog('HomePage', 'User authenticated - showing Logged-in Container');
+          } catch (error) {
+            // Token might be expired or invalid
+            setIsAuthenticated(false);
+            debugLog('HomePage', 'Token invalid - showing Guest Container');
+          }
+        } else {
+          setIsAuthenticated(false);
+          debugLog('HomePage', 'No token - showing Guest Container');
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
+        debugLog('HomePage', 'Auth check failed - showing Guest Container', error);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
     debugLog('HomePage', 'Component mounted');
-    debugLog('HomePage', 'Page loaded');
   }, []);
 
   return (
@@ -85,9 +125,46 @@ const HomePage = () => {
         <div className="page-container">
           {/* Main Content */}
           <main>
-            <tt-container>
-              {/* Top Section: Active Alerts & Summary */}
-              <tt-section data-section="top">
+            {/* Type B (Shared): Two Containers in same page */}
+            {/* Guest Container - shown to unauthenticated users */}
+            {!isAuthenticated && (
+              <tt-container data-container-type="guest">
+                <tt-section>
+                  <div className="guest-container">
+                    <div className="guest-container__header">
+                      <h1 className="guest-container__title">ברוכים הבאים ל-TikTrack</h1>
+                      <p className="guest-container__subtitle">פלטפורמה מתקדמת לניהול מסחר ופורטפוליו</p>
+                    </div>
+                    <div className="guest-container__content">
+                      <div className="guest-container__features">
+                        <div className="guest-container__feature">
+                          <h3>ניהול פורטפוליו</h3>
+                          <p>עקוב אחר כל החשבונות והפוזיציות שלך במקום אחד</p>
+                        </div>
+                        <div className="guest-container__feature">
+                          <h3>ניתוח מתקדם</h3>
+                          <p>כלים חזקים לניתוח ביצועים וקבלת החלטות מושכלות</p>
+                        </div>
+                        <div className="guest-container__feature">
+                          <h3>תמיכה מלאה</h3>
+                          <p>צוות מקצועי זמין לעזור בכל שאלה</p>
+                        </div>
+                      </div>
+                      <div className="guest-container__actions">
+                        <a href="/login" className="btn btn-primary">התחבר</a>
+                        <a href="/register" className="btn btn-secondary">הירשם</a>
+                      </div>
+                    </div>
+                  </div>
+                </tt-section>
+              </tt-container>
+            )}
+
+            {/* Logged-in Container - shown to authenticated users */}
+            {isAuthenticated && (
+              <tt-container data-container-type="logged-in">
+                {/* Top Section: Active Alerts & Summary */}
+                <tt-section data-section="top">
                 {/* Section Header */}
                 <div className="index-section__header">
                   <div className="index-section__header-title">
@@ -1116,7 +1193,8 @@ const HomePage = () => {
                   </div>
                 )}
               </tt-section>
-            </tt-container>
+              </tt-container>
+            )}
           </main>
         </div>
       </div>

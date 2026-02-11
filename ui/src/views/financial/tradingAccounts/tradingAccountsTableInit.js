@@ -388,6 +388,9 @@ import { maskedLog } from '../../../utils/maskedLog.js';
   // Auto-initialize
   initializeTableManagers();
   
-  // Load initial table data
-  loadTableData();
+  // Gate A Fix: Load table data only when authenticated - prevents 401 for guests
+  if (localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+      sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken')) {
+    loadTableData();
+  }
 })();

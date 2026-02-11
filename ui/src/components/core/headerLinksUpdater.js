@@ -43,16 +43,16 @@
       window.dispatchEvent(new CustomEvent('auth:logout'));
       
       // Redirect to login page
-      window.location.href = '/login';
+      window.location.href = '/';
     } catch (error) {
       console.error('[Header Links Updater] Logout error:', error);
-      // Even on error, clear tokens and redirect
+      // Even on error, clear tokens and redirect to home
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_token');
       sessionStorage.removeItem('access_token');
       sessionStorage.removeItem('auth_token');
       window.dispatchEvent(new CustomEvent('auth:logout'));
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   }
   

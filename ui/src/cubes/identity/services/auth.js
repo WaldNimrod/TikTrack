@@ -365,6 +365,46 @@ const authService = {
   },
 
   /**
+   * Get User Role from JWT Token
+   * Stage 1: Admin-only (D) - JWT role check per ADR-013
+   * 
+   * @description Extracts role from JWT token payload
+   * @returns {string|null} - User role ('USER', 'ADMIN', 'SUPERADMIN') or null if not found
+   */
+  getUserRole() {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        return null;
+      }
+      
+      // Decode JWT token (simple base64 decode - no verification needed for role check)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role || null;
+      } catch (e) {
+        debugError('Auth', 'Error decoding JWT token', e);
+        return null;
+      }
+    } catch (error) {
+      debugError('Auth', 'Error getting user role', error);
+      return null;
+    }
+  },
+
+  /**
+   * Check if user is admin
+   * Stage 1: Admin-only (D) - JWT role check per ADR-013
+   * 
+   * @description Checks if current user has ADMIN or SUPERADMIN role
+   * @returns {boolean} - True if user is ADMIN or SUPERADMIN
+   */
+  isAdmin() {
+    const role = this.getUserRole();
+    return role === 'ADMIN' || role === 'SUPERADMIN';
+  },
+
+  /**
    * Update User - עדכון פרופיל משתמש
    * 
    * @description מעדכן את פרטי המשתמש

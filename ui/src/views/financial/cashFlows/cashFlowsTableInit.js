@@ -71,20 +71,33 @@ function normalizeTradingAccountId(value) {
   let currencyConversionsData = { data: [], total: 0 };
   
   /**
+   * Gate A Fix: Check if user has auth token
+   */
+  function isAuthenticated() {
+    try {
+      return !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+        sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /**
    * Initialize all table managers
+   * Gate A Fix: Skip loadInitialData for guests - prevents 401
    */
   function initializeTableManagers() {
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        initTables();
-        initAddButton();
-        loadInitialData();
-      });
-    } else {
+    const runInit = () => {
       initTables();
       initAddButton();
-      loadInitialData();
+      if (isAuthenticated()) {
+        loadInitialData();
+      }
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', runInit);
+    } else {
+      runInit();
     }
   }
   

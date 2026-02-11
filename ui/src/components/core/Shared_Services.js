@@ -89,8 +89,11 @@ class SharedServices {
       // Extract backend port
       this.backendPort = this.routesConfig.backend || 8082;
       
-      // Get token from localStorage or sessionStorage
-      this.token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+      // Gate A Fix: Check access_token first (primary token name), then auth_token
+      this.token = localStorage.getItem('access_token') || 
+                    localStorage.getItem('auth_token') ||
+                    sessionStorage.getItem('access_token') ||
+                    sessionStorage.getItem('auth_token');
       
       // Use masked log for security compliance (prevents token leakage)
       maskedLog('[Shared Services] Initialized:', {
@@ -138,9 +141,15 @@ class SharedServices {
   
   /**
    * Get authorization token
+   * Gate A Fix: Check access_token first (primary token name)
    * @returns {string|null} JWT token
    */
   getToken() {
+    // Gate A Fix: Update token from storage (check access_token first)
+    this.token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('auth_token') ||
+                  sessionStorage.getItem('access_token') ||
+                  sessionStorage.getItem('auth_token');
     return this.token;
   }
   
@@ -217,6 +226,7 @@ class SharedServices {
   
   /**
    * Build request headers
+   * Gate A Fix: Update token before building headers
    * @param {Object} additionalHeaders - Additional headers
    * @returns {Object} Request headers
    */
@@ -226,9 +236,12 @@ class SharedServices {
       ...additionalHeaders
     };
     
+    // Gate A Fix: Update token from storage before building headers
+    const token = this.getToken();
+    
     // Add authorization header if token exists
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
     
     return headers;

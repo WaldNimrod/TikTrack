@@ -44,6 +44,8 @@
   
   // Wait for DOM to be ready
   function initHeader() {
+    // ADR-013 SSOT: Header Loader must run before React mount - marker for E2E load-order assert
+    try { window.__headerLoaderInit = window.__headerLoaderInit || Date.now(); } catch (_) {}
     // Gate B Fix: Skip header loading for auth pages (login, register, reset-password)
     // Auth pages should only show form + footer, no header
     const currentPath = window.location.pathname;
@@ -267,4 +269,23 @@
     // DOM already loaded
     initHeader();
   }
+  
+  // Stage 2 Fix: Listen for navigation events (e.g., Login → Home)
+  // Ensure header is loaded after navigation
+  window.addEventListener('popstate', function() {
+    // Handle browser back/forward navigation
+    setTimeout(initHeader, 100);
+  });
+  
+  // Stage 2 Fix: Listen for React Router navigation (SPA navigation)
+  // Check for header after route changes
+  let lastPath = window.location.pathname;
+  setInterval(function() {
+    const currentPath = window.location.pathname;
+    if (currentPath !== lastPath) {
+      lastPath = currentPath;
+      // Wait a bit for React Router to finish rendering
+      setTimeout(initHeader, 200);
+    }
+  }, 100);
 })();

@@ -38,7 +38,9 @@ import './styles/D15_IDENTITY_STYLES.css';
  * Application Bootstrap
  * 
  * @description Initializes React root and renders AppRouter
+ * ADR-013 SSOT: React mount marker for E2E load-order assert (Header Loader must run first)
  */
+try { window.__reactMountStart = window.__reactMountStart || Date.now(); } catch (_) {}
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(

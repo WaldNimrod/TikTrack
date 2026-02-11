@@ -19,7 +19,27 @@ export class DataStage extends StageBase {
   }
   
   /**
+   * Check if user is authenticated
+   * Gate A Fix: Prevent 401 errors for guest users
+   * @returns {boolean} True if user has valid token
+   */
+  isAuthenticated() {
+    try {
+      // Check for access token in localStorage or sessionStorage
+      const token = localStorage.getItem('access_token') || 
+                    localStorage.getItem('authToken') ||
+                    sessionStorage.getItem('access_token') ||
+                    sessionStorage.getItem('authToken');
+      return !!token && token.trim() !== '';
+    } catch (error) {
+      maskedLog('[Data Stage] Error checking authentication:', { errorMessage: error.message });
+      return false;
+    }
+  }
+
+  /**
    * Execute Data stage
+   * Gate A Fix: Check authentication before API calls to prevent 401 errors
    * @returns {Promise<void>}
    */
   async execute() {
@@ -29,18 +49,35 @@ export class DataStage extends StageBase {
       // Wait for Bridge stage to complete
       await this.waitForStage('Bridge');
       
+      // Get config from UAI
+      const config = window.UAI?.config || window.UAIState?.config;
+      if (!config) {
+        throw new Error('UAI config not found');
+      }
+      
+      // Gate A Fix: Check authentication before making API calls
+      // If page requires auth and user is not authenticated, skip data loading
+      if (config.requiresAuth) {
+        const authenticated = this.isAuthenticated();
+        if (!authenticated) {
+          maskedLog('[Data Stage] User not authenticated, skipping data loading for auth-required page', {
+            pageType: config.pageType,
+            requiresAuth: config.requiresAuth
+          });
+          // Set empty data instead of throwing error
+          this.data = {};
+          this.storeData();
+          this.markCompleted();
+          return;
+        }
+      }
+      
       // Ensure Shared Services is initialized
       try {
         await sharedServices.init();
       } catch (error) {
         console.warn('[Data Stage] Shared Services initialization failed, continuing with fallback:', error);
         // Continue anyway - some pages may not need Shared Services
-      }
-      
-      // Get config from UAI
-      const config = window.UAI?.config || window.UAIState?.config;
-      if (!config) {
-        throw new Error('UAI config not found');
       }
       
       // Get data loader path from config
@@ -65,6 +102,19 @@ export class DataStage extends StageBase {
       
       this.markCompleted();
     } catch (error) {
+      // Gate A Fix: Handle 401 errors gracefully - don't throw for unauthenticated users
+      if (error.status === 401 || error.code === 'HTTP_401') {
+        maskedLog('[Data Stage] 401 Unauthorized - user not authenticated, skipping data loading', {
+          pageType: config?.pageType,
+          requiresAuth: config?.requiresAuth
+        });
+        // Set empty data instead of throwing error
+        this.data = {};
+        this.storeData();
+        this.markCompleted();
+        return;
+      }
+      
       this.markError(error);
       throw error;
     }

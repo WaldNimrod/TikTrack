@@ -156,7 +156,10 @@ function setupFilterListeners() {
  */
 async function populateAccountSelects() {
   if (!window.TradingAccountsDataLoader) return;
-  
+  // Gate A Fix: Skip API call for guests - prevents 401
+  const hasToken = !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+    sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+  if (!hasToken) return;
   try {
     const accountsData = await window.TradingAccountsDataLoader.fetchTradingAccounts();
     const accounts = accountsData.data || [];

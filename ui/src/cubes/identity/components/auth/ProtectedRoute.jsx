@@ -17,25 +17,29 @@ import { debugLog } from '../../../../utils/debug.js';
  * ProtectedRoute Component
  * 
  * @description רכיב wrapper שמגן על routes שדורשים אימות
+ * Stage 1: Enhanced to support Admin-only (Type D) per ADR-013
  * @legacyReference Legacy.auth.isAuthenticated()
  * 
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - התוכן להגנה
  * @param {boolean} [props.requireAuth=true] - האם נדרש אימות (default: true)
+ * @param {boolean} [props.requireAdmin=false] - האם נדרש תפקיד מנהל (Type D: Admin-only)
  */
-const ProtectedRoute = ({ children, requireAuth = true }) => {
+const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = checking
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     /**
      * Check Authentication Status
+     * Stage 1: Enhanced to support Admin-only (Type D) per ADR-013
      * 
-     * @description בודק את סטטוס האימות
+     * @description בודק את סטטוס האימות ו-role (אם נדרש)
      */
     const checkAuth = async () => {
       setIsChecking(true);
-      debugLog('Auth', 'ProtectedRoute: Checking authentication status');
+      debugLog('Auth', 'ProtectedRoute: Checking authentication status', { requireAdmin });
 
       try {
         // Check if access token exists
@@ -43,6 +47,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
         
         if (!hasToken) {
           setIsAuthenticated(false);
+          setIsAdmin(false);
           setIsChecking(false);
           debugLog('Auth', 'ProtectedRoute: No access token found');
           return;
@@ -52,7 +57,19 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
         try {
           await authService.getCurrentUser();
           setIsAuthenticated(true);
-          debugLog('Auth', 'ProtectedRoute: User authenticated');
+          
+          // Check admin role if required (Type D: Admin-only)
+          if (requireAdmin) {
+            const userIsAdmin = authService.isAdmin();
+            setIsAdmin(userIsAdmin);
+            debugLog('Auth', 'ProtectedRoute: User authenticated', { 
+              isAdmin: userIsAdmin,
+              role: authService.getUserRole()
+            });
+          } else {
+            setIsAdmin(false); // Not checking admin for regular routes
+            debugLog('Auth', 'ProtectedRoute: User authenticated');
+          }
         } catch (error) {
           // Token might be expired, try to refresh
           debugLog('Auth', 'ProtectedRoute: Token validation failed, attempting refresh');
@@ -60,28 +77,42 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
           try {
             await authService.refreshToken();
             setIsAuthenticated(true);
-            debugLog('Auth', 'ProtectedRoute: Token refreshed successfully');
+            
+            // Check admin role after refresh if required
+            if (requireAdmin) {
+              const userIsAdmin = authService.isAdmin();
+              setIsAdmin(userIsAdmin);
+              debugLog('Auth', 'ProtectedRoute: Token refreshed successfully', { 
+                isAdmin: userIsAdmin 
+              });
+            } else {
+              setIsAdmin(false);
+              debugLog('Auth', 'ProtectedRoute: Token refreshed successfully');
+            }
           } catch (refreshError) {
             // Refresh failed - user needs to login
             setIsAuthenticated(false);
+            setIsAdmin(false);
             audit.error('Auth', 'ProtectedRoute: Token refresh failed', refreshError);
           }
         }
       } catch (error) {
         setIsAuthenticated(false);
+        setIsAdmin(false);
         audit.error('Auth', 'ProtectedRoute: Authentication check failed', error);
       } finally {
         setIsChecking(false);
       }
     };
 
-    if (requireAuth) {
+    if (requireAuth || requireAdmin) {
       checkAuth();
     } else {
       setIsAuthenticated(true);
+      setIsAdmin(false);
       setIsChecking(false);
     }
-  }, [requireAuth]);
+  }, [requireAuth, requireAdmin]);
 
   // Show loading state while checking
   if (isChecking) {
@@ -98,13 +129,25 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
     );
   }
 
-  // If authentication is required and user is not authenticated, redirect to login
-  if (requireAuth && !isAuthenticated) {
-    debugLog('Auth', 'ProtectedRoute: Redirecting to login');
-    return <Navigate to="/login" replace />;
+  // Type D (Admin-only): Check admin role
+  if (requireAdmin && (!isAuthenticated || !isAdmin)) {
+    debugLog('Auth', 'ProtectedRoute: User not authorized for admin route', {
+      isAuthenticated,
+      isAdmin,
+      role: authService.getUserRole()
+    });
+    // Redirect to Home (not 403 for now - can be changed per requirements)
+    return <Navigate to="/" replace />;
   }
 
-  // User is authenticated or route doesn't require auth
+  // Type C (Auth-only): If authentication is required and user is not authenticated, redirect to Home
+  // Type C: Auth-only → Home (not /login per ADR-013)
+  if (requireAuth && !isAuthenticated) {
+    debugLog('Auth', 'ProtectedRoute: Redirecting to Home (Type C: Auth-only)');
+    return <Navigate to="/" replace />;
+  }
+
+  // User is authenticated (and admin if required) or route doesn't require auth
   return <>{children}</>;
 };
 

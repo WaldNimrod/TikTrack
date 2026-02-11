@@ -10,6 +10,7 @@ import { createDriver, TEST_CONFIG } from './selenium-config.js';
 const execAsync = promisify(exec);
 
 const tests = [
+  { name: 'Gate A E2E Tests (Auth 4 Types, Header, Home)', file: 'gate-a-e2e.test.js', type: 'selenium' },
   { name: 'Authentication Flow', file: 'auth-flow.test.js' },
   { name: 'User Management Flow', file: 'user-management.test.js' },
   { name: 'API Keys Management Flow', file: 'api-keys.test.js' },

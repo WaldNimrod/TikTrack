@@ -10,102 +10,102 @@
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741079512
+        "timestamp": 1770839628970
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741079521
+        "timestamp": 1770839628999
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=3e3083b3 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-        "timestamp": 1770741079575
+        "timestamp": 1770839629187
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\"",
-        "timestamp": 1770741079751
+        "timestamp": 1770839629273
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\"",
-        "timestamp": 1770741079751
+        "timestamp": 1770839629273
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-        "timestamp": 1770741079751
+        "timestamp": 1770839629279
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-        "timestamp": 1770741079751
+        "timestamp": 1770839630320
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+        "timestamp": 1770839633884
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741084783
+        "timestamp": 1770839634557
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[UAI] Starting initialization...\" Object",
-        "timestamp": 1770741084784
+        "timestamp": 1770839634558
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"✅ CSS Load Order Verified\"",
-        "timestamp": 1770741084799
+        "timestamp": 1770839634558
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[DOM Stage] ✅ CSS Load Order Verified\" Object",
-        "timestamp": 1770741084799
+        "timestamp": 1770839634558
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: accountsTable\"",
-        "timestamp": 1770741084800
+        "timestamp": 1770839634558
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: accountsTable\"",
-        "timestamp": 1770741084801
+        "timestamp": 1770839634559
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: accountActivityTable\"",
-        "timestamp": 1770741084801
+        "timestamp": 1770839634559
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: accountActivityTable\"",
-        "timestamp": 1770741084801
+        "timestamp": 1770839634559
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: positionsTable\"",
-        "timestamp": 1770741084801
+        "timestamp": 1770839634559
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: positionsTable\"",
-        "timestamp": 1770741084801
-      },
-      {
-        "level": "DEBUG",
-        "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741084803
+        "timestamp": 1770839634559
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741084804
+        "timestamp": 1770839634567
       },
       {
         "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741084805
+        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-11T19:53:54.563Z] Auth Guard: Initializing Auth Guard\" Object",
+        "timestamp": 1770839634567
       }
     ]
   },
@@ -120,102 +120,102 @@
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741093782
+        "timestamp": 1770839644943
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741093789
+        "timestamp": 1770839644972
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=3e3083b3 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-        "timestamp": 1770741093831
+        "timestamp": 1770839645008
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\"",
-        "timestamp": 1770741093917
+        "timestamp": 1770839645098
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\"",
-        "timestamp": 1770741093917
+        "timestamp": 1770839645098
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-        "timestamp": 1770741093918
+        "timestamp": 1770839645100
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-        "timestamp": 1770741094921
-      },
-      {
-        "level": "DEBUG",
-        "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741098790
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[UAI] Starting initialization...\" Object",
-        "timestamp": 1770741098791
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"✅ CSS Load Order Verified\"",
-        "timestamp": 1770741098791
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[DOM Stage] ✅ CSS Load Order Verified\" Object",
-        "timestamp": 1770741098791
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: brokersTable\"",
-        "timestamp": 1770741098793
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: brokersTable\"",
-        "timestamp": 1770741098793
-      },
-      {
-        "level": "DEBUG",
-        "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741098795
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-10T16:31:38.795Z] Auth Guard: Initializing Auth Guard\" Object",
-        "timestamp": 1770741098795
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-10T16:31:38.795Z] Auth Guard: DOM already ready, running check\"",
-        "timestamp": 1770741098795
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741098796
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741098796
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741098799
+        "timestamp": 1770839646103
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-        "timestamp": 1770741103809
+        "timestamp": 1770839649664
+      },
+      {
+        "level": "DEBUG",
+        "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[UAI] Starting initialization...\" Object",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"✅ CSS Load Order Verified\"",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[DOM Stage] ✅ CSS Load Order Verified\" Object",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: brokersTable\"",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: brokersTable\"",
+        "timestamp": 1770839650328
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-11T19:54:10.327Z] Auth Guard: Initializing Auth Guard\" Object",
+        "timestamp": 1770839650330
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-11T19:54:10.327Z] Auth Guard: DOM already ready, running check\"",
+        "timestamp": 1770839650330
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-11T19:54:10.328Z] Auth Guard: Running authentication check\"",
+        "timestamp": 1770839650330
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-11T19:54:10.328Z] Auth Guard: localStorage is accessible\"",
+        "timestamp": 1770839650330
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-11T19:54:10.328Z] Auth Guard: Checking page access\" Object",
+        "timestamp": 1770839650330
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-11T19:54:10.328Z] Auth Guard: Checking authentication\" Object",
+        "timestamp": 1770839650331
       }
     ]
   },
@@ -223,109 +223,109 @@
     "test": "D21_CashFlows",
     "errors": 0,
     "errorsExcludingFavicon": 0,
-    "warnings": 3,
+    "warnings": 4,
     "severeMessages": [],
     "errorsExcludingFaviconMessages": [],
     "logs": [
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741107700
+        "timestamp": 1770839659327
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741107706
+        "timestamp": 1770839659349
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=3e3083b3 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-        "timestamp": 1770741107749
+        "timestamp": 1770839659375
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\"",
-        "timestamp": 1770741107827
+        "timestamp": 1770839659458
       },
       {
         "level": "WARNING",
         "message": "http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=3e3083b3 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\"",
-        "timestamp": 1770741107827
+        "timestamp": 1770839659458
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-        "timestamp": 1770741107828
+        "timestamp": 1770839659460
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-        "timestamp": 1770741108831
+        "timestamp": 1770839660462
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+        "timestamp": 1770839663650
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 494:8 \"[vite] connecting...\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664376
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[UAI] Starting initialization...\" Object",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664385
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"✅ CSS Load Order Verified\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664385
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[DOM Stage] ✅ CSS Load Order Verified\" Object",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664400
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: cashFlowsTable\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664400
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: cashFlowsTable\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664459
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: currencyConversionsTable\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664459
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/cubes/shared/PhoenixTableFilterManager.js 19:15 \"[PhoenixTableFilterManager] Initialized for table: currencyConversionsTable\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664459
       },
       {
         "level": "DEBUG",
         "message": "http://localhost:8080/@vite/client 617:14 \"[vite] connected.\"",
-        "timestamp": 1770741117075
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-10T16:31:52.701Z] Auth Guard: Initializing Auth Guard\" Object",
-        "timestamp": 1770741117075
-      },
-      {
-        "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-10T16:31:52.701Z] Auth Guard: DOM already ready, running check\"",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664481
       },
       {
         "level": "INFO",
         "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741117075
+        "timestamp": 1770839664481
       },
       {
         "level": "INFO",
-        "message": "http://localhost:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-        "timestamp": 1770741117075
+        "message": "http://localhost:8080/src/utils/maskedLog.js 100:12 \"[2026-02-11T19:54:24.427Z] Auth Guard: Initializing Auth Guard\" Object",
+        "timestamp": 1770839664481
+      },
+      {
+        "level": "INFO",
+        "message": "http://localhost:8080/src/utils/maskedLog.js 102:12 \"[2026-02-11T19:54:24.427Z] Auth Guard: DOM already ready, running check\"",
+        "timestamp": 1770839664481
       }
     ]
   },

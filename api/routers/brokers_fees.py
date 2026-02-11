@@ -91,6 +91,8 @@ async def get_brokers_fees_summary(
     search: Optional[str] = Query(default=None, include_in_schema=False),
     date_from: Optional[str] = Query(default=None, include_in_schema=False),
     date_to: Optional[str] = Query(default=None, include_in_schema=False),
+    # Gate B Fix: Add broker_id parameter (Frontend may send it, but we use broker name filter instead)
+    broker_id: Optional[str] = Query(default=None, include_in_schema=False),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -117,7 +119,8 @@ async def get_brokers_fees_summary(
         f"commission_type: '{commission_type}' (type: {type(commission_type).__name__}), "
         f"page: {page}, page_size: {page_size}, "
         f"date_range: '{date_range}', search: '{search}', "
-        f"date_from: '{date_from}', date_to: '{date_to}'"
+        f"date_from: '{date_from}', date_to: '{date_to}', "
+        f"broker_id: '{broker_id}'"
     )
     
     try:

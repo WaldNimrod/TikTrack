@@ -139,13 +139,21 @@ const RegisterForm = () => {
     
     try {
       // Prepare user data (camelCase for React)
+      // TEAM_10_PHONE_VALIDATION_DECISION: Send phone_number in E.164 normalized format
+      let phoneForApi = null;
+      if (formData.phoneNumber?.trim()) {
+        const phoneResult = validatePhoneNumber(formData.phoneNumber.trim());
+        if (phoneResult.isValid && phoneResult.normalized) {
+          // E.164 format: add + prefix for API (Backend expects ^\+?[1-9]\d{1,14}$)
+          phoneForApi = phoneResult.normalized.startsWith('+') ? phoneResult.normalized : `+${phoneResult.normalized}`;
+        }
+      }
+
       const userData = {
         username: formData.username.trim(),
         email: formData.email.trim(),
         password: formData.password,
-        ...(formData.phoneNumber?.trim() && {
-          phoneNumber: formData.phoneNumber.trim()
-        }),
+        ...(phoneForApi && { phoneNumber: phoneForApi }),
       };
       
       // Call Auth Service

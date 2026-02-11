@@ -18,6 +18,9 @@ import RegisterForm from '../cubes/identity/components/auth/RegisterForm.jsx';
 import PasswordResetFlow from '../cubes/identity/components/auth/PasswordResetFlow.jsx';
 import ProfileView from '../cubes/identity/components/profile/ProfileView.jsx';
 
+// Admin components
+import DesignSystemDashboard from '../components/admin/DesignSystemDashboard.jsx';
+
 /**
  * AppRouter Component
  * 
@@ -32,16 +35,14 @@ const AppRouter = () => {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/reset-password" element={<PasswordResetFlow />} />
         
-        {/* Protected Routes - Authentication required */}
+        {/* Type B (Shared): Home - accessible to both guests and authenticated users */}
+        {/* No ProtectedRoute - Home is Type B (Shared) per ADR-013 */}
         <Route
           path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
+          element={<HomePage />}
         />
         
+        {/* Type C (Auth-only): Profile - requires authentication */}
         <Route
           path="/profile"
           element={
@@ -51,7 +52,17 @@ const AppRouter = () => {
           }
         />
         
-        {/* Default redirect - redirect to home if authenticated, otherwise to login */}
+        {/* Type D (Admin-only): Design System Dashboard - requires ADMIN or SUPERADMIN role */}
+        <Route
+          path="/admin/design-system"
+          element={
+            <ProtectedRoute requireAuth={true} requireAdmin={true}>
+              <DesignSystemDashboard />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Default redirect - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

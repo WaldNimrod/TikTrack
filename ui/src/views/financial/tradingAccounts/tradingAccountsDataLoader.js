@@ -873,20 +873,34 @@ async function loadContainer4(filters = {}) {
 }
 
 /**
+ * Gate A Fix: Check if user has auth token before loading data
+ */
+function isAuthenticated() {
+  try {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+                  sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken');
+    return !!token && String(token).trim() !== '';
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
  * Initialize: Load all containers on page load
+ * Gate A Fix: Skip loading if guest - prevents 401 errors
  */
 function initializeTradingAccountsDataLoader() {
-  // Wait for DOM and table formatters to be ready
+  // Gate A Fix: Don't load data for guests - wait for auth redirect or skip
+  if (!isAuthenticated()) {
+    maskedLog('[Trading Accounts Data Loader] Guest detected, skipping loadAllContainers');
+    return;
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        loadAllContainers();
-      }, 100);
+      setTimeout(() => loadAllContainers(), 100);
     });
   } else {
-    setTimeout(() => {
-      loadAllContainers();
-    }, 100);
+    setTimeout(() => loadAllContainers(), 100);
   }
 }
 

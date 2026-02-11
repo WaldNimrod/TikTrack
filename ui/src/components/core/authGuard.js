@@ -155,41 +155,149 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
   }
 
   /**
+   * Determine page type (A/B/C/D) based on route
+   * Stage 1: Auth Guard distinguishes A/B/C/D per ADR-013
+   * 
+   * @param {string} path - Current pathname
+   * @returns {string} Page type: 'A', 'B', 'C', or 'D'
+   */
+  function getPageType(path) {
+    // Type A (Open): login, register, reset-password - No Header
+    const typeARoutes = ['/login', '/register', '/reset-password'];
+    if (typeARoutes.includes(path)) {
+      return 'A';
+    }
+    
+    // Type B (Shared): Home - Two containers (Guest + Logged-in), no redirect
+    if (path === '/' || path === '/index.html' || path === '/index') {
+      return 'B';
+    }
+    
+    // Type D (Admin-only): /admin/* - JWT role check required
+    if (path.startsWith('/admin/')) {
+      return 'D';
+    }
+    
+    // Type C (Auth-only): All other pages - Require auth, redirect to Home if not authenticated
+    return 'C';
+  }
+
+  /**
+   * Check if user has admin role from JWT token
+   * Stage 1: Admin-only (D) - JWT role check
+   * 
+   * @returns {boolean} True if user has ADMIN or SUPERADMIN role
+   */
+  function isAdmin() {
+    try {
+      const token = localStorage.getItem('access_token') || 
+                    localStorage.getItem('authToken') ||
+                    sessionStorage.getItem('access_token') ||
+                    sessionStorage.getItem('authToken');
+      
+      if (!token) {
+        return false;
+      }
+      
+      // Decode JWT token (simple base64 decode - no verification needed for role check)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const role = payload.role;
+        return role === 'ADMIN' || role === 'SUPERADMIN';
+      } catch (e) {
+        logWithTimestamp('Error decoding JWT token', { error: e.message });
+        return false;
+      }
+    } catch (error) {
+      logWithTimestamp('Error checking admin role', { error: error.message });
+      return false;
+    }
+  }
+
+  /**
    * Check authentication and redirect if needed
-   * Phase 1.3: Enhanced Error Handling
-   * Updated: Uses routes.json for public routes
+   * Stage 1: Enhanced to distinguish A/B/C/D page types per ADR-013
+   * Updated: Uses routes.json for public routes + page type detection
    */
   async function checkAuthAndRedirect() {
     try {
       const currentPath = window.location.pathname;
       const fullUrl = window.location.href;
+      const pageType = getPageType(currentPath);
       
       logWithTimestamp('Checking page access', {
         currentPath: currentPath,
+        pageType: pageType,
         fullUrl: fullUrl,
         debugMode: debugMode
       });
       
-      // Check if current page is public using routes.json
-      const isPublicPage = await isPublicRoute(currentPath);
-      
-      if (isPublicPage) {
-        logWithTimestamp('Public page detected (from routes.json), allowing access', {
+      // Type A (Open): Always allow access - no auth check needed
+      if (pageType === 'A') {
+        logWithTimestamp('Type A (Open) page detected, allowing access', {
           currentPath: currentPath
         });
-        return; // Allow access to public pages
+        return; // Allow access - Header will be hidden by headerLoader.js
       }
-
-      // Check authentication
+      
+      // Type B (Shared): Home - Allow access to all, render based on auth state
+      if (pageType === 'B') {
+        logWithTimestamp('Type B (Shared) page detected, allowing access', {
+          currentPath: currentPath,
+          note: 'No redirect - guest sees Guest Container, authenticated sees Logged-in Container'
+        });
+        return; // Allow access - HomePage.jsx handles container rendering
+      }
+      
+      // Type D (Admin-only): Check JWT role
+      if (pageType === 'D') {
+        const authenticated = isAuthenticated();
+        const admin = isAdmin();
+        
+        logWithTimestamp('Type D (Admin-only) page detected', {
+          currentPath: currentPath,
+          authenticated: authenticated,
+          isAdmin: admin
+        });
+        
+        if (!authenticated || !admin) {
+          logWithTimestamp('User not authorized for admin page', {
+            currentPath: currentPath,
+            willRedirect: !debugMode,
+            debugMode: debugMode
+          });
+          
+          if (debugMode) {
+            logWithTimestamp('🔍 DEBUG MODE: Skipping redirect for admin page');
+            return;
+          }
+          
+          // Redirect to Home (not 403 for now - can be changed per requirements)
+          logWithTimestamp('Redirecting to Home (Type D: Admin-only)', {
+            currentPath: currentPath,
+            redirectTo: '/'
+          });
+          window.location.href = '/';
+          return;
+        }
+        
+        // User is authenticated and is admin - allow access
+        logWithTimestamp('✅ Admin user authenticated, allowing access', {
+          currentPath: currentPath
+        });
+        return;
+      }
+      
+      // Type C (Auth-only): Require authentication, redirect to Home if not authenticated
       const authenticated = isAuthenticated();
-      logWithTimestamp('Authentication check result', {
+      logWithTimestamp('Type C (Auth-only) page detected', {
         authenticated: authenticated,
         currentPath: currentPath,
         debugMode: debugMode
       });
       
       if (!authenticated) {
-        logWithTimestamp('User not authenticated', {
+        logWithTimestamp('User not authenticated for Type C page', {
           currentPath: currentPath,
           willRedirect: !debugMode,
           debugMode: debugMode
@@ -197,16 +305,16 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
         
         // Skip redirect in debug mode
         if (debugMode) {
-          logWithTimestamp('🔍 DEBUG MODE: Skipping redirect to /login');
+          logWithTimestamp('🔍 DEBUG MODE: Skipping redirect to Home');
           return;
         }
         
-        // Redirect to login page
-        logWithTimestamp('Redirecting to /login', {
+        // Redirect to Home (Type C: Auth-only → Home, not /login per ADR-013)
+        logWithTimestamp('Redirecting to Home (Type C: Auth-only)', {
           currentPath: currentPath,
-          redirectTo: '/login'
+          redirectTo: '/'
         });
-        window.location.href = '/login';
+        window.location.href = '/';
         return;
       }
 
@@ -221,10 +329,11 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
         url: window.location.href
       });
       
-      // Fail closed - redirect to login if error occurs (unless debug mode)
+      // Fail closed - redirect to Home if error occurs (unless debug mode)
+      // Type C behavior: redirect to Home (not /login per ADR-013)
       if (!debugMode) {
-        logWithTimestamp('Redirecting to login due to error');
-        window.location.href = '/login';
+        logWithTimestamp('Redirecting to Home due to error');
+        window.location.href = '/';
       } else {
         logWithTimestamp('🔍 DEBUG MODE: Skipping redirect due to error');
       }
@@ -272,8 +381,10 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
         }
       };
       
-      // Determine delay based on debug mode
-      const delay = debugMode ? 100 : 500; // Shorter delay in debug mode, normal delay otherwise
+      // Gate A Fix: Run auth check immediately (no delay) so redirect happens BEFORE
+      // scripts at bottom of page (tableInit, filtersIntegration) make API calls.
+      // Previous 500ms delay allowed 401 errors - scripts ran before redirect.
+      const delay = debugMode ? 100 : 0;
       
       if (document.readyState === 'loading') {
         logWithTimestamp('Waiting for DOMContentLoaded');
@@ -291,9 +402,10 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
         stack: error.stack
       });
       
-      // Fail closed - redirect to login if critical error (unless debug mode)
+      // Fail closed - redirect to Home if critical error (unless debug mode)
+      // Type C: Auth-only → Home (not /login per ADR-013)
       if (!debugMode) {
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }
   }
@@ -302,6 +414,8 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
   window.AuthGuard = {
     check: checkAuthAndRedirect,
     isAuthenticated: isAuthenticated,
+    isAdmin: isAdmin,
+    getPageType: getPageType,
     debugMode: debugMode,
     logWithTimestamp: logWithTimestamp,
     loadRoutesConfig: loadRoutesConfig,

@@ -38,6 +38,7 @@
 | **`ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`** | **ADR‑013 LOCKED** — Auth 4‑Type, TipTap, Broker API, Admin JWT, Design route, User Icon, Header Loader |
 | **`ARCHITECT_PRE_CODING_MAPPING_MANDATE.md`** | **Pre‑coding Mapping — BLOCKING** (אין קידוד לפני מיפוי + אישור נמרוד) |
 | **`documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md`** | **SLA 30/40** — 40=Presentational, 30=Containers/Logic/API; איסור API בתיקיות UI |
+| **`ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`** | **SSOT נעילה** — Stage 0 Blocking, React Tables (TablesReactStage בלבד), Auth 4-Type, תיקונים ויזואליים (§6) |
 
 ### 2.1 Auth Model — החלטות ADR‑013 (LOCKED)
 
@@ -45,7 +46,7 @@
 
 **החלטות מחייבות (LOCKED):**
 - **A) Open:** /login, /register, **/reset-password** — Header מוסתר.
-- **B) Shared:** Home — שיווקי לאורח + נתונים למחובר.
+- **B) Shared:** עמוד יחיד עם שני Containers (Guest + Logged-in); אין Redirect לאורח. חובה בתוכנית — ראה §4 ו־ADR SSOT §3.1.
 - **C) Auth-only:** D16, D18, D21 — אורח → Home.
 - **D) Admin-only:** **/admin/design-system** — מקור role: **JWT (שדה role)**; אחר → redirect/403.
 - User Icon: **Success / Warning** בלבד (אסור שחור).
@@ -59,7 +60,8 @@
 ## 3. סדר ביצוע (מאוחד)
 
 **🔒 Stage 0 = Blocking — קודם לכל שלב אחר.**  
-**SSOT:** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`.
+**SSOT:** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`.  
+**איסור:** Header **בתוך Containers** (מניעת SSR כפול). **Header נטען לפני React mount.**
 
 | שלב | נושא | הערה |
 |-----|------|------|
@@ -77,14 +79,15 @@
 
 ## 4. סעיף 1 (ראשון): שער אוטנטיקציה — חלוקת העמודים ל־4 טיפוסים
 
-**מקור:** `TEAM_90_TO_TEAM_10_ADDITIONAL_VISUAL_GAPS_TASKS.md` — "🔐 Auth Page Types + Redirect Rules"; הרחבת טיפוס **D) Admin-only** (הנחיית מנהל).
+**מקור:** `TEAM_90_TO_TEAM_10_ADDITIONAL_VISUAL_GAPS_TASKS.md` — "🔐 Auth Page Types + Redirect Rules"; הרחבת טיפוס **D) Admin-only** (הנחיית מנהל).  
+**החלטה נעולה:** **Shared Pages (Type B)** = טיפוס **רשמי** במודל האוטנטיקציה (חובה בתוכנית העבודה), לא רק פרשנות UI. ראה `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` §3 ו־§3.1.
 
 ### 4.1 הגדרת הטיפוסים (חובה)
 
 | טיפוס | הגדרה | Header | התנהגות |
 |--------|--------|--------|----------|
 | **A) Open** | ציבורי — זמין לכולם | **לא מוצג** | login, register, forgot-password (reset-password) |
-| **B) Shared** | משותף — אורח ומחובר | מוצג | **Home בלבד** — שני containers: logged-out (כפתורי login/register + placeholder שיווקי) ו־logged-in (תוכן קיים) |
+| **B) Shared** | **עמוד יחיד עם שני Containers** — טיפוס רשמי | מוצג | **אורח:** Guest Container. **מחובר:** Logged-in Container. **אין Redirect** לאורח (בניגוד ל‑C). |
 | **C) Auth-only** | דורש התחברות | מוצג | כל עמוד שלא ב־A/B/D — אורח **מופנה ל־Home** (לא ל־/login) |
 | **D) Admin-only** | למשתמש מנהל בלבד | מוצג | רק משתמש עם תפקיד מנהל; אחר — הפניה (ל־Home או 403 לפי החלטה) |
 
@@ -96,16 +99,24 @@
 
 ### 4.3 Required Actions (מסמך + השלמות)
 
+- **Auth Guard** מבחין בין A/B/C/D.  
+- **Type B (Shared):** Allowed לכל המשתמשים + **render לפי auth state**; שני containers **באותו עמוד**; **אין עמודים נפרדים**; **אין Redirect** לאורח.  
 - לבטל הגנת Home (לא ProtectedRoute על Home).  
-- ליישם רינדור משותף לפי מצב auth (logged-out container / logged-in containers).  
-- אורח שנכנס לעמוד auth-only → **הפניה ל־Home**.  
+- ליישם רינדור משותף לפי מצב auth (Guest Container / Logged-in Container).  
+- אורח שנכנס לעמוד **auth-only (C)** → **הפניה ל־Home**.  
 - לאכוף לוגיקת צבע User Icon (success / warning; לא black).  
 - **טיפוס D:** להגדיר אילו routes הם admin-only; ליישם בדיקת תפקיד ו־redirect/403.
 
+### 4.3.1 דרישות יישום — Shared Pages (Type B) (חובה)
+
+- שני containers **באותו עמוד** (Guest + Logged-in); אין עמודים נפרדים.  
+- **בדיקות חובה:** אורח רואה Guest Container בלבד; מחובר רואה Logged-in בלבד; Login → Home מחליף תצוגה; **אין Redirect** ב‑B.
+
 ### 4.4 Acceptance Criteria (מסמך)
 
+- **Type B (Shared):** Home = עמוד יחיד; אורח רואה Guest Container בלבד; מחובר רואה Logged-in בלבד; Login → Home מחליף תצוגה; **אין Redirect** לאורח ב‑B.  
 - Home נגיש תמיד (אורח + מחובר) ומציג container נכון למצב.  
-- ניווט אורח לעמוד auth-only מפנה ל־Home.  
+- ניווט אורח לעמוד auth-only (C) מפנה ל־Home.  
 - Header תמיד קיים (מלבד עמודי Open).  
 - User Icon תמיד success או warning (לעולם לא black).  
 - עמודי Admin-only נגישים רק למנהל; אחר — הפניה/403.
@@ -121,11 +132,11 @@
 
 מקור: `ui/public/routes.json` + `TT2_OFFICIAL_PAGE_TRACKER`.
 
-**טבלת Routes רשמית (לעדכון SSOT — ראה דוח השלמה פריט 2):**
+**טבלת Routes רשמית (לעדכון SSOT — ראה דוח השלמה פריט 2). Shared (Type B) = טיפוס רשמי במודל — מופיע בטבלה.**
 
 | Route | קובץ / רכיב | טיפוס | הערה |
 |-------|-------------|--------|------|
-| / | **index.html** | **B) Shared** | **Home = `/` = index.html** (SSOT מפורש) |
+| / | **index.html** | **B) Shared** | **Home = `/` = index.html** — עמוד יחיד, שני Containers (Guest + Logged-in); אין Redirect לאורח. (SSOT מפורש) |
 | /login | login.html | **A) Open** | |
 | /register | register.html | **A) Open** | |
 | **/reset-password** | **PasswordResetFlow.jsx** (blueprint: D15_RESET_PWD.html) | **A) Open** | **ADR‑013 LOCKED** — מאושר כ־Open; Header מוסתר. |
@@ -160,9 +171,11 @@
 
 ## 5. משימות ויזואליות (מסמך — כל הסעיפים והתת־סעיפים)
 
-### משימה 7: Header תמיד אחרי Login → Home (Critical)
+**נעילה ב‑SSOT:** כל הסעיפים להלן תואמים ל־`ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` §6 (תיקונים ויזואליים ותפקודיים). חובה כסעיפים נפרדים עם Required Actions + Acceptance Criteria.
 
-**דרישה (מסמך):** Header מוצג תמיד מלבד login/register/reset-password; תיקון רגרסיה ב־login → home.
+### משימה 7: Header תמיד אחרי Login → Home (Critical — **תיקון ראשון**)
+
+**דרישה (מסמך):** Header מוצג תמיד מלבד login/register/reset-password; **תקלה קריטית:** Header נעלם אחרי Login → תיקון **ראשון** בתעדוף.
 
 **Required Actions (מסמך):**  
 - לתקן זרימת טעינת Header כך ש־Header תמיד קיים.  

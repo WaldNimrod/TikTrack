@@ -4,7 +4,7 @@
 **תאריך:** 2026-02-10  
 **סטטוס:** 🔒 **נעול — TablesReactStage בלבד; Stage 0 Blocking (ראה SSOT)**  
 **בסיס:** מסמך המיפוי `TEAM_10_REACT_TABLES_MAPPING_DOCUMENT.md` (שלב 1).  
-**SSOT מחייב:** `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` — React Tables רק דרך TablesReactStage; Stage 0 לפני כל שלב אחר.
+**SSOT מחייב:** `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` — React Tables רק דרך TablesReactStage; Stage 0 לפני כל שלב אחר; Auth 4-Type, תיקונים ויזואליים (§6). **מסמכי מנדט:** ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md, ARCHITECT_PRE_CODING_MAPPING_MANDATE.md, TT2_SLA_TEAMS_30_40.md.
 
 ---
 

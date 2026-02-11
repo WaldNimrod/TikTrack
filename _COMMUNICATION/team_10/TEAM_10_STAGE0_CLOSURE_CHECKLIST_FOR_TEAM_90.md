@@ -2,7 +2,7 @@
 
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-10  
-**מטרה:** סגירה סופית בסבב אחד — כל הסעיפים בוצעו; מוכן לחתימת Team 90.
+**מטרה:** סגירה סופית בסבב אחד — ריכוז החלטות ב‑SSOT; כל המסמכים מעודכנים; מוכן לחתימת Team 90.
 
 ---
 
@@ -10,11 +10,14 @@
 
 | # | קריטריון | סטטוס | מקור |
 |---|-----------|--------|------|
-| 1 | **מופיע במסמך SSOT/ADR: TablesReactStage only** | ✅ | `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` — סעיף 2 "React Tables Root Strategy (נעול — Option B בלבד)". |
-| 2 | **Stage 0 מוגדר כ‑Blocking ונכנס לתוכנית הכללית קודם לכל שלב** | ✅ | `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` סעיף 3 — "Stage 0 = Blocking — קודם לכל שלב אחר"; `TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md` — שלב 0 BLOCKING. |
-| 3 | **routes.json ו‑Header Path מיושרים** | ✅ | routes.json: auth = /login, /register, /reset-password (ללא .html). Header Path: נעילה על unified-header.html — מתועד ב‑SSOT. |
-| 4 | **Redirect rules תואמים ADR‑013** | 📋 תיעוד הושלם | SSOT מגדיר: C→Home, A=No Header, B=Home Shared, D=JWT role. ביצוע בקוד — לאימות Team 30/50. |
-| 5 | **אין חלופות או ניסוחים פתוחים בתוכנית** | ✅ | Mini Work Plan — סעיף React Root Strategy **נעול**: TablesReactStage בלבד. Mapping Document — הפניה ל‑SSOT ו‑Stage 0. |
+| 1 | **Stage 0 מוגדר כ‑Blocking לפני כל שלב** | ✅ | תוכנית עבודה + Order of Work — Stage 0 ראשון. |
+| 2 | **TablesReactStage בלבד — אין mount per page** | ✅ | `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` §2; Mini Work Plan נעול. |
+| 3 | **Redirect rules מיושמים לפי ADR‑013** | 📋 תיעוד ב‑SSOT | C→Home, A=No Header, B=Home Shared, D=JWT role. אימות בקוד — Team 30/50. |
+| 4 | **User Icon rules נעולים** | ✅ | SSOT §3 — Success/Warning; אסור שחור. |
+| 5 | **Header תמיד (מלבד A)** | ✅ | SSOT §3 — Header Persistence. |
+| 6 | **routes.json מיושר ל־/login, /register, /reset-password** | ✅ | `ui/public/routes.json` עודכן. |
+| 7 | **SSOT נעול — אין ניסוחים פתוחים** | ✅ | ADR SSOT כולל Auth 4-Type, Bridge, ADR‑013, תיקונים ויזואליים (§6); כל המסמכים מפנים ל‑SSOT. |
+| 8 | **Shared (Type B) כטיפוס רשמי** | ✅ | SSOT §3 + §3.1; תוכנית עבודה §4 + §4.3.1; טבלת Routes — B) Shared; דרישות יישום + בדיקות חובה (שני containers, אין Redirect ב‑B). |
 
 ---
 
@@ -22,12 +25,25 @@
 
 | מסמך | פעולה |
 |------|--------|
-| **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | **נוצר** — SSOT ל‑Stage 0 (Bridge) + React Tables (TablesReactStage only). |
-| **TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md** | **עודכן** — אסטרטגיית React Root = TablesReactStage בלבד; הפניה ל‑SSOT. |
-| **TEAM_10_REACT_TABLES_MAPPING_DOCUMENT.md** | **עודכן** — הפניה ל‑SSOT ו‑Stage 0. |
-| **TEAM_10_VISUAL_GAPS_WORK_PLAN.md** | **עודכן** — Stage 0 BLOCKING קודם לכל; תוכן Stage 0 מיושר ל‑SSOT. |
-| **TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md** | **עודכן** — שלב 0 BLOCKING; SSOT; routes.json מסומן עודכן. |
-| **ui/public/routes.json** | **עודכן** — auth.login=/login, auth.register=/register, auth.reset_password=/reset-password. |
+| **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | **נוצר/עודכן** — SSOT מלא: Stage 0, React Tables (Option B), Auth 4-Type (§3) + **Shared Pages (Type B) רשמי** (§3.1 — דרישות יישום + בדיקות חובה), Bridge (§4), ADR‑013 (§5), תיקונים ויזואליים (§6), קבצי הפניה (§7). |
+| **TEAM_10_VISUAL_GAPS_WORK_PLAN.md** | **עודכן** — Stage 0 Blocking; איסור Header בתוך Containers; משימה 7 = תיקון ראשון; רפרנס SSOT; **Shared (Type B) טיפוס רשמי** — §4, §4.3.1, טבלת Routes; דרישות יישום + Acceptance. |
+| **TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md** | **עודכן** — SSOT & Mandates; שלב 0.6 איסור Header בתוך Containers; שלב 2.0 Header נעלם אחרי Login (תיקון קריטי ראשון); **שלב 1 — Type B (Shared) רשמי:** Auth Guard A/B/C/D, שני containers באותו עמוד, אין Redirect ב‑B, בדיקות חובה; §6 קבצים מרכזיים. |
+| **TEAM_10_MAPPING_MODE_SUMMARY_FOR_TEAM_90_REVIEW.md** | **עודכן** — Stage 0 Blocking; הפניה ל‑ADR SSOT. |
+| **TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md** | **עודכן** — הפניה ל‑SSOT + מסמכי מנדט. |
+| **TEAM_10_REACT_TABLES_MAPPING_DOCUMENT.md** | **עודכן** — הפניה ל‑SSOT + מנדטים. |
+| **TEAM_10_STAGE0_CLOSURE_CHECKLIST_FOR_TEAM_90.md** | **מסמך זה** — צ'קליסט מלא + קבצי הפניה. |
+| **ui/public/routes.json** | **עודכן** — auth = /login, /register, /reset-password (ללא .html). |
+
+---
+
+## קבצים מרכזיים להפניה (SSOT & Mandates)
+
+| קובץ | שימוש |
+|------|--------|
+| **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | נעילה אחת — Stage 0, React Tables (Option B), Auth 4-Type, Bridge, ADR‑013, תיקונים ויזואליים. |
+| **ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md** | ADR‑013 — החלטות אדריכלית. |
+| **ARCHITECT_PRE_CODING_MAPPING_MANDATE.md** | Pre‑coding Mapping — BLOCKING. |
+| **TT2_SLA_TEAMS_30_40.md** | SLA 30/40 — תפקידים ומגבלות. |
 
 ---
 

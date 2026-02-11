@@ -3,7 +3,8 @@
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-10  
 **סטטוס:** 📋 **מסמך תזמור — סדר ביצוע מחייב**  
-**מקור:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md`, `TEAM_90_TO_TEAM_10_ADR_013_SLA_ACTIVATION_MANDATE.md`, מנדט Pre‑coding
+**מקור:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md`, `TEAM_90_TO_TEAM_10_ADR_013_SLA_ACTIVATION_MANDATE.md`, מנדט Pre‑coding.  
+**SSOT & Mandates:** `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`, `ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`, `ARCHITECT_PRE_CODING_MAPPING_MANDATE.md`, `TT2_SLA_TEAMS_30_40.md`.
 
 ---
 
@@ -56,7 +57,8 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | 0.3 | routes.json: /login, /register, /reset-password (ללא .html) | **Team 10/30** | ✅ עודכן ב־routes.json |
 | 0.4 | Header Path: נעילה על unified-header.html בלבד | **Team 30/40** | |
 | 0.5 | **React Tables:** רק דרך TablesReactStage ב‑UAI (אין mount per page) | **לפי SSOT** | ראה `TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md`, ADR SSOT. |
-| 0.6 | דיווח השלמה ל־Team 10 | **צוות מוביל** | |
+| 0.6 | איסור Header **בתוך Containers** (מניעת SSR כפול) | **Team 30** | SSOT §4. |
+| 0.7 | דיווח השלמה ל־Team 10 | **צוות מוביל** | |
 
 **הערה:** Stage 0 חוסם את כל השלבים הבאים. React Tables — TablesReactStage בלבד (נעול).
 
@@ -64,16 +66,19 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 ### שלב 1: שער אוטנטיקציה (4 טיפוסים A/B/C/D)
 
+**Shared Pages (Type B) = טיפוס רשמי (חובה):** עמוד יחיד עם שני Containers; Auth Guard מבחין A/B/C/D; Type B: Allowed + render לפי auth state; **אין Redirect** ב‑B. ראה ADR SSOT §3.1.
+
 | # | פעולה | אחראי | הערה |
 |---|--------|--------|------|
-| 1.1 | עדכון/יישום Guard + redirect לפי ROUTES_MAP (אורח → Home בעמודי C/D) | **Team 30** | לא ProtectedRoute על Home; redirect ל־Home (לא ל־/login) |
-| 1.2 | Home: שני containers — logged-out (שיווקי) / logged-in (נתונים) | **Team 30** | B) Shared |
-| 1.3 | User Icon: Success (logged-in) / Warning (logged-out); אסור שחור | **Team 30/40** | לפי SLA — 40 על מראה, 30 על לוגיקה |
-| 1.4 | Admin-only: בדיקת JWT role, redirect/403 ל־/admin/design-system | **Team 20 + 30** | מקור: שדה `role` ב־JWT |
-| 1.5 | וידוא עמודי A) Open ללא Header (login, register, reset-password) | **Team 30** | |
-| 1.6 | דיווח השלמה ל־Team 10 | **Team 30** | |
+| 1.1 | Auth Guard מבחין A/B/C/D; Type C: אורח → Home; Type B: **אין redirect** | **Team 30** | לא ProtectedRoute על Home; redirect ל־Home רק ב‑C (לא ב‑B). |
+| 1.2 | **Type B (Shared):** Home = עמוד יחיד — Guest Container (אורח) + Logged-in Container (מחובר) | **Team 30** | שני containers **באותו עמוד**; אין עמודים נפרדים. |
+| 1.3 | בדיקות חובה Type B: אורח רואה Guest בלבד; מחובר רואה Logged-in בלבד; Login→Home מחליף תצוגה | **Team 30/50** | אין Redirect ב‑B. |
+| 1.4 | User Icon: Success (logged-in) / Warning (logged-out); אסור שחור | **Team 30/40** | לפי SLA. |
+| 1.5 | Admin-only: בדיקת JWT role, redirect/403 ל־/admin/design-system | **Team 20 + 30** | מקור: שדה `role` ב־JWT. |
+| 1.6 | וידוא עמודי A) Open ללא Header (login, register, reset-password) | **Team 30** | |
+| 1.7 | דיווח השלמה ל־Team 10 | **Team 30** | |
 
-**רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` סעיף 4; ADR‑013.
+**רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` סעיף 4 ו־4.3.1; ADR‑013; ADR SSOT §3.1.
 
 ---
 
@@ -81,11 +86,12 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 | # | פעולה | אחראי | הערה |
 |---|--------|--------|------|
-| 2.1 | Header Loader רץ **לפני** React mount (תיקון רגרסיה login → home) | **Team 30** | ADR‑013 |
+| **2.0** | **Header נעלם אחרי Login — תיקון קריטי ראשון** | **Team 30** | Header חייב להישאר אחרי מעבר Login → Home; תיקון **ראשון** בתעדוף. |
+| 2.1 | Header Loader רץ **לפני** React mount | **Team 30** | ADR‑013 |
 | 2.2 | וידוא Header מוצג בכל עמוד שאינו A) Open | **Team 30** | |
 | 2.3 | דיווח השלמה ל־Team 10 | **Team 30** | |
 
-**רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` משימה 7.
+**רפרנס:** `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` משימה 7; SSOT §6.7.
 
 ---
 
@@ -123,11 +129,22 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 |-----|------------|--------|
 | **‑1** | MAPPING_MODE | ✅ סגור |
 | **0** | גשר React/HTML (Bridge) — דוח Team 90 | ⬜ |
-| **1** | אוטנטיקציה: Guards, Home containers, User Icon, Admin JWT, עמודי Open בלי Header | ⬜ |
+| **1** | אוטנטיקציה: Guards, Home containers, **Type B (Shared) רשמי** — שני containers באותו עמוד, אין Redirect ב‑B, User Icon, Admin JWT, עמודי Open בלי Header | ⬜ |
 | **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ⬜ |
 | **G** | Team 10: אישור + קונטקסט ל־QA → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ⬜ |
 
 ---
 
+## 6. קבצים מרכזיים להפניה (SSOT & Mandates)
+
+| קובץ | שימוש |
+|------|--------|
+| **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | נעילה Stage 0 + React Tables (Option B); Auth 4-Type; תיקונים ויזואליים (§6). |
+| **ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md** | ADR‑013 — החלטות אדריכלית. |
+| **ARCHITECT_PRE_CODING_MAPPING_MANDATE.md** | Pre‑coding Mapping — BLOCKING. |
+| **TT2_SLA_TEAMS_30_40.md** | SLA 30/40 — תפקידים ומגבלות. |
+
+---
+
 **Team 10 (The Gateway)**  
-**log_entry | ORDER_OF_WORK_UNTIL_GATE_A | ISSUED | 2026-02-10**
+**log_entry | ORDER_OF_WORK_UNTIL_GATE_A | UPDATED_SSOT_LOCK | 2026-02-10**

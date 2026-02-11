@@ -3,7 +3,7 @@
 **מאת:** Team 10 (The Gateway)  
 **אל:** Team 90 (The Spy)  
 **תאריך:** 2026-02-10  
-**סטטוס:** ✅ **MAPPING_MODE סגור** — עם Hold: שלב 0 (גשר React/HTML) כפי שאושר צוות 90
+**סטטוס:** ✅ **MAPPING_MODE סגור** — Stage 0 (גשר React/HTML) **Blocking**; SSOT נעול — כפי שאושר צוות 90
 
 ---
 
@@ -13,9 +13,9 @@
 
 - **משוב:** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_MAPPING_MODE_FEEDBACK_WITH_HOLD.md`
 - **הודעת סיום:** `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md`
-- **שלב 0 (Bridge):** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md` — נוסף לתוכנית העבודה מיד אחרי המיפוי.
+- **שלב 0 (Bridge):** **BLOCKING** — קודם לכל שלב. מקור: `TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`; **SSOT:** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` (React Tables = TablesReactStage בלבד; Hybrid; Redirect; routes.json; Header path; איסור Header בתוך Containers).
 
-**הבא:** ביצוע שלב 0 (גשר React/HTML), ואז שלב 1 (שער אוטנטיקציה), שלב 2 (Header), לשער א'.
+**הבא:** ביצוע שלב 0 (גשר React/HTML), ואז שלב 1 (שער אוטנטיקציה), שלב 2 (Header — תיקון קריטי: Header אחרי Login), לשער א'.
 
 ---
 
@@ -50,6 +50,7 @@
 | Pre‑coding Mapping Mandate | `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PRE_CODING_MAPPING_MANDATE.md` | שלושת קבצי המיפוי — BLOCKING |
 | הפעלה מרכזית (Team 90) | `_COMMUNICATION/team_10/TEAM_90_TO_TEAM_10_ADR_013_SLA_ACTIVATION_MANDATE.md` | הודעה מרכזית אחת; דרישות פעולה |
 | SLA 30/40 (SSOT) | `documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md` | 40=Presentational, 30=Containers/Logic/API |
+| **ADR Stage 0 + React Tables (SSOT נעילה)** | `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` | Stage 0 Blocking; TablesReactStage בלבד; Auth 4-Type; תיקונים ויזואליים (§6) |
 
 ---
 

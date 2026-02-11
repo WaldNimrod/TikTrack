@@ -106,7 +106,7 @@
 - **מפת סריקה:** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_SCAN_MAP.md`
 - **דוח Bridge:** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`
 - **מנדט תהליך:** `_COMMUNICATION/team_10/TEAM_10_REACT_TABLES_MANDATORY_PROCESS.md`
-- **SSOT — Stage 0 + React Tables (נעול):** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` — Stage 0 (Bridge) חובה לפני כל שלב; React Tables נטענות **רק** דרך TablesReactStage ב־UAI; אין mount per page.
+- **SSOT — Stage 0 + React Tables (נעול):** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` — Stage 0 (Bridge) חובה לפני כל שלב; React Tables נטענות **רק** דרך TablesReactStage ב־UAI; אין mount per page. קבצי מנדט: ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md, ARCHITECT_PRE_CODING_MAPPING_MANDATE.md, TT2_SLA_TEAMS_30_40.md.
 
 ---
 

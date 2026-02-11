@@ -2,11 +2,13 @@
  * Cash Flows Form - Form component for add/edit cash flows
  * --------------------------------------------------------
  * Creates and manages form for cash flows (D21)
+ * SOP-012: Rich-Text (TipTap) for description field
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/Shared_Services.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { createPhoenixRichTextEditor } from '../../../components/shared/phoenixRichTextEditor.js';
 
 /**
  * Get trading accounts for dropdown
@@ -131,12 +133,24 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
       </div>
       
       <div class="form-group">
-        <label for="description">תיאור</label>
-        <textarea 
-          id="description" 
-          name="description" 
-          placeholder="תיאור התנועה (אופציונלי)"
-        >${description}</textarea>
+        <label for="description-editor-container">תיאור</label>
+        <div id="description-editor-toolbar" class="phoenix-rt-toolbar">
+          <button type="button" data-rt-cmd="bold" title="מודגש">ב</button>
+          <button type="button" data-rt-cmd="italic" title="נטוי">נ</button>
+          <button type="button" data-rt-cmd="underline" title="קו תחתון">ק</button>
+          <span class="phoenix-rt-toolbar-sep">|</span>
+          <button type="button" data-rt-cmd="phx-success" title="הצלחה" class="phx-rt--success">✓</button>
+          <button type="button" data-rt-cmd="phx-warning" title="אזהרה" class="phx-rt--warning">!</button>
+          <button type="button" data-rt-cmd="phx-danger" title="סכנה" class="phx-rt--danger">✕</button>
+          <button type="button" data-rt-cmd="phx-highlight" title="הדגשה" class="phx-rt--highlight">◆</button>
+          <span class="phoenix-rt-toolbar-sep">|</span>
+          <button type="button" data-rt-cmd="bulletList" title="רשימה">•</button>
+          <button type="button" data-rt-cmd="orderedList" title="רשימה ממוספרת">1.</button>
+        </div>
+        <div 
+          id="description-editor-container" 
+          class="phoenix-rt-editor-wrapper"
+        ></div>
         <span class="form-error" id="descriptionError"></span>
       </div>
       
@@ -167,7 +181,8 @@ export async function showCashFlowFormModal(data, onSave) {
   // Get trading accounts for dropdown
   getTradingAccounts().then(tradingAccounts => {
     const formHTML = createCashFlowFormHTML(data, tradingAccounts);
-    
+    let richTextInstance = null;
+
     createModal({
       title: title,
       content: formHTML,
@@ -177,13 +192,16 @@ export async function showCashFlowFormModal(data, onSave) {
       onSave: function() {
         const form = document.getElementById('cashFlowForm');
         if (!form) return;
-        
+
         // Validate form
         if (!form.checkValidity()) {
           form.reportValidity();
           return;
         }
-        
+
+        const descriptionHtml = richTextInstance ? richTextInstance.getHTML() : '';
+        const descPlain = descriptionHtml.replace(/<[^>]+>/g, '').trim();
+
         // Collect form data
         const formData = {
           tradingAccountId: document.getElementById('tradingAccountId').value.trim(),
@@ -191,7 +209,7 @@ export async function showCashFlowFormModal(data, onSave) {
           flowType: document.getElementById('flowType').value,
           amount: parseFloat(document.getElementById('amount').value) || 0,
           currency: document.getElementById('currency').value,
-          description: document.getElementById('description').value.trim(),
+          description: descPlain ? descriptionHtml : null,
           externalReference: document.getElementById('externalReference').value.trim()
         };
         
@@ -218,13 +236,32 @@ export async function showCashFlowFormModal(data, onSave) {
         if (onSave) {
           onSave(formData, data);
         }
-        
-        // Close modal
+
+        if (richTextInstance) {
+          richTextInstance.destroy();
+          richTextInstance = null;
+        }
         closeModal();
       },
       onClose: function() {
-        // Cleanup if needed
+        if (richTextInstance) {
+          richTextInstance.destroy();
+          richTextInstance = null;
+        }
       }
     });
+
+    // Init TipTap after modal is in DOM
+    setTimeout(() => {
+      const container = document.getElementById('description-editor-container');
+      if (container) {
+        const initialContent = data?.description || '';
+        richTextInstance = createPhoenixRichTextEditor(container, {
+          content: initialContent,
+          placeholder: 'תיאור התנועה (אופציונלי)',
+          toolbarId: 'description-editor-toolbar'
+        });
+      }
+    }, 100);
   });
 }

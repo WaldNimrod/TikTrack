@@ -1435,6 +1435,49 @@ body .page-wrapper .page-container main {
   border-radius: 2px;
 }
 
+/* Rich-Text Editor Toolbar & Container (SOP-012) */
+.phoenix-rt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px 0;
+  margin-block-end: 4px;
+  border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+}
+.phoenix-rt-toolbar button {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  background: var(--apple-bg-secondary, #f5f5f7);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.phoenix-rt-toolbar button:hover {
+  background: var(--apple-bg-tertiary, #e8e8ed);
+}
+.phoenix-rt-toolbar-sep {
+  margin: 0 4px;
+  color: var(--apple-text-tertiary, #86868b);
+}
+.phoenix-rt-editor-wrapper {
+  min-height: 80px;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.phoenix-rt-editor-wrapper .ProseMirror {
+  min-height: 60px;
+  outline: none;
+}
+.phoenix-rt-editor-wrapper .ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--apple-text-tertiary, #86868b);
+  content: attr(data-placeholder);
+  float: right;
+  pointer-events: none;
+}
+
 /* ============================================
    Design System Styles Table Component
    ============================================
@@ -1475,4 +1518,35 @@ body .page-wrapper .page-container main {
   border-radius: 2px;
   font-size: 0.9em;
   color: var(--color-primary, #26baac);
+}
+
+.design-system-category-header td {
+  background: var(--apple-bg-secondary, #f5f5f7);
+  font-size: 0.95rem;
+}
+
+.design-system-colors-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.design-system-color-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.design-system-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  flex-shrink: 0;
+}
+
+.design-system-color-var {
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
 }

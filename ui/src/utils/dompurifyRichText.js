@@ -31,8 +31,6 @@ export function sanitizeRichTextHtml(dirty) {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ADD_ATTR: ['target', 'rel'],
-    ADD_TAGS: [],
-    ALLOWED_URI_REGEXP: SAFE_URI,
     ALLOWED_URI_REGEXP: SAFE_URI,
     FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'form', 'input'],
     FORBID_ATTR: ['style', 'onerror', 'onload'],
@@ -41,10 +39,10 @@ export function sanitizeRichTextHtml(dirty) {
     hooks: {
       uponSanitizeAttribute: (node, data) => {
         if (data.attrName === 'class' && data.attrValue) {
-          const classes = data.attrValue.split(/\s+/).filter((c) =>
-            ALLOWED_SPAN_CLASSES.includes(c) || c.startsWith(PHX_RT_PREFIX)
+          const allowed = data.attrValue.split(/\s+/).filter((c) =>
+            c && (ALLOWED_SPAN_CLASSES.includes(c) || c.startsWith(PHX_RT_PREFIX))
           );
-          data.attrValue = classes.join(' ');
+          data.attrValue = allowed.join(' ');
         }
         if (data.attrName === 'href' && data.attrValue && !SAFE_URI.test(data.attrValue)) {
           data.attrValue = '';

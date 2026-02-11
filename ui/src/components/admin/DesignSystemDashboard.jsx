@@ -11,6 +11,7 @@
 import React from 'react';
 import { debugLog } from '../../utils/debug.js';
 import DesignSystemStylesTable from '../shared/DesignSystemStylesTable.jsx';
+import DesignSystemColorsTable from '../shared/DesignSystemColorsTable.jsx';
 
 /**
  * DesignSystemDashboard Component
@@ -36,7 +37,7 @@ const DesignSystemDashboard = () => {
               </div>
               
               <div className="index-section__body">
-                {/* Rich-Text Styles and Button Styles Dictionary */}
+                <DesignSystemColorsTable />
                 <DesignSystemStylesTable />
               </div>
             </tt-section>

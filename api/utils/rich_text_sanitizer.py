@@ -6,6 +6,7 @@ Rules (from SOP_012_DOMPURIFY_ALLOWLIST.md):
 - Tags: p, br, strong, em, u, a, ul, ol, li, span
 - a: href (http/https/mailto), target, rel
 - span: only class with values starting phx-rt--
+- p: dir (rtl, ltr, auto) — חובה לאפשר RTL
 """
 
 import re
@@ -21,17 +22,42 @@ SOP012_TAGS = {'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span'}
 SOP012_ATTRIBUTES = {
     'a': ['href', 'target', 'rel'],
     'span': ['class'],
+    'p': ['dir'],
 }
+SOP012_DIR_VALUES = frozenset({'rtl', 'ltr', 'auto'})
 SOP012_PROTOCOLS = {'http', 'https', 'mailto'}
 PHX_RT_PREFIX = 'phx-rt--'
 
-# Regex to find span with class attribute for post-processing
-_SPAN_CLASS_RE = re.compile(r'<span\s+class="([^"]*)"\s*>', re.IGNORECASE | re.DOTALL)
+# Regex to find span with class attribute for post-processing (double or single quotes)
+_SPAN_CLASS_RE = re.compile(
+    r'<span\s+class=(["\'])([^"\']*)\1\s*>',
+    re.IGNORECASE | re.DOTALL
+)
+
+
+def _allowed_p_dir(tag: str, name: str, value: str) -> Optional[str]:
+    """Allow dir on p only if value is rtl, ltr, or auto."""
+    if tag == 'p' and name == 'dir' and value:
+        v = value.strip().lower()
+        return v if v in SOP012_DIR_VALUES else None
+    return None
+
+
+def _attributes_filter(tag: str, name: str, value: str):
+    """
+    Attribute filter for bleach. Returns value to keep, or True to keep as-is, or None to drop.
+    Handles p[dir] (rtl/ltr/auto only); others use default allowlist.
+    """
+    if tag == 'p' and name == 'dir':
+        return _allowed_p_dir(tag, name, value)
+    if tag in SOP012_ATTRIBUTES and name in SOP012_ATTRIBUTES[tag]:
+        return True
+    return None
 
 
 def _filter_span_class(match: re.Match) -> str:
     """Keep only class tokens starting with phx-rt--."""
-    class_val = match.group(1)
+    class_val = match.group(2)  # group 1 is quote, group 2 is value
     if not class_val:
         return '<span>'
     allowed = [t.strip() for t in class_val.split() if t.strip().startswith(PHX_RT_PREFIX)]
@@ -60,7 +86,7 @@ def sanitize_rich_text(html: Optional[str]) -> Optional[str]:
     cleaned = bleach.clean(
         s,
         tags=SOP012_TAGS,
-        attributes=SOP012_ATTRIBUTES,
+        attributes=_attributes_filter,
         protocols=SOP012_PROTOCOLS,
         strip=True,
         strip_comments=True,

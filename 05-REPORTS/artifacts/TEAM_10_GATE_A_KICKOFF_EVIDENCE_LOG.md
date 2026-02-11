@@ -77,5 +77,21 @@
 
 ---
 
+## עדכון: איחוד Auth תחת Shared_Services — Option B (2026-02-10)
+
+**מקור:** החלטה מאושרת Team 90 (G‑Lead). חוב שנתגלה בבדיקות — יש לסגור לפני אישור השער באופן סופי.
+
+**SSOT:** `SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md` — Root cause (auth לא דרך Shared_Services; באג refresh), החלטה Option B (אין חריגים), Task Breakdown, Acceptance.
+
+**מנדטים:**
+- `TEAM_10_TO_TEAM_30_AUTH_UNIFIED_SHARED_SERVICES_MANDATE.md` — כל auth דרך Shared_Services; תיקון שמירת token אחרי refresh.
+- `TEAM_10_TO_TEAM_20_AUTH_CONTRACT_AND_SSOT_MANDATE.md` — חוזה Response אחיד; OpenAPI/SSOT.
+- `TEAM_10_TO_TEAM_50_GATE_A_AUTH_QA_UPDATE_MANDATE.md` — עדכון Gate A; token אחרי refresh; Gate A PASS.
+- `TEAM_10_TO_ALL_TEAMS_AUTH_UNIFIED_OPTION_B_KICKOFF.md` — הודעה כללית.
+
+**תוכנית עבודה:** `TEAM_10_ORDER_OF_WORK_UNTIL_GATE_A.md` — נוסף שלב "חוב לפני אישור סופי" (A.1–A.3) + שורת סיכום A.
+
+---
+
 **Team 10 (The Gateway)**  
 **log_entry | GATE_A_KICKOFF_EVIDENCE | 2026-01-30**

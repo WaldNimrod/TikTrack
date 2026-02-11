@@ -95,6 +95,19 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 ---
 
+### חוב לפני אישור השער באופן סופי — איחוד Auth תחת Shared_Services (Option B)
+
+**SSOT:** `SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md` (החלטה מאושרת Team 90 / G‑Lead).  
+**ביצוע מידי** — חוסם אישור שער סופי.
+
+| # | פעולה | אחראי | הערה |
+|---|--------|--------|------|
+| A.1 | כל auth דרך Shared_Services (ללא axios ישיר); תיקון שמירת token אחרי refresh | **Team 30** | ראה `TEAM_10_TO_TEAM_30_AUTH_UNIFIED_SHARED_SERVICES_MANDATE.md` |
+| A.2 | חוזה Response אחיד (access_token, token_type, expires_at, user); עדכון OpenAPI/SSOT | **Team 20** | ראה `TEAM_10_TO_TEAM_20_AUTH_CONTRACT_AND_SSOT_MANDATE.md` |
+| A.3 | עדכון Gate A QA: auth דרך Shared_Services; token אחרי refresh; Gate A PASS | **Team 50** | ראה `TEAM_10_TO_TEAM_50_GATE_A_AUTH_QA_UPDATE_MANDATE.md` |
+
+---
+
 ### הכנה לשער א'
 
 | # | פעולה | אחראי | הערה |
@@ -141,6 +154,16 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | `TEAM_10_GATE_A_VERIFICATION_AND_SIGN_OFF.md` | G.1 — אימות השלמת שלבים 0, 1, 2; אישור לשער א' |
 | `TEAM_10_TO_TEAM_50_GATE_A_CONTEXT_HANDOFF.md` | G.2 — מסירת קונטקסט מפורט ל־Team 50 (תנאי להרצת שער א') |
 
+### איחוד Auth תחת Shared_Services — Option B (2026-02-10)
+
+| מסמך | תיאור |
+|------|--------|
+| `SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md` | SSOT — החלטה נעולה (Team 90); Root cause, Acceptance |
+| `TEAM_10_TO_TEAM_30_AUTH_UNIFIED_SHARED_SERVICES_MANDATE.md` | Team 30 — כל auth דרך Shared_Services; תיקון refresh |
+| `TEAM_10_TO_TEAM_20_AUTH_CONTRACT_AND_SSOT_MANDATE.md` | Team 20 — חוזה אחיד; OpenAPI/SSOT |
+| `TEAM_10_TO_TEAM_50_GATE_A_AUTH_QA_UPDATE_MANDATE.md` | Team 50 — עדכון Gate A; token אחרי refresh |
+| `TEAM_10_TO_ALL_TEAMS_AUTH_UNIFIED_OPTION_B_KICKOFF.md` | הודעה כללית — חלוקת משימות |
+
 ---
 
 ## 5. סיכום טבלארי — סדר עד שער א'
@@ -151,7 +174,8 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | **0** | גשר React/HTML (Bridge) — דוח Team 90 | ✅ |
 | **1** | אוטנטיקציה: Guards, Home containers, **Type B (Shared) רשמי** — שני containers באותו עמוד, אין Redirect ב‑B, User Icon, Admin JWT, עמודי Open בלי Header | ✅ |
 | **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ✅ |
-| **G** | Team 10: אישור (G.1) + קונטקסט ל־QA (G.2) → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ✅ G.1+G.2 בוצעו; שער א' הורצה — `tests/gate-a-e2e.test.js`; 0 SEVERE; ראה `TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md` |
+| **G** | Team 10: אישור (G.1) + קונטקסט ל־QA (G.2) → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ✅ G.1+G.2 בוצעו; שער א' הורצה — ראה `TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md` |
+| **A** | **חוב לפני אישור סופי:** איחוד Auth תחת Shared_Services (Option B) — 30/20/50 | ⬜ SSOT נעול; מנדטים נשלחו; ביצוע מידי |
 
 ---
 
@@ -160,6 +184,7 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | קובץ | שימוש |
 |------|--------|
 | **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | נעילה Stage 0 + React Tables (Option B); Auth 4-Type; תיקונים ויזואליים (§6). |
+| **SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md** | איחוד Auth תחת Shared_Services (Option B) — החלטה מאושרת Team 90; חוב לפני אישור שער סופי. |
 | **ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md** | ADR‑013 — החלטות אדריכלית. |
 | **ARCHITECT_PRE_CODING_MAPPING_MANDATE.md** | Pre‑coding Mapping — BLOCKING. |
 | **TT2_SLA_TEAMS_30_40.md** | SLA 30/40 — תפקידים ומגבלות. |

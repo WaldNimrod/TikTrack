@@ -299,12 +299,20 @@ class SharedServices {
    */
   /**
    * Check if endpoint requires authentication (Gate A: prevent 401 for guests)
+   * Auth endpoints are NEVER protected - login, register, me, refresh must work without token
    * @param {string} endpoint - API endpoint (e.g., '/trading_accounts')
-   * @returns {boolean} True if endpoint is protected
+   * @returns {boolean} True if endpoint is protected (requires token)
    */
   _isProtectedEndpoint(endpoint) {
     if (!endpoint || typeof endpoint !== 'string') return false;
     const normalized = endpoint.replace(/^\//, '');
+
+    // Gate A: NEVER block auth endpoints - required for login, register, token refresh
+    const authPrefixes = ['auth', 'users/me', 'users/profile'];
+    if (authPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'))) {
+      return false;
+    }
+
     const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees'];
     return protectedPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'));
   }

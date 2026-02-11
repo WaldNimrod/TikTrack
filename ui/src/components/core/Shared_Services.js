@@ -297,8 +297,31 @@ class SharedServices {
    * @param {Object} options - Additional fetch options
    * @returns {Promise<Object>} Response data
    */
+  /**
+   * Check if endpoint requires authentication (Gate A: prevent 401 for guests)
+   * @param {string} endpoint - API endpoint (e.g., '/trading_accounts')
+   * @returns {boolean} True if endpoint is protected
+   */
+  _isProtectedEndpoint(endpoint) {
+    if (!endpoint || typeof endpoint !== 'string') return false;
+    const normalized = endpoint.replace(/^\//, '');
+    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees'];
+    return protectedPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'));
+  }
+
   async get(endpoint, queryParams = {}, options = {}) {
     try {
+      // Gate A Fix: Skip protected API calls when guest - prevents 10 SEVERE 401 errors on Home
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+
       const url = this.buildUrl(endpoint, queryParams);
       const headers = this.buildHeaders(options.headers);
       
@@ -381,6 +404,17 @@ class SharedServices {
    */
   async post(endpoint, body = {}, options = {}) {
     try {
+      // Gate A Fix: Skip protected API calls when guest
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
       
@@ -462,6 +496,17 @@ class SharedServices {
    */
   async put(endpoint, body = {}, options = {}) {
     try {
+      // Gate A Fix: Skip protected API calls when guest
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
       
@@ -542,6 +587,17 @@ class SharedServices {
    */
   async delete(endpoint, options = {}) {
     try {
+      // Gate A Fix: Skip protected API calls when guest
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
       

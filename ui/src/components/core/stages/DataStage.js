@@ -56,20 +56,18 @@ export class DataStage extends StageBase {
       }
       
       // Gate A Fix: Check authentication before making API calls
-      // If page requires auth and user is not authenticated, skip data loading
-      if (config.requiresAuth) {
-        const authenticated = this.isAuthenticated();
-        if (!authenticated) {
-          maskedLog('[Data Stage] User not authenticated, skipping data loading for auth-required page', {
-            pageType: config.pageType,
-            requiresAuth: config.requiresAuth
-          });
-          // Set empty data instead of throwing error
-          this.data = {};
-          this.storeData();
-          this.markCompleted();
-          return;
-        }
+      // Skip data loading when user is not authenticated (all pages - not just requiresAuth)
+      // Prevents 10 SEVERE 401 errors when guests land on shared pages (e.g. Home)
+      const authenticated = this.isAuthenticated();
+      if (!authenticated) {
+        maskedLog('[Data Stage] User not authenticated, skipping data loading', {
+          pageType: config.pageType,
+          requiresAuth: config.requiresAuth
+        });
+        this.data = {};
+        this.storeData();
+        this.markCompleted();
+        return;
       }
       
       // Ensure Shared Services is initialized

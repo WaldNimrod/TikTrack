@@ -14,7 +14,7 @@
 ```
 [שלב -1] MAPPING_MODE — ✅ סגור
     ↓
-[שלב 0] גשר React/HTML (Bridge) — השלמה ארכיטקטונית (דוח Team 90)
+[שלב 0] גשר React/HTML (Bridge) — BLOCKING (קודם לכל שלב); SSOT: ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md
     ↓
 [שלב 1] שער אוטנטיקציה (A/B/C/D) — יישום
     ↓
@@ -44,20 +44,21 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 ---
 
-### שלב 0: גשר React/HTML (Bridge)
+### שלב 0: גשר React/HTML (Bridge) — **BLOCKING (קודם לכל שלב)**
 
+**SSOT:** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`.  
 **מקור:** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md` (Team 90).
 
 | # | פעולה | אחראי | הערה |
 |---|--------|--------|------|
-| 0.1 | Lock ל־Hybrid Model (HTML pages + React SPA) | **לפי הדוח** | החלטה ארכיטקטונית |
-| 0.2 | Auth Redirect Rules לפי ADR‑013 | **Team 30** | |
-| 0.3 | יישור routes.json מול React routes | **Team 10 / 30** | SSOT אחיד |
-| 0.4 | נתיב Header אחיד | **Team 30/40** | |
-| 0.5 | החלטה מחייבת לגבי React Tables | **לפי הדוח** | |
+| 0.1 | Lock ל־Hybrid Model: D16/D18/D21=HTML, Auth/Home/Admin=React | **לפי SSOT** | |
+| 0.2 | Auth Redirect Rules (ADR‑013): C→Home, A=No Header, B=Home Shared, D=JWT role | **Team 30** | |
+| 0.3 | routes.json: /login, /register, /reset-password (ללא .html) | **Team 10/30** | ✅ עודכן ב־routes.json |
+| 0.4 | Header Path: נעילה על unified-header.html בלבד | **Team 30/40** | |
+| 0.5 | **React Tables:** רק דרך TablesReactStage ב‑UAI (אין mount per page) | **לפי SSOT** | ראה `TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md`, ADR SSOT. |
 | 0.6 | דיווח השלמה ל־Team 10 | **צוות מוביל** | |
 
-**הערה:** שלב זה נוסף לפי דרישת צוות 90 (משוב MAPPING_MODE — Go with Hold).
+**הערה:** Stage 0 חוסם את כל השלבים הבאים. React Tables — TablesReactStage בלבד (נעול).
 
 ---
 

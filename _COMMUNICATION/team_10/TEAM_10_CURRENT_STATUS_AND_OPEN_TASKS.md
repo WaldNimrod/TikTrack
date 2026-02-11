@@ -121,6 +121,13 @@
 | **סגירת MAPPING_MODE** | `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md` |
 | **משוב צוות 90 (Go + Hold)** | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_MAPPING_MODE_FEEDBACK_WITH_HOLD.md` |
 | **דוח Bridge (שלב 0)** | `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md` |
+| **React Tables — תהליך חובה** | `TEAM_10_REACT_TABLES_MANDATORY_PROCESS.md` |
+| **SSOT — Stage 0 + React Tables (נעול)** | `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md` |
+| **מפת סריקה (Bridge/Tables)** | `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_SCAN_MAP.md` |
+| **React Tables — מסמך מיפוי (שלב 1)** | `TEAM_10_REACT_TABLES_MAPPING_DOCUMENT.md` |
+| **React Tables — תת‑תוכנית (שלב 2)** | `TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md` |
+| **React Tables — הגשה לצוות 90** | `TEAM_10_TO_TEAM_90_REACT_TABLES_SUBMISSION.md` |
+| **React Tables — מענה Round-1 (תיקונים)** | `TEAM_10_TO_TEAM_90_REACT_TABLES_ROUND1_RESPONSE.md` |
 | **דוח השלמת תיקונים** | `TEAM_10_MAPPING_MODE_BLOCKERS_COMPLETION_SUMMARY.md` |
 | **שאלות לאדריכל** | `TEAM_10_TO_ARCHITECT_VISUAL_GAPS_OPEN_QUESTIONS.md` |
 | **דוח השלמה (7 פריטים)** | `TEAM_10_VISUAL_GAPS_SUPPLEMENT_INFO_REPORT.md` |

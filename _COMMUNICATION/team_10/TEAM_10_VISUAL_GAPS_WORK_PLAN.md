@@ -58,10 +58,13 @@
 
 ## 3. סדר ביצוע (מאוחד)
 
+**🔒 Stage 0 = Blocking — קודם לכל שלב אחר.**  
+**SSOT:** `_COMMUNICATION/team_10/ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`.
+
 | שלב | נושא | הערה |
 |-----|------|------|
 | **‑1** | **Pre‑coding Mapping** | ✅ **סגור** — DATA_MAP_FINAL, CSS_RETROFIT_PLAN, DNA_BUTTON_SYSTEM/PALETTE_SSOT, ROUTES_MAP. ראה `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md`. |
-| **0** | **גשר React/HTML (Bridge)** | **שלב ראשון אחרי המיפוי** — Lock ל־Hybrid (HTML + React SPA), Auth Redirect, routes.json מול React, Header אחיד, React Tables. ראה `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`. |
+| **0** | **גשר React/HTML (Bridge) — BLOCKING** | **חובה לפני כל סעיף אחר.** Hybrid: D16/D18/D21=HTML, Auth/Home/Admin=React. Redirect (ADR‑013): C→Home, A=No Header, B=Home Shared, D=JWT role. routes.json: /login, /register, /reset-password (ללא .html). Header: unified-header.html בלבד. React Tables: **רק** דרך TablesReactStage ב‑UAI — ראה `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`, `TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md`, `TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`. |
 | **1** | **שער אוטנטיקציה — 4 טיפוסים (A/B/C/D)** | ADR‑013 LOCKED. |
 | 2 | Header תמיד אחרי Login → Home (משימה 7) | Header Loader לפני React mount — חסימת UX |
 | 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) |

@@ -27,7 +27,7 @@
 **React vs HTML Bridge** — נדרש טיפול **מיד לאחר סגירת המיפוי**, כשלב 0 בתוכנית העבודה.
 
 - **מסמך:** `_COMMUNICATION/team_90/TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`  
-- **תוכן עיקרי:** Lock ל־Hybrid Model (HTML + React SPA), Auth Redirect Rules (ADR‑013), routes.json מול React routes, נתיב Header אחיד, החלטה לגבי React Tables.  
+- **תוכן עיקרי:** Lock ל־Hybrid Model (HTML + React SPA), Auth Redirect Rules (ADR‑013), routes.json מול React routes, נתיב Header אחיד, **React Tables** (תהליך חובה: סריקה→מיפוי→תת‑תוכנית→אישור 90 — ראה `TEAM_10_REACT_TABLES_MANDATORY_PROCESS.md`).  
 - **הפצה:** הדוח יופץ לצוותים **לאחר** סיום המיפוי (כלומר מעכשיו — מוכן להפצה).
 
 **Team 10 הוסיף שלב 0 — גשר React/HTML** לתוכנית העבודה (מיד אחרי המיפוי), כפי שנדרש.

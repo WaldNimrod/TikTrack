@@ -231,7 +231,8 @@ async function runGateATests() {
     await clearLocalStorage(driver);
     const userSuffix = Date.now();
     const userUsername = `gatea_user_${userSuffix}`;
-    const userEmail = `gatea_${userSuffix}@test.local`;
+    const userEmail = `gatea_${userSuffix}@example.com`;
+    const userPhone = `+97250${userSuffix.toString().slice(-7)}`; // Unique phone number
     const userPassword = 'Test123456!';
     try {
       await driver.get(`${TEST_CONFIG.frontendUrl}/register`);
@@ -240,7 +241,7 @@ async function runGateATests() {
       await fillField(driver, 'input[name="email"]', userEmail);
       await fillField(driver, 'input[name="password"]', userPassword);
       await fillField(driver, 'input[name="confirmPassword"]', userPassword);
-      await fillField(driver, 'input[name="phoneNumber"]', '+972501234567');
+      await fillField(driver, 'input[name="phoneNumber"]', userPhone);
       await clickElement(driver, 'button[type="submit"]');
       await driver.sleep(4000);
     } catch (regErr) {
@@ -360,6 +361,15 @@ async function runGateATests() {
     const finalLogs = await getConsoleLogs(driver);
     const severeAll = finalLogs.filter(l => l.level === 'SEVERE');
     const severeExcludingFavicon = severeAll.filter(e => !e.message?.includes('favicon'));
+
+    // Always save console logs for analysis
+    const consolePath = path.join(ARTIFACTS_DIR, 'GATE_A_CONSOLE_LOGS.json');
+    fs.writeFileSync(consolePath, JSON.stringify(finalLogs.map(log => ({
+      level: log.level,
+      message: log.message?.substring(0, 300),
+      timestamp: log.timestamp
+    })), null, 2), 'utf-8');
+
     if (severeExcludingFavicon.length > 0) {
       const severePath = path.join(ARTIFACTS_DIR, 'GATE_A_SEVERE_LOGS.json');
       fs.writeFileSync(severePath, JSON.stringify(severeExcludingFavicon.map(e => ({
@@ -368,7 +378,7 @@ async function runGateATests() {
         timestamp: e.timestamp
       })), null, 2), 'utf-8');
       logger.log('GATE_A_Final', 'FAIL', {
-        message: `Expected 0 SEVERE, found ${severeExcludingFavicon.length}. See ${severePath}`
+        message: `Expected 0 SEVERE, found ${severeExcludingFavicon.length}. See ${severePath} and ${consolePath}`
       });
       results.failed++;
     } else {

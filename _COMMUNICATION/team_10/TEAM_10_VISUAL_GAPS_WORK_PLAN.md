@@ -9,6 +9,8 @@
 
 **הפעלה מחייבת:** `TEAM_90_TO_TEAM_10_ADR_013_SLA_ACTIVATION_MANDATE.md` — הודעה מרכזית אחת; החלטות ADR‑013 ושלב המיפוי המקדים מחייבים. **אין קידוד לפני** קובצי מיפוי + אישור ויזואלי (נמרוד). דוח עדכון ל‑Team 90 לפני פנייה לאדריכלית.
 
+**סטטוס שער א':** ✅ **Gate A מאושר** (2026-02-10) — Passed 11, Failed 0, 0 SEVERE. SSOT: `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`. הצעד הבא: משימות ויזואליות (3–7) והכנה לשער ב'.
+
 ---
 
 ## 1. מטרה ועקרונות
@@ -69,7 +71,8 @@
 | **0** | **גשר React/HTML (Bridge) — BLOCKING** | **חובה לפני כל סעיף אחר.** Hybrid: D16/D18/D21=HTML, Auth/Home/Admin=React. Redirect (ADR‑013): C→Home, A=No Header, B=Home Shared, D=JWT role. routes.json: /login, /register, /reset-password (ללא .html). Header: unified-header.html בלבד. React Tables: **רק** דרך TablesReactStage ב‑UAI — ראה `ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md`, `TEAM_10_REACT_TABLES_MINI_WORK_PLAN.md`, `TEAM_90_REACT_HTML_BRIDGE_FINDINGS_DRAFT.md`. |
 | **1** | **שער אוטנטיקציה — 4 טיפוסים (A/B/C/D)** | ADR‑013 LOCKED. |
 | 2 | Header תמיד אחרי Login → Home (משימה 7) | Header Loader לפני React mount — חסימת UX |
-| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) |
+| **שער א'** | **Gate A — אושר** | ✅ Passed 11, Failed 0, 0 SEVERE. ראה `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`. |
+| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) — **הצעד הבא** |
 | 4 | סדר כפתורים במודל + RTL (משימה 3) | |
 | 5 | צבע כותרת מודל לפי Entity (משימה 4) | |
 | 6 | תקנון כפתורים גלובלי (משימה 5) | DNA_BUTTON_SYSTEM (ADR‑013) |

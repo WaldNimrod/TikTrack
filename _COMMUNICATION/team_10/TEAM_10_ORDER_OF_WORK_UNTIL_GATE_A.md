@@ -164,6 +164,13 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | `TEAM_10_TO_TEAM_50_GATE_A_AUTH_QA_UPDATE_MANDATE.md` | Team 50 — עדכון Gate A; token אחרי refresh |
 | `TEAM_10_TO_ALL_TEAMS_AUTH_UNIFIED_OPTION_B_KICKOFF.md` | הודעה כללית — חלוקת משימות |
 
+### אחרי שער א' — התנעת הצעד הבא (2026-02-10)
+
+| מסמך | תיאור |
+|------|--------|
+| `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md` | SSOT — שער א' מאושר (Passed 11, 0 SEVERE) |
+| `TEAM_10_TO_ALL_TEAMS_NEXT_PHASE_AFTER_GATE_A_KICKOFF.md` | התנעה — משימות ויזואליות (3–7) והכנה לשער ב' |
+
 ---
 
 ## 5. סיכום טבלארי — סדר עד שער א'
@@ -174,8 +181,20 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 | **0** | גשר React/HTML (Bridge) — דוח Team 90 | ✅ |
 | **1** | אוטנטיקציה: Guards, Home containers, **Type B (Shared) רשמי** — שני containers באותו עמוד, אין Redirect ב‑B, User Icon, Admin JWT, עמודי Open בלי Header | ✅ |
 | **2** | Header Loader לפני React mount; Header בכל עמוד לא־Open | ✅ |
-| **G** | Team 10: אישור (G.1) + קונטקסט ל־QA (G.2) → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ✅ G.1+G.2 בוצעו; שער א' הורצה — ראה `TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md` |
-| **A** | **חוב לפני אישור סופי:** איחוד Auth תחת Shared_Services (Option B) — 30/20/50 | ⬜ SSOT נעול; מנדטים נשלחו; ביצוע מידי |
+| **G** | Team 10: אישור (G.1) + קונטקסט ל־QA (G.2) → Team 50: הרצת בדיקות, 0 SEVERE (שער א') | ✅ **שער א' מאושר** — Passed 11, Failed 0, 0 SEVERE; ראה `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md` |
+| **A** | **חוב לפני אישור סופי:** איחוד Auth תחת Shared_Services (Option B) — 30/20/50 | ✅ **הושלם** — כחלק מאישור שער א' |
+
+---
+
+## 5.1 אחרי שער א' — הצעד הבא (מעודכן 2026-02-10)
+
+**שער א' מאושר.** לפי תוכנית העבודה המאוחדת (`TEAM_10_VISUAL_GAPS_WORK_PLAN.md`):
+
+| צעד | נושא | אחראים | מסמך התנעה |
+|-----|------|---------|-------------|
+| **הבא** | משימות ויזואליות (3–7): Select/Rich Text, כפתורים במודל, צבע Entity, תקנון כפתורים, דף צבעים; הכנה לשער ב' | 20, 30, 40, 50 | `TEAM_10_TO_ALL_TEAMS_NEXT_PHASE_AFTER_GATE_A_KICKOFF.md` |
+
+**SSOT סטטוס שער א':** `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`.
 
 ---
 
@@ -185,6 +204,7 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 |------|--------|
 | **ADR_STAGE0_BRIDGE_AND_REACT_TABLES_SSOT.md** | נעילה Stage 0 + React Tables (Option B); Auth 4-Type; תיקונים ויזואליים (§6). |
 | **SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md** | איחוד Auth תחת Shared_Services (Option B) — החלטה מאושרת Team 90; חוב לפני אישור שער סופי. |
+| **TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md** | **שער א' מאושר** — SSOT סטטוס; Passed 11, 0 SEVERE; ראיות GATE_A_QA_REPORT.md, GATE_A_CONSOLE_LOGS.json. |
 | **ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md** | ADR‑013 — החלטות אדריכלית. |
 | **ARCHITECT_PRE_CODING_MAPPING_MANDATE.md** | Pre‑coding Mapping — BLOCKING. |
 | **TT2_SLA_TEAMS_30_40.md** | SLA 30/40 — תפקידים ומגבלות. |

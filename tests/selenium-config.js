@@ -60,11 +60,24 @@ export async function createDriver() {
     options.addArguments('--start-maximized');
   }
   
-  const driver = await new Builder()
+  // Bind chromedriver to localhost to avoid EPERM on 0.0.0.0 in locked environments.
+  const builder = new Builder()
     .forBrowser('chrome')
     .setChromeOptions(options)
-    .setLoggingPrefs({ performance: 'ALL', browser: 'ALL' })
-    .build();
+    .setLoggingPrefs({ performance: 'ALL', browser: 'ALL' });
+
+  // When chromedriver is pre-started (e.g., restricted env), connect to remote service.
+  if (process.env.CHROMEDRIVER_REMOTE === 'true') {
+    builder.usingServer('http://127.0.0.1:9515');
+  } else {
+    // Use a fixed localhost port to avoid portprober binding 0.0.0.0 in restricted environments.
+    const service = new chrome.ServiceBuilder()
+      .setHostname('127.0.0.1')
+      .setPort(9515);
+    builder.setChromeService(service);
+  }
+
+  const driver = await builder.build();
   
   // Set timeouts
   await driver.manage().setTimeouts({

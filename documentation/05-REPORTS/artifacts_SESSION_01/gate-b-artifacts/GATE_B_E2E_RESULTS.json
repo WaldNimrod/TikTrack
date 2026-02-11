@@ -1,0 +1,93 @@
+{
+  "gate": "B",
+  "timestamp": "2026-02-11T22:42:27.106Z",
+  "results": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "logs": [
+    {
+      "test": "GATE_B_T50_1_1_Brokers_D16",
+      "status": "START",
+      "timestamp": "2026-02-11T22:42:01.300Z",
+      "details": {
+        "message": "D16 broker select from API"
+      }
+    },
+    {
+      "test": "GATE_B_T50_1_1_Brokers_D16",
+      "status": "PASS",
+      "timestamp": "2026-02-11T22:42:11.656Z",
+      "details": {
+        "message": "Broker select has options from API",
+        "optCount": 15
+      }
+    },
+    {
+      "test": "GATE_B_T50_1_1_Brokers_D18",
+      "status": "START",
+      "timestamp": "2026-02-11T22:42:11.677Z",
+      "details": {
+        "message": "D18 broker select from API"
+      }
+    },
+    {
+      "test": "GATE_B_T50_1_1_Brokers_D18",
+      "status": "PASS",
+      "timestamp": "2026-02-11T22:42:16.274Z",
+      "details": {
+        "message": "Broker select has options from API",
+        "optCount": 15
+      }
+    },
+    {
+      "test": "GATE_B_T50_1_2_RichText_NoStyle",
+      "status": "START",
+      "timestamp": "2026-02-11T22:42:16.295Z",
+      "details": {
+        "message": "Cash Flows description uses classes only"
+      }
+    },
+    {
+      "test": "GATE_B_T50_1_2_RichText_NoStyle",
+      "status": "PASS",
+      "timestamp": "2026-02-11T22:42:20.928Z",
+      "details": {
+        "message": "Cash Flows has RT toolbar with class-based style buttons (phx-rt--*)"
+      }
+    },
+    {
+      "test": "GATE_B_T50_2_AdminDesignSystem",
+      "status": "START",
+      "timestamp": "2026-02-11T22:42:20.945Z",
+      "details": {
+        "message": "Admin can access /admin/design-system"
+      }
+    },
+    {
+      "test": "GATE_B_T50_2_AdminDesignSystem",
+      "status": "PASS",
+      "timestamp": "2026-02-11T22:42:24.014Z",
+      "details": {
+        "message": "ADMIN accesses /admin/design-system; Rich-Text Styles and Color Variables visible"
+      }
+    },
+    {
+      "test": "GATE_B_T50_2_GuestDesignSystem",
+      "status": "START",
+      "timestamp": "2026-02-11T22:42:24.014Z",
+      "details": {
+        "message": "Guest redirected from /admin/design-system"
+      }
+    },
+    {
+      "test": "GATE_B_T50_2_GuestDesignSystem",
+      "status": "PASS",
+      "timestamp": "2026-02-11T22:42:27.052Z",
+      "details": {
+        "message": "Guest redirected away from /admin/design-system"
+      }
+    }
+  ]
+}

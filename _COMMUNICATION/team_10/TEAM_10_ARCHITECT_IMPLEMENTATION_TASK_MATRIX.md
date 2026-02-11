@@ -33,8 +33,8 @@
 | מזהה | משימה | מקור | סטטוס / הערה |
 |------|------|------|--------------|
 | **T20.1** | **GET /api/v1/reference/brokers** — Endpoint פעיל ומוכן. | ADR-013 | ✅ הושלם (מאושר Team 10) |
-| **T20.2** | **סניטיזציה בשרת:** ליישם סניטייזר ב־Python לכל תוכן Rich-Text לפני שמירה ל-DB. **חוק:** רק תגיות/תכונות מאושרות; רק קלאסים שמתחילים ב־`phx-rt--` מאושרים. | SOP-012 §2 | |
-| **T20.3** | **אימות BE לשדות HTML:** לאשר שה־HTML המסונן **נשמר במלואו** ל-DB **ולא נחתך** (אורך, encoding, שמירת תגיות/קלאסים מאושרים). | SOP-012 §2 | דרישה רשמית |
+| **T20.2** | **סניטיזציה בשרת:** ליישם סניטייזר ב־Python לכל תוכן Rich-Text לפני שמירה ל-DB. **חוק:** רק תגיות/תכונות מאושרות; רק קלאסים שמתחילים ב־`phx-rt--` מאושרים. | SOP-012 §2 | ✅ הושלם |
+| **T20.3** | **אימות BE לשדות HTML:** לאשר שה־HTML המסונן **נשמר במלואו** ל-DB **ולא נחתך** (אורך, encoding, שמירת תגיות/קלאסים מאושרים). | SOP-012 §2 | ✅ הושלם |
 | **T20.4** | (עתידי) תמיכה ב־**user_tier** ו־**required_tier** ב־JWT ו־contract כשהמוצר ידרוש פרימיום. | ADR-013 §3 | מוכנות לעתיד |
 
 ---
@@ -44,10 +44,10 @@
 | מזהה | משימה | מקור | סטטוס / הערה |
 |------|------|------|--------------|
 | **T30.1** | **Broker Select:** שימוש ב־GET /api/v1/reference/brokers בטפסים (D16, D18, D21) — dynamic select; value/label לפי DATA_MAP. | ADR-013, משימה 1 בתוכנית | תואם Task 3 (API הושלם) |
-| **T30.2** | **Rich-Text Editor:** להחליף textarea ב־**TipTap** (Starter Kit + Link + TextStyle + Attributes) בשדות description/notes. | ADR-013, SOP-012, משימה 2 | |
-| **T30.3** | **כפתור "סגנון" (Styles):** להזריק רק מחלקות DNA — `.phx-rt--success`, `.phx-rt--warning`, `.phx-rt--danger`, `.phx-rt--highlight`. **אסור** Inline Style בתוך ה־Editor. | SOP-012 §1, PROMPTS (90) | |
-| **T30.4** | **סניטיזציה בצד לקוח:** שימוש ב־**DOMPurify** עם Allowlist קשיח — **רשימה מפורשת:** תגיות, attributes, יישור רק ב-class (אין `style`). ראה `SOP_012_DOMPURIFY_ALLOWLIST.md`. | SOP-012 §2 | |
-| **T30.5** | **דף Design System (/admin/design-system):** העמוד הוא **React Type D**; כולל **טבלת Rich-Text Styles** כחלק מהעמוד (מילון הסגנונות לפי SOP-012). Guard לפי JWT role. תיאום עם Team 40. | SOP-012 §3, ADR-013 (Type D) | |
+| **T30.2** | **Rich-Text Editor:** להחליף textarea ב־**TipTap** (Starter Kit + Link + TextStyle + Attributes) בשדות description/notes. | ADR-013, SOP-012, משימה 2 | ✅ הושלם |
+| **T30.3** | **כפתור "סגנון" (Styles):** להזריק רק מחלקות DNA — `.phx-rt--success`, `.phx-rt--warning`, `.phx-rt--danger`, `.phx-rt--highlight`. **אסור** Inline Style בתוך ה־Editor. | SOP-012 §1, PROMPTS (90) | ✅ הושלם |
+| **T30.4** | **סניטיזציה בצד לקוח:** שימוש ב־**DOMPurify** עם Allowlist קשיח — **רשימה מפורשת:** תגיות, attributes, יישור רק ב-class (אין `style`). ראה `SOP_012_DOMPURIFY_ALLOWLIST.md`. | SOP-012 §2 | ✅ הושלם |
+| **T30.5** | **דף Design System (/admin/design-system):** העמוד הוא **React Type D**; כולל **טבלת Rich-Text Styles** כחלק מהעמוד (מילון הסגנונות לפי SOP-012). Guard לפי JWT role. תיאום עם Team 40. | SOP-012 §3, ADR-013 (Type D) | ✅ הושלם |
 | **T30.6** | (אם טרם הושלם) מודל A/B/C/D: Redirect C→Home, Type B שני containers, User Icon success/warning — לפי Work Plan §4. | ADR-013 §1 | ראה TEAM_10_VISUAL_GAPS_WORK_PLAN |
 
 ---
@@ -57,8 +57,8 @@
 | מזהה | משימה | מקור | סטטוס / הערה |
 |------|------|------|--------------|
 | **T40.1** | **SSOT כפתורים (.phx-btn):** DNA_BUTTON_SYSTEM — מחלקות ותקנון. | ADR-013 | ✅ הושלם (מאושר Team 10) |
-| **T40.2** | **מחלקות Rich-Text ב-DNA:** להגדיר ב־CSS את `.phx-rt--success`, `.phx-rt--warning`, `.phx-rt--danger`, `.phx-rt--highlight` (צבעים/משתנים מהפלטה). | SOP-012 §1 | |
-| **T40.3** | **Design System Page:** העמוד הוא React Type D; כולל **טבלת Rich-Text Styles** כחלק מהעמוד (לפי SOP-012). לתת רכיב/טבלה להצגת מילון הסגנונות (Rich Text + כפתורים) — תיאום עם Team 30. | SOP-012 §3 | |
+| **T40.2** | **מחלקות Rich-Text ב-DNA:** להגדיר ב־CSS את `.phx-rt--success`, `.phx-rt--warning`, `.phx-rt--danger`, `.phx-rt--highlight` (צבעים/משתנים מהפלטה). | SOP-012 §1 | ✅ הושלם |
+| **T40.3** | **Design System Page:** העמוד הוא React Type D; כולל **טבלת Rich-Text Styles** כחלק מהעמוד (לפי SOP-012). לתת רכיב/טבלה להצגת מילון הסגנונות (Rich Text + כפתורים) — תיאום עם Team 30. | SOP-012 §3 | ✅ הושלם |
 
 ---
 
@@ -85,9 +85,9 @@
 | צוות | משימות פעילות (לא הושלמו) | משימות שהושלמו |
 |------|---------------------------|-----------------|
 | **10** | T10.1, T10.2, T10.4 | T10.3 |
-| **20** | T20.2, T20.3 | T20.1; T20.4 עתידי |
-| **30** | T30.1, T30.2, T30.3, T30.4, T30.5, T30.6 (אם רלוונטי) | — |
-| **40** | T40.2, T40.3 | T40.1 |
+| **20** | T20.4 (עתידי) | T20.1, T20.2, T20.3 |
+| **30** | T30.1, T30.6 (אם רלוונטי) | T30.2, T30.3, T30.4, T30.5 |
+| **40** | — | T40.1, T40.2, T40.3 |
 | **50** | T50.1, T50.2 | — |
 | **90** | T90.1, T90.2 | — |
 

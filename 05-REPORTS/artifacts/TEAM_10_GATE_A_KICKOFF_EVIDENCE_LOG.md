@@ -107,5 +107,47 @@
 
 ---
 
+## עדכון: השלמת Team 20 — Reference Brokers API (משימה 3) (2026-02-10)
+
+**דוח:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_REFERENCE_BROKERS_API_COMPLETE.md`  
+**הכרה:** `TEAM_10_ACKNOWLEDGMENT_TEAM_20_REFERENCE_BROKERS_COMPLETE.md` — GET /api/v1/reference/brokers ממומש ופעיל; קבצים: reference router, schemas, service, defaults_brokers.json, OpenAPI מעודכן; תיאום Team 30: TEAM_20_TO_TEAM_30_TASK_3_RESPONSE.md (value/label, אין pagination).  
+**תוכנית:** הודעת ההתנעה לעדכון — חלק Team 20 במשימה 3 מסומן הושלם.
+
+---
+
+## עדכון: השלמת Team 40 — משימות 4, 5, 6 (הצעד הבא) (2026-02-10)
+
+**דוח:** `_COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_NEXT_PHASE_TASKS_COMPLETE.md`  
+**הכרה:** `TEAM_10_ACKNOWLEDGMENT_TEAM_40_NEXT_PHASE_TASKS_COMPLETE.md` — משימה 4 (כפתורים RTL), משימה 5 (צבע כותרת Entity), משימה 6 (DNA_BUTTON_SYSTEM) הושלמו; תיאום עם Team 30 (TEAM_30_TO_TEAM_40_MODAL_HEADER_COLORS_COMPLETE); מוכנות לשער ב'.  
+**תוכנית:** הודעת ההתנעה מעודכנת — משימות 4, 5, 6 מסומנות הושלמו על ידי Team 40.
+
+---
+
+## עדכון: תשובת האדריכלית — מיקום מקומי ו־PROMPTS (2026-02-10)
+
+**הנחיה:** יש לחפש קבצים **בתיקיות המקומיות** (לא ב־Drive); סינכרון אוטומטי.
+
+**מסמך:** `TEAM_10_ARCHITECT_OFFICIAL_RESPONSE_AND_PROMPTS.md` — מיקום מקומי ל־ADR‑013 (ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md), SOP‑012 (ARCHITECT_RICH_TEXT_AND_DESIGN_SYSTEM_SPEC.md), Mapping Mandate; תמצית ADR‑013 ו־SOP‑012; **PROMPTS FOR THE FIELD** — Team 10 (MAPPING_REQUIRED, אישור מיפויים, Endpoint ברוקרים); Team 90 (סריקה: אין Inline Style ב־Editor, סניטיזציה בשרת).
+
+---
+
+## עדכון: פרוט משימות יישום וחלוקה לצוותים (2026-02-10)
+
+**מקור:** תשובת האדריכלית (ADR-013, SOP-012, PROMPTS) — פורטו למשימות יישום וחולקו לצוותים.
+
+**מסמכים שנוצרו:**
+- `TEAM_10_ARCHITECT_IMPLEMENTATION_TASK_MATRIX.md` — מטריצת משימות מלאה (T10.x, T20.x, T30.x, T40.x, T50.x, T90.x).
+- `TEAM_10_OWN_ARCHITECT_IMPLEMENTATION_TASKS.md` — משימות Team 10 (MAPPING_REQUIRED, אי־אישור קוד ללא מיפוי, הפצה).
+- `TEAM_10_TO_TEAM_20_ARCHITECT_IMPLEMENTATION_TASKS.md` — סניטיזציה בשרת (Python), Brokers הושלם, עתיד user_tier.
+- `TEAM_10_TO_TEAM_30_ARCHITECT_IMPLEMENTATION_TASKS.md` — Broker Select, TipTap, Styles, DOMPurify, Design System (Type D), A/B/C/D.
+- `TEAM_10_TO_TEAM_40_ARCHITECT_IMPLEMENTATION_TASKS.md` — מחלקות .phx-rt--* ב-DNA, רכיב Design System; .phx-btn הושלם.
+- `TEAM_10_TO_TEAM_50_ARCHITECT_IMPLEMENTATION_TASKS.md` — שער ב' / Regression, אימות Type D.
+- `TEAM_10_TO_TEAM_90_ARCHITECT_IMPLEMENTATION_TASKS.md` — סריקה: אין Inline Style ב־Editor, סניטיזציה בשרת.
+- `TEAM_10_TO_ALL_TEAMS_ARCHITECT_IMPLEMENTATION_KICKOFF.md` — הודעת התנעה לכל הצוותים + קישורים למנדטים.
+
+**הפעלה:** כל צוות מקבל מנדט ייעודי; יש לבצע לפי המטריצה ולדווח השלמה.
+
+---
+
 **Team 10 (The Gateway)**  
 **log_entry | GATE_A_KICKOFF_EVIDENCE | 2026-01-30**

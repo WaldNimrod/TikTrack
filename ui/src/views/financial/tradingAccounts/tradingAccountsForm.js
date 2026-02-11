@@ -2,16 +2,19 @@
  * Trading Accounts Form - Form component for add/edit trading accounts
  * --------------------------------------------------------
  * Creates and manages form for trading accounts (D16)
+ * ADR-013: Broker select from GET /api/v1/reference/brokers
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
 
 /**
  * Create trading account form HTML
  * @param {Object} data - Existing trading account data (for edit mode) or null (for add mode)
+ * @param {Array<{value: string, label: string}>} brokerOptions - Broker options for select
  * @returns {string} HTML string for the form
  */
-function createTradingAccountFormHTML(data = null) {
+function createTradingAccountFormHTML(data = null, brokerOptions = []) {
   const isEdit = data !== null;
   const accountName = data?.accountName || data?.displayName || data?.account_name || '';
   const broker = data?.broker || '';
@@ -20,6 +23,13 @@ function createTradingAccountFormHTML(data = null) {
   const currency = data?.currency || 'USD';
   const isActive = data?.isActive !== undefined ? data.isActive : (data?.is_active !== undefined ? data.is_active : true);
   const externalAccountId = data?.externalAccountId || data?.external_account_id || '';
+
+  // Ensure current broker is in options (legacy/edit case)
+  const options = [...brokerOptions];
+  if (broker && !options.some(o => o.value === broker)) {
+    options.unshift({ value: broker, label: broker });
+  }
+  const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${broker === o.value ? 'selected' : ''}>${String(o.label)}</option>`).join('');
 
   return `
     <form id="tradingAccountForm" class="phoenix-form">
@@ -39,14 +49,10 @@ function createTradingAccountFormHTML(data = null) {
       
       <div class="form-group">
         <label for="broker">ברוקר</label>
-        <input 
-          type="text" 
-          id="broker" 
-          name="broker" 
-          value="${broker}" 
-          maxlength="100"
-          placeholder="הזן שם ברוקר"
-        />
+        <select id="broker" name="broker">
+          <option value="">-- לא צוין --</option>
+          ${brokerOptionsHTML}
+        </select>
         <span class="form-error" id="brokerError"></span>
       </div>
       
@@ -119,15 +125,22 @@ function createTradingAccountFormHTML(data = null) {
  * @param {Object} data - Existing trading account data (for edit) or null (for add)
  * @param {Function} onSave - Callback function when form is saved
  */
-export function showTradingAccountFormModal(data, onSave) {
+export async function showTradingAccountFormModal(data, onSave) {
   const isEdit = data !== null;
   const title = isEdit ? 'עריכת חשבון מסחר' : 'הוספת חשבון מסחר חדש';
   
-  const formHTML = createTradingAccountFormHTML(data);
+  let brokerOptions = [];
+  try {
+    brokerOptions = await fetchReferenceBrokers();
+  } catch (e) {
+    console.warn('[Trading Accounts Form] Could not load brokers, using empty list:', e);
+  }
+  const formHTML = createTradingAccountFormHTML(data, brokerOptions);
   
   createModal({
     title: title,
     content: formHTML,
+    entity: 'trading_account',
     showSaveButton: true,
     saveButtonText: 'שמור',
     onSave: async function() {
@@ -142,7 +155,7 @@ export function showTradingAccountFormModal(data, onSave) {
       
       // Collect form data
       const accountNameValue = document.getElementById('accountName').value.trim();
-      const brokerValue = document.getElementById('broker').value.trim();
+      const brokerValue = document.getElementById('broker').value?.trim() || null;
       const accountNumberValue = document.getElementById('accountNumber').value.trim();
       const initialBalanceInput = document.getElementById('initialBalance').value.trim();
       const currencyValue = document.getElementById('currency').value;

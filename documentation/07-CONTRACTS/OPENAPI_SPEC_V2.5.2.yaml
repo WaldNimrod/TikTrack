@@ -270,6 +270,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /reference/brokers:
+    get:
+      summary: "Get broker list for select dropdowns (D16, D18)"
+      tags:
+        - reference
+      description: |
+        ADR-013: API-based source only for broker select.
+        Primary: user's brokers from brokers_fees. Fallback: defaults when user has none.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "List of broker options (value/label)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrokerReferenceResponse'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /users/me:
     get:
       summary: "Get current user profile (D25)"
@@ -723,6 +747,31 @@ components:
           format: date-time
         user:
           $ref: '#/components/schemas/UserResponse'
+
+    BrokerReferenceResponse:
+      type: object
+      description: "ADR-013: Broker list for select dropdowns (D16, D18)"
+      required:
+        - data
+        - total
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required: [value, label]
+            properties:
+              value:
+                type: string
+                maxLength: 100
+                description: "Broker name (form value)"
+              label:
+                type: string
+                maxLength: 100
+                description: "Display label (UI)"
+        total:
+          type: integer
+          description: "Total count"
 
     RefreshResponse:
       type: object

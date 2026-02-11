@@ -21,6 +21,7 @@ from ..models.cash_flows import CashFlow
 from ..models.trading_accounts import TradingAccount
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+from ..utils.rich_text_sanitizer import sanitize_rich_text
 from ..schemas.cash_flows import (
     CashFlowResponse,
     CashFlowSummaryResponse,
@@ -340,6 +341,9 @@ class CashFlowService:
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
             )
         
+        # SOP-012: sanitize rich-text before save (T20.2)
+        sanitized_description = sanitize_rich_text(description) if description is not None else None
+
         # Create new cash flow
         new_flow = CashFlow(
             user_id=user_id,
@@ -348,7 +352,7 @@ class CashFlowService:
             amount=amount,
             currency=currency.upper(),
             transaction_date=transaction_date,
-            description=description,
+            description=sanitized_description,
             external_reference=external_reference,
             created_by=user_id,
             updated_by=user_id,
@@ -482,7 +486,7 @@ class CashFlowService:
             cash_flow.transaction_date = transaction_date
         
         if description is not None:
-            cash_flow.description = description
+            cash_flow.description = sanitize_rich_text(description)
         
         if external_reference is not None:
             cash_flow.external_reference = external_reference

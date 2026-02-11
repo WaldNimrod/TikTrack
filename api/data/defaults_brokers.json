@@ -1,0 +1,12 @@
+[
+  {"value": "Interactive Brokers", "label": "Interactive Brokers"},
+  {"value": "TD Ameritrade", "label": "TD Ameritrade"},
+  {"value": "Charles Schwab", "label": "Charles Schwab"},
+  {"value": "Fidelity", "label": "Fidelity"},
+  {"value": "E*TRADE", "label": "E*TRADE"},
+  {"value": "Robinhood", "label": "Robinhood"},
+  {"value": "Webull", "label": "Webull"},
+  {"value": "Ally Invest", "label": "Ally Invest"},
+  {"value": "Merrill Edge", "label": "Merrill Edge"},
+  {"value": "Vanguard", "label": "Vanguard"}
+]

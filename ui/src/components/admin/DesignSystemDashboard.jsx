@@ -10,12 +10,15 @@
 
 import React from 'react';
 import { debugLog } from '../../utils/debug.js';
+import DesignSystemStylesTable from '../shared/DesignSystemStylesTable.jsx';
 
 /**
  * DesignSystemDashboard Component
  * 
  * @description Admin-only dashboard for design system
  * Type D (Admin-only): Requires ADMIN or SUPERADMIN role per ADR-013
+ * Displays Rich-Text Styles and Button Styles dictionary (SOP-012 §3)
+ * @version v1.1.0
  */
 const DesignSystemDashboard = () => {
   debugLog('Admin', 'DesignSystemDashboard: Component mounted');
@@ -33,16 +36,8 @@ const DesignSystemDashboard = () => {
               </div>
               
               <div className="index-section__body">
-                <div className="admin-dashboard-placeholder">
-                  <p>Design System Dashboard - Coming Soon</p>
-                  <p>This page will display:</p>
-                  <ul>
-                    <li>Color palette (DNA Palette)</li>
-                    <li>Button system (DNA_BUTTON_SYSTEM)</li>
-                    <li>Component library</li>
-                  </ul>
-                  <p><strong>Type D (Admin-only):</strong> This page requires ADMIN or SUPERADMIN role.</p>
-                </div>
+                {/* Rich-Text Styles and Button Styles Dictionary */}
+                <DesignSystemStylesTable />
               </div>
             </tt-section>
           </tt-container>

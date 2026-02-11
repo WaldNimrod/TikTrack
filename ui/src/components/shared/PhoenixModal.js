@@ -16,6 +16,7 @@
  * @param {Function} options.onSave - Callback when save button is clicked (optional)
  * @param {boolean} options.showSaveButton - Whether to show save button (default: true)
  * @param {string} options.saveButtonText - Save button text (default: "שמור")
+ * @param {string} options.entity - Entity for header color (trading_account | brokers_fees | cash_flow)
  * @returns {HTMLElement} Modal element
  */
 export function createModal(options = {}) {
@@ -25,7 +26,8 @@ export function createModal(options = {}) {
     onClose = null,
     onSave = null,
     showSaveButton = true,
-    saveButtonText = 'שמור'
+    saveButtonText = 'שמור',
+    entity = null
   } = options;
 
   // Remove existing modal if any
@@ -46,6 +48,10 @@ export function createModal(options = {}) {
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('aria-labelledby', 'phoenix-modal-title');
+  if (entity) {
+    modal.setAttribute('data-entity', entity);
+    modal.classList.add(`modal-entity-${entity}`);
+  }
 
   // Create modal header
   const header = document.createElement('div');
@@ -79,28 +85,28 @@ export function createModal(options = {}) {
     body.appendChild(content);
   }
 
-  // Create modal footer
+  // Create modal footer (RTL order: Cancel ימין, Confirm שמאל)
   const footer = document.createElement('div');
   footer.className = 'phoenix-modal__footer';
-  
+
+  const cancelButton = document.createElement('button');
+  cancelButton.className = 'phoenix-modal__cancel-btn';
+  cancelButton.type = 'button';
+  cancelButton.textContent = 'ביטול';
+  footer.appendChild(cancelButton);
+
   if (showSaveButton && onSave) {
     const saveButton = document.createElement('button');
     saveButton.className = 'phoenix-modal__save-btn';
     saveButton.type = 'button';
     saveButton.textContent = saveButtonText;
     footer.appendChild(saveButton);
-    
+
     saveButton.addEventListener('click', function(e) {
       e.preventDefault();
       onSave();
     });
   }
-  
-  const cancelButton = document.createElement('button');
-  cancelButton.className = 'phoenix-modal__cancel-btn';
-  cancelButton.type = 'button';
-  cancelButton.textContent = 'ביטול';
-  footer.appendChild(cancelButton);
 
   // Assemble modal
   modal.appendChild(header);

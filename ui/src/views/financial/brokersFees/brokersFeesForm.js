@@ -2,16 +2,19 @@
  * Brokers Fees Form - Form component for add/edit broker fees
  * --------------------------------------------------------
  * Creates and manages form for broker fees (D18)
+ * ADR-013: Broker select from GET /api/v1/reference/brokers
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
 
 /**
  * Create broker fee form HTML
  * @param {Object} data - Existing broker fee data (for edit mode) or null (for add mode)
+ * @param {Array<{value: string, label: string}>} brokerOptions - Broker options for select
  * @returns {string} HTML string for the form
  */
-function createBrokerFeeFormHTML(data = null) {
+function createBrokerFeeFormHTML(data = null, brokerOptions = []) {
   const isEdit = data !== null;
   const broker = data?.broker || data?.brokerName || '';
   const commissionType = data?.commissionType || data?.commission_type || 'TIERED';
@@ -22,18 +25,32 @@ function createBrokerFeeFormHTML(data = null) {
     : (typeof commissionValueRaw === 'number' ? commissionValueRaw : parseFloat(commissionValueRaw) || 0);
   const minimum = data?.minimum || 0;
 
-  return `
-    <form id="brokerFeeForm" class="phoenix-form">
-      <div class="form-group">
-        <label for="broker">שם ברוקר *</label>
-        <input 
+  // Ensure current broker is in options (legacy/edit case)
+  const options = [...brokerOptions];
+  if (broker && !options.some(o => o.value === broker)) {
+    options.unshift({ value: broker, label: broker });
+  }
+  const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${broker === o.value ? 'selected' : ''}>${String(o.label)}</option>`).join('');
+
+  const brokerFieldHTML = options.length > 0
+    ? `<select id="broker" name="broker" required>
+         <option value="">-- בחר ברוקר --</option>
+         ${brokerOptionsHTML}
+       </select>`
+    : `<input 
           type="text" 
           id="broker" 
           name="broker" 
           value="${broker}" 
           required 
           placeholder="הזן שם ברוקר"
-        />
+        />`;
+
+  return `
+    <form id="brokerFeeForm" class="phoenix-form">
+      <div class="form-group">
+        <label for="broker">שם ברוקר *</label>
+        ${brokerFieldHTML}
         <span class="form-error" id="brokerError"></span>
       </div>
       
@@ -84,15 +101,22 @@ function createBrokerFeeFormHTML(data = null) {
  * @param {Object} data - Existing broker fee data (for edit) or null (for add)
  * @param {Function} onSave - Callback function when form is saved
  */
-export function showBrokerFeeFormModal(data, onSave) {
+export async function showBrokerFeeFormModal(data, onSave) {
   const isEdit = data !== null;
   const title = isEdit ? 'עריכת עמלה' : 'הוספת ברוקר חדש';
   
-  const formHTML = createBrokerFeeFormHTML(data);
+  let brokerOptions = [];
+  try {
+    brokerOptions = await fetchReferenceBrokers();
+  } catch (e) {
+    console.warn('[Brokers Fees Form] Could not load brokers, fallback to text input:', e);
+  }
+  const formHTML = createBrokerFeeFormHTML(data, brokerOptions);
   
   createModal({
     title: title,
     content: formHTML,
+    entity: 'brokers_fees',
     showSaveButton: true,
     saveButtonText: 'שמור',
     onSave: function() {

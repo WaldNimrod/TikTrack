@@ -1404,3 +1404,75 @@ body .page-wrapper .page-container main {
   background: var(--apple-bg-secondary, #f2f2f7);
   z-index: calc(var(--z-index-sticky, 200) + 1);
 }
+
+/* ============================================
+   Rich-Text Styles - DNA Classes (SOP-012)
+   ============================================
+   These classes are used in Rich-Text Editor (TipTap) for text styling.
+   Only classes starting with "phx-rt--" are allowed in sanitized HTML.
+   ============================================ */
+
+/* Success Text Style - Green */
+.phx-rt--success {
+  color: var(--message-success, #10b981);
+}
+
+/* Warning Text Style - Orange */
+.phx-rt--warning {
+  color: var(--message-warning, #f59e0b);
+}
+
+/* Danger Text Style - Red */
+.phx-rt--danger {
+  color: var(--message-error, #ef4444);
+}
+
+/* Highlight Text Style - Secondary color background with white text */
+.phx-rt--highlight {
+  background-color: var(--color-secondary, #fc5a06);
+  color: var(--color-background, #ffffff);
+  padding: 0.125em 0.25em;
+  border-radius: 2px;
+}
+
+/* ============================================
+   Design System Styles Table Component
+   ============================================
+   Styles for Design System Dashboard tables
+   Used in /admin/design-system page (Type D)
+   ============================================ */
+
+.design-system-styles {
+  display: block;
+  width: 100%;
+}
+
+.design-system-section {
+  margin-block-end: var(--spacing-xl, 32px);
+}
+
+.design-system-section:last-child {
+  margin-block-end: 0;
+}
+
+.design-system-section__title {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--apple-text-primary, #1d1d1f);
+  margin-block-end: var(--spacing-sm, 8px);
+}
+
+.design-system-section__description {
+  font-size: var(--font-size-base, 0.92rem);
+  color: var(--apple-text-secondary, #86868b);
+  margin-block-end: var(--spacing-md, 16px);
+  line-height: 1.5;
+}
+
+.design-system-section__description code {
+  background-color: var(--apple-bg-secondary, #f5f5f7);
+  padding: 0.125em 0.25em;
+  border-radius: 2px;
+  font-size: 0.9em;
+  color: var(--color-primary, #26baac);
+}

@@ -27,10 +27,10 @@
 
 | # | נושא | תיאור קצר | אחראים |
 |---|------|------------|--------|
-| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) | 20 (API), 30 (UI) |
-| 4 | סדר כפתורים במודל + RTL (משימה 3) | Cancel/Confirm, RTL, design tokens | 30, 40 |
-| 5 | צבע כותרת מודל לפי Entity (משימה 4) | light variant לפי entity | 40, 30 |
-| 6 | תקנון כפתורים גלובלי (משימה 5) | DNA_BUTTON_SYSTEM (ADR‑013) | 40, 30 |
+| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) | 20 (API) ✅ **הושלם** — ראה `TEAM_10_ACKNOWLEDGMENT_TEAM_20_REFERENCE_BROKERS_COMPLETE.md`; 30 (UI) |
+| 4 | סדר כפתורים במודל + RTL (משימה 3) | Cancel/Confirm, RTL, design tokens | 30, 40 ✅ **40 הושלם** — ראה `TEAM_10_ACKNOWLEDGMENT_TEAM_40_NEXT_PHASE_TASKS_COMPLETE.md` |
+| 5 | צבע כותרת מודל לפי Entity (משימה 4) | light variant לפי entity | 40, 30 ✅ **40 הושלם** |
+| 6 | תקנון כפתורים גלובלי (משימה 5) | DNA_BUTTON_SYSTEM (ADR‑013) | 40, 30 ✅ **40 הושלם** (קודם) |
 | 7 | דף טבלת צבעים דינמית (משימה 6) | /admin/design-system (Type D) | 30, 40 |
 
 **שער ב':** לאחר השלמת המשימות — Team 50 הרצת בדיקות; 0 SEVERE; לפי נהלי QA.
@@ -39,9 +39,9 @@
 
 ## 3. חלוקת משימות — התנעה
 
-- **Team 20:** משימה 3 — וידוא/תחזוקת API GET /api/v1/reference/brokers; תיאום עם Team 30.
+- **Team 20:** משימה 3 — ✅ **הושלם** — GET /api/v1/reference/brokers ממומש ופעיל; תשובה ל־Team 30: `TEAM_20_TO_TEAM_30_TASK_3_RESPONSE.md`; דוח: `TEAM_20_TO_TEAM_10_REFERENCE_BROKERS_API_COMPLETE.md`.
 - **Team 30:** משימות 3 (UI — Select/Rich Text), 4 (כפתורים במודל), 7 (דף צבעים); תיאום עם 20, 40.
-- **Team 40:** משימות 4 (אישור עיצוב), 5 (משתני Entity), 6 (DNA_BUTTON_SYSTEM); תיאום עם 30.
+- **Team 40:** משימות 4, 5, 6 — ✅ **הושלמו** — דוח: `TEAM_40_TO_TEAM_10_NEXT_PHASE_TASKS_COMPLETE.md`; הכרה: `TEAM_10_ACKNOWLEDGMENT_TEAM_40_NEXT_PHASE_TASKS_COMPLETE.md`; תיאום עם 30 הושלם.
 - **Team 50:** הכנה לשער ב' — עדכון/הרצת בדיקות לפי scope שיועבר מ־Team 10 עם השלמת משימות.
 
 **פירוט מלא** לכל משימה: `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` — סעיפים 5 (משימות 1–7), 10 (מפת סקופ).

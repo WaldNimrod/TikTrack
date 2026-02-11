@@ -51,8 +51,9 @@
 
 ## 4. סיכום סטטוס נוכחי
 
-- **שער א':** G.1 ו־G.2 בוצעו; קונטקסט נמסר ל־Team 50; **שער א' הורצה** — תוצאות ב־`gate-a-artifacts/GATE_A_QA_REPORT.md`; הכרה ב־`TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md`.
-- **חוב לפני אישור סופי:** **איחוד Auth תחת Shared_Services (Option B)** — SSOT נעול (`SSOT_AUTH_UNIFIED_SHARED_SERVICES_OPTION_B.md`); מנדטים נשלחו ל־20, 30, 50; ביצוע מידי לפני אישור השער באופן סופי.
+- **שער א':** ✅ **מאושר** (2026-02-10) — Passed 11, Failed 0, 0 SEVERE. SSOT: `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`. קונטקסט נמסר; הכרה ב־`TEAM_10_GATE_A_QA_REPORT_ACKNOWLEDGMENT.md`.
+- **חוב Auth (Option B):** ✅ הושלם כחלק מאישור שער א'.
+- **הצעד הבא:** משימות ויזואליות (3–7) והכנה לשער ב' — הודעת התנעה: `TEAM_10_TO_ALL_TEAMS_NEXT_PHASE_AFTER_GATE_A_KICKOFF.md`.
 - **משימות מתמשכות:** T1, T3, T4 — להמשיך עם עדכוני שלב ו־SSOT.
 - **משימה M5:** דוח עדכון ל־Team 90 — רק בעת פנייה לאדריכלית.
 

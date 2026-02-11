@@ -171,6 +171,7 @@ export async function showCashFlowFormModal(data, onSave) {
     createModal({
       title: title,
       content: formHTML,
+      entity: 'cash_flow',
       showSaveButton: true,
       saveButtonText: 'שמור',
       onSave: function() {

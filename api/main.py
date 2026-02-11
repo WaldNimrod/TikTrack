@@ -17,7 +17,7 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 
 logging.basicConfig(level=logging.INFO)
@@ -88,6 +88,7 @@ app.include_router(trading_accounts.router, prefix=settings.api_v1_prefix)
 app.include_router(cash_flows.router, prefix=settings.api_v1_prefix)
 app.include_router(positions.router, prefix=settings.api_v1_prefix)
 app.include_router(brokers_fees.router, prefix=settings.api_v1_prefix)
+app.include_router(reference.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health")

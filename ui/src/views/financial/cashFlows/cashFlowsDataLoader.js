@@ -68,7 +68,7 @@ function normalizeTradingAccountId(value) {
  * - tradingAccountId (string, optional) - Filter by trading account ULID
  * - dateFrom (date, optional) - Filter by transaction_date >= dateFrom (YYYY-MM-DD)
  * - dateTo (date, optional) - Filter by transaction_date <= dateTo (YYYY-MM-DD)
- * - flowType (string, optional) - Filter by flow_type: "DEPOSIT", "WITHDRAWAL", "DIVIDEND", "INTEREST", "FEE", "OTHER"
+ * - flowType (string, optional) - Filter by flow_type: "DEPOSIT", "WITHDRAWAL", "DIVIDEND", "INTEREST", "FEE", "CURRENCY_CONVERSION", "OTHER"
  * - search (string, optional) - Search in description and external_reference
  * 
  * Response includes: data array, total, summary (total_deposits, total_withdrawals, net_flow)

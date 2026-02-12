@@ -68,9 +68,9 @@
 | פעולה | בעלים | סטטוס |
 |--------|--------|--------|
 | Backend — עדכון לסטנדרט סטטוסים (D16: status קנוני) | Team 20 | ✅ **הושלם ואומת** — דוח QA: TEAM_50_TO_TEAM_20_STATUS_STANDARD_QA_REPORT.md |
-| פונקציה מרכזית בקובץ משותף — שימוש אחיד בכל הממשקים | Team 30 | פתוח |
-| Header: 4 אופציות כולל "ממתין"; תפריט מ-getStatusOptions() | Team 30 | פתוח |
-| DataLoaders + Filters + PhoenixFilterBridge + badges — Adapter בלבד | Team 30 | פתוח |
+| פונקציה מרכזית בקובץ משותף — שימוש אחיד בכל הממשקים | Team 30 | ✅ **הושלם** — ממתין ל-QA (דוח: TEAM_30_TO_TEAM_10_CENTRAL_STATUS_FUNCTION_COMPLETE.md) |
+| Header: 4 אופציות כולל "ממתין"; תפריט מ-getStatusOptions() | Team 30 | ✅ הושלם |
+| DataLoaders + Filters + PhoenixFilterBridge + badges — Adapter בלבד | Team 30 | ✅ הושלם |
 | D21 — ללא שינוי (אין סטטוס לתזרימים) | — | לא רלוונטי |
 
 ---

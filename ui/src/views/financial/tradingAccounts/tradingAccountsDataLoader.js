@@ -724,14 +724,15 @@ async function loadContainer3(filters = {}) {
         ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">ממתין</span>'
         : `<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">${flow.status || ''}</span>`;
       
+      const flowTypeVal = flow.flowType || flow.flow_type || '';
       row.innerHTML = `
         <td class="phoenix-table__cell col-date" role="cell">${formatDate(flow.transactionDate || '')}</td>
-        <td class="phoenix-table__cell col-type" role="cell">${flowTypeLabels[flow.flowType] || flow.flowType || ''}</td>
+        <td class="phoenix-table__cell col-type" role="cell">${flowTypeLabels[flowTypeVal] || flowTypeVal || ''}</td>
         <td class="phoenix-table__cell col-subtype" role="cell">${flow.subtype || ''}</td>
         <td class="phoenix-table__cell col-account" role="cell">${flow.accountName || ''}</td>
         <td class="phoenix-table__cell col-amount" role="cell">
-          <span class="${flow.flowType === 'DEPOSIT' ? 'numeric-value-positive' : 'numeric-value-negative'}" dir="ltr">
-            ${flow.flowType === 'DEPOSIT' ? '+' : '-'}${formatCurrency(parseFloat(flow.amount || 0), flow.currency || 'USD', 2)}
+          <span class="${flowTypeVal === 'DEPOSIT' ? 'numeric-value-positive' : 'numeric-value-negative'}" dir="ltr">
+            ${flowTypeVal === 'DEPOSIT' ? '+' : '-'}${formatCurrency(parseFloat(flow.amount || 0), flow.currency || 'USD', 2)}
           </span>
         </td>
         <td class="phoenix-table__cell col-currency" role="cell">${flow.currency || ''}</td>

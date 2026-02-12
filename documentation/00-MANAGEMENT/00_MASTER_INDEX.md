@@ -117,6 +117,13 @@ _COMMUNICATION/
 
 ---
 
+## 📊 Cash Flows — סוגי תזרים (flow_type, D21)
+
+- [📋 CASH_FLOW_TYPES_SSOT.md](../05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md) - מקור אמת לסוגי תזרים (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, **CURRENCY_CONVERSION**) ✅ **2026-02-12**
+- **CURRENCY_CONVERSION:** מזהה ייעודי להמרת מטבע (במקום OTHER); מיגרציה הורצה; ראה _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_CURRENCY_CONVERSION_FLOW_TYPE_UPDATE.md, TEAM_60_TO_TEAM_10_CURRENCY_CONVERSION_MIGRATION_COMPLETE.md
+
+---
+
 ## 🔄 Routes SSOT & Data Transformation
 
 - [🗺️ Routes SSOT (routes.json v1.1.2)](../../ui/public/routes.json) - מקור אמת יחיד לנתיבי המערכת (Frontend: 8080, Backend: 8082, Routes Hierarchy) ✅ **P1 Complete**

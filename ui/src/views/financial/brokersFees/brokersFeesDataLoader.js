@@ -23,14 +23,15 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 /**
- * Fetch Brokers Fees
- * 
+ * Fetch Brokers Fees — ADR-015: fees per trading account
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Query Parameters (camelCase → snake_case automatically):
- * - broker (string, optional) - Filter by broker name (partial match)
+ * - tradingAccountId (string, optional) - Filter by trading account ULID (primary)
+ * - broker (string, optional) - Filter by broker name (via account)
  * - commissionType (string, optional) - Filter by commission type: "TIERED" or "FLAT"
- * - search (string, optional) - Search in broker name and commission value
- * 
+ * - search (string, optional) - Search in account name, broker, commission
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Response data with data array and total
  */
@@ -86,14 +87,15 @@ async function fetchBrokersFees(filters = {}) {
 }
 
 /**
- * Fetch Brokers Fees Summary
- * 
+ * Fetch Brokers Fees Summary — ADR-015: per trading account
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Query Parameters (camelCase → snake_case automatically):
- * - broker (string, optional) - Filter by broker name (partial match)
+ * - tradingAccountId (string, optional) - Filter by trading account ULID (primary)
+ * - broker (string, optional) - Filter by broker name (via account)
  * - commissionType (string, optional) - Filter by commission type: "TIERED" or "FLAT"
- * - search (string, optional) - Search in broker name and commission value
- * 
+ * - search (string, optional) - Search in account name, broker, commission
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Summary data from Backend
  */

@@ -1,6 +1,6 @@
 {
   "gate": "B",
-  "timestamp": "2026-02-11T22:42:27.106Z",
+  "timestamp": "2026-02-12T17:00:42.671Z",
   "results": {
     "passed": 5,
     "failed": 0,
@@ -10,7 +10,7 @@
     {
       "test": "GATE_B_T50_1_1_Brokers_D16",
       "status": "START",
-      "timestamp": "2026-02-11T22:42:01.300Z",
+      "timestamp": "2026-02-12T17:00:17.450Z",
       "details": {
         "message": "D16 broker select from API"
       }
@@ -18,33 +18,32 @@
     {
       "test": "GATE_B_T50_1_1_Brokers_D16",
       "status": "PASS",
-      "timestamp": "2026-02-11T22:42:11.656Z",
+      "timestamp": "2026-02-12T17:00:27.223Z",
       "details": {
         "message": "Broker select has options from API",
-        "optCount": 15
+        "optCount": 13
       }
     },
     {
-      "test": "GATE_B_T50_1_1_Brokers_D18",
+      "test": "GATE_B_T50_1_1_D18_TradingAccount",
       "status": "START",
-      "timestamp": "2026-02-11T22:42:11.677Z",
+      "timestamp": "2026-02-12T17:00:27.246Z",
       "details": {
-        "message": "D18 broker select from API"
+        "message": "D18 trading_account_id select (ADR-015)"
       }
     },
     {
-      "test": "GATE_B_T50_1_1_Brokers_D18",
+      "test": "GATE_B_T50_1_1_D18_TradingAccount",
       "status": "PASS",
-      "timestamp": "2026-02-11T22:42:16.274Z",
+      "timestamp": "2026-02-12T17:00:31.837Z",
       "details": {
-        "message": "Broker select has options from API",
-        "optCount": 15
+        "message": "D18: trading_account_id select (ADR-015 — עמלות לפי חשבון); no broker select"
       }
     },
     {
       "test": "GATE_B_T50_1_2_RichText_NoStyle",
       "status": "START",
-      "timestamp": "2026-02-11T22:42:16.295Z",
+      "timestamp": "2026-02-12T17:00:31.865Z",
       "details": {
         "message": "Cash Flows description uses classes only"
       }
@@ -52,7 +51,7 @@
     {
       "test": "GATE_B_T50_1_2_RichText_NoStyle",
       "status": "PASS",
-      "timestamp": "2026-02-11T22:42:20.928Z",
+      "timestamp": "2026-02-12T17:00:36.490Z",
       "details": {
         "message": "Cash Flows has RT toolbar with class-based style buttons (phx-rt--*)"
       }
@@ -60,7 +59,7 @@
     {
       "test": "GATE_B_T50_2_AdminDesignSystem",
       "status": "START",
-      "timestamp": "2026-02-11T22:42:20.945Z",
+      "timestamp": "2026-02-12T17:00:36.509Z",
       "details": {
         "message": "Admin can access /admin/design-system"
       }
@@ -68,7 +67,7 @@
     {
       "test": "GATE_B_T50_2_AdminDesignSystem",
       "status": "PASS",
-      "timestamp": "2026-02-11T22:42:24.014Z",
+      "timestamp": "2026-02-12T17:00:39.565Z",
       "details": {
         "message": "ADMIN accesses /admin/design-system; Rich-Text Styles and Color Variables visible"
       }
@@ -76,7 +75,7 @@
     {
       "test": "GATE_B_T50_2_GuestDesignSystem",
       "status": "START",
-      "timestamp": "2026-02-11T22:42:24.014Z",
+      "timestamp": "2026-02-12T17:00:39.565Z",
       "details": {
         "message": "Guest redirected from /admin/design-system"
       }
@@ -84,7 +83,7 @@
     {
       "test": "GATE_B_T50_2_GuestDesignSystem",
       "status": "PASS",
-      "timestamp": "2026-02-11T22:42:27.052Z",
+      "timestamp": "2026-02-12T17:00:42.605Z",
       "details": {
         "message": "Guest redirected away from /admin/design-system"
       }

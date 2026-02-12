@@ -93,8 +93,8 @@ async function runGateBTests() {
       }
     }
 
-    // T50.1.1 D18 (Brokers Fees)
-    logger.log('GATE_B_T50_1_1_Brokers_D18', 'START', { message: 'D18 broker select from API' });
+    // T50.1.1 D18 (Brokers Fees) — ADR-015: עמלות לפי חשבון מסחר (trading_account_id, אין broker)
+    logger.log('GATE_B_T50_1_1_D18_TradingAccount', 'START', { message: 'D18 trading_account_id select (ADR-015)' });
     if (loggedIn) {
       await driver.get(`${TEST_CONFIG.frontendUrl}/brokers_fees`);
       await driver.sleep(2500);
@@ -102,25 +102,18 @@ async function runGateBTests() {
       if (addBtnD18) {
         await addBtnD18.click();
         await driver.sleep(2000);
-        const brokerSelectD18 = await driver.findElement(By.css('#broker, select[name="broker"]')).catch(() => null);
-        if (brokerSelectD18) {
-          const optionsD18 = await brokerSelectD18.findElements(By.tagName('option'));
-          const hasBrokerOptionsD18 = optionsD18.length > 1;
-          if (hasBrokerOptionsD18) {
-            logger.log('GATE_B_T50_1_1_Brokers_D18', 'PASS', { message: 'Broker select has options from API', optCount: optionsD18.length });
-            results.passed++;
-          } else {
-            logger.log('GATE_B_T50_1_1_Brokers_D18', 'FAIL', { message: 'Broker select empty or no API options' });
-            results.failed++;
-          }
+        const tradingAccountSelectD18 = await driver.findElement(By.css('#tradingAccountId, select[name="tradingAccountId"]')).catch(() => null);
+        if (tradingAccountSelectD18) {
+          logger.log('GATE_B_T50_1_1_D18_TradingAccount', 'PASS', { message: 'D18: trading_account_id select (ADR-015 — עמלות לפי חשבון); no broker select' });
+          results.passed++;
         } else {
-          logger.log('GATE_B_T50_1_1_Brokers_D18', 'FAIL', { message: 'Broker select not found in D18 form' });
+          logger.log('GATE_B_T50_1_1_D18_TradingAccount', 'FAIL', { message: 'D18: trading_account_id select not found (ADR-015)' });
           results.failed++;
         }
         const closeBtnD18 = await driver.findElement(By.css('.phoenix-modal__close, .modal-close')).catch(() => null);
         if (closeBtnD18) await closeBtnD18.click();
       } else {
-        logger.log('GATE_B_T50_1_1_Brokers_D18', 'SKIP', { message: 'Add broker button not found' });
+        logger.log('GATE_B_T50_1_1_D18_TradingAccount', 'SKIP', { message: 'Add broker fee button not found' });
         results.skipped++;
       }
     }

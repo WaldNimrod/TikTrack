@@ -1,8 +1,11 @@
-# 🏰 אינדקס אדריכל מרכזי (v6.1.0)
+# 🏰 אינדקס אדריכל מרכזי (v8.0.0)
 ## 📜 חוקי יסוד (LOCKED 🔒)
-- ARCHITECT_BROKER_REFERENCE_MANDATE.md - (ADR-015 - NEW).
-- ARCHITECT_PHASE_2_DATA_MODEL_PIVOT_VERDICT.md - מודל עמלות (ADR-014).
+- ADR-014: Data Model Pivot (Account-based Fees).
+- ADR-015: Broker Reference & Defaults.
+- ADR-016: Versioning Policy (NEW).
+- TT2_VERSION_MATRIX: מטריצת גרסאות (NEW).
+- SOP-011/012: Data & Rich-Text Specs.
 
-## 📂 Phase 2 Closure (Step 1: Mapping ACTIVE 🏁)
-- [Status] - Implementing Broker Reference API and UI Logic.
-- [Feature] - Default Fees Injection & "Other" Broker Guard.
+## 📂 Phase 2 Execution
+- [Status] - Foundations & Versioning Locked.
+- [Focus] - Transitioning to Account-based architecture.

@@ -1,10 +1,10 @@
 # Gate A QA Report
-**Date:** 2026-02-11T22:29:37.772Z
+**Date:** 2026-02-12T16:35:59.091Z
 **Source:** tests/gate-a-e2e.test.js
 
 ## Results
-- Passed: 11
-- Failed: 0
+- Passed: 9
+- Failed: 2
 - Skipped: 0
 
 ## Scenarios Tested (SSOT/ADR-013 aligned)

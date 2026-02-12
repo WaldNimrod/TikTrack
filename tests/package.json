@@ -17,6 +17,7 @@
     "test:phase1-completion-b": "node phase1-completion-b-validation.test.js",
     "test:gate-a": "node gate-a-e2e.test.js",
     "test:gate-b": "node gate-b-e2e.test.js",
+    "test:adr015-gate-a": "node adr015-gate-a-e2e.test.js",
     "test:validation": "npx mocha validation-comprehensive.test.js --timeout 120000",
     "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change && npm run test:routing && npm run test:phase2 && npm run test:phase2-e2e"
   },

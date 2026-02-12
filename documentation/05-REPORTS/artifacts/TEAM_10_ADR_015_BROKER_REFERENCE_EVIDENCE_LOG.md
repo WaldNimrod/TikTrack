@@ -3,7 +3,7 @@
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-12  
 **נושא:** סבב פיתוח — מנדט רפרנס ברוקרים (ADR-015) | **עמלות לפי חשבון מסחר**  
-**סטטוס:** **שער ב' מאושר ✅** — Team 90 Independent Rerun: Passed 5, Failed 0. **מוכן לשער ג' (Visionary).**
+**סטטוס:** **שער א' מאושר ✅** — Team 50 GATE_A_PASSED + Team 90 Independent Verification PASS. **מוכן לשער ב' (Team 90).**
 
 ---
 
@@ -44,8 +44,7 @@
 2א. **Team 60 — מיגרציה הושלמה ✅** — גיבוי DB, הרצת סקריפט מיגרציה, אימות. דוח: `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_ADR_015_MIGRATION_COMPLETE.md`. תוצאה: 3 שורות עודכנו, 14 נמחקו (ללא התאמה); טבלה תואמת SSOT.  
 3. **Team 30 — הושלם ✅** — D16: "אחר" + הודעת משילות; D18: בחירת חשבון + עמלות לפי trading_account_id. Build עבר (110 מודולים). דוח: `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_ADR_015_VERIFICATION_REPORT.md`; Evidence: `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_ADR_015_INITIAL_VERIFICATION_REPORT.md`.  
 4. **Team 50 — שער א' הושלם ✅** — E2E D16 (אחר + הודעה), D18 (trading_account_id), 0 SEVERE. דוח: `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_ADR_015_GATE_A_QA_REPORT.md`.  
-5. **Team 90 — אימות עצמאי שער א' ✅** — הרצה עצמאית: Passed 3, Failed 0. Gate A מאושר.  
-6. **Team 90 — שער ב' ✅** — ריצה עצמאית של Gate B (לאחר תיקון הבדיקה ל-ADR-015): **Passed 5, Failed 0.** Highlights: D16 broker select from API ✔️, D18 trading_account_id (ADR-015) ✔️, Rich-Text no inline style ✔️, Admin Design System ✔️, Guest redirect ✔️. **Gate B מאושר — מוכן לשער ג' (Visionary).**
+5. **Team 90 — אימות עצמאי שער א' ✅** — הרצה עצמאית לפי נוהל: Passed 3, Failed 0, 0 SEVERE. Artifacts: ADR015_GATE_A_RESULTS.json. Validation: D16 "אחר"→הודעה ✔️, D18 trading_account_id ✔️, Console hygiene ✔️. **Gate A ל-ADR-015 מאושר; אפשר להתקדם לשער ב'.**
 
 ---
 
@@ -57,8 +56,7 @@
 | Team 60 | _COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_ADR_015_MIGRATION_COMPLETE.md | 🟢 MIGRATION_COMPLETE (2026-02-12) |
 | Team 30 | _COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_ADR_015_VERIFICATION_REPORT.md | 🟢 COMPLETE + בדיקה ראשונית (Build, Code Review) |
 | **Team 50** | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_ADR_015_GATE_A_QA_REPORT.md | 🟢 **GATE_A_PASSED** (2026-02-12) — D16, D18, 0 SEVERE |
-| **Team 90** | אימות עצמאי שער א' | 🟢 **PASS** — Passed 3, Failed 0 (Gate A) |
-| **Team 90** | שער ב' (Independent Rerun) | 🟢 **GATE_B_PASSED** — Passed 5, Failed 0 (D16, D18 ADR-015, Rich-Text, Admin DS, Guest redirect) |
+| **Team 90** | אימות עצמאי (Independent Verification) | 🟢 **PASS** — Passed 3, Failed 0, 0 SEVERE; Artifacts: ADR015_GATE_A_RESULTS.json |
 
 ## 6. QA (שער א') — הושלם ✅
 
@@ -66,14 +64,7 @@
 **מסירת קונטקסט:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_ADR_015_QA_KICKOFF.md`  
 **תוצר:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_ADR_015_GATE_A_QA_REPORT.md` — GATE_A_PASSED, 0 SEVERE  
 **Evidence:** `documentation/05-REPORTS/artifacts_SESSION_01/adr015-gate-a-artifacts/ADR015_GATE_A_RESULTS.json`  
-**Team 90 Independent Verification (שער א'):** PASS — Gate A מאושר.  
-**Team 90 שער ב':** GATE_B_PASSED — Independent Rerun: Passed 5, Failed 0. מוכן לשער ג' (Visionary).
-
-## 7. שער ב' — הושלם ✅
-
-**אחראי:** Team 90 (The Spy). **תוצר:** ריצה עצמאית של Gate B — Passed 5, Failed 0.  
-**Highlights:** D16 broker select from API, D18 trading_account_id (ADR-015), Rich-Text no inline style, Admin Design System, Guest redirect.  
-**הבא:** שער ג' (Visionary) — בדיקה ידנית-ויזואלית סופית.
+**Team 90 Independent Verification:** PASS (Passed 3, Failed 0, 0 SEVERE) — Gate A מאושר; אפשר להתקדם לשער ב'.
 
 ---
 

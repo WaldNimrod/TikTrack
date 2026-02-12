@@ -8,6 +8,8 @@
 
 **סטטוס:** READY FOR DISTRIBUTION — ראה ADR_015_READY_FOR_DISTRIBUTION.md.
 
+**יישור תפקידים (SLA 30/40):** צוות 30 = Containers (לוגיקה, API). צוות 40 = Presentational (CSS, עיצוב). אם נדרש רכיב Presentational חדש להודעת המשילות — צוות 40 מספק; צוות 30 משלב.
+
 ---
 
 ## 1. עקרון מחייב

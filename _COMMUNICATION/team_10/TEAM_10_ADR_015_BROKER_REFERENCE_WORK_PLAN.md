@@ -11,7 +11,20 @@
 
 ---
 
-## 0. עקרונות נעולים (הטמעה בתוכנית)
+## 0. חלוקת תפקידים (בהתאם להגדרות — ביקורת יישור)
+
+**מקור:** CURSOR_INTERNAL_PLAYBOOK.md (סעיף 2), TT2_SLA_TEAMS_30_40.md, TT2_TEAM_60_DEFINITION.md.
+
+| צמד | הגדרה | יישור ADR-015 |
+|-----|--------|----------------|
+| **20 vs 60** | **Team 20 (Backend):** מימוש FastAPI בהתאמה ל-SQL; מודלים ו-API. **Team 60 (DevOps):** תשתיות, גיבוי DB, סקריפטי seed, `make db-*`, **הרצת** גיבויים והזרקת נתוני בדיקה. | **Team 20:** כתיבת סקריפט המיגרציה (Account↔Fees), הרחבת endpoint ו-models — בעלות על סכמה לוגית ו-API. **Team 60:** הרצת מיגרציה בסביבה (למשל `make db-*` / pipeline) לפי הנחיית Team 20 — לא כתיבת לוגיקת המיגרציה. |
+| **30 vs 40** | **Team 30 (Frontend):** Containers — לוגיקה, State, קריאות API; לא משנה CSS. **Team 40 (UI/Design):** Presentational, Pixel Perfect, בעלות על CSS. | **Team 30:** D16 "אחר" + הודעה; D18 בחירת חשבון + עמלות (לוגיקה, אינטגרציה API). **Team 40:** אם נדרש רכיב Presentational חדש (למשל עיצוב הודעת המשילות) — 40 מספק, 30 משלב (SLA 30/40). |
+
+המשימות בתוכנית מחולקות בהתאם; אין שינוי צוותים — רק תיעוד יישור.
+
+---
+
+## 0א. עקרונות נעולים (הטמעה בתוכנית)
 
 | עקרון | פירוט |
 |--------|--------|
@@ -47,10 +60,11 @@
 | שלב | צוות | משימה | תלות | הערה |
 |-----|------|--------|------|------|
 | **1** | **Team 10** | עדכון מסמכים; החזרת תוכנית לאישור; **אין הוצאת משימות עד לאישור**. | — | |
-| **2** | **Team 20** | הרחבת GET /reference/brokers (display_name, is_supported, default_fees). **DB/API: עמלות לפי חשבון — trading_account_id; הסרת broker כ-FK בעמלות; תיקון עומק.** | — | קונטקסט: DB נוכחי brokers_fees עם broker+user_id — לא תואם. |
-| **3** | **Team 30** | D16: Conditional Rendering "אחר" + הודעת משילות (בחירת ברוקר בלבד). | — | |
+| **2** | **Team 20** | הרחבת GET /reference/brokers (display_name, is_supported, default_fees). **DB/API: עמלות לפי חשבון — trading_account_id; הסרת broker; כתיבת סקריפט מיגרציה (§6א).** | — | קונטקסט: DB נוכחי brokers_fees עם broker+user_id — לא תואם. |
+| **2א** | **Team 60** | הרצת סקריפט המיגרציה בסביבה (למשל `make db-*` / pipeline) **לפי הנחיית Team 20** — לא כתיבת לוגיקת המיגרציה. | ממתין ל-Team 20 (סקריפט מוכן). | per Playbook: גיבוי DB, הרצת סקריפטים. |
+| **3** | **Team 30** | D16: Conditional Rendering "אחר" + הודעת משילות (בחירת ברוקר בלבד). אופציונלי: רכיב Presentational מ-Team 40 (SLA 30/40). | — | |
 | **4** | **Team 30** | D18: UI — בחירת חשבון + עמלות של החשבון; כל פעולה עם trading_account_id. אופציונלי: הצעת מילוי מ-default_fees. | ממתין ל-Team 20 (חוזה API + מודל עמלות לפי חשבון). | |
-| **5** | **Team 10** | וידוא Acceptance Criteria, עדכון Page Tracker / Evidence. | אחרי 2, 3, 4. | |
+| **5** | **Team 10** | וידוא Acceptance Criteria, עדכון Page Tracker / Evidence. | אחרי 2, 2א, 3, 4. | |
 
 ---
 
@@ -75,7 +89,9 @@
 - **commission_value:** NUMERIC(20,6) — SSOT: TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md.
 - **תיקון עומק:** טבלה נוכחית brokers_fees (broker, user_id בלי account FK) — **לא תואמת החלטה; חובה תיקון + מיגרציה (§6א).**
 
-### 6א. מיגרציה Account↔Fees (חובה — ביצוע Team 20)
+### 6א. מיגרציה Account↔Fees (חובה — ביצוע Team 20; הרצה — Team 60 לפי הנחיה)
+
+**בעלות:** Team 20 כותב את סקריפט המיגרציה ומתעד (התאמה למודלים ו-API). Team 60 מריץ מיגרציה בסביבה (`make db-*` / pipeline) לפי הנחיית Team 20 (ראה §0).
 
 הוספת `trading_account_id` והסרת `broker` מחייבת **מפת מיגרציה מפורשת**. כללי החלטה:
 

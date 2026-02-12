@@ -251,12 +251,12 @@ import { maskedLog } from '../../../utils/maskedLog.js';
       // Edit mode - show form with existing data
       showTradingAccountFormModal(data, async function(formData, originalData) {
         return await handleSaveTradingAccount(originalData.externalUlid || originalData.external_ulid || originalData.id, formData);
-      });
+      }, { existingAccounts: tableData.data || [] });
     } else if (mode === 'add') {
-      // Add mode - show empty form
+      // Add mode - show empty form (pass existing for uniqueness validation)
       showTradingAccountFormModal(null, async function(formData) {
         return await handleSaveTradingAccount(null, formData);
-      });
+      }, { existingAccounts: tableData.data || [] });
     }
   }
   

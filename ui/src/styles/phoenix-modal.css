@@ -74,7 +74,8 @@
   flex: 1;
 }
 
-/* Modal Footer - RTL Order: Cancel ימין, Confirm שמאל */
+/* Modal Footer - ARCHITECT SSOT: Cancel מימין, Confirm משמאל (RTL) */
+/* DOM order: Cancel first, Save second → Cancel right, Confirm left in RTL */
 .phoenix-modal__footer {
   display: flex;
   align-items: center;
@@ -82,7 +83,6 @@
   gap: var(--spacing-md, 16px);
   padding: var(--spacing-lg, 24px);
   border-top: 1px solid var(--apple-border-light, #e5e5e5);
-  flex-direction: row-reverse;
 }
 
 /* ===== Modal Header Colors by Entity (SSOT: ARCHITECT_MODULE_MENU_STYLING_SSOT) ===== */
@@ -198,11 +198,12 @@
   margin-bottom: var(--spacing-xs, 4px);
 }
 
+/* Input, Textarea, Select: identical padding for same height (override any base/clamp variables) */
 .phoenix-modal__body input,
-.phoenix-modal__body select,
-.phoenix-modal__body textarea {
+.phoenix-modal__body textarea,
+.phoenix-modal__body select {
   width: 100%;
-  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  padding: 8px 16px; /* Fixed px - same vertical padding so input and select match height */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 6px;
   font-size: var(--font-size-base, 0.92rem);
@@ -210,6 +211,7 @@
   transition: border-color 0.2s ease;
 }
 
+/* Focus: Both use primary color (color-brand) - unified */
 .phoenix-modal__body input:focus,
 .phoenix-modal__body select:focus,
 .phoenix-modal__body textarea:focus {

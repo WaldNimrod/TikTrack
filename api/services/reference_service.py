@@ -81,6 +81,8 @@ async def get_reference_brokers(user_id: uuid.UUID, db: AsyncSession) -> List[Br
         n_lower = n.lower()
         if any(k.lower() == n_lower for k in by_value):
             continue  # already in defaults
+        if n_lower in ("other", "אחר"):
+            continue  # "other" always from defaults - prevent duplicate "אחר"
         custom_items.append(BrokerReferenceItem(
             value=n,
             display_name=n,

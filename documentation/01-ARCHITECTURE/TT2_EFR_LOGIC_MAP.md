@@ -109,7 +109,8 @@
 - `status`
 - **Renderer:** `StatusRenderer`
 - **Default Options:** `{ category: 'active' }`
-- **Categories:** `active`, `inactive`, `pending`, `cancelled`
+- **Categories (קנוני):** `active`, `inactive`, `pending`, `cancelled`
+- **תרגום עברית (תצוגה/סינון):** פתוח, סגור, ממתין, מבוטל — **SSOT:** `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md`
 
 #### **4. Badge Fields (BadgeRenderer):**
 - `type`, `commission_type`

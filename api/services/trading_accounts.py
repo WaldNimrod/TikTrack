@@ -346,30 +346,44 @@ class TradingAccountService:
         Raises:
             HTTPExceptionWithCode: If account name already exists for user
         """
-        # Check for duplicate account name (unique constraint)
-        stmt_check = select(TradingAccount).where(
+        # Check for duplicate account name (unique per user)
+        stmt_name = select(TradingAccount).where(
             and_(
                 TradingAccount.user_id == user_id,
                 TradingAccount.account_name == account_name.strip(),
                 TradingAccount.deleted_at.is_(None)
             )
         )
-        result_check = await db.execute(stmt_check)
-        existing = result_check.scalar_one_or_none()
-        
-        if existing:
+        if (await db.execute(stmt_name)).scalar_one_or_none():
             raise HTTPExceptionWithCode(
                 status_code=400,
-                detail=f"Trading account with name '{account_name}' already exists",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+                detail=f"Trading account with name '{account_name.strip()}' already exists",
+                error_code=ErrorCodes.ACCOUNT_NAME_DUPLICATE
             )
+        
+        # Check for duplicate account number (unique per user) — required on create
+        acc_num = (account_number or "").strip()
+        if acc_num:
+            stmt_num = select(TradingAccount).where(
+                and_(
+                    TradingAccount.user_id == user_id,
+                    TradingAccount.account_number == acc_num,
+                    TradingAccount.deleted_at.is_(None)
+                )
+            )
+            if (await db.execute(stmt_num)).scalar_one_or_none():
+                raise HTTPExceptionWithCode(
+                    status_code=400,
+                    detail=f"Trading account with number '{acc_num}' already exists",
+                    error_code=ErrorCodes.ACCOUNT_NUMBER_DUPLICATE
+                )
         
         # Create new trading account
         new_account = TradingAccount(
             user_id=user_id,
             account_name=account_name.strip(),
-            broker=broker.strip() if broker else None,
-            account_number=account_number.strip() if account_number else None,
+            broker=(broker or "").strip() or None,
+            account_number=acc_num or None,
             initial_balance=initial_balance,
             cash_balance=initial_balance,  # Start with initial balance
             currency=currency.upper(),
@@ -481,10 +495,29 @@ class TradingAccountService:
                 if existing:
                     raise HTTPExceptionWithCode(
                         status_code=400,
-                        detail=f"Trading account with name '{account_name}' already exists",
-                        error_code=ErrorCodes.VALIDATION_INVALID_FORMAT
+                        detail=f"Trading account with name '{account_name.strip()}' already exists",
+                        error_code=ErrorCodes.ACCOUNT_NAME_DUPLICATE
                     )
             account.account_name = account_name.strip()
+        
+        if account_number is not None:
+            acc_num_new = account_number.strip()
+            if acc_num_new and acc_num_new != (account.account_number or ""):
+                stmt_num = select(TradingAccount).where(
+                    and_(
+                        TradingAccount.user_id == user_id,
+                        TradingAccount.account_number == acc_num_new,
+                        TradingAccount.id != account_uuid,
+                        TradingAccount.deleted_at.is_(None)
+                    )
+                )
+                if (await db.execute(stmt_num)).scalar_one_or_none():
+                    raise HTTPExceptionWithCode(
+                        status_code=400,
+                        detail=f"Trading account with number '{acc_num_new}' already exists",
+                        error_code=ErrorCodes.ACCOUNT_NUMBER_DUPLICATE
+                    )
+            account.account_number = acc_num_new if acc_num_new else None
         
         if broker is not None:
             account.broker = broker.strip() if broker else None

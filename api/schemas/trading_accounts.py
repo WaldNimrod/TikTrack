@@ -101,10 +101,10 @@ class TradingAccountListResponse(BaseModel):
 
 
 class TradingAccountCreateRequest(BaseModel):
-    """Trading Account create request schema."""
-    account_name: str = Field(..., description="Account display name", max_length=100)
-    broker: Optional[str] = Field(None, description="Broker name", max_length=100)
-    account_number: Optional[str] = Field(None, description="Account number", max_length=50)
+    """Trading Account create request schema (D16 — broker, account_number required)."""
+    account_name: str = Field(..., description="Account display name", min_length=1, max_length=100)
+    broker: str = Field(..., description="Broker name (required)", min_length=1, max_length=100)
+    account_number: str = Field(..., description="Account number (required)", min_length=1, max_length=50)
     initial_balance: Decimal = Field(..., description="Initial account balance", ge=0)
     currency: str = Field(default="USD", description="Account currency (ISO 3-letter)", max_length=3)
     is_active: bool = Field(default=True, description="Account active status")

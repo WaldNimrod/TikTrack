@@ -170,6 +170,9 @@
 
 **סטטוס נוכחי (2026-02-12):** Batch 2 CLOSED. D16, D18, D21 = 4. FIDELITY. להלן היסטוריית עדכונים **(Legacy — לא משנה סטטוס נוכחי)**.
 
+**2026-02-12 (Task 2.1 A2 — Team 10):**
+- ✅ **1.1.1 D21 Infra → VERIFIED (סופי)** — Page Tracker מאומת; D21 Infra מופיע כ־VERIFIED במטריצה ובעדכונים.
+
 **2026-02-09 (ADR-010 — סגירת Phase 2 / Debt Closure):**
 - ✅ **D21 Infra:** VERIFIED סופי — Page Tracker מעודכן בהתאם לפקודת האדריכלית (תוכנית סגירה מאוחדת).
 - 📋 **תוכנית עבודה:** [TT2_PHASE_2_CLOSURE_WORK_PLAN.md](../00-MANAGEMENT/TT2_PHASE_2_CLOSURE_WORK_PLAN.md) — 4 שלבים (Debt Closure → Phase Closure → G-Lead Approval → Team 90 Re-run).

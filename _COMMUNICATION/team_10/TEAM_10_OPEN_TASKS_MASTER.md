@@ -6,6 +6,8 @@
 
 **מקורות:** TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md, TT2_PHASE_2_CLOSURE_WORK_PLAN.md, מסמכי מנדט ו-QA בתקיית team_10.
 
+**פרוטוקול שולחן נקי (Clean Table):** TEAM_10_CLEAN_TABLE_PROTOCOL.md — Checklist סגירה A/B/C; הכרזת "Clean Table" רק כאשר כל פריטי A, B, C מסומנים ✅.
+
 ---
 
 ## 1. סטטוסים שנסגרו לאחרונה (לעדכון תיעוד)
@@ -19,21 +21,23 @@
 | **Team 60 — 1.2.2 (פורטים 8080/8082, CORS, Precision 20,6)** | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md; TEAM_60_TO_TEAM_10_TASK_1_2_2_PORT_PRECISION_REPORT.md | ✅ VERIFIED |
 | **Team 60 — 1.2.3 (Seeders, make db-test-clean)** | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md; TEAM_60_TO_TEAM_10_PHASE_1_IMPLEMENTATION_START.md | ✅ COMPLETE |
 | **1.3.1 Option D (Team 40+30+50)** | TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md — כל הקריטריונים PASS/SKIP | ✅ **סגור** — יישום (40) + תשתית (30) + QA (50) הושלמו. TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
+| **דבקר ראשון 30/40/50** | דוחות השלמה התקבלו; Team 40 — סגור; Team 30 — 1.3.2, 1.3.3, UI, Nav/Auth סגור; Team 50 — 1.5, D16, Option D, **Auth Guard QA** סגור | TEAM_10_CHECKPOINT_1_REPORTS_ACK_AND_CLOSURE_DEMAND.md; TEAM_10_TO_TEAM_50_AUTH_GUARD_QA_ACK.md |
+| **Auth Guard QA (Team 50)** | TEAM_50_TO_TEAM_10_AUTH_GUARD_QA_REPORT.md — Type A/C, redirect ל-Home, גישה מאומתת, Auth Guard נטען — כל הקריטריונים PASS | ✅ **סגור** — TEAM_10_TO_TEAM_50_AUTH_GUARD_QA_ACK.md |
 
 ---
 
 ## 2. משימות פתוחות — חלוקה לפי צוות וסדר ביצוע
 
-### 2.1 Team 10 (השער)
+### 2.1 Team 10 (השער) — סיווג Clean Table: ✅/⏳
 
-| סדר | מזהה | משימה | תוצר מצופה | מקור |
-|-----|------|--------|-------------|------|
-| 1 | Batch 1+2 | פרסום **"Batch 1+2 Closure Report"** רשמי וסגירת הסבב | מסמך closure רשמי | TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md §4.3 |
-| 2 | 1.1.1 | עדכון Page Tracker: D21 Infra → **VERIFIED** (סופי) | TT2_OFFICIAL_PAGE_TRACKER.md מעודכן | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 1 |
-| 3 | 1.1.2 | אכיפת SLA 30/40 — צוות 40 UI (Presentational), צוות 30 לוגיקה (Containers) | הפניה ל-TT2_SLA_TEAMS_30_40.md; טיפול בחריגות | שם |
-| 4 | 1.1.3 | וידוא ש־`make db-test-clean` פועל ב-100% (תלוי ב־1.2.3) | תיאום עם 20/60; רישום חסימות | שם |
-| 5 | 1.4 | פלט שלב 1 — רשימת חוסרים/פערים; וידוא אין החלטות תלויות פתוחות | מסמך פלט | שם |
-| 6 | 4.1.1–4.1.4 | הכנה ל־G-Lead: תיעוד סטטוס עמודים, מסירת חומר, Sign-off, גיבוי GitHub | Handoff + תיעוד | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 4 |
+| סדר | מזהה | משימה | תוצר מצופה | סטטוס | מקור |
+|-----|------|--------|-------------|--------|------|
+| 1 | Batch 1+2 | פרסום **"Batch 1+2 Closure Report"** רשמי וסגירת הסבב | מסמך closure רשמי | ✅ **PASS** | TEAM_10_BATCH_1_2_CLOSURE_REPORT.md |
+| 2 | 1.1.1 | עדכון Page Tracker: D21 Infra → **VERIFIED** (סופי) | TT2_OFFICIAL_PAGE_TRACKER.md מעודכן | ✅ **PASS** | TT2_OFFICIAL_PAGE_TRACKER.md — 2026-02-12 Task 2.1 A2 |
+| 3 | 1.1.2 | אכיפת SLA 30/40 — רישום חריגות או "אין חריגות" | תיעוד + קישור SSOT | ✅ **PASS** | TEAM_40_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT — אין חריגות; TEAM_10_TO_TEAM_40_CHECKPOINT_1_ACK.md |
+| 4 | 1.1.3 | וידוא ש־`make db-test-clean` פועל ב-100% | אימות ריצה + תיעוד | ✅ **PASS** | TEAM_10_1_1_3_DB_TEST_CLEAN_VERIFICATION.md |
+| 5 | 1.4 | פלט שלב 1 — רשימת חוסרים/פערים; וידוא אין החלטות תלויות | מסמך פלט + חתימה | ✅ **PASS** | TEAM_10_PHASE_1_OUTPUT_1_4.md |
+| 6 | 4.1.1–4.1.4 | הכנה ל־G-Lead: תיעוד, מסירת חומר, Sign-off, גיבוי GitHub | Handoff + תיעוד | ✅ **PASS** | TEAM_10_G_LEAD_HANDOFF_PHASE_2.md |
 
 **הערה:** מסירת קונטקסט ל־Team 50 (1.4א) — חובה לפני הרצת QA כשנפתח scope חדש.
 
@@ -72,10 +76,10 @@
 |-----|------|--------|-------------|------|
 | 1 | 1.3.1 | Retrofit רספונסיביות (Option D): **כל הממשק בכל העמודים** רספונסיבי; טבלאות D16/D18/D21 — Sticky + Fluid (clamp) | CSS + layout מעודכן; בדיקות | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.3 |
 | | | | ✅ **הושלם** — יישום (40) + תשתית (30) + QA (50) PASS. דוח: TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md; אישור: TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md. | TEAM_10_TO_TEAMS_30_40_RESPONSIVE_RETROFIT_ACK.md |
-| 2 | 1.3.2 | ניקוי מוחלט של `console.log` ומעבר ל־`audit.maskedLog` | אין console.log חשוף | שם |
-| 3 | 1.3.3 | הקשחת טרנספורמרים: מניעת NaN ו־Undefined בטבלאות | transformers.js + null-safety | שם |
-| 4 | Nav/Auth | תיקון Navigation & Auth: כפילויות Header (Phase 1), קישורים סטנדרטיים (Phase 2), React Router (Phase 3), Auth Guard (Phase 4) | קוד מעודכן; בדיקות | TEAM_10_TO_TEAM_30_NAVIGATION_AUTH_FIX_MANDATE.md |
-| 5 | UI (אופציונלי) | שינוי שמות קבצים עם `d16`; ארגון למודולים; שינוי שם `portfolioSummary.js` (המלצות אודיט) | שמות ותיקיות מעודכנים | TEAM_10_UI_RESTRUCTURE_AUDIT, UI_FILENAME_QUALITY_ISSUES.md |
+| 2 | 1.3.2 | ניקוי מוחלט של `console.log` ומעבר ל־`audit.maskedLog` | אין console.log חשוף | ✅ **הושלם** — TEAM_30_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT §2.1 |
+| 3 | 1.3.3 | הקשחת טרנספורמרים: מניעת NaN ו־Undefined בטבלאות | transformers.js + null-safety | ✅ **הושלם** — TEAM_30_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT §2.2 |
+| 4 | Nav/Auth | תיקון Navigation & Auth (Phase 1–4) | קוד מעודכן או מסמך סגירה | ✅ **סגור** — מסמך סגירה תוקן ואושר. TEAM_30_TO_TEAM_10_NAV_AUTH_CLOSURE_DOC.md (§6 תיקונים); TEAM_10_TO_TEAM_30_NAV_AUTH_CLOSURE_APPROVED.md |
+| 5 | UI (אופציונלי) | שינוי שמות קבצים d16; ארגון מודולים; portfolioSummary.js | שמות ותיקיות מעודכנים | ✅ **הושלם** — TEAM_30_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT §2.4 |
 
 **תלות:** אינטגרציה מלאה עם API — 1.2.2 הושלם (Team 60); ממתין להשלמת 1.2.1 (Team 20). עבודה על 1.3.1–1.3.3 מותרת במקביל.
 
@@ -87,7 +91,7 @@
 |-----|------|--------|-------------|------|
 | 1 | 1.3.1 | תיאום עם Team 30 — עיצוב/מפרט רספונסיביות, CSS, layout (תחת SLA 30/40) | עיצוב Presentational לפי SSOT | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.3; TT2_SLA_TEAMS_30_40 |
 | | | | ✅ **הושלם** — יישום + QA PASS (TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md). | TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
-| 2 | SLA | אכיפת SLA: צוות 40 מגיש רכיבי UI (Presentational), צוות 30 מזריק לוגיקה (Containers) | טיפול בחריגות | 1.1.2 (Team 10 מפקח) |
+| 2 | SLA | אכיפת SLA: צוות 40 מגיש רכיבי UI (Presentational), צוות 30 מזריק לוגיקה (Containers) | טיפול בחריגות | ✅ **סגור** — TEAM_40_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT; TEAM_10_TO_TEAM_40_CHECKPOINT_1_ACK.md |
 
 ---
 
@@ -97,25 +101,25 @@
 |-----|------|--------|-------------|------|
 | 1 | Context | קבלת קונטקסט מ־Team 10 לפני כל סבב QA חדש — מה פותח, מה לבדוק, SSOT | עדכון מפורט מ־Team 10 | TT2_QUALITY_ASSURANCE_GATE_PROTOCOL 1ב |
 | 2 | 1.3.1 Option D | בדיקות רספונסיביות — Sticky, Fluid, D16/D18/D21 (6 קריטריונים) | דוח PASS/FAIL ל־Team 10 | ✅ **הושלם** — TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md; TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
-| 3 | 1.5 | שער א' — הרצת סוויטת בדיקות (0 SEVERE); דוח ל־Team 10 (כבר הושלם בסבב קודם — להפעיל מחדש לפי צורך) | GATE_A_PASSED / דוח | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.5 |
-| 4 | QA Tasks | Auth Guard — בדיקה לאחר תיקון (Team 30); D16 Backend API Testing — לפי עדכון Team 10 | דוחות QA | TEAM_10_QA_TASKS_PRIORITIZATION.md |
+| 3 | 1.5 | שער א' — הרצת סוויטת בדיקות (0 SEVERE); דוח ל־Team 10 | GATE_A_PASSED / דוח | ✅ **סגור** — מאומת בסבב קודם (TEAM_50_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT) |
+| 4 | QA Tasks | Auth Guard — בדיקה לאחר תיקון (Team 30); D16 Backend API Testing | דוחות QA | D16 → ✅ **סגור**. Auth Guard QA → ✅ **סגור** — TEAM_50_TO_TEAM_10_AUTH_GUARD_QA_REPORT.md (כל הקריטריונים PASS); TEAM_10_TO_TEAM_50_AUTH_GUARD_QA_ACK.md. |
 
 ---
 
-### 2.7 Team 90 (סבב מאמת)
+### 2.7 Team 90 (סבב מאמת) — סיווג Clean Table: ✅/⏳
 
-| סדר | מזהה | משימה | תוצר מצופה | מקור |
-|-----|------|--------|-------------|------|
-| 1 | 3.1.1 | ריצת Gate B (או סבב מאמת) לאחר תיקוני שלב 1–2 | דוח Team 90 | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 3 |
-| 2 | 3.1.2 | תיעוד ארטיפקטים והחלטת GREEN | ארטיפקטים ב־05-REPORTS/artifacts; GATE_B_STATUS | שם |
+| סדר | מזהה | משימה | תוצר מצופה | סטטוס | מקור |
+|-----|------|--------|-------------|--------|------|
+| 1 | 3.1.1 | ריצת Gate B (או סבב מאמת) לאחר תיקוני שלב 1–2 | דוח Gate B מאושר; GATE_B_PASSED | ⏳ **PENDING** | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 3 |
+| 2 | 3.1.2 | תיעוד ארטיפקטים והחלטת GREEN | ארטיפקטים ב־05-REPORTS/artifacts; GATE_B_STATUS | ⏳ **PENDING** | שם |
 
 ---
 
-### 2.8 G-Lead (נמרוד — Visionary)
+### 2.8 G-Lead (נמרוד — Visionary) — סיווג Clean Table: ✅/⏳
 
-| סדר | מזהה | משימה | מקור |
-|-----|------|--------|------|
-| 1 | 4.1.2–4.1.3 | בדיקה ידנית-ויזואלית בדפדפן; Sign-off או רשימת תיקונים ויזואליים | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 4 |
+| סדר | מזהה | משימה | תוצר מצופה | סטטוס | מקור |
+|-----|------|--------|-------------|--------|------|
+| 1 | 4.1.2–4.1.3 | בדיקה ידנית-ויזואלית בדפדפן; Sign-off או רשימת תיקונים | מסמך חתום / log_entry | ⏳ **PENDING** | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 4 |
 
 ---
 
@@ -141,10 +145,11 @@
 | Team 50 | TEAM_10_TO_TEAM_50_OPEN_TASKS_ASSIGNMENT.md |
 | Team 60 | TEAM_10_TO_TEAM_60_OPEN_TASKS_ASSIGNMENT.md |
 
-**דבקר ראשון (2026-02-12):** הוצאו הודעות בקשת השלמה/דוח השלמה לצוותים 30, 40, 50:
-- Team 30: TEAM_10_TO_TEAM_30_CHECKPOINT_1_COMPLETION_REQUEST.md
-- Team 40: TEAM_10_TO_TEAM_40_CHECKPOINT_1_COMPLETION_REQUEST.md
-- Team 50: TEAM_10_TO_TEAM_50_CHECKPOINT_1_COMPLETION_REQUEST.md
+**דבקר ראשון (2026-02-12):** הוצאו בקשת השלמה; דוחות התקבלו; הוצאו דרישות סגירה סופית:
+- **אישור דוחות + דרישה:** TEAM_10_CHECKPOINT_1_REPORTS_ACK_AND_CLOSURE_DEMAND.md
+- **Team 30:** TEAM_10_TO_TEAM_30_FINAL_CLOSURE_DEMAND.md — Nav/Auth: השלם או הגש מסמך סגירה (אין להשאיר פתוח)
+- **Team 40:** TEAM_10_TO_TEAM_40_CHECKPOINT_1_ACK.md — כל המשימות סגורות
+- **Team 50:** TEAM_10_TO_TEAM_50_FINAL_CLOSURE_DEMAND.md — Auth Guard: הרץ מיד עם 30; D16 סגור
 
 ---
 
@@ -152,6 +157,7 @@
 
 | מסמך | נתיב |
 |------|------|
+| **פרוטוקול Clean Table (שולחן נקי)** | _COMMUNICATION/team_10/TEAM_10_CLEAN_TABLE_PROTOCOL.md |
 | תוכנית סגירת Batch 1+2 | 05-REPORTS/artifacts/TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md |
 | תוכנית סגירת Phase 2 | documentation/00-MANAGEMENT/TT2_PHASE_2_CLOSURE_WORK_PLAN.md |
 | דוח Flow Type SSOT QA | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_FLOW_TYPE_SSOT_QA_REPORT.md |

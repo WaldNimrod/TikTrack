@@ -1023,16 +1023,18 @@ COMMENT ON TABLE user_data.cash_flows IS 'Account deposits, withdrawals, dividen
 CREATE TYPE user_data.commission_type AS ENUM ('TIERED', 'FLAT');
 
 -- ----------------------------------------------------------------------------
--- Table: user_data.brokers_fees
+-- Table: user_data.brokers_fees (ADR-015: Fees per Trading Account)
+-- SSOT: Account → Fees (one-to-many). Broker is metadata of account only.
+-- commission_value: NUMERIC(20,6) per TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md
 -- ----------------------------------------------------------------------------
 CREATE TABLE user_data.brokers_fees (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES user_data.users(id) ON DELETE CASCADE,
+    trading_account_id UUID NOT NULL REFERENCES user_data.trading_accounts(id) ON DELETE CASCADE,
     
-    -- Broker Details
-    broker VARCHAR(100) NOT NULL,
+    -- Fee structure (broker derived from trading_accounts.broker, not stored here)
     commission_type user_data.commission_type NOT NULL,
-    commission_value VARCHAR(255) NOT NULL,
+    commission_value NUMERIC(20, 6) NOT NULL,
     minimum NUMERIC(20, 6) NOT NULL DEFAULT 0,
     
     -- Timestamps
@@ -1041,14 +1043,15 @@ CREATE TABLE user_data.brokers_fees (
     deleted_at TIMESTAMPTZ,
     
     -- Constraints
-    CONSTRAINT brokers_fees_minimum_check CHECK (minimum >= 0)
+    CONSTRAINT brokers_fees_minimum_check CHECK (minimum >= 0),
+    CONSTRAINT brokers_fees_commission_value_check CHECK (commission_value >= 0)
 );
 
 CREATE INDEX idx_brokers_fees_user_id 
     ON user_data.brokers_fees(user_id);
-    
-CREATE INDEX idx_brokers_fees_broker 
-    ON user_data.brokers_fees(broker);
+
+CREATE INDEX idx_brokers_fees_trading_account_id 
+    ON user_data.brokers_fees(trading_account_id);
     
 CREATE INDEX idx_brokers_fees_commission_type 
     ON user_data.brokers_fees(commission_type);
@@ -1061,7 +1064,13 @@ CREATE INDEX idx_brokers_fees_user_deleted
     ON user_data.brokers_fees(user_id, deleted_at) 
     WHERE deleted_at IS NULL;
 
-COMMENT ON TABLE user_data.brokers_fees IS 'Brokers fees and commission structures (D18) - Stores broker commission information per user';
+CREATE INDEX idx_brokers_fees_account_deleted 
+    ON user_data.brokers_fees(trading_account_id, deleted_at) 
+    WHERE deleted_at IS NULL;
+
+COMMENT ON TABLE user_data.brokers_fees IS 'Fees per Trading Account (D18) - ADR-015. One-to-many: trading_account → brokers_fees. Broker is on account only.';
+COMMENT ON COLUMN user_data.brokers_fees.trading_account_id IS 'FK to trading_accounts. Fees belong to account; broker derived from account.';
+COMMENT ON COLUMN user_data.brokers_fees.commission_value IS 'Commission value NUMERIC(20,6) - SSOT: _COMMUNICATION/team_10/TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md';
 COMMENT ON COLUMN user_data.brokers_fees.minimum IS 'Minimum commission per transaction in USD (NUMERIC(20,6) for precision - per SSOT)';
 
 -- ----------------------------------------------------------------------------

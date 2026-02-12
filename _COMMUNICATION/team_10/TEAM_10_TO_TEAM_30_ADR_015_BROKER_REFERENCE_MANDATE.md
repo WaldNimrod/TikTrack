@@ -1,64 +1,72 @@
-# Team 10 → Team 30: מנדט ADR-015 — Conditional Rendering + Auto-fill עמלות
+# Team 10 → Team 30: מנדט ADR-015 — D16 ברוקר "אחר" + D18 עמלות לפי חשבון
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** Team 30 (Frontend)  
 **תאריך:** 2026-02-12  
-**מקור:** ARCHITECT_BROKER_REFERENCE_MANDATE.md (ADR-015), PROMPTS FOR THE FIELD.
+**עדכון:** 2026-02-12 — **עמלות לפי חשבון מסחר; "אחר" רק ב-D16.**  
+**מקור:** ARCHITECT_BROKER_REFERENCE_MANDATE.md (ADR-015); החלטת אדריכלית.
+
+**סטטוס:** READY FOR DISTRIBUTION — ראה ADR_015_READY_FOR_DISTRIBUTION.md.
 
 ---
 
-## 1. המנדט (ADR-015)
+## 1. עקרון מחייב
 
-האדריכלית הפעילה את מנדט הברוקרים (ADR-015). עליכם לממש:
-1. **Conditional Rendering** עבור ברוקר "אחר".
-2. **Auto-fill** לשדות העמלות בבחירת ברוקר (מיקום — ראה §3).
+**עמלות שייכות לחשבון מסחר (Trading Account), לא לברוקר.**  
+D18 = **עמלות לכל חשבון מסחר** — בחירת חשבון + עמלות של החשבון.  
+**"אחר" (Other broker)** שייך **לבחירת ברוקר ב-D16 בלבד** — לא לעמלות.
 
 ---
 
-## 2. דרישות מהמנדט
+## 2. דרישות לפי עמוד
+
+### 2.1 D16 — חשבונות מסחר
 
 | דרישה | פירוט |
 |--------|--------|
-| **"אחר"** | פריט 'other' יאפשר הכנסת שם ידני. בבחירת "אחר" — **הצגת הודעת המשילות** שנקבעה במנדט. |
-| **הודעה** | חובת הצגת הודעת המשילות בממשק — טקסט מאושר (ראה §3א להלן). |
-| **Auto-fill** | ברגע שנבחר ברוקר — **מילוי אוטומטי** של שדות העמלות **לערכי ה-Default** שמגיעים מה-API (default_fees). |
+| **בחירת ברוקר** | רשימת ברוקרים מ-GET /api/v1/reference/brokers (לבניית חשבון מסחר בלבד). |
+| **"אחר"** | פריט 'other' — הכנסת שם ידני. **בבחירת "אחר"** — **הצגת הודעת המשילות** (§2.1א). **רק ב-D16.** |
+| **אין עמלות ב-D16** | שדות עמלות לא שייכים לטופס חשבון מסחר (בהמשך ייתכן מודול ניהול עמלות בתוך D16 — הנחיה עתידית). |
+
+#### 2.1א טקסט הודעת המשילות (D16 בלבד) — SSOT סגור
+
+טקסט מלא + קישור: **מסמך SSOT** `documentation/06-ENGINEERING/ADR_015_GOVERNANCE_MESSAGE_SSOT.md`. ערך `primary_admin_contact` = `mailto:support@tiktrack.app` (או מ-env `PRIMARY_ADMIN_EMAIL`). אין placeholder בממשק.
+
+### 2.2 D18 — עמלות לכל חשבון מסחר
+
+| דרישה | פירוט |
+|--------|--------|
+| **בחירת חשבון** | D18 UI: **בחירת חשבון מסחר** + **עמלות של החשבון** (סינון/תצוגה לפי חשבון). |
+| **trading_account_id** | בכל פעולה של עמלה (הוספה/עריכה/תצוגה) — **trading_account_id** של החשבון הנבחר. |
+| **אין "בעלות" ברוקר על עמלות** | אין מקום ב-D18 שבו "broker = owner of fees". ברוקר נגזר מחשבון. |
+| **הצעת מילוי (אופציונלי)** | בעת הוספת עמלה לחשבון — אופציונלי: הצעת מילוי שדות מ-**default_fees** לפי **ברוקר של החשבון** (מתגובת reference/brokers). |
 
 ---
 
-## 3. עמודים ומיקום
+## 3. תוצר מצופה
 
-- **D16** = חשבונות מסחר (`trading_accounts.html`) — טופס חשבון מסחר (אין שדות עמלות).
-- **D18** = עמלות ברוקרים (`brokers_fees.html`) — טופס עמלה (ברוקר, commission_type, commission_value, minimum).
-- **Conditional Rendering + הודעה:** בכל מקום בחירת ברוקר (D16, D18), בבחירת "אחר" — הצגת הודעת המשילות (§3א).
-- **Auto-fill:** ב-**D18** (טופס עמלות) — מילוי שדות העמלות מ־default_fees בעת בחירת ברוקר.
-
-### 3א. טקסט הודעת המשילות (מאושר)
-
-להצגה בבחירת "אחר":
-
-> במידה ולא מצאתם את הברוקר שלכם במערכת, עדין ניתן לייצר את החשבון מסחר — אבל לא ניתן יהיה לייבא אוטומטית נתונים.  
-> מומלץ ליצור איתנו קשר ולבקש הוספת הברוקר למערכת, **[קישור למייל של משתמש מנהל ראשי]**.
-
-במימוש: להחליף **[קישור למייל של משתמש מנהל ראשי]** בקישור/מייל בפועל (משתמש מנהל ראשי).
-
----
-
-## 4. תוצר מצופה
-
-- בבחירת ברוקר "אחר" — הצגת הודעת המשילות בטקסט המאושר (§3א).
-- Auto-fill שדות העמלות (commission_type, commission_value, minimum) ב-D18 בעת בחירת ברוקר — מקור: `default_fees` מתגובת GET /api/v1/reference/brokers (לאחר ש־Team 20 יספק את השדות).
+- **D16:** Conditional Rendering "אחר" + הודעת משילות (טקסט §2.1א) — **בבחירת ברוקר בלבד**.
+- **D18:** UI — בחירת חשבון מסחר + רשימה/טפסים של עמלות **של אותו חשבון** (כל פעולה עם trading_account_id). אופציונלי: הצעת מילוי מ-default_fees לפי ברוקר החשבון.
 - דוח השלמה ל-Team 10 עם רפרנס ל-ADR-015.
+
+---
+
+## 4. Acceptance Criteria (רלוונטי ל-Frontend)
+
+- D18 מציג עמלות **לפי חשבון מסחר בלבד** (בחירת חשבון + עמלות של החשבון).
+- בכל פעולה של עמלה יש **trading_account_id** (נשלח ל-API).
+- "Other broker" והודעת המשילות — **ב-D16 בלבד**.
+- אין מקום ב-UI שבו "broker = owner of fees".
 
 ---
 
 ## 5. רפרנסים
 
-- **מנדט:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_MANDATE.md`
 - **תוכנית עבודה:** [TEAM_10_ADR_015_BROKER_REFERENCE_WORK_PLAN.md](./TEAM_10_ADR_015_BROKER_REFERENCE_WORK_PLAN.md)
-- **טפסים:** D16 — `ui/src/views/financial/tradingAccounts/tradingAccountsForm.js`; D18 — `ui/src/views/financial/brokersFees/brokersFeesForm.js`
-- **API:** GET /api/v1/reference/brokers (יורחב ע"י Team 20 ל־is_supported, default_fees).
+- **מסמך סופי לאישור:** [ADR_015_FINAL_FOR_ARCHITECT_APPROVAL.md](./ADR_015_FINAL_FOR_ARCHITECT_APPROVAL.md)
+- **טפסים:** D16 — `ui/src/views/financial/tradingAccounts/tradingAccountsForm.js`; D18 — `ui/src/views/financial/brokersFees/` (להגדרה מחדש: עמלות לפי חשבון).
 
 ---
 
 **Team 10 (The Gateway)**  
-**log_entry | ADR_015 | MANDATE_TO_TEAM_30 | 2026-02-12**
+**log_entry | ADR_015 | MANDATE_TO_TEAM_30_UPDATED_FEES_PER_ACCOUNT | 2026-02-12**

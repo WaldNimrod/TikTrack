@@ -2,8 +2,8 @@
 
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-12  
-**נושא:** סבב פיתוח — מנדט רפרנס ברוקרים ועמלות ברירת מחדל (ADR-015)  
-**סטטוס:** תוכנית עבודה והודעות צוותים הוכנו | שאלות השלמה לאדריכלית נשלחו
+**נושא:** סבב פיתוח — מנדט רפרנס ברוקרים (ADR-015) | **עמלות לפי חשבון מסחר**  
+**סטטוס:** READY FOR DISTRIBUTION — חסימות SSOT נסגרו (DDL, Other, הודעת משילות); ניתן להוציא מנדטים ל-20/30
 
 ---
 
@@ -27,23 +27,23 @@
 
 ---
 
-## 3. הבהרות (מאושרות)
+## 3. החלטה אדריכלית (עמלות לפי חשבון)
 
-- **עמודים:** D16 = חשבונות מסחר (trading_accounts.html), D18 = עמלות ברוקרים (brokers_fees.html). Auto-fill ב-D18.
-- **default_fees:** מבנה כ־brokers_fees (commission_type, commission_value, minimum); ברוקר אחד לבדיקה — IBKR + 3 עמלות דוגמה.
-- **הודעה:** טקסט מאושר עם פлей스홀דר לקישור למייל מנהל ראשי (ראה תוכנית/מנדטים).
-
-**שאלה פתוחה לאדריכלית:** פריט "אחר" — מה-API או רק Frontend? (מסמך סופי: ADR_015_FINAL_FOR_ARCHITECT_APPROVAL.md)
+- **עמלות שייכות לחשבון מסחר (Trading Account), לא לברוקר.** Broker = מטא-דאטה של חשבון.
+- **D16** = חשבונות מסחר + בחירת ברוקר; "אחר" והודעת משילות — **ב-D16 בלבד**.
+- **D18** = **עמלות לכל חשבון מסחר** — בחירת חשבון + עמלות של החשבון (trading_account_id).
+- **DB/API:** חובה trading_account_id בעמלות; אין broker כ-FK בעמלות. תיקון עומק נדרש (טבלה נוכחית brokers_fees ללא account FK).
+- **חסימות SSOT נסגרו (2026-02-12):** (1) DDL — trading_account_id ב-brokers_fees, הסרת broker. (2) "אחר" — מגיע מה-API, value "other", is_supported false. (3) הודעת משילות — SSOT ב-ADR_015_GOVERNANCE_MESSAGE_SSOT.md. (4) **סבב 2:** commission_value NUMERIC(20,6) ב-DDL + הפניה ל-TEAM_10_COMMISSION_VALUE_NUMERIC_DECISIONS.md. (5) מיגרציה Account↔Fees — סעיף מפורש בתוכנית §6א ובמנדט Team 20 §2.3. **READY FOR DISTRIBUTION.**
 
 ---
 
-## 4. סדר ביצוע (מתוך תוכנית העבודה)
+## 4. סדר ביצוע (מעודכן — Fees per Account)
 
-1. Team 10 — העברת מנדט + שאלות לאדריכלית ✅  
-2. Team 20 — הרחבת GET /api/v1/reference/brokers + קובץ ברוקרים עם default_fees  
-3. Team 30 — Conditional Rendering "אחר" + הודעת משילות  
-4. Team 30 — Auto-fill עמלות (תלוי ב-20 + בהבהרת מיקום)  
-5. Team 10 — וידוא השלמה ועדכון Index
+1. Team 10 — עדכון מסמכים; החזרת תוכנית לאישור; **אין הוצאת משימות עד לאישור**.  
+2. Team 20 — הרחבת GET /reference/brokers + **DB/API עמלות לפי חשבון (trading_account_id; הסרת broker כ-FK)**  
+3. Team 30 — D16: "אחר" + הודעת משילות (בחירת ברוקר בלבד)  
+4. Team 30 — D18: בחירת חשבון + עמלות של החשבון (trading_account_id)  
+5. Team 10 — וידוא Acceptance Criteria ועדכון Index
 
 ---
 

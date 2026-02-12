@@ -137,7 +137,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       });
       
       tableData = result.table;
-      updateSummary(result.summary);
+      updateSummary(result.summary, result.table);
       updateTable(result.table.data);
       updatePagination();
     } catch (error) {
@@ -174,18 +174,23 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   
   /**
    * Update summary section
+   * @param {Object} summary - Summary from API
+   * @param {Object} tableResult - Table data result (used as fallback when summary count is 0)
    */
-  function updateSummary(summary) {
+  function updateSummary(summary, tableResult) {
     const totalBrokersEl = document.getElementById('totalBrokers');
     const activeBrokersEl = document.getElementById('activeBrokers');
     const avgCommissionEl = document.getElementById('avgCommissionPerTrade');
     const monthlyFixedEl = document.getElementById('monthlyFixedCommissions');
     const yearlyFixedEl = document.getElementById('yearlyFixedCommissions');
-    const brokersCountEl = document.getElementById('brokersCount');
     const tableBrokersCountEl = document.getElementById('tableBrokersCount');
     
-    if (totalBrokersEl) totalBrokersEl.textContent = summary.totalBrokers || 0;
-    if (activeBrokersEl) activeBrokersEl.textContent = summary.activeBrokers || 0;
+    // Fallback: use table count when summary returns 0 but table has records
+    const tableCount = tableResult ? (tableResult.total ?? tableResult.data?.length ?? 0) : 0;
+    const displayCount = Math.max(summary.activeBrokers || 0, summary.totalBrokers || 0, tableCount);
+    
+    if (totalBrokersEl) totalBrokersEl.textContent = Math.max(summary.totalBrokers || 0, tableCount);
+    if (activeBrokersEl) activeBrokersEl.textContent = displayCount;
     if (avgCommissionEl) {
       const span = avgCommissionEl.querySelector('span');
       if (span) span.textContent = formatCurrency(summary.avgCommissionPerTrade || 0, 'USD');
@@ -198,8 +203,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       const span = yearlyFixedEl.querySelector('span');
       if (span) span.textContent = formatCurrency(summary.yearlyFixedCommissions || 0, 'USD');
     }
-    if (brokersCountEl) brokersCountEl.textContent = `${summary.activeBrokers || 0} ברוקרים פעילים`;
-    if (tableBrokersCountEl) tableBrokersCountEl.textContent = `${summary.activeBrokers || 0} ברוקרים פעילים`;
+    if (tableBrokersCountEl) tableBrokersCountEl.textContent = `${displayCount} ברוקרים פעילים`;
   }
   
   /**

@@ -165,5 +165,57 @@
 
 ---
 
+## עדכון: שער ב' מאושר — אימות בפועל (Team 90) (2026-02-11)
+
+**מקור:** Team 90 — הרצה מלאה בשרת מקומי לפי הנוהל.
+
+**תוצאות:** Gate B E2E — PASS 5/5 (`npm run test:gate-b`); Round-trip BE — test_rich_text_roundtrip.py PASS; ארטיפקט: GATE_B_E2E_RESULTS.json (2026-02-11T22:42:27.106Z). כיסויים: Brokers API (D16/D18), Rich-Text ללא inline style, Design System Admin/Guest, Redirects, Gate A regression (ללא SEVERE).
+
+**סטטוס:** מאושר מעבר לשלב הבא.
+
+**תיעוד:** `TEAM_10_GATE_B_APPROVAL_AND_STATUS.md` — SSOT שער ב' = PASS. הערות: D21 ללא Broker (per scope); Selenium — fallback CHROMEDRIVER_REMOTE + פורט 9515 (שקיפות; ניתן להחזיר לדינמי אם יתנגש).
+
+**עדכונים:** TEAM_10_VISUAL_GAPS_WORK_PLAN — סטטוס שער ב' + שורות 3–7 מסומנות הושלמו; TEAM_10_ARCHITECT_IMPLEMENTATION_TASK_MATRIX — T50.1, T50.2 מסומנים הושלמו. הצעד הבא: שער ג' (אישור ויזואלי) / Design Fidelity.
+
+---
+
+## עדכון: תמונת מצב — משימות פתוחות ותוכניות (2026-02-11)
+
+**מסמך:** `TEAM_10_STATE_OPEN_TASKS_AND_WORK_PLANS.md` — תמונה אחת: כל המשימות הפתוחות (מטריצה), שלבים שלא נסגרו (Code Evidence §4.5, בדיקות מקדימות §4.7, /profile, שלב 0 וידוא, משימה 7), תוכניות עבודה — מה בוצע ומה לא, תיקונים מהתהליך הוויזואלי (Header Batch 1). נועד לתמיכה בהמשך התהליך הוויזואלי.
+
+---
+
+## עדכון: סבב מהיר — זנבות (2026-02-11)
+
+**מקור:** `TEAM_10_QUICK_ROUND_TAILS.md`, `TEAM_10_TO_ALL_TEAMS_QUICK_ROUND_KICKOFF.md`.
+
+**תשובת Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_QUICK_ROUND_VERIFICATION_RESPONSE.md` — וידוא Q7, Q8, Q9: Header רק מ־unified-header.html (headerLoader.js); React Tables רק דרך TablesReactStage (כרגע אין); Header מחוץ ל־containers (לפני .page-wrapper). **מאושר.**
+
+**תשובת Team 40 (Q7):** `_COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_QUICK_ROUND_VERIFICATION_RESPONSE.md` — וידוא Header path: קובץ יחיד `ui/src/views/shared/unified-header.html`; headerLoader.js משתמש בנתיב `/src/views/shared/unified-header.html`; אין קבצי Header נוספים או הפניות חלופיות בקוד פעיל (הפניות ישנות רק בתיעוד היסטורי). **מאושר.**
+
+**משימות Team 10 (Q1–Q6, Q11) — בוצעו:** Q1 — פסקת MAPPING_REQUIRED ב־ORDER; Q2 — פריט M3b ב־Checklist (אין אישור קוד ללא מיפוי); Q3 — עדכון Evidence Log (רישום זה); Q4 — פסקת M5 ב־Checklist (מתי ואיך מעדכנים 90 לפני אדריכלית); Q5–Q6 — Work Plan §4.7 עודכן (וידוא רשימת עמודים, מטריצה רשמית ב־§4.6); Q11 — Redirect ל־Type D מתועד ב־Work Plan §4.6.
+
+**תשובת Team 50 (Q12, Q13):** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_QUICK_ROUND_SCAN_RESPONSE.md` — Q12: נסרק — כן (phoenixRichTextEditor.js, phoenixRTStyleMark.js, dompurifyRichText.js, cashFlowsForm.js). Q13: נסרק — כן (api/utils/rich_text_sanitizer.py, שילוב ב־api/services/cash_flows.py create + update). **מאושר.**
+
+**סטטוס סבב:** ✅ **סבב מהיר נסגר במלואו** — כל 13 הפריטים (Q1–Q13) בוצעו/אושרו.
+
+---
+
+## עדכון: הודעות מימוש מסודר + וידוא §4.7 (2026-01-30)
+
+**הודעות לצוותים (מימוש מסודר):**
+- **Team 30:** `TEAM_10_TO_TEAM_30_CODE_EVIDENCE_AND_AB_CD_MANDATE.md` — S1, S2, S3 (Code Evidence §4.5), S6 (אימות A/B/C/D). תוצר נדרש: וידוא/תיקון + תשובה קצרה.
+- **Team 40:** `TEAM_10_TO_TEAM_40_HEADER_ICON_AND_BATCH1_MANDATE.md` — S4 (אייקון User לא שחור), S7 (Header Batch 1 — אישור ובעלות). תוצר נדרש: וידוא S4 + תשובה על S7.
+
+**ביצוע Team 10 — וידוא §4.7 (רשימת עמודים מלאה):** בוצע. מקורות: `ui/public/routes.json` (גרסה 1.1.2), `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` §4.6 (טבלת Routes רשמית). התאמה: routes.json מכסה auth (login, register, reset-password), financial (trading_accounts, brokers_fees, cash_flows), planning (trade_plans), research (trades_history); routes של React (/, /profile, /admin/design-system) מתועדים בטבלה ב־§4.6. מטריצת route→טיפוס רשמית ב־§4.6; public_routes מעודכן.
+
+**תשובות הצוותים — מימוש מסודר (Code Evidence + Header):**
+- **Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_CODE_EVIDENCE_AND_AB_CD_RESPONSE.md` — S1, S2, S3, S6 **מאומתים** (Home ללא ProtectedRoute; Redirect ל־/; שני containers; A/B/C/D + אייקון success/warning). כל הדרישות מתקיימות בקוד; לא בוצעו שינויים. **מאושר.**
+- **Team 40:** `_COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_HEADER_ICON_AND_BATCH1_RESPONSE.md` — S4 **מאומת** (אייקון User ברירת מחדל user-icon--alert; אין black; success/warning ב־CSS). S7 **מאושר/בבעלות Team 40** — תפריט רמה 2 RTL, גובה כפתורים, header-container padding מאומתים ומתוחזקים. **מאושר.**
+
+פריטים שנסגרו: S1, S2, S3, S4, S6, S7.
+
+---
+
 **Team 10 (The Gateway)**  
 **log_entry | GATE_A_KICKOFF_EVIDENCE | 2026-01-30**

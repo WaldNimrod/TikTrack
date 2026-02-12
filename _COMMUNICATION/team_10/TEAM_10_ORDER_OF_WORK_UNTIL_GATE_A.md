@@ -43,6 +43,8 @@ Team 10: אישור השלמה + מסירת קונטקסט ל־QA
 
 **יציאה משלב ‑1:** ✅ MAPPING_MODE נסגר (הודעה: `TEAM_10_MAPPING_MODE_CLOSURE_NOTICE.md`).
 
+**MAPPING_REQUIRED (מתי חל, איפה מתועד):** מצב **MAPPING_REQUIRED** חל **לפני פתיחת קידוד** לשלב/תוכנית חדשה — כלומר: יש להשלים את קבצי המיפוי (Routes Map, Data Map, CSS Plan per ADR-011 / `ARCHITECT_PRE_CODING_MAPPING_MANDATE.md`) ולקבל אישור ויזואלי (נמרוד) לפני כתיבת קוד. מתועד כאן (שלב ‑1), ב־`TEAM_10_VISUAL_GAPS_WORK_PLAN.md` (§4.6 טבלת Routes, §4.7 בדיקות מקדימות), וב־`TEAM_10_ARCHITECT_IMPLEMENTATION_TASK_MATRIX.md` (T10.1).
+
 ---
 
 ### שלב 0: גשר React/HTML (Bridge) — **BLOCKING (קודם לכל שלב)**

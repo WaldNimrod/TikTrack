@@ -191,7 +191,7 @@ async function populateAccountSelects() {
       accounts.forEach(account => {
         const option = document.createElement('option');
         option.value = account.externalUlid;
-        option.textContent = account.displayName || account.externalUlid;
+        option.textContent = account.accountName || account.account_name || account.displayName || account.externalUlid;
         select.appendChild(option);
       });
       

@@ -34,9 +34,10 @@ const ProfileView = () => {
   const [userInfoForm, setUserInfoForm] = useState({
     username: '',
     email: '',
+    phoneNumber: '',
     firstName: '',
     lastName: '',
-    icon: '',
+    displayName: '',
   });
   
   // Form state for password change
@@ -59,11 +60,12 @@ const ProfileView = () => {
   const [isSavingApiKeys, setIsSavingApiKeys] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [showPerplexityKey, setShowPerplexityKey] = useState(false);
+  const [phoneVerificationCode, setPhoneVerificationCode] = useState('');
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
   
   // Section toggle state
   const [openSections, setOpenSections] = useState({
     'section-0': true,
-    'section-1': true,
     'section-3': true,
   });
   
@@ -80,13 +82,14 @@ const ProfileView = () => {
         setIsLoadingUser(true);
         const user = await authService.getCurrentUser();
         setUserData(user);
-        // Populate form with user data
+        // Populate form with user data (API: phone_numbers → phoneNumber via apiToReact)
         setUserInfoForm({
           username: user.username || '',
           email: user.email || '',
+          phoneNumber: user.phoneNumber || user.phone_numbers || '',
           firstName: user.firstName || '',
           lastName: user.lastName || '',
-          icon: user.icon || '',
+          displayName: user.displayName || '',
         });
         debugLog('ProfileView', 'User data loaded', { userId: user.externalUlids });
       } catch (error) {
@@ -140,7 +143,14 @@ const ProfileView = () => {
     e.preventDefault();
     setIsUpdatingInfo(true);
     try {
-      await authService.updateUser(userInfoForm);
+      // Send only fields allowed by PUT /users/me (UserUpdate schema)
+      const payload = {
+        firstName: userInfoForm.firstName,
+        lastName: userInfoForm.lastName,
+        displayName: userInfoForm.displayName,
+        phoneNumber: userInfoForm.phoneNumber || null,
+      };
+      await authService.updateUser(payload);
       debugLog('ProfileView', 'User info updated');
       // Reload user data
       const user = await authService.getCurrentUser();
@@ -210,13 +220,6 @@ const ProfileView = () => {
       // Navigate anyway
       navigate('/');
     }
-  };
-
-  /**
-   * Handle Password Change Navigation
-   */
-  const handlePasswordChangeClick = () => {
-    navigate('/change-password');
   };
 
   if (isLoadingUser) {
@@ -315,15 +318,119 @@ const ProfileView = () => {
                                   />
                                 </div>
                                 <div className="col-12">
-                                  <label className="form-label" htmlFor="profileEmail">אימייל</label>
+                                  <label className="form-label form-label-with-verify" htmlFor="profileEmail">
+                                    אימייל
+                                    {userData && (
+                                      <span className={`profile-verify-icon ${userData.isEmailVerified ? 'profile-verify-icon--verified' : 'profile-verify-icon--not-verified'}`} title={userData.isEmailVerified ? 'מאומת' : 'לא מאומת'}>
+                                        {userData.isEmailVerified ? (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                        ) : (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                                        )}
+                                      </span>
+                                    )}
+                                  </label>
                                   <input 
                                     type="email" 
                                     id="profileEmail" 
-                                    className="form-control" 
+                                    className="form-control dir-ltr" 
                                     placeholder="הכנס כתובת אימייל"
+                                    readOnly
+                                    dir="ltr"
                                     value={userInfoForm.email}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, email: e.target.value })}
                                   />
+                                  <small className="form-text text-muted">אימייל לא ניתן לשינוי מכאן</small>
+                                  {userData && !userData.isEmailVerified && (
+                                    <div className="profile-verify-row">
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-secondary"
+                                        onClick={async () => {
+                                          try {
+                                            await authService.resendEmailVerification();
+                                            audit.log('ProfileView', 'Email verification sent');
+                                          } catch (e) {
+                                            audit.error('ProfileView', 'Resend email failed', e);
+                                          }
+                                        }}
+                                      >
+                                        שלח אימות
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="col-12">
+                                  <label className="form-label form-label-with-verify" htmlFor="profilePhone">
+                                    טלפון
+                                    {userData && (userData.phoneNumbers || userData.phoneNumber) && (
+                                      <span className={`profile-verify-icon ${userData.phoneVerified ? 'profile-verify-icon--verified' : 'profile-verify-icon--not-verified'}`} title={userData.phoneVerified ? 'מאומת' : 'לא מאומת'}>
+                                        {userData.phoneVerified ? (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                        ) : (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                                        )}
+                                      </span>
+                                    )}
+                                  </label>
+                                  <input 
+                                    type="tel" 
+                                    id="profilePhone" 
+                                    className="form-control dir-ltr" 
+                                    placeholder="+972501234567"
+                                    dir="ltr"
+                                    value={userInfoForm.phoneNumber}
+                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, phoneNumber: e.target.value })}
+                                  />
+                                  <small className="form-text text-muted dir-ltr">פורמט E.164 (למשל +972501234567)</small>
+                                  {userData && (userData.phoneNumbers || userData.phoneNumber) && !userData.phoneVerified && (
+                                    <div className="profile-verify-row">
+                                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                                        <button
+                                          type="button"
+                                          className="btn btn-sm btn-outline-secondary"
+                                          onClick={async () => {
+                                            try {
+                                              await authService.resendPhoneVerification();
+                                              audit.log('ProfileView', 'Phone verification code sent');
+                                            } catch (e) {
+                                              audit.error('ProfileView', 'Resend phone verification failed', e);
+                                            }
+                                          }}
+                                        >
+                                          שלח קוד
+                                        </button>
+                                        <input
+                                          type="text"
+                                          className="form-control form-control-sm profile-verify-code-input dir-ltr"
+                                          placeholder="קוד 6 ספרות"
+                                          maxLength={6}
+                                          value={phoneVerificationCode}
+                                          onChange={(e) => setPhoneVerificationCode(e.target.value.replace(/\D/g, ''))}
+                                        />
+                                        <button
+                                          type="button"
+                                          className="btn btn-sm btn-primary"
+                                          disabled={phoneVerificationCode.length !== 6 || isVerifyingPhone}
+                                          onClick={async () => {
+                                            if (phoneVerificationCode.length !== 6) return;
+                                            setIsVerifyingPhone(true);
+                                            try {
+                                              await authService.verifyPhone(phoneVerificationCode);
+                                              setPhoneVerificationCode('');
+                                              const u = await authService.getCurrentUser();
+                                              setUserData(u);
+                                            } catch (e) {
+                                              audit.error('ProfileView', 'Phone verification failed', e);
+                                            } finally {
+                                              setIsVerifyingPhone(false);
+                                            }
+                                          }}
+                                        >
+                                          {isVerifyingPhone ? 'מאמת...' : 'אימות'}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="col-md-6">
                                   <label className="form-label" htmlFor="profileFirstName">שם פרטי</label>
@@ -348,16 +455,15 @@ const ProfileView = () => {
                                   />
                                 </div>
                                 <div className="col-12">
-                                  <label className="form-label" htmlFor="profileIcon">אייקון משתמש</label>
+                                  <label className="form-label" htmlFor="profileDisplayName">שם תצוגה</label>
                                   <input 
                                     type="text" 
-                                    id="profileIcon" 
+                                    id="profileDisplayName" 
                                     className="form-control" 
-                                    placeholder="למשל: user"
-                                    value={userInfoForm.icon}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, icon: e.target.value })}
+                                    placeholder="שם שיוצג במערכת"
+                                    value={userInfoForm.displayName}
+                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, displayName: e.target.value })}
                                   />
-                                  <small className="form-text text-muted">הזינו שם אייקון מתוך IconSystem</small>
                                 </div>
                                 <div className="col-12">
                                   <div className="d-flex justify-content-end">
@@ -439,127 +545,11 @@ const ProfileView = () => {
                         <div className="d-flex justify-content-end action-buttons-row">
                           <button
                             type="button"
-                            className="btn btn-primary"
-                            onClick={handlePasswordChangeClick}
-                          >
-                            עדכן סיסמה
-                          </button>
-                          <button
-                            type="button"
                             className="btn btn-primary btn-logout"
                             onClick={handleLogout}
                           >
                             התנתק
                           </button>
-                        </div>
-                      </div>
-                    </tt-section-row>
-                  </div>
-                )}
-              </tt-section>
-
-              {/* Container 1: עריכת פרטי משתמש */}
-              <tt-section data-section="section-1">
-                {/* Section Header */}
-                <div className="index-section__header">
-                  <div className="index-section__header-title">
-                    <img 
-                      src="/images/icons/entities/user.svg" 
-                      alt="עריכת פרטי משתמש" 
-                      className="index-section__header-icon" 
-                      width="35" 
-                      height="35"
-                    />
-                    <h2 className="index-section__header-text">עריכת פרטי משתמש</h2>
-                  </div>
-                  <div className="index-section__header-meta">
-                    <span className="index-section__header-count">ניהול העדפות ומידע אישי</span>
-                  </div>
-                  <div className="index-section__header-actions">
-                    <button 
-                      className="index-section__header-toggle-btn js-section-toggle" 
-                      aria-label="הצג/הסתר"
-                      onClick={() => handleSectionToggle('section-1')}
-                      aria-expanded={openSections['section-1']}
-                    >
-                      <svg 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2"
-                      >
-                        <path d="M6 9l6 6l6 -6"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Section Body */}
-                {openSections['section-1'] && (
-                  <div className="index-section__body">
-                    <tt-section-row>
-                      <div className="col-12">
-                        {/* User Edit Form - Same as Container 0 but in single column */}
-                        <div className="card">
-                          <div className="card-body">
-                            <form id="userInfoForm2" onSubmit={handleUserInfoSubmit}>
-                              <div className="row g-3">
-                                <div className="col-md-6">
-                                  <label className="form-label" htmlFor="profileEmail2">אימייל</label>
-                                  <input 
-                                    type="email" 
-                                    id="profileEmail2" 
-                                    className="form-control" 
-                                    placeholder="הכנס כתובת אימייל"
-                                    value={userInfoForm.email}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, email: e.target.value })}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label" htmlFor="profileIcon2">אייקון משתמש</label>
-                                  <input 
-                                    type="text" 
-                                    id="profileIcon2" 
-                                    className="form-control" 
-                                    placeholder="למשל: user"
-                                    value={userInfoForm.icon}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, icon: e.target.value })}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label" htmlFor="profileFirstName2">שם פרטי</label>
-                                  <input 
-                                    type="text" 
-                                    id="profileFirstName2" 
-                                    className="form-control" 
-                                    placeholder="הכנס שם פרטי"
-                                    value={userInfoForm.firstName}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, firstName: e.target.value })}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label" htmlFor="profileLastName2">שם משפחה</label>
-                                  <input 
-                                    type="text" 
-                                    id="profileLastName2" 
-                                    className="form-control" 
-                                    placeholder="הכנס שם משפחה"
-                                    value={userInfoForm.lastName}
-                                    onChange={(e) => setUserInfoForm({ ...userInfoForm, lastName: e.target.value })}
-                                  />
-                                </div>
-                                <div className="col-12">
-                                  <div className="d-flex justify-content-end">
-                                    <button type="submit" className="btn btn-primary" disabled={isUpdatingInfo}>
-                                      {isUpdatingInfo ? 'מעדכן...' : 'עדכן פרטים'}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                          </div>
                         </div>
                       </div>
                     </tt-section-row>

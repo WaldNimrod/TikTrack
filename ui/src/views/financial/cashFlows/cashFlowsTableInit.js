@@ -228,40 +228,13 @@ function normalizeTradingAccountId(value) {
    * Initialize internal filter handlers
    */
   function initInternalFilterHandlers() {
-    const dateFromInput = document.getElementById('cashFlowsDateFrom');
-    const dateToInput = document.getElementById('cashFlowsDateTo');
-    const accountSelect = document.getElementById('cashFlowsAccount');
     const typeSelect = document.getElementById('cashFlowsType');
-    const searchInput = document.getElementById('cashFlowsSearch');
-    
-    let filterTimeout;
-    
-    function applyInternalFilters() {
-      clearTimeout(filterTimeout);
-      filterTimeout = setTimeout(function() {
-        cashFlowsPage = 1;
-        loadAllData();
-      }, 300);
-    }
-    
-    if (dateFromInput) {
-      dateFromInput.addEventListener('change', applyInternalFilters);
-    }
-    
-    if (dateToInput) {
-      dateToInput.addEventListener('change', applyInternalFilters);
-    }
-    
-    if (accountSelect) {
-      accountSelect.addEventListener('change', applyInternalFilters);
-    }
     
     if (typeSelect) {
-      typeSelect.addEventListener('change', applyInternalFilters);
-    }
-    
-    if (searchInput) {
-      searchInput.addEventListener('input', applyInternalFilters);
+      typeSelect.addEventListener('change', function() {
+        cashFlowsPage = 1;
+        loadAllData();
+      });
     }
   }
   
@@ -277,19 +250,13 @@ function normalizeTradingAccountId(value) {
    */
   async function loadAllData() {
     try {
-      // Get internal filter values
-      // SSOT v1.2.0: Use flowType (not type) and tradingAccountId (not tradingAccount) for API
-      const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
-      const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
-      const account = document.getElementById('cashFlowsAccount')?.value || '';
+      // Filters from page header (global) + flowType (internal only filter kept)
       const flowType = document.getElementById('cashFlowsType')?.value || '';
-      const search = document.getElementById('cashFlowsSearch')?.value || '';
-      
-      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
-      const tradingAccountId = currentFilters?.tradingAccount || account || undefined;
       const dateRange = currentFilters?.dateRange;
-      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
-      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      const tradingAccountId = currentFilters?.tradingAccount || undefined;
+      const search = currentFilters?.search || undefined;
+      const dateFromFromRange = dateRange?.from || undefined;
+      const dateToFromRange = dateRange?.to || undefined;
       
       const filters = {
         dateFrom: dateFromFromRange,
@@ -326,20 +293,12 @@ function normalizeTradingAccountId(value) {
    */
   async function loadCashFlowsTableData() {
     try {
-      // SSOT v1.2.0: Use flowType (not type) and tradingAccountId (not tradingAccount) for API
-      const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
-      const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
-      const account = document.getElementById('cashFlowsAccount')?.value || '';
       const flowType = document.getElementById('cashFlowsType')?.value || '';
-      const search = document.getElementById('cashFlowsSearch')?.value || '';
-      
-      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
-      // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
-      const rawTradingAccountId = currentFilters?.tradingAccount || account || undefined;
-      const tradingAccountId = normalizeTradingAccountId(rawTradingAccountId);
       const dateRange = currentFilters?.dateRange;
-      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
-      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      const tradingAccountId = normalizeTradingAccountId(currentFilters?.tradingAccount);
+      const search = currentFilters?.search || undefined;
+      const dateFromFromRange = dateRange?.from || undefined;
+      const dateToFromRange = dateRange?.to || undefined;
       
       const filters = {
         dateFrom: dateFromFromRange,
@@ -370,18 +329,10 @@ function normalizeTradingAccountId(value) {
    */
   async function loadCurrencyConversionsTableData() {
     try {
-      // SSOT v1.2.0: Use tradingAccountId (not tradingAccount) for API
-      const dateFrom = document.getElementById('cashFlowsDateFrom')?.value || '';
-      const dateTo = document.getElementById('cashFlowsDateTo')?.value || '';
-      const account = document.getElementById('cashFlowsAccount')?.value || '';
-      
-      // Map global filters: tradingAccount → tradingAccountId, dateRange → dateFrom/dateTo
-      // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
-      const rawTradingAccountId = currentFilters?.tradingAccount || account || undefined;
-      const tradingAccountId = normalizeTradingAccountId(rawTradingAccountId);
       const dateRange = currentFilters?.dateRange;
-      const dateFromFromRange = dateRange?.from || dateFrom || undefined;
-      const dateToFromRange = dateRange?.to || dateTo || undefined;
+      const tradingAccountId = normalizeTradingAccountId(currentFilters?.tradingAccount);
+      const dateFromFromRange = dateRange?.from || undefined;
+      const dateToFromRange = dateRange?.to || undefined;
       
       const filters = {
         dateFrom: dateFromFromRange,
@@ -423,7 +374,6 @@ function normalizeTradingAccountId(value) {
     const monthlyWithdrawalsEl = document.getElementById('monthlyWithdrawals');
     const weeklyFlowsEl = document.getElementById('weeklyFlows');
     const monthlyConversionsEl = document.getElementById('monthlyConversions');
-    const cashFlowsCountEl = document.getElementById('cashFlowsCount');
     const tableCashFlowsCountEl = document.getElementById('tableCashFlowsCount');
     const currencyConversionsCountEl = document.getElementById('currencyConversionsCount');
     
@@ -451,7 +401,6 @@ function normalizeTradingAccountId(value) {
     }
     if (weeklyFlowsEl) weeklyFlowsEl.textContent = summary.weeklyFlows || 0;
     if (monthlyConversionsEl) monthlyConversionsEl.textContent = summary.monthlyConversions || 0;
-    if (cashFlowsCountEl) cashFlowsCountEl.textContent = `${summary.totalFlows || 0} תנועות`;
     if (tableCashFlowsCountEl) tableCashFlowsCountEl.textContent = `${cashFlowsData.total || 0} תנועות`;
     if (currencyConversionsCountEl) currencyConversionsCountEl.textContent = `${currencyConversionsData.total || 0} המרות`;
   }
@@ -480,32 +429,41 @@ function normalizeTradingAccountId(value) {
       const flowId = flow.externalUlid || flow.external_ulid || flow.id || '';
       row.setAttribute('data-flow-id', flowId);
       
-      // Trade
+      // Trade - placeholder until API has trade link (ticker + long/short arrow)
       const tradeCell = document.createElement('td');
       tradeCell.className = 'phoenix-table__cell col-trade';
       tradeCell.setAttribute('data-field', 'trade');
-      tradeCell.textContent = flow.trade || '';
+      const tradeDisplay = flow.trade || flow.tradeId
+        ? String(flow.trade || flow.tradeId)
+        : '—'; // TODO: When trades linked - show ticker + ↗ (long) or ↘ (short)
+      tradeCell.textContent = tradeDisplay;
       row.appendChild(tradeCell);
       
-      // Account
+      // Account - API returns accountName (camelCase) or account_name (snake_case)
       const accountCell = document.createElement('td');
       accountCell.className = 'phoenix-table__cell col-account';
       accountCell.setAttribute('data-field', 'account');
-      accountCell.textContent = flow.account || '';
+      accountCell.textContent = flow.accountName || flow.account_name || flow.account || '—';
       row.appendChild(accountCell);
       
-      // Type (badge)
+      // Type (badge) - API returns flowType (camelCase) or flow_type (snake_case)
       const typeCell = document.createElement('td');
       typeCell.className = 'phoenix-table__cell col-type';
       typeCell.setAttribute('data-field', 'type');
       typeCell.setAttribute('dir', 'rtl');
       const badge = document.createElement('span');
       badge.className = 'phoenix-table__status-badge operation-type-badge';
-      const flowType = (flow.type || '').toLowerCase();
-      const isPositive = flowType === 'deposit' || flowType === 'execution';
-      badge.setAttribute('data-operation-type', flowType);
-      badge.setAttribute('data-type-positive', isPositive);
-      badge.textContent = flow.type || '';
+      const flowTypeVal = (flow.flowType || flow.flow_type || flow.type || '').toLowerCase();
+      const flowTypeLabels = {
+        deposit: 'הפקדה',
+        withdrawal: 'משיכה',
+        dividend: 'דיבידנד',
+        interest: 'ריבית',
+        fee: 'עמלה',
+        other: 'אחר'
+      };
+      badge.setAttribute('data-operation-type', flowTypeVal);
+      badge.textContent = flowTypeLabels[flowTypeVal] || flow.flowType || flow.flow_type || flow.type || '—';
       typeCell.appendChild(badge);
       row.appendChild(typeCell);
       
@@ -522,11 +480,11 @@ function normalizeTradingAccountId(value) {
       amountCell.appendChild(amountSpan);
       row.appendChild(amountCell);
       
-      // Date
+      // Date - API returns transactionDate (camelCase) or transaction_date (snake_case)
       const dateCell = document.createElement('td');
       dateCell.className = 'phoenix-table__cell col-date phoenix-table__cell--date';
       dateCell.setAttribute('data-field', 'date');
-      dateCell.textContent = formatDate(flow.date || '');
+      dateCell.textContent = formatDate(flow.transactionDate || flow.transaction_date || flow.date || '');
       row.appendChild(dateCell);
       
       // Description
@@ -536,18 +494,18 @@ function normalizeTradingAccountId(value) {
       descriptionCell.textContent = flow.description || '';
       row.appendChild(descriptionCell);
       
-      // Source
+      // Source - API may return externalReference (camelCase) as source
       const sourceCell = document.createElement('td');
       sourceCell.className = 'phoenix-table__cell col-source';
       sourceCell.setAttribute('data-field', 'source');
-      sourceCell.textContent = flow.source || '';
+      sourceCell.textContent = flow.externalReference || flow.external_reference || flow.source || '—';
       row.appendChild(sourceCell);
       
-      // Updated
+      // Updated - API does not currently return updated_at; show when available
       const updatedCell = document.createElement('td');
       updatedCell.className = 'phoenix-table__cell col-updated phoenix-table__cell--date';
       updatedCell.setAttribute('data-field', 'updated');
-      updatedCell.textContent = formatDate(flow.updated || '');
+      updatedCell.textContent = formatDate(flow.updatedAt || flow.updated_at || flow.updated || '');
       row.appendChild(updatedCell);
       
       // Actions

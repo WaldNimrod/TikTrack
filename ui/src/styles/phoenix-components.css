@@ -974,6 +974,30 @@ body .page-wrapper .page-container main {
   color: var(--apple-orange, #ff9500) !important;
 }
 
+.operation-type-badge[data-operation-type="dividend"] {
+  background: rgba(88, 86, 214, 0.1) !important;
+  border-color: var(--apple-indigo, #5856d6) !important;
+  color: var(--apple-indigo, #5856d6) !important;
+}
+
+.operation-type-badge[data-operation-type="interest"] {
+  background: rgba(90, 200, 250, 0.1) !important;
+  border-color: var(--apple-cyan, #5ac8fa) !important;
+  color: var(--apple-cyan, #5ac8fa) !important;
+}
+
+.operation-type-badge[data-operation-type="fee"] {
+  background: rgba(255, 45, 85, 0.1) !important;
+  border-color: var(--apple-pink, #ff2d55) !important;
+  color: var(--apple-pink, #ff2d55) !important;
+}
+
+.operation-type-badge[data-operation-type="other"] {
+  background: rgba(142, 142, 147, 0.15) !important;
+  border-color: var(--apple-gray, #8e8e93) !important;
+  color: var(--apple-text-secondary, #8e8e93) !important;
+}
+
 .operation-type-badge {
   padding: 2px 8px !important;
   border-radius: 4px !important;
@@ -1549,4 +1573,43 @@ body .page-wrapper .page-container main {
 .design-system-color-var {
   font-size: 0.8rem;
   font-family: 'Courier New', monospace;
+}
+
+/* Profile view - phone verification code input */
+.profile-verify-code-input {
+  width: 6em;
+}
+
+/* Profile view - inline verification (icon next to label) */
+.form-label-with-verify {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.profile-verify-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.profile-verify-icon--verified {
+  color: var(--color-success, #28a745);
+}
+
+.profile-verify-icon--not-verified {
+  color: var(--color-error-red, #dc2626);
+}
+
+.profile-verify-row {
+  margin-top: var(--spacing-xs, 4px);
+}
+
+/* Override: .dir-ltr must win over .form-control RTL (Profile, auth forms, etc.) */
+input.dir-ltr,
+.form-control.dir-ltr,
+.form-text.dir-ltr,
+.dir-ltr {
+  direction: ltr !important;
+  text-align: left !important;
 }

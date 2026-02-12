@@ -322,7 +322,8 @@ const authService = {
     audit.log('Auth', 'Resend phone verification started');
     try {
       const userData = await this.getCurrentUser();
-      const phoneNumber = userData?.phoneNumbers?.[0] ?? userData?.phoneNumber;
+      // API returns phone_numbers (string); apiToReact → phoneNumbers
+      const phoneNumber = userData?.phoneNumbers ?? userData?.phoneNumber;
       if (!phoneNumber) throw new Error('לא נמצא מספר טלפון במערכת');
 
       await ensureInit();

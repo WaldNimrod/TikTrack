@@ -427,6 +427,13 @@
    Level 2: Base Styles (Override Pico CSS)
    ============================================ */
 
+/* Utility: LTR text (email, phone, codes) - reusable across all pages */
+/* CRITICAL: !important to override inherited RTL from html/body */
+.dir-ltr {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
 /* HTML root settings */
 html {
   direction: rtl;

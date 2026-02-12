@@ -75,7 +75,7 @@
 
 #unified-header .header-container {
   margin: 0 auto;
-  padding: clamp(12px, 2vw, 16px) clamp(10px, 1.5vw, 16px); /* Fluid padding - replaces Media Query */
+  padding: 0 clamp(10px, 1.5vw, 16px); /* 0 top/bottom; fluid horizontal padding */
   display: flex;
   flex-wrap: wrap; /* Fluid Design - wrap when needed */
   justify-content: space-between;
@@ -299,9 +299,9 @@
 /* ===== Dropdown Menu Styles - EXACT COPY FROM ORIGINAL ===== */
 #unified-header .tiktrack-dropdown-menu {
   position: absolute;
-  top: calc(100% + 3px);
-  inset-inline-end: 0; /* Aligned to start of button (right in RTL) */
-  inset-inline-start: auto; /* Goes left from there */
+  top: calc(100% - 2px); /* Raised by 15px from previous position (13px) - now closer to L1 button */
+  inset-inline-start: 0; /* RTL: right edge of menu aligns with right edge of L1 button */
+  inset-inline-end: auto; /* Extends leftward */
   background: rgba(255, 255, 255, 0.95); /* Semi-transparent - match legacy */
   backdrop-filter: blur(10px);
   border: 1px solid #e5e5e5;
@@ -309,9 +309,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 180px; /* Smaller width - match legacy */
   max-width: 200px;
-  padding: 0.0625rem 0 !important; /* CRITICAL: Much less padding - half of 0.125rem for tighter spacing - !important to override any other rules */
-  padding-top: 0.0625rem !important;
-  padding-bottom: 0.0625rem !important;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem !important; /* RTL: right large (0.75rem), left small (0.5rem) */
+  padding-top: 0.5rem !important;
+  padding-inline-end: 0.5rem !important; /* RTL: small padding from right side (visual left) */
+  padding-bottom: 0.5rem !important;
+  padding-inline-start: 0.75rem !important; /* RTL: large padding from left side (visual right) */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -320,7 +322,7 @@
   list-style: none;
   display: flex; /* Use flex to ensure vertical stacking */
   flex-direction: column; /* Stack items vertically */
-  gap: 0 !important; /* CRITICAL: No gap between items - spacing comes from padding only */
+  gap: 0.25rem !important; /* Increased gap between buttons - spacing between items */
 }
 
 /* Dropdown menu visible on hover - EXACT from blueprint */
@@ -359,19 +361,19 @@
   transform: rotate(180deg);
 }
 
-/* Main Menu Items (Level 1) - Negative margin for tighter spacing */
+/* Main Menu Items (Level 2) - no negative margin; vertical padding provides height */
 #unified-header .tiktrack-dropdown-menu > li > .tiktrack-dropdown-item {
-  margin-bottom: -7px !important; /* Negative margin for tighter spacing between items - MAIN MENU ONLY */
+  margin-bottom: 0 !important;
 }
 
 /* All dropdown items - base styles */
 #unified-header .tiktrack-dropdown-item {
   display: block;
-  padding: var(--spacing-xs, 2px) 1rem var(--spacing-xs, 2px) 0.25rem !important; /* Small padding top/bottom using spacing-xs (2px), more padding from right (RTL) - !important to override any other rules */
-  padding-top: var(--spacing-xs, 2px) !important; /* Small padding top - using spacing-xs */
-  padding-right: 1rem !important; /* RTL: this is actually left */
-  padding-bottom: var(--spacing-xs, 2px) !important; /* Small padding bottom - using spacing-xs */
-  padding-left: 0.25rem !important; /* RTL: this is actually right */
+  padding: 0.5rem 1rem 0.5rem 0.5rem !important; /* Increased vertical padding for touch targets - RTL horizontal */
+  padding-top: 0.5rem !important;
+  padding-inline-end: 1rem !important; /* RTL: more padding from text side */
+  padding-bottom: 0.5rem !important;
+  padding-inline-start: 0.5rem !important; /* RTL: less padding from edge */
   color: #29a6a8;
   text-decoration: none;
   transition: all 0.2s ease;

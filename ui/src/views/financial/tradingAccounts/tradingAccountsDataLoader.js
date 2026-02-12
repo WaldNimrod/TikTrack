@@ -556,7 +556,7 @@ async function loadContainer1(filters = {}) {
         : '<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">לא פעיל</span>';
       
       row.innerHTML = `
-        <td class="phoenix-table__cell col-name" role="cell">${account.displayName || ''}</td>
+        <td class="phoenix-table__cell col-name" role="cell">${account.accountName || account.account_name || account.displayName || ''}</td>
         <td class="phoenix-table__cell col-currency" role="cell">${account.currency || ''}</td>
         <td class="phoenix-table__cell col-balance" role="cell">
           <span class="numeric-value-positive" dir="ltr">${formatCurrency(parseFloat(account.balance || 0), account.currency || 'USD', 2)}</span>

@@ -9,7 +9,8 @@
 
 **הפעלה מחייבת:** `TEAM_90_TO_TEAM_10_ADR_013_SLA_ACTIVATION_MANDATE.md` — הודעה מרכזית אחת; החלטות ADR‑013 ושלב המיפוי המקדים מחייבים. **אין קידוד לפני** קובצי מיפוי + אישור ויזואלי (נמרוד). דוח עדכון ל‑Team 90 לפני פנייה לאדריכלית.
 
-**סטטוס שער א':** ✅ **Gate A מאושר** (2026-02-10) — Passed 11, Failed 0, 0 SEVERE. SSOT: `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`. הצעד הבא: משימות ויזואליות (3–7) והכנה לשער ב'.
+**סטטוס שער א':** ✅ **Gate A מאושר** (2026-02-10) — Passed 11, Failed 0, 0 SEVERE. SSOT: `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`.  
+**סטטוס שער ב':** ✅ **Gate B מאושר** (2026-02-11) — E2E 5/5, Round-trip BE PASS. SSOT: `TEAM_10_GATE_B_APPROVAL_AND_STATUS.md`. הצעד הבא: שער ג' (אישור ויזואלי) / Design Fidelity לפי נוהל.
 
 ---
 
@@ -72,11 +73,12 @@
 | **1** | **שער אוטנטיקציה — 4 טיפוסים (A/B/C/D)** | ADR‑013 LOCKED. |
 | 2 | Header תמיד אחרי Login → Home (משימה 7) | Header Loader לפני React mount — חסימת UX |
 | **שער א'** | **Gate A — אושר** | ✅ Passed 11, Failed 0, 0 SEVERE. ראה `TEAM_10_GATE_A_FINAL_APPROVAL_AND_STATUS.md`. |
-| 3 | Select vs Text + Rich Text (משימות 1, 2) | Broker API GET /api/v1/reference/brokers; TipTap (LOCKED) — **הצעד הבא** |
-| 4 | סדר כפתורים במודל + RTL (משימה 3) | |
-| 5 | צבע כותרת מודל לפי Entity (משימה 4) | |
-| 6 | תקנון כפתורים גלובלי (משימה 5) | DNA_BUTTON_SYSTEM (ADR‑013) |
-| 7 | דף טבלת צבעים דינמית (משימה 6) | **/admin/design-system** (Type D) |
+| 3 | Select vs Text + Rich Text (משימות 1, 2) | ✅ Broker API, TipTap, Rich-Text, Design System — הושלמו. |
+| 4 | סדר כפתורים במודל + RTL (משימה 3) | ✅ |
+| 5 | צבע כותרת מודל לפי Entity (משימה 4) | ✅ |
+| 6 | תקנון כפתורים גלובלי (משימה 5) | ✅ DNA_BUTTON_SYSTEM |
+| 7 | דף טבלת צבעים דינמית (משימה 6) | ✅ **/admin/design-system** (Type D) |
+| **שער ב'** | **Gate B — אושר** | ✅ E2E 5/5, Round-trip BE PASS (2026-02-11). ראה `TEAM_10_GATE_B_APPROVAL_AND_STATUS.md`. הצעד הבא: שער ג' / Design Fidelity. |
 
 ---
 
@@ -143,7 +145,7 @@
 | /login | login.html | **A) Open** | |
 | /register | register.html | **A) Open** | |
 | **/reset-password** | **PasswordResetFlow.jsx** (blueprint: D15_RESET_PWD.html) | **A) Open** | **ADR‑013 LOCKED** — מאושר כ־Open; Header מוסתר. |
-| /profile (או path פרופיל) | D15_PROF_VIEW | **C) Auth-only** או **D)** | להחלטה |
+| /profile (או path פרופיל) | D15_PROF_VIEW | **C) Auth-only** | עמוד פרופיל משתמש — למשתמשים רשומים בלבד. החלטה: `TEAM_10_DECISION_PROFILE_ROUTE.md`. |
 | /trading_accounts | trading_accounts.html (D16) | **C) Auth-only** | |
 | /brokers_fees | brokers_fees.html (D18) | **C) Auth-only** | |
 | /cash_flows | cash_flows.html (D21) | **C) Auth-only** | |
@@ -155,9 +157,9 @@
 
 ### 4.7 בדיקות מקדימות לשער 0
 
-- [ ] וידוא רשימת עמודים מלאה (כל ה־routes + דאשבורד/פרופיל).  
+- [x] וידוא רשימת עמודים מלאה (כל ה־routes + דאשבורד/פרופיל) — **בוצע:** טבלה רשמית ב־§4.6; התאמה ל־`ui/public/routes.json`.  
 - [ ] החלטת אדריכל: מיפוי סופי A/B/C/D לכל עמוד; התנהגות redirect ל־D (Home vs 403).  
-- [ ] מיפוי ותיעוד: מטריצה route → טיפוס; עדכון routes.json/SSOT.  
+- [x] מיפוי ותיעוד: **מטריצת route→טיפוס רשמית:** §4.6 במסמך זה (טבלת Routes). עדכון routes.json/SSOT — לפי צורך.  
 - [ ] רק לאחר מכן: יישום קוד (Guard, redirect, Home containers, User Icon).
 
 ### 4.8 משימות משנה ואחראים

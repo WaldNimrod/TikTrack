@@ -70,9 +70,6 @@
                 <img src="/images/icons/entities/cash_flows.svg" alt="תזרימי מזומנים" class="index-section__header-icon" width="35" height="35">
                 <h1 class="index-section__header-text">תזרימי מזומנים</h1>
               </div>
-              <div class="index-section__header-meta">
-                <span class="index-section__header-count" id="cashFlowsCount">0 תנועות</span>
-              </div>
               <div class="index-section__header-actions">
                 <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -86,6 +83,28 @@
             <div class="index-section__body">
               <tt-section-row>
                 <div class="col-12">
+                  <!-- Active Alerts (like home page) -->
+                  <div class="active-alerts" data-role="container">
+                    <div class="active-alerts__header">
+                      <div class="active-alerts__title-group">
+                        <button type="button" class="active-alerts__title-trigger" aria-label="פתח עמוד ההתראות">
+                          <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
+                          <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
+                        </button>
+                        <span class="active-alerts__count-badge" data-role="count" aria-live="polite" id="cashFlowsAlertsCount">0</span>
+                      </div>
+                      <div class="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
+                    </div>
+                    <div class="active-alerts__body">
+                      <div class="active-alerts__list" data-role="list" role="list" id="cashFlowsAlertsList">
+                        <!-- Alert cards populated dynamically when API available -->
+                      </div>
+                      <div class="active-alerts__empty" data-role="empty-state" id="cashFlowsAlertsEmpty">
+                        <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
+                        <span class="active-alerts__empty-text">אין התראות חדשות</span>
+                      </div>
+                    </div>
+                  </div>
                   <!-- Summary Information -->
                   <div class="info-summary" id="summaryStats">
                     <!-- First Row: Summary Stats -->
@@ -129,7 +148,7 @@
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="/images/icons/entities/cash_flows.svg" alt="תזרימי מזומנים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">יומן תנועות מזומנים (הפקדות/משיכות)</h1>
+                <h1 class="index-section__header-text">יומן תנועות מזומנים</h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count" id="tableCashFlowsCount">0 תנועות</span>
@@ -153,33 +172,19 @@
               <tt-section-row>
                 <div class="col-12">
                   
-                  <!-- Internal Filters -->
+                  <!-- Internal Filters (flowType only - account/date/search in page header) -->
                   <div class="phoenix-table-filters">
-                    <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">טווח תאריכים:</label>
-                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_from" id="cashFlowsDateFrom">
-                      <span>עד</span>
-                      <input type="date" class="phoenix-table-filter-input js-table-filter" data-filter-key="date_to" id="cashFlowsDateTo">
-                    </div>
-                    <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">חשבון:</label>
-                      <select class="phoenix-table-filter-select js-table-filter" data-filter-key="account" id="cashFlowsAccount">
-                        <option value="">כל החשבונות</option>
-                      </select>
-                    </div>
                     <div class="phoenix-table-filter-group">
                       <label class="phoenix-table-filter-label">סוג תנועה:</label>
                       <select class="phoenix-table-filter-select js-table-filter" data-filter-key="flowType" id="cashFlowsType">
                         <option value="">כל הסוגים</option>
-                        <option value="deposit">הפקדה</option>
-                        <option value="withdrawal">משיכה</option>
-                        <option value="transfer">העברה</option>
-                        <option value="execution">ביצוע</option>
+                        <option value="DEPOSIT">הפקדה</option>
+                        <option value="WITHDRAWAL">משיכה</option>
+                        <option value="DIVIDEND">דיבידנד</option>
+                        <option value="INTEREST">ריבית</option>
+                        <option value="FEE">עמלה</option>
+                        <option value="OTHER">אחר</option>
                       </select>
-                    </div>
-                    <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">חיפוש:</label>
-                      <input type="text" class="phoenix-table-filter-input js-table-filter" data-filter-key="search" id="cashFlowsSearch" placeholder="חיפוש...">
                     </div>
                   </div>
                   

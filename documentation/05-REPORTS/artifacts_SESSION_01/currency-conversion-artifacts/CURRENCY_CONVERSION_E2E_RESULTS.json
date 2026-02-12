@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-02-12T20:54:22.728Z",
+  "results": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "logs": [
+    {
+      "test": "CC_D21_Display",
+      "status": "START",
+      "timestamp": "2026-02-12T20:54:16.935Z",
+      "details": {
+        "message": "D21 table shows המרת מטבע"
+      }
+    },
+    {
+      "test": "CC_D21_Display",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:54:16.991Z",
+      "details": {
+        "message": "רשומה עם סוג \"המרת מטבע\" נמצאה"
+      }
+    },
+    {
+      "test": "CC_D21_AddForm",
+      "status": "START",
+      "timestamp": "2026-02-12T20:54:16.991Z",
+      "details": {
+        "message": "אופציית המרת מטבע בטופס"
+      }
+    },
+    {
+      "test": "CC_D21_AddForm",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:54:19.077Z",
+      "details": {
+        "message": "אופציית \"המרת מטבע\" זמינה בטופס"
+      }
+    },
+    {
+      "test": "CC_D21_Filter",
+      "status": "START",
+      "timestamp": "2026-02-12T20:54:19.606Z",
+      "details": {
+        "message": "סינון לפי המרת מטבע"
+      }
+    },
+    {
+      "test": "CC_D21_Filter",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:54:22.670Z",
+      "details": {
+        "message": "סינון הופעל (רשומות מסוננות)",
+        "count": 2
+      }
+    }
+  ]
+}

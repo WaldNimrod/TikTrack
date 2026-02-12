@@ -26,6 +26,7 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toCanonicalStatus, toHebrewStatus } from '../../../utils/statusAdapter.js';
+import { toFlowTypeLabel } from '../../../utils/flowTypeValues.js';
 
 /**
  * Validate ULID format
@@ -708,16 +709,6 @@ async function loadContainer3(filters = {}) {
         return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
       });
       
-      const flowTypeLabels = {
-        'DEPOSIT': 'הפקדה',
-        'WITHDRAWAL': 'משיכה',
-        'DIVIDEND': 'דיבידנד',
-        'INTEREST': 'ריבית',
-        'FEE': 'עמלה',
-        'CURRENCY_CONVERSION': 'המרת מטבע',
-        'OTHER': 'אחר'
-      };
-      
       const statusBadge = flow.status === 'VERIFIED' 
         ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--active">מאומת</span>'
         : flow.status === 'PENDING'
@@ -727,7 +718,7 @@ async function loadContainer3(filters = {}) {
       const flowTypeVal = flow.flowType || flow.flow_type || '';
       row.innerHTML = `
         <td class="phoenix-table__cell col-date" role="cell">${formatDate(flow.transactionDate || '')}</td>
-        <td class="phoenix-table__cell col-type" role="cell">${flowTypeLabels[flowTypeVal] || flowTypeVal || ''}</td>
+        <td class="phoenix-table__cell col-type" role="cell">${toFlowTypeLabel(flowTypeVal) || flowTypeVal || ''}</td>
         <td class="phoenix-table__cell col-subtype" role="cell">${flow.subtype || ''}</td>
         <td class="phoenix-table__cell col-account" role="cell">${flow.accountName || ''}</td>
         <td class="phoenix-table__cell col-amount" role="cell">

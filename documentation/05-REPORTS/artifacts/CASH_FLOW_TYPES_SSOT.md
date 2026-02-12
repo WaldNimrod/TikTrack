@@ -35,4 +35,5 @@
 | **DB Table Script** | `scripts/create_d16_tables.sql` — CHECK |
 | **API Model** | `api/models/cash_flows.py` — CheckConstraint |
 | **API Service** | `api/services/cash_flows.py` — `valid_flow_types` |
-| **UI Form** | `ui/src/views/financial/cashFlows/cashFlowsForm.js` — select options |
+| **UI SSOT** | `ui/src/utils/flowTypeValues.js` — `FLOW_TYPE_VALUES`, `toFlowTypeLabel`, `getFlowTypeOptions` |
+| **UI Form** | `ui/src/views/financial/cashFlows/cashFlowsForm.js` — uses `getFlowTypeOptions()` |

@@ -8,6 +8,7 @@
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/Shared_Services.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { getFlowTypeOptions } from '../../../utils/flowTypeValues.js';
 import { createPhoenixRichTextEditor } from '../../../components/shared/phoenixRichTextEditor.js';
 
 /**
@@ -53,6 +54,7 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
   const tradingAccountId = data?.tradingAccountId || data?.trading_account_id || '';
   const transactionDate = data?.transactionDate || data?.transaction_date || new Date().toISOString().split('T')[0];
   const flowType = data?.flowType || data?.flow_type || 'DEPOSIT';
+  const flowTypeOptions = getFlowTypeOptions();
   const amount = data?.amount || 0;
   const currency = data?.currency || 'USD';
   const description = data?.description || '';
@@ -98,13 +100,7 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
         <div class="form-group">
           <label for="flowType">סוג תנועה <span class="form-label-asterisk">*</span></label>
           <select id="flowType" name="flowType" required>
-            <option value="DEPOSIT" ${flowType === 'DEPOSIT' ? 'selected' : ''}>הפקדה</option>
-            <option value="WITHDRAWAL" ${flowType === 'WITHDRAWAL' ? 'selected' : ''}>משיכה</option>
-            <option value="DIVIDEND" ${flowType === 'DIVIDEND' ? 'selected' : ''}>דיבידנד</option>
-            <option value="INTEREST" ${flowType === 'INTEREST' ? 'selected' : ''}>ריבית</option>
-            <option value="FEE" ${flowType === 'FEE' ? 'selected' : ''}>עמלה</option>
-            <option value="CURRENCY_CONVERSION" ${flowType === 'CURRENCY_CONVERSION' ? 'selected' : ''}>המרת מטבע</option>
-            <option value="OTHER" ${flowType === 'OTHER' ? 'selected' : ''}>אחר</option>
+            ${flowTypeOptions.map(opt => `<option value="${opt.value}" ${flowType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('\n            ')}
           </select>
           <span class="form-error" id="flowTypeError"></span>
         </div>

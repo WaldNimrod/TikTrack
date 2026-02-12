@@ -8,6 +8,7 @@
 import { loadCashFlowsData } from './cashFlowsDataLoader.js';
 import sharedServices from '../../../components/core/Shared_Services.js';
 import { showCashFlowFormModal } from './cashFlowsForm.js';
+import { toFlowTypeLabel } from '../../../utils/flowTypeValues.js';
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
@@ -446,25 +447,16 @@ function normalizeTradingAccountId(value) {
       accountCell.textContent = flow.accountName || flow.account_name || flow.account || '—';
       row.appendChild(accountCell);
       
-      // Type (badge) - API returns flowType (camelCase) or flow_type (snake_case)
+      // Type (badge) - API returns flowType (camelCase) or flow_type (snake_case); SSOT via flowTypeValues
       const typeCell = document.createElement('td');
       typeCell.className = 'phoenix-table__cell col-type';
       typeCell.setAttribute('data-field', 'type');
       typeCell.setAttribute('dir', 'rtl');
       const badge = document.createElement('span');
       badge.className = 'phoenix-table__status-badge operation-type-badge';
-      const flowTypeVal = (flow.flowType || flow.flow_type || flow.type || '').toLowerCase();
-      const flowTypeLabels = {
-        deposit: 'הפקדה',
-        withdrawal: 'משיכה',
-        dividend: 'דיבידנד',
-        interest: 'ריבית',
-        fee: 'עמלה',
-        currency_conversion: 'המרת מטבע',
-        other: 'אחר'
-      };
-      badge.setAttribute('data-operation-type', flowTypeVal);
-      badge.textContent = flowTypeLabels[flowTypeVal] || flow.flowType || flow.flow_type || flow.type || '—';
+      const flowTypeVal = flow.flowType || flow.flow_type || flow.type || '';
+      badge.setAttribute('data-operation-type', flowTypeVal.toLowerCase());
+      badge.textContent = toFlowTypeLabel(flowTypeVal) || '—';
       typeCell.appendChild(badge);
       row.appendChild(typeCell);
       

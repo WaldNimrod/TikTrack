@@ -65,14 +65,10 @@ class SharedServices {
       
       this.routesConfig = await response.json(); // Uses setter which exposes to window
       
-      // Verify routes.json version
-      if (this.routesConfig.version !== '1.1.2') {
-        const isProduction = window.location.hostname !== 'localhost';
-        if (isProduction) {
-          throw new Error(`routes.json version mismatch in Production. Expected v1.1.2, got: ${this.routesConfig.version}`);
-        } else {
-          console.warn(`[Shared Services] routes.json version mismatch in Development. Expected v1.1.2, got: ${this.routesConfig.version}`);
-        }
+      // ADR-016: No hardcoded version — version read from routes.json (SSOT) only
+      // Verify routes.json has version field (sanity check; no expected value)
+      if (this.routesConfig.version == null || this.routesConfig.version === '') {
+        console.warn('[Shared Services] routes.json missing version field');
       }
       
       // Extract API base URL from routes.json (SSOT)

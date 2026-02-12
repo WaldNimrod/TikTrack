@@ -62,9 +62,20 @@ make db-base-seed
 
 **מפרט:** `documentation/05-REPORTS/artifacts/SPEC_BASE_TEST_USER_DATASET.md`
 
+## 6. צמצום נתוני בסיס של מנהל ראשי (TikTrackAdmin)
+
+להפחתת נתוני הבסיס של TikTrackAdmin למינימום:
+
+```bash
+make db-admin-minimal
+# או: python3 scripts/reduce_admin_base_to_minimal.py
+```
+
+**תוצאה:** 2 חשבונות, 2 עמלות, 5 תזרימים (סה״כ 9 רשומות בסיס).
+
 ---
 
-## 6. רפרנסים
+## 7. רפרנסים
 
 - `scripts/db_test_clean.py` — ניקוי
 - `scripts/seed_test_data.py` — זריעה

@@ -46,6 +46,10 @@ db-test-report:
 db-base-seed:
 	@python3 scripts/seed_base_test_user.py
 
+## Reduce TikTrackAdmin base data to minimal (מנהל ראשי)
+db-admin-minimal:
+	@python3 scripts/reduce_admin_base_to_minimal.py
+
 ## Backup DB, verify backup, then seed test data (recommended flow).
 db-backup-then-fill: db-backup
 	@echo "🌱 Seeding test data (backup already verified)..."
@@ -61,5 +65,6 @@ help:
 	@echo "  make db-test-fill        - Seed test data only (no backup)"
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
+	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

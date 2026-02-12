@@ -51,6 +51,10 @@ export async function createDriver() {
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--disable-gpu');
   }
+  // Stability flags to reduce "Timed out receiving message from renderer"
+  options.addArguments('--disable-dev-shm-usage');
+  options.addArguments('--disable-software-rasterizer');
+  options.addArguments('--disable-extensions');
   
   // Window size for consistent testing
   options.addArguments('--window-size=1920,1080');

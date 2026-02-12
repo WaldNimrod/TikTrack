@@ -1,91 +1,19 @@
 {
   "gate": "B",
-  "timestamp": "2026-02-12T19:44:50.650Z",
+  "timestamp": "2026-02-12T20:26:47.977Z",
   "results": {
-    "passed": 5,
-    "failed": 0,
+    "passed": 0,
+    "failed": 1,
     "skipped": 0
   },
   "logs": [
     {
-      "test": "GATE_B_T50_1_1_Brokers_D16",
-      "status": "START",
-      "timestamp": "2026-02-12T19:44:24.810Z",
+      "test": "GATE_B_RUN",
+      "status": "FAIL",
+      "timestamp": "2026-02-12T20:26:47.917Z",
       "details": {
-        "message": "D16 broker select from API"
-      }
-    },
-    {
-      "test": "GATE_B_T50_1_1_Brokers_D16",
-      "status": "PASS",
-      "timestamp": "2026-02-12T19:44:35.211Z",
-      "details": {
-        "message": "Broker select has options from API",
-        "optCount": 2
-      }
-    },
-    {
-      "test": "GATE_B_T50_1_1_D18_TradingAccount",
-      "status": "START",
-      "timestamp": "2026-02-12T19:44:35.236Z",
-      "details": {
-        "message": "D18 trading_account_id select (ADR-015)"
-      }
-    },
-    {
-      "test": "GATE_B_T50_1_1_D18_TradingAccount",
-      "status": "PASS",
-      "timestamp": "2026-02-12T19:44:39.832Z",
-      "details": {
-        "message": "D18: trading_account_id select (ADR-015 — עמלות לפי חשבון); no broker select"
-      }
-    },
-    {
-      "test": "GATE_B_T50_1_2_RichText_NoStyle",
-      "status": "START",
-      "timestamp": "2026-02-12T19:44:39.858Z",
-      "details": {
-        "message": "Cash Flows description uses classes only"
-      }
-    },
-    {
-      "test": "GATE_B_T50_1_2_RichText_NoStyle",
-      "status": "PASS",
-      "timestamp": "2026-02-12T19:44:44.480Z",
-      "details": {
-        "message": "Cash Flows has RT toolbar with class-based style buttons (phx-rt--*)"
-      }
-    },
-    {
-      "test": "GATE_B_T50_2_AdminDesignSystem",
-      "status": "START",
-      "timestamp": "2026-02-12T19:44:44.502Z",
-      "details": {
-        "message": "Admin can access /admin/design-system"
-      }
-    },
-    {
-      "test": "GATE_B_T50_2_AdminDesignSystem",
-      "status": "PASS",
-      "timestamp": "2026-02-12T19:44:47.559Z",
-      "details": {
-        "message": "ADMIN accesses /admin/design-system; Rich-Text Styles and Color Variables visible"
-      }
-    },
-    {
-      "test": "GATE_B_T50_2_GuestDesignSystem",
-      "status": "START",
-      "timestamp": "2026-02-12T19:44:47.560Z",
-      "details": {
-        "message": "Guest redirected from /admin/design-system"
-      }
-    },
-    {
-      "test": "GATE_B_T50_2_GuestDesignSystem",
-      "status": "PASS",
-      "timestamp": "2026-02-12T19:44:50.599Z",
-      "details": {
-        "message": "Guest redirected away from /admin/design-system"
+        "message": "timeout: Timed out receiving message from renderer: -0.004\n  (Session info: chrome=144.0.7559.133)",
+        "stack": "TimeoutError: timeout: Timed out receiving message from renderer: -0.004\n  (Session info: chrome=144.0.7559.133)\n    at Object.throwDecodedError (/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/tests/node_modules/selenium-webdriver/lib/error.js:523:15)\n    at parseHttpResponse (/Users/nimrod/"
       }
     }
   ]

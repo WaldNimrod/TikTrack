@@ -7,13 +7,14 @@
 
 | Layer | Current Version | Ceiling (SV) | Status |
 | :--- | :--- | :--- | :--- |
-| **System Version (SV)** | **2.0.0** | - | 🔒 LOCKED |
-| API Layer | 2.0.0 | 2.x.x | ✅ Aligned |
-| Database Schema | 2.5.0 | 2.x.x | ✅ Aligned |
-| UI Package | 2.1.0 | 2.x.x | ✅ Aligned |
-| Routes Config | 1.1.2 | 2.x.x | ⚠️ PENDING BUMP |
+| **System Version (SV)** | **1.0.0** | - | 🔒 LOCKED |
+| API Layer | (לבדיקה) | 1.x.x | ⚠️ לאימות Team 90 |
+| Database Schema | (לבדיקה) | 1.x.x | ⚠️ לאימות Team 90 |
+| UI Package | (לבדיקה) | 1.x.x | ⚠️ לאימות Team 90 |
+| Routes Config | 1.1.2 | 1.x.x | ✅ Aligned |
 
-**Last Updated:** 12.2.2026, 19:08:43
+**Last Updated:** 30.1.2026  
+**הערה:** גרסה ראשית המערכת = **1.0**. אף שכבה לא רשאית לעלות מעל 1.x.x (חוק Ceiling).
 
 ---
 

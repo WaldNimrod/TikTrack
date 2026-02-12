@@ -4,7 +4,7 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-12  
+**last_updated:** 2026-01-30  
 **version:** v3.9 (קידום ידע באץ' 2 — Consolidation הושלם)
 
 ---
@@ -278,7 +278,8 @@ _COMMUNICATION/
 ---
 
 **Team 10 (The Gateway)**  
-**תאריך:** 2026-02-09  
+**תאריך:** 2026-01-30  
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
-**log_entry | [Team 10] | PROCESS_FORMALIZATION | MASTER_INDEX_UPDATED | 2026-02-09**
+**log_entry | [Team 10] | PROCESS_FORMALIZATION | MASTER_INDEX_UPDATED | 2026-02-09**  
+**log_entry | [Team 10] | ADR_016_VERSIONING_INDEX_AND_PROCEDURE | 2026-01-30**

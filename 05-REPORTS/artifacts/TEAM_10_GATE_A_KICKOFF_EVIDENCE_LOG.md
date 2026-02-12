@@ -232,5 +232,18 @@
 
 ---
 
+## עדכון: הודעה לסגירה ויישור קו (2026-01-30)
+
+**מסמך:** `TEAM_10_TO_ALL_TEAMS_CLOSE_AND_ALIGN.md` — נשלח ל־Team 30, 40, 50. סיכום מה נסגר בצד Team 10; מה נדרש מכל צוות לסגירה ויישור קו (משימה 7, T30.1 בוטל, פערים ויזואליים, שער ג' V18/V19); איפה לרשום ממצאים (`TEAM_10_VISUAL_GAPS_FINDINGS_LOG.md`).
+
+**תשובות הצוותים — סגירה ויישור קו:**
+- **Team 30:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_CLOSE_AND_ALIGN_ACK.md` — משימה 7 מאומת; T30.1 בוטל; פערים ויזואליים מוכן לטיפול; יישור קו — Code Evidence, A/B/C/D, Header Batch 1 מסומנים כסגורים. **מאושר.**
+- **Team 40:** `_COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_CLOSE_AND_ALIGN_RESPONSE.md` — משימה 7 מוכן לבדיקה ויזואלית; Header Batch 1 + אייקון User מאומתים; פערים ויזואליים — תהליך מוכן (10 רושם, 40 מתקן); רשימות מסונכרנות (S4, S7 נסגרו). **מאושר. מוכן לשער ג'.**
+- **Team 50:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_CLOSE_AND_ALIGN_ACKNOWLEDGMENT.md` — יישור קו: Gate A, Gate B, Code Evidence, Q12/Q13 סגורים; תוכנית שער ג': V18, V19, משימה 7, דיווח ממצאים; הפניות לתרחישים ורשימת פערים. **מאושר.**
+
+**סיכום:** כל שלושת הצוותים אישרו סגירה ויישור קו; מוכנים לבדיקה ויזואלית בשער ג'.
+
+---
+
 **Team 10 (The Gateway)**  
 **log_entry | GATE_A_KICKOFF_EVIDENCE | 2026-01-30**

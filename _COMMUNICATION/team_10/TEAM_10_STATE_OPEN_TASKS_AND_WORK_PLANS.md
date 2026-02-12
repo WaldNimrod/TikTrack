@@ -107,7 +107,7 @@
 
 ## 5. סיכום — מה נשאר לפני "הכל סגור"
 
-**עדכון אחרון (2026-01-30):** ביצוע משימות Team 10 — רשימה מאוחדת: `TEAM_10_OPEN_TASKS_CONSOLIDATED_LIST.md`; Evidence Log + Work Plan §4.7 + STATE סונכרנו.
+**עדכון אחרון (2026-01-30):** ביצוע משימות Team 10 — רשימה מאוחדת: `TEAM_10_OPEN_TASKS_CONSOLIDATED_LIST.md`; Evidence Log + Work Plan §4.7 + STATE סונכרנו. **תשובות סגירה ויישור קו:** Team 30, 40, 50 אישרו (`TEAM_30_TO_TEAM_10_CLOSE_AND_ALIGN_ACK.md`, `TEAM_40_TO_TEAM_10_CLOSE_AND_ALIGN_RESPONSE.md`, `TEAM_50_TO_TEAM_10_CLOSE_AND_ALIGN_ACKNOWLEDGMENT.md`) — מוכנים לבדיקה ויזואלית בשער ג'.
 
 | קטגוריה | פריטים |
 |---------|--------|

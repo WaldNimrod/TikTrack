@@ -17,8 +17,8 @@
 ## 2) Runtime Flow (UI → UAI → PDSC → DB)
 1. HTML loads config
 2. UAI stages: DOM → Bridge → Data → Render → Ready
-3. Shared_Services fetches API + transforms payload
-4. UI tables render (HTML or React Tables ReactStage)
+3. sharedServices.js (PDSC client) fetches API + transforms payload
+4. UI tables render (HTML or React Tables via TablesReactStage)
 
 ## 3) Core Stages
 - **DOM Stage**: loads base structure
@@ -43,4 +43,3 @@
 - `documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md`
 - `documentation/01-ARCHITECTURE/TT2_EFR_HARDENED_TRANSFORMERS_LOCK.md`
 - `documentation/01-ARCHITECTURE/TT2_CSS_LOAD_VERIFICATION_SPEC.md`
-

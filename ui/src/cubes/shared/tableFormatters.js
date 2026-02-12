@@ -1,3 +1,5 @@
+import { toHebrewStatus } from '../../utils/statusAdapter.js';
+
 /**
  * tableFormatters - פונקציות עזר לפורמט תצוגה בטבלאות
  * -----------------------------------------------------
@@ -221,6 +223,18 @@ function formatStatusBadge(status, statusCategory = 'active') {
 }
 
 /**
+ * formatStatusBadgeFromCanonical - באגט סטטוס מערך קנוני (SSOT)
+ * @param {string} canonicalValue - ערך קנוני (active|inactive|pending|cancelled)
+ * @param {string} statusCategory - קטגוריה לעיצוב (default: same as value)
+ * @returns {HTMLElement} אלמנט span עם באגט סטטוס
+ */
+function formatStatusBadgeFromCanonical(canonicalValue, statusCategory = null) {
+  const category = statusCategory ?? canonicalValue ?? 'active';
+  const label = toHebrewStatus(canonicalValue || '');
+  return formatStatusBadge(label, category);
+}
+
+/**
  * formatOperationTypeBadge - פורמט באגט סוג פעולה
  * 
  * @description יצירת באגט סוג פעולה עם מניפת צבעים
@@ -335,6 +349,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatCurrentPrice,
     formatPL,
     formatStatusBadge,
+    formatStatusBadgeFromCanonical,
     formatOperationTypeBadge,
     formatNumericValue,
     formatCommissionValue
@@ -350,6 +365,7 @@ window.tableFormatters = {
   formatCurrentPrice,
   formatPL,
   formatStatusBadge,
+  formatStatusBadgeFromCanonical,
   formatOperationTypeBadge,
   formatNumericValue,
   formatCommissionValue

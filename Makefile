@@ -3,7 +3,7 @@
 # Team 60 (DevOps & Platform)
 # ============================================
 
-.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill help
+.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help
 
 # Database connection (from .env)
 DATABASE_URL ?= $(shell grep DATABASE_URL api/.env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
@@ -38,6 +38,10 @@ db-test-fill:
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## Report users and record counts (base vs test data)
+db-test-report:
+	@python3 scripts/db_test_data_report.py
+
 ## Backup DB, verify backup, then seed test data (recommended flow).
 db-backup-then-fill: db-backup
 	@echo "🌱 Seeding test data (backup already verified)..."
@@ -51,5 +55,6 @@ help:
 	@echo "  make db-backup-then-fill - Backup, verify, then seed test data (recommended)"
 	@echo "  make db-test-clean       - Delete all test data (is_test_data = true)"
 	@echo "  make db-test-fill        - Seed test data only (no backup)"
+	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

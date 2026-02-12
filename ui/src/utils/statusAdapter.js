@@ -21,6 +21,17 @@ export function toCanonicalStatus(label) {
 }
 
 /**
+ * Normalize status to canonical — accepts Hebrew or canonical, returns canonical
+ * @param {string} value - עברית או קנוני
+ * @returns {string|null}
+ */
+export function normalizeToCanonicalStatus(value) {
+  if (value == null || value === '' || value === 'הכול' || value === 'כל סטטוס') return null;
+  if (valueToLabel.has(value)) return value; // already canonical
+  return labelToValue.get(value) ?? null;
+}
+
+/**
  * @param {string} value - ערך קנוני (active|inactive|pending|cancelled)
  * @returns {string} תרגום עברית לתצוגה
  */
@@ -40,5 +51,5 @@ export { STATUS_VALUES } from './statusValues.js';
 
 /* Expose to window for Vanilla JS (phoenixFilterBridge, etc.) */
 if (typeof window !== 'undefined') {
-  window.statusAdapter = { toCanonicalStatus, toHebrewStatus, getStatusOptions };
+  window.statusAdapter = { toCanonicalStatus, toHebrewStatus, getStatusOptions, normalizeToCanonicalStatus };
 }

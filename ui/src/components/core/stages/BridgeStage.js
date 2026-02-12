@@ -30,7 +30,7 @@ export class BridgeStage extends StageBase {
       // Ensure PhoenixBridge is loaded (should already be loaded by DOMStage)
       if (!window.PhoenixBridge) {
         // Fallback: load phoenixFilterBridge.js if not already loaded
-        await this.loadScript('/src/components/core/phoenixFilterBridge.js');
+        await this.loadScript('/src/components/core/phoenixFilterBridge.js', { type: 'module' });
       }
       
       if (!window.PhoenixBridge) {

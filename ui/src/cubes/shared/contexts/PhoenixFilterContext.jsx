@@ -15,7 +15,7 @@ import { DEBUG_MODE } from '../../../utils/debug';
 /**
  * Filter State Type
  * @typedef {Object} FilterState
- * @property {string|null} status - סטטוס (פתוח/סגור/מבוטל)
+ * @property {string|null} status - סטטוס קנוני (active|inactive|pending|cancelled), תצוגה: פתוח/סגור/ממתין/מבוטל
  * @property {string|null} investmentType - סוג השקעה
  * @property {string|null} tradingAccount - חשבון מסחר
  * @property {{from: string|null, to: string|null}} dateRange - טווח תאריכים

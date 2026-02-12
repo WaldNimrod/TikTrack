@@ -315,8 +315,8 @@ class PhoenixTableSortManager {
       }
       return new Date(text);
     } else if (sortType === 'boolean') {
-      // בדיקה אם התא מכיל "פעיל" או "כן"
-      return text.includes('פעיל') || text.includes('כן') || text.includes('true');
+      // בדיקה אם התא מכיל ערך "פעיל" (פעיל/לא פעיל) או SSOT "פתוח" (active) או "כן"
+      return text.includes('פעיל') || text.includes('פתוח') || text.includes('כן') || text.includes('true');
     }
 
     // string - החזרת הטקסט כפי שהוא

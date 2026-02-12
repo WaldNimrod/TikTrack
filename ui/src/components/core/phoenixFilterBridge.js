@@ -13,13 +13,13 @@
  * - URL Sync: syncWithUrl()
  * - Session Storage: State persistence
  * - Cross-Page: State loading on page navigation
+ * - Status filter: SSOT via statusAdapter (toCanonicalStatus, toHebrewStatus)
  * 
  * Usage:
- * Add <script src="./phoenixFilterBridge.js"></script> before headerLoader.js
+ * <script type="module" src="./phoenixFilterBridge.js"></script> before headerLoader.js
  */
 
-(function initPhoenixBridge() {
-  'use strict';
+import { normalizeToCanonicalStatus, toHebrewStatus } from '../../utils/statusAdapter.js';
   
   /**
    * Validate ULID format
@@ -251,11 +251,11 @@
      * applyFiltersToUI - החלת פילטרים על UI
      */
     applyFiltersToUI() {
-      // Update status filter
+      // Update status filter (SSOT: display via toHebrewStatus)
       if (this.state.filters.status) {
         const statusElement = document.querySelector('#selectedStatus');
         if (statusElement) {
-          statusElement.textContent = this.state.filters.status;
+          statusElement.textContent = toHebrewStatus(this.state.filters.status);
         }
       }
       
@@ -360,6 +360,9 @@
         // Gate B Fix: Normalize search - don't store empty strings
         const trimmedValue = String(value || '').trim();
         this.state.filters.search = trimmedValue !== '' ? trimmedValue : '';
+      } else if (key === 'status') {
+        // SSOT: Normalize Hebrew or canonical to canonical (active/inactive/pending/cancelled)
+        this.state.filters.status = normalizeToCanonicalStatus(value);
       } else {
         // Gate B Fix: Normalize string values - don't store empty strings
         if (typeof value === 'string' && value.trim() === '') {
@@ -491,4 +494,3 @@
   } else {
     initBridge();
   }
-})();

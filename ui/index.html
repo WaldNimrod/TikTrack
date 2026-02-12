@@ -22,8 +22,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   
   <!-- Header Loader - Loads unified-header.html dynamically for all pages (React and HTML) -->
-  <!-- IMPORTANT: Load phoenixFilterBridge.js BEFORE headerLoader.js -->
-  <script src="/src/components/core/phoenixFilterBridge.js"></script>
+  <!-- IMPORTANT: phoenixFilterBridge (module) imports statusAdapter; load before headerLoader -->
+  <script type="module" src="/src/components/core/phoenixFilterBridge.js"></script>
   <script src="/src/components/core/headerLoader.js"></script>
 </head>
 <body>

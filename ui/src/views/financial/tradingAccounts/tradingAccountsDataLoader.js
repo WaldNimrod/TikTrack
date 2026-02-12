@@ -25,6 +25,7 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { toCanonicalStatus, toHebrewStatus } from '../../../utils/statusAdapter.js';
 
 /**
  * Validate ULID format
@@ -448,7 +449,7 @@ async function loadContainer0() {
     const searchInput = document.getElementById('searchFilterInput');
     
     if (statusFilter && statusFilter.textContent !== 'כל סטטוס') {
-      globalFilters.status = statusFilter.textContent === 'פתוח';
+      globalFilters.status = toCanonicalStatus(statusFilter.textContent);
     }
     
     if (investmentTypeFilter && investmentTypeFilter.textContent !== 'כל סוג השקעה') {
@@ -551,9 +552,8 @@ async function loadContainer1(filters = {}) {
         return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
       });
       
-      const statusBadge = account.isActive 
-        ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>'
-        : '<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">לא פעיל</span>';
+      const canon = account.isActive ? 'active' : 'inactive';
+      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${canon}">${toHebrewStatus(canon)}</span>`;
       
       row.innerHTML = `
         <td class="phoenix-table__cell col-name" role="cell">${account.accountName || account.account_name || account.displayName || ''}</td>
@@ -796,9 +796,8 @@ async function loadContainer4(filters = {}) {
         ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--long">לונג</span>'
         : '<span class="phoenix-table__status-badge phoenix-table__status-badge--short">שורט</span>';
       
-      const statusBadge = position.status === 'OPEN'
-        ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--active">פתוח</span>'
-        : '<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">סגור</span>';
+      const posCanon = position.status === 'OPEN' ? 'active' : 'inactive';
+      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${posCanon}">${toHebrewStatus(posCanon)}</span>`;
       
       // Format current price with daily change
       const currentPriceHtml = window.tableFormatters?.formatCurrentPrice 

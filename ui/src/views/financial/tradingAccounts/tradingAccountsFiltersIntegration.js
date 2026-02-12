@@ -6,6 +6,7 @@
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { toCanonicalStatus } from '../../../utils/statusAdapter.js';
 
 /**
  * Get Global Filters
@@ -13,10 +14,10 @@ import { maskedLog } from '../../../utils/maskedLog.js';
 function getGlobalFilters() {
   const filters = {};
   
-  // Status filter
+  // Status filter (SSOT: canonical values via statusAdapter)
   const statusFilter = document.getElementById('selectedStatus');
   if (statusFilter && statusFilter.textContent !== 'כל סטטוס') {
-    filters.status = statusFilter.textContent === 'פתוח';
+    filters.status = toCanonicalStatus(statusFilter.textContent);
   }
   
   // Account filter

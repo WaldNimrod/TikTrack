@@ -155,9 +155,9 @@ export class DOMStage extends StageBase {
     if (!window.statusAdapter) {
       await this.loadScript('/src/utils/statusAdapter.js', { type: 'module' });
     }
-    // Load phoenixFilterBridge.js (required by headerLoader)
+    // Load phoenixFilterBridge.js (required by headerLoader) - ES module (imports statusAdapter)
     if (!window.PhoenixBridge) {
-      await this.loadScript('/src/components/core/phoenixFilterBridge.js');
+      await this.loadScript('/src/components/core/phoenixFilterBridge.js', { type: 'module' });
     }
     
     // Load headerLoader.js

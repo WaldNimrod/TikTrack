@@ -188,7 +188,8 @@ _COMMUNICATION/
 - [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: Module/Menu Styling (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה) ✅ **SSOT — Batch 1+2**
 - [📋 TT2_SYSTEM_STATUS_VALUES_SSOT.md](../09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md) - סטטוסים מערכתיים (active/inactive/pending/cancelled + פתוח/סגור/ממתין/מבוטל) — רשימת סטטוסים מרכזית לכל הישויות ✅ **SSOT**
-- [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד הדורשים עדכון לפי סטטוסים (header, filters, DataLoader)
+- [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד — מעבר ל-Adapter (statusValues.js + statusAdapter.js) ✅ **מנדט יישום**
+- [📋 מנדט יישום סטטוסים](../../_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md) - Single Source → statusValues.js → statusAdapter.js — Acceptance Criteria + אסור
 - ⚠️ **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/90_Architects_comunication/` (לא SSOT - Communication בלבד):
   - `ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - פוטר מודולרי
   - `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - Final Governance Lock

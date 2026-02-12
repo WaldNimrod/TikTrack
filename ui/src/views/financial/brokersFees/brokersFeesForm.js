@@ -127,7 +127,7 @@ export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId 
     content: formHTML,
     entity: 'brokers_fees',
     showSaveButton: true,
-    saveButtonText: 'שמור',
+    saveButtonText: 'שמירה',
     onSave: function () {
       const form = document.getElementById('brokerFeeForm');
       if (!form) return;

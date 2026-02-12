@@ -188,7 +188,7 @@ export async function showCashFlowFormModal(data, onSave) {
       content: formHTML,
       entity: 'cash_flow',
       showSaveButton: true,
-      saveButtonText: 'שמור',
+      saveButtonText: 'שמירה',
       onSave: function() {
         const form = document.getElementById('cashFlowForm');
         if (!form) return;

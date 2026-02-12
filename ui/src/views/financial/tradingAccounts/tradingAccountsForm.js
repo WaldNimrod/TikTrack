@@ -200,7 +200,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
     content: formHTML,
     entity: 'trading_account',
     showSaveButton: true,
-    saveButtonText: 'שמור',
+    saveButtonText: 'שמירה',
     onSave: async function() {
       const form = document.getElementById('tradingAccountForm');
       if (!form) return;

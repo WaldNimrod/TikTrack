@@ -3,42 +3,55 @@
 **id:** `TT2_STATUS_VALUES_CODE_MAP`  
 **owner:** Team 10 (The Gateway)  
 **SSOT:** `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md`  
-**last_updated:** 2026-02-12
+**last_updated:** 2026-02-12  
+**מנדט יישום:** `_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md`
 
 ---
 
-## 1. תיעוד (תואם / עודכן)
+## 1. מקור קוד יחיד + Adapter (הוטמעו)
+
+| מקום | תפקיד | הערה |
+|------|--------|------|
+| `ui/src/utils/statusValues.js` | מקור יחיד | `STATUS_VALUES`, `STATUS_CANONICAL`, `STATUS_LABELS_HE` |
+| `ui/src/utils/statusAdapter.js` | Adapter יחיד | `toCanonicalStatus`, `toHebrewStatus`, `getStatusOptions` — **כל השימושים רק דרכו** |
+
+---
+
+## 2. תיעוד (תואם / עודכן)
 
 | מקום | סטטוס | הערה |
 |------|--------|------|
-| `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md` | ✅ SSOT | רשימת ארבעת הסטטוסים + עברית |
+| `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md` | ✅ SSOT | עקרון Single Source + נתיבי קוד + Acceptance Criteria + אסור |
 | `documentation/01-ARCHITECTURE/TT2_EFR_LOGIC_MAP.md` | ✅ עודכן | הפניה ל-SSOT + תרגום עברית בסעיף Status Fields |
 
 ---
 
-## 2. מקומות בקוד הדורשים תיקון או עדכון
+## 3. מקומות בקוד — מעבר ל-Adapter (חובה)
 
-### 2.1 Header — תפריט סינון סטטוס
+**כל המקומות להלן חייבים להשתמש ב-`statusAdapter.js` בלבד (אין ערכים קשיחים במודול).**
 
-| קובץ | פעולה נדרשת | פרט |
-|------|-------------|------|
-| `ui/src/views/shared/unified-header.html` | **להוסיף אופציה "ממתין"** | בתפריט `#statusFilterMenu` קיימות: הכול, פתוח, סגור, מבוטל. **חסר:** ממתין (`data-value="ממתין"`). להוסיף אחרי "סגור" ולפני "מבוטל" (או לפי סדר SSOT: פתוח, סגור, ממתין, מבוטל). |
-
-### 2.2 לוגיקת סינון (Frontend)
+### 3.1 Header — תפריט סינון סטטוס
 
 | קובץ | פעולה נדרשת | פרט |
 |------|-------------|------|
-| `ui/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js` | **להרחיב ל-4 סטטוסים** | כיום: `statusFilter.textContent === 'פתוח'` → משלב רק פתוח. יש למפות עברית → קנוני (פתוח→active, סגור→inactive, ממתין→pending, מבוטל→cancelled) ולשלוח ל-API/לוגיקת סינון. |
-| `ui/src/views/financial/tradingAccounts/tradingAccountsDataLoader.js` | **להרחיב ל-4 סטטוסים** | שורות 444–451: `globalFilters.status = statusFilter.textContent === 'פתוח'` — להחליף במיפוי עברית→קנוני ולשלוח ערך קנוני (או בוליאני רק אם API תומך רק ב-active/לא). |
-| `ui/src/components/core/phoenixFilterBridge.js` | **וידוא** | שורות 256, 405 — שימוש ב-`#selectedStatus`. לוודא שאחרי עדכון unified-header ו-DataLoader, הערך הנשלח תואם ל-SSOT (קנוני). |
+| `ui/src/views/shared/unified-header.html` | **4 אופציות + מסונן מ-Adapter** | (א) להוסיף "ממתין" אם חסר. (ב) אופציות התפריט — מומלץ ליצור דינמית מ-`getStatusOptions()` (או לשמור סדר: פתוח, סגור, ממתין, מבוטל). |
+| JS שמזין/קורא את התפריט | **שימוש ב-Adapter** | קריאת ערך נבחר → `toCanonicalStatus(label)`; הצגת אופציות ← `getStatusOptions()`. |
 
-### 2.3 תצוגת שורות (בדגלים / badges)
+### 3.2 לוגיקת סינון (Frontend)
+
+| קובץ | פעולה נדרשת | פרט |
+|------|-------------|------|
+| `ui/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js` | **Adapter בלבד** | להחליף `statusFilter.textContent === 'פתוח'` ב-`toCanonicalStatus(statusFilter.textContent)`; לשלוח ערך קנוני ל-API. |
+| `ui/src/views/financial/tradingAccounts/tradingAccountsDataLoader.js` | **Adapter בלבד** | שורות 444–451: `globalFilters.status = toCanonicalStatus(statusFilter.textContent)` (או ערך קנוני). |
+| `ui/src/components/core/phoenixFilterBridge.js` | **תאום ל-Adapter** | וידוא שהערך הנשלח/מתקבל תואם קנוני דרך `toCanonicalStatus` / `toHebrewStatus`. |
+
+### 3.3 תצוגת שורות (בדגלים / badges)
 
 | קובץ | פעולה נדרשת | פרט |
 |------|-------------|------|
 | `ui/src/views/financial/tradingAccounts/tradingAccountsDataLoader.js` | **וידוא עקביות** | שורות 555–556: פעיל/לא פעיל (isActive) — ייתכן שזה שדה נפרד מ-`status`. שורות 800–801: פתוח/סגור לפי status. שורות 721–724: מאומת/ממתין — אם זה status, למפות ל-קנוני (מאומת→active?, ממתין→pending). **להתאים** לתבנית ארבעת הסטטוסים אם השדה הוא status. |
 
-### 2.4 עמודים/תבניות נוספות (סינון סטטוס)
+### 3.4 עמודים/תבניות נוספות (סינון סטטוס)
 
 | מקום | פעולה נדרשת | פרט |
 |------|-------------|------|
@@ -48,15 +61,15 @@
 
 ---
 
-## 3. סיכום פעולות
+## 4. סיכום פעולות
 
 | עדיפות | פעולה | בעלים מוצע |
 |--------|--------|-------------|
-| P1 | הוספת "ממתין" ל-`unified-header.html` | Team 30 / Team 31 |
-| P1 | הרחבת לוגיקת סינון ב-tradingAccounts ל-4 סטטוסים (מיפוי עברית↔קנוני) | Team 30 |
-| P2 | וידוא phoenixFilterBridge ו-DataLoader משתמשים בערך קנוני ב-API | Team 30 |
-| P2 | התאמת תצוגת badges (פעיל/לא פעיל, פתוח/סגור, מאומת/ממתין) ל-SSOT אם השדה הוא status | Team 30 |
-| P3 | עדכון blueprints/d21/d16 staging — הוספת "ממתין" בתפריטי סינון | Team 31/40 לפי בעלות |
+| P1 | Header: 4 אופציות (כולל ממתין) + שימוש ב-`getStatusOptions()` / Adapter | Team 30 |
+| P1 | DataLoaders + Filters: החלפת לוגיקה קשיחה ב-`toCanonicalStatus` / `toHebrewStatus` | Team 30 |
+| P2 | PhoenixFilterBridge: תיאום ל-SSOT דרך Adapter | Team 30 |
+| P2 | badges: תצוגת עברית רק דרך `toHebrewStatus(value)` | Team 30 |
+| P3 | blueprints/staging: אופציות סינון תואמות + Adapter אם יש JS | Team 31/40 |
 
 ---
 

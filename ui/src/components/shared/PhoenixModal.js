@@ -15,7 +15,7 @@
  * @param {Function} options.onClose - Callback when modal is closed
  * @param {Function} options.onSave - Callback when save button is clicked (optional)
  * @param {boolean} options.showSaveButton - Whether to show save button (default: true)
- * @param {string} options.saveButtonText - Save button text (default: "שמור")
+ * @param {string} options.saveButtonText - Save button text (default: "שמירה")
  * @param {string} options.entity - Entity for header color (trading_account | brokers_fees | cash_flow)
  * @returns {HTMLElement} Modal element
  */
@@ -26,7 +26,7 @@ export function createModal(options = {}) {
     onClose = null,
     onSave = null,
     showSaveButton = true,
-    saveButtonText = 'שמור',
+    saveButtonText = 'שמירה',
     entity = null
   } = options;
 

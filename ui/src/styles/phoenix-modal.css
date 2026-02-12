@@ -153,26 +153,29 @@
 
 .phoenix-modal__save-btn,
 .phoenix-modal__cancel-btn {
-  padding: var(--spacing-sm, 8px) var(--spacing-lg, 24px);
+  padding: 8px var(--spacing-lg, 24px); /* 8px top/bottom - match system defaults */
   border-radius: 6px;
   font-size: var(--font-size-base, 0.92rem);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid currentColor;
 }
 
+/* Save: system default style - white bg, border + text in brand color */
 .phoenix-modal__save-btn {
+  background: var(--apple-bg-primary, #ffffff);
+  color: var(--color-brand, #26baac);
+  border-color: var(--color-brand, #26baac);
+}
+
+.phoenix-modal__save-btn:hover {
   background: var(--color-brand, #26baac);
   color: white;
 }
 
-.phoenix-modal__save-btn:hover {
-  background: var(--color-brand-dark, #1fa89a);
-}
-
 .phoenix-modal__cancel-btn {
-  background: transparent;
+  background: var(--apple-bg-primary, #ffffff);
   color: var(--apple-text-primary, #1d1d1f);
   border-color: var(--apple-border-light, #e5e5e5);
 }
@@ -198,8 +201,9 @@
   margin-bottom: var(--spacing-xs, 4px);
 }
 
-/* Input, Textarea, Select: identical padding for same height (override any base/clamp variables) */
-.phoenix-modal__body input,
+/* Input, Textarea, Select: identical padding for same height.
+   Match base specificity (phoenix-base uses input:not([type=...])×6) so we override without !important */
+.phoenix-modal__body input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
 .phoenix-modal__body textarea,
 .phoenix-modal__body select {
   width: 100%;
@@ -212,7 +216,7 @@
 }
 
 /* Focus: Both use primary color (color-brand) - unified */
-.phoenix-modal__body input:focus,
+.phoenix-modal__body input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]):focus,
 .phoenix-modal__body select:focus,
 .phoenix-modal__body textarea:focus {
   outline: none;

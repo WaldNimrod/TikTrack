@@ -160,6 +160,7 @@ _COMMUNICATION/
 - [🔘 DNA_BUTTON_SYSTEM.md](../04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md) - מערכת כפתורים DNA (SSOT) ✅ **Batch 1+2**
 - [🎨 DNA_PALETTE_SSOT.md](../04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md) - פלטת צבעים DNA — SSOT רשמי ✅ **Batch 1+2**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: עיצוב מודולים ותפריט (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה כסטנדרט) ✅ **SSOT — Batch 1+2**
+- [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה נעול: D16 חשבונות מסחר — תיעוד דיוקי עיצוב (שדות, כפתורים, פריסה, כוכבית) ✅ **SSOT — 2026-01-31**
 
 ---
 
@@ -187,6 +188,7 @@ _COMMUNICATION/
 - [🛡️ הגדרות תפקיד ומשילות לכל צוות](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#5-הגדרות-תפקיד-ומשילות-לכל-צוות--batch-1-closure-mandate) - הגדרות תפקיד ומשילות לכל צוות (Batch 1 Closure Mandate) 🛡️ **MANDATORY - FOUNDATION SEAL**
 - [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: Module/Menu Styling (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה) ✅ **SSOT — Batch 1+2**
+- [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה D16 (חשבונות מסחר) — נעול ✅ **SSOT — 2026-01-31**
 - [📋 TT2_SYSTEM_STATUS_VALUES_SSOT.md](../09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md) - סטטוסים מערכתיים (active/inactive/pending/cancelled + פתוח/סגור/ממתין/מבוטל) — רשימת סטטוסים מרכזית לכל הישויות ✅ **SSOT**
 - [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד — מעבר ל-Adapter (statusValues.js + statusAdapter.js) ✅ **מנדט יישום**
 - [📋 מנדט יישום סטטוסים](../../_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md) - Single Source → statusValues.js → statusAdapter.js — Acceptance Criteria + אסור

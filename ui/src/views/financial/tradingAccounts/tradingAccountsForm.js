@@ -55,16 +55,16 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
       </div>
     </div>
     <div id="brokerOtherNameGroup" class="form-group" style="display:none;">
-      <label for="brokerOtherName">שם ברוקר (הזנה ידנית) *</label>
+      <label for="brokerOtherName">שם ברוקר (הזנה ידנית) <span class="form-label-asterisk">*</span></label>
       <input type="text" id="brokerOtherName" name="brokerOtherName" placeholder="הזן את שם הברוקר" maxlength="100" />
       <span class="form-error" id="brokerOtherNameError"></span>
     </div>
   `;
 
   return `
-    <form id="tradingAccountForm" class="phoenix-form">
+    <form id="tradingAccountForm" class="phoenix-form phoenix-form--two-col">
       <div class="form-group">
-        <label for="accountName">שם החשבון *</label>
+        <label for="accountName">שם החשבון <span class="form-label-asterisk">*</span></label>
         <input 
           type="text" 
           id="accountName" 
@@ -77,75 +77,78 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
         <span class="form-error" id="accountNameError"></span>
       </div>
       
-      <div class="form-group">
-        <label for="broker">ברוקר *</label>
-        <select id="broker" name="broker" required>
-          <option value="">-- בחר ברוקר --</option>
-          ${brokerOptionsHTML}
-        </select>
-        <span class="form-error" id="brokerError"></span>
-        ${governanceMessageHTML}
+      <div class="form-row">
+        <div class="form-group">
+          <label for="broker">ברוקר <span class="form-label-asterisk">*</span></label>
+          <select id="broker" name="broker" required>
+            <option value="">-- בחר ברוקר --</option>
+            ${brokerOptionsHTML}
+          </select>
+          <span class="form-error" id="brokerError"></span>
+          ${governanceMessageHTML}
+        </div>
+        <div class="form-group">
+          <label for="accountNumber">מספר חשבון <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="text" 
+            id="accountNumber" 
+            name="accountNumber" 
+            value="${accountNumber}" 
+            maxlength="50"
+            placeholder="הזן מספר חשבון"
+          />
+          <span class="form-error" id="accountNumberError"></span>
+        </div>
       </div>
       
-      <div class="form-group">
-        <label for="accountNumber">מספר חשבון *</label>
-        <input 
-          type="text" 
-          id="accountNumber" 
-          name="accountNumber" 
-          value="${accountNumber}" 
-          maxlength="50"
-          placeholder="הזן מספר חשבון"
-        />
-        <span class="form-error" id="accountNumberError"></span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="currency">מטבע <span class="form-label-asterisk">*</span></label>
+          <select id="currency" name="currency" required>
+            <option value="USD" ${currency === 'USD' ? 'selected' : ''}>USD - דולר אמריקאי</option>
+            <option value="EUR" ${currency === 'EUR' ? 'selected' : ''}>EUR - אירו</option>
+            <option value="GBP" ${currency === 'GBP' ? 'selected' : ''}>GBP - לירה שטרלינג</option>
+            <option value="ILS" ${currency === 'ILS' ? 'selected' : ''}>ILS - שקל ישראלי</option>
+          </select>
+          <span class="form-error" id="currencyError"></span>
+        </div>
+        <div class="form-group">
+          <label for="initialBalance">יתרה התחלתית <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="number" 
+            id="initialBalance" 
+            name="initialBalance" 
+            value="${initialBalance}" 
+            step="0.01" 
+            min="0" 
+            required 
+            placeholder="0.00"
+          />
+          <span class="form-error" id="initialBalanceError"></span>
+        </div>
       </div>
       
-      <div class="form-group">
-        <label for="initialBalance">יתרה התחלתית *</label>
-        <input 
-          type="number" 
-          id="initialBalance" 
-          name="initialBalance" 
-          value="${initialBalance}" 
-          step="0.01" 
-          min="0" 
-          required 
-          placeholder="0.00"
-        />
-        <span class="form-error" id="initialBalanceError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="currency">מטבע *</label>
-        <select id="currency" name="currency" required>
-          <option value="USD" ${currency === 'USD' ? 'selected' : ''}>USD - דולר אמריקאי</option>
-          <option value="EUR" ${currency === 'EUR' ? 'selected' : ''}>EUR - אירו</option>
-          <option value="GBP" ${currency === 'GBP' ? 'selected' : ''}>GBP - לירה שטרלינג</option>
-          <option value="ILS" ${currency === 'ILS' ? 'selected' : ''}>ILS - שקל ישראלי</option>
-        </select>
-        <span class="form-error" id="currencyError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="isActive">סטטוס</label>
-        <select id="isActive" name="isActive" required>
-          <option value="true" ${isActive ? 'selected' : ''}>פעיל</option>
-          <option value="false" ${!isActive ? 'selected' : ''}>לא פעיל</option>
-        </select>
-        <span class="form-error" id="isActiveError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="externalAccountId">מזהה חשבון חיצוני</label>
-        <input 
-          type="text" 
-          id="externalAccountId" 
-          name="externalAccountId" 
-          value="${externalAccountId}" 
-          maxlength="100"
-          placeholder="הזן מזהה חשבון חיצוני (אופציונלי)"
-        />
-        <span class="form-error" id="externalAccountIdError"></span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="isActive">סטטוס</label>
+          <select id="isActive" name="isActive" required>
+            <option value="true" ${isActive ? 'selected' : ''}>פעיל</option>
+            <option value="false" ${!isActive ? 'selected' : ''}>לא פעיל</option>
+          </select>
+          <span class="form-error" id="isActiveError"></span>
+        </div>
+        <div class="form-group">
+          <label for="externalAccountId">מזהה חשבון חיצוני</label>
+          <input 
+            type="text" 
+            id="externalAccountId" 
+            name="externalAccountId" 
+            value="${externalAccountId}" 
+            maxlength="100"
+            placeholder="הזן מזהה חשבון חיצוני (אופציונלי)"
+          />
+          <span class="form-error" id="externalAccountIdError"></span>
+        </div>
       </div>
     </form>
   `;

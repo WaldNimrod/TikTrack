@@ -56,6 +56,13 @@
 
 | נושא | קובץ | תיאור |
 |------|------|-------|
-| עיצוב input vs select | `phoenix-modal.css` | input: יותר ריווח אנכי; select: פחות; focus: צבע ראשי אחיד |
+| עיצוב input vs select | `phoenix-modal.css` | padding אחיד 8px 16px; focus: צבע ראשי; override specificity ללא !important |
 | Dedupe "אחר" | `tradingAccountsForm.js`, `reference_service.py` | מניעת כפילות ברשימת ברוקרים |
 | וולידציה | `tradingAccountsForm.js` | ברוקר + מספר חשבון חובה; ייחודיות שם/מספר (client-side) |
+| כפתורי שמירה/ביטול | `phoenix-modal.css` | רקע לבן, מסגרת+טקסט בצבע; padding 8px אנכי |
+| טקסט כפתור | `PhoenixModal.js`, טפסים | "שמירה" (לא "שמור") |
+| פריסת טופס דו-עמודתית | `tradingAccountsForm.js`, `phoenix-modal.css` | ברוקר+מספר \| מטבע+יתרה \| סטטוס+מזהה; gap 21px |
+| כוכבית ולידציה | `tradingAccountsForm.js`, `phoenix-modal.css` | צבע סכנה (.form-label-asterisk, .form-error) |
+| רשימת ברוקרים | `defaults_brokers.json` | IBKR, IBI, Test_Broker, אחר |
+
+**SSOT נעול:** [D16_MODULE_REFERENCE_SSOT.md](../../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md)

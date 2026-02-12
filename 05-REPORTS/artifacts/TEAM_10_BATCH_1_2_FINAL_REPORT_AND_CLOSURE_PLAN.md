@@ -90,7 +90,8 @@
 | **סטטוס** | ✅ **האדריכלית אישרה החלטות** — SSOT הוטמע. כעת: **יישום בתוכנית העבודה** + משימות לצוותים. |
 | **SSOT** | `documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md` — נוסף ל-00_MASTER_INDEX. |
 | **תוכנית עבודה (שלב Module/Menu Styling)** | (א) **Team 40** — עיצוב/מפרט לפי SSOT. (ב) **Team 30** — יישום + בדיקות. (ג) **סבב דיוק ויזואלי** על **מודול דוגמה אחד** — **מול G-Lead** (Team 30/40); המודול יהפוך לסטנדרט רשמי. |
-| **Acceptance Criteria** | RTL order קבוע בכל מודול; צבעי כותרת לפי ישות (Light BG + Dark text/border/close); מודול דוגמה מאושר כסטנדרט. |
+| **מודול דוגמה** | ✅ **D16 (חשבונות מסחר)** — G-Lead אישר עיצוב ועימוד; Team 30 תיעד ב-D16_MODULE_REFERENCE_SSOT.md. **יישום לכל המודולים:** הודעות יישום נשלחו ל-Team 30 ו-Team 40. |
+| **Acceptance Criteria** | RTL order קבוע בכל מודול; צבעי כותרת לפי ישות (Light BG + Dark text/border/close); מודול דוגמה מאושר כסטנדרט; **כל המודולים (D18, D21 וכו') תואמים ל-D16 reference**. |
 
 ### 4.2 פער #2 — Header Persistence (Evidence E2E נדרש)
 
@@ -114,12 +115,41 @@
 | 3 | **החלטה אדריכלית התקבלה** — SSOT נוצר: ARCHITECT_MODULE_MENU_STYLING_SSOT.md | ✅ בוצע |
 | 4 | SSOT נוסף ל-00_MASTER_INDEX (עיצוב + הנחיות אדריכליות) | ✅ בוצע |
 | 5 | משימות מדויקות לצוות 40 ו-30 (הודעות נפרדות) | ✅ הוצאו |
+| 6 | **מודול דוגמה D16** — G-Lead אישר; תיעוד D16_MODULE_REFERENCE_SSOT ננעל (Team 30) | ✅ הושלם |
+| 7 | **יישום לכל המודולים** — הודעות rollout ל-Team 30 ו-Team 40 (D18, D21) | ✅ הוצאו |
 
-### 4.5 משימות השלמה פעילות (מיקוד)
+### 4.5 משימות השלמה פעילות (מיקוד) — מה שהצוותים מיישמים כעת
+
+**זו תוכנית העבודה הנוכחית.** אין להוסיף עליה מידע חדש לצוותים עד להשלמתה.
 
 1. **Gap #1 — Module/Menu Styling:** ✅ החלטה התקבלה; SSOT הוטמע. **יישום:** Team 40 (עיצוב) + Team 30 (יישום/בדיקות); סבב דיוק ויזואלי על מודול דוגמה **מול G-Lead** → המודול כסטנדרט.
 2. **Gap #2 — Header Persistence:** **Team 50** (אחריות בדיקות) — הרצת Gate A (Login→Home→Header); צירוף Evidence (JSON/report); PASS → סגירה, FAIL → תיקון (תיאום עם Team 30).
 3. **לאחר סגירת שני הפערים:** פרסום "Batch 1+2 Closure Report" רשמי.
+
+---
+
+### 4.6 שער נוסף — System Status Values (יישום אחיד) — **אחרי** השלמת כל המשימות למעלה
+
+**תנאי הפעלה:** שלב זה **מבוצע רק אחרי** השלמה וולידציה של כל המשימות הקודמות (Gap #1 Module/Menu Styling + Gap #2 Header Persistence + פרסום Batch 1+2 Closure Report).  
+**לא לשלוח לצוותים עד אז** — כדי לא לבלבל עם תוכנית העבודה הנוכחית.
+
+| פריט | תיאור |
+|------|--------|
+| **מטרה** | יישום אחיד של רשימת סטטוסים מרכזית (SSOT → מקור קוד יחיד → Adapter יחיד) בכל המודולים. |
+| **תיעוד מלא (מוכן)** | כל התעוד נוצר; הצוותים יקבלו הפניה רק **אחרי** סגירת הפערים. |
+
+**הפניה לתעוד — לשימוש כשער הבא:**
+
+| מסמך | נתיב |
+|------|------|
+| SSOT סטטוסים | documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md |
+| מקור קוד יחיד | ui/src/utils/statusValues.js |
+| Adapter יחיד | ui/src/utils/statusAdapter.js |
+| מיפוי קוד (מקומות לעדכון) | documentation/02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md |
+| מנדט יישום לצוותים | _COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md |
+| אישור ל-Team 30 (סטטוסים) | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_STATUS_SSOT_ACK.md |
+
+**סדר ביצוע (לאחר סגירת פערים):** Team 10 מפנה צוותים (30/40/50 לפי מיפוי) לתיעוד ולמנדט היישום; יישום לפי Acceptance Criteria ב-SSOT; וולידציה.
 
 ---
 
@@ -135,6 +165,9 @@
 | DNA Button SSOT | documentation/04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md |
 | DNA Palette SSOT | documentation/04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md |
 | **Module/Menu Styling SSOT** | **documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md** |
+| **מודול דוגמה D16 (רפרנס)** | documentation/09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md |
+| **יישום לכל המודולים — Team 30** | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_D16_REFERENCE_ROLLOUT.md |
+| **יישום לכל המודולים — Team 40** | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_40_D16_REFERENCE_ROLLOUT.md |
 | אינדקס מאסטר | documentation/00-MANAGEMENT/00_MASTER_INDEX.md |
 
 ---

@@ -189,6 +189,20 @@
   margin-bottom: var(--spacing-lg, 24px);
 }
 
+/* Two-column rows for compact layout */
+.phoenix-modal__body .form-row {
+  display: flex;
+  gap: 21px; /* 16px + 5px extra between columns */
+  margin-bottom: var(--spacing-lg, 24px);
+}
+.phoenix-modal__body .form-row:last-child {
+  margin-bottom: 0;
+}
+.phoenix-modal__body .form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .phoenix-modal__body .form-group:last-child {
   margin-bottom: 0;
 }
@@ -199,6 +213,11 @@
   font-weight: 600;
   color: var(--apple-text-primary, #1d1d1f);
   margin-bottom: var(--spacing-xs, 4px);
+}
+
+/* Asterisk + validation: danger color */
+.phoenix-modal__body .form-label-asterisk {
+  color: var(--color-error-red, #dc2626);
 }
 
 /* Input, Textarea, Select: identical padding for same height.

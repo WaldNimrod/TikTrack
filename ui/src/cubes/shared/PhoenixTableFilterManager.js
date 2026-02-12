@@ -262,16 +262,18 @@ class PhoenixTableFilterManager {
   }
 
   /**
-   * parseDate - פרסור תאריך מפורמט DD/MM/YYYY
+   * parseDate - פרסור תאריך מפורמט DD/MM/YY או DD/MM/YYYY
    * 
-   * @description המרת תאריך מפורמט DD/MM/YYYY ל-Date object
-   * @param {string} dateString - מחרוזת תאריך בפורמט DD/MM/YYYY
+   * @description המרת תאריך מפורמט DD/MM/YY ל-Date object
+   * @param {string} dateString - מחרוזת תאריך בפורמט DD/MM/YY
    * @returns {Date} - אובייקט תאריך
    */
   parseDate(dateString) {
     const parts = dateString.split('/');
     if (parts.length === 3) {
-      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+      let year = parts[2];
+      if (year.length === 2) year = '20' + year; /* yy → 20yy */
+      return new Date(`${year}-${parts[1]}-${parts[0]}`);
     }
     return new Date(dateString);
   }

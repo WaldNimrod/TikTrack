@@ -136,9 +136,12 @@ const PhoenixTable = ({
           </span>
         );
       case 'date':
-        // פורמט תאריך: DD/MM/YYYY
+        // פורמט תאריך: DD/MM/YY
         if (value instanceof Date) {
-          return value.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const d = value.getDate().toString().padStart(2, '0');
+          const m = (value.getMonth() + 1).toString().padStart(2, '0');
+          const y = value.getFullYear().toString().slice(-2);
+          return `${d}/${m}/${y}`;
         }
         return value;
       case 'boolean':

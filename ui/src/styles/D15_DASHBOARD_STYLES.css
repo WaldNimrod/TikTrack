@@ -891,31 +891,18 @@ tt-section .dashboard-section__body .info-summary {
   margin-inline: 0;
 }
 
-.info-summary__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-lg, 24px);
-  justify-content: flex-start; /* Text at start (right in RTL) */
-}
-
-.index-section__body .info-summary .info-summary__row,
-.dashboard-section__body .info-summary .info-summary__row,
-tt-section .index-section__body .info-summary .info-summary__row,
-tt-section .dashboard-section__body .info-summary .info-summary__row {
-  justify-content: flex-start; /* Text at start (right in RTL) */
+/* info-summary layout: content centered, button at end - see phoenix-components.css */
+.index-section__body .info-summary .info-summary__row--first,
+.dashboard-section__body .info-summary .info-summary__row--first,
+tt-section .index-section__body .info-summary .info-summary__row--first,
+tt-section .dashboard-section__body .info-summary .info-summary__row--first {
+  justify-content: space-between;
   width: 100%;
 }
 
-.info-summary__row > div,
-.info-summary__row > span {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs, 8px);
-}
-
-.info-summary__row .portfolio-summary__toggle-btn {
-  margin-inline-start: auto; /* Button at end (left in RTL) */
+.index-section__body .info-summary .info-summary__row--second,
+.dashboard-section__body .info-summary .info-summary__row--second {
+  justify-content: center;
 }
 
 .info-summary strong {

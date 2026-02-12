@@ -306,10 +306,12 @@ class PhoenixTableSortManager {
       text = text.replace(/[^\d.-]/g, '');
       return parseFloat(text) || 0;
     } else if (sortType === 'date') {
-      // פורמט תאריך: DD/MM/YYYY
+      // פורמט תאריך: DD/MM/YY
       const parts = text.split('/');
       if (parts.length === 3) {
-        return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+        let year = parts[2];
+        if (year.length === 2) year = '20' + year;
+        return new Date(`${year}-${parts[1]}-${parts[0]}`);
       }
       return new Date(text);
     } else if (sortType === 'boolean') {

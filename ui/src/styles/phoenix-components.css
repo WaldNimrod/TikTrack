@@ -223,23 +223,42 @@ tt-section-row > * {
 }
 
 .dashboard-section__header-toggle-btn,
-.index-section__header-toggle-btn,
-.dashboard-section__header-action-btn,
-.index-section__header-action-btn {
+.index-section__header-toggle-btn {
   display: flex;
-  align-items: center; /* CRITICAL: Aligned to middle */
+  align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
   padding: 0;
-  margin: 0; /* No margin - parent handles spacing */
+  margin: 0;
   background: transparent;
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease;
   color: var(--apple-text-primary, #1d1d1f);
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
+}
+
+/* Add/Action button - padding for icon+text, icon-only inherits from toggle */
+.dashboard-section__header-action-btn,
+.index-section__header-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs, 6px);
+  min-width: 32px;
+  height: 32px;
+  padding: 0 12px; /* Padding before/after content */
+  margin: 0;
+  background: transparent;
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--apple-text-primary, #1d1d1f);
+  flex-shrink: 0;
+  font-size: var(--font-size-sm, 14px);
 }
 
 .dashboard-section__header-toggle-btn:hover,
@@ -601,11 +620,11 @@ body .page-wrapper .page-container main {
   opacity: 1;
 }
 
-/* Table Cell */
+/* Table Cell - font-size sm to prevent oversized text (שם חשבון, מטבע, עודכן, וכו') */
 .phoenix-table__cell {
   display: table-cell;
   padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
-  font-size: var(--font-size-base, 14px);
+  font-size: var(--font-size-sm, 14px);
   font-weight: var(--font-weight-normal, 400);
   color: var(--apple-text-primary, #1d1d1f);
   vertical-align: middle;
@@ -1220,23 +1239,42 @@ body .page-wrapper .page-container main {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-lg, 24px);
-}
-
-.info-summary__row--first {
-  justify-content: flex-start !important; /* Text to start of line */
   width: 100%;
 }
 
-.info-summary__row--first > div,
-.info-summary__row--first > span {
+/* Content area: centered, full width minus button, spacing from button */
+.info-summary__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg, 24px);
+}
+
+.info-summary__row--first {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.info-summary__row--first .info-summary__content > div,
+.info-summary__row--first .info-summary__content > span,
+.info-summary__row--first > div:not(.info-summary__content) {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 8px);
 }
 
-/* Toggle button aligned to end (right in RTL) */
+/* Button always at end of row */
 .info-summary__row--first .portfolio-summary__toggle-btn {
-  margin-inline-start: auto !important; /* Push to end */
+  margin-inline-start: var(--spacing-md, 16px);
+  flex-shrink: 0;
+}
+
+/* First row without wrapper (legacy): center content when no button */
+.info-summary__row--first:not(:has(.portfolio-summary__toggle-btn)) {
+  justify-content: center;
 }
 
 .portfolio-summary__toggle-btn {
@@ -1264,6 +1302,7 @@ body .page-wrapper .page-container main {
 .info-summary__row--second {
   display: none; /* CRITICAL: Hidden by default - JavaScript will show via class toggle */
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--spacing-md, 16px);
   margin: 0;
   padding: var(--spacing-sm, 8px) 0;
@@ -1413,7 +1452,7 @@ body .page-wrapper .page-container main {
 }
 
 
-/* Sticky Column - פעולות (אחרונה משמאל ב-RTL) */
+/* Sticky Column - פעולות (אחרונה משמאל ב-RTL) - ללא כותרת גלויה, עמודה צרה יותר */
 .phoenix-table__header.col-actions,
 .phoenix-table__cell.col-actions {
   position: sticky;
@@ -1421,6 +1460,18 @@ body .page-wrapper .page-container main {
   background: var(--apple-bg-elevated, #ffffff);
   z-index: var(--z-index-sticky, 200);
   box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header: hide text visually, keep for screen readers (פעולות) */
+.phoenix-table__header.col-actions .phoenix-table__header-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 /* Header sticky עם רקע נפרד */

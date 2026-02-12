@@ -80,13 +80,13 @@ function formatNumber(number, decimals = 0) {
 /**
  * formatDate - פורמט תאריך
  * 
- * @description פורמט תאריך לפורמט DD/MM/YYYY
+ * @description פורמט תאריך לפורמט DD/MM/YY (ברירת מחדל במערכת)
  * @param {Date|string} date - תאריך (Date object או מחרוזת)
- * @returns {string} מחרוזת תאריך בפורמט DD/MM/YYYY
+ * @returns {string} מחרוזת תאריך בפורמט DD/MM/YY
  * 
  * @example
- * formatDate(new Date('2026-02-01')) // "01/02/2026"
- * formatDate('2026-02-01') // "01/02/2026"
+ * formatDate(new Date('2026-02-01')) // "01/02/26"
+ * formatDate('2026-02-01') // "01/02/26"
  */
 function formatDate(date) {
   if (!date) {
@@ -100,7 +100,7 @@ function formatDate(date) {
 
   const day = String(dateObj.getDate()).padStart(2, '0');
   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const year = dateObj.getFullYear();
+  const year = String(dateObj.getFullYear()).slice(-2); /* yy */
 
   return `${day}/${month}/${year}`;
 }

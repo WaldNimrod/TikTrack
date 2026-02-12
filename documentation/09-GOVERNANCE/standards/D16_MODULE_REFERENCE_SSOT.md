@@ -98,4 +98,18 @@
 
 ---
 
+## 7. סגנונות כלליים (Base Template) — תקף לכל העמודים
+
+הבאים חלים על כל העמודים הממשים תבנית בסיס (ללא כניסה/אוטנטיקציה):
+
+| נושא | סטנדרט | קובץ |
+|------|--------|------|
+| כפתור הוספה | padding 0 12px לפני/אחרי תוכן | phoenix-components.css |
+| עמודת פעולות | ללא כותרת גלויה (sr-only), עמודה צרה | phoenix-components.css |
+| תאריך | פורמט DD/MM/YY | tableFormatters.js, PhoenixTable.jsx |
+| גופן תאים | font-size-sm (שם, מטבע, עודכן) | phoenix-components.css |
+| סיכום מידע | כפתור בסוף שורה; מידע ממורכז; שורה שנייה מוסתרת כברירת מחדל | phoenix-components.css, HTML |
+
+---
+
 **log_entry | [Team 30] | D16_MODULE_REFERENCE | LOCKED | 2026-01-31 | G-Lead approval**

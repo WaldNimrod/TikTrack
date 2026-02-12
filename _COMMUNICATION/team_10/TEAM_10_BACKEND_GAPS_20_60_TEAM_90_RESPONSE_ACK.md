@@ -40,6 +40,12 @@ Team 90 עבר על הדוח והשיב כדלהלן.
 - **המלצת Team 90:** להשלים את שלושת רכיבי החוזה כדי לשמור על יסודות נקיים.
 - Team 90: אם תרצו, נוכל לספק שלד מסמך PDSC להטמעה.
 
+### ✅ החלטת אדריכלית (אושרה)
+
+**הודעת Team 90 אושרה על ידי האדריכלית.**  
+- PDSC Boundary Contract — **חוסם** (לפי ההחלטה); **scope מאושר: שלושת הרכיבים המלאים** (JSON Error Schema, Response Contract, Error Codes Enum).  
+- Team 90 יכול לספק שלד מסמך PDSC להטמעה ל-Team 20.
+
 ---
 
 ## 2. פעולות שבוצעו (Team 10)
@@ -52,10 +58,29 @@ Team 90 עבר על הדוח והשיב כדלהלן.
 
 ---
 
-## 3. המשך
+## 3. הודעות ביצוע שהוצאו (2026-02-12)
 
-- **1.2.1 + Auth:** הפניה ל-Team 20 (או 50 לאימות) — ביצוע + עדכון SSOT/OpenAPI.
-- **PDSC:** העלאה לאדריכלית/G-Lead להחלטה; שיקול המלצת Team 90 (3 רכיבים + שלד מסמך).
+| צוות | מסמך | תוכן |
+|------|------|------|
+| **Team 20** | TEAM_10_TO_TEAM_20_BACKEND_TASKS_EXECUTION_MANDATE.md | מנדט ביצוע: אימות Summary endpoints + עדכון OpenAPI/SSOT; Auth Contract + OpenAPI; PDSC — ממתין להחלטה, לאחר מכן scope יימסר |
+| **Team 50** | TEAM_10_TO_TEAM_50_VERIFY_SUMMARY_ENDPOINTS_REQUEST.md | בקשת אימות בפועל ל-4 endpoints (Summary + currency_conversions) |
+| **אדריכלית/G-Lead** | 90_Architects_comunication/TEAM_10_TO_ARCHITECT_PDSC_DECISION_REQUEST.md | בקשת החלטה — **החלטה התקבלה:** אושר (ראה להלן) |
+
+---
+
+## 4. החלטת אדריכלית — PDSC (עודכן)
+
+**הודעת Team 90 אושרה על ידי האדריכלית.**  
+- **PDSC:** חוסם סגירת Phase 2; **scope מאושר — שלושת הרכיבים המלאים** (JSON Error Schema, Response Contract, Error Codes Enum).  
+- **Team 20:** שלד מחייב + דוגמאות ב-SSOT: `documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md` (סעיף "שלד מחייב (Team 90)"); הודעה רשמית: TEAM_10_TO_TEAM_20_PDSC_AUTH_SKELETON_SSOT_DELIVERY.md. ביצוע + עדכון OpenAPI.
+- **Team 90:** בקשת השלד נענתה — השלד שולב ב-SSOT והועבר ל-Team 20; אם נדרש — Team 90 יספק בדיקה מהירה מול הקוד.
+
+---
+
+## 5. המשך
+
+- **1.2.1 + Auth:** Team 20 — ביצוע לפי מנדט; Team 50 — אימות endpoints לפי בקשת האימות.
+- **PDSC + Auth:** Team 20 — שלד מחייב ב-SSOT (TT2_PDSC_BOUNDARY_CONTRACT.md); הודעה מחייבת: TEAM_10_TO_TEAM_20_PDSC_AUTH_SKELETON_SSOT_DELIVERY.md.
 
 ---
 

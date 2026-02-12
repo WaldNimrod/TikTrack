@@ -4,14 +4,193 @@
 **owner:** Team 10 (The Gateway) - SSOT  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** `TEAM_20_30_PDSC_SHARED_BOUNDARY_CONTRACT.md` (promoted from Communication)  
-**last_updated:** 2026-02-07  
-**version:** v1.0 (Promoted to SSOT)
+**last_updated:** 2026-02-12  
+**version:** v1.1 (Team 90 Binding Skeleton)
 
 ---
 
-**מקור:** `TEAM_10_TO_TEAM_20_PDSC_BOUNDARY_CONTRACT_CRITICAL.md` + סשן חירום Team 20 + Team 30  
-**תאריך:** 2026-02-07  
-**מקור סטטוס:** ✅ **COMPLETE - FINAL** (Emergency Session)
+**מקור:** `TEAM_10_TO_TEAM_20_PDSC_BOUNDARY_CONTRACT_CRITICAL.md` + סשן חירום Team 20 + Team 30 + Team 90  
+**תאריך:** 2026-02-12  
+**מקור סטטוס:** ✅ **COMPLETE - FINAL** (Emergency Session) + **Team 90 Binding Skeleton**
+
+---
+
+## 🔒 Team 90 שלד מחייב (MANDATORY) — 2026-02-12
+
+**מקור:** Team 90 — PDSC Boundary + Auth Contract שלד מדויק  
+**סטטוס:** חובה לתיעוד ולביצוע
+
+### A. Error Schema (JSON Error) — חובה
+
+```json
+{
+  "error_code": "VALIDATION_INVALID_FORMAT",
+  "detail": "human-readable error",
+  "field_errors": [
+    {"field": "commission_value", "message": "must be numeric"}
+  ],
+  "trace_id": "optional"
+}
+```
+
+**שדות:**
+| שדה | סוג | חובה | תיאור |
+|-----|-----|------|-------|
+| `error_code` | string | ✅ | קוד שגיאה (ראה Error Codes Enum) |
+| `detail` | string | ✅ | הודעת שגיאה קריאה |
+| `field_errors` | array | ❌ | רשימת שגיאות שדה (validation) |
+| `trace_id` | string | ❌ | מזהה לעקיבה (אופציונלי) |
+
+---
+
+### B. Response Contract (Success) — חובה
+
+```json
+{
+  "status": "ok",
+  "data": {...},
+  "meta": {
+    "page": 1,
+    "page_size": 25,
+    "total": 120
+  }
+}
+```
+
+**שדות:**
+| שדה | סוג | חובה | תיאור |
+|-----|-----|------|-------|
+| `status` | string | ✅ | תמיד `"ok"` בהצלחה |
+| `data` | object | ✅ | נתוני התגובה |
+| `meta` | object | ❌ | page, page_size, total (pagination) |
+
+---
+
+### C. Error Codes Enum (SSOT) — חובה
+
+| Code | תיאור |
+|------|-------|
+| `VALIDATION_INVALID_FORMAT` | שגיאת validation בפורמט |
+| `AUTH_INVALID_TOKEN` | טוקן לא תקין |
+| `AUTH_EXPIRED_TOKEN` | טוקן שפג תוקפו |
+| `RESOURCE_NOT_FOUND` | משאב לא נמצא |
+| `PERMISSION_DENIED` | אין הרשאה |
+| `SERVER_ERROR` | שגיאת שרת |
+
+**מיפוי ל-ErrorCodes הקיים:** `api/utils/exceptions.py`  
+- AUTH_INVALID_TOKEN ≈ AUTH_TOKEN_INVALID  
+- AUTH_EXPIRED_TOKEN ≈ AUTH_TOKEN_EXPIRED  
+- RESOURCE_NOT_FOUND ≈ USER_NOT_FOUND / FINANCIAL_*_NOT_FOUND  
+- PERMISSION_DENIED ≈ AUTH_UNAUTHORIZED (403)
+
+---
+
+### D. Auth Contract — חובה
+
+**Auth Response (SSOT):**
+
+```json
+{
+  "access_token": "jwt",
+  "token_type": "bearer",
+  "expires_at": "2026-02-12T12:34:56Z",
+  "user": {
+    "id": "uuid",
+    "email": "user@...",
+    "role": "ADMIN|USER",
+    "user_tier": "FREE|PRO|Bronze|Silver|Gold|Platinum"
+  }
+}
+```
+
+**Endpoints לתיעוד:** `POST /auth/login`, `POST /auth/register`, `POST /auth/refresh`, `GET /users/me`, `GET /users/profile`  
+**מסמך מלא:** `documentation/07-CONTRACTS/SSOT_AUTH_CONTRACT.md`
+
+---
+
+### Acceptance Criteria (חובה)
+
+- Error Schema אחיד בכל endpoint
+- Success Contract אחיד בכל endpoint
+- Auth responses זהים בכל זרימה
+- OpenAPI/SSOT מעודכן לפי השלד
+- אם נדרש — Team 90 יספק בדיקה מהירה מול הקוד
+
+---
+
+## 📌 שלד מחייב (Team 90 — גרסה קומפקטית) 🔒
+
+**מקור:** הודעה מצוות 90 אושרה על ידי האדריכלית. נדרש מימוש ותיעוד OpenAPI לפי שלד זה.
+
+### A. Error Schema (JSON Error) — מחייב
+
+```json
+{
+  "error_code": "VALIDATION_INVALID_FORMAT",
+  "detail": "human-readable error",
+  "field_errors": [
+    {"field": "commission_value", "message": "must be numeric"}
+  ],
+  "trace_id": "optional"
+}
+```
+
+### B. Response Contract (Success) — מחייב
+
+```json
+{
+  "status": "ok",
+  "data": {},
+  "meta": {
+    "page": 1,
+    "page_size": 25,
+    "total": 120
+  }
+}
+```
+
+### C. Error Codes Enum (SSOT) — מחייב
+
+- `VALIDATION_INVALID_FORMAT`
+- `AUTH_INVALID_TOKEN`
+- `AUTH_EXPIRED_TOKEN`
+- `RESOURCE_NOT_FOUND`
+- `PERMISSION_DENIED`
+- `SERVER_ERROR`
+
+### D. Auth Contract — שלד מחייב (SSOT)
+
+**Auth Response:**
+
+```json
+{
+  "access_token": "jwt",
+  "token_type": "bearer",
+  "expires_at": "2026-02-12T12:34:56Z",
+  "user": {
+    "id": "uuid",
+    "email": "user@...",
+    "role": "ADMIN|USER",
+    "user_tier": "FREE|PRO|..."
+  }
+}
+```
+
+**Endpoints לתיעוד:**
+
+- `POST /auth/login`
+- `POST /auth/register`
+- `POST /auth/refresh`
+- `GET /users/me`
+- `GET /users/profile`
+
+### Acceptance Criteria (חובה)
+
+- Error Schema אחיד בכל endpoint.
+- Success Contract אחיד בכל endpoint.
+- Auth responses זהים בכל זרימה.
+- OpenAPI/SSOT מעודכן לפי השלד.
+- אם נדרש — Team 90 יספק בדיקה מהירה מול הקוד.
 
 ---
 

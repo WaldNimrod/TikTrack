@@ -14,9 +14,51 @@ paths:
           description: "OK"
   /auth/login:
     post:
-      summary: "User authentication"
+      summary: "User authentication (Auth Contract SSOT)"
+      description: "Returns access_token, token_type, expires_at, user per SSOT_AUTH_CONTRACT"
       responses:
-        '200': { description: "Success" }
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/register:
+    post:
+      summary: "Register new user (Auth Contract SSOT)"
+      responses:
+        '201':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/refresh:
+    post:
+      summary: "Refresh access token (Auth Contract SSOT)"
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /users/me:
     get:
       summary: "Get current user profile (D25)"
@@ -62,6 +104,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    /summary:
+      get:
+        summary: "Get trading accounts summary (Option A - SSOT)"
+        description: "Get trading accounts summary statistics without list of accounts"
+        x-option: "A"
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: status
+            in: query
+            description: "Filter by canonical status (active|inactive|pending|cancelled)"
+            schema:
+              type: string
+              enum: [active, inactive, pending, cancelled]
+        responses:
+          '200':
+            description: "Success"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TradingAccountSummaryResponse'
+          '401':
+            description: "Unauthorized"
+          '500':
+            description: "Internal Server Error"
+  /brokers_fees:
+    get:
+      summary: "List all broker fees (D18)"
+      description: "Get broker fees for current user with filters"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: trading_account_id
+          in: query
+          description: "Filter by trading account ULID (ADR-015)"
+          schema:
+            type: string
+        - name: broker
+          in: query
+          description: "Filter by broker name"
+          schema:
+            type: string
+        - name: commission_type
+          in: query
+          description: "Filter by commission type (TIERED/FLAT)"
+          schema:
+            type: string
+            enum: [TIERED, FLAT]
+        - name: search
+          in: query
+          description: "Search in account name, broker, commission value"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrokerFeeListResponse'
+        '401':
+          description: "Unauthorized"
+        '500':
+          description: "Internal Server Error"
+    /summary:
+      get:
+        summary: "Get brokers fees summary (Option A - SSOT)"
+        description: "Get brokers fees summary statistics without list"
+        x-option: "A"
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: trading_account_id
+            in: query
+            description: "Filter by trading account ULID"
+            schema:
+              type: string
+          - name: broker
+            in: query
+            schema:
+              type: string
+          - name: commission_type
+            in: query
+            schema:
+              type: string
+              enum: [TIERED, FLAT]
+        responses:
+          '200':
+            description: "Success"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BrokerFeeSummaryResponse'
+          '401':
+            description: "Unauthorized"
+          '500':
+            description: "Internal Server Error"
   /cash_flows:
     get:
       summary: "List all cash flows"
@@ -92,7 +231,7 @@ paths:
           description: "Filter by flow_type"
           schema:
             type: string
-            enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER]
+            enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION]
       responses:
         '200':
           description: "Success"
@@ -120,8 +259,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     /summary:
       get:
-        summary: "Get cash flows summary only"
+        summary: "Get cash flows summary only (Option A - SSOT)"
         description: "Get cash flows summary statistics without list of transactions"
+        x-option: "A"
         security:
           - bearerAuth: []
         parameters:
@@ -150,6 +290,44 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/CashFlowListResponse'
+          '400':
+            description: "Bad Request"
+          '401':
+            description: "Unauthorized"
+          '500':
+            description: "Internal Server Error"
+    /currency_conversions:
+      get:
+        summary: "Get currency conversions (Option A - SSOT)"
+        description: "Get list of currency conversion transactions (flow_type=CURRENCY_CONVERSION)"
+        x-option: "A"
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: trading_account_id
+            in: query
+            description: "Filter by trading account ULID"
+            schema:
+              type: string
+          - name: date_from
+            in: query
+            description: "Filter by transaction_date >= date_from"
+            schema:
+              type: string
+              format: date
+          - name: date_to
+            in: query
+            description: "Filter by transaction_date <= date_to"
+            schema:
+              type: string
+              format: date
+        responses:
+          '200':
+            description: "Success"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CurrencyConversionListResponse'
           '400':
             description: "Bad Request"
             content:
@@ -230,6 +408,24 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    AuthResponse:
+      type: object
+      description: "Auth Contract SSOT (Team 90) - login, register, refresh"
+      required: [access_token, token_type, expires_at, user]
+      properties:
+        access_token: { type: string, description: "JWT access token" }
+        token_type: { type: string, example: "bearer" }
+        expires_at: { type: string, format: date-time }
+        user:
+          $ref: '#/components/schemas/AuthUser'
+    AuthUser:
+      type: object
+      description: "User object in Auth response"
+      properties:
+        id: { type: string, description: "User ID (ULID)" }
+        email: { type: string }
+        role: { type: string, enum: [ADMIN, USER, SUPERADMIN] }
+        user_tier: { type: string, description: "FREE|PRO|Bronze|Silver|Gold|Platinum" }
     UserResponse:
       type: object
       properties:
@@ -314,6 +510,75 @@ components:
         total:
           type: integer
           description: "Total count"
+    TradingAccountSummaryResponse:
+      type: object
+      required:
+        - total_accounts
+        - active_accounts
+        - total_account_value
+        - total_cash_balance
+        - total_holdings_value
+        - total_unrealized_pl
+        - total_positions
+      properties:
+        total_accounts: { type: integer, description: "Total number of trading accounts" }
+        active_accounts: { type: integer, description: "Number of active accounts" }
+        total_account_value: { type: number, format: decimal }
+        total_cash_balance: { type: number, format: decimal }
+        total_holdings_value: { type: number, format: decimal }
+        total_unrealized_pl: { type: number, format: decimal }
+        total_positions: { type: integer }
+    BrokerFeeResponse:
+      type: object
+      properties:
+        id: { type: string, description: "External ULID" }
+        trading_account_id: { type: string }
+        account_name: { type: string }
+        commission_type: { type: string, enum: [TIERED, FLAT] }
+        commission_value: { type: number }
+        minimum: { type: number }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    BrokerFeeListResponse:
+      type: object
+      required: [data, total]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrokerFeeResponse'
+        total: { type: integer }
+    BrokerFeeSummaryResponse:
+      type: object
+      required:
+        - total_brokers
+        - active_brokers
+      properties:
+        total_brokers: { type: integer }
+        active_brokers: { type: integer }
+        avg_commission_per_trade: { type: number }
+        monthly_fixed_commissions: { type: number }
+        yearly_fixed_commissions: { type: number }
+    CurrencyConversionResponse:
+      type: object
+      properties:
+        id: { type: string }
+        date: { type: string, format: date }
+        account: { type: string }
+        from_currency: { type: string }
+        from_amount: { type: number }
+        to_currency: { type: string }
+        to_amount: { type: number }
+        rate: { type: number }
+    CurrencyConversionListResponse:
+      type: object
+      required: [data, total]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyConversionResponse'
+        total: { type: integer }
     CashFlowResponse:
       type: object
       required:
@@ -335,7 +600,7 @@ components:
           description: "Transaction date"
         flow_type:
           type: string
-          enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER]
+          enum: [DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION]
           description: "Flow type"
         subtype:
           type: string
@@ -485,17 +750,29 @@ components:
           description: "Total count"
     ErrorResponse:
       type: object
+      description: "PDSC Error Schema (Team 90 SSOT)"
       required:
-        - detail
         - error_code
+        - detail
       properties:
+        error_code:
+          type: string
+          description: "Machine-readable error code (VALIDATION_INVALID_FORMAT, AUTH_INVALID_TOKEN, etc.)"
         detail:
           oneOf:
             - type: string
             - type: array
               items:
                 type: object
-          description: "Error details"
-        error_code:
+          description: "Human-readable error message"
+        field_errors:
+          type: array
+          description: "Validation field errors (optional)"
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }
+        trace_id:
           type: string
-          description: "Machine-readable error code"
+          description: "Trace ID for debugging (optional)"

@@ -39,17 +39,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """
     Handler for Pydantic validation errors.
     
-    Adds error_code to validation error responses.
-    This ensures all validation errors include error_code for frontend handling.
+    PDSC Error Schema (Team 90): error_code, detail, field_errors, trace_id.
     """
     logger.debug(f"RequestValidationError caught: {exc.errors()}")
-    return JSONResponse(
-        status_code=422,
-        content={
-            "detail": exc.errors(),
-            "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT
-        }
-    )
+    # Build field_errors per Team 90 SSOT (PDSC Error Schema)
+    field_errors = []
+    for e in exc.errors():
+        loc = e.get("loc", ())
+        # Extract field name: ('body','x') -> 'x', ('query','y') -> 'y'
+        field_name = loc[-1] if len(loc) > 1 else (loc[0] if loc else "body")
+        field_errors.append({"field": str(field_name), "message": e.get("msg", "Validation error")})
+    content = {
+        "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT,
+        "detail": exc.errors()[0].get("msg", "Validation error") if exc.errors() else "Validation error",
+        "field_errors": field_errors
+    }
+    return JSONResponse(status_code=422, content=content)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 

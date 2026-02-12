@@ -55,18 +55,11 @@
 
 ### 2.3 PDSC Boundary Contract
 
-**סטטוס:** ממתין.
+**סטטוס:** ✅ **החלטה התקבלה** — הודעת Team 90 אושרה על ידי האדריכלית.
 
-**מה נדרש:**
-- **Team 20:** מסמך חוזה משותף (מקור החוק):  
-  - JSON Error Schema (מפורט)  
-  - Response Contract (Success + Error)  
-  - Error Codes Enum  
-- **תיאום עם Team 30** לפני סיום (מנדט קיים).
+**Scope מאושר:** **שלושת הרכיבים המלאים** — JSON Error Schema, Response Contract, Error Codes Enum. תיאום עם Team 30 לפני סיום (מנדט קיים).
 
-**החלטה נדרשת?** **כן — בהירות scope ותעדוף.**  
-- האם להשלים את כל שלושת הרכיבים לפני סגירת Phase 2, או לאשר גרסה מינימלית (למשל רק JSON Error Schema) ושאר הרכיבים בשלב מאוחר?  
-- **שאלה להעלאה:** לאדריכלית / G-Lead — תעדוף PDSC מול לוח זמנים (חוסם לעומת לא חוסם).
+**מה נדרש:** Team 20 — ביצוע לפי TEAM_10_TO_TEAM_20_PDSC_BOUNDARY_CONTRACT_MANDATE; אפשרות לקבל שלד מסמך PDSC מ-Team 90 (TEAM_10_TO_TEAM_90_PDSC_SKELETON_REQUEST.md).
 
 ---
 
@@ -90,20 +83,18 @@
 |---|-----|-------------|--------------|
 | 1 | 1.2.1 Summary endpoints | אימות ריצה של כל ה-Summary endpoints; עדכון תיעוד SSOT/OpenAPI | לא |
 | 2 | 1.2.2 פורטים + Precision | יישור סטטוס במסמך — "הושלם (אימות Team 60)" | לא (או החלטה: לאמץ אימות 60 כסגירה) |
-| 3 | PDSC Boundary Contract | Team 20: JSON Error Schema + Response Contract + Error Codes; תיאום עם 30 | **כן** — תעדוף/scope (האם חוסם, מינימום ליציאה) |
+| 3 | PDSC Boundary Contract | Team 20: 3 רכיבים (JSON Error Schema + Response Contract + Error Codes); תיאום עם 30 | ✅ **החלטה התקבלה** — אדריכלית אישרה; scope: 3 רכיבים מלאים |
 | 4 | Auth Contract + SSOT | Team 20: חוזה אחיד + עדכון OpenAPI/SSOT | לא (מנדט ברור) |
 
 ---
 
-## 4. המלצה — החלטות/שאלות להעלאה
+## 4. עדכון — החלטת אדריכלית (הודעת Team 90 אושרה)
 
-1. **PDSC:** להעלות לאדריכלית / Team 10:  
-   - האם PDSC Boundary Contract **חוסם** סגירת Phase 2 / שער?  
-   - אם כן — האם גרסה מינימלית (למשל JSON Error Schema בלבד) מספיקה ליציאה, או נדרשים שלושת הרכיבים?
+1. **PDSC:** ✅ **החלטה התקבלה** — האדריכלית אישרה את הודעת Team 90. PDSC חוסם; scope: **שלושת הרכיבים המלאים**. Team 20 — ביצוע לפי מנדט; Team 90 — בקשת שלד מסמך PDSC להטמעה.
 
-2. **1.2.2:** לאמץ רשמית את אימות Team 60 כסגירת משימה 1.2.2 בצד השאת — ולעדכן OPEN_TASKS בהתאם (ממתין → הושלם).
+2. **1.2.2:** ✅ אומת Team 60; OPEN_TASKS עודכן ל־הושלם.
 
-3. **1.2.1:** להוציא ל-Team 20 (או 50) משימת **אימות ותיעוד** — checklist של כל Summary + Conversions endpoints ורישום ב-SSOT.
+3. **1.2.1:** הוצאו הודעות ביצוע ל-Team 20 ו-Team 50 (אימות + עדכון SSOT).
 
 ---
 

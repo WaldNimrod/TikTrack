@@ -35,10 +35,11 @@
 
 ---
 
-## 4. תמצית כללים
+## 4. תמצית כללים + פורמט אחיד (SV-prefixed)
 
-- **System Version (SV)** = מקור האמת; כרגיל **SV = 1.0.0** (LOCKED).
-- **שכבות:** API, DB, UI, Routes — כולן חייבות להיות תחת **1.x.x** (חוק Ceiling).
+- **System Version (SV)** = מקור האמת; כרגיל **SV = 1.0** (LOCKED).
+- **פורמט גרסה בתיעוד:** כל שכבה מוצגת עם תחילית SV — `SV.Major.SV.Minor.LayerMajor.LayerMinor.LayerPatch` (דוגמה: 1.0.2.5.0). **אין גרסה שכבתית בלי תחילית SV במסמכי משילות.**
+- **חוק Ceiling:** אף שכבה לא מציגה Major מעל SV Major.
 - **Major/Minor:** רק באישור G-Lead. **Patch/Build:** מותר אוטומטי.
 
 ---

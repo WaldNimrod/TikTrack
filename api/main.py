@@ -19,14 +19,15 @@ import os
 from .core.config import settings
 from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+from . import __version__
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
+# Create FastAPI app (version SSOT: api/__init__.py)
 app = FastAPI(
     title="TikTrack Project Phoenix API",
-    version="2.5.2",
+    version=__version__,
     description="Unified API Specification (Fortress Protocol)",
     docs_url="/docs",
     redoc_url="/redoc"

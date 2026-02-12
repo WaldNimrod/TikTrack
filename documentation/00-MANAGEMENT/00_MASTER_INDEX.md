@@ -78,7 +78,7 @@ _COMMUNICATION/
 
 - [📜 TT2_VERSIONING_POLICY.md](../10-POLICIES/TT2_VERSIONING_POLICY.md) - **נוהל משילות: ניהול גרסאות אחוד** — חוק Ceiling (תקרת SV), Major/Minor רק באישור G-Lead, Patch/Build אוטומטי ✅ **LOCKED**
 - [📊 TT2_VERSION_MATRIX.md](../10-POLICIES/TT2_VERSION_MATRIX.md) - מטריצת גרסאות נוכחית (System, API, DB, UI, Routes) + מיקומי גרסה בקוד
-- [📋 TT2_VERSIONING_PROCEDURE.md](../05-PROCEDURES/TT2_VERSIONING_PROCEDURE.md) - נוהל מימוש: תוכנית הטמעה, בדיקת תאימות ע"י Team 90 (ללא כתיבת קוד), עדכון מטריצה
+- [📋 TT2_VERSIONING_PROCEDURE.md](../05-PROCEDURES/TT2_VERSIONING_PROCEDURE.md) - נוהל מימוש: תוכנית הטמעה, **יישום יציב** (מקורות יחידים, checklist שחרור, קובץ VERSION), בדיקת תאימות ע"י Team 90
 
 ---
 

@@ -44,10 +44,10 @@ async function fetchBrokersFees(filters = {}) {
     const normalizedFilters = { ...filters };
     delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    // Gate B Fix: Remove empty strings from filters
+    // Gate B Fix: Remove empty/null strings from filters
     Object.keys(normalizedFilters).forEach(key => {
       const value = normalizedFilters[key];
-      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+      if (value == null || value === '' || (typeof value === 'string' && value.trim() === '')) {
         delete normalizedFilters[key];
       }
     });
@@ -111,10 +111,10 @@ async function fetchBrokersFeesSummary(filters = {}) {
     delete summaryFilters.pageSize;
     delete summaryFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
     
-    // Gate B Fix: Remove empty strings from filters
+    // Gate B Fix: Remove empty/null strings from filters
     Object.keys(summaryFilters).forEach(key => {
       const value = summaryFilters[key];
-      if (value === '' || (typeof value === 'string' && value.trim() === '')) {
+      if (value == null || value === '' || (typeof value === 'string' && value.trim() === '')) {
         delete summaryFilters[key];
       }
     });

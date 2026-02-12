@@ -2,56 +2,69 @@
  * Brokers Fees Form - Form component for add/edit broker fees
  * --------------------------------------------------------
  * Creates and manages form for broker fees (D18)
- * ADR-013: Broker select from GET /api/v1/reference/brokers
+ * ADR-015: Fees per Trading Account — trading_account_id required; no broker select
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
-import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
+import sharedServices from '../../../components/core/Shared_Services.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 /**
- * Create broker fee form HTML
- * @param {Object} data - Existing broker fee data (for edit mode) or null (for add mode)
- * @param {Array<{value: string, label: string}>} brokerOptions - Broker options for select
- * @returns {string} HTML string for the form
+ * Get trading accounts for dropdown
+ * @returns {Promise<Array>} Array of trading accounts
  */
-function createBrokerFeeFormHTML(data = null, brokerOptions = []) {
-  const isEdit = data !== null;
-  const broker = data?.broker || data?.brokerName || '';
-  const commissionType = data?.commissionType || data?.commission_type || 'TIERED';
-  // Extract numeric value if it's a formatted string, otherwise use as-is
-  const commissionValueRaw = data?.commissionValue || data?.commission_value || 0;
-  const commissionValue = typeof commissionValueRaw === 'string' && commissionValueRaw.includes('/') 
-    ? parseFloat(commissionValueRaw.replace(/[^0-9.]/g, '')) || 0 
-    : (typeof commissionValueRaw === 'number' ? commissionValueRaw : parseFloat(commissionValueRaw) || 0);
-  const minimum = data?.minimum || 0;
-
-  // Ensure current broker is in options (legacy/edit case)
-  const options = [...brokerOptions];
-  if (broker && !options.some(o => o.value === broker)) {
-    options.unshift({ value: broker, label: broker });
+async function getTradingAccounts() {
+  try {
+    if (window.PhoenixBridge?.state?.tradingAccounts?.length) {
+      return window.PhoenixBridge.state.tradingAccounts;
+    }
+    if (window.TradingAccountsDataLoader?.fetchTradingAccounts) {
+      const accountsData = await window.TradingAccountsDataLoader.fetchTradingAccounts();
+      return accountsData.data || [];
+    }
+    await sharedServices.init();
+    const response = await sharedServices.get('/trading_accounts', {});
+    return response.data || response || [];
+  } catch (error) {
+    maskedLog('[Brokers Fees Form] Error fetching trading accounts:', { errorCode: error?.code, status: error?.status });
+    return [];
   }
-  const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${broker === o.value ? 'selected' : ''}>${String(o.label)}</option>`).join('');
+}
 
-  const brokerFieldHTML = options.length > 0
-    ? `<select id="broker" name="broker" required>
-         <option value="">-- בחר ברוקר --</option>
-         ${brokerOptionsHTML}
-       </select>`
-    : `<input 
-          type="text" 
-          id="broker" 
-          name="broker" 
-          value="${broker}" 
-          required 
-          placeholder="הזן שם ברוקר"
-        />`;
+/**
+ * Create broker fee form HTML (ADR-015: trading_account_id, commission fields only)
+ * @param {Object} data - Existing broker fee data (for edit) or null (for add)
+ * @param {Array} tradingAccounts - Trading accounts for dropdown
+ * @param {string} preselectedAccountId - Pre-selected trading_account_id (e.g. from page filter)
+ */
+function createBrokerFeeFormHTML(data = null, tradingAccounts = [], preselectedAccountId = '') {
+  const isEdit = data !== null;
+  const tradingAccountId = data?.tradingAccountId ?? data?.trading_account_id ?? preselectedAccountId ?? '';
+  const commissionType = data?.commissionType ?? data?.commission_type ?? 'TIERED';
+  const commissionValueRaw = data?.commissionValue ?? data?.commission_value ?? 0;
+  const commissionValue = typeof commissionValueRaw === 'string' && commissionValueRaw.includes('/')
+    ? parseFloat(commissionValueRaw.replace(/[^0-9.]/g, '')) || 0
+    : (typeof commissionValueRaw === 'number' ? commissionValueRaw : parseFloat(commissionValueRaw) || 0);
+  const minimum = data?.minimum ?? 0;
+
+  let accountOptions = '<option value="">-- בחר חשבון מסחר --</option>';
+  if (tradingAccounts.length > 0) {
+    tradingAccounts.forEach((acc) => {
+      const id = acc.externalUlid ?? acc.id ?? acc.external_ulid ?? '';
+      const name = acc.displayName ?? acc.accountName ?? acc.display_name ?? acc.account_name ?? id;
+      const sel = id === tradingAccountId ? 'selected' : '';
+      accountOptions += `<option value="${String(id).replace(/"/g, '&quot;')}" ${sel}>${String(name).replace(/</g, '&lt;')}</option>`;
+    });
+  }
 
   return `
     <form id="brokerFeeForm" class="phoenix-form">
       <div class="form-group">
-        <label for="broker">שם ברוקר *</label>
-        ${brokerFieldHTML}
-        <span class="form-error" id="brokerError"></span>
+        <label for="tradingAccountId">חשבון מסחר *</label>
+        <select id="tradingAccountId" name="tradingAccountId" required>
+          ${accountOptions}
+        </select>
+        <span class="form-error" id="tradingAccountIdError"></span>
       </div>
       
       <div class="form-group">
@@ -100,81 +113,71 @@ function createBrokerFeeFormHTML(data = null, brokerOptions = []) {
  * Show broker fee modal (add/edit)
  * @param {Object} data - Existing broker fee data (for edit) or null (for add)
  * @param {Function} onSave - Callback function when form is saved
+ * @param {string} preselectedAccountId - Optional pre-selected trading_account_id
  */
-export async function showBrokerFeeFormModal(data, onSave) {
+export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId = '') {
   const isEdit = data !== null;
-  const title = isEdit ? 'עריכת עמלה' : 'הוספת ברוקר חדש';
-  
-  let brokerOptions = [];
-  try {
-    brokerOptions = await fetchReferenceBrokers();
-  } catch (e) {
-    console.warn('[Brokers Fees Form] Could not load brokers, fallback to text input:', e);
-  }
-  const formHTML = createBrokerFeeFormHTML(data, brokerOptions);
-  
+  const title = isEdit ? 'עריכת עמלה' : 'הוספת עמלה לחשבון';
+
+  const tradingAccounts = await getTradingAccounts();
+  const formHTML = createBrokerFeeFormHTML(data, tradingAccounts, preselectedAccountId);
+
   createModal({
-    title: title,
+    title,
     content: formHTML,
     entity: 'brokers_fees',
     showSaveButton: true,
     saveButtonText: 'שמור',
-    onSave: function() {
+    onSave: function () {
       const form = document.getElementById('brokerFeeForm');
       if (!form) return;
-      
-      // Validate form
+
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-      
-      // Collect form data
-      const brokerValue = document.getElementById('broker').value.trim();
-      const commissionTypeValue = document.getElementById('commissionType').value;
-      const commissionValueInput = document.getElementById('commissionValue').value.trim();
-      const minimumInput = document.getElementById('minimum').value.trim();
-      
-      // Parse commissionValue - ensure it's a valid number
+
+      const tradingAccountIdValue = document.getElementById('tradingAccountId')?.value?.trim() ?? '';
+      const commissionTypeValue = document.getElementById('commissionType')?.value ?? 'TIERED';
+      const commissionValueInput = document.getElementById('commissionValue')?.value?.trim() ?? '';
+      const minimumInput = document.getElementById('minimum')?.value?.trim() ?? '';
+
       const commissionValueParsed = commissionValueInput ? parseFloat(commissionValueInput) : NaN;
       const minimumParsed = minimumInput ? parseFloat(minimumInput) : NaN;
-      
-      // Validate required fields
-      if (!brokerValue) {
-        document.getElementById('brokerError').textContent = 'שם ברוקר הוא שדה חובה';
+
+      if (!tradingAccountIdValue) {
+        const errEl = document.getElementById('tradingAccountIdError');
+        if (errEl) errEl.textContent = 'חובה לבחור חשבון מסחר';
         return;
       }
-      
+
       if (isNaN(commissionValueParsed) || commissionValueParsed < 0) {
-        document.getElementById('commissionValueError').textContent = 'ערך עמלה חייב להיות מספר חיובי';
+        const errEl = document.getElementById('commissionValueError');
+        if (errEl) errEl.textContent = 'ערך עמלה חייב להיות מספר חיובי';
         return;
       }
-      
+
       if (isNaN(minimumParsed) || minimumParsed < 0) {
-        document.getElementById('minimumError').textContent = 'מינימום חייב להיות מספר חיובי';
+        const errEl = document.getElementById('minimumError');
+        if (errEl) errEl.textContent = 'מינימום חייב להיות מספר חיובי';
         return;
       }
-      
+
       const formData = {
-        broker: brokerValue,
+        tradingAccountId: tradingAccountIdValue,
         commissionType: commissionTypeValue,
-        commissionValue: commissionValueParsed, // Number, not string
-        minimum: minimumParsed // Number, not string
+        commissionValue: commissionValueParsed,
+        minimum: minimumParsed
       };
-      
-      // Clear errors
-      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
-      
-      // Call save handler
+
+      document.querySelectorAll('#brokerFeeForm .form-error').forEach((el) => { el.textContent = ''; });
+
       if (onSave) {
         onSave(formData, data);
       }
-      
-      // Close modal
+
       closeModal();
     },
-    onClose: function() {
-      // Cleanup if needed
-    }
+    onClose: function () {}
   });
 }

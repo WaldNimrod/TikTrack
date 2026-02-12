@@ -24,7 +24,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
 (function initBrokersFeesTable() {
   'use strict';
   
-  let currentFilters = {};
+  let currentFilters = { tradingAccountId: null, broker: null, commissionType: null, search: null };
   let currentPage = 1;
   let currentPageSize = 25;
   let tableData = { data: [], total: 0 };
@@ -68,18 +68,49 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       const sortManager = new window.PhoenixTableSortManager(brokersTable);
       const filterManager = new window.PhoenixTableFilterManager(brokersTable);
       
-      // Listen to sort events
       brokersTable.addEventListener('phoenix-table-sorted', function(e) {
         const { sortKey, sortDirection } = e.detail;
-        // Re-sort data if needed
         if (sortKey && sortDirection) {
           sortTableData(sortKey, sortDirection);
         }
       });
     }
     
-    // Initialize pagination handlers
     initPaginationHandlers();
+    initTradingAccountFilter();
+  }
+
+  /**
+   * Initialize trading account filter (ADR-015: filter fees by account)
+   */
+  async function initTradingAccountFilter() {
+    const select = document.getElementById('tradingAccountFilterSelect');
+    if (!select) return;
+
+    try {
+      await sharedServices.init();
+      const response = await sharedServices.get('/trading_accounts', {});
+      const accounts = response?.data ?? response ?? [];
+      const arr = Array.isArray(accounts) ? accounts : [];
+
+      select.innerHTML = '<option value="">כל החשבונות</option>';
+      arr.forEach((acc) => {
+        const id = acc.externalUlid ?? acc.id ?? acc.external_ulid ?? '';
+        const name = acc.displayName ?? acc.accountName ?? acc.display_name ?? acc.account_name ?? id;
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', function() {
+        currentFilters.tradingAccountId = this.value?.trim() || null;
+        currentPage = 1;
+        loadAllData();
+      });
+    } catch (e) {
+      maskedLog('[Brokers Fees] Error loading trading accounts for filter:', { errorCode: e?.code });
+    }
   }
   
   /**
@@ -231,12 +262,12 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       row.className = 'phoenix-table__row';
       row.setAttribute('data-broker-id', brokerId);
       
-      // Broker name
-      const brokerCell = document.createElement('td');
-      brokerCell.className = 'phoenix-table__cell col-broker';
-      brokerCell.setAttribute('data-field', 'broker');
-      brokerCell.textContent = broker.broker || '';
-      row.appendChild(brokerCell);
+      // Account name (ADR-015: fees per trading account)
+      const accountCell = document.createElement('td');
+      accountCell.className = 'phoenix-table__cell col-broker col-account';
+      accountCell.setAttribute('data-field', 'account_name');
+      accountCell.textContent = broker.accountName || broker.account_name || broker.broker || '';
+      row.appendChild(accountCell);
       
       // Commission type (badge)
       const typeCell = document.createElement('td');
@@ -439,28 +470,27 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
    * Handle add new broker fee action
    */
   function handleAddBrokerFee() {
-    // Show add modal/dialog with empty form
-    showBrokerFeeModal(null, 'add');
+    const preselectedId = currentFilters.tradingAccountId || currentFilters.trading_account_id || '';
+    showBrokerFeeModal(null, 'add', preselectedId);
   }
   
   /**
    * Show broker fee modal (view/edit/add)
+   * @param {Object} data - Fee data (for edit/view) or null (for add)
+   * @param {string} mode - 'view' | 'edit' | 'add'
+   * @param {string} preselectedAccountId - For add mode: pre-select trading account
    */
-  function showBrokerFeeModal(data, mode) {
+  function showBrokerFeeModal(data, mode, preselectedAccountId = '') {
     if (mode === 'view') {
-      // View mode - show read-only modal
       alert(`צפייה בעמלה:\n${JSON.stringify(data, null, 2)}`);
     } else if (mode === 'edit') {
-      // Edit mode - show form with existing data
       showBrokerFeeFormModal(data, function(formData, originalData) {
-        // Use form data directly (already in correct format)
         handleSaveBrokerFee(originalData.externalUlid || originalData.id, formData);
       });
     } else if (mode === 'add') {
-      // Add mode - show empty form
       showBrokerFeeFormModal(null, function(formData) {
         handleSaveBrokerFee(null, formData);
-      });
+      }, preselectedAccountId);
     }
   }
   
@@ -468,19 +498,15 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   window.handleAddBrokerFee = handleAddBrokerFee;
   
   /**
-   * Handle save broker fee (create or update)
+   * Handle save broker fee (create or update) — ADR-015: trading_account_id required
    */
   async function handleSaveBrokerFee(brokerId, brokerFeeData) {
     try {
       await sharedServices.init();
-      
-      // Prepare data for API (ensure camelCase format and numeric types)
-      // commissionValue is now numeric (not string) - convert to number if needed
+
       const commissionValueRaw = brokerFeeData.commissionValue ?? brokerFeeData.commission_value ?? 0;
       let commissionValue;
-      
       if (typeof commissionValueRaw === 'string') {
-        // Try to parse string to number
         const parsed = parseFloat(commissionValueRaw);
         commissionValue = isNaN(parsed) ? 0 : parsed;
       } else if (typeof commissionValueRaw === 'number') {
@@ -488,37 +514,31 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       } else {
         commissionValue = 0;
       }
-      
-      // Ensure minimum is also a number
-      const minimum = typeof brokerFeeData.minimum === 'number' 
-        ? brokerFeeData.minimum 
+
+      const minimum = typeof brokerFeeData.minimum === 'number'
+        ? brokerFeeData.minimum
         : parseFloat(brokerFeeData.minimum) || 0;
-      
+
+      const tradingAccountId = brokerFeeData.tradingAccountId ?? brokerFeeData.trading_account_id ?? '';
+
       const apiData = {
-        broker: brokerFeeData.broker || brokerFeeData.brokerName || '',
-        commissionType: brokerFeeData.commissionType || brokerFeeData.commission_type || 'TIERED',
-        commissionValue: commissionValue,
+        trading_account_id: tradingAccountId,
+        commission_type: brokerFeeData.commissionType ?? brokerFeeData.commission_type ?? 'TIERED',
+        commission_value: commissionValue,
         minimum: minimum
       };
-      
-      // Debug log (will be masked)
+
       maskedLog('[Brokers Fees] Sending data to API:', {
-        broker: apiData.broker,
-        commissionType: apiData.commissionType,
-        commissionValue: apiData.commissionValue,
-        commissionValueType: typeof apiData.commissionValue,
-        minimum: apiData.minimum
+        trading_account_id: apiData.trading_account_id,
+        commission_type: apiData.commission_type
       });
-      
-      // Use externalUlid if available, otherwise use brokerId
-      const idToUse = brokerFeeData.externalUlid || brokerId;
-      
+
+      const idToUse = brokerFeeData.externalUlid ?? brokerId;
+
       if (idToUse) {
-        // Update existing
         await sharedServices.put(`/brokers_fees/${idToUse}`, apiData);
-        maskedLog('[Brokers Fees] Broker fee updated successfully', { brokerId: idToUse });
+        maskedLog('[Brokers Fees] Broker fee updated successfully', { id: idToUse });
       } else {
-        // Create new
         await sharedServices.post('/brokers_fees', apiData);
         maskedLog('[Brokers Fees] Broker fee created successfully');
       }
@@ -545,7 +565,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
           if (error.details.field) {
             const fieldName = error.details.field === 'commission_value' ? 'ערך עמלה' :
                             error.details.field === 'commission_type' ? 'סוג עמלה' :
-                            error.details.field === 'broker' ? 'שם ברוקר' :
+                            error.details.field === 'trading_account_id' ? 'חשבון מסחר' :
                             error.details.field === 'minimum' ? 'מינימום' :
                             error.details.field;
             detailedMessage = `שגיאה בשדה ${fieldName}: ${error.details.message || error.message || 'אנא מלא את השדה הנדרש'}`;
@@ -637,10 +657,10 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   }
   
   /**
-   * Update filters (called from header handlers)
+   * Update filters (called from header handlers or trading account filter)
    */
   window.updateBrokersFeesFilters = function(filters) {
-    currentFilters = filters;
+    currentFilters = { ...currentFilters, ...filters };
     currentPage = 1;
     loadAllData();
   };

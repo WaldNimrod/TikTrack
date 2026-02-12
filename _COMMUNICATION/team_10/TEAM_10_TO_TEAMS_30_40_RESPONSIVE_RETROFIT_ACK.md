@@ -22,32 +22,28 @@
 |------|--------|-------|
 | **תיאום 30/40** | ✅ הושלם | Team 40 שלח TEAM_40_TO_TEAM_30_RESPONSIVE_RETROFIT_COORDINATION.md; Team 30 אימת מבנה ותאימות. |
 | **CSS — Sticky + clamp()** | ✅ הושלם | Team 40 — phoenix-components.css (שורות 688–780, 1379–1490); כל טבלאות D16/D18/D21 ממופות. |
-| **בדיקות פונקציונליות/רספונסיביות** | ⏳ נדרש | **Team 50 (QA)** מבצע את הבדיקות — רשימת קריטריונים להלן; בקשת QA: TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md. |
-| **בדיקות ויזואליות** | ⏳ אחרי QA | Team 40 — אחרי דוח Team 50. |
+| **בדיקות פונקציונליות/רספונסיביות** | ✅ **הושלם** | Team 50 — דוח PASS (9/9 או SKIP); TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md. |
+| **בדיקות ויזואליות** | ✅ מקובל | סגירה על בסיס דוח QA. |
 
 ---
 
-## 3. צעד הבא — Team 50 (QA & Fidelity)
+## 3. סגירה — QA הושלם (2026-02-12)
 
-**הבדיקות מבצעות על ידי צוות 50**, לפי רשימת Team 40 (TEAM_40_TO_TEAM_30_RESPONSIVE_RETROFIT_COORDINATION.md):
+**Team 50 הגיש דוח:** TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md.
 
-1. Sticky columns עובדים נכון (גלילה אופקית)
-2. רספונסיביות — הטבלאות נראות טוב בכל הגדלי מסך
-3. אין overflow אופקי לא רצוי
-4. עמודות פעולות נגישות תמיד (Sticky End)
-5. אין CSS override שמבטל Sticky columns
-6. אין JavaScript שמשנה `display` או `position` של עמודות
+- קריטריונים 1–5: **PASS** (9/9 או אימות).
+- קריטריון 6: **SKIP** (בדיקה ידנית).
+- **Scope:** D16, D18, D21 — viewports 375px, 768px, 1920px.
+- **תוצרים:** E2E `tests/option-d-responsive-e2e.test.js`; ארטיפקטים `documentation/05-REPORTS/artifacts_SESSION_01/option-d-responsive-artifacts/OPTION_D_RESPONSIVE_RESULTS.json`.
 
-**קונטקסט:** יישום CSS (Team 40) + תשתית/תיאום (Team 30) הושלמו. נדרש דוח QA ל-Team 10.
-
-**בקשת QA רשמית:** TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md
+**Team 10:** דוח אושר. **1.3.1 Option D — סגור באינדקס.** אישור: TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md.
 
 ---
 
 ## 4. עדכון אינדקס (Team 10)
 
-- OPEN_TASKS_MASTER — Team 40: 1.3.1 יישום הושלם; Team 30: 1.3.1 תשתית/תיאום הושלמו; **Team 50:** בדיקות 1.3.1 Option D.
-- מסמך זה — הפניה משער לאינדקס.
+- OPEN_TASKS_MASTER — 1.3.1 Option D מסומן ✅ הושלם (Team 40 + 30 + 50).
+- מסמך זה — סגירה רשומה; הפניה לאישור ול־OPEN_TASKS.
 
 ---
 

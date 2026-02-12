@@ -26,7 +26,7 @@
 | # | מזהה | משימה | תוצר מצופה |
 |---|------|--------|-------------|
 | 1 | Context | קבלת קונטקסט מ־Team 10 לפני כל סבב QA חדש — מה פותח, מה לבדוק, SSOT | עדכון מפורט מ־Team 10 |
-| 2 | **1.3.1 Option D** | **בדיקות רספונסיביות** — Sticky, Fluid, טבלאות D16/D18/D21 (6 קריטריונים) | דוח PASS/FAIL — ראה TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md |
+| 2 | **1.3.1 Option D** | **בדיקות רספונסיביות** — Sticky, Fluid, D16/D18/D21 (6 קריטריונים) | ✅ **הושלם** — TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md; TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
 | 3 | 1.5 | שער א' — הרצת סוויטת בדיקות (0 SEVERE); דוח ל־Team 10 (להפעיל מחדש לפי צורך) | GATE_A_PASSED / דוח |
 | 4 | QA Tasks | Auth Guard — בדיקה לאחר תיקון (Team 30); D16 Backend API Testing — לפי עדכון Team 10 | דוחות QA |
 

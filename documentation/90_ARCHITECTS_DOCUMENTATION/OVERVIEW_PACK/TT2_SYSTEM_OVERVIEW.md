@@ -34,7 +34,7 @@ TikTrack Phoenix (TT2) is a financial-core platform for managing trading account
 - **Admin-only (D):** /admin/design-system (JWT role required)
 
 ## 5) Key Constraints & Non‑Goals
-- No inline styles for Rich-Text or UI components.
+- No inline styles inside the Rich‑Text Editor; UI uses DNA/SSOT classes.
 - No direct fetch; all API via Shared_Services.
 - Must comply with SSOT decisions (ADR-013, ADR-015, SOP-012).
 
@@ -44,3 +44,4 @@ TikTrack Phoenix (TT2) is a financial-core platform for managing trading account
 - `documentation/09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md`
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 - `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
+- `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`

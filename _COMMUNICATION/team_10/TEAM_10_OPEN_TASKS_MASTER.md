@@ -18,7 +18,7 @@
 | **פונקציה מרכזית סטטוסים (Team 30)** | TEAM_30_TO_TEAM_10_CENTRAL_STATUS_FUNCTION_COMPLETE.md; דוח QA: TEAM_50_TO_TEAM_10_CENTRAL_STATUS_FUNCTION_QA_REPORT.md | ✅ יישום + QA |
 | **Team 60 — 1.2.2 (פורטים 8080/8082, CORS, Precision 20,6)** | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md; TEAM_60_TO_TEAM_10_TASK_1_2_2_PORT_PRECISION_REPORT.md | ✅ VERIFIED |
 | **Team 60 — 1.2.3 (Seeders, make db-test-clean)** | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md; TEAM_60_TO_TEAM_10_PHASE_1_IMPLEMENTATION_START.md | ✅ COMPLETE |
-| **1.3.1 Option D (Team 40+30+50)** | TEAM_40_TO_TEAM_10_RESPONSIVE_RETROFIT_IMPLEMENTATION_REPORT.md; TEAM_30_TO_TEAM_10_FINAL_SUMMARY_REPORT.md | 🟡 יישום CSS הושלם (40); תשתית (30) הושלמה. **בדיקות — Team 50 (QA):** TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md |
+| **1.3.1 Option D (Team 40+30+50)** | TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md — כל הקריטריונים PASS/SKIP | ✅ **סגור** — יישום (40) + תשתית (30) + QA (50) הושלמו. TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
 
 ---
 
@@ -71,7 +71,7 @@
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|
 | 1 | 1.3.1 | Retrofit רספונסיביות (Option D): **כל הממשק בכל העמודים** רספונסיבי; טבלאות D16/D18/D21 — Sticky + Fluid (clamp) | CSS + layout מעודכן; בדיקות | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.3 |
-| | | | 🟡 **CSS הושלם (Team 40); תשתית/תיאום (Team 30) הושלמו.** **בדיקות:** Team 50 (QA) — TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md. | TEAM_10_TO_TEAMS_30_40_RESPONSIVE_RETROFIT_ACK.md |
+| | | | ✅ **הושלם** — יישום (40) + תשתית (30) + QA (50) PASS. דוח: TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md; אישור: TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md. | TEAM_10_TO_TEAMS_30_40_RESPONSIVE_RETROFIT_ACK.md |
 | 2 | 1.3.2 | ניקוי מוחלט של `console.log` ומעבר ל־`audit.maskedLog` | אין console.log חשוף | שם |
 | 3 | 1.3.3 | הקשחת טרנספורמרים: מניעת NaN ו־Undefined בטבלאות | transformers.js + null-safety | שם |
 | 4 | Nav/Auth | תיקון Navigation & Auth: כפילויות Header (Phase 1), קישורים סטנדרטיים (Phase 2), React Router (Phase 3), Auth Guard (Phase 4) | קוד מעודכן; בדיקות | TEAM_10_TO_TEAM_30_NAVIGATION_AUTH_FIX_MANDATE.md |
@@ -86,7 +86,7 @@
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|
 | 1 | 1.3.1 | תיאום עם Team 30 — עיצוב/מפרט רספונסיביות, CSS, layout (תחת SLA 30/40) | עיצוב Presentational לפי SSOT | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.3; TT2_SLA_TEAMS_30_40 |
-| | | | ✅ **יישום הושלם** — Sticky + clamp() ב־phoenix-components.css; תיאום נשלח. **ממתין:** בדיקות QA (Team 50) — TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md. | TEAM_10_TO_TEAMS_30_40_RESPONSIVE_RETROFIT_ACK.md |
+| | | | ✅ **הושלם** — יישום + QA PASS (TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md). | TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
 | 2 | SLA | אכיפת SLA: צוות 40 מגיש רכיבי UI (Presentational), צוות 30 מזריק לוגיקה (Containers) | טיפול בחריגות | 1.1.2 (Team 10 מפקח) |
 
 ---
@@ -96,7 +96,7 @@
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|
 | 1 | Context | קבלת קונטקסט מ־Team 10 לפני כל סבב QA חדש — מה פותח, מה לבדוק, SSOT | עדכון מפורט מ־Team 10 | TT2_QUALITY_ASSURANCE_GATE_PROTOCOL 1ב |
-| 2 | 1.3.1 Option D | בדיקות רספונסיביות — Sticky, Fluid, D16/D18/D21 (6 קריטריונים) | דוח PASS/FAIL ל־Team 10 | TEAM_10_TO_TEAM_50_OPTION_D_RESPONSIVE_QA_REQUEST.md |
+| 2 | 1.3.1 Option D | בדיקות רספונסיביות — Sticky, Fluid, D16/D18/D21 (6 קריטריונים) | דוח PASS/FAIL ל־Team 10 | ✅ **הושלם** — TEAM_50_TO_TEAM_10_OPTION_D_RESPONSIVE_QA_REPORT.md; TEAM_10_TO_TEAM_50_OPTION_D_QA_ACK.md |
 | 3 | 1.5 | שער א' — הרצת סוויטת בדיקות (0 SEVERE); דוח ל־Team 10 (כבר הושלם בסבב קודם — להפעיל מחדש לפי צורך) | GATE_A_PASSED / דוח | TT2_PHASE_2_CLOSURE_WORK_PLAN 1.5 |
 | 4 | QA Tasks | Auth Guard — בדיקה לאחר תיקון (Team 30); D16 Backend API Testing — לפי עדכון Team 10 | דוחות QA | TEAM_10_QA_TASKS_PRIORITIZATION.md |
 

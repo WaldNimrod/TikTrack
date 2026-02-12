@@ -9,7 +9,7 @@
 
 ## 1) Governance Principles
 - SSOT is the only source of truth
-- No patches; deep fixes only
+- No patches; deep fixes only (per architect decision reports)
 - Evidence required for approval
 
 ## 2) Quality Gates
@@ -33,3 +33,4 @@
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 - `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md`
 - `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSIONING_POLICY.md`
+- `_COMMUNICATION/90_Architects_comunication/TEAM_90_TO_ARCHITECT_BROKER_FEES_ENTITY_DECISION_CONTEXT.md`

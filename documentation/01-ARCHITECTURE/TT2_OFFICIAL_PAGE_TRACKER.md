@@ -4,12 +4,12 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-09  
-**version:** v3.9 (ADR-010 — D21 Infra VERIFIED סופי)
+**last_updated:** 2026-02-12  
+**version:** v4.0 (באץ' 2 פיננסי — סגור; Consolidation Batch 2)
 
 ---
 
-**Status:** 🟢 **PHASE 2 - ACTIVE DEVELOPMENT - ARCHITECT VERDICT IMPLEMENTED**
+**Status:** 🟢 **PHASE 2 - BATCH 2 CLOSED** (שער א'+ב' נסגרו; קידום ידע הושלם 2026-02-12)
 
 ---
 
@@ -48,9 +48,9 @@
 | D15.P | D15_RESET_PWD.html | שחזור סיסמה | **5. APPROVED** ✅ | Team 30/50 | Batch 1 Complete |
 | D15.I | D15_INDEX.html | דאשבורד | **4. FIDELITY** 🔵 | Team 30 | Batch 1 Complete |
 | D15.V | D15_PROF_VIEW.html | פרופיל | **4. FIDELITY** 🔵 | Team 10/20 | Batch 1 Complete |
-| D16 | trading_accounts.html | חשבונות מסחר | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
-| D18 | brokers_fees.html | עמלות ברוקרים | **2. ACTIVE_DEV** 🟢 | Team 30 | Phase 2 - Active Development |
-| D21 | cash_flows.html | תזרים מזומנים | **2. ACTIVE_DEV** 🟢 (Infra VERIFIED) | Team 30 | Phase 2 - Active Development; D21 Infra VERIFIED (ADR-010) |
+| D16 | trading_accounts.html | חשבונות מסחר | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
+| D18 | brokers_fees.html | עמלות ברוקרים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
+| D21 | cash_flows.html | תזרים מזומנים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; D21 Infra VERIFIED (ADR-010) |
 
 ---
 
@@ -67,12 +67,14 @@
 
 ---
 
-### **Batch 2: Financial Core** 🟢 **ACTIVE_DEVELOPMENT**
+### **Batch 2: Financial Core** ✅ **CLOSED** (2026-02-12)
 
 **עמודים:**
-- 🟢 D16 - Trading Accounts (**ACTIVE_DEV** - Phase 2 Active Development)
-- 🟢 D18 - Brokers Fees (**ACTIVE_DEV** - Phase 2 Active Development)
-- 🟢 D21 - Cash Flows (**ACTIVE_DEV** - Phase 2 Active Development)
+- ✅ D16 - Trading Accounts (**CLOSED** - שער א'+ב' נסגרו)
+- ✅ D18 - Brokers Fees (**CLOSED** - שער א'+ב' נסגרו)
+- ✅ D21 - Cash Flows (**CLOSED** - שער א'+ב' נסגרו)
+
+**קידום ידע:** CONSOLIDATION_BATCH_2.md; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/`.
 
 **✅ ניקוי רעלים:**
 - ✅ ניקוי פורט 7246 - הושלם
@@ -106,7 +108,7 @@
 - **🛑 REJECTED_BY_SPY** 🛑 - נדחה על ידי Spy Team - נדרשים Interface Contracts
 - **🛑 PAUSED_FOR_INFRA** 🛑 - מוקפא לטובת Infrastructure Retrofit (Phase 1.8)
 - **🔒 LOCKED_FOR_UAI_REFIT** 🔒 - נעול ל-UAI Refit (ממתין לסיום UAI Core Refactor) - **DEPRECATED** (Phase 1.8 Complete)
-- **2. ACTIVE_DEV** 🟢 - בפיתוח פעיל (Phase 2 Active Development)
+- **2. ACTIVE_DEV** 🟢 - (Legacy) — נכון ל-2026-02-12: D16/D18/D21 אינם ACTIVE_DEV; Batch 2 CLOSED.
 - **✅ APPROVED_FOR_IMPLEMENTATION** ✅ - מאושר למימוש (מערכות הליבה)
 
 ---
@@ -147,34 +149,26 @@
 
 ---
 
-## 🟢 Phase 2: Financial Core - ACTIVE DEVELOPMENT
+## ✅ Phase 2: Financial Core — BATCH 2 CLOSED (2026-02-12)
 
-**סטטוס:** 🟢 **ACTIVE DEVELOPMENT - ARCHITECT VERDICT IMPLEMENTED**
+**סטטוס:** ✅ **BATCH 2 CLOSED** — שער א'+ב' נסגרו; קידום ידע הושלם.
 
-**עמודים בפיתוח:**
-- 🟢 D16 - Trading Accounts (**ACTIVE_DEV**)
-- 🟢 D18 - Brokers Fees (**ACTIVE_DEV**)
-- 🟢 D21 - Cash Flows (**ACTIVE_DEV** - Infra VERIFIED)
+**עמודים:**
+- ✅ D16 - Trading Accounts (**4. FIDELITY** — Batch 2 CLOSED)
+- ✅ D18 - Brokers Fees (**4. FIDELITY** — Batch 2 CLOSED)
+- ✅ D21 - Cash Flows (**4. FIDELITY** — Batch 2 CLOSED; D21 Infra VERIFIED)
 
-**תשתית מוכנה:**
-- ✅ UAI Engine (100% integration)
-- ✅ PDSC Hybrid (Boundary Contract locked)
-- ✅ CSS Load Verification (enforced)
-- ✅ Transformers v1.2 Hardened (SSOT)
-- ✅ Routes SSOT (v1.1.2)
+**תשתית:**
+- ✅ UAI Engine, PDSC Hybrid, CSS Load Verification, Transformers v1.2, Routes SSOT (v1.1.2)
+- ✅ D21 Infra VERIFIED; ארכיון: `_COMMUNICATION/99-ARCHIVE/2026-02-12/`
 
-**תשתית מוכנה:**
-- ✅ **D21 Infra:** VERIFIED - טבלת `user_data.cash_flows` מאומתת כקיימת ותקינה
-- ✅ **Endpoints:** ACTIVE_DEV - `cash_flows/currency_conversions`, `brokers_fees/summary` בפיתוח
-
-**שרשרת QA:**
-- **Layer 1 (Team 50):** QA טכני/פיתוח - החזרת ריג'קטים למפתחים עד ליישור קו פונקציונלי
-- **Layer 2 (Team 90):** בקרת משילות אדריכלית - וידוא עמידה בחוזים ו-SSOT (ה'פס הירוק')
-- **Layer 3 (G-Lead - נמרוד):** בדיקה ידנית סופית וחתימה (The Architect Seal)
+**השלב הבא:** שער ג' (G-Lead) — בדיקה ידנית סופית.
 
 ---
 
 ## 🔄 עדכונים אחרונים
+
+**סטטוס נוכחי (2026-02-12):** Batch 2 CLOSED. D16, D18, D21 = 4. FIDELITY. להלן היסטוריית עדכונים **(Legacy — לא משנה סטטוס נוכחי)**.
 
 **2026-02-09 (ADR-010 — סגירת Phase 2 / Debt Closure):**
 - ✅ **D21 Infra:** VERIFIED סופי — Page Tracker מעודכן בהתאם לפקודת האדריכלית (תוכנית סגירה מאוחדת).
@@ -201,12 +195,10 @@
 - ⏸️ **Manual QA:** עדיין PENDING - נדרש השלמה מ-Team 40
 - 🟡 **Team 90 Report:** זיהה 2 חסמים קריטיים - תוקנו
 
-**2026-02-07 (Knowledge Promotion - Phase 1.8 → Phase 2):**
-- ✅ **Phase 1.8 הושלם** - System Stable, כל התיקונים הקריטיים בוצעו
-- ✅ **Knowledge Promotion** - 5 Specs הועברו ל-SSOT (`documentation/01-ARCHITECTURE/`)
-- 🟢 **Phase 2 Active Development** - D16/D18/D21 במצב `ACTIVE_DEV`
-- ✅ **תשתית מוכנה** - UAI, PDSC, CSS Verification - כל המערכות יציבות
-- 📋 **הבית נקי** - אפשר להתחיל לבנות את הליבה הפיננסית
+**2026-02-07 (Knowledge Promotion - Phase 1.8 → Phase 2) — Legacy:**
+- ✅ Phase 1.8 הושלם; Knowledge Promotion — 5 Specs ל-SSOT
+- *(Legacy: D16/D18/D21 היו ACTIVE_DEV; נכון ל-2026-02-12: Batch 2 CLOSED — 4. FIDELITY)*
+- ✅ תשתית מוכנה; הבית נקי
 
 **2026-02-07 (עדכון מאוחר - Phase 1.8 Final Resolution):**
 - 🔒 **החלטות סופיות ננעלו** - עוברים מ-'דיון' ל-'ביצוע'

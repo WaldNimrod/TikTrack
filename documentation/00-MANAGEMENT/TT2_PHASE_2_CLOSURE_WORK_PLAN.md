@@ -3,8 +3,8 @@
 **id:** `TT2_PHASE_2_CLOSURE_WORK_PLAN`  
 **owner:** Team 10 (The Gateway) — כולל **תזמור סדר ביצוע** ו**ניהול תלויות** (ממתין ל / מותר להתחיל); הודעות אופרטיביות חייבות לכלול סדר עבודה נכון.  
 **status:** 🔒 **SSOT - ACTIVE**  
-**last_updated:** 2026-02-09  
-**version:** v1.0  
+**last_updated:** 2026-02-12  
+**version:** v1.1 (שלב 2 — Phase Closure / Consolidation באץ' 2 הושלם)  
 **context:** ADR-010 (פקודת סגירה מאוחדת) + TEAM_90_TO_TEAM_10_PHASE_2_CLOSURE_PLAN_REQUEST (4 שלבים).
 
 ---
@@ -71,10 +71,10 @@
 
 | # | משימה | תוצר | סטטוס |
 |---|--------|------|--------|
-| 1.5.1 | הרצת סוויטת הבדיקות האוטומטיות (אינטגרציה, Runtime, E2E) לפי TEAM_50_QA_WORKFLOW_PROTOCOL | דוח סיכום — 0 SEVERE; GATE_A_PASSED | ⬜ |
-| 1.5.2 | מסירת דוח ל-Team 10 (שער) לאישור | הודעת Team 50 → Team 10 עם קישור לדוח | ⬜ |
+| 1.5.1 | הרצת סוויטת הבדיקות האוטומטיות (אינטגרציה, Runtime, E2E) לפי TEAM_50_QA_WORKFLOW_PROTOCOL | דוח סיכום — 0 SEVERE; GATE_A_PASSED | ✅ |
+| 1.5.2 | מסירת דוח ל-Team 10 (שער) לאישור | הודעת Team 50 → Team 10 עם קישור לדוח | ✅ |
 
-**נכון ל-2026-02-09:** שלב 1 **ממתין ל-QA צוות 50 (שער א')**. החלטת שער קודמת שסגרה את שלב 1 בלי QA תוקנה — ראה `_COMMUNICATION/team_10/TEAM_10_PHASE_1_PENDING_TEAM_50_QA.md`. שלב 2 (Phase Closure) **לא** מופעל עד להשלמת 1.5.
+**✅ הושלם 2026-02-12:** שער א' (1.5) ושער ב' אושרו. שלב 2 (Phase Closure — Consolidation באץ' 2) בוצע. ראה `_COMMUNICATION/team_10/CONSOLIDATION_BATCH_2.md`. נרטיב היסטורי: תיקון "ממתין ל-QA" הוחל עם השלמת שער א' ואישור שער ב'.
 
 ---
 
@@ -83,16 +83,18 @@
 **בעלות:** Team 10.  
 **נוהל מחייב:** [TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md](../05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md)
 
+**✅ בוצע 2026-02-12:** Consolidation באץ' 2 (פיננסי) — דוח `_COMMUNICATION/team_10/CONSOLIDATION_BATCH_2.md`; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/`.
+
 ### 2.1 תתי-משימות
 
 | # | משימה | תוצר | סטטוס |
 |---|--------|------|--------|
-| 2.1.1 | Consolidation שלב 1 — איסוף דוחות תקשורת מ-`_COMMUNICATION/team_*` | רשימת דוחות רלוונטיים | ⬜ |
-| 2.1.2 | Consolidation שלב 2 — זיקוק ל-SSOT (החלטות, דפוסים, לקחים) | מיפוי ל-`documentation/` | ⬜ |
-| 2.1.3 | Consolidation שלב 3 — יצירה/עדכון מסמכי SSOT | מסמכים מעודכנים | ⬜ |
-| 2.1.4 | Consolidation שלב 4 — עדכון אינדקסים (00_MASTER_INDEX + אינדקסים ספציפיים) | אינדקסים מעודכנים | ⬜ |
-| 2.1.5 | Consolidation שלב 5 — ארכוב דוחות תקשורת | תיקיות ארכיון + קישורים ב-SSOT | ⬜ |
-| 2.1.6 | ניקוי/ארכוב תיקיות בהתאם לנוהל | מבנה תיקיות מסודר | ⬜ |
+| 2.1.1 | Consolidation שלב 1 — איסוף דוחות תקשורת מ-`_COMMUNICATION/team_*` | רשימת דוחות רלוונטיים | ✅ |
+| 2.1.2 | Consolidation שלב 2 — זיקוק ל-SSOT (החלטות, דפוסים, לקחים) | מיפוי ל-`documentation/` | ✅ |
+| 2.1.3 | Consolidation שלב 3 — יצירה/עדכון מסמכי SSOT | מסמכים מעודכנים | ✅ |
+| 2.1.4 | Consolidation שלב 4 — עדכון אינדקסים (00_MASTER_INDEX + אינדקסים ספציפיים) | אינדקסים מעודכנים | ✅ |
+| 2.1.5 | Consolidation שלב 5 — ארכוב דוחות תקשורת | תיקיות ארכיון + קישורים ב-SSOT | ✅ |
+| 2.1.6 | ניקוי/ארכוב תיקיות בהתאם לנוהל | מבנה תיקיות מסודר | ✅ |
 
 ---
 

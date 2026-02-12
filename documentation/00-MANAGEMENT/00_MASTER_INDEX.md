@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-09  
-**version:** v3.8 (מיסוד נהלים: QA Gates + Blueprint Handoff)
+**last_updated:** 2026-02-12  
+**version:** v3.9 (קידום ידע באץ' 2 — Consolidation הושלם)
 
 ---
 
@@ -160,7 +160,10 @@ _COMMUNICATION/
 
 ## 📊 מטריצת עמודים מרכזית (Official Page Tracker)
 
-- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10) ✅ **Updated 2026-02-05 - P0/P1/P2 Complete, Batch 2 Ready**
+- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10) ✅ **Batch 2 CLOSED 2026-02-12**
+- [📚 Consolidation Batch 2 (פיננסי)](../../_COMMUNICATION/team_10/CONSOLIDATION_BATCH_2.md) - דוח קידום ידע באץ' 2; שער א'+ב' נסגרו; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/` ✅ **2026-02-12**
+- [📌 TT2_DECISION_PROFILE_ROUTE.md](../01-ARCHITECTURE/TT2_DECISION_PROFILE_ROUTE.md) - החלטה: /profile טיפוס C (Auth-only) — מקודם מבאץ' 2 ✅ **SSOT**
+- [📌 TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md](../01-ARCHITECTURE/TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md) - SSOT: A/B/C/D, Header Persistence, ProtectedRoute — מקודם מבאץ' 2 ✅ **SSOT**
 
 ---
 

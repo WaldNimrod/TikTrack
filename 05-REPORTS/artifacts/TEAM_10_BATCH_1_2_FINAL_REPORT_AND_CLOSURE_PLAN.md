@@ -133,10 +133,25 @@
 **תנאי הפעלה:** שלב זה **מבוצע רק אחרי** השלמה וולידציה של כל המשימות הקודמות (Gap #1 Module/Menu Styling + Gap #2 Header Persistence + פרסום Batch 1+2 Closure Report).  
 **לא לשלוח לצוותים עד אז** — כדי לא לבלבל עם תוכנית העבודה הנוכחית.
 
+**החלטות מחייבות (עודכנו):**
+
+| # | החלטה | פרט |
+|---|--------|------|
+| 1 | **חובה** | כל מקום שמשתמש בסטטוס — לעבור לסטנדרט הסטטוסים (TT2_SYSTEM_STATUS_VALUES_SSOT). |
+| 2 | **D21** | **לתזרים מזומנים אין סטטוס** — אין סינון/שדה סטטוס ב-D21. |
+| 3 | **Team 30** | לייצר **פונקציה מרכזית קבועה בקובץ משותף** שתשמש את כל הממשקים באופן אחיד (מקור: statusAdapter.js). |
+
 | פריט | תיאור |
 |------|--------|
 | **מטרה** | יישום אחיד של רשימת סטטוסים מרכזית (SSOT → מקור קוד יחיד → Adapter יחיד) בכל המודולים. |
-| **תיעוד מלא (מוכן)** | כל התעוד נוצר; הצוותים יקבלו הפניה רק **אחרי** סגירת הפערים. |
+| **תיעוד מלא (מוכן)** | כל התעוד נוצר; החלטות וסיכום משימות: TEAM_10_STATUS_IMPLEMENTATION_READINESS_AND_QUESTIONS.md. |
+
+**הודעות לצוותים (מעודכנות):**
+
+| צוות | מסמך |
+|------|------|
+| Team 20 | TEAM_10_TO_TEAM_20_STATUS_STANDARD_AND_D21.md — סטנדרט ל-D16; D21 ללא סטטוס |
+| Team 30 | TEAM_10_TO_TEAM_30_CENTRAL_STATUS_FUNCTION_REQUEST.md — פונקציה מרכזית בקובץ משותף |
 
 **הפניה לתעוד — לשימוש כשער הבא:**
 
@@ -147,9 +162,11 @@
 | Adapter יחיד | ui/src/utils/statusAdapter.js |
 | מיפוי קוד (מקומות לעדכון) | documentation/02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md |
 | מנדט יישום לצוותים | _COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md |
-| אישור ל-Team 30 (סטטוסים) | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_STATUS_SSOT_ACK.md |
+| החלטות וסיכום משימות | _COMMUNICATION/team_10/TEAM_10_STATUS_IMPLEMENTATION_READINESS_AND_QUESTIONS.md |
+| בקשת פונקציה מרכזית (Team 30) | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_CENTRAL_STATUS_FUNCTION_REQUEST.md |
+| סטנדרט + D21 (Team 20) | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_20_STATUS_STANDARD_AND_D21.md |
 
-**סדר ביצוע (לאחר סגירת פערים):** Team 10 מפנה צוותים (30/40/50 לפי מיפוי) לתיעוד ולמנדט היישום; יישום לפי Acceptance Criteria ב-SSOT; וולידציה.
+**סדר ביצוע (לאחר סגירת פערים):** Team 10 מפנה צוותים (20, 30 לפי הודעות למעלה) לתיעוד ולמנדט; יישום לפי Acceptance Criteria ב-SSOT; וולידציה.
 
 ---
 

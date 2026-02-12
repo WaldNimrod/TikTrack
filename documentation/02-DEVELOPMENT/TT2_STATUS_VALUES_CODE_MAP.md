@@ -4,7 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **SSOT:** `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md`  
 **last_updated:** 2026-02-12  
-**מנדט יישום:** `_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md`
+**מנדט יישום:** `_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md`  
+**בדיקת מוכנות + שאלות להשלמה:** `_COMMUNICATION/team_10/TEAM_10_STATUS_IMPLEMENTATION_READINESS_AND_QUESTIONS.md`
 
 ---
 

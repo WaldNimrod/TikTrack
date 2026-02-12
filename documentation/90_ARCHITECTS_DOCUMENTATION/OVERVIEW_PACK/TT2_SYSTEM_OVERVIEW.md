@@ -39,9 +39,8 @@ TikTrack Phoenix (TT2) is a financial-core platform for managing trading account
 - Must comply with SSOT decisions (ADR-013, ADR-015, SOP-012).
 
 ## 6) References (SSOT)
-- `documentation/90_ARCHITECTS_DOCUMENTATION/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
 - `documentation/90_ARCHITECTS_DOCUMENTATION/ARCHITECT_RICH_TEXT_AND_DESIGN_SYSTEM_SPEC.md`
 - `documentation/09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md`
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 - `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
-

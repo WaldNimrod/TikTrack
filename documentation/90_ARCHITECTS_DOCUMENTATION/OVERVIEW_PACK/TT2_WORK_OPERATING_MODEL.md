@@ -66,11 +66,11 @@
 
 ## 4) Communication Channels & Artifacts
 
-- **Work communication:** `_COMMUNICATION/team_*` folders (requests, mapping, decisions, status).
+- **Work communication:** `_COMMUNICATION/team_10/` … `_COMMUNICATION/team_90/` (requests, mapping, decisions, status).
 - **Architect communication:** `_COMMUNICATION/90_Architects_comunication` (authoritative decisions).
 - **SSOT documentation:** `documentation/` (only source of truth for locked policies).
 - **Evidence & QA artifacts:** `documentation/05-REPORTS/artifacts/`.
-- **Archive:** `_COMMUNICATION/99-ARCHIVE/YYYY-MM-DD/` with manifest.
+- **Archive:** `_COMMUNICATION/99-ARCHIVE/2026-02-12/` with manifest (pattern: date-stamped archive).
 
 ## 5) Decision & Escalation Path
 
@@ -89,4 +89,4 @@ No code changes are approved without required mapping, SSOT alignment, and evide
 - `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md`
 - `documentation/10-POLICIES/TT2_VERSIONING_POLICY.md`
 - `documentation/00-MANAGEMENT/TT2_PHASE_2_CLOSURE_WORK_PLAN.md`
-- `documentation/90_ARCHITECTS_DOCUMENTATION/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`

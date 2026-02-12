@@ -7,6 +7,5 @@
 | Database Schema | 2.5.0 | 2.x.x | ✅ Aligned |
 | UI Package | 2.1.0 | 2.x.x | ✅ Aligned |
 | Routes Config | 1.1.2 | 2.x.x | ⚠️ PENDING BUMP |
-| SSOT Documentation | 8.0.0 | - | 🟢 MASTER |
 
-**Last Updated:** 12.2.2026, 18:45:48
+**Last Updated:** 12.2.2026, 19:08:43

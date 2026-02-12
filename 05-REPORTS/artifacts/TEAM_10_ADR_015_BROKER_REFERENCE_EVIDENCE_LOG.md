@@ -3,7 +3,7 @@
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-12  
 **נושא:** סבב פיתוח — מנדט רפרנס ברוקרים (ADR-015) | **עמלות לפי חשבון מסחר**  
-**סטטוס:** **שער ב' מאושר ✅** — Team 90 Independent Rerun: Passed 5, Failed 0. **מוכן לשער ג' (Visionary).**
+**סטטוס:** **שער ב' מאושר ✅** — Team 90 Independent Rerun: Passed 5, Failed 0. **שער ג' (בדיקות ויזואליות) נדחה לשלב מאוחר יותר** — יבוצע יחד עם סבב דיוק עיצוב לפני Batch 3.
 
 ---
 
@@ -73,9 +73,10 @@
 
 **אחראי:** Team 90 (The Spy). **תוצר:** ריצה עצמאית של Gate B — Passed 5, Failed 0.  
 **Highlights:** D16 broker select from API, D18 trading_account_id (ADR-015), Rich-Text no inline style, Admin Design System, Guest redirect.  
-**הבא:** שער ג' (Visionary) — בדיקה ידנית-ויזואלית סופית.
+**הבא:** שער ג' (Visionary) — **נדחה לשלב מאוחר יותר** (סבב דיוק עיצוב לפני Batch 3). בדיקה ראשונית בוצעה; ניקוי זנבות ותאימות תיעוד–קוד — ראה דוח הראיות.
 
 ---
 
 **log_entry | TEAM_10 | ADR_015_EVIDENCE | 2026-02-12**  
-**log_entry | TEAM_10 | ADR_015_TEAM_60_MIGRATION_ACK | 2026-02-12**
+**log_entry | TEAM_10 | ADR_015_TEAM_60_MIGRATION_ACK | 2026-02-12**  
+**log_entry | TEAM_10 | ADR_015_DOCUMENTATION_EVIDENCE_REPORT | 2026-01-30** — דוח ראיות עדכוני תיעוד, ניקוי תקשורת, תאימות תיעוד–קוד: `05-REPORTS/artifacts/TEAM_10_ADR_015_DOCUMENTATION_EVIDENCE_REPORT.md`

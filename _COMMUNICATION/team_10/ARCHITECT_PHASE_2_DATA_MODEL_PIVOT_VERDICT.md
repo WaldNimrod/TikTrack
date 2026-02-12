@@ -11,4 +11,3 @@ id: ADR-014 | owner: Architect | status: LOCKED
 ## 🔐 2. מודל גישה (Final Lock)
 * **Reset-Password:** מאושר רשמית כ-Type A (Open).
 * **Admin Role Source:** JWT Claim 'role'.
-* **Redirect:** משתמש לא מורשה מופנה ל-Home (/).

@@ -22,7 +22,9 @@ from ..schemas.trading_accounts import (
     TradingAccountResponse,
     TradingAccountSummaryResponse,
     TradingAccountCreateRequest,
-    TradingAccountUpdateRequest
+    TradingAccountUpdateRequest,
+    STATUS_ACTIVE,
+    STATUS_INACTIVE,
 )
 
 logger = logging.getLogger(__name__)
@@ -117,6 +119,7 @@ class TradingAccountService:
             # Calculate account_value = cash_balance + holdings_value
             account_value = account.cash_balance + stats["holdings_value"]
             
+            canonical_status = STATUS_ACTIVE if account.is_active else STATUS_INACTIVE
             response = TradingAccountResponse(
                 external_ulid=uuid_to_ulid(account.id),
                 account_name=account.account_name,
@@ -127,6 +130,7 @@ class TradingAccountService:
                 total_pl=stats["total_pl"],
                 account_value=account_value,
                 holdings_value=stats["holdings_value"],
+                status=canonical_status,
                 is_active=account.is_active,
                 updated_at=account.updated_at
             )
@@ -298,6 +302,7 @@ class TradingAccountService:
         
         account_value = account.cash_balance + stats["holdings_value"]
         
+        canonical_status = STATUS_ACTIVE if account.is_active else STATUS_INACTIVE
         return TradingAccountResponse(
             external_ulid=uuid_to_ulid(account.id),
             account_name=account.account_name,
@@ -308,6 +313,7 @@ class TradingAccountService:
             total_pl=stats["total_pl"],
             account_value=account_value,
             holdings_value=stats["holdings_value"],
+            status=canonical_status,
             is_active=account.is_active,
             updated_at=account.updated_at
         )
@@ -399,6 +405,7 @@ class TradingAccountService:
         await db.refresh(new_account)
         
         # Return response with calculated fields (positions_count = 0 for new account)
+        canonical_status = STATUS_ACTIVE if new_account.is_active else STATUS_INACTIVE
         return TradingAccountResponse(
             external_ulid=uuid_to_ulid(new_account.id),
             account_name=new_account.account_name,
@@ -409,6 +416,7 @@ class TradingAccountService:
             total_pl=Decimal("0"),
             account_value=new_account.cash_balance,
             holdings_value=Decimal("0"),
+            status=canonical_status,
             is_active=new_account.is_active,
             updated_at=new_account.updated_at
         )
@@ -576,6 +584,7 @@ class TradingAccountService:
         
         account_value = account.cash_balance + stats["holdings_value"]
         
+        canonical_status = STATUS_ACTIVE if account.is_active else STATUS_INACTIVE
         return TradingAccountResponse(
             external_ulid=uuid_to_ulid(account.id),
             account_name=account.account_name,
@@ -586,6 +595,7 @@ class TradingAccountService:
             total_pl=stats["total_pl"],
             account_value=account_value,
             holdings_value=stats["holdings_value"],
+            status=canonical_status,
             is_active=account.is_active,
             updated_at=account.updated_at
         )

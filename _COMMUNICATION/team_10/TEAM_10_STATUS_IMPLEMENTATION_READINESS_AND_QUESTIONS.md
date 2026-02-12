@@ -65,13 +65,13 @@
 
 ## 4. סיכום משימות
 
-| פעולה | בעלים |
-|--------|--------|
-| Backend — עדכון לסטנדרט סטטוסים (D16: status קנוני) | Team 20 |
-| פונקציה מרכזית בקובץ משותף — שימוש אחיד בכל הממשקים | Team 30 |
-| Header: 4 אופציות כולל "ממתין"; תפריט מ-getStatusOptions() | Team 30 |
-| DataLoaders + Filters + PhoenixFilterBridge + badges — Adapter בלבד | Team 30 |
-| D21 — ללא שינוי (אין סטטוס לתזרימים) | — |
+| פעולה | בעלים | סטטוס |
+|--------|--------|--------|
+| Backend — עדכון לסטנדרט סטטוסים (D16: status קנוני) | Team 20 | ✅ **הושלם ואומת** — דוח QA: TEAM_50_TO_TEAM_20_STATUS_STANDARD_QA_REPORT.md |
+| פונקציה מרכזית בקובץ משותף — שימוש אחיד בכל הממשקים | Team 30 | פתוח |
+| Header: 4 אופציות כולל "ממתין"; תפריט מ-getStatusOptions() | Team 30 | פתוח |
+| DataLoaders + Filters + PhoenixFilterBridge + badges — Adapter בלבד | Team 30 | פתוח |
+| D21 — ללא שינוי (אין סטטוס לתזרימים) | — | לא רלוונטי |
 
 ---
 

@@ -37,3 +37,8 @@ export function getStatusOptions() {
 }
 
 export { STATUS_VALUES } from './statusValues.js';
+
+/* Expose to window for Vanilla JS (phoenixFilterBridge, etc.) */
+if (typeof window !== 'undefined') {
+  window.statusAdapter = { toCanonicalStatus, toHebrewStatus, getStatusOptions };
+}

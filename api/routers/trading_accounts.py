@@ -29,9 +29,22 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/trading_accounts", tags=["trading_accounts"])
 
 
+def _canonical_status_to_is_active(status_val: Optional[str]) -> Optional[bool]:
+    """Map canonical status (TT2_SYSTEM_STATUS_VALUES_SSOT) to is_active for D16.
+    active→True; inactive|pending|cancelled→False."""
+    if not status_val or not str(status_val).strip():
+        return None
+    s = str(status_val).strip().lower()
+    if s == "active":
+        return True
+    if s in ("inactive", "pending", "cancelled"):
+        return False
+    return None
+
+
 @router.get("", response_model=TradingAccountListResponse)
 async def get_trading_accounts(
-    status: Optional[bool] = Query(None, description="Filter by is_active status"),
+    status: Optional[str] = Query(None, description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)"),
     search: Optional[str] = Query(None, description="Search by account_name"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -50,11 +63,12 @@ async def get_trading_accounts(
     - search: Search by account_name (partial match)
     """
     try:
+        status_bool = _canonical_status_to_is_active(status)
         service = get_trading_account_service()
         accounts = await service.get_trading_accounts(
             user_id=current_user.id,
             db=db,
-            status=status,
+            status=status_bool,
             search=search
         )
         
@@ -73,7 +87,7 @@ async def get_trading_accounts(
 
 @router.get("/summary", response_model=TradingAccountSummaryResponse)
 async def get_trading_accounts_summary(
-    status: Optional[bool] = Query(None, description="Filter by is_active status"),
+    status: Optional[str] = Query(None, description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -93,11 +107,12 @@ async def get_trading_accounts_summary(
     - status: Filter by is_active (true/false) (optional)
     """
     try:
+        status_bool = _canonical_status_to_is_active(status)
         service = get_trading_account_service()
         summary = await service.get_trading_accounts_summary(
             user_id=current_user.id,
             db=db,
-            status=status
+            status=status_bool
         )
         return summary
     except Exception as e:

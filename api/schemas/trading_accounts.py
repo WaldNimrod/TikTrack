@@ -15,8 +15,14 @@ from pydantic import BaseModel, Field
 from ..utils.identity import uuid_to_ulid
 
 
+# D16 status mapping: is_active (DB) ↔ canonical (TT2_SYSTEM_STATUS_VALUES_SSOT)
+# is_active True → active; is_active False → inactive (trading_accounts have no pending/cancelled)
+STATUS_ACTIVE = "active"
+STATUS_INACTIVE = "inactive"
+
+
 class TradingAccountResponse(BaseModel):
-    """Trading Account response schema."""
+    """Trading Account response schema (D16 — status canonical per TT2_SYSTEM_STATUS_VALUES_SSOT)."""
     external_ulid: str = Field(..., description="External ULID identifier")
     display_name: str = Field(..., alias="account_name", description="Account display name")
     broker: Optional[str] = Field(None, description="Broker name")
@@ -26,7 +32,8 @@ class TradingAccountResponse(BaseModel):
     total_pl: Decimal = Field(..., description="Total unrealized P/L")
     account_value: Decimal = Field(..., description="Total account value (cash + holdings)")
     holdings_value: Decimal = Field(..., description="Total holdings value")
-    is_active: bool = Field(..., description="Account active status")
+    status: str = Field(..., description="Canonical status (active|inactive) per TT2_SYSTEM_STATUS_VALUES_SSOT")
+    is_active: bool = Field(..., description="Account active status (legacy; status is canonical)")
     updated_at: datetime = Field(..., description="Last update timestamp")
     
     class Config:
@@ -42,6 +49,7 @@ class TradingAccountResponse(BaseModel):
                 "total_pl": 1250.50,
                 "account_value": 143750.92,
                 "holdings_value": 1250.50,
+                "status": "active",
                 "is_active": True,
                 "updated_at": "2026-02-02T10:30:00Z"
             }
@@ -91,6 +99,7 @@ class TradingAccountListResponse(BaseModel):
                         "total_pl": 1250.50,
                         "account_value": 143750.92,
                         "holdings_value": 1250.50,
+                        "status": "active",
                         "is_active": True,
                         "updated_at": "2026-02-02T10:30:00Z"
                     }

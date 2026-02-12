@@ -148,10 +148,10 @@
 
 **הודעות לצוותים (מעודכנות):**
 
-| צוות | מסמך |
-|------|------|
-| Team 20 | TEAM_10_TO_TEAM_20_STATUS_STANDARD_AND_D21.md — סטנדרט ל-D16; D21 ללא סטטוס |
-| Team 30 | TEAM_10_TO_TEAM_30_CENTRAL_STATUS_FUNCTION_REQUEST.md — פונקציה מרכזית בקובץ משותף |
+| צוות | מסמך | סטטוס |
+|------|------|--------|
+| Team 20 | TEAM_10_TO_TEAM_20_STATUS_STANDARD_AND_D21.md — סטנדרט ל-D16; D21 ללא סטטוס | ✅ **הושלם ואומת** — דוח QA: TEAM_50_TO_TEAM_20_STATUS_STANDARD_QA_REPORT.md |
+| Team 30 | TEAM_10_TO_TEAM_30_CENTRAL_STATUS_FUNCTION_REQUEST.md — פונקציה מרכזית בקובץ משותף | פתוח |
 
 **הפניה לתעוד — לשימוש כשער הבא:**
 

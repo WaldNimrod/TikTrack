@@ -151,7 +151,11 @@ export class DOMStage extends StageBase {
       return;
     }
     
-    // Load phoenixFilterBridge.js first (required by headerLoader)
+    // Load statusAdapter first (required by phoenixFilterBridge for SSOT status mapping)
+    if (!window.statusAdapter) {
+      await this.loadScript('/src/utils/statusAdapter.js', { type: 'module' });
+    }
+    // Load phoenixFilterBridge.js (required by headerLoader)
     if (!window.PhoenixBridge) {
       await this.loadScript('/src/components/core/phoenixFilterBridge.js');
     }

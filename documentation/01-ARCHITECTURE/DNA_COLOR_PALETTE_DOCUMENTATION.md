@@ -856,7 +856,7 @@ background: rgba(38, 186, 172, 0.1);
 
 ## 📚 Related Documentation
 
-- **Button System:** `_COMMUNICATION/team_40/DNA_BUTTON_SYSTEM.md`
+- **Button System:** `documentation/04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md`
 - **Color Structure Spec:** `_COMMUNICATION/team_40/TEAM_40_COLOR_PALETTE_STRUCTURE_FINAL.md`
 - **Master Palette Spec:** `documentation/01-ARCHITECTURE/TT2_MASTER_PALETTE_SPEC.md`
 - **Visual Demo:** `_COMMUNICATION/team_40/demos/button-system-demo.html`

@@ -53,9 +53,9 @@ export class DOMStage extends StageBase {
           variablesChecked: cssVerifier.options.criticalVariables.length
         });
       } catch (error) {
-        console.error('[DOM Stage] ❌ CSS Load Order Verification Failed:', {
-          error: error.message,
-          errorCode: error.code,
+        maskedLog('[DOM Stage] ❌ CSS Load Order Verification Failed:', {
+          message: error?.message,
+          errorCode: error?.code,
           baseCSSFile: cssVerifier.options.baseCSSFile
         });
         this.emit('css-verification-failed', {
@@ -126,7 +126,7 @@ export class DOMStage extends StageBase {
       } else {
         // Wait up to 2 seconds for auth guard to initialize
         const timeout = setTimeout(() => {
-          console.warn('[DOM Stage] Auth guard initialization timeout');
+          maskedLog('[DOM Stage] Auth guard initialization timeout', {});
           resolve();
         }, 2000);
         
@@ -176,7 +176,7 @@ export class DOMStage extends StageBase {
       
       // Timeout after 5 seconds
       setTimeout(() => {
-        console.warn('[DOM Stage] Header loading timeout');
+        maskedLog('[DOM Stage] Header loading timeout', {});
         resolve();
       }, 5000);
     });

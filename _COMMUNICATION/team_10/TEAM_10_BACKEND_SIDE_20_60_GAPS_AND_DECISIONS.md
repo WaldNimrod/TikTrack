@@ -23,19 +23,9 @@
 
 ### 2.1 משימה 1.2.1 — Endpoints Summary + Conversions (Option A)
 
-**סטטוס נוכחי:** 🟡 **חלקי**
+**סטטוס נוכחי:** ✅ **הושלם** (2026-02-12)
 
-**מה קיים בקוד (אימות):**
-- `GET /api/v1/cash_flows/currency_conversions` — פעיל ואומת ב-QA.
-- `GET /api/v1/trading_accounts/summary` — קיים ב-router ו-service.
-- `GET /api/v1/brokers_fees/summary` — קיים ב-router ו-service.
-- `GET /api/v1/cash_flows` מחזיר גם summary; קיים גם endpoint נפרד ל-summary ב-cash_flows.
-
-**מה נדרש להשלמת הפער:**
-1. **אימות ריצה** — וידוא שכל ה-Summary endpoints מגיבים תחת `/api/v1/...` (trading_accounts/summary, brokers_fees/summary, cash_flows/summary אם קיים כנתיב נפרד).
-2. **תיעוד SSOT** — עדכון OpenAPI / מסמך חוזים כך שכל ה-Endpoints (Summary + Conversions) מתועדים ומסומנים כ-Option A.
-
-**החלטה נדרשת?** **לא.** מדובר באימות ותיעוד — Team 20 (או Team 50 בבדיקות) יכולים להריץ ולוודא; Team 10 יכול להפנות לתיעוד SSOT.
+**אימות:** 4 endpoints אומתו; OpenAPI + SSOT עודכנו. קבצים: `documentation/07-CONTRACTS/OPENAPI_SPEC_V2_FINAL.yaml`, `SSOT_1_2_1_SUMMARY_AND_CONVERSIONS_ENDPOINTS.md`. בדיקה קפדנית: TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION.md.
 
 ---
 
@@ -59,21 +49,16 @@
 
 **Scope מאושר:** **שלושת הרכיבים המלאים** — JSON Error Schema, Response Contract, Error Codes Enum. תיאום עם Team 30 לפני סיום (מנדט קיים).
 
-**מה נדרש:** Team 20 — ביצוע לפי TEAM_10_TO_TEAM_20_PDSC_BOUNDARY_CONTRACT_MANDATE; אפשרות לקבל שלד מסמך PDSC מ-Team 90 (TEAM_10_TO_TEAM_90_PDSC_SKELETON_REQUEST.md).
+**מה נדרש:** Team 20 — ביצוע לפי מנדט ושלד.  
+**סטטוס:** ✅ **הושלם** — לפי השלד (Error Schema 422 + field_errors; Error Codes; Auth תואם). אומת: TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION.md.
 
 ---
 
 ### 2.4 חוזה Auth + SSOT/OpenAPI
 
-**סטטוס:** ממתין.
+**סטטוס:** ✅ **הושלם** (2026-02-12)
 
-**מה נדרש:**
-- חוזה Response אחיד בכל auth endpoints: `access_token`, `token_type`, `expires_at`, `user`.
-- Endpoints: `/auth/login`, `/auth/register`, `/auth/refresh`, `/users/me`, `/users/profile`.
-- עדכון SSOT / OpenAPI כך שישקף את המבנה האחיד.
-
-**החלטה נדרשת?** **לא.** המנדט ברור (TEAM_10_TO_TEAM_20_AUTH_CONTRACT_AND_SSOT_MANDATE.md).  
-**שאלה אפשרית:** אם יש היום סטיות בקוד — האם מתקנים אותן כחלק מהמנדט או מתעדים חריגה מאושרת.
+**אימות:** `api/schemas/identity.py` (LoginResponse); `documentation/07-CONTRACTS/SSOT_AUTH_CONTRACT.md`; OpenAPI מעודכן. בדיקה: TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION.md.
 
 ---
 
@@ -81,10 +66,10 @@
 
 | # | פער | פעולה נדרשת | החלטה/שאלה? |
 |---|-----|-------------|--------------|
-| 1 | 1.2.1 Summary endpoints | אימות ריצה של כל ה-Summary endpoints; עדכון תיעוד SSOT/OpenAPI | לא |
+| 1 | 1.2.1 Summary endpoints | אימות ריצה + עדכון תיעוד SSOT/OpenAPI | ✅ הושלם — אומת |
 | 2 | 1.2.2 פורטים + Precision | יישור סטטוס במסמך — "הושלם (אימות Team 60)" | לא (או החלטה: לאמץ אימות 60 כסגירה) |
-| 3 | PDSC Boundary Contract | Team 20: 3 רכיבים (JSON Error Schema + Response Contract + Error Codes); תיאום עם 30 | ✅ **החלטה התקבלה** — אדריכלית אישרה; scope: 3 רכיבים מלאים |
-| 4 | Auth Contract + SSOT | Team 20: חוזה אחיד + עדכון OpenAPI/SSOT | לא (מנדט ברור) |
+| 3 | PDSC Boundary Contract | Team 20: 3 רכיבים; תיאום עם 30 | ✅ **הושלם** — לפי השלד; אומת |
+| 4 | Auth Contract + SSOT | Team 20: חוזה אחיד + עדכון OpenAPI/SSOT | ✅ **הושלם** — אומת |
 
 ---
 

@@ -73,7 +73,7 @@ export class ReadyStage extends StageBase {
         totalDuration: window.UAIState.totalDuration ? `${window.UAIState.totalDuration}ms` : 'unknown'
       });
     } else {
-      console.warn('[Ready Stage] UAI instance not found during finalization');
+      maskedLog('[Ready Stage] UAI instance not found during finalization', {});
     }
   }
   

@@ -11,7 +11,7 @@
 import { apiToReact, reactToApi } from '../../shared/utils/transformers.js';
 import { audit } from '../../../utils/audit.js';
 import { debugLog, debugError } from '../../../utils/debug.js';
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 
 /** Fetch options for auth endpoints - credentials required for refresh token (httpOnly cookies) */
 const AUTH_CREDENTIALS = { credentials: 'include' };

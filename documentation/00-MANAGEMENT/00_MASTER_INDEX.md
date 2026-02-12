@@ -143,7 +143,7 @@ _COMMUNICATION/
 
 ### **PDSC (Phoenix Data Service Core) - Hybrid Architecture** ✅
 - [🤝 TT2_PDSC_BOUNDARY_CONTRACT.md](../01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md) - Shared Boundary Contract בין Backend (Source of Truth) ל-Frontend (Implementation) ✅ **SSOT - Phase 1.8**
-- [🔧 PDSC Client](../../ui/src/components/core/Shared_Services.js) - Shared_Services.js - Unified API client עם routes.json SSOT ✅ **STABLE**
+- [🔧 PDSC Client](../../ui/src/components/core/sharedServices.js) - sharedServices.js - Unified API client עם routes.json SSOT ✅ **STABLE**
 
 ### **EFR (Entity Field Renderer) - Field Mapping & Rendering** ✅
 - [📊 TT2_EFR_LOGIC_MAP.md](../01-ARCHITECTURE/TT2_EFR_LOGIC_MAP.md) - SSOT Field Mapping Table (Backend snake_case → Frontend camelCase → EFR Renderer) ✅ **SSOT - Phase 1.8**

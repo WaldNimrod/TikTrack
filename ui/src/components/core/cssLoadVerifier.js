@@ -65,7 +65,7 @@ class CSSLoadVerifier {
       if (this.options.strictMode) {
         throw error;
       }
-      console.error(`❌ ${error.message}`);
+      maskedLog(`❌ ${error.message}`, { code: error.code });
       return false;
     }
 
@@ -77,7 +77,7 @@ class CSSLoadVerifier {
       if (this.options.strictMode) {
         throw error;
       }
-      console.error(`❌ ${error.message}`);
+      maskedLog(`❌ ${error.message}`, { code: error.code });
       return false;
     }
 
@@ -89,7 +89,7 @@ class CSSLoadVerifier {
       if (this.options.strictMode) {
         throw error;
       }
-      console.warn(`⚠️ ${error.message}`);
+      maskedLog(`⚠️ ${error.message}`, { code: error.code });
       return false;
     }
 
@@ -126,7 +126,7 @@ class CSSLoadVerifier {
     for (const varName of this.options.criticalVariables) {
       const value = root.getPropertyValue(varName);
       if (!value || value.trim() === '') {
-        console.error(`❌ CSS Variable ${varName} is not available`);
+        maskedLog(`❌ CSS Variable ${varName} is not available`, { varName });
         return false;
       }
     }
@@ -160,7 +160,7 @@ class CSSLoadVerifier {
       const allLinksIndex = links.findIndex(link => 
         link.href.includes(this.options.baseCSSFile)
       );
-      console.error(`❌ ${this.options.baseCSSFile} must be loaded first among Phoenix CSS files (found at index ${allLinksIndex} overall, ${baseCSSIndex} among Phoenix files)`);
+      maskedLog(`❌ ${this.options.baseCSSFile} must be loaded first among Phoenix CSS files`, { allLinksIndex, baseCSSIndex });
       return false;
     }
 

@@ -155,10 +155,10 @@ export class RenderStage extends StageBase {
         this.components.table = { initialized: true };
         maskedLog('[Render Stage] Table initialized:', { pageType });
       } else {
-        console.warn('[Render Stage] Table init function not found for:', pageType);
+        maskedLog('[Render Stage] Table init function not found for:', { pageType });
       }
     } catch (error) {
-      console.error('[Render Stage] Failed to initialize table:', error);
+      maskedLog('[Render Stage] Failed to initialize table:', { message: error?.message });
       throw error;
     }
   }

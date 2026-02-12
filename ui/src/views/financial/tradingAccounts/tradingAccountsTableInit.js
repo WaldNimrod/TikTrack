@@ -7,7 +7,7 @@
  */
 
 import { loadContainer1 } from './tradingAccountsDataLoader.js';
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { showTradingAccountFormModal } from './tradingAccountsForm.js';
 
 // Import masked log utility for security compliance

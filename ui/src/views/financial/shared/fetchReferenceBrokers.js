@@ -6,7 +6,7 @@
  *          label kept for backwards compat; display_name preferred for display
  */
 
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 
 /**
  * Fetch broker list for select dropdowns (D16 trading accounts)

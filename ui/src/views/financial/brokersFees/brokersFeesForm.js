@@ -6,7 +6,7 @@
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 /**

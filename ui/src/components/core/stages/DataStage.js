@@ -8,7 +8,7 @@
  */
 
 import { StageBase } from './StageBase.js';
-import sharedServices from '../Shared_Services.js';
+import sharedServices from '../sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 export class DataStage extends StageBase {
@@ -74,7 +74,7 @@ export class DataStage extends StageBase {
       try {
         await sharedServices.init();
       } catch (error) {
-        console.warn('[Data Stage] Shared Services initialization failed, continuing with fallback:', error);
+        maskedLog('[Data Stage] Shared Services initialization failed, continuing with fallback:', { message: error?.message });
         // Continue anyway - some pages may not need Shared Services
       }
       

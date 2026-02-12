@@ -157,11 +157,10 @@ export class UnifiedAppInit {
       });
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error('[UAI] Initialization failed:', {
-        error: error.message,
+      maskedLog('[UAI] Initialization failed:', {
+        message: error?.message,
         stage: this.currentStage,
-        duration: `${duration}ms`,
-        stack: error.stack
+        duration: `${duration}ms`
       });
       
       // Emit error event
@@ -211,7 +210,7 @@ if (document.readyState === 'loading') {
     if (hasConfig) {
       const uai = new UnifiedAppInit();
       uai.init().catch(error => {
-        console.error('[UAI] Auto-initialization failed:', error);
+        maskedLog('[UAI] Auto-initialization failed:', { message: error?.message });
       });
     }
   });
@@ -220,7 +219,7 @@ if (document.readyState === 'loading') {
   if (hasConfig) {
     const uai = new UnifiedAppInit();
     uai.init().catch(error => {
-      console.error('[UAI] Auto-initialization failed:', error);
+      maskedLog('[UAI] Auto-initialization failed:', { message: error?.message });
     });
   }
 }

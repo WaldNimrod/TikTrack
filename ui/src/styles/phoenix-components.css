@@ -686,6 +686,113 @@ body .page-wrapper .page-container main {
 }
 
 /* ============================================
+   FLUID COLUMN WIDTHS (Option D - ADR-010)
+   ============================================
+   ARCHITECT MANDATE: Fluid Weights with clamp() for responsive columns
+   - Atomic (Fixed): Icons, Checkboxes - rigid width in px/ch
+   - Fluid (Weighted): Financial data columns - clamp() + min-width
+   - Expansion (Flexible): Text columns - absorb remaining width
+   ============================================ */
+
+/* ===== Atomic (Fixed) Columns ===== */
+/* Actions Column - Fixed width */
+.phoenix-table__header.col-actions,
+.phoenix-table__cell.col-actions {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+/* Status Column - Fixed width (badge) */
+.phoenix-table__header.col-status,
+.phoenix-table__cell.col-status {
+  width: clamp(80px, 10%, 120px);
+  min-width: 80px;
+}
+
+/* ===== Fluid (Weighted) Columns - Financial Data ===== */
+/* Balance, Amount, Total PL, Account Value, Holdings Value */
+.phoenix-table__header.col-balance,
+.phoenix-table__cell.col-balance,
+.phoenix-table__header.col-amount,
+.phoenix-table__cell.col-amount,
+.phoenix-table__header.col-total-pl,
+.phoenix-table__cell.col-total-pl,
+.phoenix-table__header.col-account-value,
+.phoenix-table__cell.col-account-value,
+.phoenix-table__header.col-holdings-value,
+.phoenix-table__cell.col-holdings-value {
+  min-width: clamp(100px, 12%, 180px);
+  width: clamp(100px, 12%, 180px);
+}
+
+/* Commission Value, Minimum */
+.phoenix-table__header.col-commission-value,
+.phoenix-table__cell.col-commission-value,
+.phoenix-table__header.col-minimum,
+.phoenix-table__cell.col-minimum {
+  min-width: clamp(100px, 12%, 180px);
+  width: clamp(100px, 12%, 180px);
+}
+
+/* Positions, Quantity */
+.phoenix-table__header.col-positions,
+.phoenix-table__cell.col-positions,
+.phoenix-table__header.col-quantity,
+.phoenix-table__cell.col-quantity {
+  min-width: clamp(80px, 10%, 120px);
+  width: clamp(80px, 10%, 120px);
+}
+
+/* Currency Column */
+.phoenix-table__header.col-currency,
+.phoenix-table__cell.col-currency {
+  min-width: clamp(70px, 8%, 100px);
+  width: clamp(70px, 8%, 100px);
+}
+
+/* ===== Expansion (Flexible) Columns - Text ===== */
+/* Name, Broker, Trade, Account - Sticky Start columns (already sticky) */
+.phoenix-table__header.col-name,
+.phoenix-table__cell.col-name,
+.phoenix-table__header.col-broker,
+.phoenix-table__cell.col-broker,
+.phoenix-table__header.col-trade,
+.phoenix-table__cell.col-trade,
+.phoenix-table__header.col-account,
+.phoenix-table__cell.col-account {
+  min-width: clamp(120px, 15%, 250px);
+  /* width: auto - absorbs remaining width */
+}
+
+/* Description - Expansion column */
+.phoenix-table__header.col-description,
+.phoenix-table__cell.col-description {
+  min-width: clamp(150px, 20%, 300px);
+  /* width: auto - absorbs remaining width */
+}
+
+/* Commission Type, Flow Type, Source */
+.phoenix-table__header.col-commission-type,
+.phoenix-table__cell.col-commission-type,
+.phoenix-table__header.col-type,
+.phoenix-table__cell.col-type,
+.phoenix-table__header.col-source,
+.phoenix-table__cell.col-source {
+  min-width: clamp(100px, 12%, 180px);
+  /* width: auto - absorbs remaining width */
+}
+
+/* Date, Updated */
+.phoenix-table__header.col-date,
+.phoenix-table__cell.col-date,
+.phoenix-table__header.col-updated,
+.phoenix-table__cell.col-updated {
+  min-width: clamp(100px, 12%, 150px);
+  width: clamp(100px, 12%, 150px);
+}
+
+/* ============================================
    STATUS BADGES
    ============================================
    Badges with transparent background (0.1-0.3 alpha), border, colored text

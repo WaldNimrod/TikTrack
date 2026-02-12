@@ -7,6 +7,8 @@
  * @version v1.0.0
  */
 
+import { maskedLog } from '../../../utils/maskedLog.js';
+
 export class StageBase {
   constructor(name) {
     this.name = name;
@@ -53,7 +55,7 @@ export class StageBase {
       // Timeout after 30 seconds to prevent infinite waiting
       setTimeout(() => {
         window.removeEventListener('uai:stage-complete', handler);
-        console.warn(`[StageBase] Timeout waiting for stage: ${stageName}`);
+        maskedLog(`[StageBase] Timeout waiting for stage: ${stageName}`, { stageName });
         resolve(); // Resolve anyway to prevent blocking
       }, 30000);
     });

@@ -7,8 +7,16 @@ Centralized configuration using Pydantic Settings.
 """
 
 import os
+from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+
+# Load api/.env explicitly (uvicorn runs from project root, so .env in CWD may not exist)
+_config_dir = Path(__file__).resolve().parent.parent  # api/
+_env_file = _config_dir / ".env"
+if _env_file.exists():
+    load_dotenv(_env_file)
 
 
 class Settings(BaseSettings):
@@ -30,7 +38,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     
     class Config:
-        env_file = ".env"
+        env_file = str(_env_file) if _env_file.exists() else ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
         extra = "ignore"  # Ignore extra fields in .env that aren't in Settings

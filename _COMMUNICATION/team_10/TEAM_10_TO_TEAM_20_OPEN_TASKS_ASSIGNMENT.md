@@ -17,11 +17,11 @@
 
 | # | מזהה | משימה | תוצר מצופה | סטטוס |
 |---|------|--------|-------------|--------|
-| 1 | 1.2.1 | מימוש Endpoints ל־Summary ו־Conversions (Option A) | API פעילים; תיעוד ב־SSOT | 🟡 **חלקי** — /cash_flows/currency_conversions פעיל; Summary endpoints — יש לבדוק |
+| 1 | 1.2.1 | מימוש Endpoints ל־Summary ו־Conversions (Option A) | API פעילים; תיעוד ב־SSOT | ✅ **הושלם** — 4 endpoints אומתו; OpenAPI + SSOT_1_2_1 |
 | 2 | 1.2.2 | נעילת פורטים 8080/8082 והקשחת Precision ל־20,6 | CORS/Config + NUMERIC(20,6) מאומת (תיאום עם Team 60) | ✅ **הושלם** — מאומת Team 60; סגור רשמית |
 | 3 | 1.2.3 | בניית Python Seeders עם `is_test_data = true`; `make db-test-clean` מחזיר DB סטרילי | סקריפטים + Makefile | ✅ **הושלם** — seed_test_data.py, db_test_clean.py, seed_base_test_user.py, reduce_admin_base_to_minimal.py, db_remove_superfluous_users.py; Makefile: db-test-clean, db-test-fill, db-backup, db-base-seed, db-admin-minimal, db-test-report, db-remove-superfluous-users |
-| 4 | PDSC | PDSC Boundary Contract — JSON Error Schema, Response Contract, Error Codes | מסמך חוזה משותף | ✅ **החלטה התקבלה** — 3 רכיבים מלאים; ביצוע לפי מנדט; אפשרות שלד מ-Team 90 |
-| 5 | Auth | חוזה Auth אחיד + עדכון SSOT/OpenAPI (אם טרם הושלם) | תיעוד + OpenAPI | ממתין |
+| 4 | PDSC | PDSC Boundary Contract — JSON Error Schema, Response Contract, Error Codes | מסמך חוזה משותף | ✅ **הושלם** — לפי השלד; אומת על ידי Team 10 |
+| 5 | Auth | חוזה Auth אחיד + עדכון SSOT/OpenAPI | תיעוד + OpenAPI | ✅ **הושלם** — identity.py + SSOT_AUTH_CONTRACT + OpenAPI |
 
 **תלות:** השלמת 1.2.1–1.2.3 פותחת את 1.1.3 ל־Team 10 ואת אינטגרציה מלאה ל־Team 30/40.
 

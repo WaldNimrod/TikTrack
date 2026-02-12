@@ -68,7 +68,7 @@ class SharedServices {
       // ADR-016: No hardcoded version — version read from routes.json (SSOT) only
       // Verify routes.json has version field (sanity check; no expected value)
       if (this.routesConfig.version == null || this.routesConfig.version === '') {
-        console.warn('[Shared Services] routes.json missing version field');
+        maskedLog('[Shared Services] routes.json missing version field', {});
       }
       
       // Extract API base URL from routes.json (SSOT)
@@ -79,7 +79,7 @@ class SharedServices {
       } else {
         // Fallback
         this.apiBaseUrl = '/api/v1';
-        console.warn('[Shared Services] Using fallback API base URL. Consider adding api.base_url to routes.json');
+        maskedLog('[Shared Services] Using fallback API base URL. Consider adding api.base_url to routes.json', {});
       }
       
       // Extract backend port

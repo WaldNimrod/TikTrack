@@ -5,7 +5,7 @@
  * 
  * @description כל תקשורת API חייבת לעבור דרך פונקציות אלו כדי לשמור על ניקיון ה-State
  * @legacyReference Legacy.data.transformations
- * @version v1.2 - Hardened for Financials (forced number conversion)
+ * @version v1.3 - Hardened: NaN/Undefined prevention for table display
  */
 
 /**
@@ -58,8 +58,19 @@ function convertFinancialField(value, key) {
   // Convert to number
   const numValue = Number(value);
   
-  // Return 0 if conversion failed (NaN)
+  // Return 0 if conversion failed (NaN) - prevents NaN in tables
   return isNaN(numValue) ? 0 : numValue;
+}
+
+/**
+ * Sanitize value for table display - prevents NaN and undefined
+ * @param {any} value - Value to sanitize
+ * @returns {any} - Safe value for display
+ */
+function sanitizeForDisplay(value) {
+  if (value === undefined) return null;
+  if (typeof value === 'number' && isNaN(value)) return 0;
+  return value;
 }
 
 /**
@@ -88,14 +99,17 @@ export const apiToReact = (apiData) => {
         const transformedValue = transform(obj[key], camelKey);
         
         // Apply forced number conversion for financial fields
-        acc[camelKey] = convertFinancialField(transformedValue, camelKey);
+        let result = convertFinancialField(transformedValue, camelKey);
+        // Prevent undefined/NaN in output (table display)
+        acc[camelKey] = sanitizeForDisplay(result);
         
         return acc;
       }, {});
     }
     
     // For primitive values, check if parent key indicates financial field
-    return convertFinancialField(obj, parentKey);
+    const result = convertFinancialField(obj, parentKey);
+    return sanitizeForDisplay(result);
   };
   return transform(apiData);
 };
@@ -126,14 +140,17 @@ export const reactToApi = (reactData) => {
         const transformedValue = transform(obj[key], key);
         
         // Apply forced number conversion for financial fields
-        acc[snakeKey] = convertFinancialField(transformedValue, key);
+        let result = convertFinancialField(transformedValue, key);
+        // Prevent undefined/NaN in output
+        acc[snakeKey] = sanitizeForDisplay(result);
         
         return acc;
       }, {});
     }
     
     // For primitive values, check if parent key indicates financial field
-    return convertFinancialField(obj, parentKey);
+    const result = convertFinancialField(obj, parentKey);
+    return sanitizeForDisplay(result);
   };
   return transform(reactData);
 };

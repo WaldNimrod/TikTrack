@@ -15,7 +15,7 @@
  */
 
 // Import PDSC Client (Shared_Services.js)
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 
 // Import transformers for additional transformations if needed
 import { apiToReact } from '../../../cubes/shared/utils/transformers.js';

@@ -45,7 +45,7 @@
       // Redirect to login page
       window.location.href = '/';
     } catch (error) {
-      console.error('[Header Links Updater] Logout error:', error);
+      window.maskedLog?.('[Header Links Updater] Logout error:', { message: error?.message });
       // Even on error, clear tokens and redirect to home
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_token');

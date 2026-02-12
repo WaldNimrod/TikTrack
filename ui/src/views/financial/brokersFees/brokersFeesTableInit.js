@@ -6,7 +6,7 @@
  */
 
 import { loadBrokersFeesData } from './brokersFeesDataLoader.js';
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { showBrokerFeeFormModal } from './brokersFeesForm.js';
 
 // Import masked log utility for security compliance

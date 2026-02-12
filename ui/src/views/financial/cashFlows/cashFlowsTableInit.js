@@ -6,7 +6,7 @@
  */
 
 import { loadCashFlowsData } from './cashFlowsDataLoader.js';
-import sharedServices from '../../../components/core/Shared_Services.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { showCashFlowFormModal } from './cashFlowsForm.js';
 import { toFlowTypeLabel } from '../../../utils/flowTypeValues.js';
 

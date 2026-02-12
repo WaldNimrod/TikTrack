@@ -67,7 +67,7 @@
         }
       })
       .catch(error => {
-        console.error('Phoenix Footer Loader: Failed to load footer.html', error);
+        window.maskedLog?.('Phoenix Footer Loader: Failed to load footer.html', { message: error?.message });
       });
   }
   

@@ -430,3 +430,22 @@ button.btn-auth-primary:focus {
   text-align: center;
   padding: 2rem;
 }
+
+/* Auth Block Message (Type D: logged-in but not authorized) */
+.auth-block-message {
+  text-align: center;
+  padding: 2rem;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+.auth-block-message h2 {
+  margin-top: 0;
+  color: var(--color-warning, var(--message-warning, #f59e0b));
+}
+.auth-block-message p {
+  margin: 1rem 0;
+}
+.auth-block-message a {
+  display: inline-block;
+  margin-top: 1rem;
+}

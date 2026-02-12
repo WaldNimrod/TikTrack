@@ -94,7 +94,7 @@
 | **A) Open** | ציבורי — זמין לכולם | **לא מוצג** | login, register, forgot-password (reset-password) |
 | **B) Shared** | **עמוד יחיד עם שני Containers** — טיפוס רשמי | מוצג | **אורח:** Guest Container. **מחובר:** Logged-in Container. **אין Redirect** לאורח (בניגוד ל‑C). |
 | **C) Auth-only** | דורש התחברות | מוצג | כל עמוד שלא ב־A/B/D — אורח **מופנה ל־Home** (לא ל־/login) |
-| **D) Admin-only** | למשתמש מנהל בלבד | מוצג | רק משתמש עם תפקיד מנהל; אחר — הפניה (ל־Home או 403 לפי החלטה) |
+| **D) Admin-only** | למשתמש מנהל בלבד | מוצג | **אורח** → הפניה ל־Home. **משתמש מחובר לא מורשה** → הודעת חסימה (אין הרשאה). |
 
 ### 4.2 כללי User Icon (Header) — ממסמך Team 90
 
@@ -110,7 +110,7 @@
 - ליישם רינדור משותף לפי מצב auth (Guest Container / Logged-in Container).  
 - אורח שנכנס לעמוד **auth-only (C)** → **הפניה ל־Home**.  
 - לאכוף לוגיקת צבע User Icon (success / warning; לא black).  
-- **טיפוס D:** להגדיר אילו routes הם admin-only; ליישם בדיקת תפקיד ו־redirect/403.
+- **טיפוס D:** אורח → Home; משתמש מחובר לא מורשה → הודעת חסימה. ליישם בדיקת תפקיד ב־Guard.
 
 ### 4.3.1 דרישות יישום — Shared Pages (Type B) (חובה)
 
@@ -153,14 +153,14 @@
 | /trades_history | trades_history.html | **C) Auth-only** | |
 | **/admin/design-system** | Design Admin Dashboard (צבעים + כפתורים) | **D) Admin-only** | **ADR‑013 LOCKED** — route רשמי; מקור role: **JWT (שדה role)**. |
 
-**טיפוס D (Admin-only):** מקור הרשאות: **JWT (שדה role)**. אורח/לא־מנהל → redirect או 403 לפי החלטה. צוות 10 מוציא הנחיות לצוותים בהתאם ל־SLA 30/40.
+**טיפוס D (Admin-only):** מקור הרשאות: **JWT (שדה role)**. **אורח** → הפניה לדף הבית. **משתמש מחובר לא מורשה** → הודעת חסימה (אין הרשאה). צוות 10 מוציא הנחיות לצוותים בהתאם ל־SLA 30/40.
 
 ### 4.7 בדיקות מקדימות לשער 0
 
 - [x] וידוא רשימת עמודים מלאה (כל ה־routes + דאשבורד/פרופיל) — **בוצע:** טבלה רשמית ב־§4.6; התאמה ל־`ui/public/routes.json`.  
-- [ ] החלטת אדריכל: מיפוי סופי A/B/C/D לכל עמוד; התנהגות redirect ל־D (Home vs 403).  
+- [x] החלטת אדריכל: מיפוי סופי A/B/C/D לכל עמוד; התנהגות ל־D — **אושר:** **אורח** → הפניה **לדף הבית** (כמו Type C). **משתמש מחובר לא מורשה** (למשל לא־מנהל ב־Admin-only) → **הודעת חסימה** (אין הרשאה). מיפוי: §4.6 + `TEAM_10_DECISION_PROFILE_ROUTE.md`.  
 - [x] מיפוי ותיעוד: **מטריצת route→טיפוס רשמית:** §4.6 במסמך זה (טבלת Routes). עדכון routes.json/SSOT — לפי צורך.  
-- [ ] רק לאחר מכן: יישום קוד (Guard, redirect, Home containers, User Icon).
+- [x] יישום קוד (Guard, redirect, Home containers, User Icon) — **בוצע ומאומת:** תשובות Team 30 (`TEAM_30_TO_TEAM_10_CODE_EVIDENCE_AND_AB_CD_RESPONSE.md`), Team 40 (Header icon). Code Evidence §4.5 + A/B/C/D (S1–S4, S6, S7) נסגרו.
 
 ### 4.8 משימות משנה ואחראים
 

@@ -129,19 +129,31 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
     );
   }
 
-  // Type D (Admin-only): Check admin role
-  if (requireAdmin && (!isAuthenticated || !isAdmin)) {
-    debugLog('Auth', 'ProtectedRoute: User not authorized for admin route', {
-      isAuthenticated,
-      isAdmin,
-      role: authService.getUserRole()
-    });
-    // Redirect to Home (not 403 for now - can be changed per requirements)
+  // Type D (Admin-only): Guest → Home; Logged-in but not admin → block message (per product decision)
+  if (requireAdmin && !isAuthenticated) {
+    debugLog('Auth', 'ProtectedRoute: Guest on admin route → redirect to Home');
     return <Navigate to="/" replace />;
   }
+  if (requireAdmin && isAuthenticated && !isAdmin) {
+    debugLog('Auth', 'ProtectedRoute: User not authorized for admin route (show block message)', {
+      role: authService.getUserRole()
+    });
+    return (
+      <div className="auth-layout-root" dir="rtl">
+        <tt-container>
+          <tt-section>
+            <div className="auth-block-message" role="alert">
+              <h2>אין הרשאה</h2>
+              <p>אין לך הרשאה לגשת לעמוד זה. נדרשת הרשאת מנהל.</p>
+              <a href="/" className="phx-btn phx-btn--primary">חזרה לדף הבית</a>
+            </div>
+          </tt-section>
+        </tt-container>
+      </div>
+    );
+  }
 
-  // Type C (Auth-only): If authentication is required and user is not authenticated, redirect to Home
-  // Type C: Auth-only → Home (not /login per ADR-013)
+  // Type C (Auth-only): Guest → redirect to Home (not /login per ADR-013)
   if (requireAuth && !isAuthenticated) {
     debugLog('Auth', 'ProtectedRoute: Redirecting to Home (Type C: Auth-only)');
     return <Navigate to="/" replace />;

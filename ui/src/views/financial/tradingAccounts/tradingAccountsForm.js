@@ -7,6 +7,7 @@
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
 import { getGovernanceMessageData } from '../shared/adr015GovernanceMessage.js';
 
@@ -194,7 +195,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
   try {
     brokerOptions = await fetchReferenceBrokers();
   } catch (e) {
-    console.warn('[Trading Accounts Form] Could not load brokers, using empty list:', e);
+    maskedLog('[Trading Accounts Form] Could not load brokers, using empty list:', { errorCode: e?.code });
   }
   const formHTML = createTradingAccountFormHTML(data, brokerOptions);
   
@@ -314,7 +315,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         } catch (error) {
           // Error handling is done in handleSaveTradingAccount
           // Don't close modal on error so user can see the error message
-          console.error('[Trading Accounts Form] Error saving:', error);
+          maskedLog('[Trading Accounts Form] Error saving:', { errorCode: error?.code, status: error?.status });
           // Modal stays open so user can fix and retry
         }
       } else {

@@ -20,7 +20,7 @@
   function initFooter() {
     // Check if footer already exists (prevent duplicate)
     if (document.querySelector('footer.page-footer')) {
-      console.warn('Phoenix Footer Loader: Footer already exists. Skipping load.');
+      window.maskedLog?.('Phoenix Footer Loader: Footer already exists. Skipping load.', {});
       return;
     }
     
@@ -43,7 +43,7 @@
         // Find the footer element
         const footer = tempDiv.querySelector('footer.page-footer');
         if (!footer) {
-          console.warn('Phoenix Footer Loader: footer element not found in footer.html');
+          window.maskedLog?.('Phoenix Footer Loader: footer element not found in footer.html', {});
           return;
         }
         
@@ -62,7 +62,7 @@
           }
         } else {
           // Fallback: Append to body if .page-wrapper not found (should not happen)
-          console.warn('Phoenix Footer Loader: .page-wrapper not found. Appending footer to body.');
+          window.maskedLog?.('Phoenix Footer Loader: .page-wrapper not found. Appending footer to body.', {});
           document.body.appendChild(footer);
         }
       })

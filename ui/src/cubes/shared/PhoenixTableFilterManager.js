@@ -14,11 +14,8 @@
  * // שמירת מצב (URL/LocalStorage)
  */
 
-// Loaded as classic script - use window.maskedLog if available, else safe console fallback (audit.maskedLog per JS Standards)
-const _log = (typeof window !== 'undefined' && window.maskedLog) || ((msg, data) => {
-  if (data && typeof data === 'object' && Object.keys(data).length > 0) console.log(msg, data);
-  else console.log(msg);
-});
+// Loaded as classic script - use window.maskedLog only (no raw console.log per ADR-010)
+const _log = (typeof window !== 'undefined' && window.maskedLog) || (() => {}); // No-op if maskedLog not loaded
 
 class PhoenixTableFilterManager {
   /**
@@ -40,7 +37,7 @@ class PhoenixTableFilterManager {
    */
   init() {
     if (!this.table) {
-      console.warn('[PhoenixTableFilterManager] Table element not found');
+      window.maskedLog?.('[PhoenixTableFilterManager] Table element not found', {});
       return;
     }
 
@@ -169,7 +166,7 @@ class PhoenixTableFilterManager {
 
     const tbody = this.table.querySelector('tbody, .phoenix-table__body');
     if (!tbody) {
-      console.warn('[PhoenixTableFilterManager] Table body not found');
+      window.maskedLog?.('[PhoenixTableFilterManager] Table body not found', {});
       return;
     }
 
@@ -307,7 +304,7 @@ class PhoenixTableFilterManager {
     try {
       localStorage.setItem(storageKey, JSON.stringify(this.filters.local));
     } catch (e) {
-      console.warn('[PhoenixTableFilterManager] Failed to save filter state', e);
+      window.maskedLog?.('[PhoenixTableFilterManager] Failed to save filter state', { message: e?.message });
     }
 
     // עדכון URL (אופציונלי)
@@ -336,7 +333,7 @@ class PhoenixTableFilterManager {
         this.filters.local = JSON.parse(savedFilters);
       }
     } catch (e) {
-      console.warn('[PhoenixTableFilterManager] Failed to load filter state', e);
+      window.maskedLog?.('[PhoenixTableFilterManager] Failed to load filter state', { message: e?.message });
     }
 
     // טעינה מ-URL (אופציונלי)

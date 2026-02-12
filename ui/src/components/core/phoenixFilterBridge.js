@@ -321,7 +321,7 @@ import { normalizeToCanonicalStatus, toHebrewStatus } from '../../utils/statusAd
             this.applyFiltersToUI();
           }
         } catch (e) {
-          console.error('Phoenix Bridge: Failed to load filters from storage', e);
+          window.maskedLog?.('Phoenix Bridge: Failed to load filters from storage', { message: e?.message });
         }
       }
     },
@@ -336,7 +336,7 @@ import { normalizeToCanonicalStatus, toHebrewStatus } from '../../utils/statusAd
       try {
         sessionStorage.setItem('phoenix-filters', JSON.stringify(this.state.filters));
       } catch (e) {
-        console.error('Phoenix Bridge: Failed to save filters to storage', e);
+        window.maskedLog?.('Phoenix Bridge: Failed to save filters to storage', { message: e?.message });
       }
     },
     

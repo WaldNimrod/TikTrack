@@ -33,12 +33,7 @@
         maskedLog(message);
       }
     } catch (e) {
-      // Fallback if maskedLog import fails - use console.error for errors only
-      if (data) {
-        console.error(message, data);
-      } else {
-        console.error(message);
-      }
+      // Fallback if maskedLog import fails - no-op (no raw console per ADR-010)
     }
   }
   

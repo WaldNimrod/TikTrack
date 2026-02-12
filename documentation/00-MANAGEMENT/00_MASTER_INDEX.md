@@ -120,7 +120,8 @@ _COMMUNICATION/
 ## 📊 Cash Flows — סוגי תזרים (flow_type, D21)
 
 - [📋 CASH_FLOW_TYPES_SSOT.md](../05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md) - מקור אמת לסוגי תזרים (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, **CURRENCY_CONVERSION**) ✅ **2026-02-12**
-- **CURRENCY_CONVERSION:** מזהה ייעודי להמרת מטבע (במקום OTHER); מיגרציה הורצה; **QA מאומת** — _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_CURRENCY_CONVERSION_QA_REPORT.md (5/5 PASS)
+- **CURRENCY_CONVERSION:** מזהה ייעודי להמרת מטבע; **QA מאומת** — TEAM_50_TO_TEAM_10_CURRENCY_CONVERSION_QA_REPORT.md (5/5 PASS)
+- **Flow Type SSOT (flowTypeValues.js):** מקור אחיד לתצוגה ולסדר אופציות ב-D21/D16; **QA מאומת** — TEAM_50_TO_TEAM_10_FLOW_TYPE_SSOT_QA_REPORT.md ✅ **2026-02-12**
 
 ---
 

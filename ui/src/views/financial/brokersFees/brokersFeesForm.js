@@ -183,7 +183,7 @@ export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId 
           }
           closeModal();
         } catch (error) {
-          console.error('[Brokers Fees Form] Error saving:', error);
+          maskedLog('[Brokers Fees Form] Error saving:', { errorCode: error?.code, status: error?.status });
         }
       } else {
         closeModal();

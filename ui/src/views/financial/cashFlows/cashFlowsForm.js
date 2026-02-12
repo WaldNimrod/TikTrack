@@ -247,7 +247,7 @@ export async function showCashFlowFormModal(data, onSave) {
             }
             closeModal();
           } catch (error) {
-            console.error('[Cash Flows Form] Error saving:', error);
+            maskedLog('[Cash Flows Form] Error saving:', { errorCode: error?.code, status: error?.status });
           }
         } else {
           if (richTextInstance) {

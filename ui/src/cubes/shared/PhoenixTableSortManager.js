@@ -33,7 +33,7 @@ class PhoenixTableSortManager {
    */
   init() {
     if (!this.table) {
-      console.warn('[PhoenixTableSortManager] Table element not found');
+      maskedLog('[PhoenixTableSortManager] Table element not found', {});
       return;
     }
 
@@ -86,7 +86,7 @@ class PhoenixTableSortManager {
     const sortType = header.dataset.sortType || 'string'; // string, numeric, date, boolean
 
     if (!sortKey) {
-      console.warn('[PhoenixTableSortManager] No sort key found for header');
+      maskedLog('[PhoenixTableSortManager] No sort key found for header', {});
       return;
     }
 
@@ -194,7 +194,7 @@ class PhoenixTableSortManager {
   applySort(sortType = 'string') {
     const tbody = this.table.querySelector('tbody, .phoenix-table__body');
     if (!tbody) {
-      console.warn('[PhoenixTableSortManager] Table body not found');
+      maskedLog('[PhoenixTableSortManager] Table body not found', {});
       return;
     }
 

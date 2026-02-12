@@ -93,14 +93,13 @@
 | **מודול דוגמה** | ✅ **D16 (חשבונות מסחר)** — G-Lead אישר עיצוב ועימוד; Team 30 תיעד ב-D16_MODULE_REFERENCE_SSOT.md. **יישום לכל המודולים:** הודעות יישום נשלחו ל-Team 30 ו-Team 40. |
 | **Acceptance Criteria** | RTL order קבוע בכל מודול; צבעי כותרת לפי ישות (Light BG + Dark text/border/close); מודול דוגמה מאושר כסטנדרט; **כל המודולים (D18, D21 וכו') תואמים ל-D16 reference**. |
 
-### 4.2 פער #2 — Header Persistence (Evidence E2E נדרש)
+### 4.2 פער #2 — Header Persistence ✅ אומת (סבב בדיקות מלא)
 
 | פריט | תיאור |
 |------|--------|
-| **סטטוס** | חסר אימות סופי. |
-| **אחריות בדיקות** | **צוות 50** — הבדיקות (כולל Gate A E2E) באחריות Team 50. |
-| **נדרש מ-Team 50** | (א) **להריץ** בדיקת Gate A ממוקדת: Login → Home → Header נשאר. (ב) **לצרף Evidence** (JSON/console/log + report). (ג) **אם נכשל** — לפתוח תיקון (תיאום עם Team 30); **אם PASS** — לסגור סופית. |
-| **בדיקה** | `tests/gate-a-e2e.test.js` — תרחיש `GATE_A_HeaderPersistence` / `GATE_A_TypeB_LoginToHome`. |
+| **סטטוס** | ✅ **Header Persistence — PASS** (סבב בדיקות מלא Team 50). |
+| **דוח** | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BACKEND_VERIFICATION_QA_REPORT.md` |
+| **Gate A** | 10/12 עברו; 2 נכשלו (TypeD_UserBlocked, HeaderLoadOrder) — לא קשורים ל-Backend. |
 
 ### 4.3 לאחר סגירת שני הפערים
 
@@ -117,14 +116,15 @@
 | 5 | משימות מדויקות לצוות 40 ו-30 (הודעות נפרדות) | ✅ הוצאו |
 | 6 | **מודול דוגמה D16** — G-Lead אישר; תיעוד D16_MODULE_REFERENCE_SSOT ננעל (Team 30) | ✅ הושלם |
 | 7 | **יישום לכל המודולים** — הודעות rollout ל-Team 30 ו-Team 40 (D18, D21) | ✅ הוצאו |
+| 8 | **סבב בדיקות מלא** — Team 50: Backend + Frontend D18/D21 + Gate A; Header Persistence PASS; דוח נמסר | ✅ הושלם |
 
 ### 4.5 משימות השלמה פעילות (מיקוד) — מה שהצוותים מיישמים כעת
 
 **זו תוכנית העבודה הנוכחית.** אין להוסיף עליה מידע חדש לצוותים עד להשלמתה.
 
 1. **Gap #1 — Module/Menu Styling:** ✅ החלטה התקבלה; SSOT הוטמע. **יישום:** Team 40 (עיצוב) + Team 30 (יישום/בדיקות); סבב דיוק ויזואלי על מודול דוגמה **מול G-Lead** → המודול כסטנדרט.
-2. **Gap #2 — Header Persistence:** **Team 50** (אחריות בדיקות) — הרצת Gate A (Login→Home→Header); צירוף Evidence (JSON/report); PASS → סגירה, FAIL → תיקון (תיאום עם Team 30).
-3. **לאחר סגירת שני הפערים:** פרסום "Batch 1+2 Closure Report" רשמי.
+2. **Gap #2 — Header Persistence:** ✅ **PASS** — סבב בדיקות מלא הושלם; Header Persistence אומת.
+3. **לאחר סגירת שני הפערים:** פרסום "Batch 1+2 Closure Report" רשמי (פער #1 ו-#2 — יישום/אימות הושלמו).
 
 ---
 
@@ -162,6 +162,7 @@
 | תשובת Team 30 | _COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_BATCH_1_2_EVIDENCE.md |
 | תשובת Team 40 | _COMMUNICATION/team_40/TEAM_40_TO_TEAM_10_BATCH_1_2_EVIDENCE_RESPONSE.md |
 | מפת Evidence Team 50 | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BATCH_1_2_EVIDENCE_MAP.md |
+| **דוח סבב בדיקות מלא** | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BACKEND_VERIFICATION_QA_REPORT.md |
 | DNA Button SSOT | documentation/04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md |
 | DNA Palette SSOT | documentation/04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md |
 | **Module/Menu Styling SSOT** | **documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md** |

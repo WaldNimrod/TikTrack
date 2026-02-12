@@ -1298,15 +1298,24 @@ body .page-wrapper .page-container main {
   background: var(--apple-bg-secondary, #f5f5f7);
 }
 
-/* CRITICAL: Second row display - flex layout */
+/* CRITICAL: Second row display - same layout as first row */
 .info-summary__row--second {
   display: none; /* CRITICAL: Hidden by default - JavaScript will show via class toggle */
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--spacing-md, 16px);
+  gap: var(--spacing-lg, 24px);
   margin: 0;
   padding: var(--spacing-sm, 8px) 0;
   border-top: 1px solid var(--apple-border-light, #e5e5ea);
+}
+
+/* Second row content - same flex layout and gap as first row */
+.info-summary__row--second .info-summary__content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg, 24px);
 }
 
 /* CRITICAL: Show second row when visible class is added */

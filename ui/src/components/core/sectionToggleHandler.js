@@ -16,9 +16,53 @@
 (function initSectionToggle() {
   'use strict';
   
+  /** Open or close all sections in container. If any closed, open all; else close all. */
+  function toggleAllSections(container) {
+    const sections = container.querySelectorAll('tt-section');
+    const anyClosed = Array.from(sections).some(s => {
+      const body = s.querySelector('.index-section__body, .dashboard-section__body');
+      return body?.hasAttribute('hidden');
+    });
+    const openAll = anyClosed;
+    sections.forEach(section => {
+      const body = section.querySelector('.index-section__body, .dashboard-section__body');
+      const toggleBtn = section.querySelector('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
+      const icon = toggleBtn?.classList.contains('js-expand-collapse-all') ? null : toggleBtn?.querySelector('svg');
+      if (!body) return;
+      if (openAll) {
+        body.removeAttribute('hidden');
+        requestAnimationFrame(() => { body.style.display = ''; });
+        if (icon) icon.style.transform = 'rotate(0deg)';
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        body.setAttribute('hidden', '');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+        setTimeout(() => {
+          if (body.hasAttribute('hidden')) body.style.display = 'none';
+        }, 300);
+      }
+    });
+    const expandBtn = container.querySelector('.js-expand-collapse-all');
+    if (expandBtn) expandBtn.setAttribute('aria-label', openAll ? 'סגור את כל האזורים' : 'פתח את כל האזורים');
+  }
+  
+  function initExpandCollapseAll() {
+    document.querySelectorAll('.js-expand-collapse-all').forEach(btn => {
+      const container = btn.closest('tt-container');
+      if (!container) return;
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleAllSections(container);
+      });
+      btn.setAttribute('aria-label', 'הצג/הסתר את כל האזורים');
+    });
+  }
+  
   function initToggleButtons() {
-    // Find all toggle buttons
-    const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn, .dashboard-section__header-toggle-btn');
+    // Find all toggle buttons (exclude js-expand-collapse-all - handled separately)
+    const toggleButtons = document.querySelectorAll('.index-section__header-toggle-btn.js-section-toggle, .dashboard-section__header-toggle-btn.js-section-toggle');
     
     toggleButtons.forEach(button => {
       // Find the parent section (tt-section)
@@ -84,10 +128,13 @@
   }
   
   // Run when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initToggleButtons);
-  } else {
-    // DOM already loaded
+  function init() {
+    initExpandCollapseAll();
     initToggleButtons();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();

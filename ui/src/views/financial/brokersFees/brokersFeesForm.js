@@ -58,52 +58,54 @@ function createBrokerFeeFormHTML(data = null, tradingAccounts = [], preselectedA
   }
 
   return `
-    <form id="brokerFeeForm" class="phoenix-form">
-      <div class="form-group">
-        <label for="tradingAccountId">חשבון מסחר *</label>
-        <select id="tradingAccountId" name="tradingAccountId" required>
-          ${accountOptions}
-        </select>
-        <span class="form-error" id="tradingAccountIdError"></span>
+    <form id="brokerFeeForm" class="phoenix-form phoenix-form--two-col">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tradingAccountId">חשבון מסחר <span class="form-label-asterisk">*</span></label>
+          <select id="tradingAccountId" name="tradingAccountId" required>
+            ${accountOptions}
+          </select>
+          <span class="form-error" id="tradingAccountIdError"></span>
+        </div>
+        <div class="form-group">
+          <label for="commissionType">סוג עמלה <span class="form-label-asterisk">*</span></label>
+          <select id="commissionType" name="commissionType" required>
+            <option value="TIERED" ${commissionType === 'TIERED' ? 'selected' : ''}>מדורגת (TIERED)</option>
+            <option value="FLAT" ${commissionType === 'FLAT' ? 'selected' : ''}>קבועה (FLAT)</option>
+          </select>
+          <span class="form-error" id="commissionTypeError"></span>
+        </div>
       </div>
       
-      <div class="form-group">
-        <label for="commissionType">סוג עמלה *</label>
-        <select id="commissionType" name="commissionType" required>
-          <option value="TIERED" ${commissionType === 'TIERED' ? 'selected' : ''}>מדורגת (TIERED)</option>
-          <option value="FLAT" ${commissionType === 'FLAT' ? 'selected' : ''}>קבועה (FLAT)</option>
-        </select>
-        <span class="form-error" id="commissionTypeError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="commissionValue">ערך עמלה *</label>
-        <input 
-          type="number" 
-          id="commissionValue" 
-          name="commissionValue" 
-          value="${commissionValue}" 
-          step="0.000001" 
-          min="0" 
-          required 
-          placeholder="לדוגמה: 0.0035"
-        />
-        <span class="form-error" id="commissionValueError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="minimum">מינימום לפעולה (USD) *</label>
-        <input 
-          type="number" 
-          id="minimum" 
-          name="minimum" 
-          value="${minimum}" 
-          step="0.01" 
-          min="0" 
-          required 
-          placeholder="0.00"
-        />
-        <span class="form-error" id="minimumError"></span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="commissionValue">ערך עמלה <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="number" 
+            id="commissionValue" 
+            name="commissionValue" 
+            value="${commissionValue}" 
+            step="0.000001" 
+            min="0" 
+            required 
+            placeholder="לדוגמה: 0.0035"
+          />
+          <span class="form-error" id="commissionValueError"></span>
+        </div>
+        <div class="form-group">
+          <label for="minimum">מינימום לפעולה (USD) <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="number" 
+            id="minimum" 
+            name="minimum" 
+            value="${minimum}" 
+            step="0.01" 
+            min="0" 
+            required 
+            placeholder="0.00"
+          />
+          <span class="form-error" id="minimumError"></span>
+        </div>
       </div>
     </form>
   `;
@@ -128,7 +130,7 @@ export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId 
     entity: 'brokers_fees',
     showSaveButton: true,
     saveButtonText: 'שמירה',
-    onSave: function () {
+    onSave: async function () {
       const form = document.getElementById('brokerFeeForm');
       if (!form) return;
 
@@ -144,6 +146,9 @@ export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId 
 
       const commissionValueParsed = commissionValueInput ? parseFloat(commissionValueInput) : NaN;
       const minimumParsed = minimumInput ? parseFloat(minimumInput) : NaN;
+
+      // Clear previous errors
+      document.querySelectorAll('#brokerFeeForm .form-error').forEach((el) => { el.textContent = ''; });
 
       if (!tradingAccountIdValue) {
         const errEl = document.getElementById('tradingAccountIdError');
@@ -170,13 +175,19 @@ export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId 
         minimum: minimumParsed
       };
 
-      document.querySelectorAll('#brokerFeeForm .form-error').forEach((el) => { el.textContent = ''; });
-
       if (onSave) {
-        onSave(formData, data);
+        try {
+          const result = onSave(formData, data);
+          if (result && typeof result.then === 'function') {
+            await result;
+          }
+          closeModal();
+        } catch (error) {
+          console.error('[Brokers Fees Form] Error saving:', error);
+        }
+      } else {
+        closeModal();
       }
-
-      closeModal();
     },
     onClose: function () {}
   });

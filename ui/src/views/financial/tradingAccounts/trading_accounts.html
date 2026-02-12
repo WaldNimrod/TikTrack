@@ -74,9 +74,11 @@
                 <span class="index-section__header-count">0 התראות פעילות</span>
               </div>
               <div class="index-section__header-actions">
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
+                <button class="index-section__header-toggle-btn js-expand-collapse-all" aria-label="הצג/הסתר את כל האזורים" title="הצג/הסתר את כל האזורים">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 8h14M5 16h14"></path>
+                    <path d="M12 5l-3 3h6l-3-3"></path>
+                    <path d="M12 19l3-3h-6l3 3"></path>
                   </svg>
                 </button>
               </div>
@@ -103,10 +105,12 @@
                       </button>
                     </div>
                     <div class="info-summary__row info-summary__row--second" id="portfolioSummaryContent">
-                      <span>פוזיציות פעילות: 0</span>
-                      <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                      <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                      <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                      <div class="info-summary__content">
+                        <span>פוזיציות פעילות: 0</span>
+                        <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                        <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                        <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                      </div>
                     </div>
                   </div>
                 </div>

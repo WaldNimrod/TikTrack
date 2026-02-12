@@ -796,13 +796,12 @@ function normalizeTradingAccountId(value) {
     } else if (mode === 'edit') {
       // Edit mode - show form with existing data
       showCashFlowFormModal(data, function(formData, originalData) {
-        // Use form data directly (already in correct format)
-        handleSaveCashFlow(originalData.externalUlid || originalData.id, formData);
+        return handleSaveCashFlow(originalData.externalUlid || originalData.id, formData);
       });
     } else if (mode === 'add') {
       // Add mode - show empty form
       showCashFlowFormModal(null, function(formData) {
-        handleSaveCashFlow(null, formData);
+        return handleSaveCashFlow(null, formData);
       });
     }
   }
@@ -876,6 +875,7 @@ function normalizeTradingAccountId(value) {
       }
       
       alert(errorMessage);
+      throw error; /* D16: Re-throw so modal stays open on error */
     }
   }
   

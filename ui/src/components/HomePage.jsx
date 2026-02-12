@@ -452,10 +452,12 @@ const HomePage = () => {
                     <div className="info-summary" id="summaryStats">
                       {/* First Row: Summary Stats */}
                       <div className="info-summary__row info-summary__row--first">
-                        <div>סה"כ טריידים: <strong id="totalTrades">82</strong></div>
-                        <div>סה"כ התראות: <strong id="totalAlerts">3</strong></div>
-                        <div>יתרה נוכחית: <strong id="currentBalance"><span className="numeric-value-positive" dir="ltr">+$372,660.00</span></strong></div>
-                        <div>רווח/הפסד: <strong id="totalPnL"><span className="numeric-value-positive" dir="ltr">+$1,768.00</span></strong></div>
+                        <div className="info-summary__content">
+                          <div>סה"כ טריידים: <strong id="totalTrades">82</strong></div>
+                          <div>סה"כ התראות: <strong id="totalAlerts">3</strong></div>
+                          <div>יתרה נוכחית: <strong id="currentBalance"><span className="numeric-value-positive" dir="ltr">+$372,660.00</span></strong></div>
+                          <div>רווח/הפסד: <strong id="totalPnL"><span className="numeric-value-positive" dir="ltr">+$1,768.00</span></strong></div>
+                        </div>
                         <button 
                           className="portfolio-summary__toggle-btn" 
                           id="portfolioSummaryToggleSize" 
@@ -479,11 +481,13 @@ const HomePage = () => {
                       {/* Second Row: Portfolio Summary (hidden by default) */}
                       {showPortfolioSummary && (
                         <div className="info-summary__row info-summary__row--second" id="portfolioSummaryContent">
-                          <span>חשבונות פעילים: 31 מתוך 53</span>
-                          <span>שווי כולל: <span className="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
-                          <span>שווי ממוצע לחשבון: <span className="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
-                          <span>טריידים פתוחים: 71</span>
-                          <span>P/L כולל: <span className="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
+                          <div className="info-summary__content">
+                            <span>חשבונות פעילים: 31 מתוך 53</span>
+                            <span>שווי כולל: <span className="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
+                            <span>שווי ממוצע לחשבון: <span className="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
+                            <span>טריידים פתוחים: 71</span>
+                            <span>P/L כולל: <span className="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
+                          </div>
                         </div>
                       )}
                     </div>

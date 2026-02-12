@@ -62,8 +62,8 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
   const currentFilterAccount = window.PhoenixBridge?.state?.filters?.tradingAccount || '';
   const defaultAccountId = tradingAccountId || currentFilterAccount || '';
 
-  // Build trading accounts dropdown
-  let accountsOptions = '<option value="">בחר חשבון מסחר</option>';
+  // Build trading accounts dropdown (D16 style: -- בחר --)
+  let accountsOptions = '<option value="">-- בחר חשבון מסחר --</option>';
   if (tradingAccounts.length > 0) {
     tradingAccounts.forEach(account => {
       const accountId = account.externalUlid || account.id || account.external_ulid;
@@ -74,62 +74,64 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
   }
 
   return `
-    <form id="cashFlowForm" class="phoenix-form">
+    <form id="cashFlowForm" class="phoenix-form phoenix-form--two-col">
       <div class="form-group">
-        <label for="tradingAccountId">חשבון מסחר *</label>
+        <label for="tradingAccountId">חשבון מסחר <span class="form-label-asterisk">*</span></label>
         <select id="tradingAccountId" name="tradingAccountId" required>
           ${accountsOptions}
         </select>
         <span class="form-error" id="tradingAccountIdError"></span>
       </div>
       
-      <div class="form-group">
-        <label for="transactionDate">תאריך תנועה *</label>
-        <input 
-          type="date" 
-          id="transactionDate" 
-          name="transactionDate" 
-          value="${transactionDate}" 
-          required 
-        />
-        <span class="form-error" id="transactionDateError"></span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="transactionDate">תאריך תנועה <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="date" 
+            id="transactionDate" 
+            name="transactionDate" 
+            value="${transactionDate}" 
+            required 
+          />
+          <span class="form-error" id="transactionDateError"></span>
+        </div>
+        <div class="form-group">
+          <label for="flowType">סוג תנועה <span class="form-label-asterisk">*</span></label>
+          <select id="flowType" name="flowType" required>
+            <option value="DEPOSIT" ${flowType === 'DEPOSIT' ? 'selected' : ''}>הפקדה</option>
+            <option value="WITHDRAWAL" ${flowType === 'WITHDRAWAL' ? 'selected' : ''}>משיכה</option>
+            <option value="DIVIDEND" ${flowType === 'DIVIDEND' ? 'selected' : ''}>דיבידנד</option>
+            <option value="INTEREST" ${flowType === 'INTEREST' ? 'selected' : ''}>ריבית</option>
+            <option value="FEE" ${flowType === 'FEE' ? 'selected' : ''}>עמלה</option>
+            <option value="OTHER" ${flowType === 'OTHER' ? 'selected' : ''}>אחר</option>
+          </select>
+          <span class="form-error" id="flowTypeError"></span>
+        </div>
       </div>
       
-      <div class="form-group">
-        <label for="flowType">סוג תנועה *</label>
-        <select id="flowType" name="flowType" required>
-          <option value="DEPOSIT" ${flowType === 'DEPOSIT' ? 'selected' : ''}>הפקדה</option>
-          <option value="WITHDRAWAL" ${flowType === 'WITHDRAWAL' ? 'selected' : ''}>משיכה</option>
-          <option value="DIVIDEND" ${flowType === 'DIVIDEND' ? 'selected' : ''}>דיבידנד</option>
-          <option value="INTEREST" ${flowType === 'INTEREST' ? 'selected' : ''}>ריבית</option>
-          <option value="FEE" ${flowType === 'FEE' ? 'selected' : ''}>עמלה</option>
-          <option value="OTHER" ${flowType === 'OTHER' ? 'selected' : ''}>אחר</option>
-        </select>
-        <span class="form-error" id="flowTypeError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="amount">סכום *</label>
-        <input 
-          type="number" 
-          id="amount" 
-          name="amount" 
-          value="${amount}" 
-          step="0.01" 
-          required 
-          placeholder="0.00"
-        />
-        <span class="form-error" id="amountError"></span>
-      </div>
-      
-      <div class="form-group">
-        <label for="currency">מטבע *</label>
-        <select id="currency" name="currency" required>
-          <option value="USD" ${currency === 'USD' ? 'selected' : ''}>USD</option>
-          <option value="ILS" ${currency === 'ILS' ? 'selected' : ''}>ILS</option>
-          <option value="EUR" ${currency === 'EUR' ? 'selected' : ''}>EUR</option>
-        </select>
-        <span class="form-error" id="currencyError"></span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="amount">סכום <span class="form-label-asterisk">*</span></label>
+          <input 
+            type="number" 
+            id="amount" 
+            name="amount" 
+            value="${amount}" 
+            step="0.01" 
+            required 
+            placeholder="0.00"
+          />
+          <span class="form-error" id="amountError"></span>
+        </div>
+        <div class="form-group">
+          <label for="currency">מטבע <span class="form-label-asterisk">*</span></label>
+          <select id="currency" name="currency" required>
+            <option value="USD" ${currency === 'USD' ? 'selected' : ''}>USD</option>
+            <option value="ILS" ${currency === 'ILS' ? 'selected' : ''}>ILS</option>
+            <option value="EUR" ${currency === 'EUR' ? 'selected' : ''}>EUR</option>
+          </select>
+          <span class="form-error" id="currencyError"></span>
+        </div>
       </div>
       
       <div class="form-group">
@@ -189,7 +191,7 @@ export async function showCashFlowFormModal(data, onSave) {
       entity: 'cash_flow',
       showSaveButton: true,
       saveButtonText: 'שמירה',
-      onSave: function() {
+      onSave: async function() {
         const form = document.getElementById('cashFlowForm');
         if (!form) return;
 
@@ -212,36 +214,51 @@ export async function showCashFlowFormModal(data, onSave) {
           description: descPlain ? descriptionHtml : null,
           externalReference: document.getElementById('externalReference').value.trim()
         };
-        
+
+        // Clear previous errors
+        form.querySelectorAll('.form-error').forEach(el => { el.textContent = ''; });
+
         // Validate required fields
         if (!formData.tradingAccountId) {
-          document.getElementById('tradingAccountIdError').textContent = 'חשבון מסחר הוא שדה חובה';
+          const el = document.getElementById('tradingAccountIdError');
+          if (el) el.textContent = 'חשבון מסחר הוא שדה חובה';
           return;
         }
         
         if (!formData.transactionDate) {
-          document.getElementById('transactionDateError').textContent = 'תאריך תנועה הוא שדה חובה';
+          const el = document.getElementById('transactionDateError');
+          if (el) el.textContent = 'תאריך תנועה הוא שדה חובה';
           return;
         }
         
         if (formData.amount <= 0) {
-          document.getElementById('amountError').textContent = 'סכום חייב להיות גדול מ-0';
+          const el = document.getElementById('amountError');
+          if (el) el.textContent = 'סכום חייב להיות גדול מ-0';
           return;
         }
-        
-        // Clear errors
-        document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
-        
+
         // Call save handler
         if (onSave) {
-          onSave(formData, data);
+          try {
+            const result = onSave(formData, data);
+            if (result && typeof result.then === 'function') {
+              await result;
+            }
+            if (richTextInstance) {
+              richTextInstance.destroy();
+              richTextInstance = null;
+            }
+            closeModal();
+          } catch (error) {
+            console.error('[Cash Flows Form] Error saving:', error);
+          }
+        } else {
+          if (richTextInstance) {
+            richTextInstance.destroy();
+            richTextInstance = null;
+          }
+          closeModal();
         }
-
-        if (richTextInstance) {
-          richTextInstance.destroy();
-          richTextInstance = null;
-        }
-        closeModal();
       },
       onClose: function() {
         if (richTextInstance) {

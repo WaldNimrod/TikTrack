@@ -485,11 +485,11 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       alert(`צפייה בעמלה:\n${JSON.stringify(data, null, 2)}`);
     } else if (mode === 'edit') {
       showBrokerFeeFormModal(data, function(formData, originalData) {
-        handleSaveBrokerFee(originalData.externalUlid || originalData.id, formData);
+        return handleSaveBrokerFee(originalData.externalUlid || originalData.id, formData);
       });
     } else if (mode === 'add') {
       showBrokerFeeFormModal(null, function(formData) {
-        handleSaveBrokerFee(null, formData);
+        return handleSaveBrokerFee(null, formData);
       }, preselectedAccountId);
     }
   }
@@ -601,6 +601,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       });
       
       alert(errorMessage);
+      throw error; /* D16: Re-throw so modal stays open on error */
     }
   }
   

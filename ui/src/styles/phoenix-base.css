@@ -540,7 +540,7 @@ body .page-wrapper .page-container main {
   flex: 0 1 auto; /* CRITICAL: Don't grow - takes only needed space, but min-height ensures 100vh */
   display: flex; /* CRITICAL: Flex container for content */
   flex-direction: column; /* CRITICAL: Column layout */
-  justify-content: center; /* CRITICAL: Center content vertically - equal spacing above and below */
+  justify-content: flex-start; /* Content stays at top - not centered when sections are collapsed */
   align-items: stretch; /* CRITICAL: Stretch items to full width */
 }
 

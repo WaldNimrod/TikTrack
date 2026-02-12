@@ -98,9 +98,20 @@
 
 ---
 
-## 7. סגנונות כלליים (Base Template) — תקף לכל העמודים
+## 7. סגנונות כלליים ו־Page Layout — תקף לכל העמודים
 
-הבאים חלים על כל העמודים הממשים תבנית בסיס (ללא כניסה/אוטנטיקציה):
+הבאים חלים על כל העמודים הממשים תבנית בסיס. **מקור מפורט:** `PAGE_LAYOUT_AND_SECTIONS_SSOT.md` (אותו תיקייה).
+
+### 7.1 פריסת עמוד וסיכום מידע
+
+| נושא | סטנדרט | קובץ |
+|------|--------|------|
+| **יישור עמוד** | `main` — `justify-content: flex-start` (תוכן צמוד למעלה כש-sections סגורים) | phoenix-base.css |
+| **סיכום מידע — שורה ראשונה** | תוכן ב-`info-summary__content`; כפתור toggle בסוף | phoenix-components.css, HTML |
+| **סיכום מידע — שורה שנייה** | אותו מבנה: `info-summary__content`, `gap: var(--spacing-lg)` | phoenix-components.css, HTML |
+| **Expand/Collapse All** | עמוד עם **>3** `tt-section`: כפתור `js-expand-collapse-all` בסקציה הראשונה; aria-label: "הצג/הסתר את כל האזורים" | sectionToggleHandler.js, HTML |
+
+### 7.2 סגנונות נוספים (Base Template)
 
 | נושא | סטנדרט | קובץ |
 |------|--------|------|
@@ -108,8 +119,8 @@
 | עמודת פעולות | ללא כותרת גלויה (sr-only), עמודה צרה | phoenix-components.css |
 | תאריך | פורמט DD/MM/YY | tableFormatters.js, PhoenixTable.jsx |
 | גופן תאים | font-size-sm (שם, מטבע, עודכן) | phoenix-components.css |
-| סיכום מידע | כפתור בסוף שורה; מידע ממורכז; שורה שנייה מוסתרת כברירת מחדל | phoenix-components.css, HTML |
 
 ---
 
-**log_entry | [Team 30] | D16_MODULE_REFERENCE | LOCKED | 2026-01-31 | G-Lead approval**
+**log_entry | [Team 30] | D16_MODULE_REFERENCE | LOCKED | 2026-01-31 | G-Lead approval**  
+**log_entry | [Team 10] | D16_SECTION_7_PAGE_LAYOUT | UPDATED | 2026-02-12 | per TEAM_30_TO_TEAM_10_PAGE_LAYOUT_INFO_SUMMARY_IMPLEMENTATION_REPORT**

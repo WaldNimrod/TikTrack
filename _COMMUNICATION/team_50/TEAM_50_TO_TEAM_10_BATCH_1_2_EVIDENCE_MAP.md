@@ -47,5 +47,13 @@
 
 ---
 
+## 5. עדכון — סבב בדיקות מלא (2026-02-12)
+
+**מקור:** `TEAM_10_TO_TEAM_50_BACKEND_VERIFICATION_QA_REQUEST.md`
+
+דוח סבב מלא: `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BACKEND_VERIFICATION_QA_REPORT.md`
+
+---
+
 **Team 50 (QA & Fidelity)**  
 *log_entry | BATCH_1_2_EVIDENCE_MAP | 2026-02-12*

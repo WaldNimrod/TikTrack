@@ -92,6 +92,7 @@ _COMMUNICATION/
 - [📊 TEAM_50_QA_TEST_INDEX.md](../09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md) - אינדקס בדיקות QA מפורט
 - [👤 QA Test User Seed (README)](../../scripts/README_SEED_QA_USER.md) - משתמש QA קבוע ל-Gate B Runtime/E2E (TikTrackAdmin / 4181); הרצת `python3 scripts/seed_qa_test_user.py` אחרי איפוס DB ✅ **תעוד קבוע**
 - [📋 TT2_QA_SEED_USER_PROCEDURE.md](../05-PROCEDURES/TT2_QA_SEED_USER_PROCEDURE.md) - נוהל קצר + הפניה ל-README המלא
+- [📋 TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md](../05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md) - נוהל QA פנימי Team 30 — Checklist סטנדרטים (Page Layout, Info Summary, Sections) לפני PR ✅ **מחייב Frontend**
 - ⚠️ **TEAM_51_ONBOARDING_COMPREHENSIVE.md** - חבילת אונבורדינג מקיפה לצוות 51 (QA Remote) - נמצא ב-`_COMMUNICATION/team_51/` (לא SSOT - Communication בלבד)
 
 ---
@@ -160,7 +161,9 @@ _COMMUNICATION/
 - [🔘 DNA_BUTTON_SYSTEM.md](../04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md) - מערכת כפתורים DNA (SSOT) ✅ **Batch 1+2**
 - [🎨 DNA_PALETTE_SSOT.md](../04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md) - פלטת צבעים DNA — SSOT רשמי ✅ **Batch 1+2**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: עיצוב מודולים ותפריט (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה כסטנדרט) ✅ **SSOT — Batch 1+2**
-- [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה נעול: D16 חשבונות מסחר — תיעוד דיוקי עיצוב (שדות, כפתורים, פריסה, כוכבית) ✅ **SSOT — 2026-01-31**
+- [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה נעול: D16 חשבונות מסחר — תיעוד דיוקי עיצוב (שדות, כפתורים, פריסה, כוכבית, סעיף 7 Page Layout) ✅ **SSOT — 2026-01-31**
+- [📐 PAGE_LAYOUT_AND_SECTIONS_SSOT.md](../09-GOVERNANCE/standards/PAGE_LAYOUT_AND_SECTIONS_SSOT.md) - תבנית עמוד: יישור, Info Summary (שורות 1+2), Expand/Collapse All (>3 סקציות) ✅ **SSOT**
+- [📋 Checklist עמודים חדשים](../02-DEVELOPMENT/PAGE_LAYOUT_CHECKLIST_NEW_PAGES.md) - checklist מקוצר — Page Layout לעמוד חדש
 
 ---
 
@@ -189,6 +192,7 @@ _COMMUNICATION/
 - [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: Module/Menu Styling (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה) ✅ **SSOT — Batch 1+2**
 - [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה D16 (חשבונות מסחר) — נעול ✅ **SSOT — 2026-01-31**
+- [📐 PAGE_LAYOUT_AND_SECTIONS_SSOT.md](../09-GOVERNANCE/standards/PAGE_LAYOUT_AND_SECTIONS_SSOT.md) - Page Layout: יישור עמוד, Info Summary, Expand/Collapse All ✅ **SSOT**
 - [📋 TT2_SYSTEM_STATUS_VALUES_SSOT.md](../09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md) - סטטוסים מערכתיים (active/inactive/pending/cancelled + פתוח/סגור/ממתין/מבוטל) — רשימת סטטוסים מרכזית לכל הישויות ✅ **SSOT**
 - [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד — מעבר ל-Adapter (statusValues.js + statusAdapter.js) ✅ **מנדט יישום**
 - [📋 מנדט יישום סטטוסים](../../_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md) - Single Source → statusValues.js → statusAdapter.js — Acceptance Criteria + אסור

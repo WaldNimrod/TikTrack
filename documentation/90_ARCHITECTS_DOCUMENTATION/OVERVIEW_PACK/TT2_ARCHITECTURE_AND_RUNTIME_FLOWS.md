@@ -44,6 +44,8 @@
 - `documentation/01-ARCHITECTURE/TT2_EFR_HARDENED_TRANSFORMERS_LOCK.md`
 - `documentation/01-ARCHITECTURE/TT2_CSS_LOAD_VERIFICATION_SPEC.md`
 - `documentation/01-ARCHITECTURE/TT2_SSOT_REGISTRY.md` (Shared_Services / PDSC client)
+- `ui/public/` (HTML pages)
+- `ui/src/` (React components + UAI runtime)
 - `ui/src/components/core/stages/DOMStage.js`
 - `ui/src/components/core/stages/BridgeStage.js`
 - `ui/src/components/core/stages/DataStage.js`

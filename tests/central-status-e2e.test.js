@@ -25,12 +25,18 @@ async function login(driver) {
   try {
     await driver.get(`${TEST_CONFIG.frontendUrl}/login`);
     await driver.sleep(1500);
-    await driver.findElement(By.css('input[name="usernameOrEmail"]')).sendKeys(TEST_USERS.admin.username);
+    const usernameInput = await driver.findElement(By.css('input[name="usernameOrEmail"]')).catch(() => null);
+    if (!usernameInput) return false;
+    await usernameInput.sendKeys(TEST_USERS.admin.username);
     await driver.findElement(By.css('input[name="password"]')).sendKeys(TEST_USERS.admin.password);
     await driver.findElement(By.css('button[type="submit"]')).click();
     await driver.sleep(3500);
     const token = await getLocalStorageValue(driver, 'access_token');
-    return !!token;
+    if (token) {
+      await driver.executeScript(`localStorage.setItem('auth_token', localStorage.getItem('access_token') || '');`);
+      return true;
+    }
+    return false;
   } catch (e) {
     return false;
   }
@@ -68,12 +74,13 @@ async function runCentralStatusTests() {
 
       const menu = await driver.findElement(By.css('#statusFilterMenu')).catch(() => null);
       const items = menu ? await menu.findElements(By.css('.status-filter-item')) : [];
-      // Text may be in child span; use data-value as fallback (HTML: data-value="פתוח")
-      const values = await Promise.all(items.map(i =>
-        i.getAttribute('data-value').catch(() => i.getText().catch(() => ''))
-      ));
-      const texts = await Promise.all(items.map(i => i.getText().catch(() => '')));
-      const displayValues = values.some(v => v) ? values : texts;
+      // Collect values: data-value or child .option-text (bridge may clone items)
+      const displayValues = [];
+      for (const el of items) {
+        const v = await el.getAttribute('data-value').catch(() => '');
+        const t = v || (await el.findElement(By.css('.option-text')).getText().catch(() => el.getText().catch(() => '')));
+        displayValues.push(t || '');
+      }
       const hasAll = displayValues.some(t => t && (t.includes('הכול') || t === 'הכול'));
       const hasOpen = displayValues.some(t => t && (t.includes('פתוח') || t === 'פתוח'));
       const hasClosed = displayValues.some(t => t && (t.includes('סגור') || t === 'סגור'));
@@ -102,8 +109,8 @@ async function runCentralStatusTests() {
       let openItem = null;
       for (const el of items) {
         const v = await el.getAttribute('data-value').catch(() => '');
-        const t = await el.getText().catch(() => '');
-        if ((v && (v.includes('פתוח') || v === 'פתוח')) || (t && t.includes('פתוח'))) { openItem = el; break; }
+        const t = v || (await el.findElement(By.css('.option-text')).getText().catch(() => el.getText().catch(() => '')));
+        if ((t && (t.includes('פתוח') || t === 'פתוח'))) { openItem = el; break; }
       }
       if (openItem) {
         await openItem.click();

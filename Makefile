@@ -50,6 +50,10 @@ db-base-seed:
 db-admin-minimal:
 	@python3 scripts/reduce_admin_base_to_minimal.py
 
+## Remove superfluous users (keeps TikTrackAdmin, nimrod_wald, test_user)
+db-remove-superfluous-users:
+	@python3 scripts/db_remove_superfluous_users.py
+
 ## Backup DB, verify backup, then seed test data (recommended flow).
 db-backup-then-fill: db-backup
 	@echo "🌱 Seeding test data (backup already verified)..."

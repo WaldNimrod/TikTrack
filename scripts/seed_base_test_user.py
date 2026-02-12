@@ -126,25 +126,22 @@ def seed_trading_accounts(conn, user_id):
 
 
 def seed_brokers_fees(conn, user_id, account_ids):
+    """At least 2 fees per account. 2 accounts × 2 = 4 fees (TIERED + FLAT per account)."""
     ensure_is_test_data(conn, "user_data", "brokers_fees")
     if has_trading_account_id_in_brokers_fees(conn):
         with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO user_data.brokers_fees (
-                    id, user_id, trading_account_id, commission_type, commission_value,
-                    minimum, is_test_data, created_at, updated_at
-                ) VALUES
-                    (gen_random_uuid(), %s, %s, 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
-                    (gen_random_uuid(), %s, %s, 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
-            """,
-                (
-                    user_id,
-                    account_ids[0],
-                    user_id,
-                    account_ids[1],
-                ),
-            )
+            for acc_id in account_ids:
+                cur.execute(
+                    """
+                    INSERT INTO user_data.brokers_fees (
+                        id, user_id, trading_account_id, commission_type, commission_value,
+                        minimum, is_test_data, created_at, updated_at
+                    ) VALUES
+                        (gen_random_uuid(), %s, %s, 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
+                        (gen_random_uuid(), %s, %s, 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
+                """,
+                    (user_id, acc_id, user_id, acc_id),
+                )
             conn.commit()
     else:
         with conn.cursor() as cur:
@@ -155,21 +152,32 @@ def seed_brokers_fees(conn, user_id, account_ids):
                     minimum, is_test_data, created_at, updated_at
                 ) VALUES
                     (gen_random_uuid(), %s, 'Interactive Brokers', 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
+                    (gen_random_uuid(), %s, 'Interactive Brokers', 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW()),
+                    (gen_random_uuid(), %s, 'eToro', 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
                     (gen_random_uuid(), %s, 'eToro', 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
-            """,
-                (user_id, user_id),
+                """,
+                (user_id, user_id, user_id, user_id),
             )
             conn.commit()
 
 
+# All flow types per CASH_FLOW_TYPES_SSOT: DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER
+FLOW_TYPES = [
+    ("DEPOSIT", 1000.00, "הפקדה ראשונית"),
+    ("WITHDRAWAL", -200.00, "משיכה"),
+    ("DIVIDEND", 50.00, "דיבידנד"),
+    ("INTEREST", 2.50, "ריבית"),
+    ("FEE", -5.00, "עמלה"),
+    ("OTHER", 10.00, "אחר"),
+]
+
+
 def seed_cash_flows(conn, user_id, account_ids):
+    """One cash flow per flow_type (all 6 types)."""
     ensure_is_test_data(conn, "user_data", "cash_flows")
     flows = [
-        ("DEPOSIT", 1000.00, account_ids[0], "הפקדה ראשונית"),
-        ("WITHDRAWAL", -200.00, account_ids[0], "משיכה"),
-        ("DIVIDEND", 50.00, account_ids[0], "דיבידנד"),
-        ("INTEREST", 2.50, account_ids[0], "ריבית"),
-        ("FEE", -5.00, account_ids[1], "עמלה"),
+        (ft, amt, account_ids[0] if ft != "FEE" else account_ids[1], desc)
+        for ft, amt, desc in FLOW_TYPES
     ]
     with conn.cursor() as cur:
         for i, (ft, amt, acc_id, desc) in enumerate(flows):
@@ -199,7 +207,19 @@ def seed_cash_flows(conn, user_id, account_ids):
         conn.commit()
 
 
+def delete_base_data(conn, user_id):
+    """Delete all base data for user (for --force re-seed)."""
+    with conn.cursor() as cur:
+        for table in ("cash_flows", "brokers_fees", "trading_accounts"):
+            cur.execute(
+                f"DELETE FROM user_data.{table} WHERE user_id = %s AND (is_test_data = false OR is_test_data IS NULL)",
+                (user_id,),
+            )
+        conn.commit()
+
+
 def main():
+    force = "--force" in sys.argv or "-f" in sys.argv
     print("=" * 60)
     print("Seed Base Dataset — test_user")
     print("Reference: SPEC_BASE_TEST_USER_DATASET.md")
@@ -218,18 +238,22 @@ def main():
             conn.close()
             sys.exit(1)
 
-        if already_seeded(conn, user_id):
-            print(f"✅ {BASE_USERNAME} already has base data. Skip (or delete existing base data to re-seed).")
+        if already_seeded(conn, user_id) and not force:
+            print(f"✅ {BASE_USERNAME} already has base data. Use --force to re-seed.")
             conn.close()
             return
+
+        if force and already_seeded(conn, user_id):
+            print("Removing existing base data (--force)...")
+            delete_base_data(conn, user_id)
 
         account_ids = seed_trading_accounts(conn, user_id)
         print(f"✅ Seeded 2 trading accounts")
         seed_brokers_fees(conn, user_id, account_ids)
-        print(f"✅ Seeded 2 brokers fees")
+        print(f"✅ Seeded 4 brokers fees (2 per account)")
         seed_cash_flows(conn, user_id, account_ids)
-        print(f"✅ Seeded 5 cash flows")
-        print(f"\n✅ Base dataset for {BASE_USERNAME} seeded successfully (9 rows).")
+        print(f"✅ Seeded 6 cash flows (one per flow_type)")
+        print(f"\n✅ Base dataset for {BASE_USERNAME} seeded successfully (12 rows).")
     except Exception as e:
         conn.rollback()
         print(f"❌ Error: {e}")

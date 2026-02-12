@@ -61,7 +61,21 @@
 
 ---
 
-## 3. תוצאות E2E (סבב חלקי)
+## 3. תוצאות API Verification (ללא Selenium)
+
+**פקודה:** `node tests/central-status-api-verify.js`
+
+| # | בדיקה | תוצאה |
+|---|-------|--------|
+| 1 | GET /trading_accounts?status=active | ✅ PASS |
+| 2 | GET /trading_accounts?status=inactive | ✅ PASS |
+| 3 | GET /trading_accounts?status=pending | ✅ PASS |
+| 4 | GET /trading_accounts?status=cancelled | ✅ PASS |
+| 5 | GET /trading_accounts (ללא status) | ✅ PASS |
+
+---
+
+## 4. תוצאות E2E (Selenium)
 
 **תנאי:** Frontend 8080 + Backend 8082 פעילים. Chrome/Selenium.
 
@@ -72,18 +86,19 @@
 | 3 | URL sync ?status=active | SKIP |
 | 4 | תצוגת Badges בטבלה | ✅ PASS — עמודת סטטוס עם פתוח/סגור |
 
-**הערה:** ריצות נוספות נכשלו ב־"Timed out receiving message from renderer" (Chrome). נדרש ריצה חוזרת בסביבה יציבה.
+**הערה:** ריצות E2E נכשלו ב־"Timed out receiving message from renderer" (Chrome 144 / chromedriver 143). יש להריץ E2E בסביבה עם Chrome תואם.
 
 ---
 
-## 4. Test Artifact
+## 5. Test Artifacts
 
-- **קובץ בדיקה:** `tests/central-status-e2e.test.js`
+- **API:** `tests/central-status-api-verify.js` — `npm run test:central-status`
+- **E2E:** `tests/central-status-e2e.test.js` — `npm run test:central-status-e2e`
 - **תוצרים:** `documentation/05-REPORTS/artifacts_SESSION_01/central-status-artifacts/CENTRAL_STATUS_RESULTS.json`
 
 ---
 
-## 5. מסקנות והמלצות
+## 6. מסקנות והמלצות
 
 1. **אימות קוד:** Central Status Function ממומש לפי SSOT — `statusAdapter.js`, `phoenixFilterBridge.js`, `tradingAccountsDataLoader.js` משתמשים בתרגום קנוני/עברי דרך Adapter.
 2. **Backend:** אומת בדוח `TEAM_50_TO_TEAM_20_STATUS_STANDARD_QA_REPORT.md` — API תומך ב־status.

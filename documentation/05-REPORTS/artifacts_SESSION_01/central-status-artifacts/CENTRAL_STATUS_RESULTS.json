@@ -1,17 +1,66 @@
 {
-  "timestamp": "2026-02-12T20:27:31.940Z",
+  "timestamp": "2026-02-12T20:39:59.123Z",
   "results": {
-    "passed": 0,
-    "failed": 1,
+    "passed": 5,
+    "failed": 0,
     "skipped": 0
   },
   "logs": [
     {
-      "test": "STATUS_RUN",
-      "status": "FAIL",
-      "timestamp": "2026-02-12T20:27:31.886Z",
+      "test": "STATUS_HeaderFilterOptions",
+      "status": "START",
+      "timestamp": "2026-02-12T20:39:57.627Z",
       "details": {
-        "message": "timeout: Timed out receiving message from renderer: -0.003\n  (Session info: chrome=144.0.7559.133)"
+        "message": "Verify 5 status options"
+      }
+    },
+    {
+      "test": "STATUS_HeaderFilterOptions",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:39:58.498Z",
+      "details": {
+        "message": "5 options: הכול, פתוח, סגור, ממתין, מבוטל",
+        "count": 5
+      }
+    },
+    {
+      "test": "STATUS_PendingOrder",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:39:58.499Z",
+      "details": {
+        "message": "\"ממתין\" present between סגור and מבוטל"
+      }
+    },
+    {
+      "test": "STATUS_SelectUpdatesUI",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:39:59.042Z",
+      "details": {
+        "message": "Selected \"פתוח\" → #selectedStatus updated"
+      }
+    },
+    {
+      "test": "STATUS_URLSync",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:39:59.044Z",
+      "details": {
+        "message": "URL contains status=active (canonical)"
+      }
+    },
+    {
+      "test": "STATUS_TradingAccountsBadges",
+      "status": "START",
+      "timestamp": "2026-02-12T20:39:59.044Z",
+      "details": {
+        "message": "Verify status badges in table"
+      }
+    },
+    {
+      "test": "STATUS_TradingAccountsBadges",
+      "status": "PASS",
+      "timestamp": "2026-02-12T20:39:59.066Z",
+      "details": {
+        "message": "Table has status display (פתוח/סגור per SSOT)"
       }
     }
   ]

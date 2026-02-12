@@ -8,9 +8,9 @@ import chrome from 'selenium-webdriver/chrome.js';
 
 // Test Configuration
 export const TEST_CONFIG = {
-  frontendUrl: 'http://localhost:8080',
-  backendUrl: 'http://localhost:8082',
-  apiBaseUrl: 'http://localhost:8082/api/v1',
+  frontendUrl: 'http://127.0.0.1:8080',
+  backendUrl: 'http://127.0.0.1:8082',
+  apiBaseUrl: 'http://127.0.0.1:8082/api/v1',
   timeout: 10000,
   implicitWait: 3000,
   pageLoadTimeout: 30000,
@@ -51,10 +51,6 @@ export async function createDriver() {
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--disable-gpu');
   }
-  // Stability flags to reduce "Timed out receiving message from renderer"
-  options.addArguments('--disable-dev-shm-usage');
-  options.addArguments('--disable-software-rasterizer');
-  options.addArguments('--disable-extensions');
   
   // Window size for consistent testing
   options.addArguments('--window-size=1920,1080');

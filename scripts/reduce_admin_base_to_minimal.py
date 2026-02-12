@@ -94,7 +94,7 @@ def delete_base_data(conn, user_id):
 
 
 def seed_minimal(conn, user_id):
-    """Seed minimal representative set: 2 accounts, 2 fees, 5 cash_flows."""
+    """Seed minimal: 2 accounts, 4 fees (2 per account), 6 cash_flows (one per flow_type)."""
     ensure_is_test_data(conn, "user_data", "trading_accounts")
     with conn.cursor() as cur:
         accounts = [
@@ -128,17 +128,18 @@ def seed_minimal(conn, user_id):
     ensure_is_test_data(conn, "user_data", "brokers_fees")
     if has_trading_account_id_in_brokers_fees(conn):
         with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO user_data.brokers_fees (
-                    id, user_id, trading_account_id, commission_type, commission_value,
-                    minimum, is_test_data, created_at, updated_at
-                ) VALUES
-                    (gen_random_uuid(), %s, %s, 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
-                    (gen_random_uuid(), %s, %s, 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
-            """,
-                (user_id, account_ids[0], user_id, account_ids[1]),
-            )
+            for acc_id in account_ids:
+                cur.execute(
+                    """
+                    INSERT INTO user_data.brokers_fees (
+                        id, user_id, trading_account_id, commission_type, commission_value,
+                        minimum, is_test_data, created_at, updated_at
+                    ) VALUES
+                        (gen_random_uuid(), %s, %s, 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
+                        (gen_random_uuid(), %s, %s, 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
+                """,
+                    (user_id, acc_id, user_id, acc_id),
+                )
             conn.commit()
     else:
         with conn.cursor() as cur:
@@ -149,9 +150,11 @@ def seed_minimal(conn, user_id):
                     minimum, is_test_data, created_at, updated_at
                 ) VALUES
                     (gen_random_uuid(), %s, 'Interactive Brokers', 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
+                    (gen_random_uuid(), %s, 'Interactive Brokers', 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW()),
+                    (gen_random_uuid(), %s, 'eToro', 'TIERED'::user_data.commission_type, 0.005, 0.50, FALSE, NOW(), NOW()),
                     (gen_random_uuid(), %s, 'eToro', 'FLAT'::user_data.commission_type, 1.00, 1.00, FALSE, NOW(), NOW())
-            """,
-                (user_id, user_id),
+                """,
+                (user_id, user_id, user_id, user_id),
             )
             conn.commit()
 
@@ -162,6 +165,7 @@ def seed_minimal(conn, user_id):
         ("DIVIDEND", 50.00, account_ids[0], "דיבידנד"),
         ("INTEREST", 2.50, account_ids[0], "ריבית"),
         ("FEE", -5.00, account_ids[1], "עמלה"),
+        ("OTHER", 10.00, account_ids[0], "אחר"),
     ]
     with conn.cursor() as cur:
         for i, (ft, amt, acc_id, desc) in enumerate(flows):
@@ -212,10 +216,10 @@ def main():
         print("\n1. Deleting excess base data...")
         delete_base_data(conn, user_id)
 
-        print("\n2. Seeding minimal base set (2 accounts, 2 fees, 5 cash_flows)...")
+        print("\n2. Seeding minimal base set (2 accounts, 4 fees, 6 cash_flows)...")
         seed_minimal(conn, user_id)
 
-        print("\n✅ TikTrackAdmin base data reduced to minimum (9 rows).")
+        print("\n✅ TikTrackAdmin base data reduced to minimum (12 rows).")
     except Exception as e:
         conn.rollback()
         print(f"❌ Error: {e}")

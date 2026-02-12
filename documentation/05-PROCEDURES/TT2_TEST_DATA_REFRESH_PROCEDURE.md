@@ -73,9 +73,19 @@ make db-admin-minimal
 
 **תוצאה:** 2 חשבונות, 2 עמלות, 5 תזרימים (סה״כ 9 רשומות בסיס).
 
+## 7. הסרת משתמשים מיותרים
+
+משאיר רק: TikTrackAdmin, nimrod_wald, test_user.
+
+```bash
+make db-remove-superfluous-users
+```
+
+**אזהרה:** מריץ אחרי `db-test-clean`; משתמשים שנמחקים — נתוניהם נמחקים ב-CASCADE.
+
 ---
 
-## 7. רפרנסים
+## 8. רפרנסים
 
 - `scripts/db_test_clean.py` — ניקוי
 - `scripts/seed_test_data.py` — זריעה

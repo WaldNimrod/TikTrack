@@ -30,28 +30,29 @@
 
 ---
 
-### 2.2 brokers_fees (2 עמלות)
+### 2.2 brokers_fees (4 עמלות — 2 לכל חשבון)
 
-| # | trading_account | commission_type | commission_value | minimum | מטרה |
-|---|-----------------|-----------------|------------------|---------|------|
-| 1 | חשבון 1 | TIERED | 0.005 | 0.50 | הצגת עמלת TIERED |
-| 2 | חשבון 2 | FLAT | 1.00 | 1.00 | הצגת עמלת FLAT |
+| # | trading_account | commission_type | commission_value | minimum |
+|---|-----------------|-----------------|------------------|---------|
+| 1–2 | חשבון 1 | TIERED, FLAT | 0.005, 1.00 | 0.50, 1.00 |
+| 3–4 | חשבון 2 | TIERED, FLAT | 0.005, 1.00 | 0.50, 1.00 |
 
-**סה״כ:** 2 רשומות (קשר: trading_account_id — ADR-015).
+**סה״כ:** 4 רשומות (קשר: trading_account_id — ADR-015).
 
 ---
 
-### 2.3 cash_flows (5 תזרימים)
+### 2.3 cash_flows (6 תזרימים — אחד מכל סוג)
 
-| # | flow_type | amount | account | מטרה |
-|---|-----------|--------|---------|------|
-| 1 | DEPOSIT | 1000.00 | חשבון 1 | הצגת הפקדה |
-| 2 | WITHDRAWAL | -200.00 | חשבון 1 | הצגת משיכה |
-| 3 | DIVIDEND | 50.00 | חשבון 1 | הצגת דיבידנד |
-| 4 | INTEREST | 2.50 | חשבון 1 | הצגת ריבית |
-| 5 | FEE | -5.00 | חשבון 2 | הצגת עמלה |
+| # | flow_type | amount | account |
+|---|-----------|--------|---------|
+| 1 | DEPOSIT | 1000.00 | חשבון 1 |
+| 2 | WITHDRAWAL | -200.00 | חשבון 1 |
+| 3 | DIVIDEND | 50.00 | חשבון 1 |
+| 4 | INTEREST | 2.50 | חשבון 1 |
+| 5 | FEE | -5.00 | חשבון 2 |
+| 6 | OTHER | 10.00 | חשבון 1 |
 
-**סה״כ:** 5 רשומות.
+**רשימת סוגים:** ראה `CASH_FLOW_TYPES_SSOT.md` — DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER.
 
 ---
 
@@ -60,17 +61,17 @@
 | טבלה | כמות | הערה |
 |------|------|------|
 | trading_accounts | 2 | 1 פעיל, 1 לא פעיל |
-| brokers_fees | 2 | TIERED + FLAT |
-| cash_flows | 5 | כל flow_type מרכזי |
-| **סה״כ** | **9** | מינימלי מספק |
+| brokers_fees | 4 | 2 לכל חשבון (TIERED + FLAT) |
+| cash_flows | 6 | אחד מכל flow_type |
+| **סה״כ** | **12** | מינימלי מספק |
 
 ---
 
 ## 4. איורים לממשק
 
 - **D16 (חשבונות):** 2 שורות; סינון `status=active` יציג 1, `status=inactive` יציג 1.
-- **D18 (עמלות):** 2 שורות; סינון `commission_type=TIERED` / `FLAT` — כל אחד יציג 1.
-- **D21 (תזרים):** 5 שורות; מגוון flow_type — DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE.
+- **D18 (עמלות):** 4 שורות (2 לכל חשבון); סינון `commission_type=TIERED` / `FLAT` — כל אחד יציג 2.
+- **D21 (תזרים):** 6 שורות — אחד מכל סוג: DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER.
 
 ---
 

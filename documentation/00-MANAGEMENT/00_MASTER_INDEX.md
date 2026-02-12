@@ -84,7 +84,8 @@ _COMMUNICATION/
 
 ## 🧪 נוהלי QA (Team 50 & Team 51)
 
-- [📜 TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md) - פרוטוקול שערי איכות תלת-שכבתי (שער א' 50 / שער ב' 90 / שער ג' Visionary) ✅ **מחייב**
+- [📜 TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md) - פרוטוקול שערי איכות (שער א' 50 / שער ב' 90 / שער ג' G-Lead — אישור ויזואלי בפועל אצלו בלבד; אין צילומי מסך) ✅ **מחייב**
+- [📋 דרישות אישור עיצוב](../../_COMMUNICATION/team_10/TEAM_10_DESIGN_APPROVAL_AND_FIDELITY_REQUIREMENTS.md) - דיוקי עיצוב ותיקוני עיצוב — **תמיד מול G-Lead**; האדריכלית אינה רואה את הממשק ✅ **מחייב**
 - [💾 ARCHITECT_DATA_MANAGEMENT_SOP_011.md](../05-PROCEDURES/ARCHITECT_DATA_MANAGEMENT_SOP_011.md) - SOP-011 ניהול נתוני סביבה (Seeding) ✅ **SSOT**
 - [🧪 TEAM_50_QA_WORKFLOW_PROTOCOL.md](../09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md) - נוהל עבודה לבדיקות QA (Code Review → Selenium → Visual Validation)
 - [📋 TEAM_50_QA_REPORT_TEMPLATE.md](../09-GOVERNANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md) - תבנית דוח QA סטנדרטית
@@ -158,6 +159,7 @@ _COMMUNICATION/
 - [🎨 DNA_COLOR_PALETTE_DOCUMENTATION.md](../01-ARCHITECTURE/DNA_COLOR_PALETTE_DOCUMENTATION.md) - תיעוד מקיף לפלטת הצבעים DNA (63 משתנים, מבנה, פילוסופיה, מימוש, מיפוי Apple Colors) ✅ **SSOT**
 - [🔘 DNA_BUTTON_SYSTEM.md](../04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md) - מערכת כפתורים DNA (SSOT) ✅ **Batch 1+2**
 - [🎨 DNA_PALETTE_SSOT.md](../04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md) - פלטת צבעים DNA — SSOT רשמי ✅ **Batch 1+2**
+- [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: עיצוב מודולים ותפריט (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה כסטנדרט) ✅ **SSOT — Batch 1+2**
 
 ---
 
@@ -184,6 +186,7 @@ _COMMUNICATION/
 - [🛡️ Final Governance Lock v2.0](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#6-final-governance-lock-v20--mandatory) - נעילה ארכיטקטונית כוללת (מבנה תיקיות, Fluid Design, Design Tokens, משמעת סקריפטים) 🛡️ **FINAL LOCK**
 - [🛡️ הגדרות תפקיד ומשילות לכל צוות](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#5-הגדרות-תפקיד-ומשילות-לכל-צוות--batch-1-closure-mandate) - הגדרות תפקיד ומשילות לכל צוות (Batch 1 Closure Mandate) 🛡️ **MANDATORY - FOUNDATION SEAL**
 - [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
+- [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: Module/Menu Styling (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה) ✅ **SSOT — Batch 1+2**
 - ⚠️ **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/90_Architects_comunication/` (לא SSOT - Communication בלבד):
   - `ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - פוטר מודולרי
   - `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - Final Governance Lock

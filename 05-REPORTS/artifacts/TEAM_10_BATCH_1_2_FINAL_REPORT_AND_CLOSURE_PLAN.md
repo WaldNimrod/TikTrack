@@ -79,26 +79,47 @@
 
 ---
 
-## 4. תוכנית עבודה לסגירת כל הפערים
+## 4. תוכנית עבודה לסגירת כל הפערים (לפי משוב Team 90 — סופי)
 
-### 4.1 פערים שנותרו (2)
+**מקור:** משוב Team 90 — שני פערים חוסמי סגירה; יש ליישם תוכנית ההשלמות בהתאם.
 
-| # | פער | בעלים | פעולה | יעד |
-|---|-----|--------|--------|-----|
-| 1 | **Module/Menu Styling — חסר SSOT** | Team 10 + אדריכלית/G-Lead | (א) העלאת הנושא לאדריכלית/G-Lead: האם קיימת החלטה? (ב) אם לא — החלטה חדשה או קידום מסמך התיאום (TEAM_40_TO_TEAM_30_MODAL_HEADER_COLORS_COORDINATION.md) ל-SSOT. (ג) פרסום נתיב ב-00_MASTER_INDEX. | עד לקבלת החלטה + עדכון תיעוד |
-| 2 | **Header Persistence — אימות E2E** | Team 50 (או Team 30) | (א) להריץ את `tests/gate-a-e2e.test.js` (תרחיש Login→Home / GATE_A_TypeB_LoginToHome). (ב) לוודא שהבדיקה עוברת. (ג) אם נכשל — Team 30: תיקון (למשל reload אחרי Login) או תיעוד ידוע limitation. (ד) לתעד תוצאה ב-Evidence. | עד לאימות PASS או תיעוד החלטה |
+### 4.1 פער #1 — Module/Menu Styling ✅ החלטה התקבלה — בשלב יישום
 
-### 4.2 פעולות השלמה שבוצעו (Team 10)
+| פריט | תיאור |
+|------|--------|
+| **סטטוס** | ✅ **האדריכלית אישרה החלטות** — SSOT הוטמע. כעת: **יישום בתוכנית העבודה** + משימות לצוותים. |
+| **SSOT** | `documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md` — נוסף ל-00_MASTER_INDEX. |
+| **תוכנית עבודה (שלב Module/Menu Styling)** | (א) **Team 40** — עיצוב/מפרט לפי SSOT. (ב) **Team 30** — יישום + בדיקות. (ג) **סבב דיוק ויזואלי** על **מודול דוגמה אחד** — **מול G-Lead** (Team 30/40); המודול יהפוך לסטנדרט רשמי. |
+| **Acceptance Criteria** | RTL order קבוע בכל מודול; צבעי כותרת לפי ישות (Light BG + Dark text/border/close); מודול דוגמה מאושר כסטנדרט. |
+
+### 4.2 פער #2 — Header Persistence (Evidence E2E נדרש)
+
+| פריט | תיאור |
+|------|--------|
+| **סטטוס** | חסר אימות סופי. |
+| **אחריות בדיקות** | **צוות 50** — הבדיקות (כולל Gate A E2E) באחריות Team 50. |
+| **נדרש מ-Team 50** | (א) **להריץ** בדיקת Gate A ממוקדת: Login → Home → Header נשאר. (ב) **לצרף Evidence** (JSON/console/log + report). (ג) **אם נכשל** — לפתוח תיקון (תיאום עם Team 30); **אם PASS** — לסגור סופית. |
+| **בדיקה** | `tests/gate-a-e2e.test.js` — תרחיש `GATE_A_HeaderPersistence` / `GATE_A_TypeB_LoginToHome`. |
+
+### 4.3 לאחר סגירת שני הפערים
+
+- לפרסם **"Batch 1+2 Closure Report"** רשמי ולסגור.
+
+### 4.4 פעולות השלמה שבוצעו (Team 10)
 
 | # | פעולה | סטטוס |
 |---|--------|--------|
 | 1 | עדכון 00_MASTER_INDEX — הפניה ל-DNA_BUTTON_SYSTEM.md ו-DNA_PALETTE_SSOT.md | ✅ בוצע |
+| 2 | בקשת החלטה לאדריכלית — Module/Menu Styling (Gap #1) | ✅ נשלח |
+| 3 | **החלטה אדריכלית התקבלה** — SSOT נוצר: ARCHITECT_MODULE_MENU_STYLING_SSOT.md | ✅ בוצע |
+| 4 | SSOT נוסף ל-00_MASTER_INDEX (עיצוב + הנחיות אדריכליות) | ✅ בוצע |
+| 5 | משימות מדויקות לצוות 40 ו-30 (הודעות נפרדות) | ✅ הוצאו |
 
-### 4.3 צעדים מומלצים (לפי עדיפות)
+### 4.5 משימות השלמה פעילות (מיקוד)
 
-1. **סגירת Header Persistence:** Team 50 מריץ Gate A E2E; אם PASS — לסמן סגור; אם FAIL — להעביר ל-Team 30 לתיקון או לתיעוד.
-2. **סגירת Module/Menu Styling:** Team 10 מעלה לאדריכלית/G-Lead את השאלה (החלטה קיימת? קידום מסמך תיאום?); אחרי תשובה — עדכון SSOT ואינדקס.
-3. **עדכון דוח אודיט:** לאחר סגירת שני הפערים — לעדכן TEAM_90_BATCH_1_2_DECISION_AUDIT_REPORT או להנפיק "דוח סגירה Batch 1+2" עם סטטוס סופי.
+1. **Gap #1 — Module/Menu Styling:** ✅ החלטה התקבלה; SSOT הוטמע. **יישום:** Team 40 (עיצוב) + Team 30 (יישום/בדיקות); סבב דיוק ויזואלי על מודול דוגמה **מול G-Lead** → המודול כסטנדרט.
+2. **Gap #2 — Header Persistence:** **Team 50** (אחריות בדיקות) — הרצת Gate A (Login→Home→Header); צירוף Evidence (JSON/report); PASS → סגירה, FAIL → תיקון (תיאום עם Team 30).
+3. **לאחר סגירת שני הפערים:** פרסום "Batch 1+2 Closure Report" רשמי.
 
 ---
 
@@ -113,6 +134,7 @@
 | מפת Evidence Team 50 | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BATCH_1_2_EVIDENCE_MAP.md |
 | DNA Button SSOT | documentation/04-DESIGN_UX_UI/DNA_BUTTON_SYSTEM.md |
 | DNA Palette SSOT | documentation/04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md |
+| **Module/Menu Styling SSOT** | **documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md** |
 | אינדקס מאסטר | documentation/00-MANAGEMENT/00_MASTER_INDEX.md |
 
 ---

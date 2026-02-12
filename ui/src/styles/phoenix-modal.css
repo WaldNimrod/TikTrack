@@ -85,12 +85,14 @@
   flex-direction: row-reverse;
 }
 
-/* ===== Modal Header Colors by Entity ===== */
+/* ===== Modal Header Colors by Entity (SSOT: ARCHITECT_MODULE_MENU_STYLING_SSOT) ===== */
+/* Rule: Background = Light variant | Text + Close Button + Border = Dark variant */
+
 /* Trading Account Entity (D16) */
 .phoenix-modal[data-entity="trading_account"] .phoenix-modal__header,
 .phoenix-modal.modal-entity-trading_account .phoenix-modal__header {
   background-color: var(--entity-trading_account-light, #c3e6cb);
-  border-bottom-color: var(--entity-trading_account, #28a745);
+  border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
 }
 
 /* Brokers Fees Entity (D18) - same color as Trading Account */
@@ -99,7 +101,7 @@
 .phoenix-modal.modal-entity-brokers_fee .phoenix-modal__header,
 .phoenix-modal.modal-entity-brokers_fees .phoenix-modal__header {
   background-color: var(--entity-trading_account-light, #c3e6cb);
-  border-bottom-color: var(--entity-trading_account, #28a745);
+  border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
 }
 
 /* Cash Flow Entity (D21) */
@@ -108,10 +110,10 @@
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__header,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__header {
   background-color: var(--entity-cash_flow-light, #ffe5d3);
-  border-bottom-color: var(--entity-cash_flow, #ff9800);
+  border-bottom-color: var(--entity-cash_flow-dark, #e68900); /* Dark variant per SSOT */
 }
 
-/* Title color - Trading Account & Brokers Fees */
+/* Title color - Trading Account & Brokers Fees (Dark variant per SSOT) */
 .phoenix-modal[data-entity="trading_account"] .phoenix-modal__title,
 .phoenix-modal[data-entity="brokers_fee"] .phoenix-modal__title,
 .phoenix-modal[data-entity="brokers_fees"] .phoenix-modal__title,
@@ -121,12 +123,32 @@
   color: var(--entity-trading_account-dark, #155724);
 }
 
-/* Title color - Cash Flow */
+/* Title color - Cash Flow (Dark variant per SSOT) */
 .phoenix-modal[data-entity="cash_flow"] .phoenix-modal__title,
 .phoenix-modal[data-entity="cash_flows"] .phoenix-modal__title,
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__title,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__title {
   color: var(--entity-cash_flow-dark, #e68900);
+}
+
+/* Close button color - Trading Account & Brokers Fees (Dark variant per SSOT) */
+.phoenix-modal[data-entity="trading_account"] .phoenix-modal__close,
+.phoenix-modal[data-entity="brokers_fee"] .phoenix-modal__close,
+.phoenix-modal[data-entity="brokers_fees"] .phoenix-modal__close,
+.phoenix-modal.modal-entity-trading_account .phoenix-modal__close,
+.phoenix-modal.modal-entity-brokers_fee .phoenix-modal__close,
+.phoenix-modal.modal-entity-brokers_fees .phoenix-modal__close {
+  color: var(--entity-trading_account-dark, #155724);
+  border-color: var(--entity-trading_account-dark, #155724);
+}
+
+/* Close button color - Cash Flow (Dark variant per SSOT) */
+.phoenix-modal[data-entity="cash_flow"] .phoenix-modal__close,
+.phoenix-modal[data-entity="cash_flows"] .phoenix-modal__close,
+.phoenix-modal.modal-entity-cash_flow .phoenix-modal__close,
+.phoenix-modal.modal-entity-cash_flows .phoenix-modal__close {
+  color: var(--entity-cash_flow-dark, #e68900);
+  border-color: var(--entity-cash_flow-dark, #e68900);
 }
 
 .phoenix-modal__save-btn,

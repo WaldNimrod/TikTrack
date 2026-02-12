@@ -39,9 +39,9 @@ function createTradingAccountFormHTML(data = null, brokerOptions = []) {
 
   const govMsg = getGovernanceMessageData();
   const governanceMessageHTML = `
-    <div id="governanceMessageContainer" class="form-group adr015-governance-message" style="display:none;">
+    <div id="governanceMessageContainer" class="form-group" style="display:none;">
       <div class="governance-message governance-message--warning" role="alert">
-        <p>${govMsg.body}<a href="${govMsg.linkHref}" target="_blank" rel="noopener noreferrer">${govMsg.linkText}</a>.</p>
+        <p class="governance-message__text">${govMsg.body}<a href="${govMsg.linkHref}" class="governance-message__link" target="_blank" rel="noopener noreferrer">${govMsg.linkText}</a>.</p>
       </div>
     </div>
     <div id="brokerOtherNameGroup" class="form-group" style="display:none;">
@@ -223,11 +223,12 @@ export async function showTradingAccountFormModal(data, onSave) {
       const brokerValue = brokerSelectValue === 'other'
         ? brokerOtherNameValue || null
         : (brokerSelectValue || null);
+      const brokerOtherNameErrEl = document.getElementById('brokerOtherNameError');
       if (brokerSelectValue === 'other' && !brokerOtherNameValue) {
-        const errEl = document.getElementById('brokerOtherNameError');
-        if (errEl) errEl.textContent = 'יש להזין את שם הברוקר';
+        if (brokerOtherNameErrEl) brokerOtherNameErrEl.textContent = 'יש להזין את שם הברוקר';
         return;
       }
+      if (brokerOtherNameErrEl) brokerOtherNameErrEl.textContent = '';
       
       const formData = {
         accountName: accountNameValue,

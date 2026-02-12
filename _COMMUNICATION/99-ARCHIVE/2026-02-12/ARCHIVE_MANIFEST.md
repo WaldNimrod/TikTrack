@@ -5,6 +5,8 @@
 **created:** 2026-02-12  
 **context:** Consolidation Batch 2 — העברה בפועל לפי נוהל TT2_KNOWLEDGE_PROMOTION_PROTOCOL שלב 5.
 
+**סגירה סופית (Clean Table):** ארכיון זה מיושר עם סגירה סופית Batch 1+2 — Gate B (GATE_B_STATUS.md, TEAM_90_GATE_B_REVERIFY_GREEN.md) + G-Lead Visual Sign-off (TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md) אושרו; מסמכי SSOT ב־documentation/ ו־OPEN_TASKS/CLEAN_TABLE_PROTOCOL מעודכנים.
+
 ---
 
 ## Acceptance (Team 90)

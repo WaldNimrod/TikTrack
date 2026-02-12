@@ -10,17 +10,18 @@
 ## 1) Current Phase Status
 - **Batch 1**: Auth model A/B/C/D + Header batch 1 — closed
 - **Batch 2**: Financial Core (D16/D18/D21) — consolidated
-- **Gate A/B**: Passed for Phase 1 + responsive verification
+- **Gate A/B**: Passed (Gate B GREEN evidence package on record)
+- **Visual Sign‑off**: Approved by G‑Lead — רישום: TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md. **Clean Table**: הוכרז (OPEN_TASKS §2.7/2.8 + CLEAN_TABLE B1/C1 ✅). **קידום ידע + ארכיון (Batch 1+2)**: ARCHIVE_MANIFEST קיים; SSOT מעודכנים.
 
 ## 2) Open Gaps (Blocking / Non‑Blocking)
 | Gap | Status | Owner |
 |---|---|---|
-| Module/Menu Styling SSOT | Closed by architect approval | Team 10 + Team 40 |
-| Header Persistence validation | Requires periodic regression evidence | Team 50 |
 | PDSC Boundary Contract completion | Pending scope decision (min vs full) | Team 20 + Team 30 |
+| Knowledge Promotion + Archive cleanup (Batch 1+2) | Done — ARCHIVE_MANIFEST + Clean Table alignment | Team 10 |
 
 ## 3) Evidence Summary (Last Verified)
 - Gate A / Gate B artifacts in `documentation/05-REPORTS/artifacts_SESSION_01/`
+- Gate B status: `documentation/05-REPORTS/GATE_B_STATUS.md` + Team 90 re‑verify
 - Backend summary endpoints verified (Team 50)
 - ADR‑015 Gate A/B tests updated
 
@@ -32,4 +33,6 @@
 - `_COMMUNICATION/team_10/TEAM_10_BACKEND_100_PERCENT_GREEN_ARCHITECT_NOTIFICATION.md`
 - `05-REPORTS/artifacts/TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md`
 - `documentation/05-REPORTS/artifacts_SESSION_01/`
+- `documentation/05-REPORTS/GATE_B_STATUS.md`
+- `_COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_MODULE_MENU_STYLING_DECISION_LOCKED.md`

@@ -110,8 +110,8 @@
 
 | סדר | מזהה | משימה | תוצר מצופה | סטטוס | מקור |
 |-----|------|--------|-------------|--------|------|
-| 1 | 3.1.1 | ריצת Gate B (או סבב מאמת) לאחר תיקוני שלב 1–2 | דוח Gate B מאושר; GATE_B_PASSED | ⏳ **PENDING** | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 3 |
-| 2 | 3.1.2 | תיעוד ארטיפקטים והחלטת GREEN | ארטיפקטים ב־05-REPORTS/artifacts; GATE_B_STATUS | ⏳ **PENDING** | שם |
+| 1 | 3.1.1 | ריצת Gate B (או סבב מאמת) לאחר תיקוני שלב 1–2 | דוח Gate B מאושר; GATE_B_PASSED | ✅ **PASS** | documentation/05-REPORTS/GATE_B_STATUS.md; _COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md |
+| 2 | 3.1.2 | תיעוד ארטיפקטים והחלטת GREEN | ארטיפקטים ב־05-REPORTS/artifacts; GATE_B_STATUS | ✅ **PASS** | שם — GATE_B_STATUS.md GREEN; ארטיפקטים ב־phase2-e2e-artifacts |
 
 ---
 
@@ -119,7 +119,7 @@
 
 | סדר | מזהה | משימה | תוצר מצופה | סטטוס | מקור |
 |-----|------|--------|-------------|--------|------|
-| 1 | 4.1.2–4.1.3 | בדיקה ידנית-ויזואלית בדפדפן; Sign-off או רשימת תיקונים | מסמך חתום / log_entry | ⏳ **PENDING** | TT2_PHASE_2_CLOSURE_WORK_PLAN שלב 4 |
+| 1 | 4.1.2–4.1.3 | בדיקה ידנית-ויזואלית בדפדפן; Sign-off או רשימת תיקונים | מסמך חתום / log_entry | ✅ **PASS** | TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md |
 
 ---
 

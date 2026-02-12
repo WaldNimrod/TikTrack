@@ -38,13 +38,13 @@
 
 | # | פריט | תוצר מצופה | קריטריון | סטטוס |
 |---|------|-------------|----------|--------|
-| B1 | **Gate B** | דוח Gate B מאושר | "GATE_B_PASSED" + ארטיפקטים ב־05-REPORTS/artifacts | ⏳ **PENDING** |
+| B1 | **Gate B** | דוח Gate B מאושר | "GATE_B_PASSED" + ארטיפקטים ב־05-REPORTS/artifacts | ✅ **PASS** — documentation/05-REPORTS/GATE_B_STATUS.md; _COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md |
 
 ### C) G-Lead — Visual Sign-off
 
 | # | פריט | תוצר מצופה | קריטריון | סטטוס |
 |---|------|-------------|----------|--------|
-| C1 | **Visual Sign-off** | אישור ויזואלי סופי או רשימת תיקונים | מסמך חתום / log_entry | ⏳ **PENDING** |
+| C1 | **Visual Sign-off** | אישור ויזואלי סופי או רשימת תיקונים | מסמך חתום / log_entry | ✅ **PASS** — TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md |
 
 ---
 
@@ -55,16 +55,16 @@
 1. **כל שלושת הסעיפים A, B, C** — כל הפריטים המפורטים למעלה מסומנים ✅.
 2. **אין שורות "Pending" או "Waiting"** ב־TEAM_10_OPEN_TASKS_MASTER.md (במסגרת פריטי הסגירה A/B/C).
 
-**סטטוס נוכחי:** ⏳ **לא Clean Table** — כל פריטי **A** (A1–A6) ✅; פריטים **B1** (Gate B), **C1** (Visual Sign-off) עדיין PENDING.
+**סטטוס נוכחי:** ✅ **Clean Table — הוכרז.** כל פריטי A (A1–A6), B1 (Gate B), C1 (Visual Sign-off) מסומנים ✅.
 
 ---
 
-## 4. מה נדרש עכשיו
+## 4. מה בוצע (סגירה סופית)
 
-1. **לעדכן** את TEAM_10_OPEN_TASKS_MASTER.md — סיווג סופי (✅/⏳) לכל פריט בסגירה (משימות Team 10 סעיף 2.1; Team 90 סעיף 2.7; G-Lead סעיף 2.8).
-2. **לאסוף** את החתימות החסרות — Team 90 (Gate B) + G-Lead (Visual Sign-off).
-3. **להשלים** פריטי Team 10 — ✅ הושלמו (Batch 1+2 Closure Report, Page Tracker D21, make db-test-clean, פלט שלב 1, הכנה ל־G-Lead).
-4. **להוציא הודעת "Clean Table"** — **רק אחרי** שכל הקריטריונים בסעיפים A, B, C סגורים.
+1. **TEAM_10_OPEN_TASKS_MASTER.md** — סיווג סופי עודכן: סעיפים 2.7 (Gate B), 2.8 (G-Lead) → ✅.
+2. **חתימות** — Gate B (GATE_B_STATUS.md + TEAM_90_GATE_B_REVERIFY_GREEN.md); Visual Sign-off (TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md).
+3. **פריטי Team 10** — ✅ הושלמו (Batch 1+2 Closure Report, Page Tracker D21, make db-test-clean, פלט שלב 1, הכנה ל־G-Lead).
+4. **הודעת "Clean Table"** — הוכרז לאחר יישור Gate B + רישום G-Lead Sign-off + קידום ידע/ארכיון (ARCHIVE_MANIFEST קיים).
 
 ---
 

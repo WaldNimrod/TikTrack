@@ -10,8 +10,8 @@
 ## 1) Immediate Next Steps (30–60 days)
 1. Finalize ADR‑015 implementation (fees per trading account)
 2. Close PDSC Boundary Contract scope (min vs full)
-3. Run Gate B regressions (post‑changes)
-4. Final visual approval (G‑Lead)
+3. Execute Knowledge Promotion + Archive cleanup for Batch 1+2
+4. Declare Clean Table after docs and logs are aligned
 
 ## 2) Mid‑Term Milestones
 - Expand admin‑only tools (Design System page extensions)

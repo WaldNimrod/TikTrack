@@ -62,7 +62,7 @@ class CashFlowSummaryResponse(BaseModel):
 class CashFlowCreateRequest(BaseModel):
     """Cash Flow create request schema."""
     trading_account_id: str = Field(..., description="Trading account ULID")
-    flow_type: str = Field(..., description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER)")
+    flow_type: str = Field(..., description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)")
     amount: Decimal = Field(..., description="Transaction amount")
     currency: str = Field(default="USD", description="Currency code (ISO 3-letter)", max_length=3)
     transaction_date: date_type = Field(..., description="Transaction date")
@@ -91,7 +91,7 @@ class CashFlowCreateRequest(BaseModel):
 class CashFlowUpdateRequest(BaseModel):
     """Cash Flow update request schema."""
     trading_account_id: Optional[str] = Field(None, description="Trading account ULID")
-    flow_type: Optional[str] = Field(None, description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER)")
+    flow_type: Optional[str] = Field(None, description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)")
     amount: Optional[Decimal] = Field(None, description="Transaction amount")
     currency: Optional[str] = Field(None, description="Currency code (ISO 3-letter)", max_length=3)
     transaction_date: Optional[date_type] = Field(None, description="Transaction date")

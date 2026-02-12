@@ -161,36 +161,43 @@ def seed_brokers_fees(conn, user_id, account_ids):
             conn.commit()
 
 
-# All flow types per CASH_FLOW_TYPES_SSOT: DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER
+# All flow types per CASH_FLOW_TYPES_SSOT. OTHER = המרת מטבע (currency conversion)
 FLOW_TYPES = [
-    ("DEPOSIT", 1000.00, "הפקדה ראשונית"),
-    ("WITHDRAWAL", -200.00, "משיכה"),
-    ("DIVIDEND", 50.00, "דיבידנד"),
-    ("INTEREST", 2.50, "ריבית"),
-    ("FEE", -5.00, "עמלה"),
-    ("OTHER", 10.00, "אחר"),
+    ("DEPOSIT", 1000.00, 0, "הפקדה ראשונית", "USD", None),
+    ("WITHDRAWAL", -200.00, 0, "משיכה", "USD", None),
+    ("DIVIDEND", 50.00, 0, "דיבידנד", "USD", None),
+    ("INTEREST", 2.50, 0, "ריבית", "USD", None),
+    ("FEE", -5.00, 1, "עמלה", "USD", None),
+    # CURRENCY_CONVERSION — מזהה ברור להמרת מטבע (לא OTHER)
+    (
+        "CURRENCY_CONVERSION",
+        1050.00,
+        0,
+        "המרת מטבע USD→EUR",
+        "EUR",
+        '{"from_currency": "USD", "from_amount": 1000, "rate": 1.05}',
+    ),
+    ("OTHER", 10.00, 0, "אחר", "USD", None),
 ]
 
 
 def seed_cash_flows(conn, user_id, account_ids):
-    """One cash flow per flow_type (all 6 types)."""
+    """One cash flow per flow_type (all 7 types). CURRENCY_CONVERSION = המרת מטבע."""
     ensure_is_test_data(conn, "user_data", "cash_flows")
-    flows = [
-        (ft, amt, account_ids[0] if ft != "FEE" else account_ids[1], desc)
-        for ft, amt, desc in FLOW_TYPES
-    ]
     with conn.cursor() as cur:
-        for i, (ft, amt, acc_id, desc) in enumerate(flows):
+        for i, (ft, amt, acc_idx, desc, currency, metadata_json) in enumerate(FLOW_TYPES):
+            acc_id = account_ids[acc_idx]
+            meta = metadata_json or "{}"
             cur.execute(
                 """
                 INSERT INTO user_data.cash_flows (
                     id, user_id, trading_account_id, flow_type, amount,
                     currency, description, transaction_date,
-                    created_by, updated_by, is_test_data, created_at, updated_at
+                    created_by, updated_by, metadata, is_test_data, created_at, updated_at
                 ) VALUES (
                     gen_random_uuid(), %s, %s, %s, %s,
-                    'USD', %s, %s,
-                    %s, %s, FALSE, NOW(), NOW()
+                    %s, %s, %s,
+                    %s, %s, %s::jsonb, FALSE, NOW(), NOW()
                 )
             """,
                 (
@@ -198,10 +205,12 @@ def seed_cash_flows(conn, user_id, account_ids):
                     acc_id,
                     ft,
                     amt,
+                    currency,
                     desc,
                     (datetime.now() - timedelta(days=i)).date(),
                     user_id,
                     user_id,
+                    meta,
                 ),
             )
         conn.commit()
@@ -252,8 +261,8 @@ def main():
         seed_brokers_fees(conn, user_id, account_ids)
         print(f"✅ Seeded 4 brokers fees (2 per account)")
         seed_cash_flows(conn, user_id, account_ids)
-        print(f"✅ Seeded 6 cash flows (one per flow_type)")
-        print(f"\n✅ Base dataset for {BASE_USERNAME} seeded successfully (12 rows).")
+        print(f"✅ Seeded 7 cash flows (one per flow_type incl. CURRENCY_CONVERSION)")
+        print(f"\n✅ Base dataset for {BASE_USERNAME} seeded successfully (13 rows).")
     except Exception as e:
         conn.rollback()
         print(f"❌ Error: {e}")

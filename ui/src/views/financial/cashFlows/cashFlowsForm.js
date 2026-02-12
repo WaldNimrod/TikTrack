@@ -103,6 +103,7 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
             <option value="DIVIDEND" ${flowType === 'DIVIDEND' ? 'selected' : ''}>דיבידנד</option>
             <option value="INTEREST" ${flowType === 'INTEREST' ? 'selected' : ''}>ריבית</option>
             <option value="FEE" ${flowType === 'FEE' ? 'selected' : ''}>עמלה</option>
+            <option value="CURRENCY_CONVERSION" ${flowType === 'CURRENCY_CONVERSION' ? 'selected' : ''}>המרת מטבע</option>
             <option value="OTHER" ${flowType === 'OTHER' ? 'selected' : ''}>אחר</option>
           </select>
           <span class="form-error" id="flowTypeError"></span>

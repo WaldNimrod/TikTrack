@@ -460,6 +460,7 @@ function normalizeTradingAccountId(value) {
         dividend: 'דיבידנד',
         interest: 'ריבית',
         fee: 'עמלה',
+        currency_conversion: 'המרת מטבע',
         other: 'אחר'
       };
       badge.setAttribute('data-operation-type', flowTypeVal);

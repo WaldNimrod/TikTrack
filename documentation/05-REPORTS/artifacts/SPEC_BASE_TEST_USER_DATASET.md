@@ -41,7 +41,7 @@
 
 ---
 
-### 2.3 cash_flows (6 תזרימים — אחד מכל סוג)
+### 2.3 cash_flows (7 תזרימים — אחד מכל סוג)
 
 | # | flow_type | amount | account |
 |---|-----------|--------|---------|
@@ -50,9 +50,11 @@
 | 3 | DIVIDEND | 50.00 | חשבון 1 |
 | 4 | INTEREST | 2.50 | חשבון 1 |
 | 5 | FEE | -5.00 | חשבון 2 |
-| 6 | OTHER | 10.00 | חשבון 1 |
+| 6 | **CURRENCY_CONVERSION** | 1050.00 EUR | חשבון 1 | מזהה ייעודי להמרת מטבע |
+| 7 | OTHER | 10.00 | חשבון 1 |
 
-**רשימת סוגים:** ראה `CASH_FLOW_TYPES_SSOT.md` — DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER.
+**רשימת סוגים:** ראה `CASH_FLOW_TYPES_SSOT.md`.  
+**המרת מטבע:** `flow_type=CURRENCY_CONVERSION` — מזהה ברור, מוצג ב-`/cash_flows/currency_conversions`.
 
 ---
 
@@ -62,8 +64,8 @@
 |------|------|------|
 | trading_accounts | 2 | 1 פעיל, 1 לא פעיל |
 | brokers_fees | 4 | 2 לכל חשבון (TIERED + FLAT) |
-| cash_flows | 6 | אחד מכל flow_type |
-| **סה״כ** | **12** | מינימלי מספק |
+| cash_flows | 7 | אחד מכל flow_type |
+| **סה״כ** | **13** | מינימלי מספק |
 
 ---
 
@@ -71,7 +73,7 @@
 
 - **D16 (חשבונות):** 2 שורות; סינון `status=active` יציג 1, `status=inactive` יציג 1.
 - **D18 (עמלות):** 4 שורות (2 לכל חשבון); סינון `commission_type=TIERED` / `FLAT` — כל אחד יציג 2.
-- **D21 (תזרים):** 6 שורות — אחד מכל סוג: DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER.
+- **D21 (תזרים):** 7 שורות — אחד מכל סוג כולל CURRENCY_CONVERSION.
 
 ---
 

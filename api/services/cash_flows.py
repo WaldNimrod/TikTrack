@@ -321,7 +321,7 @@ class CashFlowService:
             CashFlowResponse
         """
         # Validate flow_type
-        valid_flow_types = ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER')
+        valid_flow_types = ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER', 'CURRENCY_CONVERSION')
         flow_type_upper = flow_type.upper()
         if flow_type_upper not in valid_flow_types:
             raise HTTPExceptionWithCode(
@@ -467,7 +467,7 @@ class CashFlowService:
         
         if flow_type is not None:
             flow_type_upper = flow_type.upper()
-            valid_flow_types = ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER')
+            valid_flow_types = ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER', 'CURRENCY_CONVERSION')
             if flow_type_upper not in valid_flow_types:
                 raise HTTPExceptionWithCode(
                     status_code=400,
@@ -590,8 +590,8 @@ class CashFlowService:
         """
         Get currency conversions for user with filters.
         
-        Currency conversions are transactions where currency differs from account base currency,
-        or transactions explicitly marked as conversions in metadata.
+        Returns cash flows with flow_type = 'CURRENCY_CONVERSION' (מזהה ברור).
+        Uses metadata (from_currency, from_amount, rate) for conversion details.
         
         Args:
             user_id: User UUID
@@ -603,10 +603,11 @@ class CashFlowService:
         Returns:
             List of CurrencyConversionResponse
         """
-        # Base query conditions
+        # Base query: flow_type = CURRENCY_CONVERSION (מזהה ברור, לא OTHER)
         conditions = [
             CashFlow.user_id == user_id,
-            CashFlow.deleted_at.is_(None)
+            CashFlow.deleted_at.is_(None),
+            CashFlow.flow_type == "CURRENCY_CONVERSION"
         ]
         
         # Handle trading_account_id filter (optional)
@@ -630,9 +631,6 @@ class CashFlowService:
         if date_to:
             conditions.append(CashFlow.transaction_date <= date_to)
         
-        # Query for transactions that are currency conversions
-        # Filter by metadata containing conversion info, or by currency != USD (default)
-        # For now, we'll return transactions with non-USD currency or with conversion metadata
         stmt = select(
             CashFlow,
             TradingAccount.account_name
@@ -649,32 +647,23 @@ class CashFlowService:
         conversions = []
         for cash_flow, account_name in rows:
             metadata = cash_flow.flow_metadata or {}
-            
-            # Check if this is a conversion transaction
-            # If metadata has conversion info, use it
-            # Otherwise, if currency != USD, treat as conversion
-            if metadata.get("conversion") or cash_flow.currency != "USD":
-                from_currency = metadata.get("from_currency") or "USD"
-                to_currency = cash_flow.currency
-                from_amount = metadata.get("from_amount")
-                rate = metadata.get("rate")
-                
-                # If no conversion metadata, assume USD -> currency conversion
-                if from_amount is None:
-                    from_amount = cash_flow.amount
-                    # Default rate: 1.0 (would need exchange rate service for real rates)
-                    rate = Decimal("1.0")
-                
-                conversions.append(CurrencyConversionResponse(
-                    id=uuid_to_ulid(cash_flow.id),
-                    date=cash_flow.transaction_date,
-                    account=account_name or "",
-                    from_currency=from_currency,
-                    from_amount=Decimal(str(from_amount)),
-                    to_currency=to_currency,
-                    to_amount=cash_flow.amount,
-                    rate=Decimal(str(rate)) if rate else Decimal("1.0")
-                ))
+            from_currency = metadata.get("from_currency") or "USD"
+            to_currency = cash_flow.currency
+            from_amount = metadata.get("from_amount")
+            rate = metadata.get("rate")
+            if from_amount is None:
+                from_amount = cash_flow.amount
+                rate = Decimal("1.0") if rate is None else rate
+            conversions.append(CurrencyConversionResponse(
+                id=uuid_to_ulid(cash_flow.id),
+                date=cash_flow.transaction_date,
+                account=account_name or "",
+                from_currency=from_currency,
+                from_amount=Decimal(str(from_amount)),
+                to_currency=to_currency,
+                to_amount=cash_flow.amount,
+                rate=Decimal(str(rate)) if rate else Decimal("1.0")
+            ))
         
         return conversions
 

@@ -714,6 +714,7 @@ async function loadContainer3(filters = {}) {
         'DIVIDEND': 'דיבידנד',
         'INTEREST': 'ריבית',
         'FEE': 'עמלה',
+        'CURRENCY_CONVERSION': 'המרת מטבע',
         'OTHER': 'אחר'
       };
       

@@ -94,7 +94,7 @@ def delete_base_data(conn, user_id):
 
 
 def seed_minimal(conn, user_id):
-    """Seed minimal: 2 accounts, 4 fees (2 per account), 6 cash_flows (one per flow_type)."""
+    """Seed minimal: 2 accounts, 4 fees (2 per account), 7 cash_flows (one per flow_type)."""
     ensure_is_test_data(conn, "user_data", "trading_accounts")
     with conn.cursor() as cur:
         accounts = [
@@ -160,25 +160,33 @@ def seed_minimal(conn, user_id):
 
     ensure_is_test_data(conn, "user_data", "cash_flows")
     flows = [
-        ("DEPOSIT", 1000.00, account_ids[0], "הפקדה ראשונית"),
-        ("WITHDRAWAL", -200.00, account_ids[0], "משיכה"),
-        ("DIVIDEND", 50.00, account_ids[0], "דיבידנד"),
-        ("INTEREST", 2.50, account_ids[0], "ריבית"),
-        ("FEE", -5.00, account_ids[1], "עמלה"),
-        ("OTHER", 10.00, account_ids[0], "אחר"),
+        ("DEPOSIT", 1000.00, account_ids[0], "הפקדה ראשונית", "USD", "{}"),
+        ("WITHDRAWAL", -200.00, account_ids[0], "משיכה", "USD", "{}"),
+        ("DIVIDEND", 50.00, account_ids[0], "דיבידנד", "USD", "{}"),
+        ("INTEREST", 2.50, account_ids[0], "ריבית", "USD", "{}"),
+        ("FEE", -5.00, account_ids[1], "עמלה", "USD", "{}"),
+        (
+            "CURRENCY_CONVERSION",
+            1050.00,
+            account_ids[0],
+            "המרת מטבע USD→EUR",
+            "EUR",
+            '{"from_currency": "USD", "from_amount": 1000, "rate": 1.05}',
+        ),
+        ("OTHER", 10.00, account_ids[0], "אחר", "USD", "{}"),
     ]
     with conn.cursor() as cur:
-        for i, (ft, amt, acc_id, desc) in enumerate(flows):
+        for i, (ft, amt, acc_id, desc, currency, meta) in enumerate(flows):
             cur.execute(
                 """
                 INSERT INTO user_data.cash_flows (
                     id, user_id, trading_account_id, flow_type, amount,
                     currency, description, transaction_date,
-                    created_by, updated_by, is_test_data, created_at, updated_at
+                    created_by, updated_by, metadata, is_test_data, created_at, updated_at
                 ) VALUES (
                     gen_random_uuid(), %s, %s, %s, %s,
-                    'USD', %s, %s,
-                    %s, %s, FALSE, NOW(), NOW()
+                    %s, %s, %s,
+                    %s, %s, %s::jsonb, FALSE, NOW(), NOW()
                 )
             """,
                 (
@@ -186,10 +194,12 @@ def seed_minimal(conn, user_id):
                     acc_id,
                     ft,
                     amt,
+                    currency,
                     desc,
                     (datetime.now() - timedelta(days=i)).date(),
                     user_id,
                     user_id,
+                    meta,
                 ),
             )
         conn.commit()
@@ -216,10 +226,10 @@ def main():
         print("\n1. Deleting excess base data...")
         delete_base_data(conn, user_id)
 
-        print("\n2. Seeding minimal base set (2 accounts, 4 fees, 6 cash_flows)...")
+        print("\n2. Seeding minimal base set (2 accounts, 4 fees, 7 cash_flows)...")
         seed_minimal(conn, user_id)
 
-        print("\n✅ TikTrackAdmin base data reduced to minimum (12 rows).")
+        print("\n✅ TikTrackAdmin base data reduced to minimum (13 rows).")
     except Exception as e:
         conn.rollback()
         print(f"❌ Error: {e}")

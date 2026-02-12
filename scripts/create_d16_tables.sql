@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS user_data.cash_flows (
     trading_account_id UUID NOT NULL REFERENCES user_data.trading_accounts(id) ON DELETE CASCADE,
     
     -- Type
-    flow_type VARCHAR(20) NOT NULL CHECK (flow_type IN ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER')),
+    flow_type VARCHAR(20) NOT NULL CHECK (flow_type IN ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER', 'CURRENCY_CONVERSION')),
     
     -- Amount
     amount NUMERIC(20, 6) NOT NULL,

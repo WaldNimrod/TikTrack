@@ -4,7 +4,7 @@
 
 ---
 
-## הרשימה הקנונית (6 סוגים)
+## הרשימה הקנונית (7 סוגים)
 
 | ערך | תיאור (UI) |
 |-----|-------------|
@@ -13,7 +13,17 @@
 | `DIVIDEND` | דיבידנד |
 | `INTEREST` | ריבית |
 | `FEE` | עמלה |
+| `CURRENCY_CONVERSION` | **המרת מטבע** — מזהה ייעודי |
 | `OTHER` | אחר |
+
+### המרת מטבע (Currency Conversion)
+
+מזהה ברור: `flow_type='CURRENCY_CONVERSION'` — לא להשתמש ב־OTHER.
+
+- `currency` = מטבע יעד
+- `metadata` = `{"from_currency": "USD", "from_amount": 1000, "rate": 1.05}`
+
+מוצג ב־`GET /api/v1/cash_flows/currency_conversions`.
 
 ---
 

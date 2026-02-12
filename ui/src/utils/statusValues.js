@@ -7,9 +7,9 @@
  */
 
 export const STATUS_VALUES = [
+  { value: 'pending', label: 'ממתין' },
   { value: 'active', label: 'פתוח' },
   { value: 'inactive', label: 'סגור' },
-  { value: 'pending', label: 'ממתין' },
   { value: 'cancelled', label: 'מבוטל' }
 ];
 

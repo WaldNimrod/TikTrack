@@ -30,7 +30,7 @@ class CashFlow(Base):
     __tablename__ = "cash_flows"
     __table_args__ = (
         CheckConstraint(
-            "flow_type IN ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER')",
+            "flow_type IN ('DEPOSIT', 'WITHDRAWAL', 'DIVIDEND', 'INTEREST', 'FEE', 'OTHER', 'CURRENCY_CONVERSION')",
             name="cash_flows_flow_type_check"
         ),
         {"schema": "user_data"},

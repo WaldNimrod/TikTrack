@@ -32,9 +32,10 @@ router = APIRouter(prefix="/brokers_fees", tags=["brokers_fees"])
 
 @router.get("", response_model=BrokerFeeListResponse)
 async def get_brokers_fees(
-    broker: Optional[str] = Query(None, description="Filter by broker name"),
+    trading_account_id: Optional[str] = Query(None, description="Filter by trading account ULID (ADR-015)"),
+    broker: Optional[str] = Query(None, description="Filter by broker name (via account)"),
     commission_type: Optional[str] = Query(None, description="Filter by commission type (TIERED/FLAT)"),
-    search: Optional[str] = Query(None, description="Search in broker name and commission value"),
+    search: Optional[str] = Query(None, description="Search in account name, broker, commission value"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -56,6 +57,7 @@ async def get_brokers_fees(
         broker_fees = await service.get_brokers_fees(
             user_id=current_user.id,
             db=db,
+            trading_account_id=trading_account_id,
             broker=broker,
             commission_type=commission_type,
             search=search
@@ -78,7 +80,8 @@ async def get_brokers_fees(
 
 @router.get("/summary", response_model=BrokerFeeSummaryResponse)
 async def get_brokers_fees_summary(
-    broker: Optional[str] = Query(default=None, description="Filter by broker name"),
+    trading_account_id: Optional[str] = Query(default=None, description="Filter by trading account ULID (ADR-015)"),
+    broker: Optional[str] = Query(default=None, description="Filter by broker name (via account)"),
     commission_type: Optional[str] = Query(default=None, description="Filter by commission type (TIERED/FLAT)"),
     # Ignore pagination parameters (page, page_size) - summary endpoint doesn't use them
     # These are included to prevent 400 errors when Frontend sends them
@@ -115,7 +118,7 @@ async def get_brokers_fees_summary(
     # Log incoming request parameters for debugging (Team 90 requirement)
     logger.info(
         f"[DEBUG] Brokers fees summary request - user_id: {current_user.id}, "
-        f"broker: '{broker}' (type: {type(broker).__name__}), "
+        f"trading_account_id: '{trading_account_id}', broker: '{broker}' (type: {type(broker).__name__}), "
         f"commission_type: '{commission_type}' (type: {type(commission_type).__name__}), "
         f"page: {page}, page_size: {page_size}, "
         f"date_range: '{date_range}', search: '{search}', "
@@ -146,6 +149,7 @@ async def get_brokers_fees_summary(
         summary = await service.get_brokers_fees_summary(
             user_id=current_user.id,
             db=db,
+            trading_account_id=trading_account_id,
             broker=normalized_broker,
             commission_type=normalized_commission_type
         )
@@ -213,20 +217,14 @@ async def create_broker_fee(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Create new broker fee.
-    
-    Args:
-        request: BrokerFeeCreateRequest with broker details
-        
-    Returns:
-        BrokerFeeResponse
+    Create new broker fee (ADR-015: fees per trading account).
     """
     try:
         service = get_brokers_fees_service()
         broker_fee = await service.create_broker_fee(
             user_id=current_user.id,
             db=db,
-            broker=request.broker,
+            trading_account_id=request.trading_account_id,
             commission_type=request.commission_type,
             commission_value=request.commission_value,
             minimum=request.minimum
@@ -266,7 +264,7 @@ async def update_broker_fee(
             user_id=current_user.id,
             broker_fee_id=id,
             db=db,
-            broker=request.broker,
+            trading_account_id=request.trading_account_id,
             commission_type=request.commission_type,
             commission_value=request.commission_value,
             minimum=request.minimum

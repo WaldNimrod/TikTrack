@@ -54,12 +54,14 @@ class BrokerFee(Base):
         nullable=False,
         index=True
     )
-    
-    # Broker Details
-    broker: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
+    trading_account_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("user_data.trading_accounts.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
+    
+    # Fee structure (broker derived from trading_accounts.broker - ADR-015)
     
     commission_type: Mapped[str] = mapped_column(
         commission_type_enum,

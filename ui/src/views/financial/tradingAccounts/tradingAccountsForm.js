@@ -3,10 +3,12 @@
  * --------------------------------------------------------
  * Creates and manages form for trading accounts (D16)
  * ADR-013: Broker select from GET /api/v1/reference/brokers
+ * ADR-015: "אחר" + הודעת משילות (בחירת ברוקר בלבד)
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
 import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
+import { getGovernanceMessageData } from '../shared/adr015GovernanceMessage.js';
 
 /**
  * Create trading account form HTML
@@ -26,10 +28,28 @@ function createTradingAccountFormHTML(data = null, brokerOptions = []) {
 
   // Ensure current broker is in options (legacy/edit case)
   const options = [...brokerOptions];
-  if (broker && !options.some(o => o.value === broker)) {
+  if (broker && broker !== 'other' && !options.some(o => o.value === broker)) {
     options.unshift({ value: broker, label: broker });
   }
-  const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${broker === o.value ? 'selected' : ''}>${String(o.label)}</option>`).join('');
+  // ADR-015 §8: "אחר" from API or inject if not present (interim until Team 20 adds to defaults_brokers.json)
+  if (!options.some(o => o.value === 'other')) {
+    options.push({ value: 'other', label: 'אחר' });
+  }
+  const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${(broker === o.value || (broker === 'other' && o.value === 'other')) ? 'selected' : ''}>${String(o.label)}</option>`).join('');
+
+  const govMsg = getGovernanceMessageData();
+  const governanceMessageHTML = `
+    <div id="governanceMessageContainer" class="form-group adr015-governance-message" style="display:none;">
+      <div class="governance-message governance-message--warning" role="alert">
+        <p>${govMsg.body}<a href="${govMsg.linkHref}" target="_blank" rel="noopener noreferrer">${govMsg.linkText}</a>.</p>
+      </div>
+    </div>
+    <div id="brokerOtherNameGroup" class="form-group" style="display:none;">
+      <label for="brokerOtherName">שם ברוקר (הזנה ידנית) *</label>
+      <input type="text" id="brokerOtherName" name="brokerOtherName" placeholder="הזן את שם הברוקר" maxlength="100" />
+      <span class="form-error" id="brokerOtherNameError"></span>
+    </div>
+  `;
 
   return `
     <form id="tradingAccountForm" class="phoenix-form">
@@ -54,6 +74,7 @@ function createTradingAccountFormHTML(data = null, brokerOptions = []) {
           ${brokerOptionsHTML}
         </select>
         <span class="form-error" id="brokerError"></span>
+        ${governanceMessageHTML}
       </div>
       
       <div class="form-group">
@@ -121,6 +142,27 @@ function createTradingAccountFormHTML(data = null, brokerOptions = []) {
 }
 
 /**
+ * Initialize broker "other" handlers (ADR-015) - show governance message when "other" selected
+ */
+function initBrokerOtherHandlers() {
+  const brokerSelect = document.getElementById('broker');
+  const govContainer = document.getElementById('governanceMessageContainer');
+  const otherNameGroup = document.getElementById('brokerOtherNameGroup');
+  if (!brokerSelect || !govContainer || !otherNameGroup) return;
+  
+  function toggleOtherUI() {
+    const isOther = brokerSelect.value === 'other';
+    govContainer.style.display = isOther ? 'block' : 'none';
+    otherNameGroup.style.display = isOther ? 'block' : 'none';
+    const otherInput = document.getElementById('brokerOtherName');
+    if (otherInput) otherInput.required = isOther;
+  }
+  
+  brokerSelect.addEventListener('change', toggleOtherUI);
+  toggleOtherUI();
+}
+
+/**
  * Show trading account modal (add/edit)
  * @param {Object} data - Existing trading account data (for edit) or null (for add)
  * @param {Function} onSave - Callback function when form is saved
@@ -138,7 +180,7 @@ export async function showTradingAccountFormModal(data, onSave) {
   const formHTML = createTradingAccountFormHTML(data, brokerOptions);
   
   createModal({
-    title: title,
+    title,
     content: formHTML,
     entity: 'trading_account',
     showSaveButton: true,
@@ -155,7 +197,8 @@ export async function showTradingAccountFormModal(data, onSave) {
       
       // Collect form data
       const accountNameValue = document.getElementById('accountName').value.trim();
-      const brokerValue = document.getElementById('broker').value?.trim() || null;
+      const brokerSelectValue = document.getElementById('broker').value?.trim() || null;
+      const brokerOtherNameValue = document.getElementById('brokerOtherName')?.value?.trim() || '';
       const accountNumberValue = document.getElementById('accountNumber').value.trim();
       const initialBalanceInput = document.getElementById('initialBalance').value.trim();
       const currencyValue = document.getElementById('currency').value;
@@ -176,9 +219,19 @@ export async function showTradingAccountFormModal(data, onSave) {
         return;
       }
       
+      // ADR-015: when "other" selected, use custom broker name; require non-empty
+      const brokerValue = brokerSelectValue === 'other'
+        ? brokerOtherNameValue || null
+        : (brokerSelectValue || null);
+      if (brokerSelectValue === 'other' && !brokerOtherNameValue) {
+        const errEl = document.getElementById('brokerOtherNameError');
+        if (errEl) errEl.textContent = 'יש להזין את שם הברוקר';
+        return;
+      }
+      
       const formData = {
         accountName: accountNameValue,
-        broker: brokerValue || null,
+        broker: brokerValue,
         accountNumber: accountNumberValue || null,
         initialBalance: initialBalanceParsed,
         currency: currencyValue,
@@ -212,4 +265,6 @@ export async function showTradingAccountFormModal(data, onSave) {
       // Cleanup if needed
     }
   });
+  
+  initBrokerOtherHandlers();
 }

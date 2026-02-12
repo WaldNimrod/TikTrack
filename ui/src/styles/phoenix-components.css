@@ -1459,6 +1459,70 @@ body .page-wrapper .page-container main {
   border-radius: 2px;
 }
 
+/* ============================================
+   Governance Message - ADR-015 (D16 "Other Broker")
+   ============================================
+   Warning message displayed when "Other" broker is selected in D16.
+   Uses DNA Palette Message & Status Colors.
+   ============================================ */
+
+/* Base Governance Message */
+.governance-message {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+  padding: clamp(12px, 1.5vw, 16px);
+  border-radius: 8px;
+  border: 1px solid;
+  margin-block-start: clamp(8px, 1vw, 12px);
+  margin-block-end: clamp(8px, 1vw, 12px);
+  font-size: clamp(0.875rem, 1.5vw, 0.92rem);
+  line-height: 1.5;
+}
+
+/* Warning Variant (ADR-015 - Default) */
+.governance-message--warning {
+  background-color: var(--message-warning-light, #fef3c7);
+  border-color: var(--message-warning, #f59e0b);
+  color: var(--message-warning-dark, #d97706);
+}
+
+/* Info Variant (Alternative) */
+.governance-message--info {
+  background-color: var(--message-info-light, #bee5eb);
+  border-color: var(--message-info, #17a2b8);
+  color: var(--message-info-dark, #0c5460);
+}
+
+/* Message Text */
+.governance-message__text {
+  color: inherit;
+  margin: 0;
+}
+
+/* Message Link */
+.governance-message__link {
+  color: var(--color-primary, #26baac);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.governance-message__link:hover {
+  color: var(--color-primary-dark, #1e968a);
+}
+
+.governance-message__link:focus {
+  outline: 2px solid var(--color-primary, #26baac);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* RTL Support - Ensure proper alignment */
+.governance-message {
+  text-align: start; /* Logical property for RTL */
+}
+
 /* Rich-Text Editor Toolbar & Container (SOP-012) */
 .phoenix-rt-toolbar {
   display: flex;

@@ -42,6 +42,10 @@ db-test-fill:
 db-test-report:
 	@python3 scripts/db_test_data_report.py
 
+## Seed base dataset for test_user (is_test_data=false, minimal representative)
+db-base-seed:
+	@python3 scripts/seed_base_test_user.py
+
 ## Backup DB, verify backup, then seed test data (recommended flow).
 db-backup-then-fill: db-backup
 	@echo "🌱 Seeding test data (backup already verified)..."
@@ -56,5 +60,6 @@ help:
 	@echo "  make db-test-clean       - Delete all test data (is_test_data = true)"
 	@echo "  make db-test-fill        - Seed test data only (no backup)"
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
+	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

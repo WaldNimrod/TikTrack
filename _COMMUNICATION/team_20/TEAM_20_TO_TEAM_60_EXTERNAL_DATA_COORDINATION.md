@@ -65,7 +65,16 @@
 
 - **FX EOD:** נשאר כרגיל — `sync_exchange_rates_eod.py`
 - **Ticker EOD:** `sync_ticker_prices_eod.py` — נוסף
+- **Ticker Intraday:** `sync_ticker_prices_intraday.py` — נוסף (TEAM_20_TO_TEAM_60_ENV_AND_INTRADAY_COORDINATION_REQUEST)
 - **ALPHA_VANTAGE_API_KEY:** `api/.env` — נדרש ל-FX; אופציונלי ל-Ticker (fallback Yahoo)
+
+---
+
+## 5. בקשת תאום נוספת
+
+**מסמך מלא:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_60_ENV_AND_INTRADAY_COORDINATION_REQUEST.md`
+
+מפרט: ENV (ALPHA_VANTAGE_API_KEY ב-cron), Intraday Job, רשימת אימות.
 
 ---
 

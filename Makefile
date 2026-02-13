@@ -90,6 +90,12 @@ sync-ticker-prices:
 	@python3 scripts/sync_ticker_prices_eod.py
 	@echo "✅ Ticker prices EOD sync complete."
 
+## Intraday Sync — ticker_prices_intraday (Active tickers; Yahoo→Alpha)
+sync-intraday:
+	@echo "🔄 Intraday sync — ticker_prices_intraday"
+	@python3 scripts/sync_ticker_prices_intraday.py
+	@echo "✅ Intraday sync complete."
+
 ## Check market_data counts (tickers, ticker_prices, exchange_rates) — Team 10/50
 check-market-data-counts:
 	@python3 scripts/check_market_data_counts.py
@@ -141,6 +147,7 @@ help:
 	@echo "  make seed-tickers       - Seed market_data.tickers (required before sync)"
 	@echo "  make sync-eod           - EOD sync exchange_rates + history (Alpha→Yahoo)"
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha; runs seed-tickers)"
+	@echo "  make sync-intraday      - Intraday sync ticker_prices_intraday (Active tickers)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"

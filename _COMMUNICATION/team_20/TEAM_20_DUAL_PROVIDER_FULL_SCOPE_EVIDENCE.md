@@ -41,7 +41,9 @@
 | פריט | תוכן |
 |------|------|
 | **טבלה** | ticker_prices_intraday קיימת (P3-016) |
-| **Job** | לא מיושם כרגע |
+| **סקריפט** | `scripts/sync_ticker_prices_intraday.py` — Yahoo→Alpha |
+| **Make target** | `make sync-intraday` |
+| **Cron** | Team 60 — `*/15 * * * 1-5` (או לפי INTRADAY_INTERVAL_MINUTES) |
 
 ---
 
@@ -61,6 +63,7 @@
 | סקריפט | תיאור |
 |--------|--------|
 | **scripts/verify_dual_provider_full_scope.py** | הרצת FX + Prices sync ו־DB counts (Evidence run) |
+| **scripts/sync_ticker_prices_intraday.py** | Intraday sync — ticker_prices_intraday |
 | **scripts/check_market_data_counts.py** | ספירות: tickers, ticker_prices, exchange_rates, exchange_rates_history, ticker_prices_intraday |
 
 **הרצה:**  

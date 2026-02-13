@@ -48,6 +48,8 @@
 
 ### 2.2 Team 20 (Backend & DB)
 
+**External Data (2026-02-13):** P3-008 (Provider Interface + Cache-First), P3-009 (Guardrails), P3-013, P3-014, P3-015 — **תוצרים התקבלו** → PENDING_VERIFICATION. מקור: TEAM_20_TO_TEAM_10_50_EXTERNAL_DATA_COMPLETION_UPDATE; מיגרציה P3-013: TEAM_60_TO_TEAM_20_P3_013_MIGRATION_EXECUTED. מוכן ל-QA (TEAM_20_TO_TEAM_50_EXTERNAL_DATA_QA_HANDOFF).
+
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|
 | 1 | 1.2.1 | מימוש Endpoints ל־Summary ו־Conversions (Option A) | API פעילים; תיעוד ב־SSOT | ✅ **הושלם** — 4 endpoints אומתו; OpenAPI + SSOT_1_2_1 (TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION) |

@@ -69,7 +69,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 
 ### 4.1 תיעוד קבוע (Permanent Documentation)
 **מיקום:** `/documentation/` (לפי מבנה התיקיות הממוספר)
-- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; **אינדקס אדריכל (חוקי יסוד):** `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
+- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; **אינדקס אדריכל (חוקי יסוד):** `_COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
 - **חובה:** עדכון האינדקס בעת יצירת מסמך תיעוד חדש
 - **אסור:** לשמור תיעוד בשורש הפרויקט
 - **מבנה תיקיות (FIXED - v2.0):**

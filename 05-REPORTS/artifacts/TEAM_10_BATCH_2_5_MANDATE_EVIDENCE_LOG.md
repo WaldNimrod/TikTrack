@@ -10,11 +10,11 @@
 
 | מסמך | מיקום | תוכן |
 |------|--------|------|
-| BATCH_2_5_COMPLETIONS_MANDATE.md | documentation/90_ARCHITECTS_DOCUMENTATION/ | ADR-017 — יישור גרסאות 1.0.0, רפקטור עמלות, אבטחה/Redirect/User Icon |
-| ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md | documentation/90_ARCHITECTS_DOCUMENTATION/ | ADR-018 — בחירת ברוקר, כלל "אחר", חסימת API/ייבוא |
-| TT2_VERSION_MATRIX_v1.0.md | documentation/90_ARCHITECTS_DOCUMENTATION/ | כבר קיים — SSOT גרסאות |
-| 00_MASTER_INDEX.md (אדריכל) | documentation/90_ARCHITECTS_DOCUMENTATION/ | כבר קיים — חוקי יסוד v1.0.0 |
-| ARCHITECT_PHASE_2_GAP_ANALYSIS_REPORT.md | documentation/90_ARCHITECTS_DOCUMENTATION/ | כבר קיים — LOCKED G-LEAD APPROVED |
+| BATCH_2_5_COMPLETIONS_MANDATE.md | _COMMUNICATION/90_Architects_comunication/ | ADR-017 — יישור גרסאות 1.0.0, רפקטור עמלות, אבטחה/Redirect/User Icon |
+| ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md | _COMMUNICATION/90_Architects_comunication/ | ADR-018 — בחירת ברוקר, כלל "אחר", חסימת API/ייבוא |
+| TT2_VERSION_MATRIX_v1.0.md | _COMMUNICATION/90_Architects_comunication/ | כבר קיים — SSOT גרסאות |
+| 00_MASTER_INDEX.md (אדריכל) | _COMMUNICATION/90_Architects_comunication/ | כבר קיים — חוקי יסוד v1.0.0 |
+| ARCHITECT_PHASE_2_GAP_ANALYSIS_REPORT.md | _COMMUNICATION/90_Architects_comunication/ | כבר קיים — LOCKED G-LEAD APPROVED |
 
 ---
 
@@ -37,7 +37,7 @@
 
 ## 4. יישור אינדקסים (הפניה בלעדית ל־00_MASTER_INDEX)
 
-- **CURSOR_INTERNAL_PLAYBOOK.md** — אינדקס ניהול: 00-MANAGEMENT/00_MASTER_INDEX.md; אינדקס אדריכל: 90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md; D15_SYSTEM_INDEX — DEPRECATED; כלל "אסור קבצים בשורש" עודכן.
+- **CURSOR_INTERNAL_PLAYBOOK.md** — אינדקס ניהול: 00-MANAGEMENT/00_MASTER_INDEX.md; אינדקס אדריכל: _COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md; D15_SYSTEM_INDEX — DEPRECATED; כלל "אסור קבצים בשורש" עודכן.
 - **TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md** — סעיף 5.2: קובץ לעדכון 00-MANAGEMENT/00_MASTER_INDEX.md.
 - **TT2_FORM_VALIDATION_FRAMEWORK.md** — עדכון אינדקס → 00_MASTER_INDEX (אינדקס מאוחד).
 

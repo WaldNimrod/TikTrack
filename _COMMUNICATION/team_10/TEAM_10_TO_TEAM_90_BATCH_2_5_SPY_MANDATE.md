@@ -28,7 +28,7 @@
 
 - ADR-017: `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md`
 - ADR-018: `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md`
-- גרסאות: `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX_v1.0.md`
+- גרסאות: `_COMMUNICATION/90_Architects_comunication/TT2_VERSION_MATRIX_v1.0.md`
 
 ---
 

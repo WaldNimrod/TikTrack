@@ -60,4 +60,4 @@ TikTrack Phoenix (TT2) is a financial-core platform for managing trading account
 - `_COMMUNICATION/99-ARCHIVE/2026-02-12/ARCHIVE_MANIFEST.md`
 - `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md`
-- `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX_v1.0.md`
+- `_COMMUNICATION/90_Architects_comunication/TT2_VERSION_MATRIX_v1.0.md`

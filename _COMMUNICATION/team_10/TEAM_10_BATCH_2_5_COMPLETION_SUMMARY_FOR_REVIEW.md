@@ -25,7 +25,7 @@
 
 | מסמך | שינוי |
 |------|--------|
-| documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md | אינדקס ניהול: 00-MANAGEMENT/00_MASTER_INDEX.md; אינדקס אדריכל: 90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md; D15_SYSTEM_INDEX — DEPRECATED. כלל "אסור קבצים בשורש" — עודכן (אין D15_SYSTEM_INDEX בשורש). |
+| documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md | אינדקס ניהול: 00-MANAGEMENT/00_MASTER_INDEX.md; אינדקס אדריכל: _COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md; D15_SYSTEM_INDEX — DEPRECATED. כלל "אסור קבצים בשורש" — עודכן (אין D15_SYSTEM_INDEX בשורש). |
 | documentation/05-PROCEDURES/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md | סעיף 5.2 — קובץ לעדכון: 00-MANAGEMENT/00_MASTER_INDEX.md; הערה D15_SYSTEM_INDEX DEPRECATED. |
 | documentation/10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md | עדכון אינדקס: 00_MASTER_INDEX.md (אינדקס מאוחד). |
 
@@ -37,9 +37,9 @@
 
 | מסמך | מיקום |
 |------|--------|
-| BATCH_2_5_COMPLETIONS_MANDATE.md | documentation/90_ARCHITECTS_DOCUMENTATION/ |
-| ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md | documentation/90_ARCHITECTS_DOCUMENTATION/ |
-| TT2_VERSION_MATRIX_v1.0.md, 00_MASTER_INDEX.md, ARCHITECT_PHASE_2_GAP_ANALYSIS_REPORT.md | כבר קיימים בתיקיית אדריכל |
+| BATCH_2_5_COMPLETIONS_MANDATE.md | _COMMUNICATION/90_Architects_comunication/ |
+| ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md | _COMMUNICATION/90_Architects_comunication/ |
+| TT2_VERSION_MATRIX_v1.0.md, 00_MASTER_INDEX.md, ARCHITECT_PHASE_2_GAP_ANALYSIS_REPORT.md | כבר קיימים בתיקיית אדריכלית (סנכרון תקשורת) |
 
 ---
 

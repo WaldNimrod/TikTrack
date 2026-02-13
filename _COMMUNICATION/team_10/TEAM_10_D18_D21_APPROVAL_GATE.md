@@ -3,7 +3,7 @@
 **id:** `TEAM_10_D18_D21_APPROVAL_GATE`  
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-13  
-**מקור:** BATCH_2_5_COMPLETIONS_MANDATE.md (ADR-017 §2)
+**מקור:** `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md` (ADR-017 §2)
 
 ---
 

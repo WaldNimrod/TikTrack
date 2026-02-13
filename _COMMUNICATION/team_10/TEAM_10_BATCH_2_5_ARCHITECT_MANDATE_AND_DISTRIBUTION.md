@@ -7,8 +7,8 @@
 **מסמכי יסוד (תיעוד אדריכל):**
 - `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md` (ADR-017)
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md` (ADR-018)
-- `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX_v1.0.md` (SSOT גרסאות)
-- `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md` — אינדקס מאוחד בלעדי; D15_SYSTEM_INDEX מבוטל.
+- `_COMMUNICATION/90_Architects_comunication/TT2_VERSION_MATRIX_v1.0.md` (SSOT גרסאות)
+- `_COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md` — אינדקס מאוחד בלעדי; D15_SYSTEM_INDEX מבוטל.
 
 ---
 

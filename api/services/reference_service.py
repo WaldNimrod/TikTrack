@@ -11,7 +11,7 @@ import uuid
 import json
 import logging
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.sql import and_
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 _DEFAULTS_PATH = Path(__file__).resolve().parent.parent / "data" / "defaults_brokers.json"
 
 
-def is_broker_supported(broker: str | None) -> bool:
+def is_broker_supported(broker: Optional[str]) -> bool:
     """
     ADR-018: Check if broker supports API/import.
     Returns False for 'other', 'אחר', or custom brokers not in defaults with is_supported=True.

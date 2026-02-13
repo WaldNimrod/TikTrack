@@ -154,11 +154,68 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 
 ---
 
-## 9. השלמת תוכנית העבודה
+## 9. סטטוס השלמה — **לא בדקנו אז לא סיימנו**
 
-**כל שלושת הצוותים (20, 30, 60) השלימו את משימות המנדט.**  
-תוכנית העבודה למודול External Data Full Module Review — **הושלמה מלאה.**  
-עדכונים/תוספות עתידיים (למשל API היסטוריה לשערים, חיבור טבלה 2) יתועדו לפי הצורך.
+**מימוש:** כל שלושת הצוותים (20, 30, 60) השלימו את משימות המנדט (§6).  
+**השלמה מלאה:** **לא** — עד שלא מבוצעות **בדיקות (QA)** ואין פתרון לבעיות הממשק המתוארות להלן, התהליך **לא נחשב סגור.**
+
+### 9.1 בעיות שדווחו (ממשק)
+
+| בעיה | תיאור | בעלים משוער |
+|------|--------|--------------|
+| **ניווט לדשבורד נתונים** | לא מצליחים לגלוש לעמוד דשבורד נתונים (הקישור בתפריט "נתונים" → "דשבורד נתונים"). | Team 30 / תשתית — לבדוק: האם העמוד נגיש ב-dev (Vite routeToFileMap); האם ב-build (dist) העמוד מוגש (multi-page או העתקה ל-dist). |
+| **נתוני מחיר בעמוד טיקרים** | בממשק לא רואים נתוני מחיר בעמוד טיקרים. | Backend מחזיר current_price רק כשיש רשומות ב־market_data.ticker_prices (sync_ticker_prices_eod). אם אין נתונים — להריץ sync או להציג placeholder (למשל "—") כשמחיר חסר. |
+
+### 9.2 פעולות נדרשות
+
+1. **QA:** הרצת בדיקות E2E/ידניות: ניווט לדשבורד נתונים, הצגת שערים, עמוד טיקרים עם/בלי נתוני מחיר.
+2. **ניווט דשבורד נתונים:** וידוא שהקישור `/data_dashboard.html` מחזיר את העמוד (dev + build/production).
+3. **מחיר בעמוד טיקרים:** וידוא ש־GET /tickers מחזיר current_price כשקיים ב-DB; הרצת sync מחירים אם צריך; בממשק — הצגת "—" או "אין נתון" כשמחיר null.
+
+**מסמך מפורט:** 05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_UI_GAPS_AND_QA.md — סיבות אפשריות, פעולות מומלצות, רשימת בדיקות QA.
+
+**הנחיית מנהלת העבודה (סגירה מסודרת, בלי ניחושים):**  
+`_COMMUNICATION/team_10/TEAM_10_WORK_MANAGER_DIRECTIVE_EXTERNAL_DATA_UI_CLOSURE.md` — סדר ביצוע: אימות (50) → תיקונים (30, 20, 60) → אימות חוזר (50) → עדכון סטטוס (10); משימות ותוצרים מוגדרים לכל צוות.
+
+---
+
+## 10. שידרוג בדיקות אוטומטיות (הנחיית אדריכל — Team 90) 🔒
+
+**מקור:** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_DIRECTIVE.md` — **MANDATORY**, implement as architect instruction.
+
+### 10.1 החלטה (נעולה)
+
+| פריט | תוכן |
+|------|------|
+| **חבילת Fixtures** | מקור יחיד (FX/Prices/Indicators) — `tests/fixtures/` |
+| **מיקום Fixtures** | `tests/fixtures/market_data/` — FX EOD, Prices (intraday+EOD), 250d history, Indicators (ATR/MA/CCI), Market Cap |
+| **מודל הרצה** | **Nightly CI:** סוויטת מלאה; **PR/commit:** תת-סוויטת Smoke |
+
+### 10.2 ארכיטקטורת בדיקות (חובה)
+
+- **Provider Replay Mode:** כל אדפטרי הספקים חייבים לתמוך ב־`mode=REPLAY` — החזרת נתונים מ-fixtures **בלי קריאות חיצוניות**.
+- **סוויטות חובה:** A) Contract & Schema (שדות חובה, precision 20,8, staleness enum); B) Cache‑First + Failover; C) Cadence & Status; D) Retention & Cleanup Jobs; E) UI (Clock + Tooltip — ללא banner).
+- **CI:** Nightly = A–E עם REPLAY; PR = Smoke: A, B, D.
+
+### 10.3 הקצאת משימות (Team 10 מפיץ)
+
+| צוות | היקף |
+|------|------|
+| **20** | Provider Replay Mode + contract tests + cache/failover tests |
+| **60** | Retention/cleanup jobs + job evidence |
+| **50** | Nightly/Smoke QA scripts + reporting |
+| **30** | UI clock/tooltip automation (Selenium) |
+| **10** | CI wiring + mandates + evidence log + לוח CI |
+
+### 10.4 קריטריוני קבלה
+
+- סוויטה מלאה עוברת ב-Nightly; Smoke עובר ב-PR.
+- אין קריאות רשת חיצוניות ב־`mode=REPLAY`.
+- Evidence logs מצורפים ל-jobs ול-Nightly run.
+
+**מנדטים מפורטים לצוותים:** §10 מפנה למנדטים הנפרדים שהונפקו (TEAM_10_TO_TEAM_xx_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE).
+
+**Team 10 — CI + Evidence:** חיווט CI (Nightly + Smoke), פרסום לוח CI, ו־Evidence log: `05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE_LOG.md`.
 
 ---
 

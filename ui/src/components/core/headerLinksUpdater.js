@@ -159,6 +159,15 @@
       }
     });
     
+    // Gate B Fix: Update data_dashboard link to use .html extension (per routes.json)
+    const dataDashboardLinks = document.querySelectorAll('a[href="/data_dashboard"], a[href="/data_dashboard.html"], a[data-page="data_dashboard"]');
+    dataDashboardLinks.forEach(link => {
+      link.href = '/data_dashboard.html';
+      if (!link.hasAttribute('data-page')) {
+        link.setAttribute('data-page', 'data_dashboard');
+      }
+    });
+    
     // Gate B Fix: Update trade_plans link to use .html extension (per routes.json)
     const tradePlansLinks = document.querySelectorAll('a[href="/trade_plans"], a[href="/trade_plans.html"], a[data-page="trade_plans"]');
     tradePlansLinks.forEach(link => {
@@ -212,7 +221,8 @@
       '/trades_history': '/trades_history.html',
       '/trading_accounts': '/trading_accounts.html',
       '/brokers_fees': '/brokers_fees.html',
-      '/cash_flows': '/cash_flows.html'
+      '/cash_flows': '/cash_flows.html',
+      '/data_dashboard': '/data_dashboard.html'
     };
     
     Object.keys(navLinks).forEach(path => {

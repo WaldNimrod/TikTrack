@@ -60,6 +60,12 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## P3-018: exchange_rates_history (Option A — approved)
+migrate-p3-018:
+	@echo "🔄 P3-018 — exchange_rates_history"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_018_exchange_rates_history.sql
+	@echo "✅ P3-018 migration complete."
+
 ## P3-013: Add market_cap to ticker_prices (run as table owner tiktrack)
 migrate-p3-013:
 	@echo "🔄 P3-013 — add market_cap to ticker_prices"
@@ -94,8 +100,9 @@ help:
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
-	@echo "  make sync-eod           - EOD sync exchange_rates (Alpha→Yahoo)"
+	@echo "  make sync-eod           - EOD sync exchange_rates + history (Alpha→Yahoo)"
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha)"
-	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d)"
+	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
+	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

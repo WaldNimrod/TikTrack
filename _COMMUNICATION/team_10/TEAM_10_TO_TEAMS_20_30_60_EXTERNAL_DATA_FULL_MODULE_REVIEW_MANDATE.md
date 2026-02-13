@@ -7,6 +7,8 @@
 **status:** 🔒 **MANDATORY — read & align before execution**  
 **מקור:** TEAM_90_TO_TEAM_10_EXTERNAL_DATA_MODULE_REVIEW_AND_EXCHANGE_RATES_HISTORY.md
 
+**תוכנית עבודה:** מסמך זה מהווה את **תוכנית העבודה המפורטת הנוכחית** למודול External Data. מולו יש לעבוד ולשמור על תהליך מסודר עד **השלמה מלאה** — אחרת נוצרים חורים. כל עדכון סטטוס משימות יתועד כאן (§8).
+
 ---
 
 ## 0. סגירת שאלות פתוחות — הרצת תהליך הפיתוח
@@ -93,43 +95,70 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 
 ## 6. משימות ליישום מיידי (לכל צוות)
 
-### 6.1 Team 20 (Backend)
+### 6.1 Team 20 (Backend) — ✅ **הושלם**
 
-| # | משימה | תוצר / Evidence |
-|---|--------|------------------|
-| 1 | **קריאת חבילת SSOT המלאה** (§2) | חובה לפני כל שינוי קוד. |
-| 2 | **סקריפט EOD לשמירת מחירי טיקר** — טעינה מ-Yahoo/Alpha ושמירה ל־`market_data.ticker_prices` (בדומה ל־sync_exchange_rates_eod.py). | סקריפט מוכן להרצה; וידוא שורות ב-DB אחרי ריצה. מקור: TEAM_10_TO_TEAM_20_GATE_B_GAPS_AND_SYNC_MANDATE. |
-| 3 | **יישור שירותי market_data ל-SSOT** — cache_first_service, providers (priority FX: Alpha→Yahoo, Prices: Yahoo→Alpha), Guardrails (Yahoo UA, Alpha rate limit). | קוד מיושר; אין סטייה מאפיון. |
-| 4 | **טיוטת DDL ל־exchange_rates_history** — טבלה `market_data.exchange_rates_history`; תוכנית עדכון job EOD (insert history + UPSERT ל־exchange_rates). תיאום עם Team 60. | קובץ DDL + תיאור שינוי job; הגשה ל-Team 10/אדריכל לאישור. |
-| 5 | **תיעוד ALPHA_VANTAGE_API_KEY** והנחיות ל-QA/סביבה (כולל אופציונליות לבדיקות בלי key). | מסמך קצר או עדכון README/env. |
+| # | משימה | תוצר / Evidence | סטטוס |
+|---|--------|------------------|--------|
+| 1 | **קריאת חבילת SSOT המלאה** (§2) | TEAM_20_TO_TEAM_10_FULL_MODULE_REVIEW_ACK | ✅ |
+| 2 | **סקריפט EOD לשמירת מחירי טיקר** | sync_ticker_prices_eod.py; make sync-ticker-prices | ✅ |
+| 3 | **יישור שירותי market_data ל-SSOT** | cache_first_service, providers, Guardrails (Yahoo UA, Alpha 12.5s); _persist_price_to_db בעת fetch | ✅ |
+| 4 | **טיוטת DDL ל־exchange_rates_history** | draft → Team 60 מימש p3_018 | ✅ |
+| 5 | **תיעוד ALPHA_VANTAGE_API_KEY** | TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md; api/.env.example | ✅ |
 
-### 6.2 Team 30 (UI)
+**הודעת סיום:** _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md
 
-| # | משימה | תוצר / Evidence |
-|---|--------|------------------|
-| 1 | **קריאת חבילת SSOT המלאה** (§2) | חובה לפני כל שינוי. |
-| 2 | **השלמת דשבורד נתונים (D23)** — טבלה 1: רשימת שערים (GET /reference/exchange-rates — זוג, שער, זמן עדכון). טבלה 2: דרופדאון לבחירת שער + מבנה להיסטוריה (placeholder או API כשקיים). | עמוד data_dashboard.html פונקציונלי; מפרט: DATA_DASHBOARD_SPEC. |
-| 3 | **יישור UI External Data ל-SSOT** — שעון סטגנציה (P3-012): Clock + צבע + tooltip; Never block UI. וידוא שכל מקום שמציג נתוני שוק תואם לאפיון. | אין חסימת UI; התנהגות לפי MARKET_DATA_PIPE_SPEC §2.5. |
-| 4 | **וידוא עמוד ניהול טיקרים (D22)** — כשהנתונים זמינים מ-backend, הצגת מחיר אחרון + שינוי יומי בהתאם לאפיון. | תיאור או checklist מול מפרט. |
+### 6.2 Team 30 (UI) — ✅ **הושלם**
 
-### 6.3 Team 60 (Infrastructure)
+| # | משימה | תוצר / Evidence | סטטוס |
+|---|--------|------------------|--------|
+| 1 | **קריאת חבילת SSOT המלאה** (§2) | חובה לפני כל שינוי. | ✅ |
+| 2 | **השלמת דשבורד נתונים (D23)** | טבלה 1: שערים (GET /reference/exchange-rates) — זוג, שער, זמן עדכון; כפתור רענון; טעינה אוטומטית. טבלה 2: דרופדאון זוג מטבעות (מטבלה 1); תאריך/שעה, שער; כרגע שורה נוכחית בלבד + הערה "היסטוריה מלאה תתווסף כשניישם API היסטוריה". סיכום עליון: סה"כ שערים, סטטוס עדכון. | ✅ |
+| 3 | **יישור UI External Data ל-SSOT** | שעון סטגנציה (P3-012); Never block UI. | ✅ |
+| 4 | **וידוא עמוד ניהול טיקרים (D22)** | כשהנתונים זמינים — מחיר אחרון + שינוי יומי (מפרט). | ✅ |
 
-| # | משימה | תוצר / Evidence |
-|---|--------|------------------|
-| 1 | **קריאת חבילת SSOT המלאה** (§2) | חובה לפני כל שינוי. |
-| 2 | **יישור cron/job EOD ל-SSOT** — הרצת sync_exchange_rates_eod (קיים); לאחר ש-Team 20 יסיים — הרצת sync מחירי טיקר לפי לוח זמנים. | cron/תזמון מתועד; ללא סטייה מאפיון. |
-| 3 | **הכנת migration ל־exchange_rates_history** — תיאום עם Team 20; DDL (טבלה, אינדקסים, הרשאות). מוכן להרצה באישור אדריכל/Team 10. | קובץ migration + תוכנית בעלות (מי מריץ, מתי). |
-| 4 | **תוכנית retention + ארכיון** — 250 ימי מסחר ל-FX history → ארכיון (לפי SSOT); תיעוד או סקריפט ניקוי/ארכוב. | מסמך קצר או הגדרה ב-job. |
+**קבצים:** data_dashboard.content.html, dataDashboardTableInit.js, page-manifest.json (טעינת dataDashboardTableInit).  
+**מקור:** TEAM_10_TO_TEAM_30_DATA_DASHBOARD_SPEC_HANDOFF.
+
+### 6.3 Team 60 (Infrastructure) — ✅ **הושלם**
+
+| # | משימה | תוצר / Evidence | סטטוס |
+|---|--------|------------------|--------|
+| 1 | **קריאת חבילת SSOT המלאה** (§2) | חובה לפני כל שינוי. | ✅ |
+| 2 | **יישור cron/job EOD ל-SSOT** — הרצת sync_exchange_rates_eod; sync מחירי טיקר לפי לוח. | TEAM_60_CRON_SCHEDULE.md — FX 22:00, Ticker 22:05, Cleanup 22:30 UTC | ✅ |
+| 3 | **הכנת migration ל־exchange_rates_history** | p3_018_exchange_rates_history.sql — הורצה בהצלחה | ✅ |
+| 4 | **תוכנית retention + ארכיון** — 250d ל-FX history | run_cleanup_fx_history() ב-cleanup_market_data.py | ✅ |
+
+**הודעת סיום:** _COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md
 
 ---
 
 ## 7. סדר ביצוע מומלץ
 
 1. **כל הצוותים:** קריאת חבילת SSOT (§2) — במקביל.  
-2. **Team 20 + 60:** טיוטת DDL ותוכנית job ל־exchange_rates_history — תיאום ביניהם; הגשה לאישור.  
-3. **Team 20:** סקריפט EOD למחירי טיקר; יישור שירותים.  
-4. **Team 30:** דשבורד נתונים (טבלה 1 + טבלה 2); יישור שעון סטגנציה ו-D22.  
-5. **Team 60:** הרצת migration (לאחר אישור); עדכון job EOD; retention/ארכיון.
+2. **Team 20 + 60:** טיוטת DDL ותוכנית job ל־exchange_rates_history — תיאום ביניהם; הגשה לאישור. — ✅ **הושלם**  
+3. **Team 20:** סקריפט EOD למחירי טיקר; יישור שירותים. — ✅ **הושלם**  
+4. **Team 30:** דשבורד נתונים (טבלה 1 + טבלה 2); יישור שעון סטגנציה ו-D22. — ✅ **הושלם**  
+5. **Team 60:** הרצת migration (לאחר אישור); עדכון job EOD; retention/ארכיון. — ✅ **הושלם**
+
+---
+
+## 8. סטטוס ביצוע (מעקב מול תוכנית העבודה)
+
+עדכון סטטוס מול §6 — יש לעדכן כאן עם כל הודעת סיום/התקדמות.
+
+| צוות | סטטוס | הודעה / Evidence |
+|------|--------|-------------------|
+| **Team 60** | ✅ **הושלם** | TEAM_60_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md — migration p3_018, job EOD (history + UPSERT), cleanup FX 250d, תיעוד cron, Makefile. |
+| **Team 20** | ✅ **הושלם** | TEAM_20_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md — sync_ticker_prices_eod, יישור market_data, DDL (60 מימש p3_018), תיעוד ALPHA_VANTAGE_API_KEY, תאום 60. |
+| **Team 30** | ✅ **הושלם** | דשבורד נתונים (D23): טבלה 1 שערים (GET exchange-rates, רענון, טעינה אוטומטית), טבלה 2 דרופדאון + שורה נוכחית + הערה ל-API היסטוריה, סיכום עליון. קבצים: data_dashboard.content.html, dataDashboardTableInit.js, page-manifest. |
+
+---
+
+## 9. השלמת תוכנית העבודה
+
+**כל שלושת הצוותים (20, 30, 60) השלימו את משימות המנדט.**  
+תוכנית העבודה למודול External Data Full Module Review — **הושלמה מלאה.**  
+עדכונים/תוספות עתידיים (למשל API היסטוריה לשערים, חיבור טבלה 2) יתועדו לפי הצורך.
 
 ---
 

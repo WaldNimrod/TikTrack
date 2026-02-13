@@ -70,12 +70,35 @@ def run_cleanup_daily() -> dict:
         conn.close()
 
 
+def run_cleanup_fx_history() -> dict:
+    """Prune exchange_rates_history older than 250 days. Per MARKET_DATA_PIPE_SPEC §7.3."""
+    import psycopg2
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor()
+        cutoff = datetime.now(timezone.utc).date() - timedelta(days=DAILY_RETENTION_DAYS)
+        cur.execute(
+            "DELETE FROM market_data.exchange_rates_history WHERE rate_date < %s",
+            (cutoff,),
+        )
+        rows = cur.rowcount
+        conn.commit()
+        return {"rows_pruned": rows, "cutoff": cutoff.isoformat()}
+    finally:
+        conn.close()
+
+
 def log_evidence(ev: dict) -> None:
     artifacts = _project / "documentation" / "05-REPORTS" / "artifacts"
     artifacts.mkdir(parents=True, exist_ok=True)
     log_file = artifacts / "TEAM_60_CLEANUP_EVIDENCE_LOG.md"
     now = datetime.now(timezone.utc).isoformat()
-    entry = f"\n## {now}\n- intraday: rows_pruned={ev.get('intraday',{}).get('rows_pruned',0)}\n- daily: rows_pruned={ev.get('daily',{}).get('rows_pruned',0)}\n"
+    entry = (
+        f"\n## {now}\n"
+        f"- intraday: rows_pruned={ev.get('intraday',{}).get('rows_pruned',0)}\n"
+        f"- daily: rows_pruned={ev.get('daily',{}).get('rows_pruned',0)}\n"
+        f"- fx_history: rows_pruned={ev.get('fx_history',{}).get('rows_pruned',0)}\n"
+    )
     with open(log_file, "a") as f:
         f.write(entry)
 
@@ -95,6 +118,12 @@ def main():
     except Exception as e:
         print(f"⚠️ Daily: {e}")
         ev["daily"] = {"rows_pruned": 0, "error": str(e)}
+    try:
+        ev["fx_history"] = run_cleanup_fx_history()
+        print(f"✅ FX History: pruned {ev['fx_history']['rows_pruned']} rows")
+    except Exception as e:
+        print(f"⚠️ FX History: {e}")
+        ev["fx_history"] = {"rows_pruned": 0, "error": str(e)}
     ev["last_run_time"] = datetime.now(timezone.utc).isoformat()
     log_evidence(ev)
     print("✅ Cleanup complete. Evidence logged.")

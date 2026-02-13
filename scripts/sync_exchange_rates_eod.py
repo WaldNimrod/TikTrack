@@ -125,13 +125,29 @@ def fetch_rates() -> List[Tuple[str, str, Decimal]]:
 
 
 def upsert_rates(rates: List[Tuple[str, str, Decimal]]) -> int:
+    """UPSERT exchange_rates (current) + INSERT exchange_rates_history (P3-018)."""
     import psycopg2
     from psycopg2.extras import execute_values
     conn = psycopg2.connect(DATABASE_URL)
     try:
         now = datetime.now(timezone.utc)
+        rate_date = now.date()
         rows = [(f, t, r, now, now) for f, t, r in rates]
         cur = conn.cursor()
+        # 1. INSERT history (ON CONFLICT DO NOTHING — idempotent per day)
+        hist_rows = [(f, t, r, rate_date) for f, t, r in rates]
+        execute_values(
+            cur,
+            """
+            INSERT INTO market_data.exchange_rates_history
+                (from_currency, to_currency, conversion_rate, rate_date)
+            VALUES %s
+            ON CONFLICT (from_currency, to_currency, rate_date) DO NOTHING
+            """,
+            hist_rows,
+            template="(%s, %s, %s, %s)",
+        )
+        # 2. UPSERT current
         execute_values(
             cur,
             """
@@ -159,7 +175,7 @@ def main():
         print("⚠️ No rates fetched. Exit 0.")
         sys.exit(0)
     n = upsert_rates(rates)
-    print(f"✅ Upserted {n} rates to market_data.exchange_rates")
+    print(f"✅ Upserted {n} rates (exchange_rates + exchange_rates_history)")
     sys.exit(0)
 
 

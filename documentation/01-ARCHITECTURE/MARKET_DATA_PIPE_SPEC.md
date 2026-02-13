@@ -42,7 +42,7 @@
 
 ### 4.1 מחירי טיקרים (Ticker Prices)
 
-- טבלה: `user_data.ticker_prices`
+- טבלה: `market_data.ticker_prices`
 - שדות: `price`, `open_price`, `high_price`, `low_price`, `close_price` — `NUMERIC(20,8)`
 - מקור: `api/models/ticker_prices.py`
 
@@ -57,8 +57,9 @@
 
 | נושא | בעלים | הערות |
 |------|--------|--------|
-| תשתית Cache | Team 60 | Redis / in-memory / DB — לפי החלטה |
-| סנכרון EOD | Team 60 | cron / job — לפי החלטה |
+| תשתית Cache | Team 60 | **DB as Cache** — טבלאות DB + `market_data.latest_ticker_prices` (MV) כמאגר; ללא Redis בשלב זה. |
+| סנכרון EOD | Team 60 | **Cron** דוגמה: `0 22 * * 1-5` (22:00 ימים א'–ה'); **אזור זמן:** UTC. סקריפט: `scripts/sync_exchange_rates_eod.py`. |
+| ספק + Scope מטבעות | Team 60 | **Frankfurter API** (חינם); **Scope ראשוני:** USD, EUR, ILS בלבד. הרחבה לפי ISO 4217 — עתידי. |
 | DDL / Schema | Team 60 | טבלאות ticker_prices, exchange_rates |
 
 ---
@@ -82,4 +83,5 @@
 
 ---
 
-**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**  
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13** — DB-as-Cache, Cron+UTC, Frankfurter, Scope USD/EUR/ILS (מקור: Team 60 TEAM_60_TO_TEAM_10_CACHE_EOD_CONDITIONAL_APPROVAL_FIXES)

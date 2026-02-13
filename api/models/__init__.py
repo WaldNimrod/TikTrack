@@ -12,6 +12,7 @@ from .trades import Trade
 from .tickers import Ticker
 from .ticker_prices import TickerPrice
 from .brokers_fees import BrokerFee
+from .exchange_rates import ExchangeRate
 
 __all__ = [
     "User",
@@ -28,4 +29,5 @@ __all__ = [
     "Ticker",
     "TickerPrice",
     "BrokerFee",
+    "ExchangeRate",
 ]

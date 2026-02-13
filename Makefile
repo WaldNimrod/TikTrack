@@ -60,6 +60,12 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## EOD Sync — exchange_rates (MARKET_DATA_PIPE_SPEC §5)
+sync-eod:
+	@echo "🔄 EOD sync — exchange_rates"
+	@python3 scripts/sync_exchange_rates_eod.py
+	@echo "✅ EOD sync complete."
+
 ## Help
 help:
 	@echo "Available targets:"
@@ -70,5 +76,6 @@ help:
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
+	@echo "  make sync-eod           - EOD sync exchange_rates (Frankfurter API)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

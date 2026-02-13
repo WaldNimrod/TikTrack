@@ -1,0 +1,1 @@
+(See ARCHITECT_VERDICT_MARKET_DATA_STAGE_1.md content above)

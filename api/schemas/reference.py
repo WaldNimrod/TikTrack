@@ -6,6 +6,7 @@ Status: COMPLETED
 Schemas for reference/lookup endpoints.
 """
 
+from datetime import datetime
 from decimal import Decimal
 from typing import List
 from pydantic import BaseModel, Field
@@ -46,6 +47,24 @@ class BrokerReferenceResponse(BaseModel):
     """Response for GET /api/v1/reference/brokers."""
     data: List[BrokerReferenceItem] = Field(..., description="List of broker options")
     total: int = Field(..., description="Total count")
+
+
+class ExchangeRateItem(BaseModel):
+    """Single exchange rate per MARKET_DATA_PIPE_SPEC."""
+    from_currency: str = Field(..., max_length=3, description="ISO 4217 source")
+    to_currency: str = Field(..., max_length=3, description="ISO 4217 target")
+    conversion_rate: Decimal = Field(..., gt=0, description="Rate NUMERIC(20,8)")
+    last_sync_time: datetime = Field(..., description="Last sync UTC")
+
+
+class ExchangeRatesResponse(BaseModel):
+    """Response for GET /api/v1/reference/exchange-rates. Per MARKET_DATA_PIPE_SPEC."""
+    data: List[ExchangeRateItem] = Field(..., description="Exchange rates")
+    total: int = Field(..., description="Total count")
+    staleness: str = Field(
+        default="ok",
+        description="ok | warning (>15min) | na (>1 trading day)"
+    )
 
     model_config = {
         "json_schema_extra": {

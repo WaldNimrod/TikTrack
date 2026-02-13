@@ -205,6 +205,7 @@ _COMMUNICATION/
 - [🛡️ ריענון נהלים ומשמעת אדריכלית v1.5](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#3-ריענון-נהלים-ומשמעת-אדריכלית-v15--חובה) - הנחיות מחייבות מהאדריכלית (ניהול קבצים, G-Bridge, Transformation Layer)
 - [🛡️ Final Governance Lock v2.0](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#6-final-governance-lock-v20--mandatory) - נעילה ארכיטקטונית כוללת (מבנה תיקיות, Fluid Design, Design Tokens, משמעת סקריפטים) 🛡️ **FINAL LOCK**
 - [🛡️ הגדרות תפקיד ומשילות לכל צוות](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md#5-הגדרות-תפקיד-ומשילות-לכל-צוות--batch-1-closure-mandate) - הגדרות תפקיד ומשילות לכל צוות (Batch 1 Closure Mandate) 🛡️ **MANDATORY - FOUNDATION SEAL**
+- [🛡️ Governance v2.102 — SOP-013 Seal Message (חסם יחיד לסגירה)](../07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md) - סגירת משימות **רק** עם Seal Message; דוח לבדו לא מתקבל 🛡️ **מחייב 2026-02-13**
 - [🏰 ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md](../09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md) - החלטות רספונסיביות טבלאות (Option D) ✅ **SSOT**
 - [🏰 ARCHITECT_MODULE_MENU_STYLING_SSOT.md](../09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md) - החלטה אדריכלית: Module/Menu Styling (RTL כפתורים, צבעי כותרת לפי ישות, מודול דוגמה) ✅ **SSOT — Batch 1+2**
 - [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה D16 (חשבונות מסחר) — נעול ✅ **SSOT — 2026-01-31**

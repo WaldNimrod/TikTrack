@@ -8,6 +8,8 @@
 
 **פרוטוקול שולחן נקי (Clean Table):** TEAM_10_CLEAN_TABLE_PROTOCOL.md — Checklist סגירה A/B/C; הכרזת "Clean Table" רק כאשר כל פריטי A, B, C מסומנים ✅.
 
+**Governance v2.102 — כלל סגירה (מחייב מתאריך 2026-02-13):** סגירת משימה תקפה **רק** עם **Seal Message (SOP-013)**. דוח/דוח השלמה לבדו **לא** מתקבל. ראה: documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md.
+
 ---
 
 ## 1. סטטוסים שנסגרו לאחרונה (לעדכון תיעוד)

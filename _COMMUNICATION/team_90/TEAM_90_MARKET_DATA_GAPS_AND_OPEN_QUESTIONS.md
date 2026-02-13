@@ -11,8 +11,8 @@
 - **Requirement (Owner):** Intraday prices for **Active tickers** in Stage‑1.  
 - **Architect Provider Spec:** Yahoo interval = **1d (EOD)**.  
 
-**Open:** האם נדרש להרחיב את ספק Yahoo ל‑intraday endpoints (chart) כבר בשלב זה?  
-**Action:** לעדכן `EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC.md` אם כן.
+**Open:** נדרש להרחיב את ספק Yahoo ל‑intraday endpoints כבר בשלב זה?  
+**Action:** לעדכן `EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC.md` + `MARKET_DATA_PIPE_SPEC.md` בהתאם.
 
 ---
 
@@ -35,6 +35,16 @@
 
 ---
 
+## 4) **Interval Dimension (Daily vs Intraday)**
+
+- Stage‑1 דורש **Intraday + Daily** לאותו טיקר.  
+- ב‑DB קיים `market_data.ticker_prices` ללא שדה interval.
+
+**Open:** להוסיף `price_interval` (ENUM) או טבלה נפרדת ל‑intraday?  
+**Action:** החלטה SSOT לפני מימוש.
+
+---
+
 ## 4) Clock‑based Staleness UI
 
 - הוחלט: **Clock + Tooltip**, ללא banner.  
@@ -51,6 +61,16 @@
 
 **Open:** החלטה על שדה מקור הסטטוס + ערכים חוקיים.  
 **Action:** להוסיף ל‑System Settings SSOT.
+
+---
+
+## 6) Market Cap Precision
+
+- Market Cap נכנס Stage‑1.  
+- Precision Policy לא כולל שדה market_cap.
+
+**Open:** להוסיף market_cap ל‑PRECISION_POLICY_SSOT (20,8).  
+**Action:** Team 10 לעדכן SSOT.
 
 ---
 

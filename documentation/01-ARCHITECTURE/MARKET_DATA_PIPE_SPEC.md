@@ -28,6 +28,55 @@
 
 ---
 
+## 2.1 Providers & Priority (Stage-1 — LOCKED)
+
+| Domain | Primary | Fallback |
+|--------|---------|----------|
+| FX (Exchange Rates) | Alpha Vantage | Yahoo Finance |
+| Prices (Ticker Prices) | Yahoo Finance | Alpha Vantage |
+
+**No Frankfurter.** IBKR is **Broker only** (not market-data provider in Stage-1).  
+**מקור:** TEAM_90_TO_TEAM_10_EXTERNAL_DATA_DELIVERY_NOTICE; ARCHITECT_VERDICT_MARKET_DATA_STAGE_1 (ADR-022).
+
+---
+
+## 2.2 Provider Guardrails (LOCKED)
+
+| ספק | חובה |
+|-----|------|
+| **Yahoo Finance** | User-Agent Rotation **required**. |
+| **Alpha Vantage** | RateLimitQueue **required** (12.5s delay → 5 calls/min). |
+
+---
+
+## 2.3 Cache-First (Mandatory)
+
+1. **Always check local cache (DB)** before any external API call.
+2. Cache HIT → return immediately.
+3. Cache MISS → Provider (Primary → Fallback).
+4. Both fail → return stale (if exists) + `staleness=na`. **Never block UI.**
+
+---
+
+## 2.4 Cadence Policy
+
+- **FX:** EOD בלבד.
+- **Prices:** Intraday for **Active tickers**; EOD for inactive (לפי System Settings — Domain + Ticker Status).
+- **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators (ATR/MA/CCI).
+- **Market Cap:** Daily (EOD). **Indicators:** ATR(14), MA(20/50/150/200), CCI(20) — Daily, derived from 250d history.
+
+**מטריצת כיסוי מלאה:** `documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md`.
+
+---
+
+## 2.5 Data Freshness & UI Indicator (No Banner)
+
+- UI must show **Last Update Clock** for prices.
+- If stale/EOD → clock changes color + tooltip explains staleness.
+- Fields: `price_timestamp` (as_of), `fetched_at`, `is_stale`. **אין באנר** — Clock + color + tooltip בלבד.
+
+---
+
 ## 3. מדיניות (Policy)
 
 | כלל | תיאור |
@@ -43,7 +92,9 @@
 ### 4.1 מחירי טיקרים (Ticker Prices)
 
 - טבלה: `market_data.ticker_prices`
-- שדות: `price`, `open_price`, `high_price`, `low_price`, `close_price` — `NUMERIC(20,8)`
+- שדות: `price`, `open_price`, `high_price`, `low_price`, `close_price`, **`market_cap`** — `NUMERIC(20,8)`
+- **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators.
+- **Indicators (Stage-1):** ATR(14), MA(20/50/150/200), CCI(20) — ראה `MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md`.
 - מקור: `api/models/ticker_prices.py`
 
 ### 4.2 שערי חליפין (Exchange Rates)
@@ -59,7 +110,7 @@
 |------|--------|--------|
 | תשתית Cache | Team 60 | **DB as Cache** — טבלאות DB + `market_data.latest_ticker_prices` (MV) כמאגר; ללא Redis בשלב זה. |
 | סנכרון EOD | Team 60 | **Cron** דוגמה: `0 22 * * 1-5` (22:00 ימים א'–ה'); **אזור זמן:** UTC. סקריפט: `scripts/sync_exchange_rates_eod.py`. |
-| ספק + Scope מטבעות | Team 60 | **Frankfurter API** (חינם); **Scope ראשוני:** USD, EUR, ILS בלבד. הרחבה לפי ISO 4217 — עתידי. |
+| ספק + Scope מטבעות | Team 60 | **Alpha Vantage → Yahoo.** **Scope ראשוני:** USD, EUR, ILS בלבד. הרחבה לפי ISO 4217 — עתידי. |
 | DDL / Schema | Team 60 | טבלאות ticker_prices, exchange_rates |
 
 ---
@@ -84,4 +135,6 @@
 ---
 
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**  
-**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13** — DB-as-Cache, Cron+UTC, Frankfurter, Scope USD/EUR/ILS (מקור: Team 60 TEAM_60_TO_TEAM_10_CACHE_EOD_CONDITIONAL_APPROVAL_FIXES)
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13**  
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | EXTERNAL_DATA_SSOT_INTEGRATION | 2026-02-13** — Providers (Yahoo+Alpha), Guardrails, Cache-First, Cadence, UI Clock (מקור: TEAM_90_MARKET_DATA_SSOT_INTEGRATION_DRAFT). — DB-as-Cache, Cron+UTC, Scope USD/EUR/ILS (מקור: Team 60).  
+**log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).

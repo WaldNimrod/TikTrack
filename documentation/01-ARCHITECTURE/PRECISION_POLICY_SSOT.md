@@ -31,6 +31,7 @@
 |------|-----|--------|------|
 | exchange_rates | conversion_rate | **(20,8)** | שער המרה |
 | ticker_prices | price, open_price, high_price, low_price, close_price | **(20,8)** | מחירי נייר |
+| ticker_prices | **market_cap** | **(20,8)** | שווי שוק — Stage-1 (מקור: TEAM_90_INDICATORS_ADDENDUM) |
 
 ### 3.2 user_data — cash_flows
 

@@ -29,7 +29,10 @@
 - **Agnostic Interface:** Provider Interface ב‑Python (ללא שינוי קוד מנוע בעת החלפה).  
 - **Visual Warning:** אין באנר. חובה **שעון עדכון** + **הדגשה צבעונית** + **Tooltip** כאשר הנתון פג תוקף (EOD/Stale).  
 - **Cadence/Precision:** מנוהל לפי **Domain** + **Ticker Status** דרך System Settings.  
-- **Fundamentals:** שלבים מתקדמים בלבד (לא Stage‑1).
+- **Market Cap:** נדרש **עכשיו** (Stage‑1).  
+- **Indicators:** ATR‑14, MA‑20/50/150/200, CCI‑20 — נדרש עכשיו (Daily, EOD).  
+- **Historical depth:** 250 ימי מסחר (Daily) — חובה לחישוב אינדיקטורים.  
+- **Fundamentals (EPS וכו')**: שלבים מתקדמים בלבד (לא Stage‑1).
   
 **ספקים — הנחיות אדריכלית מפורשות:**  
 - **Yahoo Finance:** Primary for Prices / Fallback for FX; Method: `yfinance` + Query V8 API; **Interval: 1d (EOD)**; **User‑Agent Rotation חובה**; Precision forced 20,8.  
@@ -71,10 +74,17 @@
 - להוסיף דרישות ספק: **User‑Agent Rotation (Yahoo)** + **RateLimitQueue 12.5s (Alpha)**.
 - Cadence/Precision לפי Domain + Ticker Status (System Settings).
 - להפריד Domains: FX / Prices / Historical / Fundamentals.
+- להוסיף **Market Cap** בשלב זה + דרישות Historical Daily (250 ימים).
 
 ### 3.3 `WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md`
 נתיב: `documentation/01-ARCHITECTURE/LOGIC/WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md`
 - provider_mapping_data חייב לשקף **Yahoo + Alpha** בלבד.
+
+### 3.4 SSOT חדש — Market Data Coverage Matrix
+חובה להגדיר: אילו נתונים נטענים לכל טיקר, cadence, precision, storage, freshness UI.
+
+### 3.5 SSOT חדש — Indicators & Fundamentals
+חובה לנעול: ATR‑14, MA‑20/50/150/200, CCI‑20, Market Cap (Stage‑1) + EPS (Future).
 
 ### 3.4 SSOT חדש (אם נדרש): Provider Registry
 אם אין מקום מלא ב‑MARKET_DATA_PIPE_SPEC:
@@ -89,6 +99,8 @@
 - Cache‑First logic בשירותי מחירים.  
 - Config ל‑provider selection (Yahoo/Alpha בלבד).  
 - Domain policy (Prices cadence/precision לפי ticker status).
+- Indicators compute (ATR/MA/CCI) על בסיס Historical Daily.
+- Market Cap ingestion מהספקים.
 
 ### Team 60 (Infrastructure)
 - EOD Sync ל‑FX עם Alpha→Yahoo בלבד.  
@@ -98,6 +110,7 @@
 ### Team 30 (Frontend)
 - **Clock‑based indicator**: זמן עדכון אחרון + הדגשה צבעונית + Tooltip במצב פג תוקף.  
 - UI hooks לשינוי cadence/precision לפי System Settings.
+- הצגת Market Cap + Indicators בממשקים הרלוונטיים (בהתאם ל‑Coverage Matrix).
 
 ### Team 10 (Governance)
 - קידום ידע ל‑SSOT לפי סעיף 3.  

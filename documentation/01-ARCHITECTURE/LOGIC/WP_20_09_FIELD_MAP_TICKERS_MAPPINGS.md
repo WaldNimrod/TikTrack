@@ -19,6 +19,6 @@
 | `internal_ids` | `BIGINT (PK)` | `N/A` | PK פנימי. |
 | `external_ulids` | `VARCHAR(26)` | `ULID` | מזהה API חיצוני. |
 | `ticker_symbols` | `VARCHAR(20)` | `String` | למשל: AAPL, BTC. |
-| `provider_mapping_data` | `JSONB` | `Object` | מיפוי לספקים (Yahoo, IBKR). |
+| `provider_mapping_data` | `JSONB` | `Object` | מיפוי לספקים — **Yahoo Finance + Alpha Vantage בלבד** (Stage-1). אין IBKR כספק market-data. **יישור:** MARKET_DATA_COVERAGE_MATRIX + MARKET_DATA_PIPE_SPEC. |
 | `asset_type_enums` | `VARCHAR(50)` | `Enum` | STOCK, CRYPTO, ETF. |
 | `is_active_flags` | `BOOLEAN` | `Boolean` | זמינות למסחר. |

@@ -12,7 +12,7 @@
 
 **כלל:** הרשימה לא נמחקת — רק נוספים סעיפים ומעודכן מידע. פירוט, תת־משימות ותוכניות עבודה — בקבצים נפרדים (רמה 3; ראה נוהל).
 
-**הערת סטטוס (1-001, 1-003, 1-004):** שער ב' — **PASS** (דוח: TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md). שלוש המשימות סומנו CLOSED.
+**הערת סטטוס (1-001, 1-003, 1-004):** שער ב' — **PASS**. שלוש המשימות CLOSED. **External Data:** חבילה מ־90. M1 (P3-007) CLOSED. **הגשה מחדש (Resubmission):** TEAM_90_RESUBMISSION_REQUIRED — SSOT הורחב (Market Cap, Indicators, 250d, Coverage Matrix, Indicators Spec, PRECISION_POLICY market_cap). P3-008–P3-012 — מנדטים נשלחו; P3-013–P3-015 נוספו (Market Cap, Indicators, 250d). פערים פתוחים — ראה TEAM_90_MARKET_DATA_GAPS_AND_OPEN_QUESTIONS.
 
 **מספור:** כל משימה מקבלת **תחילית לפי מספר השלב במפת הדרכים** + מספר סידורי בתוך השלב: `[שלב]-[סידורי]` (למשל 1-001, 1b-001, P3-001). ראה נוהל.
 
@@ -33,6 +33,12 @@
 | P3-004 | ADR-022 + POL-015 Enforcement | Unified Shell, EOD Warning, Provider Lock, SSOT | OPEN | Pre-Batch 3 | Team 30 + Team 10 + Team 20 + Team 60 | TEAM_90_TO_TEAM_10_ADR_022_AND_POL_015_1_ENFORCEMENT.md | 2026-02-13 | 2026-02-13 | — |
 | P3-005 | FOREX_MARKET_SPEC ADR-022 | עדכון SSOT לפי ADR-022; 1-001 CLOSED | CLOSED | Pre-Batch 3 | Team 10 + Team 20 | TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md | 2026-02-13 | 2026-02-13 | 2026-02-13 |
 | P3-006 | Precision Policy SSOT | מסמך SSOT; יישור Field Maps + Models + DB; 1-004 CLOSED | CLOSED | Pre-Batch 3 | Team 10 + Team 20 + Team 60 | TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md | 2026-02-13 | 2026-02-13 | 2026-02-13 |
+| P3-007 | External Data M1 — SSOT Lock | עדכון MARKET_DATA_PIPE_SPEC, FOREX_MARKET_SPEC, WP_20_09; Evidence; 00_MASTER_INDEX | CLOSED | Pre-Batch 3 | Team 10 | TEAM_90_TO_TEAM_10_EXTERNAL_DATA_DELIVERY_NOTICE.md | 2026-02-13 | 2026-02-13 | 2026-02-13 |
+| P3-008 | External Data M2 — Provider Interface + Cache-First | ממשק אגנוסטי; cache-first; config-driven (Team 20) | OPEN | Pre-Batch 3 | Team 20 | TEAM_10_EXTERNAL_DATA_MASTER_PLAN.md | 2026-02-13 | 2026-02-13 | — |
+| P3-009 | External Data M3 — Provider Guardrails | Yahoo UA Rotation; Alpha RateLimitQueue 12.5s (Team 20) | OPEN | Pre-Batch 3 | Team 20 | TEAM_10_EXTERNAL_DATA_MASTER_PLAN.md | 2026-02-13 | 2026-02-13 | — |
+| P3-010 | External Data M4 — Cadence + Ticker Status | Cadence Policy ב־SSOT; ticker_status מקור וערכים (10+20) | OPEN | Pre-Batch 3 | Team 10 + Team 20 | TEAM_90_MARKET_DATA_GAPS_AND_OPEN_QUESTIONS.md | 2026-02-13 | 2026-02-13 | — |
+| P3-011 | External Data M5 — FX EOD Sync | Alpha→Yahoo; Evidence (Team 60) | OPEN | Pre-Batch 3 | Team 60 | TEAM_10_EXTERNAL_DATA_MASTER_PLAN.md | 2026-02-13 | 2026-02-13 | — |
+| P3-012 | External Data M6 — Clock Staleness UI | Clock + color + tooltip, אין באנר (Team 30) | OPEN | Pre-Batch 3 | Team 30 | TEAM_10_EXTERNAL_DATA_MASTER_PLAN.md | 2026-02-13 | 2026-02-13 | — |
 
 ---
 
@@ -54,4 +60,5 @@
 **log_entry | TEAM_10 | MASTER_TASK_LIST | TEAM_MESSAGES_ISSUED | 2026-02-13** — הודעות: 20, 60, 30, 50.  
 **log_entry | TEAM_10 | MASTER_TASK_LIST | P3_006_20_60_COMPLETE | 2026-02-13**  
 **log_entry | TEAM_10 | MASTER_TASK_LIST | G2_G5_G6_COMPLETE_GATE_B_RE_REQUESTED | 2026-02-13**  
+**log_entry | TEAM_10 | MASTER_TASK_LIST | EXTERNAL_DATA_INTEGRATION | 2026-02-13** — חבילת External Data (90). M1 (P3-007) — SSOT משולב (MARKET_DATA_PIPE_SPEC, FOREX_MARKET_SPEC, WP_20_09). P3-008–P3-012 נוספו; תוכנית אב: TEAM_10_EXTERNAL_DATA_MASTER_PLAN.md. שאלות פתוחות: TEAM_10_EXTERNAL_DATA_OPEN_QUESTIONS_FOR_ARCHITECT.md.  
 **log_entry | TEAM_10 | MASTER_TASK_LIST | STAGE1_1_001_1_003_1_004_GATE_B_PASSED_CLOSED | 2026-02-13** — TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md. 1-001, 1-003, 1-004 → CLOSED. P3-005, P3-006 → CLOSED. — G2: FOREX_MARKET_SPEC.md מעודכן (ADR-022 §2.1–2.5). G5: Evidence log — documentation/05-REPORTS/artifacts/TEAM_10_STAGE1_1_001_1_003_1_004_PRE_GATE_B_EVIDENCE_LOG.md. G6: בקשת Gate B מחדש ל־90 — TEAM_10_TO_TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_RE_REQUEST.md. — 20: Models תואמים; Field Maps טיוטה → Team 10 החיל ב־documentation/01-ARCHITECTURE/LOGIC/ (CASH_FLOWS, TRADES, TRADING_ACCOUNTS, BALANCES). Evidence: TEAM_20_P3_006_PRECISION_EVIDENCE.md. 60: מיגרציה brokers_fees.minimum 20,6; TEAM_60_P3_006_PRECISION_EVIDENCE.md, TEAM_60_TO_TEAM_10_P3_006_COMPLETION_REPORT.md. P3-006 → PENDING_VERIFICATION. נותר G2 + Gate B.

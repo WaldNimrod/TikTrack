@@ -51,11 +51,11 @@
 
 **מטבעות נתמכים (טווח ראשוני):** USD, EUR, ILS. הרחבה עתידית — לפי החלטת Product.
 
-### 2.5 Visual Warning (EOD)
+### 2.5 Staleness & UI (EOD)
 
-- **חובה:** התרעה למשתמש כאשר מוצג מחיר/שער EOD (סוף יום).
+- **חובה:** אינדיקציה למשתמש כאשר מוצג מחיר/שער EOD או stale.
 - **מימוש:** שדה `staleness` בתגובת API: `ok` \| `warning` (>15 דקות) \| `na` (>24 שעות).
-- **Frontend:** להציג אזהרה כאשר `staleness` ≠ `ok`.
+- **Frontend:** Clock + color + tooltip (אין באנר). ראה MARKET_DATA_PIPE_SPEC §2.5.
 
 ---
 

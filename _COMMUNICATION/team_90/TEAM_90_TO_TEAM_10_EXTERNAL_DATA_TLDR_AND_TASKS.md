@@ -21,6 +21,7 @@
 - **Cadence/Precision לפי Domain + Ticker Status** (System Settings).
 - **Yahoo:** yfinance + Query V8, Interval 1d, **User‑Agent Rotation חובה**.
 - **Alpha:** 5 calls/min, **RateLimitQueue 12.5s חובה**.
+- **Market Cap עכשיו**; **ATR‑14 / MA‑20,50,150,200 / CCI‑20 עכשיו**; **EPS מאוחר**.
 
 **מקורות:**  
 `_COMMUNICATION/90_Architects_comunication/ARCHITECT_VERDICT_MARKET_DATA_STAGE_1.md`  
@@ -60,9 +61,15 @@
 
 **Acceptance:** סקריפט sync ללא Frankfurter; EOD cron + TZ מתועד; evidence log עם last_sync_time.
 
----\n+\n+### M3.1 — Provider Guardrails (Rate‑Limit + User‑Agent)\n+**Owner:** Team 20  \n+**Goal:** ליישם דרישות ספק: RateLimitQueue (Alpha) + User‑Agent Rotation (Yahoo).  \n+\n+**Acceptance:** Queue 12.5s פעיל בכל קריאה ל‑Alpha; Rotation תקין ב‑Yahoo; evidence בלוג.\n+\n ---
 ---
 
+### M3.1 — Provider Guardrails (Rate‑Limit + User‑Agent)
+**Owner:** Team 20  
+**Goal:** ליישם דרישות ספק: RateLimitQueue (Alpha) + User‑Agent Rotation (Yahoo).
+
+**Acceptance:** Queue 12.5s פעיל בכל קריאה ל‑Alpha; Rotation תקין ב‑Yahoo; evidence בלוג.
+
+---
 ### M4 — Cadence/Precision Settings
 **Owner:** Team 20 + Team 10  
 **Goal:** ניהול cadence/precision לפי domain + ticker status דרך System Settings.
@@ -76,6 +83,30 @@
 **Goal:** שעון עדכון + הדגשה צבעונית + Tooltip במצב פג תוקף (EOD/Stale).
 
 **Acceptance:** רכיב שעון מוצג בכל תצוגת מחיר; Tooltip מופיע במצב פג תוקף; evidence QA.
+
+---
+
+### M6 — Historical Daily Data (250 trading days)
+**Owner:** Team 20 + Team 60  
+**Goal:** Daily OHLCV history for 250 trading days (no intraday retention for full range).
+
+**Acceptance:** Daily history stored; usable for indicators; evidence in DB/ETL.
+
+---
+
+### M7 — Indicators (ATR/MA/CCI)
+**Owner:** Team 20  
+**Goal:** Compute ATR‑14, MA‑20/50/150/200, CCI‑20 from daily history.
+
+**Acceptance:** API returns indicator values; precision 20,8; evidence tests.
+
+---
+
+### M8 — Market Cap (Stage‑1)
+**Owner:** Team 20  
+**Goal:** Ingest Market Cap from providers; store + expose.
+
+**Acceptance:** Market Cap available in data model + API; precision 20,8; evidence.
 
 ---
 

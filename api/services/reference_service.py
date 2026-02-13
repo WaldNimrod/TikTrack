@@ -24,6 +24,24 @@ logger = logging.getLogger(__name__)
 _DEFAULTS_PATH = Path(__file__).resolve().parent.parent / "data" / "defaults_brokers.json"
 
 
+def is_broker_supported(broker: str | None) -> bool:
+    """
+    ADR-018: Check if broker supports API/import.
+    Returns False for 'other', 'אחר', or custom brokers not in defaults with is_supported=True.
+    """
+    if not broker or not str(broker).strip():
+        return False
+    b = str(broker).strip().lower()
+    if b in ("other", "אחר"):
+        return False
+    defaults = _load_defaults()
+    for item in defaults:
+        if item.value.lower() == b:
+            return item.is_supported
+    # Custom broker (not in defaults) = not supported
+    return False
+
+
 def _load_defaults() -> List[BrokerReferenceItem]:
     """Load default broker list from JSON (ADR-015 format)."""
     try:

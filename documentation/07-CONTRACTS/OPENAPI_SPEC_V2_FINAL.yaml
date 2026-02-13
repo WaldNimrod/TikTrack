@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: TikTrack Project Phoenix API (Master Release)
-  version: 2.5.2
+  version: 1.0.0
   description: Unified API Specification (Fortress Protocol)
 servers:
   - url: http://localhost:8080/api/v1

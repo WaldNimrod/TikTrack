@@ -1,4 +1,4 @@
-"""Unified Pydantic Models - v2.5.2"""
+"""Unified Pydantic Models - v1.0.0"""
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 import re

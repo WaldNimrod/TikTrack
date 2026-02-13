@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-02-13T08:24:08.997Z",
+  "criteria": {
+    "redirect": {
+      "name": "Redirect ל-Home לכל אנונימי בעמוד שאינו Open",
+      "status": "SKIP",
+      "note": ""
+    },
+    "userIconSuccess": {
+      "name": "User Icon: SUCCESS (מחובר)",
+      "status": "SKIP",
+      "note": ""
+    },
+    "userIconWarning": {
+      "name": "User Icon: WARNING (מנותק)",
+      "status": "SKIP",
+      "note": ""
+    },
+    "noSevere": {
+      "name": "0 SEVERE בקונסול",
+      "status": "SKIP",
+      "note": ""
+    }
+  }
+}

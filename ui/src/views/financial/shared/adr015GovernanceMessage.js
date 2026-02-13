@@ -12,13 +12,14 @@ export function getPrimaryAdminContact() {
   return PRIMARY_ADMIN_CONTACT;
 }
 
-const MESSAGE_BODY = 'במידה ולא מצאתם את הברוקר שלכם במערכת, עדין ניתן לייצר את החשבון מסחר — אבל לא ניתן יהיה לייבא אוטומטית נתונים. מומלץ ליצור איתנו קשר ולבקש הוספת הברוקר למערכת, ';
+/* ADR-018: Message for broker "אחר" - is_supported=false */
+const MESSAGE_BODY = 'רוצה שנוסיף תמיכה בברוקר שלך? ';
 
 /** @returns {{ body: string, linkHref: string, linkText: string }} נתוני הודעה להצגה */
 export function getGovernanceMessageData() {
   return {
     body: MESSAGE_BODY,
     linkHref: PRIMARY_ADMIN_CONTACT,
-    linkText: 'קישור למייל מנהל ראשי'
+    linkText: 'צור קשר'
   };
 }

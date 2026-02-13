@@ -14,8 +14,10 @@ import logging
 from ..core.database import get_db
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+from ..utils.identity import ulid_to_uuid
 from ..models.identity import User
 from ..services.trading_accounts import get_trading_account_service
+from ..services.reference_service import is_broker_supported
 from ..schemas.trading_accounts import (
     TradingAccountListResponse,
     TradingAccountSummaryResponse,
@@ -120,6 +122,44 @@ async def get_trading_accounts_summary(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch trading accounts summary",
+            error_code=ErrorCodes.SERVER_ERROR
+        )
+
+
+@router.get("/{id}/api-import-eligible")
+async def get_trading_account_api_import_eligible(
+    id: str = Path(..., description="Trading account ULID"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    ADR-018: Check if trading account is eligible for API setup or import.
+    Returns 200 with eligible=true only when broker is_supported.
+    Returns 403 when broker is 'other' or custom (is_supported=false).
+    """
+    try:
+        service = get_trading_account_service()
+        account = await service.get_trading_account_by_id(
+            user_id=current_user.id,
+            trading_account_id=id,
+            db=db
+        )
+        broker = account.broker if hasattr(account, 'broker') else getattr(account, 'broker', None)
+        eligible = is_broker_supported(broker)
+        if not eligible:
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="API and import are not supported for this broker. Contact us to add support.",
+                error_code=ErrorCodes.BROKER_NOT_SUPPORTED_FOR_API_IMPORT
+            )
+        return {"eligible": True, "account_id": id}
+    except HTTPExceptionWithCode:
+        raise
+    except Exception as e:
+        logger.error(f"Error checking api-import eligibility: {str(e)}", exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to check eligibility",
             error_code=ErrorCodes.SERVER_ERROR
         )
 

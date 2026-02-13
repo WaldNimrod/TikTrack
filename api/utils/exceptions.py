@@ -79,6 +79,8 @@ class ErrorCodes:
     # Trading Account Errors (D16 validation)
     ACCOUNT_NAME_DUPLICATE = "ACCOUNT_NAME_DUPLICATE"
     ACCOUNT_NUMBER_DUPLICATE = "ACCOUNT_NUMBER_DUPLICATE"
+    # ADR-018: Broker "other" / unsupported - block API/import
+    BROKER_NOT_SUPPORTED_FOR_API_IMPORT = "BROKER_NOT_SUPPORTED_FOR_API_IMPORT"
     
     # API Key Errors
     API_KEY_NOT_FOUND = "API_KEY_NOT_FOUND"

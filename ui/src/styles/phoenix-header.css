@@ -979,7 +979,8 @@
 #unified-header .header-filters .filters-container .user-profile-link .user-icon {
   width: 19.2px; /* 24px - 20% = 19.2px */
   height: 19.2px; /* 24px - 20% = 19.2px */
-  /* No default color - must have success or warning class */
+  /* ADR-017: Default = warning (guest) — never black; success/warning required */
+  color: var(--color-warning, var(--message-warning, #f59e0b));
   cursor: pointer;
   transition: opacity 0.2s ease, color 0.2s ease;
 }

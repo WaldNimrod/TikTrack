@@ -1,5 +1,5 @@
 /**
- * Phoenix-Section-Toggle-Ver: v2.0.0 | Section Toggle JavaScript
+ * Phoenix-Section-Toggle-Ver: v1.0.0 | Section Toggle JavaScript
  * Sync-Time: 2026-02-02 00:00:00 IST
  * Team: Team 31 (Blueprint)
  * Status: ✅ EXTERNAL JS - Clean Slate Rule Compliant

@@ -1,5 +1,5 @@
 /**
- * Phoenix-Filter-Bridge-Ver: v2.0.0 | Dynamic Bridge for Header Filters
+ * Phoenix-Filter-Bridge-Ver: v1.0.0 | Dynamic Bridge for Header Filters
  * Sync-Time: 2026-02-03 00:00:00 IST
  * Team: Team 31 (Shared Components)
  * Status: ✅ PHOENIX DYNAMIC BRIDGE V2.0

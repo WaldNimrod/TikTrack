@@ -59,7 +59,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 
 ## 3. תקשורת פנימית ודיווח (Internal Flow)
 1. **דיווח EOD:** כל צוות שולח לצוות 10 סיכום ביצוע יומי.
-2. **שער המידע:** שום שאלה לא עוברת לאדריכלים ללא בדיקה של צוות 10 מול ה-D15.
+2. **שער המידע:** שום שאלה לא עוברת לאדריכלים ללא בדיקה של צוות 10 מול האינדקס המאוחד (00_MASTER_INDEX): ניהול — `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; אדריכל (חוקי יסוד) — `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md`.
 
 ---
 

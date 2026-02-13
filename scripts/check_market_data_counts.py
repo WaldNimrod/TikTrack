@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-בדיקת ספירות — market_data.tickers, market_data.ticker_prices.
-לשימוש: וידוא שיש טיקרים ומחירים לפני תצוגה ב-UI.
-Team 10 / Team 50 — TEAM_10_EXTERNAL_DATA_UI_GAPS_AND_QA.
+בדיקת ספירות — market_data.tickers, ticker_prices, exchange_rates, exchange_rates_history, ticker_prices_intraday.
+לשימוש: וידוא שיש טיקרים ומחירים לפני תצוגה ב-UI; Evidence Dual Provider + Full Scope.
+Team 10 / Team 50 — TEAM_10_EXTERNAL_DATA_UI_GAPS_AND_QA; TEAM_20_DUAL_PROVIDER_FULL_SCOPE_EVIDENCE.
 """
 import os
 import sys
@@ -41,9 +41,21 @@ def main():
         prices_count = cur.fetchone()[0]
         cur.execute("SELECT COUNT(*) FROM market_data.exchange_rates")
         fx_count = cur.fetchone()[0]
+        try:
+            cur.execute("SELECT COUNT(*) FROM market_data.exchange_rates_history")
+            fx_hist = cur.fetchone()[0]
+        except Exception:
+            fx_hist = "N/A"
+        try:
+            cur.execute("SELECT COUNT(*) FROM market_data.ticker_prices_intraday")
+            intraday = cur.fetchone()[0]
+        except Exception:
+            intraday = "N/A"
         print("market_data.tickers:", tickers_count)
         print("market_data.ticker_prices:", prices_count)
         print("market_data.exchange_rates:", fx_count)
+        print("market_data.exchange_rates_history:", fx_hist)
+        print("market_data.ticker_prices_intraday:", intraday)
         if tickers_count == 0:
             print("⚠️ אין טיקרים — הרץ: make seed-tickers")
         if prices_count == 0 and tickers_count > 0:

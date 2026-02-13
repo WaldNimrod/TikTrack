@@ -106,9 +106,11 @@ _COMMUNICATION/
 - [👤 QA Test User Seed](../../scripts/README_SEED_QA_USER.md) - סקריפט Seed למשתמש QA קבוע (Gate B Runtime/E2E); הרצה אחרי DB reset
 - [🏛️ TT2_MASTER_BLUEPRINT.md](../01-ARCHITECTURE/TT2_MASTER_BLUEPRINT.md) - Master Blueprint (Stack, IDs, Time, Design, Ports)
 - [💱 FOREX_MARKET_SPEC.md](../01-ARCHITECTURE/FOREX_MARKET_SPEC.md) - אפיון שערי חליפין ומחירי FOREX — ADR-022 (Yahoo+Alpha, EOD, Cache-First), Scope USD/EUR/ILS ✅ **SSOT — Stage-1 — Gate B PASS (2026-02-13)**
-- [📡 MARKET_DATA_PIPE_SPEC.md](../01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md) - תשתית מחירי שוק — Providers (Yahoo+Alpha), Guardrails, Cache-First, Cadence, UI Clock ✅ **SSOT — Stage-1 — External Data integrated (2026-02-13)**
+- [📡 MARKET_DATA_PIPE_SPEC.md](../01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md) - תשתית מחירי שוק — Providers, Guardrails, Cache-First, Cadence, Market Cap, 250d, Indicators ✅ **SSOT — Stage-1 — Resubmission expanded (2026-02-13)**
+- [📊 MARKET_DATA_COVERAGE_MATRIX.md](../01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md) - מטריצת כיסוי Stage-1 — FX, Prices, Historical 250d, Indicators, Market Cap ✅ **SSOT — Stage-1 (2026-02-13)**
+- [📈 MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md](../01-ARCHITECTURE/MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md) - ATR(14), MA(20/50/150/200), CCI(20), Market Cap — דיוק 20,8 ✅ **SSOT — Stage-1 (2026-02-13)**
 - [📄 CASH_FLOW_PARSER_SPEC.md](../01-ARCHITECTURE/CASH_FLOW_PARSER_SPEC.md) - פיענוח תזרימים — Field Mapping, flow_type, amount NUMERIC(20,6) per PRECISION_POLICY_SSOT ✅ **SSOT — Stage-1 — Gate B PASS (2026-02-13)**
-- [📐 PRECISION_POLICY_SSOT.md](../01-ARCHITECTURE/PRECISION_POLICY_SSOT.md) - מפת דיוק 20,8 vs 20,6 לכל ישות (תזרימים, יתרות, מחירים) ✅ **SSOT — Stage-1 — Gate B PASS (2026-02-13)**
+- [📐 PRECISION_POLICY_SSOT.md](../01-ARCHITECTURE/PRECISION_POLICY_SSOT.md) - מפת דיוק 20,8 vs 20,6 לכל ישות (תזרימים, יתרות, מחירים, **market_cap**) ✅ **SSOT — Stage-1 — Gate B PASS + market_cap (2026-02-13)**
 
 ---
 

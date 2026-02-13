@@ -58,7 +58,7 @@
 
 ---
 
-## 2.4 Cadence Policy
+## 2.4 Cadence Policy (Stage‑1 — Intraday required)
 
 - **FX:** EOD בלבד.
 - **Prices:** Intraday for **Active tickers**; EOD for inactive (לפי System Settings — Domain + Ticker Status).
@@ -74,6 +74,17 @@
 - UI must show **Last Update Clock** for prices.
 - If stale/EOD → clock changes color + tooltip explains staleness.
 - Fields: `price_timestamp` (as_of), `fetched_at`, `is_stale`. **אין באנר** — Clock + color + tooltip בלבד.
+
+## 2.6 Cadence Configuration (System Settings — Required)
+
+System Settings (Admin) must allow **configurable cadence** by **domain** and **ticker status**:
+
+- **Prices (Active):** intraday interval (minutes) — configurable.  
+- **Prices (Inactive):** EOD schedule (time + timezone).  
+- **FX:** EOD schedule (time + timezone).  
+- **Staleness thresholds:** warning + na boundaries (for clock color/tooltip).
+
+This configuration is required for Stage‑1, and must be available via Admin Settings UI.
 
 ---
 
@@ -91,7 +102,9 @@
 
 ### 4.1 מחירי טיקרים (Ticker Prices)
 
-- טבלה: `market_data.ticker_prices`
+- טבלאות:
+  - **Daily / EOD + Historical:** `market_data.ticker_prices`
+  - **Intraday (Active tickers):** `market_data.ticker_prices_intraday`  **(separate table)**
 - שדות: `price`, `open_price`, `high_price`, `low_price`, `close_price`, **`market_cap`** — `NUMERIC(20,8)`
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators.
 - **Indicators (Stage-1):** ATR(14), MA(20/50/150/200), CCI(20) — ראה `MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md`.
@@ -123,7 +136,58 @@
 
 ---
 
-## 7. הפניות
+## 7. תחזוקה וניקוי (Background Jobs — Stage‑1)
+
+**מטרה:** למנוע התנפחות DB ולשמור על דיוק נתונים לאורך זמן.
+
+### 7.1 Jobs מחייבים (Stage‑1)
+
+1. **FX EOD Sync (Cron)**  
+   - מקור: FOREX_MARKET_SPEC §2.3  
+   - תזמון: `0 22 * * 1-5` (UTC)  
+   - פעולה: עדכון `market_data.exchange_rates` + `last_sync_time`
+
+2. **Intraday Refresh (Active tickers)**  
+   - תזמון: **מתוך System Settings** (דקות)  
+   - פעולה: רענון `market_data.ticker_prices_intraday`  
+   - תנאי: **Active בלבד** (`is_active_flags = true`)
+
+3. **Daily History Retention**  
+   - טווח חובה: **250 ימי מסחר**  
+   - פעולה: ניקוי רשומות ישנות מ־`market_data.ticker_prices`  
+
+4. **Intraday Retention Cleanup**  
+   - פעולה: מחיקת רשומות ישנות מ־`market_data.ticker_prices_intraday`  
+   - **חלון שימור (נעול):** **30 ימים** ב־DB  
+   - **ארכוב:** לאחר 30 ימים → מעבר לקבצי מידע (archive files)  
+   - **מחיקה סופית:** קבצי Intraday יימחקו לאחר **שנה** (365 ימים)
+
+5. **MV Refresh (אם קיים)**  
+   - `market_data.latest_ticker_prices` — רענון לאחר ריצת Intraday / EOD.
+
+### 7.2 Evidence (נדרש)
+
+- כל Job חייב לכתוב: `last_run_time`, `rows_updated`, `rows_pruned`.  
+- Evidence לוג יתווסף ב־`documentation/05-REPORTS/artifacts/` לכל סבב סגירה.
+
+### 7.3 Retention + Archive Policy (Locked)
+
+1. **Daily/EOD + FX (DB Retention):** **250 ימי מסחר** ב־DB.  
+2. **Archive (post‑retention):** נתוני EOD + FX **לא נמחקים** — מועברים לקבצי מידע/לוג לקריאה איטית בעת הצורך.  
+3. **Intraday (DB Retention):** **30 ימים**.  
+4. **Intraday (Archive Retention):** שמירה בקבצים **שנה אחת** ואז מחיקה סופית.
+
+### 7.4 Cleanup Cycles (Locked)
+
+- **Daily:** ניקוי בסיסי (DB retention thresholds).  
+- **Weekly:** ניקוי מעמיק + אימות תקינות ארכיב.  
+- **Monthly:** ניקוי עומק + בדיקת עקביות לוגים/ארכיב.
+
+**הערה:** תזמוני תחזוקה נוספים יתווספו בהמשך תהליך הפיתוח.
+
+---
+
+## 8. הפניות
 
 | מסמך | נתיב |
 |------|------|
@@ -137,4 +201,6 @@
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**  
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13**  
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | EXTERNAL_DATA_SSOT_INTEGRATION | 2026-02-13** — Providers (Yahoo+Alpha), Guardrails, Cache-First, Cadence, UI Clock (מקור: TEAM_90_MARKET_DATA_SSOT_INTEGRATION_DRAFT). — DB-as-Cache, Cron+UTC, Scope USD/EUR/ILS (מקור: Team 60).  
-**log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).
+**log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).  
+**log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday required for Active tickers; separate intraday table; System Settings cadence config (domain + status).
+**log_entry | TEAM_90 | MAINTENANCE_RETENTION_LOCK | STAGE1 | 2026-02-13** — Retention + archive policy + cleanup cycles locked (Intraday 30d→archive 1y; EOD/FX 250d→archive; daily/weekly/monthly).

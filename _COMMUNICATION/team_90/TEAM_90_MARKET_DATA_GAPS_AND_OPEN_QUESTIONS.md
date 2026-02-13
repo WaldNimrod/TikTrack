@@ -2,21 +2,21 @@
 
 **id:** `TEAM_90_MARKET_DATA_GAPS_AND_OPEN_QUESTIONS`  
 **date:** 2026-02-13  
-**status:** ⚠️ **OPEN — requires closure before implementation**
+**status:** ✅ **PARTIAL CLOSED — core blockers resolved**
 
 ---
 
-## 1) **Conflict: Intraday requirement vs Provider Specs**
+## 1) **Conflict: Intraday requirement vs Provider Specs** — **RESOLVED**
 
 - **Requirement (Owner):** Intraday prices for **Active tickers** in Stage‑1.  
 - **Architect Provider Spec:** Yahoo interval = **1d (EOD)**.  
 
-**Open:** נדרש להרחיב את ספק Yahoo ל‑intraday endpoints כבר בשלב זה?  
-**Action:** לעדכן `EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC.md` + `MARKET_DATA_PIPE_SPEC.md` בהתאם.
+**Decision:** Stage‑1 includes **Intraday** for Active tickers.  
+**Action:** Update provider spec references + `MARKET_DATA_PIPE_SPEC.md` (done in SSOT).
 
 ---
 
-## 2) Rate‑Limit Feasibility (Alpha Vantage)
+## 2) Rate‑Limit Feasibility (Alpha Vantage) — **OPEN (non‑blocking)**
 
 - Alpha rate limit: 5 calls/min → 12.5s queue.  
 - Intraday + Active tickers עשוי להיות כבד תחת limit זה.
@@ -26,7 +26,7 @@
 
 ---
 
-## 3) Provider Registry SSOT
+## 3) Provider Registry SSOT — **OPEN (non‑blocking)**
 
 - יש החלטה ל‑agnostic interface, אבל **Registry SSOT** לא קיים עדיין.
 
@@ -35,43 +35,52 @@
 
 ---
 
-## 4) **Interval Dimension (Daily vs Intraday)**
+## 4) **Interval Dimension (Daily vs Intraday)** — **RESOLVED**
 
 - Stage‑1 דורש **Intraday + Daily** לאותו טיקר.  
 - ב‑DB קיים `market_data.ticker_prices` ללא שדה interval.
 
-**Open:** להוסיף `price_interval` (ENUM) או טבלה נפרדת ל‑intraday?  
-**Action:** החלטה SSOT לפני מימוש.
+**Decision:** **Separate table** for intraday — `market_data.ticker_prices_intraday`.  
+**Action:** Reflected in `MARKET_DATA_PIPE_SPEC.md` + `MARKET_DATA_COVERAGE_MATRIX.md`.
 
 ---
 
-## 4) Clock‑based Staleness UI
+## 5) Clock‑based Staleness UI — **RESOLVED**
 
-- הוחלט: **Clock + Tooltip**, ללא banner.  
-- עדיין לא מוגדרים thresholds מדויקים (colors, warning/na boundaries).
-
-**Open:** להגדיר thresholds ו‑UI contract ב‑SSOT.
+**Decision:** Clock + Tooltip (no banner) with thresholds:  
+- **warning** > 15 minutes  
+- **na** > 24 hours  
+**Source:** `TT2_MARKET_DATA_RESILIENCE.md`, `FOREX_MARKET_SPEC.md`, `MARKET_DATA_PIPE_SPEC.md`
 
 ---
 
-## 5) Cadence Policy per Ticker Status
+## 6) Cadence Policy per Ticker Status — **RESOLVED**
 
 - נדרש: Active = intraday, inactive = EOD.  
 - עדיין אין מיפוי SSOT לערכי `ticker_status` (איפה נשמר, מי מגדיר).
 
-**Open:** החלטה על שדה מקור הסטטוס + ערכים חוקיים.  
-**Action:** להוסיף ל‑System Settings SSOT.
+**Decision:** Use existing `is_active_flags` as source of truth.  
+**Action:** Add System Settings cadence config (domain + status) in `MARKET_DATA_PIPE_SPEC.md`.
 
 ---
 
-## 6) Market Cap Precision
+## 7) Market Cap Precision — **RESOLVED**
 
 - Market Cap נכנס Stage‑1.  
 - Precision Policy לא כולל שדה market_cap.
 
-**Open:** להוסיף market_cap ל‑PRECISION_POLICY_SSOT (20,8).  
-**Action:** Team 10 לעדכן SSOT.
+**Decision:** `market_cap = NUMERIC(20,8)` in `PRECISION_POLICY_SSOT`.  
+**Action:** Updated in SSOT.
 
 ---
 
-**log_entry | TEAM_90 | MARKET_DATA_GAPS | 2026-02-13**
+## 8) **Intraday Retention Window** — **RESOLVED**
+
+**Decision:** Intraday DB retention **30 days** → archive files **1 year** → delete.  
+**Source:** `MARKET_DATA_PIPE_SPEC.md` §7.3 + `MARKET_DATA_COVERAGE_MATRIX.md`.
+
+---
+
+**log_entry | TEAM_90 | MARKET_DATA_GAPS | 2026-02-13**  
+**log_entry | TEAM_90 | MARKET_DATA_GAPS_PARTIAL_CLOSED | 2026-02-13**  
+**log_entry | TEAM_90 | MARKET_DATA_GAPS_REVIEW_UPDATE | 2026-02-13**

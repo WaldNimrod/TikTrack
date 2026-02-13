@@ -18,7 +18,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 | Domain | Data Items | Provider Priority | Cadence | Storage | Precision | Freshness UI | Notes |
 |---|---|---|---|---|---|---|---|
 | **FX Rates** | conversion_rate, last_sync_time | **Alpha → Yahoo** | **EOD בלבד** | `market_data.exchange_rates` | **20,8** | Clock + tooltip (stale) | USD/EUR/ILS בלבד |
-| **Prices (Active tickers)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **Intraday** | `market_data.ticker_prices` | **20,8** | Clock + tooltip (stale) | Active tickers only |
+| **Prices (Active tickers)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **Intraday** (configurable) | `market_data.ticker_prices_intraday` | **20,8** | Clock + tooltip (stale) | Active tickers only |
 | **Prices (Inactive)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **EOD בלבד** | `market_data.ticker_prices` | **20,8** | Clock + tooltip (stale) | Cadence per ticker status |
 | **Historical Daily** | OHLCV daily | **Yahoo → Alpha** | **Daily** | `market_data.ticker_prices` | **20,8** | N/A | **250 trading days retention** |
 | **Indicators** | ATR(14), MA(20/50/150/200), CCI(20) | Derived from daily OHLC | **Daily** | Derived (compute) or cached | **20,8** | N/A | Computed from 250‑day history |
@@ -35,6 +35,9 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 4. **Market Cap** is required now; EPS deferred to advanced fundamentals.  
 5. **Provider Swap** must be possible via config only (Agnostic Interface).  
 6. **Cache‑First** applies to all domains.
+7. **Retention + Archive:**  
+   - Intraday DB: 30 days → archive files (1 year) → delete.  
+   - EOD/FX DB: 250 trading days → archive files (no hard delete).
 
 ---
 
@@ -48,4 +51,6 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 
 ---
 
-**log_entry | TEAM_10 | SSOT_PROMOTION | MARKET_DATA_COVERAGE_MATRIX | 2026-02-13**
+**log_entry | TEAM_10 | SSOT_PROMOTION | MARKET_DATA_COVERAGE_MATRIX | 2026-02-13**  
+**log_entry | TEAM_90 | INTRADAY_LOCK | SEPARATE_INTRADAY_TABLE | 2026-02-13**
+**log_entry | TEAM_90 | RETENTION_ARCHIVE_LOCK | 2026-02-13** — Intraday 30d→archive 1y; EOD/FX 250d→archive.

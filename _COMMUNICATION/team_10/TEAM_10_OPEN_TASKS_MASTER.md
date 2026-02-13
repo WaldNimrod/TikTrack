@@ -53,6 +53,9 @@
 | 3 | 1.2.3 | בניית Python Seeders עם `is_test_data = true`; `make db-test-clean` מחזיר DB סטרילי | סקריפטים + Makefile | ✅ **הושלם** — seed_test_data.py, db_test_clean.py, seed_base_test_user.py, reduce_admin_base_to_minimal.py, db_remove_superfluous_users.py; Makefile: db-test-clean, db-test-fill, db-backup, db-base-seed, db-admin-minimal, db-test-report, db-remove-superfluous-users |
 | 4 | PDSC | PDSC Boundary Contract — JSON Error Schema, Response Contract, Error Codes | מסמך חוזה משותף | ✅ **הושלם** — לפי השלד; אומת (TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION) |
 | 5 | Auth | חוזה Auth אחיד + עדכון SSOT/OpenAPI | תיעוד + OpenAPI | ✅ **הושלם** — identity.py + SSOT_AUTH_CONTRACT + OpenAPI (אומת) |
+| 6 | **P3-013** | External Data M6 (Addendum) — Market Cap | שדה market_cap ב־ticker_prices, NUMERIC(20,8); Yahoo→Alpha EOD | TEAM_10_MASTER_TASK_LIST; MARKET_DATA_COVERAGE_MATRIX; PRECISION_POLICY_SSOT |
+| 7 | **P3-014** | External Data M7 — Indicators ATR/MA/CCI | ATR(14), MA(20/50/150/200), CCI(20); 250d history | MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC |
+| 8 | **P3-015** | External Data M8 — 250d Historical Daily | OHLCV 250 trading days retention ב־ticker_prices | MARKET_DATA_COVERAGE_MATRIX; MARKET_DATA_PIPE_SPEC |
 
 **תלות:** השלמת 1.2.1–1.2.3 פותחת את 1.1.3 ל־Team 10 ואת אינטגרציה מלאה ל־30/40.
 

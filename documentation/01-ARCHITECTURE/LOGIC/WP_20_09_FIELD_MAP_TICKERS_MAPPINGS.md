@@ -4,8 +4,8 @@
 **owner:** Team 20 (Backend Implementation)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-05  
-**version:** v1.0
+**last_updated:** 2026-02-13  
+**version:** v1.1
 
 **סשן:** S20.09 | **סטטוס:** סגירת 100% פערים | **סטנדרט:** Identity Strategy
 

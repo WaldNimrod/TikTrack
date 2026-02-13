@@ -60,6 +60,12 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## P3-013: Add market_cap to ticker_prices (run as table owner tiktrack)
+migrate-p3-013:
+	@echo "🔄 P3-013 — add market_cap to ticker_prices"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_013_add_market_cap_to_ticker_prices.sql
+	@echo "✅ P3-013 migration complete."
+
 ## EOD Sync — exchange_rates (P3-011; Alpha→Yahoo)
 sync-eod:
 	@echo "🔄 EOD sync — exchange_rates"

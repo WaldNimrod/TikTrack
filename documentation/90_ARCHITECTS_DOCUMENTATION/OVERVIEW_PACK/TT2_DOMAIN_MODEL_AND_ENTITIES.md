@@ -3,7 +3,7 @@
 **id:** `TT2_DOMAIN_MODEL_AND_ENTITIES`  
 **owner:** Team 20 (Backend) + Team 30 (Frontend)  
 **status:** DRAFT  
-**last_updated:** 2026-02-12  
+**last_updated:** 2026-02-13  
 
 ---
 
@@ -36,6 +36,9 @@
 - Fees belong to **Trading Accounts**, not Brokers.
 - “Other broker” is only a selection in D16 (account creation).
 - Status values are canonical: active/inactive/pending/cancelled.
+- **ADR‑017/ADR‑014:** Full refactor to account‑based fees (`trading_account_fees`) is mandatory.
+- **ADR‑018:** Selecting “Other” sets `is_supported=false` and blocks API/import; UI shows contact notice.
+- **ADR‑018:** Selecting a broker injects default fees into the form.
 
 ## 5) Data Ownership & Sources
 - **SSOT DB**: `PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
@@ -47,3 +50,5 @@
 - `documentation/09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_DATA_MODEL_PIVOT_VERDICT.md`
+- `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md`
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md`

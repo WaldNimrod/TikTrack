@@ -69,7 +69,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 
 ### 4.1 תיעוד קבוע (Permanent Documentation)
 **מיקום:** `/documentation/` (לפי מבנה התיקיות הממוספר)
-- כל מסמך תיעוד קבוע חייב להיכנס ל-`/documentation/D15_SYSTEM_INDEX.md`
+- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; **אינדקס אדריכל (חוקי יסוד):** `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
 - **חובה:** עדכון האינדקס בעת יצירת מסמך תיעוד חדש
 - **אסור:** לשמור תיעוד בשורש הפרויקט
 - **מבנה תיקיות (FIXED - v2.0):**
@@ -106,8 +106,8 @@ log_entry | [Team X] | READY | 001 | GREEN
 - **שימו לב:** Reports הם חלק מהתיעוד הקבוע ולכן נמצאים ב-`/documentation/`
 
 ### 4.4 כללים נוספים
-- **אסור לשמור קבצים בשורש הפרויקט** (רק קבצי מערכת כמו `.gitignore`, `D15_SYSTEM_INDEX.md`)
-- **תיקיית `/99-ARCHIVE/`** מיועדת לארכיון בלבד, לא לתקשורת פעילה
+- **אסור לשמור קבצים בשורש הפרויקט** (רק קבצי מערכת כמו `.gitignore`; אינדקסים ב-`documentation/00-MANAGEMENT/` ו-`documentation/90_ARCHITECTS_DOCUMENTATION/`)
+- **תיקיית `/99-ARCHIVE/`** מיועדת לארכיון בלבד, לא לתקשורת פעילה. **ארכוב:** לפי `TT2_KNOWLEDGE_PROMOTION_PROTOCOL` — רק דוחות/Evidence לארכיון; נהלים, מפרטים והגדרות נשארים בתקשורת פעילה (ראה נוהל "הפרדה — מה לא לארכיון").
 - **כל מסמך תיעוד קבוע** (ב-`documentation/`) **חייב להיכנס לאינדקס**. קבצי תקשורת (`_COMMUNICATION/`) **לא** מתווספים לאינדקס.
 - **אין כפילות:** כל קובץ במקום אחד בלבד
 

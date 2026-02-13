@@ -4,7 +4,7 @@
 **תאריך:** 2026-02-12  
 **סטטוס:** SSOT לרשימת המשימות הפתוחות — חלוקה לפי צוותים וסדר ביצוע
 
-**מקורות:** TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md, TT2_PHASE_2_CLOSURE_WORK_PLAN.md, מסמכי מנדט ו-QA בתקיית team_10.
+**מקורות:** TEAM_10_BATCH_1_2_FINAL_REPORT_AND_CLOSURE_PLAN.md, TT2_PHASE_2_CLOSURE_WORK_PLAN.md, **BATCH_2_5 (ADR-017, ADR-018)** — TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md.
 
 **פרוטוקול שולחן נקי (Clean Table):** TEAM_10_CLEAN_TABLE_PROTOCOL.md — Checklist סגירה A/B/C; הכרזת "Clean Table" רק כאשר כל פריטי A, B, C מסומנים ✅.
 
@@ -38,6 +38,7 @@
 | 4 | 1.1.3 | וידוא ש־`make db-test-clean` פועל ב-100% | אימות ריצה + תיעוד | ✅ **PASS** | TEAM_10_1_1_3_DB_TEST_CLEAN_VERIFICATION.md |
 | 5 | 1.4 | פלט שלב 1 — רשימת חוסרים/פערים; וידוא אין החלטות תלויות | מסמך פלט + חתימה | ✅ **PASS** | TEAM_10_PHASE_1_OUTPUT_1_4.md |
 | 6 | 4.1.1–4.1.4 | הכנה ל־G-Lead: תיעוד, מסירת חומר, Sign-off, גיבוי GitHub | Handoff + תיעוד | ✅ **PASS** | TEAM_10_G_LEAD_HANDOFF_PHASE_2.md |
+| 7 | Batch 2.5 | הפצת מנדט אדריכל (ADR-017, ADR-018); וידוא אינדקסים — הפניה בלעדית ל־00_MASTER_INDEX; שער D18/D21; סיכום לבדיקה | מנדט מופץ; אינדקסים מעודכנים; שער מתועד; סיכום להגשה | ✅ **PASS** | TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md; TEAM_10_TO_TEAM_90_BATCH_2_5_SPY_MANDATE.md; TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md; TEAM_10_D18_D21_APPROVAL_GATE.md |
 
 **הערה:** מסירת קונטקסט ל־Team 50 (1.4א) — חובה לפני הרצת QA כשנפתח scope חדש.
 
@@ -123,6 +124,21 @@
 
 ---
 
+### 2.9 בץ 2.5 — מנדט אדריכל (ADR-017, ADR-018) — משימות חוסמות
+
+| צוות | משימה | תוצר מצופה | סטטוס |
+|------|--------|-------------|--------|
+| **20** | גרסאות API → 1.0.0; רפקטור עמלות (trading_account_fees) + Data Migration Plan; חסימת API/ייבוא ל"אחר" | 1.0.0; תוכנית מיגרציה; לוגיקה | ⏳ |
+| **30** | גרסאות UI → 1.0.0; Redirect ל-Home (/) לא מחוברים; User Icon Success/Warning; טופס ברוקר "אחר" + הודעה | 1.0.0; קוד; UI | ⏳ |
+| **50** | אימות Redirect ואייקון | דוח QA | ⏳ |
+| **60** | גרסאות DB → 1.0.0; תשתית רפקטור עמלות | 1.0.0; תשתית | ⏳ |
+| **90** | פסילת 2.x ו-D15_SYSTEM_INDEX; אימות חסימת ייבוא/API ל"אחר"; אימות Redirect ואייקון | דוח Spy | ⏳ |
+| **10** | וידוא רפקטור לפני אישור D18/D21; הפניה בלעדית ל־00_MASTER_INDEX | אינדקסים; חסימה | ✅ **הושלם** — סיכום: TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md; שער: TEAM_10_D18_D21_APPROVAL_GATE.md |
+
+**מקור:** BATCH_2_5_COMPLETIONS_MANDATE.md (ADR-017), ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md (ADR-018); פירוט: TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md.
+
+---
+
 ## 3. סדר ביצוע מומלץ (תזמור)
 
 1. **Team 60** — ✅ 1.2.2, 1.2.3 הושלמו (דוח: TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md).
@@ -145,6 +161,8 @@
 | Team 50 | TEAM_10_TO_TEAM_50_OPEN_TASKS_ASSIGNMENT.md |
 | Team 60 | TEAM_10_TO_TEAM_60_OPEN_TASKS_ASSIGNMENT.md |
 
+**בץ 2.5 (2026-02-13):** מנדט אדריכל — גרסה 1.0.0 רשמית; ADR-017, ADR-018. הופץ: TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md; TEAM_10_TO_TEAM_90_BATCH_2_5_SPY_MANDATE.md. **Team 10 — בוצע במלואו:** סיכום לבדיקה: TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md; שער D18/D21: TEAM_10_D18_D21_APPROVAL_GATE.md.
+
 **דבקר ראשון (2026-02-12):** הוצאו בקשת השלמה; דוחות התקבלו; הוצאו דרישות סגירה סופית:
 - **אישור דוחות + דרישה:** TEAM_10_CHECKPOINT_1_REPORTS_ACK_AND_CLOSURE_DEMAND.md
 - **Team 30:** TEAM_10_TO_TEAM_30_FINAL_CLOSURE_DEMAND.md — Nav/Auth: השלם או הגש מסמך סגירה (אין להשאיר פתוח)
@@ -163,7 +181,11 @@
 | דוח Flow Type SSOT QA | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_FLOW_TYPE_SSOT_QA_REPORT.md |
 | SLA 30/40 | documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md |
 | פרוטוקול שערי QA | documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md |
+| **מנדט בץ 2.5 (ADR-017/018)** | _COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md; ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md |
+| **הפצה בץ 2.5** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md; TEAM_10_TO_TEAM_90_BATCH_2_5_SPY_MANDATE.md |
+| **סיכום בץ 2.5 לבדיקה** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md |
+| **שער אישור D18/D21** | _COMMUNICATION/team_10/TEAM_10_D18_D21_APPROVAL_GATE.md |
 
 ---
 
-**log_entry | TEAM_10 | OPEN_TASKS_MASTER | CREATED | 2026-02-12**
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**

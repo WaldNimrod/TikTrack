@@ -5,13 +5,15 @@
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
 **last_updated:** 2026-01-30  
-**version:** v3.9 (קידום ידע באץ' 2 — Consolidation הושלם)
+**version:** v3.10 (בץ 2.5 — מנדט אדריכל ADR-017/ADR-018; גרסה 1.0.0 רשמית)
 
 ---
 
 ## 📢 Executive Summary
 
 זהו האינדקס המאוחד היחיד (SSOT) לכל התיעוד במערכת TikTrack Phoenix. כל האינדקסים האחרים מסומנים כ-DEPRECATED.
+
+**אינדקס אדריכל מאוחד (חוקי יסוד System v1.0.0):** [90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md](../90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md) — BATCH_2_5 (ADR-017), TT2_VERSION_MATRIX_v1.0, ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC (ADR-018). דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
 
 **עקרון יסוד:** ה-SSOT וכל נהלי העבודה הם **תקוד קריטי וקבוע** — מחייבים, קבועים, ומתעדכנים רק דרך הנהלים המפורשים (קידום מידע, החלטות אדריכלית). ראה `CURSOR_INTERNAL_PLAYBOOK.md` עקרון יסוד.
 

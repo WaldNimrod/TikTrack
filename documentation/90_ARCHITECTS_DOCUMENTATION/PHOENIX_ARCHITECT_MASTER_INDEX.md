@@ -1,9 +1,14 @@
-# 🏰 אינדקס אדריכל מרכזי (v8.3.0)
+# 🏰 אינדקס אדריכל מרכזי (v8.4.0)
 ## 📜 חוקי יסוד (LOCKED 🔒)
 - ADR-014: Data Model Pivot (Account-based Fees).
 - ADR-015: Broker Reference & Defaults.
 - ADR-016: Versioning Policy (SYSTEM v1.0 LOCKED).
+- ADR-017: Batch 2.5 Completions Mandate (Version 1.0 alignment + account-based fees refactor).
+- ADR-018: Broker "Other" rule + import/API block.
 - TT2_VERSION_MATRIX: מטריצת גרסאות (Initial SV: 1.0.0).
+ 
+## ✅ Index Authority (Consolidated)
+- `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md` — consolidated authoritative index (v11.0.0).
 
 ## 📂 Phase 2 Execution
 - [Status] - System v1.0 Foundations Materialized.

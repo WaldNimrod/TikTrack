@@ -3,7 +3,7 @@
 **id:** `TT2_WORK_OPERATING_MODEL`
 **owner:** Team 10
 **status:** DRAFT
-**last_updated:** 2026-02-12
+**last_updated:** 2026-02-13
 
 ---
 
@@ -82,7 +82,12 @@
 
 No code changes are approved without required mapping, SSOT alignment, and evidence.
 
-## 6) References (SSOT)
+## 6) Current Closure Status (2026-02-13)
+- **Gate B:** GREEN (Team 90 re‑verify on record).
+- **Visual Sign‑off:** Approved (G‑Lead sign‑off log).
+- **Clean Table:** Declared after A/B/C completion.
+
+## 7) References (SSOT)
 
 - `documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md`
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
@@ -90,3 +95,7 @@ No code changes are approved without required mapping, SSOT alignment, and evide
 - `documentation/10-POLICIES/TT2_VERSIONING_POLICY.md`
 - `documentation/00-MANAGEMENT/TT2_PHASE_2_CLOSURE_WORK_PLAN.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
+- `_COMMUNICATION/team_10/TEAM_10_CLEAN_TABLE_PROTOCOL.md`
+- `documentation/05-REPORTS/GATE_B_STATUS.md`
+- `_COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md`
+- `_COMMUNICATION/team_10/TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md`

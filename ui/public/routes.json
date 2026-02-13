@@ -31,6 +31,7 @@
       "cash_flows": "/cash_flows.html"
     },
     "data": {
+      "data_dashboard": "/data_dashboard.html",
       "alerts": "/alerts.html",
       "notes": "/notes.html",
       "user_ticker": "/user_ticker.html",
@@ -47,5 +48,9 @@
       "tickers": "/tickers.html"
     }
   },
-  "public_routes": ["/login", "/register", "/reset-password"]
+  "public_routes": [
+    "/login",
+    "/register",
+    "/reset-password"
+  ]
 }

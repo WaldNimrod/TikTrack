@@ -65,6 +65,33 @@
         "<script src=\"/src/views/financial/cashFlows/cashFlowsLucideInit.js\"></script>",
         "<script src=\"/src/views/financial/cashFlows/cashFlowsSummaryToggle.js\"></script>"
       ]
+    },
+    {
+      "id": "tickers",
+      "outputFile": "src/views/management/tickers/tickers.html",
+      "title": "ניהול טיקרים | TikTrack Phoenix",
+      "bodyClass": "tickers-page context-management",
+      "configPath": "/src/views/management/tickers/tickersPageConfig.js",
+      "contentFile": "src/views/management/tickers/tickers.content.html",
+      "scripts": [
+        "<script src=\"/src/components/core/sectionToggleHandler.js\"></script>",
+        "<script src=\"/src/cubes/shared/PhoenixTableSortManager.js\"></script>",
+        "<script type=\"module\" src=\"/src/views/management/tickers/tickersTableInit.js\"></script>",
+        "<script src=\"/src/views/shared/footerLoader.js\"></script>"
+      ]
+    },
+    {
+      "id": "data_dashboard",
+      "outputFile": "src/views/data/dataDashboard/data_dashboard.html",
+      "title": "דשבורד נתונים | TikTrack Phoenix",
+      "bodyClass": "data-dashboard-page context-data",
+      "configPath": "/src/views/data/dataDashboard/dataDashboardPageConfig.js",
+      "contentFile": "src/views/data/dataDashboard/data_dashboard.content.html",
+      "scripts": [
+        "<script src=\"/src/components/core/sectionToggleHandler.js\"></script>",
+        "<script type=\"module\" src=\"/src/views/data/dataDashboard/dataDashboardTableInit.js\"></script>",
+        "<script src=\"/src/views/shared/footerLoader.js\"></script>"
+      ]
     }
   ]
 }

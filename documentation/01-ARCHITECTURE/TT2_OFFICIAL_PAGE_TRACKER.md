@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-12  
-**version:** v4.0 (באץ' 2 פיננסי — סגור; Consolidation Batch 2)
+**last_updated:** 2026-01-31  
+**version:** v4.2 (D22 ניהול טיקרים, D23 דשבורד נתונים — רשימת עמודים עדכנית וברורה; Batch 3 מפורט)
 
 ---
 
@@ -51,6 +51,8 @@
 | D16 | trading_accounts.html | חשבונות מסחר | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
 | D18 | brokers_fees.html | עמלות ברוקרים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
 | D21 | cash_flows.html | תזרים מזומנים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; D21 Infra VERIFIED (ADR-010) |
+| D22 | tickers.html | ניהול טיקרים | **3. IN PROGRESS** 🟡 | Team 30 | Roadmap v2.1 Batch 3 — TICKERS_MGR; CRUD; מחיר אחרון + שינוי יומי |
+| D23 | data_dashboard.html | דשבורד נתונים | **1. DRAFT** 📝 | Team 30 | תבנית בלבד; מקושר מכפתור "נתונים"; תוכן מלא בהמשך |
 
 ---
 
@@ -166,9 +168,34 @@
 
 ---
 
+### **Batch 3 / Current Scope** 🟡 **IN PROGRESS**
+
+**עמודים (רשימה עדכנית — SSOT):**
+
+| ID | קובץ | תיאור | נתיב view | Route | סטטוס |
+|----|------|--------|-----------|--------|--------|
+| D22 | tickers.html | ניהול טיקרים | `ui/src/views/management/tickers/` | `/tickers.html` | **3. IN PROGRESS** — Roadmap v2.1 Batch 3 TICKERS_MGR |
+| D23 | data_dashboard.html | דשבורד נתונים | `ui/src/views/data/dataDashboard/` | `/data_dashboard.html` | **1. DRAFT** — תבנית בלבד; נתונים → דשבורד נתונים (פריט ראשון) |
+
+**Scope:** IN SCOPE — D22 מתוך Roadmap v2.1 באץ' 3 (TICKERS_MGR); D23 דשבורד מרכזי לתפריט נתונים (הגדרה חדשה).  
+**מקור:** TEAM_30_TO_TEAM_10_NEW_PAGES_SCOPE_UPDATE.md (2026-01-31).
+
+---
+
 ## 🔄 עדכונים אחרונים
 
-**סטטוס נוכחי (2026-02-12):** Batch 2 CLOSED. D16, D18, D21 = 4. FIDELITY. להלן היסטוריית עדכונים **(Legacy — לא משנה סטטוס נוכחי)**.
+**סטטוס נוכחי (2026-01-31):** Batch 2 CLOSED. D22 + D23 נוספו — Batch 3 IN PROGRESS.
+
+**2026-01-31 (Team 30 — הוספת שני עמודים חדשים — D22, D23):**
+- ✅ **D22 tickers.html** — ניהול טיקרים: סיכום (סה"כ/פעילים), טבלה + CRUD, מחיר אחרון, שינוי יומי. מיקום: `ui/src/views/management/tickers/`. Route: `/tickers.html`. תפריט: ניהול → ניהול טיקרים.
+- ✅ **D23 data_dashboard.html** — דשבורד נתונים: תבנית בלבד (תוכן מלא בהמשך). מיקום: `ui/src/views/data/dataDashboard/`. Route: `/data_dashboard.html`. תפריט: נתונים → דשבורד נתונים (פריט ראשון).
+- 📍 **עדכוני SSOT:** routes.json (tickers, data_dashboard), page-manifest.json, unified-header.html, vite.config.js.
+- 📋 **הודעה:** TEAM_30_TO_TEAM_10_NEW_PAGES_SCOPE_UPDATE.md
+
+**2026-01-31 (Team 10 — יישור רשימת עמודים):**
+- ✅ **Page Tracker:** סעיף Batch 3 עודכן לטבלה מפורשת (D22, D23) — נתיב, Route, סטטוס; רשימת עמודים עדכנית וברורה.
+- ✅ **00_MASTER_INDEX:** ציון Batch 3 ו-D22/D23 בקישור ל-Page Tracker (v3.11).
+- 📋 **אישור ל-Team 30:** TEAM_10_TO_TEAM_30_NEW_PAGES_ACK_AND_PAGE_TRACKER_UPDATE.md
 
 **2026-02-12 (Task 2.1 A2 — Team 10):**
 - ✅ **1.1.1 D21 Infra → VERIFIED (סופי)** — Page Tracker מאומת; D21 Infra מופיע כ־VERIFIED במטריצה ובעדכונים.

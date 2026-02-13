@@ -72,6 +72,12 @@ sync-eod:
 	@python3 scripts/sync_exchange_rates_eod.py
 	@echo "✅ EOD sync complete."
 
+## EOD Sync — ticker_prices (Gate B; Yahoo→Alpha)
+sync-ticker-prices:
+	@echo "🔄 EOD sync — ticker_prices"
+	@python3 scripts/sync_ticker_prices_eod.py
+	@echo "✅ Ticker prices EOD sync complete."
+
 ## Cleanup — market data (P3-017)
 cleanup-market-data:
 	@echo "🔄 Cleanup — market data"
@@ -89,6 +95,7 @@ help:
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
 	@echo "  make sync-eod           - EOD sync exchange_rates (Alpha→Yahoo)"
+	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

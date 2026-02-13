@@ -48,7 +48,7 @@
 
 ### 2.2 Team 20 (Backend & DB)
 
-**External Data (2026-02-13):** P3-008 (Provider Interface + Cache-First), P3-009 (Guardrails), P3-013, P3-014, P3-015 — **תוצרים התקבלו** → PENDING_VERIFICATION. מקור: TEAM_20_TO_TEAM_10_50_EXTERNAL_DATA_COMPLETION_UPDATE; מיגרציה P3-013: TEAM_60_TO_TEAM_20_P3_013_MIGRATION_EXECUTED. מוכן ל-QA (TEAM_20_TO_TEAM_50_EXTERNAL_DATA_QA_HANDOFF).
+**External Data (2026-02-13):** P3-008, P3-009, P3-013, P3-014, P3-015 — **CLOSED** (Seal SOP-013 התקבל: TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE).
 
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|
@@ -57,9 +57,9 @@
 | 3 | 1.2.3 | בניית Python Seeders עם `is_test_data = true`; `make db-test-clean` מחזיר DB סטרילי | סקריפטים + Makefile | ✅ **הושלם** — seed_test_data.py, db_test_clean.py, seed_base_test_user.py, reduce_admin_base_to_minimal.py, db_remove_superfluous_users.py; Makefile: db-test-clean, db-test-fill, db-backup, db-base-seed, db-admin-minimal, db-test-report, db-remove-superfluous-users |
 | 4 | PDSC | PDSC Boundary Contract — JSON Error Schema, Response Contract, Error Codes | מסמך חוזה משותף | ✅ **הושלם** — לפי השלד; אומת (TEAM_10_BACKEND_TASKS_EXECUTION_VERIFICATION) |
 | 5 | Auth | חוזה Auth אחיד + עדכון SSOT/OpenAPI | תיעוד + OpenAPI | ✅ **הושלם** — identity.py + SSOT_AUTH_CONTRACT + OpenAPI (אומת) |
-| 6 | **P3-013** | External Data M6 (Addendum) — Market Cap | ✅ תוצרים התקבלו — PENDING_VERIFICATION (מיגרציה 60 הופעלה) | TEAM_20_TO_TEAM_10_50_EXTERNAL_DATA_COMPLETION_UPDATE; TEAM_60_TO_TEAM_20_P3_013_MIGRATION_EXECUTED |
-| 7 | **P3-014** | External Data M7 — Indicators ATR/MA/CCI | ✅ תוצרים התקבלו — PENDING_VERIFICATION | TEAM_20_TO_TEAM_10_50_EXTERNAL_DATA_COMPLETION_UPDATE |
-| 8 | **P3-015** | External Data M8 — 250d Historical Daily | ✅ תוצרים התקבלו — PENDING_VERIFICATION | TEAM_20_TO_TEAM_10_50_EXTERNAL_DATA_COMPLETION_UPDATE |
+| 6 | **P3-013** | External Data M6 (Addendum) — Market Cap | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
+| 7 | **P3-014** | External Data M7 — Indicators ATR/MA/CCI | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
+| 8 | **P3-015** | External Data M8 — 250d Historical Daily | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
 
 **תלות:** השלמת 1.2.1–1.2.3 פותחת את 1.1.3 ל־Team 10 ואת אינטגרציה מלאה ל־30/40.
 
@@ -73,9 +73,9 @@
 |------|--------|--------|-------------|
 | 1.2.2 | נעילת פורטים 8080/8082, Config, Precision 20,6 | ✅ VERIFIED | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md, TEAM_60_TO_TEAM_10_TASK_1_2_2_PORT_PRECISION_REPORT.md |
 | 1.2.3 | Seeders, `make db-test-clean` | ✅ COMPLETE | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md, TEAM_60_TO_TEAM_10_PHASE_1_IMPLEMENTATION_START.md |
-| **P3-011** | FX EOD Sync (Alpha→Yahoo) | ✅ תוצרים התקבלו — PENDING_VERIFICATION | TEAM_60_TO_TEAM_20_EXTERNAL_DATA_COORDINATION; TEAM_10_TO_TEAM_60_EXTERNAL_DATA_DELIVERABLES_ACK |
-| **P3-016** | Intraday Table + Migration (`ticker_prices_intraday`) | ✅ תוצרים התקבלו — PENDING_VERIFICATION | כנ"ל |
-| **P3-017** | Cleanup Jobs (retention 30d/250d, archive) + Evidence | ✅ תוצרים התקבלו — PENDING_VERIFICATION | כנ"ל |
+| **P3-011** | FX EOD Sync (Alpha→Yahoo) | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_60_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
+| **P3-016** | Intraday Table + Migration (`ticker_prices_intraday`) | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_60_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
+| **P3-017** | Cleanup Jobs (retention 30d/250d, archive) + Evidence | ✅ **CLOSED** (Seal 2026-02-13) | TEAM_60_TO_TEAM_10_EXTERNAL_DATA_SEAL_MESSAGE |
 
 **תלויות שפתחו:** משימה 1.1.3 (Team 10) — מוכן לביצוע; אינטגרציה מלאה Team 30/40 — מוכנה.
 

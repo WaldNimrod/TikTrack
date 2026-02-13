@@ -2,7 +2,7 @@
 """
 Live Provider Execution — Team 20
 TEAM_10_TO_TEAM_20_EXTERNAL_DATA_LIVE_PROVIDER_EXECUTION_MANDATE
-- Yahoo + Alpha LIVE fetches for AAPL, MSFT, TSLA
+- Yahoo + Alpha LIVE — טיקרים מ־market_data.tickers בלבד
 - Confirms UA Rotation (Yahoo), RateLimitQueue (Alpha 12.5s)
 """
 
@@ -14,17 +14,24 @@ from pathlib import Path
 
 _project = Path(__file__).parent.parent
 env_file = _project / "api" / ".env"
+DATABASE_URL = None
 if env_file.exists():
     with open(env_file) as f:
         for line in f:
             line = line.strip()
             if "=" in line and not line.startswith("#"):
                 k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip().strip("'\"").strip())
+                val = v.strip().strip("'\"").strip()
+                os.environ.setdefault(k.strip(), val)
+                if k.strip() == "DATABASE_URL":
+                    DATABASE_URL = val
+if not DATABASE_URL:
+    DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and "postgresql+asyncpg" in str(DATABASE_URL):
+    DATABASE_URL = str(DATABASE_URL).replace("postgresql+asyncpg://", "postgresql://")
 
 sys.path.insert(0, str(_project))
 
-TICKERS = ["AAPL", "MSFT", "TSLA"]
 OUTPUT_LINES = []
 
 
@@ -35,11 +42,39 @@ def log(msg: str):
     OUTPUT_LINES.append(line)
 
 
+def load_tickers_from_db():
+    """טיקרים מ־market_data.tickers — מקור יחיד."""
+    if not DATABASE_URL or "postgresql" not in str(DATABASE_URL):
+        return []
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT id, symbol FROM market_data.tickers
+            WHERE (deleted_at IS NULL) AND is_active = true
+            ORDER BY symbol LIMIT 5
+        """)
+        return [r["symbol"] for r in cur.fetchall()]
+    finally:
+        conn.close()
+
+
 async def run():
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider, _YAHOO_USER_AGENTS, _next_user_agent
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider, ALPHA_RATE_LIMIT_SECONDS
 
     log("=== Live Provider Execution — Team 20 ===")
+    log("")
+
+    tickers = load_tickers_from_db()
+    if not tickers:
+        log("⚠️ No tickers in market_data.tickers. Run: python3 scripts/seed_market_data_tickers.py")
+        log("")
+        return OUTPUT_LINES
+
+    log(f"Tickers from DB: {', '.join(tickers)}")
     log("")
 
     # UA Rotation
@@ -59,7 +94,7 @@ async def run():
     # Yahoo LIVE
     log("3. Yahoo LIVE — ticker prices")
     yahoo = YahooProvider(mode="LIVE")
-    for symbol in TICKERS:
+    for symbol in tickers:
         try:
             pr = await yahoo.get_ticker_price(symbol)
             if pr and pr.price:
@@ -73,7 +108,7 @@ async def run():
     # Alpha LIVE (with rate limit — 12.5s between calls)
     log("4. Alpha Vantage LIVE — ticker prices (RateLimitQueue 12.5s)")
     alpha = AlphaProvider(mode="LIVE")
-    for symbol in TICKERS:
+    for symbol in tickers:
         try:
             pr = await alpha.get_ticker_price(symbol)
             if pr and pr.price:

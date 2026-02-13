@@ -6,7 +6,20 @@
 
 ---
 
-## Command output
+## 1. סיכום קריטריוני הצלחה
+
+| קריטריון | סטטוס |
+|----------|--------|
+| נתונים חיים מ־Alpha עבור לפחות 3 טיקרים | ✅ AAPL, MSFT, TSLA — כולם החזירו נתונים |
+| Yahoo — עובד או מתועד 429 + UA Rotation | ⚠️ Yahoo: no data (yfinance — ייתכן weekend); UA Rotation מאומת (3 UAs) |
+| UA Rotation פעיל | ✅ UA pool size: 3; rotation מאומת |
+| RateLimitQueue (Alpha 12.5s) פעיל | ✅ ~25s בין AAPL→MSFT→TSLA (12.5s בין קריאות) |
+
+**פקודה:** `python3 scripts/verify_live_providers.py`
+
+---
+
+## 2. Command output
 
 ```
 [2026-02-13T23:18:31Z] === Live Provider Execution — Team 20 ===

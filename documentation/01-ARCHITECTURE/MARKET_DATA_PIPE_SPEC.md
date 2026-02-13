@@ -187,7 +187,41 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ---
 
-## 8. הפניות
+## 8. Rate‑Limit & Scaling Policy (Stage‑1)
+
+**מטרה:** למנוע חסימות ספקים (429) ולאפשר סקייל עם נפחי מידע גדולים.
+
+### 8.1 Core Rules (LOCKED)
+
+1. **Cache‑First Only** — אין קריאה חיצונית מתוך request.  
+2. **Single‑Flight Refresh** — Job יחיד מרענן; בקשות אחרות מקבלות stale.  
+3. **Backoff & Cooldown** — ספק שמחזיר 429 נכנס ל‑cooldown (ללא ניסיונות נוספים בפרק הזמן).  
+4. **Provider Fallback** — Yahoo → Alpha (Prices), Alpha → Yahoo (FX).  
+5. **Never Block UI** — במקרה כשל → stale + `staleness=na`.
+
+### 8.2 Cadence Tiering (Load Control)
+
+- **Active tickers:** Intraday (minutes, configurable).  
+- **Inactive tickers:** EOD בלבד.  
+- **Market Cap:** Daily (EOD).  
+- **Indicators (ATR/MA/CCI):** Daily (computed from 250d).  
+
+### 8.3 System Settings (Required)
+
+System Settings must expose:
+- `max_active_tickers`  
+- `intraday_interval_minutes`  
+- `provider_cooldown_minutes`  
+- `max_symbols_per_request` (if provider supports batching)
+
+### 8.4 Yahoo Guardrails
+
+- **User‑Agent rotation** required.  
+- If **429** → cooldown + fallback.  
+
+---
+
+## 9. הפניות
 
 | מסמך | נתיב |
 |------|------|
@@ -204,3 +238,4 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 **log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).  
 **log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday required for Active tickers; separate intraday table; System Settings cadence config (domain + status).
 **log_entry | TEAM_90 | MAINTENANCE_RETENTION_LOCK | STAGE1 | 2026-02-13** — Retention + archive policy + cleanup cycles locked (Intraday 30d→archive 1y; EOD/FX 250d→archive; daily/weekly/monthly).
+**log_entry | TEAM_90 | RATELIMIT_SCALING_LOCK | STAGE1 | 2026-02-13** — Rate‑limit & scaling policy locked (cache‑first, single‑flight, cooldown on 429, system settings controls).

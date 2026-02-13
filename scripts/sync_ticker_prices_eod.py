@@ -2,7 +2,7 @@
 """
 EOD Sync — Ticker Prices (Gate B Gaps)
 Team 20 — TEAM_10_TO_TEAM_20_GATE_B_GAPS_AND_SYNC_MANDATE
-MARKET_DATA_PIPE_SPEC §4.1, §7.1
+TEAM_90_RATELIMIT_SCALING_LOCK — Single-Flight, Cooldown on 429, טיקרים מ-DB בלבד
 
 Providers: Yahoo Finance (Primary) → Alpha Vantage (Fallback).
 Loads tickers from market_data.tickers, fetches EOD prices, saves to market_data.ticker_prices.
@@ -10,6 +10,7 @@ Cron: similar to FX (e.g. 0 22 * * 1-5 UTC).
 """
 
 import asyncio
+import fcntl
 import os
 import sys
 from datetime import datetime, timezone
@@ -55,19 +56,37 @@ def _quantize(raw) -> Optional[Decimal]:
         return None
 
 
+def _is_429(e: Exception) -> bool:
+    """Detect 429 rate limit from exception."""
+    s = str(e).lower()
+    return "429" in s or "too many" in s or "rate limit" in s
+
+
 async def fetch_prices_for_tickers(
     tickers: List[Tuple[UUID, str]]
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
-    """Yahoo (Primary) → Alpha (Fallback). Returns (ticker_id, symbol, price, o, h, l, c, vol, market_cap, as_of, provider)."""
+    """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Returns (ticker_id, symbol, ...)."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
+    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
+    cooldown_min = get_provider_cooldown_minutes()
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []
+    yahoo_skipped = alpha_skipped = False
 
     for ticker_id, symbol in tickers:
-        for provider in (yahoo, alpha):
+        for provider, name in [(yahoo, "YAHOO_FINANCE"), (alpha, "ALPHA_VANTAGE")]:
+            if is_in_cooldown(name):
+                if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
+                    print(f"⚠️ {name} in cooldown — skipping")
+                if name == "YAHOO_FINANCE":
+                    yahoo_skipped = True
+                else:
+                    alpha_skipped = True
+                continue
             try:
                 pr = await provider.get_ticker_price(symbol)
                 if pr and pr.price and pr.price > 0:
@@ -86,7 +105,10 @@ async def fetch_prices_for_tickers(
                     ))
                     break
             except Exception as e:
-                print(f"⚠️ {provider.__class__.__name__} {symbol}: {e}")
+                if _is_429(e):
+                    set_cooldown(name, cooldown_min)
+                    print(f"⚠️ {name} 429 — cooldown {cooldown_min}min")
+                print(f"⚠️ {name} {symbol}: {e}")
         else:
             print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
 

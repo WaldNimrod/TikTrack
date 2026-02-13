@@ -38,6 +38,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 7. **Retention + Archive:**  
    - Intraday DB: 30 days → archive files (1 year) → delete.  
    - EOD/FX DB: 250 trading days → archive files (no hard delete).
+8. **Rate‑Limit & Scaling Policy:** Cache‑First + Single‑Flight + cooldown on 429; configurable cadence in System Settings.
 
 ---
 

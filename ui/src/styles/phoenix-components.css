@@ -1846,24 +1846,26 @@ input.dir-ltr,
 }
 
 /* ============================================
-   EOD Warning Banner (ADR-022 §2.4)
-   Visual warning when End-of-Day market data is displayed
+   Staleness Clock - P3-012 / M6 (Clock + color + tooltip, no banner)
+   Last Update Clock for prices; color = ok | warning | na
    ============================================ */
-.eod-warning-banner {
-  display: flex;
+.staleness-clock {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  margin-block-end: var(--spacing-md, 12px);
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  color: #92400e;
+  margin-inline-end: 0.5rem;
+  vertical-align: middle;
+  cursor: help;
 }
-.eod-warning-banner--hidden {
-  display: none;
+.staleness-clock svg {
+  width: 16px;
+  height: 16px;
 }
-.eod-warning-banner__icon {
-  font-size: 1.2rem;
+.staleness-clock--ok {
+  color: var(--color-success, #059669);
+}
+.staleness-clock--warning {
+  color: var(--color-warning, #f59e0b);
+}
+.staleness-clock--na {
+  color: var(--color-danger, #dc2626);
 }

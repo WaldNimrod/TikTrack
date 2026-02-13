@@ -1,8 +1,7 @@
 /**
- * EOD Staleness Check - ADR-022 §2.4
- * -----------------------------------
- * Fetches exchange-rates (market data) and shows EOD warning if staleness is warning/na.
- * Runs on financial pages that display prices/conversions.
+ * Staleness Check - P3-012 / M6 (Clock + color + tooltip, no banner)
+ * ------------------------------------------------------------------
+ * Fetches exchange-rates; updates staleness clock (color + tooltip).
  */
 
 (function () {
@@ -13,11 +12,12 @@
       const sharedServices = (await import('./sharedServices.js')).default;
       await sharedServices.init();
       const response = await sharedServices.get('/reference/exchange-rates', {});
-      if (response && typeof response.staleness === 'string' && window.showEodWarning) {
-        window.showEodWarning(response.staleness);
+      if (response && typeof response.staleness === 'string' && window.updateStalenessClock) {
+        const ts = response.data?.[0]?.last_sync_time;
+        window.updateStalenessClock(response.staleness, ts);
       }
     } catch (_) {
-      /* 401, network error, etc. — silently skip */
+      /* 401, network error — silently skip */
     }
   }
 

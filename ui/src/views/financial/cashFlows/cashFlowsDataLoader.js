@@ -8,7 +8,7 @@
  * - קונטיינר 1: טבלת תזרימי מזומנים
  * - קונטיינר 2: טבלת המרות מטבע (אם נדרש)
  * 
- * @version v2.1 - Phase 2: Uses Shared_Services.js (PDSC Client) - Fixed manual transformation
+ * @version v1.0 - Uses sharedServices.js (PDSC Client) - Fixed manual transformation
  * 
  * API Integration Guide: TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md
  * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md

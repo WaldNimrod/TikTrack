@@ -10,7 +10,7 @@
  * - קונטיינר 3: טבלת תנועות
  * - קונטיינר 4: טבלת פוזיציות
  * 
- * @version v2.0 - Phase 2: Uses Shared_Services.js (PDSC Client) for all API calls
+ * @version v1.0 - Uses sharedServices.js (PDSC Client) for all API calls
  * 
  * Note: Trading Accounts API schema not in API Integration Guide yet.
  * Using Shared_Services.js for consistency with D18 and D21.

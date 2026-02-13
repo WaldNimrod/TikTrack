@@ -129,6 +129,37 @@ paths:
             description: "Unauthorized"
           '500':
             description: "Internal Server Error"
+    /{id}/api-import-eligible:
+      get:
+        summary: "ADR-018: Check if account eligible for API/import"
+        description: "Returns 200+eligible=true when broker is_supported; 403 when broker is 'other' or unsupported"
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: id
+            in: path
+            required: true
+            schema:
+              type: string
+              pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$'
+        responses:
+          '200':
+            description: "Eligible"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    eligible: { type: boolean, example: true }
+                    account_id: { type: string }
+          '403':
+            description: "Broker not supported (other/custom)"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: "Unauthorized"
   /brokers_fees:
     get:
       summary: "List all broker fees (D18)"

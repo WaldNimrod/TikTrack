@@ -291,6 +291,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
       }
       if (brokerOtherNameErrEl) brokerOtherNameErrEl.textContent = '';
       
+      /* ADR-018: When broker is "other", mark is_supported=false */
       const formData = {
         accountName: accountNameValue,
         broker: brokerValue,
@@ -298,7 +299,8 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         initialBalance: initialBalanceParsed,
         currency: currencyValue,
         isActive: isActiveValue,
-        externalAccountId: externalAccountIdValue || null
+        externalAccountId: externalAccountIdValue || null,
+        ...(brokerSelectValue === 'other' ? { isSupported: false } : {})
       };
       
       // Call save handler (async - don't close modal if error)

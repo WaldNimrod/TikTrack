@@ -128,10 +128,10 @@
 
 | צוות | משימה | תוצר מצופה | סטטוס |
 |------|--------|-------------|--------|
-| **20** | גרסאות API → 1.0.0; רפקטור עמלות (trading_account_fees) + Data Migration Plan; חסימת API/ייבוא ל"אחר" | 1.0.0; תוכנית מיגרציה; לוגיקה | ⏳ |
-| **30** | גרסאות UI → 1.0.0; Redirect ל-Home (/) לא מחוברים; User Icon Success/Warning; טופס ברוקר "אחר" + הודעה | 1.0.0; קוד; UI | ⏳ |
+| **20** | גרסאות API → 1.0.0; רפקטור עמלות (trading_account_fees) + Data Migration Plan; חסימת API/ייבוא ל"אחר" | 1.0.0; תוכנית מיגרציה; לוגיקה | ⏳ *(ממתין להרצת מיגרציה מלאה בפועל)* |
+| **30** | גרסאות UI → 1.0.0; Redirect ל-Home (/) לא מחוברים; User Icon Success/Warning; טופס ברוקר "אחר" + הודעה | 1.0.0; קוד; UI | ✅ **PASS** — TEAM_30_TO_TEAM_10_BATCH_2_5_CLOSURE_REPORT.md; TEAM_30_BATCH_2_5_EVIDENCE_LOG.md |
 | **50** | אימות Redirect ואייקון | דוח QA | ⏳ |
-| **60** | גרסאות DB → 1.0.0; תשתית רפקטור עמלות | 1.0.0; תשתית | ⏳ |
+| **60** | גרסאות DB → 1.0.0; תשתית רפקטור עמלות | 1.0.0; תשתית | ✅ **PASS** — TEAM_60_TO_TEAM_10_BATCH_2_5_CLOSURE_REPORT.md; TEAM_60_BATCH_2_5_EVIDENCE_LOG.md; TEAM_60_TO_TEAM_90_MIGRATION_EXECUTION_EVIDENCE.md |
 | **90** | פסילת 2.x ו-D15_SYSTEM_INDEX; אימות חסימת ייבוא/API ל"אחר"; אימות Redirect ואייקון | דוח Spy | ⏳ |
 | **10** | וידוא רפקטור לפני אישור D18/D21; הפניה בלעדית ל־00_MASTER_INDEX | אינדקסים; חסימה | ✅ **הושלם** — סיכום: TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md; שער: TEAM_10_D18_D21_APPROVAL_GATE.md |
 

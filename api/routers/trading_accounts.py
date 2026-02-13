@@ -14,7 +14,6 @@ import logging
 from ..core.database import get_db
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-from ..utils.identity import ulid_to_uuid
 from ..models.identity import User
 from ..services.trading_accounts import get_trading_account_service
 from ..services.reference_service import is_broker_supported
@@ -144,7 +143,7 @@ async def get_trading_account_api_import_eligible(
             trading_account_id=id,
             db=db
         )
-        broker = account.broker if hasattr(account, 'broker') else getattr(account, 'broker', None)
+        broker = getattr(account, 'broker', None)
         eligible = is_broker_supported(broker)
         if not eligible:
             raise HTTPExceptionWithCode(

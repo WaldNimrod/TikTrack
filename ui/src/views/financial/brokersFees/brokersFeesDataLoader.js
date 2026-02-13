@@ -7,7 +7,7 @@
  * - קונטיינר 0: סיכום מידע והתראות פעילות
  * - קונטיינר 1: טבלת ברוקרים ועמלות
  * 
- * @version v2.0 - Phase 2: Uses Shared_Services.js (PDSC Client) for all API calls
+ * @version v1.0 - Uses sharedServices.js (PDSC Client) for all API calls
  * 
  * API Integration Guide: TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md
  * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md

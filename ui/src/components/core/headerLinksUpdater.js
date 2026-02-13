@@ -16,9 +16,9 @@
    * Gate B Fix: Check multiple token storage locations
    */
   function isAuthenticated() {
-    // Check both access_token and auth_token (for compatibility)
-    const accessToken = localStorage.getItem('access_token');
-    const authToken = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    // ADR-017: Check access_token + authToken (SSOT: TT2_AUTH_GUARDS_AND_ROUTE_SSOT)
+    const accessToken = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     return !!(accessToken || authToken);
   }
   
@@ -34,9 +34,11 @@
       } else {
         // Fallback: Clear tokens manually
         localStorage.removeItem('access_token');
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('auth_token'); // legacy cleanup
         sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('auth_token');
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('auth_token'); // legacy cleanup
       }
       
       // Dispatch logout event for real-time updates

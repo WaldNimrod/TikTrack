@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-02-13T08:24:08.997Z",
+  "timestamp": "2026-02-13T08:24:40.311Z",
   "criteria": {
     "redirect": {
       "name": "Redirect ל-Home לכל אנונימי בעמוד שאינו Open",
-      "status": "SKIP",
-      "note": ""
+      "status": "PASS",
+      "note": "אנונימי ב-/trading_accounts הופנה ל-/"
     },
     "userIconSuccess": {
       "name": "User Icon: SUCCESS (מחובר)",
-      "status": "SKIP",
-      "note": ""
+      "status": "PASS",
+      "note": ".user-icon--success / .user-profile-link--success נוכח"
     },
     "userIconWarning": {
       "name": "User Icon: WARNING (מנותק)",
-      "status": "SKIP",
-      "note": ""
+      "status": "PASS",
+      "note": ".user-icon--alert / .user-profile-link--alert נוכח (מנותק)"
     },
     "noSevere": {
       "name": "0 SEVERE בקונסול",
-      "status": "SKIP",
-      "note": ""
+      "status": "FAIL",
+      "note": "1 SEVERE נמצאו"
     }
   }
 }

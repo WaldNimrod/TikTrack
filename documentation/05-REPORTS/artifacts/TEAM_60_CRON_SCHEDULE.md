@@ -26,6 +26,26 @@
 
 ---
 
+## Cron Wrapper (טעינת .env)
+
+```bash
+# דוגמה — טוען api/.env ומריץ job:
+./scripts/run_market_data_job.sh sync-eod
+./scripts/run_market_data_job.sh sync-ticker-prices
+./scripts/run_market_data_job.sh sync-intraday
+./scripts/run_market_data_job.sh cleanup-market-data
+```
+
+**Crontab דוגמה:**
+```
+0 22 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-eod
+5 22 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-ticker-prices
+*/15 * * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-intraday
+30 22 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh cleanup-market-data
+```
+
+---
+
 ## Scripts
 
 | Script | תפקיד |

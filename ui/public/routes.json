@@ -1,1 +1,51 @@
-{"version":"1.1.2","frontend":8080,"backend":8082,"api":{"base_url":"/api/v1","version":"v1"},"routes":{"auth":{"login":"/login","register":"/register","reset_password":"/reset-password"},"financial":{"trading_accounts":"/trading_accounts.html","brokers_fees":"/brokers_fees.html","cash_flows":"/cash_flows.html"},"planning":{"trade_plans":"/trade_plans.html"},"research":{"trades_history":"/trades_history.html"}},"public_routes":["/login","/register","/reset-password"]}
+{
+  "version": "1.2.0",
+  "frontend": 8080,
+  "backend": 8082,
+  "api": {
+    "base_url": "/api/v1",
+    "version": "v1"
+  },
+  "routes": {
+    "auth": {
+      "login": "/login",
+      "register": "/register",
+      "reset_password": "/reset-password"
+    },
+    "planning": {
+      "trade_plans": "/trade_plans.html"
+    },
+    "tracking": {
+      "watch_lists": "/watch_lists.html",
+      "ticker_dashboard": "/ticker_dashboard.html",
+      "trading_journal": "/trading_journal.html"
+    },
+    "research": {
+      "strategy_analysis": "/strategy-analysis.html",
+      "trades_history": "/trades_history.html",
+      "portfolio_state": "/portfolio-state.html"
+    },
+    "financial": {
+      "trading_accounts": "/trading_accounts.html",
+      "brokers_fees": "/brokers_fees.html",
+      "cash_flows": "/cash_flows.html"
+    },
+    "data": {
+      "alerts": "/alerts.html",
+      "notes": "/notes.html",
+      "user_ticker": "/user_ticker.html",
+      "executions": "/executions.html"
+    },
+    "settings": {
+      "profile": "/profile",
+      "data_import": "/data_import.html",
+      "tag_management": "/tag_management.html",
+      "preferences": "/preferences.html"
+    },
+    "management": {
+      "system_management": "/system_management.html",
+      "tickers": "/tickers.html"
+    }
+  },
+  "public_routes": ["/login", "/register", "/reset-password"]
+}

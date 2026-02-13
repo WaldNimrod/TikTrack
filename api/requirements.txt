@@ -32,6 +32,9 @@ ulid-py>=1.1.0  # ULID support for UUID→ULID conversion
 # Logging
 structlog>=23.2.0
 
+# External Market Data — P3-008, P3-009 (EXTERNAL_PROVIDER_*_SPEC)
+yfinance>=0.2.36
+
 # Testing (development)
 pytest>=7.4.0
 pytest-asyncio>=0.21.0

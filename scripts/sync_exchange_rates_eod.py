@@ -1,71 +1,130 @@
 #!/usr/bin/env python3
 """
-EOD Sync — Exchange Rates
-Team 60 (DevOps & Platform) — MARKET_DATA_PIPE_SPEC §5
-Fetches rates from external API and upserts to market_data.exchange_rates.
-Suitable for cron: 0 22 * * 1-5 (22:00 Sun-Thu)
+EOD Sync — Exchange Rates (P3-011)
+Team 60 — MARKET_DATA_PIPE_SPEC §5, M5 Mandate
+Providers: Alpha Vantage (Primary) → Yahoo Finance (Fallback). No Frankfurter.
+Scope: USD, EUR, ILS. Cron: 0 22 * * 1-5 (UTC)
 """
 
 import os
 import sys
+import time
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
-# NUMERIC(20,8) per SSOT — quantize to 8 decimal places
 DECIMAL_SCALE = Decimal("0.00000001")
+RATE_LIMIT_SEC = 12.5  # Alpha Vantage: 5 calls/min
 
-# Load api/.env
 _project = Path(__file__).parent.parent
 env_file = _project / "api" / ".env"
 DATABASE_URL = None
+ALPHA_VANTAGE_API_KEY = None
 if env_file.exists():
     with open(env_file) as f:
         for line in f:
             line = line.strip()
             if line.startswith("DATABASE_URL=") and not line.startswith("#"):
                 DATABASE_URL = line.split("=", 1)[1].strip().strip("'\"").strip()
-                break
+            elif line.startswith("ALPHA_VANTAGE_API_KEY=") and not line.startswith("#"):
+                ALPHA_VANTAGE_API_KEY = line.split("=", 1)[1].strip().strip("'\"").strip()
 if not DATABASE_URL:
     DATABASE_URL = os.getenv("DATABASE_URL")
+if not ALPHA_VANTAGE_API_KEY:
+    ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 if not DATABASE_URL:
     print("❌ DATABASE_URL not set (api/.env)")
     sys.exit(1)
 if "postgresql+asyncpg" in DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
 
+PAIRS = [("USD", "ILS"), ("USD", "EUR"), ("EUR", "USD"), ("EUR", "ILS"), ("ILS", "USD")]
 
-def fetch_rates() -> List[Tuple[str, str, Decimal]]:
-    """
-    Fetch rates from Frankfurter (free, no key).
-    Scope: USD, EUR, ILS per SSOT (initial scope).
-    Returns [(from_ccy, to_ccy, rate), ...] with Decimal quantized to 8 places.
-    """
+
+def _quantize(raw: float) -> Decimal:
+    return Decimal(str(raw)).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+
+
+def fetch_alpha_vantage() -> List[Tuple[str, str, Decimal]]:
+    """Primary: Alpha Vantage. Rate limit 12.5s between calls."""
+    if not ALPHA_VANTAGE_API_KEY:
+        return []
     try:
         import httpx
     except ImportError:
-        print("❌ httpx required. pip install httpx")
-        sys.exit(1)
-    pairs = [("USD", "ILS"), ("USD", "EUR"), ("EUR", "USD"), ("EUR", "ILS"), ("ILS", "USD")]
+        return []
     results: List[Tuple[str, str, Decimal]] = []
-    with httpx.Client(timeout=10.0) as client:
-        for from_ccy, to_ccy in pairs:
+    with httpx.Client(timeout=15.0) as client:
+        for i, (from_ccy, to_ccy) in enumerate(PAIRS):
+            if i > 0:
+                time.sleep(RATE_LIMIT_SEC)
             try:
-                r = client.get(f"https://api.frankfurter.app/latest?from={from_ccy}&to={to_ccy}")
+                r = client.get(
+                    "https://www.alphavantage.co/query",
+                    params={
+                        "function": "CURRENCY_EXCHANGE_RATE",
+                        "from_currency": from_ccy,
+                        "to_currency": to_ccy,
+                        "apikey": ALPHA_VANTAGE_API_KEY,
+                    },
+                )
                 r.raise_for_status()
                 data = r.json()
-                raw = float(data.get("rates", {}).get(to_ccy, 0))
-                if raw > 0:
-                    rate = Decimal(str(raw)).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
-                    results.append((from_ccy, to_ccy, rate))
+                rr = data.get("Realtime Currency Exchange Rate", {})
+                rate_str = rr.get("5. Exchange Rate", "0")
+                if rate_str and float(rate_str) > 0:
+                    results.append((from_ccy, to_ccy, _quantize(float(rate_str))))
             except Exception as e:
-                print(f"⚠️ Skip {from_ccy}->{to_ccy}: {e}")
+                print(f"⚠️ Alpha {from_ccy}->{to_ccy}: {e}")
     return results
 
 
+def fetch_yahoo() -> List[Tuple[str, str, Decimal]]:
+    """Fallback: Yahoo Finance. Ticker format: XXXYYY=X."""
+    try:
+        import yfinance as yf
+    except ImportError:
+        return []
+    symbol_map = {
+        ("USD", "ILS"): "USDILS=X",
+        ("USD", "EUR"): "USDEUR=X",
+        ("EUR", "USD"): "EURUSD=X",
+        ("EUR", "ILS"): "EURILS=X",
+        ("ILS", "USD"): "USDILS=X",  # inverse
+    }
+    results: List[Tuple[str, str, Decimal]] = []
+    for from_ccy, to_ccy in PAIRS:
+        try:
+            sym = symbol_map.get((from_ccy, to_ccy))
+            if not sym:
+                continue
+            t = yf.Ticker(sym)
+            hist = t.history(period="5d")
+            if hist.empty:
+                continue
+            close = float(hist["Close"].iloc[-1])
+            if close <= 0:
+                continue
+            if (from_ccy, to_ccy) == ("ILS", "USD"):
+                close = 1.0 / close
+            results.append((from_ccy, to_ccy, _quantize(close)))
+        except Exception as e:
+            print(f"⚠️ Yahoo {from_ccy}->{to_ccy}: {e}")
+    return results
+
+
+def fetch_rates() -> List[Tuple[str, str, Decimal]]:
+    """Alpha (Primary) → Yahoo (Fallback)."""
+    rates = fetch_alpha_vantage()
+    if len(rates) >= 3:
+        return rates
+    print("⚠️ Alpha partial/fail — fallback to Yahoo")
+    rates = fetch_yahoo()
+    return rates
+
+
 def upsert_rates(rates: List[Tuple[str, str, Decimal]]) -> int:
-    """Upsert to market_data.exchange_rates. conversion_rate NUMERIC(20,8) per SSOT."""
     import psycopg2
     from psycopg2.extras import execute_values
     conn = psycopg2.connect(DATABASE_URL)
@@ -94,7 +153,7 @@ def upsert_rates(rates: List[Tuple[str, str, Decimal]]) -> int:
 
 
 def main():
-    print("🔄 EOD sync — exchange_rates")
+    print("🔄 EOD sync — exchange_rates (Alpha→Yahoo)")
     rates = fetch_rates()
     if not rates:
         print("⚠️ No rates fetched. Exit 0.")

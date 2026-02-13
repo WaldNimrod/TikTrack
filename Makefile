@@ -60,11 +60,17 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
-## EOD Sync — exchange_rates (MARKET_DATA_PIPE_SPEC §5)
+## EOD Sync — exchange_rates (P3-011; Alpha→Yahoo)
 sync-eod:
 	@echo "🔄 EOD sync — exchange_rates"
 	@python3 scripts/sync_exchange_rates_eod.py
 	@echo "✅ EOD sync complete."
+
+## Cleanup — market data (P3-017)
+cleanup-market-data:
+	@echo "🔄 Cleanup — market data"
+	@python3 scripts/cleanup_market_data.py
+	@echo "✅ Cleanup complete."
 
 ## Help
 help:
@@ -76,6 +82,7 @@ help:
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
-	@echo "  make sync-eod           - EOD sync exchange_rates (Frankfurter API)"
+	@echo "  make sync-eod           - EOD sync exchange_rates (Alpha→Yahoo)"
+	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

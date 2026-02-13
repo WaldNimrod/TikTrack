@@ -1,0 +1,203 @@
+"""
+Alpha Vantage Provider — P3-009
+SSOT: EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC, MARKET_DATA_PIPE_SPEC §2.2
+Guardrail: RateLimitQueue 12.5s (5 calls/min).
+Role: Primary FX / Fallback Prices. Precision 20,8.
+"""
+
+import asyncio
+import logging
+import os
+from datetime import datetime, timezone
+from decimal import Decimal
+from typing import Optional
+
+import httpx
+
+from ..provider_interface import (
+    ExchangeRateResult,
+    MarketDataProvider,
+    OHLCVRow,
+    PriceResult,
+)
+
+logger = logging.getLogger(__name__)
+
+ALPHA_BASE_URL = "https://www.alphavantage.co/query"
+ALPHA_RATE_LIMIT_SECONDS = 12.5  # 5 calls/min per spec
+
+
+class AlphaProvider(MarketDataProvider):
+    """
+    RateLimitQueue 12.5s — per EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC.
+    API key from env: ALPHA_VANTAGE_API_KEY (Team 60 config).
+    """
+
+    def __init__(self, api_key: Optional[str] = None):
+        self._api_key = api_key or os.environ.get("ALPHA_VANTAGE_API_KEY", "")
+        self._last_call: Optional[float] = 0.0
+        self._lock = asyncio.Lock()
+
+    async def _rate_limit(self) -> None:
+        """Enforce 12.5s between calls — 5 calls/min per spec."""
+        async with self._lock:
+            now = asyncio.get_event_loop().time()
+            elapsed = now - (self._last_call or 0)
+            if elapsed < ALPHA_RATE_LIMIT_SECONDS:
+                await asyncio.sleep(ALPHA_RATE_LIMIT_SECONDS - elapsed)
+            self._last_call = asyncio.get_event_loop().time()
+
+    def _to_decimal(self, val) -> Optional[Decimal]:
+        """Force precision 20,8 per spec."""
+        if val is None:
+            return None
+        try:
+            return Decimal(str(float(val))).quantize(Decimal("0.00000001"))
+        except (TypeError, ValueError):
+            return None
+
+    async def get_ticker_price(self, symbol: str) -> Optional[PriceResult]:
+        """Fallback for Prices. GLOBAL_QUOTE endpoint."""
+        if not self._api_key:
+            logger.warning("Alpha Vantage: no API key")
+            return None
+        await self._rate_limit()
+        try:
+            params = {
+                "function": "GLOBAL_QUOTE",
+                "symbol": symbol,
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            quote = data.get("Global Quote", {})
+            if not quote:
+                return None
+            price = self._to_decimal(quote.get("05. price"))
+            if not price or price <= 0:
+                return None
+            market_cap = await self._fetch_market_cap(symbol)
+            return PriceResult(
+                symbol=symbol,
+                price=price,
+                open_price=self._to_decimal(quote.get("02. open")),
+                high_price=self._to_decimal(quote.get("03. high")),
+                low_price=self._to_decimal(quote.get("04. low")),
+                close_price=price,
+                volume=int(quote.get("06. volume", 0)) if quote.get("06. volume") else None,
+                market_cap=market_cap,
+                as_of=datetime.now(timezone.utc),
+                provider="ALPHA_VANTAGE",
+            )
+        except Exception as e:
+            logger.warning("Alpha price fetch failed for %s: %s", symbol, e)
+            return None
+
+    async def _fetch_market_cap(self, symbol: str) -> Optional[Decimal]:
+        """P3-013 — OVERVIEW endpoint has MarketCapitalization."""
+        await self._rate_limit()
+        try:
+            params = {
+                "function": "OVERVIEW",
+                "symbol": symbol,
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            mc = data.get("MarketCapitalization")
+            return self._to_decimal(mc) if mc else None
+        except Exception as e:
+            logger.debug("Alpha market cap fetch failed for %s: %s", symbol, e)
+            return None
+
+    async def get_ticker_history(
+        self, symbol: str, trading_days: int = 250
+    ) -> list:
+        """P3-015 — 250d OHLCV. TIME_SERIES_DAILY."""
+        if not self._api_key:
+            return []
+        await self._rate_limit()
+        result = []
+        try:
+            params = {
+                "function": "TIME_SERIES_DAILY",
+                "symbol": symbol,
+                "outputsize": "full",
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            series = data.get("Time Series (Daily)", {})
+            if not series:
+                return []
+            sorted_dates = sorted(series.keys(), reverse=True)[:trading_days]
+            for d in reversed(sorted_dates):
+                v = series[d]
+                try:
+                    ts = datetime.fromisoformat(d).replace(tzinfo=timezone.utc)
+                except (ValueError, TypeError):
+                    ts = datetime.now(timezone.utc)
+                result.append(OHLCVRow(
+                    date=ts,
+                    open_price=self._to_decimal(v.get("1. open")) or Decimal("0"),
+                    high_price=self._to_decimal(v.get("2. high")) or Decimal("0"),
+                    low_price=self._to_decimal(v.get("3. low")) or Decimal("0"),
+                    close_price=self._to_decimal(v.get("4. close")) or Decimal("0"),
+                    volume=int(v.get("5. volume", 0)) if v.get("5. volume") else None,
+                ))
+        except Exception as e:
+            logger.warning("Alpha history fetch failed for %s: %s", symbol, e)
+        return result
+
+    async def get_exchange_rate(
+        self, from_ccy: str, to_ccy: str
+    ) -> Optional[ExchangeRateResult]:
+        """Primary for FX. CURRENCY_EXCHANGE_RATE endpoint."""
+        if not self._api_key:
+            logger.warning("Alpha Vantage: no API key")
+            return None
+        await self._rate_limit()
+        try:
+            params = {
+                "function": "CURRENCY_EXCHANGE_RATE",
+                "from_currency": from_ccy,
+                "to_currency": to_ccy,
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            rate_info = data.get("Realtime Currency Exchange Rate", {})
+            if not rate_info:
+                return None
+            rate = self._to_decimal(rate_info.get("5. Exchange Rate"))
+            if not rate or rate <= 0:
+                return None
+            last_refresh = rate_info.get("6. Last Refreshed")
+            ts = datetime.now(timezone.utc)
+            if last_refresh:
+                try:
+                    ts = datetime.fromisoformat(
+                        str(last_refresh).replace(" ", "T")
+                    )
+                    if ts.tzinfo is None:
+                        ts = ts.replace(tzinfo=timezone.utc)
+                except (ValueError, TypeError):
+                    pass
+            return ExchangeRateResult(
+                from_currency=from_ccy,
+                to_currency=to_ccy,
+                rate=rate,
+                as_of=ts,
+                provider="ALPHA_VANTAGE",
+            )
+        except Exception as e:
+            logger.warning("Alpha FX fetch failed for %s/%s: %s", from_ccy, to_ccy, e)
+            return None

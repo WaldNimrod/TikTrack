@@ -71,15 +71,17 @@
 |------|--------|--------|-------------|
 | 1.2.2 | נעילת פורטים 8080/8082, Config, Precision 20,6 | ✅ VERIFIED | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md, TEAM_60_TO_TEAM_10_TASK_1_2_2_PORT_PRECISION_REPORT.md |
 | 1.2.3 | Seeders, `make db-test-clean` | ✅ COMPLETE | TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md, TEAM_60_TO_TEAM_10_PHASE_1_IMPLEMENTATION_START.md |
-| **P3-011** | FX EOD Sync (Alpha→Yahoo) | OPEN | TEAM_10_TO_TEAM_60_EXTERNAL_DATA_M5_MANDATE |
-| **P3-016** | Intraday Table + Migration (`ticker_prices_intraday`) | OPEN | TEAM_90_TO_TEAM_10_EXTERNAL_DATA_MAINTENANCE_LOCKED_UPDATE; MARKET_DATA_PIPE_SPEC §4.1, §7 |
-| **P3-017** | Cleanup Jobs (retention 30d/250d, archive) + Evidence | OPEN | MARKET_DATA_PIPE_SPEC §7 |
+| **P3-011** | FX EOD Sync (Alpha→Yahoo) | ✅ תוצרים התקבלו — PENDING_VERIFICATION | TEAM_60_TO_TEAM_20_EXTERNAL_DATA_COORDINATION; TEAM_10_TO_TEAM_60_EXTERNAL_DATA_DELIVERABLES_ACK |
+| **P3-016** | Intraday Table + Migration (`ticker_prices_intraday`) | ✅ תוצרים התקבלו — PENDING_VERIFICATION | כנ"ל |
+| **P3-017** | Cleanup Jobs (retention 30d/250d, archive) + Evidence | ✅ תוצרים התקבלו — PENDING_VERIFICATION | כנ"ל |
 
 **תלויות שפתחו:** משימה 1.1.3 (Team 10) — מוכן לביצוע; אינטגרציה מלאה Team 30/40 — מוכנה.
 
 ---
 
 ### 2.4 Team 30 (Frontend Execution)
+
+**Pre-Batch 3 (SOP-013 Seal 2026-01-31):** P3-001 (Routes SSOT), P3-002 (Menu Alignment), P3-012 (Clock Staleness UI) — **CLOSED** per TEAM_30_TO_TEAM_10_PRE_BATCH_3_SEAL_MESSAGE. P3-004 (חלק 30) — נחתם; משימה כוללת OPEN.
 
 | סדר | מזהה | משימה | תוצר מצופה | מקור |
 |-----|------|--------|-------------|------|

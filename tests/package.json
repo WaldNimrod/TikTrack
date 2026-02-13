@@ -17,6 +17,7 @@
     "test:phase1-completion-b": "node phase1-completion-b-validation.test.js",
     "test:gate-a": "node gate-a-e2e.test.js",
     "test:gate-b": "node gate-b-e2e.test.js",
+    "test:external-data-suite-e": "node external-data-suite-e-staleness-clock.test.js",
     "test:adr015-gate-a": "node adr015-gate-a-e2e.test.js",
     "test:central-status": "node central-status-api-verify.js",
     "test:central-status-e2e": "node central-status-e2e.test.js",

@@ -3,12 +3,14 @@ Yahoo Finance Provider — P3-009
 SSOT: EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC, MARKET_DATA_PIPE_SPEC §2.2
 Guardrail: User-Agent Rotation required.
 Role: Primary Prices / Fallback FX. Interval 1d (EOD). Precision 20,8.
+REPLAY mode: returns fixtures — zero HTTP calls (TEAM_90 Automated Testing Directive).
 """
 
 import asyncio
 import logging
 from datetime import datetime, timezone
 from decimal import Decimal
+from pathlib import Path
 from typing import Optional
 
 from ..provider_interface import (
@@ -163,16 +165,100 @@ def _fetch_history_sync(symbol: str, trading_days: int) -> list:
     return result
 
 
+def _replay_price(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceResult]:
+    """REPLAY: load from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_prices_eod, load_prices_intraday
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    for loader in (load_prices_intraday, load_prices_eod):
+        data = loader(base) if base else {}
+        raw = data.get(symbol) if isinstance(data, dict) else None
+        if not raw:
+            continue
+        try:
+            ts = raw.get("as_of", "")
+            as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+            return PriceResult(
+                symbol=raw.get("symbol", symbol),
+                price=_to_decimal(raw.get("price")),
+                open_price=_to_decimal(raw.get("open_price")),
+                high_price=_to_decimal(raw.get("high_price")),
+                low_price=_to_decimal(raw.get("low_price")),
+                close_price=_to_decimal(raw.get("close_price")),
+                volume=int(raw["volume"]) if raw.get("volume") is not None else None,
+                market_cap=_to_decimal(raw.get("market_cap")),
+                as_of=as_of,
+                provider=raw.get("provider", "YAHOO_FINANCE"),
+            )
+        except (KeyError, TypeError, ValueError):
+            pass
+    return None
+
+
+def _replay_fx(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
+    """REPLAY: load from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_fx_eod
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    data = load_fx_eod(base) if base else {}
+    key = f"{from_ccy}_{to_ccy}"
+    raw = data.get(key)
+    if not raw:
+        return None
+    try:
+        ts = raw.get("as_of", "")
+        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        return ExchangeRateResult(
+            from_currency=raw.get("from_currency", from_ccy),
+            to_currency=raw.get("to_currency", to_ccy),
+            rate=_to_decimal(raw.get("rate")),
+            as_of=as_of,
+            provider=raw.get("provider", "YAHOO_FINANCE"),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _replay_history(fixtures_dir: Optional[Path], symbol: str, trading_days: int) -> list:
+    """REPLAY: load 250d history from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_prices_history
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    data = load_prices_history(base) if base else {}
+    rows_data = data.get(symbol, []) if isinstance(data, dict) else []
+    result = []
+    for item in rows_data[-trading_days:]:
+        try:
+            d = item.get("date", "")
+            ts = datetime.fromisoformat(d.replace("Z", "+00:00")) if d else datetime.now(timezone.utc)
+            result.append(OHLCVRow(
+                date=ts,
+                open_price=_to_decimal(item.get("open_price")) or Decimal("0"),
+                high_price=_to_decimal(item.get("high_price")) or Decimal("0"),
+                low_price=_to_decimal(item.get("low_price")) or Decimal("0"),
+                close_price=_to_decimal(item.get("close_price")) or Decimal("0"),
+                volume=int(item["volume"]) if item.get("volume") is not None else None,
+            ))
+        except (KeyError, TypeError, ValueError):
+            pass
+    return result
+
+
 class YahooProvider(MarketDataProvider):
-    """User-Agent Rotation required — EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC."""
+    """User-Agent Rotation required — EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC. Supports mode=REPLAY."""
+
+    def __init__(self, mode: str = "LIVE", fixtures_dir: Optional[Path] = None):
+        self._mode = (mode or "LIVE").upper()
+        self._fixtures_dir = fixtures_dir
 
     async def get_ticker_price(self, symbol: str) -> Optional[PriceResult]:
+        if self._mode == "REPLAY":
+            return _replay_price(self._fixtures_dir, symbol)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _fetch_price_sync, symbol)
 
     async def get_exchange_rate(
         self, from_ccy: str, to_ccy: str
     ) -> Optional[ExchangeRateResult]:
+        if self._mode == "REPLAY":
+            return _replay_fx(self._fixtures_dir, from_ccy, to_ccy)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
             None, _fetch_fx_sync, from_ccy, to_ccy
@@ -182,6 +268,8 @@ class YahooProvider(MarketDataProvider):
         self, symbol: str, trading_days: int = 250
     ) -> list:
         """P3-015 — 250d OHLCV. period 1y ≈ 252 trading days."""
+        if self._mode == "REPLAY":
+            return _replay_history(self._fixtures_dir, symbol, trading_days)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
             None, _fetch_history_sync, symbol, trading_days

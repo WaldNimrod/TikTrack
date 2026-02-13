@@ -1,0 +1,23 @@
+{
+  "USD_ILS": {
+    "from_currency": "USD",
+    "to_currency": "ILS",
+    "rate": "3.06170000",
+    "as_of": "2026-02-13T13:11:47Z",
+    "provider": "ALPHA_VANTAGE"
+  },
+  "USD_EUR": {
+    "from_currency": "USD",
+    "to_currency": "EUR",
+    "rate": "0.84218000",
+    "as_of": "2026-02-13T13:11:47Z",
+    "provider": "ALPHA_VANTAGE"
+  },
+  "EUR_ILS": {
+    "from_currency": "EUR",
+    "to_currency": "ILS",
+    "rate": "3.63420000",
+    "as_of": "2026-02-13T13:11:47Z",
+    "provider": "ALPHA_VANTAGE"
+  }
+}

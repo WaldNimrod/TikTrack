@@ -54,6 +54,8 @@ npm run test:user      # User Management Flow
 npm run test:apikeys   # API Keys Management Flow
 npm run test:errors    # Error Handling & Security
 npm run test:password-change  # Password Change Flow
+npm run test:gate-b    # Gate B E2E (Design System, Brokers)
+npm run test:external-data-suite-e  # External Data — Suite E (Staleness Clock + Tooltip)
 
 # Run in headless mode (for CI/CD - browser not visible)
 HEADLESS=true npm run test:all

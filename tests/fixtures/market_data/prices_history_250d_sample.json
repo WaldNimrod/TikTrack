@@ -1,0 +1,29 @@
+{
+  "AAPL": [
+    {"date": "2025-03-01T21:00:00Z", "open_price": "175.00", "high_price": "177.00", "low_price": "174.50", "close_price": "176.50", "volume": 45000000},
+    {"date": "2025-03-02T21:00:00Z", "open_price": "176.50", "high_price": "178.00", "low_price": "175.80", "close_price": "177.20", "volume": 42000000},
+    {"date": "2025-03-03T21:00:00Z", "open_price": "177.20", "high_price": "179.50", "low_price": "176.50", "close_price": "178.80", "volume": 48000000},
+    {"date": "2025-03-04T21:00:00Z", "open_price": "178.80", "high_price": "180.00", "low_price": "177.00", "close_price": "179.20", "volume": 52000000},
+    {"date": "2025-03-05T21:00:00Z", "open_price": "179.20", "high_price": "181.50", "low_price": "178.50", "close_price": "180.50", "volume": 46000000},
+    {"date": "2025-03-06T21:00:00Z", "open_price": "180.50", "high_price": "182.00", "low_price": "179.80", "close_price": "181.20", "volume": 44000000},
+    {"date": "2025-03-07T21:00:00Z", "open_price": "181.20", "high_price": "183.00", "low_price": "180.50", "close_price": "182.50", "volume": 50000000},
+    {"date": "2025-03-08T21:00:00Z", "open_price": "182.50", "high_price": "184.00", "low_price": "181.80", "close_price": "183.20", "volume": 47000000},
+    {"date": "2025-03-09T21:00:00Z", "open_price": "183.20", "high_price": "185.00", "low_price": "182.50", "close_price": "184.50", "volume": 49000000},
+    {"date": "2025-03-10T21:00:00Z", "open_price": "184.50", "high_price": "186.00", "low_price": "183.80", "close_price": "185.20", "volume": 51000000},
+    {"date": "2025-03-11T21:00:00Z", "open_price": "185.20", "high_price": "187.00", "low_price": "184.50", "close_price": "186.50", "volume": 53000000},
+    {"date": "2025-03-12T21:00:00Z", "open_price": "186.50", "high_price": "188.00", "low_price": "185.80", "close_price": "187.20", "volume": 48000000},
+    {"date": "2025-03-13T21:00:00Z", "open_price": "187.20", "high_price": "189.00", "low_price": "186.50", "close_price": "188.20", "volume": 52000000},
+    {"date": "2025-03-14T21:00:00Z", "open_price": "188.20", "high_price": "190.00", "low_price": "187.50", "close_price": "189.50", "volume": 55000000},
+    {"date": "2025-03-15T21:00:00Z", "open_price": "189.50", "high_price": "191.00", "low_price": "188.80", "close_price": "190.20", "volume": 46000000},
+    {"date": "2025-03-16T21:00:00Z", "open_price": "190.20", "high_price": "192.00", "low_price": "189.50", "close_price": "191.20", "volume": 49000000},
+    {"date": "2025-03-17T21:00:00Z", "open_price": "191.20", "high_price": "193.00", "low_price": "190.50", "close_price": "192.50", "volume": 51000000},
+    {"date": "2025-03-18T21:00:00Z", "open_price": "192.50", "high_price": "194.00", "low_price": "191.80", "close_price": "193.20", "volume": 50000000},
+    {"date": "2025-03-19T21:00:00Z", "open_price": "193.20", "high_price": "195.00", "low_price": "192.50", "close_price": "184.50", "volume": 54000000},
+    {"date": "2025-03-20T21:00:00Z", "open_price": "184.50", "high_price": "186.00", "low_price": "183.00", "close_price": "185.00", "volume": 60000000},
+    {"date": "2025-03-21T21:00:00Z", "open_price": "185.00", "high_price": "186.50", "low_price": "184.00", "close_price": "185.80", "volume": 47000000},
+    {"date": "2025-03-22T21:00:00Z", "open_price": "185.80", "high_price": "187.00", "low_price": "184.80", "close_price": "186.20", "volume": 48000000},
+    {"date": "2025-03-23T21:00:00Z", "open_price": "186.20", "high_price": "188.00", "low_price": "185.50", "close_price": "187.00", "volume": 49000000},
+    {"date": "2025-03-24T21:00:00Z", "open_price": "187.00", "high_price": "188.50", "low_price": "186.00", "close_price": "187.80", "volume": 52000000},
+    {"date": "2025-03-25T21:00:00Z", "open_price": "187.80", "high_price": "189.00", "low_price": "186.80", "close_price": "188.20", "volume": 51000000}
+  ]
+}

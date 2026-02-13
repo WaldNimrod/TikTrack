@@ -89,10 +89,13 @@ def run_cleanup_fx_history() -> dict:
 
 
 def log_evidence(ev: dict) -> None:
+    """MD log + JSON evidence (CI/QA collectible). Per TEAM_10_TO_TEAM_60_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE."""
+    import json
     artifacts = _project / "documentation" / "05-REPORTS" / "artifacts"
     artifacts.mkdir(parents=True, exist_ok=True)
+    now = ev.get("last_run_time", datetime.now(timezone.utc).isoformat())
+    # MD log
     log_file = artifacts / "TEAM_60_CLEANUP_EVIDENCE_LOG.md"
-    now = datetime.now(timezone.utc).isoformat()
     entry = (
         f"\n## {now}\n"
         f"- intraday: rows_pruned={ev.get('intraday',{}).get('rows_pruned',0)}\n"
@@ -101,6 +104,23 @@ def log_evidence(ev: dict) -> None:
     )
     with open(log_file, "a") as f:
         f.write(entry)
+    # JSON evidence (CI/QA)
+    rows_pruned = (
+        ev.get("intraday", {}).get("rows_pruned", 0)
+        + ev.get("daily", {}).get("rows_pruned", 0)
+        + ev.get("fx_history", {}).get("rows_pruned", 0)
+    )
+    json_ev = {
+        "last_run_time": now,
+        "rows_pruned": rows_pruned,
+        "rows_updated": ev.get("rows_updated", 0),
+        "intraday": ev.get("intraday", {}),
+        "daily": ev.get("daily", {}),
+        "fx_history": ev.get("fx_history", {}),
+    }
+    json_file = artifacts / "TEAM_60_CLEANUP_EVIDENCE.json"
+    with open(json_file, "w") as f:
+        json.dump(json_ev, f, indent=2)
 
 
 def main():

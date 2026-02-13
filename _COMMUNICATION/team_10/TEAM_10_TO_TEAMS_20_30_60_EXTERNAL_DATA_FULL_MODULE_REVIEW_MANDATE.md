@@ -217,6 +217,16 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 
 **Team 10 — CI + Evidence:** חיווט CI (Nightly + Smoke), פרסום לוח CI, ו־Evidence log: `05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE_LOG.md`.
 
+### 10.5 סטטוס ביצוע — Automated Testing (§10)
+
+| צוות | היקף | סטטוס | Evidence / הודעה |
+|------|------|--------|-------------------|
+| **60** | Retention/cleanup + סוויטה D | ✅ **הושלם** | TEAM_60_TO_TEAM_10_AUTOMATED_TESTING_MANDATE_COMPLETE.md; tests/test_retention_cleanup_suite_d.py; TEAM_60_CLEANUP_EVIDENCE.json |
+| 20 | Replay Mode + A, B | ⏳ | — |
+| 30 | סוויטה E (UI) | ⏳ | — |
+| 50 | Nightly/Smoke scripts + reporting | ⏳ | — |
+| 10 | CI wiring + evidence log | ⏳ | — |
+
 ---
 
 **log_entry | TEAM_10 | TO_TEAMS_20_30_60 | EXTERNAL_DATA_FULL_MODULE_REVIEW_MANDATE | 2026-02-13**

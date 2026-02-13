@@ -16,7 +16,7 @@
 | CI wiring | ⏳ | ימולא עם הפעלת Nightly + Smoke. |
 | לוח CI (schedule) | ⏳ | ימולא עם תיאום Team 50/תשתית. |
 | Evidence — Nightly run | ⏳ | ימולא עם הרצה ראשונה. |
-| Evidence — Jobs (60) | ⏳ | ימולא עם דיווח Team 60. |
+| Evidence — Jobs (60) | ✅ | Team 60 הושלם. JSON: documentation/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json; בדיקה: tests/test_retention_cleanup_suite_d.py, make test-suite-d. |
 
 ---
 
@@ -33,6 +33,8 @@
 
 - הנחיית אדריכל: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_DIRECTIVE.md`
 - מנדטים: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_{20,30,50,60}_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE.md`
+- Team 60 סיום: `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_AUTOMATED_TESTING_MANDATE_COMPLETE.md`
+- Team 10 ACK ל-60: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_60_EXTERNAL_DATA_AUTOMATED_TESTING_ACK.md`
 
 ---
 

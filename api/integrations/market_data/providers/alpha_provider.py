@@ -3,6 +3,7 @@ Alpha Vantage Provider — P3-009
 SSOT: EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC, MARKET_DATA_PIPE_SPEC §2.2
 Guardrail: RateLimitQueue 12.5s (5 calls/min).
 Role: Primary FX / Fallback Prices. Precision 20,8.
+REPLAY mode: returns fixtures — zero HTTP calls (TEAM_90 Automated Testing Directive).
 """
 
 import asyncio
@@ -10,6 +11,7 @@ import logging
 import os
 from datetime import datetime, timezone
 from decimal import Decimal
+from pathlib import Path
 from typing import Optional
 
 import httpx
@@ -27,16 +29,93 @@ ALPHA_BASE_URL = "https://www.alphavantage.co/query"
 ALPHA_RATE_LIMIT_SECONDS = 12.5  # 5 calls/min per spec
 
 
+def _replay_fx_alpha(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
+    """REPLAY: load FX from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_fx_eod
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    data = load_fx_eod(base) if base else {}
+    key = f"{from_ccy}_{to_ccy}"
+    raw = data.get(key)
+    if not raw:
+        return None
+    try:
+        ts = raw.get("as_of", "")
+        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        return ExchangeRateResult(
+            from_currency=raw.get("from_currency", from_ccy),
+            to_currency=raw.get("to_currency", to_ccy),
+            rate=Decimal(str(raw.get("rate", "0"))).quantize(Decimal("0.00000001")),
+            as_of=as_of,
+            provider=raw.get("provider", "ALPHA_VANTAGE"),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _replay_price_alpha(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceResult]:
+    """REPLAY: load price from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_prices_eod
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    data = load_prices_eod(base) if base else {}
+    raw = data.get(symbol)
+    if not raw:
+        return None
+    try:
+        ts = raw.get("as_of", "")
+        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        return PriceResult(
+            symbol=raw.get("symbol", symbol),
+            price=Decimal(str(raw.get("price", "0"))).quantize(Decimal("0.00000001")),
+            open_price=Decimal(str(raw.get("open_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("open_price") else None,
+            high_price=Decimal(str(raw.get("high_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("high_price") else None,
+            low_price=Decimal(str(raw.get("low_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("low_price") else None,
+            close_price=Decimal(str(raw.get("close_price", raw.get("price", "0")))).quantize(Decimal("0.00000001")),
+            volume=int(raw["volume"]) if raw.get("volume") is not None else None,
+            market_cap=Decimal(str(raw["market_cap"])).quantize(Decimal("0.00000001")) if raw.get("market_cap") else None,
+            as_of=as_of,
+            provider=raw.get("provider", "ALPHA_VANTAGE"),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _replay_history_alpha(fixtures_dir: Optional[Path], symbol: str, trading_days: int) -> list:
+    """REPLAY: load 250d history from fixtures — zero HTTP calls."""
+    from ..replay_loader import load_prices_history
+    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+    data = load_prices_history(base) if base else {}
+    rows_data = data.get(symbol, []) if isinstance(data, dict) else []
+    result = []
+    for item in rows_data[-trading_days:]:
+        try:
+            d = item.get("date", "")
+            ts = datetime.fromisoformat(d.replace("Z", "+00:00")) if d else datetime.now(timezone.utc)
+            result.append(OHLCVRow(
+                date=ts,
+                open_price=Decimal(str(item.get("open_price", "0"))).quantize(Decimal("0.00000001")),
+                high_price=Decimal(str(item.get("high_price", "0"))).quantize(Decimal("0.00000001")),
+                low_price=Decimal(str(item.get("low_price", "0"))).quantize(Decimal("0.00000001")),
+                close_price=Decimal(str(item.get("close_price", "0"))).quantize(Decimal("0.00000001")),
+                volume=int(item["volume"]) if item.get("volume") is not None else None,
+            ))
+        except (KeyError, TypeError, ValueError):
+            pass
+    return result
+
+
 class AlphaProvider(MarketDataProvider):
     """
     RateLimitQueue 12.5s — per EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC.
     API key from env: ALPHA_VANTAGE_API_KEY (Team 60 config).
+    Supports mode=REPLAY — zero HTTP calls.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, mode: str = "LIVE", fixtures_dir: Optional[Path] = None):
         self._api_key = api_key or os.environ.get("ALPHA_VANTAGE_API_KEY", "")
         self._last_call: Optional[float] = 0.0
         self._lock = asyncio.Lock()
+        self._mode = (mode or "LIVE").upper()
+        self._fixtures_dir = fixtures_dir
 
     async def _rate_limit(self) -> None:
         """Enforce 12.5s between calls — 5 calls/min per spec."""
@@ -57,7 +136,9 @@ class AlphaProvider(MarketDataProvider):
             return None
 
     async def get_ticker_price(self, symbol: str) -> Optional[PriceResult]:
-        """Fallback for Prices. GLOBAL_QUOTE endpoint."""
+        """Fallback for Prices. GLOBAL_QUOTE endpoint. REPLAY: fixtures only."""
+        if self._mode == "REPLAY":
+            return _replay_price_alpha(self._fixtures_dir, symbol)
         if not self._api_key:
             logger.warning("Alpha Vantage: no API key")
             return None
@@ -118,6 +199,8 @@ class AlphaProvider(MarketDataProvider):
         self, symbol: str, trading_days: int = 250
     ) -> list:
         """P3-015 — 250d OHLCV. TIME_SERIES_DAILY."""
+        if self._mode == "REPLAY":
+            return _replay_history_alpha(self._fixtures_dir, symbol, trading_days)
         if not self._api_key:
             return []
         await self._rate_limit()
@@ -158,7 +241,9 @@ class AlphaProvider(MarketDataProvider):
     async def get_exchange_rate(
         self, from_ccy: str, to_ccy: str
     ) -> Optional[ExchangeRateResult]:
-        """Primary for FX. CURRENCY_EXCHANGE_RATE endpoint."""
+        """Primary for FX. CURRENCY_EXCHANGE_RATE endpoint. REPLAY: fixtures only."""
+        if self._mode == "REPLAY":
+            return _replay_fx_alpha(self._fixtures_dir, from_ccy, to_ccy)
         if not self._api_key:
             logger.warning("Alpha Vantage: no API key")
             return None

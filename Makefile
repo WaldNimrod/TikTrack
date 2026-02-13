@@ -90,6 +90,34 @@ cleanup-market-data:
 	@python3 scripts/cleanup_market_data.py
 	@echo "✅ Cleanup complete."
 
+## Suite A: Contract & Schema (Smoke) — Automated Testing Mandate
+test-suite-a:
+	@echo "🔄 Suite A — Contract & Schema"
+	@python3 tests/external_data_suite_a_contract_schema.py
+	@echo "✅ Suite A complete."
+
+## Suite B: Cache-First + Failover (Smoke) — mode=REPLAY, zero HTTP
+test-suite-b:
+	@echo "🔄 Suite B — Cache-First + Failover"
+	@python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v
+	@echo "✅ Suite B complete."
+
+## Smoke: Suites A + B (PR/commit — no external calls)
+test-external-data-smoke: test-suite-a test-suite-b
+	@echo "✅ External Data Smoke complete."
+
+## Suite D: Retention & Cleanup — Smoke/Nightly test (Automated Testing Mandate)
+test-suite-d:
+	@echo "🔄 Suite D — Retention & Cleanup"
+	@python3 tests/test_retention_cleanup_suite_d.py
+	@echo "✅ Suite D complete."
+
+## Suite E: UI (Clock + Tooltip) — Nightly test (Team 30; requires frontend 8080 + backend 8082)
+test-suite-e:
+	@echo "🔄 Suite E — UI Staleness Clock + Tooltip"
+	@cd tests && npm run test:external-data-suite-e
+	@echo "✅ Suite E complete."
+
 ## Help
 help:
 	@echo "Available targets:"
@@ -104,5 +132,7 @@ help:
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
+	@echo "  make test-suite-d      - Suite D: Retention & Cleanup (Smoke/Nightly)"
+	@echo "  make test-suite-e      - Suite E: UI Staleness Clock + Tooltip (Nightly)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

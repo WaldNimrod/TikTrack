@@ -10,6 +10,7 @@ SSOT: MARKET_DATA_PIPE_SPEC §2.3
 import logging
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from pathlib import Path
 from typing import Optional, Tuple
 from uuid import UUID
 
@@ -79,6 +80,8 @@ async def get_exchange_rate_cache_first(
     to_ccy: str,
     *,
     skip_fetch: bool = False,
+    mode: str = "LIVE",
+    fixtures_dir: Optional[Path] = None,
 ) -> Tuple[Optional[ExchangeRateResult], str]:
     """
     Cache-First FX. Per FOREX_MARKET_SPEC: Alpha → Yahoo.
@@ -118,8 +121,8 @@ async def get_exchange_rate_cache_first(
         )
 
     # Cache MISS or stale — Primary (Alpha) → Fallback (Yahoo)
-    alpha = AlphaProvider()
-    yahoo = YahooProvider()
+    alpha = AlphaProvider(mode=mode, fixtures_dir=fixtures_dir)
+    yahoo = YahooProvider(mode=mode, fixtures_dir=fixtures_dir)
     for provider in (alpha, yahoo):
         try:
             rate = await provider.get_exchange_rate(from_ccy, to_ccy)
@@ -150,6 +153,8 @@ async def get_ticker_price_cache_first(
     ticker_id: UUID,
     *,
     skip_fetch: bool = False,
+    mode: str = "LIVE",
+    fixtures_dir: Optional[Path] = None,
 ) -> Tuple[Optional[PriceResult], str]:
     """
     Cache-First Prices. Per MARKET_DATA_PIPE_SPEC §2.1: Yahoo → Alpha.
@@ -199,8 +204,8 @@ async def get_ticker_price_cache_first(
         )
 
     # Cache MISS or stale — Primary (Yahoo) → Fallback (Alpha)
-    yahoo = YahooProvider()
-    alpha = AlphaProvider()
+    yahoo = YahooProvider(mode=mode, fixtures_dir=fixtures_dir)
+    alpha = AlphaProvider(mode=mode, fixtures_dir=fixtures_dir)
     for provider in (yahoo, alpha):
         try:
             price = await provider.get_ticker_price(symbol)
@@ -237,6 +242,8 @@ async def get_ticker_history_cache_first(
     trading_days: int = 250,
     *,
     skip_fetch: bool = False,
+    mode: str = "LIVE",
+    fixtures_dir: Optional[Path] = None,
 ) -> list:
     """P3-015 — 250d OHLCV. Cache-First: DB → Yahoo → Alpha."""
     stmt = (
@@ -261,7 +268,8 @@ async def get_ticker_history_cache_first(
         ]
     if skip_fetch:
         return []
-    yahoo, alpha = YahooProvider(), AlphaProvider()
+    yahoo = YahooProvider(mode=mode, fixtures_dir=fixtures_dir)
+    alpha = AlphaProvider(mode=mode, fixtures_dir=fixtures_dir)
     for provider in (yahoo, alpha):
         try:
             hist = await provider.get_ticker_history(symbol, trading_days)
@@ -280,9 +288,12 @@ async def get_ticker_indicators_cache_first(
     trading_days: int = 250,
     *,
     skip_fetch: bool = False,
+    mode: str = "LIVE",
+    fixtures_dir: Optional[Path] = None,
 ) -> dict:
     """P3-014 — ATR(14), MA(20/50/150/200), CCI(20). Compute-on-read from 250d OHLC."""
     rows = await get_ticker_history_cache_first(
-        db, symbol, ticker_id, trading_days, skip_fetch=skip_fetch
+        db, symbol, ticker_id, trading_days,
+        skip_fetch=skip_fetch, mode=mode, fixtures_dir=fixtures_dir
     )
     return compute_indicators(rows)

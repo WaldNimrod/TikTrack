@@ -201,7 +201,7 @@
       const href = toggle.getAttribute('href');
       if (href && href !== '#' && !href.startsWith('#')) {
         // Only set to # if it's not a valid page route
-        const validRoutes = ['/trade_plans.html', '/trades', '/research'];
+        const validRoutes = ['/trade_plans.html', '/trades', '/research', '/data_dashboard.html'];
         if (!validRoutes.includes(href)) {
           toggle.href = '#';
         }

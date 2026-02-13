@@ -90,6 +90,10 @@ sync-ticker-prices:
 	@python3 scripts/sync_ticker_prices_eod.py
 	@echo "✅ Ticker prices EOD sync complete."
 
+## Check market_data counts (tickers, ticker_prices, exchange_rates) — Team 10/50
+check-market-data-counts:
+	@python3 scripts/check_market_data_counts.py
+
 ## Cleanup — market data (P3-017)
 cleanup-market-data:
 	@echo "🔄 Cleanup — market data"

@@ -1,59 +1,62 @@
-# Team 30 → Team 10: Rate-Limit & Scaling — System Settings UI — הושלם
+# Team 30 → Team 10: סיום מנדט Rate‑Limit & Scaling — System Settings UI
 
+**id:** `TEAM_30_TO_TEAM_10_RATELIMIT_SCALING_SETTINGS_COMPLETE`  
 **from:** Team 30 (UI)  
 **to:** Team 10 (The Gateway)  
 **date:** 2026-02-13  
-**מקור:** TEAM_10_TO_TEAM_30_RATELIMIT_SCALING_SETTINGS_MANDATE  
-**סטטוס:** ✅ **הושלם**
+**מקור:** TEAM_10_TO_TEAM_30_RATELIMIT_SCALING_SETTINGS_MANDATE; TEAM_90_RATELIMIT_SCALING_LOCK
 
 ---
 
-## 1. דרישה
+## 1. סטטוס
 
-System Settings UI/API חייבים לכלול את ארבע הבקרות:
-- `max_active_tickers`
-- `intraday_interval_minutes`
-- `provider_cooldown_minutes`
-- `max_symbols_per_request`
+עמוד ניהול המערכת מוצג **כמצופה**. ארבע הבקרות נטענות מ־API ומוצגות.
 
 ---
 
-## 2. יישום
+## 2. API (Team 20)
 
-### 2.1 API (תיאום Team 20)
-- **נתיב:** `GET /api/v1/settings/market-data`
-- **קובץ:** `api/routers/settings.py`
-- **מקור:** `market_data_settings.py` (env: MAX_ACTIVE_TICKERS, INTRADAY_INTERVAL_MINUTES, וכו')
-- **אימות:** `curl http://127.0.0.1:8082/api/v1/settings/market-data` → מחזיר 4 שדות
-
-### 2.2 UI — עמוד ניהול מערכת
-- **נתיב:** `/system_management.html`
-- **תפריט:** ניהול → ניהול מערכת
-- **קבצים:**
-  - `ui/src/views/management/systemManagement/system_management.html`
-  - `ui/src/views/management/systemManagement/systemManagementPageConfig.js`
-  - `ui/src/views/management/systemManagement/systemManagementSettingsInit.js`
-- **מקור נתונים:** `GET /settings/market-data` (דרך sharedServices)
+| פריט | תוכן |
+|------|------|
+| נתיב | `GET /api/v1/settings/market-data` |
+| מקור | `api/routers/settings.py` — מחזיר את 4 הבקרות |
+| ערכים | `market_data_settings.py` (env vars) |
 
 ---
 
-## 3. בקרות מוצגות
+## 3. UI (Team 30)
 
-| בקרה | תיאור UI |
-|------|----------|
+| פריט | תוכן |
+|------|------|
+| עמוד | `/system_management.html` |
+| ניווט | תפריט **ניהול** → **🔧 ניהול מערכת** |
+
+| בקרה | תיאור |
+|------|--------|
 | max_active_tickers | מקסימום טיקרים פעילים (Intraday) |
 | intraday_interval_minutes | מרווח Intraday (דקות) |
 | provider_cooldown_minutes | זמן Cooldown אחרי 429 (דקות) |
 | max_symbols_per_request | מקסימום סימבולים לבקשה |
 
----
-
-## 4. Evidence
-
-- עמוד ניהול מערכת נגיש ב־`/system_management.html`
-- ארבע הבקרות נטענות מה-API ומוצגות
-- ערכים נקבעים ב-Backend (env) — קריאה בלבד ב-UI
+**קבצים:**
+- `ui/src/views/management/systemManagement/system_management.html`
+- `ui/src/views/management/systemManagement/systemManagementSettingsInit.js`
 
 ---
 
-**log_entry | TEAM_30 | RATELIMIT_SCALING_SETTINGS | COMPLETE | 2026-02-13**
+## 4. בדיקה ידנית (מומלצת)
+
+- לפתוח `/system_management.html` (דרך תפריט ניהול).
+- לוודא שהערכים נטענים מ־API ומוצגים כמצופה.
+
+**אין צורך בשינויי קוד** — המימוש קיים.
+
+---
+
+## 5. הערה — עמוד ניהול טיקרים
+
+בעמוד **ניהול טיקרים** עדיין **אין נתונים** (נושא נפרד — נתונים/ sync / ticker_prices). לא חלק ממנדט System Settings.
+
+---
+
+**log_entry | TEAM_30 | TO_TEAM_10 | RATELIMIT_SCALING_SETTINGS_COMPLETE | 2026-02-13**

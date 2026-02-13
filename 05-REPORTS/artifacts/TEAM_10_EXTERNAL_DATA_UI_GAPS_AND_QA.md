@@ -3,6 +3,8 @@
 **תאריך:** 2026-02-13  
 **מקור:** דיווח משתמש — "לא בדקנו אז לא סיימנו"; ניווט לדשבורד נתונים לא עובד; אין נתוני מחיר בעמוד טיקרים.
 
+**סטטוס נוכחי (עדכון):** **עדיין לא רואים נתונים שמתקבלים** — דיווח משתמש. פער פתוח עד לאימות (QA) ו/או הרצת sync + וידוא תצוגה.
+
 ---
 
 ## 1. עקרון: לא בדקנו אז לא סיימנו
@@ -54,3 +56,28 @@
 ---
 
 **מסמך זה מפנה מתוכנית העבודה (מנדט External Data) §9.**
+
+---
+
+## 5. פעולות קונקרטיות — "עדיין לא רואים נתונים"
+
+| סדר | פעולה | בעלים | תוצר |
+|-----|--------|--------|------|
+| 1 | **אימות עובדות** — GET /api/v1/tickers: האם מחזיר `current_price` (או null)? SELECT COUNT מ־market_data.ticker_prices ו־market_data.tickers. | Team 50 (או 20/60 עם גישה ל-DB) | TEAM_50_TO_TEAM_10_EXTERNAL_DATA_UI_VERIFICATION_REPORT (לפי הנחיית מנהלת העבודה) |
+| 2 | **אם 0 שורות ב־ticker_prices** — להריץ `make sync-ticker-prices` (או sync_ticker_prices_eod.py) כדי למלא מחירים; לוודא שיש טיקרים ב־tickers. | Team 20 | לוג הרצה + SELECT אחרי sync |
+| 3 | **אחרי שיש נתונים ב-DB** — לפתוח עמוד ניהול טיקרים; לוודא שהעמודה "מחיר אחרון" מוצגת וערך או "—" מופיע. | Team 50 / משתמש | דוח PASS או תיאור כשל |
+
+**הנחיה מלאה:** _COMMUNICATION/team_10/TEAM_10_WORK_MANAGER_DIRECTIVE_EXTERNAL_DATA_UI_CLOSURE.md — שלב 1 (אימות) → שלב 2 (תיקונים לפי תוצאות) → שלב 3 (אימות חוזר).
+
+---
+
+## 6. גישה ל-DB + הוכחת טעינה משני ספקים
+
+**גישה לבסיס הנתונים:** קיימת (לצוותים ולביצוע בדיקות).  
+**פקודת בדיקת ספירות:** `make check-market-data-counts` או `python3 scripts/check_market_data_counts.py` — מציגה COUNT ל־tickers, ticker_prices, exchange_rates.
+
+**דרישת מנהל:** חובה **הוכחה לטעינה משני הספקים** (Yahoo + Alpha) של **כל היקף הנתונים** — מחיר (EOD + intraday), FX, היסטוריה (250d) — לפי המפרט המלא.  
+**מנדט:** _COMMUNICATION/team_10/TEAM_10_TO_TEAM_20_DUAL_PROVIDER_AND_FULL_SCOPE_EVIDENCE_MANDATE.md  
+**תוצר Team 20:** _COMMUNICATION/team_20/TEAM_20_DUAL_PROVIDER_FULL_SCOPE_EVIDENCE.md
+
+**סטטוס לאחר בדיקה:** tickers=5, ticker_prices=0, exchange_rates=5. הרצת sync-ticker-prices — Yahoo החזיר "No data found for this date range"; Alpha ללא API key. יש להגדיר API key (Alpha) ו/או לתקן טווח תאריכים ל-Yahoo ולהריץ עד לקבלת שורות ב־ticker_prices.

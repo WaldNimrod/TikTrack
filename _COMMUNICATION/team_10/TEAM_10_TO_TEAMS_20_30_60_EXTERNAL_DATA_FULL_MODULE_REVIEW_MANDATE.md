@@ -148,8 +148,8 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 
 | צוות | סטטוס | הודעה / Evidence |
 |------|--------|-------------------|
-| **Team 60** | ✅ **הושלם** | TEAM_60_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md — migration p3_018, job EOD (history + UPSERT), cleanup FX 250d, תיעוד cron, Makefile. |
-| **Team 20** | ✅ **הושלם** | TEAM_20_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md — sync_ticker_prices_eod, יישור market_data, DDL (60 מימש p3_018), תיעוד ALPHA_VANTAGE_API_KEY, תאום 60. |
+| **Team 60** | ✅ **הושלם** | Full Module: TEAM_60_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE.md (migration p3_018, job EOD, cleanup FX 250d, cron, Makefile). Rate‑Limit & Scaling: TEAM_60_TO_TEAM_10_RATELIMIT_SCALING_MANDATE_COMPLETE.md (env, TEAM_60_CRON_SCHEDULE, SSOT §8/Rule #8). |
+| **Team 20** | ✅ **הושלם** | כל המנדטים הנוכחיים: Full Module (TEAM_20_TO_TEAM_10_EXTERNAL_DATA_IMPLEMENTATION_COMPLETE), Automated Testing (TEAM_20_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_COMPLETE), Live Provider (TEAM_20_EXTERNAL_DATA_LIVE_PROVIDER_EVIDENCE), Rate‑Limit & Scaling (TEAM_20_TO_TEAM_10_RATELIMIT_SCALING_LOCK_COMPLETE). |
 | **Team 30** | ✅ **הושלם** | דשבורד נתונים (D23): טבלה 1 שערים (GET exchange-rates, רענון, טעינה אוטומטית), טבלה 2 דרופדאון + שורה נוכחית + הערה ל-API היסטוריה, סיכום עליון. קבצים: data_dashboard.content.html, dataDashboardTableInit.js, page-manifest. |
 
 ---
@@ -157,7 +157,8 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 ## 9. סטטוס השלמה — **לא בדקנו אז לא סיימנו**
 
 **מימוש:** כל שלושת הצוותים (20, 30, 60) השלימו את משימות המנדט (§6).  
-**השלמה מלאה:** **לא** — עד שלא מבוצעות **בדיקות (QA)** ואין פתרון לבעיות הממשק המתוארות להלן, התהליך **לא נחשב סגור.**
+**השלמה מלאה:** **לא** — עד שלא מבוצעות **בדיקות (QA)** ואין פתרון לבעיות הממשק המתוארות להלן, התהליך **לא נחשב סגור.**  
+**עדכון:** עדיין **לא רואים נתונים שמתקבלים** (דיווח משתמש) — פער פתוח; פעולות קונקרטיות: מסמך 05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_UI_GAPS_AND_QA.md §5 + הנחיית מנהלת העבודה.
 
 ### 9.1 בעיות שדווחו (ממשק)
 
@@ -171,6 +172,9 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 1. **QA:** הרצת בדיקות E2E/ידניות: ניווט לדשבורד נתונים, הצגת שערים, עמוד טיקרים עם/בלי נתוני מחיר.
 2. **ניווט דשבורד נתונים:** וידוא שהקישור `/data_dashboard.html` מחזיר את העמוד (dev + build/production).
 3. **מחיר בעמוד טיקרים:** וידוא ש־GET /tickers מחזיר current_price כשקיים ב-DB; הרצת sync מחירים אם צריך; בממשק — הצגת "—" או "אין נתון" כשמחיר null.
+4. **הוכחת טעינה משני ספקים + היקף מלא:** חובה להציג Evidence לטעינה מ-**Yahoo ו-Alpha** של כל היקף הנתונים הנדרש — מחיר (EOD + intraday לפי הגדרות), FX, היסטוריה (250 ימי מסחר) — בהתאם ל־MARKET_DATA_PIPE_SPEC ו־MARKET_DATA_COVERAGE_MATRIX. מנדט: TEAM_10_TO_TEAM_20_DUAL_PROVIDER_AND_FULL_SCOPE_EVIDENCE_MANDATE. תוצר: TEAM_20_DUAL_PROVIDER_FULL_SCOPE_EVIDENCE.md.
+
+**גישה ל-DB:** לצוותים יש גישה. בדיקת ספירות: `make check-market-data-counts` או `python3 scripts/check_market_data_counts.py`.
 
 **מסמך מפורט:** 05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_UI_GAPS_AND_QA.md — סיבות אפשריות, פעולות מומלצות, רשימת בדיקות QA.
 
@@ -265,6 +269,14 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 | **10** | עדכון מנדטים (20/60/30), איסוף Evidence ב־לוגים. |
 
 **הודעות הפעלה:** TEAM_10_TO_TEAM_20_RATELIMIT_SCALING_MANDATE, TEAM_10_TO_TEAM_60_RATELIMIT_SCALING_MANDATE, TEAM_10_TO_TEAM_30_RATELIMIT_SCALING_SETTINGS_MANDATE.
+
+### 11.5 סטטוס ביצוע — Rate‑Limit & Scaling (§11)
+
+| צוות | סטטוס | Evidence / הודעה |
+|------|--------|-------------------|
+| **20** | ✅ **הושלם** | TEAM_20_TO_TEAM_10_RATELIMIT_SCALING_LOCK_COMPLETE; Cooldown, Single‑Flight, System Settings (env + תיעוד). |
+| **60** | ✅ **הושלם** | TEAM_60_TO_TEAM_10_RATELIMIT_SCALING_MANDATE_COMPLETE; env (.env.example), TEAM_60_CRON_SCHEDULE, market_data_settings, SSOT §8. |
+| **30** | ✅ **הושלם** | TEAM_30_TO_TEAM_10_RATELIMIT_SCALING_SETTINGS_COMPLETE — עמוד ניהול מערכת /system_management.html, 4 בקרות (max_active_tickers, intraday_interval_minutes, provider_cooldown_minutes, max_symbols_per_request) נטענות מ־GET /api/v1/settings/market-data. בדיקה ידנית: לוודא ערכים נטענים ומוצגים. הערה: עמוד ניהול טיקרים עדיין ללא נתונים (נושא נפרד — §9). |
 
 ---
 

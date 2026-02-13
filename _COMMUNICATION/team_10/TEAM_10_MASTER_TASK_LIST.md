@@ -5,7 +5,7 @@
 **owner:** Team 10 בלבד — אף צוות אחר לא רשאי לכתוב לקובץ זה  
 **מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
 **נוהל ניהול:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`  
-**last_updated:** 2026-02-13
+**last_updated:** 2026-02-13 (הפצת מנדטי Stage-1 ו-Stage-1b — ראה TEAM_10_NEXT_STEPS_AND_STAGE1_KICKOFF.md)
 
 ---
 
@@ -33,4 +33,4 @@
 **ערכי סטטוס:** OPEN | IN_PROGRESS | BLOCKED | CLOSED  
 **תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | 3 = Batch 3 | 4 = Batch 4 | …
 
-**log_entry | TEAM_10 | MASTER_TASK_LIST | NUMBERING_PREFIX_BY_STAGE | 2026-02-13**
+**log_entry | TEAM_10 | MASTER_TASK_LIST | STAGE1_KICKOFF_MANDATES_SENT | 2026-02-13**

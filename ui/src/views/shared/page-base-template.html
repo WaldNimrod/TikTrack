@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PAGE_TITLE}}</title>
+  
+  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+  
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
+       ============================================ -->
+  
+  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles -->
+  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="{{BODY_CLASS}}">
+  
+  <!-- ============================================
+       UAI Entry Point (Unified App Init)
+       Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
+       ============================================ -->
+  <script src="{{PAGE_CONFIG_SCRIPT}}"></script>
+  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+
+  <!-- ============================================
+       PAGE WRAPPER + CONTAINER STRUCTURE
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
+       ============================================ -->
+  
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        {{PAGE_CONTENT}}
+      </main>
+    </div>
+  </div>
+  
+{{PAGE_SCRIPTS}}
+</body>
+</html>

@@ -123,6 +123,7 @@ const htmlPagesPlugin = () => {
               '/cash_flows.html': '/views/financial/cashFlows/cash_flows.html',
               '/tickers.html': '/views/management/tickers/tickers.html',
               '/data_dashboard.html': '/views/data/dataDashboard/data_dashboard.html',
+              '/system_management.html': '/views/management/systemManagement/system_management.html',
             };
             actualFilePath = routeToFileMap[htmlPath] || htmlPath;
           }
@@ -174,6 +175,7 @@ const htmlPagesPlugin = () => {
             path.join(__dirname, 'src', 'views', 'financial', 'cashFlows', htmlFileName),
             path.join(__dirname, 'src', 'views', 'management', 'tickers', htmlFileName),
             path.join(__dirname, 'src', 'views', 'data', 'dataDashboard', htmlFileName),
+            path.join(__dirname, 'src', 'views', 'management', 'systemManagement', htmlFileName),
             path.join(__dirname, 'src', url.substring(1)), // Direct path from URL
           ];
           

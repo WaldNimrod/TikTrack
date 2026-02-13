@@ -6,43 +6,36 @@
 
 ---
 
-## 1. סיכום קריטריוני הצלחה
-
-| קריטריון | סטטוס |
-|----------|--------|
-| נתונים חיים מ־Alpha עבור לפחות 3 טיקרים | ✅ AAPL, MSFT, TSLA — כולם החזירו נתונים |
-| Yahoo — עובד או מתועד 429 + UA Rotation | ⚠️ Yahoo: no data (yfinance — ייתכן weekend); UA Rotation מאומת (3 UAs) |
-| UA Rotation פעיל | ✅ UA pool size: 3; rotation מאומת |
-| RateLimitQueue (Alpha 12.5s) פעיל | ✅ ~25s בין AAPL→MSFT→TSLA (12.5s בין קריאות) |
-
-**פקודה:** `python3 scripts/verify_live_providers.py`
-
----
-
-## 2. Command output
+## Command output
 
 ```
-[2026-02-13T23:18:31Z] === Live Provider Execution — Team 20 ===
-[2026-02-13T23:18:31Z] 
-[2026-02-13T23:18:31Z] 1. UA Rotation (Yahoo guardrail)
-[2026-02-13T23:18:31Z]    UA pool size: 3
-[2026-02-13T23:18:31Z]    UA[0] prefix: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb...
-[2026-02-13T23:18:31Z]    UA[1] prefix: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap...
-[2026-02-13T23:18:31Z] 
-[2026-02-13T23:18:31Z] 2. RateLimitQueue (Alpha guardrail)
-[2026-02-13T23:18:31Z]    ALPHA_RATE_LIMIT_SECONDS: 12.5
-[2026-02-13T23:18:31Z] 
-[2026-02-13T23:18:31Z] 3. Yahoo LIVE — ticker prices
-[2026-02-13T23:18:32Z]    AAPL: no data
-[2026-02-13T23:18:32Z]    MSFT: no data
-[2026-02-13T23:18:33Z]    TSLA: no data
-[2026-02-13T23:18:33Z] 
-[2026-02-13T23:18:33Z] 4. Alpha Vantage LIVE — ticker prices (RateLimitQueue 12.5s)
-[2026-02-13T23:18:57Z]    AAPL: price=255.78000000, market_cap=3846888227000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:18:57.095343+00:00
-[2026-02-13T23:19:22Z]    MSFT: price=401.32000000, market_cap=2986626777000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:19:22.107602+00:00
-[2026-02-13T23:19:47Z]    TSLA: price=417.44000000, market_cap=1565026812000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:19:47.100018+00:00
-[2026-02-13T23:19:47Z] 
-[2026-02-13T23:19:47Z] === Execution complete ===
+[2026-02-13T23:27:16Z] === Live Provider Execution — Team 20 ===
+[2026-02-13T23:27:16Z] 
+[2026-02-13T23:27:16Z] Tickers from DB: AAPL, AMZN, GOOGL, MSFT, TSLA
+[2026-02-13T23:27:16Z] 
+[2026-02-13T23:27:16Z] 1. UA Rotation (Yahoo guardrail)
+[2026-02-13T23:27:16Z]    UA pool size: 3
+[2026-02-13T23:27:16Z]    UA[0] prefix: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb...
+[2026-02-13T23:27:16Z]    UA[1] prefix: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap...
+[2026-02-13T23:27:16Z] 
+[2026-02-13T23:27:16Z] 2. RateLimitQueue (Alpha guardrail)
+[2026-02-13T23:27:16Z]    ALPHA_RATE_LIMIT_SECONDS: 12.5
+[2026-02-13T23:27:16Z] 
+[2026-02-13T23:27:16Z] 3. Yahoo LIVE — ticker prices
+[2026-02-13T23:27:17Z]    AAPL: no data
+[2026-02-13T23:27:17Z]    AMZN: no data
+[2026-02-13T23:27:18Z]    GOOGL: no data
+[2026-02-13T23:27:18Z]    MSFT: no data
+[2026-02-13T23:27:18Z]    TSLA: no data
+[2026-02-13T23:27:18Z] 
+[2026-02-13T23:27:18Z] 4. Alpha Vantage LIVE — ticker prices (RateLimitQueue 12.5s)
+[2026-02-13T23:27:41Z]    AAPL: price=255.78000000, market_cap=3846888227000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:27:41.872671+00:00
+[2026-02-13T23:28:06Z]    AMZN: price=198.79000000, market_cap=2142690214000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:28:06.877683+00:00
+[2026-02-13T23:28:31Z]    GOOGL: price=305.72000000, market_cap=3737973162000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:28:31.880761+00:00
+[2026-02-13T23:28:56Z]    MSFT: price=401.32000000, market_cap=2986626777000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:28:56.859303+00:00
+[2026-02-13T23:29:21Z]    TSLA: price=417.44000000, market_cap=1565026812000.00000000, provider=ALPHA_VANTAGE, as_of=2026-02-13 23:29:21.885683+00:00
+[2026-02-13T23:29:21Z] 
+[2026-02-13T23:29:21Z] === Execution complete ===
 ```
 
 ---

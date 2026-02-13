@@ -1,14 +1,14 @@
 {
-  "last_run_time": "2026-02-13T22:53:13.137801+00:00",
+  "last_run_time": "2026-02-13T23:27:57.327099+00:00",
   "rows_pruned": 0,
   "rows_updated": 0,
   "intraday": {
     "rows_pruned": 0,
-    "cutoff": "2026-01-14T22:53:13.119215+00:00"
+    "cutoff": "2026-01-14T23:27:57.308615+00:00"
   },
   "daily": {
     "rows_pruned": 0,
-    "cutoff": "2025-06-08T22:53:13.128193+00:00"
+    "cutoff": "2025-06-08T23:27:57.316773+00:00"
   },
   "fx_history": {
     "rows_pruned": 0,

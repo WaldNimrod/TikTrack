@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניהול מערכת | TikTrack Phoenix</title>
+  
+  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="system-management-page context-management">
+  
+  <script src="/src/views/management/systemManagement/systemManagementPageConfig.js"></script>
+  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        <tt-container>
+          
+          <tt-section data-section="market-data-settings">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="/images/icons/entities/home.svg" alt="הגדרות" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">Rate-Limit & Scaling</h1>
+              </div>
+              <div class="index-section__header-meta">
+                <span class="index-section__header-count">TEAM_90_RATELIMIT_SCALING_LOCK — System Settings</span>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <div class="settings-panel" id="marketDataSettingsPanel">
+                    <p class="settings-note">בקרות נדרשות (SSOT: MARKET_DATA_PIPE_SPEC §8.3). ערכים נקבעים מול Backend (env).</p>
+                    <div id="marketDataSettingsValues" class="settings-values">
+                      <p>טוען...</p>
+                    </div>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
+        </tt-container>
+      </main>
+    </div>
+  </div>
+  
+  <script src="/src/components/core/sectionToggleHandler.js"></script>
+  <script type="module" src="/src/views/management/systemManagement/systemManagementSettingsInit.js"></script>
+  <script src="/src/views/shared/footerLoader.js"></script>
+</body>
+</html>

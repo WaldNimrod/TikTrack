@@ -10,9 +10,12 @@ Cron: similar to FX (e.g. 0 22 * * 1-5 UTC).
 """
 
 import asyncio
-import fcntl
 import os
 import sys
+try:
+    import fcntl
+except ImportError:
+    fcntl = None  # Windows — fallback to no lock
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
@@ -195,7 +198,9 @@ def upsert_prices(
 def load_tickers() -> List[Tuple[UUID, str]]:
     import psycopg2
     from psycopg2.extras import RealDictCursor
+    from api.integrations.market_data.market_data_settings import get_max_active_tickers
 
+    max_tickers = get_max_active_tickers()
     conn = psycopg2.connect(DATABASE_URL)
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -204,7 +209,8 @@ def load_tickers() -> List[Tuple[UUID, str]]:
             WHERE (deleted_at IS NULL OR deleted_at > NOW())
             AND is_active = true
             ORDER BY symbol
-        """)
+            LIMIT %s
+        """, (max_tickers,))
         rows = cur.fetchall()
         return [(r["id"], r["symbol"]) for r in rows]
     finally:
@@ -212,19 +218,39 @@ def load_tickers() -> List[Tuple[UUID, str]]:
 
 
 def main():
-    print("🔄 EOD sync — ticker_prices (Yahoo→Alpha)")
-    tickers = load_tickers()
-    if not tickers:
-        print("⚠️ No tickers in market_data.tickers. Add tickers to sync.")
-        sys.exit(0)
+    fd = None
+    if fcntl:
+        lock_path = _project / "scripts" / ".sync_ticker_prices.lock"
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR)
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print("⚠️ Another sync already running (Single-Flight). Exit.")
+            if fd is not None:
+                os.close(fd)
+            sys.exit(0)
+        except Exception as e:
+            print(f"⚠️ Lock error: {e}")
+            sys.exit(0)
 
-    rows = asyncio.run(fetch_prices_for_tickers(tickers))
-    if not rows:
-        print("⚠️ No prices fetched. Exit 0.")
-        sys.exit(0)
+    try:
+        print("🔄 EOD sync — ticker_prices (Yahoo→Alpha, Single-Flight)")
+        tickers = load_tickers()
+        if not tickers:
+            print("⚠️ No tickers in market_data.tickers. Run: python3 scripts/seed_market_data_tickers.py")
+            sys.exit(0)
 
-    n = upsert_prices(rows)
-    print(f"✅ Upserted {n} ticker prices to market_data.ticker_prices")
+        rows = asyncio.run(fetch_prices_for_tickers(tickers))
+        if not rows:
+            print("⚠️ No prices fetched. Exit 0.")
+            sys.exit(0)
+
+        n = upsert_prices(rows)
+        print(f"✅ Upserted {n} ticker prices to market_data.ticker_prices")
+    finally:
+        if fd is not None and fcntl:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            os.close(fd)
     sys.exit(0)
 
 

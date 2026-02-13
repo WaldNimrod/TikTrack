@@ -8,6 +8,7 @@ __pycache__/
 # Scripts (keep scripts directory, ignore only logs/temp files)
 scripts/*.log
 scripts/*.tmp
+scripts/.sync_ticker_prices.lock
 
 # Staging/Communication - נשארים בדרייב בלבד, לא נכנסים לגיט
 communication/

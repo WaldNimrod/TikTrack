@@ -78,7 +78,13 @@ sync-eod:
 	@python3 scripts/sync_exchange_rates_eod.py
 	@echo "✅ EOD sync complete."
 
-## EOD Sync — ticker_prices (Gate B; Yahoo→Alpha)
+## Seed market_data.tickers (AAPL, MSFT, TSLA, …) — required before sync
+seed-tickers:
+	@echo "🔄 Seeding market_data.tickers"
+	@python3 scripts/seed_market_data_tickers.py
+	@echo "✅ Tickers seeded."
+
+## EOD Sync — ticker_prices (Gate B; Yahoo→Alpha) — uses tickers from market_data.tickers
 sync-ticker-prices:
 	@echo "🔄 EOD sync — ticker_prices"
 	@python3 scripts/sync_ticker_prices_eod.py
@@ -128,8 +134,9 @@ help:
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
+	@echo "  make seed-tickers       - Seed market_data.tickers (required before sync)"
 	@echo "  make sync-eod           - EOD sync exchange_rates + history (Alpha→Yahoo)"
-	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha)"
+	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha; runs seed-tickers)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"

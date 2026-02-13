@@ -20,8 +20,23 @@
 | Script | תפקיד |
 |--------|-------|
 | `scripts/sync_exchange_rates_eod.py` | INSERT history + UPSERT exchange_rates |
-| `scripts/sync_ticker_prices_eod.py` | EOD ticker prices (Team 20) |
+| `scripts/sync_ticker_prices_eod.py` | EOD ticker prices (uses max_active_tickers, provider_cooldown) |
 | `scripts/cleanup_market_data.py` | Retention: intraday, daily, fx_history |
+
+---
+
+## System Settings (env) — Rate‑Limit & Scaling §8.3
+
+Jobs read from `api/integrations/market_data/market_data_settings.py` → env vars:
+
+| Var | Default | תיאור |
+|-----|---------|-------|
+| MAX_ACTIVE_TICKERS | 50 | Max active tickers for intraday |
+| INTRADAY_INTERVAL_MINUTES | 15 | Intraday refresh interval |
+| PROVIDER_COOLDOWN_MINUTES | 15 | Cooldown after 429 |
+| MAX_SYMBOLS_PER_REQUEST | 5 | Max symbols per batch |
+
+**תיאום Team 20:** ערכים מוגדרים ב־`market_data_settings.py`; cron/jobs קוראים אותם.
 
 ---
 

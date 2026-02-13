@@ -1763,3 +1763,58 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
   border-color: var(--color-primary, #26baac) !important;
   box-shadow: 0 0 0 3px rgba(252, 90, 6, 0.25) !important; /* Secondary color glow */
 }
+
+/* ============================================
+   System Management — Rate-Limit Settings Panel
+   TEAM_10_TO_TEAM_30_RATELIMIT_SCALING_SETTINGS_MANDATE
+   ============================================ */
+body.system-management-page {
+  background: var(--apple-bg-secondary, #f2f2f7);
+}
+
+.settings-panel {
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-elevated, #ffffff);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: var(--apple-radius-medium, 10px);
+}
+
+.settings-note {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary, #86868b);
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.settings-values {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm, 8px) 0;
+  border-block-end: 1px solid var(--apple-border-light, #e5e5e5);
+}
+
+.settings-row:last-child {
+  border-block-end: none;
+}
+
+.settings-row__label {
+  font-weight: 500;
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.settings-row__value {
+  font-family: ui-monospace, monospace;
+  color: var(--color-brand, #26baac);
+  font-weight: 600;
+}
+
+.settings-error {
+  color: var(--color-error-red, #FF3B30);
+  font-size: 0.9rem;
+}

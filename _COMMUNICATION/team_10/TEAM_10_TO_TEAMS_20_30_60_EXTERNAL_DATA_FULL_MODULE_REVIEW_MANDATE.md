@@ -229,4 +229,43 @@ Team 10 ביקש הנחיית אדריכלות לאחסון היסטוריית F
 
 ---
 
+## 11. Rate‑Limit & Scaling Policy (נעול — Team 90) 🔒
+
+**מקור:** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_RATELIMIT_SCALING_LOCK.md` — **LOCKED — implement now.**
+
+### 11.1 SSOT
+
+המדיניות נעולה ב:
+- `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` (§8)
+- `documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md` (Rule #8)
+- `documentation/05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_SSOT_EVIDENCE_LOG.md`
+
+### 11.2 כללי ליבה (חובה ליישם)
+
+1. **Cache‑First only** — אין קריאות חיצוניות מתוך request path.
+2. **Single‑Flight refresh** — job אחד מרענן; השאר מחזירים stale.
+3. **Cooldown on 429** — ספק נכנס ל־cooldown; אין קריאות נוספות במהלך החלון.
+4. **Fallback enforced** — Prices: Yahoo→Alpha; FX: Alpha→Yahoo.
+5. **Never block UI** — stale + `staleness=na` בכישלון.
+
+### 11.3 System Settings (בקרות נדרשות)
+
+- `max_active_tickers`
+- `intraday_interval_minutes`
+- `provider_cooldown_minutes`
+- `max_symbols_per_request`
+
+### 11.4 הקצאת משימות
+
+| צוות | היקף |
+|------|------|
+| **20** | יישום כללי ליבה + Rate‑Limit/Cooldown; תמיכה ב־System Settings ב-API/Backend. |
+| **60** | תשתית/סביבה התומכת ב־System Settings; תיאום עם 20 על ערכי ברירת מחדל ו־cron. |
+| **30** | וידוא ש־System Settings UI/API כוללים את ארבע הבקרות לעיל (הצגה/עריכה). |
+| **10** | עדכון מנדטים (20/60/30), איסוף Evidence ב־לוגים. |
+
+**הודעות הפעלה:** TEAM_10_TO_TEAM_20_RATELIMIT_SCALING_MANDATE, TEAM_10_TO_TEAM_60_RATELIMIT_SCALING_MANDATE, TEAM_10_TO_TEAM_30_RATELIMIT_SCALING_SETTINGS_MANDATE.
+
+---
+
 **log_entry | TEAM_10 | TO_TEAMS_20_30_60 | EXTERNAL_DATA_FULL_MODULE_REVIEW_MANDATE | 2026-02-13**

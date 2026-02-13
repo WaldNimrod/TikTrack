@@ -31,7 +31,7 @@ async def get_brokers(
     Get broker list for select dropdowns (D16, D18).
     
     ADR-013: API-based source only. No fallback to manual text input.
-    - Primary: user's brokers from brokers_fees
+    - Primary: user's brokers from trading_accounts.broker
     - Fallback: defaults_brokers.json when user has none
     """
     try:

@@ -5,7 +5,8 @@
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
 **last_updated:** 2026-02-13  
-**version:** v1.2
+**version:** v1.3  
+**מנדט:** GOV-MANDATE-V3 — Sandbox, קידום ידע בזמן, אימות ע"י צוות 90.
 
 ---
 
@@ -19,9 +20,9 @@
 
 **Team 10 (The Gateway) הוא הצוות היחיד המורשה לכתוב לתיקיית `documentation/`.**
 
-כל סיום באץ' ב-Phase 2 דורש שלב **Consolidation** שבו Team 10 מזקק דוחות תקשורת (`_COMMUNICATION/`) למסמכי SSOT (`documentation/`).
+כל סיום באץ' ב-Phase 2 דורש שלב **Consolidation** שבו Team 10 מזקק דוחות תקשורת (`_COMMUNICATION/`) למסמכי SSOT (`documentation/`). **GOV-MANDATE-V3:** צוות 10 חייב לבצע קידום ידע (Consolidation) **בזמן**; צוות 90 (המרגל) מוודא שזה מתבצע.
 
-**הפרדה חובה:** קבצי תקשורת וקבצים זמניים נוצרים **רק** בתיקיית הצוות (`_COMMUNICATION/team_XX/`) **ואינם** מתווספים לאינדקס. רק תוכן שמקודם ל-`documentation/` דרך נוהל זה מתועד באינדקס. ראה `CURSOR_INTERNAL_PLAYBOOK.md` סעיף 4.2.
+**הפרדה חובה:** קבצי תקשורת וקבצים זמניים נוצרים **רק** בתיקיית הצוות (`_COMMUNICATION/team_XX/`) **ואינם** מתווספים לאינדקס. רק תוכן שמקודם ל-`documentation/` דרך נוהל זה מתועד באינדקס. ראה `CURSOR_INTERNAL_PLAYBOOK.md` סעיפים 4.2 ו-7 (GOV-MANDATE-V3).
 
 ---
 
@@ -45,7 +46,8 @@
 ### **מתי מתבצע Consolidation?**
 - ✅ בסיום כל באץ' ב-Phase 2
 - ✅ לפני מעבר לבאץ' הבא
-- ✅ לפני אישור סופי של האדריכל
+- ✅ לפני אישור סופי של האדריכל  
+**GOV-MANDATE-V3:** צוות 10 מבצע Consolidation **בזמן**; צוות 90 (Enforcer) מוודא שהקידום בוצע.
 
 ### **תהליך Consolidation (5 שלבים):**
 

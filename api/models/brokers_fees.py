@@ -1,9 +1,10 @@
 """
 Brokers Fees Model - SQLAlchemy ORM
 Task: Phase 2.1 - Brokers Fees (D18)
-Status: IN PROGRESS
+Status: ADR-017/018 CLOSED
 
-SQLAlchemy ORM model for brokers_fees table.
+ORM model for user_data.trading_account_fees table (migrated from brokers_fees).
+Endpoint remains /brokers_fees; table is trading_account_fees.
 Based on WP_20_09_FIELD_MAP_BROKERS_FEES.md
 """
 
@@ -20,21 +21,21 @@ from sqlalchemy.sql import func
 
 from .base import Base
 
-# DB uses user_data.commission_type ENUM (create_d18_brokers_fees_table.sql) — do not create_type
+# DB uses user_data.commission_type ENUM — do not create_type
 commission_type_enum = Enum('TIERED', 'FLAT', name='commission_type', schema='user_data', create_type=False)
 
 
 class BrokerFee(Base):
     """
-    Broker Fee model - maps to user_data.brokers_fees table.
+    Broker Fee model - maps to user_data.trading_account_fees table (ADR-017/018).
     
-    Represents broker commission structures and fees.
+    Represents trading account commission structures and fees.
     """
-    __tablename__ = "brokers_fees"
+    __tablename__ = "trading_account_fees"
     __table_args__ = (
         CheckConstraint(
             "minimum >= 0",
-            name="brokers_fees_minimum_check"
+            name="trading_account_fees_minimum_check"
         ),
         {"schema": "user_data"},
     )

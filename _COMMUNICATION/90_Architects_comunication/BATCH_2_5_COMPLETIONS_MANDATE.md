@@ -4,18 +4,24 @@ owner: Architect
 status: LOCKED - G-LEAD APPROVED
 SV: 1.0.0
 ---
-# 🏰 מנדט אדריכל: השלמות בץ 2.5 (Cumulative Polish)
 
-## 🛠️ 1. יישור גרסאות ל-1.0.0
-- חובת הורדת כל גרסאות הקוד (UI, API, DB) מ-2.x ל-1.x.
-- המערכת מוגדרת רשמית כדור 1.0 של פיניקס.
+# 🏰 מנדט אדריכל: השלמות בץ 2.5 וביצור שער האוטנטיקציה
 
-## 📊 2. רפקטור עמלות (Account-based Fees)
-- סיום המעבר לטבלת trading_account_fees.
-- חסימה: אין לאשר עמודי D18/D21 ללא רפקטור נתונים מלא (ADR-014).
+מסמך זה מאחד את כלל תיקוני "שלב הנבט" ונועל את מודל הגישה.
 
-## 🔐 3. אבטחה ומשילות
-- אכיפת Redirect ל-Home (/) לכל משתמש לא מחובר בכל עמוד שאינו Open.
-- User Icon: SUCCESS (מחובר) / WARNING (מנותק). שחור = פסילה.
+## 🔐 1. מודל האוטנטיקציה המרובע (A/B/C/D)
+- **A) Open:** Login, Register, Reset-Password. (Header מוסתר).
+- **B) Shared:** Home (/). מציג Container שונה לאורח/מחובר.
+- **C) Auth-only:** כל שאר העמודים. אורח מופנה ל-Home (/).
+- **D) Admin-only:** עמודי ניהול. בדיקת JWT Role. לא-מורשה מופנה ל-Home.
 
-**log_entry | [Architect] | BATCH_2_5_FINAL_SEAL | GREEN | 13.2.2026, 2:16:58**
+## 📐 2. רספונסיביות ו-Fidelity (Option D)
+- **עמודות Sticky:** מזהה/שם ב-Start, פעולות ב-End.
+- **נוסחת clamp:** מזהה: `clamp(140px, 18vw, 400px)` | נתונים: `clamp(90px, 12vw, 180px)`.
+- **Header Fix:** תיקון רגרסיה - ה-Header חייב להופיע תמיד במעבר Login -> Home.
+
+## 🛡️ 3. היגיינת קוד וגרסאות
+- **Versioning:** יישור קו גורף לגרסה 1.0.0 בכל הקבצים (Package.json, API, DDL).
+- **No-Logs:** שימוש בלעדי ב-`audit.maskedLog`. הסרה מוחלטת של console.log.
+
+**log_entry | [Architect] | CUMULATIVE_SETTLEMENT | GREEN | 13.2.2026, 11:13:08**

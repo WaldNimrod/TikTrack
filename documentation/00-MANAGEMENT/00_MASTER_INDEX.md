@@ -66,7 +66,7 @@ _COMMUNICATION/
 ## 🚀 מסמכי יסוד (Foundations)
 
 - [📖 PHOENIX_MASTER_BIBLE.md](../09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md) - ספר החוקים המאסטר
-- [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](../09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md) - מדריך עבודה פנימי
+- [⚔️ CURSOR_INTERNAL_PLAYBOOK.md](../09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md) - מדריך עבודה פנימי (v2.6 — GOV-MANDATE-V3: יושרה טריטוריאלית, Sandbox, מנדט המרגל) 🛡️ **מחייב**
 - [🏛️ PHOENIX_ORGANIZATIONAL_STRUCTURE.md](./PHOENIX_ORGANIZATIONAL_STRUCTURE.md) - מבנה ארגוני
 - [🤝 TT2_SLA_TEAMS_30_40.md](../05-PROCEDURES/TT2_SLA_TEAMS_30_40.md) - אמנת שירות צוות 30 (Frontend) ↔ 40 (UI Assets) — Presentational vs Container ✅ **מחייב**
 - [📜 TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md](../05-PROCEDURES/TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md) - דרישות מסירת בלופרינט (צוות 31 → 30/40) ✅ **מחייב**

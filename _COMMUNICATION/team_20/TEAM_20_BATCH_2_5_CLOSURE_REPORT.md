@@ -47,8 +47,9 @@
 
 ### מצב נוכחי
 
-- `brokers_fees` עדיין בשימוש; קשר `trading_account_id` קיים (ADR-015).
-- התוכנית מפרטת את שלבי המיגרציה ל-`trading_account_fees`.
+- **DB:** Team 60 הריץ מיגרציה — `user_data.trading_account_fees` קיימת עם נתונים (Evidence: TEAM_60_TO_TEAM_90_MIGRATION_EXECUTION_EVIDENCE.md)
+- **Backend:** ORM/Services מצביעים לטבלה `trading_account_fees` (עדכון 2026-01-31)
+- **Endpoint:** נשאר `/brokers_fees` (alias לפי החלטת Product)
 
 ---
 
@@ -88,11 +89,12 @@
 
 ## 6. המשך נדרש
 
-| צוות | פעולה |
-|------|--------|
-| **Team 60** | הרצת מיגרציה brokers_fees → trading_account_fees, דיווח |
-| **Team 30** | קריאה ל-`GET /trading_accounts/{id}/api-import-eligible` לפני הצגת UI של API/ייבוא; השבתת כפתורים כאשר eligible=false |
-| **Team 90** | אימות חסימה (Spy) |
+| צוות | פעולה | סטטוס |
+|------|--------|-------|
+| **Team 60** | הרצת מיגרציה brokers_fees → trading_account_fees | ✅ הושלם (Evidence קיים) |
+| **Team 20** | עדכון ORM לטבלה trading_account_fees | ✅ הושלם (2026-01-31) |
+| **Team 30** | קריאה ל-`GET /trading_accounts/{id}/api-import-eligible` לפני הצגת UI של API/ייבוא | ממתין |
+| **Team 90** | אימות חסימה (Spy) + סגירת ADR-017/018 | ממתין |
 
 ---
 
@@ -119,8 +121,9 @@
 | # | קריטריון | אימות |
 |---|----------|--------|
 | 1 | אין 2.x בגרסת API/תיעוד | ✅ api 1.0.0, OpenAPI 1.0.0, VERSION 1.0.0 |
-| 2 | נתוני עמלות לא תלויים ב‑broker כ‑FK | ✅ brokers_fees.trading_account_id (ADR-015) |
+| 2 | נתוני עמלות לא תלויים ב‑broker כ‑FK | ✅ trading_account_fees.trading_account_id (ADR-015) |
 | 3 | תוכנית מיגרציה מתועדת | ✅ TEAM_20_TRADING_ACCOUNT_FEES_MIGRATION_PLAN.md |
+| 5 | ORM מצביע לטבלה trading_account_fees | ✅ api/models/brokers_fees.py — __tablename__ = "trading_account_fees" |
 | 4 | חסימה אפקטיבית ברמת Backend (ADR-018) | ✅ GET /trading_accounts/{id}/api-import-eligible → 403 |
 
 ---

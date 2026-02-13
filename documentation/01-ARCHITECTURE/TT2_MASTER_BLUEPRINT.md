@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-05  
-**version:** v2.5
+**last_updated:** 2026-02-13  
+**version:** v2.6
 
 ---
 
@@ -17,7 +17,7 @@
 
 ## 🔄 Architect Mandate Implementation Status
 
-**Last Updated:** 2026-02-04
+**Last Updated:** 2026-02-13
 
 ### **P0/P1/P2 Complete:**
 - ✅ **Port Unification:** Frontend (8080), Backend (8082)
@@ -29,4 +29,5 @@
 
 ### **Batch Status:**
 - ✅ **Batch 1:** Identity & Auth - COMPLETE (2026-02-02)
-- 🟡 **Batch 2:** Financial Core - READY TO START (2026-02-04)
+- ✅ **Batch 2:** Financial Core - CLOSED (2026-02-12)
+- 🟠 **Batch 2.5:** Completions Mandate LOCKED (ADR‑017/ADR‑018) — execution tracked in Team 10 evidence logs

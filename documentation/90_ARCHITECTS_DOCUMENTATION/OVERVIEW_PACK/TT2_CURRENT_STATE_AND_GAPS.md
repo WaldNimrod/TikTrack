@@ -14,16 +14,16 @@
 - **Visual Sign‑off**: Approved by G‑Lead — רישום: TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md.
 - **Clean Table**: הוכרז (OPEN_TASKS §2.7/2.8 + CLEAN_TABLE B1/C1 ✅).
 - **Knowledge Promotion + Archive**: ARCHIVE_MANIFEST קיים (99‑ARCHIVE/2026‑02‑12); SSOT עודכנו.
-- **Batch 2.5 Mandate (ADR‑017/ADR‑018):** LOCKED — הוטמע כמשימות חוסמות (יישור גרסאות, refactor עמלות, Other rule, Redirect/User‑Icon).
+- **Batch 2.5 Mandate (ADR‑017/ADR‑018):** ✅ מיושם ומאומת לפי דוחות סגירה ו‑QA (יישור גרסאות, refactor עמלות, Other rule, Redirect/User‑Icon).
 
 ## 2) Open Gaps (Blocking / Non‑Blocking)
 | Gap | Status | Owner |
 |---|---|---|
-| Version alignment to 1.0.0 across code layers | Pending execution (ADR‑017) | Team 10 + All |
-| Account‑based fees refactor → `trading_account_fees` | Pending execution (ADR‑014/ADR‑017) | Team 20 + Team 30 |
-| “Other” broker logic + import/API block | Pending execution (ADR‑018) | Team 30 + Team 20 |
-| Redirect enforcement for all non‑Open pages | Pending verification (ADR‑017) | Team 30 + Team 50 |
-| User Icon colors (Success/Warning only) | Pending verification (ADR‑017) | Team 40 + Team 50 |
+| Version alignment to 1.0.0 across code layers | ✅ Closed (ADR‑017) | Team 10 + Teams 20/30/60 |
+| Account‑based fees refactor → `trading_account_fees` | ✅ Closed (ADR‑014/ADR‑017) | Team 20 + Team 60 |
+| “Other” broker logic + import/API block | ✅ Closed (ADR‑018) | Team 20 + Team 30 |
+| Redirect enforcement for all non‑Open pages | ✅ Closed (ADR‑017) | Team 30 + Team 50 |
+| User Icon colors (Success/Warning only) | ✅ Closed (ADR‑017) | Team 30 + Team 50 |
 | PDSC Boundary Contract completion | Pending scope decision (min vs full) | Team 20 + Team 30 |
 | Knowledge Promotion + Archive cleanup (Batch 1+2) | ✅ Done — ARCHIVE_MANIFEST + Consolidation Report קיימים | Team 10 |
 
@@ -43,6 +43,10 @@
 - `documentation/05-REPORTS/artifacts_SESSION_01/`
 - `documentation/05-REPORTS/GATE_B_STATUS.md`
 - `_COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md`
+- `_COMMUNICATION/team_20/TEAM_20_BATCH_2_5_CLOSURE_REPORT.md`
+- `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_BATCH_2_5_CLOSURE_REPORT.md`
+- `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_BATCH_2_5_ADR017_QA_REPORT.md`
+- `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_BATCH_2_5_CLOSURE_REPORT.md`
 - `_COMMUNICATION/99-ARCHIVE/2026-02-12/ARCHIVE_MANIFEST.md`
 - `_COMMUNICATION/90_Architects_comunication/ARCHITECT_MODULE_MENU_STYLING_DECISION_LOCKED.md`
 - `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md` (ADR-017)

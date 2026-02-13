@@ -3,7 +3,7 @@
 **id:** `TEAM_30_EXTERNAL_DATA_SUITE_E_EVIDENCE`  
 **מקור:** TEAM_10_TO_TEAM_30_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE, TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_DIRECTIVE  
 **תאריך:** 2026-02-13  
-**עדכון:** 2026-01-31 — השלמת מימוש לאחר חזרת סביבה
+**עדכון:** 2026-02-13 — סיום מנדט מלא
 
 ---
 
@@ -11,18 +11,23 @@
 
 | פריט | נתיב |
 |------|------|
-| E2E Test | `tests/external-data-suite-e-staleness-clock.test.js` |
-| npm script | `tests/package.json` → `test:external-data-suite-e` |
+| E2E Test | `tests/external-data-suite-e-staleness-clock.e2e.test.js` |
+| npm script | `tests/package.json` → `test:external-data-suite-e` → קובץ לעיל |
+| Nightly | `scripts/run-nightly-external-data.sh` — מריץ Suite E עם A–D |
 | Report | `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_COMPLETE.md` |
 
 ---
 
-## בדיקות (4 קריטריונים)
+## בדיקות (E1–E4)
 
-1. **suiteE_ok** — `staleness=ok` → class `staleness-clock--ok`, tooltip "נתונים מעודכנים"
-2. **suiteE_warning** — `staleness=warning` → class `staleness-clock--warning`, tooltip עם "15 דקות"
-3. **suiteE_na** — `staleness=na` → class `staleness-clock--na`, tooltip עם "EOD" / "סוף יום"
-4. **suiteE_noBanner** — אין באנר גלוי (eod-warning-banner לא קיים או מוסתר)
+| בדיקה | דרישה | סטטוס |
+|-------|--------|--------|
+| E1 | staleness=ok → שעון ניטרלי + tooltip | PASS |
+| E2 | staleness=warning → צבע אזהרה + tooltip | PASS |
+| E3 | staleness=na → צבע alert + tooltip | PASS |
+| E4 | No banner — אין באנר | PASS |
+
+(מקביל ל־suiteE_ok, suiteE_warning, suiteE_na, suiteE_noBanner — class `staleness-clock--ok|warning|na`, tooltip, אין eod-warning-banner.)
 
 ---
 
@@ -30,6 +35,7 @@
 
 ```bash
 cd tests && npm run test:external-data-suite-e
+# תוצאה: 5/5 PASS (כולל Login)
 ```
 
 ---

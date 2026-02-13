@@ -4,11 +4,27 @@
 **to:** Team 10 (The Gateway)  
 **date:** 2026-02-13  
 **מקור:** TEAM_10_TO_TEAM_30_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE  
-**סטטוס:** ✅ **הושלם**
+**סטטוס:** ✅ **הושלם — מנדט מומש במלואו**
 
 ---
 
-## 1. היקף יישום
+## 1. סיכום המימוש — סוויטה E (Clock + Tooltip)
+
+| בדיקה | דרישה | סטטוס |
+|-------|--------|--------|
+| E1 | staleness=ok → שעון ניטרלי + tooltip | PASS |
+| E2 | staleness=warning → צבע אזהרה + tooltip | PASS |
+| E3 | staleness=na → צבע alert + tooltip | PASS |
+| E4 | No banner — אין באנר | PASS |
+
+**הרצה:** `cd tests && npm run test:external-data-suite-e` — **5/5 PASS** (כולל Login).  
+**קובץ:** `tests/external-data-suite-e-staleness-clock.e2e.test.js`  
+**package.json:** `test:external-data-suite-e` מצביע ל־`external-data-suite-e-staleness-clock.e2e.test.js`  
+**Nightly:** `scripts/run-nightly-external-data.sh` מריץ Suite E (יחד עם A–D). **Smoke:** לא כוללת Suite E (לפי ההנחיה).
+
+---
+
+## 2. היקף יישום
 
 | פריט | תוכן |
 |------|------|
@@ -16,7 +32,7 @@
 
 ---
 
-## 2. דרישות שמומשו
+## 3. דרישות שמומשו
 
 - `staleness=ok` → שעון ניטרלי (neutral clock) — class `staleness-clock--ok`, tooltip "נתונים מעודכנים"
 - `staleness=warning` → צבע אזהרה + tooltip — class `staleness-clock--warning`, tooltip "נתונים בני יותר מ־15 דקות..."
@@ -25,16 +41,16 @@
 
 ---
 
-## 3. תוצרים
+## 4. תוצרים
 
 | תוצר | נתיב |
 |------|------|
-| **קובץ בדיקות E2E** | `tests/external-data-suite-e-staleness-clock.test.js` |
+| **קובץ בדיקות E2E** | `tests/external-data-suite-e-staleness-clock.e2e.test.js` |
 | **סקריפט הרצה** | `npm run test:external-data-suite-e` (מתוך `tests/`) |
 
 ---
 
-## 4. אופן הרצה
+## 5. אופן הרצה
 
 ```bash
 # מתוך תיקיית הפרויקט
@@ -50,7 +66,7 @@ npm run test:external-data-suite-e
 
 ---
 
-## 5. אינטגרציה ב-CI
+## 6. אינטגרציה ב-CI
 
 - סוויטה E מיועדת ל-**Nightly** (per Team 90 Directive)
 - Team 10/50: הרצה ב-Nightly, רישום Evidence
@@ -58,18 +74,19 @@ npm run test:external-data-suite-e
 
 ---
 
-## 6. Evidence
+## 7. Evidence
 
 - בדיקות מופעלות באמצעות `executeScript` — הזרקת `updateStalenessClock('ok'|'warning'|'na')` ווידוא class + title
 - עמוד נבדק: `trading_accounts.html` (מכיל stalenessClock + eodStalenessCheck)
 - **ריצת אימות:** 2026-01-31 — 5/5 PASS (HEADLESS=true)
+- **ריצת אימות חוזרת:** 2026-02-13 — E1–E4 PASS (5/5 כולל Login)
 
 ---
 
-## 7. אינטגרציה
+## 8. אינטגרציה
 
-- **run-external-data-nightly.js:** Suite E מריץ `external-data-suite-e-staleness-clock.test.js`
-- **Makefile:** `make test-suite-e` — הרצת סוויטה E
+- **scripts/run-nightly-external-data.sh:** Suite E מריץ `npm run test:external-data-suite-e` (מתוך `tests/`)
+- **tests/package.json:** `test:external-data-suite-e` → `node external-data-suite-e-staleness-clock.e2e.test.js`
 
 ---
 

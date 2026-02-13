@@ -16,8 +16,8 @@ echo "--- Suite A: Contract & Schema ---"
 python3 tests/external_data_suite_a_contract_schema.py || FAILED=1
 
 echo ""
-echo "--- Suite B: Cache-First + Failover ---"
-python3 tests/external_data_suite_b_cache_failover.py || FAILED=1
+echo "--- Suite B: Cache-First + Failover (REPLAY) ---"
+python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v -q || FAILED=1
 
 echo ""
 echo "--- Suite C: Cadence & Status ---"

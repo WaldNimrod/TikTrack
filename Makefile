@@ -102,8 +102,8 @@ test-suite-b:
 	@python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v
 	@echo "✅ Suite B complete."
 
-## Smoke: Suites A + B (PR/commit — no external calls)
-test-external-data-smoke: test-suite-a test-suite-b
+## Smoke: Suites A + B + D (PR/commit — REPLAY, no external calls)
+test-external-data-smoke: test-suite-a test-suite-b test-suite-d
 	@echo "✅ External Data Smoke complete."
 
 ## Suite D: Retention & Cleanup — Smoke/Nightly test (Automated Testing Mandate)
@@ -132,6 +132,9 @@ help:
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
+	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"
+	@echo "  make test-suite-b      - Suite B: Cache-First + Failover (Smoke, REPLAY)"
+	@echo "  make test-external-data-smoke - Suites A+B+D (PR smoke)"
 	@echo "  make test-suite-d      - Suite D: Retention & Cleanup (Smoke/Nightly)"
 	@echo "  make test-suite-e      - Suite E: UI Staleness Clock + Tooltip (Nightly)"
 	@echo ""

@@ -4,14 +4,13 @@
  * TEAM_10_TO_TEAM_30_EXTERNAL_DATA_AUTOMATED_TESTING_MANDATE
  * TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_DIRECTIVE
  *
- * Verifies:
- * - staleness=ok → neutral clock (staleness-clock--ok)
- * - staleness=warning → warning color + tooltip
- * - staleness=na → alert color + tooltip
- * - No banner (eod-warning-banner must not be visible)
+ * סוויטה E — אוטומציית Selenium לוידוא התנהגות שעון סטגנציה ו-tooltip:
+ * - staleness=ok → שעון ניטרלי (neutral clock)
+ * - staleness=warning → צבע אזהרה + tooltip
+ * - staleness=na → צבע alert + tooltip
+ * - No banner (אין באנר)
  *
- * Pages with staleness clock: trading_accounts, brokers_fees, cash_flows
- * Run: npm run test:external-data-suite-e (from tests/) or node external-data-suite-e-staleness-clock.test.js
+ * הרצה: Nightly CI (full suite). PR Smoke לפי הנחיית Team 10/50.
  */
 
 import { createDriver, TEST_CONFIG, TEST_USERS, getLocalStorageValue, TestLogger } from './selenium-config.js';
@@ -19,7 +18,7 @@ import { By } from 'selenium-webdriver';
 
 const logger = new TestLogger();
 
-// Tooltips from stalenessClock.js (SSOT)
+// Tooltips per stalenessClock.js (SSOT)
 const EXPECTED_TOOLTIPS = {
   ok: 'נתונים מעודכנים',
   warning: 'נתונים בני יותר מ־15 דקות — ייתכן שלא מעודכנים',
@@ -45,27 +44,67 @@ async function login(driver) {
 }
 
 /**
- * Ensure clock exists and is ready for programmatic updates.
- * StalenessClock injects into #summaryStats/.info-summary; eodStalenessCheck runs after 500ms.
+ * Ensure clock exists and set staleness state via updateStalenessClock
  */
-async function ensureClockReady(driver) {
-  // If clock doesn't exist yet, trigger it via updateStalenessClock (stalenessClock.js exposes it)
-  const clockExists = await driver.executeScript(`
-    if (typeof window.updateStalenessClock === 'function') {
-      window.updateStalenessClock('ok');
-      return !!document.getElementById('staleness-clock');
+async function setStalenessState(driver, state) {
+  return await driver.executeScript(`
+    if (window.updateStalenessClock) {
+      window.updateStalenessClock('${state}');
+      return true;
     }
     return false;
   `);
-  return clockExists;
+}
+
+/**
+ * Verify clock has correct class and tooltip for given state
+ */
+async function verifyClockState(driver, expectedState) {
+  const clock = await driver.findElement(By.id('staleness-clock')).catch(() => null);
+  if (!clock) return { pass: false, message: 'שעון סטגנציה לא נמצא' };
+
+  const className = await clock.getAttribute('class') || '';
+  const title = await clock.getAttribute('title') || '';
+  const ariaLabel = await clock.getAttribute('aria-label') || '';
+
+  const hasCorrectClass = className.includes(`staleness-clock--${expectedState}`);
+  const expectedTooltip = EXPECTED_TOOLTIPS[expectedState] || EXPECTED_TOOLTIPS.ok;
+  const hasCorrectTooltip = title.includes(expectedTooltip) || ariaLabel.includes(expectedTooltip);
+
+  return {
+    pass: hasCorrectClass && hasCorrectTooltip,
+    message: hasCorrectClass && hasCorrectTooltip
+      ? `OK: class=${expectedState}, tooltip מציג נכון`
+      : `class=${hasCorrectClass ? 'OK' : 'FAIL'}, tooltip=${hasCorrectTooltip ? 'OK' : 'FAIL'} (${title || ariaLabel})`
+  };
+}
+
+/**
+ * Verify no EOD warning banner is visible (per spec: No banner)
+ */
+async function verifyNoBanner(driver) {
+  const result = await driver.executeScript(`
+    const banner = document.getElementById('eod-warning-banner');
+    if (!banner) return { visible: false, reason: 'no-banner' };
+    const isHidden = banner.classList.contains('eod-warning-banner--hidden');
+    const styleDisplay = window.getComputedStyle(banner).display;
+    return {
+      visible: !isHidden && styleDisplay !== 'none',
+      reason: isHidden ? 'hidden-class' : 'visible'
+    };
+  `);
+  return {
+    pass: !result.visible,
+    message: result.visible ? 'באנר EOD מוצג (אסור לפי האפיון)' : 'אין באנר — תואם לאפיון'
+  };
 }
 
 async function runSuiteE() {
-  const criteria = {
-    suiteE_clock_ok: { name: 'Suite E: staleness=ok → neutral clock + tooltip', status: 'SKIP' },
-    suiteE_clock_warning: { name: 'Suite E: staleness=warning → warning color + tooltip', status: 'SKIP' },
-    suiteE_clock_na: { name: 'Suite E: staleness=na → alert color + tooltip', status: 'SKIP' },
-    suiteE_no_banner: { name: 'Suite E: No banner (per spec)', status: 'SKIP' },
+  const results = {
+    E1_ok_neutral: { name: 'E1: staleness=ok → שעון ניטרלי + tooltip', status: 'SKIP', note: '' },
+    E2_warning: { name: 'E2: staleness=warning → צבע אזהרה + tooltip', status: 'SKIP', note: '' },
+    E3_na: { name: 'E3: staleness=na → צבע alert + tooltip', status: 'SKIP', note: '' },
+    E4_no_banner: { name: 'E4: No banner — אין באנר', status: 'SKIP', note: '' }
   };
 
   let driver;
@@ -77,117 +116,81 @@ async function runSuiteE() {
     const loggedIn = await login(driver);
     if (!loggedIn) {
       logger.log('Login', 'FAIL', { message: 'לא הצלחנו להתחבר' });
-      return criteria;
+      return results;
     }
     logger.log('Login', 'PASS');
 
-    // Navigate to page with staleness clock (trading_accounts has #summaryStats + stalenessClock + eodStalenessCheck)
+    // Navigate to page with staleness clock (trading_accounts has stalenessClock + eodStalenessCheck)
     await driver.get(`${TEST_CONFIG.frontendUrl}/trading_accounts.html`);
-    await driver.sleep(3500); // Wait for eodStalenessCheck (500ms) + API + DOM
+    await driver.sleep(6000); // Wait for eodStalenessCheck (500ms) + API + clock render
 
-    const clockReady = await ensureClockReady(driver);
-    if (!clockReady) {
-      criteria.suiteE_clock_ok.note = 'שעון סטגנציה לא זמין (stalenessClock.js / updateStalenessClock חסר)';
-      criteria.suiteE_clock_ok.status = 'FAIL';
-      criteria.suiteE_clock_warning.status = 'SKIP';
-      criteria.suiteE_clock_na.status = 'SKIP';
-    } else {
-      // === 1. staleness=ok ===
-      await driver.executeScript("window.updateStalenessClock && window.updateStalenessClock('ok');");
-      await driver.sleep(300);
-
-      const okState = await driver.executeScript(
-        `const el = document.getElementById('staleness-clock');
-        if (!el) return { hasClass: false, hasTooltip: false, className: '', title: '' };
-        const className = el.getAttribute('class') || '';
-        const title = el.getAttribute('title') || '';
-        const hasClass = className.includes('staleness-clock--ok');
-        const hasTooltip = title && title.length > 0 && (title.includes('מעודכנים') || (arguments[0] && title.includes(arguments[0])));
-        return { hasClass, hasTooltip, className, title };`,
-        EXPECTED_TOOLTIPS.ok
-      );
-
-      criteria.suiteE_clock_ok.status = okState.hasClass && okState.hasTooltip ? 'PASS' : 'FAIL';
-      criteria.suiteE_clock_ok.note = okState.hasClass && okState.hasTooltip
-        ? `שעון ניטרלי: ${okState.className} | tooltip: ${okState.title?.substring(0, 40)}...`
-        : `חסר: hasClass=${okState.hasClass} hasTooltip=${okState.hasTooltip} class=${okState.className}`;
-
-      // === 2. staleness=warning ===
-      await driver.executeScript("window.updateStalenessClock && window.updateStalenessClock('warning');");
-      await driver.sleep(300);
-
-      const warningState = await driver.executeScript(
-        `const el = document.getElementById('staleness-clock');
-        if (!el) return { hasClass: false, hasTooltip: false };
-        const className = el.getAttribute('class') || '';
-        const title = el.getAttribute('title') || '';
-        const hasClass = className.includes('staleness-clock--warning');
-        const hasTooltip = title && (title.includes('15') || title.includes('דקות') || title.includes('אזהרה'));
-        return { hasClass, hasTooltip };`
-      );
-
-      criteria.suiteE_clock_warning.status = warningState.hasClass && warningState.hasTooltip ? 'PASS' : 'FAIL';
-      criteria.suiteE_clock_warning.note = warningState.hasClass && warningState.hasTooltip
-        ? 'צבע אזהרה + tooltip מוצגים'
-        : `חסר: hasClass=${warningState.hasClass} hasTooltip=${warningState.hasTooltip}`;
-
-      // === 3. staleness=na ===
-      await driver.executeScript("window.updateStalenessClock && window.updateStalenessClock('na');");
-      await driver.sleep(300);
-
-      const naState = await driver.executeScript(
-        `const el = document.getElementById('staleness-clock');
-        if (!el) return { hasClass: false, hasTooltip: false };
-        const className = el.getAttribute('class') || '';
-        const title = el.getAttribute('title') || '';
-        const hasClass = className.includes('staleness-clock--na');
-        const hasTooltip = title && (title.includes('EOD') || title.includes('סוף יום') || title.includes('לא מעודכנים'));
-        return { hasClass, hasTooltip };`
-      );
-
-      criteria.suiteE_clock_na.status = naState.hasClass && naState.hasTooltip ? 'PASS' : 'FAIL';
-      criteria.suiteE_clock_na.note = naState.hasClass && naState.hasTooltip
-        ? 'צבע alert + tooltip EOD מוצגים'
-        : `חסר: hasClass=${naState.hasClass} hasTooltip=${naState.hasTooltip}`;
-    }
-
-    // === 4. No banner (per spec: "No banner") ===
-    const bannerCheck = await driver.executeScript(`
-      const banner = document.getElementById('eod-warning-banner');
-      if (!banner) return { noBanner: true, hidden: true };
-      const className = banner.getAttribute('class') || '';
-      const hidden = className.includes('eod-warning-banner--hidden');
-      const style = window.getComputedStyle(banner);
-      const displayNone = style.display === 'none';
-      return { noBanner: false, hidden, displayNone };
+    // Ensure clock exists — inject via updateStalenessClock if needed (creates element)
+    const clockExists = await driver.executeScript(`
+      if (window.updateStalenessClock) {
+        window.updateStalenessClock('ok');
+        return !!document.getElementById('staleness-clock');
+      }
+      return false;
     `);
 
-    // Pass if: no banner element, or banner is hidden
-    const noBannerVisible = bannerCheck.noBanner || bannerCheck.hidden || bannerCheck.displayNone;
-    criteria.suiteE_no_banner.status = noBannerVisible ? 'PASS' : 'FAIL';
-    criteria.suiteE_no_banner.note = noBannerVisible
-      ? 'אין באנר גלוי (per spec)'
-      : 'באנר מוצג — אסור לפי האפיון';
+    if (!clockExists) {
+      results.E1_ok_neutral.status = 'FAIL';
+      results.E1_ok_neutral.note = 'stalenessClock לא נטען או לא קיים בעמוד';
+      results.E2_warning.status = 'SKIP';
+      results.E2_warning.note = 'תלוי ב-E1';
+      results.E3_na.status = 'SKIP';
+      results.E3_na.note = 'תלוי ב-E1';
+      results.E4_no_banner.status = 'SKIP';
+      results.E4_no_banner.note = 'תלוי בטעינת עמוד';
+      await driver.quit();
+      return results;
+    }
+
+    // === E1: staleness=ok → neutral clock + tooltip ===
+    await setStalenessState(driver, 'ok');
+    await driver.sleep(300);
+    const r1 = await verifyClockState(driver, 'ok');
+    results.E1_ok_neutral.status = r1.pass ? 'PASS' : 'FAIL';
+    results.E1_ok_neutral.note = r1.message;
+
+    // === E2: staleness=warning → warning color + tooltip ===
+    await setStalenessState(driver, 'warning');
+    await driver.sleep(300);
+    const r2 = await verifyClockState(driver, 'warning');
+    results.E2_warning.status = r2.pass ? 'PASS' : 'FAIL';
+    results.E2_warning.note = r2.message;
+
+    // === E3: staleness=na → alert color + tooltip ===
+    await setStalenessState(driver, 'na');
+    await driver.sleep(300);
+    const r3 = await verifyClockState(driver, 'na');
+    results.E3_na.status = r3.pass ? 'PASS' : 'FAIL';
+    results.E3_na.note = r3.message;
+
+    // === E4: No banner ===
+    const r4 = await verifyNoBanner(driver);
+    results.E4_no_banner.status = r4.pass ? 'PASS' : 'FAIL';
+    results.E4_no_banner.note = r4.message;
 
     await driver.quit();
   } catch (e) {
     logger.error('Suite E', e);
     if (driver) try { await driver.quit(); } catch (_) {}
-    Object.keys(criteria).forEach(k => {
-      if (criteria[k].status === 'SKIP') criteria[k].status = 'FAIL';
-      if (!criteria[k].note) criteria[k].note = e.message;
+    Object.keys(results).forEach(k => {
+      if (results[k].status === 'SKIP') results[k].status = 'FAIL';
+      results[k].note = results[k].note || e.message;
     });
   }
 
-  return criteria;
+  return results;
 }
 
-runSuiteE().then(criteria => {
-  console.log('\n=== External Data — Suite E (Clock + Tooltip) Results ===\n');
-  Object.entries(criteria).forEach(([k, v]) => {
+runSuiteE().then(results => {
+  console.log('\n=== External Data — Suite E: Staleness Clock + Tooltip ===\n');
+  Object.entries(results).forEach(([k, v]) => {
     logger.log(v.name, v.status, { message: v.note });
   });
   logger.printSummary();
-  const failed = Object.values(criteria).filter(v => v.status === 'FAIL').length;
+  const failed = Object.values(results).filter(v => v.status === 'FAIL').length;
   process.exit(failed > 0 ? 1 : 0);
 });

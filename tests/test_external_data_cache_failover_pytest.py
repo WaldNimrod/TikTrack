@@ -86,7 +86,7 @@ def test_cache_miss_price_replay_returns_from_fixtures():
     mock_db = AsyncMock()
     mock_db.execute = AsyncMock(return_value=mock_result)
     mock_db.add = MagicMock()
-    mock_db.flush = AsyncMock()
+    mock_db.flush = MagicMock()
 
     ticker_id = uuid4()
 

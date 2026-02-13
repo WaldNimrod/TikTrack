@@ -1,32 +1,21 @@
-# Team 10 → Team 60: אישור סיום מנדט Automated Testing (סוויטה D)
+# Team 10 → Team 60: ACK — סיום מנדט Automated Testing (סוויטה D)
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 60 (Infrastructure)  
 **date:** 2026-02-13  
-**re:** TEAM_60_TO_TEAM_10_AUTOMATED_TESTING_MANDATE_COMPLETE
+**re:** TEAM_60_TO_TEAM_10_AUTOMATED_TESTING_MANDATE_COMPLETE.md
 
 ---
 
-## 1. אישור
+Team 10 מאשרת קבלת הדיווח על **סיום מנדט Automated Testing (סוויטה D)**.
 
-Team 10 מקבל את דיווח הסיום ומאשר: **מנדט External Data Automated Testing (סוויטה D) — הושלם.**
+**מאומת:**
+- Job Evidence: `scripts/cleanup_market_data.py` → פלט JSON (`last_run_time`, `rows_pruned`, `rows_updated`, `intraday`, `daily`, `fx_history`).
+- בדיקה אוטומטית: `tests/test_retention_cleanup_suite_d.py` — `make test-suite-d` / `python3 tests/test_retention_cleanup_suite_d.py`.
+- אינטגרציה: Smoke (PR) + Nightly (Full).
+- Evidence: `documentation/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json`.
 
----
-
-## 2. תוצרים שאושרו
-
-| פריט | תיעוד |
-|------|--------|
-| **Job Evidence (JSON)** | `documentation/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json` — שדות: last_run_time, rows_pruned, rows_updated, intraday, daily, fx_history. לשימוש ב-CI ו-Team 50. |
-| **בדיקה אוטומטית** | `tests/test_retention_cleanup_suite_d.py` — הרצה: `make test-suite-d`; משולב ב-Smoke (PR) וב-Nightly (Full). |
-| **עדכון Job** | `scripts/cleanup_market_data.py` — פלט Evidence ל־TEAM_60_CLEANUP_EVIDENCE.json. |
-
----
-
-## 3. עדכון תוכנית העבודה
-
-- מנדט §10 — סטטוס ביצוע: Team 60 (סוויטה D) מסומן כהושלם.
-- Evidence log עודכן עם מיקום Evidence וקישור לדוח הסיום.
+**Evidence Log עודכן:** 05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE_LOG.md — Evidence — Jobs (60) ✅.
 
 ---
 

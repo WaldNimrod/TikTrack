@@ -5,7 +5,8 @@
 **בעלים:** Team 20 (Backend) + Team 10 (תיעוד SSOT)  
 **מפת דרכים:** Roadmap v2.1 — Stage-1 (BLOCKING BATCH 3)  
 **סטטוס:** SSOT — קודם מטיוטת Team 20 ע"י Team 10 (Knowledge Promotion)  
-**תאריך קידום:** 2026-02-13
+**תאריך קידום:** 2026-02-13  
+**עדכון ADR-022:** 2026-02-13 — Providers (Yahoo+Alpha), FX EOD, Cache-First, Scope USD/EUR/ILS, Visual Warning (מטיוטת Team 20).
 
 ---
 
@@ -20,9 +21,41 @@
 | נושא | תיאור |
 |------|--------|
 | **שערי חליפין** | מקור שערים להמרת מטבע (Cash Flows CURRENCY_CONVERSION, D21) |
-| **דיוק** | `NUMERIC(20, 8)` לכל ערך כספי/שער (SSOT: .cursorrules, WP_20_07) |
-| **מטבעות** | ISO 4217 (USD, EUR, ILS וכו') |
+| **דיוק** | `NUMERIC(20, 8)` לשערים/מחירים (SSOT: PRECISION_POLICY_SSOT, WP_20_07) |
+| **מטבעות** | USD, EUR, ILS (טווח ראשוני — ראה §2.4) |
 | **זמן** | `last_sync_time` — TIMESTAMP UTC |
+
+### 2.1 Providers (ספקי שערי FX) — ADR-022
+
+| ספק | שימוש | הערות |
+|-----|--------|------|
+| **Alpha Vantage** | Primary | ראשי |
+| **Yahoo Finance** | Fallback | גיבוי |
+| ~~Frankfurter~~ | **אין** | הוסר לפי ADR-022 |
+
+**החלטה:** Yahoo + Alpha בלבד. אין שימוש ב-Frankfurter.
+
+### 2.2 מקור נתונים — FX EOD בלבד
+
+- **EOD (End-of-Day):** שערי חליפין נמשכים פעם ביום (סנכרון EOD).
+- **אין Real-Time:** לא נעשה שימוש בשערי real-time.
+- **Primary/Fallback:** Alpha Vantage → Yahoo (בעת כשל או חוסר נתונים).
+
+### 2.3 Cache-First Enforcement
+
+- **חובה:** אין פנייה ל-API חיצוני לפני בדיקת local cache.
+- **מקור נתונים ל-Endpoint:** קריאה מ־`market_data.exchange_rates` (מטמון/DB).
+- **סנכרון:** Team 60 — cron/job מרענן את הטבלה (EOD). אין קריאה חיצונית מתוך request.
+
+### 2.4 Scope מטבעות (נעול)
+
+**מטבעות נתמכים (טווח ראשוני):** USD, EUR, ILS. הרחבה עתידית — לפי החלטת Product.
+
+### 2.5 Visual Warning (EOD)
+
+- **חובה:** התרעה למשתמש כאשר מוצג מחיר/שער EOD (סוף יום).
+- **מימוש:** שדה `staleness` בתגובת API: `ok` \| `warning` (>15 דקות) \| `na` (>24 שעות).
+- **Frontend:** להציג אזהרה כאשר `staleness` ≠ `ok`.
 
 ---
 
@@ -57,7 +90,8 @@
 | תלות | תיאור |
 |------|--------|
 | **MARKET_DATA_PIPE** | תשתית אספקת מחירי שוק (1-002) |
-| **Precision Audit** | אימות NUMERIC(20,8) בכל השדות הכספיים (1-004) |
+| **ADR-022** | מדיניות ספקים, EOD, Cache-First, Visual Warning (§2.1–2.5) |
+| **Precision Audit** | אימות דיוק לפי PRECISION_POLICY_SSOT (1-004) |
 
 ---
 
@@ -80,4 +114,5 @@
 
 ---
 
-**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | FOREX_MARKET_SPEC_SSOT | 2026-02-13**
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | FOREX_MARKET_SPEC_SSOT | 2026-02-13**  
+**log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | FOREX_MARKET_SPEC_ADR_022 | 2026-02-13** — מיזוג טיוטת P3-005 (TEAM_20_P3_005_FOREX_MARKET_SPEC_UPDATE_DRAFT) ל־SSOT.

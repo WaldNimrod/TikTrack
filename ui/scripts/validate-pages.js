@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
  * validate-pages.js
- * Validates HTML pages against TT2_PAGE_TEMPLATE_CONTRACT (POL-015).
+ * Validates HTML pages against TT2_PAGE_TEMPLATE_CONTRACT (POL-015 v1.1).
  * Rejects any page that violates DOM structure or CSS loading order.
  *
- * Per Architect Verdict: Auth pages (Login, Register, etc.) excluded - different layout (Type A).
+ * POL-015 v1.1: No Auth exceptions — all pages (including Auth via React SPA) must comply.
+ * Index.html = Unified Shell for React routes (/, /login, /register, /reset-password, etc.)
  *
  * Usage: node ui/scripts/validate-pages.js
  * Exit: 0 = PASS, 1 = violations found
@@ -27,24 +28,24 @@ const CSS_ORDER = [
   'phoenix-modal.css',
 ];
 
-// Non-Auth pages to validate (per Architect Verdict)
-const PAGES_TO_VALIDATE = [
-  'src/views/financial/tradingAccounts/trading_accounts.html',
-  'src/views/financial/brokersFees/brokers_fees.html',
-  'src/views/financial/cashFlows/cash_flows.html',
+// All pages per POL-015 v1.1 (Non-Auth + Auth shell)
+const PAGES_CONFIG = [
+  { path: 'index.html', profile: 'spa' },
+  { path: 'src/views/financial/tradingAccounts/trading_accounts.html', profile: 'financial' },
+  { path: 'src/views/financial/brokersFees/brokers_fees.html', profile: 'financial' },
+  { path: 'src/views/financial/cashFlows/cash_flows.html', profile: 'financial' },
 ];
 
-function validateFile(filePath) {
+function validateFile(filePath, profile) {
   const fullPath = path.join(UI_ROOT, filePath);
   if (!fs.existsSync(fullPath)) {
     return [{ file: filePath, line: 0, rule: 'FILE_NOT_FOUND', msg: `File does not exist: ${filePath}` }];
   }
 
   const html = fs.readFileSync(fullPath, 'utf8');
-  const lines = html.split('\n');
   const violations = [];
 
-  // 1. RTL
+  // 1. RTL (all profiles)
   if (!/lang="he"/.test(html)) {
     violations.push({ file: filePath, line: 2, rule: 'RTL', msg: 'Missing lang="he"' });
   }
@@ -52,53 +53,12 @@ function validateFile(filePath) {
     violations.push({ file: filePath, line: 2, rule: 'RTL', msg: 'Missing dir="rtl"' });
   }
 
-  // 2. Favicon
+  // 2. Favicon (all profiles)
   if (!/rel="icon".*favicon/i.test(html)) {
     violations.push({ file: filePath, line: 0, rule: 'FAVICON', msg: 'Missing favicon link' });
   }
 
-  // 3. CSS order (per CSS_LOADING_ORDER.md)
-  const linkRegex = /<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>|href=["']([^"']+)["'][^>]*rel=["']stylesheet["']/gi;
-  const cssLinks = [];
-  let m;
-  while ((m = linkRegex.exec(html)) !== null) {
-    cssLinks.push((m[1] || m[2] || '').trim());
-  }
-
-  let lastIdx = -1;
-  for (let i = 0; i < CSS_ORDER.length; i++) {
-    const needle = CSS_ORDER[i];
-    const idx = cssLinks.findIndex(href => href && href.includes(needle));
-    if (idx === -1) {
-      violations.push({ file: filePath, line: 0, rule: 'CSS_ORDER', msg: `Missing CSS: ${needle}` });
-    } else if (idx <= lastIdx) {
-      violations.push({ file: filePath, line: 0, rule: 'CSS_ORDER', msg: `Wrong order: ${needle}` });
-    } else {
-      lastIdx = idx;
-    }
-  }
-
-  // 4. UAI: PageConfig before UnifiedAppInit before page-wrapper
-  const pageConfigIdx = html.indexOf('PageConfig');
-  const uaiIdx = html.indexOf('UnifiedAppInit');
-  const wrapperIdx = html.indexOf('page-wrapper');
-  if (pageConfigIdx === -1) {
-    violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'Missing PageConfig script' });
-  }
-  if (uaiIdx === -1) {
-    violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'Missing UnifiedAppInit script' });
-  }
-  if (wrapperIdx === -1) {
-    violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing page-wrapper' });
-  }
-  if (pageConfigIdx !== -1 && uaiIdx !== -1 && pageConfigIdx > uaiIdx) {
-    violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'PageConfig must load before UnifiedAppInit' });
-  }
-  if (uaiIdx !== -1 && wrapperIdx !== -1 && uaiIdx > wrapperIdx) {
-    violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'UnifiedAppInit must load before page-wrapper' });
-  }
-
-  // 5. DOM structure: page-wrapper > page-container > main > tt-container
+  // 3. DOM structure: page-wrapper > page-container > main (all profiles)
   if (!/<div[^>]*class="[^"]*page-wrapper/.test(html)) {
     violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing page-wrapper' });
   }
@@ -108,26 +68,75 @@ function validateFile(filePath) {
   if (!/<main[\s>]/.test(html)) {
     violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing main' });
   }
-  if (!/<tt-container[\s>]/.test(html)) {
-    violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing tt-container' });
-  }
 
-  // 6. tt-container: at least one tt-section
-  const ttSectionCount = (html.match(/<tt-section[\s>]/g) || []).length;
-  if (ttSectionCount < 1) {
-    violations.push({ file: filePath, line: 0, rule: 'TT_CONTAINER', msg: 'tt-container must contain at least one tt-section' });
-  }
+  if (profile === 'spa') {
+    // SPA (index.html): Unified Shell for React/Auth. CSS via main.jsx; layout via headerLoader path.
+    if (!/id="root"/.test(html)) {
+      violations.push({ file: filePath, line: 0, rule: 'SPA', msg: 'Missing #root for React mount' });
+    }
+    const linkRegex = /<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>|href=["']([^"']+)["'][^>]*rel=["']stylesheet["']/gi;
+    const cssLinks = [];
+    let m;
+    while ((m = linkRegex.exec(html)) !== null) {
+      cssLinks.push((m[1] || m[2] || '').trim());
+    }
+    if (!cssLinks.some(href => href && (href.includes('picocss') || href.includes('pico.min')))) {
+      violations.push({ file: filePath, line: 0, rule: 'CSS', msg: 'SPA must load Pico CSS in HTML' });
+    }
+  } else {
+    // financial: full validation
+    const linkRegex = /<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>|href=["']([^"']+)["'][^>]*rel=["']stylesheet["']/gi;
+    const cssLinks = [];
+    let m;
+    while ((m = linkRegex.exec(html)) !== null) {
+      cssLinks.push((m[1] || m[2] || '').trim());
+    }
+    let lastIdx = -1;
+    for (let i = 0; i < CSS_ORDER.length; i++) {
+      const needle = CSS_ORDER[i];
+      const idx = cssLinks.findIndex(href => href && href.includes(needle));
+      if (idx === -1) {
+        violations.push({ file: filePath, line: 0, rule: 'CSS_ORDER', msg: `Missing CSS: ${needle}` });
+      } else if (idx <= lastIdx) {
+        violations.push({ file: filePath, line: 0, rule: 'CSS_ORDER', msg: `Wrong order: ${needle}` });
+      } else {
+        lastIdx = idx;
+      }
+    }
 
-  // 7. tt-section structure: index-section__header, index-section__body, tt-section-row
-  if (ttSectionCount >= 1) {
-    if (!/index-section__header/.test(html)) {
-      violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must have index-section__header' });
+    const pageConfigIdx = html.indexOf('PageConfig');
+    const uaiIdx = html.indexOf('UnifiedAppInit');
+    const wrapperIdx = html.indexOf('page-wrapper');
+    if (pageConfigIdx === -1) {
+      violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'Missing PageConfig script' });
     }
-    if (!/index-section__body/.test(html)) {
-      violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must have index-section__body' });
+    if (uaiIdx === -1) {
+      violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'Missing UnifiedAppInit script' });
     }
-    if (!/<tt-section-row[\s>]/.test(html)) {
-      violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must contain tt-section-row' });
+    if (pageConfigIdx !== -1 && uaiIdx !== -1 && pageConfigIdx > uaiIdx) {
+      violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'PageConfig must load before UnifiedAppInit' });
+    }
+    if (uaiIdx !== -1 && wrapperIdx !== -1 && uaiIdx > wrapperIdx) {
+      violations.push({ file: filePath, line: 0, rule: 'UAI', msg: 'UnifiedAppInit must load before page-wrapper' });
+    }
+
+    if (!/<tt-container[\s>]/.test(html)) {
+      violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing tt-container' });
+    }
+    const ttSectionCount = (html.match(/<tt-section[\s>]/g) || []).length;
+    if (ttSectionCount < 1) {
+      violations.push({ file: filePath, line: 0, rule: 'TT_CONTAINER', msg: 'tt-container must contain at least one tt-section' });
+    }
+    if (ttSectionCount >= 1) {
+      if (!/index-section__header/.test(html)) {
+        violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must have index-section__header' });
+      }
+      if (!/index-section__body/.test(html)) {
+        violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must have index-section__body' });
+      }
+      if (!/<tt-section-row[\s>]/.test(html)) {
+        violations.push({ file: filePath, line: 0, rule: 'TT_SECTION', msg: 'Each tt-section must contain tt-section-row' });
+      }
     }
   }
 
@@ -135,12 +144,12 @@ function validateFile(filePath) {
 }
 
 function main() {
-  console.log('[validate-pages] Validating Non-Auth pages per POL-015...\n');
+  console.log('[validate-pages] Validating all pages per POL-015 v1.1 (including Auth shell)...\n');
 
   let totalViolations = 0;
 
-  for (const filePath of PAGES_TO_VALIDATE) {
-    const violations = validateFile(filePath);
+  for (const { path: filePath, profile } of PAGES_CONFIG) {
+    const violations = validateFile(filePath, profile);
     if (violations.length === 0) {
       console.log(`[PASS] ${filePath}`);
     } else {
@@ -154,7 +163,7 @@ function main() {
 
   console.log('');
   if (totalViolations === 0) {
-    console.log('[validate-pages] PASS — All pages comply with TT2_PAGE_TEMPLATE_CONTRACT.');
+    console.log('[validate-pages] PASS — All pages (including Auth) comply with POL-015 v1.1.');
     process.exit(0);
   } else {
     console.log(`[validate-pages] FAIL — ${totalViolations} violation(s) found.`);

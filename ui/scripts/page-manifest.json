@@ -8,6 +8,8 @@
       "configPath": "/src/views/financial/tradingAccounts/tradingAccountsPageConfig.js",
       "contentFile": "src/views/financial/tradingAccounts/trading_accounts.content.html",
       "scripts": [
+        "<script src=\"/src/components/core/eodWarningBanner.js\"></script>",
+        "<script type=\"module\" src=\"/src/components/core/eodStalenessCheck.js\"></script>",
         "<script src=\"/src/views/shared/footerLoader.js\"></script>",
         "<script src=\"/src/components/core/navigationHandler.js\"></script>",
         "<script src=\"/src/components/core/headerDropdown.js\"></script>",
@@ -31,6 +33,8 @@
       "configPath": "/src/views/financial/brokersFees/brokersFeesPageConfig.js",
       "contentFile": "src/views/financial/brokersFees/brokers_fees.content.html",
       "scripts": [
+        "<script src=\"/src/components/core/eodWarningBanner.js\"></script>",
+        "<script type=\"module\" src=\"/src/components/core/eodStalenessCheck.js\"></script>",
         "<script src=\"/src/components/core/sectionToggleHandler.js\"></script>",
         "<script src=\"/src/cubes/shared/PhoenixTableSortManager.js\"></script>",
         "<script src=\"/src/cubes/shared/PhoenixTableFilterManager.js\"></script>",
@@ -49,6 +53,8 @@
       "configPath": "/src/views/financial/cashFlows/cashFlowsPageConfig.js",
       "contentFile": "src/views/financial/cashFlows/cash_flows.content.html",
       "scripts": [
+        "<script src=\"/src/components/core/eodWarningBanner.js\"></script>",
+        "<script type=\"module\" src=\"/src/components/core/eodStalenessCheck.js\"></script>",
         "<script src=\"/src/components/core/sectionToggleHandler.js\"></script>",
         "<script src=\"/src/cubes/shared/PhoenixTableSortManager.js\"></script>",
         "<script src=\"/src/cubes/shared/PhoenixTableFilterManager.js\"></script>",

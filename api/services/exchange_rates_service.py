@@ -1,9 +1,11 @@
 """
-Exchange Rates Service - MARKET_DATA_PIPE_SPEC
-Stage-1 (1-002) post-Closure: use exchange_rates, Never block UI, Staleness.
+Exchange Rates Service - MARKET_DATA_PIPE_SPEC, ADR-022
+Stage-1 (1-002) post-Closure + P3-005: use exchange_rates, Cache-First, EOD only.
 
-Per TT2_MARKET_DATA_RESILIENCE: Staleness Warning at 15 mins, N/A after 1 trading day.
-Never block UI: internal DB only (no external API); fast path.
+- Cache-First: reads only from market_data.exchange_rates (no external API call).
+- EOD: data populated by Team 60 sync (Alpha/Yahoo). No real-time fetches.
+- Staleness: Warning at 15 mins, N/A after 1 trading day (Visual Warning per ADR-022).
+- Never block UI: DB only, timeout 5s.
 """
 
 import asyncio

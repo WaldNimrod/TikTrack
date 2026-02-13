@@ -20,6 +20,6 @@
 | `external_ulids` | `VARCHAR(26)` | `ULID` | מזהה API (ULID). |
 | `trading_account_ids` | `BIGINT (FK)` | `ULID` | קונטיינר חשבונות המסחר. |
 | `currency_codes` | `VARCHAR(3)` | `String` | ISO 4217 (Plural). |
-| `available_amounts` | `NUMERIC(20, 8)` | `Decimal` | מזומן זמין. |
-| `locked_amounts` | `NUMERIC(20, 8)` | `Decimal` | הון נעול. |
-| `opening_balance_amounts` | `NUMERIC(20, 8)` | `Decimal` | **יתרת פתיחה ראשונית** (DECIMAL 20,8). |
+| `available_amounts` | `NUMERIC(20, 6)` | `Decimal` | מזומן זמין — PRECISION_POLICY_SSOT. |
+| `locked_amounts` | `NUMERIC(20, 6)` | `Decimal` | הון נעול — PRECISION_POLICY_SSOT. |
+| `opening_balance_amounts` | `NUMERIC(20, 6)` | `Decimal` | **יתרת פתיחה ראשונית** — PRECISION_POLICY_SSOT (20,6). |

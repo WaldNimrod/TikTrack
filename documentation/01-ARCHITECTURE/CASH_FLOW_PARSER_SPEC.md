@@ -3,7 +3,7 @@
 **id:** `CASH_FLOW_PARSER_SPEC`  
 **משימה:** 1-003 (Stage-1)  
 **בעלים:** Team 20 (לוגיקה) + Team 10 (SSOT)  
-**תלות:** MARKET_DATA_PIPE (רלוונטי — שערים להמרת מטבע)  
+**תלות:** MARKET_DATA_PIPE (שערים להמרת מטבע); PRECISION_POLICY_SSOT (שדה amount — 20,6)  
 **מפת דרכים:** Roadmap v2.1 — Stage-1 (BLOCKING BATCH 3)  
 **רקע:** תנאי מחייב לפני Data Import (Cash Flows + Executions) — Batch 4  
 **סטטוס:** SSOT — קודם מטיוטת Team 20 ע"י Team 10 (Knowledge Promotion)  
@@ -35,7 +35,7 @@
 |------------|-------|------------|
 | `trading_account_id` | ULID | חובה — מיפוי מ־account name/code או ברירת מחדל |
 | `flow_type` | ENUM | DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, CURRENCY_CONVERSION, OTHER |
-| `amount` | NUMERIC(20,8) | המרה ל־Decimal; דיוק 8 ספרות |
+| `amount` | NUMERIC(20,6) | המרה ל־Decimal; דיוק 6 ספרות — **SSOT:** PRECISION_POLICY_SSOT (cash_flows.amount) |
 | `currency` | VARCHAR(3) | ISO 4217; ברירת מחדל USD |
 | `transaction_date` | DATE | ISO 8601 / dd/mm/yyyy — נורמליזציה |
 | `description` | TEXT | אופציונלי; sanitize Rich Text |

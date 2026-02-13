@@ -7,7 +7,7 @@
 **last_updated:** 2026-02-05  
 **version:** v1.0
 
-**סשן:** S20.08.C | **סטנדרט:** Plural Standard (G-10) | **דיוק:** DECIMAL(20, 8)
+**סשן:** S20.08.C | **סטנדרט:** Plural Standard (G-10) | **דיוק יתרות/סכומים:** DECIMAL(20, 6) — PRECISION_POLICY_SSOT
 
 ## 1. אסטרטגיית מזהים (Identity Strategy)
 - **Internal IDs:** `BIGINT (PK)` - אינדוקס פנימי.
@@ -20,9 +20,9 @@
 | `external_ulids` | `VARCHAR(26)` | `ULID` | מזהה API. |
 | `owner_user_ids` | `BIGINT (FK)` | `ULID` | בעלות. |
 | `display_names` | `VARCHAR(255)` | `String` | אכיפת 'חשבונות מסחר'. |
-| `account_settings` | `JSONB` | `Object` | אכיפת דיוק נומרי פנימי ל-`DECIMAL(20, 8)`. |
+| `account_settings` | `JSONB` | `Object` | אכיפת דיוק נומרי פנימי ל-`DECIMAL(20, 6)` (סכומים). |
 | `is_active_statuses` | `BOOLEAN` | `Boolean` | |
 
 ## 3. הצהרת דיוק פיננסי (Mandatory Precision)
-- **אכיפה:** כל שדה המכיל ערך כספי, הגדרה נומרית או סף (Threshold) בתוך ה-JSONB חייב להישמר בדיוק של **DECIMAL(20, 8)**.
+- **אכיפה:** כל שדה המכיל ערך כספי, הגדרה נומרית או סף (Threshold) בתוך ה-JSONB — דיוק **DECIMAL(20, 6)** (יתרות/סכומים — PRECISION_POLICY_SSOT).
 - **Separated Model:** אין שדות יתרה בטבלה זו. היתרות מנוהלות בישות Balances.

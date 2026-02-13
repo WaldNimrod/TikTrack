@@ -62,10 +62,11 @@ async def get_exchange_rates_endpoint(
     """
     Get exchange rates (FOREX) for currency conversion.
     
-    Per MARKET_DATA_PIPE_SPEC:
-    - Source: market_data.exchange_rates
-    - Never block UI: DB only, no external API
-    - Staleness: ok | warning (>15min) | na (>1 trading day)
+    Per MARKET_DATA_PIPE_SPEC + ADR-022 (P3-005):
+    - Cache-First: reads only from market_data.exchange_rates (no external API).
+    - EOD only: data from Team 60 sync (Alpha/Yahoo). No real-time fetches.
+    - Staleness: ok | warning (>15min) | na (>24h) — Visual Warning per ADR-022.
+    - Never block UI: timeout 5s.
     """
     try:
         items, staleness = await asyncio.wait_for(

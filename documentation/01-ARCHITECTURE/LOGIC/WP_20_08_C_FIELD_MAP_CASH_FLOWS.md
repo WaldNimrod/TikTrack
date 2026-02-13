@@ -18,4 +18,4 @@
 | `internal_ids` | `BIGINT (PK)` | `N/A` | PK פנימי. |
 | `external_ulids` | `VARCHAR(26)` | `ULID` | API ID. |
 | `trading_account_ids` | `BIGINT (FK)` | `ULID` | מזהה חשבונות המסחר. |
-| `transaction_amounts` | `NUMERIC(20, 8)` | `Decimal` | דיוק נומרי 20,8. |
+| `transaction_amounts` | `NUMERIC(20, 6)` | `Decimal` | דיוק נומרי 20,6 — PRECISION_POLICY_SSOT (תזרימים). |

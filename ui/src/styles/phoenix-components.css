@@ -1844,3 +1844,26 @@ input.dir-ltr,
   direction: ltr !important;
   text-align: left !important;
 }
+
+/* ============================================
+   EOD Warning Banner (ADR-022 §2.4)
+   Visual warning when End-of-Day market data is displayed
+   ============================================ */
+.eod-warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-block-end: var(--spacing-md, 12px);
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #92400e;
+}
+.eod-warning-banner--hidden {
+  display: none;
+}
+.eod-warning-banner__icon {
+  font-size: 1.2rem;
+}

@@ -43,4 +43,19 @@
 
 ---
 
-**log_entry | GATE_B | STATUS | GREEN | 2026-02-09 | Team 90 closure acknowledged**
+---
+
+## Stage-1 — משימות 1-001, 1-003, 1-004 (ולידציה מחדש)
+
+| משימה | סטטוס | דוח |
+|--------|--------|------|
+| 1-001 FOREX_MARKET_SPEC | ✅ PASS | TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md |
+| 1-003 CASH_FLOW_PARSER | ✅ PASS | _COMMUNICATION/team_90/ |
+| 1-004 Precision Audit | ✅ PASS | כנ"ל |
+
+**תאריך:** 2026-02-13. רשימת משימות מרכזית — 1-001, 1-003, 1-004 סומנו CLOSED.
+
+---
+
+**log_entry | GATE_B | STATUS | GREEN | 2026-02-09 | Team 90 closure acknowledged**  
+**log_entry | GATE_B | STAGE1_1_001_1_003_1_004_PASS | 2026-02-13 | TEAM_90_STAGE1_1_001_1_003_1_004_GATE_B_PASS.md**

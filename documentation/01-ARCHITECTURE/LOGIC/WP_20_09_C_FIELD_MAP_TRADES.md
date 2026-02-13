@@ -17,4 +17,4 @@
 | :--- | :--- | :--- | :--- |
 | `internal_ids` | `BIGINT (PK)` | `N/A` | |
 | `entry_execution_ids` | `BIGINT (FK)` | `ULID` | ביצוע כניסה (FIFO). |
-| `realized_pnl_amounts`| `NUMERIC(20, 8)` | `Decimal` | P&L ממומש (20,8). |
+| `realized_pnl_amounts`| `NUMERIC(20, 6)` | `Decimal` | P&L ממומש (20,6) — PRECISION_POLICY_SSOT. |

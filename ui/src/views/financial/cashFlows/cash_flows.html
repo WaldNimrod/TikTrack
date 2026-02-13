@@ -10,6 +10,7 @@
   
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
        ============================================ -->
   
   <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
@@ -36,19 +37,14 @@
   
   <!-- ============================================
        UAI Entry Point (Unified App Init)
+       Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
        ============================================ -->
-  <!-- ✅ REQUIRED: Load config from external JS file BEFORE UAI -->
   <script src="/src/views/financial/cashFlows/cashFlowsPageConfig.js"></script>
-  
-  <!-- ✅ REQUIRED: Load UAI after config -->
   <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
-  
-  <!-- Note: Auth Guard, PhoenixBridge, and Header are loaded automatically by UAI DOMStage -->
 
   <!-- ============================================
        PAGE WRAPPER + CONTAINER STRUCTURE
-       ============================================
-       LEGO System: page-wrapper > page-container > main > tt-container > tt-section
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
        ============================================ -->
   
   <div class="page-wrapper">
@@ -456,38 +452,19 @@
           </tt-section>
 
         </tt-container>
+
       </main>
     </div>
   </div>
-
-  <!-- ============================================
-       JavaScript Files (External Only - Policy Compliance)
-       ============================================ -->
   
-  <!-- Section Toggle Handler -->
-  <script src="/src/components/core/sectionToggleHandler.js"></script>
-  
-  <!-- Table Managers (Required for sorting and filtering) -->
-  <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
-  <script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
-  
-  <!-- Table Formatters (Required for table formatting) -->
-  <script type="module" src="/src/cubes/shared/tableFormatters.js"></script>
-  
-  <!-- Cash Flows Table Initialization -->
-  <!-- Note: cashFlowsDataLoader.js is loaded dynamically by UAI DataStage -->
-  <script type="module" src="/src/views/financial/cashFlows/cashFlowsTableInit.js"></script>
-  
-  <!-- Cash Flows Header Handlers -->
-  <script src="/src/views/financial/cashFlows/cashFlowsHeaderHandlers.js"></script>
-  
-  <!-- Footer Loader -->
-  <script src="/src/views/shared/footerLoader.js"></script>
-  
-  <!-- Lucide Icons Initialization (External JS - Policy Compliance) -->
-  <script src="/src/views/financial/cashFlows/cashFlowsLucideInit.js"></script>
-  
-  <!-- Cash Flows Summary Toggle Handler (External JS - Policy Compliance) -->
-  <script src="/src/views/financial/cashFlows/cashFlowsSummaryToggle.js"></script>
+<script src="/src/components/core/sectionToggleHandler.js"></script>
+<script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+<script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
+<script type="module" src="/src/cubes/shared/tableFormatters.js"></script>
+<script type="module" src="/src/views/financial/cashFlows/cashFlowsTableInit.js"></script>
+<script src="/src/views/financial/cashFlows/cashFlowsHeaderHandlers.js"></script>
+<script src="/src/views/shared/footerLoader.js"></script>
+<script src="/src/views/financial/cashFlows/cashFlowsLucideInit.js"></script>
+<script src="/src/views/financial/cashFlows/cashFlowsSummaryToggle.js"></script>
 </body>
 </html>

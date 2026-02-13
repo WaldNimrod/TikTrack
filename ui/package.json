@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "check:css": "node -e \"console.log('Run check-css-loading.js in browser console (F12) on http://localhost:8080/')\""
+    "check:css": "node -e \"console.log('Run check-css-loading.js in browser console (F12) on http://localhost:8080/')\"",
+    "build:pages": "node scripts/generate-pages.js",
+    "validate:pages": "node scripts/validate-pages.js"
   },
   "dependencies": {
     "@tiptap/core": "^3.19.0",

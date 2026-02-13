@@ -10,6 +10,7 @@
   
   <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
        ============================================ -->
   
   <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
@@ -27,7 +28,7 @@
   <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
   <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
   
-  <!-- 6. Modal Styles (for CRUD forms) -->
+  <!-- 6. Modal Styles -->
   <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
   
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -36,19 +37,14 @@
   
   <!-- ============================================
        UAI Entry Point (Unified App Init)
+       Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
        ============================================ -->
-  <!-- ✅ REQUIRED: Load config from external JS file BEFORE UAI -->
   <script src="/src/views/financial/tradingAccounts/tradingAccountsPageConfig.js"></script>
-  
-  <!-- ✅ REQUIRED: Load UAI after config -->
   <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
-  
-  <!-- Note: Auth Guard, PhoenixBridge, and Header are loaded automatically by UAI DOMStage -->
 
   <!-- ============================================
        PAGE WRAPPER + CONTAINER STRUCTURE
-       ============================================
-       LEGO System: page-wrapper > page-container > main > tt-container > tt-section
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
        ============================================ -->
   
   <div class="page-wrapper">
@@ -662,47 +658,23 @@
           </tt-section>
           
         </tt-container>
+
       </main>
     </div>
   </div>
   
-<!-- Modular Footer: Loaded dynamically via footerLoader.js -->
 <script src="/src/views/shared/footerLoader.js"></script>
-  
-  <!-- External JavaScript Files - NO inline scripts -->
-  <!-- CRITICAL: Clean Slate Rule - All JavaScript in external files -->
-  
-  <!-- Navigation Handler: Handle navigation link clicks -->
-  <script src="/src/components/core/navigationHandler.js"></script>
-  
-  <!-- Header Dropdown: Dropdown menu functionality -->
-  <script src="/src/components/core/headerDropdown.js"></script>
-  
-  <!-- Header Filters: Toggle functionality -->
-  <script src="/src/components/core/headerFilters.js"></script>
-  
-  <!-- Section Toggle: Show/hide section body -->
-  <script src="/src/components/core/sectionToggleHandler.js"></script>
-  
-  <!-- Portfolio Summary Toggle -->
-  <script src="/src/views/financial/shared/portfolioSummaryToggle.js"></script>
-  
-  <!-- Table Management Classes -->
-  <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
-  <script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
-  <script type="module" src="/src/cubes/shared/tableFormatters.js"></script>
-  
-  <!-- Trading Accounts Filters Integration: Connect filters to data loading -->
-  <!-- Note: tradingAccountsDataLoader.js is loaded dynamically by UAI DataStage -->
-  <script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js"></script>
-  
-  <!-- Trading Accounts Header Handlers: Event handlers for header filters -->
-  <script src="/src/views/financial/tradingAccounts/tradingAccountsHeaderHandlers.js"></script>
-  
-  <!-- Trading Accounts Table Initialization: Initialize table managers and CRUD handlers -->
-  <script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsTableInit.js"></script>
-  
-  <!-- Header Links Updater: Dynamic header links based on authentication -->
-  <script src="/src/components/core/headerLinksUpdater.js"></script>
+<script src="/src/components/core/navigationHandler.js"></script>
+<script src="/src/components/core/headerDropdown.js"></script>
+<script src="/src/components/core/headerFilters.js"></script>
+<script src="/src/components/core/sectionToggleHandler.js"></script>
+<script src="/src/views/financial/shared/portfolioSummaryToggle.js"></script>
+<script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+<script src="/src/cubes/shared/PhoenixTableFilterManager.js"></script>
+<script type="module" src="/src/cubes/shared/tableFormatters.js"></script>
+<script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsFiltersIntegration.js"></script>
+<script src="/src/views/financial/tradingAccounts/tradingAccountsHeaderHandlers.js"></script>
+<script type="module" src="/src/views/financial/tradingAccounts/tradingAccountsTableInit.js"></script>
+<script src="/src/components/core/headerLinksUpdater.js"></script>
 </body>
 </html>

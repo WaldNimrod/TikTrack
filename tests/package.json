@@ -18,6 +18,7 @@
     "test:gate-a": "node gate-a-e2e.test.js",
     "test:gate-b": "node gate-b-e2e.test.js",
     "test:external-data-suite-e": "node external-data-suite-e-staleness-clock.e2e.test.js",
+    "test:external-data-live-ui-evidence": "node external-data-live-ui-evidence-capture.e2e.test.js",
     "test:external-data-nightly": "bash ../scripts/run-nightly-external-data.sh",
     "test:external-data-smoke": "bash ../scripts/run-smoke-external-data.sh",
     "test:adr015-gate-a": "node adr015-gate-a-e2e.test.js",

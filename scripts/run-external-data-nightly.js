@@ -16,7 +16,7 @@ const suites = [
   { name: 'B: Cache-First + Failover', cmd: 'python3', args: ['tests/external_data_suite_b_cache_failover.py'] },
   { name: 'C: Cadence & Status', cmd: 'python3', args: ['tests/external_data_suite_c_cadence.py'] },
   { name: 'D: Retention & Cleanup', cmd: 'python3', args: ['tests/external_data_suite_d_retention.py'] },
-  { name: 'E: UI (Clock + Tooltip)', cmd: 'node', args: ['tests/external-data-suite-e-staleness-clock.test.js'] },
+  { name: 'E: UI (Clock + Tooltip)', cmd: 'node', args: ['tests/external-data-suite-e-staleness-clock.e2e.test.js'] },
 ];
 
 console.log('=== External Data Nightly (Full Suite A–E) ===\n');

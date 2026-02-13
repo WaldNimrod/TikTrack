@@ -66,6 +66,15 @@
 
 ---
 
+## מוכנות לולידציה Team 90 — ⚠️ NOT READY (מכשולים)
+
+**דוח Team 90:** _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_REVIEW.md  
+**פעולות Team 10:** _COMMUNICATION/team_10/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_BLOCKERS_ACK_AND_ACTIONS.md
+
+מכשולים: (1) Evidence לא עדכני — הרצה מחדש Smoke+Nightly + עדכון Evidence [50]. (2) כפילות Suite E — קובץ קנוני .e2e.test.js, ארכוב כפיל [30+10]. (3) Suite C — Evidence ל־ticker_prices_intraday [20/60]. אחרי תיקון → ולידציה חוזרת → GATE_B_READY.
+
+---
+
 **log_entry | TEAM_10 | EVIDENCE_LOG | EXTERNAL_DATA_AUTOMATED_TESTING | 2026-01-31**  
 **log_entry | TEAM_30 | SUITE_E | IMPLEMENTATION_VERIFIED | 2026-01-31**  
 **log_entry | TEAM_50 | FULL_RUN_VERIFIED | SMOKE_AND_NIGHTLY_PASS | 2026-01-31**

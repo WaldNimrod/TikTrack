@@ -31,18 +31,20 @@
 
 ---
 
-## 3. מוכנות לולידציה Team 90
+## 3. מוכנות לולידציה Team 90 — ⚠️ NOT READY (מכשולים)
 
-| קריטריון (הנחיית Team 90) | סטטוס |
-|----------------------------|--------|
-| Full suite passes in nightly run | ✅ A–E PASS (2026-01-31) |
-| Smoke suite passes on PR | ✅ A, B, D PASS |
-| No external network calls when mode=REPLAY | ✅ (סוויטות A, B עם REPLAY) |
-| Evidence logs attached for jobs + nightly run | ✅ TEAM_10 + TEAM_50 + TEAM_60 evidence |
+**דוח Team 90:** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_REVIEW.md`  
+**תוכנית פעולה Team 10:** `_COMMUNICATION/team_10/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_BLOCKERS_ACK_AND_ACTIONS.md`
 
-**צוותים:** 20 (Replay, A, B) ✅ | 30 (Suite E) ✅ | 50 (Smoke/Nightly, reporting, CI) ✅ | 60 (Suite D, job evidence) ✅  
+### מכשולים (חייבים תיקון לפני GATE_B_READY)
 
-**הערכת Team 10:** מימוש ההנחיה הושלם; Evidence ו-CI Schedule מפורסמים. **מוכנים לולידציה של Team 90** — בהמתנה לבקרת Spy (Team 90) לפי Acceptance Criteria בהנחיה.
+| # | מכשול | תיקון | בעלים |
+|---|--------|--------|--------|
+| 1 | Evidence לא עדכני — לוגים 2026-01-31, קבצים 2026-02-14 | הרצה מחדש Smoke + Nightly; עדכון Evidence בתאריכים ובתוצאות | ⏳ **נדרש** — להריץ ולהעדכן (Team 50). |
+| 2 | כפילות Suite E — `.e2e.test.js` ו־`.test.js` | קובץ קנוני אחד (`.e2e.test.js`); עדכון references; ארכוב/הסרת כפיל | ✅ בוצע — כפיל ב־99-ARCHIVE/tests/; Nightly משתמש ב־.e2e.test.js. |
+| 3 | Suite C דורשת `market_data.ticker_prices_intraday` | Evidence שהטבלה קיימת ב-DB (DDL/בדיקה) | ✅ Evidence: TEAM_20_60_TICKER_PRICES_INTRADAY_EVIDENCE.md + p3_016. אם DB לא הריץ migration — Team 20/60 להריץ. |
+
+**אחרי תיקון:** Team 90 תבצע ולידציה חוזרת; אם נקי — GATE_B_READY.
 
 ---
 
@@ -62,6 +64,10 @@
 - Team 10 ACK ל-50: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_EXTERNAL_DATA_AUTOMATED_TESTING_ACK.md`
 - Team 60 סיום: `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_AUTOMATED_TESTING_MANDATE_COMPLETE.md`
 - Team 10 ACK ל-60: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_60_EXTERNAL_DATA_AUTOMATED_TESTING_ACK.md`
+- דוח ולידציה Team 90: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_REVIEW.md`
+- תוכנית פעולה (מכשולים): `_COMMUNICATION/team_10/TEAM_10_EXTERNAL_DATA_AUTOMATED_TESTING_VALIDATION_BLOCKERS_ACK_AND_ACTIONS.md`
+- צ'קליסט מול Team 90: `05-REPORTS/artifacts/TEAM_10_EXTERNAL_DATA_VALIDATION_CHECKLIST_FOR_TEAM_90.md`
+- Evidence intraday: `documentation/05-REPORTS/artifacts/TEAM_20_60_TICKER_PRICES_INTRADAY_EVIDENCE.md`
 
 ---
 

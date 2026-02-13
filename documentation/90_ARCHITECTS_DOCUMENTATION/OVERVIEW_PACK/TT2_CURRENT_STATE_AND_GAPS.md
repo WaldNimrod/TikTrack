@@ -17,7 +17,7 @@
 | Gap | Status | Owner |
 |---|---|---|
 | PDSC Boundary Contract completion | Pending scope decision (min vs full) | Team 20 + Team 30 |
-| Knowledge Promotion + Archive cleanup (Batch 1+2) | Done — ARCHIVE_MANIFEST + Clean Table alignment | Team 10 |
+| Knowledge Promotion + Archive cleanup (Batch 1+2) | Done — יישום מלא: ~1,305 קבצים הועברו ל־99-ARCHIVE/2026-02-13; ARCHIVE_MANIFEST + Consolidation Report; ניקוי .tmp | Team 10 |
 
 ## 3) Evidence Summary (Last Verified)
 - Gate A / Gate B artifacts in `documentation/05-REPORTS/artifacts_SESSION_01/`

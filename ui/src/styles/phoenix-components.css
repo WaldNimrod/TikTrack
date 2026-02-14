@@ -1847,7 +1847,7 @@ input.dir-ltr,
 
 /* ============================================
    Staleness Clock - P3-012 / M6 (Clock + color + tooltip, no banner)
-   Last Update Clock for prices; color = ok | warning | na
+   Color scale: success | info | warning | error
    ============================================ */
 .staleness-clock {
   display: inline-flex;
@@ -1860,13 +1860,16 @@ input.dir-ltr,
   width: 16px;
   height: 16px;
 }
-.staleness-clock--ok {
+.staleness-level--success {
   color: var(--color-success, #059669);
 }
-.staleness-clock--warning {
+.staleness-level--info {
+  color: var(--apple-blue, #007AFF);
+}
+.staleness-level--warning {
   color: var(--color-warning, #f59e0b);
 }
-.staleness-clock--na {
+.staleness-level--error {
   color: var(--color-danger, #dc2626);
 }
 

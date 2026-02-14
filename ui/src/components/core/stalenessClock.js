@@ -1,11 +1,10 @@
 /**
  * Staleness Clock - P3-012 / M6 (MARKET_DATA_PIPE_SPEC §2.5)
  * ----------------------------------------------------------
- * Clock + color + tooltip. When #stalenessClockCard exists → full card (clock, market status, time elapsed).
- * Else → minimal inline clock for other pages.
- *
- * staleness: ok | warning (>15m) | na (>24h)
- * marketStatus: { market_state, display_label } — optional
+ * Clock + market status. Color scale: success | info | warning | error.
+ * Staleness from timestamp: <1h=success, 1-24h=info, 24-72h=warning, >72h=error.
+ * Market: פתוח=success, מחוץ לשעות=info, לילה/אפטר=warning, סגור=error.
+ * Tooltip: data-tooltip only (no title — avoids double).
  */
 
 (function () {
@@ -15,20 +14,22 @@
   const CLOCK_ID = 'staleness-clock';
   const MARKET_KEY_ID = 'market-status-key';
 
-  const TOOLTIPS = {
-    ok: 'נתונים מעודכנים',
-    warning: 'נתונים בני יותר מ־15 דקות — ייתכן שלא מעודכנים',
-    na: 'נתוני EOD — לא מעודכנים (סוף יום)'
+  const STALENESS_TOOLTIPS = {
+    success: 'נתונים עדכניים (מתחת לשעה)',
+    info: 'נתונים בני 1–24 שעות',
+    warning: 'נתונים בני 24–72 שעות',
+    error: 'נתונים בני יותר מ־72 שעות'
   };
 
-  const MARKET_STATE_CLASS = {
-    REGULAR: 'market-status--open',
-    PRE: 'market-status--pre',
-    PREPRE: 'market-status--pre',
-    POST: 'market-status--post',
-    POSTPOST: 'market-status--post',
-    CLOSED: 'market-status--closed',
-    unknown: 'market-status--unknown'
+  /* market_state → level (success|info|warning|error) */
+  const MARKET_LEVEL = {
+    REGULAR: 'success',
+    PRE: 'info',
+    PREPRE: 'info',
+    POST: 'info',
+    POSTPOST: 'warning',
+    CLOSED: 'error',
+    unknown: 'warning'
   };
 
   const CLOCK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
@@ -46,6 +47,22 @@
     CLOSED: ICON_MOON,
     unknown: ICON_UNKNOWN
   };
+
+  function computeStalenessLevel(ts) {
+    if (!ts) return 'error';
+    try {
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return 'error';
+      const ageMs = Date.now() - d.getTime();
+      const ageH = ageMs / (60 * 60 * 1000);
+      if (ageH < 1) return 'success';
+      if (ageH < 24) return 'info';
+      if (ageH < 72) return 'warning';
+      return 'error';
+    } catch (_) {
+      return 'error';
+    }
+  }
 
   function formatTime(ts) {
     if (!ts) return '—';
@@ -71,20 +88,20 @@
     const card = document.getElementById(CARD_ID);
     if (!card) return;
 
-    const s = staleness || 'ok';
-    const clockTooltip = TOOLTIPS[s];
+    const clockLevel = computeStalenessLevel(timestamp);
+    const clockTooltip = STALENESS_TOOLTIPS[clockLevel];
     const state = (marketStatus?.market_state || 'unknown').toUpperCase();
-    const label = marketStatus?.display_label || '—';
+    const label = marketStatus?.display_label || 'חסר נתון';
+    const marketLevel = MARKET_LEVEL[state] || MARKET_LEVEL.unknown;
     const marketTooltip = 'מצב שוק: ' + label;
-    const stateClass = MARKET_STATE_CLASS[state] || MARKET_STATE_CLASS.unknown;
     const marketIcon = MARKET_ICONS[state] || MARKET_ICONS.unknown;
     const timeStr = formatTime(timestamp);
 
     card.innerHTML = `
       <div class="staleness-clock-card__inner" role="status">
-        <span class="staleness-clock-card__cell staleness-clock-card__market ${stateClass}" data-tooltip="${escapeHtml(marketTooltip)}" title="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}</span>
+        <span class="staleness-clock-card__cell staleness-clock-card__market staleness-level--${marketLevel}" data-tooltip="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}<span class="staleness-clock-card__market-label">${escapeHtml(label)}</span></span>
         <span class="staleness-clock-card__divider" aria-hidden="true"></span>
-        <span class="staleness-clock-card__cell staleness-clock staleness-clock--${s}" data-tooltip="${escapeHtml(clockTooltip)}" title="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>
+        <span class="staleness-clock-card__cell staleness-clock staleness-level--${clockLevel}" data-tooltip="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>
         <span class="staleness-clock-card__divider" aria-hidden="true"></span>
         <span class="staleness-clock-card__time" dir="ltr">${escapeHtml(timeStr)}</span>
       </div>
@@ -97,9 +114,9 @@
     if (!el) {
       el = document.createElement('span');
       el.id = CLOCK_ID;
-      el.className = 'staleness-clock staleness-clock--ok';
+      el.className = 'staleness-clock staleness-level--success';
       el.setAttribute('role', 'img');
-      el.setAttribute('aria-label', TOOLTIPS.ok);
+      el.setAttribute('aria-label', STALENESS_TOOLTIPS.success);
       el.innerHTML = CLOCK_SVG;
       const summary = document.querySelector('#summaryStats, .info-summary, [id^="summaryStats"]');
       const target = summary || document.querySelector('main');
@@ -126,11 +143,13 @@
     return el;
   }
 
+  const TOOLTIPS_LEGACY = { ok: STALENESS_TOOLTIPS.success, warning: STALENESS_TOOLTIPS.info, na: STALENESS_TOOLTIPS.error };
+
   function updateInline(staleness, timestamp, marketStatus) {
+    const level = computeStalenessLevel(timestamp);
     const el = ensureInlineClock();
-    el.className = 'staleness-clock staleness-clock--' + (staleness || 'ok');
-    el.setAttribute('title', TOOLTIPS[staleness] || TOOLTIPS.ok);
-    el.setAttribute('aria-label', TOOLTIPS[staleness] || TOOLTIPS.ok);
+    el.className = 'staleness-clock staleness-level--' + level;
+    el.setAttribute('aria-label', STALENESS_TOOLTIPS[level] || TOOLTIPS_LEGACY[staleness] || STALENESS_TOOLTIPS.success);
     if (timestamp) el.setAttribute('data-timestamp', timestamp);
 
     const keyEl = document.getElementById(MARKET_KEY_ID);
@@ -138,10 +157,10 @@
       const mEl = ensureMarketKey();
       const state = (marketStatus.market_state || 'unknown').toUpperCase();
       const label = marketStatus.display_label || '—';
-      const stateClass = MARKET_STATE_CLASS[state] || MARKET_STATE_CLASS.unknown;
-      mEl.className = 'market-status-key ' + stateClass;
+      const marketLevel = MARKET_LEVEL[state] || MARKET_LEVEL.unknown;
+      mEl.className = 'market-status-key staleness-level--' + marketLevel;
       mEl.textContent = label;
-      mEl.setAttribute('title', 'מצב שוק: ' + label);
+      mEl.setAttribute('aria-label', 'מצב שוק: ' + label);
       mEl.style.display = '';
     } else if (keyEl) {
       keyEl.style.display = 'none';

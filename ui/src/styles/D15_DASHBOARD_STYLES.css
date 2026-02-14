@@ -1895,21 +1895,27 @@ body.system-management-page {
   height: 20px;
 }
 
-.staleness-clock-card__market.market-status--open {
+.staleness-clock-card__market-label {
+  margin-inline-start: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* מפתח צבעים: הצלחה → מידע → אזהרה → שגיאה */
+.staleness-level--success {
   color: var(--color-success, #059669);
 }
 
-.staleness-clock-card__market.market-status--pre,
-.staleness-clock-card__market.market-status--post {
+.staleness-level--info {
+  color: var(--apple-blue, #007AFF);
+}
+
+.staleness-level--warning {
   color: var(--color-warning, #f59e0b);
 }
 
-.staleness-clock-card__market.market-status--closed {
-  color: var(--apple-text-secondary, #64748b);
-}
-
-.staleness-clock-card__market.market-status--unknown {
-  color: var(--apple-text-tertiary, #94a3b8);
+.staleness-level--error {
+  color: var(--color-error-red, #dc2626);
 }
 
 .staleness-clock-card__divider {

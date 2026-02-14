@@ -18,6 +18,7 @@
       ]);
 
       let staleness, ts, marketState, displayLabel;
+
       if (ratesRes.status === 'fulfilled' && ratesRes.value) {
         staleness = ratesRes.value.staleness;
         const first = ratesRes.value.data?.[0];
@@ -31,10 +32,16 @@
           ts = latest;
         }
       }
+
       if (statusRes.status === 'fulfilled' && statusRes.value) {
         const v = statusRes.value;
         marketState = v.market_state ?? v.marketState ?? null;
         displayLabel = v.display_label ?? v.displayLabel ?? null;
+      } else if (statusRes.status === 'rejected') {
+        const err = statusRes.reason;
+        if (typeof console !== 'undefined' && console.debug) {
+          console.debug('[eodStalenessCheck] market-status failed:', err?.message || err?.code || 'unknown');
+        }
       }
 
       if (window.updateStalenessClock) {
@@ -43,8 +50,10 @@
           display_label: displayLabel,
         });
       }
-    } catch (_) {
-      /* 401, network error — silently skip */
+    } catch (e) {
+      if (typeof console !== 'undefined' && console.debug) {
+        console.debug('[eodStalenessCheck] checkStaleness failed:', e?.message || 'unknown');
+      }
     }
   }
 

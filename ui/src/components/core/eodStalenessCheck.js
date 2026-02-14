@@ -20,15 +20,25 @@
       let staleness, ts, marketState, displayLabel;
       if (ratesRes.status === 'fulfilled' && ratesRes.value) {
         staleness = ratesRes.value.staleness;
-        ts = ratesRes.value.data?.[0]?.last_sync_time;
+        const first = ratesRes.value.data?.[0];
+        ts = first?.last_sync_time ?? first?.lastSyncTime ?? null;
+        if (!ts && Array.isArray(ratesRes.value.data)) {
+          let latest = null;
+          for (const r of ratesRes.value.data) {
+            const t = r?.last_sync_time ?? r?.lastSyncTime;
+            if (t && (!latest || new Date(t) > new Date(latest))) latest = t;
+          }
+          ts = latest;
+        }
       }
       if (statusRes.status === 'fulfilled' && statusRes.value) {
-        marketState = statusRes.value.market_state;
-        displayLabel = statusRes.value.display_label;
+        const v = statusRes.value;
+        marketState = v.market_state ?? v.marketState ?? null;
+        displayLabel = v.display_label ?? v.displayLabel ?? null;
       }
 
-      if (typeof staleness === 'string' && window.updateStalenessClock) {
-        window.updateStalenessClock(staleness, ts, {
+      if (window.updateStalenessClock) {
+        window.updateStalenessClock(staleness || 'ok', ts, {
           market_state: marketState,
           display_label: displayLabel,
         });

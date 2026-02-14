@@ -33,4 +33,5 @@ Team 20 השלים מימוש **מצב שוק** (Market Status) — מפתח צ�
 
 ---
 
-**log_entry | TEAM_10 | TO_TEAM_50 | MARKET_STATUS_QA_NOTE | 2026-02-14**
+**log_entry | TEAM_10 | TO_TEAM_50 | MARKET_STATUS_QA_NOTE | 2026-02-14**  
+**סטטוס:** ✅ **CLOSED** — דוח התקבל ואושר: TEAM_50_TO_TEAM_10_MARKET_STATUS_QA_REPORT.md; ACK: TEAM_10_TO_TEAM_50_MARKET_STATUS_QA_ACK.md (2026-02-14).

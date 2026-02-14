@@ -36,7 +36,7 @@
   const ICON_SUNRISE = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m4.93 10.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 13.07 2.83-2.83"/><path d="M12 6a6 6 0 0 1 6 6"/><circle cx="12" cy="12" r="4"/></svg>';
   const ICON_TRENDING = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
   const ICON_MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
-  const ICON_UNKNOWN = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
+  const ICON_UNKNOWN = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
   const MARKET_ICONS = {
     REGULAR: ICON_TRENDING,
     PRE: ICON_SUNRISE,
@@ -47,26 +47,24 @@
     unknown: ICON_UNKNOWN
   };
 
-  function formatTimeElapsed(ts) {
+  function formatTime(ts) {
     if (!ts) return '—';
-    let d;
     try {
-      d = new Date(ts);
+      const d = new Date(ts);
       if (isNaN(d.getTime())) return '—';
+      return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
     } catch (_) {
       return '—';
     }
-    const now = new Date();
-    const diffMs = now - d;
-    const diffMin = Math.floor(diffMs / 60000);
-    const diffHr = Math.floor(diffMin / 60);
-    const diffDay = Math.floor(diffHr / 24);
-    if (diffMin < 1) return 'עכשיו';
-    if (diffMin < 60) return `לפני ${diffMin} דק׳`;
-    if (diffHr < 24) return `לפני ${diffHr} שעות`;
-    if (diffDay === 1) return 'אתמול';
-    if (diffDay < 7) return `לפני ${diffDay} ימים`;
-    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function renderCard(staleness, timestamp, marketStatus) {
@@ -74,29 +72,21 @@
     if (!card) return;
 
     const s = staleness || 'ok';
-    const tooltip = TOOLTIPS[s];
+    const clockTooltip = TOOLTIPS[s];
     const state = (marketStatus?.market_state || 'unknown').toUpperCase();
     const label = marketStatus?.display_label || '—';
+    const marketTooltip = 'מצב שוק: ' + label;
     const stateClass = MARKET_STATE_CLASS[state] || MARKET_STATE_CLASS.unknown;
     const marketIcon = MARKET_ICONS[state] || MARKET_ICONS.unknown;
-    const timeStr = formatTimeElapsed(timestamp);
+    const timeStr = formatTime(timestamp);
 
     card.innerHTML = `
       <div class="staleness-clock-card__inner" role="status">
-        <div class="staleness-clock-card__clock" title="${tooltip}" aria-label="${tooltip}">
-          <span class="staleness-clock staleness-clock--${s}">${CLOCK_SVG}</span>
-          <span class="staleness-clock-card__clock-label">עדכון נתונים</span>
-        </div>
-        <div class="staleness-clock-card__divider" aria-hidden="true"></div>
-        <div class="staleness-clock-card__market market-status-key ${stateClass}" title="מצב שוק: ${label}">
-          <span class="staleness-clock-card__market-icon">${marketIcon}</span>
-          <span class="staleness-clock-card__market-label">${label}</span>
-        </div>
-        <div class="staleness-clock-card__divider" aria-hidden="true"></div>
-        <div class="staleness-clock-card__time">
-          <span class="staleness-clock-card__time-value">${timeStr}</span>
-          <span class="staleness-clock-card__time-label">מאז העדכון</span>
-        </div>
+        <span class="staleness-clock-card__cell staleness-clock-card__market ${stateClass}" data-tooltip="${escapeHtml(marketTooltip)}" title="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}</span>
+        <span class="staleness-clock-card__divider" aria-hidden="true"></span>
+        <span class="staleness-clock-card__cell staleness-clock staleness-clock--${s}" data-tooltip="${escapeHtml(clockTooltip)}" title="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>
+        <span class="staleness-clock-card__divider" aria-hidden="true"></span>
+        <span class="staleness-clock-card__time" dir="ltr">${escapeHtml(timeStr)}</span>
       </div>
     `;
     card.classList.add('staleness-clock-card--loaded');

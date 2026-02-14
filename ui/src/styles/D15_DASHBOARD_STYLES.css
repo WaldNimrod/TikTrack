@@ -1855,79 +1855,74 @@ body.system-management-page {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacing-md, 16px);
+  gap: var(--spacing-sm, 8px);
 }
 
 .staleness-clock-card__inner {
   display: none;
 }
 
-.staleness-clock-card__clock {
+.staleness-clock-card__cell {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm, 8px);
+  justify-content: center;
+  padding: 6px;
   cursor: help;
+  border-radius: 4px;
 }
 
-.staleness-clock-card__clock .staleness-clock {
-  display: inline-flex;
-  align-items: center;
+.staleness-clock-card__cell[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: #1e293b;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  z-index: var(--z-index-tooltip, 1100);
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.staleness-clock-card__clock .staleness-clock svg {
+.staleness-clock-card__cell svg {
   width: 20px;
   height: 20px;
 }
 
-.staleness-clock-card__clock-label {
-  font-size: 0.9rem;
-  font-weight: 500;
+.staleness-clock-card__market.market-status--open {
+  color: var(--color-success, #059669);
+}
+
+.staleness-clock-card__market.market-status--pre,
+.staleness-clock-card__market.market-status--post {
+  color: var(--color-warning, #f59e0b);
+}
+
+.staleness-clock-card__market.market-status--closed {
   color: var(--apple-text-secondary, #64748b);
+}
+
+.staleness-clock-card__market.market-status--unknown {
+  color: var(--apple-text-tertiary, #94a3b8);
 }
 
 .staleness-clock-card__divider {
   width: 1px;
-  height: 28px;
+  height: 20px;
   background: var(--apple-border-light, #e2e8f0);
 }
 
-.staleness-clock-card__market {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm, 8px);
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
-  border-radius: var(--apple-radius-small, 6px);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: help;
-}
-
-.staleness-clock-card__market-icon {
-  display: inline-flex;
-  align-items: center;
-}
-
-.staleness-clock-card__market-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
 .staleness-clock-card__time {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.staleness-clock-card__time-value {
   font-size: 1rem;
   font-weight: 600;
   color: var(--apple-text-primary, #0f172a);
-}
-
-.staleness-clock-card__time-label {
-  font-size: 0.75rem;
-  color: var(--apple-text-secondary, #64748b);
+  font-variant-numeric: tabular-nums;
 }
 
 .data-integrity-controls {

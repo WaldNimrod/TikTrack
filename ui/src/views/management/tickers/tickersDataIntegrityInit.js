@@ -2,10 +2,12 @@
  * Tickers Data Integrity Widget
  * TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST
  * TEAM_20_TO_TEAM_30_INDICATORS_DATA_INTEGRITY_UPDATE — backfill banner when indicators/history insufficient
+ * TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_MANDATE — force_reload (Admin only)
  * בקרת תקינות נתוני טיקר — דרופדאון + פירוט + חוסרים
  */
 
 import sharedServices from '../../../components/core/sharedServices.js';
+import authService from '../../../cubes/identity/services/auth.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 function gapToLevel(gap) {
@@ -112,6 +114,12 @@ function formatTs(ts) {
         ? `<p class="data-integrity-backfill-banner">נדרש History Backfill ל־ATR/MA/CCI <button type="button" id="tickerDataIntegrityBackfillBtn" class="data-integrity-backfill-btn" data-ticker-id="${tickerId}">הפעל History Backfill</button></p>`
         : '';
 
+      const dataComplete = (hist?.row_count ?? 0) >= 250 && hist?.gap_status === 'OK';
+      const isAdmin = authService.isAdmin();
+      const forceReloadBlock = (dataComplete && isAdmin)
+        ? `<p class="data-integrity-force-reload-banner">הנתונים מלאים (250 ימים). לטעון מחדש? (יכלול מחיקת כל הנתונים) <button type="button" id="tickerDataIntegrityForceReloadBtn" class="data-integrity-force-reload-btn" data-ticker-id="${tickerId}">טען מחדש (מחיקה)</button></p>`
+        : '';
+
       detailEl.innerHTML = `
         <div class="data-integrity-summary-cards">
           <div class="data-integrity-card staleness-level--${eodLevel}">
@@ -131,6 +139,7 @@ function formatTs(ts) {
           <div class="data-integrity-detail-col">
             <div class="data-integrity-detail-row data-integrity-detail-row--header"><strong>אינדיקטורים (מ־250d)</strong></div>
             ${backfillBanner}
+            ${forceReloadBlock}
             ${indRows1}
           </div>
           <div class="data-integrity-detail-col">
@@ -157,7 +166,7 @@ function formatTs(ts) {
     }
     try {
       await sharedServices.init();
-      await sharedServices.post(`/tickers/${tickerId}/history-backfill`, {});
+      await sharedServices.post(`/tickers/${tickerId}/history-backfill`, {}); // mode=gap_fill (ברירת מחדל)
       if (btn) {
         btn.textContent = 'הושלם — רענן תוצאות';
       }
@@ -179,7 +188,38 @@ function formatTs(ts) {
     }
   }
 
+  async function doForceReload(tickerId) {
+    if (!tickerId) return;
+    if (!window.confirm('פעולה זו מוחקת את כל נתוני ההיסטוריה וטוענת מחדש. להמשיך?')) return;
+    const btn = document.getElementById('tickerDataIntegrityForceReloadBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'טוען מחדש...';
+    }
+    try {
+      await sharedServices.init();
+      await sharedServices.post(`/tickers/${tickerId}/history-backfill?mode=force_reload`, {});
+      if (btn) btn.textContent = 'הושלם';
+      doCheck();
+    } catch (e) {
+      maskedLog('[Tickers Data Integrity] Force reload failed:', e);
+      const status = e?.status ?? e?.code;
+      const msg = status === 403 ? 'דורש הרשאת Admin' : (e?.message ?? 'שגיאה');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'טען מחדש (מחיקה)';
+      }
+      detailEl.insertAdjacentHTML('beforeend', `<p class="data-integrity-error">${msg}</p>`);
+    }
+  }
+
   detailEl.addEventListener('click', (e) => {
+    const forceBtn = e.target.closest('#tickerDataIntegrityForceReloadBtn');
+    if (forceBtn) {
+      const id = forceBtn.dataset.tickerId || selectEl.value?.trim();
+      if (id) doForceReload(id);
+      return;
+    }
     const btn = e.target.closest('#tickerDataIntegrityBackfillBtn');
     if (btn) {
       const tickerId = btn.dataset.tickerId || selectEl.value?.trim();

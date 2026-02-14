@@ -2096,6 +2096,33 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   font-size: 0.95rem;
 }
 
+.data-integrity-force-reload-banner {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  margin: var(--spacing-sm, 8px) 0;
+  background: rgba(0, 122, 255, 0.06);
+  border: 1px solid var(--apple-blue, #007AFF);
+  border-radius: var(--apple-radius-small, 6px);
+  color: var(--apple-text-primary, #0f172a);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.data-integrity-force-reload-btn {
+  margin-right: var(--spacing-md, 16px);
+  padding: var(--spacing-xs, 4px) var(--spacing-md, 16px);
+  background: var(--apple-blue, #007AFF);
+  color: #fff;
+  border: none;
+  border-radius: var(--apple-radius-small, 6px);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.data-integrity-force-reload-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
 .data-integrity-backfill-btn {
   margin-right: var(--spacing-md, 16px);
   padding: var(--spacing-xs, 4px) var(--spacing-md, 16px);

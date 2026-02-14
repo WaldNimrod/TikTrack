@@ -60,6 +60,18 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
+migrate-p3-019:
+	@echo "🔄 P3-019 — market_cap precision (24,4)"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_019_market_cap_precision_mega_caps.sql
+	@echo "✅ P3-019 migration complete."
+
+## Ensure ticker_prices partitions (2025–2027)
+ensure-ticker-prices-partitions:
+	@echo "🔄 Ensuring ticker_prices partitions"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/ensure_ticker_prices_partitions.sql
+	@echo "✅ Partitions ensured."
+
 ## P3-018: exchange_rates_history (Option A — approved)
 migrate-p3-018:
 	@echo "🔄 P3-018 — exchange_rates_history"
@@ -150,6 +162,8 @@ help:
 	@echo "  make sync-intraday      - Intraday sync ticker_prices_intraday (Active tickers)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
+	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"
+	@echo "  make ensure-ticker-prices-partitions - Create 2025–2027 partitions"
 	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"
 	@echo "  make test-suite-b      - Suite B: Cache-First + Failover (Smoke, REPLAY)"
 	@echo "  make test-external-data-smoke - Suites A+B+D (PR smoke)"

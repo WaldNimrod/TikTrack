@@ -145,9 +145,95 @@ def step5_full_browser_headers():
         return None
 
 
-def step6_try_query2():
-    """צעד 6: נסיון query2 במקום query1 (subdomain אחר)"""
-    print("\n=== צעד 6: HTTP ישיר → query2.finance.yahoo.com ===")
+def step6_no_session():
+    """צעד 6: yfinance בלי Session — לתת ל-YF לטפל ב-cookies/crumb (מומלץ בתעוד)"""
+    print("\n=== צעד 6: yfinance.Ticker בלי session — let YF handle ===")
+    try:
+        import yfinance as yf
+        ticker = yf.Ticker(SYMBOL)  # NO session
+        info = ticker.history(period="5d", interval="1d")
+        print(f"history empty: {info.empty if info is not None else 'N/A'}")
+        if info is not None and not info.empty:
+            last = info.iloc[-1]
+            print(f"✓ Close: {last['Close']}")
+            return last["Close"]
+        print("✗ history ריק")
+        return None
+    except Exception as e:
+        print(f"✗ Error: {type(e).__name__}: {e}")
+        return None
+
+
+def step6b_no_session_1mo():
+    """צעד 6b: כמו 6 אבל period=1mo (יותר היסטוריה — אולי עובד בסוף שבוע)"""
+    print("\n=== צעד 6b: yfinance.Ticker בלי session, period='1mo' ===")
+    try:
+        import yfinance as yf
+        ticker = yf.Ticker(SYMBOL)
+        info = ticker.history(period="1mo", interval="1d")
+        print(f"history empty: {info.empty if info is not None else 'N/A'}, rows: {len(info) if info is not None else 0}")
+        if info is not None and not info.empty:
+            last = info.iloc[-1]
+            print(f"✓ Close: {last['Close']}, date: {last.name}")
+            return last["Close"]
+        print("✗ history ריק")
+        return None
+    except Exception as e:
+        print(f"✗ Error: {type(e).__name__}: {e}")
+        return None
+
+
+def step6c_history_start_end():
+    """צעד 6c: history(start=..., end=...) — טווח תאריכים מפורש (היסטורי)"""
+    print("\n=== צעד 6c: yfinance history(start, end) מפורש ===")
+    try:
+        from datetime import timedelta, datetime, timezone
+        import yfinance as yf
+        end_d = datetime.now(timezone.utc).date()
+        start_d = end_d - timedelta(days=14)
+        # end: exclusive in Yahoo — use tomorrow to include today
+        end_inclusive = (end_d + timedelta(days=1)).isoformat()
+        ticker = yf.Ticker(SYMBOL)
+        info = ticker.history(start=start_d.isoformat(), end=end_inclusive, interval="1d", debug=False)
+        print(f"start={start_d}, end={end_d}, empty={info.empty if info is not None else 'N/A'}, rows={len(info) if info is not None else 0}")
+        if info is not None and not info.empty:
+            last = info.iloc[-1]
+            print(f"✓ Close: {last['Close']}, date: {last.name}")
+            return last["Close"]
+        print("✗ ריק")
+        return None
+    except Exception as e:
+        print(f"✗ Error: {type(e).__name__}: {e}")
+        return None
+
+
+def step7_yf_download():
+    """צעד 7: yf.download() — bulk download, period=1mo"""
+    print("\n=== צעד 7: yf.download() bulk, period='1mo' — בלי session ===")
+    try:
+        import yfinance as yf
+        data = yf.download(SYMBOL, period="1mo", interval="1d", progress=False, group_by="ticker")
+        if data is not None and not data.empty:
+            last = data.iloc[-1]
+            try:
+                close = last["Close"]
+            except (KeyError, TypeError):
+                try:
+                    close = last[(SYMBOL, "Close")] if hasattr(data.columns, "levels") else last.iloc[0]
+                except Exception:
+                    close = last.iloc[-1] if hasattr(last, "iloc") else None
+            print(f"✓ data shape: {data.shape}, last Close: {close}")
+            return close
+        print("✗ download ריק")
+        return None
+    except Exception as e:
+        print(f"✗ Error: {type(e).__name__}: {e}")
+        return None
+
+
+def step8_try_query2():
+    """צעד 8: HTTP ישיר → query2 (לשוואה)"""
+    print("\n=== צעד 8: HTTP ישיר → query2.finance.yahoo.com ===")
     try:
         import httpx
         url = "https://query2.finance.yahoo.com/v7/finance/quote"
@@ -167,7 +253,11 @@ def main():
     step3_yfinance_info()
     step4_yfinance_fast_info()
     step5_full_browser_headers()
-    step6_try_query2()
+    step6_no_session()
+    step6b_no_session_1mo()
+    step6c_history_start_end()
+    step7_yf_download()
+    step8_try_query2()
     print("\n--- סיום ---")
 
 

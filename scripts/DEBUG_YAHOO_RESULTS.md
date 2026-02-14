@@ -1,29 +1,34 @@
-# Yahoo — תוצאות דיאגנוסטיקה (טיקר אחד: AAPL)
+# Yahoo — תוצאות דיאגנוסטיקה ותיקון
 
-## סיכום
+## תיקון מרכזי (יושם)
 
-| צעד | שיטה | תוצאה |
-|-----|------|--------|
-| 1 | HTTP ישיר → query1.finance.yahoo.com/v7/finance/quote | **429 Too Many Requests** |
-| 2 | yfinance history(period='5d') | **ריק** — "No data found for this date range" |
-| 3 | yfinance ticker.info | **429** — query2.finance.yahoo.com/v10/finance/quoteSummary |
-| 4 | yfinance fast_info | **429** — אותו endpoint |
-| 5 | HTTP ישיר → query2.finance.yahoo.com | **429 Too Many Requests** |
+**הסרת custom Session** — לפי תעוד yfinance וממצאי GitHub:
+- העברת `Session` מותאם ל-`yf.Ticker()` **מפעילה 429** מ-Yahoo
+- ההמלצה: "stop setting session, let YF handle"
+- yfinance מנהל cookies/crumb בפנימי; Session חיצוני שובר את הזרימה
 
-## מסקנה
+**שינוי בקוד:** `api/integrations/market_data/providers/yahoo_provider.py`
+- כל הקריאות ל-`yf.Ticker()` — **בלי** `session=...`
+- `ticker = yf.Ticker(symbol)` בלבד
 
-**כל נקודות הכניסה ל־Yahoo מחזירות 429** — query1, query2, chart, quoteSummary.
+## תוצאות דיאגנוסטיקה (עם Session vs בלי)
 
-זה מרמז על **הגבלת קצב (rate limit) או חסימת IP** מצד Yahoo בסביבה הנוכחית, ולא על באג בקוד.
+| צעד | שיטה | עם Session | בלי Session |
+|-----|------|------------|-------------|
+| 1–5 | HTTP ישיר / yfinance עם Session | 429 | — |
+| 6–7 | yfinance **בלי** session | — | אין 429, אך "No data" (אולי סוף שבוע) |
 
-## צעדים מומלצים
+## "No data found for this date range"
 
-1. **רשת אחרת** — מחשב נייד דרך נקודת גישה סלולרית / VPN / רשת אחרת
-2. **המתנה** — לפעמים ה-rate limit מתאפס אחרי זמן
-3. **Header מלא** — הוספת Referer וכו' כדי להדמות דפדפן מלא (ניסוי)
+יכול להופיע:
+- סוף שבוע (אין מסחר)
+- טווח תאריכים לא רלוונטי
+- yfinance ישן (0.2.18) — לעדכן: `pip install --upgrade yfinance`
 
 ## הרצה
 
 ```bash
 python3 scripts/debug_yahoo_one_ticker.py
 ```
+
+לבדיקה בשעות מסחר — ייתכן שתתקבל החזרה תקינה.

@@ -97,50 +97,69 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
 
 
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
-    """Sync fetch. Primary: history(5d). Fallback: v7/finance/quote when history fails."""
+    """Sync fetch. Primary: history(5d). Fallback: history(start,end) for historical range.
+    When period returns empty (e.g. weekend), retry with explicit start/end — historical OHLC
+    is always available. Final fallback: v7/finance/quote. No custom Session."""
     try:
         import yfinance as yf
-        from requests import Session
+        from datetime import timedelta
 
-        session = Session()
-        session.headers["User-Agent"] = _next_user_agent()
-        ticker = yf.Ticker(symbol, session=session)
-        info = ticker.history(period="5d", interval="1d")
+        ticker = yf.Ticker(symbol)  # no session — let YF handle
+        info = ticker.history(period="5d", interval="1d", debug=False)
+        if info is None or info.empty:
+            # Weekend/outside hours: period="5d" may return empty. Retry with explicit dates.
+            # Historical OHLC is always available. end is exclusive in Yahoo.
+            end_d = datetime.now(timezone.utc).date()
+            start_d = end_d - timedelta(days=14)  # ~10 trading days
+            end_exclusive = (end_d + timedelta(days=1)).isoformat()
+            info = ticker.history(
+                start=start_d.isoformat(),
+                end=end_exclusive,
+                interval="1d",
+                debug=False,
+            )
         if info is not None and not info.empty:
             last = info.iloc[-1]
-            ts = last.name
-            if hasattr(ts, "to_pydatetime"):
-                ts = ts.to_pydatetime()
-            if ts.tzinfo is None:
-                ts = ts.replace(tzinfo=timezone.utc)
-            close = last["Close"]
-            try:
-                vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
-            except (ValueError, TypeError, KeyError):
-                vol = None
-            market_cap = None
-            try:
-                ticker_info = ticker.info
-                if isinstance(ticker_info, dict) and ticker_info.get("marketCap"):
-                    market_cap = _to_decimal(ticker_info["marketCap"])
-            except Exception:
-                pass
-            return PriceResult(
-                symbol=symbol,
-                price=_to_decimal(close),
-                open_price=_to_decimal(last.get("Open")),
-                high_price=_to_decimal(last.get("High")),
-                low_price=_to_decimal(last.get("Low")),
-                close_price=_to_decimal(close),
-                volume=vol,
-                market_cap=market_cap,
-                as_of=ts,
-                provider="YAHOO_FINANCE",
-            )
+            return _history_to_price_result(symbol, last, ticker)
     except Exception as e:
         logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
 
     return _fetch_price_via_quote_api(symbol)
+
+
+def _history_to_price_result(
+    symbol: str, last, ticker
+) -> Optional[PriceResult]:
+    """Build PriceResult from history row. Avoid calling ticker.info (quoteSummary → 429)."""
+    ts = last.name
+    if hasattr(ts, "to_pydatetime"):
+        ts = ts.to_pydatetime()
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    close = last["Close"]
+    try:
+        vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
+    except (ValueError, TypeError, KeyError):
+        vol = None
+    market_cap = None
+    try:
+        ticker_info = ticker.info
+        if isinstance(ticker_info, dict) and ticker_info.get("marketCap"):
+            market_cap = _to_decimal(ticker_info["marketCap"])
+    except Exception:
+        pass
+    return PriceResult(
+        symbol=symbol,
+        price=_to_decimal(close),
+        open_price=_to_decimal(last.get("Open")),
+        high_price=_to_decimal(last.get("High")),
+        low_price=_to_decimal(last.get("Low")),
+        close_price=_to_decimal(close),
+        volume=vol,
+        market_cap=market_cap,
+        as_of=ts,
+        provider="YAHOO_FINANCE",
+    )
 
 
 def _fetch_fx_via_quote_api(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
@@ -183,16 +202,24 @@ def _fetch_fx_via_quote_api(from_ccy: str, to_ccy: str) -> Optional[ExchangeRate
 
 
 def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
-    """FX via Yahoo (Fallback). Primary: history(5d). Fallback: v7/finance/quote."""
+    """FX via Yahoo. Primary: history(5d). Fallback: history(start,end). Final: quote API."""
     try:
         import yfinance as yf
-        from requests import Session
+        from datetime import timedelta
 
-        session = Session()
-        session.headers["User-Agent"] = _next_user_agent()
         pair = f"{from_ccy}{to_ccy}=X"
-        ticker = yf.Ticker(pair, session=session)
-        info = ticker.history(period="5d", interval="1d")
+        ticker = yf.Ticker(pair)  # no session
+        info = ticker.history(period="5d", interval="1d", debug=False)
+        if info is None or info.empty:
+            end_d = datetime.now(timezone.utc).date()
+            start_d = end_d - timedelta(days=14)
+            end_exclusive = (end_d + timedelta(days=1)).isoformat()
+            info = ticker.history(
+                start=start_d.isoformat(),
+                end=end_exclusive,
+                interval="1d",
+                debug=False,
+            )
         if info is not None and not info.empty:
             last = info.iloc[-1]
             rate = _to_decimal(last["Close"])
@@ -216,17 +243,26 @@ def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
 
 
 def _fetch_history_sync(symbol: str, trading_days: int) -> list:
-    """P3-015 — 250d OHLCV. period 1y for ~252 trading days."""
+    """P3-015 — 250d OHLCV. Primary: period 1y/2y. Fallback: start/end (historical always available).
+    No custom Session."""
     result = []
     try:
         import yfinance as yf
-        from requests import Session
+        from datetime import timedelta
 
-        session = Session()
-        session.headers["User-Agent"] = _next_user_agent()
-        ticker = yf.Ticker(symbol, session=session)
+        ticker = yf.Ticker(symbol)  # no session
         period = "2y" if trading_days > 252 else "1y"
-        info = ticker.history(period=period, interval="1d")
+        info = ticker.history(period=period, interval="1d", debug=False)
+        if info is None or info.empty:
+            end_d = datetime.now(timezone.utc).date()
+            start_d = end_d - timedelta(days=400)  # ~280 trading days
+            end_exclusive = (end_d + timedelta(days=1)).isoformat()
+            info = ticker.history(
+                start=start_d.isoformat(),
+                end=end_exclusive,
+                interval="1d",
+                debug=False,
+            )
         if info is None or info.empty:
             return result
         rows = info.tail(trading_days)

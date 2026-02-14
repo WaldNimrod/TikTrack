@@ -197,6 +197,12 @@ tt-section-row > * {
   min-width: 0; /* Allow shrinking if needed */
 }
 
+/* Filter dropdown in container header — max-width 200px (global rule) */
+.index-section__header-meta .index-section__header-filter-select,
+.dashboard-section__header-meta .index-section__header-filter-select {
+  max-width: 200px;
+}
+
 /* Element: Header Count - High specificity to ensure centering */
 .index-section__header-meta .index-section__header-count,
 .dashboard-section__header-meta .dashboard-section__header-count {

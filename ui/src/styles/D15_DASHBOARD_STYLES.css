@@ -1830,6 +1830,11 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   justify-content: flex-end;
 }
 
+/* פילטר חשבון מסחר בכותרת — יישור לסוף השורה כמו כפתור הוספה */
+tt-section[data-section="brokers-management"] .index-section__header-meta--align-end {
+  justify-content: flex-end;
+}
+
 /* פילטר סוג תנועה בכותרת קונטיינר תזרימי מזומנים — מיושר לסוף השורה ליד כפתור הסגירה */
 tt-section[data-section="cash-flows-management"] .phoenix-table-filter-group--header {
   display: flex;

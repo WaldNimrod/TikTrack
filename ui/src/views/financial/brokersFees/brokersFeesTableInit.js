@@ -214,7 +214,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
     const items = Array.isArray(brokers) ? brokers : [];
     const supported = items.filter(b => (b.isSupported ?? b.is_supported ?? true) !== false);
     if (supported.length === 0) {
-      listEl.textContent = items.length === 0 ? 'טוען רשימת ברוקרים...' : '';
+      listEl.textContent = '—';
       return;
     }
     listEl.textContent = supported

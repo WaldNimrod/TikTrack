@@ -61,6 +61,21 @@ class TickerUpdateRequest(BaseModel):
         return v.upper()
 
 
+class AddMyTickerRequest(BaseModel):
+    """Request for POST /me/tickers — add existing (ticker_id) or create new (symbol)."""
+    ticker_id: Optional[str] = Field(None, description="Existing ticker ULID (add to list)")
+    symbol: Optional[str] = Field(None, min_length=1, max_length=20, description="Symbol for new ticker (creates + adds)")
+    company_name: Optional[str] = Field(None, max_length=255)
+    ticker_type: str = Field(default="STOCK", description="Ticker type for new ticker")
+
+    @field_validator("ticker_type")
+    @classmethod
+    def validate_ticker_type(cls, v: str) -> str:
+        if v.upper() not in TICKER_TYPES:
+            raise ValueError(f"ticker_type must be one of: {TICKER_TYPES}")
+        return v.upper()
+
+
 class TickerListResponse(BaseModel):
     """Ticker list response schema."""
     data: List[TickerResponse]

@@ -14,7 +14,7 @@ from sqlalchemy import (
     String, Boolean, Date, ForeignKey, TIMESTAMP
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base

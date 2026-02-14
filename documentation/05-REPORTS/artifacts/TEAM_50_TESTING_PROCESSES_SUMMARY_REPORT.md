@@ -55,7 +55,7 @@
 
 ### 3.3 דפים
 
-tickers, trading_accounts, cash_flows, brokers_fees.
+tickers, trading_accounts, cash_flows, brokers_fees, **data_dashboard** (רה־ריצה 2026-02-14).
 
 ### 3.4 Evidence
 
@@ -134,7 +134,7 @@ python3 -m pytest tests/test_gap_fill_smart_history.py -v
 | **B** | Intraday Active only; EOD Warning UI; שעון + tooltip | קוד + Market Status QA |
 | **C** | Retention: Intraday 30d, EOD/FX 250d; Cron/Jobs | TEAM_60_CRON_SCHEDULE, cleanup_market_data |
 | **D** | Smart History Fill Items 2–3: בלוק "הנתונים מלאים" + force_reload Admin | E2E PASS (AAPL 250+) |
-| **E** | data_dashboard — לא נדרש (אין stalenessClock) | grep + החלטה |
+| **E** | data_dashboard — שעון + מפתח (צוות 30 תיקון) | E2E רה־ריצה PASS |
 
 ---
 
@@ -148,6 +148,7 @@ python3 -m pytest tests/test_gap_fill_smart_history.py -v
 | דוח Smart History Fill | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_SMART_HISTORY_FILL_QA_REPORT.md |
 | Evidence Smart History Fill | documentation/05-REPORTS/artifacts/TEAM_50_SMART_HISTORY_FILL_QA_EVIDENCE.md |
 | Evidence SSOT Verification | _COMMUNICATION/team_50/TEAM_50_SSOT_EXTERNAL_DATA_VERIFICATION_EVIDENCE.md |
+| Evidence Market Status Re-Run | _COMMUNICATION/team_50/TEAM_50_MARKET_STATUS_QA_RERUN_EVIDENCE.md |
 | סטטוס רה־ריצה | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_SMART_HISTORY_FILL_RERUN_STATUS.md |
 
 ---

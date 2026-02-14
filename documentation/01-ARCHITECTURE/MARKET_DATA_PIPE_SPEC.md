@@ -61,7 +61,7 @@
 ## 2.4 Cadence Policy (Stage‑1 — Intraday required)
 
 - **FX:** EOD בלבד.
-- **Prices:** Intraday for **Active tickers**; EOD for inactive (לפי System Settings — Domain + Ticker Status).
+- **Prices:** Intraday for **Active tickers** (`active`); EOD for inactive (לפי System Settings — Domain + Ticker Status). **סטטוס טיקר:** ממתין=EOD+היסטוריה בלבד; פתוח=קצב מלא; סגור=קצב מופחת; מבוטל=לא טוען — ראה TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators (ATR/MA/CCI).
 - **Market Cap:** Daily (EOD). **Indicators:** ATR(14), MA(20/50/150/200), CCI(20) — Daily, derived from 250d history.
 

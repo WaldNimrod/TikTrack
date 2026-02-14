@@ -77,7 +77,9 @@
 
 - `documentation/01-ARCHITECTURE/TT2_EFR_LOGIC_MAP.md` — Status Fields, Categories + הפניה ל-SSOT ✓
 - מיפוי מקומות לעדכון: `documentation/02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md`
+- **סטטוס טיקר והתנהגות טעינת נתונים:** `documentation/09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md` — משמעות ארבעת הסטטוסים **בעמוד טיקרים** לגבי EOD/Intraday/History (ממתין=EOD+היסטוריה בלבד, פתוח=קצב מלא, סגור=קצב מופחת, מבוטל=לא טוען). מחייב ל-Backend (20) ו-Infrastructure (60).
 
 ---
 
-**log_entry | TEAM_10 | SYSTEM_STATUS_VALUES_SSOT | LOCKED | IMPLEMENTATION_MANDATE | 2026-02-12**
+**log_entry | TEAM_10 | SYSTEM_STATUS_VALUES_SSOT | LOCKED | IMPLEMENTATION_MANDATE | 2026-02-12**  
+**log_entry | TEAM_10 | SSOT_REFERENCE | TICKER_STATUS_LOADING_ADDED | 2026-02-14**

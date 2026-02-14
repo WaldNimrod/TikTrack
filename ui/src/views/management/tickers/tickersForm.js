@@ -1,21 +1,35 @@
 /**
  * Tickers Form - Modal for add/edit ticker
+ * Status: 4 system statuses (pending|active|inactive|cancelled) per TT2_SYSTEM_STATUS_VALUES_SSOT
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { STATUS_VALUES } from '../../../utils/statusValues.js';
 
 const TICKER_TYPES = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+
+/** Resolve status for form: prefer status from API, else is_active true->active, false->cancelled */
+function getInitialStatus(data) {
+  const canon = data?.status ? (['pending', 'active', 'inactive', 'cancelled'].includes(data.status) ? data.status : null) : null;
+  if (canon) return canon;
+  const isActive = data?.is_active ?? data?.isActive ?? true;
+  return isActive ? 'active' : 'cancelled';
+}
 
 function createTickerFormHTML(data = null) {
   const isEdit = data !== null;
   const symbol = data?.symbol ?? '';
   const companyName = data?.company_name ?? data?.companyName ?? '';
   const tickerType = data?.ticker_type ?? data?.tickerType ?? 'STOCK';
-  const isActive = data?.is_active ?? data?.isActive ?? true;
+  const initialStatus = getInitialStatus(data);
 
   const typeOptions = TICKER_TYPES.map(
     (t) => `<option value="${t}" ${tickerType === t ? 'selected' : ''}>${t}</option>`
+  ).join('');
+
+  const statusOptions = STATUS_VALUES.map(
+    (s) => `<option value="${s.value}" ${initialStatus === s.value ? 'selected' : ''}>${s.label}</option>`
   ).join('');
 
   return `
@@ -56,10 +70,9 @@ function createTickerFormHTML(data = null) {
           </select>
         </div>
         <div class="form-group">
-          <label for="tickerIsActive">פעיל</label>
-          <select id="tickerIsActive" name="is_active">
-            <option value="true" ${isActive ? 'selected' : ''}>פעיל</option>
-            <option value="false" ${!isActive ? 'selected' : ''}>לא פעיל</option>
+          <label for="tickerStatus">סטטוס</label>
+          <select id="tickerStatus" name="status" title="ממתין=בדיקה בלבד, פתוח=טעינה מלאה, סגור=טעינה מופחתת, מבוטל=לא פעיל">
+            ${statusOptions}
           </select>
         </div>
       </div>
@@ -96,7 +109,8 @@ export function showTickerFormModal(data, onSave) {
       const symbol = document.getElementById('tickerSymbol')?.value?.trim() ?? '';
       const companyName = document.getElementById('tickerCompanyName')?.value?.trim() || null;
       const tickerType = document.getElementById('tickerType')?.value ?? 'STOCK';
-      const isActive = document.getElementById('tickerIsActive')?.value === 'true';
+      const status = document.getElementById('tickerStatus')?.value ?? 'active';
+      const isActive = status !== 'cancelled';
 
       document.querySelectorAll('#tickerForm .form-error').forEach((el) => { el.textContent = ''; });
 
@@ -106,7 +120,13 @@ export function showTickerFormModal(data, onSave) {
         return;
       }
 
-      const formData = { symbol: symbol.toUpperCase(), company_name: companyName, ticker_type: tickerType, is_active: isActive };
+      const formData = {
+        symbol: symbol.toUpperCase(),
+        company_name: companyName,
+        ticker_type: tickerType,
+        status,
+        is_active: isActive,
+      };
 
       if (onSave) {
         try {

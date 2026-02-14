@@ -54,18 +54,19 @@ def test_cleanup_job_emits_evidence():
     with open(EVIDENCE_JSON) as f:
         ev = json.load(f)
 
-    required = ["last_run_time", "rows_pruned", "rows_updated"]
+    required = ["last_run_time", "rows_pruned", "rows_updated", "rows_archived"]
     missing = [k for k in required if k not in ev]
     if missing:
         print(f"FAIL: Evidence missing keys: {missing}")
         return False
 
-    # rows_pruned and rows_updated must be present (int); last_run_time non-empty string
+    # Required fields must be present
     ok = (
         isinstance(ev["last_run_time"], str)
         and len(ev["last_run_time"]) > 0
         and isinstance(ev["rows_pruned"], (int, float))
         and isinstance(ev["rows_updated"], (int, float))
+        and isinstance(ev["rows_archived"], (int, float))
     )
     if not ok:
         print(f"FAIL: Evidence format invalid: {ev}")

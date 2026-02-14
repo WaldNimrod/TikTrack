@@ -42,3 +42,15 @@
 - intraday: rows_pruned=0
 - daily: rows_pruned=349
 - fx_history: rows_pruned=0
+
+## 2026-02-14T14:10:51.796617+00:00
+- intraday: rows_archived=0, rows_pruned=0
+- daily: rows_archived=5, rows_pruned=5
+- fx_history: rows_archived=0, rows_pruned=0
+- archive_paths: ['/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/archive/market_data/daily/ticker_prices_2025-06-09_20260214_141051.csv']
+
+## 2026-02-14T14:11:02.143589+00:00
+- intraday: rows_archived=0, rows_pruned=0
+- daily: rows_archived=0, rows_pruned=0
+- fx_history: rows_archived=0, rows_pruned=0
+- archive_paths: []

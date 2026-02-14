@@ -4,7 +4,8 @@
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (The Gateway)  
 **re:** TEAM_10_TO_TEAM_50_MARKET_STATUS_QA_NOTE  
-**date:** 2026-01-31
+**date:** 2026-02-14  
+**רה־ריצה (כולל data_dashboard):** 2026-02-14
 
 ---
 
@@ -12,7 +13,7 @@
 
 | פריט | תוצאה |
 |------|--------|
-| **1. שעון + מפתח צבעים** | ✅ PASS — מופיעים בכל 4 הדפים הרלוונטיים |
+| **1. שעון + מפתח צבעים** | ✅ PASS — מופיעים בכל 5 הדפים (כולל data_dashboard) |
 | **2. כישלון (401, network)** | ✅ PASS — מפתח הצבעים מוסתר, ללא קריסה |
 | **3. נגישות** | ✅ PASS — `aria-label` ו־`title` על מפתח הצבעים |
 
@@ -28,8 +29,9 @@
 | trading_accounts | ✅ | ✅ | — |
 | cash_flows | ✅ | ✅ | — |
 | brokers_fees | ✅ | ✅ | — |
+| **data_dashboard** | ✅ | ✅ | — |
 
-**הערה:** דשבורד נתונים (`data_dashboard.html`) — אינו טוען `stalenessClock.js` / `eodStalenessCheck.js` (משתמש ב־`dataDashboardTableInit.js` נפרד). מפתח מצב שוק לא מופיע שם. אם נדרש — יש להוסיף את הסקריפטים.
+**רה־ריצה 2026-02-14:** צוות 30 הוסיף `stalenessClock.js` + `eodStalenessCheck.js` ל־`data_dashboard.html`. שעון + מפתח צבעים מוצגים כעת גם בדשבורד נתונים.
 
 ### 2.2 כישלון (401, network)
 
@@ -62,4 +64,19 @@
 
 ---
 
-**log_entry | TEAM_50 | TO_TEAM_10 | MARKET_STATUS_QA_REPORT | 2026-01-31**
+---
+
+## 5. רה־ריצה כולל data_dashboard (2026-02-14)
+
+| פריט | תוצאה |
+|------|--------|
+| Item 1 (5 דפים) | 5/5 PASS — כולל data_dashboard |
+| Item 2 (כישלון) | PASS |
+| Item 3 (נגישות) | PASS |
+
+**פקודה:** `cd tests && node market-status-qa.e2e.test.js`
+
+---
+
+**log_entry | TEAM_50 | TO_TEAM_10 | MARKET_STATUS_QA_REPORT | 2026-02-14**  
+**log_entry | TEAM_50 | MARKET_STATUS_QA_RERUN | DATA_DASHBOARD_INCLUDED | 2026-02-14**

@@ -62,9 +62,10 @@
 
 | בדיקה | תוצאה |
 |-------|--------|
-| **data_dashboard מכיל stalenessClock / eodStalenessCheck?** | לא — grep ב־`ui/src/views/data/` — אין התייחסות |
-| **דרישה לפי SSOT?** | TEAM_10_TO_TEAM_50_MARKET_STATUS_QA_NOTE — דפים: tickers, trading_accounts, cash_flows, brokers_fees, "דשבורד נתונים" |
-| **החלטה** | data_dashboard לא מכיל שעון/מפתח לפי המימוש הנוכחי. לא נדרש סבב בדיקה נוסף — דפים העיקריים נבדקו (Market Status QA 5/5 PASS). |
+| **data_dashboard מכיל stalenessClock / eodStalenessCheck?** | כן — צוות 30 הוסיף (2026-02-14) |
+| **שעון + מפתח צבעים** | ✅ PASS — E2E רה־ריצה |
+| **כישלון — מפתח מוסתר** | ✅ PASS |
+| **נגישות** | ✅ PASS |
 
 ---
 

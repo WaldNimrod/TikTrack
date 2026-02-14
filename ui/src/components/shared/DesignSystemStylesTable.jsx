@@ -56,10 +56,10 @@ const DesignSystemStylesTable = () => {
 
   // Status Badges — סטטוסים קבועים (TT2_SYSTEM_STATUS_VALUES_SSOT)
   const statusBadgeStyles = [
-    { value: 'pending', label: 'ממתין', cssVar: '--status-pending', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--pending">ממתין</span> },
-    { value: 'active', label: 'פתוח', cssVar: '--status-active', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--active">פתוח</span> },
-    { value: 'inactive', label: 'סגור', cssVar: '--status-inactive', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--inactive">סגור</span> },
-    { value: 'cancelled', label: 'מבוטל', cssVar: '--status-cancelled', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--cancelled">מבוטל</span> },
+    { value: 'pending', label: 'ממתין', cssVar: '--status-pending', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--pending" data-status-category="pending">ממתין</span> },
+    { value: 'active', label: 'פתוח', cssVar: '--status-active', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--active" data-status-category="active">פתוח</span> },
+    { value: 'inactive', label: 'סגור', cssVar: '--status-inactive', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--inactive" data-status-category="inactive">סגור</span> },
+    { value: 'cancelled', label: 'מבוטל', cssVar: '--status-cancelled', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--cancelled" data-status-category="cancelled">מבוטל</span> },
   ];
 
   // Button Styles Data (from DNA_BUTTON_SYSTEM.md)

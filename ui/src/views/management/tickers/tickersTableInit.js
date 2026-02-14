@@ -6,6 +6,7 @@
 import sharedServices from '../../../components/core/sharedServices.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
 
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
@@ -149,9 +150,13 @@ const formatChangePct = (pct) => {
 
       const statusCell = document.createElement('td');
       statusCell.className = 'phoenix-table__cell col-status';
+      // Prefer status (pending|active|inactive|cancelled); fallback: is_active -> active, !is_active -> cancelled
+      const statusCanon = normalizeToCanonicalStatus(t.status) ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
+      const statusLabel = toHebrewStatus(statusCanon);
       const statusBadge = document.createElement('span');
-      statusBadge.className = 'phoenix-table__status-badge badge ' + (t.is_active ? 'badge--success' : 'badge--danger');
-      statusBadge.textContent = t.is_active ? 'פעיל' : 'לא פעיל';
+      statusBadge.className = `phoenix-table__status-badge phoenix-table__status-badge--${statusCanon}`;
+      statusBadge.setAttribute('data-status-category', statusCanon);
+      statusBadge.textContent = statusLabel || (t.is_active ? 'פתוח' : 'מבוטל');
       statusCell.appendChild(statusBadge);
       row.appendChild(statusCell);
 

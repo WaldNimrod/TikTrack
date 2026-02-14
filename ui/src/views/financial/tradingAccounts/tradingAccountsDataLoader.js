@@ -554,7 +554,7 @@ async function loadContainer1(filters = {}) {
       });
       
       const canon = account.isActive ? 'active' : 'inactive';
-      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${canon}">${toHebrewStatus(canon)}</span>`;
+      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${canon}" data-status-category="${canon}">${toHebrewStatus(canon)}</span>`;
       
       row.innerHTML = `
         <td class="phoenix-table__cell col-name" role="cell">${account.accountName || account.account_name || account.displayName || ''}</td>
@@ -709,11 +709,9 @@ async function loadContainer3(filters = {}) {
         return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
       });
       
-      const statusBadge = flow.status === 'VERIFIED' 
-        ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--active">מאומת</span>'
-        : flow.status === 'PENDING'
-        ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">ממתין</span>'
-        : `<span class="phoenix-table__status-badge phoenix-table__status-badge--inactive">${flow.status || ''}</span>`;
+      const flowStatusCanon = flow.status === 'VERIFIED' ? 'active' : flow.status === 'PENDING' ? 'pending' : 'inactive';
+      const flowStatusLabel = flow.status === 'VERIFIED' ? 'מאומת' : flow.status === 'PENDING' ? 'ממתין' : (flow.status || '');
+      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${flowStatusCanon}" data-status-category="${flowStatusCanon}">${flowStatusLabel}</span>`;
       
       const flowTypeVal = flow.flowType || flow.flow_type || '';
       row.innerHTML = `
@@ -790,7 +788,7 @@ async function loadContainer4(filters = {}) {
         : '<span class="phoenix-table__status-badge phoenix-table__status-badge--short">שורט</span>';
       
       const posCanon = position.status === 'OPEN' ? 'active' : 'inactive';
-      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${posCanon}">${toHebrewStatus(posCanon)}</span>`;
+      const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${posCanon}" data-status-category="${posCanon}">${toHebrewStatus(posCanon)}</span>`;
       
       // Format current price with daily change
       const currentPriceHtml = window.tableFormatters?.formatCurrentPrice 

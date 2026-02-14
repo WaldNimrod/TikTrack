@@ -17,10 +17,8 @@ const PAGES = [
   { id: 'trading_accounts', url: '/trading_accounts.html', hasCard: false },
   { id: 'cash_flows', url: '/cash_flows.html', hasCard: false },
   { id: 'brokers_fees', url: '/brokers_fees.html', hasCard: false },
+  { id: 'data_dashboard', url: '/data_dashboard.html', hasCard: true },
 ];
-
-// Data dashboard uses different init — no stalenessClock/eodStalenessCheck; skip or add separately
-const DATA_DASHBOARD = { id: 'data_dashboard', url: '/data_dashboard.html' };
 
 const EXPECTED_CLASSES = {
   open: 'market-status--open',

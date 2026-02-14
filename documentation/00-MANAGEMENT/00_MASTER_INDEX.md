@@ -216,6 +216,7 @@ _COMMUNICATION/
 - [🔒 D16_MODULE_REFERENCE_SSOT.md](../09-GOVERNANCE/standards/D16_MODULE_REFERENCE_SSOT.md) - מודול דוגמה D16 (חשבונות מסחר) — נעול ✅ **SSOT — 2026-01-31**
 - [📐 PAGE_LAYOUT_AND_SECTIONS_SSOT.md](../09-GOVERNANCE/standards/PAGE_LAYOUT_AND_SECTIONS_SSOT.md) - Page Layout: יישור עמוד, Info Summary, Expand/Collapse All ✅ **SSOT**
 - [📋 TT2_SYSTEM_STATUS_VALUES_SSOT.md](../09-GOVERNANCE/TT2_SYSTEM_STATUS_VALUES_SSOT.md) - סטטוסים מערכתיים (active/inactive/pending/cancelled + פתוח/סגור/ממתין/מבוטל) — רשימת סטטוסים מרכזית לכל הישויות ✅ **SSOT**
+- [📋 TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) - סטטוס טיקר והתנהגות טעינת נתונים: ממתין=EOD+היסטוריה בלבד, פתוח=קצב מלא, סגור=קצב מופחת, מבוטל=לא טוען. מחייב ל-20/60 (לוגיקת סנכרון ו-Cron). הודעה: _COMMUNICATION/team_10/TEAM_10_TO_TEAMS_20_60_TICKER_STATUS_MARKET_DATA_ALIGNMENT.md. ✅ **2026-02-14**
 - [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד — מעבר ל-Adapter (statusValues.js + statusAdapter.js) ✅ **מנדט יישום**
 - [📋 מנדט יישום סטטוסים](../../_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md) - Single Source → statusValues.js → statusAdapter.js — Acceptance Criteria + אסור
 - ⚠️ **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/90_Architects_comunication/` (לא SSOT - Communication בלבד):

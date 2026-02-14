@@ -2,6 +2,10 @@
  * User Ticker Add Form - הוספת טיקר לרשימה שלי
  * Supports: add existing ticker (select) + add new ticker inline (symbol → POST)
  * Per brief: provider failure → show error, do NOT create ticker in UI
+ * Per TEAM_10_TO_TEAM_30_USER_TICKERS_CRYPTO_EXCHANGE_CORRECTIVE:
+ * - סוג נכס (STOCK/CRYPTO)
+ * - Market (קריפטו בלבד)
+ * - בורסה/סיומת (מניות אירופאיות, TASE)
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
@@ -12,7 +16,15 @@ import { reactToApi } from '../../../cubes/shared/utils/transformers.js';
 const PROVIDER_ERROR_MSG = 'אין נתונים זמינים מהספק עבור טיקר זה. לא ניתן ליצור טיקר.';
 const GENERIC_ERROR_MSG = 'שגיאה בהוספת הטיקר. נסה שוב.';
 
-/** Build form HTML with two modes: add existing (select) + add new (inline symbol) */
+/** Exchange suffixes (Yahoo format) — SSOT: WP_20_09, TEAM_10 corrective */
+const EXCHANGE_OPTIONS = [
+  { value: '', label: '— ברירת מחדל (NASDAQ/NYSE) —' },
+  { value: '.TA', label: 'תל אביב (TASE)' },
+  { value: '.MI', label: 'מילאנו (Milan)' },
+  { value: '.L', label: 'לונדון (LSE)' },
+];
+
+/** Build form HTML with two modes: add existing (select) + add new (inline symbol + type + market + exchange) */
 function createAddFormHTML(availableTickers, userTickerIds) {
   const existingOptions = (availableTickers || [])
     .filter((t) => {
@@ -25,6 +37,10 @@ function createAddFormHTML(availableTickers, userTickerIds) {
       const name = t.company_name ?? t.companyName ?? '';
       return `<option value="${id}">${sym}${name ? ` — ${name}` : ''}</option>`;
     })
+    .join('');
+
+  const exchangeOptionsHtml = EXCHANGE_OPTIONS
+    .map((o) => `<option value="${o.value}">${o.label}</option>`)
     .join('');
 
   return `
@@ -52,6 +68,31 @@ function createAddFormHTML(availableTickers, userTickerIds) {
             placeholder="AAPL"
           />
           <span class="form-error" id="userTickerNewSymbolError"></span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="userTickerAssetType">סוג נכס</label>
+          <select id="userTickerAssetType" class="phoenix-form__select" name="ticker_type">
+            <option value="STOCK" selected>מניה (STOCK)</option>
+            <option value="CRYPTO">קריפטו (CRYPTO)</option>
+            <option value="ETF">ETF</option>
+          </select>
+        </div>
+        <div class="form-group" id="userTickerMarketGroup" style="display:none;">
+          <label for="userTickerMarket">Market (קריפטו)</label>
+          <select id="userTickerMarket" class="phoenix-form__select" name="market">
+            <option value="USD" selected>USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" id="userTickerExchangeRow">
+        <div class="form-group">
+          <label for="userTickerExchange">בורסה / סיומת</label>
+          <select id="userTickerExchange" class="phoenix-form__select" name="exchange_suffix">
+            ${exchangeOptionsHtml}
+          </select>
         </div>
       </div>
       <div class="form-row" id="userTickerFormError" style="display:none;">
@@ -89,6 +130,9 @@ export function showUserTickerAddModal(options = {}) {
 
       const existingSelect = document.getElementById('userTickerExistingSelect');
       const newSymbolInput = document.getElementById('userTickerNewSymbol');
+      const assetTypeSelect = document.getElementById('userTickerAssetType');
+      const marketSelect = document.getElementById('userTickerMarket');
+      const exchangeSelect = document.getElementById('userTickerExchange');
       const errBlock = document.getElementById('userTickerFormError');
       const errText = document.getElementById('userTickerFormErrorText');
       const symbolErr = document.getElementById('userTickerNewSymbolError');
@@ -98,7 +142,15 @@ export function showUserTickerAddModal(options = {}) {
       if (symbolErr) symbolErr.textContent = '';
 
       const existingId = existingSelect?.value?.trim() || null;
-      const newSymbol = newSymbolInput?.value?.trim().toUpperCase() || null;
+      let newSymbol = newSymbolInput?.value?.trim().toUpperCase() || null;
+      const tickerType = assetTypeSelect?.value || 'STOCK';
+      const market = marketSelect?.value || 'USD';
+      const exchangeSuffix = exchangeSelect?.value?.trim() || '';
+
+      // Append exchange suffix to symbol when adding new ticker (e.g. ANAU + .MI → ANAU.MI)
+      if (newSymbol && exchangeSuffix) {
+        newSymbol = newSymbol + exchangeSuffix;
+      }
 
       if (!existingId && !newSymbol) {
         if (symbolErr) symbolErr.textContent = 'בחר טיקר קיים או הזן סמל לטיקר חדש';
@@ -114,13 +166,19 @@ export function showUserTickerAddModal(options = {}) {
       if (existingId) {
         payload = { ticker_id: existingId };
       } else {
-        payload = { symbol: newSymbol };
+        payload = {
+          symbol: newSymbol,
+          ticker_type: tickerType,
+          market: tickerType === 'CRYPTO' ? market : undefined,
+        };
+        // Remove undefined for query params
+        if (payload.market === undefined) delete payload.market;
       }
 
       try {
         await sharedServices.init();
         const apiPayload = reactToApi(payload);
-        await sharedServices.post('/me/tickers', apiPayload);
+        await sharedServices.post('/me/tickers', apiPayload, { useQueryParams: true });
         closeModal();
         if (typeof onSuccess === 'function') onSuccess();
       } catch (error) {
@@ -147,4 +205,19 @@ export function showUserTickerAddModal(options = {}) {
     },
     onClose: function () {},
   });
+
+  // Bind asset-type change → show/hide Market field (CRYPTO only)
+  const assetTypeEl = document.getElementById('userTickerAssetType');
+  const marketGroupEl = document.getElementById('userTickerMarketGroup');
+  const exchangeRowEl = document.getElementById('userTickerExchangeRow');
+  if (assetTypeEl && marketGroupEl) {
+    const toggle = () => {
+      const isCrypto = assetTypeEl.value === 'CRYPTO';
+      marketGroupEl.style.display = isCrypto ? 'block' : 'none';
+      // Show exchange for STOCK/ETF when adding new; hide for CRYPTO (market handles it)
+      if (exchangeRowEl) exchangeRowEl.style.display = isCrypto ? 'none' : 'block';
+    };
+    assetTypeEl.addEventListener('change', toggle);
+    toggle(); // initial
+  }
 }

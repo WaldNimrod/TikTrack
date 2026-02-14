@@ -47,6 +47,16 @@
 | **Yahoo Finance** | User-Agent Rotation **required**. |
 | **Alpha Vantage** | RateLimitQueue **required** (12.5s delay → 5 calls/min). |
 
+## 2.2.1 Provider Symbol Contract (LOCKED)
+
+| Asset Type | Yahoo Finance | Alpha Vantage | Notes |
+|-----------|---------------|---------------|-------|
+| **STOCK/ETF** | `SYMBOL` (example: `AAPL`, `ANAU.MI`) | `symbol=SYMBOL` for `GLOBAL_QUOTE` / `TIME_SERIES_DAILY` | Standard equity flow |
+| **CRYPTO** | `BASE-QUOTE` (example: `BTC-USD`) | `symbol=BASE` + `market=QUOTE` for `DIGITAL_CURRENCY_DAILY` (and `CRYPTO_INTRADAY` if enabled) | Do not use equity endpoints as primary crypto contract |
+
+**Required mapping field:** `provider_mapping_data` per ticker (SSOT in `WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md`).  
+**Rule:** For CRYPTO, provider calls must use `provider_mapping_data`; do not infer from generic symbol at runtime.
+
 ---
 
 ## 2.3 Cache-First (Mandatory)
@@ -109,6 +119,17 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators.
 - **Indicators (Stage-1):** ATR(14), MA(20/50/150/200), CCI(20) — ראה `MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md`.
 - מקור: `api/models/ticker_prices.py`
+
+### 4.1.1 `provider_mapping_data` Example (Stage‑1)
+
+```json
+{
+  "yahoo_finance": { "symbol": "BTC-USD" },
+  "alpha_vantage": { "symbol": "BTC", "market": "USD" }
+}
+```
+
+For STOCK/ETF, `market` is optional and mapping may use the same symbol in both providers.
 
 ### 4.2 שערי חליפין (Exchange Rates)
 

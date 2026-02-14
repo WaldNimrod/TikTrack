@@ -21,7 +21,7 @@ except ImportError:
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import UUID
 
 DECIMAL_SCALE = Decimal("0.00000001")
@@ -70,12 +70,13 @@ def _is_429(e: Exception) -> bool:
 
 
 async def fetch_prices_for_tickers(
-    tickers: List[Tuple[UUID, str]]
+    tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
-    """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Returns (ticker_id, symbol, ...)."""
+    """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Per CORRECTIVE: CRYPTO uses provider mapping, Alpha DIGITAL_CURRENCY_DAILY."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
     cooldown_min = get_provider_cooldown_minutes()
@@ -84,8 +85,14 @@ async def fetch_prices_for_tickers(
     results = []
     yahoo_skipped = alpha_skipped = False
 
-    for ticker_id, symbol in tickers:
-        for provider, name in [(yahoo, "YAHOO_FINANCE"), (alpha, "ALPHA_VANTAGE")]:
+    for ticker_id, symbol, ticker_type, metadata in tickers:
+        pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
+        yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+        pr = None
+        for provider, name, use_sym, use_crypto in [
+            (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
+            (alpha, "ALPHA_VANTAGE", alpha_sym, ticker_type == "CRYPTO"),
+        ]:
             if is_in_cooldown(name):
                 if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
                     print(f"⚠️ {name} in cooldown — skipping")
@@ -95,7 +102,10 @@ async def fetch_prices_for_tickers(
                     alpha_skipped = True
                 continue
             try:
-                pr = await provider.get_ticker_price(symbol)
+                if use_crypto and provider is alpha:
+                    pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
+                else:
+                    pr = await provider.get_ticker_price(use_sym)
                 if pr and pr.price and pr.price > 0:
                     results.append((
                         ticker_id,
@@ -213,9 +223,11 @@ def insert_intraday(
         conn.close()
 
 
-def load_active_tickers() -> List[Tuple[UUID, str]]:
+def load_active_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
+    """Load tickers with ticker_type and metadata for provider mapping (CORRECTIVE)."""
     import psycopg2
     from psycopg2.extras import RealDictCursor
+    import json
     from api.integrations.market_data.market_data_settings import get_max_active_tickers
 
     max_tickers = get_max_active_tickers()
@@ -223,14 +235,24 @@ def load_active_tickers() -> List[Tuple[UUID, str]]:
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
-            SELECT id, symbol FROM market_data.tickers
+            SELECT id, symbol, COALESCE(ticker_type, 'STOCK') AS ticker_type, metadata
+            FROM market_data.tickers
             WHERE (deleted_at IS NULL OR deleted_at > NOW())
             AND is_active = true
             ORDER BY symbol
             LIMIT %s
         """, (max_tickers,))
         rows = cur.fetchall()
-        return [(r["id"], r["symbol"]) for r in rows]
+        out = []
+        for r in rows:
+            meta = r.get("metadata")
+            if isinstance(meta, str):
+                try:
+                    meta = json.loads(meta) if meta else None
+                except (json.JSONDecodeError, TypeError):
+                    meta = None
+            out.append((r["id"], r["symbol"], r["ticker_type"] or "STOCK", meta))
+        return out
     finally:
         conn.close()
 

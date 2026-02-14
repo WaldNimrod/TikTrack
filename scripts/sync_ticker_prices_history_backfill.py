@@ -21,7 +21,7 @@ except ImportError:
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 from uuid import UUID
 
 _project = Path(__file__).parent.parent
@@ -61,26 +61,36 @@ def _is_429(e: Exception) -> bool:
     return "429" in s or "too many" in s or "rate limit" in s
 
 
-def load_tickers_needing_backfill() -> List[Tuple[UUID, str]]:
-    """Tickers with < MIN_HISTORY_DAYS rows in ticker_prices."""
+def load_tickers_needing_backfill() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
+    """Tickers with < MIN_HISTORY_DAYS rows in ticker_prices. Includes ticker_type and metadata (CORRECTIVE)."""
     import psycopg2
     from psycopg2.extras import RealDictCursor
+    import json
 
     conn = psycopg2.connect(DATABASE_URL)
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
-            SELECT t.id, t.symbol
+            SELECT t.id, t.symbol, COALESCE(t.ticker_type, 'STOCK') AS ticker_type, t.metadata
             FROM market_data.tickers t
             LEFT JOIN market_data.ticker_prices tp ON tp.ticker_id = t.id
             WHERE (t.deleted_at IS NULL OR t.deleted_at > NOW())
-            GROUP BY t.id, t.symbol
+            GROUP BY t.id, t.symbol, t.ticker_type, t.metadata
             HAVING COUNT(tp.id) < %s
             ORDER BY COUNT(tp.id) ASC
             LIMIT %s
         """, (MIN_HISTORY_DAYS, MAX_TICKERS_PER_RUN))
         rows = cur.fetchall()
-        return [(r["id"], r["symbol"]) for r in rows]
+        out = []
+        for r in rows:
+            meta = r.get("metadata")
+            if isinstance(meta, str):
+                try:
+                    meta = json.loads(meta) if meta else None
+                except (json.JSONDecodeError, TypeError):
+                    meta = None
+            out.append((r["id"], r["symbol"], r["ticker_type"] or "STOCK", meta))
+        return out
     finally:
         conn.close()
 
@@ -140,19 +150,21 @@ def load_ticker_by_id_for_backfill(ticker_id: str) -> Optional[Tuple[UUID, str]]
         conn.close()
 
 
-def load_ticker_with_history_info(ticker_id: str) -> Optional[Tuple[UUID, str, Set[str], int]]:
+def load_ticker_with_history_info(ticker_id: str) -> Optional[Tuple[UUID, str, Set[str], int, str, Optional[Dict[str, Any]]]]:
     """
     Load ticker with existing dates and count for Smart History Engine (API).
-    Returns (uuid, symbol, existing_dates, existing_count) or None if ticker not found.
+    Returns (uuid, symbol, existing_dates, existing_count, ticker_type, metadata) or None.
+    CORRECTIVE: ticker_type and metadata for provider mapping (CRYPTO).
     """
     import psycopg2
     from psycopg2.extras import RealDictCursor
+    import json
 
     conn = psycopg2.connect(DATABASE_URL)
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
-            SELECT t.id, t.symbol
+            SELECT t.id, t.symbol, COALESCE(t.ticker_type, 'STOCK') AS ticker_type, t.metadata
             FROM market_data.tickers t
             WHERE t.id = %s AND (t.deleted_at IS NULL OR t.deleted_at > NOW())
         """, (ticker_id,))
@@ -160,8 +172,15 @@ def load_ticker_with_history_info(ticker_id: str) -> Optional[Tuple[UUID, str, S
         if not row:
             return None
         uuid_val, symbol = row["id"], row["symbol"]
+        ticker_type = row.get("ticker_type") or "STOCK"
+        meta = row.get("metadata")
+        if isinstance(meta, str):
+            try:
+                meta = json.loads(meta) if meta else None
+            except (json.JSONDecodeError, TypeError):
+                meta = None
         existing = get_existing_dates(uuid_val)
-        return (uuid_val, symbol, existing, len(existing))
+        return (uuid_val, symbol, existing, len(existing), ticker_type, meta)
     finally:
         conn.close()
 
@@ -300,25 +319,41 @@ def insert_history_rows(
 async def fetch_history_for_ticker(
     ticker_id: UUID,
     symbol: str,
+    ticker_type: str = "STOCK",
+    metadata: Optional[Dict[str, Any]] = None,
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> Tuple[Optional[list], str]:
-    """Yahoo → Alpha (SMART_HISTORY_FILL_SPEC). SPEC-PROV-YF-HIST: EOD history available 24/7 — do NOT skip when market closed."""
+    """Yahoo → Alpha (SMART_HISTORY_FILL_SPEC). Per CORRECTIVE: CRYPTO uses provider mapping, Alpha get_ticker_history_crypto."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
     cooldown_min = get_provider_cooldown_minutes()
-    provider_order = [(YahooProvider(), "YAHOO_FINANCE"), (AlphaProvider(), "ALPHA_VANTAGE")]
+    pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
+    yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+    is_crypto = ticker_type == "CRYPTO"
+    yahoo = YahooProvider()
+    alpha = AlphaProvider()
     min_rows = 1 if (date_from or date_to) else 50  # gap-fill: accept even 1 row
-    for provider, name in provider_order:
+
+    for provider, name, use_sym, use_crypto in [
+        (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
+        (alpha, "ALPHA_VANTAGE", alpha_sym, is_crypto),
+    ]:
         if is_in_cooldown(name):
             continue
         try:
-            hist = await provider.get_ticker_history(
-                symbol, MIN_HISTORY_DAYS, date_from=date_from, date_to=date_to
-            )
+            if use_crypto and provider is alpha:
+                hist = await alpha.get_ticker_history_crypto(
+                    alpha_sym, alpha_market, MIN_HISTORY_DAYS, date_from=date_from, date_to=date_to
+                )
+            else:
+                hist = await provider.get_ticker_history(
+                    use_sym, MIN_HISTORY_DAYS, date_from=date_from, date_to=date_to
+                )
             if hist and len(hist) >= min_rows:
                 return hist, name
         except Exception as e:
@@ -354,7 +389,7 @@ def main():
 
         print(f"📋 {len(tickers)} ticker(s) need backfill (< {MIN_HISTORY_DAYS} rows)")
         total_inserted = 0
-        for ticker_id, symbol in tickers:
+        for ticker_id, symbol, ticker_type, metadata in tickers:
             existing = get_existing_dates(ticker_id)
             gaps = compute_gaps(existing)
             date_from_val, date_to_val = None, None
@@ -363,7 +398,11 @@ def main():
                 date_from_val = datetime.strptime(gap_dates[0], "%Y-%m-%d").date()
                 date_to_val = datetime.strptime(gap_dates[-1], "%Y-%m-%d").date()
             hist, provider = asyncio.run(
-                fetch_history_for_ticker(ticker_id, symbol, date_from=date_from_val, date_to=date_to_val)
+                fetch_history_for_ticker(
+                    ticker_id, symbol,
+                    ticker_type=ticker_type, metadata=metadata,
+                    date_from=date_from_val, date_to=date_to_val,
+                )
             )
             if not hist:
                 print(f"⚠️ No history for {symbol}")

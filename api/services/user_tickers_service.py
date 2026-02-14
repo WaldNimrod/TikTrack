@@ -6,6 +6,7 @@ Source: TEAM_90_TO_TEAM_10_USER_TICKERS_IMPLEMENTATION_BRIEF, TEAM_10_USER_TICKE
 GET /me/tickers, POST /me/tickers (add existing or create new + live data check), DELETE /me/tickers/{ticker_id}.
 """
 
+import os
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -44,30 +45,62 @@ def _ticker_to_response(t: Ticker, price_data: Optional[Dict[str, Any]] = None) 
     )
 
 
-async def _live_data_check(symbol: str) -> bool:
+def _get_provider_mapping(symbol: str, ticker_type: str, market: Optional[str], provider_mapping: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """From metadata or infer. Shared logic with sync scripts via provider_mapping_utils."""
+    from ..integrations.market_data.provider_mapping_utils import get_provider_mapping
+    return provider_mapping or get_provider_mapping(symbol, ticker_type, market, metadata=None)
+
+
+def _is_live_data_check_bypass_enabled() -> bool:
+    """Dev/QA only: SKIP_LIVE_DATA_CHECK=true bypasses provider fetch when API key unavailable."""
+    return os.environ.get("SKIP_LIVE_DATA_CHECK", "").strip().lower() in ("true", "1", "yes")
+
+
+async def _live_data_check(
+    symbol: str,
+    ticker_type: str = "STOCK",
+    market: Optional[str] = None,
+    provider_mapping: Optional[Dict[str, Any]] = None,
+) -> bool:
     """
-    Live data-load check per brief §4.1.
-    Attempt Yahoo → Alpha fetch for EOD/last price.
+    Live data-load check per brief §4.1 + CORRECTIVE.
+    Uses provider_mapping when provided; otherwise infers from symbol + ticker_type.
+    For CRYPTO: Alpha uses DIGITAL_CURRENCY_DAILY (not GLOBAL_QUOTE).
     Returns True if at least one provider returns valid data.
+    Bypass: SKIP_LIVE_DATA_CHECK=true (dev/QA only — never in production).
     """
+    if _is_live_data_check_bypass_enabled():
+        logger.info("Live data check bypassed (SKIP_LIVE_DATA_CHECK=true) for %s", symbol)
+        return True
     from ..integrations.market_data.providers.yahoo_provider import YahooProvider
     from ..integrations.market_data.providers.alpha_provider import AlphaProvider
+    from ..integrations.market_data.provider_mapping_utils import get_provider_mapping as _resolve_pm
+
+    from ..integrations.market_data.provider_mapping_utils import resolve_symbols_for_fetch
+
+    pm = provider_mapping or _resolve_pm(symbol, ticker_type, market, metadata=None)
+    yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type, pm)
 
     for provider_cls in (YahooProvider,):
         try:
             provider = provider_cls(mode="LIVE")
-            result = await provider.get_ticker_price(symbol)
+            result = await provider.get_ticker_price(yahoo_sym)
             if result and result.price and result.price > 0:
                 return True
         except Exception as e:
-            logger.warning("Live data check %s failed for %s: %s", provider_cls.__name__, symbol, e)
+            logger.warning("Live data check %s failed for %s: %s", provider_cls.__name__, yahoo_sym, e)
+
+    # Alpha: for CRYPTO use DIGITAL_CURRENCY_DAILY; for STOCK use GLOBAL_QUOTE
     try:
         provider = AlphaProvider(mode="LIVE")
-        result = await provider.get_ticker_price(symbol)
+        if ticker_type == "CRYPTO":
+            result = await provider.get_ticker_price_crypto(alpha_sym, alpha_market)
+        else:
+            result = await provider.get_ticker_price(alpha_sym)
         if result and result.price and result.price > 0:
             return True
     except Exception as e:
-        logger.warning("Live data check AlphaProvider failed for %s: %s", symbol, e)
+        logger.warning("Live data check AlphaProvider failed for %s: %s", alpha_sym, e)
     return False
 
 
@@ -130,10 +163,13 @@ class UserTickersService:
         symbol: Optional[str] = None,
         company_name: Optional[str] = None,
         ticker_type: str = "STOCK",
+        market: Optional[str] = None,
+        provider_mapping: Optional[Dict[str, Any]] = None,
     ) -> TickerResponse:
         """
         Add existing ticker or create new system ticker + add.
         Per brief: before creating new ticker — live data-load check (Yahoo→Alpha).
+        For CRYPTO: market (default USD) + provider mapping used; Alpha uses DIGITAL_CURRENCY_DAILY.
         If fetch fails → 4xx, do not create.
         New ticker status = pending (locked SSOT).
         """
@@ -164,25 +200,36 @@ class UserTickersService:
                     error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
                 )
             symbol = symbol.strip().upper()
-            # Live data-load check (per brief §4.1)
-            if not await _live_data_check(symbol):
+            ticker_type_uc = ticker_type.upper()
+            pm = _get_provider_mapping(symbol, ticker_type_uc, market, provider_mapping)
+            from ..integrations.market_data.provider_mapping_utils import resolve_symbols_for_fetch
+            # Live data-load check (per brief §4.1 + CORRECTIVE). ROOT_FIX: provider failure → 422, never 500.
+            try:
+                live_ok = await _live_data_check(symbol, ticker_type=ticker_type_uc, market=market, provider_mapping=pm)
+            except Exception as e:
+                logger.warning("Live data check raised for %s: %s", symbol, e)
+                live_ok = False
+            if not live_ok:
                 raise HTTPExceptionWithCode(
                     status_code=422,
-                    detail="Provider could not fetch data for this symbol. Ticker not created.",
+                    detail="Provider could not fetch data for this symbol. Check ALPHA_VANTAGE_API_KEY in api/.env and Yahoo availability. Ticker not created.",
                     error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
                 )
-            # Check if ticker already exists
+            # Check if ticker already exists; canonical symbol from mapping (e.g. BTC-USD for crypto)
+            lookup_sym, _, _ = resolve_symbols_for_fetch(symbol, ticker_type_uc, pm)
             stmt = select(Ticker).where(
-                and_(Ticker.symbol == symbol, Ticker.deleted_at.is_(None))
+                and_(Ticker.symbol == lookup_sym, Ticker.deleted_at.is_(None))
             )
             ticker = (await db.execute(stmt)).scalar_one_or_none()
             if not ticker:
+                meta = {"provider_mapping_data": pm}
                 ticker = Ticker(
-                    symbol=symbol,
+                    symbol=lookup_sym,
                     company_name=company_name or None,
-                    ticker_type=ticker_type.upper(),
+                    ticker_type=ticker_type_uc,
                     is_active=True,
                     status=_USER_CREATED_TICKER_STATUS,
+                    ticker_metadata=meta,
                 )
                 db.add(ticker)
                 await db.flush()

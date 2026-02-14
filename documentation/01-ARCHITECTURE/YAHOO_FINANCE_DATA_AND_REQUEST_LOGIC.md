@@ -54,6 +54,15 @@
 - **end** ב־Yahoo הוא **exclusive** — ל־"היום" יש להעביר `end = tomorrow`
 - **היסטוריה** — נתונים על עבר זמינים תמיד; הבעיה לרוב ב־range יחסי (period)
 
+### 4.1 סימבולים לקריפטו (Locked)
+
+- Yahoo עובד עם סימבול קריפטו בפורמט `BASE-QUOTE` בלבד.
+- דוגמאות תקינות: `BTC-USD`, `ETH-USD`, `SOL-USD`.
+- סימבולים כמו `BTC` בלבד עלולים להחזיר "no data" או תוצאות לא עקביות.
+- ליישור מול Alpha Vantage יש לשמור `provider_mapping_data` לכל טיקר קריפטו:
+  - Yahoo: `symbol=BTC-USD`
+  - Alpha: `symbol=BTC`, `market=USD`
+
 ---
 
 ## 5. טבלאות DB רלוונטיות

@@ -136,7 +136,7 @@ async def run_history_backfill(
         if not info:
             raise ValueError("not_found")
 
-        ticker_uuid, symbol, existing_dates, existing_count = info
+        ticker_uuid, symbol, existing_dates, existing_count, ticker_type, metadata = info
 
         # Smart History Engine: decide
         decision = decide(
@@ -164,11 +164,13 @@ async def run_history_backfill(
                 # Edge: has_gaps was False, no gaps — no_op
                 return get_no_op_response(ticker_id, symbol)
 
-        # Fetch (Yahoo → Alpha). Gap-fill uses date range; full reload uses full range.
+        # Fetch (Yahoo → Alpha). Per CORRECTIVE: CRYPTO uses provider mapping.
         hist, provider = await asyncio.wait_for(
             mod.fetch_history_for_ticker(
                 ticker_uuid,
                 symbol,
+                ticker_type=ticker_type,
+                metadata=metadata,
                 date_from=date_from_val,
                 date_to=date_to_val,
             ),
@@ -187,7 +189,11 @@ async def run_history_backfill(
             # Full fetch returned few rows — try immediate retry (Retry Policy)
             logger.info("Smart History: %s got %d rows — immediate retry", symbol, len(hist))
             hist2, provider2 = await asyncio.wait_for(
-                mod.fetch_history_for_ticker(ticker_uuid, symbol, None, None),
+                mod.fetch_history_for_ticker(
+                    ticker_uuid, symbol,
+                    ticker_type=ticker_type, metadata=metadata,
+                    date_from=None, date_to=None,
+                ),
                 timeout=BACKFILL_TIMEOUT - 10,
             )
             if hist2 and len(hist2) > len(hist):

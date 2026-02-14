@@ -5,71 +5,45 @@
       "label": "🚀 Start Backend Server (Port 8082)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-backend.sh",
+      "detail": "scripts/start-backend.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-        "focus": true,
-        "clear": true
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "runOptions": {
-        "runOn": "default"
-      }
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
+      "group": { "kind": "build", "isDefault": false },
+      "runOptions": { "runOn": "default" }
     },
     {
       "label": "🛑 Stop Backend Server",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/stop-backend.sh",
+      "detail": "scripts/stop-backend.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
+      "presentation": { "reveal": "always", "panel": "new" }
     },
     {
       "label": "🔄 Restart Backend Server",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/restart-backend.sh",
+      "detail": "scripts/restart-backend.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-        "focus": true,
-        "clear": true
-      }
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
     },
     {
       "label": "🚀 Start Frontend Dev Server (Port 8080 - V2)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-frontend.sh",
+      "detail": "scripts/start-frontend.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-        "focus": true,
-        "clear": true
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "runOptions": {
-        "runOn": "default"
-      }
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
+      "group": { "kind": "build", "isDefault": false },
+      "runOptions": { "runOn": "default" }
     },
     {
       "label": "🛑 Stop Frontend Dev Server",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/stop-frontend.sh",
+      "detail": "scripts/stop-frontend.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
+      "presentation": { "reveal": "always", "panel": "new" }
     },
     {
       "label": "🚀 Start All Servers (Backend + Frontend)",
@@ -78,15 +52,10 @@
         "🚀 Start Frontend Dev Server (Port 8080 - V2)"
       ],
       "dependsOrder": "parallel",
+      "detail": "→ start-backend.sh + start-frontend.sh (parallel)",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
+      "presentation": { "reveal": "always", "panel": "new" },
+      "group": { "kind": "build", "isDefault": true }
     },
     {
       "label": "🛑 Stop All Servers",
@@ -95,33 +64,76 @@
         "🛑 Stop Frontend Dev Server"
       ],
       "dependsOrder": "parallel",
+      "detail": "→ stop-backend.sh + stop-frontend.sh (parallel)",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "🔄 Restart All Servers",
+      "dependsOn": [
+        "🛑 Stop All Servers",
+        "🚀 Start All Servers (Backend + Frontend)"
+      ],
+      "dependsOrder": "sequence",
+      "detail": "stop-all → start-all (sequence)",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "🌐 Init Full Env (DB + Servers)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/init-full-env.sh",
+      "detail": "scripts/init-full-env.sh → Docker + restart-all-servers.sh",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
+    },
+    {
+      "label": "📋 Init Servers for QA",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/init-servers-for-qa.sh",
+      "detail": "scripts/init-servers-for-qa.sh",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
     },
     {
       "label": "📋 Check Server Status",
       "type": "shell",
-      "command": "echo 'Frontend V2 (8080):' && (lsof -Pi :8080 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running') && echo 'Backend API (8082):' && (lsof -Pi :8082 -sTCP:LISTEN >/dev/null 2>&1 && echo '✅ Running' || echo '❌ Not running')",
+      "command": "${workspaceFolder}/scripts/check-ports.sh",
+      "detail": "scripts/check-ports.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "🔧 Fix Port 8082 Conflict",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/fix-port-8082.sh",
+      "detail": "scripts/fix-port-8082.sh",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new" }
     },
     {
       "label": "👤 Create Admin User (admin/418141)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/create-admin.sh",
+      "detail": "scripts/create-admin.sh",
       "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-        "focus": true,
-        "clear": true
-      }
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
+    },
+    {
+      "label": "🧪 Run User Tickers QA (API)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run-user-tickers-qa-api.sh",
+      "detail": "scripts/run-user-tickers-qa-api.sh (requires Backend 8082)",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "⚙️ Ensure Skip Live Data Check",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/ensure-skip-live-data-check.sh",
+      "detail": "scripts/ensure-skip-live-data-check.sh (dev/QA bypass)",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new" }
     }
   ]
 }

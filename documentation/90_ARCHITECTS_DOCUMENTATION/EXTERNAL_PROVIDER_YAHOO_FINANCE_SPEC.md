@@ -6,3 +6,5 @@
 - **Interval:** 1d (EOD).
 - **Enforcement:** User-Agent Rotation required.
 - **Precision:** Forced 20,8 conversion.
+- **Crypto Symbol Contract (Locked):** `BASE-QUOTE` format (for example: `BTC-USD`, `ETH-USD`, `SOL-USD`).
+- **Equity Symbol Contract:** Native exchange symbol (for example: `AAPL`, `MSFT`, `ANAU.MI`).

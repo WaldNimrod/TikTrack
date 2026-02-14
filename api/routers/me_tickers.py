@@ -51,7 +51,8 @@ async def add_my_ticker(
     ticker_id: Optional[str] = Query(None, description="Existing ticker ULID (add to list)"),
     symbol: Optional[str] = Query(None, description="Symbol for new ticker (creates + adds)"),
     company_name: Optional[str] = Query(None),
-    ticker_type: str = Query("STOCK", description="Ticker type for new ticker"),
+    ticker_type: str = Query("STOCK", description="Ticker type for new ticker (STOCK, CRYPTO, etc.)"),
+    market: Optional[str] = Query(None, description="Market/currency for CRYPTO (e.g. USD, EUR); default USD"),
     current_user: User = Depends(get_current_user),
     db=Depends(get_db),
 ):
@@ -83,10 +84,20 @@ async def add_my_ticker(
             symbol=symbol,
             company_name=company_name,
             ticker_type=ticker_type,
+            market=market,
         )
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
+        # ROOT_FIX: provider/add-ticker failures → 422, not 500 (TEAM_50_RERUN)
+        err_lower = str(e).lower()
+        if "provider" in err_lower or "could not fetch" in err_lower or "invalid literal" in err_lower:
+            logger.warning("Add ticker provider failure (422): %s", e)
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Provider could not fetch data for this symbol. Ticker not created.",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
         logger.error("Add my ticker failed: %s", e, exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -404,8 +404,8 @@ class SharedServices {
   /**
    * POST request
    * @param {string} endpoint - API endpoint
-   * @param {Object} body - Request body (camelCase)
-   * @param {Object} options - Additional fetch options
+   * @param {Object} body - Request body (camelCase); or query params when options.useQueryParams=true (e.g. POST /me/tickers)
+   * @param {Object} options - Additional fetch options; useQueryParams: send body keys as URL query params (for endpoints that use Query())
    * @returns {Promise<Object>} Response data
    */
   async post(endpoint, body = {}, options = {}) {
@@ -421,10 +421,11 @@ class SharedServices {
         }
       }
 
-      const url = this.buildUrl(endpoint);
+      const useQueryParams = options.useQueryParams === true;
+      const url = useQueryParams ? this.buildUrl(endpoint, body) : this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
-      
-      // Transform request body (camelCase → snake_case)
+
+      // Transform body (camelCase → snake_case); when useQueryParams, body is already in URL
       const apiBody = reactToApi(body);
       
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
@@ -433,7 +434,7 @@ class SharedServices {
         response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify(apiBody),
+          body: useQueryParams ? undefined : JSON.stringify(apiBody),
           ...options
         });
       } catch (fetchError) {

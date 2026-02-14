@@ -76,4 +76,19 @@ Jobs read from `api/integrations/market_data/market_data_settings.py` → env va
 
 ---
 
+## User Tickers — Crypto + Provider Mapping (Corrective)
+
+**מקור:** `TEAM_10_TO_TEAM_60_USER_TICKERS_CRYPTO_EXCHANGE_CORRECTIVE.md` | `TEAM_10_USER_TICKERS_CRYPTO_EXCHANGE_GAPS_AND_CORRECTIVE_PLAN`
+
+| דרישה | סטטוס |
+|--------|--------|
+| Jobs (EOD, Intraday, History Backfill) משתמשים ב־**מיפוי ספקים** (symbol+market) בעת fetch | **תלות ב־Team 20** — הלוגיקה בסקריפטים; Team 60 מריץ |
+| **אין** סינון/החרגה של `ticker_type=CRYPTO` | ✅ Jobs טוענים מטבלת tickers לפי `is_active` — אין החרגת קריפטו |
+| אין שינוי ב־cron/env שימנע טעינת קריפטו | ✅ אין תוכנן |
+
+**תאום:** `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_20_USER_TICKERS_CRYPTO_EXCHANGE_COORDINATION.md`
+
+---
+
 **log_entry | TEAM_60 | CRON_SCHEDULE | SSOT_ALIGNED | 2026-02-13**
+**log_entry | TEAM_60 | CRON_SCHEDULE | USER_TICKERS_CRYPTO_CORRECTIVE | 2026-02-14**

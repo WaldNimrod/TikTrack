@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (New document)  
-**last_updated:** 2026-02-05  
-**version:** v1.0
+**last_updated:** 2026-01-31  
+**version:** v1.1
 
 ---
 
@@ -103,10 +103,21 @@
 - **Allowed Headers:** Content-Type, Authorization
 
 ### **Environment Variables:**
-- **Database URL:** `DATABASE_URL` (PostgreSQL connection string)
-- **JWT Secret:** `JWT_SECRET_KEY` (token signing)
-- **JWT Algorithm:** `HS256`
-- **Token Expiry:** `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`
+
+| משתנה | תיאור | חובה | מקור תיעוד |
+|-------|-------|------|------------|
+| `DATABASE_URL` | חיבור PostgreSQL | ✅ כן | `api/.env.example` |
+| `JWT_SECRET_KEY` | חתימת JWT (64+ תווים) | ✅ כן | `api/.env.example` |
+| `JWT_ALGORITHM` | אלגוריתם JWT | ברירת מחדל: `HS256` | — |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | תוקף Access Token | אופציונלי | — |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | תוקף Refresh Token | אופציונלי | — |
+| `ENCRYPTION_KEY` | הצפנת נתונים רגישים | מומלץ | `api/.env.example` |
+| `ALPHA_VANTAGE_API_KEY` | מפתח API ל-Alpha Vantage (Market Data) | נדרש ל־User Tickers, FX EOD, Sync scripts | `api/.env.example`; `documentation/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md` |
+| `SKIP_LIVE_DATA_CHECK` | `true` = דילוג על בדיקת live ב־POST /me/tickers | **dev/QA בלבד** — אסור בפרודקשן | `api/.env.example` |
+
+**קבלת `ALPHA_VANTAGE_API_KEY`:** https://www.alphavantage.co/support/#api-key (חינם — 5 קריאות/דקה).
+
+**אחריות:** תיעוד הדרישות — Team 20. שמירת המפתח בסביבה (הגדרה ב־`api/.env`, CI, production) — **Team 60**.
 
 ---
 
@@ -188,7 +199,7 @@ postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
 
 ### **Environment Setup:**
 1. **Frontend:** Copy `.env.production` with production values
-2. **Backend:** Copy `api/.env` with production database credentials
+2. **Backend:** Copy `api/.env` מ־`api/.env.example` — מילוי: `DATABASE_URL`, `JWT_SECRET_KEY`, `ENCRYPTION_KEY`, `ALPHA_VANTAGE_API_KEY` (לפי `TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES`)
 3. **Database:** Run migrations and seed initial data
 
 ---
@@ -220,6 +231,7 @@ postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
 - **Database Credentials:** `documentation/01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md`
 - **Routes SSOT:** `ui/public/routes.json`
 - **Backend API Spec:** `05-DEVELOPMENT_&_CONTRACTS/OPENAPI_SPEC_V2_FINAL.yaml`
+- **ALPHA_VANTAGE_API_KEY (הנחיות מפורטות):** `documentation/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md`
 
 ---
 

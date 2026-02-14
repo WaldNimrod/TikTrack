@@ -135,8 +135,74 @@ class AlphaProvider(MarketDataProvider):
         except (TypeError, ValueError):
             return None
 
+    async def get_ticker_price_crypto(self, symbol: str, market: str = "USD") -> Optional[PriceResult]:
+        """
+        Crypto-specific: DIGITAL_CURRENCY_DAILY endpoint.
+        Per CORRECTIVE: Alpha must NOT use GLOBAL_QUOTE for crypto.
+        symbol: base (e.g. BTC), market: quote (e.g. USD).
+        """
+        if self._mode == "REPLAY":
+            return _replay_price_alpha(self._fixtures_dir, f"{symbol}-{market}")
+        if not self._api_key:
+            logger.warning("Alpha Vantage: no API key")
+            return None
+        await self._rate_limit()
+        try:
+            params = {
+                "function": "DIGITAL_CURRENCY_DAILY",
+                "symbol": symbol,
+                "market": market,
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            series = data.get("Time Series (Digital Currency Daily)", {})
+            if not series:
+                return None
+            sorted_dates = sorted(series.keys(), reverse=True)
+            latest_key = sorted_dates[0]
+            v = series[latest_key]
+            # Alpha returns "1a. open (USD)", "2a. high (USD)" etc when market=USD
+            def _get(key_candidates):
+                for k in key_candidates:
+                    if k in v and v[k] is not None:
+                        return v[k]
+                return None
+            open_val = _get([f"1a. open ({market})", "1a. open (USD)", "1. open"])
+            high_val = _get([f"2a. high ({market})", "2a. high (USD)", "2. high"])
+            low_val = _get([f"3a. low ({market})", "3a. low (USD)", "3. low"])
+            close_val = _get([f"4a. close ({market})", "4a. close (USD)", "4. close"])
+            vol_val = v.get("5. volume")
+            price = self._to_decimal(close_val or open_val)
+            if not price or price <= 0:
+                return None
+            # Alpha returns volume as float string (e.g. "352.20690897") — ROOT_FIX: int(float(...))
+            vol_int = None
+            if vol_val is not None and str(vol_val).strip():
+                try:
+                    vol_int = int(float(vol_val))
+                except (TypeError, ValueError):
+                    pass
+            return PriceResult(
+                symbol=f"{symbol}-{market}",
+                price=price,
+                open_price=self._to_decimal(open_val),
+                high_price=self._to_decimal(high_val),
+                low_price=self._to_decimal(low_val),
+                close_price=price,
+                volume=vol_int,
+                market_cap=None,
+                as_of=datetime.now(timezone.utc),
+                provider="ALPHA_VANTAGE",
+            )
+        except Exception as e:
+            logger.warning("Alpha crypto price fetch failed for %s/%s: %s", symbol, market, e)
+            return None
+
     async def get_ticker_price(self, symbol: str) -> Optional[PriceResult]:
-        """Fallback for Prices. GLOBAL_QUOTE endpoint. REPLAY: fixtures only."""
+        """Fallback for Prices. GLOBAL_QUOTE endpoint. Do NOT use for crypto — use get_ticker_price_crypto."""
         if self._mode == "REPLAY":
             return _replay_price_alpha(self._fixtures_dir, symbol)
         if not self._api_key:
@@ -195,6 +261,73 @@ class AlphaProvider(MarketDataProvider):
             logger.debug("Alpha market cap fetch failed for %s: %s", symbol, e)
             return None
 
+    async def get_ticker_history_crypto(
+        self,
+        symbol: str,
+        market: str = "USD",
+        trading_days: int = 250,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+    ) -> list:
+        """Crypto: DIGITAL_CURRENCY_DAILY — 250d OHLCV. Per CORRECTIVE: not TIME_SERIES_DAILY."""
+        if self._mode == "REPLAY":
+            return _replay_history_alpha(self._fixtures_dir, f"{symbol}-{market}", trading_days)
+        if not self._api_key:
+            return []
+        await self._rate_limit()
+        result = []
+        try:
+            params = {
+                "function": "DIGITAL_CURRENCY_DAILY",
+                "symbol": symbol,
+                "market": market,
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            series = data.get("Time Series (Digital Currency Daily)", {})
+            if not series:
+                return []
+            sorted_dates = sorted(series.keys(), reverse=True)[:trading_days]
+            for d in reversed(sorted_dates):
+                try:
+                    d_date = datetime.strptime(d, "%Y-%m-%d").date()
+                except (ValueError, TypeError):
+                    d_date = None
+                if date_from is not None and d_date is not None and d_date < date_from:
+                    continue
+                if date_to is not None and d_date is not None and d_date > date_to:
+                    continue
+                v = series[d]
+                open_val = v.get(f"1a. open ({market})") or v.get("1a. open (USD)") or v.get("1. open")
+                high_val = v.get(f"2a. high ({market})") or v.get("2a. high (USD)") or v.get("2. high")
+                low_val = v.get(f"3a. low ({market})") or v.get("3a. low (USD)") or v.get("3. low")
+                close_val = v.get(f"4a. close ({market})") or v.get("4a. close (USD)") or v.get("4. close")
+                vol_val = v.get("5. volume")
+                vol_int = None
+                if vol_val is not None and str(vol_val).strip():
+                    try:
+                        vol_int = int(float(vol_val))  # ROOT_FIX: Alpha returns float string
+                    except (TypeError, ValueError):
+                        pass
+                try:
+                    ts = datetime.fromisoformat(d).replace(tzinfo=timezone.utc)
+                except (ValueError, TypeError):
+                    ts = datetime.now(timezone.utc)
+                result.append(OHLCVRow(
+                    date=ts,
+                    open_price=self._to_decimal(open_val) or Decimal("0"),
+                    high_price=self._to_decimal(high_val) or Decimal("0"),
+                    low_price=self._to_decimal(low_val) or Decimal("0"),
+                    close_price=self._to_decimal(close_val) or Decimal("0"),
+                    volume=vol_int,
+                ))
+        except Exception as e:
+            logger.warning("Alpha crypto history fetch failed for %s/%s: %s", symbol, market, e)
+        return result
+
     async def get_ticker_history(
         self,
         symbol: str,
@@ -202,7 +335,7 @@ class AlphaProvider(MarketDataProvider):
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
     ) -> list:
-        """P3-015 — 250d OHLCV. compact = 100 days. Filters to date_from/date_to when provided — only return needed range."""
+        """P3-015 — 250d OHLCV. compact = 100 days. Filters to date_from/date_to when provided — only return needed range. Do NOT use for crypto — use get_ticker_history_crypto."""
         if self._mode == "REPLAY":
             return _replay_history_alpha(self._fixtures_dir, symbol, trading_days)
         if not self._api_key:
@@ -238,13 +371,20 @@ class AlphaProvider(MarketDataProvider):
                     ts = datetime.fromisoformat(d).replace(tzinfo=timezone.utc)
                 except (ValueError, TypeError):
                     ts = datetime.now(timezone.utc)
+                vol_raw = v.get("5. volume")
+                vol_int = None
+                if vol_raw is not None and str(vol_raw).strip():
+                    try:
+                        vol_int = int(float(vol_raw))  # ROOT_FIX: Alpha may return float string
+                    except (TypeError, ValueError):
+                        pass
                 result.append(OHLCVRow(
                     date=ts,
                     open_price=self._to_decimal(v.get("1. open")) or Decimal("0"),
                     high_price=self._to_decimal(v.get("2. high")) or Decimal("0"),
                     low_price=self._to_decimal(v.get("3. low")) or Decimal("0"),
                     close_price=self._to_decimal(v.get("4. close")) or Decimal("0"),
-                    volume=int(v.get("5. volume", 0)) if v.get("5. volume") else None,
+                    volume=vol_int,
                 ))
         except Exception as e:
             logger.warning("Alpha history fetch failed for %s: %s", symbol, e)

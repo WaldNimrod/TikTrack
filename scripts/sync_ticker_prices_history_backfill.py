@@ -18,13 +18,15 @@ try:
     import fcntl
 except ImportError:
     fcntl = None
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
+
+from api.services.smart_history_engine import MIN_HISTORY_DAYS, compute_gaps
 from uuid import UUID
 
-MIN_HISTORY_DAYS = 200  # Backfill if fewer rows (250 required for indicators)
+# MIN_HISTORY_DAYS imported from smart_history_engine (250 per spec)
 MAX_TICKERS_PER_RUN = 15  # Limit per run — Alpha 5/min
 
 _project = Path(__file__).parent.parent
@@ -157,6 +159,36 @@ def get_existing_dates(ticker_id: UUID) -> Set[str]:
         conn.close()
 
 
+def get_row_count(ticker_id: str) -> int:
+    """Row count for ticker in ticker_prices. Post-run verification (SMART_HISTORY_FILL_SPEC)."""
+    import psycopg2
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT COUNT(*) FROM market_data.ticker_prices WHERE ticker_id = %s",
+            (ticker_id,),
+        )
+        row = cur.fetchone()
+        return row[0] if row else 0
+    finally:
+        conn.close()
+
+
+def delete_ticker_prices_for_ticker(ticker_id: str) -> int:
+    """Delete all ticker_prices for ticker. For force_reload (Admin only). Returns deleted count."""
+    import psycopg2
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM market_data.ticker_prices WHERE ticker_id = %s", (ticker_id,))
+        deleted = cur.rowcount
+        conn.commit()
+        return deleted
+    finally:
+        conn.close()
+
+
 def _next_month(year: int, month: int) -> Tuple[int, int]:
     if month == 12:
         return year + 1, 1
@@ -243,8 +275,10 @@ def insert_history_rows(
 async def fetch_history_for_ticker(
     ticker_id: UUID,
     symbol: str,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
 ) -> Tuple[Optional[list], str]:
-    """Yahoo → Alpha. Returns (rows, provider_name) or (None, '')."""
+    """Yahoo → Alpha (SMART_HISTORY_FILL_SPEC). Optional date_from/date_to for gap-fill."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
@@ -255,8 +289,10 @@ async def fetch_history_for_ticker(
         if is_in_cooldown(name):
             continue
         try:
-            hist = await provider.get_ticker_history(symbol, 250)
-            if hist and len(hist) >= 100:
+            hist = await provider.get_ticker_history(
+                symbol, MIN_HISTORY_DAYS, date_from=date_from, date_to=date_to
+            )
+            if hist and len(hist) >= 50:  # Accept partial for gap-fill
                 return hist, name
         except Exception as e:
             if _is_429(e):
@@ -293,13 +329,25 @@ def main():
         total_inserted = 0
         for ticker_id, symbol in tickers:
             existing = get_existing_dates(ticker_id)
-            hist, provider = asyncio.run(fetch_history_for_ticker(ticker_id, symbol))
+            gaps = compute_gaps(existing)
+            date_from_val, date_to_val = None, None
+            if gaps:
+                gap_dates = sorted(gaps)
+                date_from_val = datetime.strptime(gap_dates[0], "%Y-%m-%d").date()
+                date_to_val = datetime.strptime(gap_dates[-1], "%Y-%m-%d").date()
+            hist, provider = asyncio.run(
+                fetch_history_for_ticker(ticker_id, symbol, date_from=date_from_val, date_to=date_to_val)
+            )
             if not hist:
                 print(f"⚠️ No history for {symbol}")
                 continue
             n = insert_history_rows(ticker_id, symbol, hist, existing)
             total_inserted += n
             print(f"  {symbol}: +{n} rows ({provider})")
+            # Post-run verification (SMART_HISTORY_FILL_SPEC — Retry policy)
+            count = get_row_count(str(ticker_id))
+            if count < MIN_HISTORY_DAYS:
+                print(f"  ⚠️ {symbol}: {count}/{MIN_HISTORY_DAYS} rows — batch will retry")
         print(f"✅ Backfill complete — inserted {total_inserted} historical rows")
     finally:
         if fd is not None and fcntl:

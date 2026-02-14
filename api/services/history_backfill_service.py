@@ -4,18 +4,21 @@ History Backfill Service — TEAM_30_TO_TEAM_20_HISTORY_BACKFILL_API_REQUEST
 API-facing service for single-ticker history backfill (250d OHLCV).
 Uses scripts/sync_ticker_prices_history_backfill.py logic.
 Idempotent, Single-Flight lock, timeout 90s.
+API passes ULID; DB uses UUID — conversion required.
 """
 
 import asyncio
 import logging
 import os
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple
 
 try:
     import fcntl
 except ImportError:
     fcntl = None
+
+from ..utils.identity import ulid_to_uuid
 
 logger = logging.getLogger(__name__)
 
@@ -61,9 +64,21 @@ def _release_lock(fd) -> None:
             logger.warning("Lock release error: %s", e)
 
 
+def _ulid_to_db_id(ticker_id: str) -> str:
+    """Convert API ULID to DB UUID string. Raises ValueError on invalid ULID."""
+    try:
+        u = ulid_to_uuid(ticker_id)
+    except Exception:
+        raise ValueError("not_found")
+    if u is None:
+        raise ValueError("not_found")
+    return str(u)
+
+
 async def run_history_backfill(ticker_id: str) -> dict:
     """
     Run history backfill for a single ticker.
+    ticker_id: ULID (API format). DB uses UUID — we convert before script calls.
     Returns dict with status, rows_inserted, message, ticker_id, symbol.
     Raises:
         - ValueError("not_found") -> 404
@@ -71,6 +86,12 @@ async def run_history_backfill(ticker_id: str) -> dict:
         - ValueError("locked") -> 409
         - ValueError("provider_error") -> 502
     """
+    db_id: str
+    try:
+        db_id = _ulid_to_db_id(ticker_id)
+    except Exception:
+        raise ValueError("not_found")
+
     mod = _load_backfill_module()
 
     acquired, fd = await asyncio.to_thread(_acquire_lock)
@@ -80,13 +101,13 @@ async def run_history_backfill(ticker_id: str) -> dict:
 
     try:
         # 404: ticker not found
-        if not await asyncio.to_thread(mod.ticker_exists, ticker_id):
+        if not await asyncio.to_thread(mod.ticker_exists, db_id):
             raise ValueError("not_found")
 
         # no_op: already has 200+ rows
-        pair = await asyncio.to_thread(mod.load_ticker_by_id_for_backfill, ticker_id)
+        pair = await asyncio.to_thread(mod.load_ticker_by_id_for_backfill, db_id)
         if not pair:
-            symbol = await asyncio.to_thread(mod.get_ticker_symbol, ticker_id) or ""
+            symbol = await asyncio.to_thread(mod.get_ticker_symbol, db_id) or ""
             return get_no_op_response(ticker_id, symbol)
 
         ticker_uuid, symbol = pair
@@ -101,7 +122,13 @@ async def run_history_backfill(ticker_id: str) -> dict:
         )
 
         if not hist or len(hist) < 100:
-            raise ValueError("provider_error")
+            logger.warning(
+                "History backfill: providers failed for %s (got %s rows). "
+                "Check ALPHA_VANTAGE_API_KEY; Yahoo may be rate-limited.",
+                symbol,
+                len(hist) if hist else 0,
+            )
+            raise ValueError(f"provider_error|{symbol}")
 
         # Insert
         inserted = await asyncio.to_thread(

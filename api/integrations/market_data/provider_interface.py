@@ -1,12 +1,12 @@
 """
 Provider Interface — P3-008
-SSOT: MARKET_DATA_PIPE_SPEC §2.1, M2 Mandate
+SSOT: MARKET_DATA_PIPE_SPEC §2.1, M2 Mandate, TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC
 Agnostic interface: swap provider without changing engine logic.
 """
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -68,7 +68,15 @@ class MarketDataProvider(ABC):
         pass
 
     async def get_ticker_history(
-        self, symbol: str, trading_days: int = 250
+        self,
+        symbol: str,
+        trading_days: int = 250,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
     ) -> list:
-        """P3-015 — 250d OHLCV. Override in providers. Default returns []."""
+        """
+        P3-015 — 250d OHLCV. Override in providers.
+        date_from/date_to optional — for gap-fill; providers may use or ignore.
+        Default returns [].
+        """
         return []

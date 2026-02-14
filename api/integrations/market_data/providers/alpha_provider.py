@@ -9,7 +9,7 @@ REPLAY mode: returns fixtures — zero HTTP calls (TEAM_90 Automated Testing Dir
 import asyncio
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Optional
@@ -196,9 +196,13 @@ class AlphaProvider(MarketDataProvider):
             return None
 
     async def get_ticker_history(
-        self, symbol: str, trading_days: int = 250
+        self,
+        symbol: str,
+        trading_days: int = 250,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
     ) -> list:
-        """P3-015 — 250d OHLCV. TIME_SERIES_DAILY."""
+        """P3-015 — 250d OHLCV. TIME_SERIES_DAILY. date_from/date_to: interface only (Alpha API lacks range)."""
         if self._mode == "REPLAY":
             return _replay_history_alpha(self._fixtures_dir, symbol, trading_days)
         if not self._api_key:
@@ -209,7 +213,7 @@ class AlphaProvider(MarketDataProvider):
             params = {
                 "function": "TIME_SERIES_DAILY",
                 "symbol": symbol,
-                "outputsize": "full",
+                "outputsize": "compact",  # full requires premium; compact = 100 days (enough for indicators)
                 "apikey": self._api_key,
             }
             async with httpx.AsyncClient(timeout=15.0) as client:

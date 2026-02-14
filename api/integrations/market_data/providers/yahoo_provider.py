@@ -8,10 +8,10 @@ REPLAY mode: returns fixtures — zero HTTP calls (TEAM_90 Automated Testing Dir
 
 import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from ..provider_interface import (
     ExchangeRateResult,
@@ -280,30 +280,37 @@ def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
     return _fetch_fx_via_quote_api(from_ccy, to_ccy)
 
 
-def _fetch_history_sync(symbol: str, trading_days: int) -> list:
-    """P3-015 — 250d OHLCV. Primary: period 1y/2y. Fallback: start/end (historical always available).
-    No custom Session."""
-    result = []
+def _fetch_history_sync(
+    symbol: str,
+    trading_days: int,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+) -> List:
+    """P3-015 — 250d OHLCV. Optional date_from/date_to for gap-fill (SMART_HISTORY_FILL_SPEC)."""
+    result: List = []
     try:
         import yfinance as yf
-        from datetime import timedelta
 
         ticker = yf.Ticker(symbol)  # no session
-        period = "2y" if trading_days > 252 else "1y"
-        info = ticker.history(period=period, interval="1d", debug=False)
+        end_d = date_to or datetime.now(timezone.utc).date()
+        start_d = date_from
+        if start_d and date_to:
+            info = ticker.history(start=start_d.isoformat(), end=(end_d + timedelta(days=1)).isoformat(), interval="1d", debug=False)
+        else:
+            period = "2y" if trading_days > 252 else "1y"
+            info = ticker.history(period=period, interval="1d", debug=False)
         if info is None or info.empty:
-            end_d = datetime.now(timezone.utc).date()
-            start_d = end_d - timedelta(days=400)  # ~280 trading days
-            end_exclusive = (end_d + timedelta(days=1)).isoformat()
+            if not start_d:
+                start_d = end_d - timedelta(days=400)
             info = ticker.history(
                 start=start_d.isoformat(),
-                end=end_exclusive,
+                end=(end_d + timedelta(days=1)).isoformat(),
                 interval="1d",
                 debug=False,
             )
         if info is None or info.empty:
             return result
-        rows = info.tail(trading_days)
+        rows = info.tail(trading_days) if not (date_from or date_to) else info
         for idx in range(len(rows)):
             row = rows.iloc[idx]
             ts = row.name
@@ -424,12 +431,16 @@ class YahooProvider(MarketDataProvider):
         )
 
     async def get_ticker_history(
-        self, symbol: str, trading_days: int = 250
+        self,
+        symbol: str,
+        trading_days: int = 250,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
     ) -> list:
-        """P3-015 — 250d OHLCV. period 1y ≈ 252 trading days."""
+        """P3-015 — 250d OHLCV. date_from/date_to for gap-fill (SMART_HISTORY_FILL_SPEC)."""
         if self._mode == "REPLAY":
             return _replay_history(self._fixtures_dir, symbol, trading_days)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
-            None, _fetch_history_sync, symbol, trading_days
+            None, _fetch_history_sync, symbol, trading_days, date_from, date_to
         )

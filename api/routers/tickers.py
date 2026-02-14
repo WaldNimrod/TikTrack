@@ -136,10 +136,15 @@ async def post_ticker_history_backfill(
                 detail="Another history backfill is already running (Single-Flight)",
                 error_code=ErrorCodes.SERVER_ERROR,
             )
-        if msg == "provider_error":
+        if msg.startswith("provider_error"):
+            symbol = msg.split("|", 1)[1] if "|" in msg else ""
+            detail = (
+                f"Yahoo/Alpha failed to return history{f' for {symbol}' if symbol else ''}. "
+                "Verify ALPHA_VANTAGE_API_KEY in api/.env; Yahoo may be rate-limited."
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Provider error — Yahoo/Alpha failed to return history",
+                detail=detail,
                 error_code=ErrorCodes.SERVER_ERROR,
             )
         raise HTTPExceptionWithCode(

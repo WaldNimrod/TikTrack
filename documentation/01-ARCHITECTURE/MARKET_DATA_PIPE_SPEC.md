@@ -117,7 +117,40 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ---
 
-## 5. תיאום Team 60
+## 5. Smart History Fill (LOCKED — Stage-1)
+
+**מקור אמת:** _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md
+
+### 5.1 עקרונות מחייבים
+
+| החלטה | תוכן |
+|--------|------|
+| **Gap-First** | תמיד קודם בודקים פערים; מבקשים מהספק **רק תאריכים חסרים** (לא טעינה מלאה מיותרת). |
+| **Reload רק ב-Admin** | טעינה מלאה (מחיקה + טעינה מחדש) מנוהלת **אך ורק** מעמוד ניהול טיקרים (Admin), עם אישור מפורש. |
+| **250 ימי מסחר מינימום** | סף מינימום לכל טיקר — 250 ימי מסחר (OHLCV) — נדרש ל־Indicators (ATR/MA/CCI). |
+| **Gap Definition** | **Gap** = יום חסר אחד בתוך חלון 250 ימי המסחר. |
+| **Retry Policy** | ניסיון חוזר **מיידי** אחד + **Batch לילה** אם לא הושגו 250 ימים. |
+| **History Priority** | **Yahoo → Alpha** (כבכל מחירי טיקר — §2.1). |
+| **Provider Interface** | הרחבת `get_ticker_history`: פרמטרים אופציונליים **`date_from`**, **`date_to`** — למילוי פערים בלבד. |
+| **API Design** | **Endpoint יחיד:** `POST /api/v1/tickers/{ticker_id}/history-backfill` עם query **`mode=gap_fill`** (ברירת מחדל) או **`mode=force_reload`** (Admin בלבד). |
+
+### 5.2 זרימת עבודה (Smart History Engine)
+
+1. **Gap Analysis** — רשימת תאריכים קיימים מ-DB; חישוב `missing_dates` (עד 250 ימי מסחר אחורה).  
+2. **Decision** — אין פערים → NO_OP; יש פערים → GAP_FILL.  
+3. **Gap Fill** — קריאה לספק רק עבור טווח המכסה את `missing_dates` (דרך `date_from`/`date_to`).  
+4. **Force Reload** — רק מ-Admin עם אישור → ניקוי נתונים לטיקר → טעינה מלאה.  
+5. **Post-run Verification** — `COUNT(rows) >= MIN_HISTORY_DAYS`; אם לא — Retry חכם (מיידי + batch לילה).
+
+### 5.3 מיקום לוגיקה
+
+- **מנגנון ברמת מערכת:** Smart History Engine (Service/Engine) — לא בתוך קוד הספקים; שימוש אחיד לכל ספק.  
+- **סקריפט:** `scripts/sync_ticker_prices_history_backfill.py` — מתואם עם המנוע.  
+- **API:** `api/routers/tickers.py` — `POST /{ticker_id}/history-backfill?mode=gap_fill|force_reload`.
+
+---
+
+## 6. תיאום Team 60
 
 | נושא | בעלים | הערות |
 |------|--------|--------|
@@ -128,7 +161,7 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ---
 
-## 6. תוכנית ולידציה
+## 7. תוכנית ולידציה
 
 1. וידוא שהממשק לא חוסם UI (timeout, fallback).
 2. וידוא Staleness logic — Warning / N/A.
@@ -136,7 +169,7 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ---
 
-## 7. תחזוקה וניקוי (Background Jobs — Stage‑1)
+## 8. תחזוקה וניקוי (Background Jobs — Stage‑1)
 
 **מטרה:** למנוע התנפחות DB ולשמור על דיוק נתונים לאורך זמן.
 
@@ -187,7 +220,7 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ---
 
-## 8. Rate‑Limit & Scaling Policy (Stage‑1)
+## 9. Rate‑Limit & Scaling Policy (Stage‑1)
 
 **מטרה:** למנוע חסימות ספקים (429) ולאפשר סקייל עם נפחי מידע גדולים.
 
@@ -221,7 +254,7 @@ System Settings must expose:
 
 ---
 
-## 9. הפניות
+## 10. הפניות
 
 | מסמך | נתיב |
 |------|------|
@@ -229,8 +262,11 @@ System Settings must expose:
 | FOREX_MARKET_SPEC | documentation/01-ARCHITECTURE/FOREX_MARKET_SPEC.md |
 | ticker_prices model | api/models/ticker_prices.py |
 | Roadmap v2.1 | _COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
+| Smart History Fill (Locked) | _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md |
 
 ---
+
+**log_entry | TEAM_10 | SSOT_UPDATE | SMART_HISTORY_FILL_LOCKED | 2026-02-14** — §5 Smart History Fill (Gap-First, 250d min, Gap def, Retry, Yahoo→Alpha, date_from/date_to, API mode=gap_fill|force_reload, Reload Admin only). מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.
 
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**  
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13**  

@@ -67,6 +67,12 @@
                 <h1 class="index-section__header-text">תזרימי מזומנים</h1>
               </div>
               <div class="index-section__header-actions">
+                <button class="portfolio-summary__toggle-btn index-section__header-action-btn js-summary-toggle" id="cashFlowsSummaryToggle" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                  </svg>
+                </button>
                 <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9l6 6l6 -6"></path>
@@ -112,16 +118,8 @@
                         <div>סה"כ הפקדות החודש: <strong id="monthlyDeposits"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ משיכות החודש: <strong id="monthlyWithdrawals"><span class="numeric-value-negative" dir="ltr">$0.00</span></strong></div>
                       </div>
-                      <div class="info-summary__row-aside">
-                        <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
-                          <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
-                        </div>
-                        <button class="portfolio-summary__toggle-btn js-summary-toggle" id="cashFlowsSummaryToggle" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                        </svg>
-                      </button>
+                      <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
+                        <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
                       </div>
                     </div>
                     <!-- Second Row: Extended Summary (hidden by default) -->

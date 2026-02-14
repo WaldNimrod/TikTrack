@@ -8,6 +8,12 @@
 
 ---
 
+> **⚠️ היסטורי — לא להפעלה.**  
+> **Session 01 יושם והושלם.** מסמך זה והוראות הביצוע (TEAM_10_TO_TEAM_XX_EXECUTION_INSTRUCTIONS_SESSION_01) נשמרים לתיעוד בלבד.  
+> **הפעלה ומשימות נוכחיות:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md`
+
+---
+
 ## 1. בדיקות חובה (Mandatory Checks)
 
 | # | בדיקה | מיקום / מקור | סטטוס |

@@ -1979,24 +1979,9 @@ body.brokers-fees-page tt-container tt-section {
   font-size: 0.95rem;
 }
 
-/* שעון בתוך info-summary — space-between כדי להציג משמאל לנתונים */
+/* שעון — זהה 100% לעמוד טיקרים: מיקום + עיצוב */
 .info-summary:has(#stalenessClockCard) .info-summary__row--first {
   justify-content: space-between;
-}
-
-/* עטיפה לשעון + כפתור (תזרימי מזומנים) — מרווח נקי */
-.info-summary__row-aside {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md, 16px);
-  flex-shrink: 0;
-}
-
-/* שעון — התאמות ל-context של info-summary (סגנונות בסיס ב-phoenix-components.css) */
-.info-summary .staleness-clock-card {
-  flex-shrink: 0;
-  padding: var(--spacing-xs, 6px) var(--spacing-md, 16px);
-  min-height: 0;
 }
 
 .data-integrity-btn {

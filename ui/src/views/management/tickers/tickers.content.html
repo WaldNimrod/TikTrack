@@ -28,6 +28,9 @@
                 <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
                 <div>טיקרים פעילים: <strong id="activeTickers">0</strong></div>
               </div>
+              <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
+                <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
+              </div>
             </div>
           </div>
         </div>
@@ -62,15 +65,13 @@
       <tt-section-row>
         <div class="col-12">
           <div class="data-integrity-panel">
-            <div class="data-integrity-top-row">
-              <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
-                <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
-              </div>
-            </div>
             <div id="tickerDataIntegrityDetail" class="data-integrity-detail"></div>
-            <div class="data-integrity-gaps">
-              <strong>חוסרים:</strong> <span id="tickerDataIntegrityGaps">—</span>
-            </div>
+            <tt-section-row id="tickerDataIntegrityGapsRow" class="data-integrity-gaps-row" hidden>
+              <div id="tickerDataIntegrityBackfillBanner" class="data-integrity-gaps-row__col1"></div>
+              <div class="data-integrity-gaps-row__col2">
+                <strong>חוסרים:</strong> <span id="tickerDataIntegrityGaps">—</span>
+              </div>
+            </tt-section-row>
           </div>
         </div>
       </tt-section-row>

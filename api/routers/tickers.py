@@ -127,6 +127,13 @@ async def post_ticker_history_backfill(
             error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
         )
     is_admin = current_user.role in (UserRole.ADMIN, UserRole.SUPERADMIN)
+    # force_reload is Admin-only: return 403 before calling service
+    if mode_val == "force_reload" and not is_admin:
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="force_reload requires Admin. Use from Admin tickers page with confirmation.",
+            error_code=ErrorCodes.SERVER_ERROR,
+        )
     try:
         result = await asyncio.wait_for(
             run_history_backfill(ticker_id, mode=mode_val, is_admin=is_admin),

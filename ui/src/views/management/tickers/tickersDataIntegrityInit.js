@@ -32,6 +32,9 @@ function formatTs(ts) {
   const selectEl = document.getElementById('tickerDataIntegritySelect');
   const detailEl = document.getElementById('tickerDataIntegrityDetail');
   const gapsEl = document.getElementById('tickerDataIntegrityGaps');
+  const backfillBannerEl = document.getElementById('tickerDataIntegrityBackfillBanner');
+  const gapsRowEl = document.getElementById('tickerDataIntegrityGapsRow');
+  const panelEl = detailEl?.closest('.data-integrity-panel');
 
   if (!selectEl || !detailEl) return;
 
@@ -63,13 +66,24 @@ function formatTs(ts) {
   async function doCheck() {
     const tickerId = selectEl.value?.trim();
     if (!tickerId) {
-      detailEl.innerHTML = '<p class="data-integrity-empty">נא לבחור טיקר</p>';
-      gapsEl.textContent = '—';
+      if (backfillBannerEl) backfillBannerEl.innerHTML = '';
+      if (gapsRowEl) {
+        if (gapsRowEl.parentNode) gapsRowEl.parentNode.removeChild(gapsRowEl);
+        gapsRowEl.hidden = true;
+        if (panelEl) panelEl.appendChild(gapsRowEl);
+      }
+      detailEl.innerHTML = '<p class="data-integrity-empty-badge">בחרו טיקר לבדיקה</p>';
       return;
     }
 
+    if (backfillBannerEl) backfillBannerEl.innerHTML = '';
+    if (gapsRowEl) {
+      if (gapsRowEl.parentNode) gapsRowEl.parentNode.removeChild(gapsRowEl);
+      gapsRowEl.hidden = true;
+      if (panelEl) panelEl.appendChild(gapsRowEl);
+    }
     detailEl.innerHTML = '<p class="data-integrity-loading">בודק...</p>';
-    gapsEl.textContent = '—';
+    if (gapsEl) gapsEl.textContent = '—';
 
     try {
       await sharedServices.init();
@@ -110,9 +124,11 @@ function formatTs(ts) {
       const indRows2 = indItems.slice(4, 7).map(([lbl, val]) => `<div class="data-integrity-detail-row"><strong>${lbl}</strong><span dir="ltr">${val}</span></div>`).join('');
 
       const needBackfill = !ind || Object.keys(ind).length === 0 || hist.gap_status === 'INSUFFICIENT';
-      const backfillBanner = needBackfill
-        ? `<p class="data-integrity-backfill-banner">נדרש History Backfill ל־ATR/MA/CCI <button type="button" id="tickerDataIntegrityBackfillBtn" class="data-integrity-backfill-btn" data-ticker-id="${tickerId}">הפעל History Backfill</button></p>`
+      const backfillBannerHtml = needBackfill
+        ? `<span class="data-integrity-backfill-banner"><span class="data-integrity-backfill-banner__text">נדרש History Backfill ל־ATR/MA/CCI</span><button type="button" id="tickerDataIntegrityBackfillBtn" class="data-integrity-backfill-btn" data-ticker-id="${tickerId}">הפעל History Backfill</button></span>`
         : '';
+
+      if (backfillBannerEl) backfillBannerEl.innerHTML = backfillBannerHtml;
 
       const dataComplete = (hist?.row_count ?? 0) >= 250 && hist?.gap_status === 'OK';
       const isAdmin = authService.isAdmin();
@@ -120,8 +136,10 @@ function formatTs(ts) {
         ? `<p class="data-integrity-force-reload-banner">הנתונים מלאים (250 ימים). לטעון מחדש? (יכלול מחיקת כל הנתונים) <button type="button" id="tickerDataIntegrityForceReloadBtn" class="data-integrity-force-reload-btn" data-ticker-id="${tickerId}">טען מחדש (מחיקה)</button></p>`
         : '';
 
+      if (gapsRowEl?.parentNode) gapsRowEl.parentNode.removeChild(gapsRowEl);
+
       detailEl.innerHTML = `
-        <div class="data-integrity-summary-cards">
+        <tt-section-row class="data-integrity-summary-row">
           <div class="data-integrity-card staleness-level--${eodLevel}">
             <div class="data-integrity-card__title">נתוני EOD</div>
             <div class="data-integrity-card__value" dir="ltr">${eodContent}</div>
@@ -134,26 +152,36 @@ function formatTs(ts) {
             <div class="data-integrity-card__title">היסטוריה 250d</div>
             <div class="data-integrity-card__value" dir="ltr">${histContent}</div>
           </div>
-        </div>
-        <div class="data-integrity-detail-grid">
-          <div class="data-integrity-detail-col">
-            <div class="data-integrity-detail-row data-integrity-detail-row--header"><strong>אינדיקטורים (מ־250d)</strong></div>
-            ${backfillBanner}
+        </tt-section-row>
+        <tt-section-row>
+          <div class="data-integrity-indicators-header"><strong>אינדיקטורים (מ־250d)</strong></div>
+        </tt-section-row>
+        <tt-section-row class="data-integrity-indicators-row">
+          <div class="data-integrity-indicators-col">
             ${forceReloadBlock}
             ${indRows1}
           </div>
-          <div class="data-integrity-detail-col">
+          <div class="data-integrity-indicators-col">
             ${indRows2}
           </div>
-        </div>
+        </tt-section-row>
       `;
 
+      if (gapsRowEl) detailEl.appendChild(gapsRowEl);
+
       const gaps = data?.gaps_summary ?? [];
-      gapsEl.textContent = gaps.length > 0 ? gaps.join('; ') : 'אין חוסרים';
+      if (gapsEl) gapsEl.textContent = gaps.length > 0 ? gaps.join('; ') : 'אין חוסרים';
+      if (gapsRowEl) gapsRowEl.hidden = false;
     } catch (e) {
       maskedLog('[Tickers Data Integrity] Check failed:', e);
+      if (backfillBannerEl) backfillBannerEl.innerHTML = '';
+      if (gapsRowEl?.parentNode) gapsRowEl.parentNode.removeChild(gapsRowEl);
       detailEl.innerHTML = `<p class="data-integrity-error">שגיאה: ${e?.message ?? 'לא ניתן לטעון'}</p>`;
-      gapsEl.textContent = '—';
+      if (gapsEl) gapsEl.textContent = '—';
+      if (gapsRowEl) {
+        gapsRowEl.hidden = false;
+        if (panelEl) panelEl.appendChild(gapsRowEl);
+      }
     }
   }
 
@@ -173,10 +201,9 @@ function formatTs(ts) {
       doCheck();
     } catch (e) {
       maskedLog('[Tickers Data Integrity] Backfill failed:', e);
-      const status = e?.status ?? e?.code;
-      const msg = status === 404 || status === 501
-        ? 'ממתין ל־API — נא לפנות ל־Team 20'
-        : (e?.message ?? 'שגיאה');
+      const status = e?.status ?? e?.code ?? e?.response?.status;
+      const apiDetail = e?.response?.data?.detail ?? e?.detail;
+      const msg = apiDetail || (status === 404 ? 'טיקר לא נמצא' : null) || e?.message || 'שגיאה';
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'הפעל History Backfill';
@@ -213,7 +240,7 @@ function formatTs(ts) {
     }
   }
 
-  detailEl.addEventListener('click', (e) => {
+  (panelEl || document).addEventListener('click', (e) => {
     const forceBtn = e.target.closest('#tickerDataIntegrityForceReloadBtn');
     if (forceBtn) {
       const id = forceBtn.dataset.tickerId || selectEl.value?.trim();
@@ -231,4 +258,5 @@ function formatTs(ts) {
   populateSelect(list);
 
   selectEl.addEventListener('change', doCheck);
+  doCheck();
 })();

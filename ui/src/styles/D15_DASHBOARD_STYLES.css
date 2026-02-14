@@ -1840,13 +1840,35 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   border-radius: 0;
 }
 
-.data-integrity-top-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: flex-end;
-  gap: var(--spacing-md, 16px);
-  margin-bottom: var(--spacing-md, 16px);
+/* שורת סיכום — סטנדרט tt-section-row (LEGO) */
+.data-integrity-gaps-row {
+  padding-top: var(--spacing-md, 16px);
+  margin-top: var(--spacing-md, 16px);
+  border-top: 1px solid var(--apple-border-light, #e2e8f0);
+}
+
+.data-integrity-gaps-row__col1 {
+  min-width: 0;
+}
+
+.data-integrity-gaps-row__col1:empty {
+  display: none;
+}
+
+.data-integrity-gaps-row__col2 {
+  min-width: 0;
+  font-size: 0.95rem;
+}
+
+/* שעון בתוך info-summary — space-between כדי להציג משמאל לנתונים */
+.info-summary:has(#stalenessClockCard) .info-summary__row--first {
+  justify-content: space-between;
+}
+
+.info-summary .staleness-clock-card {
+  flex-shrink: 0;
+  padding: var(--spacing-xs, 6px) var(--spacing-md, 16px);
+  min-height: 0;
 }
 
 /* Staleness Clock Card — כרטיס שעון סטגנציה + מצב שוק */
@@ -1983,18 +2005,9 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   margin-bottom: var(--spacing-md, 16px);
 }
 
-/* כרטיסי סיכום עם רמזור — עמודה אחת */
-.data-integrity-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md, 16px);
+/* כרטיסי סיכום — tt-section-row (סטנדרט) */
+.data-integrity-summary-row {
   margin-bottom: var(--spacing-lg, 24px);
-}
-
-@media (max-width: 768px) {
-  .data-integrity-summary-cards {
-    grid-template-columns: 1fr;
-  }
 }
 
 .data-integrity-card {
@@ -2030,26 +2043,21 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   color: var(--apple-text-secondary, #64748b);
 }
 
-/* פרטים — שתי עמודות באורך דומה */
-.data-integrity-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg, 24px);
-  align-items: start;
+/* אינדיקטורים — tt-section-row (סטנדרט), כותרת על כל הרוחב */
+.data-integrity-indicators-header {
+  grid-column: 1 / -1;
+  padding-block-end: var(--spacing-xs, 4px);
+  border-block-end: 1px solid var(--apple-border-light, #e5e5e5);
+  margin-block-end: var(--spacing-xs, 4px);
 }
 
-@media (max-width: 640px) {
-  .data-integrity-detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.data-integrity-detail-col {
+.data-integrity-indicators-col {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs, 4px);
 }
 
+/* שורת מפתח:ערך (תוכן פרטני) */
 .data-integrity-detail-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2067,17 +2075,6 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   text-align: left;
 }
 
-.data-integrity-detail-row--header {
-  grid-template-columns: 1fr;
-  padding-block-end: var(--spacing-xs, 4px);
-  border-block-end: 1px solid var(--apple-border-light, #e5e5e5);
-  margin-block-end: var(--spacing-xs, 4px);
-}
-
-.data-integrity-gaps {
-  padding: var(--spacing-sm, 8px) 0;
-  font-size: 0.95rem;
-}
 
 .data-integrity-empty,
 .data-integrity-loading {
@@ -2085,15 +2082,36 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   font-style: italic;
 }
 
+/* באנר עדין — כשאין טיקר נבחר */
+.data-integrity-empty-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: var(--spacing-lg, 24px);
+  color: var(--apple-text-secondary, #86868b);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 .data-integrity-backfill-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm, 8px);
   padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
-  margin: var(--spacing-sm, 8px) 0;
+  margin: 0;
   background: var(--color-warning-bg, #fff3e0);
   border: 1px solid var(--color-warning-border, #ffb74d);
   border-radius: var(--apple-radius-small, 6px);
   color: var(--color-warning-text, #e65100);
   font-weight: 500;
   font-size: 0.95rem;
+}
+
+.data-integrity-backfill-banner__text {
+  display: block;
 }
 
 .data-integrity-force-reload-banner {

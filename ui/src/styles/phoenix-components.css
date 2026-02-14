@@ -550,6 +550,18 @@ body .page-wrapper .page-container main {
   background: var(--apple-bg-secondary, #f2f2f7);
 }
 
+/* Sticky cells have their own background — must inherit row hover */
+.phoenix-table__row:hover .phoenix-table__cell.col-name,
+.phoenix-table__row:hover .phoenix-table__cell.col-symbol,
+.phoenix-table__row:hover .phoenix-table__cell.col-broker,
+.phoenix-table__row:hover .phoenix-table__cell.col-trade,
+.phoenix-table__row:hover .phoenix-table__cell.col-account,
+.phoenix-table__row:hover .phoenix-table__cell.col-actions,
+#accountActivityTable .phoenix-table__row:hover .phoenix-table__cell.col-date:first-child,
+#currencyConversionsTable .phoenix-table__row:hover .phoenix-table__cell.col-date:first-child {
+  background: var(--apple-bg-secondary, #f2f2f7);
+}
+
 .phoenix-table__row:last-child {
   border-block-end: none;
 }

@@ -8,7 +8,7 @@
 import { loadCashFlowsData } from './cashFlowsDataLoader.js';
 import sharedServices from '../../../components/core/sharedServices.js';
 import { showCashFlowFormModal } from './cashFlowsForm.js';
-import { toFlowTypeLabel } from '../../../utils/flowTypeValues.js';
+import { toFlowTypeLabel, getFlowTypeEntity } from '../../../utils/flowTypeValues.js';
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
@@ -456,6 +456,7 @@ function normalizeTradingAccountId(value) {
       badge.className = 'phoenix-table__status-badge operation-type-badge';
       const flowTypeVal = flow.flowType || flow.flow_type || flow.type || '';
       badge.setAttribute('data-operation-type', flowTypeVal.toLowerCase());
+      badge.setAttribute('data-entity', getFlowTypeEntity(flowTypeVal));
       badge.textContent = toFlowTypeLabel(flowTypeVal) || '—';
       typeCell.appendChild(badge);
       row.appendChild(typeCell);

@@ -61,7 +61,7 @@
 | טבלה | תוכן | מקור |
 |------|------|------|
 | ticker_prices | EOD, שורה/יום | sync_ticker_prices_eod |
-| ticker_prices_intraday | Intraday (Active) | sync_ticker_prices_intraday |
+| ticker_prices_intraday | Intraday — טיקרים עם is_active=true | sync_ticker_prices_intraday. מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT |
 | exchange_rates | שער נוכחי | sync_exchange_rates_eod |
 | exchange_rates_history | היסטוריית FX | sync_exchange_rates_eod |
 

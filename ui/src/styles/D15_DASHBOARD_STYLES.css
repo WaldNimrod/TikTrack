@@ -1830,6 +1830,106 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   justify-content: flex-end;
 }
 
+/* פילטר סוג תנועה בכותרת קונטיינר תזרימי מזומנים — מיושר לסוף השורה ליד כפתור הסגירה */
+tt-section[data-section="cash-flows-management"] .phoenix-table-filter-group--header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  margin: 0;
+  flex-shrink: 0;
+}
+tt-section[data-section="cash-flows-management"] .phoenix-table-filter-group--header .phoenix-table-filter-select {
+  height: 32px;
+  padding: 0 var(--spacing-sm, 8px);
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+/* ============================================
+   BROKERS FEES PAGE — קונטיינרים אחד מתחת לשני + פאנל ברוקרים
+   ============================================ */
+
+body.brokers-fees-page tt-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gutter, var(--spacing-md));
+}
+
+body.brokers-fees-page tt-container tt-section {
+  display: block;
+}
+
+/* פאנל רשימת ברוקרים והסבר על "אחר" */
+.brokers-list-panel {
+  margin-bottom: var(--spacing-lg, 24px);
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #f2f2f7);
+  border-radius: var(--apple-radius-medium, 10px);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+}
+
+.brokers-list-panel__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm, 8px);
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.brokers-list-panel__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-md, 16px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs, 4px);
+}
+
+.brokers-list-panel__item {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--entity-trading_account-light, rgba(40, 167, 69, 0.1));
+  border: 1px solid var(--entity-trading_account, #28a745);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--entity-trading_account-dark, #155724);
+}
+
+.brokers-list-panel__item--unsupported {
+  background: var(--entity-note-light, rgba(108, 117, 125, 0.15));
+  border-color: var(--entity-note, #6c757d);
+  color: var(--entity-note-dark, #383d41);
+}
+
+.brokers-list-panel__item--empty {
+  background: transparent;
+  border: none;
+  color: var(--apple-text-secondary, #86868b);
+  font-style: italic;
+}
+
+.brokers-list-panel__other-explanation {
+  padding-top: var(--spacing-md, 16px);
+  border-top: 1px solid var(--apple-border-light, #e5e5ea);
+}
+
+.brokers-list-panel__subtitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs, 4px);
+  color: var(--apple-text-primary, #1d1d1f);
+}
+
+.brokers-list-panel__other-explanation p {
+  margin: 0 0 var(--spacing-sm, 8px);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--apple-text-secondary, #3c3c43);
+}
+
+.brokers-list-panel__other-explanation p:last-child {
+  margin-bottom: 0;
+}
+
 .data-integrity-panel {
   display: flex;
   flex-direction: column;
@@ -1863,6 +1963,14 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
 /* שעון בתוך info-summary — space-between כדי להציג משמאל לנתונים */
 .info-summary:has(#stalenessClockCard) .info-summary__row--first {
   justify-content: space-between;
+}
+
+/* עטיפה לשעון + כפתור (תזרימי מזומנים) — מרווח נקי */
+.info-summary__row-aside {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  flex-shrink: 0;
 }
 
 .info-summary .staleness-clock-card {

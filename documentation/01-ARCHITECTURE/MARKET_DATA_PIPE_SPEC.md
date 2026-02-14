@@ -61,7 +61,7 @@
 ## 2.4 Cadence Policy (Stage‑1 — Intraday required)
 
 - **FX:** EOD בלבד.
-- **Prices:** Intraday for **Active tickers** (`active`); EOD for inactive (לפי System Settings — Domain + Ticker Status). **סטטוס טיקר:** ממתין=EOD+היסטוריה בלבד; פתוח=קצב מלא; סגור=קצב מופחת; מבוטל=לא טוען — ראה TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
+- **Prices:** Intraday לטיקרים עם **`is_active = true`** (מצב נוכחי); EOD ליתר. סטטוס טיקר וקצב: ממתין/פתוח/סגור/מבוטל — **מקור אמת:** [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) (מצב נוכחי: is_active; יעד: שדה status).
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators (ATR/MA/CCI).
 - **Market Cap:** Daily (EOD). **Indicators:** ATR(14), MA(20/50/150/200), CCI(20) — Daily, derived from 250d history.
 
@@ -79,8 +79,8 @@
 
 System Settings (Admin) must allow **configurable cadence** by **domain** and **ticker status**:
 
-- **Prices (Active):** intraday interval (minutes) — configurable.  
-- **Prices (Inactive):** EOD schedule (time + timezone).  
+- **טיקרים עם is_active = true:** Intraday (דקות, ניתן להגדרה). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
+- **טיקרים עם is_active = false:** EOD (זמן + timezone).  
 - **FX:** EOD schedule (time + timezone).  
 - **Staleness thresholds:** warning + na boundaries (for clock color/tooltip).
 
@@ -104,7 +104,7 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 - טבלאות:
   - **Daily / EOD + Historical:** `market_data.ticker_prices`
-  - **Intraday (Active tickers):** `market_data.ticker_prices_intraday`  **(separate table)**
+  - **Intraday (טיקרים עם is_active = true):** `market_data.ticker_prices_intraday` — מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
 - שדות: `price`, `open_price`, `high_price`, `low_price`, `close_price`, **`market_cap`** — `NUMERIC(20,8)`
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators.
 - **Indicators (Stage-1):** ATR(14), MA(20/50/150/200), CCI(20) — ראה `MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md`.
@@ -180,10 +180,10 @@ This configuration is required for Stage‑1, and must be available via Admin Se
    - תזמון: `0 22 * * 1-5` (UTC)  
    - פעולה: עדכון `market_data.exchange_rates` + `last_sync_time`
 
-2. **Intraday Refresh (Active tickers)**  
+2. **Intraday Refresh**  
    - תזמון: **מתוך System Settings** (דקות)  
    - פעולה: רענון `market_data.ticker_prices_intraday`  
-   - תנאי: **Active בלבד** (`is_active_flags = true`)
+   - תנאי: טיקרים עם **`is_active = true`** (מצב נוכחי). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
 
 3. **Daily History Retention**  
    - טווח חובה: **250 ימי מסחר**  
@@ -234,8 +234,8 @@ This configuration is required for Stage‑1, and must be available via Admin Se
 
 ### 8.2 Cadence Tiering (Load Control)
 
-- **Active tickers:** Intraday (minutes, configurable).  
-- **Inactive tickers:** EOD בלבד.  
+- **טיקרים עם is_active = true:** Intraday (דקות, ניתן להגדרה). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
+- **טיקרים עם is_active = false:** EOD בלבד.  
 - **Market Cap:** Daily (EOD).  
 - **Indicators (ATR/MA/CCI):** Daily (computed from 250d).  
 
@@ -272,6 +272,6 @@ System Settings must expose:
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13**  
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | EXTERNAL_DATA_SSOT_INTEGRATION | 2026-02-13** — Providers (Yahoo+Alpha), Guardrails, Cache-First, Cadence, UI Clock (מקור: TEAM_90_MARKET_DATA_SSOT_INTEGRATION_DRAFT). — DB-as-Cache, Cron+UTC, Scope USD/EUR/ILS (מקור: Team 60).  
 **log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).  
-**log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday required for Active tickers; separate intraday table; System Settings cadence config (domain + status).
+**log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday לטיקרים עם is_active=true; טבלת intraday נפרדת; Cadence ב-System Settings (מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT).
 **log_entry | TEAM_90 | MAINTENANCE_RETENTION_LOCK | STAGE1 | 2026-02-13** — Retention + archive policy + cleanup cycles locked (Intraday 30d→archive 1y; EOD/FX 250d→archive; daily/weekly/monthly).
 **log_entry | TEAM_90 | RATELIMIT_SCALING_LOCK | STAGE1 | 2026-02-13** — Rate‑limit & scaling policy locked (cache‑first, single‑flight, cooldown on 429, system settings controls).

@@ -10,6 +10,21 @@
 
 ---
 
+## 0. מצב נוכחי (קוד/DB) vs יעד — יישור תיעוד
+
+**בקוד וב-DB כיום:** טבלת `market_data.tickers` משתמשת בשדה **`is_active` (boolean)** בלבד — אין שדה `status` עם ארבעה ערכים.
+
+| מצב נוכחי (קוד) | מיפוי להתנהגות טעינת נתונים | הערה |
+|------------------|------------------------------|------|
+| `is_active = true` | **פתוח** — Intraday + EOD + היסטוריה (קצב מלא) | תואם "Active tickers" בתיעוד נתונים חיצוניים |
+| `is_active = false` | **סגור** — EOD + היסטוריה בלבד (ללא Intraday); לא "מבוטל" (לא מונע backfill) | עד הוספת שדה status — כל הטיקרים שאינם active מקבלים אותה התנהגות |
+
+**יעד:** שדה **`status`** (ערכים: pending, active, inactive, cancelled) ב-DB וב-API — דורש מיגרציית סכמה ועדכון API (Teams 20/60). לאחר מכן סקריפטים ו-Cron יתבססו על TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT במלואו (מבוטל = לא טוען; ממתין = EOD+היסטוריה בלבד).
+
+**אין סתירה:** התיעוד מתאר את **היעד** (ארבעה סטטוסים); הקוד הנוכחי עובד עם **מיפוי זמני** is_active ↔ פתוח/סגור. כל אזכור "Active tickers" או "is_active = true" בתיעוד נתונים חיצוניים — תואם למצב הנוכחי.
+
+---
+
 ## 1. עקרון
 
 שדה **סטטוס** בעמוד טיקרים (D22) ובכל מקום שמציג/מנהל סטטוס טיקר — **חייב** להשתמש **רק** בסטטוסים המערכתיים (ממתין, פתוח, סגור, מבוטל) ובמשמעות המתוארת להלן לגבי טעינת נתוני שוק.
@@ -38,13 +53,15 @@
 
 ---
 
-## 4. מקורות תיעוד קשורים
+## 4. מקורות תיעוד קשורים (מתואמים)
 
 | מסמך | תוכן |
 |------|------|
 | TT2_SYSTEM_STATUS_VALUES_SSOT | ערכים קנוניים + עברית — מקור יחיד לתצוגה וסינון |
-| MARKET_DATA_PIPE_SPEC | Cadence לפי ticker status; Intraday ל-Active בלבד |
-| MARKET_DATA_COVERAGE_MATRIX | Stage-1 Rules — Intraday only for Active tickers |
+| MARKET_DATA_PIPE_SPEC | Cadence: Intraday לטיקרים עם is_active=true; EOD ליתר — מתואם למסמך זה |
+| MARKET_DATA_COVERAGE_MATRIX | Stage-1: Intraday רק ל-is_active=true — מתואם למסמך זה |
+| WP_20_09_FIELD_MAP_TICKERS_MAPPINGS | שדה is_active_flags — מתואם למסמך זה |
+| TEAM_60_CRON_SCHEDULE, TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY | Intraday job / טבלאות — טיקרים עם is_active=true — מתואמים למסמך זה |
 
 ---
 

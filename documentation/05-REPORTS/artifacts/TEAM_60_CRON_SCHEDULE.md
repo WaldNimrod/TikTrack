@@ -20,7 +20,7 @@
 
 | Job | Cron | Make target | תיאור |
 |-----|------|-------------|-------|
-| **Intraday Sync** | `*/15 * * * 1-5` | `make sync-intraday` | ticker_prices_intraday (Active tickers; Yahoo→Alpha) |
+| **Intraday Sync** | `*/15 * * * 1-5` | `make sync-intraday` | ticker_prices_intraday — טיקרים עם is_active=true (Yahoo→Alpha). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT |
 
 **תזמון:** מתוך System Settings `INTRADAY_INTERVAL_MINUTES` (ברירת מחדל 15).  
 **מקור:** Team 20 — TEAM_20_TO_TEAM_60_ENV_AND_INTRADAY_COORDINATION_REQUEST; MARKET_DATA_PIPE_SPEC §7.1.
@@ -56,7 +56,7 @@
 | `scripts/sync_ticker_prices_history_backfill.py` | 250d OHLCV backfill (tickers with < 250 rows) |
 | `scripts/sync_exchange_rates_eod.py` | INSERT history + UPSERT exchange_rates |
 | `scripts/sync_ticker_prices_eod.py` | EOD ticker prices (uses max_active_tickers, provider_cooldown) |
-| `scripts/sync_ticker_prices_intraday.py` | Intraday ticker_prices_intraday (Active tickers) |
+| `scripts/sync_ticker_prices_intraday.py` | Intraday ticker_prices_intraday — טיקרים עם is_active=true. מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT |
 | `scripts/cleanup_market_data.py` | Retention: intraday, daily, fx_history |
 
 ---

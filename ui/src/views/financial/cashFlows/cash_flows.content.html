@@ -60,12 +60,17 @@
                         <div>סה"כ הפקדות החודש: <strong id="monthlyDeposits"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ משיכות החודש: <strong id="monthlyWithdrawals"><span class="numeric-value-negative" dir="ltr">$0.00</span></strong></div>
                       </div>
-                      <button class="portfolio-summary__toggle-btn js-summary-toggle" id="cashFlowsSummaryToggle" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                      <div class="info-summary__row-aside">
+                        <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
+                          <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
+                        </div>
+                        <button class="portfolio-summary__toggle-btn js-summary-toggle" id="cashFlowsSummaryToggle" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
                           <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
                         </svg>
                       </button>
+                      </div>
                     </div>
                     <!-- Second Row: Extended Summary (hidden by default) -->
                     <div class="info-summary__row info-summary__row--second" id="cashFlowsSummaryContent">
@@ -102,6 +107,19 @@
                 <span class="index-section__header-count" id="tableCashFlowsCount">0 תנועות</span>
               </div>
               <div class="index-section__header-actions">
+                <div class="phoenix-table-filter-group phoenix-table-filter-group--header">
+                  <label class="phoenix-table-filter-label" for="cashFlowsType">סוג תנועה:</label>
+                  <select class="phoenix-table-filter-select js-table-filter index-section__header-filter-select" data-filter-key="flowType" id="cashFlowsType" aria-label="סינון לפי סוג תנועה">
+                    <option value="">כל הסוגים</option>
+                    <option value="DEPOSIT">הפקדה</option>
+                    <option value="WITHDRAWAL">משיכה</option>
+                    <option value="DIVIDEND">דיבידנד</option>
+                    <option value="INTEREST">ריבית</option>
+                    <option value="FEE">עמלה</option>
+                    <option value="CURRENCY_CONVERSION">המרת מטבע</option>
+                    <option value="OTHER">אחר</option>
+                  </select>
+                </div>
                 <button class="index-section__header-action-btn js-add-cash-flow" aria-label="הוסף תזרים" title="הוסף תזרים חדש">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 5v14M5 12h14"></path>
@@ -119,25 +137,6 @@
             <div class="index-section__body">
               <tt-section-row>
                 <div class="col-12">
-                  
-                  <!-- Internal Filters (flowType only - account/date/search in page header) -->
-                  <div class="phoenix-table-filters">
-                    <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">סוג תנועה:</label>
-                      <!-- SSOT: ui/src/utils/flowTypeValues.js — keep options in sync with FLOW_TYPE_VALUES -->
-                      <select class="phoenix-table-filter-select js-table-filter" data-filter-key="flowType" id="cashFlowsType">
-                        <option value="">כל הסוגים</option>
-                        <option value="DEPOSIT">הפקדה</option>
-                        <option value="WITHDRAWAL">משיכה</option>
-                        <option value="DIVIDEND">דיבידנד</option>
-                        <option value="INTEREST">ריבית</option>
-                        <option value="FEE">עמלה</option>
-                        <option value="CURRENCY_CONVERSION">המרת מטבע</option>
-                        <option value="OTHER">אחר</option>
-                      </select>
-                    </div>
-                  </div>
-                  
                   <!-- Table Wrapper -->
                   <div class="phoenix-table-wrapper">
                     <table id="cashFlowsTable" class="phoenix-table js-table" data-table-type="cash_flows" role="table" aria-label="יומן תזרים מזומנים">

@@ -26,7 +26,7 @@
 |--------|--------|-------------|
 | **sync_exchange_rates_eod.py** | FX (Alpha→Yahoo) + exchange_rates_history | `make sync-eod` |
 | **sync_ticker_prices_eod.py** | מחירי טיקר EOD (Yahoo→Alpha); טיקרים מ־market_data.tickers | `make sync-ticker-prices` |
-| **sync_intraday.py** (או מקביל) | ticker_prices_intraday — Active tickers | `make sync-intraday` |
+| **sync_ticker_prices_intraday.py** | ticker_prices_intraday — טיקרים עם is_active=true | `make sync-intraday` |
 | **History Backfill** | 250d OHLCV לטיקרים עם &lt; 250 שורות (Indicators) | `make sync-history-backfill` |
 | **cleanup_market_data.py** | Intraday 30d, Daily 250d, FX history 250d | `make cleanup-market-data` |
 | **seed_market_data_tickers.py** | Seed טיקרים (נדרש לפני sync מחירים) | `make seed-tickers` |
@@ -64,7 +64,7 @@
 |------|--------|
 | **tickers** | רשימת טיקרים (symbol, company_name, …). |
 | **ticker_prices** | מחירי EOD + היסטוריה יומית (250d retention). |
-| **ticker_prices_intraday** | מחירים תוך־יומיים — Active tickers (P3-016). |
+| **ticker_prices_intraday** | מחירים תוך־יומיים — טיקרים עם is_active=true (P3-016). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT. |
 | **exchange_rates** | שערי חליפין נוכחיים. |
 | **exchange_rates_history** | היסטוריית FX 250d (p3_018). |
 
@@ -87,7 +87,7 @@
 
 | סוג | מסמכים |
 |-----|--------|
-| **SSOT** | MARKET_DATA_PIPE_SPEC, MARKET_DATA_COVERAGE_MATRIX, FOREX_MARKET_SPEC, PRECISION_POLICY_SSOT, TT2_MARKET_DATA_RESILIENCE. |
+| **SSOT** | MARKET_DATA_PIPE_SPEC, MARKET_DATA_COVERAGE_MATRIX, FOREX_MARKET_SPEC, PRECISION_POLICY_SSOT, TT2_MARKET_DATA_RESILIENCE, **TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT** (סטטוס טיקר: is_active כיום; Intraday רק ל-is_active=true). |
 | **תאום** | TEAM_20_TO_TEAM_60_ENV_AND_INTRADAY_COORDINATION_REQUEST, TEAM_20_TO_TEAM_60_HISTORY_BACKFILL_COORDINATION_REQUEST, TEAM_60_CRON_SCHEDULE. |
 | **Evidence** | TEAM_20_DUAL_PROVIDER_FULL_SCOPE_EVIDENCE, TEAM_20_EXTERNAL_DATA_LIVE_PROVIDER_EVIDENCE, TEAM_20_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE. |
 | **Debug / ספירות** | scripts/check_market_data_counts.py, scripts/verify_dual_provider_full_scope.py. |
@@ -101,7 +101,7 @@
 | seed-tickers | Seed market_data.tickers (לפני sync מחירים) |
 | sync-eod | EOD FX + exchange_rates_history |
 | sync-ticker-prices | EOD ticker_prices (Yahoo→Alpha) |
-| sync-intraday | Intraday ticker_prices_intraday (Active) |
+| sync-intraday | Intraday ticker_prices_intraday — טיקרים עם is_active=true |
 | sync-history-backfill | History backfill 250d (טיקרים עם &lt; 250 שורות) |
 | cleanup-market-data | Retention + ארכיון |
 | check-market-data-counts | ספירות טבלאות market_data |

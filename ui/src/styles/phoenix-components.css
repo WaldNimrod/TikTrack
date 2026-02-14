@@ -1106,53 +1106,81 @@ body .page-wrapper .page-container main {
   display: inline-block;
 }
 
-/* Operation Type Badge - Color Palette */
-.operation-type-badge[data-operation-type="deposit"] {
-  background: rgba(52, 199, 89, 0.1) !important;
-  border-color: var(--apple-green, #34c759) !important;
-  color: var(--apple-green, #34c759) !important;
+/* Operation Type Badge - Entity Color Scale (סוגי ישויות)
+   SSOT: ui/src/utils/flowTypeValues.js FLOW_TYPE_ENTITY_MAP
+   Each flow type maps to an entity; badge uses entity colors from phoenix-base.css
+ */
+.operation-type-badge[data-entity="trading_account"] {
+  background: var(--entity-trading_account-light, rgba(40, 167, 69, 0.1)) !important;
+  border-color: var(--entity-trading_account, #28a745) !important;
+  color: var(--entity-trading_account-dark, #155724) !important;
+}
+.operation-type-badge[data-entity="alert"] {
+  background: var(--entity-alert-light, rgba(220, 53, 69, 0.1)) !important;
+  border-color: var(--entity-alert, #dc3545) !important;
+  color: var(--entity-alert-dark, #b02a37) !important;
+}
+.operation-type-badge[data-entity="ticker"] {
+  background: var(--entity-ticker-light, rgba(23, 162, 184, 0.1)) !important;
+  border-color: var(--entity-ticker, #17a2b8) !important;
+  color: var(--entity-ticker-dark, #138496) !important;
+}
+.operation-type-badge[data-entity="research"] {
+  background: var(--entity-research-light, rgba(156, 39, 176, 0.1)) !important;
+  border-color: var(--entity-research, #9c27b0) !important;
+  color: var(--entity-research-dark, #7b1fa2) !important;
+}
+.operation-type-badge[data-entity="execution"] {
+  background: var(--entity-execution-light, rgba(23, 162, 184, 0.1)) !important;
+  border-color: var(--entity-execution, #17a2b8) !important;
+  color: var(--entity-execution-dark, #0c5460) !important;
+}
+.operation-type-badge[data-entity="note"] {
+  background: var(--entity-note-light, rgba(108, 117, 125, 0.15)) !important;
+  border-color: var(--entity-note, #6c757d) !important;
+  color: var(--entity-note-dark, #383d41) !important;
 }
 
-.operation-type-badge[data-operation-type="withdrawal"] {
-  background: rgba(255, 59, 48, 0.1) !important;
-  border-color: var(--apple-red, #ff3b30) !important;
-  color: var(--apple-red, #ff3b30) !important;
+/* Fallback when data-entity missing (legacy) — use data-operation-type */
+.operation-type-badge[data-operation-type="deposit"]:not([data-entity]) {
+  background: var(--entity-trading_account-light) !important;
+  border-color: var(--entity-trading_account) !important;
+  color: var(--entity-trading_account-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="transfer"] {
-  background: rgba(0, 122, 255, 0.1) !important;
-  border-color: var(--apple-blue, #007aff) !important;
-  color: var(--apple-blue, #007aff) !important;
+.operation-type-badge[data-operation-type="withdrawal"]:not([data-entity]) {
+  background: var(--entity-alert-light) !important;
+  border-color: var(--entity-alert) !important;
+  color: var(--entity-alert-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="execution"] {
-  background: rgba(255, 149, 0, 0.1) !important;
-  border-color: var(--apple-orange, #ff9500) !important;
-  color: var(--apple-orange, #ff9500) !important;
+.operation-type-badge[data-operation-type="currency_conversion"]:not([data-entity]) {
+  background: var(--entity-execution-light) !important;
+  border-color: var(--entity-execution) !important;
+  color: var(--entity-execution-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="dividend"] {
-  background: rgba(88, 86, 214, 0.1) !important;
-  border-color: var(--apple-indigo, #5856d6) !important;
-  color: var(--apple-indigo, #5856d6) !important;
+.operation-type-badge[data-operation-type="dividend"]:not([data-entity]) {
+  background: var(--entity-ticker-light) !important;
+  border-color: var(--entity-ticker) !important;
+  color: var(--entity-ticker-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="interest"] {
-  background: rgba(90, 200, 250, 0.1) !important;
-  border-color: var(--apple-cyan, #5ac8fa) !important;
-  color: var(--apple-cyan, #5ac8fa) !important;
+.operation-type-badge[data-operation-type="interest"]:not([data-entity]) {
+  background: var(--entity-research-light) !important;
+  border-color: var(--entity-research) !important;
+  color: var(--entity-research-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="fee"] {
-  background: rgba(255, 45, 85, 0.1) !important;
-  border-color: var(--apple-pink, #ff2d55) !important;
-  color: var(--apple-pink, #ff2d55) !important;
+.operation-type-badge[data-operation-type="fee"]:not([data-entity]) {
+  background: var(--entity-alert-light) !important;
+  border-color: var(--entity-alert) !important;
+  color: var(--entity-alert-dark) !important;
 }
-
-.operation-type-badge[data-operation-type="other"] {
-  background: rgba(142, 142, 147, 0.15) !important;
-  border-color: var(--apple-gray, #8e8e93) !important;
-  color: var(--apple-text-secondary, #8e8e93) !important;
+.operation-type-badge[data-operation-type="other"]:not([data-entity]) {
+  background: var(--entity-note-light) !important;
+  border-color: var(--entity-note) !important;
+  color: var(--entity-note-dark) !important;
+}
+.operation-type-badge[data-operation-type="transfer"]:not([data-entity]) {
+  background: var(--entity-execution-light) !important;
+  border-color: var(--entity-execution) !important;
+  color: var(--entity-execution-dark) !important;
 }
 
 .operation-type-badge {

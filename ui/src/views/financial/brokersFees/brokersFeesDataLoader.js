@@ -163,19 +163,37 @@ async function fetchBrokersFeesSummary(filters = {}) {
 }
 
 /**
+ * Fetch Reference Brokers — GET /reference/brokers (ADR-013)
+ * Used for brokers list in top container
+ */
+async function fetchReferenceBrokers() {
+  try {
+    await sharedServices.init();
+    const response = await sharedServices.get('/reference/brokers', {});
+    const items = response?.data ?? response ?? [];
+    return Array.isArray(items) ? items : [];
+  } catch (error) {
+    maskedLog('[Brokers Fees] Error fetching reference brokers:', { errorCode: error?.code, status: error?.status });
+    return [];
+  }
+}
+
+/**
  * Load all data for Brokers Fees View
  */
 async function loadBrokersFeesData(filters = {}) {
   try {
-    // Load summary and table data in parallel
-    const [summaryData, tableData] = await Promise.all([
+    // Load summary, table, and reference brokers in parallel
+    const [summaryData, tableData, brokersList] = await Promise.all([
       fetchBrokersFeesSummary(filters),
-      fetchBrokersFees(filters)
+      fetchBrokersFees(filters),
+      fetchReferenceBrokers()
     ]);
     
     return {
       summary: summaryData,
-      table: tableData
+      table: tableData,
+      brokersList
     };
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
@@ -192,7 +210,8 @@ async function loadBrokersFeesData(filters = {}) {
         monthlyFixedCommissions: 0,
         yearlyFixedCommissions: 0
       },
-      table: { data: [], total: 0 }
+      table: { data: [], total: 0 },
+      brokersList: []
     };
   }
 }
@@ -201,5 +220,6 @@ async function loadBrokersFeesData(filters = {}) {
 export {
   fetchBrokersFees,
   fetchBrokersFeesSummary,
+  fetchReferenceBrokers,
   loadBrokersFeesData
 };

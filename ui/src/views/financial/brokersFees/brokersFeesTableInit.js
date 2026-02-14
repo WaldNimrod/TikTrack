@@ -171,6 +171,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       updateSummary(result.summary, result.table);
       updateTable(result.table.data);
       updatePagination();
+      updateBrokersList(result.brokersList || []);
     } catch (error) {
       // Use masked log for security compliance (prevents token leakage)
       maskedLog('Error loading brokers fees data:', { 
@@ -203,6 +204,31 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
     }
   }
   
+  /**
+   * Update brokers list in top container (from GET /reference/brokers)
+   */
+  function updateBrokersList(brokers) {
+    const listEl = document.getElementById('brokersList');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    const items = Array.isArray(brokers) ? brokers : [];
+    if (items.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'brokers-list-panel__item brokers-list-panel__item--empty';
+      li.textContent = 'טוען רשימת ברוקרים...';
+      listEl.appendChild(li);
+      return;
+    }
+    items.forEach((b) => {
+      const displayName = b.displayName ?? b.display_name ?? b.value ?? b;
+      const isSupported = b.isSupported ?? b.is_supported ?? true;
+      const li = document.createElement('li');
+      li.className = 'brokers-list-panel__item' + (isSupported ? '' : ' brokers-list-panel__item--unsupported');
+      li.textContent = displayName + (isSupported ? '' : ' (ללא תמיכה ב-API/ייבוא)');
+      listEl.appendChild(li);
+    });
+  }
+
   /**
    * Update summary section
    * @param {Object} summary - Summary from API

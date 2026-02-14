@@ -18,8 +18,8 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 | Domain | Data Items | Provider Priority | Cadence | Storage | Precision | Freshness UI | Notes |
 |---|---|---|---|---|---|---|---|
 | **FX Rates** | conversion_rate, last_sync_time | **Alpha → Yahoo** | **EOD בלבד** | `market_data.exchange_rates` | **20,8** | Clock + tooltip (stale) | USD/EUR/ILS בלבד |
-| **Prices (Active tickers)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **Intraday** (configurable) | `market_data.ticker_prices_intraday` | **20,8** | Clock + tooltip (stale) | Active tickers only |
-| **Prices (Inactive)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **EOD בלבד** | `market_data.ticker_prices` | **20,8** | Clock + tooltip (stale) | Cadence per ticker status |
+| **Prices (is_active = true)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **Intraday** (configurable) | `market_data.ticker_prices_intraday` | **20,8** | Clock + tooltip (stale) | מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT |
+| **Prices (is_active = false)** | price, open, high, low, close, volume | **Yahoo → Alpha** | **EOD בלבד** | `market_data.ticker_prices` | **20,8** | Clock + tooltip (stale) | מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT |
 | **Historical Daily** | OHLCV daily | **Yahoo → Alpha** | **Daily** | `market_data.ticker_prices` | **20,8** | N/A | **250 trading days retention** |
 | **Indicators** | ATR(14), MA(20/50/150/200), CCI(20) | Derived from daily OHLC | **Daily** | Derived (compute) or cached | **20,8** | N/A | Computed from 250‑day history |
 | **Market Cap** | market_cap | **Yahoo → Alpha** | **Daily (EOD)** | `market_data.ticker_prices` (new field) | **20,8** | Clock + tooltip | **Required now** |
@@ -29,7 +29,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 
 ## 3) Stage‑1 Rules
 
-1. **Intraday only for Active tickers** (defined by System Settings).  
+1. **Intraday** רק לטיקרים עם **`is_active = true`** (מצב נוכחי ב-DB). סטטוס טיקר וקצב: מקור אמת [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md). System Settings: תזמון Intraday ניתן להגדרה.  
 2. **Historical daily** data is required to compute ATR/MA/CCI.  
 3. **No intraday retention for full 250‑day range.**  
 4. **Market Cap** is required now; EPS deferred to advanced fundamentals.  
@@ -45,6 +45,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 
 ## 4) SSOT References
 
+- **סטטוס טיקר וקצב טעינה:** [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) — מצב נוכחי: is_active (true/false); יעד: שדה status.
 - `MARKET_DATA_PIPE_SPEC.md` — hierarchy, guardrails, cadence.  
 - `FOREX_MARKET_SPEC.md` — FX cadence + providers + precision.  
 - `WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md` — provider mapping.  

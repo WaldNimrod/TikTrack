@@ -15,6 +15,8 @@
 **Team 30** כבר בונה את הממשק — יישור לתבנית זו (statusValues.js + statusAdapter.js, ארבעת הערכים בלבד).  
 **Teams 20 ו-60** — נדרש יישור לוגיקת סנכרון ו-Cron/Jobs להתנהגות המפורטת להלן.
 
+**מצב נוכחי (קוד/DB):** טבלת טיקרים — שדה **`is_active` (boolean)** בלבד. `is_active = true` → Intraday+EOD+היסטוריה; `is_active = false` → EOD+היסטוריה בלבד (ללא Intraday). **יעד:** שדה `status` (pending/active/inactive/cancelled) — מיגרציה. עד אז: סקריפטים ו-Cron מסתמכים על `is_active`; מקור אמת: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
+
 ---
 
 ## 2. טבלת סטטוס → התנהגות טעינת נתונים (מחייבת)

@@ -26,7 +26,7 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toCanonicalStatus, toHebrewStatus } from '../../../utils/statusAdapter.js';
-import { toFlowTypeLabel } from '../../../utils/flowTypeValues.js';
+import { toFlowTypeLabel, getFlowTypeEntity } from '../../../utils/flowTypeValues.js';
 
 /**
  * Validate ULID format
@@ -714,9 +714,11 @@ async function loadContainer3(filters = {}) {
       const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${flowStatusCanon}" data-status-category="${flowStatusCanon}">${flowStatusLabel}</span>`;
       
       const flowTypeVal = flow.flowType || flow.flow_type || '';
+      const flowTypeEntity = getFlowTypeEntity(flowTypeVal);
+      const flowTypeBadge = `<span class="phoenix-table__status-badge operation-type-badge" data-operation-type="${(flowTypeVal || '').toLowerCase()}" data-entity="${flowTypeEntity}">${toFlowTypeLabel(flowTypeVal) || flowTypeVal || ''}</span>`;
       row.innerHTML = `
         <td class="phoenix-table__cell col-date" role="cell">${formatDate(flow.transactionDate || '')}</td>
-        <td class="phoenix-table__cell col-type" role="cell">${toFlowTypeLabel(flowTypeVal) || flowTypeVal || ''}</td>
+        <td class="phoenix-table__cell col-type" role="cell">${flowTypeBadge}</td>
         <td class="phoenix-table__cell col-subtype" role="cell">${flow.subtype || ''}</td>
         <td class="phoenix-table__cell col-account" role="cell">${flow.accountName || ''}</td>
         <td class="phoenix-table__cell col-amount" role="cell">

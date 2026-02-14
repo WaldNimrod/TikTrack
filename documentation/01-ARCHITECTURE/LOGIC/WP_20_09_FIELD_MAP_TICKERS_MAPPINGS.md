@@ -21,4 +21,4 @@
 | `ticker_symbols` | `VARCHAR(20)` | `String` | למשל: AAPL, BTC. |
 | `provider_mapping_data` | `JSONB` | `Object` | מיפוי לספקים — **Yahoo Finance + Alpha Vantage בלבד** (Stage-1). אין IBKR כספק market-data. **יישור:** MARKET_DATA_COVERAGE_MATRIX + MARKET_DATA_PIPE_SPEC. |
 | `asset_type_enums` | `VARCHAR(50)` | `Enum` | STOCK, CRYPTO, ETF. |
-| `is_active_flags` | `BOOLEAN` | `Boolean` | זמינות למסחר. |
+| `is_active_flags` | `BOOLEAN` | `Boolean` | true = Intraday+EOD+היסטוריה; false = EOD+היסטוריה בלבד. מקור: [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT](../../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) (יעד: שדה status). |

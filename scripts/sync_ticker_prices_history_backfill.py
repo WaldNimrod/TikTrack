@@ -119,7 +119,7 @@ def get_ticker_symbol(ticker_id: str) -> Optional[str]:
 
 
 def load_ticker_by_id_for_backfill(ticker_id: str) -> Optional[Tuple[UUID, str]]:
-    """Load a single ticker by ID for backfill (if it has < MIN_HISTORY_DAYS rows)."""
+    """Load a single ticker by ID for backfill (if it has < MIN_HISTORY_DAYS rows). Batch script uses this."""
     import psycopg2
     from psycopg2.extras import RealDictCursor
 
@@ -137,6 +137,32 @@ def load_ticker_by_id_for_backfill(ticker_id: str) -> Optional[Tuple[UUID, str]]
         """, (ticker_id, MIN_HISTORY_DAYS))
         row = cur.fetchone()
         return (row["id"], row["symbol"]) if row else None
+    finally:
+        conn.close()
+
+
+def load_ticker_with_history_info(ticker_id: str) -> Optional[Tuple[UUID, str, Set[str], int]]:
+    """
+    Load ticker with existing dates and count for Smart History Engine (API).
+    Returns (uuid, symbol, existing_dates, existing_count) or None if ticker not found.
+    """
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT t.id, t.symbol
+            FROM market_data.tickers t
+            WHERE t.id = %s AND (t.deleted_at IS NULL OR t.deleted_at > NOW())
+        """, (ticker_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        uuid_val, symbol = row["id"], row["symbol"]
+        existing = get_existing_dates(uuid_val)
+        return (uuid_val, symbol, existing, len(existing))
     finally:
         conn.close()
 

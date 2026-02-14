@@ -105,7 +105,7 @@ function formatTs(ts) {
         ['שווי שוק (Market Cap)', fmt(ind.market_cap)],
       ];
       const indRows1 = indItems.slice(0, 4).map(([lbl, val]) => `<div class="data-integrity-detail-row"><strong>${lbl}</strong><span dir="ltr">${val}</span></div>`).join('');
-      const indRows2 = indItems.slice(4).map(([lbl, val]) => `<div class="data-integrity-detail-row"><strong>${lbl}</strong><span dir="ltr">${val}</span></div>`).join('');
+      const indRows2 = indItems.slice(4, 7).map(([lbl, val]) => `<div class="data-integrity-detail-row"><strong>${lbl}</strong><span dir="ltr">${val}</span></div>`).join('');
 
       const needBackfill = !ind || Object.keys(ind).length === 0 || hist.gap_status === 'INSUFFICIENT';
       const backfillBanner = needBackfill

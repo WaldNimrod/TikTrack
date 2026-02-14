@@ -1983,6 +1983,54 @@ tt-section[data-section="data-integrity"] .index-section__header-meta--align-end
   margin-bottom: var(--spacing-md, 16px);
 }
 
+/* כרטיסי סיכום עם רמזור — עמודה אחת */
+.data-integrity-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md, 16px);
+  margin-bottom: var(--spacing-lg, 24px);
+}
+
+@media (max-width: 768px) {
+  .data-integrity-summary-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.data-integrity-card {
+  padding: var(--spacing-md, 16px);
+  border-radius: var(--apple-radius-medium, 10px);
+  border: 1px solid;
+  border-inline-start-width: 4px;
+}
+
+.data-integrity-card.staleness-level--success {
+  background: rgba(5, 150, 105, 0.06);
+  border-color: var(--color-success, #059669);
+}
+
+.data-integrity-card.staleness-level--warning {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--color-warning, #f59e0b);
+}
+
+.data-integrity-card.staleness-level--error {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: var(--color-error-red, #dc2626);
+}
+
+.data-integrity-card__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-xs, 4px);
+}
+
+.data-integrity-card__value {
+  font-size: 0.85rem;
+  color: var(--apple-text-secondary, #64748b);
+}
+
+/* פרטים — שתי עמודות באורך דומה */
 .data-integrity-detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

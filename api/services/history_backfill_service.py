@@ -1,8 +1,8 @@
 """
-History Backfill Service — TEAM_30_TO_TEAM_20_HISTORY_BACKFILL_API_REQUEST
----------------------------------------------------------------------------
+History Backfill Service — TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (LOCKED)
+--------------------------------------------------------------------------------
 API-facing service for single-ticker history backfill (250d OHLCV).
-Uses scripts/sync_ticker_prices_history_backfill.py logic.
+Uses Smart History Engine (gap-first, force_reload Admin-only).
 Idempotent, Single-Flight lock, timeout 90s.
 API passes ULID; DB uses UUID — conversion required.
 """
@@ -10,6 +10,7 @@ API passes ULID; DB uses UUID — conversion required.
 import asyncio
 import logging
 import os
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -20,11 +21,21 @@ except ImportError:
 
 from ..utils.identity import ulid_to_uuid
 
+from .smart_history_engine import (
+    BackfillDecision,
+    MIN_HISTORY_DAYS,
+    compute_gaps,
+    decide,
+    has_gaps,
+)
+
 logger = logging.getLogger(__name__)
 
 _project = Path(__file__).resolve().parents[2]
 _script_path = _project / "scripts" / "sync_ticker_prices_history_backfill.py"
 BACKFILL_TIMEOUT = 90  # seconds
+REQUIRED_MIN_AFTER_INSERT = 100  # Accept provider result if >= this (partial success)
+IMMEDIATE_RETRY_MIN_ROWS = 50  # Retry if we get at least this many (worth retrying)
 
 
 def _load_backfill_module():
@@ -75,14 +86,34 @@ def _ulid_to_db_id(ticker_id: str) -> str:
     return str(u)
 
 
-async def run_history_backfill(ticker_id: str) -> dict:
+def _gaps_to_date_range(gaps: set) -> Tuple[Optional[date], Optional[date]]:
+    """Convert gap dates (YYYY-MM-DD) to (date_from, date_to) for provider."""
+    if not gaps:
+        return None, None
+    sorted_gaps = sorted(gaps)
+    try:
+        date_from_val = datetime.strptime(sorted_gaps[0], "%Y-%m-%d").date()
+        date_to_val = datetime.strptime(sorted_gaps[-1], "%Y-%m-%d").date()
+        return date_from_val, date_to_val
+    except (ValueError, IndexError):
+        return None, None
+
+
+async def run_history_backfill(
+    ticker_id: str,
+    mode: str = "gap_fill",
+    is_admin: bool = False,
+) -> dict:
     """
-    Run history backfill for a single ticker.
+    Run history backfill for a single ticker (Smart History Engine).
     ticker_id: ULID (API format). DB uses UUID — we convert before script calls.
+    mode: gap_fill (default) | force_reload (Admin only)
+    is_admin: user has ADMIN or SUPERADMIN role
     Returns dict with status, rows_inserted, message, ticker_id, symbol.
     Raises:
         - ValueError("not_found") -> 404
         - ValueError("no_op") -> 200 no_op
+        - ValueError("forbidden") -> 403 (force_reload without Admin)
         - ValueError("locked") -> 409
         - ValueError("provider_error") -> 502
     """
@@ -101,50 +132,98 @@ async def run_history_backfill(ticker_id: str) -> dict:
 
     try:
         # 404: ticker not found
-        if not await asyncio.to_thread(mod.ticker_exists, db_id):
+        info = await asyncio.to_thread(mod.load_ticker_with_history_info, db_id)
+        if not info:
             raise ValueError("not_found")
 
-        # no_op: already has 200+ rows
-        pair = await asyncio.to_thread(mod.load_ticker_by_id_for_backfill, db_id)
-        if not pair:
-            symbol = await asyncio.to_thread(mod.get_ticker_symbol, db_id) or ""
+        ticker_uuid, symbol, existing_dates, existing_count = info
+
+        # Smart History Engine: decide
+        decision = decide(
+            existing_count=existing_count,
+            has_any_gaps=has_gaps(existing_dates),
+            mode=mode or "gap_fill",
+            is_admin=is_admin,
+        )
+
+        if decision == BackfillDecision.NO_OP:
             return get_no_op_response(ticker_id, symbol)
 
-        ticker_uuid, symbol = pair
+        if decision == BackfillDecision.FULL_RELOAD:
+            if not is_admin:
+                raise ValueError("forbidden")
+            # Admin confirmed: delete all, then full fetch
+            await asyncio.to_thread(mod.delete_ticker_prices_for_ticker, db_id)
+            existing_dates = set()
+            date_from_val, date_to_val = None, None
+        else:
+            # GAP_FILL
+            gaps = compute_gaps(existing_dates)
+            date_from_val, date_to_val = _gaps_to_date_range(gaps)
+            if not gaps and existing_count >= MIN_HISTORY_DAYS:
+                # Edge: has_gaps was False, no gaps — no_op
+                return get_no_op_response(ticker_id, symbol)
 
-        # Get existing dates
-        existing = await asyncio.to_thread(mod.get_existing_dates, ticker_uuid)
-
-        # Fetch history (async, Yahoo → Alpha)
+        # Fetch (Yahoo → Alpha). Gap-fill uses date range; full reload uses full range.
         hist, provider = await asyncio.wait_for(
-            mod.fetch_history_for_ticker(ticker_uuid, symbol),
+            mod.fetch_history_for_ticker(
+                ticker_uuid,
+                symbol,
+                date_from=date_from_val,
+                date_to=date_to_val,
+            ),
             timeout=BACKFILL_TIMEOUT - 10,
         )
 
-        if not hist or len(hist) < 100:
+        if not hist:
             logger.warning(
-                "History backfill: providers failed for %s (got %s rows). "
+                "History backfill: providers failed for %s. "
                 "Check ALPHA_VANTAGE_API_KEY; Yahoo may be rate-limited.",
                 symbol,
-                len(hist) if hist else 0,
             )
             raise ValueError(f"provider_error|{symbol}")
 
-        # Insert
+        if len(hist) < IMMEDIATE_RETRY_MIN_ROWS and not (date_from_val or date_to_val):
+            # Full fetch returned few rows — try immediate retry (Retry Policy)
+            logger.info("Smart History: %s got %d rows — immediate retry", symbol, len(hist))
+            hist2, provider2 = await asyncio.wait_for(
+                mod.fetch_history_for_ticker(ticker_uuid, symbol, None, None),
+                timeout=BACKFILL_TIMEOUT - 10,
+            )
+            if hist2 and len(hist2) > len(hist):
+                hist, provider = hist2, provider2
+
         inserted = await asyncio.to_thread(
             mod.insert_history_rows,
             ticker_uuid,
             symbol,
             hist,
-            existing,
+            existing_dates,
         )
+
+        # Post-run verification (Retry Policy)
+        final_count = await asyncio.to_thread(mod.get_row_count, db_id)
+        if final_count < MIN_HISTORY_DAYS:
+            logger.info(
+                "Smart History: %s has %d/%d rows — nightly batch will retry",
+                symbol, final_count, MIN_HISTORY_DAYS,
+            )
+
+        status = "completed" if inserted > 0 else "no_op"
+        message = (
+            f"History backfill completed — {inserted} rows inserted"
+            if inserted > 0
+            else "Ticker already has sufficient history (no new rows)"
+        )
+        if decision == BackfillDecision.FULL_RELOAD and inserted > 0:
+            message = f"Full reload completed — {inserted} rows inserted"
 
         return {
             "ticker_id": ticker_id,
             "symbol": symbol,
             "rows_inserted": inserted,
-            "status": "completed",
-            "message": f"History backfill completed — {inserted} rows inserted",
+            "status": status,
+            "message": message,
         }
     finally:
         _release_lock(fd)

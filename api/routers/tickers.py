@@ -15,6 +15,7 @@ from ..core.database import get_db
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
+from ..models.enums import UserRole
 from ..services.tickers_service import get_tickers_service
 from ..schemas.tickers import (
     TickerResponse,
@@ -110,15 +111,25 @@ async def get_ticker_data_integrity(
 )
 async def post_ticker_history_backfill(
     ticker_id: str = Path(..., description="Ticker ULID"),
+    mode: Optional[str] = Query("gap_fill", description="gap_fill (default) | force_reload (Admin only)"),
     current_user: User = Depends(get_current_user),
 ):
     """
-    Trigger history backfill for a ticker (250d OHLCV).
-    Idempotent, Single-Flight. Returns 200 (completed/no_op), 404, 409, 502.
+    Trigger history backfill for a ticker (250d OHLCV) — Smart History Engine.
+    mode=gap_fill (default): Fill gaps only. mode=force_reload: Full reload (Admin only).
+    Idempotent, Single-Flight. Returns 200 (completed/no_op), 403, 404, 409, 502.
     """
+    mode_val = (mode or "gap_fill").lower()
+    if mode_val not in ("gap_fill", "force_reload"):
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="mode must be gap_fill or force_reload",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+        )
+    is_admin = current_user.role in (UserRole.ADMIN, UserRole.SUPERADMIN)
     try:
         result = await asyncio.wait_for(
-            run_history_backfill(ticker_id),
+            run_history_backfill(ticker_id, mode=mode_val, is_admin=is_admin),
             timeout=90.0,
         )
         return HistoryBackfillResponse(**result)
@@ -129,6 +140,12 @@ async def post_ticker_history_backfill(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Ticker not found",
                 error_code=ErrorCodes.USER_NOT_FOUND,
+            )
+        if msg == "forbidden":
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="force_reload requires Admin. Use from Admin tickers page with confirmation.",
+                error_code=ErrorCodes.SERVER_ERROR,
             )
         if msg == "locked":
             raise HTTPExceptionWithCode(

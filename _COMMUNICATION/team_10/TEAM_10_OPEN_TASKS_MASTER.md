@@ -151,6 +151,25 @@
 
 ---
 
+### 2.10 Smart History Fill (Level-2) — מימוש לפי SSOT נעול
+
+**מקור אמת (נעול):** _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md  
+**החלטות:** Gap-First; Reload רק ב-Admin; 250 ימי מסחר מינימום; Gap = יום חסר בתוך 250; Retry: מיידי + Batch לילה; History: Yahoo → Alpha; Provider: date_from/date_to; API: endpoint יחיד `mode=gap_fill`|`force_reload`.
+
+| מזהה | בעלים | משימה | תוצר מצופה | תלות / חסימה | סטטוס |
+|------|--------|--------|-------------|----------------|--------|
+| SHF-1 | **Team 20** | Smart History Engine — Gap analysis, Decision (GAP_FILL\|NO_OP\|force_reload), Post-run verification + Retry (מיידי + batch לילה) | Service/Engine; לוגיקה ברמת מערכת (לא בתוך קונקטורים) | — | ⬜ OPEN |
+| SHF-2 | **Team 20** | הרחבת Provider Interface — `get_ticker_history(symbol, trading_days, date_from?, date_to?)` | Yahoo + Alpha תומכים בטווח תאריכים (או fallback לטווח מלא) | — | ⬜ OPEN |
+| SHF-3 | **Team 20** | API — `POST /api/v1/tickers/{ticker_id}/history-backfill?mode=gap_fill\|force_reload` (ברירת מחדל: gap_fill); force_reload — אימות Admin בלבד | Router + אימות הרשאה ל־force_reload | SHF-1 | ⬜ OPEN |
+| SHF-4 | **Team 20** | סנכרון סקריפט `sync_ticker_prices_history_backfill.py` עם המנוע (קריאה ל־Engine במקום לוגיקה מפוזרת) | סקריפט מעודכן; Make target אם רלוונטי | SHF-1 | ⬜ OPEN |
+| SHF-5 | **Team 30** | Admin UI — דיאלוג "הנתונים מלאים — לטעון מחדש?" + טריגר ל־force_reload באישור מפורש | עמוד ניהול טיקרים (D22); כפתור/פעולה עם אישור | SHF-3 (API פעיל) | ⬜ OPEN |
+| SHF-6 | **Team 30** | הצגת סטטוס השלמה/טעינה חוזרת (לאחר backfill) | UI feedback — שורות שהושלמו, כישלון, retry | SHF-1, SHF-3 | ⬜ OPEN |
+| SHF-7 | **Team 60** | ללא משימה חדשה (Schema קיים) | — | — | ✅ N/A |
+
+**חסימות ידועות:** אין. תלות: SHF-3, SHF-5, SHF-6 תלויים ב־SHF-1.
+
+---
+
 ## 3. סדר ביצוע מומלץ (תזמור)
 
 1. **Team 60** — ✅ 1.2.2, 1.2.3 הושלמו (דוח: TEAM_60_TO_TEAM_10_OPEN_TASKS_STATUS_REPORT.md).
@@ -197,7 +216,9 @@
 | **הפצה בץ 2.5** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md; TEAM_10_TO_TEAM_90_BATCH_2_5_SPY_MANDATE.md |
 | **סיכום בץ 2.5 לבדיקה** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md |
 | **שער אישור D18/D21** | _COMMUNICATION/team_10/TEAM_10_D18_D21_APPROVAL_GATE.md |
+| **Smart History Fill (נעול)** | _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md; MARKET_DATA_PIPE_SPEC §5; OPEN_TASKS §2.10 |
 
 ---
 
-**log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**  
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (נעול).

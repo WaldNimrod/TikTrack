@@ -1824,22 +1824,42 @@ body.system-management-page {
    TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST
    Staleness Clock Card — שעון + מצב שוק + זמן שעבר
    ============================================ */
+
+/* בחר טיקר בכותרת — יישור לסוף השורה לפני כפתור הסגירה */
+tt-section[data-section="data-integrity"] .index-section__header-meta--align-end {
+  justify-content: flex-end;
+}
+
 .data-integrity-panel {
-  padding: var(--spacing-md, 16px);
-  background: var(--apple-bg-elevated, #ffffff);
-  border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: var(--apple-radius-medium, 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.data-integrity-top-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--spacing-md, 16px);
+  margin-bottom: var(--spacing-md, 16px);
 }
 
 /* Staleness Clock Card — כרטיס שעון סטגנציה + מצב שוק */
 .staleness-clock-card {
-  margin-bottom: var(--spacing-md, 16px);
+  width: fit-content;
+  flex: 0 0 auto;
   padding: var(--spacing-md, 16px) var(--spacing-lg, 20px);
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border: 1px solid var(--apple-border-light, #e2e8f0);
   border-radius: var(--apple-radius-medium, 10px);
   min-height: 56px;
 }
+
 
 .staleness-clock-card__loading {
   font-size: 0.9rem;
@@ -1924,24 +1944,25 @@ body.system-management-page {
   background: var(--apple-border-light, #e2e8f0);
 }
 
-.staleness-clock-card__time {
-  font-size: 1rem;
+.staleness-clock-card__time-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.staleness-clock-card__time-label {
+  font-size: 0.7rem;
+  color: var(--apple-text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.staleness-clock-card__time-value {
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--apple-text-primary, #0f172a);
   font-variant-numeric: tabular-nums;
-}
-
-.data-integrity-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-md, 16px);
-  align-items: center;
-  margin-bottom: var(--spacing-md, 16px);
-}
-
-.data-integrity-select {
-  min-width: 180px;
-  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
 }
 
 .data-integrity-btn {

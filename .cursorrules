@@ -27,6 +27,13 @@ Before performing any task, you MUST:
 - **Identity:** External IDs = ULID strings only.
 - **Precision:** Decimal(20,8) for money.
 
+## 🎯 CSS CLASS PRIORITY (IRON RULE)
+In every page or interface implementation:
+1. **First:** Use default classes or no class (rely on phoenix-base / element styles).
+2. **Second:** Use an existing class already used elsewhere in the system (e.g. index-section__*, phoenix-table-*, form-group).
+3. **Last:** Create a new class only when truly required. Always check CSS_CLASSES_INDEX and codebase before creating.
+**Reference:** documentation/05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md §1.5
+
 ## 📚 KNOWLEDGE PROMOTION PROTOCOL (MANDATORY - ACTIVE 2026-02-06)
 **CRITICAL:** Only Team 10 (The Gateway) is authorized to write to `documentation/` directory.
 

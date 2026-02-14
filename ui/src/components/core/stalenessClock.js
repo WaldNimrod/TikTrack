@@ -1,10 +1,9 @@
 /**
  * Staleness Clock - P3-012 / M6 (MARKET_DATA_PIPE_SPEC §2.5)
  * ----------------------------------------------------------
- * Clock + market status. Color scale: success | info | warning | error.
- * Staleness from timestamp: <1h=success, 1-24h=info, 24-72h=warning, >72h=error.
- * Market: פתוח=success, מחוץ לשעות=info, לילה/אפטר=warning, סגור=error.
- * Tooltip: data-tooltip only (no title — avoids double).
+ * שתי שכבת זמן: price_timestamp (ערך) | fetched_at (סקריפט).
+ * מפתח צבעים: success | info | warning | error.
+ * קונפיגורציה לכל ממשק: איזה אלמנטים להציג.
  */
 
 (function () {
@@ -14,14 +13,38 @@
   const CLOCK_ID = 'staleness-clock';
   const MARKET_KEY_ID = 'market-status-key';
 
+  function formatExactAge(ts) {
+    if (!ts) return '—';
+    try {
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return '—';
+    } catch (_) {
+      return '—';
+    }
+    const diffMs = Date.now() - new Date(ts).getTime();
+    const sec = Math.floor(diffMs / 1000);
+    const min = Math.floor(sec / 60);
+    const hr = Math.floor(min / 60);
+    const day = Math.floor(hr / 24);
+    if (sec < 60) return `לפני ${sec} שניות`;
+    if (min < 60) return min === 1 ? 'לפני דקה' : `לפני ${min} דקות`;
+    if (hr < 24) {
+      const m = min % 60;
+      if (m === 0) return hr === 1 ? 'לפני שעה' : `לפני ${hr} שעות`;
+      return `לפני ${hr} שעות ו־${m} דקות`;
+    }
+    if (day === 1) return 'לפני יום';
+    if (day < 7) return `לפני ${day} ימים`;
+    return `לפני ${day} ימים`;
+  }
+
   const STALENESS_TOOLTIPS = {
-    success: 'נתונים עדכניים (מתחת לשעה)',
-    info: 'נתונים בני 1–24 שעות',
-    warning: 'נתונים בני 24–72 שעות',
-    error: 'נתונים בני יותר מ־72 שעות'
+    success: 'נתונים עדכניים',
+    info: 'נתונים מלפני פחות מ־24 שעות',
+    warning: 'נתונים מלפני 24–72 שעות',
+    error: 'נתונים ישנים או חסרים'
   };
 
-  /* market_state → level (success|info|warning|error) */
   const MARKET_LEVEL = {
     REGULAR: 'success',
     PRE: 'info',
@@ -48,6 +71,18 @@
     unknown: ICON_UNKNOWN
   };
 
+  function getConfig(card) {
+    if (!card) return {};
+    return {
+      showMarket: card.dataset.showMarket !== 'false',
+      showClock: card.dataset.showClock !== 'false',
+      showPriceTime: card.dataset.showPriceTime !== 'false',
+      showFetchedTime: card.dataset.showFetchedTime !== 'false',
+      priceLabel: card.dataset.priceLabel || 'עודכן ב',
+      fetchedLabel: card.dataset.fetchedLabel || 'עודכן ב'
+    };
+  }
+
   function computeStalenessLevel(ts) {
     if (!ts) return 'error';
     try {
@@ -62,6 +97,26 @@
     } catch (_) {
       return 'error';
     }
+  }
+
+  function formatTimeElapsed(ts) {
+    if (!ts) return null;
+    try {
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return null;
+    } catch (_) {
+      return null;
+    }
+    const diffMs = Date.now() - new Date(ts).getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffMin < 1) return 'עכשיו';
+    if (diffMin < 60) return `לפני ${diffMin} דק׳`;
+    if (diffHr < 24) return `לפני ${diffHr} שעות`;
+    if (diffDay === 1) return 'אתמול';
+    if (diffDay < 7) return `לפני ${diffDay} ימים`;
+    return `לפני ${diffDay} ימים`;
   }
 
   function formatTime(ts) {
@@ -84,28 +139,44 @@
       .replace(/"/g, '&quot;');
   }
 
-  function renderCard(staleness, timestamp, marketStatus) {
+  function renderCard(staleness, timestamps, marketStatus, config) {
     const card = document.getElementById(CARD_ID);
     if (!card) return;
 
-    const clockLevel = computeStalenessLevel(timestamp);
-    const clockTooltip = STALENESS_TOOLTIPS[clockLevel];
+    const cfg = config || getConfig(card);
+    const priceTs = timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? null;
+    const fetchedTs = timestamps?.fetched_at ?? timestamps?.fetchedAt ?? (typeof timestamps === 'string' || (timestamps && timestamps instanceof Date) ? timestamps : null);
+    const primaryTs = priceTs || fetchedTs;
+    const clockLevel = computeStalenessLevel(primaryTs);
+    const clockTooltip = primaryTs ? formatExactAge(primaryTs) : 'אין נתוני עדכון';
+
     const state = (marketStatus?.market_state || 'unknown').toUpperCase();
     const label = marketStatus?.display_label || 'חסר נתון';
     const marketLevel = MARKET_LEVEL[state] || MARKET_LEVEL.unknown;
     const marketTooltip = 'מצב שוק: ' + label;
     const marketIcon = MARKET_ICONS[state] || MARKET_ICONS.unknown;
-    const timeStr = formatTime(timestamp);
 
-    card.innerHTML = `
-      <div class="staleness-clock-card__inner" role="status">
-        <span class="staleness-clock-card__cell staleness-clock-card__market staleness-level--${marketLevel}" data-tooltip="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}<span class="staleness-clock-card__market-label">${escapeHtml(label)}</span></span>
-        <span class="staleness-clock-card__divider" aria-hidden="true"></span>
-        <span class="staleness-clock-card__cell staleness-clock staleness-level--${clockLevel}" data-tooltip="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>
-        <span class="staleness-clock-card__divider" aria-hidden="true"></span>
-        <span class="staleness-clock-card__time" dir="ltr">${escapeHtml(timeStr)}</span>
-      </div>
-    `;
+    const priceElapsed = formatTimeElapsed(priceTs);
+    const fetchedElapsed = formatTimeElapsed(fetchedTs);
+    const parts = [];
+
+    if (cfg.showMarket !== false) {
+      parts.push(`<span class="staleness-clock-card__cell staleness-clock-card__market staleness-level--${marketLevel}" data-tooltip="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}<span class="staleness-clock-card__market-label">${escapeHtml(label)}</span></span>`);
+      parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+    }
+    if (cfg.showClock !== false) {
+      parts.push(`<span class="staleness-clock-card__cell staleness-clock staleness-level--${clockLevel}" data-tooltip="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>`);
+      parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+    }
+    if (cfg.showPriceTime !== false && (priceElapsed || priceTs)) {
+      parts.push(`<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.priceLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(priceElapsed || formatTime(priceTs))}</span></span>`);
+      if (cfg.showFetchedTime !== false && fetchedTs) parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+    }
+    if (cfg.showFetchedTime !== false && (fetchedElapsed || fetchedTs)) {
+      parts.push(`<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.fetchedLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(fetchedElapsed || formatTime(fetchedTs))}</span></span>`);
+    }
+
+    card.innerHTML = `<div class="staleness-clock-card__inner" role="status">${parts.join('')}</div>`;
     card.classList.add('staleness-clock-card--loaded');
   }
 
@@ -145,12 +216,15 @@
 
   const TOOLTIPS_LEGACY = { ok: STALENESS_TOOLTIPS.success, warning: STALENESS_TOOLTIPS.info, na: STALENESS_TOOLTIPS.error };
 
-  function updateInline(staleness, timestamp, marketStatus) {
-    const level = computeStalenessLevel(timestamp);
+  function updateInline(staleness, timestamps, marketStatus) {
+    const fetchedTs = timestamps?.fetched_at ?? timestamps?.fetchedAt ?? (typeof timestamps === 'string' ? timestamps : null);
+    const primaryTs = timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? fetchedTs;
+    const level = computeStalenessLevel(primaryTs);
     const el = ensureInlineClock();
     el.className = 'staleness-clock staleness-level--' + level;
-    el.setAttribute('aria-label', STALENESS_TOOLTIPS[level] || TOOLTIPS_LEGACY[staleness] || STALENESS_TOOLTIPS.success);
-    if (timestamp) el.setAttribute('data-timestamp', timestamp);
+    const ariaLabel = primaryTs ? formatExactAge(primaryTs) : (STALENESS_TOOLTIPS[level] || TOOLTIPS_LEGACY[staleness] || STALENESS_TOOLTIPS.success);
+    el.setAttribute('aria-label', ariaLabel);
+    if (fetchedTs) el.setAttribute('data-timestamp', fetchedTs);
 
     const keyEl = document.getElementById(MARKET_KEY_ID);
     if (marketStatus && (marketStatus.market_state || marketStatus.display_label)) {
@@ -167,12 +241,18 @@
     }
   }
 
-  function updateClock(staleness, timestamp, marketStatus) {
+  /**
+   * @param {string} staleness - ok | warning | na (legacy)
+   * @param {Object|string} timestamps - { price_timestamp, fetched_at } or single fetched_at for backwards compat
+   * @param {Object} marketStatus - { market_state, display_label }
+   * @param {Object} [config] - { showMarket, showClock, showPriceTime, showFetchedTime, priceLabel, fetchedLabel }
+   */
+  function updateClock(staleness, timestamps, marketStatus, config) {
     const card = document.getElementById(CARD_ID);
     if (card) {
-      renderCard(staleness, timestamp, marketStatus);
+      renderCard(staleness, timestamps, marketStatus, config);
     } else {
-      updateInline(staleness, timestamp, marketStatus);
+      updateInline(staleness, timestamps, marketStatus);
     }
   }
 

@@ -6,7 +6,7 @@
 **Session:** SESSION_01 - Phase 1.6  
 **Subject:** CODE_VALIDATION_CRITERIA | Status: 🛡️ **MANDATORY**  
 **Purpose:** קריטריוני בדיקת קוד לולידציה של Components  
-**Version:** v1.2 (עודכן עם Batch 1 Closure & חוקי ברזל)
+**Version:** v1.3 (עודכן עם כלל ברזל עדיפות מחלקות CSS — TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE §1.5)
 
 ---
 
@@ -157,19 +157,37 @@ border-radius: 10px;
 
 ### **2. CSS Classes Compliance** 🔴 **CRITICAL**
 
+**מקור מחייב (כלל ברזל):** `documentation/05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md` §1.5
+
+#### **2.0 כלל ברזל — עדיפות מחלקות CSS (חובה)**
+
+בכל עמוד או ממשק — סדר עדיפויות מחייב:
+
+| עדיפות | פעולה | תיאור |
+|--------|-------|--------|
+| **1** | מחלקות ברירת מחדל או ללא מחלקה | העיצוב מ־phoenix-base / element selectors. אלמנטים סטנדרטיים (input, select, button, form-group) — ללא class או עם class בסיסי. |
+| **2** | מחלקה **קיימת** כבר בשימוש בממשקים אחרים | נדרש סגנון שונה — **תחילה** לחפש מחלקה קיימת (index-section__*, phoenix-table-*, form-group וכו'). **כולל בדיקה ב־CSS_CLASSES_INDEX.** |
+| **3** | מחלקה **חדשה** — רק במידת הצורך | רק כשיש **הבדל מהותי** ואין מחלקה מתאימה. **חובה** לבדוק ב־CSS_CLASSES_INDEX ובקוד לפני יצירה. |
+
+**דוגמאות:**  
+✅ עדיפות 1: `<input>` ללא מחלקה; `<select class="index-section__header-filter-select">` (מחלקה קיימת).  
+✅ עדיפות 2: `<div class="form-group">` (קיים במודולים).  
+❌ מיותר: מחלקה חדשה כשקיימת מתאימה (למשל `index-section__header-filter-select` במקום מחלקה ad-hoc).
+
 #### **2.1 CSS Classes Usage**
-- ✅ **חובה:** שימוש במחלקות מ-`CSS_CLASSES_INDEX.md`
-- ✅ **חובה:** שימוש חוזר במחלקות קיימות
-- ❌ **אסור:** יצירת מחלקות חדשות ללא בדיקה
+- ✅ **חובה:** ציות לסדר העדיפויות למעלה (1 → 2 → 3).
+- ✅ **חובה:** שימוש במחלקות מ-`CSS_CLASSES_INDEX.md` ובמחלקות קיימות בממשקים אחרים.
+- ✅ **חובה:** שימוש חוזר במחלקות קיימות (עדיפות 2).
+- ❌ **אסור:** יצירת מחלקות חדשות ללא בדיקה (עדיפות 3 — רק אחרי בדיקה).
 
 **דוגמאות:**
 ```jsx
-/* ✅ נכון - שימוש במחלקות קיימות */
+/* ✅ נכון - שימוש במחלקות קיימות (עדיפות 2) */
 <div className="auth-header">
   <h1 className="auth-title">התחברות</h1>
 </div>
 
-/* ❌ שגוי - מחלקה חדשה ללא צורך */
+/* ❌ שגוי - מחלקה חדשה ללא צורך (עדיפות 3 בלי צורך) */
 <div className="login-header">
   <h1 className="login-title">התחברות</h1>
 </div>
@@ -194,7 +212,7 @@ border-radius: 10px;
 
 #### **2.3 No Duplicate Classes**
 - ✅ **חובה:** מניעת מחלקות כפולות
-- ✅ **חובה:** בדיקה ב-`CSS_CLASSES_INDEX.md` לפני יצירת מחלקה חדשה
+- ✅ **חובה (עדיפות 3):** בדיקה ב-`CSS_CLASSES_INDEX.md` **ובקוד** לפני יצירת מחלקה חדשה — מחלקה חדשה רק כשנדרש, אחרי וידוא שאין מחלקה קיימת מתאימה.
 
 ---
 
@@ -633,7 +651,8 @@ cubes/identity/scripts/
 **הערות:** _______________
 
 ### **2. בדיקת קוד סטטית:**
-- [ ] ✅ משתמש במחלקות מ-`CSS_CLASSES_INDEX.md`
+- [ ] ✅ **כלל ברזל עדיפות מחלקות:** עדיפות 1 (default/ללא מחלקה) → עדיפות 2 (מחלקה קיימת, כולל CSS_CLASSES_INDEX) → עדיפות 3 (מחלקה חדשה רק אחרי בדיקה). ראה TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE §1.5
+- [ ] ✅ משתמש במחלקות מ-`CSS_CLASSES_INDEX.md` או במחלקות קיימות בממשקים אחרים
 - [ ] ✅ משתמש ב-CSS Variables מ-`phoenix-base.css` בלבד
 - [ ] ✅ אין ערכים hardcoded (צבעים, ריווחים)
 - [ ] ✅ אין inline styles (`style={{ ... }}`)
@@ -812,7 +831,8 @@ cubes/identity/scripts/
 - [`ui/src/styles/phoenix-base.css`](../../ui/src/styles/phoenix-base.css) - Design Tokens SSOT
 - [`documentation/01-ARCHITECTURE/TT2_MASTER_PALETTE_SPEC.md`](../../documentation/01-ARCHITECTURE/TT2_MASTER_PALETTE_SPEC.md) - Palette Spec
 
-### **סטנדרטים:**
+### **סטנדרטים ונוהלים:**
+- [`documentation/05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md`](../../documentation/05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md) §1.5 — כלל ברזל עדיפות מחלקות CSS
 - [`documentation/10-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`](../../documentation/10-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md) - CSS Standards
 - [`documentation/10-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md`](../../documentation/10-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md) - JavaScript Standards
 
@@ -851,4 +871,4 @@ log_entry | [Team 40] | VALIDATION_METHODS | CODE_BASED | 2026-02-01
 **Date:** 2026-02-02  
 **Version:** v1.2  
 **Status:** 🛡️ **MANDATORY CODE VALIDATION CRITERIA**  
-**עדכון אחרון:** Batch 1 Closure - הוספת חוקי ברזל (אין inline styles, אין ערכי צבע hardcoded)
+**עדכון אחרון:** 2026-02-14 — כלל ברזל עדיפות מחלקות CSS (שלוש עדיפויות + הפניה ל-TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE §1.5)

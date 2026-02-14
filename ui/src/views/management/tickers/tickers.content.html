@@ -45,6 +45,11 @@
       <div class="index-section__header-title">
         <h2 class="index-section__header-text">בקרת תקינות נתונים</h2>
       </div>
+      <div class="index-section__header-meta index-section__header-meta--align-end">
+        <select id="tickerDataIntegritySelect" class="index-section__header-filter-select" aria-label="בחר טיקר">
+          <option value="">— בחר טיקר —</option>
+        </select>
+      </div>
       <div class="index-section__header-actions">
         <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -57,19 +62,12 @@
       <tt-section-row>
         <div class="col-12">
           <div class="data-integrity-panel">
-            <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite">
-              <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
+            <div class="data-integrity-top-row">
+              <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
+                <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
+              </div>
             </div>
-            <div class="data-integrity-controls">
-              <label for="tickerDataIntegritySelect" class="sr-only">בחר טיקר</label>
-              <select id="tickerDataIntegritySelect" class="data-integrity-select" aria-label="בחר טיקר">
-                <option value="">— בחר טיקר —</option>
-              </select>
-              <button type="button" id="tickerDataIntegrityCheck" class="data-integrity-btn">בדוק</button>
-            </div>
-            <div id="tickerDataIntegrityDetail" class="data-integrity-detail">
-              <p class="data-integrity-empty">בחר טיקר ולחץ בדוק</p>
-            </div>
+            <div id="tickerDataIntegrityDetail" class="data-integrity-detail"></div>
             <div class="data-integrity-gaps">
               <strong>חוסרים:</strong> <span id="tickerDataIntegrityGaps">—</span>
             </div>

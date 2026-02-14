@@ -69,14 +69,21 @@ def _fetch_market_status_sync() -> Optional[str]:
         data = r.json()
         results = data.get("quoteResponse", {}).get("result", [])
         if not results:
+            logger.warning("Yahoo market status: empty result for SPY")
             return None
         q = results[0]
         state = q.get("marketState")
         if isinstance(state, str) and state:
             return state
+        logger.warning("Yahoo market status: marketState missing or empty (got %r)", state)
         return None
     except Exception as e:
-        logger.debug("Yahoo market status fetch failed: %s", e)
+        status = getattr(e, "response", None)
+        if status is not None:
+            code = getattr(status, "status_code", None)
+            logger.warning("Yahoo market status fetch failed: HTTP %s — %s", code, e)
+        else:
+            logger.warning("Yahoo market status fetch failed: %s", e)
         return None
 
 

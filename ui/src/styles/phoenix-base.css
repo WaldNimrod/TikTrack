@@ -612,61 +612,59 @@ a:hover {
    ============================================ */
 
 /* ============================================
-   Input, Textarea, Select - Base Styles
+   Input, Textarea, Select - Base Styles (SSOT)
    ============================================
-   These are the system-wide defaults, matching the main filter styles EXACTLY.
-   These styles apply to ALL text inputs, dropdowns, and form fields throughout the system.
-   Source: Legacy filter styles (header-styles.css)
+   System-wide defaults — aligned with modal "הוסף חשבון" (add account) reference.
+   Source: phoenix-modal.css .phoenix-modal__body input/select/textarea
+   All text inputs, dropdowns, form fields inherit these unless overridden.
    ============================================ */
 input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
 textarea,
 select {
-  /* Typography - Inherit from global defaults */
-  /* font-family and font-size inherited from * selector - SINGLE SOURCE OF TRUTH */
-  font-weight: 300; /* Light weight - system default */
-  line-height: 1.2; /* Tighter line-height - system default */
+  /* Typography */
+  font-weight: 300;
+  line-height: 1.2;
   color: #1d1d1f;
+  font-size: var(--font-size-base, 0.92rem);
+  font-family: inherit;
   
-  /* Appearance - Match filter dropdown exactly */
+  /* Appearance — modal reference: 8px 16px padding, 6px radius */
   background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 4px; /* Smaller border-radius */
-  
-  /* Spacing - Match filter dropdown exactly (reduced vertical padding to fit in 60px container) */
-  /* Note: Auth pages override this with !important for larger padding - see D15_IDENTITY_STYLES.css */
-  padding: 0.125rem 0.6rem; /* 2px top/bottom, 9.6px left/right - reduced vertical padding - default for system */
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 6px;
+  padding: 8px 16px;
   margin: 0;
   box-sizing: border-box;
   
   /* Layout */
   width: 100%;
+  max-width: 400px;
   min-height: auto;
-  height: fit-content; /* Fit content height - no fixed height */
+  height: fit-content;
   
   /* Behavior */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
-  /* RTL Support */
+  /* RTL */
   direction: rtl;
   text-align: right;
 }
 
-/* Focus States - Match filter hover/focus exactly */
+/* Focus — color-brand (modal reference) */
 input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]):focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #ff9500; /* Orange border on focus - match filter */
-  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+  border-color: var(--color-brand, #26baac);
 }
 
-/* Hover States - Match filter hover exactly */
+/* Hover */
 input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]):hover,
 textarea:hover,
 select:hover {
-  border-color: #ff9500; /* Orange border on hover - match filter */
+  border-color: var(--color-brand, #26baac);
 }
 
 /* Placeholder Styles - Match filter placeholder */

@@ -14,6 +14,25 @@
 
 ---
 
+## 1.5 כלל ברזל — עדיפות מחלקות CSS (חובה)
+
+בכל עמוד או ממשק:
+
+| עדיפות | פעולה | תיאור |
+|--------|-------|--------|
+| **1** | מחלקות ברירת מחדל או ללא מחלקה | אלמנטים סטנדרטיים (input, select, button, form-group) — ללא class או עם class בסיסי. העיצוב מ־phoenix-base / element selectors |
+| **2** | מחלקה קיימת | נדרש סגנון שונה — **תחילה** לחפש מחלקה קיימת בשימוש בממשקים אחרים (index-section__*, phoenix-table-*, form-group וכו') |
+| **3** | מחלקה חדשה — רק במידת הצורך | רק כשיש **הבדל מהותי** ואין מחלקה מתאימה — ליצור מחלקה חדשה. **לבדוק תמיד** ב־CSS_CLASSES_INDEX ובקוד לפני יצירה |
+
+**דוגמאות:**  
+✅ עדיפות 1: `<select class="index-section__header-filter-select">` (מחלקה קיימת); `<input>` ללא מחלקה.  
+✅ עדיפות 2: `<div class="form-group">` (קיים במודולים).  
+❌ מיותר: מחלקה חדשה כשקיימת מתאימה (למשל `index-section__header-filter-select` במקום `data-integrity-select`).
+
+**מקור:** _COMMUNICATION/team_30/TEAM_30_CSS_CLASS_PRIORITY_IRON_RULE_PROPOSAL.md (קידום Team 10).
+
+---
+
 ## 2. Checklist — עמודים עם page-wrapper + tt-container
 
 ### 2.1 Page Layout

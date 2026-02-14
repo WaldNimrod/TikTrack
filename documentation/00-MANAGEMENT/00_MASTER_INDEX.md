@@ -94,7 +94,7 @@ _COMMUNICATION/
 - [📊 TEAM_50_QA_TEST_INDEX.md](../09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md) - אינדקס בדיקות QA מפורט
 - [👤 QA Test User Seed (README)](../../scripts/README_SEED_QA_USER.md) - משתמש QA קבוע ל-Gate B Runtime/E2E (TikTrackAdmin / 4181); הרצת `python3 scripts/seed_qa_test_user.py` אחרי איפוס DB ✅ **תעוד קבוע**
 - [📋 TT2_QA_SEED_USER_PROCEDURE.md](../05-PROCEDURES/TT2_QA_SEED_USER_PROCEDURE.md) - נוהל קצר + הפניה ל-README המלא
-- [📋 TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md](../05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md) - נוהל QA פנימי Team 30 — Checklist סטנדרטים (Page Layout, Info Summary, Sections) לפני PR ✅ **מחייב Frontend**
+- [📋 TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md](../05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md) - נוהל QA פנימי Team 30 — §1.5 **כלל ברזל עדיפות מחלקות CSS** (1. default/no class → 2. existing class → 3. new only when required); Checklist (Page Layout, Info Summary, Sections) לפני PR ✅ **מחייב Frontend**
 - ⚠️ **TEAM_51_ONBOARDING_COMPREHENSIVE.md** - חבילת אונבורדינג מקיפה לצוות 51 (QA Remote) - נמצא ב-`_COMMUNICATION/team_51/` (לא SSOT - Communication בלבד)
 
 ---

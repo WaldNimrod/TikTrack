@@ -24,12 +24,11 @@ function formatTs(ts) {
   'use strict';
 
   const selectEl = document.getElementById('tickerDataIntegritySelect');
-  const btnEl = document.getElementById('tickerDataIntegrityCheck');
   const detailEl = document.getElementById('tickerDataIntegrityDetail');
   const gapsEl = document.getElementById('tickerDataIntegrityGaps');
   const logEl = document.getElementById('tickerDataIntegrityLog');
 
-  if (!selectEl || !btnEl || !detailEl) return;
+  if (!selectEl || !detailEl) return;
 
   let tickersList = [];
 
@@ -194,5 +193,5 @@ function formatTs(ts) {
   const list = await loadTickers();
   populateSelect(list);
 
-  btnEl.addEventListener('click', doCheck);
+  selectEl.addEventListener('change', doCheck);
 })();

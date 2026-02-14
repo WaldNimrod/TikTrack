@@ -45,7 +45,13 @@
       }
 
       if (window.updateStalenessClock) {
-        window.updateStalenessClock(staleness || 'ok', ts, {
+        const timestamps = { fetched_at: ts };
+        if (ratesRes.status === 'fulfilled' && ratesRes.value?.data?.[0]) {
+          const r = ratesRes.value.data[0];
+          const pt = r.price_timestamp ?? r.priceTimestamp ?? null;
+          if (pt) timestamps.price_timestamp = pt;
+        }
+        window.updateStalenessClock(staleness || 'ok', timestamps, {
           market_state: marketState,
           display_label: displayLabel,
         });

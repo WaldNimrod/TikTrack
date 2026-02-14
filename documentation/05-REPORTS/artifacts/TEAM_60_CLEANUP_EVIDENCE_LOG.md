@@ -37,3 +37,8 @@
 - intraday: rows_pruned=0
 - daily: rows_pruned=0
 - fx_history: rows_pruned=0
+
+## 2026-02-14T03:38:15.407971+00:00
+- intraday: rows_pruned=0
+- daily: rows_pruned=349
+- fx_history: rows_pruned=0

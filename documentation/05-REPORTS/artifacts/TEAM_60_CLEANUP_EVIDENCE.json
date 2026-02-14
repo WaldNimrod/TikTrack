@@ -1,17 +1,17 @@
 {
-  "last_run_time": "2026-02-13T23:27:57.327099+00:00",
-  "rows_pruned": 0,
+  "last_run_time": "2026-02-14T03:38:15.407971+00:00",
+  "rows_pruned": 349,
   "rows_updated": 0,
   "intraday": {
     "rows_pruned": 0,
-    "cutoff": "2026-01-14T23:27:57.308615+00:00"
+    "cutoff": "2026-01-15T03:38:15.383874+00:00"
   },
   "daily": {
-    "rows_pruned": 0,
-    "cutoff": "2025-06-08T23:27:57.316773+00:00"
+    "rows_pruned": 349,
+    "cutoff": "2025-06-09T03:38:15.394777+00:00"
   },
   "fx_history": {
     "rows_pruned": 0,
-    "cutoff": "2025-06-08"
+    "cutoff": "2025-06-09"
   }
 }

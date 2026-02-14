@@ -136,7 +136,12 @@ async function runSmartHistoryFillQA() {
             window.confirm = function() { window.__qaForceReloadConfirmed = true; return true; };
           `);
           await forceBtn.click();
-          await driver.sleep(6000);
+          // force_reload fetches 250 rows — can take 15–30s
+          for (let i = 0; i < 12; i++) {
+            await driver.sleep(3000);
+            const html = await detailEl.getAttribute('innerHTML');
+            if (html.includes('הושלם')) break;
+          }
           const confirmed = await driver.executeScript('return !!window.__qaForceReloadConfirmed');
           const htmlAfter = await detailEl.getAttribute('innerHTML');
           const ok = htmlAfter.includes('הושלם') || !htmlAfter.includes('טוען מחדש...');

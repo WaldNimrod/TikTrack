@@ -191,6 +191,7 @@ help:
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"
+	@echo "  make migrate-p3-020    - user_tickers + tickers.status (User Tickers)"
 	@echo "  make ensure-ticker-prices-partitions - Create 2025–2027 partitions"
 	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"
 	@echo "  make test-suite-b      - Suite B: Cache-First + Failover (Smoke, REPLAY)"

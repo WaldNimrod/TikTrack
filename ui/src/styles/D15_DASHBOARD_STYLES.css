@@ -1908,8 +1908,11 @@ body.brokers-fees-page tt-container tt-section {
 }
 
 .brokers-list-panel__other-explanation {
-  padding-top: var(--spacing-md, 16px);
-  border-top: 1px solid var(--apple-border-light, #e5e5ea);
+  margin-top: var(--spacing-lg, 24px);
+  padding: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #f2f2f7);
+  border-radius: var(--apple-radius-medium, 10px);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
 }
 
 .brokers-list-panel__subtitle {
@@ -1928,6 +1931,22 @@ body.brokers-fees-page tt-container tt-section {
 
 .brokers-list-panel__other-explanation p:last-child {
   margin-bottom: 0;
+}
+
+/* רשימת ברוקרים בתוך info-summary — טקסט פשוט, צבע מידע, מיושר למרכז */
+/* display: block כדי לא לרשת display:flex שמתיישר ל-start */
+.info-summary__brokers-row {
+  display: block;
+  flex-basis: 100%;
+  width: 100%;
+  line-height: 1.5;
+  color: var(--message-info, var(--entity-ticker, #17a2b8));
+  text-align: center;
+}
+
+.info-summary__brokers-row #brokersList {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .data-integrity-panel {
@@ -1973,126 +1992,11 @@ body.brokers-fees-page tt-container tt-section {
   flex-shrink: 0;
 }
 
+/* שעון — התאמות ל-context של info-summary (סגנונות בסיס ב-phoenix-components.css) */
 .info-summary .staleness-clock-card {
   flex-shrink: 0;
   padding: var(--spacing-xs, 6px) var(--spacing-md, 16px);
   min-height: 0;
-}
-
-/* Staleness Clock Card — כרטיס שעון סטגנציה + מצב שוק */
-.staleness-clock-card {
-  width: fit-content;
-  flex: 0 0 auto;
-  padding: var(--spacing-md, 16px) var(--spacing-lg, 20px);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid var(--apple-border-light, #e2e8f0);
-  border-radius: var(--apple-radius-medium, 10px);
-  min-height: 56px;
-}
-
-
-.staleness-clock-card__loading {
-  font-size: 0.9rem;
-  color: var(--apple-text-secondary, #64748b);
-  font-style: italic;
-}
-
-.staleness-clock-card--loaded .staleness-clock-card__loading {
-  display: none;
-}
-
-.staleness-clock-card--loaded .staleness-clock-card__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-sm, 8px);
-}
-
-.staleness-clock-card__inner {
-  display: none;
-}
-
-.staleness-clock-card__cell {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  cursor: help;
-  border-radius: 4px;
-}
-
-.staleness-clock-card__cell[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 12px;
-  background: #1e293b;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
-  border-radius: 6px;
-  z-index: var(--z-index-tooltip, 1100);
-  pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.staleness-clock-card__cell svg {
-  width: 20px;
-  height: 20px;
-}
-
-.staleness-clock-card__market-label {
-  margin-inline-start: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* מפתח צבעים: הצלחה → מידע → אזהרה → שגיאה */
-.staleness-level--success {
-  color: var(--color-success, #059669);
-}
-
-.staleness-level--info {
-  color: var(--apple-blue, #007AFF);
-}
-
-.staleness-level--warning {
-  color: var(--color-warning, #f59e0b);
-}
-
-.staleness-level--error {
-  color: var(--color-error-red, #dc2626);
-}
-
-.staleness-clock-card__divider {
-  width: 1px;
-  height: 20px;
-  background: var(--apple-border-light, #e2e8f0);
-}
-
-.staleness-clock-card__time-block {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.staleness-clock-card__time-label {
-  font-size: 0.7rem;
-  color: var(--apple-text-secondary, #64748b);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.staleness-clock-card__time-value {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--apple-text-primary, #0f172a);
-  font-variant-numeric: tabular-nums;
 }
 
 .data-integrity-btn {

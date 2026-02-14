@@ -1426,7 +1426,7 @@ body .page-wrapper .page-container main {
 
 .info-summary__row--first .info-summary__content > div,
 .info-summary__row--first .info-summary__content > span,
-.info-summary__row--first > div:not(.info-summary__content) {
+.info-summary__row--first > div:not(.info-summary__content):not(.staleness-clock-card) {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 8px);
@@ -1930,6 +1930,76 @@ input.dir-ltr,
 }
 .staleness-level--error {
   color: var(--color-danger, #dc2626);
+}
+
+/* Staleness Clock Card — כרטיס שעון אחיד בכל העמודים */
+.staleness-clock-card {
+  display: block;
+  width: fit-content;
+  flex: 0 0 auto;
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 20px);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--apple-border-light, #e2e8f0);
+  border-radius: var(--apple-radius-medium, 10px);
+  min-height: 56px;
+}
+.staleness-clock-card__loading {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary, #64748b);
+  font-style: italic;
+}
+.staleness-clock-card--loaded .staleness-clock-card__loading {
+  display: none;
+}
+.staleness-clock-card--loaded .staleness-clock-card__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+.staleness-clock-card__inner {
+  display: none;
+}
+.staleness-clock-card__cell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 4px;
+}
+/* טולטיפ: [data-tooltip] ב-phoenix-base.css */
+.staleness-clock-card__cell svg {
+  width: 20px;
+  height: 20px;
+}
+.staleness-clock-card__market-label {
+  margin-inline-start: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.staleness-clock-card__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--apple-border-light, #e2e8f0);
+}
+.staleness-clock-card__time-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.staleness-clock-card__time-label {
+  font-size: 0.7rem;
+  color: var(--apple-text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.staleness-clock-card__time-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--apple-text-primary, #0f172a);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Market Status Key - מפתח צבעים למצב שוק (WP_20_03) */

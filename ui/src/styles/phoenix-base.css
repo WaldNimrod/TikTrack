@@ -458,6 +458,32 @@
   text-align: left !important;
 }
 
+/* ============================================
+   [data-tooltip] — טולטיפ גלובלי זמין לכל העמודים
+   ============================================ */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: #1e293b;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  z-index: var(--z-tooltip, 1070);
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* HTML root settings */
 html {
   direction: rtl;

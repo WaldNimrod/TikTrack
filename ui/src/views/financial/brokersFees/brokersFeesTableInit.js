@@ -205,28 +205,21 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   }
   
   /**
-   * Update brokers list in top container (from GET /reference/brokers)
+   * Update brokers list in info-summary (from GET /reference/brokers)
+   * רק ברוקרים נתמכים, טקסט פשוט עם פסיקים
    */
   function updateBrokersList(brokers) {
     const listEl = document.getElementById('brokersList');
     if (!listEl) return;
-    listEl.innerHTML = '';
     const items = Array.isArray(brokers) ? brokers : [];
-    if (items.length === 0) {
-      const li = document.createElement('li');
-      li.className = 'brokers-list-panel__item brokers-list-panel__item--empty';
-      li.textContent = 'טוען רשימת ברוקרים...';
-      listEl.appendChild(li);
+    const supported = items.filter(b => (b.isSupported ?? b.is_supported ?? true) !== false);
+    if (supported.length === 0) {
+      listEl.textContent = items.length === 0 ? 'טוען רשימת ברוקרים...' : '';
       return;
     }
-    items.forEach((b) => {
-      const displayName = b.displayName ?? b.display_name ?? b.value ?? b;
-      const isSupported = b.isSupported ?? b.is_supported ?? true;
-      const li = document.createElement('li');
-      li.className = 'brokers-list-panel__item' + (isSupported ? '' : ' brokers-list-panel__item--unsupported');
-      li.textContent = displayName + (isSupported ? '' : ' (ללא תמיכה ב-API/ייבוא)');
-      listEl.appendChild(li);
-    });
+    listEl.textContent = supported
+      .map(b => b.displayName ?? b.display_name ?? b.value ?? String(b))
+      .join(', ');
   }
 
   /**

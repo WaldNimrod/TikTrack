@@ -22,17 +22,6 @@
             <div class="index-section__body">
               <tt-section-row>
                 <div class="col-12">
-                  <div class="brokers-list-panel">
-                    <h2 class="brokers-list-panel__title">ברוקרים נתמכים במערכת</h2>
-                    <ul id="brokersList" class="brokers-list-panel__list" role="list">
-                      <!-- Populated by brokersFeesDataLoader from GET /reference/brokers -->
-                    </ul>
-                    <div class="brokers-list-panel__other-explanation">
-                      <h3 class="brokers-list-panel__subtitle">מגבלת שימוש בברוקר "אחר"</h3>
-                      <p>בחירת ברוקר "אחר" מאפשרת להגדיר חשבון עם שם חופשי, אולם חשבון זה <strong>לא יתמך</strong> בחיבור API או בייבוא קבצים אוטומטי.</p>
-                      <p><strong>כדי להוסיף ברוקר חדש למערכת באופן מלא:</strong> יש לפנות לצוות הטיקטרק. נדרשת אינטגרציה עם ממשקי ה־API של הברוקר, תמיכה בייבוא נתונים, והגדרת מבנה עמלות.</p>
-                    </div>
-                  </div>
                   <div class="info-summary" id="summaryStats">
                     <div class="info-summary__row info-summary__row--first">
                       <div class="info-summary__content">
@@ -41,8 +30,14 @@
                         <div>עמלה ממוצעת לפעולה: <strong id="avgCommissionPerTrade"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ עמלות קבועות לחודש: <strong id="monthlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ עמלות קבועות לשנה: <strong id="yearlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
+                        <div class="info-summary__brokers-row">ברוקרים נתמכים: <span id="brokersList" class="info-summary__brokers-list"></span></div>
                       </div>
                     </div>
+                  </div>
+                  <div class="brokers-list-panel__other-explanation">
+                    <h3 class="brokers-list-panel__subtitle">מגבלת שימוש בברוקר "אחר"</h3>
+                    <p>בחירת ברוקר "אחר" מאפשרת להגדיר חשבון עם שם חופשי, אולם חשבון זה <strong>לא יתמך</strong> בחיבור API או בייבוא קבצים אוטומטי.</p>
+                    <p><strong>כדי להוסיף ברוקר חדש למערכת באופן מלא:</strong> יש לפנות לצוות TikTrack. נדרשת אינטגרציה עם ממשקי ה־API של הברוקר, תמיכה בייבוא נתונים, והגדרת מבנה עמלות.</p>
                   </div>
                 </div>
               </tt-section-row>

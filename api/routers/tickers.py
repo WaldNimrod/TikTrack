@@ -5,6 +5,7 @@ Task: Management - Tickers CRUD
 FastAPI routes for tickers API (market_data.tickers).
 """
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -22,7 +23,9 @@ from ..schemas.tickers import (
     TickerUpdateRequest,
     TickerSummaryResponse,
     TickerDataIntegrityResponse,
+    HistoryBackfillResponse,
 )
+from ..services.history_backfill_service import run_history_backfill
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +99,67 @@ async def get_ticker_data_integrity(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch ticker data integrity",
+            error_code=ErrorCodes.SERVER_ERROR,
+        )
+
+
+@router.post(
+    "/{ticker_id}/history-backfill",
+    response_model=HistoryBackfillResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def post_ticker_history_backfill(
+    ticker_id: str = Path(..., description="Ticker ULID"),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Trigger history backfill for a ticker (250d OHLCV).
+    Idempotent, Single-Flight. Returns 200 (completed/no_op), 404, 409, 502.
+    """
+    try:
+        result = await asyncio.wait_for(
+            run_history_backfill(ticker_id),
+            timeout=90.0,
+        )
+        return HistoryBackfillResponse(**result)
+    except ValueError as e:
+        msg = str(e)
+        if msg == "not_found":
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ticker not found",
+                error_code=ErrorCodes.USER_NOT_FOUND,
+            )
+        if msg == "locked":
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Another history backfill is already running (Single-Flight)",
+                error_code=ErrorCodes.SERVER_ERROR,
+            )
+        if msg == "provider_error":
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Provider error — Yahoo/Alpha failed to return history",
+                error_code=ErrorCodes.SERVER_ERROR,
+            )
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=msg,
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+        )
+    except asyncio.TimeoutError:
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="History backfill timeout (90s)",
+            error_code=ErrorCodes.SERVER_ERROR,
+        )
+    except HTTPExceptionWithCode:
+        raise
+    except Exception as e:
+        logger.error(f"History backfill failed for {ticker_id}: {e}", exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="History backfill failed",
             error_code=ErrorCodes.SERVER_ERROR,
         )
 

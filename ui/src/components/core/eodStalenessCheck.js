@@ -1,7 +1,7 @@
 /**
  * Staleness Check - P3-012 / M6 (Clock + color + tooltip, no banner)
  * ------------------------------------------------------------------
- * Fetches exchange-rates; updates staleness clock (color + tooltip).
+ * Fetches exchange-rates + market-status; updates staleness clock (color + tooltip + market key).
  */
 
 (function () {
@@ -11,10 +11,27 @@
     try {
       const sharedServices = (await import('./sharedServices.js')).default;
       await sharedServices.init();
-      const response = await sharedServices.get('/reference/exchange-rates', {});
-      if (response && typeof response.staleness === 'string' && window.updateStalenessClock) {
-        const ts = response.data?.[0]?.last_sync_time;
-        window.updateStalenessClock(response.staleness, ts);
+
+      const [ratesRes, statusRes] = await Promise.allSettled([
+        sharedServices.get('/reference/exchange-rates', {}),
+        sharedServices.get('/system/market-status', {}),
+      ]);
+
+      let staleness, ts, marketState, displayLabel;
+      if (ratesRes.status === 'fulfilled' && ratesRes.value) {
+        staleness = ratesRes.value.staleness;
+        ts = ratesRes.value.data?.[0]?.last_sync_time;
+      }
+      if (statusRes.status === 'fulfilled' && statusRes.value) {
+        marketState = statusRes.value.market_state;
+        displayLabel = statusRes.value.display_label;
+      }
+
+      if (typeof staleness === 'string' && window.updateStalenessClock) {
+        window.updateStalenessClock(staleness, ts, {
+          market_state: marketState,
+          display_label: displayLabel,
+        });
       }
     } catch (_) {
       /* 401, network error — silently skip */

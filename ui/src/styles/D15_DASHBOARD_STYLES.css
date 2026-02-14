@@ -1822,12 +1822,112 @@ body.system-management-page {
 /* ============================================
    Data Integrity Panel (בקרת תקינות נתונים)
    TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST
+   Staleness Clock Card — שעון + מצב שוק + זמן שעבר
    ============================================ */
 .data-integrity-panel {
   padding: var(--spacing-md, 16px);
   background: var(--apple-bg-elevated, #ffffff);
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: var(--apple-radius-medium, 10px);
+}
+
+/* Staleness Clock Card — כרטיס שעון סטגנציה + מצב שוק */
+.staleness-clock-card {
+  margin-bottom: var(--spacing-md, 16px);
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 20px);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--apple-border-light, #e2e8f0);
+  border-radius: var(--apple-radius-medium, 10px);
+  min-height: 56px;
+}
+
+.staleness-clock-card__loading {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary, #64748b);
+  font-style: italic;
+}
+
+.staleness-clock-card--loaded .staleness-clock-card__loading {
+  display: none;
+}
+
+.staleness-clock-card--loaded .staleness-clock-card__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+}
+
+.staleness-clock-card__inner {
+  display: none;
+}
+
+.staleness-clock-card__clock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  cursor: help;
+}
+
+.staleness-clock-card__clock .staleness-clock {
+  display: inline-flex;
+  align-items: center;
+}
+
+.staleness-clock-card__clock .staleness-clock svg {
+  width: 20px;
+  height: 20px;
+}
+
+.staleness-clock-card__clock-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--apple-text-secondary, #64748b);
+}
+
+.staleness-clock-card__divider {
+  width: 1px;
+  height: 28px;
+  background: var(--apple-border-light, #e2e8f0);
+}
+
+.staleness-clock-card__market {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border-radius: var(--apple-radius-small, 6px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: help;
+}
+
+.staleness-clock-card__market-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.staleness-clock-card__market-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.staleness-clock-card__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.staleness-clock-card__time-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--apple-text-primary, #0f172a);
+}
+
+.staleness-clock-card__time-label {
+  font-size: 0.75rem;
+  color: var(--apple-text-secondary, #64748b);
 }
 
 .data-integrity-controls {
@@ -1893,6 +1993,27 @@ body.system-management-page {
   color: var(--color-warning-text, #e65100);
   font-weight: 500;
   font-size: 0.95rem;
+}
+
+.data-integrity-backfill-btn {
+  margin-right: var(--spacing-md, 16px);
+  padding: var(--spacing-xs, 4px) var(--spacing-md, 16px);
+  background: var(--color-brand, #26baac);
+  color: #fff;
+  border: none;
+  border-radius: var(--apple-radius-small, 6px);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.data-integrity-backfill-btn:hover:not(:disabled) {
+  background: var(--color-brand-hover, #1e968a);
+}
+
+.data-integrity-backfill-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .data-integrity-error {

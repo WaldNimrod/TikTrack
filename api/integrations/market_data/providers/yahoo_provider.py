@@ -49,6 +49,37 @@ def _to_decimal(val) -> Optional[Decimal]:
         return None
 
 
+# US market proxy for market status (SPY = S&P 500 ETF)
+_MARKET_STATUS_SYMBOL = "SPY"
+
+
+def _fetch_market_status_sync() -> Optional[str]:
+    """
+    Fetch US market state from Yahoo v7/finance/quote.
+    Returns: REGULAR | PRE | POST | CLOSED | None (on failure).
+    """
+    try:
+        import httpx
+        url = "https://query1.finance.yahoo.com/v7/finance/quote"
+        params = {"symbols": _MARKET_STATUS_SYMBOL}
+        headers = {"User-Agent": _next_user_agent()}
+        with httpx.Client(timeout=5.0, headers=headers) as client:
+            r = client.get(url, params=params)
+            r.raise_for_status()
+        data = r.json()
+        results = data.get("quoteResponse", {}).get("result", [])
+        if not results:
+            return None
+        q = results[0]
+        state = q.get("marketState")
+        if isinstance(state, str) and state:
+            return state
+        return None
+    except Exception as e:
+        logger.debug("Yahoo market status fetch failed: %s", e)
+        return None
+
+
 def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
     """Fallback: v7/finance/quote when history() fails. Requires User-Agent."""
     try:

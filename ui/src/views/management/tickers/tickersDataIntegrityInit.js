@@ -109,7 +109,7 @@ function formatTs(ts) {
 
       const needBackfill = !ind || Object.keys(ind).length === 0 || hist.gap_status === 'INSUFFICIENT';
       const backfillBanner = needBackfill
-        ? '<p class="data-integrity-backfill-banner">נדרש History Backfill ל־ATR/MA/CCI</p>'
+        ? `<p class="data-integrity-backfill-banner">נדרש History Backfill ל־ATR/MA/CCI <button type="button" id="tickerDataIntegrityBackfillBtn" class="data-integrity-backfill-btn" data-ticker-id="${tickerId}">הפעל History Backfill</button></p>`
         : '';
 
       detailEl.innerHTML = `
@@ -151,6 +151,45 @@ function formatTs(ts) {
       logEl.innerHTML = '';
     }
   }
+
+  async function doBackfill(tickerId) {
+    if (!tickerId) return;
+    const btn = document.getElementById('tickerDataIntegrityBackfillBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'מריץ...';
+    }
+    try {
+      await sharedServices.init();
+      await sharedServices.post(`/tickers/${tickerId}/history-backfill`, {});
+      if (btn) {
+        btn.textContent = 'הושלם — רענן תוצאות';
+      }
+      doCheck();
+    } catch (e) {
+      maskedLog('[Tickers Data Integrity] Backfill failed:', e);
+      const status = e?.status ?? e?.code;
+      const msg = status === 404 || status === 501
+        ? 'ממתין ל־API — נא לפנות ל־Team 20'
+        : (e?.message ?? 'שגיאה');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'הפעל History Backfill';
+      }
+      detailEl.insertAdjacentHTML(
+        'beforeend',
+        `<p class="data-integrity-error">Backfill: ${msg}</p>`
+      );
+    }
+  }
+
+  detailEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('#tickerDataIntegrityBackfillBtn');
+    if (btn) {
+      const tickerId = btn.dataset.tickerId || selectEl.value?.trim();
+      if (tickerId) doBackfill(tickerId);
+    }
+  });
 
   const list = await loadTickers();
   populateSelect(list);

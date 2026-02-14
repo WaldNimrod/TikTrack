@@ -881,7 +881,7 @@ body .page-wrapper .page-container main {
   top: 0;
   inset-inline-end: calc(100% + 1px); /* Very close to trigger button */
   display: flex;
-  flex-direction: row;
+    flex-direction: row;
   gap: 3px;
   padding: 4px; /* CRITICAL: Padding 4px for container only */
   background: var(--apple-bg-primary, #ffffff);
@@ -1868,4 +1868,35 @@ input.dir-ltr,
 }
 .staleness-clock--na {
   color: var(--color-danger, #dc2626);
+}
+
+/* Market Status Key - מפתח צבעים למצב שוק (WP_20_03) */
+.market-status-key {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.5rem;
+  padding-inline: 0.4rem 0.5rem;
+  padding-block: 0.15rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  vertical-align: middle;
+  cursor: help;
+}
+.market-status-key.market-status--open {
+  background: rgba(5, 150, 105, 0.15);
+  color: var(--color-success, #059669);
+}
+.market-status-key.market-status--pre,
+.market-status-key.market-status--post {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning, #f59e0b);
+}
+.market-status-key.market-status--closed {
+  background: rgba(107, 114, 128, 0.2);
+  color: var(--color-muted, #6b7280);
+}
+.market-status-key.market-status--unknown {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--color-muted, #6b7280);
 }

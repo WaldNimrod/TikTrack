@@ -123,3 +123,16 @@ class TickerDataIntegrityResponse(BaseModel):
         default_factory=list,
         description="Last N price updates (price_timestamp, fetched_at)",
     )
+
+
+# --- History Backfill (TEAM_30_TO_TEAM_20_HISTORY_BACKFILL_API_REQUEST) ---
+
+
+class HistoryBackfillResponse(BaseModel):
+    """Response for POST /tickers/{ticker_id}/history-backfill."""
+
+    ticker_id: str = Field(..., description="Ticker ULID")
+    symbol: str = Field(..., description="Ticker symbol")
+    rows_inserted: int = Field(..., ge=0, description="Rows inserted (0 for no_op)")
+    status: str = Field(..., description="completed | no_op | failed")
+    message: str = Field(..., description="Human-readable message")

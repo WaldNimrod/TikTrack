@@ -10,6 +10,7 @@ inserts into market_data.ticker_prices. Idempotent — skips existing dates.
 Single-Flight lock. Cooldown on 429.
 """
 
+import argparse
 import asyncio
 import os
 import sys
@@ -79,6 +80,61 @@ def load_tickers_needing_backfill() -> List[Tuple[UUID, str]]:
         """, (MIN_HISTORY_DAYS, MAX_TICKERS_PER_RUN))
         rows = cur.fetchall()
         return [(r["id"], r["symbol"]) for r in rows]
+    finally:
+        conn.close()
+
+
+def ticker_exists(ticker_id: str) -> bool:
+    """Check if ticker exists and is not deleted. Used by API for 404 vs no_op."""
+    import psycopg2
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT 1 FROM market_data.tickers WHERE id = %s AND (deleted_at IS NULL OR deleted_at > NOW())",
+            (ticker_id,),
+        )
+        return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def get_ticker_symbol(ticker_id: str) -> Optional[str]:
+    """Get symbol for ticker (for API response)."""
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(
+            "SELECT symbol FROM market_data.tickers WHERE id = %s AND (deleted_at IS NULL OR deleted_at > NOW())",
+            (ticker_id,),
+        )
+        row = cur.fetchone()
+        return row["symbol"] if row else None
+    finally:
+        conn.close()
+
+
+def load_ticker_by_id_for_backfill(ticker_id: str) -> Optional[Tuple[UUID, str]]:
+    """Load a single ticker by ID for backfill (if it has < MIN_HISTORY_DAYS rows)."""
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT t.id, t.symbol
+            FROM market_data.tickers t
+            LEFT JOIN market_data.ticker_prices tp ON tp.ticker_id = t.id
+            WHERE t.id = %s
+              AND (t.deleted_at IS NULL OR t.deleted_at > NOW())
+            GROUP BY t.id, t.symbol
+            HAVING COUNT(tp.id) < %s
+        """, (ticker_id, MIN_HISTORY_DAYS))
+        row = cur.fetchone()
+        return (row["id"], row["symbol"]) if row else None
     finally:
         conn.close()
 

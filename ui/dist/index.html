@@ -21,15 +21,24 @@
   <!-- 1. Pico CSS FIRST (Framework) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   
+  <!-- 2-6: Remaining CSS loaded via main.jsx imports (React SPA) -->
+  
   <!-- Header Loader - Loads unified-header.html dynamically for all pages (React and HTML) -->
   <!-- IMPORTANT: phoenixFilterBridge (module) imports statusAdapter; load before headerLoader -->
   <script src="/src/components/core/headerLoader.js"></script>
-  <script type="module" crossorigin src="/assets/index-BSaf_U22.js"></script>
+  <script type="module" crossorigin src="/assets/index-DJJwu6NE.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/react-vendor-ayDCT5qY.js">
   <link rel="modulepreload" crossorigin href="/assets/axios-vendor-D5GkNzM3.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DE6-NN6K.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-CwrkIVsl.css">
 </head>
 <body>
-  <div id="root"></div>
+  <!-- POL-015 v1.1: Unified Shell - page-wrapper > page-container > main (no Auth exceptions) -->
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        <div id="root"></div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>

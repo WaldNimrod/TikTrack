@@ -39,8 +39,12 @@
 
 ### 3.3 `get_ticker_history` (250d OHLCV)
 
-1. **ניסיון ראשון:** `history(period="1y" או "2y")`
-2. **אם ריק:** `history(start=..., end=...)` — 400 ימים אחורה
+1. **Primary:** v8/chart (HTTP ישיר, httpx) — `https://query1.finance.yahoo.com/v8/finance/chart/{symbol}`
+   - **Full 250d:** `range=2y` (trading_days > 252) או `range=1y` — מחזיר ~504/252 ימי לוח, לוקח 250 אחרונים
+   - **Gap-fill:** `period1` + `period2` **בלבד** (ללא range). `period2` = תחילת יום לאחר date_to (כולל date_to)
+   - **Retry:** 3×5 שניות (SPEC-PROV-YF-HIST)
+   - **Deduplication:** הסרת תאריכים כפולים לפני החזרה
+2. **Fallback:** yfinance + Session + User-Agent — `history(start=..., end=...)` 400 ימים אחורה
 
 ---
 

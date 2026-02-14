@@ -239,11 +239,18 @@
       }, 300);
     }
     
-    // Load headerLinksUpdater.js if not already loaded (for dynamic user profile link)
+    // Load headerLinksUpdater.js if not already loaded (for dynamic user profile link + management menu visibility)
     if (!document.querySelector('script[src*="headerLinksUpdater.js"]')) {
       const headerLinksScript = document.createElement('script');
       headerLinksScript.src = '/src/components/core/headerLinksUpdater.js';
+      headerLinksScript.onload = function() {
+        if (window.HeaderLinksUpdater && window.HeaderLinksUpdater.update) {
+          window.HeaderLinksUpdater.update();
+        }
+      };
       document.head.appendChild(headerLinksScript);
+    } else if (window.HeaderLinksUpdater && window.HeaderLinksUpdater.update) {
+      window.HeaderLinksUpdater.update();
     }
     
     // Initialize Phoenix Bridge if available

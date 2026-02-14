@@ -27,7 +27,7 @@
 | **sync_exchange_rates_eod.py** | FX (Alpha→Yahoo) + exchange_rates_history | `make sync-eod` |
 | **sync_ticker_prices_eod.py** | מחירי טיקר EOD (Yahoo→Alpha); טיקרים מ־market_data.tickers | `make sync-ticker-prices` |
 | **sync_intraday.py** (או מקביל) | ticker_prices_intraday — Active tickers | `make sync-intraday` |
-| **History Backfill** | 250d OHLCV לטיקרים עם &lt; 200 שורות (Indicators) | `make sync-history-backfill` |
+| **History Backfill** | 250d OHLCV לטיקרים עם &lt; 250 שורות (Indicators) | `make sync-history-backfill` |
 | **cleanup_market_data.py** | Intraday 30d, Daily 250d, FX history 250d | `make cleanup-market-data` |
 | **seed_market_data_tickers.py** | Seed טיקרים (נדרש לפני sync מחירים) | `make seed-tickers` |
 
@@ -102,7 +102,7 @@
 | sync-eod | EOD FX + exchange_rates_history |
 | sync-ticker-prices | EOD ticker_prices (Yahoo→Alpha) |
 | sync-intraday | Intraday ticker_prices_intraday (Active) |
-| sync-history-backfill | History backfill 250d (טיקרים עם &lt; 200 שורות) |
+| sync-history-backfill | History backfill 250d (טיקרים עם &lt; 250 שורות) |
 | cleanup-market-data | Retention + ארכיון |
 | check-market-data-counts | ספירות טבלאות market_data |
 | ensure-ticker-prices-partitions | יצירת 파티ונות 2025–2027 |

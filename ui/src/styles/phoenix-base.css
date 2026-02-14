@@ -212,6 +212,30 @@
   --message-success: #10b981;
   --message-success-dark: #059669;
   
+  /* ===== 3.1 System Status Colors (סטטוסים קבועים — TT2_SYSTEM_STATUS_VALUES_SSOT) ===== */
+  /* ערכים: pending (ממתין) | active (פתוח) | inactive (סגור) | cancelled (מבוטל) */
+  /* שימוש: באגטים, סינון, טבלאות — רק דרך statusAdapter.js */
+  
+  /* pending — ממתין (amber) */
+  --status-pending-light: #fef3c7;
+  --status-pending: #f59e0b;
+  --status-pending-dark: #d97706;
+  
+  /* active — פתוח (green) */
+  --status-active-light: #d1fae5;
+  --status-active: #10b981;
+  --status-active-dark: #059669;
+  
+  /* inactive — סגור (gray) */
+  --status-inactive-light: #f3f4f6;
+  --status-inactive: #6b7280;
+  --status-inactive-dark: #4b5563;
+  
+  /* cancelled — מבוטל (red) */
+  --status-cancelled-light: #fee2e2;
+  --status-cancelled: #ef4444;
+  --status-cancelled-dark: #dc2626;
+  
   /* ===== 4. Investment Type Colors (3 variables - Color Scale) ===== */
   --investment-trade-color: #0d9488; /* טרייד - Dark Turquoise */
   --investment-investment-color: #14b8a6; /* השקעה - Medium Turquoise */

@@ -202,7 +202,7 @@ class AlphaProvider(MarketDataProvider):
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
     ) -> list:
-        """P3-015 — 250d OHLCV. TIME_SERIES_DAILY. date_from/date_to: interface only (Alpha API lacks range)."""
+        """P3-015 — 250d OHLCV. compact = 100 days. Filters to date_from/date_to when provided — only return needed range."""
         if self._mode == "REPLAY":
             return _replay_history_alpha(self._fixtures_dir, symbol, trading_days)
         if not self._api_key:
@@ -213,7 +213,7 @@ class AlphaProvider(MarketDataProvider):
             params = {
                 "function": "TIME_SERIES_DAILY",
                 "symbol": symbol,
-                "outputsize": "compact",  # full requires premium; compact = 100 days (enough for indicators)
+                "outputsize": "compact",  # min request; Alpha API lacks range param
                 "apikey": self._api_key,
             }
             async with httpx.AsyncClient(timeout=15.0) as client:
@@ -225,6 +225,14 @@ class AlphaProvider(MarketDataProvider):
                 return []
             sorted_dates = sorted(series.keys(), reverse=True)[:trading_days]
             for d in reversed(sorted_dates):
+                try:
+                    d_date = datetime.strptime(d, "%Y-%m-%d").date()
+                except (ValueError, TypeError):
+                    d_date = None
+                if date_from is not None and d_date is not None and d_date < date_from:
+                    continue
+                if date_to is not None and d_date is not None and d_date > date_to:
+                    continue
                 v = series[d]
                 try:
                     ts = datetime.fromisoformat(d).replace(tzinfo=timezone.utc)

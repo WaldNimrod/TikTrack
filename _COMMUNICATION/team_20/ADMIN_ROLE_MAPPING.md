@@ -101,11 +101,11 @@ async def get_current_user(
 
 ---
 
-### **2.2 Admin Route Guard (Required Implementation)**
+### **2.2 Admin Route Guard — IMPLEMENTED**
 
-**Location:** `api/utils/dependencies.py` (to be created)
+**Location:** `api/utils/dependencies.py` → `require_admin_role()`
 
-**Required Function:**
+**Implementation:**
 ```python
 async def require_admin_role(
     current_user: User = Depends(get_current_user)
@@ -315,8 +315,9 @@ function AdminGuard({ children }) {
 ## 6. Implementation Checklist
 
 ### **Backend (Team 20):**
-- [ ] Create `require_admin_role()` dependency in `api/utils/dependencies.py`
-- [ ] Add role check to admin routes (e.g., `/admin/design-system`)
+- [x] Create `require_admin_role()` dependency in `api/utils/dependencies.py`
+- [x] Apply to Tickers API (all endpoints — ניהול טיקרים)
+- [x] Apply to Settings API `/settings/market-data` (ניהול מערכת)
 - [ ] Test with different roles (USER, ADMIN, SUPERADMIN)
 - [ ] Verify 403 response for non-admin users
 
@@ -395,7 +396,7 @@ curl -X GET http://localhost:8082/api/v1/admin/design-system \
 **Backend:**
 - `api/services/auth.py` (JWT token creation with role claim)
 - `api/models/enums.py` (UserRole enum)
-- `api/utils/dependencies.py` (get_current_user, require_admin_role - to be created)
+- `api/utils/dependencies.py` (get_current_user, require_admin_role — implemented)
 - `api/models/identity.py` (User model with role field)
 
 **Frontend:**

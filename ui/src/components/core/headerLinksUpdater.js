@@ -21,6 +21,23 @@
     const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     return !!(accessToken || authToken);
   }
+
+  /**
+   * Check if user has admin role (ADMIN or SUPERADMIN)
+   * Type D (Admin-only) per ADR-013, TT2_AUTH_GUARDS_AND_ROUTE_SSOT
+   */
+  function isAdmin() {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+                  sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.role;
+      return role === 'ADMIN' || role === 'SUPERADMIN';
+    } catch (e) {
+      return false;
+    }
+  }
   
   /**
    * Handle logout action
@@ -114,11 +131,24 @@
   }
   
   /**
+   * Show/hide Management menu per admin role (Type D)
+   * Guest or non-admin: menu hidden. Admin only: menu visible.
+   */
+  function updateManagementMenuVisibility() {
+    const el = document.getElementById('nav-management') ||
+               document.querySelector('.tiktrack-nav-item.dropdown[data-admin-only="true"]');
+    if (!el) return;
+    el.style.display = isAdmin() ? '' : 'none';
+  }
+
+  /**
    * Update all header links
    */
   function updateHeaderLinks() {
     // Update user profile link
     updateUserProfileLink();
+    // Management menu: admin only (Type D per ADR-013)
+    updateManagementMenuVisibility();
     
     // Update home link (already correct, but ensure it's set)
     const homeLinks = document.querySelectorAll('a[data-page="home"]');
@@ -395,6 +425,7 @@
   // Export for manual updates
   window.HeaderLinksUpdater = {
     update: updateHeaderLinks,
-    isAuthenticated: isAuthenticated
+    isAuthenticated: isAuthenticated,
+    isAdmin: isAdmin
   };
 })();

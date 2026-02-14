@@ -303,21 +303,23 @@ async def fetch_history_for_ticker(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> Tuple[Optional[list], str]:
-    """Yahoo → Alpha (SMART_HISTORY_FILL_SPEC). Optional date_from/date_to for gap-fill."""
+    """Yahoo → Alpha (SMART_HISTORY_FILL_SPEC). SPEC-PROV-YF-HIST: EOD history available 24/7 — do NOT skip when market closed."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
     from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
     cooldown_min = get_provider_cooldown_minutes()
-    for provider, name in [(YahooProvider(), "YAHOO_FINANCE"), (AlphaProvider(), "ALPHA_VANTAGE")]:
+    provider_order = [(YahooProvider(), "YAHOO_FINANCE"), (AlphaProvider(), "ALPHA_VANTAGE")]
+    min_rows = 1 if (date_from or date_to) else 50  # gap-fill: accept even 1 row
+    for provider, name in provider_order:
         if is_in_cooldown(name):
             continue
         try:
             hist = await provider.get_ticker_history(
                 symbol, MIN_HISTORY_DAYS, date_from=date_from, date_to=date_to
             )
-            if hist and len(hist) >= 50:  # Accept partial for gap-fill
+            if hist and len(hist) >= min_rows:
                 return hist, name
         except Exception as e:
             if _is_429(e):

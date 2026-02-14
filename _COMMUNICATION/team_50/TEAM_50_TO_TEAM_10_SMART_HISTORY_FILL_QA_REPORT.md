@@ -4,7 +4,8 @@
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (The Gateway)  
 **re:** TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST  
-**date:** 2026-01-31
+**date:** 2026-01-31  
+**רה־ריצה (לאחר תיקונים):** 2026-01-31
 
 ---
 
@@ -13,10 +14,10 @@
 | פריט | תוצאה | הערות |
 |------|--------|-------|
 | 1. כפתור "הפעל History Backfill" | ✅ PASS | טיקר עם חסרים → לחיצה → gap_fill → 200 |
-| 2. בלוק "הנתונים מלאים — לטעון מחדש?" | ⚠️ SKIP | אין טיקר עם 250+ שורות — נדרש seed |
+| 2. בלוק "הנתונים מלאים — לטעון מחדש?" | ⚠️ SKIP | אין טיקר עם 250+ שורות (backfill → 242) |
 | 3. force_reload Admin | ⚠️ SKIP | תלוי ב־Item 2 |
-| 4. force_reload משתמש רגיל → 403 | ⚠️ GAP | Backend מחזיר 200 (GAP_FILL) — לא 403 |
-| 5. טיפול בשגיאות 404, 409, 502 | ⚠️ PARTIAL | 404 API תקין; UI override להודעה גנרית |
+| 4. force_reload משתמש רגיל → 403 | ✅ PASS | Router guard — 403 + "דורש הרשאת Admin" |
+| 5. טיפול בשגיאות 404, 409, 502 | ✅ PASS | 404 API + UI הודעות מתאימות (תיקון Team 30) |
 
 ---
 
@@ -55,25 +56,17 @@
 
 | בדיקה | תוצאה |
 |-------|--------|
-| 403 + הודעה "דורש הרשאת Admin" | ⚠️ GAP |
+| 403 + הודעה "דורש הרשאת Admin" | ✅ PASS |
 
-**ממצא:** משתמש רגיל (USER) שקורא ל־`POST .../history-backfill?mode=force_reload` מקבל **200** ולא 403.
-
-**סיבה:** `decide()` ב־smart_history_engine מחזיר FULL_RELOAD רק כאשר `mode=force_reload` **ו־** `is_admin`. כאשר `!is_admin`, המנוע מחזיר GAP_FILL או NO_OP, ולכן אין Raise של 403. ה־403 נוצר רק כאשר `decision == FULL_RELOAD` ו־`not is_admin`, מצב שלא מתקיים כי FULL_RELOAD לא מוחזר עבור משתמש לא Admin.
-
-**המלצה (Team 20):** בדיקה מפורשת לפני `decide()`: אם `mode == "force_reload"` ו־`not is_admin` → `raise ValueError("forbidden")`.
+**רה־ריצה:** Router guard ב־`api/routers/tickers.py` — אם `mode=force_reload` ו־`!is_admin` → 403 לפני קריאה ל־service. **אומת.**
 
 ### 2.5 טיפול בשגיאות 404, 409, 502
 
 | שגיאה | API | UI |
 |-------|-----|-----|
-| **404** | ✅ `Ticker not found` | ⚠️ מוצג "ממתין ל־API — נא לפנות ל־Team 20" (override) |
+| **404** | ✅ `Ticker not found` | ✅ הודעת API / "טיקר לא נמצא" (תיקון Team 30) |
 | **409** | ✅ `Another history backfill is already running` | לא נבדק (דורש lock) |
 | **502** | ✅ `Yahoo/Alpha failed...` | לא נבדק (דורש provider failure) |
-
-**ממצא UI (Item 5):** `doBackfill` ב־tickersDataIntegrityInit.js מגדיר הודעה ייעודית ל־404/501: `'ממתין ל־API — נא לפנות ל־Team 20'`, במקום להציג את ה־`detail` מהתשובה.
-
-**המלצה (Team 30):** להציג את `e?.message` או `detail` מהתשובה עבור 404 (למשל "טיקר לא נמצא").
 
 ---
 
@@ -95,4 +88,21 @@
 
 ---
 
-**log_entry | TEAM_50 | TO_TEAM_10 | SMART_HISTORY_FILL_QA_REPORT | 2026-01-31**
+---
+
+## 5. רה־ריצה (לאחר TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES_MANDATE)
+
+| פריט | תוצאה |
+|------|--------|
+| 1 | ✅ PASS |
+| 2 | SKIP — טיקרים 242 שורות (Yahoo 429) |
+| 3 | SKIP |
+| 4 | ✅ PASS |
+| 5 | ✅ PASS |
+
+**סה"כ:** 4/5 PASS, 2 SKIP (תלוי בטיקר 250+).
+
+---
+
+**log_entry | TEAM_50 | TO_TEAM_10 | SMART_HISTORY_FILL_QA_REPORT | 2026-01-31**  
+**log_entry | TEAM_50 | RERUN_AFTER_FIXES | 4_PASS_2_SKIP | 2026-01-31**

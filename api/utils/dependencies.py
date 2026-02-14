@@ -14,6 +14,7 @@ from sqlalchemy import select
 from ..core.database import get_db
 from ..services.auth import get_auth_service, TokenError
 from ..models.identity import User
+from ..models.enums import UserRole
 from ..utils.identity import ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 import logging
@@ -122,3 +123,25 @@ async def get_current_user(
             detail="Authentication failed",
             error_code=ErrorCodes.SERVER_ERROR
         )
+
+
+async def require_admin_role(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """
+    Dependency that requires ADMIN or SUPERADMIN role.
+    Per ADMIN_ROLE_MAPPING, ADR-013 — Type D (Admin-only) routes.
+
+    Returns:
+        User instance if admin.
+
+    Raises:
+        HTTPExceptionWithCode: 403 Forbidden + ACCESS_DENIED if not admin
+    """
+    if current_user.role not in (UserRole.ADMIN, UserRole.SUPERADMIN):
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+            error_code=ErrorCodes.ACCESS_DENIED,
+        )
+    return current_user

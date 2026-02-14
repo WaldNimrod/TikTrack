@@ -40,6 +40,15 @@ const COLOR_CATEGORIES = [
     ],
   },
   {
+    title: '3.1 סטטוסים קבועים — System Status (12 משתנים)',
+    rows: [
+      { label: 'pending (ממתין)', vars: ['--status-pending-light', '--status-pending', '--status-pending-dark'] },
+      { label: 'active (פתוח)', vars: ['--status-active-light', '--status-active', '--status-active-dark'] },
+      { label: 'inactive (סגור)', vars: ['--status-inactive-light', '--status-inactive', '--status-inactive-dark'] },
+      { label: 'cancelled (מבוטל)', vars: ['--status-cancelled-light', '--status-cancelled', '--status-cancelled-dark'] },
+    ],
+  },
+  {
     title: '4. Investment Types (3 משתנים)',
     rows: [
       { label: 'trade', vars: ['--investment-trade-color'] },
@@ -91,7 +100,7 @@ const DesignSystemColorsTable = () => (
   <div className="design-system-section">
     <h2 className="design-system-section__title">משתני צבע DNA</h2>
     <p className="design-system-section__description">
-      כל 63 משתני הצבע מ־<code>phoenix-base.css</code>. הצבעים מקושרים למשתנים — ללא inline.
+      משתני הצבע מ־<code>phoenix-base.css</code> (כולל סטטוסים קבועים). הצבעים מקושרים למשתנים — ללא inline.
     </p>
     <div className="phoenix-table-wrapper">
       <table className="phoenix-table">

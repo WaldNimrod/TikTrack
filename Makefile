@@ -108,7 +108,7 @@ sync-intraday:
 	@python3 scripts/sync_ticker_prices_intraday.py
 	@echo "✅ Intraday sync complete."
 
-## History Backfill — 250d OHLCV for tickers with < 200 rows (Indicators ATR/MA/CCI)
+## History Backfill — 250d OHLCV for tickers with < 250 rows (Indicators ATR/MA/CCI, SSOT)
 sync-history-backfill:
 	@echo "🔄 History backfill — 250d OHLCV"
 	@python3 scripts/sync_ticker_prices_history_backfill.py
@@ -117,6 +117,14 @@ sync-history-backfill:
 ## Ensure QA ticker 250d — לפחות טיקר אחד עם 250+ שורות (TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES)
 ensure-qa-ticker-250d:
 	@python3 scripts/ensure_qa_ticker_250d.py
+
+## Yahoo heartbeat — אות חיים (הכי פשוט: יום אחד מהספק). proof of connection
+yahoo-heartbeat:
+	@python3 scripts/yahoo_heartbeat.py
+
+## Yahoo 250d — אימות מלא (סקופ, דיוק, השלמות)
+verify-yahoo-250d:
+	@python3 scripts/verify_yahoo_250d.py
 
 ## Check market_data counts (tickers, ticker_prices, exchange_rates) — Team 10/50
 check-market-data-counts:
@@ -172,6 +180,8 @@ help:
 	@echo "  make sync-intraday      - Intraday sync ticker_prices_intraday (Active tickers)"
 	@echo "  make sync-history-backfill - History backfill 250d OHLCV (tickers with < 250 rows)"
 	@echo "  make ensure-qa-ticker-250d - Ensure at least one ticker has 250+ rows (QA seed)"
+	@echo "  make yahoo-heartbeat       - Yahoo connection heartbeat (1 row from provider)"
+	@echo "  make verify-yahoo-250d     - Yahoo 250d full verification (scope, accuracy, completeness)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"

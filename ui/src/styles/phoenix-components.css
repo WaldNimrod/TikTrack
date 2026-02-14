@@ -823,33 +823,52 @@ body .page-wrapper .page-container main {
   white-space: nowrap;
 }
 
-/* Active Status - Green */
+/* System Status Badges — צבעים מ־phoenix-base (--status-*). מקור: TT2_SYSTEM_STATUS_VALUES_SSOT */
+
+/* pending — ממתין */
+.phoenix-table__status-badge--pending,
+.status-badge[data-status-category="pending"] {
+  background: var(--status-pending-light) !important;
+  border: 1px solid var(--status-pending) !important;
+  color: var(--status-pending-dark) !important;
+}
+
+/* active — פתוח */
 .phoenix-table__status-badge--active,
 .status-badge[data-status-category="active"] {
-  background: rgba(52, 199, 89, 0.1) !important;
-  border: 1px solid var(--apple-green, #34c759) !important;
-  color: var(--apple-green, #34c759) !important;
+  background: var(--status-active-light) !important;
+  border: 1px solid var(--status-active) !important;
+  color: var(--status-active-dark) !important;
 }
 
-/* Long Position - Green */
+/* Long Position — Green (aligns with positive/active) */
 .phoenix-table__status-badge--long {
-  background: rgba(52, 199, 89, 0.1) !important;
-  border: 1px solid var(--apple-green, #34c759) !important;
-  color: var(--apple-green, #34c759) !important;
+  background: var(--status-active-light) !important;
+  border: 1px solid var(--status-active) !important;
+  color: var(--status-active-dark) !important;
 }
 
-/* Short Position - Red */
+/* Short Position — Red (aligns with negative) */
 .phoenix-table__status-badge--short {
-  background: rgba(255, 59, 48, 0.1) !important;
-  border: 1px solid var(--apple-red, #ff3b30) !important;
-  color: var(--apple-red, #ff3b30) !important;
+  background: var(--status-cancelled-light) !important;
+  border: 1px solid var(--status-cancelled) !important;
+  color: var(--status-cancelled-dark) !important;
 }
 
-/* Inactive Status - Gray */
-.phoenix-table__status-badge--inactive {
-  background: rgba(142, 142, 147, 0.1) !important;
-  border: 1px solid var(--apple-gray-6, #8e8e93) !important;
-  color: var(--apple-gray-6, #8e8e93) !important;
+/* inactive — סגור */
+.phoenix-table__status-badge--inactive,
+.status-badge[data-status-category="inactive"] {
+  background: var(--status-inactive-light) !important;
+  border: 1px solid var(--status-inactive) !important;
+  color: var(--status-inactive-dark) !important;
+}
+
+/* cancelled — מבוטל */
+.phoenix-table__status-badge--cancelled,
+.status-badge[data-status-category="cancelled"] {
+  background: var(--status-cancelled-light) !important;
+  border: 1px solid var(--status-cancelled) !important;
+  color: var(--status-cancelled-dark) !important;
 }
 
 /* Count Badge - Primary Color */

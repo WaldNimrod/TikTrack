@@ -54,6 +54,14 @@ const DesignSystemStylesTable = () => {
     }
   ];
 
+  // Status Badges — סטטוסים קבועים (TT2_SYSTEM_STATUS_VALUES_SSOT)
+  const statusBadgeStyles = [
+    { value: 'pending', label: 'ממתין', cssVar: '--status-pending', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--pending">ממתין</span> },
+    { value: 'active', label: 'פתוח', cssVar: '--status-active', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--active">פתוח</span> },
+    { value: 'inactive', label: 'סגור', cssVar: '--status-inactive', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--inactive">סגור</span> },
+    { value: 'cancelled', label: 'מבוטל', cssVar: '--status-cancelled', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--cancelled">מבוטל</span> },
+  ];
+
   // Button Styles Data (from DNA_BUTTON_SYSTEM.md)
   const buttonStyles = [
     {
@@ -124,6 +132,36 @@ const DesignSystemStylesTable = () => {
 
   return (
     <div className="design-system-styles">
+      {/* Status Badges Section — סטטוסים קבועים */}
+      <div className="design-system-section">
+        <h2 className="design-system-section__title">סטטוסים קבועים (Status Badges)</h2>
+        <p className="design-system-section__description">
+          ארבעת הסטטוסים המערכתיים (TT2_SYSTEM_STATUS_VALUES_SSOT). צבעים מ־<code>phoenix-base.css</code> (<code>--status-*</code>). שימוש: <code>.phoenix-table__status-badge--pending|active|inactive|cancelled</code> או <code>data-status-category</code>.
+        </p>
+        <div className="phoenix-table-wrapper">
+          <table className="phoenix-table">
+            <thead className="phoenix-table__head">
+              <tr className="phoenix-table__row">
+                <th className="phoenix-table__header">ערך קנוני</th>
+                <th className="phoenix-table__header">תצוגה עברית</th>
+                <th className="phoenix-table__header">משתנה צבע</th>
+                <th className="phoenix-table__header">דוגמה</th>
+              </tr>
+            </thead>
+            <tbody className="phoenix-table__body">
+              {statusBadgeStyles.map((row, index) => (
+                <tr key={index} className="phoenix-table__row">
+                  <td className="phoenix-table__cell"><code>{row.value}</code></td>
+                  <td className="phoenix-table__cell">{row.label}</td>
+                  <td className="phoenix-table__cell"><code>{row.cssVar}</code></td>
+                  <td className="phoenix-table__cell">{row.example}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Rich-Text Styles Section */}
       <div className="design-system-section">
         <h2 className="design-system-section__title">Rich-Text Styles</h2>

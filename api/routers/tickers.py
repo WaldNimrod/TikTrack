@@ -12,7 +12,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, Path, status
 
 from ..core.database import get_db
-from ..utils.dependencies import get_current_user
+from ..utils.dependencies import require_admin_role
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
 from ..models.enums import UserRole
@@ -38,7 +38,7 @@ async def get_tickers(
     search: Optional[str] = Query(None, description="Search in symbol, company_name"),
     ticker_type: Optional[str] = Query(None, description="Filter by ticker type"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Get all tickers (paginated)."""
@@ -64,7 +64,7 @@ async def get_tickers(
 
 @router.get("/summary", response_model=TickerSummaryResponse)
 async def get_tickers_summary(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Get tickers summary (total, active)."""
@@ -86,7 +86,7 @@ async def get_tickers_summary(
 @router.get("/{ticker_id}/data-integrity", response_model=TickerDataIntegrityResponse)
 async def get_ticker_data_integrity(
     ticker_id: str = Path(..., description="Ticker ULID"),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Get ticker data integrity report — EOD, intraday, history + last updates."""
@@ -112,7 +112,7 @@ async def get_ticker_data_integrity(
 async def post_ticker_history_backfill(
     ticker_id: str = Path(..., description="Ticker ULID"),
     mode: Optional[str] = Query("gap_fill", description="gap_fill (default) | force_reload (Admin only)"),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
 ):
     """
     Trigger history backfill for a ticker (250d OHLCV) — Smart History Engine.
@@ -196,7 +196,7 @@ async def post_ticker_history_backfill(
 @router.get("/{ticker_id}", response_model=TickerResponse)
 async def get_ticker(
     ticker_id: str = Path(..., description="Ticker ULID"),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Get single ticker by ID."""
@@ -217,7 +217,7 @@ async def get_ticker(
 @router.post("", response_model=TickerResponse, status_code=status.HTTP_201_CREATED)
 async def create_ticker(
     payload: TickerCreateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Create a new ticker."""
@@ -245,7 +245,7 @@ async def create_ticker(
 async def update_ticker(
     ticker_id: str = Path(..., description="Ticker ULID"),
     payload: TickerUpdateRequest = ...,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Update a ticker."""
@@ -273,7 +273,7 @@ async def update_ticker(
 @router.delete("/{ticker_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_ticker(
     ticker_id: str = Path(..., description="Ticker ULID"),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_role),
     db=Depends(get_db),
 ):
     """Soft-delete a ticker."""

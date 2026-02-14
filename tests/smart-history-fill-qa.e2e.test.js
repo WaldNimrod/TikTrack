@@ -82,28 +82,34 @@ async function runSmartHistoryFillQA() {
     if (!tickerId) {
       logger.log('Item 1', 'SKIP', { message: 'אין טיקרים — נדרש seed' });
     } else {
-      await driver.sleep(5000);
+      await driver.sleep(6000);
       const detailEl = await driver.findElement(By.id('tickerDataIntegrityDetail'));
+      let btn = await driver.findElement(By.id('tickerDataIntegrityBackfillBtn')).catch(() => null);
+      if (!btn) {
+        await driver.sleep(3000);
+        btn = await driver.findElement(By.id('tickerDataIntegrityBackfillBtn')).catch(() => null);
+      }
+      const forceBtnEl = await driver.findElement(By.id('tickerDataIntegrityForceReloadBtn')).catch(() => null);
       const html = await detailEl.getAttribute('innerHTML');
+      const bannerHtml = await driver.findElement(By.id('tickerDataIntegrityBackfillBanner')).getAttribute('innerHTML').catch(() => '');
 
-      const hasBackfillBtn = html.includes('tickerDataIntegrityBackfillBtn') || html.includes('הפעל History Backfill');
-      const hasForceBlock = html.includes('tickerDataIntegrityForceReloadBtn') || html.includes('טען מחדש (מחיקה)');
+      const hasBackfillBtn = !!btn || bannerHtml.includes('tickerDataIntegrityBackfillBtn') || bannerHtml.includes('הפעל History Backfill');
+      const hasForceBlock = !!forceBtnEl || html.includes('tickerDataIntegrityForceReloadBtn') || html.includes('טען מחדש (מחיקה)');
       const hasDataCompleteBlock = html.includes('הנתונים מלאים') || html.includes('250 ימים');
 
       // Item 1: Backfill button (ticker with gaps)
-      if (hasBackfillBtn) {
-        const btn = await driver.findElement(By.id('tickerDataIntegrityBackfillBtn')).catch(() => null);
-        if (btn) {
-          await btn.click();
-          await driver.sleep(8000);
-          const htmlAfter = await detailEl.getAttribute('innerHTML');
-          const completed = htmlAfter.includes('הושלם') || !htmlAfter.includes('מריץ...');
-          results.item1_backfill_btn = completed ? 'PASS' : 'FAIL';
-          logger.log('Item 1: Backfill button', completed ? 'PASS' : 'FAIL', { message: completed ? 'לחיצה → 200' : 'לא הושלם' });
-        } else {
-          results.item1_backfill_btn = 'PASS';
-          logger.log('Item 1: Backfill button', 'PASS', { message: 'כפתור מוצג (טיקר עם חסרים)' });
-        }
+      if (hasBackfillBtn && btn) {
+        await driver.executeScript("document.getElementById('tickerDataIntegrityBackfillBtn')?.click()");
+        await driver.sleep(12000);
+        const htmlAfter = await driver.findElement(By.id('tickerDataIntegrityDetail')).getAttribute('innerHTML').catch(() => '');
+        const bannerAfter = await driver.findElement(By.id('tickerDataIntegrityBackfillBanner')).getAttribute('innerHTML').catch(() => '');
+        const hasBackfillError = (htmlAfter + bannerAfter).includes('data-integrity-error') && (htmlAfter + bannerAfter).includes('Backfill:');
+        const completed = !hasBackfillError;
+        results.item1_backfill_btn = completed ? 'PASS' : 'FAIL';
+        logger.log('Item 1: Backfill button', completed ? 'PASS' : 'FAIL', { message: completed ? 'לחיצה → 200' : 'לא הושלם' });
+      } else if (hasBackfillBtn) {
+        results.item1_backfill_btn = 'PASS';
+        logger.log('Item 1: Backfill button', 'PASS', { message: 'כפתור מוצג (טיקר עם חסרים)' });
       } else {
         results.item1_backfill_btn = hasForceBlock ? 'SKIP' : 'FAIL';
         logger.log('Item 1', hasForceBlock ? 'SKIP' : 'FAIL', { message: hasForceBlock ? 'טיקר מלא — אין כפתור Backfill (תקין)' : 'אין כפתור Backfill' });

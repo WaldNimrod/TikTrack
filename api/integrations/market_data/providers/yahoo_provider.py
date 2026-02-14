@@ -280,41 +280,123 @@ def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
     return _fetch_fx_via_quote_api(from_ccy, to_ccy)
 
 
+def _fetch_history_v8_chart(
+    symbol: str,
+    trading_days: int,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+) -> List:
+    """Direct v8/chart — עובד (v7/quote = 401). SPEC-PROV-YF-HIST. Retry 3×5s.
+    250d full: range=2y (~504 cal days). Gap-fill: period1/period2 only (no range)."""
+    import time
+    for attempt in range(3):
+        try:
+            import httpx
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+            if date_from and date_to:
+                # Gap-fill: use period1/period2 only. period2 = start of day after date_to (to include date_to)
+                p1 = datetime.combine(date_from, datetime.min.time()).replace(tzinfo=timezone.utc)
+                p2 = datetime.combine(date_to + timedelta(days=1), datetime.min.time()).replace(tzinfo=timezone.utc)
+                period1_ts = int(p1.timestamp())
+                period2_ts = int(p2.timestamp())
+                params = {"interval": "1d", "period1": period1_ts, "period2": period2_ts}
+                logger.info(
+                    "Yahoo gap-fill: symbol=%s date_from=%s date_to=%s period1=%d period2=%d",
+                    symbol, date_from, date_to, period1_ts, period2_ts,
+                )
+            else:
+                # Full 250d: range=2y covers ~504 cal days (~252 trading days)
+                range_val = "2y" if trading_days > 252 else "1y"
+                params = {"interval": "1d", "range": range_val}
+            headers = {"User-Agent": _next_user_agent()}
+            with httpx.Client(timeout=15.0) as client:
+                r = client.get(url, params=params, headers=headers)
+                r.raise_for_status()
+            data = r.json()
+            chart = data.get("chart", {}).get("result")
+            if not chart:
+                err = data.get("chart", {}).get("error")
+                if attempt < 2:
+                    time.sleep(5)
+                    continue
+                logger.warning("Yahoo v8/chart empty for %s: %s", symbol, err)
+                return []
+            c0 = chart[0]
+            timestamps = c0.get("timestamp", [])
+            quote = (c0.get("indicators", {}).get("quote", [{}]) or [{}])[0]
+            opens = quote.get("open", []) or []
+            highs = quote.get("high", []) or []
+            lows = quote.get("low", []) or []
+            closes = quote.get("close", []) or []
+            volumes = quote.get("volume", []) or []
+            result: List = []
+            for i, ts_unix in enumerate(timestamps):
+                try:
+                    ts = datetime.fromtimestamp(ts_unix, tz=timezone.utc)
+                except (ValueError, TypeError, OSError):
+                    continue
+                o = _to_decimal(opens[i] if i < len(opens) else None) or Decimal("0")
+                h = _to_decimal(highs[i] if i < len(highs) else None) or Decimal("0")
+                lw = _to_decimal(lows[i] if i < len(lows) else None) or Decimal("0")
+                c = _to_decimal(closes[i] if i < len(closes) else None) or Decimal("0")
+                v = volumes[i] if i < len(volumes) else None
+                v = int(v) if v is not None and str(v) != "nan" else None
+                if date_from and ts.date() < date_from:
+                    continue
+                if date_to and ts.date() > date_to:
+                    continue
+                result.append(OHLCVRow(date=ts, open_price=o, high_price=h, low_price=lw, close_price=c, volume=v))
+            if result:
+                # Dedupe by date (keep last occurrence)
+                seen: set = set()
+                deduped: List = []
+                for r in reversed(result):
+                    d = r.date.date() if hasattr(r.date, "date") else r.date
+                    d_str = d.isoformat() if hasattr(d, "isoformat") else str(d)[:10]
+                    if d_str not in seen:
+                        seen.add(d_str)
+                        deduped.append(r)
+                deduped.reverse()
+                out = deduped[-trading_days:] if not (date_from or date_to) else deduped
+                if date_from and date_to:
+                    logger.info("Yahoo gap-fill: symbol=%s returned %d rows", symbol, len(out))
+                return out
+            if date_from and date_to:
+                logger.warning("Yahoo gap-fill: symbol=%s returned 0 rows (empty chart)", symbol)
+            if attempt < 2:
+                time.sleep(5)
+        except Exception as e:
+            logger.warning("Yahoo v8/chart failed for %s (attempt %d/3): %s", symbol, attempt + 1, e)
+            if attempt < 2:
+                time.sleep(5)
+    if date_from and date_to:
+        logger.warning("Yahoo gap-fill: symbol=%s failed after retries, returning empty", symbol)
+    return []
+
+
 def _fetch_history_sync(
     symbol: str,
     trading_days: int,
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> List:
-    """P3-015 — 250d OHLCV. Optional date_from/date_to for gap-fill (SMART_HISTORY_FILL_SPEC).
-    Uses session with User-Agent — required for Yahoo to return data (avoid 401/429)."""
-    result: List = []
+    """P3-015 — 250d OHLCV. Primary: v8/chart (עובד). Fallback: yfinance."""
+    result = _fetch_history_v8_chart(symbol, trading_days, date_from, date_to)
+    if result:
+        return result
     try:
         import yfinance as yf
         from requests import Session
-
         session = Session()
         session.headers["User-Agent"] = _next_user_agent()
         ticker = yf.Ticker(symbol, session=session)
         end_d = date_to or datetime.now(timezone.utc).date()
-        start_d = date_from
-        if start_d and date_to:
-            info = ticker.history(start=start_d.isoformat(), end=(end_d + timedelta(days=1)).isoformat(), interval="1d", debug=False)
-        else:
-            period = "2y" if trading_days > 252 else "1y"
-            info = ticker.history(period=period, interval="1d", debug=False)
+        start_d = date_from or (end_d - timedelta(days=400))
+        info = ticker.history(start=start_d.isoformat(), end=(end_d + timedelta(days=1)).isoformat(), interval="1d", debug=False)
         if info is None or info.empty:
-            if not start_d:
-                start_d = end_d - timedelta(days=400)
-            info = ticker.history(
-                start=start_d.isoformat(),
-                end=(end_d + timedelta(days=1)).isoformat(),
-                interval="1d",
-                debug=False,
-            )
-        if info is None or info.empty:
-            return result
+            return []
         rows = info.tail(trading_days) if not (date_from or date_to) else info
+        out: List = []
         for idx in range(len(rows)):
             row = rows.iloc[idx]
             ts = row.name
@@ -322,7 +404,7 @@ def _fetch_history_sync(
                 ts = ts.to_pydatetime()
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=timezone.utc)
-            result.append(OHLCVRow(
+            out.append(OHLCVRow(
                 date=ts,
                 open_price=_to_decimal(row.get("Open")) or Decimal("0"),
                 high_price=_to_decimal(row.get("High")) or Decimal("0"),
@@ -330,9 +412,10 @@ def _fetch_history_sync(
                 close_price=_to_decimal(row.get("Close")) or Decimal("0"),
                 volume=int(row["Volume"]) if "Volume" in row.index and str(row.get("Volume", "")) != "nan" else None,
             ))
+        return out
     except Exception as e:
-        logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
-    return result
+        logger.warning("Yahoo yfinance fallback failed for %s: %s", symbol, e)
+    return []
 
 
 def _replay_price(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceResult]:

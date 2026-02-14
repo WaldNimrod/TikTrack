@@ -72,3 +72,25 @@
 **log_entry | TEAM_10 | EVIDENCE_LOG | SMART_HISTORY_FILL_SSOT_UPDATE | 2026-02-14**  
 **log_entry | TEAM_10 | EVIDENCE_LOG | NO_CONTRADICTIONS_VERIFIED | 2026-02-14**  
 **log_entry | TEAM_20 | IMPLEMENTATION | SHF_1_2_3_4_COMPLETE | 2026-02-14** — TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE. Engine (smart_history_engine.py), API (mode=gap_fill|force_reload, Admin check), Provider Interface (date_from/date_to), Retry (מיידי + batch לילה), סקריפט מתואם. Evidence: TEAM_20_SMART_HISTORY_FILL_IMPLEMENTATION_COMPLETE.md. ACK: TEAM_10_TO_TEAM_20_SMART_HISTORY_FILL_ACK. SHF-5, SHF-6 (Team 30) — פתוחים; בקשת ביצוע: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md.
+
+**log_entry | TEAM_20 | DOCUMENTATION_UPDATE | YAHOO_ENGINE_FULL | 2026-02-14** — Yahoo 250d מלא: v8/chart Primary (range=2y / period1+period2); gap-fill period1/period2 בלבד; dedup; Retry 3×5s (SPEC-PROV-YF-HIST); Fallback yfinance. סקריפטים: yahoo-heartbeat, verify-yahoo-250d. תיעוד: YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC §3.3; TEAM_60_CRON_SCHEDULE 200→250. מקור: TEAM_20_TO_TEAM_10_YAHOO_ENGINE_DOCUMENTATION_UPDATE.md.
+
+---
+
+## 6. תיקוני SSOT — Smart Update Logic (2026-02-14)
+
+**מקור:** דרישת צוות 10 — יישור לפני אישור אדריכלית
+
+| תיקון | מיקום | Evidence |
+|-------|--------|----------|
+| **Cache-First 200→250** | `cache_first_service.py` L256 — `len(rows) >= trading_days` (250) | SSOT: MIN_HISTORY_DAYS |
+| **Retry policy** | מסמך ההצעה — "ניסיון מיידי אחד + Batch לילה" | TEAM_20_TO_ARCHITECT_SMART_UPDATE_LOGIC_PROPOSAL §6.1, §8 |
+| **force_reload 403 ל־USER** | `api/routers/tickers.py` L115 `require_admin_role` + L129–136 guard מפורש | USER מקבל 403 מ־require_admin_role (לפני handler); guard נוסף: `if mode==force_reload and !is_admin → 403` |
+| **validate_only** | הוסר — data-integrity כבר DB-only, Admin-only | אין צורך בפרמטר נוסף |
+| **History wording** | "Gap-First ברירת מחדל; Reload Admin ל־splits/dividends" | §1.2 במסמך ההצעה |
+
+**קבצים מתוקנים:**
+- `api/integrations/market_data/cache_first_service.py`
+- `_COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_UPDATE_LOGIC_PROPOSAL.md`
+
+**QA נדרש:** לאשר ש־USER מקבל 403 ב־`POST /tickers/{id}/history-backfill?mode=force_reload`.

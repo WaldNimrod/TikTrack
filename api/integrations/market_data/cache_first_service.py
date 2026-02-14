@@ -253,7 +253,8 @@ async def get_ticker_history_cache_first(
     )
     result = await db.execute(stmt)
     rows = result.scalars().all()
-    if rows and len(rows) >= 200:
+    # SSOT: MIN_HISTORY_DAYS=250 — Cache HIT when DB has enough (no provider fetch)
+    if rows and len(rows) >= trading_days:
         recent = rows[-trading_days:]
         return [
             OHLCVRow(

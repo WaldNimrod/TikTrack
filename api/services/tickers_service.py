@@ -279,7 +279,7 @@ class TickersService:
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
 
-        MIN_HISTORY_FOR_INDICATORS = 200
+        MIN_HISTORY_FOR_INDICATORS = 250  # SSOT: 250 ימי מסחר מינימום (MARKET_DATA_PIPE_SPEC)
         STALE_HOURS = 48  # EOD > 48h = stale
 
         gaps: List[str] = []
@@ -360,7 +360,7 @@ class TickersService:
         history_status = "OK" if eod_count >= MIN_HISTORY_FOR_INDICATORS else "INSUFFICIENT"
         if eod_count < MIN_HISTORY_FOR_INDICATORS:
             gaps.append(
-                f"היסטוריה 250d: {eod_count} שורות (נדרש {MIN_HISTORY_FOR_INDICATORS}+ ל־ATR/MA/CCI)"
+                f"היסטוריה 250d: {eod_count} שורות (נדרש {MIN_HISTORY_FOR_INDICATORS} ימים ל־ATR/MA/CCI)"
             )
 
         history_overview = DataDomainOverview(
@@ -369,7 +369,7 @@ class TickersService:
             latest_fetched_at=eod_latest.fetched_at if eod_latest else None,
             has_data=eod_count > 0,
             gap_status=history_status,
-            note=f"נדרש מינימום {MIN_HISTORY_FOR_INDICATORS} שורות",
+            note=f"נדרש {MIN_HISTORY_FOR_INDICATORS} ימים",
         )
 
         # --- Last updates (last 5 from ticker_prices) ---

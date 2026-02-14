@@ -373,13 +373,16 @@
   padding-top: 0.5rem !important;
   padding-inline-end: 1rem !important; /* RTL: more padding from text side */
   padding-bottom: 0.5rem !important;
-  padding-inline-start: 0.5rem !important; /* RTL: less padding from edge */
+  padding-inline-start: 0.5rem !important; /* RTL: base padding */
   color: #29a6a8;
   text-decoration: none;
   transition: all 0.2s ease;
-  /* Font defaults inherited from phoenix-base.css * selector - 0.92rem (14.72px), 300, 1.4 */
-  /* Override line-height to 1.2 for tighter spacing - !important needed to override Pico CSS */
   line-height: 1.2 !important;
+}
+
+/* Items without icon — add spacer so label aligns with items that have emoji */
+#unified-header .tiktrack-dropdown-item.dropdown-item--no-icon {
+  padding-inline-start: 1.5em !important;
 }
 
 /* Submenu Items (Level 2) - Normal padding all around, margin top/bottom same size */

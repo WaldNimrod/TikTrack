@@ -45,7 +45,8 @@
     },
     "management": {
       "system_management": "/system_management.html",
-      "tickers": "/tickers.html"
+      "tickers": "/tickers.html",
+      "design_system": "/admin/design-system"
     }
   },
   "public_routes": [

@@ -173,8 +173,15 @@ import { maskedLogWithTimestamp } from '../../utils/maskedLog.js';
       return 'B';
     }
     
-    // Type D (Admin-only): /admin/* - JWT role check required
+    // Type D (Admin-only): /admin/* + כל עמודי תפריט ניהול — SSOT: routes.json management, unified-header ניהול
     if (path.startsWith('/admin/')) {
+      return 'D';
+    }
+    const managementPaths = [
+      '/system_management.html', '/system_management',
+      '/tickers.html', '/tickers'
+    ];
+    if (managementPaths.includes(path)) {
       return 'D';
     }
     

@@ -131,3 +131,24 @@ async def get_market_status() -> Tuple[Optional[str], str]:
     state, label = _us_market_status_from_local_time()
     logger.debug("Market status: using local time heuristic -> %s", label)
     return state, label
+
+
+def get_market_status_sync() -> Optional[str]:
+    """
+    Sync market status — for scripts (e.g. history backfill).
+    Returns REGULAR | PRE | POST | CLOSED | None. Skips Yahoo when closed.
+    """
+    try:
+        state = _fetch_market_status_sync()
+        if state:
+            return state
+    except Exception:
+        pass
+    try:
+        state = _fetch_alpha_market_status_sync()
+        if state:
+            return state
+    except Exception:
+        pass
+    state, _ = _us_market_status_from_local_time()
+    return state

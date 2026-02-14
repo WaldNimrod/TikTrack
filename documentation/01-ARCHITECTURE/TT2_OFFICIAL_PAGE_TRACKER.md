@@ -51,7 +51,7 @@
 | D16 | trading_accounts.html | חשבונות מסחר | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
 | D18 | brokers_fees.html | עמלות ברוקרים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; שער א'+ב' נסגרו |
 | D21 | cash_flows.html | תזרים מזומנים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; D21 Infra VERIFIED (ADR-010) |
-| D22 | tickers.html | ניהול טיקרים | **3. IN PROGRESS** 🟡 | Team 30 | Roadmap v2.1 Batch 3 — TICKERS_MGR; CRUD; מחיר אחרון + שינוי יומי |
+| D22 | tickers.html | ניהול טיקרים | **3. IN PROGRESS** 🟡 | Team 30 | Roadmap v2.1 Batch 3 — TICKERS_MGR; CRUD; מחיר אחרון + שינוי יומי. **בקרת תקינות:** widget נדרש — דרופדאון טיקר + GET /tickers/{id}/data-integrity + פירוט EOD/Intraday/250d + gaps + last_updates (TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST). |
 | D23 | data_dashboard.html | דשבורד נתונים | **1. DRAFT** 📝 | Team 30 | תבנית בלבד; מקושר מכפתור "נתונים"; תוכן מלא בהמשך |
 
 ---
@@ -174,11 +174,12 @@
 
 | ID | קובץ | תיאור | נתיב view | Route | סטטוס |
 |----|------|--------|-----------|--------|--------|
-| D22 | tickers.html | ניהול טיקרים | `ui/src/views/management/tickers/` | `/tickers.html` | **3. IN PROGRESS** — Roadmap v2.1 Batch 3 TICKERS_MGR |
+| D22 | tickers.html | ניהול טיקרים | `ui/src/views/management/tickers/` | `/tickers.html` | **3. IN PROGRESS** — TICKERS_MGR; **+ בקרת תקינות:** widget דרופדאון + data-integrity (TEAM_20_TO_TEAMS_10_30) |
 | D23 | data_dashboard.html | דשבורד נתונים | `ui/src/views/data/dataDashboard/` | `/data_dashboard.html` | **1. DRAFT** — תבנית בלבד; נתונים → דשבורד נתונים (פריט ראשון) |
 
 **Scope:** IN SCOPE — D22 מתוך Roadmap v2.1 באץ' 3 (TICKERS_MGR); D23 דשבורד מרכזי לתפריט נתונים (הגדרה חדשה).  
-**מקור:** TEAM_30_TO_TEAM_10_NEW_PAGES_SCOPE_UPDATE.md (2026-01-31).
+**מקור:** TEAM_30_TO_TEAM_10_NEW_PAGES_SCOPE_UPDATE.md (2026-01-31).  
+**D22 — בקרת תקינות:** TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST — API מוכן; נדרש UI (דרופדאון + פירוט + gaps + last_updates). מסירה: TEAM_10_TO_TEAM_30_TICKER_DATA_INTEGRITY_UI_HANDOFF.
 
 ---
 

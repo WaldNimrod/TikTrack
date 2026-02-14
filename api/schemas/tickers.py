@@ -71,3 +71,55 @@ class TickerSummaryResponse(BaseModel):
     """Ticker summary for top section."""
     total_tickers: int
     active_tickers: int
+
+
+# --- Ticker Data Integrity (בקרת תקינות נתונים) ---
+
+class DataDomainOverview(BaseModel):
+    """Overview of a single data domain (EOD, Intraday, History)."""
+    row_count: int = Field(..., description="Number of rows in DB")
+    latest_price_timestamp: Optional[datetime] = Field(None, description="Timestamp of latest price/as_of")
+    latest_fetched_at: Optional[datetime] = Field(None, description="When the data was last fetched")
+    has_data: bool = Field(..., description="Whether any data exists")
+    gap_status: str = Field(..., description="OK | NO_DATA | INSUFFICIENT | STALE")
+    note: Optional[str] = Field(None, description="Optional clarification")
+
+
+class LastUpdateEntry(BaseModel):
+    """Single entry in the update log."""
+    price_timestamp: datetime = Field(..., description="Price as-of timestamp")
+    fetched_at: datetime = Field(..., description="When fetched")
+    price: Optional[Decimal] = Field(None, description="Price value")
+
+
+class IndicatorsOverview(BaseModel):
+    """Indicators from 250d OHLC — ATR, MA, CCI. Per MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC."""
+    atr_14: Optional[Decimal] = Field(None, description="ATR(14)")
+    ma_20: Optional[Decimal] = Field(None, description="MA(20)")
+    ma_50: Optional[Decimal] = Field(None, description="MA(50)")
+    ma_150: Optional[Decimal] = Field(None, description="MA(150)")
+    ma_200: Optional[Decimal] = Field(None, description="MA(200)")
+    cci_20: Optional[Decimal] = Field(None, description="CCI(20)")
+    market_cap: Optional[Decimal] = Field(None, description="Market Cap from latest EOD")
+
+
+class TickerDataIntegrityResponse(BaseModel):
+    """Ticker data integrity report — for UI verification widget."""
+    ticker_id: str = Field(..., description="Ticker ULID")
+    symbol: str = Field(..., description="Ticker symbol")
+    company_name: Optional[str] = Field(None, description="Company name")
+
+    eod_prices: DataDomainOverview = Field(..., description="EOD prices (ticker_prices)")
+    intraday_prices: DataDomainOverview = Field(..., description="Intraday (ticker_prices_intraday; active only)")
+    history_250d: DataDomainOverview = Field(..., description="250d history for Indicators")
+
+    indicators: Optional[IndicatorsOverview] = Field(
+        None,
+        description="ATR/MA/CCI + Market Cap (מחושב מ־250d; null אם חסרה היסטוריה)",
+    )
+
+    gaps_summary: List[str] = Field(default_factory=list, description="Human-readable list of gaps")
+    last_updates: List[LastUpdateEntry] = Field(
+        default_factory=list,
+        description="Last N price updates (price_timestamp, fetched_at)",
+    )

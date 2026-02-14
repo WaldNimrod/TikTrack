@@ -16,9 +16,10 @@ import logging
 
 from ..models.tickers import Ticker
 from ..models.ticker_prices import TickerPrice
+from ..models.ticker_prices_intraday import TickerPriceIntraday
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-from ..schemas.tickers import TickerResponse
+from ..schemas.tickers import TickerResponse, TickerDataIntegrityResponse
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +252,175 @@ class TickersService:
         total = (await db.execute(total_stmt)).scalar() or 0
         active = (await db.execute(active_stmt)).scalar() or 0
         return {"total_tickers": total, "active_tickers": active}
+
+    async def get_ticker_data_integrity(
+        self, db: AsyncSession, ticker_id: str
+    ) -> TickerDataIntegrityResponse:
+        """Ticker data integrity report — EOD, intraday, history counts + last updates."""
+        from ..schemas.tickers import DataDomainOverview, LastUpdateEntry
+
+        try:
+            ticker_uuid = ulid_to_uuid(ticker_id)
+        except Exception:
+            raise HTTPExceptionWithCode(
+                status_code=400,
+                detail="Invalid ticker ID format",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        stmt = select(Ticker).where(
+            and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None))
+        )
+        result = await db.execute(stmt)
+        ticker = result.scalar_one_or_none()
+        if not ticker:
+            raise HTTPExceptionWithCode(
+                status_code=404,
+                detail="Ticker not found",
+                error_code=ErrorCodes.RESOURCE_NOT_FOUND,
+            )
+
+        MIN_HISTORY_FOR_INDICATORS = 200
+        STALE_HOURS = 48  # EOD > 48h = stale
+
+        gaps: List[str] = []
+
+        # --- EOD (ticker_prices) ---
+        eod_count_stmt = select(func.count(TickerPrice.id)).where(
+            TickerPrice.ticker_id == ticker_uuid
+        )
+        eod_count = (await db.execute(eod_count_stmt)).scalar() or 0
+
+        eod_latest_stmt = (
+            select(
+                TickerPrice.price_timestamp,
+                TickerPrice.fetched_at,
+                TickerPrice.price,
+                TickerPrice.market_cap,
+            )
+            .where(TickerPrice.ticker_id == ticker_uuid)
+            .order_by(TickerPrice.price_timestamp.desc())
+            .limit(1)
+        )
+        eod_latest = (await db.execute(eod_latest_stmt)).first()
+
+        eod_status = "OK"
+        if eod_count == 0:
+            eod_status = "NO_DATA"
+            gaps.append("אין נתוני EOD (מחיר)")
+        elif eod_latest and eod_latest.price_timestamp:
+            ts = eod_latest.price_timestamp
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            delta_h = (datetime.now(timezone.utc) - ts).total_seconds() / 3600
+            if delta_h > STALE_HOURS:
+                eod_status = "STALE"
+                gaps.append(f"נתוני EOD ישנים ({int(delta_h)} שעות)")
+
+        eod_overview = DataDomainOverview(
+            row_count=eod_count,
+            latest_price_timestamp=eod_latest.price_timestamp if eod_latest else None,
+            latest_fetched_at=eod_latest.fetched_at if eod_latest else None,
+            has_data=eod_count > 0,
+            gap_status=eod_status,
+        )
+
+        # --- Intraday ---
+        intraday_count_stmt = select(func.count(TickerPriceIntraday.id)).where(
+            TickerPriceIntraday.ticker_id == ticker_uuid
+        )
+        intraday_count = (await db.execute(intraday_count_stmt)).scalar() or 0
+
+        intraday_latest_stmt = (
+            select(
+                TickerPriceIntraday.price_timestamp,
+                TickerPriceIntraday.fetched_at,
+                TickerPriceIntraday.price,
+            )
+            .where(TickerPriceIntraday.ticker_id == ticker_uuid)
+            .order_by(TickerPriceIntraday.price_timestamp.desc())
+            .limit(1)
+        )
+        intraday_latest = (await db.execute(intraday_latest_stmt)).first()
+
+        intraday_status = "OK" if intraday_count > 0 else "NO_DATA"
+        if intraday_count == 0 and ticker.is_active:
+            gaps.append("אין נתוני Intraday (פעיל אבל אין עדכונים תוך־יומיים)")
+
+        intraday_note = "Active tickers only" if ticker.is_active else "Inactive — no intraday"
+        intraday_overview = DataDomainOverview(
+            row_count=intraday_count,
+            latest_price_timestamp=intraday_latest.price_timestamp if intraday_latest else None,
+            latest_fetched_at=intraday_latest.fetched_at if intraday_latest else None,
+            has_data=intraday_count > 0,
+            gap_status=intraday_status,
+            note=intraday_note,
+        )
+
+        # --- History 250d ---
+        history_status = "OK" if eod_count >= MIN_HISTORY_FOR_INDICATORS else "INSUFFICIENT"
+        if eod_count < MIN_HISTORY_FOR_INDICATORS:
+            gaps.append(
+                f"היסטוריה 250d: {eod_count} שורות (נדרש {MIN_HISTORY_FOR_INDICATORS}+ ל־ATR/MA/CCI)"
+            )
+
+        history_overview = DataDomainOverview(
+            row_count=eod_count,
+            latest_price_timestamp=eod_latest.price_timestamp if eod_latest else None,
+            latest_fetched_at=eod_latest.fetched_at if eod_latest else None,
+            has_data=eod_count > 0,
+            gap_status=history_status,
+            note=f"נדרש מינימום {MIN_HISTORY_FOR_INDICATORS} שורות",
+        )
+
+        # --- Last updates (last 5 from ticker_prices) ---
+        last_updates_stmt = (
+            select(TickerPrice.price_timestamp, TickerPrice.fetched_at, TickerPrice.price)
+            .where(TickerPrice.ticker_id == ticker_uuid)
+            .order_by(TickerPrice.price_timestamp.desc())
+            .limit(5)
+        )
+        last_rows = (await db.execute(last_updates_stmt)).all()
+        last_updates = [
+            LastUpdateEntry(
+                price_timestamp=r.price_timestamp,
+                fetched_at=r.fetched_at,
+                price=r.price,
+            )
+            for r in last_rows
+        ]
+
+        # --- Indicators (ATR/MA/CCI) + Market Cap — compute from 250d or fetch from provider ---
+        from ..integrations.market_data.cache_first_service import get_ticker_indicators_cache_first
+        from ..schemas.tickers import IndicatorsOverview
+
+        indicators_dict = await get_ticker_indicators_cache_first(
+            db, ticker.symbol, ticker_uuid, 250, skip_fetch=False, mode="LIVE"
+        )
+        market_cap = None
+        if eod_latest:
+            market_cap = getattr(eod_latest, "market_cap", None)
+
+        indicators_overview = IndicatorsOverview(
+            atr_14=indicators_dict.get("atr_14"),
+            ma_20=indicators_dict.get("ma_20"),
+            ma_50=indicators_dict.get("ma_50"),
+            ma_150=indicators_dict.get("ma_150"),
+            ma_200=indicators_dict.get("ma_200"),
+            cci_20=indicators_dict.get("cci_20"),
+            market_cap=market_cap,
+        )
+
+        return TickerDataIntegrityResponse(
+            ticker_id=uuid_to_ulid(ticker.id),
+            symbol=ticker.symbol,
+            company_name=ticker.company_name,
+            eod_prices=eod_overview,
+            intraday_prices=intraday_overview,
+            history_250d=history_overview,
+            indicators=indicators_overview,
+            gaps_summary=gaps,
+            last_updates=last_updates,
+        )
 
 
 _tickers_service: Optional[TickersService] = None

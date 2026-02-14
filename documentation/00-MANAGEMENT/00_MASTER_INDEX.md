@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-01-31  
-**version:** v3.11 (עדכון Page Tracker — D22, D23 ברשימת העמודים; Batch 3)
+**last_updated:** 2026-02-14  
+**version:** v3.12 (External Data — Jobs + דוח מימוש Team 20 באינדקס; Team 10 Consolidation)
 
 ---
 
@@ -108,6 +108,8 @@ _COMMUNICATION/
 - [💱 FOREX_MARKET_SPEC.md](../01-ARCHITECTURE/FOREX_MARKET_SPEC.md) - אפיון שערי חליפין ומחירי FOREX — ADR-022 (Yahoo+Alpha, EOD, Cache-First), Scope USD/EUR/ILS ✅ **SSOT — Stage-1 — Gate B PASS (2026-02-13)**
 - [📡 MARKET_DATA_PIPE_SPEC.md](../01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md) - תשתית מחירי שוק — Providers, Guardrails, Cache-First, Cadence, Market Cap, 250d, Indicators ✅ **SSOT — Stage-1 — Resubmission expanded (2026-02-13)**
 - [📊 MARKET_DATA_COVERAGE_MATRIX.md](../01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md) - מטריצת כיסוי Stage-1 — FX, Prices, Historical 250d, Indicators, Market Cap ✅ **SSOT — Stage-1 (2026-02-13)**
+- **External Data — Jobs (תזמון):** [TEAM_60_CRON_SCHEDULE.md](../05-REPORTS/artifacts/TEAM_60_CRON_SCHEDULE.md) — EOD (History Backfill 21:00, FX 22:00, Ticker 22:05, Cleanup 22:30 UTC); Intraday */15 דק'; Make: sync-history-backfill, sync-eod, sync-ticker-prices, sync-intraday, cleanup-market-data; Wrapper: `scripts/run_market_data_job.sh`. ✅ **2026-02-14**
+- **External Data — דוח מימוש (Team 20):** [TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY_FOR_TEAM_10.md](../05-REPORTS/artifacts/TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY_FOR_TEAM_10.md) — Providers, סקריפטים, API, טבלאות, UI בקרת תקינות, Make, ENV. ✅ **2026-02-14**
 - [📈 MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md](../01-ARCHITECTURE/MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC.md) - ATR(14), MA(20/50/150/200), CCI(20), Market Cap — דיוק 20,8 ✅ **SSOT — Stage-1 (2026-02-13)**
 - [📄 CASH_FLOW_PARSER_SPEC.md](../01-ARCHITECTURE/CASH_FLOW_PARSER_SPEC.md) - פיענוח תזרימים — Field Mapping, flow_type, amount NUMERIC(20,6) per PRECISION_POLICY_SSOT ✅ **SSOT — Stage-1 — Gate B PASS (2026-02-13)**
 - [📐 PRECISION_POLICY_SSOT.md](../01-ARCHITECTURE/PRECISION_POLICY_SSOT.md) - מפת דיוק 20,8 vs 20,6 לכל ישות (תזרימים, יתרות, מחירים, **market_cap**) ✅ **SSOT — Stage-1 — Gate B PASS + market_cap (2026-02-13)**
@@ -313,4 +315,5 @@ _COMMUNICATION/
 **סטטוס:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**
 
 **log_entry | [Team 10] | PROCESS_FORMALIZATION | MASTER_INDEX_UPDATED | 2026-02-09**  
-**log_entry | [Team 10] | ADR_016_VERSIONING_INDEX_AND_PROCEDURE | 2026-01-30**
+**log_entry | [Team 10] | ADR_016_VERSIONING_INDEX_AND_PROCEDURE | 2026-01-30**  
+**log_entry | [Team 10] | GATEWAY_CONSOLIDATION | EXTERNAL_DATA_JOBS_AND_REPORT_IN_INDEX | 2026-02-14** — עדכון אינדקס לפי TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SUMMARY_REPORT: רשימת Jobs (TEAM_60_CRON_SCHEDULE), דוח מימוש (TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY_FOR_TEAM_10).

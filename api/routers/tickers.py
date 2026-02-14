@@ -21,6 +21,7 @@ from ..schemas.tickers import (
     TickerCreateRequest,
     TickerUpdateRequest,
     TickerSummaryResponse,
+    TickerDataIntegrityResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,27 @@ async def get_tickers_summary(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch tickers summary",
+            error_code=ErrorCodes.SERVER_ERROR,
+        )
+
+
+@router.get("/{ticker_id}/data-integrity", response_model=TickerDataIntegrityResponse)
+async def get_ticker_data_integrity(
+    ticker_id: str = Path(..., description="Ticker ULID"),
+    current_user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Get ticker data integrity report — EOD, intraday, history + last updates."""
+    try:
+        service = get_tickers_service()
+        return await service.get_ticker_data_integrity(db=db, ticker_id=ticker_id)
+    except HTTPExceptionWithCode:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching ticker data integrity: {e}", exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch ticker data integrity",
             error_code=ErrorCodes.SERVER_ERROR,
         )
 

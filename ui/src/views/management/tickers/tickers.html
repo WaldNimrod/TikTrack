@@ -88,6 +88,51 @@
   </tt-section>
 
   <!-- ============================================
+       CONTAINER 0.5: בקרת תקינות נתונים (TEAM_20)
+       GET /tickers/{id}/data-integrity
+       ============================================ -->
+  
+  <tt-section data-section="data-integrity">
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <h2 class="index-section__header-text">בקרת תקינות נתונים</h2>
+      </div>
+      <div class="index-section__header-actions">
+        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <div class="data-integrity-panel">
+            <div class="data-integrity-controls">
+              <label for="tickerDataIntegritySelect" class="sr-only">בחר טיקר</label>
+              <select id="tickerDataIntegritySelect" class="data-integrity-select" aria-label="בחר טיקר">
+                <option value="">— בחר טיקר —</option>
+              </select>
+              <button type="button" id="tickerDataIntegrityCheck" class="data-integrity-btn">בדוק</button>
+            </div>
+            <div id="tickerDataIntegrityDetail" class="data-integrity-detail">
+              <p class="data-integrity-empty">בחר טיקר ולחץ בדוק</p>
+            </div>
+            <div class="data-integrity-gaps">
+              <strong>חוסרים:</strong> <span id="tickerDataIntegrityGaps">—</span>
+            </div>
+            <div class="data-integrity-log">
+              <strong>עדכונים אחרונים:</strong>
+              <div id="tickerDataIntegrityLog"></div>
+            </div>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
+
+  <!-- ============================================
        CONTAINER 1: טבלת טיקרים
        ============================================ -->
   
@@ -229,6 +274,7 @@
   
 <script src="/src/components/core/sectionToggleHandler.js"></script>
 <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+<script type="module" src="/src/views/management/tickers/tickersDataIntegrityInit.js"></script>
 <script type="module" src="/src/views/management/tickers/tickersTableInit.js"></script>
 <script src="/src/views/shared/footerLoader.js"></script>
 </body>

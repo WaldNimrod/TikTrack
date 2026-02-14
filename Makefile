@@ -114,6 +114,10 @@ sync-history-backfill:
 	@python3 scripts/sync_ticker_prices_history_backfill.py
 	@echo "✅ History backfill complete."
 
+## Ensure QA ticker 250d — לפחות טיקר אחד עם 250+ שורות (TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES)
+ensure-qa-ticker-250d:
+	@python3 scripts/ensure_qa_ticker_250d.py
+
 ## Check market_data counts (tickers, ticker_prices, exchange_rates) — Team 10/50
 check-market-data-counts:
 	@python3 scripts/check_market_data_counts.py
@@ -166,7 +170,8 @@ help:
 	@echo "  make sync-eod           - EOD sync exchange_rates + history (Alpha→Yahoo)"
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha; runs seed-tickers)"
 	@echo "  make sync-intraday      - Intraday sync ticker_prices_intraday (Active tickers)"
-	@echo "  make sync-history-backfill - History backfill 250d OHLCV (tickers with < 200 rows)"
+	@echo "  make sync-history-backfill - History backfill 250d OHLCV (tickers with < 250 rows)"
+	@echo "  make ensure-qa-ticker-250d - Ensure at least one ticker has 250+ rows (QA seed)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"

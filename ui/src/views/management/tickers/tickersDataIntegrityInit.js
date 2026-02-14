@@ -230,8 +230,9 @@ function formatTs(ts) {
       doCheck();
     } catch (e) {
       maskedLog('[Tickers Data Integrity] Force reload failed:', e);
-      const status = e?.status ?? e?.code;
-      const msg = status === 403 ? 'דורש הרשאת Admin' : (e?.message ?? 'שגיאה');
+      const status = e?.status ?? e?.code ?? e?.response?.status;
+      const apiDetail = e?.response?.data?.detail ?? e?.detail ?? e?.message;
+      const msg = apiDetail || (status === 404 ? 'טיקר לא נמצא' : status === 403 ? 'דורש הרשאת Admin' : null) || e?.message || 'שגיאה';
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'טען מחדש (מחיקה)';

@@ -286,12 +286,16 @@ def _fetch_history_sync(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> List:
-    """P3-015 — 250d OHLCV. Optional date_from/date_to for gap-fill (SMART_HISTORY_FILL_SPEC)."""
+    """P3-015 — 250d OHLCV. Optional date_from/date_to for gap-fill (SMART_HISTORY_FILL_SPEC).
+    Uses session with User-Agent — required for Yahoo to return data (avoid 401/429)."""
     result: List = []
     try:
         import yfinance as yf
+        from requests import Session
 
-        ticker = yf.Ticker(symbol)  # no session
+        session = Session()
+        session.headers["User-Agent"] = _next_user_agent()
+        ticker = yf.Ticker(symbol, session=session)
         end_d = date_to or datetime.now(timezone.utc).date()
         start_d = date_from
         if start_d and date_to:

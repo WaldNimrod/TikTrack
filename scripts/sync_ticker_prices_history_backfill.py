@@ -22,14 +22,15 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
+from uuid import UUID
+
+_project = Path(__file__).parent.parent
+sys.path.insert(0, str(_project))
 
 from api.services.smart_history_engine import MIN_HISTORY_DAYS, compute_gaps
-from uuid import UUID
 
 # MIN_HISTORY_DAYS imported from smart_history_engine (250 per spec)
 MAX_TICKERS_PER_RUN = 15  # Limit per run — Alpha 5/min
-
-_project = Path(__file__).parent.parent
 env_file = _project / "api" / ".env"
 DATABASE_URL: Optional[str] = None
 ALPHA_VANTAGE_API_KEY: Optional[str] = None
@@ -53,8 +54,6 @@ if not DATABASE_URL:
     sys.exit(1)
 if "postgresql+asyncpg" in str(DATABASE_URL):
     DATABASE_URL = str(DATABASE_URL).replace("postgresql+asyncpg://", "postgresql://")
-
-sys.path.insert(0, str(_project))
 
 
 def _is_429(e: Exception) -> bool:

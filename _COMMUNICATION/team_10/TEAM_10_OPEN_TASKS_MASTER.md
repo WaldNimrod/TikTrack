@@ -166,7 +166,8 @@
 | SHF-6 | **Team 30** | הצגת סטטוס השלמה/טעינה חוזרת (לאחר backfill) | UI feedback — שורות שהושלמו, כישלון, retry | SHF-1, SHF-3 | ✅ **CLOSED** — TEAM_30_TO_TEAM_20_SMART_HISTORY_FILL_UI_COMPLETE |
 | SHF-7 | **Team 60** | ללא משימה חדשה (Schema קיים) | — | — | ✅ N/A |
 
-**חסימות ידועות:** אין. **Team 20 — SHF-1–SHF-4:** ✅ הושלמו. **Team 30 — SHF-5, SHF-6:** ✅ הושלמו (TEAM_30_TO_TEAM_20_SMART_HISTORY_FILL_UI_COMPLETE). **QA:** בקשת בדיקה הועברה ל-Team 50 — TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST.md (ממתין לדוח).
+**חסימות ידועות:** אין. **Team 20 — SHF-1–SHF-4:** ✅ הושלמו. **Team 30 — SHF-5, SHF-6:** ✅ הושלמו (TEAM_30_TO_TEAM_20_SMART_HISTORY_FILL_UI_COMPLETE). **QA:** בקשת בדיקה הועברה ל-Team 50 — TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST.md.  
+**🔴 תיקונים דחופים (2026-02-14):** מנדט TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES_MANDATE — (1) 403 למשתמש רגיל ✅ תוקן ב־router; (2) הודעות שגיאה 404 ב־UI ✅ תוקן ב־tickersDataIntegrityInit.js; (3) Seed 250+ + רה־ריצת QA — Team 20 (נתונים) + Team 50 (רה־ריצה). **לא לסגור** עד רה־ריצת QA מלאה ו־Evidence מעודכן.
 
 ---
 
@@ -223,4 +224,5 @@
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**  
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (נעול).  
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_1_2_3_4_CLOSED | 2026-02-14** — Team 20 דיווח השלמה: TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE. SHF-1–SHF-4 → CLOSED. SHF-5, SHF-6 (Team 30) פתוחים — בקשת ביצוע: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md.  
-**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_5_6_CLOSED_QA_REQUESTED | 2026-02-14** — Team 20 דיווח UI הושלם (TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_QA_REQUEST). SHF-5, SHF-6 → CLOSED. בקשת QA הועברה ל-Team 50: TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST.md.
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_5_6_CLOSED_QA_REQUESTED | 2026-02-14** — Team 20 דיווח UI הושלם (TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_QA_REQUEST). SHF-5, SHF-6 → CLOSED. בקשת QA הועברה ל-Team 50: TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST.md.  
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_QA_URGENT_FIXES | 2026-02-14** — מנדט תיקונים דחופים: TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES_MANDATE. 403 (router) + הודעות UI (tickersDataIntegrityInit) תוקנו. Seed 250+ + רה־ריצת QA — על Team 20 + 50. לא לסגור עד Evidence מעודכן.

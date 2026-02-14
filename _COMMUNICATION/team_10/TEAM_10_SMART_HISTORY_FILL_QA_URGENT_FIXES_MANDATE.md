@@ -23,7 +23,8 @@
 | **דרישה** | **לפני** קריאה ל־`decide()` (או **ב־router**): אם `mode=force_reload` ו־`!is_admin` → **403**. מומלץ: ב־`api/routers/tickers.py` — מיד אחרי ולידציית `mode_val`, אם `mode_val == "force_reload"` ו־`not is_admin` → להחזיר `HTTPException(403, detail="force_reload requires Admin.")`. |
 | **קריטריון הצלחה** | קריאה ל־`POST /api/v1/tickers/{id}/history-backfill?mode=force_reload` עם **משתמש רגיל** (לא Admin) מחזירה **403** והודעת "דורש הרשאת Admin". |
 
-**בעלים:** Team 20
+**בעלים:** Team 20  
+**סטטוס תיקון:** ✅ **בוצע (Team 10)** — נוסף guard ב־`api/routers/tickers.py`: אם `mode_val == "force_reload"` ו־`not is_admin` → 403 לפני קריאה ל־service. נא לוודא בבדיקה.
 
 ---
 
@@ -36,7 +37,8 @@
 | **דרישה** | להשתמש ב־`e.message` (או בשדה הודעת השגיאה מה־API) ולהציג למשתמש "טיקר לא נמצא" או את ההודעה המדויקת מהתשובה (למשל `detail` מ־JSON). |
 | **קריטריון הצלחה** | תשובה 404 מהשרת → בממשק מוצגת הודעת ה־API בפועל (למשל "Ticker not found" / "טיקר לא נמצא"). |
 
-**בעלים:** Team 30
+**בעלים:** Team 30  
+**סטטוס תיקון:** ✅ **בוצע (Team 10)** — ב־`tickersDataIntegrityInit.js`: ב־doBackfill() ו־doForceReload() — שימוש ב־`e?.response?.data?.detail ?? e?.detail` כ־הודעת API; 404 → fallback "טיקר לא נמצא". נא לוודא שהתאמת השדה (detail) תואמת את תשובת ה־API.
 
 ---
 

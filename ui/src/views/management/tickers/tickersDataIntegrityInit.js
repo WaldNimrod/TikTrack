@@ -1,5 +1,7 @@
 /**
- * Tickers Data Integrity Widget — TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST
+ * Tickers Data Integrity Widget
+ * TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST
+ * TEAM_20_TO_TEAM_30_INDICATORS_DATA_INTEGRITY_UPDATE — backfill banner when indicators/history insufficient
  * בקרת תקינות נתוני טיקר — דרופדאון + כפתור בדוק + פירוט + לוג
  */
 
@@ -105,12 +107,18 @@ function formatTs(ts) {
         .map(([lbl, val]) => `<div class="data-integrity-detail-row"><strong>${lbl}:</strong> <span dir="ltr">${val}</span></div>`)
         .join('');
 
+      const needBackfill = !ind || Object.keys(ind).length === 0 || hist.gap_status === 'INSUFFICIENT';
+      const backfillBanner = needBackfill
+        ? '<p class="data-integrity-backfill-banner">נדרש History Backfill ל־ATR/MA/CCI</p>'
+        : '';
+
       detailEl.innerHTML = `
         <div class="data-integrity-detail-row"><strong>נתוני EOD:</strong> ${eodLine}</div>
         <div class="data-integrity-detail-row"><strong>נתוני Intraday:</strong> ${intraLine}</div>
         <div class="data-integrity-detail-row"><strong>היסטוריה 250d:</strong> ${histLine}</div>
         <div class="data-integrity-indicators">
           <div class="data-integrity-detail-row"><strong>אינדיקטורים (מ־250d):</strong></div>
+          ${backfillBanner}
           ${indRows}
         </div>
       `;

@@ -1884,6 +1884,17 @@ body.system-management-page {
   font-style: italic;
 }
 
+.data-integrity-backfill-banner {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  margin: var(--spacing-sm, 8px) 0;
+  background: var(--color-warning-bg, #fff3e0);
+  border: 1px solid var(--color-warning-border, #ffb74d);
+  border-radius: var(--apple-radius-small, 6px);
+  color: var(--color-warning-text, #e65100);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
 .data-integrity-error {
   color: var(--color-error-red, #FF3B30);
 }

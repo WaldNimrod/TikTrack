@@ -90,12 +90,27 @@ async def add_my_ticker(
         raise
     except Exception as e:
         # ROOT_FIX: provider/add-ticker failures → 422, not 500 (TEAM_50_RERUN)
+        # When adding by symbol (create-new), failures are almost always provider/validation.
         err_lower = str(e).lower()
-        if "provider" in err_lower or "could not fetch" in err_lower or "invalid literal" in err_lower:
-            logger.warning("Add ticker provider failure (422): %s", e)
+        _provider_keywords = (
+            "provider", "could not fetch", "invalid literal", "timeout", "connection",
+            "rate limit", "api key", "api_key", "symbol", "fetch", "yahoo", "alpha",
+            "httpx", "yfinance", "no data", "empty", "404", "429", "503"
+        )
+        if any(k in err_lower for k in _provider_keywords):
+            logger.warning("Add ticker provider/validation failure (422): %s", e)
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Provider could not fetch data for this symbol. Ticker not created.",
+                detail="Provider could not fetch data for this symbol. Check ALPHA_VANTAGE_API_KEY in api/.env and Yahoo availability. Ticker not created.",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        # Fallback: when adding by symbol, treat any unexpected error as 422 to avoid 500
+        # (provider failures often surface as generic exceptions)
+        if symbol and not ticker_id:
+            logger.warning("Add ticker (symbol=%s) unexpected error → 422: %s", symbol, e)
+            raise HTTPExceptionWithCode(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Provider could not fetch data for this symbol. Check ALPHA_VANTAGE_API_KEY in api/.env and Yahoo availability. Ticker not created.",
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
             )
         logger.error("Add my ticker failed: %s", e, exc_info=True)

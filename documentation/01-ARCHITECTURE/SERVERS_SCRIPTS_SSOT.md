@@ -112,6 +112,7 @@
 | 🔧 Fix Port 8082 Conflict | `scripts/fix-port-8082.sh` | |
 | 👤 Create Admin User (admin/418141) | `scripts/create-admin.sh` | |
 | 🧪 Run User Tickers QA (API) | `scripts/run-user-tickers-qa-api.sh` | דורש Backend 8082 |
+| 🔄 Verify User Tickers Fix (Team 20) | `scripts/verify-user-tickers-fix.sh` | restart + QA — **חובה לפני הגשה** אחרי שינוי קוד |
 | ⚙️ Ensure Skip Live Data Check | `scripts/ensure-skip-live-data-check.sh` | dev/QA bypass |
 
 ### 7.2 סקריפטים ללא משימה (שימוש ישיר / cron / Make)

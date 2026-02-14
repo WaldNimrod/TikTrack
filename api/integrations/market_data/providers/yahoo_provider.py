@@ -135,20 +135,21 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
 
 
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
-    """Sync fetch. Primary: history(5d). Fallback: history(start,end) for historical range.
-    When period returns empty (e.g. weekend), retry with explicit start/end — historical OHLC
-    is always available. Final fallback: v7/finance/quote. No custom Session."""
+    """Sync fetch. Primary: v7/quote (lightweight, works stocks+crypto+international).
+    Fallback: history(5d) → history(start,end). Per EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC."""
+    # Try quote API first — faster, fewer 429s, works for AAPL/BTC-USD/TEVA.TA/ANAU.MI
+    result = _fetch_price_via_quote_api(symbol)
+    if result and result.price and result.price > 0:
+        return result
     try:
         import yfinance as yf
         from datetime import timedelta
 
-        ticker = yf.Ticker(symbol)  # no session — let YF handle
+        ticker = yf.Ticker(symbol)
         info = ticker.history(period="5d", interval="1d", debug=False)
         if info is None or info.empty:
-            # Weekend/outside hours: period="5d" may return empty. Retry with explicit dates.
-            # Historical OHLC is always available. end is exclusive in Yahoo.
             end_d = datetime.now(timezone.utc).date()
-            start_d = end_d - timedelta(days=14)  # ~10 trading days
+            start_d = end_d - timedelta(days=14)
             end_exclusive = (end_d + timedelta(days=1)).isoformat()
             info = ticker.history(
                 start=start_d.isoformat(),
@@ -162,7 +163,7 @@ def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
     except Exception as e:
         logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
 
-    return _fetch_price_via_quote_api(symbol)
+    return result
 
 
 def _history_to_price_result(

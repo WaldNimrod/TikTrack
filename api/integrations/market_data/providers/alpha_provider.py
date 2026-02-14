@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 ALPHA_BASE_URL = "https://www.alphavantage.co/query"
 ALPHA_RATE_LIMIT_SECONDS = 12.5  # 5 calls/min per spec
 
+# Module-level rate limit — shared across ALL AlphaProvider instances (per EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC)
+_alpha_last_call: float = 0.0
+_alpha_rate_lock = asyncio.Lock()
+
 
 def _replay_fx_alpha(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
     """REPLAY: load FX from fixtures — zero HTTP calls."""
@@ -112,19 +116,18 @@ class AlphaProvider(MarketDataProvider):
 
     def __init__(self, api_key: Optional[str] = None, mode: str = "LIVE", fixtures_dir: Optional[Path] = None):
         self._api_key = api_key or os.environ.get("ALPHA_VANTAGE_API_KEY", "")
-        self._last_call: Optional[float] = 0.0
-        self._lock = asyncio.Lock()
         self._mode = (mode or "LIVE").upper()
         self._fixtures_dir = fixtures_dir
 
     async def _rate_limit(self) -> None:
-        """Enforce 12.5s between calls — 5 calls/min per spec."""
-        async with self._lock:
+        """Enforce 12.5s between calls — 5 calls/min per spec. Shared across ALL instances."""
+        global _alpha_last_call
+        async with _alpha_rate_lock:
             now = asyncio.get_event_loop().time()
-            elapsed = now - (self._last_call or 0)
+            elapsed = now - _alpha_last_call
             if elapsed < ALPHA_RATE_LIMIT_SECONDS:
                 await asyncio.sleep(ALPHA_RATE_LIMIT_SECONDS - elapsed)
-            self._last_call = asyncio.get_event_loop().time()
+            _alpha_last_call = asyncio.get_event_loop().time()
 
     def _to_decimal(self, val) -> Optional[Decimal]:
         """Force precision 20,8 per spec."""
@@ -202,7 +205,7 @@ class AlphaProvider(MarketDataProvider):
             return None
 
     async def get_ticker_price(self, symbol: str) -> Optional[PriceResult]:
-        """Fallback for Prices. GLOBAL_QUOTE endpoint. Do NOT use for crypto — use get_ticker_price_crypto."""
+        """Fallback for Prices. GLOBAL_QUOTE primary; TIME_SERIES_DAILY fallback for international symbols."""
         if self._mode == "REPLAY":
             return _replay_price_alpha(self._fixtures_dir, symbol)
         if not self._api_key:
@@ -220,26 +223,75 @@ class AlphaProvider(MarketDataProvider):
                 r.raise_for_status()
                 data = r.json()
             quote = data.get("Global Quote", {})
-            if not quote:
+            price = self._to_decimal(quote.get("05. price")) if quote else None
+            if price and price > 0:
+                market_cap = await self._fetch_market_cap(symbol)
+                return PriceResult(
+                    symbol=symbol,
+                    price=price,
+                    open_price=self._to_decimal(quote.get("02. open")),
+                    high_price=self._to_decimal(quote.get("03. high")),
+                    low_price=self._to_decimal(quote.get("04. low")),
+                    close_price=price,
+                    volume=int(quote.get("06. volume", 0)) if quote.get("06. volume") else None,
+                    market_cap=market_cap,
+                    as_of=datetime.now(timezone.utc),
+                    provider="ALPHA_VANTAGE",
+                )
+            # Fallback: GLOBAL_QUOTE empty for some international symbols — try TIME_SERIES_DAILY
+            result = await self._get_price_from_timeseries_daily(symbol)
+            if result:
+                return result
+            return None
+        except Exception as e:
+            logger.warning("Alpha price fetch failed for %s: %s", symbol, e)
+            return None
+
+    async def _get_price_from_timeseries_daily(self, symbol: str) -> Optional[PriceResult]:
+        """Fallback when GLOBAL_QUOTE empty (e.g. TEVA.TA, ANAU.MI per Alpha docs)."""
+        await self._rate_limit()
+        try:
+            params = {
+                "function": "TIME_SERIES_DAILY",
+                "symbol": symbol,
+                "outputsize": "compact",
+                "apikey": self._api_key,
+            }
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(ALPHA_BASE_URL, params=params)
+                r.raise_for_status()
+                data = r.json()
+            series = data.get("Time Series (Daily)", {})
+            if not series:
                 return None
-            price = self._to_decimal(quote.get("05. price"))
+            sorted_dates = sorted(series.keys(), reverse=True)
+            latest_key = sorted_dates[0]
+            v = series[latest_key]
+            close_val = v.get("4. close")
+            price = self._to_decimal(close_val)
             if not price or price <= 0:
                 return None
-            market_cap = await self._fetch_market_cap(symbol)
+            vol_raw = v.get("5. volume")
+            vol_int = None
+            if vol_raw is not None and str(vol_raw).strip():
+                try:
+                    vol_int = int(float(vol_raw))
+                except (TypeError, ValueError):
+                    pass
             return PriceResult(
                 symbol=symbol,
                 price=price,
-                open_price=self._to_decimal(quote.get("02. open")),
-                high_price=self._to_decimal(quote.get("03. high")),
-                low_price=self._to_decimal(quote.get("04. low")),
+                open_price=self._to_decimal(v.get("1. open")),
+                high_price=self._to_decimal(v.get("2. high")),
+                low_price=self._to_decimal(v.get("3. low")),
                 close_price=price,
-                volume=int(quote.get("06. volume", 0)) if quote.get("06. volume") else None,
-                market_cap=market_cap,
+                volume=vol_int,
+                market_cap=None,
                 as_of=datetime.now(timezone.utc),
                 provider="ALPHA_VANTAGE",
             )
         except Exception as e:
-            logger.warning("Alpha price fetch failed for %s: %s", symbol, e)
+            logger.debug("Alpha TIME_SERIES_DAILY fallback failed for %s: %s", symbol, e)
             return None
 
     async def _fetch_market_cap(self, symbol: str) -> Optional[Decimal]:

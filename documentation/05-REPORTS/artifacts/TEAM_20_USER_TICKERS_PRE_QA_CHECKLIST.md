@@ -51,16 +51,26 @@
 
 ---
 
-## 6. הרצת QA
+## 6. הרצת QA — חובה לפני הגשה
 
+**סקריפט מאוחד (איתחול + QA):**
 ```bash
-# 1. וידוא Backend מעודכן
-# 2. הפעלה מחדש: python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8082
+bash scripts/verify-user-tickers-fix.sh
+```
 
+**או ידנית:**
+```bash
+# 1. הפעלה מחדש
+bash scripts/restart-backend.sh
+# 2. הרצת QA
 bash scripts/run-user-tickers-qa-api.sh
 ```
 
-**מצופה:**
+**נהל:** אחרי שינוי ב־me_tickers.py או user_tickers_service.py — **חובה** להריץ verify לפני הגשה.
+
+---
+
+## 7. מצופה
 - POST (fake) → 422
 - POST (AAPL) → 201 או 409
 - POST (BTC) → 201 או 409 (אם Alpha מחזיר נתונים)

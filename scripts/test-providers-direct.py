@@ -90,9 +90,8 @@ async def main():
             "alpha": "✅" if a_ok else "❌",
             "alpha_note": a_msg,
         })
-        if ticker_type == "CRYPTO":
-            await asyncio.sleep(13)  # Alpha rate limit
-        await asyncio.sleep(0.5)
+        # Alpha rate limit 12.5s between symbols (module-level, shared)
+        await asyncio.sleep(13)
 
     # Print table
     print("| Symbol        | Type   | Yahoo | Alpha | Yahoo note | Alpha note |")

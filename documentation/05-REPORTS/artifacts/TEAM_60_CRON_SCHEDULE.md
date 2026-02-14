@@ -9,6 +9,7 @@
 
 | Job | Cron | Make target | תיאור |
 |-----|------|-------------|-------|
+| **History Backfill** | `0 21 * * 1-5` | `make sync-history-backfill` | 250d OHLCV לטיקרים עם < 200 שורות (Indicators) |
 | **FX Sync** | `0 22 * * 1-5` | `make sync-eod` | exchange_rates + exchange_rates_history (Alpha→Yahoo) |
 | **Ticker Sync** | `5 22 * * 1-5` | `make sync-ticker-prices` | ticker_prices (Yahoo→Alpha) |
 | **Cleanup** | `30 22 * * 1-5` | `make cleanup-market-data` | Intraday 30d, Daily 250d, FX history 250d |
@@ -30,6 +31,7 @@
 
 ```bash
 # דוגמה — טוען api/.env ומריץ job:
+./scripts/run_market_data_job.sh sync-history-backfill
 ./scripts/run_market_data_job.sh sync-eod
 ./scripts/run_market_data_job.sh sync-ticker-prices
 ./scripts/run_market_data_job.sh sync-intraday
@@ -38,6 +40,7 @@
 
 **Crontab דוגמה:**
 ```
+0 21 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-history-backfill
 0 22 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-eod
 5 22 * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-ticker-prices
 */15 * * * 1-5 cd /path/to/TikTrackAppV2-phoenix && ./scripts/run_market_data_job.sh sync-intraday
@@ -50,6 +53,7 @@
 
 | Script | תפקיד |
 |--------|-------|
+| `scripts/sync_ticker_prices_history_backfill.py` | 250d OHLCV backfill (tickers with < 200 rows) |
 | `scripts/sync_exchange_rates_eod.py` | INSERT history + UPSERT exchange_rates |
 | `scripts/sync_ticker_prices_eod.py` | EOD ticker prices (uses max_active_tickers, provider_cooldown) |
 | `scripts/sync_ticker_prices_intraday.py` | Intraday ticker_prices_intraday (Active tickers) |

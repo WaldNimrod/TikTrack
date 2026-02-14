@@ -108,6 +108,12 @@ sync-intraday:
 	@python3 scripts/sync_ticker_prices_intraday.py
 	@echo "✅ Intraday sync complete."
 
+## History Backfill — 250d OHLCV for tickers with < 200 rows (Indicators ATR/MA/CCI)
+sync-history-backfill:
+	@echo "🔄 History backfill — 250d OHLCV"
+	@python3 scripts/sync_ticker_prices_history_backfill.py
+	@echo "✅ History backfill complete."
+
 ## Check market_data counts (tickers, ticker_prices, exchange_rates) — Team 10/50
 check-market-data-counts:
 	@python3 scripts/check_market_data_counts.py
@@ -160,6 +166,7 @@ help:
 	@echo "  make sync-eod           - EOD sync exchange_rates + history (Alpha→Yahoo)"
 	@echo "  make sync-ticker-prices - EOD sync ticker_prices (Yahoo→Alpha; runs seed-tickers)"
 	@echo "  make sync-intraday      - Intraday sync ticker_prices_intraday (Active tickers)"
+	@echo "  make sync-history-backfill - History backfill 250d OHLCV (tickers with < 200 rows)"
 	@echo "  make cleanup-market-data - Cleanup market data (Intraday 30d, Daily 250d, FX history 250d)"
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"

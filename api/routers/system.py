@@ -7,6 +7,7 @@ Endpoints for system-level info: market status, etc.
 import logging
 from fastapi import APIRouter, Depends, status
 
+from ..core.config import settings
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
@@ -36,6 +37,6 @@ async def get_market_status_endpoint(
         logger.error("Market status failed: %s", e)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch market status",
+            detail=str(e) if settings.debug else "Failed to fetch market status",
             error_code=ErrorCodes.SERVER_ERROR
         )

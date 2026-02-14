@@ -1457,6 +1457,11 @@ body .page-wrapper .page-container main {
   justify-content: center;
 }
 
+/* Staleness clock: info-summary__row--first uses space-between for content + clock layout (unified) */
+.info-summary__row--first:has(#stalenessClockCard) {
+  justify-content: space-between;
+}
+
 .portfolio-summary__toggle-btn {
   display: flex;
   align-items: center;

@@ -11,6 +11,7 @@ import logging
 from fastapi import APIRouter, Depends, status
 
 from ..core.database import get_db
+from ..core.config import settings
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
@@ -49,7 +50,7 @@ async def get_brokers(
         logger.error(f"Error fetching reference brokers: {e}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch broker list",
+            detail=str(e) if settings.debug else "Failed to fetch broker list",
             error_code=ErrorCodes.SERVER_ERROR
         )
 
@@ -87,6 +88,6 @@ async def get_exchange_rates_endpoint(
         logger.error(f"Error fetching exchange rates: {e}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch exchange rates",
+            detail=str(e) if settings.debug else "Failed to fetch exchange rates",
             error_code=ErrorCodes.SERVER_ERROR
         )

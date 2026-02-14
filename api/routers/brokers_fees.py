@@ -13,6 +13,7 @@ from decimal import Decimal
 import logging
 
 from ..core.database import get_db
+from ..core.config import settings
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
@@ -73,7 +74,7 @@ async def get_brokers_fees(
         logger.error(f"Error fetching broker fees: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch broker fees",
+            detail=str(e) if settings.debug else "Failed to fetch broker fees",
             error_code=ErrorCodes.SERVER_ERROR
         )
 
@@ -171,7 +172,7 @@ async def get_brokers_fees_summary(
         )
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch brokers fees summary",
+            detail=str(e) if settings.debug else "Failed to fetch brokers fees summary",
             error_code=ErrorCodes.SERVER_ERROR
         )
 
@@ -205,7 +206,7 @@ async def get_broker_fee(
         logger.error(f"Error fetching broker fee: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch broker fee",
+            detail=str(e) if settings.debug else "Failed to fetch broker fee",
             error_code=ErrorCodes.SERVER_ERROR
         )
 

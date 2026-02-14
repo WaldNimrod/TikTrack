@@ -12,6 +12,7 @@ from typing import Optional
 import logging
 
 from ..core.database import get_db
+from ..core.config import settings
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
@@ -81,7 +82,7 @@ async def get_trading_accounts(
         logger.error(f"Error fetching trading accounts: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch trading accounts",
+            detail=str(e) if settings.debug else "Failed to fetch trading accounts",
             error_code=ErrorCodes.SERVER_ERROR
         )
 

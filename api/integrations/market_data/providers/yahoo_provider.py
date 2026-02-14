@@ -49,8 +49,55 @@ def _to_decimal(val) -> Optional[Decimal]:
         return None
 
 
+def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
+    """Fallback: v7/finance/quote when history() fails. Requires User-Agent."""
+    try:
+        import httpx
+        url = "https://query1.finance.yahoo.com/v7/finance/quote"
+        params = {"symbols": symbol}
+        headers = {"User-Agent": _next_user_agent()}
+        with httpx.Client(timeout=10.0, headers=headers) as client:
+            r = client.get(url, params=params)
+            r.raise_for_status()
+        data = r.json()
+        results = data.get("quoteResponse", {}).get("result", [])
+        if not results:
+            return None
+        q = results[0]
+        price = _to_decimal(q.get("regularMarketPrice") or q.get("regularMarketPreviousClose"))
+        if not price or price <= 0:
+            return None
+        ts_raw = q.get("regularMarketTime") or q.get("regularMarketOpen")
+        if ts_raw:
+            try:
+                ts = datetime.fromtimestamp(int(ts_raw), tz=timezone.utc)
+            except (ValueError, TypeError, OSError):
+                ts = datetime.now(timezone.utc)
+        else:
+            ts = datetime.now(timezone.utc)
+        vol = q.get("regularMarketVolume")
+        vol = int(vol) if vol is not None and str(vol) != "nan" else None
+        market_cap_raw = q.get("marketCap")
+        market_cap = _to_decimal(market_cap_raw) if market_cap_raw else None
+        return PriceResult(
+            symbol=q.get("symbol", symbol),
+            price=price,
+            open_price=_to_decimal(q.get("regularMarketOpen")),
+            high_price=_to_decimal(q.get("regularMarketDayHigh")),
+            low_price=_to_decimal(q.get("regularMarketDayLow")),
+            close_price=price,
+            volume=vol,
+            market_cap=market_cap,
+            as_of=ts,
+            provider="YAHOO_FINANCE",
+        )
+    except Exception as e:
+        logger.debug("Yahoo quote API fallback failed for %s: %s", symbol, e)
+        return None
+
+
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
-    """Sync fetch — runs in executor."""
+    """Sync fetch. Primary: history(5d). Fallback: v7/finance/quote when history fails."""
     try:
         import yfinance as yf
         from requests import Session
@@ -59,45 +106,84 @@ def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
         session.headers["User-Agent"] = _next_user_agent()
         ticker = yf.Ticker(symbol, session=session)
         info = ticker.history(period="5d", interval="1d")
-        if info is None or info.empty:
+        if info is not None and not info.empty:
+            last = info.iloc[-1]
+            ts = last.name
+            if hasattr(ts, "to_pydatetime"):
+                ts = ts.to_pydatetime()
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            close = last["Close"]
+            try:
+                vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
+            except (ValueError, TypeError, KeyError):
+                vol = None
+            market_cap = None
+            try:
+                ticker_info = ticker.info
+                if isinstance(ticker_info, dict) and ticker_info.get("marketCap"):
+                    market_cap = _to_decimal(ticker_info["marketCap"])
+            except Exception:
+                pass
+            return PriceResult(
+                symbol=symbol,
+                price=_to_decimal(close),
+                open_price=_to_decimal(last.get("Open")),
+                high_price=_to_decimal(last.get("High")),
+                low_price=_to_decimal(last.get("Low")),
+                close_price=_to_decimal(close),
+                volume=vol,
+                market_cap=market_cap,
+                as_of=ts,
+                provider="YAHOO_FINANCE",
+            )
+    except Exception as e:
+        logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
+
+    return _fetch_price_via_quote_api(symbol)
+
+
+def _fetch_fx_via_quote_api(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
+    """Fallback: v7/finance/quote for FX when history() fails."""
+    try:
+        import httpx
+        pair = f"{from_ccy}{to_ccy}=X"
+        url = "https://query1.finance.yahoo.com/v7/finance/quote"
+        params = {"symbols": pair}
+        headers = {"User-Agent": _next_user_agent()}
+        with httpx.Client(timeout=10.0, headers=headers) as client:
+            r = client.get(url, params=params)
+            r.raise_for_status()
+        data = r.json()
+        results = data.get("quoteResponse", {}).get("result", [])
+        if not results:
             return None
-        last = info.iloc[-1]
-        ts = last.name
-        if hasattr(ts, "to_pydatetime"):
-            ts = ts.to_pydatetime()
-        if ts.tzinfo is None:
-            ts = ts.replace(tzinfo=timezone.utc)
-        close = last["Close"]
-        try:
-            vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
-        except (ValueError, TypeError, KeyError):
-            vol = None
-        market_cap = None
-        try:
-            info = ticker.info
-            if isinstance(info, dict) and info.get("marketCap"):
-                market_cap = _to_decimal(info["marketCap"])
-        except Exception:
-            pass
-        return PriceResult(
-            symbol=symbol,
-            price=_to_decimal(close),
-            open_price=_to_decimal(last.get("Open")),
-            high_price=_to_decimal(last.get("High")),
-            low_price=_to_decimal(last.get("Low")),
-            close_price=_to_decimal(close),
-            volume=vol,
-            market_cap=market_cap,
+        q = results[0]
+        rate = _to_decimal(q.get("regularMarketPrice") or q.get("regularMarketPreviousClose"))
+        if not rate or rate <= 0:
+            return None
+        ts_raw = q.get("regularMarketTime") or q.get("regularMarketOpen")
+        if ts_raw:
+            try:
+                ts = datetime.fromtimestamp(int(ts_raw), tz=timezone.utc)
+            except (ValueError, TypeError, OSError):
+                ts = datetime.now(timezone.utc)
+        else:
+            ts = datetime.now(timezone.utc)
+        return ExchangeRateResult(
+            from_currency=from_ccy,
+            to_currency=to_ccy,
+            rate=rate,
             as_of=ts,
             provider="YAHOO_FINANCE",
         )
     except Exception as e:
-        logger.warning("Yahoo price fetch failed for %s: %s", symbol, e)
+        logger.debug("Yahoo FX quote API fallback failed for %s/%s: %s", from_ccy, to_ccy, e)
         return None
 
 
 def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
-    """FX via Yahoo (Fallback). Sync — runs in executor."""
+    """FX via Yahoo (Fallback). Primary: history(5d). Fallback: v7/finance/quote."""
     try:
         import yfinance as yf
         from requests import Session
@@ -107,27 +193,26 @@ def _fetch_fx_sync(from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
         pair = f"{from_ccy}{to_ccy}=X"
         ticker = yf.Ticker(pair, session=session)
         info = ticker.history(period="5d", interval="1d")
-        if info is None or info.empty:
-            return None
-        last = info.iloc[-1]
-        rate = _to_decimal(last["Close"])
-        if not rate or rate <= 0:
-            return None
-        ts = last.name
-        if hasattr(ts, "to_pydatetime"):
-            ts = ts.to_pydatetime()
-        if ts.tzinfo is None:
-            ts = ts.replace(tzinfo=timezone.utc)
-        return ExchangeRateResult(
-            from_currency=from_ccy,
-            to_currency=to_ccy,
-            rate=rate,
-            as_of=ts,
-            provider="YAHOO_FINANCE",
-        )
+        if info is not None and not info.empty:
+            last = info.iloc[-1]
+            rate = _to_decimal(last["Close"])
+            if rate and rate > 0:
+                ts = last.name
+                if hasattr(ts, "to_pydatetime"):
+                    ts = ts.to_pydatetime()
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+                return ExchangeRateResult(
+                    from_currency=from_ccy,
+                    to_currency=to_ccy,
+                    rate=rate,
+                    as_of=ts,
+                    provider="YAHOO_FINANCE",
+                )
     except Exception as e:
-        logger.warning("Yahoo FX fetch failed for %s/%s: %s", from_ccy, to_ccy, e)
-        return None
+        logger.warning("Yahoo FX history fetch failed for %s/%s: %s", from_ccy, to_ccy, e)
+
+    return _fetch_fx_via_quote_api(from_ccy, to_ccy)
 
 
 def _fetch_history_sync(symbol: str, trading_days: int) -> list:

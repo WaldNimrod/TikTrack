@@ -5,6 +5,7 @@ Team 20 — TEAM_10_TO_TEAM_20_GATE_B_GAPS_AND_SYNC_MANDATE
 TEAM_90_RATELIMIT_SCALING_LOCK — Single-Flight, Cooldown on 429, טיקרים מ-DB בלבד
 
 Providers: Yahoo Finance (Primary) → Alpha Vantage (Fallback).
+Fallback: when both fail (e.g. weekend) → use last-known price from ticker_prices.
 Loads tickers from market_data.tickers, fetches EOD prices, saves to market_data.ticker_prices.
 Cron: similar to FX (e.g. 0 22 * * 1-5 UTC).
 """
@@ -41,6 +42,8 @@ if not DATABASE_URL:
     DATABASE_URL = os.getenv("DATABASE_URL")
 if not ALPHA_VANTAGE_API_KEY:
     ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+if ALPHA_VANTAGE_API_KEY:
+    os.environ["ALPHA_VANTAGE_API_KEY"] = ALPHA_VANTAGE_API_KEY
 if not DATABASE_URL:
     print("❌ DATABASE_URL not set (api/.env)")
     sys.exit(1)
@@ -113,9 +116,58 @@ async def fetch_prices_for_tickers(
                     print(f"⚠️ {name} 429 — cooldown {cooldown_min}min")
                 print(f"⚠️ {name} {symbol}: {e}")
         else:
-            print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
+            # Both providers failed (e.g. weekend) — fallback to last-known price from DB
+            last = _get_last_known_price(ticker_id, symbol)
+            if last:
+                results.append(last)
+                print(f"📌 {symbol}: using last-known price (providers unavailable)")
+            else:
+                print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
 
     return results
+
+
+def _get_last_known_price(
+    ticker_id: UUID, symbol: str
+) -> Optional[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
+    """When providers fail (weekend etc.) — return most recent row from ticker_prices."""
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT price, open_price, high_price, low_price, close_price, volume, market_cap, price_timestamp
+            FROM market_data.ticker_prices
+            WHERE ticker_id = %s
+            ORDER BY price_timestamp DESC
+            LIMIT 1
+        """, (str(ticker_id),))
+        row = cur.fetchone()
+        if not row or not row.get("price") or float(row["price"]) <= 0:
+            return None
+        ts = row.get("price_timestamp")
+        if ts and getattr(ts, "tzinfo", None) is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        if not ts:
+            ts = datetime.now(timezone.utc)
+        close_val = row.get("close_price") or row.get("price")
+        return (
+            ticker_id,
+            symbol,
+            Decimal(str(row["price"])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP),
+            Decimal(str(row["open_price"])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row.get("open_price") else None,
+            Decimal(str(row["high_price"])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row.get("high_price") else None,
+            Decimal(str(row["low_price"])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row.get("low_price") else None,
+            Decimal(str(close_val)).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if close_val else None,
+            int(row["volume"]) if row.get("volume") is not None else None,
+            Decimal(str(row["market_cap"])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row.get("market_cap") else None,
+            ts,
+            "LAST_KNOWN",
+        )
+    finally:
+        conn.close()
 
 
 def _next_month(year: int, month: int) -> Tuple[int, int]:

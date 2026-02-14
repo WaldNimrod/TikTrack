@@ -17,7 +17,7 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, settings as settings_router, system
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from . import __version__
 
@@ -96,6 +96,7 @@ app.include_router(positions.router, prefix=settings.api_v1_prefix)
 app.include_router(brokers_fees.router, prefix=settings.api_v1_prefix)
 app.include_router(reference.router, prefix=settings.api_v1_prefix)
 app.include_router(tickers.router, prefix=settings.api_v1_prefix)
+app.include_router(me_tickers.router, prefix=settings.api_v1_prefix)
 app.include_router(settings_router.router, prefix=settings.api_v1_prefix)
 app.include_router(system.router, prefix=settings.api_v1_prefix)
 

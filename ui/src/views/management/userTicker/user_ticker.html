@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הטיקרים שלי | TikTrack Phoenix</title>
+  
+  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+  
+  <!-- ============================================
+       CSS Loading Order (CRITICAL - DO NOT CHANGE)
+       Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
+       ============================================ -->
+  
+  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  
+  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
+  
+  <!-- 3. LEGO Components (Reusable components) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
+  
+  <!-- 4. Header Component (Unified Header Styles) -->
+  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
+  
+  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
+  
+  <!-- 6. Modal Styles -->
+  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="user-ticker-page context-management">
+  
+  <!-- ============================================
+       UAI Entry Point (Unified App Init)
+       Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
+       ============================================ -->
+  <script src="/src/views/management/userTicker/userTickerPageConfig.js"></script>
+  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+
+  <!-- ============================================
+       PAGE WRAPPER + CONTAINER STRUCTURE
+       LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
+       ============================================ -->
+  
+  <div class="page-wrapper">
+    <div class="page-container">
+      <main>
+        <tt-container>
+          
+  <!-- ============================================
+       CONTAINER 0: סיכום מידע — הטיקרים שלי
+       ============================================ -->
+  
+  <tt-section data-section="summary">
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img src="/images/icons/entities/home.svg" alt="הטיקרים שלי" class="index-section__header-icon" width="35" height="35">
+        <h1 class="index-section__header-text">הטיקרים שלי</h1>
+      </div>
+      <div class="index-section__header-actions">
+        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <div class="info-summary" id="summaryStats">
+            <div class="info-summary__row info-summary__row--first">
+              <div class="info-summary__content">
+                <div>סה"כ הטיקרים שלי: <strong id="totalTickers">0</strong></div>
+                <div>טיקרים פעילים: <strong id="activeTickers">0</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
+
+  <!-- ============================================
+       CONTAINER 1: טבלת הטיקרים שלי
+       Data: GET /me/tickers
+       ============================================ -->
+  
+  <tt-section data-section="user-tickers-management">
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img src="/images/icons/entities/home.svg" alt="הטיקרים שלי" class="index-section__header-icon" width="35" height="35">
+        <h1 class="index-section__header-text">רשימת הטיקרים שלי</h1>
+      </div>
+      <div class="index-section__header-meta">
+        <span class="index-section__header-count" id="tableTickersCount">0 טיקרים</span>
+      </div>
+      <div class="index-section__header-actions">
+        <button class="index-section__header-action-btn js-add-ticker" aria-label="הוסף טיקר" title="הוסף טיקר לרשימה שלי">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+        </button>
+        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          
+          <div class="phoenix-table-wrapper">
+            <table id="userTickersTable" class="phoenix-table js-table" data-table-type="user_ticker" role="table" aria-label="ניהול הטיקרים שלי">
+              <thead class="phoenix-table__head" role="rowgroup">
+                <tr class="phoenix-table__row" role="row">
+                  <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">סמל</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-price phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">מחיר אחרון</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-change phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="daily_change_pct" data-sort-type="numeric" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">שינוי יומי</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-company js-table-sort-trigger" data-sortable="true" data-sort-key="company_name" data-sort-type="string" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">שם חברה</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="ticker_type" data-sort-type="string" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">סוג</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="is_active" data-sort-type="boolean" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
+                    <span class="phoenix-table__header-text">סטטוס</span>
+                    <span class="phoenix-table__sort-indicator js-sort-indicator">
+                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
+                    <span class="phoenix-table__header-text sr-only">פעולות</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="phoenix-table__body" role="rowgroup" id="userTickersTableBody">
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="phoenix-table-pagination">
+            <div class="phoenix-table-pagination__info">
+              <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+            </div>
+            <div class="phoenix-table-pagination__controls">
+              <div class="phoenix-table-pagination__page-size">
+                <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+                <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="userTickersTable">
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="phoenix-table-pagination__pages" id="paginationControls">
+                <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="prevPageBtn" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
+                </button>
+                <div id="pageNumbers"></div>
+                <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="nextPageBtn" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
+
+</tt-container>
+
+      </main>
+    </div>
+  </div>
+  
+<script src="/src/components/core/stalenessClock.js"></script>
+<script type="module" src="/src/components/core/eodStalenessCheck.js"></script>
+<script src="/src/components/core/sectionToggleHandler.js"></script>
+<script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+<script type="module" src="/src/views/management/userTicker/userTickerTableInit.js"></script>
+<script src="/src/views/shared/footerLoader.js"></script>
+</body>
+</html>

@@ -60,6 +60,12 @@ db-backup-then-fill: db-backup
 	@python3 scripts/seed_test_data.py
 	@echo "✅ Test data seeded successfully."
 
+## P3-020: user_data.user_tickers + market_data.tickers.status (User Tickers)
+migrate-p3-020:
+	@echo "🔄 P3-020 — user_tickers + tickers.status"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_020_user_tickers_and_ticker_status.sql
+	@echo "✅ P3-020 migration complete."
+
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
 	@echo "🔄 P3-019 — market_cap precision (24,4)"

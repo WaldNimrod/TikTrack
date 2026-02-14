@@ -71,7 +71,13 @@ class Ticker(Base):
     isin: Mapped[Optional[str]] = mapped_column(String(12), nullable=True)
     figi: Mapped[Optional[str]] = mapped_column(String(12), nullable=True)
     
-    # Status
+    # Status (per TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT: pending|active|inactive|cancelled)
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="active",
+        server_default="'active'"
+    )
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         nullable=False,
@@ -105,3 +111,4 @@ class Ticker(Base):
         default=dict,
         server_default="'{}'::JSONB"
     )
+    user_tickers = relationship("UserTicker", back_populates="ticker")

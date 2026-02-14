@@ -10,6 +10,7 @@ from .trading_accounts import TradingAccount
 from .cash_flows import CashFlow
 from .trades import Trade
 from .tickers import Ticker
+from .user_tickers import UserTicker
 from .ticker_prices import TickerPrice
 from .ticker_prices_intraday import TickerPriceIntraday
 from .brokers_fees import BrokerFee
@@ -28,6 +29,7 @@ __all__ = [
     "CashFlow",
     "Trade",
     "Ticker",
+    "UserTicker",
     "TickerPrice",
     "TickerPriceIntraday",
     "BrokerFee",

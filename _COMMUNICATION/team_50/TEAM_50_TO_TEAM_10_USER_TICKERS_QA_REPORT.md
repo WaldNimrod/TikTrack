@@ -59,10 +59,10 @@
 **סקריפט:** `scripts/run-user-tickers-qa-api.sh`  
 **הרצה:** `bash scripts/run-user-tickers-qa-api.sh`
 
-### סטטוס הרצה
-- **E2E:** נחסם — `ERR_CONNECTION_REFUSED` (Backend 8082 לא זמין בעת ההרצה)
-- **אימות קוד:** בוצע — כל הקריטריונים מאומתים בקוד
-- **להשלמה:** להפעיל Backend + Frontend, להריץ `node tests/user-tickers-qa.e2e.test.js` ולעדכן Evidence בתוצאות
+### סטטוס הרצה (2026-02-14)
+- **API:** ✅ Login OK, GET /me/tickers 200, POST (fake symbol) 422, **POST (AAPL) 201** — טיקר תקין נוצר
+- **BTC-USD:** 422 — provider לא החזיר נתונים (ייתכן crypto/symbol format)
+- **E2E:** ✅ 1a (עמוד), 2 (מקור), 4 (provider failure), 5 (אין עריכת מטא-דאטה) — PASS; 1b/3 SKIP
 
 ---
 

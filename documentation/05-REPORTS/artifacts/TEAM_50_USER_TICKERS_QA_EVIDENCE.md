@@ -28,7 +28,7 @@
 
 **דרישות:** Backend 8082, Frontend 8080, משתמש QA (TikTrackAdmin/4181)
 
-**סטטוס הרצה (2026-02-14):** נחסם — `ERR_CONNECTION_REFUSED` (Backend 8082 לא זמין). להריץ כשהסביבה פעילה.
+**סטטוס הרצה (2026-02-14):** הושלם — 1a PASS, 2 PASS, 4 PASS, 5 PASS; 1b/3 SKIP.
 
 **פריטים נבדקים:**
 - Item 1a: עמוד נטען, טבלה קיימת
@@ -45,7 +45,16 @@
 **סקריפט:** `scripts/run-user-tickers-qa-api.sh`  
 **הרצה:** `bash scripts/run-user-tickers-qa-api.sh`
 
-בודק: Login → GET /me/tickers (200) → POST עם טיקר מזויף (422/400).
+**תוצאה (2026-02-14):**
+```
+✅ Login OK
+✅ GET /me/tickers → 200
+✅ POST (fake symbol) → 422 — provider failure handled
+✅ POST (AAPL) → 201 — live data check passed, טיקר נוצר
+⚠️ POST (BTC-USD) → 422 — provider לא החזיר נתונים (ייתכן crypto/symbol)
+```
+
+**טיקרים תקינים (אימות ידני):** AAPL — 201, נוצר ברשימה, מחיר 255.77. BTC-USD — 422 (provider לא החזיר נתונים; ייתכן crypto/symbol).
 
 ---
 

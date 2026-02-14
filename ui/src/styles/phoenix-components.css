@@ -197,10 +197,18 @@ tt-section-row > * {
   min-width: 0; /* Allow shrinking if needed */
 }
 
-/* Filter dropdown in container header — max-width 200px (global rule) */
+/* Filter dropdown in container header — max-width 200px (LOCKED GLOBAL RULE)
+   חוק קבוע: פילטר דרופדאון בכותרת קונטיינר — רוחב מקסימלי 200px תמיד */
 .index-section__header-meta .index-section__header-filter-select,
 .dashboard-section__header-meta .index-section__header-filter-select {
   max-width: 200px;
+}
+
+/* Filter + count in header-meta — align to end of row (like Add button)
+   פילטר וספירה מיושרים לסוף השורה */
+.index-section__header-meta:has(.index-section__header-filter-select),
+.dashboard-section__header-meta:has(.index-section__header-filter-select) {
+  justify-content: flex-end;
 }
 
 /* Element: Header Count - High specificity to ensure centering */

@@ -34,7 +34,7 @@
       "data_dashboard": "/data_dashboard.html",
       "alerts": "/alerts.html",
       "notes": "/notes.html",
-      "user_ticker": "/user_ticker.html",
+      "user_tickers": "/user_tickers.html",
       "executions": "/executions.html"
     },
     "settings": {

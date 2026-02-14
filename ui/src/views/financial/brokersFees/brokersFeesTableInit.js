@@ -44,12 +44,15 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   /**
    * Initialize all table managers
    * Gate A Fix: Skip loadInitialData for guests - prevents 401
+   * Brokers list: clear loading state also when not authenticated (shows "—")
    */
   function initializeTableManagers() {
     const runInit = () => {
       initTable();
       if (isAuthenticated()) {
         loadInitialData();
+      } else {
+        updateBrokersList([]);
       }
     };
     if (document.readyState === 'loading') {
@@ -207,6 +210,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
   /**
    * Update brokers list in info-summary (from GET /reference/brokers)
    * רק ברוקרים נתמכים, טקסט פשוט עם פסיקים
+   * מקור: GET /reference/brokers — מוצג רשימה או "—" אם אין נתונים
    */
   function updateBrokersList(brokers) {
     const listEl = document.getElementById('brokersList');
@@ -218,7 +222,7 @@ const formatCurrency = window.tableFormatters?.formatCurrency || function(amount
       return;
     }
     listEl.textContent = supported
-      .map(b => b.displayName ?? b.display_name ?? b.value ?? String(b))
+      .map(b => b.displayName ?? b.display_name ?? b.label ?? b.value ?? String(b))
       .join(', ');
   }
 

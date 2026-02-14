@@ -36,6 +36,12 @@
 <body class="brokers-fees-page context-trading">
   
   <!-- ============================================
+       Header Loader - MANDATORY per POL-015
+       טוען unified-header.html דינמית — אלמנט ראש דף לכל עמוד (מלבד Auth)
+       ============================================ -->
+  <script src="/src/components/core/headerLoader.js"></script>
+  
+  <!-- ============================================
        UAI Entry Point (Unified App Init)
        Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
        ============================================ -->
@@ -82,7 +88,7 @@
                         <div>עמלה ממוצעת לפעולה: <strong id="avgCommissionPerTrade"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ עמלות קבועות לחודש: <strong id="monthlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
                         <div>סה"כ עמלות קבועות לשנה: <strong id="yearlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div class="info-summary__brokers-row">ברוקרים נתמכים: <span id="brokersList" class="info-summary__brokers-list"></span></div>
+                        <div class="info-summary__brokers-row">ברוקרים נתמכים: <span id="brokersList" class="info-summary__brokers-list">טוען רשימת ברוקרים...</span></div>
                       </div>
                       <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
                         <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>

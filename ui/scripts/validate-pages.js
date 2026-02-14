@@ -29,11 +29,15 @@ const CSS_ORDER = [
 ];
 
 // All pages per POL-015 v1.1 (Non-Auth + Auth shell)
+// Template pages (financial, management, data) MUST include headerLoader.js — אלמנט ראש דף
 const PAGES_CONFIG = [
   { path: 'index.html', profile: 'spa' },
-  { path: 'src/views/financial/tradingAccounts/trading_accounts.html', profile: 'financial' },
-  { path: 'src/views/financial/brokersFees/brokers_fees.html', profile: 'financial' },
-  { path: 'src/views/financial/cashFlows/cash_flows.html', profile: 'financial' },
+  { path: 'src/views/financial/tradingAccounts/trading_accounts.html', profile: 'template' },
+  { path: 'src/views/financial/brokersFees/brokers_fees.html', profile: 'template' },
+  { path: 'src/views/financial/cashFlows/cash_flows.html', profile: 'template' },
+  { path: 'src/views/management/tickers/tickers.html', profile: 'template' },
+  { path: 'src/views/management/userTicker/user_tickers.html', profile: 'template' },
+  { path: 'src/views/data/dataDashboard/data_dashboard.html', profile: 'template' },
 ];
 
 function validateFile(filePath, profile) {
@@ -69,6 +73,12 @@ function validateFile(filePath, profile) {
     violations.push({ file: filePath, line: 0, rule: 'DOM', msg: 'Missing main' });
   }
 
+  // POL-015: Header Loader — אלמנט ראש דף חובה לכל עמוד (מלבד Auth)
+  const templateProfiles = ['template', 'financial'];
+  if (templateProfiles.includes(profile) && !/headerLoader\.js/.test(html)) {
+    violations.push({ file: filePath, line: 0, rule: 'HEADER', msg: 'Missing headerLoader.js — אלמנט ראש דף חובה' });
+  }
+
   if (profile === 'spa') {
     // SPA (index.html): Unified Shell for React/Auth. CSS via main.jsx; layout via headerLoader path.
     if (!/id="root"/.test(html)) {
@@ -83,8 +93,8 @@ function validateFile(filePath, profile) {
     if (!cssLinks.some(href => href && (href.includes('picocss') || href.includes('pico.min')))) {
       violations.push({ file: filePath, line: 0, rule: 'CSS', msg: 'SPA must load Pico CSS in HTML' });
     }
-  } else {
-    // financial: full validation
+  } else if (profile === 'template' || profile === 'financial') {
+    // template/financial: full validation
     const linkRegex = /<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>|href=["']([^"']+)["'][^>]*rel=["']stylesheet["']/gi;
     const cssLinks = [];
     let m;

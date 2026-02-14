@@ -122,7 +122,7 @@ const htmlPagesPlugin = () => {
               '/brokers_fees.html': '/views/financial/brokersFees/brokers_fees.html',
               '/cash_flows.html': '/views/financial/cashFlows/cash_flows.html',
               '/tickers.html': '/views/management/tickers/tickers.html',
-              '/user_ticker.html': '/views/management/userTicker/user_ticker.html',
+              '/user_tickers.html': '/views/management/userTicker/user_tickers.html',
               '/data_dashboard.html': '/views/data/dataDashboard/data_dashboard.html',
               '/system_management.html': '/views/management/systemManagement/system_management.html',
             };

@@ -4,7 +4,7 @@
  * TEAM_10_USER_TICKERS_WORK_PLAN §2.4 Team 50
  *
  * Acceptance criteria:
- * 1. /user_ticker.html loads in dev/build and appears in menu
+ * 1. /user_tickers.html loads in dev/build and appears in menu (plural per ARCHITECT_RESOLUTION_NAMING_FINAL)
  * 2. Data source = /me/tickers
  * 3. Add/remove work and persist
  * 4. Adding new ticker triggers live data check; provider failure → creation fails, error to user
@@ -58,7 +58,7 @@ async function runUserTickersQA() {
     logger.log('Login', 'PASS');
 
     // --- Item 1: Page loads + menu ---
-    await driver.get(`${TEST_CONFIG.frontendUrl}/user_ticker.html`);
+    await driver.get(`${TEST_CONFIG.frontendUrl}/user_tickers.html`);
     await driver.sleep(5000);
     const pageTitle = await driver.getTitle();
     const hasUserTickerTitle = pageTitle.includes('הטיקרים שלי') || pageTitle.includes('TikTrack');
@@ -67,7 +67,7 @@ async function runUserTickersQA() {
     logger.log('Item 1a: עמוד נטען', results.item1_page_load, { message: hasTable ? 'טבלה קיימת' : 'טבלה חסרה' });
 
     // Menu link
-    const menuLink = await driver.findElement(By.css('a[href*="user_ticker"], a[data-page="user_ticker"]')).catch(() => null);
+    const menuLink = await driver.findElement(By.css('a[href*="user_tickers"], a[data-page="user_tickers"]')).catch(() => null);
     results.item1_menu = !!menuLink ? 'PASS' : 'SKIP';
     logger.log('Item 1b: מופיע בתפריט', results.item1_menu);
 

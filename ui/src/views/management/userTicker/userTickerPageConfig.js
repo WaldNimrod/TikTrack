@@ -8,7 +8,7 @@
 window.UAI = window.UAI || {};
 
 window.UAI.config = {
-  pageType: 'user_ticker',
+  pageType: 'userTicker',
   requiresAuth: true,
   requiresHeader: true,
   dataEndpoints: ['/me/tickers'],
@@ -17,7 +17,7 @@ window.UAI.config = {
   tables: [
     {
       id: 'userTickersTable',
-      type: 'user_ticker',
+      type: 'user_tickers',
       pageSize: 25,
       sortable: true,
       filterable: false,

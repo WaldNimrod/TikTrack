@@ -197,6 +197,14 @@
         link.setAttribute('data-page', 'data_dashboard');
       }
     });
+
+    const userTickersLinks = document.querySelectorAll('a[href="/user_tickers"], a[href="/user_tickers.html"], a[data-page="user_tickers"]');
+    userTickersLinks.forEach(link => {
+      link.href = '/user_tickers.html';
+      if (!link.hasAttribute('data-page')) {
+        link.setAttribute('data-page', 'user_tickers');
+      }
+    });
     
     // Gate B Fix: Update trade_plans link to use .html extension (per routes.json)
     const tradePlansLinks = document.querySelectorAll('a[href="/trade_plans"], a[href="/trade_plans.html"], a[data-page="trade_plans"]');

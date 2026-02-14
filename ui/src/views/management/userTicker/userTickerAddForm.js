@@ -80,7 +80,7 @@ export function showUserTickerAddModal(options = {}) {
   createModal({
     title: 'הוסף טיקר לרשימה שלי',
     content: formHTML,
-    entity: 'user_ticker',
+    entity: 'user_tickers',
     showSaveButton: true,
     saveButtonText: 'הוסף',
     onSave: async function () {

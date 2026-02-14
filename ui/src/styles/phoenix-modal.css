@@ -104,6 +104,13 @@
   border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
 }
 
+/* User Tickers Entity ("הטיקרים שלי") — Plural per ARCHITECT_RESOLUTION_NAMING_FINAL */
+.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__header,
+.phoenix-modal.modal-entity-user_tickers .phoenix-modal__header {
+  background-color: var(--entity-ticker-light, #e3f2fd);
+  border-bottom-color: var(--entity-ticker-dark, #1976d2);
+}
+
 /* Cash Flow Entity (D21) */
 .phoenix-modal[data-entity="cash_flow"] .phoenix-modal__header,
 .phoenix-modal[data-entity="cash_flows"] .phoenix-modal__header,
@@ -111,6 +118,12 @@
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__header {
   background-color: var(--entity-cash_flow-light, #ffe5d3);
   border-bottom-color: var(--entity-cash_flow-dark, #e68900); /* Dark variant per SSOT */
+}
+
+/* Title color - User Tickers (Plural per SSOT) */
+.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__title,
+.phoenix-modal.modal-entity-user_tickers .phoenix-modal__title {
+  color: var(--entity-ticker-dark, #1976d2);
 }
 
 /* Title color - Trading Account & Brokers Fees (Dark variant per SSOT) */
@@ -129,6 +142,13 @@
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__title,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__title {
   color: var(--entity-cash_flow-dark, #e68900);
+}
+
+/* Close button color - User Tickers */
+.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__close,
+.phoenix-modal.modal-entity-user_tickers .phoenix-modal__close {
+  color: var(--entity-ticker-dark, #1976d2);
+  border-color: var(--entity-ticker-dark, #1976d2);
 }
 
 /* Close button color - Trading Account & Brokers Fees (Dark variant per SSOT) */

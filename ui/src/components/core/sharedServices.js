@@ -309,7 +309,7 @@ class SharedServices {
       return false;
     }
 
-    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees'];
+    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees', 'reference'];
     return protectedPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'));
   }
 

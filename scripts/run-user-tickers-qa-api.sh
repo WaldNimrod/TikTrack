@@ -40,4 +40,24 @@ else
   echo "⚠️ POST (fake symbol) → $CODE (expected 422/400)"
 fi
 
+# 4. Valid ticker AAPL → expect 201 (or 409 if already in list)
+CODE=$(curl -s -o /tmp/ut_aapl.json -w "%{http_code}" -X POST "$BACKEND/api/v1/me/tickers?symbol=AAPL" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json")
+if [ "$CODE" = "201" ] || [ "$CODE" = "409" ]; then
+  echo "✅ POST (AAPL) → $CODE — live data check passed / already in list"
+else
+  echo "⚠️ POST (AAPL) → $CODE (expected 201/409)"
+fi
+
+# 5. BTC-USD — provider may or may not return (Yahoo format); document result
+CODE=$(curl -s -o /tmp/ut_btc.json -w "%{http_code}" -X POST "$BACKEND/api/v1/me/tickers?symbol=BTC-USD" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json")
+if [ "$CODE" = "201" ] || [ "$CODE" = "409" ]; then
+  echo "✅ POST (BTC-USD) → $CODE"
+elif [ "$CODE" = "422" ]; then
+  echo "⚠️ POST (BTC-USD) → 422 — provider לא החזיר נתונים (ייתכן crypto)"
+else
+  echo "⚠️ POST (BTC-USD) → $CODE"
+fi
+
 echo "=== API Verification Done ==="

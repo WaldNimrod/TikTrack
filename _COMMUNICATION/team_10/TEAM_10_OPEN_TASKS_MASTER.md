@@ -158,15 +158,15 @@
 
 | מזהה | בעלים | משימה | תוצר מצופה | תלות / חסימה | סטטוס |
 |------|--------|--------|-------------|----------------|--------|
-| SHF-1 | **Team 20** | Smart History Engine — Gap analysis, Decision (GAP_FILL\|NO_OP\|force_reload), Post-run verification + Retry (מיידי + batch לילה) | Service/Engine; לוגיקה ברמת מערכת (לא בתוך קונקטורים) | — | ⬜ OPEN |
-| SHF-2 | **Team 20** | הרחבת Provider Interface — `get_ticker_history(symbol, trading_days, date_from?, date_to?)` | Yahoo + Alpha תומכים בטווח תאריכים (או fallback לטווח מלא) | — | ⬜ OPEN |
-| SHF-3 | **Team 20** | API — `POST /api/v1/tickers/{ticker_id}/history-backfill?mode=gap_fill\|force_reload` (ברירת מחדל: gap_fill); force_reload — אימות Admin בלבד | Router + אימות הרשאה ל־force_reload | SHF-1 | ⬜ OPEN |
-| SHF-4 | **Team 20** | סנכרון סקריפט `sync_ticker_prices_history_backfill.py` עם המנוע (קריאה ל־Engine במקום לוגיקה מפוזרת) | סקריפט מעודכן; Make target אם רלוונטי | SHF-1 | ⬜ OPEN |
-| SHF-5 | **Team 30** | Admin UI — דיאלוג "הנתונים מלאים — לטעון מחדש?" + טריגר ל־force_reload באישור מפורש | עמוד ניהול טיקרים (D22); כפתור/פעולה עם אישור | SHF-3 (API פעיל) | ⬜ OPEN |
+| SHF-1 | **Team 20** | Smart History Engine — Gap analysis, Decision (GAP_FILL\|NO_OP\|force_reload), Post-run verification + Retry (מיידי + batch לילה) | Service/Engine; לוגיקה ברמת מערכת (לא בתוך קונקטורים) | — | ✅ **CLOSED** — TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE; smart_history_engine.py |
+| SHF-2 | **Team 20** | הרחבת Provider Interface — `get_ticker_history(symbol, trading_days, date_from?, date_to?)` | Yahoo + Alpha תומכים בטווח תאריכים (או fallback לטווח מלא) | — | ✅ **CLOSED** — TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE |
+| SHF-3 | **Team 20** | API — `POST /api/v1/tickers/{ticker_id}/history-backfill?mode=gap_fill\|force_reload` (ברירת מחדל: gap_fill); force_reload — אימות Admin בלבד | Router + אימות הרשאה ל־force_reload | SHF-1 | ✅ **CLOSED** — TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE; 200/403/404/409/502 |
+| SHF-4 | **Team 20** | סנכרון סקריפט `sync_ticker_prices_history_backfill.py` עם המנוע (קריאה ל־Engine במקום לוגיקה מפוזרת) | סקריפט מעודכן; Make target אם רלוונטי | SHF-1 | ✅ **CLOSED** — TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE |
+| SHF-5 | **Team 30** | Admin UI — דיאלוג "הנתונים מלאים — לטעון מחדש?" + טריגר ל־force_reload באישור מפורש | עמוד ניהול טיקרים (D22); כפתור/פעולה עם אישור | SHF-3 (API פעיל) | ⬜ OPEN — בקשת ביצוע: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md |
 | SHF-6 | **Team 30** | הצגת סטטוס השלמה/טעינה חוזרת (לאחר backfill) | UI feedback — שורות שהושלמו, כישלון, retry | SHF-1, SHF-3 | ⬜ OPEN |
 | SHF-7 | **Team 60** | ללא משימה חדשה (Schema קיים) | — | — | ✅ N/A |
 
-**חסימות ידועות:** אין. תלות: SHF-3, SHF-5, SHF-6 תלויים ב־SHF-1.
+**חסימות ידועות:** אין. **Team 20 — SHF-1–SHF-4:** ✅ הושלמו (TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE; Evidence: TEAM_20_SMART_HISTORY_FILL_IMPLEMENTATION_COMPLETE.md). **Team 30:** SHF-5, SHF-6 פתוחים — בקשת ביצוע נשלחה: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md.
 
 ---
 
@@ -221,4 +221,5 @@
 ---
 
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**  
-**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (נעול).
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (נעול).  
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_1_2_3_4_CLOSED | 2026-02-14** — Team 20 דיווח השלמה: TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE. SHF-1–SHF-4 → CLOSED. SHF-5, SHF-6 (Team 30) פתוחים — בקשת ביצוע: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md.

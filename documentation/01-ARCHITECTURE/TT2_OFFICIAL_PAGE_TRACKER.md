@@ -4,8 +4,10 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-01-31  
-**version:** v4.2 (D22 ניהול טיקרים, D23 דשבורד נתונים — רשימת עמודים עדכנית וברורה; Batch 3 מפורט)
+**last_updated:** 2026-02-15  
+**version:** v4.3 (יישור ל־TT2_PAGES_SSOT_MASTER_LIST — trade_plans/ai_analysis/trades, עמודים חובה, דשבורדים רמה 1)
+
+**מקור אמת לרשימת עמודים מלאה:** [TT2_PAGES_SSOT_MASTER_LIST.md](TT2_PAGES_SSOT_MASTER_LIST.md) — מטריצה, תפריט ובלופרינט.
 
 ---
 
@@ -53,6 +55,18 @@
 | D21 | cash_flows.html | תזרים מזומנים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; D21 Infra VERIFIED (ADR-010) |
 | D22 | tickers.html | ניהול טיקרים | **3. IN PROGRESS** 🟡 | Team 30 | Roadmap v2.1 Batch 3 — TICKERS_MGR; CRUD; מחיר אחרון + שינוי יומי. **בקרת תקינות:** widget נדרש — דרופדאון טיקר + GET /tickers/{id}/data-integrity + פירוט EOD/Intraday/250d + gaps + last_updates (TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST). |
 | D23 | data_dashboard.html | דשבורד נתונים | **1. DRAFT** 📝 | Team 30 | תבנית בלבד; מקושר מכפתור "נתונים"; תוכן מלא בהמשך |
+| D24 | trade_plans.html | תוכניות טריידים | **תכנון** | Team 31/30 | תפריט: תכנון → **תוכניות טריידים** (לא אנליזת AI). SSOT: TT2_PAGES_SSOT_MASTER_LIST |
+| D25 | ai_analysis.html | אנליזת AI (עמוד נפרד) | **תכנון** | Team 31/30 | תפריט: תכנון → **אנליזת AI**. קיים בלגסי. נדרש אפיון. |
+| D26 | watch_lists.html | רשימות צפייה | מעקב | Team 31/30 | נדרש אפיון. |
+| D27 | ticker_dashboard.html | דשבורד טיקר | מעקב | Team 31/30 | נדרש אפיון. |
+| D28 | trading_journal.html | יומן מסחר | מעקב | Team 31/30 | נדרש אפיון. |
+| D29 | trades.html | ניהול טריידים | מעקב | Team 31/30 | תפריט: מעקב → ניהול טריידים. ישויות טרייד. אפיון: WP_20_09, DB trades. |
+| D30–D32 | strategy_analysis, trades_history, portfolio_state | מחקר | מחקר | Team 31/30 | נדרש אפיון. |
+| D37 | data_import.html | ייבוא נתונים | הגדרות | Team 31/30 | **דחוף.** CSV → תזרימים/ביצועים. CASH_FLOW_PARSER_SPEC. |
+| D38–D39 | tag_management, preferences | הגדרות | הגדרות | Team 31/30 | נדרש אפיון. |
+| D40–D41 | system_management, design_system | ניהול | ניהול | — | חיוני; design_system קיים. לא נדרש Blueprint. |
+
+**לא נדרש:** api_keys, securities. **דשבורדים רמה 1:** בית, תכנון, מעקב, מחקר, נתונים, ניהול — לא נדרש Blueprint; באץ' אחד מאוחר יותר.
 
 ---
 

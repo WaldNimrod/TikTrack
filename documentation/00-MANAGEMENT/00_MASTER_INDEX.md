@@ -198,7 +198,7 @@ _COMMUNICATION/
 
 ## 📊 מטריצת עמודים מרכזית (Official Page Tracker)
 
-- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים במערכת (מחויב על ידי האדריכלית, מתוחזק על ידי Team 10) ✅ **Batch 2 CLOSED 2026-02-12** | **Batch 3:** D22 (ניהול טיקרים), D23 (דשבורד נתונים) — IN SCOPE, v4.2
+- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים (מתוחזק Team 10). **מקור אמת לרשימה:** [TT2_PAGES_SSOT_MASTER_LIST.md](../01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md) — trade_plans (תוכניות טריידים), ai_analysis (אנליזת AI), trades (ניהול טריידים), עמודים חובה, דשבורדים רמה 1. v4.3 **2026-02-15**
 - [📚 Consolidation Batch 2 (פיננסי)](../../_COMMUNICATION/team_10/CONSOLIDATION_BATCH_2.md) - דוח קידום ידע באץ' 2; שער א'+ב' נסגרו; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/` ✅ **2026-02-12**
 - [📌 TT2_DECISION_PROFILE_ROUTE.md](../01-ARCHITECTURE/TT2_DECISION_PROFILE_ROUTE.md) - החלטה: /profile טיפוס C (Auth-only) — מקודם מבאץ' 2 ✅ **SSOT**
 - [📌 TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md](../01-ARCHITECTURE/TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md) - SSOT: A/B/C/D, Header Persistence, ProtectedRoute — מקודם מבאץ' 2 ✅ **SSOT**

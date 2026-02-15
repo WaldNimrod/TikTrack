@@ -4,49 +4,47 @@
 **from:** Team 10 (The Gateway)  
 **date:** 2026-02-15  
 **re:** רשימת המשימות המרכזית — סגירת P3-003  
-**מקור:** TEAM_10_TO_TEAM_90_ROADMAP_V2_1_RESPONSE_AND_STAGE1_PLAN.md
+**מקור:** TEAM_10_TO_TEAM_90_ROADMAP_V2_1_RESPONSE_AND_STAGE1_PLAN.md  
+**עדכון 2026-02-15:** יישור להחלטת G-Lead — **SSOT רשימת עמודים:** `documentation/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md`
 
 ---
 
-## 1. מטריצת Blueprint ↔ Roadmap v2.1
+## 1. SSOT רשימת עמודים (מחייב)
 
-**מקורות:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`, `ui/public/routes.json`, `_COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`.
+**מטריצת העמודים המלאה** — מקור אמת יחיד: **`documentation/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md`**
 
-### IN SCOPE (Roadmap v2.1 — Batches 3–4, מאושרים ליישור נוכחי)
+המטריצה להלן היא תמצית; לכל מזהה, Route, בלופרינט, תפריט ואפיון — ראה SSOT.
 
-| עמוד / Route | מזהה | סטטוס Page Tracker | הערה |
-|--------------|------|---------------------|------|
-| D15.* (Login, Register, Reset, Index, Profile) | D15.L/R/P/I/V | 5. APPROVED / 4. FIDELITY | Auth + דאשבורד + פרופיל |
-| D16 trading_accounts | D16 | 4. FIDELITY — Batch 2 CLOSED | חשבונות מסחר |
-| D18 brokers_fees | D18 | 4. FIDELITY — Batch 2 CLOSED | עמלות ברוקרים |
-| D21 cash_flows | D21 | 4. FIDELITY — Batch 2 CLOSED | תזרימי מזומנים |
-| D22 tickers | D22 | 3. IN PROGRESS | ניהול טיקרים — Batch 3 TICKERS_MGR |
-| D23 data_dashboard | D23 | 1. DRAFT | דשבורד נתונים — Batch 3 |
-| user_tickers | data.user_tickers | — | Batch 3 USER_TICKERS |
-| alerts, notes | data.alerts, data.notes | — | Batch 3 ALERTS & NOTES |
-| executions | data.executions | — | Batch 4 EXECUTIONS & IMPORT |
-| preferences | settings.preferences | — | Batch 3 D15_SETTINGS |
+### עקרון: דשבורדים ברמה 1
 
-### OUT OF SCOPE ל־Roadmap v2.1 (Batches 3–4) — טיפול Drift
+כל הכפתורים ברמה 1 (בית, תכנון, מעקב, מחקר, נתונים, ניהול) = **עמודי דשבורד**. **לא נדרש Blueprint**; יבנו בבאץ' אחד בשלב מתקדם.
 
-עמודים שקיימים ב־routes / Blueprint אך **לא** כלולים ב־Batches 3–4 של Roadmap v2.1 — מסומנים **OUT OF SCOPE** ליישור נוכחי (לא חלק מסגירת P3-003/Batch 3–4).
+### IN SCOPE — עמודים חובה (תמצית)
 
-| עמוד / אזור | סטטוס | הערה |
-|-------------|--------|------|
-| research.* (strategy_analysis, trades_history, portfolio_state) | **OUT OF SCOPE** | Batch 5–6 (תובנות/ניתוח) — יטופלו בשלב מאוחר |
-| planning.* (trade_plans) | **OUT OF SCOPE** | Batch 5 — יטופל בשלב מאוחר |
-| tracking.* (watch_lists, ticker_dashboard, trading_journal) | **OUT OF SCOPE** | לא מפורש ב־Batches 3–4 — ממתין להחלטת Roadmap |
-| management.system_management, design_system | **OUT OF SCOPE** | ניהול מערכת/עיצוב — לא חלק מ־Batch 3–4 |
-| settings.data_import, tag_management | **OUT OF SCOPE** | לא מפורשים ב־Roadmap v2.1 Batches 3–4 — ממתין להחלטה |
+| מזהה | Route | בלופרינט? | תפריט | אפיון |
+|------|--------|------------|--------|--------|
+| D15.L/R/P/I/V | login, register, reset, home, profile | ✅ / דשבורד | Auth, בית, הגדרות | קיים |
+| D24 | trade_plans | ✅ | תכנון → **תוכניות טריידים** | קיים |
+| D25 | ai_analysis | ✅ (עמוד נפרד) | תכנון → **אנליזת AI** | נדרש אפיון |
+| D26–D29 | watch_lists, ticker_dashboard, trading_journal, **trades** | ✅ | מעקב → רשימות צפייה, דשבורד טיקר, יומן מסחר, **ניהול טריידים** | נדרש אפיון / קיים (trades) |
+| D30–D32 | strategy_analysis, trades_history, portfolio_state | ✅ | מחקר → … | נדרש אפיון |
+| D16, D18, D21, D22, D23 | trading_accounts … data_dashboard | ✅ | נתונים, ניהול | קיים |
+| D33–D37 | user_tickers, alerts, notes, executions, **data_import** | ✅ | נתונים, הגדרות → ייבוא נתונים | קיים / נדרש אפיון (data_import דחוף) |
+| D38–D39 | tag_management, preferences | ✅ | הגדרות | נדרש אפיון |
+| D40–D41 | system_management, design_system | לא נדרש / קיים | ניהול | — |
 
-**החלטה:** עמודים אלה **לא** נדרשים לסגירת P3-003 או ל־Kickoff Batch 3–4. אם ייכללו בעתיד — החלטה רשמית (אדריכל / G-Lead) ותיעוד ב-SSOT.
+### לא נדרש
+
+api_keys, securities — **לא נדרש**. research (דשבורד ראשי) — לא נדרש Blueprint.
 
 ---
 
 ## 2. Evidence
 
-- **Routes/Menu:** מעודכנים (P3-001, P3-002 — CLOSED). `routes.json` תואם Page Tracker.
-- **מטריצת Blueprint + Drift:** מתועדת במסמך זה — IN SCOPE / OUT OF SCOPE ברור.
+- **SSOT רשימת עמודים:** [TT2_PAGES_SSOT_MASTER_LIST.md](../../documentation/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md) — מקור אמת לרשימה, תפריט ובלופרינט.
+- **תיקונים (תפריט + מטריצה):** [TEAM_10_P3_003_MATRIX_AND_MENU_CORRECTIONS.md](TEAM_10_P3_003_MATRIX_AND_MENU_CORRECTIONS.md).
+- **Routes:** `routes.json` — נוספו ai_analysis, trades. תפריט — תוכניות טריידים ↔ trade_plans; אנליזת AI ↔ ai_analysis; מעקב → ניהול טריידים.
+- **טבלת השוואה:** [TEAM_10_P3_003_PAGES_COMPARISON_TABLE.md](TEAM_10_P3_003_PAGES_COMPARISON_TABLE.md) — מתיישרת ל-SSOT.
 
 ---
 

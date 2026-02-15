@@ -74,11 +74,14 @@ async def fetch_prices_for_tickers(
     """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Per CORRECTIVE: CRYPTO uses provider mapping, Alpha DIGITAL_CURRENCY_DAILY."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
-    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
     cooldown_min = get_provider_cooldown_minutes()
+    # SOP-015: Cooldown Protocol — log status for Team 90 audit
+    for prov, _until, sec in get_cooldown_status():
+        print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []
@@ -258,7 +261,9 @@ def upsert_prices(
 
 
 def load_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
-    """Load tickers with ticker_type and metadata for provider mapping (CORRECTIVE)."""
+    """Load tickers for EOD sync. P3-010: EOD covers ALL tickers (active + inactive).
+    Per MARKET_DATA_PIPE_SPEC §2.4: 'EOD ליתר' — inactive get EOD only.
+    Intraday (sync_ticker_prices_intraday) loads is_active=true only."""
     import psycopg2
     from psycopg2.extras import RealDictCursor
     import json
@@ -272,8 +277,7 @@ def load_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
             SELECT id, symbol, COALESCE(ticker_type, 'STOCK') AS ticker_type, metadata
             FROM market_data.tickers
             WHERE (deleted_at IS NULL OR deleted_at > NOW())
-            AND is_active = true
-            ORDER BY symbol
+            ORDER BY is_active DESC NULLS LAST, symbol
             LIMIT %s
         """, (max_tickers,))
         rows = cur.fetchall()

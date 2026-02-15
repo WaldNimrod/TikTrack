@@ -27,11 +27,13 @@
 
 ## 3. זרימת מימוש ב־yahoo_provider
 
-### 3.1 `get_ticker_price` (מחיר אחרון)
+### 3.1 `get_ticker_price` (מחיר סגירה EOD)
 
-1. **ניסיון ראשון:** `history(period="5d", interval="1d")` — מהיר בשעות מסחר
-2. **אם ריק:** `history(start=..., end=...)` — טווח 14 יום אחורה, כולל סוף שבוע
-3. **אם עדיין ריק:** `v7/finance/quote` (httpx) — fallback אחרון
+**חובה:** מחירי סגירה חייבים להחזיר תמיד; שוק סגור לא משנה. לא תוך־יום.
+
+1. **Primary:** `v8/finance/chart` (range=1mo) — היסטוריה תמיד קיימת; לוקח את סגירת היום האחרון
+2. **Fallback:** `history(5d)` → `history(start,end)` — yfinance (בלי session)
+3. **אחרון:** `v7/finance/quote` — httpx
 
 ### 3.2 `get_exchange_rate` (FX)
 
@@ -44,7 +46,7 @@
    - **Gap-fill:** `period1` + `period2` **בלבד** (ללא range). `period2` = תחילת יום לאחר date_to (כולל date_to)
    - **Retry:** 3×5 שניות (SPEC-PROV-YF-HIST)
    - **Deduplication:** הסרת תאריכים כפולים לפני החזרה
-2. **Fallback:** yfinance + Session + User-Agent — `history(start=..., end=...)` 400 ימים אחורה
+2. **Fallback:** yfinance (בלי Session — RULE 1) — `history(start=..., end=...)` 400 ימים אחורה
 
 ---
 
@@ -56,9 +58,10 @@
 
 ### 4.1 סימבולים לקריפטו (Locked)
 
-- Yahoo עובד עם סימבול קריפטו בפורמט `BASE-QUOTE` בלבד.
-- דוגמאות תקינות: `BTC-USD`, `ETH-USD`, `SOL-USD`.
-- סימבולים כמו `BTC` בלבד עלולים להחזיר "no data" או תוצאות לא עקביות.
+- Yahoo תומך **בשני פורמטים** (תיעוד רישמי): `BASE-QUOTE` (BTC-USD) ו־`BASEQUOTE=X` (BTCUSD=X).
+- דוגמאות: `BTC-USD`, `ETH-USD`, `BTCUSD=X` — chart API עשוי להעדיף =X ל־forex/crypto.
+- מימוש: מנסים קודם `BTC-USD`, אם נכשל — `BTCUSD=X` (עם רווח 2s).
+- סימבולים כמו `BTC` בלבד עלולים להחזיר "no data".
 - ליישור מול Alpha Vantage יש לשמור `provider_mapping_data` לכל טיקר קריפטו:
   - Yahoo: `symbol=BTC-USD`
   - Alpha: `symbol=BTC`, `market=USD`
@@ -75,6 +78,40 @@
 | exchange_rates_history | היסטוריית FX | sync_exchange_rates_eod |
 
 סוף שבוע: אין מסחר חדש, אבל **היסטוריה** (סגירות קודמות) קיימת ויש להסתמך עליה.
+
+---
+
+## 6. מגבלות 429 — מה ידוע ומה מנוהל
+
+### 6.1 תעוד רשמי של Yahoo
+
+- **לא מפורסם.** Yahoo לא מפרסמת מגבלות מדויקות ל־query1.finance.yahoo.com.
+- **Terms of Use:** "APIs may be subject to rate limits at Yahoo's absolute and sole discretion".
+- **YQL (הפסק ב־2019):** 2,000/hr/IP (לא רלוונטי ל־v7/v8 הנוכחי).
+
+### 6.2 ממצאים מקהילה (אינם רשמיים)
+
+| מקור | הערכת מגבלה | זמן המתנה אחרי 429 |
+|------|--------------|---------------------|
+| Stack Overflow | ~100 בקשות/שעה | — |
+| קהילה | 2+ דקות בין בקשות (לא מובטח) | — |
+| User-Agent | חובה — בקשות בלי UA נחסמות |
+
+### 6.3 ניהול אצלנו (SSOT: MARKET_DATA_PIPE_SPEC §8)
+
+| מנגנון | מימוש | פרמטר |
+|--------|--------|--------|
+| **Cooldown על 429** | `provider_cooldown.py` | `PROVIDER_COOLDOWN_MINUTES` (ברירת מחדל: 15) |
+| **חלון Cooldown** | 15 דקות (ניתן להגדרה) | אין קריאות נוספות לספק בתקופה |
+| **Fallback** | Yahoo → Alpha (Prices) | אין חסימה של ה־UI |
+| **Retry** | v8/chart: 3× עם 5s ביניהם | בתוך אותו ספק |
+| **User-Agent** | Rotation חובה | `_next_user_agent()` |
+
+### 6.4 המלצה ל־"בלי עומס"
+
+- **לבדיקות ידניות / test-providers-direct:** המתנה **15–30 דקות** אחרי סשן עם הרבה בקשות.
+- **לסביבת Production:** Cooldown 15 דקות; Single-Flight; Cache-First — מפחיתים עומס.
+- **רווח בין סמלים בבדיקה:** 4+ שניות (כבר מיושם ב־test-providers-direct.py).
 
 ---
 

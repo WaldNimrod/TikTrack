@@ -1,10 +1,9 @@
-# 🏰 אינדקס אדריכל מרכזי (v24.0.0)
-## 📜 חוקי יסוד (System v1.0.0 LOCKED 🔒)
-- TT2_GOVERNANCE_AND_AI_COMMUNICATION_PROTOCOL.md (AI Reporting - NEW).
-- PHOENIX_ORGANIZATIONAL_STRUCTURE_V2_7.md (Operational Command).
-- TT2_TASK_GOVERNANCE_PROTOCOL.md (3-Level Hierarchy).
+# 🏰 אינדקס אדריכל מרכזי (v25.0.0)
+## 📜 חוקי יסוד (Stage-1 LOCKED 🔒)
+- MISSION_DIRECTIVE_90_02_FINAL.md (Yahoo Gold Standard - SOP-015).
+- ARCHITECT_MARKET_DATA_STRATEGY_ANALYSIS.md (LOCKED).
+- TT2_VERSION_MATRIX_v1.0.md (LOCKED).
 
 ## 📂 סטטוס פרויקט
-- Governance: 🛡️ STRENGTHENED - SOP-013 Active.
-- Team 10: ⚔️ Enforcing Field Discipline & Reporting Cascade.
-- Phase 2.5: ✅ SIGNED OFF.
+- Stage-1: 🟢 EXECUTING - Implementing Yahoo Provider with 11 Golden Rules.
+- Batch 3: 🛑 BLOCKED - Waiting for Data Pipe implementation.

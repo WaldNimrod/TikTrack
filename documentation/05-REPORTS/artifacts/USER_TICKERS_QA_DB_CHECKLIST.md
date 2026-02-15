@@ -53,8 +53,9 @@ docker exec -it tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -c
 ## 4. אתחול / migrations (אם צריך)
 
 ```bash
-# Migration ל-user_tickers (P3-020)
-make migrate-p3-020
+# Migrations (לפני QA)
+make migrate-p3-020   # user_tickers + tickers.status
+make migrate-p3-021   # exchanges, sectors, industries, market_cap_groups (חובה ל-POST /me/tickers)
 
 # Seed לטסט
 make db-base-seed

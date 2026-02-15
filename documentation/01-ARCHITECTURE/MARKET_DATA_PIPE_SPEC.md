@@ -295,4 +295,5 @@ System Settings must expose:
 **log_entry | TEAM_10 | SSOT_EXPANSION | RESUBMISSION_90 | 2026-02-13** — Market Cap, Indicators (ATR/MA/CCI), 250d historical, Coverage Matrix + Indicators Spec (מקור: TEAM_90_RESUBMISSION_REQUIRED, TEAM_90_INDICATORS_ADDENDUM).  
 **log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday לטיקרים עם is_active=true; טבלת intraday נפרדת; Cadence ב-System Settings (מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT).
 **log_entry | TEAM_90 | MAINTENANCE_RETENTION_LOCK | STAGE1 | 2026-02-13** — Retention + archive policy + cleanup cycles locked (Intraday 30d→archive 1y; EOD/FX 250d→archive; daily/weekly/monthly).
-**log_entry | TEAM_90 | RATELIMIT_SCALING_LOCK | STAGE1 | 2026-02-13** — Rate‑limit & scaling policy locked (cache‑first, single‑flight, cooldown on 429, system settings controls).
+**log_entry | TEAM_90 | RATELIMIT_SCALING_LOCK | STAGE1 | 2026-02-13** — Rate‑limit & scaling policy locked (cache‑first, single‑flight, cooldown on 429, system settings controls).  
+**log_entry | TEAM_10 | P3_010_SSOT_ALIGNMENT | 2026-02-15** — EOD sync: טוען את **כל** הטיקרים (active + inactive); העדפת סדר: ORDER BY is_active DESC. Intraday — רק is_active = true (ללא שינוי). מימוש: sync_ticker_prices_eod.py (TEAM_20_P3_010_AND_P3_004_ACTIVATION_ACK).

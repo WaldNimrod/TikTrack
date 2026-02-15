@@ -75,11 +75,13 @@ async def fetch_prices_for_tickers(
     """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Per CORRECTIVE: CRYPTO uses provider mapping, Alpha DIGITAL_CURRENCY_DAILY."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
-    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
 
     cooldown_min = get_provider_cooldown_minutes()
+    for prov, _until, sec in get_cooldown_status():
+        print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []

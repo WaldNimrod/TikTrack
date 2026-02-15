@@ -73,7 +73,8 @@
 | `make db-test-clean` | ניקוי נתוני טסט |
 | `make db-test-fill` | מילוי נתוני טסט |
 | `make db-base-seed` | seed בסיסי ל־test_user |
-| `make migrate-p3-020` | P3-020 user_tickers (דורש Docker) |
+| `make migrate-p3-020` | P3-020 user_tickers + tickers.status |
+| `make migrate-p3-021` | P3-021 exchanges, sectors, industries, market_cap_groups |
 | `python3 scripts/seed_qa_test_user.py` | משתמש QA TikTrackAdmin/4181 |
 | `python3 scripts/seed_base_test_user.py` | seed בסיס ל־test_user |
 

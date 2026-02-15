@@ -142,6 +142,16 @@
 - **מקור:** `ARCHITECT_POLICY_HYBRID_SCRIPTS.md` (2026-02-04)
 
 ---
+## 7. SOP-013 — פרוטוקול משילות: דיווחי Agents וחיתום שלב 🛡️ **מחייב**
 
-**עודכן על ידי:** צוות 10 (The Gateway) | 2026-02-04  
-**גרסה:** v2.8 (עדכון מדיניות סקריפטים - Hybrid Scripts Policy)
+**id:** SOP-013 | **owner:** Architect / Team 10 | **סטטוס:** LOCKED — MANDATORY (2026-02-13)
+
+- **סגירת משימות:** **רק** באמצעות **הודעת Seal (SOP-013)** — לא דוח או דוח השלמה לבד. פורמט: `--- PHOENIX TASK SEAL ---` עם TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT.
+- **שרשרת:** צוותי ביצוע (20–60) מפיקים Seal → Team 10 מעדכן MASTER_TASK_LIST ומפעיל 90 → Team 90 סריקה ו-PASS/FAIL. **חיתום שלב (PCS):** רק Team 10 מייצר PCS_[ID].md בסיום באץ' שלם.
+- **אכיפה:** No Seal No Pay; LCI Integrity (90 דוחה שינוי קוד בלי Seal); **Zero Noise** — קבצי תיעוד זמניים שלא זוקקים ל-PCS יימחקו.
+- **מקור מלא:** `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` | הנחיית אדריכלית: `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
+
+---
+
+**עודכן על ידי:** צוות 10 (The Gateway) | 2026-02-15  
+**גרסה:** v2.9 (SOP-013 משילות מלאה — Seal, PCS, Zero Noise)

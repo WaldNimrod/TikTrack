@@ -53,6 +53,8 @@ In every page or interface implementation:
 4. Update master indexes
 5. Archive communication reports to `_COMMUNICATION/99-ARCHIVE/`
 
-## 🏁 TASK COMPLETION
-- Create an Evidence log in `_COMMUNICATION/team_[ID]/` (NOT in `documentation/`)
-- Notify Team 10 for Consolidation and Index update.
+## 🏁 TASK COMPLETION (SOP-013 — LOCKED)
+- **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח/דוח השלמה לבד **לא** נחשב סגירה. פורמט: `--- PHOENIX TASK SEAL ---` + TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT. ראה: `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`
+- **Zero Noise:** קבצי תיעוד "זמניים" בתיקיות הצוותים שלא זוקקים ל-PCS (חיתום שלב) — **יימחקו**. Evidence רק כחלק מ-Seal או לפי הנחיית Team 10.
+- Create an Evidence log in `_COMMUNICATION/team_[ID]/` (NOT in `documentation/`) when required for Seal/PCS.
+- Notify Team 10 for Consolidation and Index update; **task closure = Seal Message only.**

@@ -22,7 +22,7 @@
 |-----------|--------|
 | `market_data.tickers.exchange_id` | ✅ קיים (FK ל־exchanges) |
 | `market_data.tickers.metadata` (JSONB) | ✅ קיים — יכול להכיל provider_mapping_data |
-| `market_data.exchanges` seed | ❌ חסר Milan — רק NASDAQ, NYSE, LSE, TASE |
+| `market_data.exchanges` seed | ✅ P3-021 — NASDAQ, NYSE, LSE, TASE, MIL |
 | `provider_mapping_data` בקוד | ❌ לא בשימוש (user_tickers_service, alpha_provider) |
 | Alpha crypto endpoint | ❌ משתמש ב‑GLOBAL_QUOTE — לא DIGITAL_CURRENCY_DAILY |
 | UI crypto market/currency | ❌ חסר |

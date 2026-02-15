@@ -161,6 +161,13 @@ class AlphaProvider(MarketDataProvider):
                 r = await client.get(ALPHA_BASE_URL, params=params)
                 r.raise_for_status()
                 data = r.json()
+            if data.get("Information") or data.get("Note"):
+                logger.warning(
+                    "Alpha Vantage rate limit (crypto) for %s/%s: %s",
+                    symbol, market,
+                    (data.get("Information") or data.get("Note"))[:120],
+                )
+                return None
             series = data.get("Time Series (Digital Currency Daily)", {})
             if not series:
                 return None
@@ -222,6 +229,14 @@ class AlphaProvider(MarketDataProvider):
                 r = await client.get(ALPHA_BASE_URL, params=params)
                 r.raise_for_status()
                 data = r.json()
+            # Rate limit: Alpha returns {"Information":"..."} or {"Note":"..."} — do NOT call fallback (saves quota)
+            if data.get("Information") or data.get("Note"):
+                logger.warning(
+                    "Alpha Vantage rate limit for %s: %s",
+                    symbol,
+                    (data.get("Information") or data.get("Note"))[:120],
+                )
+                return None
             quote = data.get("Global Quote", {})
             price = self._to_decimal(quote.get("05. price")) if quote else None
             if price and price > 0:

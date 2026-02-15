@@ -68,10 +68,24 @@
 - `_COMMUNICATION/team_40/` = מרחב טיוטות, דיונים, דוחות ביצוע — ידע זמני.
 - חוקים וקביעות — רק ב"תנ"ך" (אינדקס מאוחד, SSOT ב-`documentation/`). לא מחפשים חוקים בתיקיות צוותים.
 
-### 4.3 תקשורת וסגירת משימות (Playbook §3, SOP-013)
+### 4.3 תקשורת וסגירת משימות (Playbook §3, SOP-013 — LOCKED)
 
 - **אין הודעות "אישור קבלה" רוטיניות** — כשהצעד הבא חד־משמעי, **מממשים את הצעד הבא** (לא רק "קיבלנו").
-- **סגירת משימה:** **רק** באמצעות **Seal Message (SOP-013)** — דוח לבדו לא נחשב סגירה. מקור: `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`.
+- **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח או דוח השלמה לבד **לא** נחשב סגירה. מקור: `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`.
+- **פורמט Seal:** כותרת מפורשת "הודעת Seal (SOP-013)" + בלוק מובנה:
+  ```
+  --- PHOENIX TASK SEAL ---
+  TASK_ID: [L2-XXX]
+  STATUS: COMPLETED
+  FILES_MODIFIED:
+    - [Path/to/file]
+  PRE_FLIGHT: [PASS/FAIL]
+  HANDOVER_PROMPT: "צוות 90, המשימה מוכנה לבדיקת יושרה. ודא תאימות ל-routes.json."
+  --- END SEAL ---
+  ```
+  + log_entry.
+- **שרשרת:** אנחנו מפיקים Seal → Team 10 מעדכן MASTER_TASK_LIST ומפעיל 90 → Team 90 סריקה ו־PASS/FAIL. **PCS** (חיתום שלב) — רק Team 10 מייצר PCS_[ID].md בסיום באץ' שלם.
+- **Zero Noise:** קבצי תיעוד זמניים שלא זוקקים ל־PCS — **יימחקו**.
 
 ### 4.4 אופי פעולה (Playbook §7.4)
 

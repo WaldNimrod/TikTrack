@@ -87,8 +87,110 @@ def _fetch_market_status_sync() -> Optional[str]:
         return None
 
 
+def _to_forex_style_symbol(symbol: str) -> Optional[str]:
+    """BTC-USD → BTCUSD=X. Yahoo משתמש בשני פורמטים (תיעוד רישמי)."""
+    if "-" in symbol and len(symbol) >= 6:
+        parts = symbol.split("-", 1)
+        if len(parts) == 2 and parts[0].isalpha() and parts[1].isalpha():
+            return f"{parts[0]}{parts[1]}=X"
+    return None
+
+
+def _fetch_last_close_via_v8_chart(symbol: str) -> Optional[PriceResult]:
+    """Primary for EOD: v8/chart — היסטוריה תמיד קיימת (YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC §1).
+    מחירי סגירה חייבים להחזיר תמיד — לא תוך־יום; השוק סגור לא משנה.
+    Crypto: Yahoo תומך ב־BTC-USD ו־BTCUSD=X (תיעוד רישמי) — מנסים שניהם.
+    Retry 3×5s on 429 — כמו _fetch_history_v8_chart."""
+    result = _fetch_last_close_via_v8_chart_inner(symbol)
+    if result:
+        return result
+    alt = _to_forex_style_symbol(symbol)
+    if alt and alt != symbol:
+        import time
+        time.sleep(2)  # רווח לפני ניסיון פורמט חלופי (BTCUSD=X)
+        return _fetch_last_close_via_v8_chart_inner(alt, preferred_symbol=symbol)
+    return None
+
+
+def _fetch_last_close_via_v8_chart_inner(
+    symbol: str, preferred_symbol: Optional[str] = None
+) -> Optional[PriceResult]:
+    """Inner: fetch from v8/chart. preferred_symbol = סימבול להחזרה (e.g. BTC-USD when fetching BTCUSD=X)."""
+    import time
+    import httpx
+    out_sym = preferred_symbol or symbol
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    params = {"interval": "1d", "range": "1mo"}  # 1mo = ~22 trading days, תמיד יש נתונים
+    headers = {"User-Agent": _next_user_agent()}
+    for attempt in range(3):
+        try:
+            with httpx.Client(timeout=10.0, headers=headers) as client:
+                r = client.get(url, params=params)
+                if r.status_code == 429:
+                    if attempt < 2:
+                        time.sleep(5)
+                        continue
+                    # RULE 9: Cooldown on 429 (SOP-015) — set before raising
+                    from ..provider_cooldown import set_cooldown
+                    from ..market_data_settings import get_provider_cooldown_minutes
+                    cooldown_min = get_provider_cooldown_minutes()
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+                    logger.warning("Yahoo 429 — cooldown %d min (SOP-015)", cooldown_min)
+                r.raise_for_status()
+            data = r.json()
+            chart = data.get("chart", {}).get("result")
+            if not chart:
+                return None
+            c0 = chart[0]
+            timestamps = c0.get("timestamp", []) or []
+            quote = (c0.get("indicators", {}).get("quote", [{}]) or [{}])[0]
+            closes = quote.get("close", []) or []
+            price = None
+            if timestamps and closes:
+                i = -1
+                close_val = closes[i]
+                price = _to_decimal(close_val)
+            if (not price or price <= 0) and c0.get("meta"):
+                meta = c0["meta"]
+                price = _to_decimal(meta.get("regularMarketPrice"))
+            if not price or price <= 0:
+                return None
+            ts_unix = timestamps[-1] if timestamps else None
+            try:
+                ts = datetime.fromtimestamp(ts_unix, tz=timezone.utc) if ts_unix else datetime.now(timezone.utc)
+            except (ValueError, TypeError, OSError):
+                ts = datetime.now(timezone.utc)
+            i = -1
+            opens = quote.get("open", []) or []
+            highs = quote.get("high", []) or []
+            lows = quote.get("low", []) or []
+            vols = quote.get("volume", []) or []
+            o = _to_decimal(opens[i]) if abs(i) <= len(opens) and opens[i] else None
+            h = _to_decimal(highs[i]) if abs(i) <= len(highs) and highs[i] else None
+            lw = _to_decimal(lows[i]) if abs(i) <= len(lows) and lows[i] else None
+            vol = int(vols[i]) if abs(i) <= len(vols) and vols[i] is not None and str(vols[i]) != "nan" else None
+            return PriceResult(
+                symbol=out_sym,
+                price=price,
+                open_price=o,
+                high_price=h,
+                low_price=lw,
+                close_price=price,
+                volume=vol,
+                market_cap=None,
+                as_of=ts,
+                provider="YAHOO_FINANCE",
+            )
+        except Exception as e:
+            logger.debug("Yahoo v8/chart last-close attempt %s failed for %s: %s", attempt + 1, symbol, e)
+            if attempt < 2:
+                time.sleep(5)
+    return None
+
+
 def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
-    """Fallback: v7/finance/quote when history() fails. Requires User-Agent."""
+    """Last fallback: v7/finance/quote when history() fails. Requires User-Agent.
+    Per YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC: history first (less 429), quote last."""
     try:
         import httpx
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
@@ -135,17 +237,16 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
 
 
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
-    """Sync fetch. Primary: v7/quote (lightweight, works stocks+crypto+international).
-    Fallback: history(5d) → history(start,end). Per EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC."""
-    # Try quote API first — faster, fewer 429s, works for AAPL/BTC-USD/TEVA.TA/ANAU.MI
-    result = _fetch_price_via_quote_api(symbol)
+    """מחיר סגירה EOD — חייב להחזיר תמיד. לא תוך־יום; שוק סגור לא משנה.
+    Primary: v8/chart (היסטוריה תמיד קיימת). Fallback: yfinance → v7/quote."""
+    result = _fetch_last_close_via_v8_chart(symbol)
     if result and result.price and result.price > 0:
         return result
     try:
         import yfinance as yf
         from datetime import timedelta
 
-        ticker = yf.Ticker(symbol)
+        ticker = yf.Ticker(symbol)  # NO session — per DEBUG_YAHOO_RESULTS
         info = ticker.history(period="5d", interval="1d", debug=False)
         if info is None or info.empty:
             end_d = datetime.now(timezone.utc).date()
@@ -159,17 +260,15 @@ def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
             )
         if info is not None and not info.empty:
             last = info.iloc[-1]
-            return _history_to_price_result(symbol, last, ticker)
+            return _history_to_price_result(symbol, last)
     except Exception as e:
         logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
 
-    return result
+    return _fetch_price_via_quote_api(symbol)
 
 
-def _history_to_price_result(
-    symbol: str, last, ticker
-) -> Optional[PriceResult]:
-    """Build PriceResult from history row. Avoid calling ticker.info (quoteSummary → 429)."""
+def _history_to_price_result(symbol: str, last) -> Optional[PriceResult]:
+    """Build PriceResult from history row. NO ticker.info — quoteSummary causes 429 (YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC)."""
     ts = last.name
     if hasattr(ts, "to_pydatetime"):
         ts = ts.to_pydatetime()
@@ -180,13 +279,6 @@ def _history_to_price_result(
         vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
     except (ValueError, TypeError, KeyError):
         vol = None
-    market_cap = None
-    try:
-        ticker_info = ticker.info
-        if isinstance(ticker_info, dict) and ticker_info.get("marketCap"):
-            market_cap = _to_decimal(ticker_info["marketCap"])
-    except Exception:
-        pass
     return PriceResult(
         symbol=symbol,
         price=_to_decimal(close),
@@ -195,7 +287,7 @@ def _history_to_price_result(
         low_price=_to_decimal(last.get("Low")),
         close_price=_to_decimal(close),
         volume=vol,
-        market_cap=market_cap,
+        market_cap=None,  # avoid ticker.info (quoteSummary → 429)
         as_of=ts,
         provider="YAHOO_FINANCE",
     )
@@ -312,6 +404,16 @@ def _fetch_history_v8_chart(
             headers = {"User-Agent": _next_user_agent()}
             with httpx.Client(timeout=15.0) as client:
                 r = client.get(url, params=params, headers=headers)
+                if r.status_code == 429:
+                    if attempt < 2:
+                        time.sleep(5)
+                        continue
+                    # RULE 9: Cooldown on 429 (SOP-015)
+                    from ..provider_cooldown import set_cooldown
+                    from ..market_data_settings import get_provider_cooldown_minutes
+                    cooldown_min = get_provider_cooldown_minutes()
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+                    logger.warning("Yahoo v8/chart 429 — cooldown %d min (SOP-015)", cooldown_min)
                 r.raise_for_status()
             data = r.json()
             chart = data.get("chart", {}).get("result")
@@ -387,10 +489,8 @@ def _fetch_history_sync(
         return result
     try:
         import yfinance as yf
-        from requests import Session
-        session = Session()
-        session.headers["User-Agent"] = _next_user_agent()
-        ticker = yf.Ticker(symbol, session=session)
+        # RULE 1: NO custom Session for yfinance — causes 429 (DEBUG_YAHOO_RESULTS, YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC)
+        ticker = yf.Ticker(symbol)
         end_d = date_to or datetime.now(timezone.utc).date()
         start_d = date_from or (end_d - timedelta(days=400))
         info = ticker.history(start=start_d.isoformat(), end=(end_d + timedelta(days=1)).isoformat(), interval="1d", debug=False)

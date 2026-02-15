@@ -382,6 +382,9 @@ def main():
 
     try:
         print("🔄 History backfill — 250d OHLCV (Yahoo→Alpha, Single-Flight)")
+        from api.integrations.market_data.provider_cooldown import get_cooldown_status
+        for prov, _until, sec in get_cooldown_status():
+            print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
         tickers = load_tickers_needing_backfill()
         if not tickers:
             print("✅ All tickers have sufficient history. Nothing to backfill.")

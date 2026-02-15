@@ -2,52 +2,58 @@
 
 **id:** `TT2_ARCHITECTURE_AND_RUNTIME_FLOWS`  
 **owner:** Team 10 + Team 90  
-**status:** DRAFT  
-**last_updated:** 2026-02-13  
+**status:** ACTIVE  
+**last_updated:** 2026-02-14  
 
 ---
 
-## 1) System Topology (High‑Level)
-- **UI Layer**: HTML pages + React (Hybrid)
-- **UAI**: Unified App Init orchestrator
-- **PDSC**: Shared API client (Shared_Services)
-- **Backend**: FastAPI
-- **DB**: Postgres schema (SSOT DDL)
+## 1) System Topology (High-Level)
+- **UI Layer:** Hybrid HTML + React
+- **UAI:** UnifiedAppInit with staged boot flow
+- **PDSC client:** `sharedServices.js` boundary for API access
+- **Backend:** FastAPI routers/services
+- **DB:** PostgreSQL (market_data / user_data / identity schemas)
 
-## 2) Runtime Flow (UI → UAI → PDSC → DB)
+## 2) Runtime Flow (UI -> UAI -> PDSC -> DB)
 1. HTML loads config
 2. UAI stages: DOM → Bridge → Data → Render → Ready
-3. sharedServices.js (PDSC client) fetches API + transforms payload
-4. UI tables render (HTML or React Tables via TablesReactStage)
+3. `sharedServices.js` performs API calls + transformers
+4. TableInit / page modules render view
+5. Header/filters/status widgets sync through bridge and handlers
 
 ## 3) Core Stages
-- **DOM Stage**: loads base structure
-- **Bridge Stage**: filters + header orchestration
-- **Data Stage**: DataLoaders (Shared_Services)
-- **Render Stage**: TableInit / React tables
-- **Ready Stage**: UI stable
+- **DOM Stage:** base shell, header loader hooks
+- **Bridge Stage:** filters/events and shared bridge coordination
+- **Data Stage:** page data loaders via `sharedServices`
+- **Render Stage:** table/page render init
+- **Ready Stage:** final interactive readiness
 
 ## 4) Integration Contracts
-- **UAI Config Contract**
-- **PDSC Boundary Contract**
-- **EFR Transformers Lock**
-- **CSS Load Verification**
+- UAI config contract
+- PDSC boundary contract
+- EFR transformers lock
+- CSS load verification
+- Template contract v1.1 (single shell for non-auth and auth layout via config)
 
 ## 5) Failure Modes & Recovery
-- Header loader failures → UI navigation broken
-- Auth redirect drift → guard issues
-- Token leakage → maskedLog policy
+- Header loader failure -> broken global navigation
+- Guard mismatch -> wrong redirect/access behavior
+- Provider errors/429 -> stale-safe return path
+- Token leakage risk -> masked logging policy
 
 ## 6) References (SSOT)
 - `documentation/01-ARCHITECTURE/TT2_UAI_CONFIG_CONTRACT.md`
 - `documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md`
 - `documentation/01-ARCHITECTURE/TT2_EFR_HARDENED_TRANSFORMERS_LOCK.md`
 - `documentation/01-ARCHITECTURE/TT2_CSS_LOAD_VERIFICATION_SPEC.md`
-- `documentation/01-ARCHITECTURE/TT2_SSOT_REGISTRY.md` (Shared_Services / PDSC client)
-- `ui/public/` (HTML pages)
-- `ui/src/` (React components + UAI runtime)
+- `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_PAGE_TEMPLATE_CONTRACT_v1.1.md`
+- `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md`
+- `ui/public/`
+- `ui/src/`
 - `ui/src/components/core/stages/DOMStage.js`
 - `ui/src/components/core/stages/BridgeStage.js`
 - `ui/src/components/core/stages/DataStage.js`
 - `ui/src/components/core/stages/RenderStage.js`
 - `ui/src/components/core/stages/ReadyStage.js`
+- `ui/scripts/generate-pages.js`
+- `ui/scripts/validate-pages.js`

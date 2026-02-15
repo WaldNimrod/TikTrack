@@ -2,62 +2,54 @@
 
 **id:** `TT2_SYSTEM_OVERVIEW`  
 **owner:** Team 10 (The Gateway)  
-**status:** DRAFT  
-**last_updated:** 2026-02-13  
+**status:** ACTIVE  
+**last_updated:** 2026-02-14  
 
 ---
 
 ## 1) Purpose
-TikTrack Phoenix (TT2) is a financial-core platform for managing trading accounts, broker fees, and cash flows with strict governance, unified architecture (UAI/PDSC), and consistent UX. The system is designed for auditability, future integrations, and high-fidelity UI consistency.
+TikTrack Phoenix (TT2) is a governance-first financial platform with hybrid UI (HTML + React), unified runtime (UAI), strict API boundary (PDSC/sharedServices), and auditable delivery gates (A/B/C).  
+This overview reflects current implemented code and locked SSOT decisions.
 
-## 2) Scope (In / Out)
-**In scope (Phase 2 Financial Core):**
+## 2) Implemented Scope (Current)
+### Phase 2 / Batch 1+2 (+2.5 hardening)
+- Auth model A/B/C/D (Open/Shared/Auth-only/Admin-only)
 - D16 Trading Accounts
-- D18 Brokers Fees (fees per trading account)
-- D21 Cash Flows + Currency Conversions
-- Unified Header + Auth model (A/B/C/D)
-- Gate A/B/C quality protocol
+- D18 Brokers Fees (account-based fees model)
+- D21 Cash Flows + currency conversions
+- Unified header + header loader + auth icon rules
+- ADR-017/018 hardening: 1.0.0 alignment, redirect enforcement, "Other broker" constraints
 
-**Out of scope (current):**
-- Premium tiers business logic (user_tier routing) — readiness only
-- Full production deployment hardening
+### Active Stage-1 (External Data + User Tickers)
+- External providers: Yahoo + Alpha only
+- Cache-first + fallback pipeline
+- Smart history fill (`gap_fill` / `force_reload`)
+- User Tickers page (`/user_tickers.html`) with add existing / add new / remove
 
-## 3) Core Value Proposition
-- **Account-centric model:** Fees and operations are anchored to Trading Accounts.
-- **Unified contract enforcement:** UAI config + PDSC boundary reduce drift.
-- **Governance-first delivery:** SSOT-driven changes + audit trails.
+## 3) Core System Principles
+- **Account-centric financial model:** fees and flows anchored to trading accounts.
+- **No UI blocking on provider failures:** stale-safe behavior with freshness indicators.
+- **Provider-agnostic mapping:** per-ticker `provider_mapping_data` for cross-provider symbols.
+- **Evidence-based governance:** no closure without gate evidence.
 
-## 4) Primary User Journeys (Summary)
-- **Open (A):** Login / Register / Reset Password (no header)
-- **Shared (B):** Home with guest vs logged-in containers
-- **Auth-only (C):** D16/D18/D21 (guest → Home)
-- **Admin-only (D):** /admin/design-system (JWT role required)
+## 4) Auth & Access Summary
+- **A Open:** `/login`, `/register`, `/reset-password` (header hidden)
+- **B Shared:** `/` (guest/logged-in containers in one page)
+- **C Auth-only:** protected pages redirect guest to `/`
+- **D Admin-only:** `/admin/design-system` and admin actions (JWT role)
 
-## 5) Key Constraints & Non‑Goals
-- No inline styles inside the Rich‑Text Editor; UI uses DNA/SSOT classes.
-- No direct fetch; all API via Shared_Services.
-- Must comply with SSOT decisions (ADR-013, ADR-015, SOP-012).
-- **ADR‑017:** System version locked to **1.0.0**; all layers must align to 1.x.
-- **ADR‑017/ADR‑014:** Account‑based fees refactor is mandatory (no approval for D18/D21 without full data refactor).
-- **ADR‑018:** “Other” broker rule enforced (unsupported accounts block API/import; user‑facing notice).
+## 5) Current Constraints
+- System version locked to `1.0.0` (no 2.x in active flow)
+- Rich text must use locked class set + FE/BE sanitization
+- No direct API calls from UI; use sharedServices boundary
+- No external market-data call before local cache check
 
-## 6) Status Snapshot (2026-02-13)
-- **Gate B:** GREEN (Team 90 re‑verify on record).
-- **Visual Sign‑off:** Approved (Team 10 log entry).
-- **Clean Table:** Declared (A/B/C all ✅; knowledge promotion + archive completed).
-
-## 7) References (SSOT)
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
-- `documentation/90_ARCHITECTS_DOCUMENTATION/ARCHITECT_RICH_TEXT_AND_DESIGN_SYSTEM_SPEC.md`
-- `documentation/09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md`
+## 6) References (SSOT)
+- `documentation/90_ARCHITECTS_DOCUMENTATION/BATCH_2_5_COMPLETIONS_MANDATE.md`
+- `documentation/90_ARCHITECTS_DOCUMENTATION/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md`
+- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_VERDICT_MARKET_DATA_STAGE_1.md`
+- `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX_v1.0.md`
+- `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md`
+- `documentation/01-ARCHITECTURE/TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md`
+- `documentation/09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md`
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
-- `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
-- `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`
-- `documentation/05-REPORTS/GATE_B_STATUS.md`
-- `_COMMUNICATION/team_90/TEAM_90_GATE_B_REVERIFY_GREEN.md`
-- `_COMMUNICATION/team_10/TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md`
-- `_COMMUNICATION/team_10/TEAM_10_CLEAN_TABLE_PROTOCOL.md`
-- `_COMMUNICATION/99-ARCHIVE/2026-02-12/ARCHIVE_MANIFEST.md`
-- `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md`
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md`
-- `_COMMUNICATION/90_Architects_comunication/TT2_VERSION_MATRIX_v1.0.md`

@@ -66,6 +66,12 @@ migrate-p3-020:
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_020_user_tickers_and_ticker_status.sql
 	@echo "✅ P3-020 migration complete."
 
+## P3-021: market_data reference tables (exchanges, sectors, industries, market_cap_groups)
+migrate-p3-021:
+	@echo "🔄 P3-021 — market_data reference tables (unblock POST /me/tickers)"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_021_market_data_reference_tables.sql
+	@echo "✅ P3-021 migration complete."
+
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
 	@echo "🔄 P3-019 — market_cap precision (24,4)"
@@ -192,6 +198,7 @@ help:
 	@echo "  make migrate-p3-018    - Create exchange_rates_history table"
 	@echo "  make migrate-p3-019    - market_cap NUMERIC(24,4) for mega caps"
 	@echo "  make migrate-p3-020    - user_tickers + tickers.status (User Tickers)"
+	@echo "  make migrate-p3-021    - market_data reference tables (exchanges, sectors; unblock POST /me/tickers)"
 	@echo "  make ensure-ticker-prices-partitions - Create 2025–2027 partitions"
 	@echo "  make test-suite-a      - Suite A: Contract & Schema (Smoke)"
 	@echo "  make test-suite-b      - Suite B: Cache-First + Failover (Smoke, REPLAY)"

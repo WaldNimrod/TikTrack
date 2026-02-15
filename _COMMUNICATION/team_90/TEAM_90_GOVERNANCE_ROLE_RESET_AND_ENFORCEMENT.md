@@ -34,6 +34,9 @@ Team 90 is **not**:
 3. **No assumption accepted** without file-path evidence.  
 4. **Territorial integrity enforced** per GOV-MANDATE-V3.  
 5. **All Team 90 outputs** must be audit findings, pass/fail decisions, and corrective directives only.
+6. **Dual-channel architect rule:**  
+   - `_COMMUNICATION/_Architects_Decisions/` = architect SSOT source  
+   - `_COMMUNICATION/90_Architects_comunication/` = communication channel only
 
 ---
 
@@ -51,7 +54,7 @@ Team 90 is **not**:
 
 - `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`
 - `documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md`
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
+- `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 
 ---
 

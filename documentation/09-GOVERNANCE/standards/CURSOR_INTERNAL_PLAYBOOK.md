@@ -72,7 +72,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 
 ### 4.1 תיעוד קבוע (Permanent Documentation)
 **מיקום:** `/documentation/` (לפי מבנה התיקיות הממוספר)
-- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; **אינדקס אדריכל (חוקי יסוד):** `_COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
+- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`; **אינדקס אדריכל (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
 - **חובה:** עדכון האינדקס בעת יצירת מסמך תיעוד חדש
 - **אסור:** לשמור תיעוד בשורש הפרויקט
 - **מבנה תיקיות (FIXED - v2.0):**
@@ -98,9 +98,14 @@ log_entry | [Team X] | READY | 001 | GREEN
 - **אין להוסיף לאינדקס:** קבצי `_COMMUNICATION` וקבצים זמניים **לא מתווספים** ל-00_MASTER_INDEX או לאינדקסים אחרים. רק תיעוד קבוע שמועלה ל-`documentation/` דרך נוהל קידום המידע (Knowledge Promotion) מתועד באינדקס.
 - **Sandbox:** תיקיות `_COMMUNICATION` הן מרחב טיוטות ודיונים — **חוקים קיימים רק ב"תנ"ך"** (אינדקס מאוחד, 00_MASTER_INDEX). אל תחפשו חוקים בתיקיות הצוותים.
 - **הפרדה:** שמירה קפדנית על ההפרדה בין תיקיות העבודה/תקשורת לבין התיעוד הקבוע (`documentation/`) ותהליך קידום המידע כפי שמוגדר בנהלים.
+- **הפרדת ערוצים (v2.111):**
+  - `_COMMUNICATION/_Architects_Decisions/` = מקור אמת יחיד למסמכים שנוצרו ע"י האדריכלית (ADR/Directives/Bible/נעילות).
+  - `_COMMUNICATION/90_Architects_comunication/` = ערוץ תקשורת בלבד (הגשות לצוות אדריכלית/פקודות פעולה).
+  - אסור להתייחס לקבצים ב-`90_Architects_comunication` כ-SSOT מחייב ללא נעילה ב-`_Architects_Decisions`.
 - **מבנה תיקיות (FIXED - v2.0):**
   - `team_01/`, `team_02/`, `team_10/`, `team_20/`, `team_30/`, `team_31/`, `team_40/`, `team_50/`, `team_60/` - תיקיות צוותים (כל צוות רק בתיקיה שלו)
-  - `90_Architects_communication/` - **READ ONLY** - תיקיית האדריכלית בלבד
+  - `90_Architects_communication/` - ערוץ תקשורת לאדריכלית (Inbox/Outbox; לא SSOT)
+  - `_Architects_Decisions/` - **READ ONLY** לצוותים; SSOT אדריכלי מחייב
   - קבצים בשורש _COMMUNICATION: רק קבצים לטווח ארוך (README_COMMUNICATION.md, סיכומים כלליים) — באישור.
 - **אסור:** לשמור תקשורת או קבצים זמניים ב-`/documentation/` או ב-`/99-ARCHIVE/`
 
@@ -193,8 +198,9 @@ log_entry | [Team X] | READY | 001 | GREEN
 ### 6.1 ניהול קבצים ודוקומנטציה
 
 **מקור אמת:**
-- תיקיית `90_Architects_documentation/` היא **המקור הבלעדי** לכל הנחיות אדריכליות
-- כל שינוי בקבצי מפתח מחייב **תיאום מול האדריכל**
+- תיקיית `_COMMUNICATION/_Architects_Decisions/` היא **המקור הבלעדי** לכל הנחיות אדריכליות מחייבות (ADR/Directive/Bible).
+- תיקיית `_COMMUNICATION/90_Architects_comunication/` היא ערוץ תקשורת בלבד.
+- כל שינוי בקבצי מפתח מחייב **תיאום מול האדריכל**.
 
 **קבצי מפתח:**
 - `PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (v2.4)

@@ -22,6 +22,14 @@ Create a **locked, automation‑first** validation procedure that verifies **SSO
 6. **Automation Gatekeeper:** Team 90 automation gates are the **only** path to Production approval. No shortcuts.
 7. **Master Index Sync:** Gates must remain **continuously synchronized** with the Master Index updates.
 
+## 🧭 Architect Source Hierarchy (v2.111)
+
+1. **Authoritative architect SSOT:** `_COMMUNICATION/_Architects_Decisions/`  
+   (ADR / Directives / Bible / locked mandates).
+2. **Communication channel only:** `_COMMUNICATION/90_Architects_comunication/`  
+   (team submissions to architect, architect operational prompts).
+3. Team 90 rejects any closure/claim that relies on architect communication files as locked SSOT when no corresponding decision exists in `_Architects_Decisions`.
+
 ---
 
 ## 🧱 Validation Layers (Gate Model)

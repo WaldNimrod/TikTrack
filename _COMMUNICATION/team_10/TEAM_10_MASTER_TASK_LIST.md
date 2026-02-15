@@ -3,7 +3,7 @@
 **id:** `TEAM_10_MASTER_TASK_LIST`  
 **היררכיית ניהול:** **רמה 2** — בין מפת הדרכים (רמה 1) לתוכניות ביצוע לצוותים (רמה 3). חובה תאום מלא בין הרמות — ראה נוהל.  
 **owner:** Team 10 בלבד — אף צוות אחר לא רשאי לכתוב לקובץ זה  
-**מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
+**מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
 **נוהל ניהול:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
 **last_updated:** 2026-02-15
@@ -50,8 +50,24 @@
 
 ---
 
+## MB3A_NOTES_ALERTS — Mini-Batch 3A (Notes → Alerts)
+
+**מקור מנדט:** [TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md](../team_90/TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md)  
+**סדר ביצוע:** 1) notes.html (ראשון) 2) alerts.html (שני). אין משלוח Alerts לפני סגירת שער Notes.
+
+| # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|------------|------------|------------|------------|------------|
+| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; שערים: Gate-0 (Scope/SSOT) → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP (Knowledge Promotion + cleanup). סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+| MB3A-ALERTS | alerts.html (D34 התראות) | עמוד התראות; שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. תלוי בסגירת Notes. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+
+**שערים חובה לכל עמוד:** Gate-0 (Scope/SSOT mapping lock) | Gate-A (QA validation — Team 50) | Gate-B (Spy verification — Team 90) | Gate-KP (Knowledge Promotion + cleanup closure — Team 10). מקור החלטות: `_COMMUNICATION/_Architects_Decisions/` (לא תיבת התקשורת כ-SSOT).
+
+---
+
 **ערכי סטטוס:** OPEN | IN_PROGRESS | BLOCKED | PENDING_VERIFICATION | CLOSED — הגדרות וכללי סגירה: נוהל.  
-**תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | 3 = Batch 3 | 4 = Batch 4 | …
+**תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | MB3A = Mini-Batch 3A | 3 = Batch 3 | 4 = Batch 4 | …
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_NOTES_ALERTS_ADDED | 2026-02-15** — מנדט Team 90: TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE. משימות MB3A-NOTES, MB3A-ALERTS נוספו; תוכנית עבודה: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md. ממתין לאישור Team 90 לפני הפעלת צוותים.
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | STAGE1_1_002_DDL_COMPLETED_PENDING_VERIFICATION | 2026-02-13**  
 **log_entry | TEAM_10 | MASTER_TASK_LIST | STAGE1_1_002_QA_GATE_A_PASS_RUNTIME_VERIFIED | 2026-02-13** — דוח: TEAM_50_TO_TEAM_10_STAGE1_1_002_QA_REPORT.md  

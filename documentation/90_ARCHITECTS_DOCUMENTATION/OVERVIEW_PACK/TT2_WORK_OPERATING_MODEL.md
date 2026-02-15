@@ -93,7 +93,8 @@ Rules:
 ## 5) Communication Channels & Artifacts
 
 - **Work communication:** `_COMMUNICATION/team_10/` … `_COMMUNICATION/team_90/`, `_COMMUNICATION/team_70/` (requests, mapping, decisions, status).
-- **Architect communication:** `_COMMUNICATION/90_Architects_comunication` (authoritative decisions).
+- **Architect decisions (authoritative SSOT):** `_COMMUNICATION/_Architects_Decisions/`.
+- **Architect communication channel (inbox/outbox):** `_COMMUNICATION/90_Architects_comunication/`.
 - **SSOT documentation:** `documentation/` (only source of truth for locked policies).
 - **Evidence & QA artifacts:** `documentation/05-REPORTS/artifacts/`.
 - **Archive:** `_COMMUNICATION/99-ARCHIVE/YYYY-MM-DD/` with manifest (date-stamped archive).
@@ -125,6 +126,6 @@ No code changes are approved without required mapping, SSOT alignment, and evide
 - `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 - `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md`
 - `documentation/10-POLICIES/TT2_VERSIONING_POLICY.md`
-- `_COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
+- `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
 - `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`
 - `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md`

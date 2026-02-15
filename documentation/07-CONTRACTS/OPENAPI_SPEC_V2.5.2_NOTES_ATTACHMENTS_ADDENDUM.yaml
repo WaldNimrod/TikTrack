@@ -1,0 +1,237 @@
+# D35 Notes — Rich Text + Attachments (MB3A) — OpenAPI Addendum
+# Integrate paths and schemas into OPENAPI_SPEC_V2.5.2.yaml (or OPENAPI_SPEC_V2_FINAL.yaml).
+# LOCKED: max 3 attachments/note; 1MB/file; MIME magic-bytes; storage path users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}
+# Error contracts: 413 Payload Too Large, 415 Unsupported Media Type, 422 Unprocessable (quota/validation), 403 Forbidden, 404 Not Found
+
+paths:
+  /notes:
+    get:
+      summary: "List notes (D35)"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: parent_type
+          in: query
+          schema: { type: string, enum: [trade, trade_plan, ticker, account, general] }
+        - name: parent_id
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: "List of notes"
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/NoteResponse' } }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+    post:
+      summary: "Create note (D35) — content is Rich Text, sanitized server-side"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoteCreate' }
+      responses:
+        '201':
+          description: "Note created"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoteResponse' }
+        '400': { description: "Validation error", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '422': { description: "Unprocessable (e.g. sanitization failure)", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+  /notes/{note_id}:
+    get:
+      summary: "Get note by id (D35)"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoteResponse' }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+    put:
+      summary: "Update note (D35) — content Rich Text, sanitized server-side"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoteUpdate' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoteResponse' }
+        '400': { description: "Validation error", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '422': { description: "Unprocessable", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+    delete:
+      summary: "Delete note (D35)"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: "Deleted" }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+  /notes/{note_id}/attachments:
+    get:
+      summary: "List attachments for note (D35) — max 3 per note"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: "List of attachments (0–3)"
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/NoteAttachmentResponse' } }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Note not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+    post:
+      summary: "Upload attachment for note (D35). Max 3 per note, 1MB per file. MIME validated (magic-bytes)."
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Allowed: jpg, png, webp, pdf, xls, xlsx, doc, docx. Max 1048576 bytes."
+      responses:
+        '201':
+          description: "Attachment created"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoteAttachmentResponse' }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Note not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '413': { description: "Payload Too Large — file > 1MB", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '415': { description: "Unsupported Media Type — disallowed file type", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '422': { description: "Unprocessable — e.g. quota exceeded (already 3 attachments)", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+  /notes/{note_id}/attachments/{attachment_id}:
+    get:
+      summary: "Get attachment metadata or download (D35)"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: attachment_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: "Attachment metadata or file stream"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoteAttachmentResponse' }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+    delete:
+      summary: "Delete attachment (D35)"
+      tags: [notes]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: attachment_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: "Deleted" }
+        '401': { description: "Unauthorized", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Forbidden", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Not found", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+components:
+  schemas:
+    NoteCreate:
+      type: object
+      required: [content]
+      properties:
+        parent_type: { type: string, enum: [trade, trade_plan, ticker, account, general] }
+        parent_id: { type: string, format: uuid, nullable: true }
+        title: { type: string, maxLength: 200, nullable: true }
+        content: { type: string, description: "Rich Text HTML — sanitized server-side (SOP-012, RICH_TEXT_SANITIZATION_POLICY)" }
+        category: { type: string, enum: [GENERAL, TRADE, RESEARCH, WATCHLIST], default: GENERAL }
+        is_pinned: { type: boolean, default: false }
+    NoteUpdate:
+      type: object
+      properties:
+        title: { type: string, maxLength: 200, nullable: true }
+        content: { type: string, description: "Rich Text HTML — sanitized server-side" }
+        category: { type: string, enum: [GENERAL, TRADE, RESEARCH, WATCHLIST] }
+        is_pinned: { type: boolean }
+    NoteResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        parent_type: { type: string }
+        parent_id: { type: string, format: uuid, nullable: true }
+        title: { type: string, nullable: true }
+        content: { type: string, description: "Sanitized Rich Text" }
+        category: { type: string }
+        is_pinned: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    NoteAttachmentResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        note_id: { type: string, format: uuid }
+        storage_path: { type: string, description: "Relative: users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}" }
+        original_filename: { type: string }
+        content_type: { type: string }
+        file_size_bytes: { type: integer, maximum: 1048576 }
+        created_at: { type: string, format: date-time }

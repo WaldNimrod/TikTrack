@@ -22,6 +22,7 @@
 | Endpoint | שדה |
 |----------|-----|
 | cash_flows (POST/PUT) | description |
+| notes (POST/PUT) — D35 | content |
 
 ## 4. אימות T20.3
 

@@ -33,6 +33,10 @@ Turn distributed technical and legacy knowledge into one coherent product/busine
 ## 4) Mandatory Reading Order (Day 1–2)
 
 ### A. Governance and roadmap foundation
+**Canonical source rule (mandatory):**  
+Use `_COMMUNICATION/_Architects_Decisions/` as the architect decision SSOT.  
+`_COMMUNICATION/90_Architects_comunication/` is communication/supplemental context only.
+
 1. `documentation/90_ARCHITECTS_DOCUMENTATION/OVERVIEW_PACK/TT2_SYSTEM_OVERVIEW.md`
 2. `documentation/90_ARCHITECTS_DOCUMENTATION/OVERVIEW_PACK/TT2_CURRENT_STATE_AND_GAPS.md`
 3. `documentation/90_ARCHITECTS_DOCUMENTATION/OVERVIEW_PACK/TT2_ROADMAP_NEXT_STEPS.md`
@@ -55,6 +59,7 @@ Turn distributed technical and legacy knowledge into one coherent product/busine
 14. `_COMMUNICATION/99-ARCHIVE/_Cursor_full_design_V1_final_PROJECT_PHOENIX/00_Strategic_Decisions/TT2_USER_PAGES_SCOPE_DESIGN_FREEZE.md`
 
 ### E. Marketing and narrative assets (existing drafts)
+**Note:** These are supplemental/context drafts (non-canonical), unless explicitly locked in `_Architects_Decisions`.
 15. `_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/02_PRODUCT/USER_EXPERIENCE_DOCUMENTATION.md`
 16. `_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/03_MARKETING/PRODUCT_POSITIONING.md`
 17. `_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/03_MARKETING/BRANDING_BOOK.md`

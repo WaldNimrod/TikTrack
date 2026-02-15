@@ -125,6 +125,21 @@ const htmlPagesPlugin = () => {
               '/user_tickers.html': '/views/management/userTicker/user_tickers.html',
               '/data_dashboard.html': '/views/data/dataDashboard/data_dashboard.html',
               '/system_management.html': '/views/management/systemManagement/system_management.html',
+              '/trade_plans.html': '/views/planning/tradePlans/trade_plans.html',
+              '/ai_analysis.html': '/views/planning/aiAnalysis/ai_analysis.html',
+              '/watch_lists.html': '/views/tracking/watchLists/watch_lists.html',
+              '/ticker_dashboard.html': '/views/tracking/tickerDashboard/ticker_dashboard.html',
+              '/trading_journal.html': '/views/tracking/tradingJournal/trading_journal.html',
+              '/trades.html': '/views/tracking/trades/trades.html',
+              '/strategy-analysis.html': '/views/research/strategyAnalysis/strategy_analysis.html',
+              '/trades_history.html': '/views/research/tradesHistory/trades_history.html',
+              '/portfolio-state.html': '/views/research/portfolioState/portfolio_state.html',
+              '/alerts.html': '/views/data/alerts/alerts.html',
+              '/notes.html': '/views/data/notes/notes.html',
+              '/executions.html': '/views/data/executions/executions.html',
+              '/data_import.html': '/views/settings/dataImport/data_import.html',
+              '/tag_management.html': '/views/settings/tagManagement/tag_management.html',
+              '/preferences.html': '/views/settings/preferences/preferences.html',
             };
             actualFilePath = routeToFileMap[htmlPath] || htmlPath;
           }
@@ -170,7 +185,27 @@ const htmlPagesPlugin = () => {
         if (url.endsWith('.html') && !url.includes('/node_modules/') && !url.includes('/dist/')) {
           // Try to find the file in src/views/financial/...
           const htmlFileName = url.split('/').pop(); // e.g., trading_accounts.html
+          const urlToFileName = {
+            'strategy-analysis.html': 'strategy_analysis.html',
+            'portfolio-state.html': 'portfolio_state.html',
+          };
+          const resolvedHtmlFileName = urlToFileName[htmlFileName] || htmlFileName;
           const possiblePaths = [
+            path.join(__dirname, 'src', 'views', 'planning', 'tradePlans', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'planning', 'aiAnalysis', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'tracking', 'watchLists', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'tracking', 'tickerDashboard', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'tracking', 'tradingJournal', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'tracking', 'trades', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'research', 'strategyAnalysis', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'research', 'tradesHistory', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'research', 'portfolioState', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'data', 'alerts', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'data', 'notes', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'data', 'executions', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'settings', 'dataImport', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'settings', 'tagManagement', resolvedHtmlFileName),
+            path.join(__dirname, 'src', 'views', 'settings', 'preferences', resolvedHtmlFileName),
             path.join(__dirname, 'src', 'views', 'financial', 'tradingAccounts', htmlFileName),
             path.join(__dirname, 'src', 'views', 'financial', 'brokersFees', htmlFileName),
             path.join(__dirname, 'src', 'views', 'financial', 'cashFlows', htmlFileName),
@@ -178,7 +213,7 @@ const htmlPagesPlugin = () => {
             path.join(__dirname, 'src', 'views', 'management', 'userTicker', htmlFileName),
             path.join(__dirname, 'src', 'views', 'data', 'dataDashboard', htmlFileName),
             path.join(__dirname, 'src', 'views', 'management', 'systemManagement', htmlFileName),
-            path.join(__dirname, 'src', url.substring(1)), // Direct path from URL
+            path.join(__dirname, 'src', url.substring(1)),
           ];
           
           for (const filePath of possiblePaths) {

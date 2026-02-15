@@ -437,6 +437,49 @@
   }
 }
 
+/* ===== Page Entity Overrides (body.entity-XXX sets --color-brand per page) ===== */
+/* Per: PAGES_ENTITY_COLOR_MAPPING.md - section headers, accents inherit entity color */
+body.entity-trade {
+  --color-brand: var(--entity-trade);
+  --color-brand-hover: var(--entity-trade-dark);
+}
+body.entity-trade_plan {
+  --color-brand: var(--entity-trade_plan);
+  --color-brand-hover: var(--entity-trade_plan-dark);
+}
+body.entity-execution {
+  --color-brand: var(--entity-execution);
+  --color-brand-hover: var(--entity-execution-dark);
+}
+body.entity-trading_account {
+  --color-brand: var(--entity-trading_account);
+  --color-brand-hover: var(--entity-trading_account-dark);
+}
+body.entity-cash_flow {
+  --color-brand: var(--entity-cash_flow);
+  --color-brand-hover: var(--entity-cash_flow-dark);
+}
+body.entity-ticker {
+  --color-brand: var(--entity-ticker);
+  --color-brand-hover: var(--entity-ticker-dark);
+}
+body.entity-alert {
+  --color-brand: var(--entity-alert);
+  --color-brand-hover: var(--entity-alert-dark);
+}
+body.entity-note {
+  --color-brand: var(--entity-note);
+  --color-brand-hover: var(--entity-note-dark);
+}
+body.entity-research {
+  --color-brand: var(--entity-research);
+  --color-brand-hover: var(--entity-research-dark);
+}
+body.entity-system {
+  --color-brand: var(--message-info);
+  --color-brand-hover: var(--message-info-dark);
+}
+
 * { 
   box-sizing: border-box;
   /* Global Font Defaults - Applied to ALL elements unless overridden */

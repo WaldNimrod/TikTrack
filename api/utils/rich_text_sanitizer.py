@@ -1,6 +1,6 @@
 """
 Rich-Text Sanitizer (SOP-012, T20.2)
-Server-side HTML sanitization for description/notes fields.
+Server-side HTML sanitization for description, notes, and notes.content (D35) fields.
 
 Rules (from SOP_012_DOMPURIFY_ALLOWLIST.md):
 - Tags: p, br, strong, em, u, a, ul, ol, li, span
@@ -97,5 +97,5 @@ def sanitize_rich_text(html: Optional[str]) -> Optional[str]:
 
 
 def is_rich_text_field(field_name: str) -> bool:
-    """Check if field receives sanitization (description, notes)."""
-    return field_name in ('description', 'notes')
+    """Check if field receives sanitization (description, notes, content for D35 notes)."""
+    return field_name in ('description', 'notes', 'content')

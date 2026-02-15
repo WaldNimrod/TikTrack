@@ -76,9 +76,13 @@ async def fetch_prices_for_tickers(
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
-    from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
+    from api.integrations.market_data.market_data_settings import (
+        get_provider_cooldown_minutes,
+        get_delay_between_symbols_seconds,
+    )
 
     cooldown_min = get_provider_cooldown_minutes()
+    delay_sec = get_delay_between_symbols_seconds()
     # SOP-015: Cooldown Protocol — log status for Team 90 audit
     for prov, _until, sec in get_cooldown_status():
         print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
@@ -136,6 +140,9 @@ async def fetch_prices_for_tickers(
                 print(f"📌 {symbol}: using last-known price (providers unavailable)")
             else:
                 print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
+
+        if delay_sec > 0:
+            await asyncio.sleep(delay_sec)
 
     return results
 

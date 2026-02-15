@@ -56,27 +56,58 @@
 
 ---
 
-## 5. Critical path ותלויות
+## 5. D35 Feedback Lock — Rich Text + Attachments (משימת-על נעולה)
 
-```
-Notes:   [Gate-0] → [Build] → [Gate-A] → [Gate-B] → [Gate-KP]
-              ↓
-Alerts:  (המתנה ל-Gate-KP Notes) → [Gate-0] → [Build] → [Gate-A] → [Gate-B] → [Gate-KP]
-```
+**מקור:** Team 90 Feedback Lock (D35 Notes) — Mini-Batch 3A.  
+**משימת-על ב-Master Task List:** D35_RICH_TEXT_ATTACHMENTS_LOCK.
 
-- **צוות 20:** מעורב אם נדרש API/Backend ל-Notes או Alerts (לפי סקופ).
-- **צוות 60:** מעורב אם נדרש תשתית/DB (לפי סקופ).
+**החלטות נעולות (LOCKED):**
+- עד 3 קבצים פעילים לכל הערה; כל קובץ עד 1MB (1048576 bytes).
+- סוגים מותרים: jpg, png, webp, pdf, xls, xlsx, doc, docx.
+- אחסון: `storage/uploads/users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}`.
+- `notes.content` — Rich Text עם סניטיזציה בשרת (מנגנון קיים); ולידציה MIME לפי magic-bytes (לא רק סיומת).
+
+**פירוק תתי-משימות (חובה):**
+
+| תת-משימה | צוות | תיאור | Acceptance Criteria מדידים |
+|----------|------|--------|----------------------------|
+| **DB** | 60 | Migration, טבלת `user_data.note_attachments`, CHECK גודל, אינדקסים; נתיב אחסון בפועל, הרשאות כתיבה, מדיניות ניקוי | DDL רץ; נתיב דיסק תואם תבנית; Evidence ב-05-REPORTS/artifacts |
+| **API** | 20 | מודל/שירות/ראוטים ל-attachments; ולידציות MIME (magic-bytes), גודל, מכסה (3); סניטיזציה ל-`notes.content` | 413/415/422/403/404 לפי OpenAPI; קובץ רביעי נדחה; קובץ >1MB נדחה; סוג לא מורשה נדחה |
+| **UI** | 30 | עורך Rich Text ב-Notes; העלאת קבצים; חסימות UI (סוג/גודל/מכסה 3) | יצירה/עריכה עם Rich Text נשמרת ומוצגת; עד 3 קבצים; הודעות ברורות לדחייה |
+| **QA** | 50 | E2E + API: קבצים פסולים, חריגת גודל, חריגת מכסה, regression אבטחה (XSS) | דוח Gate-A; כל ה-AC מאומתים; Seal (SOP-013) |
+| **KP** | 10 | עדכון SSOT, Index, Evidence; סגירה רק עם Seal (SOP-013); אין Gate-B לפני תוכנית + SSOT + מנדטים + Gate-A | 00_MASTER_INDEX מעודכן; Evidence מלא; Seal מאושר |
+
+**SSOT עודכנו:**  
+- DDL: `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_NOTES_ATTACHMENTS_DDL.sql`  
+- OpenAPI: `documentation/07-CONTRACTS/OPENAPI_SPEC_V2.5.2_NOTES_ATTACHMENTS_ADDENDUM.yaml`  
+- Rich Text: `api/utils/RICH_TEXT_SANITIZATION_POLICY.md` (שדה `notes.content`); `api/utils/rich_text_sanitizer.py`  
+- Index: `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` — הפניה ל-D35 Notes Attachments + Rich Text lock.
 
 ---
 
-## 6. הפניות להחלטות אדריכלית
+## 6. Critical path ותלויות
+
+```
+Notes:   [Gate-0] → [Build] → [Gate-A] → [Gate-B] → [Gate-KP]
+              ↓         ↑ D35 Lock (DB, API, UI, QA) משולב ב-Build
+Alerts:  (המתנה ל-Gate-KP Notes) → [Gate-0] → [Build] → [Gate-A] → [Gate-B] → [Gate-KP]
+```
+
+- **צוות 20:** API/Backend ל-Notes (כולל attachments, MIME/size/count, sanitization content).
+- **צוות 60:** Migration, אחסון, הרשאות, cleanup (D35).
+- **צוות 30:** UI Notes — Rich Text editor, העלאת קבצים, חסימות.
+- **צוות 50:** QA — תרחישי E2E/API מלאים; Seal חובה.
+
+---
+
+## 7. הפניות להחלטות אדריכלית
 
 - **מקור יחיד להחלטות:** `_COMMUNICATION/_Architects_Decisions/`
 - רלוונטי ל-MB3A (בהתאם לתוכן): Page Template/Blueprint, LEGO, Table/UI — ראה `00_MASTER_INDEX.md` בתיקייה.
 
 ---
 
-## 7. טיוטות הפעלה (לא לשליחה לפני אישור 90)
+## 8. טיוטות הפעלה (לא לשליחה לפני אישור 90)
 
 טיוטות מנדטי הפעלה לצוותים מוכנות בקבצים נפרדים; **לא ישלחו** עד אישור Team 90 על תוכנית זו:
 

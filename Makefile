@@ -72,6 +72,16 @@ migrate-p3-021:
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/p3_021_market_data_reference_tables.sql
 	@echo "✅ P3-021 migration complete."
 
+## MD-SETTINGS: market_data.system_settings (Gate-A; PATCH /settings/market-data)
+migrate-md-settings:
+	@echo "🔄 MD-SETTINGS — market_data.system_settings"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/md_system_settings.sql
+	@echo "✅ MD-SETTINGS migration complete."
+
+## Verify market_data.system_settings exists (uses api/.env DATABASE_URL)
+verify-md-settings:
+	@python3 scripts/verify_md_system_settings.py
+
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
 	@echo "🔄 P3-019 — market_cap precision (24,4)"

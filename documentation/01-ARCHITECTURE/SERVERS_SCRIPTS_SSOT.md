@@ -43,6 +43,7 @@
 | `scripts/restart-all-servers.sh` | הפעלה מחדש של שני השרתים | stop→start (רקע)+המתנה לזמינות |
 | `scripts/init-servers-for-qa.sh` | איתחול QA | stop→start backend (רקע)→start frontend (רקע); מחכה לזמינות |
 | `scripts/init-full-env.sh` | איתחול סביבה מלא | Docker Postgres + restart servers |
+| `scripts/fix-env-after-restart.sh` | **תיקון סביבה אחרי אתחול מחשב** | PostgreSQL + .env + restart backend + /health/detailed — מומלץ כש־Login מחזיר 500 |
 
 ---
 
@@ -111,6 +112,7 @@
 | 📋 Init Servers for QA | `scripts/init-servers-for-qa.sh` | |
 | 📋 Check Server Status | `scripts/check-ports.sh` | |
 | 🔧 Fix Port 8082 Conflict | `scripts/fix-port-8082.sh` | |
+| 🔧 Fix Env After Restart (Login 500) | `scripts/fix-env-after-restart.sh` | PostgreSQL + .env + restart backend |
 | 👤 Create Admin User (admin/418141) | `scripts/create-admin.sh` | |
 | 🧪 Run User Tickers QA (API) | `scripts/run-user-tickers-qa-api.sh` | דורש Backend 8082 |
 | 🔄 Verify User Tickers Fix (Team 20) | `scripts/verify-user-tickers-fix.sh` | restart + QA — **חובה לפני הגשה** אחרי שינוי קוד |
@@ -130,13 +132,18 @@
 
 ## 8. איתחול סביבה מלא (טעינה מחודשת)
 
+**אחרי אתחול מחשב — Login מחזיר 500?**  
+→ הרץ: **`./scripts/fix-env-after-restart.sh`** (PostgreSQL + .env + restart backend + בדיקת health)
+
 **רצף מומלץ לטעינה מלאה:**
 
 1. **PostgreSQL:** `docker start tiktrack-postgres-dev` (אם כבוי)
 2. **עצירת שרתים:** `scripts/stop-backend.sh` + `scripts/stop-frontend.sh`
 3. **הפעלת שרתים:** `scripts/start-backend.sh` + `scripts/start-frontend.sh` (או Start All)
 
-**אופציה — QA:** `scripts/init-servers-for-qa.sh` (עצירה + הפעלה ברקע + המתנה)
+**אופציה — QA:** `scripts/init-servers-for-qa.sh` (עצירה + הפעלה ברקע + המתנה)  
+**אופציה — Full:** `scripts/init-full-env.sh` (PostgreSQL + restart servers)  
+**תיקון מהיר:** `scripts/fix-env-after-restart.sh` (אחרי אתחול מחשב)
 
 **אם נדרש איפוס DB:** `make db-backup-then-fill` לפני הפעלת Backend.
 

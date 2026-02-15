@@ -57,15 +57,38 @@
 
 | # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
 |---|-----|------|--------|-----|------------|------------|------------|------------|------------|
-| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; שערים: Gate-0 (Scope/SSOT) → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP (Knowledge Promotion + cleanup). סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+| D35_RICH_TEXT_ATTACHMENTS_LOCK | D35 Notes — Rich Text + Attachments | משימת-על נעולה (Team 90 Feedback Lock): Rich Text ב־content עם סניטיזציה שרת; עד 3 קבצים/הערה, 1MB/קובץ; MIME magic-bytes; נתיב אחסון לוק. תתי-משימות: DB (60), API (20), UI (30), QA (50), KP (10). SSOT עודכנו. סגירה רק עם Seal (SOP-013). | OPEN | MB3A | 20/30/50/60/10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §5 | 2026-02-15 | 2026-02-15 | — |
+| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; כפוף ל-D35_RICH_TEXT_ATTACHMENTS_LOCK. שערים: Gate-0 (Scope/SSOT) → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
 | MB3A-ALERTS | alerts.html (D34 התראות) | עמוד התראות; שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. תלוי בסגירת Notes. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
 
 **שערים חובה לכל עמוד:** Gate-0 (Scope/SSOT mapping lock) | Gate-A (QA validation — Team 50) | Gate-B (Spy verification — Team 90) | Gate-KP (Knowledge Promotion + cleanup closure — Team 10). מקור החלטות: `_COMMUNICATION/_Architects_Decisions/` (לא תיבת התקשורת כ-SSOT).
 
 ---
 
+## MARKET_DATA_SETTINGS_UI — מיני-פרויקט תשתיתי
+
+**מקור:** Team 90 Review — [TEAM_20_TO_ARCHITECT_MARKET_DATA_SETTINGS_UI_PLAN.md](../90_Architects_comunication/TEAM_20_TO_ARCHITECT_MARKET_DATA_SETTINGS_UI_PLAN.md); דרישת תכנון מפורט לפני הפעלה.
+
+| # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|------------|------------|------------|------------|------------|
+| MD-SETTINGS | Market Data Settings UI | ממשק הגדרות נתוני שוק: GET+PATCH, DB>env, market_data.system_settings, validation Backend, Admin-only; intraday_enabled אכיפה ב-job; delay_between_symbols בסקריפטי sync; יישור TT2_TICKER_STATUS. שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. סגירה רק Seal (SOP-013). | PENDING_VERIFICATION | MD-SETTINGS | 20/30/50/60/10 | TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+
+**חבילת תכנון:** Work Plan + SSOT delta + מנדטים 20/30/50/60 — אושרה; צוותים הופעלו. **כל דרישות סגירה Gate-B הושלמו** — Evidence 403 התקבל; ניתן להגיש Gate-B חוזר.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_403_EVIDENCE_RECEIVED | 2026-02-15** — Team 50: בדיקת 403 אמיתית (qa_nonadmin, GET+PATCH → 403). Evidence: TEAM_50_TO_TEAM_10_MD_SETTINGS_403_EVIDENCE.md, MD_SETTINGS_403_EVIDENCE_*.log, run-md-settings-403-evidence.sh. כל 4 דרישות סגירה הושלמו. בקשה חוזרת ל-Gate-B: TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_GATE_B_RE_REQUEST.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_GATE_B_BLOCKED | 2026-02-15** — Spy: לא לאשר Gate-B עדיין. P1: 403 לא אומת בפועל (בקשת Evidence ל-50); OpenAPI חסר — תוקן (addendum). P2: SSOT DRAFT — תוקן (LOCKED); חוזה 400 vs 422 — תוקן (422/403). דרישות סגירה: TEAM_10_GATE_B_MD_SETTINGS_BLOCKED_AND_CLOSURE_REQUIREMENTS.md. לאחר Evidence 403 — Gate-B חוזר.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_GATE_A_PASS | 2026-02-15** — Gate-A הושלם: 6/6 (100%). Admin Login 200, GET 200, PATCH validation 422 (empty/0/501), PATCH valid 200. Seal: COMPLETED | PRE_FLIGHT: PASS. בקשה ל-Gate-B: TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_GATE_B_REQUEST.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MARKET_DATA_SETTINGS_UI_PLANNING_PACKAGE | 2026-02-15** — חבילת תכנון: Work Plan, SSOT delta, TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT, מנדטים 20/30/50/60. ממתין לאישור 90.
+
+---
+
 **ערכי סטטוס:** OPEN | IN_PROGRESS | BLOCKED | PENDING_VERIFICATION | CLOSED — הגדרות וכללי סגירה: נוהל.  
 **תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | MB3A = Mini-Batch 3A | 3 = Batch 3 | 4 = Batch 4 | …
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | D35_RICH_TEXT_ATTACHMENTS_LOCK_ADDED | 2026-02-15** — משימת-על D35 (Team 90 Feedback Lock): Rich Text + Attachments. תוכנית עבודה עודכנה (§5); SSOT: DDL (PHX_DB_SCHEMA_V2.5_NOTES_ATTACHMENTS_DDL.sql), OpenAPI Addendum, RICH_TEXT_SANITIZATION_POLICY (notes.content), 00_MASTER_INDEX. מנדטים: TEAM_10_TO_TEAM_20/30/50/60_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md. סגירה רק עם Seal (SOP-013); אין Gate-B לפני תוכנית+SSOT+מנדטים+Gate-A.
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_NOTES_ALERTS_ADDED | 2026-02-15** — מנדט Team 90: TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE. משימות MB3A-NOTES, MB3A-ALERTS נוספו; תוכנית עבודה: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md. ממתין לאישור Team 90 לפני הפעלת צוותים.
 

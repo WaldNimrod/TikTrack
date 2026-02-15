@@ -77,9 +77,13 @@ async def fetch_prices_for_tickers(
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
-    from api.integrations.market_data.market_data_settings import get_provider_cooldown_minutes
+    from api.integrations.market_data.market_data_settings import (
+        get_provider_cooldown_minutes,
+        get_delay_between_symbols_seconds,
+    )
 
     cooldown_min = get_provider_cooldown_minutes()
+    delay_sec = get_delay_between_symbols_seconds()
     for prov, _until, sec in get_cooldown_status():
         print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
     yahoo = YahooProvider()
@@ -136,6 +140,9 @@ async def fetch_prices_for_tickers(
                 print(f"📌 {symbol}: using last-known price (providers unavailable)")
             else:
                 print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
+
+        if delay_sec > 0:
+            await asyncio.sleep(delay_sec)
 
     return results
 
@@ -260,6 +267,11 @@ def load_active_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]
 
 
 def main():
+    from api.integrations.market_data.market_data_settings import get_intraday_enabled
+    if not get_intraday_enabled():
+        print("📋 [MD-SETTINGS] intraday_enabled=false — skipping Intraday job")
+        sys.exit(0)
+
     fd = None
     if fcntl:
         lock_path = _project / "scripts" / ".sync_ticker_prices_intraday.lock"

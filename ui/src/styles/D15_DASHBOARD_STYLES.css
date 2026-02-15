@@ -1819,6 +1819,33 @@ body.system-management-page {
   font-size: 0.9rem;
 }
 
+.settings-success {
+  color: var(--color-success, #10b981);
+  font-size: 0.9rem;
+}
+
+.settings-row--editable .settings-row__input-wrap {
+  flex-shrink: 0;
+}
+
+.settings-row__input-wrap input[type="number"] {
+  width: 6ch;
+  text-align: left;
+  direction: ltr;
+}
+
+.settings-row__hint {
+  font-size: 0.8rem;
+  color: var(--apple-text-secondary, #86868b);
+  font-weight: 400;
+}
+
+.settings-actions {
+  margin-top: var(--spacing-md, 16px);
+  padding-top: var(--spacing-md, 16px);
+  border-block-start: 1px solid var(--apple-border-light, #e5e5e5);
+}
+
 /* ============================================
    Data Integrity Panel (בקרת תקינות נתונים)
    TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST

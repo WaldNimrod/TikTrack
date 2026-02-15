@@ -309,7 +309,7 @@ class SharedServices {
       return false;
     }
 
-    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees', 'reference'];
+    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees', 'reference', 'settings'];
     return protectedPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'));
   }
 
@@ -588,6 +588,75 @@ class SharedServices {
     }
   }
   
+  /**
+   * PATCH request (partial update)
+   * @param {string} endpoint - API endpoint
+   * @param {Object} body - Request body (camelCase) — partial fields only
+   * @param {Object} options - Additional fetch options
+   * @returns {Promise<Object>} Response data
+   */
+  async patch(endpoint, body = {}, options = {}) {
+    try {
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+      const url = this.buildUrl(endpoint);
+      const headers = this.buildHeaders(options.headers);
+      const apiBody = reactToApi(body);
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(apiBody),
+          ...options
+        });
+      } catch (fetchError) {
+        maskedLog('[Shared Services] PATCH fetch failed:', { endpoint, errorMessage: fetchError.message });
+        const networkError = new Error(`Network error: ${fetchError.message}`);
+        networkError.code = 'NETWORK_ERROR';
+        networkError.status = 0;
+        throw networkError;
+      }
+      if (!response.ok) {
+        const errorData = { code: `HTTP_${response.status}`, message: `HTTP ${response.status}: ${response.statusText}`, status: response.status, statusText: response.statusText };
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.details = errorBody.error.details || {};
+          } else if (errorBody.detail) {
+            errorData.detail = errorBody.detail;
+            if (typeof errorBody.detail === 'object' && errorBody.detail.validation_errors) {
+              errorData.validation_errors = errorBody.detail.validation_errors;
+            } else if (typeof errorBody.detail === 'string') {
+              errorData.message = errorBody.detail;
+            }
+          }
+        } catch (e) {}
+        maskedLog('[Shared Services] PATCH failed:', { endpoint, status: response.status });
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        errorObj.details = errorData.details || {};
+        errorObj.detail = errorData.detail;
+        errorObj.validation_errors = errorData.validation_errors;
+        throw errorObj;
+      }
+      return await this.handleResponse(response);
+    } catch (error) {
+      maskedLog('[Shared Services] PATCH failed:', { endpoint, errorCode: error.code, errorMessage: error.message });
+      throw error;
+    }
+  }
+
   /**
    * DELETE request
    * @param {string} endpoint - API endpoint

@@ -203,14 +203,14 @@ components:
         parent_id: { type: string, format: uuid, nullable: true }
         title: { type: string, maxLength: 200, nullable: true }
         content: { type: string, description: "Rich Text HTML — sanitized server-side (SOP-012, RICH_TEXT_SANITIZATION_POLICY)" }
-        category: { type: string, enum: [GENERAL, TRADE, RESEARCH, WATCHLIST], default: GENERAL }
+        category: { type: string, enum: [TRADE, PSYCHOLOGY, ANALYSIS, GENERAL], default: GENERAL }
         is_pinned: { type: boolean, default: false }
     NoteUpdate:
       type: object
       properties:
         title: { type: string, maxLength: 200, nullable: true }
         content: { type: string, description: "Rich Text HTML — sanitized server-side" }
-        category: { type: string, enum: [GENERAL, TRADE, RESEARCH, WATCHLIST] }
+        category: { type: string, enum: [TRADE, PSYCHOLOGY, ANALYSIS, GENERAL] }
         is_pinned: { type: boolean }
     NoteResponse:
       type: object

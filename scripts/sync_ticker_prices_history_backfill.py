@@ -14,6 +14,7 @@ import argparse
 import asyncio
 import os
 import sys
+import time
 try:
     import fcntl
 except ImportError:
@@ -383,6 +384,8 @@ def main():
     try:
         print("🔄 History backfill — 250d OHLCV (Yahoo→Alpha, Single-Flight)")
         from api.integrations.market_data.provider_cooldown import get_cooldown_status
+        from api.integrations.market_data.market_data_settings import get_delay_between_symbols_seconds
+        delay_sec = get_delay_between_symbols_seconds()
         for prov, _until, sec in get_cooldown_status():
             print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
         tickers = load_tickers_needing_backfill()
@@ -413,6 +416,8 @@ def main():
             n = insert_history_rows(ticker_id, symbol, hist, existing)
             total_inserted += n
             print(f"  {symbol}: +{n} rows ({provider})")
+            if delay_sec > 0:
+                time.sleep(delay_sec)
             # Post-run verification (SMART_HISTORY_FILL_SPEC — Retry policy)
             count = get_row_count(str(ticker_id))
             if count < MIN_HISTORY_DAYS:

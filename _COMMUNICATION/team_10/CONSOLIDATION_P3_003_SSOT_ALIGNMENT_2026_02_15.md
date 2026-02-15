@@ -1,13 +1,15 @@
-# דוח קונסולידציה — יישור קו P3-003 ו-SSOT רשימת עמודים
+# 📚 דוח קונסולידציה — יישור קו P3-003 ו-SSOT רשימת עמודים
 
 **id:** CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15  
 **owner:** Team 10 (The Gateway)  
-**תאריך:** 2026-02-15  
+**status:** 🔒 **SSOT - ACTIVE**  
+**last_updated:** 2026-02-15  
+**version:** v1.0  
 **נושא:** קידום ידע — רשימת עמודים SSOT, מטריצה, תפריט, Page Tracker; ניקוי סביבה
 
 ---
 
-## 1. סיכום באץ'
+## 📊 סיכום באץ' (Batch Summary)
 
 | פריט | ערך |
 |------|-----|
@@ -42,48 +44,76 @@
 | TEAM_10_TO_TEAM_31_P3_003_BLUEPRINT_SCOPE_REQUEST.md | בקשת סקופ |
 | TEAM_10_TO_TEAM_30_MENU_SSOT_ALIGNMENT.md | הנחיית יישור תפריט (סגורה — Team 30 ביצע) |
 
-### 2.3 החלטות מרכזיות
+### 2.3 החלטות מרכזיות (Key Decisions)
 
 - **trade_plans / ai_analysis / trades:** שלושה עמודים נפרדים; תפריט: תוכניות טריידים, אנליזת AI, ניהול טריידים.
 - **דשבורדים ברמה 1:** כל הכפתורים ברמה 1 = דשבורד; לא נדרש Blueprint — יבנו בבאץ' מתקדם.
 - **לא נדרש:** api_keys, securities.
 - **עמודים חובה (בלופרינט):** רשימה ב-SSOT (כולל data_import דחוף).
 
----
+### 2.4 דפוסים שנקבעו (Patterns Established)
 
-## 3. ארכיון
+- רשימת עמודים אחת — מקור אמת יחיד: `TT2_PAGES_SSOT_MASTER_LIST.md`; Page Tracker ו־מטריצת P3-003 מתייחסים אליו בלבד.
+- תפריט ראשי (unified-header) ו־routes.json — מתיישרים ל-SSOT; עדכון תפריט דרך הנחיית Team 10 ל-Team 30.
 
-### 3.1 מה הועבר לארכיון (סבב 2026-02-15)
+### 2.5 לקחים (Lessons Learned)
 
-**יעד:** `_COMMUNICATION/99-ARCHIVE/2026-02-15/`
-
-| קובץ | סיבה |
-|------|------|
-| team_10/TEAM_10_TO_TEAM_30_MENU_SSOT_ALIGNMENT_ACK.md | דוח השלמה/ACK חד-פעמי — יישור תפריט הושלם. |
-
-רשימה מלאה: [ARCHIVE_MANIFEST.md](../99-ARCHIVE/2026-02-15/ARCHIVE_MANIFEST.md).
-
-### 3.2 מה לא ארכוב ולמה
-
-- מטריצה, טבלת השוואה, תיקוני מטריצה/תפריט — **מפרטים/רפרנס פעיל**.
-- הנחיות ל-Team 31 ו-Team 30 — **הנחיות וסקופ** (נשארות בתקשורת עד סבב ארכיון כללי).
+- יישור תפריט + מטריצה + סקופ צוות 31 במקביל מקטין סחיפה; עדכון אדריכלית בסיום סבב משמר visibility.
 
 ---
 
-## 4. ניקוי סביבת עבודה
+## 📦 ארכוב (שלב 5) — ארכיון מלא
 
-### 4.1 רשימת ניקוי (לפי סריקה)
+**סיווג בוצע:** כל דוחות התקשורת, הודעות בין צוותים, ACK, Evidence, מנדטים סגורים → **הועברו לארכיון**. רק **נהלים, תהליכי עבודה, מפרטים/חוזים/סכמות, מדריכים ומדיניות** ורשימות מאסטר — **נשארו** בתקשורת פעילה.
 
-| פריט | פעולה מומלצת |
-|------|---------------|
-| .tmp.driveupload/ | ריקון קבצים זמניים (לפי מדיניות הפרויקט). |
-| לוגים / *.log | לא זוהו תיקיות logs/ או .log פעילות ב-_COMMUNICATION. |
-| קבצי tmp נוספים | סריקה ידנית לפי צורך. |
+**תיקיית ארכיון:** `_COMMUNICATION/99-ARCHIVE/2026-02-15/`  
+**ARCHIVE_MANIFEST:** [ARCHIVE_MANIFEST.md](../99-ARCHIVE/2026-02-15/ARCHIVE_MANIFEST.md)  
+**רשימת KEEP:** [ARCHIVE_FULL_2026_02_15_KEEP_LISTS.md](ARCHIVE_FULL_2026_02_15_KEEP_LISTS.md)
 
-### 4.2 בוצע בסבב זה
+### סיכום העברה לארכיון (ארכיון מלא)
 
+| תיקייה | קבצים הועברו |
+|--------|----------------|
+| team_10 | 160 |
+| team_20 | 67 |
+| team_30 | 9 |
+| team_31 | 63 |
+| team_40 | 6 |
+| team_50 | 26 |
+| team_60 | 14 |
+| team_90 | 44 |
+| **סה"כ** | **389** |
+
+### מה נשאר בתקשורת פעילה (KEEP)
+
+- **team_10:** נהלים (CLEAN_TABLE, KNOWLEDGE_PROMOTION_WORKFLOW, MASTER_TASK_LIST_PROTOCOL), OPEN_TASKS_MASTER, MASTER_TASK_LIST, GATEWAY_ROLE_AND_PROCESS, דוח קונסולידציה נוכחי, מפרט P3_003 (מטריצה, טבלת השוואה, תיקונים), הנחיות סקופ ל-31/30.
+- **team_20:** מפרטים/חוזים/סכמות (PDSC, API, EXCHANGE_RATES_DDL), מדריך אינטגרציה, ADMIN_ROLE_MAPPING.
+- **team_30:** — (כל הקבצים בארכיון).
+- **team_31:** README, PAGE_TEMPLATE_README, LEGO_REFACTOR_PLAN; ב-staging: WORKFLOW, CSS_DEVELOPER_GUIDE, PHOENIX_TABLES_SPECIFICATION, MAPPING_INSTRUCTIONS.
+- **team_40:** TEAM_40_VISUAL_VALIDATION_CRITERIA.
+- **team_50:** QA_RERUN_SOP, DEFECT_REPORTING_PROCESS, GATE_B_DETAILED_ERROR_AND_VERIFICATION_GUIDE.
+- **team_60:** — (כל הקבצים בארכיון).
+- **team_90:** פרוטוקולים (SOP_010, SPY_VALIDATION_SOP), SERVER_START_POLICY, SOP_010_PROTOCOL_NOTICE, GOVERNANCE_ROLE_RESET.
+
+---
+
+## 🧹 ניקוי סביבת עבודה
+
+### רשימת ניקוי (לפי סריקה)
+
+| פריט | סטטוס |
+|------|--------|
+| .tmp.driveupload/ | נסרק — ריק (אין קבצים זמניים). |
+| logs/ או *.log ב-_COMMUNICATION | לא זוהו. |
+| ניקוי פיזי | ארכיון מלא הועבר — 389 קבצים ל-99-ARCHIVE/2026-02-15. |
+
+### בוצע בסבב זה
+
+- **שלב 1:** איסוף דוחות — team_10, team_30, team_31 (P3-003 / MENU_SSOT).
+- **שלב 2–3:** SSOT נוצר/עודכן — TT2_PAGES_SSOT_MASTER_LIST, Page Tracker v4.3, אינדקס.
+- **שלב 4:** עדכון אינדקס — 00_MASTER_INDEX (TT2_PAGES_SSOT_MASTER_LIST, דוח קונסולידציה, עדכון אדריכלית).
+- **שלב 5:** ארכיון מלא — 389 קבצים (כל הצוותים) ל-99-ARCHIVE/2026-02-15/; רק נהלים/מפרטים/תהליכים נשארו בתקשורת; ARCHIVE_MANIFEST + רשימת KEEP עודכנו.
 - עדכון אדריכלית: `_COMMUNICATION/90_Architects_comunication/TEAM_10_TO_ARCHITECT_P3_003_SSOT_ALIGNMENT_UPDATE.md`.
-- דוח קונסולידציה זה; ארכיון ACK אחד — הועבר ל-99-ARCHIVE/2026-02-15/team_10/.
 
 ---
 

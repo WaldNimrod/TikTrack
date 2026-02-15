@@ -43,7 +43,7 @@
 
 | ID | Previous Gap | Current State |
 |----|--------------|---------------|
-| R-001 | Header pointed to non-implemented pages (404/redirect risk) | Resolved: all header links route to served pages |
+| R-001 | Header-routing mismatch risk (404/redirect) | Resolved: all header links route to served pages |
 | R-002 | Route/menu mismatch | Resolved at navigation/template level |
 | R-003 | Missing physical page files for roadmap links | Resolved: template pages created and mapped |
 

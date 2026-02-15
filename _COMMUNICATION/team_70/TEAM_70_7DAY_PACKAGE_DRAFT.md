@@ -29,7 +29,7 @@
 
 ### 2.2 Consistency
 - [ ] Menu/routes/template alignment reflected correctly
-- [ ] Page counts are exact (no "26+" notation)
+- [ ] Page counts are exact (no vague notation)
 - [ ] Functional vs template classification is consistent across PI-001..PI-005
 
 ### 2.3 Completeness

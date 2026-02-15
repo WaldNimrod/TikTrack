@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-14  
-**version:** v3.12 (External Data — Jobs + דוח מימוש Team 20 באינדקס; Team 10 Consolidation)
+**last_updated:** 2026-02-15  
+**version:** v3.13 (P3-003 SSOT Alignment — TT2_PAGES_SSOT_MASTER_LIST, Consolidation 2026-02-15, עדכון אדריכלית)
 
 ---
 
@@ -198,8 +198,11 @@ _COMMUNICATION/
 
 ## 📊 מטריצת עמודים מרכזית (Official Page Tracker)
 
-- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים (מתוחזק Team 10). **מקור אמת לרשימה:** [TT2_PAGES_SSOT_MASTER_LIST.md](../01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md) — trade_plans (תוכניות טריידים), ai_analysis (אנליזת AI), trades (ניהול טריידים), עמודים חובה, דשבורדים רמה 1. v4.3 **2026-02-15**
-- [📚 Consolidation Batch 2 (פיננסי)](../../_COMMUNICATION/team_10/CONSOLIDATION_BATCH_2.md) - דוח קידום ידע באץ' 2; שער א'+ב' נסגרו; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/` ✅ **2026-02-12**
+- [📋 TT2_PAGES_SSOT_MASTER_LIST.md](../01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md) - **מקור אמת לרשימת עמודים** — D15–D41, תפריט, בלופרינט?, עמודים חובה, דשבורדים רמה 1, "לא נדרש" (api_keys, securities). יישור P3-003 **2026-02-15**
+- [📊 TT2_OFFICIAL_PAGE_TRACKER.md](../01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md) - מטריצה מרכזית למעקב התקדמות כל העמודים (מתוחזק Team 10). מתייחס ל-[TT2_PAGES_SSOT_MASTER_LIST.md](../01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md). v4.3 **2026-02-15**
+- [📚 Consolidation P3-003 SSOT Alignment (2026-02-15)](../../_COMMUNICATION/team_10/CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15.md) - דוח קידום ידע — יישור רשימת עמודים, מטריצה, תפריט; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-15/` ✅ **2026-02-15**
+- [📤 עדכון לאדריכלית — P3-003 יישור קו](../../_COMMUNICATION/90_Architects_comunication/TEAM_10_TO_ARCHITECT_P3_003_SSOT_ALIGNMENT_UPDATE.md) - סיכום יישור לאדריכלית ✅ **2026-02-15**
+- [📚 Consolidation Batch 2 (פיננסי)](../../_COMMUNICATION/99-ARCHIVE/2026-02-13/team_10/CONSOLIDATION_BATCH_2.md) - דוח קידום ידע באץ' 2; שער א'+ב' נסגרו; ארכיון `_COMMUNICATION/99-ARCHIVE/2026-02-12/` ✅ **2026-02-12**
 - [📌 TT2_DECISION_PROFILE_ROUTE.md](../01-ARCHITECTURE/TT2_DECISION_PROFILE_ROUTE.md) - החלטה: /profile טיפוס C (Auth-only) — מקודם מבאץ' 2 ✅ **SSOT**
 - [📌 TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md](../01-ARCHITECTURE/TT2_AUTH_GUARDS_AND_ROUTE_SSOT.md) - SSOT: A/B/C/D, Header Persistence, ProtectedRoute — מקודם מבאץ' 2 ✅ **SSOT**
 
@@ -322,4 +325,5 @@ _COMMUNICATION/
 **log_entry | [Team 10] | PROCESS_FORMALIZATION | MASTER_INDEX_UPDATED | 2026-02-09**  
 **log_entry | [Team 10] | ADR_016_VERSIONING_INDEX_AND_PROCEDURE | 2026-01-30**  
 **log_entry | [Team 10] | GATEWAY_CONSOLIDATION | EXTERNAL_DATA_JOBS_AND_REPORT_IN_INDEX | 2026-02-14** — עדכון אינדקס לפי TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SUMMARY_REPORT: רשימת Jobs (TEAM_60_CRON_SCHEDULE), דוח מימוש (TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY_FOR_TEAM_10).  
-**log_entry | [Team 10] | OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION | 2026-02-15** — תוכנית סגירת פתוחים (P3-003, P3-010, P3-004): [_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md](../../_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md). הודעות הפעלה: 31 (Blueprint Scope), 20 (P3-010 + P3-004), 30 (P3-004 Seal), 60 (P3-004 אימות).
+**log_entry | [Team 10] | OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION | 2026-02-15** — תוכנית סגירת פתוחים (P3-003, P3-010, P3-004): [_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md](../../_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md). הודעות הפעלה: 31 (Blueprint Scope), 20 (P3-010 + P3-004), 30 (P3-004 Seal), 60 (P3-004 אימות).  
+**log_entry | [Team 10] | GATEWAY_CONSOLIDATION | P3_003_SSOT_ALIGNMENT_IN_INDEX | 2026-02-15** — נוהל קידום ידע מלא: TT2_PAGES_SSOT_MASTER_LIST, CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15, עדכון לאדריכלית; ארכיון 2026-02-15 (2 קבצים).

@@ -214,6 +214,23 @@
         link.setAttribute('data-page', 'trade_plans');
       }
     });
+
+    // Menu SSOT: ai_analysis, trades (per TT2_PAGES_SSOT_MASTER_LIST)
+    const aiAnalysisLinks = document.querySelectorAll('a[href="/ai_analysis"], a[href="/ai_analysis.html"], a[data-page="ai_analysis"]');
+    aiAnalysisLinks.forEach(link => {
+      link.href = '/ai_analysis.html';
+      if (!link.hasAttribute('data-page')) {
+        link.setAttribute('data-page', 'ai_analysis');
+      }
+    });
+
+    const tradesLinks = document.querySelectorAll('a[href="/trades"], a[href="/trades.html"], a[data-page="trades"]');
+    tradesLinks.forEach(link => {
+      link.href = '/trades.html';
+      if (!link.hasAttribute('data-page')) {
+        link.setAttribute('data-page', 'trades');
+      }
+    });
     
     // Gate B Fix: Update trades_history link to use .html extension (per routes.json)
     const tradesHistoryLinks = document.querySelectorAll('a[href="/trades_history"], a[href="/trades_history.html"], a[data-page="trades_history"]');
@@ -247,6 +264,7 @@
     });
     
     // Ensure all navigation links have correct paths (comprehensive mapping)
+    // Per TT2_PAGES_SSOT_MASTER_LIST, TEAM_10_TO_TEAM_30_MENU_SSOT_ALIGNMENT
     const navLinks = {
       // React routes (no .html)
       '/profile': '/profile',
@@ -256,6 +274,8 @@
       '/reset-password': '/reset-password',
       // HTML routes (with .html)
       '/trade_plans': '/trade_plans.html',
+      '/ai_analysis': '/ai_analysis.html',
+      '/trades': '/trades.html',
       '/trades_history': '/trades_history.html',
       '/trading_accounts': '/trading_accounts.html',
       '/brokers_fees': '/brokers_fees.html',

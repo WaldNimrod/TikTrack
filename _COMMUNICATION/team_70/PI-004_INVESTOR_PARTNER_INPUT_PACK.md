@@ -2,113 +2,79 @@
 
 **id:** `PI-004_INVESTOR_PARTNER_INPUT_PACK`  
 **owner:** Team 70 (Product Intelligence)  
-**status:** DRAFT  
+**status:** DRAFT (UPDATED AFTER MENU+DOC ALIGNMENT)  
 **date:** 2026-02-15  
 **scope:** Business model assumptions, GTM hypotheses, integration value map
 
 ---
 
-## 1) Business Model Assumptions (Traceable to System)
+## 1) Business Model Assumptions (Evidence-Based)
 
-### 1.1 Current Capabilities (Evidence-Based)
-| Capability | Implementation | Evidence |
-|------------|----------------|----------|
-| **B2C SaaS core** | Auth, multi-user, account-centric | identity, trading_accounts |
-| **Financial data layer** | Accounts, fees, cash flows, tickers | D16, D18, D21, user_tickers |
-| **Market data pipeline** | Yahoo + Alpha, cache-first, multi-asset | MARKET_DATA_PIPE_SPEC, Stage-1 |
-| **Governance & quality** | SSOT, gates, Team 90 audits | TT2_WORK_OPERATING_MODEL |
-| **Locale** | Hebrew RTL, ILS/USD/EUR | routes.json, FOREX_MARKET_SPEC |
-| **Tier structure (planned)** | user_tier in roadmap | TT2_ROADMAP_NEXT_STEPS § Mid‑Term |
+| Capability Layer | Current State | Evidence |
+|------------------|---------------|----------|
+| Product runtime | 28 served pages (6 React + 22 HTML) | routes + AppRouter + vite route map |
+| Functional core | 13 pages functional baseline | PI-001 classification |
+| Expansion scope | 15 template-shell pages prepared | physical HTML scaffolds + mapped routes |
+| Data backbone | market data providers + cache-first policy | market data specs and routers |
+| Governance | gate/evidence architecture in operation | operating model + QA artifacts |
 
-### 1.2 Monetization Levers (from Roadmap)
-| Lever | Stage | Evidence |
-|-------|-------|----------|
-| **Premium tiers** | Long-term | TT2_ROADMAP_NEXT_STEPS § Long‑Term Vision |
-| **Tier-based routing** | Mid-term | user_tier hardening |
-| **Automated broker ingestion** | Long-term | TT2_ROADMAP_NEXT_STEPS |
-| **Free tier** | Current | No paywall in implemented scope |
-
-**Note:** No explicit pricing or revenue model in SSOT. Assumptions only.
+Note: pricing, ARPU, and hard revenue model are not locked in current SSOT.
 
 ---
 
-## 2) GTM Hypotheses
+## 2) GTM Hypotheses (Current)
 
-### 2.1 Target Segment
-- **Primary:** Israeli/Hebrew-speaking traders and investors
-- **Secondary:** Portfolio managers, financial analysts
-- **Evidence:** RTL, Hebrew UI, ILS in FX scope, PRODUCT_POSITIONING ICP
-
-### 2.2 Channel Hypotheses (Not in SSOT)
-- Direct signup via homepage
-- Possible broker partnerships (IBKR referenced as "Broker only" in Stage-1)
-- No evidence of paid acquisition, affiliate, or partnership GTM in docs
-
-### 2.3 Integration Value (for Partners)
-
-| Partner Type | Value Proposition | System Support | Evidence |
-|--------------|-------------------|----------------|----------|
-| **Broker** | White-label or data sync | "Other broker" path, future broker sync | ADR-018, TT2_ROADMAP |
-| **Data provider** | Embedded market data | Yahoo, Alpha; extensible pipeline | MARKET_DATA_PIPE_SPEC |
-| **Institutional** | Multi-account, audit trail | Governance, evidence, JWT roles | TT2_SYSTEM_OVERVIEW, TT2_WORK_OPERATING_MODEL |
+| Hypothesis | Support Level | Notes |
+|------------|---------------|-------|
+| Hebrew-first retail/prosumer trading audience | Strong | RTL + Hebrew UI + current docs |
+| Operational wedge via D16/D18/D21 + User Tickers | Strong | Functional pages live |
+| Expansion into advanced analytics | Medium | Template shells exist, feature logic pending |
+| Partnership value through provider/broker integrations | Medium | data-provider pipeline active; broker expansion staged |
 
 ---
 
 ## 3) Integration Value Map
 
-### 3.1 Current Integrations
-| Integration | Role | Status |
-|-------------|------|--------|
-| Yahoo Finance | Prices primary | ✅ Stage-1 |
-| Alpha Vantage | FX primary, Prices fallback | ✅ Stage-1 |
-| PostgreSQL | Persistence, cache | ✅ |
-| JWT Auth | Identity | ✅ |
+### 3.1 Live integrations
+- Yahoo Finance / Alpha Vantage data-provider layer.
+- JWT-based auth and role controls.
+- PostgreSQL-driven cache/history model.
 
-### 3.2 Planned / Referenced
-| Integration | Role | Evidence |
-|-------------|------|----------|
-| IBKR | Broker only (not market data in Stage-1) | MARKET_DATA_PIPE_SPEC §2.1 |
-| Broker sync | Automated ingestion | TT2_ROADMAP Long‑Term |
-| Additional providers | Extensible | Provider-agnostic mapping |
-
-### 3.3 Partner Onboarding (Technical)
-- **API boundary:** PDSC/sharedServices — no direct UI→API
-- **Auth:** JWT, roles (user, admin, superadmin)
-- **Data model:** Account-centric; clear entity boundaries
-- **Evidence:** TT2_DOMAIN_MODEL, TT2_SYSTEM_OVERVIEW
+### 3.2 Prepared (template) product surfaces
+- Planning, tracking, research, and settings modules are scaffolded and routable.
+- These surfaces support staged feature rollout without restructuring navigation/template architecture.
 
 ---
 
-## 4) Risks for Investor Narrative
+## 4) Investor Narrative Risks (Updated)
 
-| Risk | Mitigation | Owner |
-|------|------------|-------|
-| 13 header links to non-implemented pages | Scope honesty; fix or hide links | Team 30 |
-| No explicit business model in SSOT | Architect to define revenue assumptions | Architect |
-| Provider dependency (Yahoo rate limits) | Fallback, cooldown; documented | TT2_CURRENT_STATE_AND_GAPS |
-| Crypto mapping complexity | provider_mapping_data, provider-specific | MARKET_DATA_PIPE_SPEC §2.2.1 |
-
----
-
-## 5) What Investors/Partners Can Rely On
-
-1. **Governance:** Evidence gates, SSOT, no closure without proof.
-2. **Architecture:** Modular, cache-first, non-blocking UI.
-3. **Locale:** Hebrew-first, RTL, multi-currency.
-4. **Scope honesty:** PI-001 provides accurate implemented vs planned matrix.
-5. **Roadmap:** Batch structure, Stage-1 closure, Batch 3–6 pipeline.
+| Risk | Mitigation |
+|------|------------|
+| Confusion between routable page and functional module | enforce readiness labeling (functional vs template) |
+| No locked commercial model in SSOT | architect decision pack required |
+| Advanced modules visible before feature completion | messaging policy must define roadmap disclosure language |
+| External-data operational cost assumptions not yet investor-modeled | add ops-cost sheet in next iteration |
 
 ---
 
-## 6) Open Questions
+## 5) What Can Be Claimed Reliably Today
 
-| # | Question | Owner |
+1. Governance and quality discipline is active and evidence-based.
+2. Financial operational core is functional.
+3. External-data pipeline baseline is operational.
+4. Full product surface template architecture is in place for phased rollout.
+
+---
+
+## 6) Decisions Required for Investor-Ready Version
+
+| # | Decision | Owner |
 |---|----------|-------|
-| 1 | Revenue model assumptions for investor deck? | Architect |
-| 2 | GTM channel priorities? | Architect |
-| 3 | Partner integration roadmap (brokers, data)? | Architect |
-| 4 | Target metrics (DAU, retention, ARPU)? | Architect |
+| 1 | Commercial model framing (tiers, packaging, timeline) | Architect |
+| 2 | "Template-shell" disclosure standard in investor deck | Architect + Team 90 |
+| 3 | Priority wave for template-to-functional conversion | Architect + Team 10 |
+| 4 | KPI baseline set for investor communication | Architect + Team 10 |
 
 ---
 
-**log_entry | TEAM_70 | PI-004_DRAFT | 2026-02-15**
+**log_entry | TEAM_70 | PI-004_UPDATED_AFTER_MENU_ALIGNMENT | 2026-02-15**

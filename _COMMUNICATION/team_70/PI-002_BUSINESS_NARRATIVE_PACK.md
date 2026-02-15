@@ -2,7 +2,7 @@
 
 **id:** `PI-002_BUSINESS_NARRATIVE_PACK`  
 **owner:** Team 70 (Product Intelligence)  
-**status:** DRAFT  
+**status:** DRAFT (UPDATED AFTER MENU+DOC ALIGNMENT)  
 **date:** 2026-02-15  
 **scope:** ICP, value narrative, pains/jobs, strategic differentiation
 
@@ -13,105 +13,85 @@
 ### 1.1 Primary ICP
 | Attribute | Description | Evidence |
 |-----------|-------------|----------|
-| **Role** | Traders, Investors, Portfolio Managers | PRODUCT_POSITIONING.md § קהל יעד |
-| **Behavior** | Active traders managing positions and performance | USER_EXPERIENCE_DOCUMENTATION.md § Persona Trader |
-| **Technical level** | Medium–high; expects professional tools | PRODUCT_POSITIONING.md § Positioning Map |
-| **Locale** | Hebrew RTL; ILS, USD, EUR support | routes.json, FOREX_MARKET_SPEC scope |
+| Role | Traders, investors, portfolio-oriented users | `PRODUCT_POSITIONING.md`, `USER_EXPERIENCE_DOCUMENTATION.md` |
+| Behavior | Account tracking, fees, cash-flow, ticker monitoring | D16/D18/D21 + user_tickers pages |
+| Language/Locale | Hebrew RTL, ILS/USD/EUR context | `index.html` RTL, FX scope docs |
 
 ### 1.2 Secondary ICP
 | Attribute | Description | Evidence |
 |-----------|-------------|----------|
-| **Role** | Trading enthusiasts, Financial analysts | PRODUCT_POSITIONING.md |
-| **Behavior** | Analysis and journaling; lower frequency | USER_EXPERIENCE_DOCUMENTATION.md § Persona Investor |
-
-### 1.3 Source
-- `_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/03_MARKETING/PRODUCT_POSITIONING.md`
-- `_COMMUNICATION/90_Architects_comunication/EXTERNAL_AUDIT_v1/02_PRODUCT/USER_EXPERIENCE_DOCUMENTATION.md`
+| Role | Semi-active investors / analysts | UX personas docs |
+| Behavior | Dashboard and analysis consumption | research/tracking template pages now scaffolded |
 
 ---
 
 ## 2) Value Proposition
 
 ### 2.1 Core Message
-**"יומן חכם למסחר מקצועי"** — Smart Trading Journal for professional trading.
+- "יומן חכם למסחר מקצועי" with governed, modular delivery.
 
-### 2.2 Value Pillars (from SSOT)
-| Pillar | Description | Traceability |
-|--------|-------------|--------------|
-| **יומן חכם** | Smart journal with automated analysis | PRODUCT_POSITIONING, TT2 scope |
-| **ניהול מקצועי** | Professional trade and position management | TT2_DOMAIN_MODEL, D16/D18/D21 |
-| **ניתוח מתקדם** | Advanced performance analytics | Roadmap Batch 6 (TRADING_JOURNAL, STRATEGY_ANALYSIS) |
-| **עיצוב מודרני** | Modern, accessible UI | USER_EXPERIENCE_DOCUMENTATION, Fluid Design |
-| **אמינות** | Reliable, governed system | TT2_SYSTEM_OVERVIEW, evidence gates |
+### 2.2 Value Pillars
+| Pillar | Current Proof |
+|--------|---------------|
+| Operational core | D16/D18/D21 functional |
+| Data layer | User tickers + market data pipeline functional baseline |
+| Governance | Gate model + SSOT + Team 90 verification |
+| Expansion readiness | 15 additional pages now available as structural templates |
 
-### 2.3 Differentiation (from positioning)
-- **X-axis (מורכבות):** Medium–High — professional but usable
-- **Y-axis (מקצועיות):** High — standards, QA, governance
-- **Architecture:** Modular (LEGO), Fidelity LOD 400, strict QA
-
-**Source:** `PRODUCT_POSITIONING.md` § Positioning Map, § יתרונות תחרותיים
+### 2.3 Differentiation (Current)
+- Professional governance discipline.
+- Account-based financial model.
+- Cache-first external data strategy.
+- Clear separation between "live functional" and "template in-progress" scope.
 
 ---
 
 ## 3) Jobs to Be Done
 
-| Job | User Statement | System Capability | Status |
-|-----|----------------|-------------------|--------|
-| Manage trading accounts | "I need to track my accounts and brokers" | D16 Trading Accounts | ✅ |
-| Track fees | "I need to see commissions per account" | D18 Brokers Fees | ✅ |
-| Track cash flows | "I need deposits/withdrawals and FX" | D21 Cash Flows | ✅ |
-| Follow my tickers | "I need a list of symbols I care about" | User Tickers | ✅ |
-| Get market data | "I need prices and freshness" | Stage-1 Yahoo+Alpha, cache-first | ✅ |
-| Plan trades | "I need to plan entries/exits" | Trade Plans | ❌ UI not implemented |
-| Execute and log | "I need to log executions and journal" | Executions, Journal | ❌ UI not implemented |
-| Analyze performance | "I need strategy/portfolio analysis" | Strategy Analysis, Portfolio State | ❌ UI not implemented |
-| Import data | "I need to import broker data" | Data Import | ❌ UI not implemented |
+| Job | User Statement | Capability | Status |
+|-----|----------------|------------|--------|
+| Manage accounts | "Track accounts and broker settings" | D16 | ✅ Functional |
+| Manage fees | "Track fees per account" | D18 | ✅ Functional |
+| Manage cash flow | "Track deposits/withdrawals/currency" | D21 | ✅ Functional |
+| Manage watch universe | "Maintain my symbols" | User Tickers | ✅ Functional |
+| Monitor market freshness | "Know if displayed data is current" | Data dashboard + staleness | ✅ Functional baseline |
+| Plan trades | "Structure trade planning" | Trade Plans page | 🟡 Template shell |
+| Track journal | "Capture execution and journaling" | Journal/Trades pages | 🟡 Template shell |
+| Advanced analysis | "Analyze strategy/portfolio" | Research pages | 🟡 Template shell |
+| Import operational data | "Import external files/data" | Data Import page | 🟡 Template shell |
 
 ---
 
-## 4) Pains Addressed
+## 4) Pain Coverage
 
-| Pain | Current Mitigation | Evidence |
-|------|--------------------|----------|
-| UI blocking on provider failures | Stale-safe; never block UI | MARKET_DATA_PIPE_SPEC §2.3, §3 |
-| Inconsistent data | Cache-first, provider fallback | MARKET_DATA_PIPE_SPEC |
-| Complex setup | Unified header, auth flows | unified-header.html, auth |
-| Fragmented UX | Single design system, RTL | phoenix-base, D15_IDENTITY_STYLES |
-| Governance drift | SSOT, evidence gates, Team 90 | TT2_WORK_OPERATING_MODEL |
+| Pain | Mitigation | Status |
+|------|------------|--------|
+| Fragmented financial workflow | Unified core pages D16/D18/D21 | ✅ |
+| Data provider instability | cache-first + fallback | ✅ |
+| Scope confusion | explicit functional vs template mapping | ✅ (PI-001 update) |
+| Overpromise risk | marketing must distinguish readiness levels | Open governance action |
 
 ---
 
 ## 5) Persona-to-Value Matrix
 
-| Persona | Primary Value | Implemented | Missing |
-|---------|---------------|-------------|---------|
-| **Trader** | Fast access, real-time, journaling | Auth, accounts, fees, cash flows, user tickers | Executions, journal, plans |
-| **Investor** | Clear info, reports, portfolio view | Auth, accounts, user tickers | Portfolio state, strategy analysis |
-| **Portfolio Manager** | Multi-account, fees, import | Auth, accounts, fees, cash flows | Data import, advanced analytics |
-| **Admin** | System management, tickers | Design system, system_management, tickers | User management (if in scope) |
-
-**Source:** USER_EXPERIENCE_DOCUMENTATION.md § User Personas; PI-001 for implementation status.
+| Persona | Primary Value | Current Readiness |
+|---------|---------------|-------------------|
+| Trader | Fast operational control + market tracking | ✅ Core functional |
+| Investor | Portfolio visibility + progressive analytics | 🟡 Partial (analytics template stage) |
+| Portfolio manager | Multi-entity controls + disciplined workflow | 🟡 Partial |
+| Admin | System/ticker management + governance visibility | ✅ Baseline functional |
 
 ---
 
-## 6) Strategic Context (Legacy → Phoenix)
+## 6) Open Decision Requests
 
-- **Legacy (POC):** 26 pages, Strangler migration, code bloat addressed
-- **Phoenix:** Governance-first, hybrid HTML+React, PDSC boundary, audit gates
-- **Roadmap v2.1:** Batch 3 (Essential Data) → Batch 4 (Financial Execution) → Batch 5/6 (Complex, Analytics)
-
-**Source:** EXECUTIVE_SUMMARY.md, TT2_ROADMAP_NEXT_STEPS, TT2_SYSTEM_OVERVIEW
-
----
-
-## 7) Open Questions
-
-| # | Question | Owner |
+| # | Decision | Owner |
 |---|----------|-------|
-| 1 | Is "AI Analysis" / trade_plans a differentiator to highlight in narrative? | Architect |
-| 2 | Premium tiers / GTM assumptions for investor narrative? | Architect |
-| 3 | Broker integrations (IBKR etc.) — when in narrative? | Architect |
+| 1 | Priority order for converting 15 templates to functional modules | Architect + Team 10 |
+| 2 | Investor narrative phrasing for "template pages" (promise boundary) | Architect |
+| 3 | Which template pages are mandatory before first external campaign | Architect + Marketing |
 
 ---
 
-**log_entry | TEAM_70 | PI-002_DRAFT | 2026-02-15**
+**log_entry | TEAM_70 | PI-002_UPDATED_AFTER_MENU_ALIGNMENT | 2026-02-15**

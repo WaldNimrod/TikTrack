@@ -1,4 +1,4 @@
-# Team 70 — Architect Handoff Package
+# Team 70 - Architect Handoff Package
 
 **id:** `TEAM_70_ARCHITECT_HANDOFF`  
 **owner:** Team 70 (Product Intelligence)  
@@ -10,7 +10,11 @@
 
 ## 1) Executive Summary
 
-Team 70 has completed the 7-Day Onboarding execution plan and produced the full Product Intelligence package. The package consolidates SSOT, legacy context, and current code state into a coherent product/business narrative for marketing and investor use.
+Team 70 completed the Product Intelligence package and updated it after menu/routes/template alignment.
+The package now reflects current reality:
+- all menu links are routable,
+- all planned page entries are scaffolded,
+- readiness is split between functional baseline and template-shell pages.
 
 ---
 
@@ -23,56 +27,53 @@ Team 70 has completed the 7-Day Onboarding execution plan and produced the full 
 | PI-003 | Marketing Input Pack | `_COMMUNICATION/team_70/PI-003_MARKETING_INPUT_PACK.md` |
 | PI-004 | Investor/Partner Input Pack | `_COMMUNICATION/team_70/PI-004_INVESTOR_PARTNER_INPUT_PACK.md` |
 | PI-005 | Gap Register | `_COMMUNICATION/team_70/PI-005_GAP_REGISTER.md` |
-| — | 7-Day Package Draft (Team 90) | `_COMMUNICATION/team_70/TEAM_70_7DAY_PACKAGE_DRAFT.md` |
+| - | Team 90 review draft | `_COMMUNICATION/team_70/TEAM_70_7DAY_PACKAGE_DRAFT.md` |
 
 ---
 
-## 3) Critical Decisions Requested
+## 3) Critical Decisions Requested (Updated)
 
 | # | Decision | Impact |
 |---|----------|--------|
-| 1 | **Header strategy:** Hide non-implemented links vs show "בקרוב" placeholders? | UX, marketing trust |
-| 2 | **Guest HomePage:** What should anonymous visitors see? CTA hierarchy? | Marketing campaign |
-| 3 | **User Management:** In Phoenix user scope or deferred? | Page inventory, Gap Register |
-| 4 | **Revenue / GTM assumptions:** For investor narrative completeness | PI-004 |
-| 5 | **AI Analysis / Trade Plans:** Prioritization for narrative and marketing | PI-002, PI-003 |
+| 1 | Approve canonical wording for "Template-shell" vs "Functional" modules in public communication | Marketing and investor trust |
+| 2 | Approve priority sequence for converting 15 template pages into functional modules | Execution planning |
+| 3 | Lock guest homepage content policy and CTA narrative | Campaign readiness |
+| 4 | Lock investor assumptions: model framing, KPI baseline, GTM milestones | Investor pack completeness |
+| 5 | Confirm executions module target (contract + rollout wave) | Batch 4 integrity |
 
 ---
 
 ## 4) Recommended Immediate Actions
 
-1. **P1 — Header alignment** (Team 30): Align menu with implemented pages or add placeholders
-2. **P2 — Guest HomePage** (Architect + Team 30): Define content and CTA flow
-3. **P3 — Executions** (Team 20 + 30): Clarify API status; implement UI or remove from menu
-4. **P4 — routes.json** (Team 10): Align with Page Tracker and implementation
+1. Team 10 promotes readiness matrix to central docs.
+2. Team 30 applies visual/readiness markers to template pages per approved wording.
+3. Team 20/30 define first implementation wave from template set.
+4. Architect approves business narrative constraints for external communication.
 
 ---
 
-## 5) Evidence & Methodology
+## 5) Evidence Method
 
-- **Sources:** TT2_SYSTEM_OVERVIEW, TT2_CURRENT_STATE_AND_GAPS, TT2_ROADMAP_NEXT_STEPS, TT2_OFFICIAL_PAGE_TRACKER, routes.json, unified-header.html, vite.config.js, AppRouter.jsx, MARKET_DATA_PIPE_SPEC, TT2_DOMAIN_MODEL, legacy EXECUTIVE_SUMMARY, DESIGN_FREEZE, PRODUCT_POSITIONING, USER_EXPERIENCE_DOCUMENTATION
-- **Hierarchy:** SSOT over Legacy; code state validated against docs
-- **LOD 400:** Every claim has evidence path; no future promise without roadmap reference
+- SSOT and code-first validation.
+- Legacy used for context only.
+- No claim left without direct path reference.
 
----
-
-## 6) Onboarding Exit Criteria Status
-
-| Criterion | Status |
-|-----------|--------|
-| Reading list confirmed | ✅ |
-| Baseline inventory submitted | ✅ PI-001 |
-| First verified gap register approved by Team 90 | ⏳ Pending Team 90 audit |
+Core evidence anchors:
+- `ui/public/routes.json`
+- `ui/src/views/shared/unified-header.html`
+- `ui/vite.config.js`
+- `ui/src/router/AppRouter.jsx`
+- `documentation/90_ARCHITECTS_DOCUMENTATION/OVERVIEW_PACK/*`
 
 ---
 
-## 7) Handoff Flow
+## 6) Handoff Flow
 
-1. Team 90 performs no-assumption audit (see TEAM_70_7DAY_PACKAGE_DRAFT.md §2)
-2. Architect reviews package direction and decisions
-3. Team 10 receives promotion-ready deltas for SSOT publication
-4. Team 70 stands by for clarifications or refinements
+1. Team 90 performs no-assumption audit.
+2. Architect decides on section 3 items.
+3. Team 10 receives promotion-ready deltas.
+4. Team 70 supports clarifications only.
 
 ---
 
-**log_entry | TEAM_70 | ARCHITECT_HANDOFF_READY | 2026-02-15**
+**log_entry | TEAM_70 | ARCHITECT_HANDOFF_UPDATED_AFTER_MENU_ALIGNMENT | 2026-02-15**

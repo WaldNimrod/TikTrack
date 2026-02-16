@@ -5,58 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>התראות | TikTrack Phoenix</title>
   
-  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
   <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
   
-  <!-- ============================================
-       CSS Loading Order (CRITICAL - DO NOT CHANGE)
-       Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
-       ============================================ -->
-  
-  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  
-  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
   <link rel="stylesheet" href="/src/styles/phoenix-base.css">
-  
-  <!-- 3. LEGO Components (Reusable components) -->
   <link rel="stylesheet" href="/src/styles/phoenix-components.css">
-  
-  <!-- 4. Header Component (Unified Header Styles) -->
   <link rel="stylesheet" href="/src/styles/phoenix-header.css">
-  
-  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
   <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
-  
-  <!-- 6. Modal Styles -->
   <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
   
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="alerts-page context-data entity-alert">
   
-  <!-- ============================================
-       Header Loader - MANDATORY per POL-015
-       טוען unified-header.html דינמית — אלמנט ראש דף לכל עמוד (מלבד Auth)
-       ============================================ -->
   <script src="/src/components/core/headerLoader.js"></script>
-  
-  <!-- ============================================
-       UAI Entry Point (Unified App Init)
-       Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
-       ============================================ -->
   <script src="/src/views/data/alerts/alertsPageConfig.js"></script>
   <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
 
-  <!-- ============================================
-       PAGE WRAPPER + CONTAINER STRUCTURE
-       LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
-       ============================================ -->
-  
   <div class="page-wrapper">
     <div class="page-container">
       <main>
         <tt-container>
+  <!-- CONTAINER 0: סיכום מידע — התראות (Per: alerts_BLUEPRINT) -->
   <tt-section data-section="summary" data-entity="alert">
     <div class="index-section__header">
       <div class="index-section__header-title">
@@ -71,28 +41,104 @@
     </div>
     <div class="index-section__body">
       <tt-section-row><div class="col-12">
-        <div class="info-summary" id="summaryStats">
+        <div class="info-summary" id="alertsSummaryStats">
           <div class="info-summary__row info-summary__row--first">
-            <div class="info-summary__content"><div>סיכום מידע — התראות</div></div>
+            <div class="info-summary__content">
+              <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
+              <div>התראות פעילות: <strong id="activeAlerts">0</strong></div>
+              <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+              <button class="portfolio-summary__toggle-btn" id="alertsSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
+              </button>
+            </div>
+          </div>
+          <div class="info-summary__row info-summary__row--second" id="alertsSummaryContent" style="display: none;">
+            <span>התראות שהופעלו: <strong id="triggeredAlerts">0</strong></span>
           </div>
         </div>
       </div></tt-section-row>
     </div>
   </tt-section>
-  <tt-section data-section="alerts-main" data-entity="alert">
+
+  <!-- CONTAINER 1: ניהול התראות — Table + Filters (Per: alerts_BLUEPRINT, TEAM_40 coordination) -->
+  <tt-section data-section="alerts-management" data-entity="alert">
     <div class="index-section__header">
       <div class="index-section__header-title">
         <img src="/images/icons/entities/alerts.svg" alt="התראות" class="index-section__header-icon" width="35" height="35">
-        <h1 class="index-section__header-text">התראות</h1>
+        <h1 class="index-section__header-text">ניהול התראות</h1>
+      </div>
+      <div class="index-section__header-meta">
+        <span class="index-section__header-count" id="alertsCount">0 התראות</span>
       </div>
       <div class="index-section__header-actions">
+        <div class="filter-buttons-container">
+          <button class="filter-icon-btn filter-icon-btn--active" data-filter-type="all" aria-label="הצג הכל" title="הצג הכל">
+            <img src="/images/icons/entities/alerts.svg" alt="הכל" width="20" height="20">
+          </button>
+          <button class="filter-icon-btn" data-filter-type="account" aria-label="התראות על חשבונות מסחר" title="סינון לפי: חשבונות מסחר">
+            <img src="/images/icons/entities/trading_accounts.svg" alt="חשבונות מסחר" width="20" height="20">
+          </button>
+          <button class="filter-icon-btn" data-filter-type="trade" aria-label="התראות על טריידים" title="סינון לפי: טריידים">
+            <img src="/images/icons/entities/trades.svg" alt="טריידים" width="20" height="20">
+          </button>
+          <button class="filter-icon-btn" data-filter-type="trade_plan" aria-label="התראות על תוכניות" title="סינון לפי: תוכניות">
+            <img src="/images/icons/entities/trade_plans.svg" alt="תוכניות" width="20" height="20">
+          </button>
+          <button class="filter-icon-btn" data-filter-type="ticker" aria-label="התראות על טיקרים" title="סינון לפי: טיקרים">
+            <img src="/images/icons/entities/tickers.svg" alt="טיקרים" width="20" height="20">
+          </button>
+        </div>
+        <button class="index-section__header-action-btn js-add-alert" aria-label="הוספת התראה" title="הוספת התראה חדשה">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+          הוספת התראה
+        </button>
         <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6l6 -6"></path></svg>
         </button>
       </div>
     </div>
     <div class="index-section__body">
-      <tt-section-row><div class="col-12"><!-- תוכן יוגדר בהמשך --></div></tt-section-row>
+      <tt-section-row><div class="col-12">
+        <div class="phoenix-table-wrapper">
+          <table id="alertsTable" class="phoenix-table js-table" data-table-type="alerts" role="table" aria-label="ניהול התראות">
+            <thead class="phoenix-table__head" role="rowgroup">
+              <tr class="phoenix-table__row" role="row">
+                <th class="phoenix-table__header col-linked-object" data-sortable="true" data-sort-key="target_type" role="columnheader"><span class="phoenix-table__header-text">מקושר ל</span></th>
+                <th class="phoenix-table__header col-ticker" data-sortable="true" data-sort-key="ticker_id" role="columnheader"><span class="phoenix-table__header-text">טיקר</span></th>
+                <th class="phoenix-table__header col-condition" data-sortable="true" data-sort-key="condition_field" role="columnheader"><span class="phoenix-table__header-text">תנאי</span></th>
+                <th class="phoenix-table__header col-status" data-sortable="true" data-sort-key="is_active" role="columnheader"><span class="phoenix-table__header-text">סטטוס</span></th>
+                <th class="phoenix-table__header col-triggered" data-sortable="true" data-sort-key="is_triggered" role="columnheader"><span class="phoenix-table__header-text">הופעל</span></th>
+                <th class="phoenix-table__header col-created" data-sortable="true" data-sort-key="created_at" role="columnheader"><span class="phoenix-table__header-text">נוצר ב</span></th>
+                <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader" aria-label="פעולות"><span class="phoenix-table__header-text sr-only">פעולות</span></th>
+              </tr>
+            </thead>
+            <tbody class="phoenix-table__body" role="rowgroup" id="alertsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="phoenix-table-pagination">
+          <div class="phoenix-table-pagination__info"><span id="alertsPaginationInfo">מציג 0-0 מתוך 0 רשומות</span></div>
+          <div class="phoenix-table-pagination__controls">
+            <div class="phoenix-table-pagination__page-size">
+              <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
+              <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="alertsTable">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="phoenix-table-pagination__pages" id="alertsPaginationControls">
+              <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="alertsPrevPageBtn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
+              </button>
+              <div id="alertsPageNumbers"></div>
+              <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="alertsNextPageBtn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div></tt-section-row>
     </div>
   </tt-section>
 </tt-container>
@@ -102,6 +148,9 @@
   </div>
   
 <script src="/src/components/core/sectionToggleHandler.js"></script>
+<script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+<script src="/src/cubes/shared/PhoenixTablePagination.js"></script>
+<script type="module" src="/src/views/data/alerts/alertsTableInit.js"></script>
 <script src="/src/views/shared/footerLoader.js"></script>
 <script src="/src/components/core/headerLinksUpdater.js"></script>
 </body>

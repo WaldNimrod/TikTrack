@@ -293,7 +293,7 @@ button,
 - **Auth Buttons:** `ui/src/styles/D15_IDENTITY_STYLES.css` (שורות 242-258)
 - **Table Actions:** `ui/src/styles/phoenix-components.css` (שורות 794-853)
 - **SLA 30/40:** `documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md`
-- **ADR-013:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
+- **ADR-013:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md`
 - **DNA Palette SSOT:** `documentation/04-DESIGN_UX_UI/DNA_PALETTE_SSOT.md`
 
 ---

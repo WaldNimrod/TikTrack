@@ -30,7 +30,7 @@
 ## 3. סקופ (נעול)
 
 - **מבנה:** LEGO — page-wrapper → tt-container → tt-section (בהתאם לתבנית עמודים).
-- **תוכן:** עמוד התראות (ישות Alert, D34); תאום עם תיעוד API כאשר יוגדר.
+- **תוכן:** עמוד התראות (ישות Alert, D34); תאום עם תיעוד API כאשר יוגדר. **צד שרת (DB/API):** ראה [TEAM_10_MB3A_ALERTS_EXECUTION_ORDER_AND_PROMPTS_REF.md](TEAM_10_MB3A_ALERTS_EXECUTION_ORDER_AND_PROMPTS_REF.md) §6 — טבלת `user_data.alerts` ב-DDL; API לא מוגדר ב-MB3A עד להחלטה.
 - **סגנונות:** phoenix-base, phoenix-components, phoenix-header; data-action ללא inline scripts.
 
 ---

@@ -147,13 +147,13 @@
 | **90** | פסילת 2.x ו-D15_SYSTEM_INDEX; אימות חסימת ייבוא/API ל"אחר"; אימות Redirect ואייקון | דוח Spy | ✅ **PASS** — TEAM_90_TO_ARCHITECT_BATCH_2_5_SPY_FINAL_REPORT.md |
 | **10** | וידוא רפקטור לפני אישור D18/D21; הפניה בלעדית ל־00_MASTER_INDEX | אינדקסים; חסימה | ✅ **הושלם** — סיכום: TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md; שער: TEAM_10_D18_D21_APPROVAL_GATE.md |
 
-**מקור:** `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md` (ADR-017), `_COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md` (ADR-018); פירוט: TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md.
+**מקור:** `_COMMUNICATION/_Architects_Decisions/BATCH_2_5_COMPLETIONS_MANDATE.md` (ADR-017), `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md` (ADR-018); פירוט: TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md.
 
 ---
 
 ### 2.10 Smart History Fill (Level-2) — מימוש לפי SSOT נעול
 
-**מקור אמת (נעול):** _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md  
+**מקור אמת (נעול):** `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` (§5) + `documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md` (Rule 9)  
 **החלטות:** Gap-First; Reload רק ב-Admin; 250 ימי מסחר מינימום; Gap = יום חסר בתוך 250; Retry: מיידי + Batch לילה; History: Yahoo → Alpha; Provider: date_from/date_to; API: endpoint יחיד `mode=gap_fill`|`force_reload`.
 
 | מזהה | בעלים | משימה | תוצר מצופה | תלות / חסימה | סטטוס |
@@ -213,16 +213,16 @@
 | דוח Flow Type SSOT QA | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_FLOW_TYPE_SSOT_QA_REPORT.md |
 | SLA 30/40 | documentation/05-PROCEDURES/TT2_SLA_TEAMS_30_40.md |
 | פרוטוקול שערי QA | documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md |
-| **מנדט בץ 2.5 (ADR-017/018)** | _COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md; _COMMUNICATION/90_Architects_comunication/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md |
+| **מנדט בץ 2.5 (ADR-017/018)** | _COMMUNICATION/_Architects_Decisions/BATCH_2_5_COMPLETIONS_MANDATE.md; _COMMUNICATION/_Architects_Decisions/ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md |
 | **הפצה בץ 2.5** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_ARCHITECT_MANDATE_AND_DISTRIBUTION.md; TEAM_10_TO_TEAM_90_BATCH_2_5_SPY_MANDATE.md |
 | **סיכום בץ 2.5 לבדיקה** | _COMMUNICATION/team_10/TEAM_10_BATCH_2_5_COMPLETION_SUMMARY_FOR_REVIEW.md |
 | **שער אישור D18/D21** | _COMMUNICATION/team_10/TEAM_10_D18_D21_APPROVAL_GATE.md |
-| **Smart History Fill (נעול)** | _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md; MARKET_DATA_PIPE_SPEC §5; OPEN_TASKS §2.10 |
+| **Smart History Fill (נעול)** | documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md §5; documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md Rule 9; OPEN_TASKS §2.10 |
 
 ---
 
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | BATCH_2_5_TEAM_10_COMPLETE | 2026-02-13**  
-**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC (נעול).  
+**log_entry | TEAM_10 | OPEN_TASKS_MASTER | SMART_HISTORY_FILL_LEVEL2_ADDED | 2026-02-14** — §2.10 משימות מימוש (SHF-1–SHF-7), owners, תלויות. מקור SSOT: MARKET_DATA_PIPE_SPEC §5 + MARKET_DATA_COVERAGE_MATRIX Rule 9.  
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_1_2_3_4_CLOSED | 2026-02-14** — Team 20 דיווח השלמה: TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_UPDATE. SHF-1–SHF-4 → CLOSED. SHF-5, SHF-6 (Team 30) פתוחים — בקשת ביצוע: TEAM_20_TO_TEAM_30_SMART_HISTORY_FILL_EXECUTION_REQUEST.md.  
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_5_6_CLOSED_QA_REQUESTED | 2026-02-14** — Team 20 דיווח UI הושלם (TEAM_20_TO_TEAM_10_SMART_HISTORY_FILL_QA_REQUEST). SHF-5, SHF-6 → CLOSED. בקשת QA הועברה ל-Team 50: TEAM_10_TO_TEAM_50_SMART_HISTORY_FILL_QA_REQUEST.md.  
 **log_entry | TEAM_10 | OPEN_TASKS_MASTER | SHF_QA_URGENT_FIXES | 2026-02-14** — מנדט תיקונים דחופים: TEAM_10_SMART_HISTORY_FILL_QA_URGENT_FIXES_MANDATE. 403 (router) + הודעות UI (tickersDataIntegrityInit) תוקנו. Seed 250+ + רה־ריצת QA — על Team 20 + 50. לא לסגור עד Evidence מעודכן.  

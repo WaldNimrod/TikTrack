@@ -8,7 +8,7 @@
 - TT2_VERSION_MATRIX: מטריצת גרסאות (Initial SV: 1.0.0).
  
 ## ✅ Index Authority (Consolidated)
-- `_COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md` — consolidated authoritative index (v11.0.0).
+- `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md` — consolidated authoritative index (v11.0.0).
 
 ## 📂 Phase 2 Execution
 - [Status] - System v1.0 Foundations Materialized.

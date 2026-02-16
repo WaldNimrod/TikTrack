@@ -2,7 +2,7 @@
 
 **מבצע:** Team 30  
 **תאריך:** 2026-02-12  
-**מקור:** `_COMMUNICATION/90_Architects_comunication/BATCH_2_5_COMPLETIONS_MANDATE.md`
+**מקור:** `_COMMUNICATION/_Architects_Decisions/BATCH_2_5_COMPLETIONS_MANDATE.md`
 
 ---
 

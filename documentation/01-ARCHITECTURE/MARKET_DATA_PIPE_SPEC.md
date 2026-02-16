@@ -140,7 +140,7 @@ For STOCK/ETF, `market` is optional and mapping may use the same symbol in both 
 
 ## 5. Smart History Fill (LOCKED — Stage-1)
 
-**מקור אמת:** _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md
+**מקור אמת:** `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` (§5) + `documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md` (Rule 9)
 
 ### 5.1 עקרונות מחייבים
 
@@ -282,12 +282,12 @@ System Settings must expose:
 | TT2_MARKET_DATA_RESILIENCE | documentation/01-ARCHITECTURE/LOGIC/TT2_MARKET_DATA_RESILIENCE.md |
 | FOREX_MARKET_SPEC | documentation/01-ARCHITECTURE/FOREX_MARKET_SPEC.md |
 | ticker_prices model | api/models/ticker_prices.py |
-| Roadmap v2.1 | _COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
-| Smart History Fill (Locked) | _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md |
+| Roadmap v2.1 | _COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
+| Smart History Fill (Locked) | documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md (Rule 9) |
 
 ---
 
-**log_entry | TEAM_10 | SSOT_UPDATE | SMART_HISTORY_FILL_LOCKED | 2026-02-14** — §5 Smart History Fill (Gap-First, 250d min, Gap def, Retry, Yahoo→Alpha, date_from/date_to, API mode=gap_fill|force_reload, Reload Admin only). מקור: TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.
+**log_entry | TEAM_10 | SSOT_UPDATE | SMART_HISTORY_FILL_LOCKED | 2026-02-14** — §5 Smart History Fill (Gap-First, 250d min, Gap def, Retry, Yahoo→Alpha, date_from/date_to, API mode=gap_fill|force_reload, Reload Admin only). מקור SSOT: MARKET_DATA_PIPE_SPEC §5 + MARKET_DATA_COVERAGE_MATRIX Rule 9.
 
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | MARKET_DATA_PIPE_SPEC_SSOT | 2026-02-13**  
 **log_entry | TEAM_10 | KNOWLEDGE_PROMOTION | CACHE_EOD_DECISION_TO_SSOT | 2026-02-13**  

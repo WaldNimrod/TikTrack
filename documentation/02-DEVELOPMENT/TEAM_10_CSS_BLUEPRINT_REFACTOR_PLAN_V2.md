@@ -354,8 +354,8 @@ ui/src/
 - 🛡️ **Viewports:** רוחב מינימלי לרכיבי LEGO עם Horizontal Scroll פנימי
 
 **קישורים:**
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית 🛡️ **FINAL GOVERNANCE LOCK**
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_RESPONSIVE_CHARTER.md` - אמנת רספונסיביות
+- `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית 🛡️ **FINAL GOVERNANCE LOCK**
+- `_COMMUNICATION/_Architects_Decisions/ARCHITECT_RESPONSIVE_CHARTER.md` - אמנת רספונסיביות
 
 **סטטוס:** 🔴 **READY TO START** - ממתין להפעלת Team 40
 
@@ -470,7 +470,7 @@ ui/src/
 - 🛡️ **G-Bridge:** כל חריגה תגרור פסילת G-Bridge מיידית
 
 **קישורים:**
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית
+- `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - החלטה אדריכלית סופית
 - `documentation/10-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md` - JS Standards Protocol
 
 **סטטוס:** 🔴 **READY TO START** - משימה רטרואקטיבית חובה

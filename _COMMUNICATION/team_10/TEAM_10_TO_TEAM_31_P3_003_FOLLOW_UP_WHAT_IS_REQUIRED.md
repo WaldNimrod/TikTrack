@@ -46,7 +46,7 @@
 |------|------|
 | בקשת התשומה המקורית | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_31_P3_003_BLUEPRINT_SCOPE_REQUEST.md |
 | מטריצה (Team 10) | _COMMUNICATION/team_10/TEAM_10_P3_003_BLUEPRINT_SCOPE_AND_DRIFT_MATRIX.md |
-| Roadmap v2.1 | _COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
+| Roadmap v2.1 | _COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
 
 ---
 

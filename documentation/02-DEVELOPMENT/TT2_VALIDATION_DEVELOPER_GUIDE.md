@@ -404,7 +404,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
 1. **תשתית ולידציה:** `documentation/10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md`
 2. **JS Standards:** `documentation/10-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md`
 3. **CSS Standards:** `documentation/10-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`
-4. **החלטה אדריכלית:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md`
+4. **החלטה אדריכלית:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md`
 
 ---
 

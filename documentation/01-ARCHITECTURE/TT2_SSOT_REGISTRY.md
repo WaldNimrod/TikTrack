@@ -260,7 +260,7 @@
 
 ## 🔗 קישורים רלוונטיים
 
-- **Header Unification Mandate:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
+- **Header Unification Mandate:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
 - **תוכנית מימוש:** `documentation/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md`
 - **Page Tracker:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
 

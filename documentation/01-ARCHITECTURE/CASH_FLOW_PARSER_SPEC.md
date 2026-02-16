@@ -106,7 +106,7 @@
 | PDSC Boundary Contract | documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md |
 | Cash Flows model | api/models/cash_flows.py |
 | Cash Flows service | api/services/cash_flows.py |
-| Roadmap v2.1 | _COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
+| Roadmap v2.1 | _COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
 
 ---
 

@@ -428,7 +428,7 @@ if (!isValid) {
 
 ### **מקור המנדט:**
 - `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_40_CSS_LOAD_VERIFICATION.md`
-- `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
+- `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
 
 ### **Specs קשורים:**
 - `_COMMUNICATION/team_40/TEAM_40_DNA_VARIABLES_CSS_SPEC.md`

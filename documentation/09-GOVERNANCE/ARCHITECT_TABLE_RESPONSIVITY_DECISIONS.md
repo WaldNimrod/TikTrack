@@ -5,7 +5,7 @@
 **status:** ✅ **SSOT - ACTIVE**
 **last_updated:** 2026-02-09
 **version:** v1.0
-**source:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md`
+**source:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md`
 
 ---
 

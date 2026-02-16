@@ -1494,11 +1494,11 @@
 - **Auth Guard Urgent Fix:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_URGENT_FIX_AUTH_GUARD.md` (Communication only)
 
 ### החלטות אדריכליות:
-> ⚠️ **NON-SSOT:** קבצים אלה הם תקשורת פנימית בלבד ואינם חלק מה-SSOT. להתייחסות בלבד.
+> **SSOT:** החלטות אדריכליות מחייבות נקראות מתיקיית `_COMMUNICATION/_Architects_Decisions/`.
 
-- **Header Architecture Decision:** `_COMMUNICATION/90_Architects_comunication/TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md` (Communication only)
-- **Filter Bridge Spec:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_FILTER_BRIDGE_SPEC_V2.md` (Communication only)
-- **Footer Strategy:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` (Communication only)
+- **Header Unification Mandate:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
+- **Filter Bridge Spec:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_FILTER_BRIDGE_SPEC_V2.md`
+- **Footer Strategy:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md`
 
 ---
 

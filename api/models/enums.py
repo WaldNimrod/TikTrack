@@ -44,8 +44,27 @@ class NoteCategory(str, enum.Enum):
     GENERAL = "GENERAL"
 
 
+class AlertType(str, enum.Enum):
+    """Alert type enum - maps to user_data.alert_type (D34)"""
+    PRICE = "PRICE"
+    VOLUME = "VOLUME"
+    TECHNICAL = "TECHNICAL"
+    NEWS = "NEWS"
+    CUSTOM = "CUSTOM"
+
+
+class AlertPriority(str, enum.Enum):
+    """Alert priority enum - maps to user_data.alert_priority (D34)"""
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+
 # SQLAlchemy Enum types for use in Column definitions
 user_role_enum = Enum(UserRole, name="user_role", schema="user_data", create_type=False)
 reset_method_enum = Enum(ResetMethod, name="reset_method", schema="user_data", create_type=False)
 api_provider_enum = Enum(ApiProvider, name="api_provider", schema="user_data", create_type=False)
 note_category_enum = Enum(NoteCategory, name="note_category", schema="user_data", create_type=False)
+alert_type_enum = Enum(AlertType, name="alert_type", schema="user_data", create_type=False)
+alert_priority_enum = Enum(AlertPriority, name="alert_priority", schema="user_data", create_type=False)

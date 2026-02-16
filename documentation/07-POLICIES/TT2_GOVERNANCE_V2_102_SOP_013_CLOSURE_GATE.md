@@ -63,7 +63,7 @@ HANDOVER_PROMPT: "צוות 90, המשימה מוכנה לבדיקת יושרה. 
 
 | מסמך | נתיב |
 |------|------|
-| **הנחיית האדריכלית — חיזוק משילות** | _COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md |
+| **הנחיית האדריכלית — חיזוק משילות** | _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md |
 | **פרוטוקול משילות ותקשורת AI** | documentation/90_ARCHITECTS_DOCUMENTATION/TT2_GOVERNANCE_AND_AI_COMMUNICATION_PROTOCOL.md (אם קיים) |
 | **רישום משימות** | _COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md, TEAM_10_OPEN_TASKS_MASTER.md |
 

@@ -202,7 +202,8 @@ export class RenderStage extends StageBase {
       'cashFlows': '/src/views/financial/cashFlows/cashFlowsTableInit.js',
       'brokersFees': '/src/views/financial/brokersFees/brokersFeesTableInit.js',
       'tradingAccounts': '/src/views/financial/tradingAccounts/tradingAccountsTableInit.js',
-      'notes': '/src/views/data/notes/notesTableInit.js'
+      'notes': '/src/views/data/notes/notesTableInit.js',
+      'alerts': '/src/views/data/alerts/alertsTableInit.js'
     };
     return pathMap[pageType] || null;
   }
@@ -217,7 +218,8 @@ export class RenderStage extends StageBase {
       '/cash_flows.html': 'cashFlows',
       '/brokers_fees.html': 'brokersFees',
       '/trading_accounts.html': 'tradingAccounts',
-      '/notes.html': 'notes'
+      '/notes.html': 'notes',
+      '/alerts.html': 'alerts'
     };
     return pageMap[path] || 'default';
   }

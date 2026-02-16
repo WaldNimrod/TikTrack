@@ -113,7 +113,7 @@
 3. **EFR Logic Map (Team 30):** טבלת SSOT המגדירה איזה טיפוס נתונים ב-API מקבל איזה רכיב רינדור ב-EFR
 4. **CSS Load Verification (Team 40+10):** הוספת סעיף בדיקה ב-G-Bridge לווידוא סדר טעינת קבצי ה-CSS
 
-**מקור המנדט:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
+**מקור המנדט:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
 
 **⚠️ BLOCKING:** אין אישור התקדמות ללא Interface Contracts.
 
@@ -148,7 +148,7 @@
 - [ ] Team 10: בדיקה ואישור כל התיקונים
 - [ ] Team 90: Re-Scan לביקורת
 
-**מקור המנדט:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
+**מקור המנדט:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
 
 **מנדטים מפורטים:**
 - `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_30_INTERFACE_CONTRACTS_MANDATE.md`

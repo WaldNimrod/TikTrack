@@ -2,7 +2,7 @@
 
 **id:** `TEAM_10_SMART_HISTORY_FILL_SSOT_EVIDENCE_LOG`  
 **משימה:** עדכון תיעוד מערכת לפי מפרט נעול — ללא סטיות  
-**מקור אמת:** _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md  
+**מקור אמת:** `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` (§5) + `documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md` (Rule 9)  
 **תאריך:** 2026-02-14  
 **בעלים:** Team 10 (The Gateway)
 
@@ -61,7 +61,7 @@
 
 | מסמך | נתיב |
 |------|------|
-| מפרט נעול | _COMMUNICATION/90_Architects_comunication/TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md |
+| מפרט נעול (SSOT) | documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md §5 + documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md Rule 9 |
 | MARKET_DATA_PIPE_SPEC §5 | documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md |
 | MARKET_DATA_COVERAGE_MATRIX Rule 9 | documentation/01-ARCHITECTURE/MARKET_DATA_COVERAGE_MATRIX.md |
 | 00_MASTER_INDEX | documentation/00-MANAGEMENT/00_MASTER_INDEX.md |

@@ -119,7 +119,7 @@
 ## 6. מפת דרכים (SSOT)
 
 - **מקור:** מפת הדרכים המחייבת היא זו שאושרה ע"י Team 90 / אדריכל (נכון לעכשיו: Roadmap v2.1).
-- **קישור:** `_COMMUNICATION/90_Architects_comunication/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
+- **קישור:** `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
 - עמודת **"שלב"** ברשימה תעודכן בהתאם לשלבים המופיעים במפת הדרכים.
 
 ---

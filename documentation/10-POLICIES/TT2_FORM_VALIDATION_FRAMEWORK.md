@@ -622,7 +622,7 @@ const useFormValidation = (initialData, rules) => {
    - G-Bridge validation
    - Transformation Layer requirements
 
-4. **החלטה אדריכלית:** `_COMMUNICATION/90_Architects_comunication/ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md`
+4. **החלטה אדריכלית:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md`
    - מודל ולידציה היברידי
    - PhoenixSchema requirement
 

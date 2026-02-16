@@ -219,13 +219,11 @@ export async function openNotesForm(noteId = null) {
     } catch (err) {
       maskedLog('[Notes Form] Save error:', { status: (err && err.status) });
       const status = err && err.status;
-      let msg = err?.message_i18n || err?.message;
-      if (!msg || typeof msg !== 'string') {
-        if (status === 413) msg = 'הקובץ חורג מ־1MB. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
-        else if (status === 415) msg = 'סוג הקובץ לא נתמך. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
-        else if (status === 422) msg = 'מכסה של 3 קבצים להערה הושלמה. הסר קובץ כדי להוסיף אחר.';
-        else msg = 'שגיאה בשמירה';
-      }
+      let msg;
+      if (status === 413) msg = 'הקובץ חורג מ־1MB. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
+      else if (status === 415) msg = 'סוג הקובץ לא נתמך. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
+      else if (status === 422) msg = 'מכסה של 3 קבצים להערה הושלמה. הסר קובץ כדי להוסיף אחר.';
+      else msg = err?.message_i18n || err?.message || 'שגיאה בשמירה';
       alert(msg);
     }
   }

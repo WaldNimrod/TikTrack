@@ -22,10 +22,10 @@
 Team 20 ביצע איתחול Backend והרצת QA לפי נוהל `TEAM_20_BACKEND_RESTART_WORK_PROCEDURE`:
 
 - POST /notes → 201
-- Attachments 201 (×3), 422 (מכסה), 413 (>1MB)
+- Attachments 201 (×3), 422 (מכסה), 413 (>1MB), 415 (Fake MIME)
 - GET 404, XSS sanitization
 
-**הערה:** Fake MIME (EXE) החזיר 422 במקום 415 — ייתכן שנדרש תיקון נפרד.
+**תיקון Fake MIME:** סדר בדיקות ב־note_attachments_service הועבר — MIME (415) לפני מכסה (422). Gate-A 10/10.
 
 ---
 

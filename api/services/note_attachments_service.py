@@ -111,15 +111,15 @@ class NoteAttachmentsService:
         if len(file_content) > MAX_FILE_BYTES:
             return (None, 413, "File exceeds 1MB limit")
 
+        # 415: MIME validation (magic-bytes) — before quota (422) per D35/Gate-A
+        ok, mime_or_err = validate_mime_magic(file_content, claimed_content_type)
+        if not ok:
+            return (None, 415, mime_or_err)
+
         # 422: already 3 attachments
         count = await self.count_attachments(db, note_id)
         if count >= MAX_ATTACHMENTS_PER_NOTE:
             return (None, 422, "Maximum 3 attachments per note")
-
-        # 415: MIME validation (magic-bytes)
-        ok, mime_or_err = validate_mime_magic(file_content, claimed_content_type)
-        if not ok:
-            return (None, 415, mime_or_err)
 
         # Create attachment record and persist file
         attachment_id = uuid.uuid4()

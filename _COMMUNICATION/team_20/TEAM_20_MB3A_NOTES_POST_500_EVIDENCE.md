@@ -23,20 +23,22 @@
 
 ---
 
-## 3. תוצאות Gate-A API
+## 3. תוצאות Gate-A API (10/10 PASS)
 
 ```
 ✅ Admin Login OK
-✅ POST /notes → 201 (note_id=83703881-6a04-4daa-bc79-e248dfe672dd)
+✅ POST /notes → 201
 ✅ POST attachment (valid JPEG) → 201
 ✅ POST attachment 2 → 201
 ✅ POST attachment 3 → 201
 ✅ POST attachment 4 (quota) → 422
 ✅ POST attachment (>1MB) → 413
-⚠️ Fake MIME → 422 (expected 415)
+✅ POST attachment (fake EXE/MIME) → 415
 ✅ GET /notes/{fake} → 404
 ✅ XSS sanitization — <script> removed from content
 ```
+
+**תיקון Fake MIME (TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT):** סדר בדיקות ב־upload_attachment הועבר — MIME (415) לפני מכסה (422).
 
 ---
 

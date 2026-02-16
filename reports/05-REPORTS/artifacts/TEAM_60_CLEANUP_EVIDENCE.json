@@ -1,0 +1,28 @@
+{
+  "last_run_time": "2026-02-16T14:09:19.569486+00:00",
+  "rows_archived": 10,
+  "rows_pruned": 10,
+  "rows_updated": 0,
+  "archive_paths": [
+    "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/archive/market_data/daily/ticker_prices_2025-06-11_20260216_140919.csv"
+  ],
+  "intraday": {
+    "rows_archived": 0,
+    "rows_pruned": 0,
+    "archive_path": null,
+    "archive_files_deleted": 0,
+    "cutoff": "2026-01-17T14:09:19.540501+00:00"
+  },
+  "daily": {
+    "rows_archived": 10,
+    "rows_pruned": 10,
+    "archive_path": "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/archive/market_data/daily/ticker_prices_2025-06-11_20260216_140919.csv",
+    "cutoff": "2025-06-11T14:09:19.552566+00:00"
+  },
+  "fx_history": {
+    "rows_archived": 0,
+    "rows_pruned": 0,
+    "archive_path": null,
+    "cutoff": "2025-06-11"
+  }
+}

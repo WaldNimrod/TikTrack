@@ -1,0 +1,22 @@
+[
+  {
+    "name": "POST /brokers_fees",
+    "url": "http://localhost:8082/api/v1/brokers_fees",
+    "method": "POST",
+    "requestBody": {
+      "broker": "QA Test Broker",
+      "commission_type": "FLAT",
+      "commission_value": "2.00",
+      "minimum": 2
+    },
+    "responseStatus": 500,
+    "responseStatusText": "Internal Server Error",
+    "responseHeaders": {
+      "content-length": "68",
+      "content-type": "application/json",
+      "date": "Tue, 10 Feb 2026 08:41:34 GMT",
+      "server": "uvicorn"
+    },
+    "responseBody": "{\"detail\":\"Failed to create broker fee\",\"error_code\":\"SERVER_ERROR\"}"
+  }
+]

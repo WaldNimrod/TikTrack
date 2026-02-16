@@ -1,0 +1,7 @@
+[
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/src/cubes/shared/tableFormatters.js 0:0 Uncaught SyntaxError: Cannot use import statement outside a module",
+    "timestamp": 1770971060254
+  }
+]

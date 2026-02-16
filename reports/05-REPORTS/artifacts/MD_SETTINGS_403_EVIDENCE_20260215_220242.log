@@ -1,0 +1,11 @@
+[22:02:42] === MD-SETTINGS 403 Evidence Run ===
+[22:02:42] Backend: http://127.0.0.1:8082 | User: qa_nonadmin (role USER)
+[22:02:42] Seeding non-admin user if needed...
+✅ Non-admin user qa_nonadmin / qa403test seeded (role USER)
+[22:02:42] Logging in as non-admin...
+[22:02:43] ✅ Non-admin login OK
+[22:02:43] GET /settings/market-data → HTTP 403
+[22:02:43]    Body: {"detail":"Admin access required","error_code":"ACCESS_DENIED"}
+[22:02:43] PATCH /settings/market-data → HTTP 403
+[22:02:43]    Body: {"detail":"Admin access required","error_code":"ACCESS_DENIED"}
+[22:02:43] ✅ 403 Evidence: PASS — both GET and PATCH return 403 Forbidden

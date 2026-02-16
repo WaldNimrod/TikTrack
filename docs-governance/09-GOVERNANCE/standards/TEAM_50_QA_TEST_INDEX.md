@@ -1,0 +1,701 @@
+# 🧪 אינדקס בדיקות QA - Team 50
+
+**id:** `TEAM_50_QA_TEST_INDEX`  
+**owner:** Team 50 (QA & Fidelity)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-02-16 (סריקה מלאה, הוספת Notes D35/MB3A, סקריפטי API, נוהל עדכון אינדקס)  
+**version:** v1.3  
+**⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
+
+---
+
+**מיקום:** `documentation/09-GOVERNANCE/standards/`  
+**סטטוס:** ✅ **MAINTAINED**
+
+---
+
+## 📋 תקציר
+
+אינדקס זה מספק סקירה מפורטת ומסודרת של כל הבדיקות, תרחישי הבדיקה, ותשתית הבדיקות של Team 50. האינדקס מאפשר תחזוקה וניקיון תקיות בצורה מרוכזת.
+
+---
+
+## 📂 מבנה תיקיות בדיקות
+
+```
+tests/
+├── selenium-config.js              # הגדרות Selenium
+├── package.json                    # תלויות בדיקות
+├── README.md                       # תיעוד בדיקות
+├── run-all.js                      # Test runner
+├── auth-flow.test.js               # Authentication Flow
+├── user-management.test.js         # User Management Flow
+├── api-keys.test.js                # API Keys Management Flow
+├── error-handling.test.js          # Error Handling & Security
+├── password-change.test.js         # Password Change Flow
+├── validation-comprehensive.test.js # Validation Comprehensive (P0)
+├── trading-accounts-routing.test.js # Trading Accounts Routing
+├── phase2-runtime.test.js          # Phase 2 Runtime (D16/D18/D21)
+├── phase2-e2e-selenium.test.js     # Phase 2 E2E (SOP-010)
+├── phase1-completion-b-validation.test.js # Phase 1 Completion B
+├── gate-a-e2e.test.js              # Gate A E2E (Auth 4 types, Header, Home)
+├── gate-b-e2e.test.js              # Gate B E2E (Brokers API, Design System)
+├── adr015-gate-a-e2e.test.js       # ADR-015 Gate A QA
+├── batch-2-5-qa-e2e.test.js        # Batch 2.5 QA (Redirect, User Icon)
+├── batch-2-5-adr017-qa-e2e.test.js # Batch 2.5 ADR-017 QA
+├── notes-mb3a-e2e.test.js          # Notes MB3A E2E (D35, 13 פריטים, CRUD)
+├── user-tickers-qa.e2e.test.js     # User Tickers QA
+├── central-status-e2e.test.js      # Central Status E2E
+├── central-status-api-verify.js    # Central Status API
+├── market-status-qa.e2e.test.js    # Market Status QA
+├── smart-history-fill-qa.e2e.test.js # Smart History Fill QA
+├── auth-guard-qa-e2e.test.js       # Auth Guard QA (Type A/C redirect)
+├── option-d-responsive-e2e.test.js # Option D Responsive QA
+├── flow-type-ssot-e2e.test.js      # Flow Type SSOT QA
+├── currency-conversion-e2e.test.js # Currency Conversion E2E
+├── currency-conversion-qa.test.js  # Currency Conversion QA
+├── summary-endpoints-verify.js     # Summary Endpoints
+├── external-data-*.e2e.test.js     # External Data E2E (Gate B, Suite E, Live UI)
+├── external_data_*.py              # External Data Python (Contract, Cache, Cadence, Retention)
+├── scenarios/                      # תרחישי בדיקה
+│   └── auth_scenarios.md
+└── sanity/
+    └── phase1_sanity_checklist.md
+
+scripts/
+├── run-notes-d35-qa-api.sh         # Notes D35 API (413, 415, 422, 404, XSS)
+├── run-user-tickers-qa-api.sh      # User Tickers API
+├── run-market-data-settings-qa-api.sh # Market Data Settings API
+├── init-servers-for-qa.sh          # איתחול שרתים ל-QA (TEAM_50_QA_RERUN_SOP)
+└── [seed_qa_test_user, etc.]       # תשתית נתוני בדיקה
+```
+
+---
+
+## 🧪 קטגוריות בדיקות
+
+### 1. Authentication Flow (Task 50.2.1)
+
+**קובץ בדיקות:** `tests/auth-flow.test.js`  
+**תרחישים:** `tests/scenarios/auth_scenarios.md`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.1_AUTHENTICATION_FLOW_INTEGRATION.md`
+
+**תרחישי בדיקה:**
+- ✅ Registration - Successful
+- ✅ Registration - Validation Errors
+- ✅ Registration - Duplicate User
+- ✅ Login - Successful
+- ✅ Login - Invalid Credentials
+- ✅ Login - Token Refresh
+- ✅ Logout - Successful
+- ✅ Password Reset - Request (EMAIL)
+- ✅ Password Reset - Request (SMS)
+- ✅ Password Reset - Verify (EMAIL)
+- ✅ Password Reset - Verify (SMS)
+- ✅ Phone Verification - Request
+- ✅ Phone Verification - Verify
+- ✅ Phone Verification - Invalid Code
+
+**סה"כ תרחישים:** 14
+
+---
+
+### 2. User Management Flow (Task 50.2.2)
+
+**קובץ בדיקות:** `tests/user-management.test.js`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.2_USER_MANAGEMENT_FLOW_INTEGRATION.md`
+
+**תרחישי בדיקה:**
+- ✅ Get Current User - Successful
+- ✅ Get Current User - Token Expiration
+- ✅ Get Current User - Invalid Token
+- ✅ Update User Profile - Successful
+- ✅ Update User Profile - Validation Errors
+- ✅ Update User Profile - Unauthorized Access
+- ✅ Password Strength Validation
+
+**סה"כ תרחישים:** 7
+
+---
+
+### 2.5. Password Change Flow (QA Protocol)
+
+**קובץ בדיקות:** `tests/password-change.test.js`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PASSWORD_CHANGE_QA_RESULTS.md`
+
+**תרחישי בדיקה:**
+- ✅ Valid Password Change
+- ✅ Invalid Old Password (401)
+- ✅ Rate Limiting (5/15min)
+- ✅ Unauthorized Access
+- ✅ Expired Token
+- ⚠️ Eye Icon Display (Missing)
+- ⚠️ Eye Icon Functionality (Cannot Verify)
+- ✅ Form Structure (LEGO)
+- ✅ Audit Trail (Debug Mode)
+- ✅ Integration Testing
+- ✅ Transformation Layer (snake_case)
+
+**סה"כ תרחישים:** 11 (9 verified, 2 need Eye icon)
+
+---
+
+### 3. API Keys Management Flow (Task 50.2.3)
+
+**קובץ בדיקות:** `tests/api-keys.test.js`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.3_API_KEYS_FLOW_INTEGRATION.md`
+
+**תרחישי בדיקה:**
+- ✅ Create API Key - Successful
+- ✅ Create API Key - Validation Errors
+- ✅ Create API Key - Encryption Verification
+- ✅ List API Keys - Successful
+- ✅ List API Keys - Empty List
+- ✅ List API Keys - Unauthorized Access
+- ✅ Update API Key - Successful
+- ✅ Update API Key - Invalid ID
+- ✅ Verify API Key - Successful
+- ✅ Verify API Key - Invalid Provider
+- ✅ Delete API Key - Successful
+- ✅ Delete API Key - Soft Delete Verification
+
+**סה"כ תרחישים:** 12
+
+---
+
+### 4. Error Handling & Security (Task 50.2.4)
+
+**קובץ בדיקות:** `tests/error-handling.test.js`  
+**דוח QA:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.4_ERROR_HANDLING_SECURITY_INTEGRATION.md`
+
+**תרחישי בדיקה:**
+- ✅ Network Error - Backend Offline
+- ✅ Network Error - Timeout
+- ✅ Network Error - CORS
+- ✅ API Error - 400 Bad Request
+- ✅ API Error - 401 Unauthorized
+- ✅ API Error - 404 Not Found
+- ✅ API Error - 500 Server Error
+- ✅ Security - Token Expiration → Auto Refresh
+- ✅ Security - Refresh Token Rotation
+- ✅ Security - Token Tampering
+- ✅ Security - API Key Masking
+
+**סה"כ תרחישים:** 11
+
+---
+
+### 5. Validation Comprehensive Testing (P0 MANDATORY)
+
+**קובץ בדיקות:** `tests/validation-comprehensive.test.js`  
+**דוח QA:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`  
+**משימה:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md` ⚠️ **NON-SSOT - Communication only**
+
+**תרחישי בדיקה:**
+
+#### LoginForm Validation:
+- ⏸️ Empty usernameOrEmail field (שדה חובה)
+- ⏸️ Empty password field (שדה חובה)
+- ⏸️ Field-level validation on blur
+- ⏸️ BEM error classes (auth-form__input--error)
+- ⏸️ ARIA attributes (aria-invalid, aria-describedby)
+- ⏸️ Server-side: 401 Invalid Credentials
+- ⏸️ Server-side: 400 Validation Error
+- ⏸️ Error code translation (AUTH_INVALID_CREDENTIALS → Hebrew)
+
+#### RegisterForm Validation:
+- ⏸️ Empty username (שדה חובה)
+- ⏸️ Username too short (< 3 characters)
+- ⏸️ Invalid email format (אימייל לא תקין)
+- ⏸️ Password too short (< 8 characters)
+- ⏸️ Password mismatch (סיסמאות לא תואמות)
+- ⏸️ Invalid phone format (E.164)
+- ⏸️ Server-side: 400 Duplicate User (USER_ALREADY_EXISTS)
+
+#### Transformation Layer:
+- ⏸️ Payload format (camelCase → snake_case)
+- ⏸️ Response format (snake_case → camelCase)
+
+#### PhoenixSchema:
+- ⏸️ Centralized validation usage
+- ⏸️ Validation messages match schema
+
+#### Error Code Translation:
+- ⏸️ AUTH_INVALID_CREDENTIALS → Hebrew
+
+**סה"כ תרחישים:** 20+
+
+---
+
+### 6. Frontend Routing & HTML Pages Testing (Team 30)
+
+**קטגוריה:** בדיקות Routing ו-HTML Pages  
+**אחריות:** Team 30 (Frontend Execution)  
+**תאריך יצירה:** 2026-02-03
+
+#### 6.1 Trading Accounts Routing Test
+
+**קובץ:** `tests/trading-accounts-routing.test.js`  
+**סוג:** בדיקת Selenium אוטומטית  
+**תפקיד:** בודק ש-routing של עמודים HTML עובד נכון
+
+**תרחישי בדיקה:**
+- ✅ Trading Accounts Route Serves HTML - בודק שהנתיב `/trading_accounts` משרת קובץ HTML
+- ✅ Trading Accounts with Debug Mode - בודק ש-Debug Mode עובד עם `?debug=true`
+- ✅ Trading Accounts without Authentication - בודק ש-redirect ל-login מתבצע נכון
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת קובץ HTML (לא React Router redirect)
+- בדיקת Auth Guard execution
+- בדיקת Debug Mode functionality
+- בדיקת Authentication redirect
+
+**שימוש:**
+```bash
+cd tests
+npm install
+npm run test:routing
+```
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_SELENIUM_TEST_ADDED.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 7. Phase 2 Runtime Testing (Phase 2 Financial Core)
+
+**קובץ בדיקות:** `tests/phase2-runtime.test.js`  
+**סוג:** בדיקת Runtime אוטומטית (HTTP requests)  
+**תפקיד:** בודק טעינת עמודים ו-API endpoints עבור Phase 2 Financial Core
+
+**תרחישי בדיקה:**
+- ✅ Login API - Successful authentication
+- ✅ D16 - Trading Accounts: Page loads (HTTP 200)
+- ✅ D18 - Brokers Fees: Page loads (HTTP 200)
+- ✅ D21 - Cash Flows: Page loads (HTTP 200)
+- ✅ D16 API: `/api/v1/trading_accounts` - Success (200)
+- ✅ D18 API: `/api/v1/brokers_fees` - Success (200)
+- ✅ D21 API: `/api/v1/cash_flows` - Success (200)
+- ✅ CSS Loading: phoenix-base.css referenced
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת קובץ HTML (HTTP 200)
+- בדיקת CSS loading order (phoenix-base.css)
+- בדיקת API endpoints עם authentication
+- בדיקת Infrastructure (Backend + Frontend servers)
+
+**שימוש:**
+```bash
+cd tests
+node phase2-runtime.test.js
+```
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_50/TEAM_50_PHASE_2_QA_COMPLETE.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 8. Phase 2 E2E Selenium Tests (SOP-010 Compliance)
+
+**קובץ בדיקות:** `tests/phase2-e2e-selenium.test.js`  
+**סוג:** בדיקת E2E אוטומטית (Selenium/Headless)  
+**תפקיד:** סימולציה טכנית מלאה - SOP-010 Compliance
+
+**SOP-010 Requirements:**
+- ✅ Selenium/Headless להרצות UI מלאות
+- ✅ CRUD E2E לכל endpoints (כולל summary/derivatives)
+- ✅ Security validation (Masked Log, token leakage, headers)
+- ✅ Routes SSOT compliance
+- ✅ Artifacts: logs, screenshots, HTML/JUnit report
+
+**תרחישי בדיקה:**
+- ✅ D16 - Trading Accounts: Page Load & Console Hygiene
+- ✅ D18 - Brokers Fees: Page Load & Console Hygiene
+- ✅ D21 - Cash Flows: Page Load & Console Hygiene
+- ✅ CRUD E2E - Trading Accounts API
+- ✅ CRUD E2E - Brokers Fees API
+- ✅ CRUD E2E - Cash Flows API (כולל summary)
+- ✅ Security Validation - Token Leakage
+- ✅ Routes SSOT Compliance
+
+**בדיקות שבוצעות:**
+- בדיקת טעינת עמודים בדפדפן (Selenium)
+- בדיקת Console Hygiene (0 שגיאות, 0 אזהרות)
+- בדיקת Security Validation (Masked Log, Token Leakage)
+- בדיקת CRUD E2E - כל ה-endpoints
+- בדיקת Routes SSOT compliance
+- יצירת Artifacts: screenshots, console logs, network logs, errors
+
+**שימוש:**
+```bash
+cd tests
+npm run test:phase2-e2e
+```
+
+**Artifacts:**
+- Screenshots: `documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/`
+- Console logs: `console_logs.json`
+- Network logs: `network_logs.json`
+- Errors: `errors.json`
+- Test summary: `test_summary.json`
+
+**תיעוד:**
+- **דוח:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_PHASE_2_QA_COMPLETE.md` ⚠️ **NON-SSOT - Communication only**
+- **SOP-010:** `_COMMUNICATION/team_90/SOP_010_MANUAL_INTENT_SIMULATION_PROTOCOL.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+### 9. Frontend Development Testing Tools (Team 30)
+
+**קטגוריה:** כלי בדיקה לפיתוח Frontend  
+**אחריות:** Team 30 (Frontend Execution)  
+**תאריך יצירה:** 2026-02-02
+
+#### 6.1 CSS Loading Checker
+
+**קובץ:** `ui/check-css-loading.js`  
+**סוג:** כלי בדיקה אוטומטי (Browser Console)  
+**תפקיד:** בודק שכל קבצי ה-CSS נטענים בסדר הנכון
+
+**שימוש:**
+1. פתח `http://localhost:8080/` בדפדפן
+2. פתח DevTools (F12) → Console
+3. העתק והדבק את התוכן של `check-css-loading.js`
+4. לחץ Enter
+
+**או:** `npm run check:css` (מציג הוראות)
+
+**בדיקות שבוצעות:**
+- ✅ בדיקת סדר טעינת CSS (Pico → phoenix-base → phoenix-components → phoenix-header → page-specific)
+- ✅ בדיקת קבצי CSS חסרים
+- ✅ בדיקת כפילויות בטעינת CSS
+- ✅ בדיקת זמינות CSS Variables (--apple-blue, --spacing-md, וכו')
+- ✅ בדיקת דרישות CSS ספציפיות לעמוד (Auth/Dashboard)
+
+**תוצאות:**
+- דוח מפורט על כל הבדיקות
+- רשימת שגיאות (errors)
+- רשימת אזהרות (warnings)
+- סיכום כולל (passed/failed)
+
+**תיעוד:**
+- **מדריך שימוש:** `documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md`
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+---
+
+#### 6.2 Blueprint Comparison Tool
+
+**קובץ:** `ui/blueprint-comparison.js`  
+**סוג:** כלי בדיקה אוטומטי (Browser Console)  
+**תפקיד:** משווה את העמוד בפועל לבלופרינט (DOM structure, CSS styles)
+
+**שימוש:**
+1. פתח `http://localhost:8080/` בדפדפן
+2. פתח DevTools (F12) → Console
+3. העתק והדבק את התוכן של `blueprint-comparison.js`
+4. לחץ Enter
+
+**בדיקות שבוצעות:**
+- ✅ בדיקת טעינת CSS (בסיסית)
+- ✅ בדיקת מבנה DOM (page-wrapper, page-container, tt-container, tt-section)
+- ✅ בדיקת CSS Variables availability
+- ✅ בדיקת Dropdown Menu Spacing
+- ✅ בדיקת Filter User Section Position
+- ✅ בדיקת Investment Type Filter Options
+- ✅ בדיקת Active Alerts Structure & Design
+- ✅ בדיקת Info Summary Structure & Design
+- ✅ בדיקת Widget Placeholders Structure & Design
+- ✅ בדיקת Portfolio Section Header Filters
+
+**תוצאות:**
+- דוח מפורט על כל הבדיקות
+- השוואת ערכים בפועל מול צפוי
+- רשימת שגיאות (errors)
+- רשימת אזהרות (warnings)
+- סיכום כולל (passed/failed)
+
+**תיעוד:**
+- **תהליך עבודה:** `_COMMUNICATION/team_30/TT2_BLUEPRINT_INTEGRATION_WORKFLOW.md` ⚠️ **NON-SSOT - Communication only**
+- **הנחיות בלופרינט:** `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_31_BLUEPRINT_WORK_GUIDELINES_V2.md` ⚠️ **NON-SSOT - Communication only**
+
+**סטטוס:** ✅ **ACTIVE - READY FOR USE**
+
+**גרסה:** Enhanced (עודכן עם בדיקת CSS loading ו-DOM structure)
+
+---
+
+**סה"כ כלי בדיקה Frontend:** 2
+
+**סה"כ בדיקות Routing:** 1 (3 תרחישים)
+
+---
+
+### 10. Notes D35 / MB3A Gate-A (D35 Rich Text + Attachments)
+
+**מקור:** TEAM_10_TO_TEAM_50_D35_RICH_TEXT_ATTACHMENTS_MANDATE  
+**דוח Gate-A:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md`
+
+#### 10.1 סקריפט API — Notes D35
+
+**קובץ:** `scripts/run-notes-d35-qa-api.sh`  
+**הרצה:** `bash scripts/run-notes-d35-qa-api.sh`  
+**תיאור:** בדיקות API ל-D35 — Rich Text, קבצים מצורפים, MIME magic-bytes, חוזי שגיאה.
+
+**תרחישי בדיקה:** Admin Login, POST /notes 201, Attachments ×3 (201), מכסה 4 (422), >1MB (413), Fake MIME (415), 404, XSS sanitization.
+
+**דרישה:** Backend 8082, Admin (TikTrackAdmin/4181), מיגרציה D35.
+
+#### 10.2 E2E Selenium — Notes MB3A
+
+**קובץ:** `tests/notes-mb3a-e2e.test.js`  
+**הרצה:** `cd tests && npm run test:notes-mb3a-e2e`  
+**תיאור:** 13 פריטי Team 30 + CRUD — מודל, טולבר, סטנדרטים (שמירה, לבטל, לבחור, חשבון מסחר).
+
+**דרישה:** Backend 8082, Frontend 8080, Admin.  
+**Evidence:** `documentation/05-REPORTS/artifacts/TEAM_50_MB3A_NOTES_E2E_RESULTS.json`
+
+---
+
+### 11. סקריפטי QA API (scripts/)
+
+| קובץ | תיאור | הרצה |
+|------|-------|------|
+| `run-notes-d35-qa-api.sh` | Notes D35 — 413, 415, 422, 404, XSS | `bash scripts/run-notes-d35-qa-api.sh` |
+| `run-alerts-d34-qa-api.sh` | Alerts D34 — summary, list, CRUD, filter, pagination, sort | `bash scripts/run-alerts-d34-qa-api.sh` |
+| `run-user-tickers-qa-api.sh` | User Tickers API | `bash scripts/run-user-tickers-qa-api.sh` |
+| `run-market-data-settings-qa-api.sh` | Market Data Settings API | `bash scripts/run-market-data-settings-qa-api.sh` |
+| `init-servers-for-qa.sh` | איתחול שרתים ל-QA (TEAM_50_QA_RERUN_SOP) | `bash scripts/init-servers-for-qa.sh` |
+
+---
+
+### 12. Alerts D34 / MB3A Gate-A
+
+**מקור:** TEAM_10_TO_TEAM_50_MB3A_ALERTS_GATE_A_QA_REQUEST
+
+| קובץ | תיאור | הרצה |
+|------|-------|------|
+| `scripts/run-alerts-d34-qa-api.sh` | Alerts API — summary, list, POST, GET :id, PATCH, DELETE, 404, filter, pagination, sort | `bash scripts/run-alerts-d34-qa-api.sh` |
+| `tests/alerts-mb3a-e2e.test.js` | Alerts UI — עמוד, סיכום, טבלה, סינון, pagination, LEGO | `npm run test:alerts-mb3a-e2e` |
+
+**דוח Gate-A:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_MB3A_ALERTS_QA_REPORT.md`
+
+---
+
+### 13. Gate / Batch / Domain E2E — סיכום
+
+| קובץ | תיאור קצר | npm run |
+|------|------------|---------|
+| `gate-a-e2e.test.js` | Gate A — Auth 4 types, Header, Home, Console 0 SEVERE | `test:gate-a` |
+| `gate-b-e2e.test.js` | Gate B — Brokers API, Design System, Rich-Text | `test:gate-b` |
+| `adr015-gate-a-e2e.test.js` | ADR-015 Gate A QA | `test:adr015-gate-a` |
+| `batch-2-5-adr017-qa-e2e.test.js` | Batch 2.5 ADR-017 — Redirect + User Icon | `test:batch-2-5-adr017` |
+| `notes-mb3a-e2e.test.js` | Notes MB3A — 13 פריטים, CRUD | `test:notes-mb3a-e2e` |
+| `alerts-mb3a-e2e.test.js` | Alerts MB3A — עמוד, סיכום, טבלה, סינון, LEGO | `test:alerts-mb3a-e2e` |
+| `user-tickers-qa.e2e.test.js` | User Tickers — Add/remove, Evidence | — |
+| `central-status-e2e.test.js` | Central Status E2E | `test:central-status-e2e` |
+| `central-status-api-verify.js` | Central Status API | `test:central-status` |
+| `auth-guard-qa-e2e.test.js` | Auth Guard — Type A/C redirect | `test:auth-guard-qa` |
+| `option-d-responsive-e2e.test.js` | Option D Responsive | `test:option-d-responsive` |
+| `external-data-suite-e-staleness-clock.e2e.test.js` | External Data Suite E — Staleness Clock | `test:external-data-suite-e` |
+| `external-data-live-ui-evidence-capture.e2e.test.js` | External Data Live UI Evidence | `test:external-data-live-ui-evidence` |
+
+---
+
+## 📊 סיכום כללי
+
+### סטטיסטיקות בדיקות
+
+| קטגוריה | תרחישים | Code Review | Runtime | Visual | Status |
+|---------|---------|-------------|---------|--------|--------|
+| **Authentication Flow** | 14 | ✅ 14/14 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **User Management Flow** | 7 | ✅ 7/7 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **Password Change Flow** | 11 | ✅ 9/11 | ⏸️ Ready | ⏸️ Pending | ⚠️ 1 Issue |
+| **API Keys Management Flow** | 12 | ✅ 12/12 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **Error Handling & Security** | 11 | ✅ 11/11 | ⏸️ Ready | ⏸️ Pending | ✅ Complete |
+| **Validation Comprehensive** | 20+ | ✅ 12/18 | ⚠️ 1 Failed | ⏸️ Pending | ⚠️ **1 Issue** |
+| **Frontend Testing Tools** | 2 | ✅ 2/2 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Frontend Routing Tests** | 3 | ✅ 3/3 | ⏸️ Ready | ⏸️ Pending | ✅ **Complete** |
+| **Phase 2 Runtime Tests** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Phase 2 E2E Selenium (SOP-010)** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Notes D35/MB3A Gate-A** | 21 | ✅ 21/21 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Gate/Batch/Domain E2E** | 15+ | ✅ Active | ✅ Ready | — | ✅ **Indexed** |
+| **Total** | **140+** | **✅ Active** | **✅ Ready** | **⏸️ Pending** | — |
+
+---
+
+## 🔗 קישורים לבדיקות
+
+### קבצי בדיקות Selenium / E2E
+
+- **Authentication:** `tests/auth-flow.test.js`
+- **User Management:** `tests/user-management.test.js`
+- **Password Change:** `tests/password-change.test.js`
+- **API Keys:** `tests/api-keys.test.js`
+- **Error Handling:** `tests/error-handling.test.js`
+- **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
+- **Trading Accounts Routing:** `tests/trading-accounts-routing.test.js` (Team 30)
+- **Phase 2 Runtime:** `tests/phase2-runtime.test.js`
+- **Phase 2 E2E Selenium (SOP-010):** `tests/phase2-e2e-selenium.test.js`
+- **Notes MB3A E2E:** `tests/notes-mb3a-e2e.test.js` (D35, Gate-A)
+- **Alerts MB3A E2E:** `tests/alerts-mb3a-e2e.test.js` (D34, Gate-A)
+- **Gate A / B:** `tests/gate-a-e2e.test.js`, `tests/gate-b-e2e.test.js`
+- **Configuration:** `tests/selenium-config.js`
+- **Test Runner:** `tests/run-all.js`
+
+### סקריפטי QA API (scripts/)
+
+- **Notes D35:** `scripts/run-notes-d35-qa-api.sh`
+- **Alerts D34:** `scripts/run-alerts-d34-qa-api.sh`
+- **User Tickers:** `scripts/run-user-tickers-qa-api.sh`
+- **Market Data Settings:** `scripts/run-market-data-settings-qa-api.sh`
+- **Init Servers:** `scripts/init-servers-for-qa.sh`
+
+### כלי בדיקה Frontend (Team 30)
+
+- **CSS Loading Checker:** `ui/check-css-loading.js`
+- **Blueprint Comparison Tool:** `ui/blueprint-comparison.js`
+- **npm Script:** `npm run check:css` (מציג הוראות לשימוש)
+
+### דוחות QA
+
+- **Phase 1.5 Summary:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.5_INTEGRATION_TESTING_RESULTS.md`
+- **Task 50.2.1:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.1_AUTHENTICATION_FLOW_INTEGRATION.md`
+- **Task 50.2.2:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.2_USER_MANAGEMENT_FLOW_INTEGRATION.md`
+- **Password Change:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PASSWORD_CHANGE_QA_RESULTS.md`
+- **Task 50.2.3:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.3_API_KEYS_FLOW_INTEGRATION.md`
+- **Task 50.2.4:** `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.2.4_ERROR_HANDLING_SECURITY_INTEGRATION.md`
+- **Validation Comprehensive:** `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_50_VALIDATION_COMPREHENSIVE_TESTING.md`
+
+### תרחישי בדיקה
+
+- **Authentication Scenarios:** `tests/scenarios/auth_scenarios.md`
+- **Sanity Checklist:** `tests/sanity/phase1_sanity_checklist.md`
+
+---
+
+## 📋 נוהלי עבודה
+
+### נוהל עבודה QA (מחייב)
+
+**מסמך:** `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`  
+**מקור:** נוהל QA מחייב מצוות 90 (Spy) והאדריכלית הראשית  
+**סטטוס:** 🔒 **MANDATORY - נוהל קבוע ומחייב לכל הפרויקט**
+
+**מפת נוהל QA (שלבים + דרישות):**
+
+#### 🧭 Gate A — Doc↔Code (אוטומטי, חובה)
+- **מטרה:** לוודא שכל Spec ב-SSOT תואם לקוד
+- **בדיקות:** התאמת endpoints, schemas, versions
+- **תוצר:** Doc/Code Matrix + דוח סטיות
+
+#### 🧭 Gate B — Contract↔Runtime (אוטומטי, חובה)
+- **מטרה:** לוודא שה-API חוזר בפועל לפי החוזים
+- **בדיקות:** Contract tests, Shared_Services בלבד, UAI config חיצוני
+- **תוצר:** ContractTestReport
+
+#### 🧭 Gate C — UI↔Runtime (E2E חובה)
+- **מטרה:** בדיקות E2E לכל הדפים הקריטיים
+- **בדיקות:** UAI stages, Filters, Pagination, CSS load order, Failure injection, Console Hygiene, Security
+- **תוצר:** E2EReport + screenshots
+
+#### 🧭 Gate D — Manual/Visual (רק בסוף)
+- **מטרה:** אישור חזותי ותפקודי סופי
+- **בדיקות:** תקינות UI מול SSOT, דיוק תאריכים/סכומים/labels, UX sanity
+- **תוצר:** ManualApproval
+
+**כללי חובה:**
+- ✅ **Automation-First:** אין קיצור דרך — כל מה שאפשר אוטומטי
+- ✅ **E2E חובה:** ללא E2E אין GREEN
+- ✅ **Manual רק בסוף:** ידני תמיד אחרי כל האוטומציות
+- ✅ **Zero-Deviation:** סטייה = RED מיידי
+- ✅ **בדיקות אבטחה חובה:** Masked Log + token leakage בכל Gate
+
+**תוצרים סופיים חובה:**
+1. DocCode Matrix (Gate A)
+2. ContractTestReport (Gate B)
+3. E2EReport (Gate C)
+4. ManualApproval (Gate D)
+5. QA Final Summary
+
+**שלבים Legacy (עדיין תקף):**
+1. Code Review (חובה ראשונית)
+2. Selenium Automation (חובה)
+3. Visual Validation (חובה)
+
+### תבניות דיווח
+
+**QA Report Template:** `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md`
+
+---
+
+## 🔗 סטנדרטים מחייבים
+
+### CSS Standards
+
+**מסמך:** `documentation/07-POLICIES/TT2_CSS_STANDARDS_PROTOCOL.md`
+
+**בדיקות QA נדרשות:**
+- Pixel Match (0 pixel deviation)
+- RTL Mirroring verification
+- State Integrity (hover, focus, active)
+- G-Bridge validation
+
+### JavaScript Standards
+
+**מסמך:** `documentation/07-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md`
+
+**בדיקות QA נדרשות:**
+- Network Integrity (Payloads ב-snake_case)
+- Console Audit (נקי במצב רגיל, מלא ב-`?debug`)
+- Fidelity Resilience (שגיאות ב-LEGO components)
+- Transformation Layer compliance
+
+---
+
+## 📊 תחזוקה וניקיון
+
+### תחזוקה שוטפת
+
+**תדירות:** מייד עם יצירת כל בדיקה חדשה + לאחר כל Phase/Module completion
+
+**פעולות (מחייב):**
+1. **עם יצירת בדיקה חדשה** — עדכון מיידי של אינדקס זה (סעיף קטגוריה + קישור + תיאור קצר)
+2. עדכון דוחות QA עם תוצאות
+3. ניקיון תיקיות Evidence (העברה לארכיון אם נדרש)
+4. עדכון סטטיסטיקות
+
+### ניקיון תקיות
+
+**תדירות:** בסיום כל Session
+
+**פעולות:**
+1. ארכיון דוחות ישנים (אם נדרש)
+2. עדכון אינדקסים
+3. ניקיון קבצי Evidence זמניים
+4. עדכון קישורים
+
+---
+
+## ✅ Sign-off
+
+**אינדקס זה מתעדכן באופן שוטף עם כל בדיקה חדשה.**
+
+**Last Updated:** 2026-02-16  
+**Maintained By:** Team 50 (QA) + Team 30 (Frontend Testing Tools)  
+**Next Update:** מייד עם כל בדיקה חדשה (נוהל מחייב — ראה TEAM_50_QA_WORKFLOW_PROTOCOL)
+
+**נוהל QA עודכן:** 2026-02-07 - נוהל QA מחייב מצוות 90 (Automation-First + E2E חובה) אומץ ותועד
+
+---
+
+**log_entry | Team 50 | QA_TEST_INDEX | MAINTAINED | 2026-02-16 | Notes D35/MB3A, סקריפטי API, Gate/Batch E2E, נוהל עדכון אינדקס מחייב**

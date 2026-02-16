@@ -1,0 +1,293 @@
+# 🔐 Database Credentials Configuration - TikTrack Phoenix
+
+**id:** `TT2_DATABASE_CREDENTIALS`  
+**owner:** Team 60 (DevOps & Platform)  
+**status:** 🔒 **SSOT - ACTIVE**  
+**supersedes:** None (Master document)  
+**last_updated:** 2026-01-31  
+**version:** v1.0
+
+---
+
+**Date:** 2026-01-31  
+**Session:** SESSION_01  
+**Status:** ✅ **CONFIGURED**
+
+---
+
+## 📋 Overview
+
+This document provides secure reference for database credentials configuration. **The actual password is stored in `api/.env` file (which is in `.gitignore`) and should NEVER be committed to git.**
+
+---
+
+## 🗄️ Database Configuration
+
+### **Database Name:**
+```
+TikTrack-phoenix-db
+```
+
+### **Database User:**
+```
+TikTrackDbAdmin
+```
+
+### **Database Connection Format:**
+```
+postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
+```
+
+⚠️ **SECURITY:** Replace `<PASSWORD>` with the actual password stored in `api/.env`.
+
+---
+
+## 🔒 Password Security
+
+### **Password Storage:**
+- **Location:** `api/.env` file (already in `.gitignore`)
+- **Format:** Cryptographically secure random string (32+ characters)
+- **Generation:** Python `secrets.token_urlsafe()` or equivalent
+- **Backup:** Store in secure password manager
+
+### **Security Best Practices:**
+1. ✅ Password stored in `.env` file (not committed to git)
+2. ✅ Password stored in secure password manager
+3. ✅ Password is cryptographically secure (32+ characters)
+4. ✅ Never commit `.env` file to git
+5. ✅ Rotate password periodically for security
+
+---
+
+## 📝 Database Setup Instructions
+
+### **1. Create Database:**
+```bash
+createdb TikTrack-phoenix-db
+```
+
+### **2. Create User:**
+```sql
+CREATE USER TikTrackDbAdmin WITH PASSWORD '<secure-password>';
+```
+
+### **3. Grant Privileges:**
+```sql
+GRANT ALL PRIVILEGES ON DATABASE "TikTrack-phoenix-db" TO TikTrackDbAdmin;
+```
+
+### **4. Create Schemas:**
+```sql
+\c TikTrack-phoenix-db
+CREATE SCHEMA IF NOT EXISTS user_data;
+CREATE SCHEMA IF NOT EXISTS market_data;
+GRANT ALL ON SCHEMA user_data TO TikTrackDbAdmin;
+GRANT ALL ON SCHEMA market_data TO TikTrackDbAdmin;
+```
+
+### **5. Set Default Privileges:**
+```sql
+ALTER DEFAULT PRIVILEGES IN SCHEMA user_data GRANT ALL ON TABLES TO TikTrackDbAdmin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA market_data GRANT ALL ON TABLES TO TikTrackDbAdmin;
+```
+
+### **6. Configure Environment Variable:**
+```bash
+# In api/.env file:
+DATABASE_URL=postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
+```
+
+---
+
+## ✅ Verification
+
+### **Test Database Connection:**
+```bash
+psql postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db -c "SELECT 1;"
+```
+
+### **Check Backend Health:**
+```bash
+curl http://localhost:8082/health
+```
+
+**Expected Response:**
+```json
+{
+    "status": "ok",
+    "components": {
+        "database": {
+            "status": "ok",
+            "message": "Database connection successful"
+        }
+    }
+}
+```
+
+---
+
+## 📎 Related Documents
+
+1. **Infrastructure Guide:** `documentation/01-ARCHITECTURE/TT2_INFRASTRUCTURE_GUIDE.md`
+2. **Database Schema:** `04-ENGINEERING_&_ARCHITECTURE/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql`
+3. **Environment Variables:** `api/.env` (not in git)
+
+---
+
+## 👥 System Users (Base Infrastructure Users)
+
+**⚠️ IMPORTANT:** These are **permanent infrastructure users** that form the foundation of the system. **DO NOT DELETE** these users.
+
+### **User 1: TikTrackAdmin (Super Administrator)**
+- **Username:** `TikTrackAdmin`
+- **Display Name:** `TikTrack Admin`
+- **Email:** `nimrod@mezoo.co`
+- **Phone:** `NULL` (no phone number)
+- **Password:** `4181` (will be updated later)
+- **Role:** `SUPERADMIN`
+- **Status:** ✅ **PERMANENT** - Active, Email verified
+- **Purpose:** System super administrator with full system access
+
+### **User 2: nimrod_wald (Administrator)**
+- **Username:** `nimrod_wald`
+- **Display Name:** `Nimrod Wald`
+- **Email:** `waldnimrod@gmail.com`
+- **Phone:** Verified (phone_verified: True)
+- **Password:** `4181` (will be updated later)
+- **Role:** `ADMIN`
+- **Status:** ✅ **PERMANENT** - Active, Email verified, Phone verified
+- **Purpose:** System administrator with administrative privileges
+
+### **User 3: test_user (Test User)**
+- **Username:** `test_user`
+- **Display Name:** `Test User`
+- **Email:** `test_qa_1769933177@example.com`
+- **Phone:** `NULL` (no phone number)
+- **Password:** `4181` (will be updated later)
+- **Role:** `USER`
+- **Status:** ✅ **PERMANENT** - Active (for testing purposes)
+- **Purpose:** QA testing, development testing, integration testing
+
+**Password Hash:** `$2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqcAP8an.qQtG` (bcrypt for password `4181`)
+
+### **Protection Rules:**
+- ✅ **DO NOT DELETE** - These users are infrastructure
+- ✅ **DO NOT DEACTIVATE** - Required for system operation
+- ✅ **DO NOT CHANGE ROLES** - Without approval
+- ✅ **DO NOT CHANGE EMAILS** - Without approval
+- ✅ **ALLOWED:** Password updates (security), Phone/Email verification updates, Profile information updates
+
+⚠️ **SECURITY:** User passwords are bcrypt hashed in database. Never store plain text passwords.
+
+### **QA Test User Seed (Gate B Runtime/E2E)**
+
+משתמש QA **קבוע** לבדיקות Gate B (Runtime + E2E) — נוצר/מעודכן דרך סקריפט Seed אחרי כל איפוס DB.
+
+- **מסמך מלא:** `scripts/README_SEED_QA_USER.md` (Team 60)
+- **Credentials:** Username `TikTrackAdmin` / Password `4181` (או כמוגדר ב-README)
+- **הרצה אחרי DB reset:** `python3 scripts/seed_qa_test_user.py`
+- **אימות Login:** `POST /api/v1/auth/login` עם `username_or_email: "TikTrackAdmin"`, `password: "4181"` — מצופה `access_token`.
+
+---
+
+## 📋 Database Schema Status
+
+### **Authentication Tables Created:**
+
+1. ✅ **`user_data.users`** - Core users table
+   - Supports authentication (username, email, password_hash)
+   - Supports phone authentication (phone_number, phone_verified)
+   - Role-based access control (USER, ADMIN, SUPERADMIN)
+   - User status management (is_active, is_email_verified)
+
+2. ✅ **`user_data.password_reset_requests`** - Password recovery
+   - Supports email and SMS password reset
+   - Token and verification code management
+
+3. ✅ **`user_data.user_refresh_tokens`** - Refresh token management
+   - Stores refresh tokens for JWT authentication
+   - Supports token rotation and revocation
+   - Foreign key to `user_data.users(id)` ON DELETE CASCADE
+   - Unique constraint on `jti` (JWT ID)
+   - Indexes on `user_id`, `jti`, and `expires_at`
+   - **Columns:**
+     - `id` - UUID PRIMARY KEY
+     - `user_id` - UUID NOT NULL (FK to users.id)
+     - `token_hash` - VARCHAR(255) NOT NULL (SHA-256 hash)
+     - `jti` - VARCHAR(255) UNIQUE NOT NULL (JWT ID)
+     - `expires_at` - TIMESTAMPTZ NOT NULL
+     - `revoked_at` - TIMESTAMPTZ NULL (NULL if active)
+     - `created_at` - TIMESTAMPTZ NOT NULL DEFAULT NOW()
+
+4. ✅ **`user_data.revoked_tokens`** - Token revocation/blacklist
+   - Stores revoked JWT tokens (blacklist)
+   - Used for token validation and security
+   - Primary key on `jti` (JWT ID)
+   - Index on `expires_at` for automatic cleanup
+   - **Columns:**
+     - `jti` - VARCHAR(255) PRIMARY KEY (JWT ID)
+     - `expires_at` - TIMESTAMPTZ NOT NULL
+     - `revoked_at` - TIMESTAMPTZ NOT NULL DEFAULT NOW()
+   - **Constraints:**
+     - `revoked_tokens_jti_not_empty` - CHECK constraint (LENGTH(jti) > 0)
+     - PRIMARY KEY on `jti`
+
+5. ✅ **`user_data.notes`** - User notes
+   - Polymorphic notes system
+
+**Note:** Additional tables will be created incrementally during development.
+
+---
+
+## 🔄 Change Log
+
+### **2026-01-31 (Initial Setup):**
+- ✅ Database `TikTrack-phoenix-db` created
+- ✅ User `TikTrackDbAdmin` created
+- ✅ Password configured securely
+- ✅ All privileges granted
+- ✅ Schemas created (`user_data`, `market_data`)
+- ✅ Default privileges configured
+- ✅ Backend connection verified
+
+### **2026-01-31 (System Users):**
+- ✅ Primary admin user created (`nimrod`, SUPERADMIN)
+- ✅ Secondary admin user created (`nimrod_wald`, ADMIN)
+- ✅ Authentication tables created (`user_data.users`, `user_data.password_reset_requests`, `user_data.notes`)
+- ✅ Users ready for login testing
+
+### **2026-01-31 (Refresh Token Table):**
+- ✅ `user_data.user_refresh_tokens` table created
+- ✅ Table structure verified (UUID id, user_id FK, token_hash, jti, expires_at, revoked_at, created_at)
+- ✅ Constraints created (jti_not_empty, hash_not_empty, FK to users, unique jti)
+- ✅ Indexes created (user_id, jti, expires_at)
+- ✅ Backend server restarted
+- ✅ Ready for refresh token operations
+
+### **2026-01-31 (Revoked Tokens Table):**
+- ✅ `user_data.revoked_tokens` table created
+- ✅ Table structure verified (jti PRIMARY KEY, expires_at, revoked_at)
+- ✅ Constraints created (jti_not_empty, PRIMARY KEY on jti)
+- ✅ Index created on `expires_at` (for automatic cleanup)
+- ✅ Backend server restarted
+- ✅ Ready for token revocation/blacklist operations
+
+### **2026-01-31 (Phase 1.5 Authentication System - Complete):**
+- ✅ Authentication system verified and complete
+- ✅ Login endpoint: 100% pass rate (4/4 tests)
+- ✅ Users/Me endpoint: 100% pass rate (3/3 tests) - FIXED
+- ✅ Token validation: VERIFIED
+- ✅ All 5 authentication tables operational
+- ✅ Production readiness: READY
+- ✅ All critical issues resolved (ULID conversion, revoked tokens table, users/me endpoint)
+
+---
+
+**Prepared by:** Team 60 (DevOps & Platform)  
+**Date:** 2026-01-31  
+**Last Updated:** 2026-01-31 (Phase 1.5 Complete)  
+**log_entry | [Team 60] | DATABASE_CREDENTIALS_CONFIGURED | COMPLETE | GREEN | 2026-01-31**
+
+---
+
+⚠️ **REMINDER:** The actual password is stored in `api/.env` file. Never commit this file to git. Store the password securely in a password manager.

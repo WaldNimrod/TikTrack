@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-02-10T13:36:29.594Z",
+  "login": {
+    "success": true
+  },
+  "display": {
+    "D16": {
+      "total": 3,
+      "expectedMin": 3,
+      "passed": true,
+      "sample": [
+        {
+          "id": "3NNVN4TTRQ99M8D507YPJ0D2WV",
+          "account_name": "Test Account 1",
+          "broker": "Interactive Brokers",
+          "currency": "USD"
+        },
+        {
+          "id": "38H40VNETJ8CN8412Q8AD1E90T",
+          "account_name": "Test Account 2",
+          "broker": "TD Ameritrade",
+          "currency": "EUR"
+        }
+      ]
+    },
+    "D18": {
+      "total": 6,
+      "expectedMin": 6,
+      "passed": true,
+      "sample": [
+        {
+          "id": "059BKCYCDP91RRABPX58QMAY4B",
+          "broker": "Interactive Brokers",
+          "commission_type": "TIERED"
+        },
+        {
+          "id": "2HBVP0D71S9WYAB43M998FJVKT",
+          "broker": "TD Ameritrade",
+          "commission_type": "FLAT"
+        }
+      ]
+    },
+    "D21": {
+      "total": 11,
+      "expectedMin": 10,
+      "passed": true,
+      "sample": [
+        {
+          "flow_type": "DEPOSIT",
+          "amount": "100.000000"
+        },
+        {
+          "flow_type": "DEPOSIT",
+          "amount": "100.000000"
+        }
+      ]
+    },
+    "issues": []
+  },
+  "crud": {
+    "brokers_fees": {
+      "create": {
+        "success": true,
+        "id": "0A922HFQQ29HG8BE04FH7W4TM9"
+      },
+      "update": {
+        "success": true
+      },
+      "delete": {
+        "success": true
+      },
+      "issues": []
+    },
+    "cash_flows": {
+      "create": {
+        "success": true,
+        "id": "1TMJRW02M58XBB1HEAB8F72TW1"
+      },
+      "update": {
+        "success": true
+      },
+      "delete": {
+        "success": true
+      },
+      "issues": []
+    },
+    "trading_accounts": "read_only_no_crud_api"
+  },
+  "issues": [],
+  "passed": true,
+  "rawFailures": []
+}

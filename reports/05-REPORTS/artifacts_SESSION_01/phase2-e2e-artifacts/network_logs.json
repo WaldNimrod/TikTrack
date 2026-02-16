@@ -1,0 +1,17 @@
+[
+  {
+    "test": "CRUD_TradingAccounts",
+    "apiCalls": 10,
+    "tableRows": 7
+  },
+  {
+    "test": "CRUD_BrokersFees",
+    "apiCalls": 5,
+    "tableRows": 13
+  },
+  {
+    "test": "CRUD_CashFlows",
+    "apiCalls": 6,
+    "tableRows": 11
+  }
+]

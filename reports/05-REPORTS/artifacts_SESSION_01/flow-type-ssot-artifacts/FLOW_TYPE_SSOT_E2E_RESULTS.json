@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-02-12T21:02:46.516Z",
+  "results": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "logs": [
+    {
+      "test": "FT_D21_TableLabels",
+      "status": "START",
+      "timestamp": "2026-02-12T21:02:39.264Z",
+      "details": {
+        "message": "D21 table column labels"
+      }
+    },
+    {
+      "test": "FT_D21_TableLabels",
+      "status": "PASS",
+      "timestamp": "2026-02-12T21:02:39.342Z",
+      "details": {
+        "message": "D21 table: DEPOSIT→הפקדה, CURRENCY_CONVERSION→המרת מטבע",
+        "foundConversion": true,
+        "foundDeposit": true
+      }
+    },
+    {
+      "test": "FT_D21_FilterOptions",
+      "status": "START",
+      "timestamp": "2026-02-12T21:02:39.342Z",
+      "details": {
+        "message": "D21 filter: options + order"
+      }
+    },
+    {
+      "test": "FT_D21_FilterOptions",
+      "status": "PASS",
+      "timestamp": "2026-02-12T21:02:39.345Z",
+      "details": {
+        "message": "Filter: כל הסוגים...המרת מטבע...אחר"
+      }
+    },
+    {
+      "test": "FT_D21_FilterWorks",
+      "status": "PASS",
+      "timestamp": "2026-02-12T21:02:42.348Z",
+      "details": {
+        "message": "סינון לפי המרת מטבע עובד"
+      }
+    },
+    {
+      "test": "FT_D16_MovementsLabels",
+      "status": "START",
+      "timestamp": "2026-02-12T21:02:42.348Z",
+      "details": {
+        "message": "D16 movements table labels"
+      }
+    },
+    {
+      "test": "FT_D16_MovementsLabels",
+      "status": "PASS",
+      "timestamp": "2026-02-12T21:02:46.459Z",
+      "details": {
+        "message": "D16: same labels via toFlowTypeLabel"
+      }
+    }
+  ]
+}

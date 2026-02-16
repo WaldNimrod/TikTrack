@@ -13,7 +13,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import TIMESTAMP
 
 from .base import Base
-from .enums import note_category_enum
+from .enums import note_category_enum, NoteCategory
 
 
 class Note(Base):
@@ -48,10 +48,10 @@ class Note(Base):
     )
     title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    category: Mapped[str] = mapped_column(
+    category: Mapped[NoteCategory] = mapped_column(
         note_category_enum,
         nullable=False,
-        default="GENERAL",
+        default=NoteCategory.GENERAL,
         server_default="GENERAL",
     )
     is_pinned: Mapped[bool] = mapped_column(

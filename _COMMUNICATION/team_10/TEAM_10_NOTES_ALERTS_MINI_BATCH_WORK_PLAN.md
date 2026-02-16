@@ -3,7 +3,7 @@
 **id:** TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN  
 **owner:** Team 10 (The Gateway)  
 **מקור מנדט:** [TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md](../team_90/TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md)  
-**סטטוס:** פעיל — MB3A Notes CLOSED (Gate-B PASS + Gate-KP); Alerts (Phase 2) בפעולה  
+**סטטוס:** MB3A Notes CLOSED; MB3A Alerts CLOSED (Gate-B PASS + Gate-KP 2026-02-16). Mini-Batch 3A הושלם.  
 **last_updated:** 2026-02-16
 
 ---

@@ -2,7 +2,7 @@
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway)  
-**date:** 2026-01-31  
+**date:** 2026-02-16  
 **re:** MB3A Alerts — חיבור UI ל-API, דוח השלמה
 
 ---

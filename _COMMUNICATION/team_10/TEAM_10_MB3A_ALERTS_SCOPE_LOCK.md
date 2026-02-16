@@ -30,7 +30,7 @@
 ## 3. סקופ (נעול)
 
 - **מבנה:** LEGO — page-wrapper → tt-container → tt-section (בהתאם לתבנית עמודים).
-- **תוכן:** עמוד התראות (ישות Alert, D34); תאום עם תיעוד API כאשר יוגדר. **צד שרת (DB/API):** ראה [TEAM_10_MB3A_ALERTS_EXECUTION_ORDER_AND_PROMPTS_REF.md](TEAM_10_MB3A_ALERTS_EXECUTION_ORDER_AND_PROMPTS_REF.md) §6 — טבלת `user_data.alerts` ב-DDL; API לא מוגדר ב-MB3A עד להחלטה.
+- **תוכן:** עמוד התראות (ישות Alert, D34); חיבור ל-API מומש (Team 20 — endpoints summary, list, CRUD; Gate-A/Gate-B אומתו). **צד שרת:** טבלת `user_data.alerts` ב-DDL; API — `api/routers/alerts.py`, `api/services/alerts_service.py`; ראה TEAM_20_TO_TEAM_10_MB3A_ALERTS_API_COMPLETION_REPORT.md.
 - **סגנונות:** phoenix-base, phoenix-components, phoenix-header; data-action ללא inline scripts.
 
 ---
@@ -38,7 +38,7 @@
 ## 4. יישור SSOT / Page Tracker
 
 - **TT2_PAGES_SSOT_MASTER_LIST.md:** D34 — בלופרינט ✅ קיים; אפיון קיים (Blueprint מסופק; MB3A Phase 2).
-- **TT2_OFFICIAL_PAGE_TRACKER.md:** D34 רשום; סטטוס Gate-0 Alerts → Build.
+- **TT2_OFFICIAL_PAGE_TRACKER.md:** D34 רשום; סטטוס **5. APPROVED** ✅ (MB3A CLOSED) — Gate-B PASS, Gate-KP + Seal 2026-02-16.
 
 ---
 

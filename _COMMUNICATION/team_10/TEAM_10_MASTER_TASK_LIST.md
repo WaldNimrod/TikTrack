@@ -71,9 +71,15 @@
 
 | # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
 |---|-----|------|--------|-----|------------|------------|------------|------------|------------|
-| MD-SETTINGS | Market Data Settings UI | ממשק הגדרות נתוני שוק: GET+PATCH, DB>env, market_data.system_settings, validation Backend, Admin-only; intraday_enabled אכיפה ב-job; delay_between_symbols בסקריפטי sync; יישור TT2_TICKER_STATUS. שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. סגירה רק Seal (SOP-013). | PENDING_VERIFICATION | MD-SETTINGS | 20/30/50/60/10 | TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+| MD-SETTINGS | Market Data Settings UI | ממשק הגדרות נתוני שוק: GET+PATCH, DB>env, market_data.system_settings, validation Backend, Admin-only; intraday_enabled אכיפה ב-job; delay_between_symbols בסקריפטי sync; יישור TT2_TICKER_STATUS. שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. סגירה רק Seal (SOP-013). | CLOSED | MD-SETTINGS | 20/30/50/60/10 | TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | 2026-02-15 |
 
-**חבילת תכנון:** Work Plan + SSOT delta + מנדטים 20/30/50/60 — אושרה; צוותים הופעלו. **כל דרישות סגירה Gate-B הושלמו** — Evidence 403 התקבל; ניתן להגיש Gate-B חוזר.
+**חבילת תכנון:** Work Plan + SSOT delta + מנדטים 20/30/50/60 — אושרה; צוותים הופעלו. **Gate-B PASS** → **Gate-KP הושלם** — Seal (SOP-013). משימה **CLOSED**.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_CLOSED_SEAL | 2026-02-15** — Gate-KP הושלם. הודעת Seal (SOP-013): documentation/05-REPORTS/artifacts/TEAM_10_MD_SETTINGS_GATE_KP_AND_SEAL.md. משימה MD-SETTINGS → CLOSED. תיקון 90: נתיבי Evidence 403 נוספו למשפט המלווה (פרומט) ו-RE_REQUEST.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_INDEX_AND_KP_NOTE | 2026-02-15** — 00_MASTER_INDEX עודכן (MD-SETTINGS SSOT + OpenAPI addendum); הערת קונסולידציה: לשלב addendum ב-OpenAPI הראשי בסבב הבא. פרומטים להפעלה: TEAM_10_MD_SETTINGS_GATE_B_READY_AND_ACTIVATION_PROMPTS.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_GATE_B_PASS | 2026-02-15** — צוות 90 אישר את ההגשה. Gate-B PASS. מתקדמים ל-Gate-KP (Knowledge Promotion); סגירה עם Seal (SOP-013).
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | MD_SETTINGS_403_EVIDENCE_RECEIVED | 2026-02-15** — Team 50: בדיקת 403 אמיתית (qa_nonadmin, GET+PATCH → 403). Evidence: TEAM_50_TO_TEAM_10_MD_SETTINGS_403_EVIDENCE.md, MD_SETTINGS_403_EVIDENCE_*.log, run-md-settings-403-evidence.sh. כל 4 דרישות סגירה הושלמו. בקשה חוזרת ל-Gate-B: TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_GATE_B_RE_REQUEST.md.
 

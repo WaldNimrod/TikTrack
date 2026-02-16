@@ -97,4 +97,11 @@
 
 ---
 
+## 9. Gate-KP — הערות קונסולידציה
+
+- **00_MASTER_INDEX:** עודכן — הפניה ל-TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT ו-OpenAPI Addendum (MD-SETTINGS). ✅
+- **OpenAPI:** addendum נוכחי — `OPENAPI_SPEC_V2.5.2_MARKET_DATA_SETTINGS_ADDENDUM.yaml`. **בסבב קונסולידציה הבא** — לשלב את תוכן ה-addendum ב-OpenAPI הראשי (OPENAPI_SPEC_V2.5.2.yaml) ולא להשאיר כנספח נפרד לצמיתות.
+
+---
+
 **log_entry | TEAM_10 | MARKET_DATA_SETTINGS_UI | WORK_PLAN_DRAFT | 2026-02-15** — חבילת תכנון מפורטת לאישור Team 90 לפני הפצה לצוותים.

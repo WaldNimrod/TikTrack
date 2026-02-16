@@ -17,7 +17,10 @@
 - [ ] Operational docs use authority anchors only:
   - `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
   - `_COMMUNICATION/_Architects_Decisions/`
+- [ ] Team 70 prepares execution package (SSOT + archive deltas).
+- [ ] Team 10 approves the package (gateway gate).
 - [ ] Team 90 re-validation completed and PASS/BLOCK issued.
+- [ ] Team 70 executes SSOT update and archive operations after PASS.
 
 ---
 

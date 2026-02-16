@@ -1,8 +1,8 @@
 # Team 90 -> Team 10 | Governance Alignment Plan Submission (Pre-Migration)
 
 **from:** Team 90 (External Validation Unit)
-**to:** Team 10 (The Gateway)
-**cc:** Team 100, Architect, Team 70
+**to:** Team 10 (Gateway Orchestration Authority)
+**cc:** Team 70, Team 100, Architect
 **date:** 2026-02-16
 **status:** ACTION REQUIRED - APPROVAL REQUEST
 **subject:** Submission of pre-migration governance alignment package for approval
@@ -11,7 +11,7 @@
 
 ## Context
 
-בהמשך לפקודת Team 10 (Governance Alignment Pre-Migration Plan) ובהתאם לדוח האימות:
+בהמשך לפקודת Governance Alignment ובהתאם לדוח האימות:
 `TEAM_90_DOC_ARCH_VALIDATION_2026_02_16`
 
 Team 90 השלים את חבילת התכנון המקדימה, ללא ביצוע שינויים במסמכי SSOT וללא מיגרציה בפועל.
@@ -39,9 +39,9 @@ Team 90 השלים את חבילת התכנון המקדימה, ללא ביצו�
 
 ---
 
-## Approval Request (Team 10)
+## Approval Request (Team 10 + Architect)
 
-נדרש אישור Team 10 כדי לפתוח ביצוע בפועל של **Phase A (Authority Drift Mapping)**.
+נדרש אישור Team 10 + אדריכלית כדי לפתוח ביצוע בפועל של **Phase A (Authority Drift Mapping)**.
 
 עד לקבלת אישור:
 - אין ביצוע תיקונים במסמכים

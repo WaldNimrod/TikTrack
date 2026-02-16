@@ -471,13 +471,27 @@ npm run test:phase2-e2e
 | קובץ | תיאור | הרצה |
 |------|-------|------|
 | `run-notes-d35-qa-api.sh` | Notes D35 — 413, 415, 422, 404, XSS | `bash scripts/run-notes-d35-qa-api.sh` |
+| `run-alerts-d34-qa-api.sh` | Alerts D34 — summary, list, CRUD, filter, pagination, sort | `bash scripts/run-alerts-d34-qa-api.sh` |
 | `run-user-tickers-qa-api.sh` | User Tickers API | `bash scripts/run-user-tickers-qa-api.sh` |
 | `run-market-data-settings-qa-api.sh` | Market Data Settings API | `bash scripts/run-market-data-settings-qa-api.sh` |
 | `init-servers-for-qa.sh` | איתחול שרתים ל-QA (TEAM_50_QA_RERUN_SOP) | `bash scripts/init-servers-for-qa.sh` |
 
 ---
 
-### 12. Gate / Batch / Domain E2E — סיכום
+### 12. Alerts D34 / MB3A Gate-A
+
+**מקור:** TEAM_10_TO_TEAM_50_MB3A_ALERTS_GATE_A_QA_REQUEST
+
+| קובץ | תיאור | הרצה |
+|------|-------|------|
+| `scripts/run-alerts-d34-qa-api.sh` | Alerts API — summary, list, POST, GET :id, PATCH, DELETE, 404, filter, pagination, sort | `bash scripts/run-alerts-d34-qa-api.sh` |
+| `tests/alerts-mb3a-e2e.test.js` | Alerts UI — עמוד, סיכום, טבלה, סינון, pagination, LEGO | `npm run test:alerts-mb3a-e2e` |
+
+**דוח Gate-A:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_MB3A_ALERTS_QA_REPORT.md`
+
+---
+
+### 13. Gate / Batch / Domain E2E — סיכום
 
 | קובץ | תיאור קצר | npm run |
 |------|------------|---------|
@@ -486,6 +500,7 @@ npm run test:phase2-e2e
 | `adr015-gate-a-e2e.test.js` | ADR-015 Gate A QA | `test:adr015-gate-a` |
 | `batch-2-5-adr017-qa-e2e.test.js` | Batch 2.5 ADR-017 — Redirect + User Icon | `test:batch-2-5-adr017` |
 | `notes-mb3a-e2e.test.js` | Notes MB3A — 13 פריטים, CRUD | `test:notes-mb3a-e2e` |
+| `alerts-mb3a-e2e.test.js` | Alerts MB3A — עמוד, סיכום, טבלה, סינון, LEGO | `test:alerts-mb3a-e2e` |
 | `user-tickers-qa.e2e.test.js` | User Tickers — Add/remove, Evidence | — |
 | `central-status-e2e.test.js` | Central Status E2E | `test:central-status-e2e` |
 | `central-status-api-verify.js` | Central Status API | `test:central-status` |
@@ -532,6 +547,7 @@ npm run test:phase2-e2e
 - **Phase 2 Runtime:** `tests/phase2-runtime.test.js`
 - **Phase 2 E2E Selenium (SOP-010):** `tests/phase2-e2e-selenium.test.js`
 - **Notes MB3A E2E:** `tests/notes-mb3a-e2e.test.js` (D35, Gate-A)
+- **Alerts MB3A E2E:** `tests/alerts-mb3a-e2e.test.js` (D34, Gate-A)
 - **Gate A / B:** `tests/gate-a-e2e.test.js`, `tests/gate-b-e2e.test.js`
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
@@ -539,6 +555,7 @@ npm run test:phase2-e2e
 ### סקריפטי QA API (scripts/)
 
 - **Notes D35:** `scripts/run-notes-d35-qa-api.sh`
+- **Alerts D34:** `scripts/run-alerts-d34-qa-api.sh`
 - **User Tickers:** `scripts/run-user-tickers-qa-api.sh`
 - **Market Data Settings:** `scripts/run-market-data-settings-qa-api.sh`
 - **Init Servers:** `scripts/init-servers-for-qa.sh`

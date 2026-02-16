@@ -4,8 +4,8 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - SINGLE SOURCE OF TRUTH**  
 **supersedes:** `D15_SYSTEM_INDEX.md`, `PHOENIX_ARCHITECT_MASTER_INDEX.md`, `TT2_MASTER_DOCUMENTATION_INDEX.md`, `SPY_DOCS_INDEX_EXPANDED.md`  
-**last_updated:** 2026-02-15  
-**version:** v3.13 (P3-003 SSOT Alignment — TT2_PAGES_SSOT_MASTER_LIST, Consolidation 2026-02-15, עדכון אדריכלית)
+**last_updated:** 2026-02-16  
+**version:** v3.14 (Architect Decision Template Standard + Procedure added; governance role realignment support)
 
 ---
 
@@ -224,6 +224,8 @@ _COMMUNICATION/
 - [📋 TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) - סטטוס טיקר והתנהגות טעינת נתונים: ממתין=EOD+היסטוריה בלבד, פתוח=קצב מלא, סגור=קצב מופחת, מבוטל=לא טוען. **מצב נוכחי:** is_active (true=פתוח, false=סגור). **יעד:** שדה status. מחייב ל-20/60. הודעה: _COMMUNICATION/team_10/TEAM_10_TO_TEAMS_20_60_TICKER_STATUS_MARKET_DATA_ALIGNMENT.md. ✅ **2026-02-14**
 - [📋 TT2_STATUS_VALUES_CODE_MAP.md](../02-DEVELOPMENT/TT2_STATUS_VALUES_CODE_MAP.md) - מיפוי מקומות בקוד — מעבר ל-Adapter (statusValues.js + statusAdapter.js) ✅ **מנדט יישום**
 - [📋 מנדט יישום סטטוסים](../../_COMMUNICATION/team_10/TEAM_10_SYSTEM_STATUS_IMPLEMENTATION_MANDATE.md) - Single Source → statusValues.js → statusAdapter.js — Acceptance Criteria + אסור
+- [🧾 ARCHITECT_DECISION_TEMPLATE_STANDARD.md](../../_COMMUNICATION/_Architects_Decisions/ARCHITECT_DECISION_TEMPLATE_STANDARD.md) - נעילת תבנית החלטה אדריכלית אחידה (חדשים/מעודכנים בלבד; ללא רטרופיט מלא להיסטוריה) ✅ **LOCKED 2026-02-16**
+- [🧩 TT2_ARCHITECT_DECISION_TEMPLATE_PROCEDURE.md](../05-PROCEDURES/TT2_ARCHITECT_DECISION_TEMPLATE_PROCEDURE.md) - נוהל ביצוע: Team 70 מכין, Team 10 מאשר שער, Team 90 מאמת, Team 70 מעדכן SSOT ✅ **ACTIVE v1.0**
 - **החלטות אדריכליות נוספות** - נמצאות ב-`_COMMUNICATION/_Architects_Decisions/`:
   - `ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md` - פוטר מודולרי
   - `ARCHITECT_DECISION_LEGO_CUBES_FINAL.md` - Final Governance Lock
@@ -328,3 +330,4 @@ _COMMUNICATION/
 **log_entry | [Team 10] | GATEWAY_CONSOLIDATION | EXTERNAL_DATA_JOBS_AND_REPORT_IN_INDEX | 2026-02-14** — עדכון אינדקס לפי TEAM_20_TO_TEAM_10_EXTERNAL_DATA_SUMMARY_REPORT: רשימת Jobs (TEAM_60_CRON_SCHEDULE), דוח מימוש (TEAM_20_EXTERNAL_DATA_IMPLEMENTATION_SUMMARY_FOR_TEAM_10).  
 **log_entry | [Team 10] | OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION | 2026-02-15** — תוכנית סגירת פתוחים (P3-003, P3-010, P3-004): [_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md](../../_COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md). הודעות הפעלה: 31 (Blueprint Scope), 20 (P3-010 + P3-004), 30 (P3-004 Seal), 60 (P3-004 אימות).  
 **log_entry | [Team 10] | GATEWAY_CONSOLIDATION | P3_003_SSOT_ALIGNMENT_IN_INDEX | 2026-02-15** — נוהל קידום ידע מלא: TT2_PAGES_SSOT_MASTER_LIST, CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15, עדכון לאדריכלית; ארכיון 2026-02-15 (2 קבצים).
+**log_entry | [Team 70] | ARCHITECT_DECISION_TEMPLATE_POLICY_ADOPTED | 2026-02-16** — הוספת מסמך נעילה אדריכלי (`ARCHITECT_DECISION_TEMPLATE_STANDARD.md`), תבנית קנונית (`ARCHITECT_DECISION_TEMPLATE.md`) ונוהל יישום (`TT2_ARCHITECT_DECISION_TEMPLATE_PROCEDURE.md`) עם כלל רטרואקטיבי: חדשים/מעודכנים בלבד.

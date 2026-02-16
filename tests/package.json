@@ -28,6 +28,7 @@
     "test:auth-guard-qa": "node auth-guard-qa-e2e.test.js",
     "test:batch-2-5-adr017": "node batch-2-5-adr017-qa-e2e.test.js",
     "test:notes-mb3a-e2e": "node notes-mb3a-e2e.test.js",
+    "test:alerts-mb3a-e2e": "node alerts-mb3a-e2e.test.js",
     "test:validation": "npx mocha validation-comprehensive.test.js --timeout 120000",
     "test:all": "npm run test:auth && npm run test:user && npm run test:apikeys && npm run test:errors && npm run test:password-change && npm run test:routing && npm run test:phase2 && npm run test:phase2-e2e"
   },

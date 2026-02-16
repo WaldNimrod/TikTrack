@@ -2,10 +2,10 @@
 
 **id:** TEAM_90_GOV_ALIGNMENT_PLAN_2026_02_16
 **from:** Team 90 (External Validation Unit)
-**to:** Team 10 (The Gateway)
-**cc:** Team 100, Architect, Team 70
+**to:** Team 10 (Gateway Orchestration Authority)
+**cc:** Team 70, Team 100, Architect
 **date:** 2026-02-16
-**status:** DRAFT FOR APPROVAL (NO EXECUTION BEFORE TEAM 10 APPROVAL)
+**status:** DRAFT FOR APPROVAL (NO EXECUTION BEFORE TEAM 10 + ARCHITECT APPROVAL)
 **scope:** Pre-Migration Governance Alignment only (no file moves, no SSOT edits in this phase)
 
 ---
@@ -29,6 +29,8 @@ Target outcome:
   `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
 - **Architect decisions authority:**
   `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/_Architects_Decisions/`
+- **Role realignment authority:**
+  `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/_Architects_Decisions/ARCHITECT_TEAM_10_70_ROLE_REALIGNMENT.md`
 - **Architect communication inbox/outbox only (non-SSOT):**
   `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/90_Architects_comunication/`
 
@@ -41,7 +43,7 @@ Target outcome:
 **Goal:** produce a complete list of active documents with wrong authority references.
 
 **Actions:**
-1. Scan active docs in `documentation/` and operational governance docs in `_COMMUNICATION/team_10/`.
+1. Scan active docs in `documentation/` and operational governance docs in `_COMMUNICATION/team_10/` and `_COMMUNICATION/team_70/`.
 2. Classify each reference as:
    - Correct anchor
    - Legacy but allowed context
@@ -89,7 +91,7 @@ Target outcome:
 - `TEAM_90_INDEX_CONSOLIDATION_AND_DEPRECATION_PLAN.md` (to be created after approval)
 
 **Gate B Exit Criteria:**
-- Single-index policy documented and approved by Team 10.
+- Single-index policy documented and approved by Team 10 + Architect.
 - Deprecation list includes owner + due date + replacement link.
 
 ---
@@ -107,7 +109,7 @@ Target outcome:
 - `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/team_90/GOVERNANCE_SOURCE_MATRIX.md`
 
 **Gate C Exit Criteria:**
-- Matrix signed by Team 10 (operational owner) and architect acknowledged.
+- Matrix signed by Team 10 (gateway) and architect acknowledged; Team 70 marked as execution owner.
 
 ---
 
@@ -115,12 +117,14 @@ Target outcome:
 
 **Goal:** operationalize the locked promotion rule as enforceable checklist.
 
-**Locked Rule:**
-1. Team submits summary report with proposed SSOT text.
-2. Team 10 reviews docs-system/docs-governance/team folders.
-3. Team 90 validates.
-4. Team 10 updates SSOT.
-5. Stage communication folders archived.
+**Locked Rule (Role Realignment):**
+1. Teams submit stage reports.
+2. Teams propose documentation updates.
+3. Team 70 aggregates documentation changes.
+4. Team 10 approves updates (gateway gate).
+5. Team 90 validates.
+6. Team 70 updates SSOT.
+7. Team 70 archives stage communication artifacts.
 
 **Actions:**
 1. Convert rule into gate checklist template.
@@ -131,7 +135,7 @@ Target outcome:
 - `TEAM_90_KP_GATE_CHECKLIST_TEMPLATE.md` (to be created after approval)
 
 **Gate D Exit Criteria:**
-- Checklist approved and added to Team 10 operational use.
+- Checklist approved by Team 10 and used operationally by Team 70.
 
 ---
 
@@ -155,10 +159,10 @@ Target outcome:
 
 ## 4) Dependencies
 
-1. Team 10 approval of this plan (mandatory before execution).
-2. Team 10 ownership of SSOT edits in `documentation/`.
+1. Team 10 + Architect approval of this plan (mandatory before execution).
+2. Team 70 ownership of documentation alignment execution.
 3. Architect final authority for decision-source disputes.
-4. Team 70 taxonomy for Product/Business class in matrix.
+4. Team 10 gateway approval gate enforced before SSOT updates.
 
 ---
 
@@ -168,9 +172,9 @@ Target outcome:
 |---|---|---|
 | Partial fixes only in communication layer | Drift returns quickly | Fix P1 docs in `documentation/` first; re-scan required |
 | Confusing local indexes with master index | Governance fragmentation | Enforce one global index rule + deprecation ledger |
-| Team-level shortcuts bypass Team 10 promotion | SSOT inconsistency | Mandatory KP checklist + Team 90 gate |
+| Team-level shortcuts bypass Team 10 approval gate | SSOT inconsistency | Mandatory KP checklist + Team 90 gate |
 | Product/business docs remain undefined | Marketing/investor messaging drift | Team 70 class locked in matrix with owner and promotion path |
-| Mixed authority references in copied templates | Reintroduced drift | Add static review check in Team 10 handoff template |
+| Mixed authority references in copied templates | Reintroduced drift | Add static review check in Team 70 handoff template + Team 10 approval step |
 
 ---
 
@@ -204,8 +208,8 @@ Prepared now:
 1. `PHOENIX_GOVERNANCE_ALIGNMENT_PLAN.md` (this file)
 2. `GOVERNANCE_SOURCE_MATRIX.md` (completed draft for validation)
 
-Execution files for Phases A/B/D/E will be produced only after Team 10 approval.
+Execution files for Phases A/B/D/E will be produced only after Team 10 + Architect approval.
 
 ---
 
-**log_entry | TEAM_90 | PHOENIX_GOVERNANCE_ALIGNMENT_PLAN_SUBMITTED | AWAITING_TEAM_10_APPROVAL | 2026-02-16**
+**log_entry | TEAM_90 | PHOENIX_GOVERNANCE_ALIGNMENT_PLAN_SUBMITTED | AWAITING_TEAM_10_ARCHITECT_APPROVAL | 2026-02-16**

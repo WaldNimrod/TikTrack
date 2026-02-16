@@ -1,8 +1,8 @@
 # Team 90 -> Team 10 | Gate-Authority-Alignment Decision Lock
 
 **from:** Team 90 (External Validation Unit)
-**to:** Team 10 (The Gateway)
-**cc:** Architect, Team 100, Team 70
+**to:** Team 10 (Gateway Orchestration Authority)
+**cc:** Team 70, Architect, Team 100
 **date:** 2026-02-16
 **status:** LOCKED DECISIONS RECEIVED - READY FOR EXECUTION
 
@@ -35,8 +35,10 @@
 
 Gate-Authority-Alignment will be marked PASS only after:
 1. All 4 decisions are implemented.
-2. Team 90 performs re-validation.
-3. No active authority drift remains in operational docs.
+2. Team 10 gateway approval confirms closure package.
+3. Team 70 executes SSOT and archive updates.
+4. Team 90 performs re-validation.
+5. No active authority drift remains in operational docs.
 
 ---
 

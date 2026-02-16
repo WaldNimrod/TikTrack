@@ -14,6 +14,9 @@ scripts/.sync_ticker_prices.lock
 communication/
 _Cursor_full_design_*/
 
+# D35 Notes — user uploads (keep structure, ignore contents)
+storage/uploads/users/
+
 # OS specific
 .DS_Store
 *.tmp

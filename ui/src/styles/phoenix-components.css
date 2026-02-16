@@ -337,6 +337,76 @@ tt-section-row > * {
   line-height: 1;
 }
 
+/* ============================================
+   Notes (D35) — Entity filter icon bar (header)
+   סדרת איקונים בכותרת הקונטיינר; פעיל/לא פעיל
+   Ref: notes_BLUEPRINT.html 1522–1536; TEAM_30_TO_TEAM_40_NOTES_FILTER_BUTTONS_CLASSES_REQUEST
+   ============================================ */
+.filter-buttons-container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs, 6px);
+  margin-inline-start: var(--spacing-sm, 12px);
+  margin-block-end: 0;
+}
+
+.filter-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  margin-block-end: 0;
+  background: var(--apple-bg-secondary, #f2f2f7);
+  color: var(--apple-text-primary, #1d1d1f);
+  border: 1px solid var(--apple-border-light, #e5e5ea);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  vertical-align: middle;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.filter-icon-btn img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.filter-icon-btn:hover {
+  background: var(--apple-bg-elevated, #ffffff);
+  border-color: var(--apple-border, #d1d1d6);
+}
+
+/* פעיל (נבחר) — צבע מותג */
+.filter-icon-btn--active,
+.filter-icon-btn.filter-icon-btn--active {
+  background: var(--apple-bg-elevated, #ffffff);
+  color: var(--color-brand, var(--entity-note, #26baac));
+  border: 2px solid var(--color-brand, var(--entity-note, #26baac));
+}
+
+.filter-icon-btn--active:hover,
+.filter-icon-btn.filter-icon-btn--active:hover {
+  background: var(--message-info-light, rgba(23, 162, 184, 0.08));
+  border-color: var(--color-brand, var(--entity-note, #26baac));
+}
+
+/* אופציונלי: צבע ישות כשפעיל (לפי data-filter-type) */
+.filter-icon-btn--active[data-filter-type="account"],
+.filter-icon-btn.filter-icon-btn--active[data-filter-type="account"] { --color-brand: var(--entity-trading_account); }
+.filter-icon-btn--active[data-filter-type="trade"],
+.filter-icon-btn.filter-icon-btn--active[data-filter-type="trade"] { --color-brand: var(--entity-trade); }
+.filter-icon-btn--active[data-filter-type="trade_plan"],
+.filter-icon-btn.filter-icon-btn--active[data-filter-type="trade_plan"] { --color-brand: var(--entity-trade_plan); }
+.filter-icon-btn--active[data-filter-type="ticker"],
+.filter-icon-btn.filter-icon-btn--active[data-filter-type="ticker"] { --color-brand: var(--entity-ticker); }
+.filter-icon-btn--active[data-filter-type="all"],
+.filter-icon-btn.filter-icon-btn--active[data-filter-type="all"] { --color-brand: var(--entity-note); }
+
 /* Entity-specific header colors - Basic entity colors */
 /* Settings/Preferences Context - Gray (#475569) */
 main[data-context="settings"],

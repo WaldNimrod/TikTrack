@@ -82,6 +82,12 @@ migrate-md-settings:
 verify-md-settings:
 	@python3 scripts/verify_md_system_settings.py
 
+## D35 Notes — user_data.note_attachments (MB3A, D35_RICH_TEXT_ATTACHMENTS_LOCK)
+migrate-d35-notes:
+	@echo "🔄 D35 — user_data.note_attachments"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/d35_note_attachments.sql
+	@echo "✅ D35 note_attachments migration complete."
+
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
 	@echo "🔄 P3-019 — market_cap precision (24,4)"

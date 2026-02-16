@@ -36,7 +36,16 @@ class ApiProvider(str, enum.Enum):
     CUSTOM = "CUSTOM"
 
 
+class NoteCategory(str, enum.Enum):
+    """Note category enum - maps to user_data.note_category (D35)"""
+    TRADE = "TRADE"
+    PSYCHOLOGY = "PSYCHOLOGY"
+    ANALYSIS = "ANALYSIS"
+    GENERAL = "GENERAL"
+
+
 # SQLAlchemy Enum types for use in Column definitions
 user_role_enum = Enum(UserRole, name="user_role", schema="user_data", create_type=False)
 reset_method_enum = Enum(ResetMethod, name="reset_method", schema="user_data", create_type=False)
 api_provider_enum = Enum(ApiProvider, name="api_provider", schema="user_data", create_type=False)
+note_category_enum = Enum(NoteCategory, name="note_category", schema="user_data", create_type=False)

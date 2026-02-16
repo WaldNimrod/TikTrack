@@ -6,7 +6,7 @@
 **מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
 **נוהל ניהול:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
-**last_updated:** 2026-02-15
+**last_updated:** 2026-02-16
 
 ---
 **תוכנית סגירה פתוחים (2026-02-15):** [TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md](TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md) — סדר: P3-003 → P3-010 → P3-004; הודעות הפעלה: 31 (P3-003), 20 (P3-010 + P3-004), 30 (P3-004 Seal), 60 (P3-004 אימות).
@@ -57,8 +57,8 @@
 
 | # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
 |---|-----|------|--------|-----|------------|------------|------------|------------|------------|
-| D35_RICH_TEXT_ATTACHMENTS_LOCK | D35 Notes — Rich Text + Attachments | משימת-על נעולה (Team 90 Feedback Lock): Rich Text ב־content עם סניטיזציה שרת; עד 3 קבצים/הערה, 1MB/קובץ; MIME magic-bytes; נתיב אחסון לוק. תתי-משימות: DB (60), API (20), UI (30), QA (50), KP (10). SSOT עודכנו. סגירה רק עם Seal (SOP-013). | OPEN | MB3A | 20/30/50/60/10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §5 | 2026-02-15 | 2026-02-15 | — |
-| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; כפוף ל-D35_RICH_TEXT_ATTACHMENTS_LOCK. שערים: Gate-0 (Scope/SSOT) → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+| D35_RICH_TEXT_ATTACHMENTS_LOCK | D35 Notes — Rich Text + Attachments | משימת-על נעולה (Team 90 Feedback Lock): Rich Text ב־content עם סניטיזציה שרת; עד 3 קבצים/הערה, 1MB/קובץ; MIME magic-bytes; נתיב אחסון לוק. תתי-משימות: DB (60), API (20), UI (30), QA (50), KP (10). SSOT עודכנו. **API (20):** הושלם + אימות (pytest 17, MIME, Sanitizer, startup); תיאום 60. סגירה רק עם Seal (SOP-013). | OPEN | MB3A | 20/30/50/60/10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §5 | 2026-02-15 | 2026-02-15 | — |
+| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; כפוף ל-D35_RICH_TEXT_ATTACHMENTS_LOCK. שערים: Gate-0 (Scope/SSOT) → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP. **Backend (20+60):** הושלם; ממתין Build (31→30/40) ו-Gate-A (50) + Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
 | MB3A-ALERTS | alerts.html (D34 התראות) | עמוד התראות; שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. תלוי בסגירת Notes. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
 
 **שערים חובה לכל עמוד:** Gate-0 (Scope/SSOT mapping lock) | Gate-A (QA validation — Team 50) | Gate-B (Spy verification — Team 90) | Gate-KP (Knowledge Promotion + cleanup closure — Team 10). מקור החלטות: `_COMMUNICATION/_Architects_Decisions/` (לא תיבת התקשורת כ-SSOT).
@@ -93,6 +93,10 @@
 
 **ערכי סטטוס:** OPEN | IN_PROGRESS | BLOCKED | PENDING_VERIFICATION | CLOSED — הגדרות וכללי סגירה: נוהל.  
 **תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | MB3A = Mini-Batch 3A | 3 = Batch 3 | 4 = Batch 4 | …
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | TEAM_30_NOTES_DESIGN_DATA_COMPATIBILITY_RECEIVED | 2026-02-16** — דוח תאימות עמוד הערות (עיצוב vs נתונים): documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_NOTES_PAGE_DESIGN_DATA_COMPATIBILITY_REPORT.md. סטיות: NoteResponse חסר `tags`; אין endpoint סיכום. החלטות: סיכום — חישוב client-side מ־GET /notes; `tags` — בקשה ל־20 להוספה ל־NoteResponse + OpenAPI addendum; "הערות חדשות" = 10 ימים — מאושר, רשום ב-SSOT. תגובה: TEAM_10_TO_TEAM_30_NOTES_DESIGN_DATA_COMPATIBILITY_RESPONSE.md; בקשה ל־20: TEAM_10_TO_TEAM_20_D35_NOTES_ADD_TAGS_TO_RESPONSE.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | TEAM_20_SESSION_SUMMARY_VERIFICATION | 2026-02-16** — צד שרת הושלם. סיכום: [_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION.md](../team_20/TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION.md). **בדיקות:** pytest 17 עברו; D35 MIME — JPEG/PDF מאושרים, EXE נדחה; D35 Sanitizer — XSS מוסר, תוכן תקין נשמר; App startup — FastAPI טוען, notes router רשום. **תיקון:** Python 3.9 — `str | None` → `Optional[str]` ב־api/routers/notes.py. **MD-SETTINGS:** Backend הושלם, תיאום 60; (משימה כבר CLOSED — Gate-KP). **D35 Notes:** API הושלם, תיאום 60; ממתין Gate-A (Team 50) ו־Seal (SOP-013).
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | D35_RICH_TEXT_ATTACHMENTS_LOCK_ADDED | 2026-02-15** — משימת-על D35 (Team 90 Feedback Lock): Rich Text + Attachments. תוכנית עבודה עודכנה (§5); SSOT: DDL (PHX_DB_SCHEMA_V2.5_NOTES_ATTACHMENTS_DDL.sql), OpenAPI Addendum, RICH_TEXT_SANITIZATION_POLICY (notes.content), 00_MASTER_INDEX. מנדטים: TEAM_10_TO_TEAM_20/30/50/60_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md. סגירה רק עם Seal (SOP-013); אין Gate-B לפני תוכנית+SSOT+מנדטים+Gate-A.
 

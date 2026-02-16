@@ -1,0 +1,3 @@
+# D35 Notes — Attachments storage root
+# Path template: storage/uploads/users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}
+# Created by Team 60 per TEAM_10_TO_TEAM_60_D35_RICH_TEXT_ATTACHMENTS_MANDATE

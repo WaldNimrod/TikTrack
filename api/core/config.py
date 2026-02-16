@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # API
     api_v1_prefix: str = "/api/v1"
     
+    # D35: Attachments storage base (Team 60 provides path; default relative to project root)
+    storage_uploads_base: str = os.getenv("STORAGE_UPLOADS_BASE", "storage/uploads")
+    
     # Debug: include exception detail in 500 responses (set DEBUG=true in api/.env)
     debug: bool = False
     

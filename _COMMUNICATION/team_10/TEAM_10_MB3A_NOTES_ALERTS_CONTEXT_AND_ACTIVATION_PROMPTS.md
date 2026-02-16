@@ -2,7 +2,7 @@
 
 **id:** TEAM_10_MB3A_CONTEXT_AND_ACTIVATION_PROMPTS  
 **owner:** Team 10 (The Gateway)  
-**תאריך:** 2026-02-15  
+**תאריך:** 2026-02-16  
 **מקור מנדט:** [TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md](../team_90/TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md)
 
 ---
@@ -42,6 +42,34 @@
 | **מנדטי D35 (לפי צוות):** | [TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md](TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md), [30](TEAM_10_TO_TEAM_30_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md), [50](TEAM_10_TO_TEAM_50_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md), [60](TEAM_10_TO_TEAM_60_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md) |
 | **Scope lock (תוצרי Gate-0):** | Notes: `TEAM_10_MB3A_NOTES_SCOPE_LOCK.md`; Alerts: `TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md` (ליצירה ב-Gate-0) |
 | **TT2_PAGES_SSOT_MASTER_LIST.md** | documentation/01-ARCHITECTURE — עדכון מיפוי עמודים ב-Gate-0 |
+| **תשובת Gate-0 Notes (31→10):** | [_COMMUNICATION/team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md](../team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md) — מיקום Blueprint, סקופ, גבול D35 Lock, המלצות SSOT |
+
+### 1.5 תשובת Gate-0 Notes — Team 31 (קלט ל-30/40)
+
+צוות 31 סיפקו קלט רשמי ל-Gate-0 Notes. **צוותים 30 ו-40 מקבלים כעת את הפרומט המעודכן (לא קיבלו את הפרומט הקודם)** — בהתבסס על המסמך הבא:
+
+| פריט | ערך |
+|------|-----|
+| **מסמך** | [TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md](../team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md) |
+| **D35** | route: notes, תפריט: נתונים → הערות |
+| **Blueprint** | `_COMMUNICATION/team_31/team_31_staging/sandbox_v2/notes_BLUEPRINT.html`; באינדקס: "הערות (notes) - Blueprint" — הושלם ואושר |
+| **סקופ Blueprint** | LEGO (page-wrapper → tt-container → tt-section); סקשן סיכום + סקשן ניהול הערות; טבלה (תוכן, קשור ל־, תאריך, פעולות); סינונים לפי טיפוס; כפתור הוספה; CSS: phoenix-base/components/header/D15_DASHBOARD; data-action (ללא inline scripts). **הערה:** כפתורי סינון — להעביר מ-inline styles ל-classes במסירה (TT2_BLUEPRINT_HANDOFF_REQUIREMENTS). |
+| **גבול D35 Lock** | Rich Text + Attachments (עד 3, 1MB, MIME, סניטיזציה) **לא** בבלופרינט — באחריות 20/30/60 לפי מנדטי D35. |
+
+### 1.6 סטטוס צד שרת (Team 20) — עדכון 2026-02-16
+
+צד שרת הושלם; סיכום ואימות: [_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION.md](../team_20/TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION.md).
+
+| בדיקה | תוצאה |
+|--------|--------|
+| pytest tests/ | 17 עברו בהצלחה |
+| D35 MIME | JPEG, PDF מאושרים; EXE נדחה |
+| D35 Sanitizer | XSS מוסר, תוכן תקין נשמר |
+| App startup | FastAPI טוען; notes router רשום |
+| **תיקון** | Python 3.9: `str \| None` → `Optional[str]` ב־api/routers/notes.py |
+
+- **MD-SETTINGS:** Backend הושלם, תיאום Team 60. (משימה CLOSED — Gate-KP.)
+- **D35 Notes:** API הושלם, תיאום Team 60. **מצב:** ממתינים Gate-A (Team 50) ו־Seal (SOP-013).
 
 ---
 
@@ -117,26 +145,34 @@ Gate-0 Notes סגור. אתם מופעלים ל-Build Notes.
 תוכנית: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §3. סגירה: רק עם Seal (SOP-013).
 ```
 
-**פרומט → Team 30:**
+**פרומט → Team 30 (מעודכן — קלט Gate-0 מ-31; לא קיבלתם את הפרומט הקודם):**
 
 ```
-Team 10 → Team 30 | MB3A Build Notes — UI אינטגרציה D35
+Team 10 → Team 30 | MB3A Build Notes — UI אינטגרציה D35 (פרומט מעודכן עם קלט Gate-0)
 
-אתם מופעלים לאינטגרציה UI של עמוד הערות (Notes). תלות: תוצרי Team 31 (Blueprint) ו-Backend (20) ל-notes/attachments.
+זה הפרומט הרשמי הראשון שלכם ל-Build Notes — מעודכן בהתאם לתשובת Team 31 ל-Gate-0.
 
-משימה: עורך Rich Text ב-Notes, העלאת קבצים, חסימות UI (סוג/גודל/מכסה 3). תאום עם 31 ו-20. מנדט D35: TEAM_10_TO_TEAM_30_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md.
+קלט חובה: קראו את _COMMUNICATION/team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md.
+- Blueprint: _COMMUNICATION/team_31/team_31_staging/sandbox_v2/notes_BLUEPRINT.html (D35, route: notes, תפריט: נתונים → הערות).
+- סקופ Blueprint: מבנה LEGO, סקשן סיכום + סקשן ניהול הערות, טבלה (תוכן, קשור ל־, תאריך, פעולות), סינונים לפי טיפוס, כפתור הוספה; data-action ללא inline scripts. במסירה — כפתורי סינון: להעביר מ-inline styles ל-classes (TT2_BLUEPRINT_HANDOFF_REQUIREMENTS).
+- גבול D35 Lock: עורך Rich Text והעלאת קבצים (עד 3, 1MB, MIME, סניטיזציה) לא בבלופרינט — באחריותכם יחד עם 20/60. מנדט: TEAM_10_TO_TEAM_30_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md.
 
-תוכנית: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §3, §5. סגירה: רק עם Seal (SOP-013).
+משימה: אינטגרציה UI — מימוש לפי Blueprint + עורך Rich Text, העלאת קבצים, חסימות UI (סוג/גודל/מכסה 3). תאום עם 31 ו-20. תוכנית: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §3, §5. סגירה: רק עם Seal (SOP-013).
 ```
 
-**פרומט → Team 40:**
+**פרומט → Team 40 (מעודכן — קלט Gate-0 מ-31; לא קיבלתם את הפרומט הקודם):**
 
 ```
-Team 10 → Team 40 | MB3A Build Notes — UI Assets/סטיילינג D35 (אם בסקופ)
+Team 10 → Team 40 | MB3A Build Notes — UI Assets/סטיילינג D35 (פרומט מעודכן עם קלט Gate-0)
 
-אתם מופעלים לחלק UI/סטיילינג של עמוד הערות (Notes) לפי סקופ Gate-0 ותוצרי 31. תלות: Blueprint מ-31; תאום עם 30.
+זה הפרומט הרשמי הראשון שלכם ל-Build Notes — מעודכן בהתאם לתשובת Team 31 ל-Gate-0.
 
-משימה: לפי TEAM_10_MB3A_NOTES_SCOPE_LOCK.md ו-SLA עם 30. תוכנית: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md. סגירה: רק עם Seal (SOP-013).
+קלט חובה: קראו את _COMMUNICATION/team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md.
+- Blueprint: _COMMUNICATION/team_31/team_31_staging/sandbox_v2/notes_BLUEPRINT.html (D35, נתונים → הערות).
+- סקופ: מבנה LEGO, סקשנים, טבלה, סינונים, כפתור הוספה; CSS מקושר ל-phoenix-base/components/header/D15_DASHBOARD; במסירה — inline styles בכפתורי סינון להעביר ל-classes (TT2_BLUEPRINT_HANDOFF_REQUIREMENTS).
+- גבול D35 Lock: Rich Text + Attachments באחריות 20/30/60 — תאום עם 30.
+
+משימה: UI/סטיילינג לעמוד הערות לפי Blueprint ו-SLA עם 30. תוכנית: TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md. סגירה: רק עם Seal (SOP-013).
 ```
 
 ---
@@ -241,4 +277,4 @@ Alerts: (המתנה ל-Gate-KP Notes) → [Gate-0 (10+31)] → [Build (31→30/4
 
 ---
 
-**log_entry | TEAM_10 | MB3A | CONTEXT_AND_ACTIVATION_PROMPTS_ISSUED | 2026-02-15**
+**log_entry | TEAM_10 | MB3A | CONTEXT_AND_ACTIVATION_PROMPTS_ISSUED | 2026-02-16**

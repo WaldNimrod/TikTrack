@@ -707,7 +707,7 @@ a:hover {
 /* ============================================
    Input, Textarea, Select - Base Styles (SSOT)
    ============================================
-   System-wide defaults — aligned with modal "הוסף חשבון" (add account) reference.
+   System-wide defaults — aligned with modal "הוספת חשבון מסחר" (add trading account) reference.
    Source: phoenix-modal.css .phoenix-modal__body input/select/textarea
    All text inputs, dropdowns, form fields inherit these unless overridden.
    ============================================ */

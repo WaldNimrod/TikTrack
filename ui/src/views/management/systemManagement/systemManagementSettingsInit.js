@@ -86,7 +86,7 @@ function renderForm(container, data) {
 
   const actions = document.createElement('div');
   actions.className = 'settings-actions';
-  actions.innerHTML = `<button type="submit" class="btn btn-primary js-save-market-data">שמור הגדרות</button>`;
+  actions.innerHTML = `<button type="submit" class="btn btn-primary js-save-market-data">שמירת הגדרות</button>`;
   form.appendChild(actions);
 
   form.addEventListener('submit', handleSave);
@@ -104,7 +104,7 @@ async function handleSave(ev) {
   if (errorEl) errorEl.textContent = '';
   if (successEl) successEl.textContent = '';
   btn.disabled = true;
-  btn.textContent = 'שומר...';
+    btn.textContent = 'שמירה...';
 
   const payload = {};
   const inputs = form.querySelectorAll('.js-market-data-input');
@@ -125,7 +125,7 @@ async function handleSave(ev) {
   if (Object.keys(payload).length === 0) {
     if (errorEl) errorEl.textContent = 'לא בוצעו שינויים.';
     btn.disabled = false;
-    btn.textContent = 'שמור הגדרות';
+    btn.textContent = 'שמירת הגדרות';
     return;
   }
 
@@ -152,7 +152,7 @@ async function handleSave(ev) {
     if (errorEl) errorEl.textContent = msg;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'שמור הגדרות';
+    btn.textContent = 'שמירת הגדרות';
   }
 }
 

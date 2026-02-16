@@ -52,7 +52,7 @@
                       <div class="info-summary__content">
                         <span>פוזיציות פעילות: 0</span>
                         <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                        <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
+                        <span>שווי ממוצע לחשבון מסחר: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
                         <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
                       </div>
                     </div>
@@ -85,7 +85,7 @@
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                   </svg>
-                  <span>הוסף חשבון</span>
+                  <span>הוספת חשבון מסחר</span>
                 </button>
                 <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -151,7 +151,7 @@
                             </span>
                           </th>
                           <th class="phoenix-table__header col-account-value js-table-sort-trigger" data-sortable="true" data-sort-key="account_value" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">שווי חשבון</span>
+                            <span class="phoenix-table__header-text">שווי חשבון מסחר</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M8 9l4 -4l4 4"></path>
@@ -245,7 +245,7 @@
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="/images/icons/entities/cash_flows.svg" alt="תנועות" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">סיכום תנועות לחשבון</h1>
+                <h1 class="index-section__header-text">סיכום תנועות לחשבון מסחר</h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">0 תנועות</span>
@@ -292,8 +292,8 @@
             <!-- Section Header -->
             <div class="index-section__header">
               <div class="index-section__header-title">
-                <img src="/images/icons/entities/trading_accounts.svg" alt="חשבון לתאריכים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">דף חשבון לתאריכים</h1>
+                <img src="/images/icons/entities/trading_accounts.svg" alt="חשבון מסחר לתאריכים" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">דף חשבון מסחר לתאריכים</h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">0 רשומות</span>
@@ -314,7 +314,7 @@
                   <!-- TODO: Container 3 Content - Cash Flows Table (8 columns) + Internal Filters -->
                   <div class="phoenix-table-filters">
                     <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">חשבון:</label>
+                      <label class="phoenix-table-filter-label">חשבון מסחר:</label>
                       <select class="phoenix-table-filter-select js-table-filter" data-filter-key="account" id="accountByDatesSelect">
                         <option value="">כל החשבונות</option>
                       </select>
@@ -328,7 +328,7 @@
                   </div>
                   
                   <div class="phoenix-table-wrapper">
-                    <table id="accountActivityTable" class="phoenix-table js-table" role="table" aria-label="דף חשבון לתאריכים">
+                    <table id="accountActivityTable" class="phoenix-table js-table" role="table" aria-label="דף חשבון מסחר לתאריכים">
                       <thead class="phoenix-table__head" role="rowgroup">
                         <tr class="phoenix-table__row" role="row">
                           <th class="phoenix-table__header col-date js-table-sort-trigger" data-sortable="true" data-sort-key="date" data-sort-type="date" role="columnheader" aria-sort="none" tabindex="0">
@@ -359,7 +359,7 @@
                             </span>
                           </th>
                           <th class="phoenix-table__header col-account js-table-sort-trigger" data-sortable="true" data-sort-key="account" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">חשבון</span>
+                            <span class="phoenix-table__header-text">חשבון מסחר</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M8 9l4 -4l4 4"></path>
@@ -453,7 +453,7 @@
             <div class="index-section__header">
               <div class="index-section__header-title">
                 <img src="/images/icons/entities/trades.svg" alt="פוזיציות" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">פוזיציות לפי חשבון</h1>
+                <h1 class="index-section__header-text">פוזיציות לפי חשבון מסחר</h1>
               </div>
               <div class="index-section__header-meta">
                 <span class="index-section__header-count">0 פוזיציות פעילות</span>
@@ -474,7 +474,7 @@
                   <!-- TODO: Container 4 Content - Positions Table (9 columns) + Internal Filters -->
                   <div class="phoenix-table-filters">
                     <div class="phoenix-table-filter-group">
-                      <label class="phoenix-table-filter-label">חשבון:</label>
+                      <label class="phoenix-table-filter-label">חשבון מסחר:</label>
                       <select class="phoenix-table-filter-select js-table-filter" data-filter-key="account" id="positionsAccountSelect">
                         <option value="">כל החשבונות</option>
                       </select>
@@ -482,7 +482,7 @@
                   </div>
                   
                   <div class="phoenix-table-wrapper">
-                    <table id="positionsTable" class="phoenix-table js-table" role="table" aria-label="פוזיציות לפי חשבון">
+                    <table id="positionsTable" class="phoenix-table js-table" role="table" aria-label="פוזיציות לפי חשבון מסחר">
                       <thead class="phoenix-table__head" role="rowgroup">
                         <tr class="phoenix-table__row" role="row">
                           <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" role="columnheader" aria-sort="none" tabindex="0">
@@ -541,7 +541,7 @@
                             </span>
                           </th>
                           <th class="phoenix-table__header col-percent-account js-table-sort-trigger" data-sortable="true" data-sort-key="percent_account" data-sort-type="numeric" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">אחוז מהחשבון</span>
+                            <span class="phoenix-table__header-text">אחוז מחשבון מסחר</span>
                             <span class="phoenix-table__sort-indicator js-sort-indicator">
                               <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M8 9l4 -4l4 4"></path>

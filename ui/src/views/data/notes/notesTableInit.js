@@ -18,7 +18,7 @@ let currentSortDir = 'asc';
 
 const PARENT_TYPE_LABELS = {
   all: 'הכל',
-  account: 'חשבון',
+  account: 'חשבון מסחר',
   trade: 'טרייד',
   trade_plan: 'תוכנית',
   ticker: 'טיקר',
@@ -127,13 +127,13 @@ function renderNoteRow(note) {
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
-            <button class="table-action-btn js-action-edit" aria-label="ערוך" data-note-id="${id}">
+            <button class="table-action-btn js-action-edit" aria-label="לערוך" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="מחק" data-note-id="${id}">
+            <button class="table-action-btn js-action-delete" aria-label="למחוק" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -168,15 +168,27 @@ function sortNotesData(arr, sortKey, sortDir) {
 
 /**
  * Update pagination UI — MANDATORY: always show correct count
+ * Uses PhoenixTablePagination (shared object) — אובייקט קבוע לכל הטבלאות
  */
 function updatePagination() {
-  const total = tableData.total || 0;
-  const totalPages = Math.max(1, Math.ceil(total / currentPageSize));
-  const start = total === 0 ? 0 : (currentPage - 1) * currentPageSize + 1;
-  const end = Math.min(currentPage * currentPageSize, total);
+  const P = window.PhoenixTablePagination;
+  const dataLen = (tableData.data || []).length;
+  const state = P
+    ? P.computeState(tableData.total, currentPage, currentPageSize, dataLen)
+    : (() => {
+        const t = Math.max(tableData.total || 0, dataLen);
+        const tp = Math.max(1, Math.ceil(t / currentPageSize));
+        return {
+          start: t === 0 ? 0 : (currentPage - 1) * currentPageSize + 1,
+          end: Math.min(currentPage * currentPageSize, t),
+          total: t,
+          totalPages: tp
+        };
+      })();
+  const { start, end, total, totalPages } = state;
 
   const infoEl = document.getElementById('notesPaginationInfo');
-  if (infoEl) infoEl.textContent = `מציג ${start}-${end} מתוך ${total} רשומות`;
+  if (infoEl) infoEl.textContent = P ? P.formatInfoText(start, end, total) : `מציג ${start}-${end} מתוך ${total} רשומות`;
 
   const prevBtn = document.getElementById('notesPrevPageBtn');
   const nextBtn = document.getElementById('notesNextPageBtn');
@@ -212,18 +224,21 @@ function renderTableFromState() {
   tbody.innerHTML = pageData.map(renderNoteRow).join('');
 
   const countEl = document.getElementById('notesCount');
-  if (countEl) countEl.textContent = `${tableData.total} הערות`;
+  const total = Math.max(tableData.total || 0, (tableData.data || []).length);
+  if (countEl) countEl.textContent = `${total} הערות`;
 
   updatePagination();
 }
 
 /**
  * Render table body — entry point when data arrives. Stores in tableData, renders page, updates pagination.
+ * CRITICAL: total must always reflect actual row count for correct pagination display.
  */
 function renderTable(notes) {
-  const raw = Array.isArray(notes) ? notes : (notes && notes.data != null ? notes.data : []);
-  const total = (notes && notes.total != null ? notes.total : raw.length) || raw.length;
-  tableData = { data: raw, total: total };
+  const raw = Array.isArray(notes) ? notes : (notes?.data ?? notes?.notes ?? notes?.results ?? notes?.items ?? []) || [];
+  const reportedTotal = notes?.total ?? notes?.total_count ?? null;
+  const total = Math.max(raw.length, reportedTotal ?? 0);
+  tableData = { data: raw, total };
   currentPage = 1;
   renderTableFromState();
 }
@@ -261,7 +276,7 @@ async function handleViewNote(noteId) {
     });
     setTimeout(function() {
       const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
-      if (cancelBtn) cancelBtn.textContent = 'סגור';
+      if (cancelBtn) cancelBtn.textContent = 'לסגור';
     }, 0);
   } catch (err) {
     maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
@@ -313,7 +328,9 @@ function initSortManager() {
   table.addEventListener('phoenix-table-sorted', function(e) {
     const detail = e.detail || {};
     currentSortKey = detail.sortKey || null;
-    currentSortDir = detail.sortDirection || detail.sortDir || 'asc';
+    const dir = (detail.sortDirection || detail.sortDir || 'asc');
+    currentSortDir = typeof dir === 'string' ? dir.toLowerCase() : 'asc';
+    if (currentSortDir !== 'asc' && currentSortDir !== 'desc') currentSortDir = 'asc';
     renderTableFromState();
   });
 }

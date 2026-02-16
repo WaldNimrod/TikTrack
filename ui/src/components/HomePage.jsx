@@ -353,7 +353,7 @@ const HomePage = () => {
                               </div>
                               <div className="active-alerts__row active-alerts__row--message">
                                 <span className="active-alerts__row-label">הודעה</span>
-                                <span className="active-alerts__row-value">⚠️ התראה: יתרת חשבון נמוכה - נדרש מימון</span>
+                                <span className="active-alerts__row-value">⚠️ התראה: יתרת חשבון מסחר נמוכה - נדרש מימון</span>
                               </div>
                             </div>
                             <div className="active-alerts__card-footer">
@@ -484,7 +484,7 @@ const HomePage = () => {
                           <div className="info-summary__content">
                             <span>חשבונות פעילים: 31 מתוך 53</span>
                             <span>שווי כולל: <span className="numeric-value-positive" dir="ltr">+$372,660.00</span></span>
-                            <span>שווי ממוצע לחשבון: <span className="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
+                            <span>שווי ממוצע לחשבון מסחר: <span className="numeric-value-positive" dir="ltr">+$7,031.32</span></span>
                             <span>טריידים פתוחים: 71</span>
                             <span>P/L כולל: <span className="numeric-value-positive" dir="ltr">+$1,768.00</span></span>
                           </div>
@@ -1055,7 +1055,7 @@ const HomePage = () => {
                       <select 
                         id="portfolioAccountFilter" 
                         className="portfolio-filter-select align-push-down" 
-                        aria-label="בחר חשבון מסחר"
+                        aria-label="לבחור חשבון מסחר"
                       >
                         <option value="">כל חשבונות המסחר</option>
                         <option value="1">חשבון 1</option>
@@ -1140,7 +1140,7 @@ const HomePage = () => {
                             <th className="col-avg-price">מחיר ממוצע</th>
                             <th className="col-market-value">שווי שוק</th>
                             <th className="col-unrealized-pl">P/L</th>
-                            <th className="col-account">חשבון</th>
+                            <th className="col-account">חשבון מסחר</th>
                             <th className="col-percent-portfolio">% פורטפוליו</th>
                             <th className="col-actions">פעולות</th>
                           </tr>

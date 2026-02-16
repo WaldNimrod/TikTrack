@@ -117,7 +117,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     const select = document.getElementById('historyRateSelect');
     if (!select) return;
 
-    select.innerHTML = '<option value="">— בחר שער —</option>';
+    select.innerHTML = '<option value="">— לבחור שער —</option>';
     (data || []).forEach((r) => {
       const from = r.from_currency ?? r.fromCurrency ?? '';
       const to = r.to_currency ?? r.toCurrency ?? '';
@@ -138,7 +138,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     if (!selectedPair) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">בחר זוג מטבעות למעלה</td>';
+      row.innerHTML = '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">לבחור זוג מטבעות למעלה</td>';
       tbody.appendChild(row);
       return;
     }

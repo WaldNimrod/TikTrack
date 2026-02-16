@@ -2,11 +2,11 @@
 Rich-Text Sanitizer (SOP-012, T20.2)
 Server-side HTML sanitization for description, notes, and notes.content (D35) fields.
 
-Rules (from SOP_012_DOMPURIFY_ALLOWLIST.md):
-- Tags: p, br, strong, em, u, a, ul, ol, li, span
+Rules:
+- Tags: p, br, strong, em, u, a, ul, ol, li, span, h3, h4
 - a: href (http/https/mailto), target, rel
 - span: only class with values starting phx-rt--
-- p: dir (rtl, ltr, auto) — חובה לאפשר RTL
+- p, h3, h4: dir (rtl, ltr, auto), style (text-align only)
 """
 
 import re
@@ -16,13 +16,19 @@ try:
     import bleach
 except ImportError:
     bleach = None
+try:
+    from bleach.css_sanitizer import CSSSanitizer
+except ImportError:
+    CSSSanitizer = None
 
 # SOP-012 allowlist
-SOP012_TAGS = {'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span'}
+SOP012_TAGS = {'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span', 'h3', 'h4'}
 SOP012_ATTRIBUTES = {
     'a': ['href', 'target', 'rel'],
     'span': ['class'],
-    'p': ['dir'],
+    'p': ['dir', 'style'],
+    'h3': ['dir', 'style'],
+    'h4': ['dir', 'style'],
 }
 SOP012_DIR_VALUES = frozenset({'rtl', 'ltr', 'auto'})
 SOP012_PROTOCOLS = {'http', 'https', 'mailto'}
@@ -73,6 +79,7 @@ def sanitize_rich_text(html: Optional[str]) -> Optional[str]:
     - Only allowed tags and attributes
     - span class: only phx-rt--* values
     - a href: only http, https, mailto
+    - p, h3, h4: dir (rtl/ltr/auto), style (text-align only)
     """
     if html is None or not isinstance(html, str):
         return html
@@ -83,6 +90,8 @@ def sanitize_rich_text(html: Optional[str]) -> Optional[str]:
     if bleach is None:
         raise RuntimeError("bleach package required for rich-text sanitization. pip install bleach")
     
+    css_sanitizer = CSSSanitizer(allowed_css_properties=['text-align']) if CSSSanitizer else None
+    
     cleaned = bleach.clean(
         s,
         tags=SOP012_TAGS,
@@ -90,6 +99,7 @@ def sanitize_rich_text(html: Optional[str]) -> Optional[str]:
         protocols=SOP012_PROTOCOLS,
         strip=True,
         strip_comments=True,
+        css_sanitizer=css_sanitizer,
     )
     # Post-process: filter span class to only phx-rt--*
     cleaned = _SPAN_CLASS_RE.sub(_filter_span_class, cleaned)

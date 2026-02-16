@@ -49,7 +49,7 @@ function createAddFormHTML(availableTickers, userTickerIds) {
         <div class="form-group">
           <label>הוסף טיקר קיים</label>
           <select id="userTickerExistingSelect" class="phoenix-form__select">
-            <option value="">— בחר טיקר —</option>
+            <option value="">— לבחור טיקר —</option>
             ${existingOptions}
           </select>
         </div>
@@ -123,7 +123,7 @@ export function showUserTickerAddModal(options = {}) {
     content: formHTML,
     entity: 'user_tickers',
     showSaveButton: true,
-    saveButtonText: 'הוסף',
+    saveButtonText: 'הוספה',
     onSave: async function () {
       const form = document.getElementById('userTickerAddForm');
       if (!form) return;
@@ -153,12 +153,12 @@ export function showUserTickerAddModal(options = {}) {
       }
 
       if (!existingId && !newSymbol) {
-        if (symbolErr) symbolErr.textContent = 'בחר טיקר קיים או הזן סמל לטיקר חדש';
+        if (symbolErr) symbolErr.textContent = 'לבחור טיקר קיים או להזין סמל לטיקר חדש';
         return;
       }
 
       if (existingId && newSymbol) {
-        if (symbolErr) symbolErr.textContent = 'בחר אפשרות אחת בלבד — טיקר קיים או טיקר חדש';
+        if (symbolErr) symbolErr.textContent = 'לבחור אפשרות אחת בלבד — טיקר קיים או טיקר חדש';
         return;
       }
 

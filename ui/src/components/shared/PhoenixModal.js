@@ -16,6 +16,7 @@
  * @param {Function} options.onSave - Callback when save button is clicked (optional)
  * @param {boolean} options.showSaveButton - Whether to show save button (default: true)
  * @param {string} options.saveButtonText - Save button text (default: "שמירה")
+ * @param {string} options.cancelButtonText - Cancel button text (default: "לבטל")
  * @param {string} options.entity - Entity for header color (trading_account | brokers_fees | cash_flow)
  * @returns {HTMLElement} Modal element
  */
@@ -27,6 +28,7 @@ export function createModal(options = {}) {
     onSave = null,
     showSaveButton = true,
     saveButtonText = 'שמירה',
+    cancelButtonText = 'לבטל',
     entity = null
   } = options;
 
@@ -92,7 +94,7 @@ export function createModal(options = {}) {
   const cancelButton = document.createElement('button');
   cancelButton.className = 'phoenix-modal__cancel-btn';
   cancelButton.type = 'button';
-  cancelButton.textContent = 'ביטול';
+  cancelButton.textContent = cancelButtonText;
   footer.appendChild(cancelButton);
 
   if (showSaveButton && onSave) {

@@ -495,6 +495,51 @@ class SharedServices {
       throw error;
     }
   }
+
+  /**
+   * POST multipart/form-data (file upload)
+   * @param {string} endpoint - API endpoint (e.g. /notes/{note_id}/attachments)
+   * @param {FormData} formData - FormData with file(s)
+   * @returns {Promise<Object>} Response data
+   */
+  async postFormData(endpoint, formData) {
+    try {
+      if (this._isProtectedEndpoint(endpoint)) {
+        const token = this.getToken();
+        if (!token || String(token).trim() === '') {
+          const err = new Error('Authentication required for protected endpoint');
+          err.code = 'HTTP_401';
+          err.status = 401;
+          throw err;
+        }
+      }
+      const url = this.buildUrl(endpoint);
+      const headers = { Authorization: `Bearer ${this.getToken() || ''}` };
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+      if (!response.ok) {
+        const errorData = { code: `HTTP_${response.status}`, message: response.statusText, status: response.status };
+        try {
+          const errorBody = await response.json();
+          if (errorBody.error) {
+            errorData.code = errorBody.error.code || errorData.code;
+            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+          }
+        } catch (_) {}
+        const errorObj = new Error(errorData.message);
+        errorObj.code = errorData.code;
+        errorObj.status = errorData.status;
+        throw errorObj;
+      }
+      return await this.handleResponse(response);
+    } catch (error) {
+      maskedLog('[Shared Services] POST FormData failed:', { endpoint, errorCode: error.code });
+      throw error;
+    }
+  }
   
   /**
    * PUT request
@@ -732,6 +777,7 @@ class SharedServices {
         throw errorObj;
       }
       
+      if (response.status === 204) return {};
       return await this.handleResponse(response);
     } catch (error) {
       // Use masked log for security compliance (prevents token leakage)

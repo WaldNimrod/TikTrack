@@ -1,16 +1,14 @@
 /**
  * DOMPurify configuration for Rich-Text (SOP-012)
  * -----------------------------------------------
- * Allowlist per SOP_012_DOMPURIFY_ALLOWLIST.md
- * Tags: p, br, strong, em, u, a, ul, ol, li, span
- * span class: only phx-rt--* (success, warning, danger, highlight)
- * No style attribute; no event handlers
+ * Tags: p, br, strong, em, u, a, ul, ol, li, span, h3, h4
+ * span class: only phx-rt--* | p/h3/h4: dir, style (text-align only)
  */
 
 import DOMPurify from 'dompurify';
 
-const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span'];
-const ALLOWED_ATTR = ['href', 'target', 'rel', 'class'];
+const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span', 'h3', 'h4'];
+const ALLOWED_ATTR = ['href', 'target', 'rel', 'class', 'dir', 'style'];
 
 /** Allow only class values starting with phx-rt-- */
 const PHX_RT_PREFIX = 'phx-rt--';
@@ -46,6 +44,14 @@ export function sanitizeRichTextHtml(dirty) {
         }
         if (data.attrName === 'href' && data.attrValue && !SAFE_URI.test(data.attrValue)) {
           data.attrValue = '';
+        }
+        if (data.attrName === 'style' && data.attrValue) {
+          const m = data.attrValue.match(/text-align\s*:\s*(left|center|right|justify)/i);
+          data.attrValue = m ? `text-align: ${m[1].toLowerCase()}` : '';
+        }
+        if (data.attrName === 'dir' && data.attrValue) {
+          const v = (data.attrValue || '').toLowerCase();
+          if (!['ltr', 'rtl', 'auto'].includes(v)) data.attrValue = '';
         }
       }
     }

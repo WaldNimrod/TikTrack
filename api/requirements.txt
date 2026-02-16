@@ -19,8 +19,8 @@ slowapi>=0.1.9  # Rate limiting for FastAPI
 # Validation
 pydantic>=2.5.0
 
-# Rich-Text Sanitization (SOP-012)
-bleach>=6.0.0
+# Rich-Text Sanitization (SOP-012) — text-align support
+bleach[css]>=6.0.0
 pydantic-settings>=2.1.0
 email-validator>=2.0.0  # Required for Pydantic EmailStr validation
 

@@ -169,7 +169,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
         errorCode: error.code,
         status: error.status
       });
-      alert('שגיאה בטעינת פרטי החשבון');
+      alert('שגיאה בטעינת פרטי חשבון מסחר');
     }
   }
   
@@ -197,7 +197,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
    * Handle delete trading account action
    */
   async function handleDeleteTradingAccount(accountId) {
-    if (!confirm('האם אתה בטוח שברצונך למחוק את החשבון? פעולה זו לא ניתנת לביטול.')) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון המסחר? פעולה זו לא ניתנת לביטול.')) {
       return;
     }
     
@@ -215,7 +215,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
         status: error.status
       });
       
-      let errorMessage = 'שגיאה במחיקת החשבון';
+      let errorMessage = 'שגיאה במחיקת חשבון המסחר';
       if (error.message_i18n || error.message) {
         errorMessage = error.message_i18n || error.message;
       }
@@ -322,7 +322,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
       });
       
       // Show user-friendly error message
-      let errorMessage = 'שגיאה בשמירת החשבון';
+      let errorMessage = 'שגיאה בשמירת חשבון המסחר';
       
       // Handle authentication errors (401)
       if (error.code === 'HTTP_401' || error.status === 401) {
@@ -343,7 +343,7 @@ import { maskedLog } from '../../../utils/maskedLog.js';
         // Check if error.details contains field-specific information
         if (error.details) {
           if (error.details.field) {
-            const fieldName = error.details.field === 'account_name' ? 'שם החשבון' :
+            const fieldName = error.details.field === 'account_name' ? 'שם חשבון מסחר' :
                             error.details.field === 'initial_balance' ? 'יתרה התחלתית' :
                             error.details.field === 'currency' ? 'מטבע' :
                             error.details.field;

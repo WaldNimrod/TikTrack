@@ -47,7 +47,7 @@ function createBrokerFeeFormHTML(data = null, tradingAccounts = [], preselectedA
     : (typeof commissionValueRaw === 'number' ? commissionValueRaw : parseFloat(commissionValueRaw) || 0);
   const minimum = data?.minimum ?? 0;
 
-  let accountOptions = '<option value="">-- בחר חשבון מסחר --</option>';
+  let accountOptions = '<option value="">-- לבחור חשבון מסחר --</option>';
   if (tradingAccounts.length > 0) {
     tradingAccounts.forEach((acc) => {
       const id = acc.externalUlid ?? acc.id ?? acc.external_ulid ?? '';
@@ -119,7 +119,7 @@ function createBrokerFeeFormHTML(data = null, tradingAccounts = [], preselectedA
  */
 export async function showBrokerFeeFormModal(data, onSave, preselectedAccountId = '') {
   const isEdit = data !== null;
-  const title = isEdit ? 'עריכת עמלה' : 'הוספת עמלה לחשבון';
+  const title = isEdit ? 'עריכת עמלה' : 'הוספת עמלה לחשבון מסחר';
 
   const tradingAccounts = await getTradingAccounts();
   const formHTML = createBrokerFeeFormHTML(data, tradingAccounts, preselectedAccountId);

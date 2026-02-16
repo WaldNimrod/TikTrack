@@ -11,8 +11,8 @@
 
 ## 2. חוקים
 
-- **תגיות מותרות:** `p`, `br`, `strong`, `em`, `u`, `a`, `ul`, `ol`, `li`, `span`
-- **`p`:** `dir` (רק rtl, ltr, auto) — תמיכה ב-RTL
+- **תגיות מותרות:** `p`, `br`, `strong`, `em`, `u`, `a`, `ul`, `ol`, `li`, `span`, `h3`, `h4`
+- **`p`, `h3`, `h4`:** `dir` (rtl, ltr, auto), `style` (רק text-align)
 - **`a`:** `href` (רק http, https, mailto), `target`, `rel`
 - **`span`:** רק `class` — וערך ה-class **חייב** להתחיל ב-`phx-rt--` (למשל `phx-rt--success`, `phx-rt--warning`, `phx-rt--danger`, `phx-rt--highlight`)
 - **אסור:** `style`, `on*`, `script`, `iframe`, וכל תגית/attribute שלא ברשימה

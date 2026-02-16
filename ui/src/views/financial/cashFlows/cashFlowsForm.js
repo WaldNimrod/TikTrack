@@ -10,6 +10,7 @@ import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { getFlowTypeOptions } from '../../../utils/flowTypeValues.js';
 import { createPhoenixRichTextEditor } from '../../../components/shared/phoenixRichTextEditor.js';
+import { getPhoenixRichTextToolbarHTML } from '../../../components/shared/phoenixRichTextToolbarConfig.js';
 
 /**
  * Get trading accounts for dropdown
@@ -64,8 +65,8 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
   const currentFilterAccount = window.PhoenixBridge?.state?.filters?.tradingAccount || '';
   const defaultAccountId = tradingAccountId || currentFilterAccount || '';
 
-  // Build trading accounts dropdown (D16 style: -- בחר --)
-  let accountsOptions = '<option value="">-- בחר חשבון מסחר --</option>';
+  // Build trading accounts dropdown (D16 style: -- לבחור --)
+  let accountsOptions = '<option value="">-- לבחור חשבון מסחר --</option>';
   if (tradingAccounts.length > 0) {
     tradingAccounts.forEach(account => {
       const accountId = account.externalUlid || account.id || account.external_ulid;
@@ -133,23 +134,8 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
       
       <div class="form-group">
         <label for="description-editor-container">תיאור</label>
-        <div id="description-editor-toolbar" class="phoenix-rt-toolbar">
-          <button type="button" data-rt-cmd="bold" title="מודגש">ב</button>
-          <button type="button" data-rt-cmd="italic" title="נטוי">נ</button>
-          <button type="button" data-rt-cmd="underline" title="קו תחתון">ק</button>
-          <span class="phoenix-rt-toolbar-sep">|</span>
-          <button type="button" data-rt-cmd="phx-success" title="הצלחה" class="phx-rt--success">✓</button>
-          <button type="button" data-rt-cmd="phx-warning" title="אזהרה" class="phx-rt--warning">!</button>
-          <button type="button" data-rt-cmd="phx-danger" title="סכנה" class="phx-rt--danger">✕</button>
-          <button type="button" data-rt-cmd="phx-highlight" title="הדגשה" class="phx-rt--highlight">◆</button>
-          <span class="phoenix-rt-toolbar-sep">|</span>
-          <button type="button" data-rt-cmd="bulletList" title="רשימה">•</button>
-          <button type="button" data-rt-cmd="orderedList" title="רשימה ממוספרת">1.</button>
-        </div>
-        <div 
-          id="description-editor-container" 
-          class="phoenix-rt-editor-wrapper"
-        ></div>
+        ${getPhoenixRichTextToolbarHTML('description-editor-toolbar')}
+        <div id="description-editor-container" class="phoenix-rt-editor-wrapper"></div>
         <span class="form-error" id="descriptionError"></span>
       </div>
       

@@ -716,7 +716,7 @@ body .page-wrapper .page-container main {
   opacity: 1;
 }
 
-/* Table Cell - font-size sm to prevent oversized text (שם חשבון, מטבע, עודכן, וכו') */
+/* Table Cell - font-size sm to prevent oversized text (שם חשבון מסחר, מטבע, עודכן, וכו') */
 .phoenix-table__cell {
   display: table-cell;
   padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
@@ -1121,6 +1121,7 @@ body .page-wrapper .page-container main {
 }
 
 .table-action-btn[aria-label*="ביטול"],
+.table-action-btn[aria-label*="לבטל"],
 .table-action-btn.js-action-cancel {
   color: var(--apple-orange, #ff9500);
   /* border-color: currentColor (inherited from base) */
@@ -1650,7 +1651,7 @@ body .page-wrapper .page-container main {
    Required for: col-name, col-symbol, col-actions
    ============================================ */
 
-/* Sticky Column - שם החשבון (ראשונה מימין ב-RTL) */
+/* Sticky Column - שם חשבון מסחר (ראשונה מימין ב-RTL) */
 .phoenix-table__header.col-name,
 .phoenix-table__cell.col-name {
   position: sticky;
@@ -1858,40 +1859,72 @@ body .page-wrapper .page-container main {
   text-align: start; /* Logical property for RTL */
 }
 
-/* Rich-Text Editor Toolbar & Container (SOP-012) */
+/* Rich-Text Editor Toolbar (SOP-012) — שורה 1: סגנונות | שורה 2: יישור, כיוון, רשימות */
 .phoenix-rt-toolbar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  padding: 4px 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0;
   margin-block-end: 4px;
   border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
 }
-.phoenix-rt-toolbar button {
-  min-width: 28px;
-  height: 28px;
+.phoenix-rt-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.phoenix-rt-toolbar-btn {
+  min-width: 32px;
+  height: 32px;
   padding: 0 6px;
   border: 1px solid var(--apple-border-light, #e5e5e5);
-  border-radius: 4px;
-  background: var(--apple-bg-secondary, #f5f5f7);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--apple-text-primary, #1d1d1f);
   cursor: pointer;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.phoenix-rt-toolbar button:hover {
+.phoenix-rt-toolbar-btn:hover {
   background: var(--apple-bg-tertiary, #e8e8ed);
+  border-color: var(--apple-border-light, #d1d1d6);
 }
+.phoenix-rt-toolbar-btn.is-active,
+.phoenix-rt-toolbar-btn.is-active.phx-rt--success,
+.phoenix-rt-toolbar-btn.is-active.phx-rt--warning,
+.phoenix-rt-toolbar-btn.is-active.phx-rt--danger,
+.phoenix-rt-toolbar-btn.is-active.phx-rt--highlight {
+  background: #1d1d1f !important;
+  color: #fff !important;
+  border-color: #1d1d1f !important;
+}
+.phoenix-rt-toolbar-btn.is-active:hover {
+  background: #2c2c2e;
+  border-color: #2c2c2e;
+}
+.phoenix-rt-toolbar-btn svg {
+  flex-shrink: 0;
+}
+/* מפריד אנכי בין קבוצות */
 .phoenix-rt-toolbar-sep {
-  margin: 0 4px;
-  color: var(--apple-text-tertiary, #86868b);
+  width: 1px;
+  height: 20px;
+  margin: 0 2px;
+  background: var(--apple-border-light, #e5e5e5);
+  align-self: center;
 }
+/* CRITICAL: שדה בגובה מקורי לפחות 5 שורות */
 .phoenix-rt-editor-wrapper {
-  min-height: 80px;
+  min-height: 8.5em; /* 5 rows + padding */
   border: 1px solid var(--apple-border-light, #e5e5e5);
   border-radius: 6px;
   padding: 8px 12px;
 }
 .phoenix-rt-editor-wrapper .ProseMirror {
-  min-height: 60px;
+  min-height: 7.5em; /* 5 rows (1.5em line-height) */
   outline: none;
 }
 .phoenix-rt-editor-wrapper .ProseMirror p.is-editor-empty:first-child::before {
@@ -1899,6 +1932,98 @@ body .page-wrapper .page-container main {
   content: attr(data-placeholder);
   float: right;
   pointer-events: none;
+}
+.phoenix-rt-editor-wrapper .ProseMirror h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+.phoenix-rt-editor-wrapper .ProseMirror h4 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0.6em 0 0.3em;
+}
+
+/* Notes Attachments (D35 — עד 3 קבצים, 1MB) — טבלה עדינה */
+.notes-attachments-area {
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+.notes-attachments-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.notes-attachments-header .form-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--apple-text-tertiary, #86868b);
+}
+.notes-attachments-header .notes-upload-trigger {
+  margin-inline-start: auto;
+}
+.notes-attachments-area .notes-upload-trigger:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.notes-attachments-area .notes-upload-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.notes-attachments-table {
+  margin-block-start: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+}
+.notes-attachment-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  font-size: 0.8125rem;
+  background: var(--apple-bg-primary, #fff);
+  border: 1px solid var(--apple-border-light, #e8e8ed);
+  border-radius: 4px;
+}
+.notes-attachment-row.notes-attachment-pending {
+  border-color: var(--apple-system-blue-dim, #c8e1ff);
+  background: rgba(0, 122, 255, 0.04);
+}
+.notes-attachment-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+.notes-attachment-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--apple-text-primary, #1d1d1f);
+}
+.notes-attachment-remove {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--apple-text-tertiary, #86868b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+.notes-attachment-remove:hover {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--apple-system-red, #ff3b30);
 }
 
 /* ============================================

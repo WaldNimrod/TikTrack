@@ -67,10 +67,10 @@ const DesignSystemStylesTable = () => {
     {
       className: '.btn-primary',
       description: 'פעולה ראשית',
-      usage: 'שמור, אישור, שלח',
+      usage: 'שמירה, אישור, שליחה',
       cssVariable: '--context-primary',
       color: '#475569',
-      example: <button className="btn btn-primary">שמור</button>
+      example: <button className="btn btn-primary">שמירה</button>
     },
     {
       className: '.btn-auth-primary',
@@ -94,15 +94,15 @@ const DesignSystemStylesTable = () => {
       usage: 'מחיקה, ביטול פעולה',
       cssVariable: '--message-warning',
       color: '#f59e0b',
-      example: <button className="btn btn-warning">ביטול</button>
+      example: <button className="btn btn-warning">לבטל</button>
     },
     {
       className: '.btn-secondary',
       description: 'פעולות משניות',
-      usage: 'ביטול, חזרה',
+      usage: 'לבטל, חזרה',
       cssVariable: '--color-secondary',
       color: '#fc5a06',
-      example: <button className="btn btn-secondary">ביטול</button>
+      example: <button className="btn btn-secondary">לבטל</button>
     },
     {
       className: '.btn-outline-secondary',

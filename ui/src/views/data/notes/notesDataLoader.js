@@ -50,8 +50,10 @@ async function fetchNotes(filters = {}) {
     }
     if (filters.parentId) params.parent_id = filters.parentId;
     const response = await sharedServices.get('/notes', params);
-    const data = Array.isArray(response) ? response : (response.data != null ? response.data : response.notes) || [];
-    return { data, total: data.length };
+    const data = Array.isArray(response) ? response : (response?.data ?? response?.notes ?? response?.results ?? response?.items ?? []) || [];
+    // CRITICAL: total must always reflect actual row count (pagination displays correctly)
+    const total = Math.max(data.length, (response.total != null ? response.total : response.total_count) || 0);
+    return { data, total };
   } catch (error) {
     maskedLog('[Notes Data Loader] Error fetching notes:', { errorCode: (error && error.code), status: (error && error.status) });
     return { data: [], total: 0 };

@@ -509,7 +509,7 @@ async function loadContainer0() {
       expandedContent.innerHTML = `
         <span>פוזיציות פעילות: ${activePositions}</span>
         <span>שווי כולל: <span class="numeric-value-positive" dir="ltr">${window.tableFormatters?.formatCurrency(totalValue, 'USD', 2) || `$${totalValue.toFixed(2)}`}</span></span>
-        <span>שווי ממוצע לחשבון: <span class="numeric-value-positive" dir="ltr">${window.tableFormatters?.formatCurrency(avgValue, 'USD', 2) || `$${avgValue.toFixed(2)}`}</span></span>
+        <span>שווי ממוצע לחשבון מסחר: <span class="numeric-value-positive" dir="ltr">${window.tableFormatters?.formatCurrency(avgValue, 'USD', 2) || `$${avgValue.toFixed(2)}`}</span></span>
         <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">${window.tableFormatters?.formatCurrency(totalPnL, 'USD', 2) || `$${totalPnL.toFixed(2)}`}</span></span>
       `;
     }

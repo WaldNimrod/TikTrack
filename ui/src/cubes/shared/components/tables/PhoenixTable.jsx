@@ -48,7 +48,7 @@ import { DEBUG_MODE } from '../../../utils/debug';
  * <PhoenixTable
  *   data={accounts}
  *   columns={[
- *     { key: 'displayNames', label: 'שם חשבון', sortable: true, type: 'string' },
+ *     { key: 'displayNames', label: 'שם חשבון מסחר', sortable: true, type: 'string' },
  *     { key: 'availableAmounts', label: 'יתרה', sortable: true, type: 'numeric' }
  *   ]}
  *   loading={false}

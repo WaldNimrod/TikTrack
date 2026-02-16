@@ -131,6 +131,18 @@ class PhoenixTableSortManager {
     // ביצוע סידור
     this.applySort(sortType);
 
+    // CRITICAL: Dispatch event for data-driven tables (pagination, client-side sort)
+    const primaryState = this.sortState.primary;
+    const dir = primaryState.direction || 'ASC';
+    const detail = {
+      sortKey: primaryState.key,
+      sortDirection: dir,
+      sortDir: dir.toLowerCase(),
+      sortType,
+      sortState: this.getSortState()
+    };
+    this.table.dispatchEvent(new CustomEvent('phoenix-table-sorted', { detail, bubbles: true }));
+
     maskedLog('[PhoenixTableSortManager] Sort changed', {
       key: sortKey,
       direction: isSecondary ? this.sortState.secondary.direction : this.sortState.primary.direction,

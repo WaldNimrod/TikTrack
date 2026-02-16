@@ -65,7 +65,7 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
   return `
     <form id="tradingAccountForm" class="phoenix-form phoenix-form--two-col">
       <div class="form-group">
-        <label for="accountName">שם החשבון <span class="form-label-asterisk">*</span></label>
+        <label for="accountName">שם חשבון מסחר <span class="form-label-asterisk">*</span></label>
         <input 
           type="text" 
           id="accountName" 
@@ -73,7 +73,7 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
           value="${accountName}" 
           required 
           maxlength="100"
-          placeholder="הזן שם חשבון"
+          placeholder="הזן שם חשבון מסחר"
         />
         <span class="form-error" id="accountNameError"></span>
       </div>
@@ -89,14 +89,14 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
           ${governanceMessageHTML}
         </div>
         <div class="form-group">
-          <label for="accountNumber">מספר חשבון <span class="form-label-asterisk">*</span></label>
+          <label for="accountNumber">מספר חשבון מסחר <span class="form-label-asterisk">*</span></label>
           <input 
             type="text" 
             id="accountNumber" 
             name="accountNumber" 
             value="${accountNumber}" 
             maxlength="50"
-            placeholder="הזן מספר חשבון"
+            placeholder="הזן מספר חשבון מסחר"
           />
           <span class="form-error" id="accountNumberError"></span>
         </div>
@@ -139,14 +139,14 @@ const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).rep
           <span class="form-error" id="isActiveError"></span>
         </div>
         <div class="form-group">
-          <label for="externalAccountId">מזהה חשבון חיצוני</label>
+          <label for="externalAccountId">מזהה חשבון מסחר חיצוני</label>
           <input 
             type="text" 
             id="externalAccountId" 
             name="externalAccountId" 
             value="${externalAccountId}" 
             maxlength="100"
-            placeholder="הזן מזהה חשבון חיצוני (אופציונלי)"
+            placeholder="הזן מזהה חשבון מסחר חיצוני (אופציונלי)"
           />
           <span class="form-error" id="externalAccountIdError"></span>
         </div>
@@ -236,7 +236,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
 
       // Validate required fields
       if (!accountNameValue) {
-        document.getElementById('accountNameError').textContent = 'שם החשבון הוא שדה חובה';
+        document.getElementById('accountNameError').textContent = 'שם חשבון מסחר הוא שדה חובה';
         return;
       }
 
@@ -246,7 +246,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
       }
 
       if (!accountNumberValue) {
-        document.getElementById('accountNumberError').textContent = 'מספר חשבון הוא שדה חובה';
+        document.getElementById('accountNumberError').textContent = 'מספר חשבון מסחר הוא שדה חובה';
         return;
       }
       
@@ -265,7 +265,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         return n === accountNameValue.trim().toLowerCase();
       });
       if (dupName) {
-        document.getElementById('accountNameError').textContent = 'קיים כבר חשבון עם שם זה';
+        document.getElementById('accountNameError').textContent = 'קיים כבר חשבון מסחר עם שם זה';
         return;
       }
       const dupNum = existingAccounts.some(acc => {
@@ -276,7 +276,7 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         return num && num === accountNumberValue.trim().toLowerCase();
       });
       if (dupNum) {
-        document.getElementById('accountNumberError').textContent = 'מספר חשבון זה כבר קיים אצלך';
+        document.getElementById('accountNumberError').textContent = 'מספר חשבון מסחר זה כבר קיים אצלך';
         return;
       }
       

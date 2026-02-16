@@ -54,7 +54,7 @@ function formatTs(ts) {
   }
 
   function populateSelect(list) {
-    selectEl.innerHTML = '<option value="">— בחר טיקר —</option>';
+    selectEl.innerHTML = '<option value="">— לבחור טיקר —</option>';
     list.forEach((t) => {
       const opt = document.createElement('option');
       opt.value = t.id ?? t.external_ulid ?? '';
@@ -72,7 +72,7 @@ function formatTs(ts) {
         gapsRowEl.hidden = true;
         if (panelEl) panelEl.appendChild(gapsRowEl);
       }
-      detailEl.innerHTML = '<p class="data-integrity-empty-badge">בחרו טיקר לבדיקה</p>';
+      detailEl.innerHTML = '<p class="data-integrity-empty-badge">לבחור טיקר לבדיקה</p>';
       return;
     }
 

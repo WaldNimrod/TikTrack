@@ -5,6 +5,18 @@
 
 ---
 
+## 🔒 כלל קבוע (חובה)
+
+**בעיית תקשורת לשרת / כשל אימות (Login, 500, Connection):**
+
+1. **להשתמש בסקריפטים המתועדים בתעוד הרשמי** לצורך איתחול השרת וביצוע בדיקה חוזרת.
+2. **מקור:** `documentation/01-ARCHITECTURE/SERVERS_SCRIPTS_SSOT.md` — `scripts/init-servers-for-qa.sh`, `scripts/fix-env-after-restart.sh`, `scripts/restart-all-servers.sh` וכו'.
+3. **אחרי איתחול והתחברות תקינה** — אין לחזור שוב ושוב על "BLOCKED — איתחול נדרש". ביצוע איתחול ואימות כניסה/אוטנטיקציה — **מצופה שהבדיקה תרוץ ותעבור**.
+
+**אין לסמן כישלון בדיקה כחסימת איתחול באופן חוזר לאחר שאיתחול בוצע.**
+
+---
+
 ## תהליך (צעד־אחר־צעד)
 
 ### 1. וידוא תשתית
@@ -12,7 +24,7 @@
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8082/health
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/
 ```
-- אם לא 200 — להפעיל: `./scripts/start-backend.sh` | `./scripts/start-frontend.sh`
+- אם לא 200 — להפעיל סקריפטים מתוך **SERVERS_SCRIPTS_SSOT**: `./scripts/init-servers-for-qa.sh` או `./scripts/fix-env-after-restart.sh` (אם Login מחזיר 500).
 - **Policy:** אתחול שרתים הוא self‑service. אין לערב את Team 60 אלא אם יש תקלה תשתיתית אמיתית.
 
 ### 2. הרצת בדיקות

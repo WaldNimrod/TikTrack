@@ -479,6 +479,7 @@
 2. **בדיקת Infrastructure:**
    - Backend: `curl http://localhost:8082/health`
    - Frontend: `curl http://localhost:8080`
+   - **בעיית תקשורת/אימות:** להשתמש בסקריפטים המתועדים ב־`SERVERS_SCRIPTS_SSOT` (`init-servers-for-qa.sh`, `fix-env-after-restart.sh`) — איתחול וביצוע בדיקה חוזרת. לא לסמן BLOCKED איתחול בחוזרה — ראה `TEAM_50_QA_RERUN_SOP` כלל קבוע.
 
 3. **הרצת בדיקות:**
    ```bash

@@ -66,7 +66,7 @@
 ## 3. הפניות
 
 - נוהל דיווח תקלות: `TT2_TEAM_50_DEFECT_REPORTING_PROCEDURE`
-- SOP ריצה חוזרת: `TEAM_50_QA_RERUN_SOP`
+- SOP ריצה חוזרת: `TEAM_50_QA_RERUN_SOP` — כולל **כלל קבוע:** בעיית תקשורת לשרת → סקריפטים מתוך SERVERS_SCRIPTS_SSOT → איתחול → בדיקה חוזרת. לא לחזור על BLOCKED איתחול אחרי שאיתחול בוצע.
 - נוהל QA: `TEAM_50_QA_WORKFLOW_PROTOCOL`
 
 ---

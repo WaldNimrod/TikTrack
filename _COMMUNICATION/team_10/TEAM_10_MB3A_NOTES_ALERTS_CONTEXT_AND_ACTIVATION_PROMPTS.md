@@ -43,6 +43,7 @@
 | **Scope lock (תוצרי Gate-0):** | Notes: `TEAM_10_MB3A_NOTES_SCOPE_LOCK.md`; Alerts: `TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md` (ליצירה ב-Gate-0) |
 | **TT2_PAGES_SSOT_MASTER_LIST.md** | documentation/01-ARCHITECTURE — עדכון מיפוי עמודים ב-Gate-0 |
 | **תשובת Gate-0 Notes (31→10):** | [_COMMUNICATION/team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md](../team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md) — מיקום Blueprint, סקופ, גבול D35 Lock, המלצות SSOT |
+| **דוח מימוש Notes (30→10 & 50):** | [documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_REPORT.md](../../documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_REPORT.md) — סיכום מימוש, 13 פריטי QA, המלצות תיעוד |
 
 ### 1.5 תשובת Gate-0 Notes — Team 31 (קלט ל-30/40)
 

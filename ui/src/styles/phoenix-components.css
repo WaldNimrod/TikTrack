@@ -879,13 +879,30 @@ body .page-wrapper .page-container main {
   /* width: auto - absorbs remaining width */
 }
 
-/* Date, Updated */
+/* Date, Updated, Created */
 .phoenix-table__header.col-date,
 .phoenix-table__cell.col-date,
 .phoenix-table__header.col-updated,
-.phoenix-table__cell.col-updated {
+.phoenix-table__cell.col-updated,
+.phoenix-table__header.col-created,
+.phoenix-table__cell.col-created {
   min-width: clamp(100px, 12%, 150px);
   width: clamp(100px, 12%, 150px);
+}
+
+/* Notes table: linked object (badge), content (expansion), attachment */
+.phoenix-table__header.col-linked-object,
+.phoenix-table__cell.col-linked-object {
+  min-width: clamp(100px, 12%, 180px);
+}
+.phoenix-table__header.col-content,
+.phoenix-table__cell.col-content {
+  min-width: clamp(150px, 20%, 300px);
+}
+.phoenix-table__header.col-attachment,
+.phoenix-table__cell.col-attachment {
+  min-width: clamp(80px, 10%, 140px);
+  width: clamp(80px, 10%, 140px);
 }
 
 /* ============================================
@@ -1728,8 +1745,9 @@ body .page-wrapper .page-container main {
   box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Header: hide text visually, keep for screen readers (פעולות) */
-.phoenix-table__header.col-actions .phoenix-table__header-text {
+/* Header: NO visible text — keeps column narrow. MANDATORY per TEAM_30_FRONTEND_STANDARDS (R3) */
+.phoenix-table__header.col-actions .phoenix-table__header-text,
+.phoenix-table__header.col-actions .sr-only {
   position: absolute;
   width: 1px;
   height: 1px;

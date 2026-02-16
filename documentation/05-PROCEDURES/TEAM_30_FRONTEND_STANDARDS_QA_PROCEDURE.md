@@ -1,4 +1,4 @@
-# נוהל אבטחת איכות פנימי — Team 30 (Frontend Standards)
+# נוהל עבודה פנימי — Team 30 (Frontend Standards)
 
 **id:** `TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE`  
 **owner:** Team 30 (Frontend)  
@@ -11,6 +11,18 @@
 ## 1. מטרה
 
 נוהל זה מגדיר **בדיקות חובה** לכל עמוד/רכיב חדש או מתוחזק, לשמירה על **סטנדרטים מדויקים ואחידות** בכל המערכת. הבדיקות מבוצעות **לפני** העברת העבודה ל-Team 10/50.
+
+---
+
+## 1.1 כללים מחייבים — ללא יוצא מן הכלל
+
+**חובה לוודא מול נוהל זה כל ביצוע וכל ממשק — קיים או חדש.**
+
+| # | כלל | תיאור |
+|---|-----|--------|
+| **R1** | **רספונסיביות טבלאות** | כל טבלה חייבת לעמוד בדרישות הרספונסיביות: `phoenix-table-wrapper` עם `overflow-x: auto`, עמודות עם `clamp()` לפי TT2_RESPONSIVE_FLUID_DESIGN, Option D (Sticky). ראה ARCHITECT_TABLE_RESPONSIVITY_DECISIONS. |
+| **R2** | **רספונסיביות ממשק** | **כל** הממשקים ללא יוצא מהכלל חייבים להיות רספונסיביים — layout, טיפוגרפיה, ריווח. |
+| **R3** | **עמודת פעולות — בלי כותרת** | לעמודת פעולות (`col-actions`) **אף פעם** אין כותרת גלויה. שימוש ב-`<span class="phoenix-table__header-text sr-only">פעולות</span>` או דומה (טקסט ל-screen readers בלבד). כלל קבוע לכל העמודים — מקטין רוחב נדרש. |
 
 ---
 
@@ -83,10 +95,11 @@
 
 | # | בדיקה | סטנדרט | רפרנס |
 |---|-------|--------|--------|
-| 16 | עמודת פעולות | כותרת sr-only, עמודה צרה | phoenix-components.css |
-| 17 | תאריך | פורמט DD/MM/YY | tableFormatters.js |
-| 18 | גופן תאים | `font-size-sm` | phoenix-components.css |
-| 19 | כפתור הוספה | padding 0 12px | phoenix-components.css |
+| 16 | עמודת פעולות | **ללא כותרת גלויה** — רק `<span class="phoenix-table__header-text sr-only">פעולות</span>` | R3, phoenix-components.css L1721 |
+| 17 | רספונסיביות טבלה | עטיפה ב-`phoenix-table-wrapper`, overflow-x: auto, עמודות fluid | R1, TT2_RESPONSIVE_FLUID_DESIGN |
+| 18 | תאריך | פורמט DD/MM/YY | tableFormatters.js |
+| 19 | גופן תאים | `font-size-sm` | phoenix-components.css |
+| 20 | כפתור הוספה | padding 0 12px | phoenix-components.css |
 
 ---
 
@@ -112,6 +125,8 @@
 
 | מסמך | מיקום |
 |------|--------|
+| TT2_RESPONSIVE_FLUID_DESIGN | documentation/04-DESIGN_UX_UI/ |
+| ARCHITECT_TABLE_RESPONSIVITY_DECISIONS | documentation/09-GOVERNANCE/ |
 | D16_MODULE_REFERENCE_SSOT | documentation/09-GOVERNANCE/standards/ |
 | ARCHITECT_MODULE_MENU_STYLING_SSOT | documentation/09-GOVERNANCE/ |
 | phoenix-base.css | ui/src/styles/ |

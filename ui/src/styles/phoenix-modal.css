@@ -171,6 +171,22 @@
   border-color: var(--entity-cash_flow-dark, #e68900);
 }
 
+/* Note Entity (D35 — הערות) — per PAGES_ENTITY_COLOR_MAPPING */
+.phoenix-modal[data-entity="note"] .phoenix-modal__header,
+.phoenix-modal.modal-entity-note .phoenix-modal__header {
+  background-color: var(--entity-note-light, #e2e3e5);
+  border-bottom-color: var(--entity-note-dark, #383d41);
+}
+.phoenix-modal[data-entity="note"] .phoenix-modal__title,
+.phoenix-modal.modal-entity-note .phoenix-modal__title {
+  color: var(--entity-note-dark, #383d41);
+}
+.phoenix-modal[data-entity="note"] .phoenix-modal__close,
+.phoenix-modal.modal-entity-note .phoenix-modal__close {
+  color: var(--entity-note-dark, #383d41);
+  border-color: var(--entity-note-dark, #383d41);
+}
+
 .phoenix-modal__save-btn,
 .phoenix-modal__cancel-btn {
   padding: 8px var(--spacing-lg, 24px); /* 8px top/bottom - match system defaults */

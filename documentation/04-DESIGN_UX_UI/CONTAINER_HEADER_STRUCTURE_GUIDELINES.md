@@ -26,7 +26,7 @@
 
 ### **חלק 1: כותרת (Title)**
 - **מיקום:** תחילת השורה (start)
-- **תוכן:** איקון + טקסט כותרת
+- **תוכן:** **איקון אחד** + טקסט כותרת (אין שני איקונים — חוזה תבנית)
 - **רוחב:** מינימום לפי התוכן (`flex-shrink: 0`)
 - **יישור:** מיושר לתחילת השורה
 
@@ -202,7 +202,23 @@
 }
 ```
 
-### **❌ שגיאה 2: גובה לא קבוע**
+### **❌ שגיאה 2: שני איקונים בכותרת**
+```html
+<!-- WRONG -->
+<div class="index-section__header-title">
+  <img src="home.svg" class="index-section__header-icon">
+  <img src="notes.svg" class="index-section__header-icon">
+  <h1 class="index-section__header-text">הערות</h1>
+</div>
+
+<!-- CORRECT -->
+<div class="index-section__header-title">
+  <img src="notes.svg" alt="הערות" class="index-section__header-icon">
+  <h1 class="index-section__header-text">הערות</h1>
+</div>
+```
+
+### **❌ שגיאה 3: גובה לא קבוע**
 ```css
 /* WRONG */
 .container-header {
@@ -217,7 +233,7 @@
 }
 ```
 
-### **❌ שגיאה 3: שבירת שורה**
+### **❌ שגיאה 4: שבירת שורה**
 ```css
 /* WRONG */
 .container-header {
@@ -230,7 +246,7 @@
 }
 ```
 
-### **❌ שגיאה 4: יישור לא נכון**
+### **❌ שגיאה 5: יישור לא נכון**
 ```css
 /* WRONG */
 .container-header__meta {
@@ -251,6 +267,7 @@
 לפני סיום כל כותרת קונטיינר, ודא:
 
 - [ ] 3 חלקים בסדר הנכון (Title | Subtitle | Actions)
+- [ ] איקון אחד בלבד בכותרת (אין שני איקונים)
 - [ ] כל האלמנטים מיושרים לאמצע (`align-items: center`)
 - [ ] גובה קבוע ולא יכול להישבר (`height: 60px !important` לקונטיינר ראשי, `40px` לוויגיטים)
 - [ ] הכל בשורה אחת (`flex-wrap: nowrap !important`)

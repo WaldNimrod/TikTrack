@@ -82,6 +82,12 @@ migrate-md-settings:
 verify-md-settings:
 	@python3 scripts/verify_md_system_settings.py
 
+## Seed 2 demo notes for TikTrackAdmin (חשבון מסחר + AAPL; אחת עם קובץ)
+seed-admin-notes-demo:
+	@echo "🌱 Seeding admin demo notes..."
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/seed_admin_notes_demo.sql
+	@echo "✅ Admin demo notes seeded."
+
 ## D35 Notes — user_data.note_attachments (MB3A, D35_RICH_TEXT_ATTACHMENTS_LOCK)
 migrate-d35-notes:
 	@echo "🔄 D35 — user_data.note_attachments"

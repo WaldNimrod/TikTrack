@@ -303,7 +303,8 @@ export class DataStage extends StageBase {
     const functionMap = {
       'cashFlows': 'loadCashFlowsData',
       'brokersFees': 'loadBrokersFeesData',
-      'tradingAccounts': 'loadTradingAccountsData'
+      'tradingAccounts': 'loadTradingAccountsData',
+      'notes': 'loadNotesData'
     };
     
     // Return mapped function name or generate default

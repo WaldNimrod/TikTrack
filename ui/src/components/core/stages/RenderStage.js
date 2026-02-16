@@ -201,7 +201,8 @@ export class RenderStage extends StageBase {
     const pathMap = {
       'cashFlows': '/src/views/financial/cashFlows/cashFlowsTableInit.js',
       'brokersFees': '/src/views/financial/brokersFees/brokersFeesTableInit.js',
-      'tradingAccounts': '/src/views/financial/tradingAccounts/tradingAccountsTableInit.js'
+      'tradingAccounts': '/src/views/financial/tradingAccounts/tradingAccountsTableInit.js',
+      'notes': '/src/views/data/notes/notesTableInit.js'
     };
     return pathMap[pageType] || null;
   }
@@ -215,7 +216,8 @@ export class RenderStage extends StageBase {
     const pageMap = {
       '/cash_flows.html': 'cashFlows',
       '/brokers_fees.html': 'brokersFees',
-      '/trading_accounts.html': 'tradingAccounts'
+      '/trading_accounts.html': 'tradingAccounts',
+      '/notes.html': 'notes'
     };
     return pageMap[path] || 'default';
   }

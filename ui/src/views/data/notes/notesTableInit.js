@@ -1,0 +1,437 @@
+/**
+ * Notes Table Init — D35 (MB3A)
+ * --------------------------------------------------------
+ * טעינה, רינדור וניהול טבלת הערות
+ * מקור: notes_BLUEPRINT, TEAM_40_TO_TEAM_30_NOTES_FILTER_BUTTONS_CLASSES_RESPONSE
+ * Per: PhoenixTableSortManager, pagination pattern (brokersFees, userTicker)
+ */
+
+import { fetchNotes, loadNotesData } from './notesDataLoader.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
+
+/** State for pagination/sort — same pattern as brokersFees, userTicker */
+let tableData = { data: [], total: 0 };
+let currentPage = 1;
+let currentPageSize = 25;
+let currentSortKey = null;
+let currentSortDir = 'asc';
+
+const PARENT_TYPE_LABELS = {
+  all: 'הכל',
+  account: 'חשבון',
+  trade: 'טרייד',
+  trade_plan: 'תוכנית',
+  ticker: 'טיקר',
+  general: 'כללי'
+};
+
+/**
+ * Format date for display
+ */
+function formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return iso;
+  }
+}
+
+/**
+ * Get format icon by content_type / extension
+ */
+function getFormatIcon(contentType, filename) {
+  const ext = (filename || '').split('.').pop() || '';
+  const type = (contentType || '').toLowerCase();
+  if (type.includes('pdf') || ext === 'pdf') return '📄';
+  if (type.includes('image') || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) return '🖼';
+  if (type.includes('sheet') || type.includes('excel') || ['xls', 'xlsx'].includes(ext)) return '📊';
+  if (type.includes('word') || type.includes('document') || ['doc', 'docx'].includes(ext)) return '📝';
+  return '📎';
+}
+
+/**
+ * Render attachment cell: format icon + 20 chars of filename
+ */
+function getAttachmentDisplay(note) {
+  const att = note.attachments && note.attachments[0];
+  const name = att && (att.original_filename || att.originalFilename || att.filename);
+  const contentType = att && (att.content_type || att.contentType);
+  if (!name) return '—';
+  const icon = getFormatIcon(contentType, name);
+  const truncated = name.length > 20 ? name.slice(0, 17) + '…' : name;
+  return `<span class="attachment-cell" title="${(name || '').replace(/"/g, '&quot;')}">${icon} ${truncated}</span>`;
+}
+
+/**
+ * Strip HTML for truncated preview
+ */
+function stripHtml(html) {
+  if (!html || typeof html !== 'string') return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return (tmp.textContent || '').trim().slice(0, 80) || '';
+}
+
+/**
+ * Render summary section
+ */
+function renderSummary(summary) {
+  const el = (id) => document.getElementById(id);
+  if (!el('totalNotes')) return;
+  const s = summary || {};
+  el('totalNotes').textContent = s.totalNotes != null ? s.totalNotes : 0;
+  el('recentNotes').textContent = s.recentNotes != null ? s.recentNotes : 0;
+  el('totalLinks').textContent = s.totalAttachments != null ? s.totalAttachments : 0;
+  el('pinnedNotes').textContent = s.pinnedNotes != null ? s.pinnedNotes : 0;
+  const byType = s.notesByParentType || {};
+  el('notesByTicker').textContent = byType.ticker != null ? byType.ticker : 0;
+  el('notesByTrade').textContent = byType.trade != null ? byType.trade : 0;
+}
+
+/**
+ * Render note row
+ */
+function renderNoteRow(note) {
+  const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || 'general';
+  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
+  const typeLabel = (PARENT_TYPE_LABELS[parentType] != null ? PARENT_TYPE_LABELS[parentType] : parentType) || parentType;
+  const contentPreview = stripHtml(note.content != null ? note.content : '') || (note.title != null ? note.title : '—');
+  const created = formatDate(note.created_at != null ? note.created_at : note.createdAt);
+  const updated = formatDate(note.updated_at != null ? note.updated_at : note.updatedAt);
+  const id = note.id;
+
+  return `
+    <tr class="phoenix-table__row" data-note-id="${id}" role="row">
+      <td class="phoenix-table__cell col-linked-object" data-field="parent_type">
+        <span class="linked-object-badge entity-${parentType}">${typeLabel}${parentId ? ' ' + parentId.slice(0, 8) + '…' : ''}</span>
+      </td>
+      <td class="phoenix-table__cell col-content" data-field="content">${contentPreview}</td>
+      <td class="phoenix-table__cell col-attachment" data-field="attachment">${getAttachmentDisplay(note)}</td>
+      <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
+      <td class="phoenix-table__cell col-updated phoenix-table__cell--date">${updated}</td>
+      <td class="phoenix-table__cell col-actions phoenix-table__cell--actions">
+        <div class="table-actions-tooltip">
+          <button class="table-actions-trigger" aria-label="פעולות">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+            </svg>
+          </button>
+          <div class="table-actions-menu">
+            <button class="table-action-btn js-action-view" aria-label="פרטים" data-note-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button class="table-action-btn js-action-edit" aria-label="ערוך" data-note-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="table-action-btn js-action-delete" aria-label="מחק" data-note-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+const SORT_KEY_MAP = { created_at: 'createdAt', updated_at: 'updatedAt', parent_type: 'parentType' };
+
+/**
+ * Sort notes array by key
+ */
+function sortNotesData(arr, sortKey, sortDir) {
+  if (!sortKey || !arr.length) return arr;
+  const key = SORT_KEY_MAP[sortKey] || sortKey;
+  const dir = sortDir === 'desc' ? -1 : 1;
+  return [...arr].sort((a, b) => {
+    let va = a[sortKey] != null ? a[sortKey] : (a[key] != null ? a[key] : '');
+    let vb = b[sortKey] != null ? b[sortKey] : (b[key] != null ? b[key] : '');
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return -1 * dir;
+    if (va > vb) return 1 * dir;
+    return 0;
+  });
+}
+
+/**
+ * Update pagination UI — MANDATORY: always show correct count
+ */
+function updatePagination() {
+  const total = tableData.total || 0;
+  const totalPages = Math.max(1, Math.ceil(total / currentPageSize));
+  const start = total === 0 ? 0 : (currentPage - 1) * currentPageSize + 1;
+  const end = Math.min(currentPage * currentPageSize, total);
+
+  const infoEl = document.getElementById('notesPaginationInfo');
+  if (infoEl) infoEl.textContent = `מציג ${start}-${end} מתוך ${total} רשומות`;
+
+  const prevBtn = document.getElementById('notesPrevPageBtn');
+  const nextBtn = document.getElementById('notesNextPageBtn');
+  if (prevBtn) prevBtn.disabled = currentPage <= 1;
+  if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+  const pageNumbersEl = document.getElementById('notesPageNumbers');
+  if (pageNumbersEl) {
+    pageNumbersEl.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'phoenix-table-pagination__page-number' + (i === currentPage ? ' phoenix-table-pagination__page-number--active' : '');
+      btn.textContent = i;
+      btn.addEventListener('click', () => {
+        currentPage = i;
+        renderTableFromState();
+      });
+      pageNumbersEl.appendChild(btn);
+    }
+  }
+}
+
+/**
+ * Render table from current state (paginated, sorted)
+ */
+function renderTableFromState() {
+  const tbody = document.getElementById('notesTableBody');
+  if (!tbody) return;
+  const arr = tableData.data || [];
+  const sorted = sortNotesData(arr, currentSortKey, currentSortDir);
+  const start = (currentPage - 1) * currentPageSize;
+  const pageData = sorted.slice(start, start + currentPageSize);
+  tbody.innerHTML = pageData.map(renderNoteRow).join('');
+
+  const countEl = document.getElementById('notesCount');
+  if (countEl) countEl.textContent = `${tableData.total} הערות`;
+
+  updatePagination();
+}
+
+/**
+ * Render table body — entry point when data arrives. Stores in tableData, renders page, updates pagination.
+ */
+function renderTable(notes) {
+  const raw = Array.isArray(notes) ? notes : (notes && notes.data != null ? notes.data : []);
+  const total = (notes && notes.total != null ? notes.total : raw.length) || raw.length;
+  tableData = { data: raw, total: total };
+  currentPage = 1;
+  renderTableFromState();
+}
+
+/**
+ * Handle view note (Details)
+ */
+async function handleViewNote(noteId) {
+  try {
+    const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+    await sharedServices.init();
+    const note = await sharedServices.get('/notes/' + noteId);
+    const n = (note && note.data) ? note.data : note;
+    const content = (n && n.content) ? n.content : '';
+    const title = (n && n.title) ? n.title : '';
+    const parentType = PARENT_TYPE_LABELS[(n && n.parent_type) || (n && n.parentType)] || (n && n.parent_type) || '—';
+    const created = formatDate((n && n.created_at) || (n && n.createdAt));
+    const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
+    const { createModal, closeModal } = await import('../../../components/shared/PhoenixModal.js');
+    const html = `
+      <div class="note-view-content phoenix-form">
+        ${title ? `<div class="form-group"><strong>כותרת:</strong> ${title}</div>` : ''}
+        <div class="form-group"><strong>אובייקט מקושר:</strong> ${parentType}</div>
+        <div class="form-group"><strong>נוצר:</strong> ${created} <strong>עודכן:</strong> ${updated}</div>
+        <div class="form-group"><strong>תוכן:</strong></div>
+        <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:200px;overflow-y:auto;">${content || '—'}</div>
+      </div>
+    `;
+    createModal({
+      title: 'פרטי הערה',
+      content: html,
+      entity: 'note',
+      showSaveButton: false,
+      onClose: function() {}
+    });
+    setTimeout(function() {
+      const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
+      if (cancelBtn) cancelBtn.textContent = 'סגור';
+    }, 0);
+  } catch (err) {
+    maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
+    alert('שגיאה בטעינת פרטי ההערה');
+  }
+}
+
+/**
+ * Init pagination handlers — page size, prev, next
+ */
+function initPaginationHandlers() {
+  const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="notesTable"]');
+  const prevBtn = document.getElementById('notesPrevPageBtn');
+  const nextBtn = document.getElementById('notesNextPageBtn');
+
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('change', function() {
+      currentPageSize = parseInt(this.value, 10) || 25;
+      currentPage = 1;
+      renderTableFromState();
+    });
+  }
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTableFromState();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(tableData.total / currentPageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTableFromState();
+      }
+    });
+  }
+}
+
+/**
+ * Init sort manager — PhoenixTableSortManager
+ */
+function initSortManager() {
+  const table = document.getElementById('notesTable');
+  if (!table || !window.PhoenixTableSortManager) return;
+  const sortManager = new window.PhoenixTableSortManager(table);
+  table.addEventListener('phoenix-table-sorted', function(e) {
+    const detail = e.detail || {};
+    currentSortKey = detail.sortKey || null;
+    currentSortDir = detail.sortDirection || detail.sortDir || 'asc';
+    renderTableFromState();
+  });
+}
+
+/**
+ * Bind filter buttons
+ */
+function bindFilters() {
+  const container = document.querySelector('.filter-buttons-container');
+  if (!container) return;
+  container.querySelectorAll('.filter-icon-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const type = btn.dataset.filterType || 'all';
+      container.querySelectorAll('.filter-icon-btn').forEach((b) => b.classList.remove('filter-icon-btn--active'));
+      btn.classList.add('filter-icon-btn--active');
+      window.PhoenixBridge = window.PhoenixBridge || {};
+      window.PhoenixBridge.state = window.PhoenixBridge.state || {};
+      window.PhoenixBridge.state.filters = { ...(window.PhoenixBridge.state.filters || {}), parentType: type === 'all' ? undefined : type };
+      const result = await loadNotesData({ parentType: type === 'all' ? undefined : type });
+      renderTable(result.notes);
+    });
+  });
+}
+
+/**
+ * Bind add button — דינמי import כדי להבטיח שהמודול נטען
+ */
+function bindAddButton() {
+  const addBtn = document.querySelector('.js-add-note');
+  if (!addBtn) return;
+  addBtn.addEventListener('click', async () => {
+    try {
+      const { openNotesForm } = await import('./notesForm.js');
+      openNotesForm();
+    } catch (err) {
+      maskedLog('[Notes] Form load error:', { message: (err && err.message) || 'Unknown' });
+      alert('שגיאה בטעינת טופס הוספת הערה');
+    }
+  });
+}
+
+/**
+ * Bind row actions (edit/delete)
+ */
+function bindRowActions() {
+  const tbody = document.getElementById('notesTableBody');
+  if (tbody) tbody.addEventListener('click', async (e) => {
+    const viewBtn = e.target.closest('.js-action-view');
+    const editBtn = e.target.closest('.js-action-edit');
+    const delBtn = e.target.closest('.js-action-delete');
+    const btn = viewBtn || editBtn || delBtn;
+    const id = btn && btn.dataset.noteId;
+    if (!id) return;
+    if (viewBtn) {
+      handleViewNote(id);
+    } else if (editBtn && window.openNotesForm) {
+      window.openNotesForm(id);
+    } else if (delBtn) {
+      if (confirm('למחוק את ההערה?')) {
+        try {
+          const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+          await sharedServices.init();
+          await sharedServices.delete(`/notes/${id}`);
+          const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
+          renderSummary(result.summary);
+          renderTable(result.notes);
+        } catch (err) {
+          maskedLog('[Notes] Delete error:', { status: (err && err.status) });
+          alert('שגיאה במחיקה');
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Bind summary toggle
+ */
+function bindSummaryToggle() {
+  const toggle = document.getElementById('notesSummaryToggleSize');
+  const content = document.getElementById('notesSummaryContent');
+  if (toggle && content) {
+    toggle.addEventListener('click', () => {
+      const isHidden = content.style.display === 'none';
+      content.style.display = isHidden ? 'flex' : 'none';
+    });
+  }
+}
+
+/**
+ * Init: render from data and bind handlers
+ * Signature: (data, config) for Render stage
+ */
+function initNotesTable(data, config) {
+  const d = data || (window.UAIState && window.UAIState.data);
+  if (d && d.summary) renderSummary(d.summary);
+  if (d && d.notes) renderTable(d.notes);
+  initPaginationHandlers();
+  initSortManager();
+  bindFilters();
+  bindAddButton();
+  bindRowActions();
+  bindSummaryToggle();
+}
+
+window.initNotesTable = initNotesTable;
+
+/**
+ * Refresh table (called after add/edit/delete)
+ */
+export async function refreshNotesTable() {
+  const filters = (window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {};
+  const parentType = filters.parentType;
+  const result = await loadNotesData({ parentType: parentType === 'all' ? undefined : parentType });
+  renderSummary(result.summary);
+  renderTable(result.notes);
+}
+
+window.refreshNotesTable = refreshNotesTable;
+
+export { initNotesTable, renderSummary, renderTable };

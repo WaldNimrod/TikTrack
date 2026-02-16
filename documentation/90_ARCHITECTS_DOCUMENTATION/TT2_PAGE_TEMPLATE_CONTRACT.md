@@ -20,7 +20,12 @@ context: UI Structural Integrity
 - **חובה:** `<script src="/src/components/core/headerLoader.js"></script>` בתחילת `<body>`.
 - עמודים: trading_accounts, brokers_fees, cash_flows, tickers, user_tickers, data_dashboard.
 
-## 4. ולידציה אוטומטית (Scripts)
+## 4. צבעי ישות (Entity Colors) — חובה
+- **body class:** לכל עמוד חייבת להיות מחלקת `entity-{entity_id}` (למשל `entity-note`, `entity-trading_account`).
+- **tt-section:** לכל קונטיינר `data-entity="{entity_id}"` לקריאת צבע בכותרת ובאבזרים.
+- **מפתח צבעים + מיפוי:** ראו `documentation/05-REPORTS/artifacts_SESSION_01/PAGES_ENTITY_COLOR_MAPPING.md` — לכל עמוד מתועד צבע ישות מוגדר.
+
+## 5. ולידציה אוטומטית (Scripts)
 - `generate-pages.js`: מרכיב את העמודים מתוך `.content.html`.
 - `validate-pages.js`: פוסל כל עמוד שחורג מהמבנה, מסדר ה-CSS, או חסר headerLoader.
 

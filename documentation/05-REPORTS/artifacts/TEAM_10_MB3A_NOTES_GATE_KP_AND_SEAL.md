@@ -9,7 +9,7 @@
 
 ## 1. Gate-B PASS
 
-Team 90 בדק ואישר את שער Gate-B (Spy) לעמוד הערות. בקשת Gate-B: _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md.
+Team 90 בדק ואישר את שער Gate-B (Spy) לעמוד הערות. **Evidence רשמי:** _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_MB3A_NOTES_GATE_B_PASS.md. בקשת Gate-B: _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md.
 
 ---
 
@@ -31,7 +31,7 @@ Team 90 בדק ואישר את שער Gate-B (Spy) לעמוד הערות. בקש
 TASK_ID: MB3A-NOTES
 STATUS: CLOSED
 GATE_CHAIN: Gate-0 → Build → Gate-A (PASS) → Gate-B (PASS — Team 90) → Gate-KP (הושלם)
-FILES_REF: TEAM_10_MB3A_NOTES_SCOPE_LOCK.md, TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md, TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md
+FILES_REF: TEAM_10_MB3A_NOTES_SCOPE_LOCK.md, TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md, TEAM_90_TO_TEAM_10_MB3A_NOTES_GATE_B_PASS.md (Evidence Gate-B), TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md
 PRE_FLIGHT: PASS
 HANDOVER_PROMPT: "Notes (D35) סגור. מותר להתחיל Alerts (D34) — Gate-0 Alerts הופעל."
 --- END SEAL ---

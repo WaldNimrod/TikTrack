@@ -130,7 +130,7 @@
 
 ## 8. המלצות
 
-1. **Evidence נתיב אחסון (AC5):** תיאום 60/20.
+1. **Evidence נתיב אחסון (AC5):** אומת — Evidence: documentation/05-REPORTS/artifacts/TEAM_60_D35_NOTE_ATTACHMENTS_EVIDENCE.md (אין צורך בתיאום נוסף).
 2. **Delete E2E:** אופציונלי — כפתור מחיקה קיים; API DELETE מאומת.
 
 ---

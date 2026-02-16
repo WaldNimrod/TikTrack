@@ -1,0 +1,15 @@
+# 🚀 מפרט ספק: Alpha Vantage
+---
+- **Role:** Primary for FX / Fallback for Prices.
+- **Endpoint:** https://www.alphavantage.co/query
+- **Rate Limit:** 5 calls/min.
+- **Enforcement:** Mandatory RateLimitQueue (12.5s delay).
+- **Precision:** Forced 20,8 conversion.
+- **Crypto Contract (Locked):**
+  - Daily Crypto: `function=DIGITAL_CURRENCY_DAILY&symbol=<BASE>&market=<QUOTE>`
+  - Intraday Crypto (if available in plan): `function=CRYPTO_INTRADAY&symbol=<BASE>&market=<QUOTE>&interval=<...>`
+  - Examples: `symbol=BTC&market=USD`, `symbol=ETH&market=USD`
+- **Equity/ETF Contract:**
+  - Price fallback: `function=GLOBAL_QUOTE&symbol=<SYMBOL>`
+  - History fallback: `function=TIME_SERIES_DAILY&symbol=<SYMBOL>`
+- **Rule:** `GLOBAL_QUOTE` / `TIME_SERIES_DAILY` are not the primary contract for crypto.

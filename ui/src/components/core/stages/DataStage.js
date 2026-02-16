@@ -304,7 +304,8 @@ export class DataStage extends StageBase {
       'cashFlows': 'loadCashFlowsData',
       'brokersFees': 'loadBrokersFeesData',
       'tradingAccounts': 'loadTradingAccountsData',
-      'notes': 'loadNotesData'
+      'notes': 'loadNotesData',
+      'alerts': 'loadAlertsData'
     };
     
     // Return mapped function name or generate default
@@ -328,7 +329,8 @@ export class DataStage extends StageBase {
       '/cash_flows.html': 'cashFlows',
       '/brokers_fees.html': 'brokersFees',
       '/trading_accounts.html': 'tradingAccounts',
-      '/notes.html': 'notes'
+      '/notes.html': 'notes',
+      '/alerts.html': 'alerts'
     };
     return pageMap[path] || 'default';
   }

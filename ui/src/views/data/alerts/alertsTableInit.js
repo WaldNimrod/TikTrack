@@ -2,15 +2,17 @@
  * Alerts Table Init — D34 (MB3A)
  * --------------------------------------------------------
  * טעינה, רינדור וניהול טבלת התראות
- * מקור: alerts_BLUEPRINT, TEAM_40_TO_TEAM_30_MB3A_BUILD_ALERTS_COORDINATION
- * Scope Lock: אין API עדיין — placeholder / mock. תאום עם תיעוד API כאשר יוגדר.
+ * מקור: alerts_BLUEPRINT, TEAM_20_TO_TEAM_30_MB3A_ALERTS_API_IMPLEMENTATION_COMPLETE
  * Per: PhoenixTableSortManager, pagination pattern (notes, brokersFees)
  */
+
+import { loadAlertsData } from './alertsDataLoader.js';
+import { maskedLog } from '../../../utils/maskedLog.js';
 
 const EMPTY_ROW_HTML = `
   <tr class="phoenix-table__row phoenix-table__row--empty" role="row">
     <td colspan="7" class="phoenix-table__cell phoenix-table__cell--empty" data-role="empty-state">
-      <span class="phoenix-table__empty-text">אין נתונים להצגה — API התראות בתהליך פיתוח</span>
+      <span class="phoenix-table__empty-text">אין התראות להצגה</span>
     </td>
   </tr>
 `;
@@ -122,7 +124,7 @@ function renderTableFromState() {
 function renderAlertRow(alert) {
   const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
   const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '—';
-  const ticker = (alert.ticker_id != null ? alert.ticker_id : alert.tickerId) || (alert.ticker_symbol || '—');
+  const ticker = (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) || '—';
   const condition = (alert.condition_field != null ? alert.condition_field : alert.conditionField) || (alert.condition_summary || '—');
   const isActive = (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
   const isTriggered = (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) === true;
@@ -205,7 +207,7 @@ function bindFilters() {
   const container = document.querySelector('[data-section="alerts-management"] .filter-buttons-container');
   if (!container) return;
   container.querySelectorAll('.filter-icon-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const type = btn.dataset.filterType || 'all';
       container.querySelectorAll('.filter-icon-btn').forEach((b) => b.classList.remove('filter-icon-btn--active'));
       btn.classList.add('filter-icon-btn--active');
@@ -213,8 +215,14 @@ function bindFilters() {
       window.PhoenixBridge = window.PhoenixBridge || {};
       window.PhoenixBridge.state = window.PhoenixBridge.state || {};
       window.PhoenixBridge.state.filters = { ...(window.PhoenixBridge.state.filters || {}), targetType: type === 'all' ? undefined : type };
-      // TODO: When API exists, call loadAlertsData({ targetType: ... }) and renderTable(result.alerts)
-      renderTable([]);
+      try {
+        const result = await loadAlertsData({ targetType: type === 'all' ? undefined : type });
+        renderSummary(result.summary);
+        renderTable(result.alerts);
+      } catch (err) {
+        maskedLog('[Alerts] Filter error:', { message: (err && err.message) || 'Unknown' });
+        renderTable([]);
+      }
     });
   });
 }
@@ -223,8 +231,8 @@ function bindAddButton() {
   const addBtn = document.querySelector('.js-add-alert');
   if (!addBtn) return;
   addBtn.addEventListener('click', () => {
-    // TODO: When alerts form/modal exists, open it
-    alert('הוספת התראה — בתהליך פיתוח. API התראות טרם מוגדר.');
+    // TODO: Alerts form/modal — Phase 2. API ready for POST /alerts.
+    alert('הוספת התראה — טופס הוספה בתהליך פיתוח. API זמין.');
   });
 }
 

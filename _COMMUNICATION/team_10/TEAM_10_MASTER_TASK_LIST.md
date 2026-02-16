@@ -58,8 +58,8 @@
 | # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
 |---|-----|------|--------|-----|------------|------------|------------|------------|------------|
 | D35_RICH_TEXT_ATTACHMENTS_LOCK | D35 Notes — Rich Text + Attachments | משימת-על נעולה (Team 90 Feedback Lock): Rich Text ב־content עם סניטיזציה שרת; עד 3 קבצים/הערה, 1MB/קובץ; MIME magic-bytes; נתיב אחסון לוק. תתי-משימות: DB (60), API (20), UI (30), QA (50), KP (10). SSOT עודכנו. **API (20):** הושלם + אימות (pytest 17, MIME, Sanitizer, startup); תיאום 60. סגירה רק עם Seal (SOP-013). | OPEN | MB3A | 20/30/50/60/10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §5 | 2026-02-15 | 2026-02-15 | — |
-| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; כפוף ל-D35_RICH_TEXT_ATTACHMENTS_LOCK. שערים: Gate-0 → Build → Gate-A (QA 50) → Gate-B (Spy 90) → Gate-KP. **Build (30):** דוח מימוש התקבל — documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_REPORT.md; 13 פריטי QA. **ממתין:** Gate-A (Team 50) + Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-16 | — |
-| MB3A-ALERTS | alerts.html (D34 התראות) | עמוד התראות; שערים: Gate-0 → Gate-A → Gate-B → Gate-KP. תלוי בסגירת Notes. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-15 | — |
+| MB3A-NOTES | notes.html (D35 הערות) | עמוד הערות; כפוף ל-D35_RICH_TEXT_ATTACHMENTS_LOCK. שערים: Gate-0 → Build → Gate-A → Gate-B → Gate-KP. **Gate-B:** PASS (Team 90 אישר). **Gate-KP:** הושלם — Seal (SOP-013). משימה **CLOSED**. | CLOSED | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-16 | 2026-02-16 |
+| MB3A-ALERTS | alerts.html (D34 התראות) | עמוד התראות; שערים: Gate-0 → Build → Gate-A → Gate-B → Gate-KP. **Notes סגור.** Gate-0 Alerts הופעל — Scope Lock: TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md. סגירה רק ב-Seal (SOP-013). | OPEN | MB3A | Team 31→30/40→50→90→10 | TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md | 2026-02-15 | 2026-02-16 | — |
 
 **שערים חובה לכל עמוד:** Gate-0 (Scope/SSOT mapping lock) | Gate-A (QA validation — Team 50) | Gate-B (Spy verification — Team 90) | Gate-KP (Knowledge Promotion + cleanup closure — Team 10). מקור החלטות: `_COMMUNICATION/_Architects_Decisions/` (לא תיבת התקשורת כ-SSOT).
 
@@ -93,6 +93,16 @@
 
 **ערכי סטטוס:** OPEN | IN_PROGRESS | BLOCKED | PENDING_VERIFICATION | CLOSED — הגדרות וכללי סגירה: נוהל.  
 **תחיליות שלב (מפת דרכים):** 1 = Stage-1 | 1b = Stage-1b | P3 = Pre-Batch 3 | MB3A = Mini-Batch 3A | 3 = Batch 3 | 4 = Batch 4 | …
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_NOTES_GATE_B_PASS_AND_GATE_KP | 2026-02-16** — Team 90 בדק ואישר Gate-B (Notes). Gate-KP הושלם — Seal (SOP-013): documentation/05-REPORTS/artifacts/TEAM_10_MB3A_NOTES_GATE_KP_AND_SEAL.md. משימה MB3A-NOTES → CLOSED. תהליך Alerts הופעל: TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md נוצר; SSOT + Page Tracker עודכנו; הפעלה: TEAM_10_MB3A_ALERTS_ACTIVATION.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_READINESS_ALERTS_PREP | 2026-02-16** — מוכנות: שער הבא = Gate-B Notes (בקשה נשלחה ל-90). Alerts — מותר רק אחרי Gate-KP Notes. תוכנית Alerts מסודרת (Work Plan §4, קונטקסט §2.2). פער: קלט Gate-0 Alerts מ-31. בקשה ל-31: TEAM_10_TO_TEAM_31_MB3A_GATE0_ALERTS_PREP_REQUEST.md (הכנה מראש, לא הפעלה). מסמך: TEAM_10_MB3A_READINESS_AND_ALERTS_PREP.md.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_GATE_B_BLOCKERS_FIXED | 2026-02-16** — תיקון פערים לפני הגשת Gate-B: (1) נוצר TEAM_10_MB3A_NOTES_SCOPE_LOCK.md (Gate-0 מחייב). (2) עודכנו TT2_PAGES_SSOT_MASTER_LIST.md (D35 בלופרינט/אפיון קיים) ו-TT2_OFFICIAL_PAGE_TRACKER.md (D34/D35 רשומים). (3) בקשת Gate-B עודכנה — Evidence AC5 (TEAM_60_D35_NOTE_ATTACHMENTS_EVIDENCE.md) צורף; הבקשה תקינה להגשה ל-90. TEAM_10_MB3A_ALERTS_SCOPE_LOCK — ייווצר ב-Gate-0 Alerts (אחרי סגירת Notes).
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_NOTES_GATE_B_REQUEST_SENT | 2026-02-16** — בקשת Gate-B (Spy) ל-Team 90 נשלחה: TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md. תוצרים מצורפים (סקופ, דוח מימוש, דוח Gate-A + Seal, Evidence 20). ממתין לאישור 90.
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | MB3A_NOTES_GATE_A_10_10_COMPLETED | 2026-02-16** — Gate-A Notes D35: **10/10 API** (כולל Fake MIME → 415). תיקון Team 20: `api/services/note_attachments_service.py` (סדר MIME לפני מכסה). Evidence: _COMMUNICATION/team_20/TEAM_20_MB3A_NOTES_POST_500_EVIDENCE.md; תגובה: _COMMUNICATION/team_20/TEAM_20_TO_TEAM_50_MB3A_NOTES_POST_500_FIX_RESPONSE.md. דוח QA: _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md. Seal (SOP-013) התקבל. ממתין Gate-B (Team 90).
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_RECEIVED | 2026-02-16** — דוח מימוש עמוד הערות (Team 30 → 10 & 50): documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_REPORT.md. תוכן: סיכום מנהלים, פירוט שינויים (טופס, Rich Text, סטנדרטים, כותרת חובה), קבצים שעודכנו, 13 פריטי QA ל-Team 50, המלצות לתיעוד (Page Tracker, Gate-KP). הפעלת Gate-A: TEAM_10_TO_TEAM_50_MB3A_NOTES_GATE_A_QA_REQUEST.md.
 

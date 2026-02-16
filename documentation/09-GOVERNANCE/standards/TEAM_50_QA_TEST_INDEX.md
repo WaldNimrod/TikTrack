@@ -4,8 +4,8 @@
 **owner:** Team 50 (QA & Fidelity)  
 **status:** 🔒 **SSOT - ACTIVE**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-07 (עדכון עם נוהל QA מחייב מצוות 90 - Automation-First + E2E חובה)  
-**version:** v1.2  
+**last_updated:** 2026-02-16 (סריקה מלאה, הוספת Notes D35/MB3A, סקריפטי API, נוהל עדכון אינדקס)  
+**version:** v1.3  
 **⚠️ Note:** מסמך זה מכיל הפניות לקבצי תקשורת (`_COMMUNICATION`) לצורכי התייחסות בלבד. קבצי התקשורת אינם חלק מה-SSOT.
 
 ---
@@ -25,19 +25,50 @@
 
 ```
 tests/
-├── selenium-config.js          # הגדרות Selenium
-├── package.json                # תלויות בדיקות
-├── README.md                   # תיעוד בדיקות
-├── run-all.js                  # Test runner
-├── auth-flow.test.js           # בדיקות Authentication Flow
-├── user-management.test.js     # בדיקות User Management Flow
-├── api-keys.test.js            # בדיקות API Keys Management Flow
-├── error-handling.test.js      # בדיקות Error Handling & Security
-├── password-change.test.js     # בדיקות Password Change Flow
-├── scenarios/                  # תרחישי בדיקה מפורטים
+├── selenium-config.js              # הגדרות Selenium
+├── package.json                    # תלויות בדיקות
+├── README.md                       # תיעוד בדיקות
+├── run-all.js                      # Test runner
+├── auth-flow.test.js               # Authentication Flow
+├── user-management.test.js         # User Management Flow
+├── api-keys.test.js                # API Keys Management Flow
+├── error-handling.test.js          # Error Handling & Security
+├── password-change.test.js         # Password Change Flow
+├── validation-comprehensive.test.js # Validation Comprehensive (P0)
+├── trading-accounts-routing.test.js # Trading Accounts Routing
+├── phase2-runtime.test.js          # Phase 2 Runtime (D16/D18/D21)
+├── phase2-e2e-selenium.test.js     # Phase 2 E2E (SOP-010)
+├── phase1-completion-b-validation.test.js # Phase 1 Completion B
+├── gate-a-e2e.test.js              # Gate A E2E (Auth 4 types, Header, Home)
+├── gate-b-e2e.test.js              # Gate B E2E (Brokers API, Design System)
+├── adr015-gate-a-e2e.test.js       # ADR-015 Gate A QA
+├── batch-2-5-qa-e2e.test.js        # Batch 2.5 QA (Redirect, User Icon)
+├── batch-2-5-adr017-qa-e2e.test.js # Batch 2.5 ADR-017 QA
+├── notes-mb3a-e2e.test.js          # Notes MB3A E2E (D35, 13 פריטים, CRUD)
+├── user-tickers-qa.e2e.test.js     # User Tickers QA
+├── central-status-e2e.test.js      # Central Status E2E
+├── central-status-api-verify.js    # Central Status API
+├── market-status-qa.e2e.test.js    # Market Status QA
+├── smart-history-fill-qa.e2e.test.js # Smart History Fill QA
+├── auth-guard-qa-e2e.test.js       # Auth Guard QA (Type A/C redirect)
+├── option-d-responsive-e2e.test.js # Option D Responsive QA
+├── flow-type-ssot-e2e.test.js      # Flow Type SSOT QA
+├── currency-conversion-e2e.test.js # Currency Conversion E2E
+├── currency-conversion-qa.test.js  # Currency Conversion QA
+├── summary-endpoints-verify.js     # Summary Endpoints
+├── external-data-*.e2e.test.js     # External Data E2E (Gate B, Suite E, Live UI)
+├── external_data_*.py              # External Data Python (Contract, Cache, Cadence, Retention)
+├── scenarios/                      # תרחישי בדיקה
 │   └── auth_scenarios.md
-└── sanity/                     # Sanity Checklists
+└── sanity/
     └── phase1_sanity_checklist.md
+
+scripts/
+├── run-notes-d35-qa-api.sh         # Notes D35 API (413, 415, 422, 404, XSS)
+├── run-user-tickers-qa-api.sh      # User Tickers API
+├── run-market-data-settings-qa-api.sh # Market Data Settings API
+├── init-servers-for-qa.sh          # איתחול שרתים ל-QA (TEAM_50_QA_RERUN_SOP)
+└── [seed_qa_test_user, etc.]       # תשתית נתוני בדיקה
 ```
 
 ---
@@ -409,6 +440,62 @@ npm run test:phase2-e2e
 
 ---
 
+### 10. Notes D35 / MB3A Gate-A (D35 Rich Text + Attachments)
+
+**מקור:** TEAM_10_TO_TEAM_50_D35_RICH_TEXT_ATTACHMENTS_MANDATE  
+**דוח Gate-A:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md`
+
+#### 10.1 סקריפט API — Notes D35
+
+**קובץ:** `scripts/run-notes-d35-qa-api.sh`  
+**הרצה:** `bash scripts/run-notes-d35-qa-api.sh`  
+**תיאור:** בדיקות API ל-D35 — Rich Text, קבצים מצורפים, MIME magic-bytes, חוזי שגיאה.
+
+**תרחישי בדיקה:** Admin Login, POST /notes 201, Attachments ×3 (201), מכסה 4 (422), >1MB (413), Fake MIME (415), 404, XSS sanitization.
+
+**דרישה:** Backend 8082, Admin (TikTrackAdmin/4181), מיגרציה D35.
+
+#### 10.2 E2E Selenium — Notes MB3A
+
+**קובץ:** `tests/notes-mb3a-e2e.test.js`  
+**הרצה:** `cd tests && npm run test:notes-mb3a-e2e`  
+**תיאור:** 13 פריטי Team 30 + CRUD — מודל, טולבר, סטנדרטים (שמירה, לבטל, לבחור, חשבון מסחר).
+
+**דרישה:** Backend 8082, Frontend 8080, Admin.  
+**Evidence:** `documentation/05-REPORTS/artifacts/TEAM_50_MB3A_NOTES_E2E_RESULTS.json`
+
+---
+
+### 11. סקריפטי QA API (scripts/)
+
+| קובץ | תיאור | הרצה |
+|------|-------|------|
+| `run-notes-d35-qa-api.sh` | Notes D35 — 413, 415, 422, 404, XSS | `bash scripts/run-notes-d35-qa-api.sh` |
+| `run-user-tickers-qa-api.sh` | User Tickers API | `bash scripts/run-user-tickers-qa-api.sh` |
+| `run-market-data-settings-qa-api.sh` | Market Data Settings API | `bash scripts/run-market-data-settings-qa-api.sh` |
+| `init-servers-for-qa.sh` | איתחול שרתים ל-QA (TEAM_50_QA_RERUN_SOP) | `bash scripts/init-servers-for-qa.sh` |
+
+---
+
+### 12. Gate / Batch / Domain E2E — סיכום
+
+| קובץ | תיאור קצר | npm run |
+|------|------------|---------|
+| `gate-a-e2e.test.js` | Gate A — Auth 4 types, Header, Home, Console 0 SEVERE | `test:gate-a` |
+| `gate-b-e2e.test.js` | Gate B — Brokers API, Design System, Rich-Text | `test:gate-b` |
+| `adr015-gate-a-e2e.test.js` | ADR-015 Gate A QA | `test:adr015-gate-a` |
+| `batch-2-5-adr017-qa-e2e.test.js` | Batch 2.5 ADR-017 — Redirect + User Icon | `test:batch-2-5-adr017` |
+| `notes-mb3a-e2e.test.js` | Notes MB3A — 13 פריטים, CRUD | `test:notes-mb3a-e2e` |
+| `user-tickers-qa.e2e.test.js` | User Tickers — Add/remove, Evidence | — |
+| `central-status-e2e.test.js` | Central Status E2E | `test:central-status-e2e` |
+| `central-status-api-verify.js` | Central Status API | `test:central-status` |
+| `auth-guard-qa-e2e.test.js` | Auth Guard — Type A/C redirect | `test:auth-guard-qa` |
+| `option-d-responsive-e2e.test.js` | Option D Responsive | `test:option-d-responsive` |
+| `external-data-suite-e-staleness-clock.e2e.test.js` | External Data Suite E — Staleness Clock | `test:external-data-suite-e` |
+| `external-data-live-ui-evidence-capture.e2e.test.js` | External Data Live UI Evidence | `test:external-data-live-ui-evidence` |
+
+---
+
 ## 📊 סיכום כללי
 
 ### סטטיסטיקות בדיקות
@@ -425,13 +512,15 @@ npm run test:phase2-e2e
 | **Frontend Routing Tests** | 3 | ✅ 3/3 | ⏸️ Ready | ⏸️ Pending | ✅ **Complete** |
 | **Phase 2 Runtime Tests** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
 | **Phase 2 E2E Selenium (SOP-010)** | 8 | ✅ 8/8 | ✅ Active | ✅ Ready | ✅ **Complete** |
-| **Total** | **96+** | **86/96+** | **✅ Active** | **⏸️ Pending** | ⚠️ **2 Issues** |
+| **Notes D35/MB3A Gate-A** | 21 | ✅ 21/21 | ✅ Active | ✅ Ready | ✅ **Complete** |
+| **Gate/Batch/Domain E2E** | 15+ | ✅ Active | ✅ Ready | — | ✅ **Indexed** |
+| **Total** | **140+** | **✅ Active** | **✅ Ready** | **⏸️ Pending** | — |
 
 ---
 
 ## 🔗 קישורים לבדיקות
 
-### קבצי בדיקות Selenium
+### קבצי בדיקות Selenium / E2E
 
 - **Authentication:** `tests/auth-flow.test.js`
 - **User Management:** `tests/user-management.test.js`
@@ -440,10 +529,19 @@ npm run test:phase2-e2e
 - **Error Handling:** `tests/error-handling.test.js`
 - **Validation Comprehensive:** `tests/validation-comprehensive.test.js`
 - **Trading Accounts Routing:** `tests/trading-accounts-routing.test.js` (Team 30)
-- **Phase 2 Runtime:** `tests/phase2-runtime.test.js` (Phase 2 Financial Core)
-- **Phase 2 E2E Selenium (SOP-010):** `tests/phase2-e2e-selenium.test.js` (Phase 2 Financial Core - SOP-010 Compliance)
+- **Phase 2 Runtime:** `tests/phase2-runtime.test.js`
+- **Phase 2 E2E Selenium (SOP-010):** `tests/phase2-e2e-selenium.test.js`
+- **Notes MB3A E2E:** `tests/notes-mb3a-e2e.test.js` (D35, Gate-A)
+- **Gate A / B:** `tests/gate-a-e2e.test.js`, `tests/gate-b-e2e.test.js`
 - **Configuration:** `tests/selenium-config.js`
 - **Test Runner:** `tests/run-all.js`
+
+### סקריפטי QA API (scripts/)
+
+- **Notes D35:** `scripts/run-notes-d35-qa-api.sh`
+- **User Tickers:** `scripts/run-user-tickers-qa-api.sh`
+- **Market Data Settings:** `scripts/run-market-data-settings-qa-api.sh`
+- **Init Servers:** `scripts/init-servers-for-qa.sh`
 
 ### כלי בדיקה Frontend (Team 30)
 
@@ -551,10 +649,10 @@ npm run test:phase2-e2e
 
 ### תחזוקה שוטפת
 
-**תדירות:** לאחר כל Phase/Module completion
+**תדירות:** מייד עם יצירת כל בדיקה חדשה + לאחר כל Phase/Module completion
 
-**פעולות:**
-1. עדכון אינדקס זה עם תרחישי בדיקה חדשים
+**פעולות (מחייב):**
+1. **עם יצירת בדיקה חדשה** — עדכון מיידי של אינדקס זה (סעיף קטגוריה + קישור + תיאור קצר)
 2. עדכון דוחות QA עם תוצאות
 3. ניקיון תיקיות Evidence (העברה לארכיון אם נדרש)
 4. עדכון סטטיסטיקות
@@ -575,12 +673,12 @@ npm run test:phase2-e2e
 
 **אינדקס זה מתעדכן באופן שוטף עם כל בדיקה חדשה.**
 
-**Last Updated:** 2026-02-07  
+**Last Updated:** 2026-02-16  
 **Maintained By:** Team 50 (QA) + Team 30 (Frontend Testing Tools)  
-**Next Update:** After Phase 2 manual tests completed (Gate D)
+**Next Update:** מייד עם כל בדיקה חדשה (נוהל מחייב — ראה TEAM_50_QA_WORKFLOW_PROTOCOL)
 
 **נוהל QA עודכן:** 2026-02-07 - נוהל QA מחייב מצוות 90 (Automation-First + E2E חובה) אומץ ותועד
 
 ---
 
-**log_entry | Team 50 | QA_TEST_INDEX | MAINTAINED | GREEN | 2026-01-31**
+**log_entry | Team 50 | QA_TEST_INDEX | MAINTAINED | 2026-02-16 | Notes D35/MB3A, סקריפטי API, Gate/Batch E2E, נוהל עדכון אינדקס מחייב**

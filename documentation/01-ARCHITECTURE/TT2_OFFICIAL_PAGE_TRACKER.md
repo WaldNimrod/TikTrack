@@ -55,6 +55,8 @@
 | D21 | cash_flows.html | תזרים מזומנים | **4. FIDELITY** 🔵 (Batch 2 CLOSED) | Team 30 | Batch 2 Closed 2026-02-12; D21 Infra VERIFIED (ADR-010) |
 | D22 | tickers.html | ניהול טיקרים | **3. IN PROGRESS** 🟡 | Team 30 | Roadmap v2.1 Batch 3 — TICKERS_MGR; CRUD; מחיר אחרון + שינוי יומי. **בקרת תקינות:** widget נדרש — דרופדאון טיקר + GET /tickers/{id}/data-integrity + פירוט EOD/Intraday/250d + gaps + last_updates (TEAM_20_TO_TEAMS_10_30_TICKER_DATA_INTEGRITY_UI_REQUEST). |
 | D23 | data_dashboard.html | דשבורד נתונים | **1. DRAFT** 📝 | Team 30 | תבנית בלבד; מקושר מכפתור "נתונים"; תוכן מלא בהמשך |
+| D34 | alerts.html | התראות | **3. IN PROGRESS** 🟡 (MB3A — Gate-0 Alerts) | Team 31→30/40 | נתונים → התראות; Scope Lock: TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md. |
+| D35 | notes.html | הערות | **5. APPROVED** ✅ (MB3A CLOSED) | Team 31→30/40 | נתונים → הערות; Gate-B PASS, Gate-KP + Seal. משימה CLOSED 2026-02-16. |
 | D24 | trade_plans.html | תוכניות טריידים | **תכנון** | Team 31/30 | תפריט: תכנון → **תוכניות טריידים** (לא אנליזת AI). SSOT: TT2_PAGES_SSOT_MASTER_LIST |
 | D25 | ai_analysis.html | אנליזת AI (עמוד נפרד) | **תכנון** | Team 31/30 | תפריט: תכנון → **אנליזת AI**. קיים בלגסי. נדרש אפיון. |
 | D26 | watch_lists.html | רשימות צפייה | מעקב | Team 31/30 | נדרש אפיון. |

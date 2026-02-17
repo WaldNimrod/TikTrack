@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-02-12T23:17:10.097Z",
+  "criteria": {
+    "1": {
+      "name": "Sticky columns",
+      "status": "PASS",
+      "note": "9/9 sticky checks ok"
+    },
+    "2": {
+      "name": "Responsiveness (mobile/tablet/desktop)",
+      "status": "PASS",
+      "note": "Tables rendered at 9/9 viewport/page combos"
+    },
+    "3": {
+      "name": "No unwanted horizontal overflow",
+      "status": "PASS",
+      "note": "Overflow controlled: 9/9"
+    },
+    "4": {
+      "name": "col-actions always visible (Sticky End)",
+      "status": "PASS",
+      "note": "col-actions visible: 9/9"
+    },
+    "5": {
+      "name": "No CSS override cancelling sticky",
+      "status": "PASS",
+      "note": "No override found"
+    },
+    "6": {
+      "name": "No JS changing display/position of columns",
+      "status": "SKIP",
+      "note": "Manual/code review; no automated check"
+    }
+  },
+  "logs": []
+}

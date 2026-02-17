@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-02-13T08:27:12.593Z",
+  "criteria": {
+    "redirect": {
+      "name": "Redirect ל-Home לכל אנונימי בעמוד שאינו Open",
+      "status": "PASS",
+      "note": "אנונימי ב-/trading_accounts הופנה ל-/"
+    },
+    "userIcon_warning": {
+      "name": "User Icon: WARNING (מנותק)",
+      "status": "PASS",
+      "note": ".user-icon--alert / .user-profile-link--alert נוכח (מנותק)"
+    },
+    "userIcon_success": {
+      "name": "User Icon: SUCCESS (מחובר)",
+      "status": "SKIP",
+      "note": "Login failed"
+    },
+    "noSevere": {
+      "name": "0 SEVERE בקונסול",
+      "status": "FAIL",
+      "note": "6 SEVERE נמצאו"
+    }
+  },
+  "severeLogs": [
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/src/cubes/shared/tableFormatters.js 0:0 Uncaught SyntaxError: Cannot use import statement outside a module"
+    },
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/api/v1/auth/login - Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failure\" Error: HTTP 500: Internal Server Error\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js:475:26)\n    at async Object.login (http://127.0.0.1:8080/src/cubes/identity/services/auth.js:79:19)\n    at async handleSubmit (http://127.0.0.1:8080/src/cubes/identity/components/auth/LoginForm.jsx:137:24)"
+    },
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][ErrorHandler] ERROR: Network/CORS error\" Error: HTTP 500: Internal Server Error\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js:475:26)\n    at async Object.login (http://127.0.0.1:8080/src/cubes/identity/services/auth.js:79:19)\n    at async handleSubmit (http://127.0.0.1:8080/src/cubes/identity/components/auth/LoginForm.jsx:137:24)"
+    },
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failed\" Object"
+    },
+    {
+      "level": "SEVERE",
+      "message": "http://127.0.0.1:8080/src/cubes/shared/tableFormatters.js 0:0 Uncaught SyntaxError: Cannot use import statement outside a module"
+    }
+  ]
+}

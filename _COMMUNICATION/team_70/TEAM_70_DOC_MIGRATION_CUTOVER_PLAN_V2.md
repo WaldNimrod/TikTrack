@@ -4,8 +4,10 @@
 **owner:** Team 70 (Knowledge Librarian)  
 **to:** Team 90 (Validation), Team 10 (Gateway)  
 **date:** 2026-02-17  
-**context:** TEAM_90_TO_TEAM_70_DOCUMENTATION_MIGRATION_CORRECTION_DIRECTIVE  
-**status:** DRAFT — NO EXECUTION UNTIL GATE APPROVAL
+**context:** TEAM_90_TO_TEAM_70_MODEL_B_LOCKED_CORRECTION_DIRECTIVE  
+**status:** Model B EXECUTED — structure under `documentation/`
+
+**Model B (as executed):** Targets under `documentation/`: `documentation/docs-system/`, `documentation/docs-governance/`, `documentation/reports/`. Legacy: `archive/documentation/legacy_documentation_2026-2-17/`.
 
 ---
 
@@ -67,12 +69,14 @@
 - **Rollback:** N/A; verification only.
 
 ### Phase 7 — Archive Legacy (ONLY AFTER VALIDATION)
-- **Action:** Copy full `documentation/` snapshot → `archive/documentation_legacy/` as single unit. **Then** remove `documentation/` from active tree (or rename to `documentation_DEPRECATED` and create symlink/redirect per Team 10 decision).
+- **Action:** Copy full `documentation/` snapshot → `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/` (immutable legacy snapshot path). **Then** remove `documentation/` from active tree (or rename per Team 10 decision).
+- **Snapshot policy:** Immutable destination format `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/` (e.g. `2026-02-17_1430`).
 - **Validation:** Full backup in archive; MASTER_INDEX updated.
-- **Rollback:** Restore `documentation/` from `archive/documentation_legacy/`; remove archive copy if needed.
+- **Rollback:** Restore `documentation/` from `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/`; remove archive copy if needed.
 
 ### Phase 8 — MASTER_INDEX Update
-- **Action:** Publish MASTER_INDEX alignment (root entry point + references to docs-system, docs-governance, reports, archive).
+- **Action:** Publish MASTER_INDEX alignment. Pre-cutover: `00_MASTER_INDEX.md` (repo root) is canonical. If relocating post-cutover: create `docs-governance/00-FOUNDATIONS/00_MASTER_INDEX.md` per Team 10/90 gate.
+- **Owner/Gate:** Team 10 (owner), Team 90 (validation).
 - **Validation:** Authority chain locked; Team 90 final Gate.
 
 ---

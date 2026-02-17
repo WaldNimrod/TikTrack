@@ -4,20 +4,22 @@
 **owner:** Team 70 (Knowledge Librarian)  
 **to:** Team 90 (Validation), Team 10 (Gateway)  
 **date:** 2026-02-17  
-**context:** TEAM_90_TO_TEAM_70_DOCUMENTATION_MIGRATION_CORRECTION_DIRECTIVE  
+**context:** TEAM_90_TO_TEAM_70_MIGRATION_PACKAGE_CORRECTIONS_V3  
 **source:** TEAM_90_AUTHORITY_DRIFT_REGISTER_2026_02_16 (Phase A)  
-**status:** SUBMITTED FOR VALIDATION
+**status:** SUBMITTED FOR VALIDATION (cleaned per Corrections V3; resolved header gap removed)
 
 ---
 
 ## 1) Authority Anchors (Canonical)
 
+**Authority chain per Corrections V2 — use only:**
+
 | Anchor | Path | Rule |
 |--------|------|------|
-| Global index | `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` | Single source of truth for navigation |
+| Global index | `00_MASTER_INDEX.md` (root — canonical path per MASTER_INDEX_ALIGNMENT_DRAFT) | Single source of truth for navigation |
 | Architect decisions | `_COMMUNICATION/_Architects_Decisions/` | Binding SSOT; no `90_Architects_comunication` as authority |
 
-**Rule:** References to `_COMMUNICATION/90_Architects_comunication/` are communication context only, never binding SSOT.
+**Rule:** References to `_COMMUNICATION/90_Architects_comunication/` are communication context only, never binding SSOT. Outdated anchor references (e.g. `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` as authority) removed from drift register.
 
 ---
 
@@ -60,7 +62,7 @@
 ## 4) Gaps Requiring Team 10 + Architect Decision
 
 1. **TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md** — Appears as "locked SSOT" in active docs; not in _Architects_Decisions. Resolution: promote to documentation/ or _Architects_Decisions, or demote to reference.
-2. **TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md** — Referenced in procedures; no canonical decision file. Resolution: create or align.
+2. ~~**TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md**~~ — **RESOLVED.** Canonical `_COMMUNICATION/_Architects_Decisions/HEADER_ARCHITECTURE_DECISION.md` exists and is locked.
 3. **TEAM_10_TO_ARCHITECT_P3_003_SSOT_ALIGNMENT_UPDATE.md** — Communication update; should not be authority link.
 
 ---
@@ -72,4 +74,4 @@
 
 ---
 
-**log_entry | TEAM_70 | AUTHORITY_DRIFT_REGISTER_SUBMITTED | 2026-02-17**
+**log_entry | TEAM_70 | AUTHORITY_DRIFT_REGISTER_V3_SUBMITTED | HEADER_GAP_RESOLVED | 2026-02-17**

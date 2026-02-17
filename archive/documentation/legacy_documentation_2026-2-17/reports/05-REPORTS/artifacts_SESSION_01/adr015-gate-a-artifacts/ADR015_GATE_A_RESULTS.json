@@ -1,0 +1,61 @@
+{
+  "gate": "ADR015_GATE_A",
+  "timestamp": "2026-02-12T19:44:49.338Z",
+  "results": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "logs": [
+    {
+      "test": "ADR015_D16_OtherGovernance",
+      "status": "START",
+      "timestamp": "2026-02-12T19:44:32.388Z",
+      "details": {
+        "message": "D16: Select \"אחר\" → governance message"
+      }
+    },
+    {
+      "test": "ADR015_D16_OtherGovernance",
+      "status": "PASS",
+      "timestamp": "2026-02-12T19:44:38.570Z",
+      "details": {
+        "message": "D16: \"אחר\" selected → governance message visible; brokerOtherName group shown",
+        "govVisible": true,
+        "otherNameVisible": true
+      }
+    },
+    {
+      "test": "ADR015_D18_TradingAccountSelect",
+      "status": "START",
+      "timestamp": "2026-02-12T19:44:38.592Z",
+      "details": {
+        "message": "D18: trading_account_id selector, add fee form"
+      }
+    },
+    {
+      "test": "ADR015_D18_TradingAccountSelect",
+      "status": "PASS",
+      "timestamp": "2026-02-12T19:44:46.209Z",
+      "details": {
+        "message": "D18: trading_account_id select present; no broker select (per ADR-015)"
+      }
+    },
+    {
+      "test": "ADR015_ZeroSevere",
+      "status": "START",
+      "timestamp": "2026-02-12T19:44:46.240Z",
+      "details": {
+        "message": "0 SEVERE in console"
+      }
+    },
+    {
+      "test": "ADR015_ConsoleHygiene",
+      "status": "PASS",
+      "timestamp": "2026-02-12T19:44:49.282Z",
+      "details": {
+        "message": "0 SEVERE in console"
+      }
+    }
+  ]
+}

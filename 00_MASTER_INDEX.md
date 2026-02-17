@@ -7,16 +7,18 @@
 
 ---
 
-## Canonical Structure (Phoenix Cutover 2026-02-17)
+## Canonical Structure — Model B (Approved)
+
+**Topology decision:** Model B — canonical layers under `documentation/` (per Architect/Team 10 approval, 2026-02-17).
 
 | Location | Contents |
 |----------|----------|
-| `docs-system/` | Architecture, Server (Engineering), Design, Product |
-| `docs-governance/` | Foundations, Policies, Procedures, Contracts, Governance |
-| `reports/` | Reports and artifacts |
-| `archive/documentation_legacy/` | Legacy documentation (pre-migration) |
-| `_COMMUNICATION/_ARCHITECT_INBOX/` | Architect documentation (90_ARCHITECTS_DOCUMENTATION) |
+| `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT |
+| `documentation/docs-governance/` | 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE |
+| `documentation/reports/` | 05-REPORTS, 08-REPORTS |
+| `archive/` | documentation, code |
+| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, team-* |
 
-**Full Master Index (detailed):** [archive/documentation_legacy/00-MANAGEMENT/00_MASTER_INDEX.md](archive/documentation_legacy/00-MANAGEMENT/00_MASTER_INDEX.md)
+**Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
-**Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md`
+**Legacy snapshot (historical):** `archive/documentation/legacy_documentation_2026-2-17/` → [00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md](archive/documentation/legacy_documentation_2026-2-17/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md)

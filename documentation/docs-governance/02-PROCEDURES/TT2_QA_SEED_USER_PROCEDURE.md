@@ -36,7 +36,7 @@
 
 ## 🔗 קישורים בתיעוד הקבוע
 
-- **אינדקס מאסטר:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` — סעיפי נוהלי QA ותשתיות
+- **אינדקס מאסטר:** `00_MASTER_INDEX.md` (root) — סעיפי נוהלי QA ותשתיות
 - **Database Credentials:** `documentation/01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md` — סעיף "QA Test User Seed"
 
 ---

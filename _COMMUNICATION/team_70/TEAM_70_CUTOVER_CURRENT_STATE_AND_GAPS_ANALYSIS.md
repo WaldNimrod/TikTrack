@@ -12,11 +12,11 @@
 
 | פעולה | סטטוס | מיקום נוכחי |
 |-------|--------|-------------|
-| העברת legacy documentation לארכיון | ✅ בוצע | `archive/documentation/legacy_documentation_2026-2-17/` |
+| העברת legacy documentation לארכיון | ✅ בוצע | `archive/documentation_legacy/snapshots/2026-02-17_0000/` |
 | העברת docs-system | ✅ בוצע | `documentation/docs-system/` |
 | העברת docs-governance | ✅ בוצע | `documentation/docs-governance/` |
 
-**הערה:** המיקום שונה במעט מהתכנון המקורי — המבנה הנוכחי משתמש ב-`documentation/` כהורה, ו-legacy בנתיב `archive/documentation/legacy_documentation_2026-2-17/`.
+**הערה:** המיקום שונה במעט מהתכנון המקורי — המבנה הנוכחי משתמש ב-`documentation/` כהורה, ו-legacy בנתיב `archive/documentation_legacy/snapshots/2026-02-17_0000/`.
 
 ---
 
@@ -28,14 +28,14 @@
 |------|------|-------------|
 | `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT | 99 |
 | `documentation/docs-governance/` | 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE, 99-archive | 66 |
-| `archive/documentation/legacy_documentation_2026-2-17/` | Full legacy snapshot (כל התיקיות הישנות) | 857 |
+| `archive/documentation_legacy/snapshots/2026-02-17_0000/` | Full legacy snapshot (כל התיקיות הישנות) | 857 |
 | `_COMMUNICATION/_ARCHITECT_INBOX/90_ARCHITECTS_DOCUMENTATION/` | Architect docs | קיים |
 
 ### תיקיות חסרות (לפי תכנון מאושר)
 
 | תיקייה חסרה | יעד (per Completeness Matrix) | מקור להעתקה |
 |-------------|------------------------------|--------------|
-| **documentation/reports/** | 05-REPORTS, 08-REPORTS | `archive/.../legacy_documentation_2026-2-17/05-REPORTS` (170 קבצים), `.../08-REPORTS` (139 קבצים) |
+| **documentation/reports/** | 05-REPORTS, 08-REPORTS | `archive/documentation_legacy/snapshots/2026-02-17_0000/05-REPORTS` (170 קבצים), `archive/documentation_legacy/snapshots/2026-02-17_0000/08-REPORTS` (139 קבצים) |
 
 ---
 
@@ -53,13 +53,13 @@
 2. **00_MASTER_INDEX.md — נתיבים לא מעודכנים**
    - כרגע מפנה ל: `docs-system/`, `docs-governance/`, `reports/` (בשורש הפרויקט)
    - כרגע מפנה ל: `archive/documentation_legacy/00-MANAGEMENT/00_MASTER_INDEX.md`
-   - **מצב בפועל:** docs-system, docs-governance תחת `documentation/`; legacy ב-`archive/documentation/legacy_documentation_2026-2-17/`
+   - **מצב בפועל:** docs-system, docs-governance תחת `documentation/`; legacy ב-`archive/documentation_legacy/snapshots/2026-02-17_0000/`
    - **פעולה נדרשת:** עדכון 00_MASTER_INDEX.md לנתיבים בפועל (לאחר השלמת reports)
 
 3. **עדכון מסמכי תכנון**
-   - `TEAM_70_DOC_MIGRATION_CUTOVER_PLAN_V2.md` — נתיב legacy: לעדכן ל-`archive/documentation/legacy_documentation_2026-2-17/`
+   - `TEAM_70_DOC_MIGRATION_CUTOVER_PLAN_V2.md` — נתיב legacy: לעדכן ל-`archive/documentation_legacy/snapshots/2026-02-17_0000/`
    - `TEAM_70_MASTER_INDEX_ALIGNMENT_DRAFT.md` — לעדכן נתיבים לפורמט בפועל
-   - `TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md` — נתיבי יעד: `archive/documentation_legacy/` → `archive/documentation/legacy_documentation_2026-2-17/` (אם רוצים consistency)
+   - `TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md` — נתיבי יעד: `archive/documentation_legacy/` → `archive/documentation_legacy/snapshots/2026-02-17_0000/` (אם רוצים consistency)
 
 ---
 
@@ -67,7 +67,7 @@
 
 1. **השלמת תיקיות חסרות**
    - יצירת `documentation/reports/05-REPORTS` ו-`documentation/reports/08-REPORTS`
-   - העתקת תוכן מ-`archive/documentation/legacy_documentation_2026-2-17/05-REPORTS` ו-`.../08-REPORTS` (copy-first)
+   - העתקת תוכן מ-`archive/documentation_legacy/snapshots/2026-02-17_0000/05-REPORTS` ו-`.../08-REPORTS` (copy-first)
 
 2. **אימות ספירות**
    - לפני: ספירת קבצים ב-legacy 05-REPORTS (170), 08-REPORTS (139)
@@ -78,7 +78,7 @@
      - `documentation/docs-system/`
      - `documentation/docs-governance/`
      - `documentation/reports/`
-     - `archive/documentation/legacy_documentation_2026-2-17/` (Full legacy index)
+     - `archive/documentation_legacy/snapshots/2026-02-17_0000/` (Full legacy index)
 
 4. **הכנת דוח סיום**
    - לוג אימות ספירות לפני/אחרי

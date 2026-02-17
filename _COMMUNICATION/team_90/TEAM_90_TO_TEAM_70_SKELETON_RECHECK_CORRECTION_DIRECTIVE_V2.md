@@ -22,7 +22,7 @@ Root skeleton folders now exist (`docs-system`, `docs-governance`, `reports`, `l
 - This violates "no active nested canonical layers" after cutover.
 
 ### P1 — Legacy archive path not aligned to skeleton
-- Legacy snapshot exists in `archive/documentation/legacy_documentation_2026-2-17/`.
+- Legacy snapshot exists in `archive/documentation_legacy/snapshots/2026-02-17_0000/`.
 - Skeleton requires archive namespace under `archive/documentation_legacy/`.
 - Current `archive/documentation_legacy/` is empty.
 

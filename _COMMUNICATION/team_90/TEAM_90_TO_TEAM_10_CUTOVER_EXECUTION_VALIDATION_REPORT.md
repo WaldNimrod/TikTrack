@@ -41,7 +41,7 @@ Team 70 completion claim is not consistent with the validated state on disk.
 - Locked policy required immutable path format:
   - `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/`
 - Actual execution path:
-  - `archive/documentation/legacy_documentation_2026-2-17/`
+  - `archive/documentation_legacy/snapshots/2026-02-17_0000/`
 - Policy non-compliance.
 
 ### [P2] Completion report contradicts actual state

@@ -17,7 +17,7 @@
 - `documentation/docs-system/`
 - `documentation/docs-governance/`
 - `documentation/reports/`
-- `archive/documentation/legacy_documentation_2026-2-17/` (או חריג מאושר לנתיב אחר)
+- `archive/documentation_legacy/snapshots/2026-02-17_0000/` (או חריג מאושר לנתיב אחר)
 - `_COMMUNICATION/_Architects_Decisions/`
 
 ---
@@ -66,12 +66,12 @@
 
 עם טבלת כל דוחות המקור:
 - מה עבר ל-`documentation/reports/`
-- מה נשאר ב-`archive/documentation/legacy_documentation_2026-2-17/`
+- מה נשאר ב-`archive/documentation_legacy/snapshots/2026-02-17_0000/`
 - למה (Active / Archive)
 
 ### D) Snapshot Exception (אם נדרש)
 אם נשארים עם:
-`archive/documentation/legacy_documentation_2026-2-17/`
+`archive/documentation_legacy/snapshots/2026-02-17_0000/`
 
 יש להגיש:
 `TEAM_70_SNAPSHOT_PATH_EXCEPTION_REQUEST.md`

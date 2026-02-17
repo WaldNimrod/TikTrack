@@ -27,7 +27,7 @@
 
 3. **Snapshot exception closure**
    - Submit approved decision reference (Team 10 + Architect) for:
-     - `archive/documentation/legacy_documentation_2026-2-17/`
+     - `archive/documentation_legacy/snapshots/2026-02-17_0000/`
    - If not approved, execute path normalization to approved policy path and update references.
 
 ---

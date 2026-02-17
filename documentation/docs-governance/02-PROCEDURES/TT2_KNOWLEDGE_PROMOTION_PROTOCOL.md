@@ -78,7 +78,7 @@
 3. **חובה:** כל עדכון חשוב שזוהה בתקשורת — מופיע או מקושר ב-`documentation/`.
 
 #### **שלב 4: עדכון אינדקסים**
-1. עדכון `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`.
+1. עדכון `00_MASTER_INDEX.md` (root).
 2. עדכון אינדקסים ספציפיים (אם רלוונטי).
 
 #### **שלב 5: ארכוב דוחות תקשורת (אחרי קידום הידע)**
@@ -252,7 +252,7 @@
 ## 🔗 קישורים רלוונטיים
 
 - **Workflow מפורט:** `_COMMUNICATION/team_10/TEAM_10_KNOWLEDGE_PROMOTION_WORKFLOW.md`
-- **Master Index:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+- **Master Index:** `00_MASTER_INDEX.md` (root)
 - **Page Tracker:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
 
 ---

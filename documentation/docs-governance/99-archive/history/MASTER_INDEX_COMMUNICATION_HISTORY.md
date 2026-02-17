@@ -2,7 +2,7 @@
 
 **id:** MASTER_INDEX_COMM_HISTORY_2026_02_16
 **status:** ARCHIVE HISTORY
-**scope:** historical communication links removed from `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+**scope:** historical communication links removed from `00_MASTER_INDEX.md` (root)
 
 ---
 

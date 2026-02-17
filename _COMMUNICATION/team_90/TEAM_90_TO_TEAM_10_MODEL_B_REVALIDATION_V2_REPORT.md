@@ -33,7 +33,7 @@
 `TEAM_70_REPORTS_ACTIVE_VS_ARCHIVE_MAP.md` is aggregate-only (counts), not auditable file-level mapping as requested.
 
 ### [P1] Snapshot path is pending exception approval
-Current path is `archive/documentation/legacy_documentation_2026-2-17/`; exception is requested but not yet approved by Team 10 + Architect.
+Current path is `archive/documentation_legacy/snapshots/2026-02-17_0000/`; exception is requested but not yet approved by Team 10 + Architect.
 
 ---
 

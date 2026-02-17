@@ -30,10 +30,10 @@
 | `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT |
 | `documentation/docs-governance/` | 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
-| `archive/documentation/legacy_documentation_2026-2-17/` | Full legacy snapshot |
+| `archive/documentation_legacy/snapshots/2026-02-17_0000/` | Full legacy snapshot |
 | `_COMMUNICATION/_ARCHITECT_INBOX/` | 90_ARCHITECTS_DOCUMENTATION |
 
-**Legacy index (historical):** `archive/documentation/legacy_documentation_2026-2-17/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md`  
+**Legacy index (historical):** `archive/documentation_legacy/snapshots/2026-02-17_0000/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md`  
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
 ---

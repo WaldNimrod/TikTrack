@@ -5,7 +5,8 @@
 **to:** Team 10 (Gateway), Architect  
 **cc:** Team 90 (Validation)  
 **date:** 2026-02-17  
-**status:** REQUEST FOR APPROVAL  
+**context:** TEAM_90_TO_TEAM_70_MODEL_B_FINAL_CORRECTIONS_V4  
+**status:** CLOSED — Normalization executed (per TEAM_90_V4_VALIDATION_DIRECTIVE)  
 **subject:** Exception to immutable snapshot path policy
 
 ---
@@ -19,7 +20,7 @@ Required format:
 
 ## 2) Actual Path (in use)
 
-`archive/documentation/legacy_documentation_2026-2-17/`
+`archive/documentation_legacy/snapshots/2026-02-17_0000/`
 
 ---
 
@@ -35,15 +36,25 @@ Required format:
 ## 4) Request
 
 Request approval of **exception** to use:
-`archive/documentation/legacy_documentation_2026-2-17/`
+`archive/documentation_legacy/snapshots/2026-02-17_0000/`
 as the canonical legacy snapshot path for this cutover.
 
 ---
 
-## 5) Commitment
+## 5) Approval / Normalization
 
-If exception not granted: Team 70 will execute move to policy path and update all references.
+- **If exception approved:** Team 10 + Architect to provide decision reference. Team 70 will document approval in this file.
+- **If exception not approved:** Team 70 will execute path normalization to `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/`, update 00_MASTER_INDEX, Completeness Matrix, and all references; submit normalization proof.
 
 ---
 
-**log_entry | TEAM_70 | SNAPSHOT_PATH_EXCEPTION_REQUEST | 2026-02-17**
+## 6) Closure — Normalization Executed
+
+**Date:** 2026-02-17  
+**Reference:** TEAM_90_V4_VALIDATION_BLOCK directive — closure via path normalization  
+**Canonical path:** `archive/documentation_legacy/snapshots/2026-02-17_0000/`  
+**Actions:** Physical move completed; Completeness Matrix, Drift Register, 00_MASTER_INDEX, and all references updated.
+
+---
+
+**log_entry | TEAM_70 | SNAPSHOT_PATH_NORMALIZATION_COMPLETE | 2026-02-17**

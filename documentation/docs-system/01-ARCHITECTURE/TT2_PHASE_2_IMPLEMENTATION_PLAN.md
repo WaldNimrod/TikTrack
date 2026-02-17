@@ -325,7 +325,7 @@
 3. הוספת מטא-דאטה מלא (`id`, `owner`, `status`, `supersedes`, `last_updated`, `version`)
 
 #### **שלב 4: עדכון אינדקסים**
-1. עדכון `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+1. עדכון `00_MASTER_INDEX.md` (root)
 2. עדכון `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
 3. עדכון אינדקסים ספציפיים (אם רלוונטי)
 

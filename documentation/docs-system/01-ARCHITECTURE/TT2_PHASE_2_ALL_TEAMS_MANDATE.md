@@ -37,7 +37,7 @@
 
 #### **1. "התנ"ך שלנו" - חובת קריאה חוזרת**
 - 📖 **קובץ:** `documentation/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`
-- 📖 **קובץ:** `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+- 📖 **קובץ:** `00_MASTER_INDEX.md` (root)
 - 📖 **קובץ:** כל מסמכי ה-Blueprints ב-`documentation/01-ARCHITECTURE/`
 
 **חובה:** כל ראש צוות (20, 30, 40, 50, 60) **חייב לחתום על למידה חוזרת** של התנ"ך והגדרות התפקיד.

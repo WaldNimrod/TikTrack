@@ -5,7 +5,7 @@
 **cc:** Architect  
 **date:** 2026-02-17  
 **context:** TEAM_90_TO_TEAM_70_CUTOVER_EXECUTION_BLOCK_AND_CORRECTIONS | Model B  
-**status:** SUBMITTED — Model B topology; correction package
+**status:** SUBMITTED V4.1 — Model B topology; correction package
 
 ---
 
@@ -19,19 +19,19 @@ Team 70 has studied the organizational structure (PHOENIX_ORGANIZATIONAL_STRUCTU
 
 | # | Document | Path | Status |
 |---|----------|------|--------|
-| 1 | Completeness Matrix (100% coverage) | `TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md` | ✅ Submitted V3 |
-| 2 | Authority Drift Register (cleaned, resolved gap removed) | `TEAM_70_AUTHORITY_DRIFT_REGISTER.md` | ✅ Submitted V3 |
-| 3 | Cutover Plan v2 | `TEAM_70_DOC_MIGRATION_CUTOVER_PLAN_V2.md` | ✅ Submitted V3 |
-| 4 | MASTER_INDEX Alignment Draft (existing path) | `TEAM_70_MASTER_INDEX_ALIGNMENT_DRAFT.md` | ✅ Submitted V3 |
+| 1 | Completeness Matrix (100% coverage) | `TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md` | ✅ Submitted V4.1 |
+| 2 | Authority Drift Register (cleaned, Model B paths) | `TEAM_70_AUTHORITY_DRIFT_REGISTER.md` | ✅ Submitted V4.1 |
+| 3 | Cutover Plan v2 | `TEAM_70_DOC_MIGRATION_CUTOVER_PLAN_V2.md` | ✅ Submitted V4.1 |
+| 4 | MASTER_INDEX Alignment Draft (existing path) | `TEAM_70_MASTER_INDEX_ALIGNMENT_DRAFT.md` | ✅ Submitted V4.1 |
 | 5 | Correction Deliverables (this file) | `TEAM_70_TO_TEAM_90_10_DOC_MIGRATION_CORRECTION_DELIVERABLES.md` | ✅ Submitted |
 | 6 | Reports Active vs Archive Map | `TEAM_70_REPORTS_ACTIVE_VS_ARCHIVE_MAP.md` | ✅ Submitted |
 | 7 | Snapshot Path Exception Request | `TEAM_70_SNAPSHOT_PATH_EXCEPTION_REQUEST.md` | ✅ Submitted |
 
 ---
 
-## Corrections V3 Checklist (per TEAM_90_TO_TEAM_70_MIGRATION_PACKAGE_CORRECTIONS_V3)
+## Corrections V4.1 Checklist (per TEAM_90_TO_TEAM_70_V4_VALIDATION_BLOCK)
 
-- [x] **Matrix completeness gap closed** — 545 files (100%); 38 previously missing files added
+- [x] **Matrix completeness gap closed** — 548 files (100%); 00_FOUNDATIONS + 99-archive native files added
 - [x] **Canonical master index path** — Aligned to existing `00_MASTER_INDEX.md` (repo root); creation step documented for post-cutover
 - [x] **Drift register cleanup** — Removed stale resolved header-decision gap (HEADER_ARCHITECTURE_DECISION.md exists)
 
@@ -49,7 +49,7 @@ Team 70 has studied the organizational structure (PHOENIX_ORGANIZATIONAL_STRUCTU
 
 ## Corrections V2 Checklist (per TEAM_90_TO_TEAM_70_MIGRATION_PACKAGE_CORRECTIONS_V2)
 
-- [x] **File-level completeness matrix** — One row per file; fields: source_file, target_file, status, owner, notes; exact count reconciled (507)
+- [x] **File-level completeness matrix** — One row per file; fields: source_file, target_file, status, owner, notes; exact count reconciled (548)
 - [x] **Exact inventory reconciliation** — Totals by folder + grand total; no approximations
 - [x] **Authority chain alignment** — Anchors: `00_MASTER_INDEX.md` (root), `_COMMUNICATION/_Architects_Decisions/` only; outdated references removed
 - [x] **MASTER_INDEX draft** — Model B; `00_MASTER_INDEX.md` at root
@@ -61,7 +61,7 @@ Team 70 has studied the organizational structure (PHOENIX_ORGANIZATIONAL_STRUCTU
 ## Cutover Status
 
 - **Model B cutover executed.** `documentation/docs-system`, `documentation/docs-governance`, `documentation/reports` active.
-- Legacy snapshot at `archive/documentation/legacy_documentation_2026-2-17/`.
+- Legacy snapshot at `archive/documentation_legacy/snapshots/2026-02-17_0000/`.
 - Pending: Team 90 re-validation; snapshot path exception (if required).
 
 ---
@@ -73,4 +73,15 @@ Team 10: Please approve for Cutover Gate when ready.
 
 ---
 
-**log_entry | TEAM_70 | DOC_MIGRATION_CORRECTION_DELIVERABLES_SUBMITTED | 2026-02-17**
+---
+
+## V4.1 Checksum (Re-submit)
+
+| Item | Value |
+|------|-------|
+| Matrix rows | 548 |
+| Fixed files | V4.1: TT2_PHASE_2_IMPLEMENTATION_PLAN, TT2_QA_SEED_USER_PROCEDURE, TT2_BLUEPRINT_INTEGRATION_WORKFLOW, TT2_FORM_VALIDATION_FRAMEWORK (P1 authority); Matrix +3 (00_DOCUMENTATION_STANDARDS_INDEX, ADR_TEMPLATE_CANONICAL, MASTER_INDEX_COMMUNICATION_HISTORY); .DS_Store deleted (P2) |
+
+---
+
+**log_entry | TEAM_70 | DOC_MIGRATION_CORRECTION_DELIVERABLES_V4.1_SUBMITTED | 2026-02-17**

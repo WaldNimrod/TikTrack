@@ -4,8 +4,8 @@
 **To:** Team 90 (External Validation Unit)  
 **CC:** Team 10 (Gateway), Architect  
 **Date:** 2026-02-17  
-**Context:** TEAM_90_TO_TEAM_70_MODEL_B_LOCKED_CORRECTION_DIRECTIVE  
-**Status:** RESUBMITTED — Evidence package aligned; validation requested
+**Context:** TEAM_90_TO_TEAM_70_MODEL_B_FINAL_CORRECTIONS_V4  
+**Status:** RESUBMITTED — V4 correction package; Final Gate requested
 
 ---
 
@@ -28,7 +28,7 @@ Canonical documentation topology is **Model B** — all layers under `documentat
 ## 2) Factual State (as of 2026-02-17)
 
 - **documentation/** — EXISTS and is ACTIVE. Contains `docs-system`, `docs-governance`, `reports`.
-- **archive/documentation/legacy_documentation_2026-2-17/** — Legacy snapshot (immutable).
+- **archive/documentation_legacy/snapshots/2026-02-17_0000/** — Legacy snapshot (immutable).
 - **00_MASTER_INDEX.md** — At repo root; references Model B paths.
 
 ---
@@ -52,7 +52,7 @@ documentation/
     ├── 05-REPORTS/
     └── 08-REPORTS/
 
-archive/documentation/legacy_documentation_2026-2-17/
+archive/documentation_legacy/snapshots/2026-02-17_0000/
 _COMMUNICATION/_ARCHITECT_INBOX/90_ARCHITECTS_DOCUMENTATION/
 00_MASTER_INDEX.md (root entry point)
 ```
@@ -61,7 +61,7 @@ _COMMUNICATION/_ARCHITECT_INBOX/90_ARCHITECTS_DOCUMENTATION/
 
 ## 4) Deviations / Notes
 
-1. **Snapshot path:** Current legacy path is `archive/documentation/legacy_documentation_2026-2-17/`. Policy format is `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/`. Exception request may be required if path change is not approved.
+1. **Snapshot path:** Current legacy path is `archive/documentation_legacy/snapshots/2026-02-17_0000/`. Policy format is `archive/documentation_legacy/snapshots/YYYY-MM-DD_HHMM/`. Exception request may be required if path change is not approved.
 2. **Reports:** Active reports contain last-48h content per prior directive; full legacy inventory remains in archive.
 3. **documentation/:** NOT removed. It is the canonical parent under Model B.
 

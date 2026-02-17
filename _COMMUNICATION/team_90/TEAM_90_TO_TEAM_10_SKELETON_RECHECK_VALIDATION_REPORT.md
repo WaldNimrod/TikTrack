@@ -36,7 +36,7 @@ Team 70 progressed on root structure creation, but closure criteria are not full
    - `documentation/reports` (80 files)
 
 2. **Legacy archive path misalignment**
-   - active snapshot in `archive/documentation/legacy_documentation_2026-2-17/` (857 files)
+   - active snapshot in `archive/documentation_legacy/snapshots/2026-02-17_0000/` (857 files)
    - required skeleton family `archive/documentation_legacy/` remains empty
 
 3. **Missing required correction deliverables**

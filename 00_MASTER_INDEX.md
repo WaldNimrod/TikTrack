@@ -21,4 +21,4 @@
 
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
-**Legacy snapshot (historical):** `archive/documentation/legacy_documentation_2026-2-17/` → [00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md](archive/documentation/legacy_documentation_2026-2-17/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md)
+**Legacy snapshot (historical):** `archive/documentation_legacy/snapshots/2026-02-17_0000/` → [00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md](archive/documentation_legacy/snapshots/2026-02-17_0000/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md)

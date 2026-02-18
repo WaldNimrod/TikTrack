@@ -4,7 +4,7 @@
 **owner:** Team 10 (The Gateway) + Architect (Gemini Bridge)  
 **status:** 🔒 **SSOT - MANDATORY**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-02  
+**last_updated:** 2026-02-18  
 **version:** v2.7
 
 ---
@@ -21,6 +21,10 @@
 * **צוות 01 (Frontend Arch):** תכנון לוגיקת ממשק וחוזים ויזואליים.
 * **צוות 02 (Backend Arch):** תכנון סכימות נתונים (SQL) וארכיטקטורה.
 * **צוות 10 (The Gateway):** הקבלן המתזמר (סנכרון Drive/Git, ניהול מטריצת עמודים מרכזית). **הפילטר הראשון** — תופס בעיות מהותיות תוך כדי תהליך; מודד את "דופק" המערכת; המטרה: להגיע לבדיקות המעמיקות (סיום כל שלב) עם קוד מדויק וללא שגיאות מהותיות.
+* **צוותי ביצוע:** 20, 30, 31, 40, 50, 51, 60.
+* **צוות 70 (Knowledge Librarian):** תחזוקת תיעוד, קידום ידע, ארכוב.
+* **צוות 90 (The Spy):** ולידציה חיצונית, בקרה ואכיפה.
+* **צוות 100 (Research & Product Engineering):** מחקר תהליכים, מתודולוגיה ותמיכה תכנונית (ללא מימוש קוד).
 ---
 ## 2. נוהל מרחב נקי
 כל מסמכי העבודה הפנימיים ב-/_COMMUNICATION/team_[ID]/. ניקוי חובה בסיום סשן.
@@ -35,8 +39,10 @@
 ### 3.1 ניהול קבצים ודוקומנטציה
 
 **מקור אמת:**
-- **תיקיית `90_Architects_documentation/` היא המקור הבלעדי** לכל הנחיות אדריכליות
-- כל שינוי בקבצי מפתח מחייב **תיאום מול האדריכל**
+- **`_COMMUNICATION/_Architects_Decisions/`** היא שכבת ה-SSOT האדריכלית הבלעדית (ADR/Directive/Policy/Mandate).
+- **`_COMMUNICATION/_ARCHITECT_INBOX/`** הוא ערוץ הגשות לאדריכלית (לא SSOT).
+- **`_COMMUNICATION/90_Architects_comunication/`** הוא ערוץ תקשורת בלבד (לא SSOT).
+- כל שינוי בקבצי מפתח מחייב **תיאום מול האדריכל**.
 
 **קבצי מפתח:**
 - `PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (v2.4)
@@ -55,8 +61,8 @@
 - G-Bridge הוא השער האדריכלי - ולידציה ותקשורת
 
 **ניהול מקומי:**
-- צוות 10 ממשיך לנהל את ה-Tracking בתיקיית הסטייג'ינג (`team_10_staging/`)
-- האדריכל יבצע סנכרון ל-Bible
+- צוות 10 מנהל Tracking בתיקיית `_COMMUNICATION/team_10/` ובמסמכי רמה 2 הקנוניים.
+- האדריכל יבצע סנכרון למסמכי החלטות בשכבת `_Architects_Decisions`.
 
 ### 3.3 לוגיקה ו-JavaScript
 
@@ -73,7 +79,7 @@
 ---
 ## 4. מטריצת עמודים מרכזית (Official Page Tracker)
 
-**מיקום:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`  
+**מיקום:** `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`  
 **אחריות:** צוות 10 (The Gateway)  
 **מטרה:** מטריצה מרכזית המשותפת לכל הצוותים, העוקבת אחרי כל העמודים במערכת.
 
@@ -104,7 +110,7 @@
 - ניהול מטריצת עמודים מרכזית (`TT2_OFFICIAL_PAGE_TRACKER.md`)
 - אי-שינוי קבצי מפתח ללא תיאום מול האדריכל
 - אי-קידום עמודים לסטטוס APPROVED ללא בדיקת G-Bridge
-- ניהול Tracking מקומי ב-`team_10_staging/`
+- ניהול Tracking מקומי ב-`_COMMUNICATION/team_10/`
 - אכיפת Transformation Layer ו-`snake_case` בכל ה-Payloads
 
 ---
@@ -149,9 +155,9 @@
 - **סגירת משימות:** **רק** באמצעות **הודעת Seal (SOP-013)** — לא דוח או דוח השלמה לבד. פורמט: `--- PHOENIX TASK SEAL ---` עם TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT.
 - **שרשרת:** צוותי ביצוע (20–60) מפיקים Seal → Team 10 מעדכן MASTER_TASK_LIST ומפעיל 90 → Team 90 סריקה ו-PASS/FAIL. **חיתום שלב (PCS):** רק Team 10 מייצר PCS_[ID].md בסיום באץ' שלם.
 - **אכיפה:** No Seal No Pay; LCI Integrity (90 דוחה שינוי קוד בלי Seal); **Zero Noise** — קבצי תיעוד זמניים שלא זוקקים ל-PCS יימחקו.
-- **מקור מלא:** `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` | הנחיית אדריכלית: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
+- **מקור מלא:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` + `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 
 ---
 
-**עודכן על ידי:** צוות 10 (The Gateway) | 2026-02-15  
+**עודכן על ידי:** צוות 10 (The Gateway) | 2026-02-18  
 **גרסה:** v2.9 (SOP-013 משילות מלאה — Seal, PCS, Zero Noise)

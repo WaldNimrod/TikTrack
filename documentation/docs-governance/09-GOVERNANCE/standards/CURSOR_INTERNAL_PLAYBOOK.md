@@ -50,12 +50,14 @@ log_entry | [Team X] | READY | 001 | GREEN
 * **צוות 10 (The Gateway):** **ניהול התהליך.** מפקד השטח — סדר משימות וסטטוס, **הפעלת הצוותים** בסדר ובמשימות הנכונות לפי השלבים. **כלל ברזל:** יש משימות לצוות → **מיד** הודעה ברורה עם משימות (`TEAM_10_TO_TEAM_XX_...`); הצוותים ממתינים להוראות. משימות צוות 10 — ממומשות **ישירות**. ניהול האינדקס המאוחד, סנכרון GitHub/Drive, סינון לאדריכלים. **רשימת משימות:** `TEAM_10_MASTER_TASK_LIST.md` + נוהל `TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`; **תפקיד מפורט:** `_COMMUNICATION/team_10/TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`. **מהות:** הפילטר הראשון — תופס בעיות מהותיות תוך כדי תהליך; מודד "דופק" המערכת; מטרה — להגיע לבדיקות המעמיקות עם קוד מדויק וללא שגיאות מהותיות.
 * **צוות 20 (Backend):** מימוש FastAPI בהתאמה ל-LOD 400 SQL.
 * **צוות 30 (Frontend):** הפיכת רכיבי Presentational ל-Containers — לוגיקה עסקית, ניהול מצב (State), קריאות API. לא משנה CSS/מראה של רכיבים; שינוי עיצוב — דרך צוות 40.
-* **צוות 40 (UI Assets & Design):** הפיכת Blueprints לרכיבי React Presentational (Pixel Perfect); בעלים בלעדיים של CSS ומראה ויזואלי (Design Tokens, CSS Layers). ראה [TT2_SLA_TEAMS_30_40.md](../../05-PROCEDURES/TT2_SLA_TEAMS_30_40.md).
-* **צוות 50 (QA & Fidelity):** **QA** — שער א': הרצת סוויטת הבדיקות האוטומטיות (0 SEVERE), ולידציה בממשק, Evidence ב-05-REPORTS/artifacts. ראה [TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../../05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md) ו-[TEAM_50_QA_WORKFLOW_PROTOCOL.md](./TEAM_50_QA_WORKFLOW_PROTOCOL.md).
+* **צוות 40 (UI Assets & Design):** הפיכת Blueprints לרכיבי React Presentational (Pixel Perfect); בעלים בלעדיים של CSS ומראה ויזואלי (Design Tokens, CSS Layers). ראה [TT2_SLA_TEAMS_30_40.md](../../02-PROCEDURES/TT2_SLA_TEAMS_30_40.md).
+* **צוות 50 (QA & Fidelity):** **QA** — שער א': הרצת סוויטת הבדיקות האוטומטיות (0 SEVERE), ולידציה בממשק, Evidence ב-05-REPORTS/artifacts. ראה [TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../../02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md) ו-[TEAM_50_QA_WORKFLOW_PROTOCOL.md](./TEAM_50_QA_WORKFLOW_PROTOCOL.md).
 * **צוות 51 (QA Remote):** צוות QA נוסף הפועל מרחוק על חבילת הקבצים. בדיקות Validation Framework מקיפות.
-* **צוות 31 (Shared Components / Blueprints):** יצירת בלופרינטים (HTML סטטי) לפי [TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md](../../05-PROCEDURES/TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md). מסירה רק לאחר Checklist ואישור Visionary.
+* **צוות 31 (Shared Components / Blueprints):** יצירת בלופרינטים (HTML סטטי) לפי [TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md](../../02-PROCEDURES/TT2_BLUEPRINT_HANDOFF_REQUIREMENTS.md). מסירה רק לאחר Checklist ואישור Visionary.
 * **צוות 60 (DevOps & Platform):** **DevOps ובסיס נתונים** — תשתיות ייצור (Build), סביבות פיתוח ו-Deployment, גיבוי DB, סקריפטי seed ונתוני בדיקה, `make db-*`. אחראי על הרצת גיבויים והזרקת נתוני בדיקה לפי נוהל.
-* **צוות 90 (The Spy):** **בקרה חיצונית ו-Enforcer** — שער ב': ביקורת חיצונית (חוסן, אבטחה, סטנדרטים ארכיטקטוניים). **מנדט GOV-MANDATE-V3:** צוות 90 מבצע "צנזורה" אקטיבית — וידוא ששום קובץ מחוץ לטריטוריה, וידוא שצוות 10 מבצע קידום ידע בזמן; קובץ שיימצא מחוץ לטריטוריה יימחק ללא התראה. צוות 90 אינו מבצע את ה-QA הפורמלי (שער א') — זה באחריות צוות 50. ראה [TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../../05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md).
+* **צוות 70 (Knowledge Librarian):** תחזוקת שכבת התיעוד, אגרגציית עדכונים, קידום ידע וארכוב תחת אישור Gateway ואימות Team 90.
+* **צוות 90 (The Spy):** **בקרה חיצונית ו-Enforcer** — שער ב': ביקורת חיצונית (חוסן, אבטחה, סטנדרטים ארכיטקטוניים). **מנדט GOV-MANDATE-V3:** צוות 90 מבצע "צנזורה" אקטיבית — וידוא ששום קובץ מחוץ לטריטוריה, וידוא שצוות 10 מבצע קידום ידע בזמן; קובץ שיימצא מחוץ לטריטוריה יימחק ללא התראה. צוות 90 אינו מבצע את ה-QA הפורמלי (שער א') — זה באחריות צוות 50. ראה [TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md](../../02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md).
+* **צוות 100 (Research & Product Engineering):** מחקר תהליכים, מתודולוגיות עבודה, ותמיכת תכנון. אינו צוות מימוש קוד/SSOT.
 
 ---
 
@@ -71,28 +73,18 @@ log_entry | [Team X] | READY | 001 | GREEN
 **כלל ברזל:** אסור לייצר רעש וזבל בפרויקט. כל קובץ חייב להיות במקום הנכון.
 
 ### 4.1 תיעוד קבוע (Permanent Documentation)
-**מיקום:** `/documentation/` (לפי מבנה התיקיות הממוספר)
-- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד. **אינדקס ניהול:** `00_MASTER_INDEX.md` (root); **אינדקס אדריכל (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md`. דפי D15_SYSTEM_INDEX מבוטלים (DEPRECATED).
-- **חובה:** עדכון האינדקס בעת יצירת מסמך תיעוד חדש
-- **אסור:** לשמור תיעוד בשורש הפרויקט
-- **מבנה תיקיות (FIXED - v2.0):**
-  - `00-MANAGEMENT/` - מסמכי ניהול ואסטרטגיה
-  - `01-ARCHITECTURE/` - מסמכי ארכיטקטורה (LOGIC, FRONTEND)
-  - `02-DEVELOPMENT/` - מסמכי פיתוח
-  - `03-PRODUCT_&_BUSINESS/` - לוגיקת מוצר (שונה מ-02-PRODUCT_&_BUSINESS_LOGIC)
-  - `04-DESIGN_UX_UI/` - עיצוב וממשק (שונה מ-03-DESIGN_UX_UI)
-  - `05-PROCEDURES/` - נהלים (שונה מ-03-PROCEDURES)
-  - `06-ENGINEERING/` - הנדסה (שונה מ-04-ENGINEERING_&_ARCHITECTURE)
-  - `07-CONTRACTS/` - חוזים (שונה מ-05-DEVELOPMENT_&_CONTRACTS)
-  - `08-REPORTS/` - דיווחים ו-Evidence (שונה מ-05-REPORTS)
-  - `09-GOVERNANCE/` - ממשל ותקינה (שונה מ-06-GOVERNANCE_&_COMPLIANCE)
-  - `10-POLICIES/` - מדיניות (שונה מ-07-POLICIES)
-  - `90_Architects_documentation/` - **READ ONLY** - תיקיית האדריכלית בלבד
-  - `99-ARCHIVE/` - ארכיון
+**מיקום:** `documentation/` לפי Model B הקנוני.
+- כל מסמך תיעוד קבוע חייב להיכנס לאינדקס המאוחד: `00_MASTER_INDEX.md` (root).
+- **אסור:** לשמור תיעוד קבוע בשורש הפרויקט.
+- **מבנה תיקיות קנוני (Model B):**
+  - `documentation/docs-system/`
+  - `documentation/docs-governance/`
+  - `documentation/reports/`
+  - `archive/` (historical snapshots only)
 
 ### 4.2 תקשורת מול צוותים (Team Communication) 🚨 חובה קפדנית — יושרה טריטוריאלית (GOV-MANDATE-V3)
 **מיקום:** `/_COMMUNICATION/`
-- **כתיבת צוותים:** כל צוות (20, 30, 40, 50, 60, 90) כותב **אך ורק** בתוך תיקיית ה-`_COMMUNICATION` האישית שלו (למשל צוות 10 → `_COMMUNICATION/team_10/` בלבד).
+- **כתיבת צוותים:** כל צוות (10, 20, 30, 31, 40, 50, 51, 60, 70, 90, 100) כותב **אך ורק** בתוך תיקיית ה-`_COMMUNICATION` האישית שלו.
 - **איסור נגיעה ב-SSOT:** שום צוות (מלבד אדריכל או צוות 10 תחת נוהל קידום ידע) **אינו רשאי לערוך** קבצים בתיקיית `documentation/`. עריכה שם שמורה לאדריכל או לצוות 10 בלבד.
 - **הפרת משילות:** קובץ שיימצא מחוץ לטריטוריה של הצוות **יימחק אוטומטית** ע"י המרגל (צוות 90) **ללא התראה**.
 - **אין להוסיף לאינדקס:** קבצי `_COMMUNICATION` וקבצים זמניים **לא מתווספים** ל-00_MASTER_INDEX או לאינדקסים אחרים. רק תיעוד קבוע שמועלה ל-`documentation/` דרך נוהל קידום המידע (Knowledge Promotion) מתועד באינדקס.
@@ -100,24 +92,26 @@ log_entry | [Team X] | READY | 001 | GREEN
 - **הפרדה:** שמירה קפדנית על ההפרדה בין תיקיות העבודה/תקשורת לבין התיעוד הקבוע (`documentation/`) ותהליך קידום המידע כפי שמוגדר בנהלים.
 - **הפרדת ערוצים (v2.111):**
   - `_COMMUNICATION/_Architects_Decisions/` = מקור אמת יחיד למסמכים שנוצרו ע"י האדריכלית (ADR/Directives/Bible/נעילות).
+  - `_COMMUNICATION/_ARCHITECT_INBOX/` = ערוץ הגשה רשמי לאדריכלית.
   - `_COMMUNICATION/90_Architects_comunication/` = ערוץ תקשורת בלבד (הגשות לצוות אדריכלית/פקודות פעולה).
   - אסור להתייחס לקבצים ב-`90_Architects_comunication` כ-SSOT מחייב ללא נעילה ב-`_Architects_Decisions`.
 - **מבנה תיקיות (FIXED - v2.0):**
-  - `team_01/`, `team_02/`, `team_10/`, `team_20/`, `team_30/`, `team_31/`, `team_40/`, `team_50/`, `team_60/` - תיקיות צוותים (כל צוות רק בתיקיה שלו)
-  - `90_Architects_communication/` - ערוץ תקשורת לאדריכלית (Inbox/Outbox; לא SSOT)
+  - `team_01/`, `team_02/`, `team_10/`, `team_20/`, `team_30/`, `team_31/`, `team_40/`, `team_50/`, `team_51/`, `team_60/`, `team_70/`, `team_90/`, `team_100/` - תיקיות צוותים (כל צוות רק בתיקיה שלו)
+  - `90_Architects_comunication/` - ערוץ תקשורת לאדריכלית (Inbox/Outbox; לא SSOT)
+  - `_ARCHITECT_INBOX/` - הגשות רשמיות לאדריכלית
   - `_Architects_Decisions/` - **READ ONLY** לצוותים; SSOT אדריכלי מחייב
   - קבצים בשורש _COMMUNICATION: רק קבצים לטווח ארוך (README_COMMUNICATION.md, סיכומים כלליים) — באישור.
 - **אסור:** לשמור תקשורת או קבצים זמניים ב-`/documentation/` או ב-`/99-ARCHIVE/`
 
 ### 4.3 Evidence ו-Reports
-**מיקום:** `/documentation/05-REPORTS/artifacts/` או `/documentation/05-REPORTS/artifacts_SESSION_XX/`
+**מיקום:** `documentation/reports/05-REPORTS/artifacts/` או `documentation/reports/05-REPORTS/artifacts_SESSION_XX/`
 - כל ה-Evidence של ביצוע משימות
 - דיווחי סשן וסיכומי ביצוע
 - **שימו לב:** Reports הם חלק מהתיעוד הקבוע ולכן נמצאים ב-`/documentation/`
 
 ### 4.4 כללים נוספים
-- **אסור לשמור קבצים בשורש הפרויקט** (רק קבצי מערכת כמו `.gitignore`; אינדקסים ב-`documentation/00-MANAGEMENT/` ו-`documentation/90_ARCHITECTS_DOCUMENTATION/`)
-- **תיקיית `/99-ARCHIVE/`** מיועדת לארכיון בלבד, לא לתקשורת פעילה. **ארכוב:** לפי `TT2_KNOWLEDGE_PROMOTION_PROTOCOL` — רק דוחות/Evidence לארכיון; נהלים, מפרטים והגדרות נשארים בתקשורת פעילה (ראה נוהל "הפרדה — מה לא לארכיון").
+- **אסור לשמור קבצים בשורש הפרויקט** (רק קבצי מערכת כמו `.gitignore`; אינדקס קנוני: `00_MASTER_INDEX.md`).
+- **תיקיית `archive/`** מיועדת לארכיון בלבד, לא לתקשורת פעילה. **ארכוב:** לפי נוהל Knowledge Promotion.
 - **כל מסמך תיעוד קבוע** (ב-`documentation/`) **חייב להיכנס לאינדקס**. קבצי תקשורת (`_COMMUNICATION/`) **לא** מתווספים לאינדקס.
 - **אין כפילות:** כל קובץ במקום אחד בלבד
 
@@ -133,7 +127,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 
 ## 5. מטריצת עמודים מרכזית (Official Page Tracker) 🚨 חובה
 
-**מיקום:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`  
+**מיקום:** `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`  
 **אחריות:** צוות 10 (The Gateway)  
 **מטרה:** מטריצה מרכזית המשותפת לכל הצוותים, העוקבת אחרי כל העמודים במערכת.
 
@@ -174,7 +168,7 @@ log_entry | [Team X] | READY | 001 | GREEN
 |-----|------|--------|
 | **רמה 1 — מפת הדרכים הכללית** | שלבים, באצ'ים, תלויות; קו מנחה אסטרטגי | אדריכל / Team 90; SSOT במפת הדרכים |
 | **רמה 2 — רשימות משימות מרכזיות** | משימות־על (מספר, סטטוס, שלב, צוות מוביל) | **Team 10 בלבד** — `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` + `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` |
-| **רמה 3 — תוכניות עבודה ומשימות ביצוע** | פירוט, תת־משימות, מנדטים, דוחות | צוותים — בתיקיות _COMMUNICATION שלהם |
+| **רמה 3 — תוכניות עבודה ומשימות ביצוע** | פירוט, תת־משימות, מנדטים, דוחות | צוותים 20,30,31,40,50,51,60,70,90,100 — בתיקיות _COMMUNICATION שלהם |
 
 - **תאום מלא:** שינוי ברמה 1 → עדכון רמה 2 והפצה לרמה 3. דוחות/אישורים ברמה 3 → עדכון רמה 2. סגירת שלב ברמה 2 → תיעוד ברמה 1.
 - **התקדמות מסודרת:** תכנון מלמעלה למטה; עדכון סטטוס מלמטה למעלה. אין לפתוח משימות ביצוע (רמה 3) בלי משימת־על ברשימה (רמה 2); אין להוסיף משימת־על בלי שלב במפת הדרכים (רמה 1).
@@ -193,6 +187,12 @@ log_entry | [Team X] | READY | 001 | GREEN
 - **מיקום:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`
 - **שימוש:** ריכוז סעיפים פתוחים שהועברו ממסמכים לפני ארכוב.
 - **חובה:** כל סעיף Carryover ימופה למשימת־על ב־`TEAM_10_MASTER_TASK_LIST.md` לפני סגירה.
+
+### 5.8 שמות קבצים קבועים לרשימות רמה 2
+- `TEAM_10_MASTER_TASK_LIST.md`
+- `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`
+- `TEAM_10_LEVEL2_LISTS_REGISTRY.md`
+- אסור ליצור רשימות חלופיות לכל שלב; ניהול שלבים נעשה בתוך הרשימות הקבועות.
 
 ---
 

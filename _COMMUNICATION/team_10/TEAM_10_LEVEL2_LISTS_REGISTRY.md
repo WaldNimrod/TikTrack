@@ -31,6 +31,8 @@ Roadmap (Level-1) must link to this registry and to each active Level-2 list.
 2. Any list moved to archive must keep final status here (`ARCHIVED`) + archive path.
 3. Every active Level-2 list must be linked from Level-1 roadmap.
 4. `TEAM_10_MASTER_TASK_LIST.md` remains the primary operational list.
+5. Fixed filenames policy: Level-2 lists may use only the three canonical names in this registry.
+6. No per-stage duplicate task-list files are allowed outside this registry.
 
 ---
 

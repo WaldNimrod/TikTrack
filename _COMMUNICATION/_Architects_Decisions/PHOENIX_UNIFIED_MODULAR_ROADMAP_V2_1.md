@@ -41,5 +41,6 @@ last_updated: 2026-02-18
 | Open Tasks Master (legacy duplicate) | `_COMMUNICATION/99-ARCHIVE/2026-02-18/team_10/TEAM_10_OPEN_TASKS_MASTER.md` | ARCHIVED |
 
 **Rule:** every open item extracted from archived docs must exist in a Level-2 list (Carryover or Master Task List).
+**Rule:** Level-2 list filenames are fixed and mandatory across all stages: `TEAM_10_MASTER_TASK_LIST.md`, `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`, `TEAM_10_LEVEL2_LISTS_REGISTRY.md`.
 
 **log_entry | [Architect] | MASTER_ROADMAP_V2_1 | GREEN**

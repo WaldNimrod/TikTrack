@@ -17,7 +17,7 @@
 | `documentation/docs-governance/` | 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
 | `archive/` | documentation, code |
-| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_70, team_90, team_100, team_170, team_190) |
+| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_70, team_100) |
 
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
@@ -41,7 +41,7 @@
 | Level 2 — Task lists registry | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md` |
 | Level 2 — Master list | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` |
 | Level 2 — Carryover list | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` |
-| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|51|60|70|90|100|170|190/` |
+| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|51|60|70|90|100/` |
 
 **Fixed Level-2 filenames (mandatory across all stages):**
 - `TEAM_10_MASTER_TASK_LIST.md`

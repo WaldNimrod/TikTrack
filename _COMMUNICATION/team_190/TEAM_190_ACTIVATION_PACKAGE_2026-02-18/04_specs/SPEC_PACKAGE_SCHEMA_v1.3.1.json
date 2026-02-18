@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "PHOENIX_SPEC_PACKAGE_SCHEMA_v1.3.1",
+  "title": "Phoenix Spec Package v1.3.1",
+  "type": "object",
+  "required": [
+    "module_id",
+    "functional_requirements",
+    "ui_contract",
+    "state_definitions",
+    "selector_registry",
+    "acceptance_criteria",
+    "test_plan",
+    "blueprint_reference"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "owner": {"type": "string"},
+        "status": {"type": "string"},
+        "sv": {"type": "string"},
+        "last_updated": {"type": "string", "format": "date"}
+      },
+      "additionalProperties": true
+    },
+    "module_id": {"type": "string", "minLength": 1},
+    "functional_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "statement"],
+        "properties": {
+          "id": {"type": "string"},
+          "statement": {"type": "string"},
+          "priority": {"type": "string", "enum": ["MUST", "SHOULD", "MAY"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "ui_contract": {
+      "type": "object",
+      "required": ["flows"],
+      "properties": {
+        "flows": {"type": "array", "items": {"type": "string"}},
+        "states": {"type": "array", "items": {"type": "string"}},
+        "dom_contract": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
+    "state_definitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["state_id", "description"],
+        "properties": {
+          "state_id": {"type": "string"},
+          "description": {"type": "string"},
+          "transitions": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "selector_registry": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["selector_id", "selector"],
+        "properties": {
+          "selector_id": {"type": "string"},
+          "selector": {"type": "string"},
+          "purpose": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "test_plan": {
+      "type": "object",
+      "required": ["unit", "integration", "e2e"],
+      "properties": {
+        "unit": {"type": "array", "items": {"type": "string"}},
+        "integration": {"type": "array", "items": {"type": "string"}},
+        "e2e": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
+    "blueprint_reference": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    }
+  },
+  "additionalProperties": true
+}

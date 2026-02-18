@@ -25,6 +25,17 @@ Team 90 is **not**:
 - a SSOT promotion owner,
 - a replacement for Team 10 process management.
 
+## 2.1) Team 190 Relationship (Validation Unit Split)
+
+Team 190 is a **separate complementary validator** in the same validation organization.
+
+- **Team 90 scope (Gate 4):** development validation, governance integrity, implementation evidence.
+- **Team 190 scope (Gate 5):** constitutional architectural validation (spec completeness, ADR consistency, state/selector integrity).
+
+Boundary rule:
+- Team 90 does not perform Team 190 architectural constitutional sign-off.
+- Team 190 does not replace Team 90 development/gate validation.
+
 ---
 
 ## 3) Hard Operating Rules (Effective Immediately)
@@ -37,6 +48,7 @@ Team 90 is **not**:
 6. **Dual-channel architect rule:**  
    - `_COMMUNICATION/_Architects_Decisions/` = architect SSOT source  
    - `_COMMUNICATION/90_Architects_comunication/` = communication channel only
+7. **Team split enforcement:** Gate 4 decision = Team 90; Gate 5 constitutional decision = Team 190.
 
 ---
 

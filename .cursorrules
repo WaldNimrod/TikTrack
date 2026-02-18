@@ -3,17 +3,19 @@
 
 ## 🏁 NEW TEAM ONBOARDING (MANDATORY)
 Before performing any task, you MUST:
-1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, 51, or 60)?"
+1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, 51, 60, 170, or 190)?"
    - Team 20: Backend Implementation
    - Team 30: Frontend Execution
    - Team 40: UI Assets & Design
    - Team 50: QA & Fidelity
    - Team 51: QA Remote (Remote QA team working on validation framework)
    - Team 60: DevOps & Platform (Infrastructure)
+   - Team 170: Librarian / SSOT Authority (documentation integrity, index consistency; routes via Team 10)
+   - Team 190: Constitutional Architectural Validator (Gate 5; spec/ADR validation; routes via Team 10)
 2. Locate and study these MANDATORY FILES:
-   - /06-GOVERNANCE_&_COMPLIANCE/standards/PHOENIX_MASTER_BIBLE.md
-   - /D15_SYSTEM_INDEX.md
-3. Perform a Deep Scan of your assigned directory and /04-ENGINEERING.
+   - 00_MASTER_INDEX.md (repo root — global entry point; D15_SYSTEM_INDEX deprecated)
+   - documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md
+3. Perform a Deep Scan of your assigned directory and documentation/ (Model B).
 4. State: "I have studied the Bible and Playbook. I am ready to operate as Team [ID]. I am providing the READINESS_DECLARATION."
 
 ## 📡 COMMAND CHAIN
@@ -32,7 +34,7 @@ In every page or interface implementation:
 1. **First:** Use default classes or no class (rely on phoenix-base / element styles).
 2. **Second:** Use an existing class already used elsewhere in the system (e.g. index-section__*, phoenix-table-*, form-group).
 3. **Last:** Create a new class only when truly required. Always check CSS_CLASSES_INDEX and codebase before creating.
-**Reference:** documentation/05-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md §1.5
+**Reference:** documentation/docs-governance/02-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md §1.5
 
 ## 📚 KNOWLEDGE PROMOTION PROTOCOL (MANDATORY - ACTIVE 2026-02-06)
 **CRITICAL:** Only Team 10 (The Gateway) is authorized to write to `documentation/` directory.
@@ -57,7 +59,7 @@ In every page or interface implementation:
 - **תאריך מדויק:** כל דוח, הודעת Seal, log_entry ומסמך תאום חייבים לשאת את **תאריך היום האמיתי** (למשל 2026-02-16). אסור לדוחות של Team 10 ושל הצוותים לעבור עם תאריך לא מדויק.
 
 ## 🏁 TASK COMPLETION (SOP-013 — LOCKED)
-- **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח/דוח השלמה לבד **לא** נחשב סגירה. פורמט: `--- PHOENIX TASK SEAL ---` + TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT. ראה: `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`
+- **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח/דוח השלמה לבד **לא** נחשב סגירה. פורמט: `--- PHOENIX TASK SEAL ---` + TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT. **Canonical SOP-013:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 - **Zero Noise:** קבצי תיעוד "זמניים" בתיקיות הצוותים שלא זוקקים ל-PCS (חיתום שלב) — **יימחקו**. Evidence רק כחלק מ-Seal או לפי הנחיית Team 10.
 - Create an Evidence log in `_COMMUNICATION/team_[ID]/` (NOT in `documentation/`) when required for Seal/PCS.
 - Notify Team 10 for Consolidation and Index update; **task closure = Seal Message only.**

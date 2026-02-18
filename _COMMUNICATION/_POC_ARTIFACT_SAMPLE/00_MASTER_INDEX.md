@@ -1,4 +1,11 @@
-# TikTrack Master Documentation Index — Entry Point
+# ⚠️ NOT CANONICAL — POC sample only
+
+**Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
+**This file:** Sample artifact for POC. Do not treat as authority.
+
+---
+
+# TikTrack Master Documentation Index — Entry Point (sample)
 
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  

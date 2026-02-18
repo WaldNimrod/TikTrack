@@ -1,3 +1,10 @@
+# ⚠️ Not the global Master Index
+
+**Global canonical index:** repo root `00_MASTER_INDEX.md`  
+**This file:** Architect-layer index (חוקי יסוד) only. Do not use as global entry point.
+
+---
+
 # 🏰 אינדקס אדריכל מרכזי (v30.0.0)
 ## 📜 חוקי יסוד (System v1.0.0 LOCKED 🔒)
 - PI_STRATEGIC_NARRATIVE_REPORT.md (Product Story SSOT).

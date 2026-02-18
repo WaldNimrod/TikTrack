@@ -1,4 +1,11 @@
-# TikTrack Master Documentation Index — Entry Point
+# ⚠️ NOT CANONICAL — Package snapshot only
+
+**Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
+**This file:** Copy inside Team 190 activation package. Do not treat as global authority.
+
+---
+
+# TikTrack Master Documentation Index — Entry Point (snapshot)
 
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  

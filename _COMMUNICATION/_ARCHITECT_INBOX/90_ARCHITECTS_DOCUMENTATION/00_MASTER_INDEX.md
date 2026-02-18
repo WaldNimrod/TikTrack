@@ -1,3 +1,10 @@
+# ⚠️ Not the global Master Index
+
+**Global canonical index:** repo root `00_MASTER_INDEX.md`  
+**This file:** Architect inbox index only. Do not use as global entry point.
+
+---
+
 # 🏰 אינדקס אדריכל מרכזי (v25.0.0)
 ## 📜 חוקי יסוד (Stage-1 LOCKED 🔒)
 - MISSION_DIRECTIVE_90_02_FINAL.md (Yahoo Gold Standard - SOP-015).

@@ -1,0 +1,57 @@
+# Repository tree snapshot — 2026-02-18 (Team 170 intake)
+# Key governance, documentation, and communication structure only.
+# Note: D15_SYSTEM_INDEX.md deprecated; global entry = 00_MASTER_INDEX.md (root).
+
+00_MASTER_INDEX.md
+.cursorrules
+.gitignore
+
+02-PRODUCT_&_BUSINESS_LOGIC/
+03-DESIGN_UX_UI/
+04-ENGINEERING_&_ARCHITECTURE/
+05-DEVELOPMENT_&_CONTRACTS/
+06-GOVERNANCE_&_COMPLIANCE/
+  standards/
+    CURSOR_INTERNAL_PLAYBOOK.md
+    PHOENIX_MASTER_BIBLE.md
+
+documentation/
+  docs-governance/
+    00-FOUNDATIONS/
+    01-POLICIES/
+    02-PROCEDURES/
+    05-REPORTS/
+    09-GOVERNANCE/
+      standards/
+  docs-system/
+  reports/
+    05-REPORTS/
+      artifacts/
+
+_COMMUNICATION/
+  _Architects_Decisions/
+  _ARCHITECT_INBOX/
+  90_Architects_comunication/
+  team_10/
+  team_70/
+  team_90/
+  team_100/
+  team_170/   (Librarian — directory created when Team 170 activated; not yet present in tree)
+  team_190/
+  99-ARCHIVE/
+
+archive/
+  documentation_legacy/
+    snapshots/
+
+ui/
+  src/
+  public/
+  dist/
+
+scripts/
+raw_inputs/
+OPENAPI_SPEC_V2.yaml
+
+---
+Generated for Team 170 intake. Full tree: run from repo root (exclude node_modules, .git, 99-ARCHIVE per .gitignore).

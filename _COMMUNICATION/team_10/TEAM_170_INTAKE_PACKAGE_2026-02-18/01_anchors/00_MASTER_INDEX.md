@@ -1,7 +1,7 @@
-# ⚠️ NOT CANONICAL — POC package snapshot only
+# ⚠️ NOT CANONICAL — Pointer only
 
 **Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
-**This file:** Copy inside Dev-Orchestration POC package. Do not treat as global authority.
+**This file:** Snapshot/pointer for Team 170 intake package. Do not treat as authority.
 
 ---
 
@@ -10,7 +10,8 @@
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  
 **status:** Entry point — canonical structure post Phoenix Cutover  
-**last_updated:** 2026-02-18
+**last_updated:** 2026-02-18  
+**source:** repo root `00_MASTER_INDEX.md` (snapshot for Team 170 intake)
 
 ---
 
@@ -24,7 +25,7 @@
 | `documentation/docs-governance/` | 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
 | `archive/` | documentation, code |
-| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_70, team_100) |
+| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_70, team_90, team_100, team_170, team_190) |
 
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
@@ -37,8 +38,8 @@
 | `_COMMUNICATION/90_Architects_comunication/` | Operational communication with architect | Communication only (non-SSOT) |
 
 **Legacy snapshots (historical):**
-- `archive/documentation_legacy/snapshots/2026-02-17_0000/` → [00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md](archive/documentation_legacy/snapshots/2026-02-17_0000/00-MANAGEMENT/00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md)
-- `archive/documentation_legacy/snapshots/2026-02-18_0200/` → `ARCHIVE_MANIFEST_LEVEL2_ALIGNMENT.md`
+- `archive/documentation_legacy/snapshots/2026-02-17_0000/` → 00_LEGACY_INDEX_SNAPSHOT_2026-02-17.md
+- `archive/documentation_legacy/snapshots/2026-02-18_0200/` → ARCHIVE_MANIFEST_LEVEL2_ALIGNMENT.md
 
 ## Task Governance Anchors (3 Levels)
 
@@ -48,7 +49,7 @@
 | Level 2 — Task lists registry | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md` |
 | Level 2 — Master list | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` |
 | Level 2 — Carryover list | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` |
-| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|51|60|70|90|100/` |
+| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|51|60|70|90|100|170|190/` |
 
 **Fixed Level-2 filenames (mandatory across all stages):**
 - `TEAM_10_MASTER_TASK_LIST.md`
@@ -56,3 +57,12 @@
 - `TEAM_10_LEVEL2_LISTS_REGISTRY.md`
 
 **Deprecated Level-2 source (archived):** `_COMMUNICATION/99-ARCHIVE/2026-02-18/team_10/TEAM_10_OPEN_TASKS_MASTER.md`
+
+### SOP-013 (Closure/Seal policy) — canonical only
+
+| Item | Value |
+|------|--------|
+| **Canonical location** | `_COMMUNICATION/_Architects_Decisions/` |
+| **Canonical file name** | `ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
+| **Full path** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
+| **Rule** | Task closure valid only with Seal Message (SOP-013); no report-only acceptance. Old path `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` is **archived context only**. |

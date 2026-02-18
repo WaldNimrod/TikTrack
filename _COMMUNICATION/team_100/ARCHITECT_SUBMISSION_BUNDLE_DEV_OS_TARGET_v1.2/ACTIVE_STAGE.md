@@ -1,11 +1,15 @@
-# Active Stage — GAP_CLOSURE_PRE_AGENT
+# ⚠️ NOT CANONICAL — Package snapshot. Canonical: _COMMUNICATION/team_10/ACTIVE_STAGE.md
 
-**Stage ID:** GAP_CLOSURE_PRE_AGENT  
+---
+
+# Active Stage — GAP_CLOSURE_BEFORE_AGENT_POC (snapshot)
+
+**Stage ID:** GAP_CLOSURE_BEFORE_AGENT_POC  
 **Owner:** Team 10 (The Gateway)  
 **Status:** BLOCKED  
 **date:** 2026-02-18  
 **Mode:** Standard governance process  
-**Validation report:** [_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md](../team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md) — **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר)
+**Validation report:** [_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_BEFORE_AGENT_POC_REVALIDATION_REPORT.md](../team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_BEFORE_AGENT_POC_REVALIDATION_REPORT.md) — **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר)
 
 ---
 
@@ -81,8 +85,8 @@ No POC implementation may begin before Stage exit confirmation (written **STATUS
 
 | Date | Result | Evidence |
 |------|--------|----------|
-| 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_VALIDATION_REPORT.md |
-| 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר) | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md — B1/B2/B3 |
+| 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** | TEAM_90_TO_TEAM_10_GAP_CLOSURE_BEFORE_AGENT_POC_VALIDATION_REPORT.md |
+| 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר) | TEAM_90_TO_TEAM_10_GAP_CLOSURE_BEFORE_AGENT_POC_REVALIDATION_REPORT.md — B1/B2/B3 |
 
 **חסמים (לאחר הגשה ראשונה):** B1 — קבצים פעילים עם עוגן ל־documentation/00-MANAGEMENT/00_MASTER_INDEX; B2 — קבצי Team 90 במצב pre-fix; B3 — SOP-013 נתיב ישן כבסיס משילות בארטיפקטים.
 
@@ -132,4 +136,4 @@ No POC implementation may begin before Stage exit confirmation (written **STATUS
 
 ---
 
-**log_entry | TEAM_10 | ACTIVE_STAGE | GAP_CLOSURE_PRE_AGENT | B1_B2_B3_CORRECTIONS_SUBMITTED | 2026-02-18**
+**log_entry | TEAM_10 | ACTIVE_STAGE | GAP_CLOSURE_BEFORE_AGENT_POC | B1_B2_B3_CORRECTIONS_SUBMITTED | 2026-02-18**

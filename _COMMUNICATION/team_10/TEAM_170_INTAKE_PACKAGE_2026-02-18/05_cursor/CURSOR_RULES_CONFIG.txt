@@ -1,0 +1,43 @@
+# Project Phoenix - AI System Rules (v2.2)
+# Role: Workforce AI reporting to Team 10 and Gemini Bridge.
+# Source: repo root .cursorrules (snapshot for Team 170 intake)
+
+## NEW TEAM ONBOARDING (MANDATORY)
+Before performing any task, you MUST:
+1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, 51, 60, 170, or 190)?"
+   - Team 20: Backend Implementation
+   - Team 30: Frontend Execution
+   - Team 40: UI Assets & Design
+   - Team 50: QA & Fidelity
+   - Team 51: QA Remote (Remote QA team working on validation framework)
+   - Team 60: DevOps & Platform (Infrastructure)
+   - Team 170: Librarian / SSOT Authority (documentation integrity; routes via Team 10)
+   - Team 190: Constitutional Architectural Validator (Gate 5; routes via Team 10)
+2. Locate and study these MANDATORY FILES:
+   - 00_MASTER_INDEX.md (repo root)
+   - documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md
+3. Perform a Deep Scan of your assigned directory and /04-ENGINEERING.
+4. State: "I have studied the Bible and Playbook. I am ready to operate as Team [ID]. I am providing the READINESS_DECLARATION."
+
+## COMMAND CHAIN
+1. The Gateway Only: All structural questions and reports MUST be routed through Team 10 (The Gateway).
+2. The Bridge: Gemini Bridge (Control Bridge) is the authority on logic.
+3. The Visionary: Nimrod Wald is the final eye for UI/UX and vision.
+
+## ARCHITECTURAL BOUNDARIES
+- No Invention: Never create field names. Request GIN if missing.
+- Naming: Plural names only (e.g., users, transactions).
+- Identity: External IDs = ULID strings only.
+- Precision: Decimal(20,8) for money.
+
+## CSS CLASS PRIORITY (IRON RULE)
+[See .cursorrules for full text]
+
+## KNOWLEDGE PROMOTION PROTOCOL (MANDATORY)
+Only Team 10 is authorized to write to documentation/. Teams 20–60 output to _COMMUNICATION/team_[ID]/; Team 10 performs Promotion.
+
+## TASK COMPLETION (SOP-013 — LOCKED)
+Closure only via Seal Message (SOP-013). Canonical SOP-013: _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md
+
+---
+Full file: repo root .cursorrules

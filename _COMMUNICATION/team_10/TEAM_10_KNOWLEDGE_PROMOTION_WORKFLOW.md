@@ -78,7 +78,7 @@
    - עדכון `last_updated`
 
 #### **שלב 4: עדכון אינדקסים**
-1. **עדכון `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`:**
+1. **עדכון `00_MASTER_INDEX.md` (שורש הפרויקט):**
    - הוספת מסמכים חדשים
    - עדכון קישורים
 

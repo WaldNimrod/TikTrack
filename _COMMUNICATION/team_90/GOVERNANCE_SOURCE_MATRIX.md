@@ -2,7 +2,7 @@
 
 **id:** TEAM_90_GOVERNANCE_SOURCE_MATRIX_2026_02_16
 **owner:** Team 90 (validation), Team 70 (knowledge execution), Team 10 (gateway approval)
-**status:** DRAFT FOR APPROVAL
+**status:** POST-FIX — Canonical Master Index = 00_MASTER_INDEX.md (root); AD remediated (2026-02-18)
 **scope:** governance source-of-truth mapping for Phoenix
 
 ---
@@ -11,12 +11,13 @@
 
 | Document Class | Authority Source | Operational Owner | Validation Gate | Promotion Path | Archive Rule | Notes |
 |---|---|---|---|---|---|---|
-| Master Index (global) | `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/documentation/00-MANAGEMENT/00_MASTER_INDEX.md` | Team 70 | Team 90 Gate-B style governance validation | Team 70 prepares deltas -> Team 10 approves -> Team 90 validates -> Team 70 updates | Legacy index docs -> archive with deprecation note | Single global index authority |
+| Master Index (global) | `00_MASTER_INDEX.md` (שורש הפרויקט — repo root) | Team 70 | Team 90 Gate-B style governance validation | Team 70 prepares deltas -> Team 10 approves -> Team 90 validates -> Team 70 updates | Legacy index docs -> archive with deprecation note | Single global index authority — LOCKED 2026-02-18 |
 | Architect decisions | `_COMMUNICATION/_Architects_Decisions/` | Architect | Team 90 checks references point here | Architect directive -> Team 70 alignment package -> Team 10 approval -> Team 90 validation -> Team 70 updates references | Keep decision history, no team edits | Canonical template: `docs-governance/00-FOUNDATIONS/ADR_TEMPLATE_CANONICAL.md`; authoring: `ARCHITECT_DECISION_TEMPLATE.md` |
 | Governance foundations / templates | `docs-governance/00-FOUNDATIONS/` | Team 70 | Team 90 governance audit | Team 70 registers -> Team 10 approves -> Team 90 validates | Superseded templates archived | ADR template + metadata model; `sv` = system version (NOT doc schema) |
 | Governance policies | `docs-governance/01-POLICIES` (target model) | Architect + Team 70 | Team 90 governance audit | Team 70 prepares policy deltas -> Team 10 approves -> Team 90 validates -> Team 70 updates | Superseded policy -> governance archive | Until migration, active policies are under `documentation/07-POLICIES`/`documentation/09-GOVERNANCE` |
 | Procedures | `docs-governance/02-PROCEDURES` (target model) | Team 70 | Team 90 spot checks for authority links | Team 70 KP package -> Team 10 approves -> Team 90 validates -> Team 70 updates | Stage procedures archived post-consolidation | Must not override architect decisions |
 | Workflow / gate protocols | `docs-governance/03-WORKFLOW` + `04-QA` (target model) | Team 70 + Team 50 | Team 90 gate audit | Team reports -> Team 70 consolidates -> Team 10 approves -> Team 90 validates -> Team 70 updates | Old protocol versions archived with replacement pointer | SOP-013 seal rule is mandatory closure gate |
+| **SOP-013 (Closure/Seal policy)** | **`_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`** | Architect | Team 90 reference drift check | Single canonical file; no separate policy file in active tree | Old file `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` archived | **Canonical location + file name LOCKED** — all refs must point here |
 | Team role definitions | `docs-governance/05-ROLE_DEFINITIONS` (target model) | Architect + Team 70 | Team 90 territorial-integrity audit | Architect lock + Team 70 alignment -> Team 10 approves -> Team 90 validates -> Team 70 updates | Prior role docs archived with effective date | Must reflect direct reporting lines (e.g., Team 90, Team 70) |
 | Governance contracts | `docs-governance/06-CONTRACTS` (target model) | Architect + Team 70 | Team 90 contract coherence check | Draft in communication -> Team 70 consolidation -> Team 10 approves -> Team 90 validates -> Team 70 updates | Contract revisions versioned, old versions archived | No contract is valid if only in communication |
 | Versioning governance | `docs-governance/07-VERSIONING` (target model) | Architect + Team 70 | Team 90 version-ceiling compliance checks | Architect lock -> Team 70 rollout package -> Team 10 approves -> Team 90 validates -> Team 70 updates | Old matrices archived with effective date | Must match SV policy and matrix |
@@ -32,7 +33,7 @@
 1. `docs-system/` and `docs-governance/` folder model is target-state; current structure still mixed under `documentation/`.
 2. Formal deprecation ledger file not yet created (required before migration).
 3. Product/business taxonomy needs architect + Team 70 lock before migration start.
-4. Authority references to `_COMMUNICATION/90_Architects_comunication/` still exist in active docs and must be remediated.
+4. ~~Authority references to 90_Architects_comunication~~ — Remediated per GAP_CLOSURE; active docs point to _Architects_Decisions and 00_MASTER_INDEX.md (root).
 
 ---
 

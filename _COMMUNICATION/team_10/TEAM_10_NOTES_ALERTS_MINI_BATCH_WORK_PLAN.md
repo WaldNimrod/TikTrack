@@ -81,7 +81,7 @@
 - DDL: `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_NOTES_ATTACHMENTS_DDL.sql`  
 - OpenAPI: `documentation/07-CONTRACTS/OPENAPI_SPEC_V2.5.2_NOTES_ATTACHMENTS_ADDENDUM.yaml`  
 - Rich Text: `api/utils/RICH_TEXT_SANITIZATION_POLICY.md` (שדה `notes.content`); `api/utils/rich_text_sanitizer.py`  
-- Index: `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` — הפניה ל-D35 Notes Attachments + Rich Text lock.
+- Index: `00_MASTER_INDEX.md` (שורש הפרויקט) — הפניה ל-D35 Notes Attachments + Rich Text lock.
 
 ---
 

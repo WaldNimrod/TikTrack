@@ -6,7 +6,15 @@
 **cc:** Team 70, Architect
 **date:** 2026-02-16
 **phase:** Phase A - Authority Drift Mapping
-**status:** SUBMITTED
+**status:** POST-FIX — AD CLOSED (2026-02-18)
+
+---
+
+## 0) POST-FIX STATUS (2026-02-18)
+
+- **Canonical global index:** `00_MASTER_INDEX.md` (שורש הפרויקט — repo root). לא `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`.
+- **AD-001 … AD-019:** CLOSED/RESOLVED — תוקן בהתאם ל־TEAM_10_GAP_CLOSURE_FORMAL_DECISIONS ולתיקוני קבצים פעילים (Architect, Team 10, Evidence). אין עוגן פעיל ל־documentation/00-MANAGEMENT או ל־90_Architects_comunication כסמכות.
+- **SOP-013:** הנתיב `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` — **הקשר ארכיוני בלבד** (קובץ הועבר לארכיון). **קנון פעיל:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`.
 
 ---
 
@@ -18,9 +26,9 @@
 - `_COMMUNICATION/team_70/`
 - Team 90 governance baseline docs (for cross-check only)
 
-**Authority anchors used in validation:**
-1. Global index authority: `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
-2. Architect decisions authority: `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/_Architects_Decisions/`
+**Authority anchors (post-fix canonical):**
+1. Global index authority: `00_MASTER_INDEX.md` (repo root)
+2. Architect decisions authority: `_COMMUNICATION/_Architects_Decisions/`
 
 **Rule applied:** references to `_COMMUNICATION/90_Architects_comunication/` are valid only as communication context, never as binding SSOT authority.
 
@@ -56,7 +64,7 @@
 | AD-012 | P2 | `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` | 285 | Roadmap source points to communication folder | same roadmap in communication path | replace with `_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md` | Team 70 |
 | AD-013 | P2 | `documentation/10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md` | 625 | Policy points architectural decision to communication folder | `ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md` in comm path | replace with `_Architects_Decisions/ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md` | Team 70 |
 | AD-014 | P2 | `documentation/02-DEVELOPMENT/TT2_VALIDATION_DEVELOPER_GUIDE.md` | 407 | Dev guide points architectural decision to communication folder | `ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md` in comm path | replace with `_Architects_Decisions/ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md` | Team 70 |
-| AD-015 | P2 | `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` | 66 | Policy links directive through communication path | governance strengthening directive in comm path | replace with `_Architects_Decisions` path | Team 70 |
+| AD-015 | P2 | **CLOSED** — קובץ 07-POLICIES ארכיוני. קנון: `_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` | — | ארכיון בלבד | נתיב ישן בארכיון | קנון פעיל above | — |
 | AD-016 | P2 | `documentation/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` | 152 | Governance standard links directive through communication path | same governance directive in comm path | replace with `_Architects_Decisions` path | Team 70 |
 | AD-017 | P2 | `documentation/01-ARCHITECTURE/TT2_SSOT_REGISTRY.md` | 263 | Mandate linked from communication path | `ARCHITECT_HEADER_UNIFICATION_MANDATE.md` in comm path | replace with `_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md` | Team 70 |
 | AD-018 | P2 | `documentation/09-GOVERNANCE/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md` | 8 | Self-reference points to communication copy | `ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md` in comm path | replace with `_Architects_Decisions/ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md` | Team 70 |
@@ -73,7 +81,7 @@ The following reusable assets used by teams were explicitly scanned and included
 | Master task protocol template | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | AD-009 |
 | Validation framework template | `documentation/10-POLICIES/TT2_FORM_VALIDATION_FRAMEWORK.md` | AD-013 |
 | Validation developer guide template | `documentation/02-DEVELOPMENT/TT2_VALIDATION_DEVELOPER_GUIDE.md` | AD-014 |
-| SOP closure gate policy template | `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` | AD-015 |
+| SOP closure gate (SOP-013) | **קנון פעיל:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. נתיב 07-POLICIES — ארכיון בלבד. | AD-015 CLOSED |
 | Governance standards bible | `documentation/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` | AD-016 |
 | Team 50 testing scenarios procedure template | `documentation/05-PROCEDURES/TEAM_50_BROWSER_TEST_SCENARIOS.md` | mapped as contextual references; verify only decision files under `_Architects_Decisions` are used |
 | Team playbook (routing of authority) | `documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` | informational alignment already partly corrected; keep under enforcement watch |

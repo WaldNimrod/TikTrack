@@ -23,16 +23,13 @@ Target outcome:
 
 ---
 
-## 2) Locked Authority Anchors
+## 2) Locked Authority Anchors (POST-FIX 2026-02-18)
 
-- **Master Index (single index authority):**
-  `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+- **Master Index (single index authority):** `00_MASTER_INDEX.md` (שורש הפרויקט — repo root). לא documentation/00-MANAGEMENT.
 - **Architect decisions authority:**
-  `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/_Architects_Decisions/`
-- **Role realignment authority:**
-  `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/_Architects_Decisions/ARCHITECT_TEAM_10_70_ROLE_REALIGNMENT.md`
-- **Architect communication inbox/outbox only (non-SSOT):**
-  `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/90_Architects_comunication/`
+  `_COMMUNICATION/_Architects_Decisions/`
+- **Role realignment authority:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_TEAM_10_70_ROLE_REALIGNMENT.md`
+- **Architect communication inbox/outbox only (non-SSOT):** `_COMMUNICATION/90_Architects_comunication/`
 
 ---
 
@@ -53,8 +50,8 @@ Target outcome:
    - P2: Procedures + work plans used for current execution
    - P3: Historical reports/evidence with low operational impact
 
-**Current P1 examples already detected:**
-- `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` (still references old architect communication path as authority)
+**Current P1 examples (POST-FIX: canonical index = 00_MASTER_INDEX.md at root; documentation/00-MANAGEMENT deprecated):**
+- ~~documentation/00-MANAGEMENT/00_MASTER_INDEX.md~~ — קנון עבר ל־00_MASTER_INDEX.md (root); פעילים תוקנו.
 - `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md`
 - `documentation/01-ARCHITECTURE/FOREX_MARKET_SPEC.md`
 - `documentation/01-ARCHITECTURE/CASH_FLOW_PARSER_SPEC.md`

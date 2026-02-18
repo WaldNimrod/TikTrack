@@ -152,6 +152,8 @@
 
 **id:** SOP-013 | **owner:** Architect / Team 10 | **סטטוס:** LOCKED — MANDATORY (2026-02-13)
 
+**קנון (מיקום + שם קובץ):** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` — מקור יחיד לנוהל סגירה/Seal; אין קובץ policy נפרד בנתיב פעיל.
+
 - **סגירת משימות:** **רק** באמצעות **הודעת Seal (SOP-013)** — לא דוח או דוח השלמה לבד. פורמט: `--- PHOENIX TASK SEAL ---` עם TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT.
 - **שרשרת:** צוותי ביצוע (20–60) מפיקים Seal → Team 10 מעדכן MASTER_TASK_LIST ומפעיל 90 → Team 90 סריקה ו-PASS/FAIL. **חיתום שלב (PCS):** רק Team 10 מייצר PCS_[ID].md בסיום באץ' שלם.
 - **אכיפה:** No Seal No Pay; LCI Integrity (90 דוחה שינוי קוד בלי Seal); **Zero Noise** — קבצי תיעוד זמניים שלא זוקקים ל-PCS יימחקו.

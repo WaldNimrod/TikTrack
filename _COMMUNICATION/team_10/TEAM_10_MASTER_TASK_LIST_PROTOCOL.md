@@ -133,7 +133,7 @@
 3. **עדכון שוטף:** Team 10 מעדכן את הרשימה **כל הזמן** בהתאם להתקדמות ולאישורים סופיים שמתקבלים (דוחות צוותים, אישור Team 90, סגירת Stage וכו').
 4. **יישור למפת דרכים:** כל משימה משויכת לשלב ממפת הדרכים; משימות שלא מופיעות במפה — רק באישור/החלטה רשמית.
 5. **מספור משימות:** כל משימה מקבלת **תחילית לפי מספר/מזהה השלב במפת הדרכים** ואחריה מקף ומספר סידורי (למשל 1-001, 1b-001, P3-001). כך ניתן לזהות מיד מאיזה שלב נגזרה המשימה.
-6. **סגירה (CLOSED):** אסור לסמן משימה כ־CLOSED לפני שעבר נוהל הבדיקות/אימות. **Governance v2.102 (מתאריך 2026-02-13):** סגירה תקפה **רק** עם **Seal Message (SOP-013)** — דוח/דוח השלמה לבדו **לא** מתקבל. ראה `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`. פרטי נוהל הבדיקות — `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`. PENDING_VERIFICATION = משימה הועברה לשלב אימות לפי אותו נוהל.
+6. **סגירה (CLOSED):** אסור לסמן משימה כ־CLOSED לפני שעבר נוהל הבדיקות/אימות. **Governance v2.102 (מתאריך 2026-02-13):** סגירה תקפה **רק** עם **Seal Message (SOP-013)** — דוח/דוח השלמה לבדו **לא** מתקבל. **קנון SOP-013 (מיקום + קובץ):** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. ראה גם `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`. פרטי נוהל הבדיקות — `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`. PENDING_VERIFICATION = משימה הועברה לשלב אימות לפי אותו נוהל.
 
 **תחיליות שלב (Roadmap v2.1 — לעדכון בהתאם למפה):**
 

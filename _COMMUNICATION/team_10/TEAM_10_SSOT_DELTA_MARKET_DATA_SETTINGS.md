@@ -14,7 +14,7 @@
 | 2 | **יצירה** | `documentation/06-ENGINEERING/PHX_DB_SCHEMA_V2.5_MARKET_DATA_SYSTEM_SETTINGS_DDL.sql` (או addendum) | טבלת `market_data.system_settings` — key, value, type, constraints, updated_by, updated_at, audit. |
 | 3 | **עדכון** | `documentation/07-CONTRACTS/OPENAPI_SPEC_V2.5.2_MARKET_DATA_SETTINGS_ADDENDUM.yaml` | GET+PATCH `/settings/market-data`; סכמות request/response; 403, 422. ✅ |
 | 4 | **עדכון** | `documentation/01-ARCHITECTURE/MARKET_DATA_PIPE_SPEC.md` §8.3 | הפניה ל-TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT; עדכון רשימת משתנים (כולל delay_between_symbols_seconds, intraday_enabled). |
-| 5 | **עדכון** | `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` | הוספת הפניה ל-TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT ולתוכנית העבודה. |
+| 5 | **עדכון** | `00_MASTER_INDEX.md` (שורש הפרויקט) | הוספת הפניה ל-TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT ולתוכנית העבודה. |
 
 ---
 

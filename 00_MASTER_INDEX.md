@@ -49,3 +49,12 @@
 - `TEAM_10_LEVEL2_LISTS_REGISTRY.md`
 
 **Deprecated Level-2 source (archived):** `_COMMUNICATION/99-ARCHIVE/2026-02-18/team_10/TEAM_10_OPEN_TASKS_MASTER.md`
+
+### SOP-013 (Closure/Seal policy) — canonical only
+
+| Item | Value |
+|------|--------|
+| **Canonical location** | `_COMMUNICATION/_Architects_Decisions/` |
+| **Canonical file name** | `ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
+| **Full path** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
+| **Rule** | Task closure valid only with Seal Message (SOP-013); no report-only acceptance. Old path `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` is **archived context only**. |

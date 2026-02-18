@@ -2,11 +2,10 @@
 
 **Stage ID:** GAP_CLOSURE_PRE_AGENT  
 **Owner:** Team 10 (The Gateway)  
-**Status:** **CLEAN_FOR_AGENT** — Stage closed  
+**Status:** BLOCKED  
 **date:** 2026-02-18  
 **Mode:** Standard governance process  
-**Final validation:** [_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_FINAL_VALIDATION.md](../team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_FINAL_VALIDATION.md) — **STATUS: CLEAN_FOR_AGENT**  
-**SOP-013 reference validation:** [_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md](../team_90/TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md) — **SOP_REFERENCE_DRIFT_RESOLVED = TRUE**
+**Validation report:** [_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md](../team_90/TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md) — **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר)
 
 ---
 
@@ -84,12 +83,10 @@ No POC implementation may begin before Stage exit confirmation (written **STATUS
 |------|--------|----------|
 | 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_VALIDATION_REPORT.md |
 | 2026-02-18 | **BLOCKED_NOT_CLEAN_FOR_AGENT** (חוזר) | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_REVALIDATION_REPORT.md — B1/B2/B3 |
-| 2026-02-18 | **CLEAN_FOR_AGENT** | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_FINAL_VALIDATION.md — שלב נסגר; POC יכול להמשיך בכפוף לשערים. |
-| 2026-02-18 | **SOP_REFERENCE_DRIFT_RESOLVED = TRUE** | TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md — הפניות פעילות מיושרות לקנון ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md. |
 
-**חסמים (היסטוריה):** B1/B2/B3 נסגרו בתיקון חוזר; ולידציה סופית אימתה CLEAN_FOR_AGENT.
+**חסמים (לאחר הגשה ראשונה):** B1 — קבצים פעילים עם עוגן ל־documentation/00-MANAGEMENT/00_MASTER_INDEX; B2 — קבצי Team 90 במצב pre-fix; B3 — SOP-013 נתיב ישן כבסיס משילות בארטיפקטים.
 
-**צעד הבא:** Dev-Orchestration POC — בכפוף לנהלי השערים הרגילים (Seal/SOP-013 ובדיקות המשך).
+**צעד הבא:** Team 10 סוגר B1/B2/B3; Team 90 מבצע Gate חוזר.
 
 ---
 
@@ -135,15 +132,4 @@ No POC implementation may begin before Stage exit confirmation (written **STATUS
 
 ---
 
-## 9. סגירת שלב — CLEAN_FOR_AGENT (2026-02-18)
-
-| אישור | מסמך |
-|--------|--------|
-| **STATUS: CLEAN_FOR_AGENT** | TEAM_90_TO_TEAM_10_GAP_CLOSURE_PRE_AGENT_FINAL_VALIDATION.md |
-| **SOP_REFERENCE_DRIFT_RESOLVED = TRUE** | TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md |
-
-**הכרעה:** שלב GAP_CLOSURE_PRE_AGENT נסגר. המשך ל־Dev-Orchestration POC — בכפוף לנהלי השערים הרגילים (Seal/SOP-013 ובדיקות המשך).
-
----
-
-**log_entry | TEAM_10 | ACTIVE_STAGE | GAP_CLOSURE_PRE_AGENT | STAGE_CLOSED_CLEAN_FOR_AGENT | 2026-02-18**
+**log_entry | TEAM_10 | ACTIVE_STAGE | GAP_CLOSURE_PRE_AGENT | B1_B2_B3_CORRECTIONS_SUBMITTED | 2026-02-18**

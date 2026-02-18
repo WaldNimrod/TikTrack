@@ -5,7 +5,7 @@
 **requester:** Team 10 (The Gateway) + Team 100 (Research & Product Engineering)  
 **date:** 2026-02-16  
 **scope:** Mapping only (no file/code changes)  
-**status:** ACTIVE FINDINGS — READY FOR TEAM 10 ACTION PLAN
+**status:** POST-FIX (2026-02-18) — קנון Master Index = `00_MASTER_INDEX.md` (root); SOP-013 קנון = _Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md; נתיב 07-POLICIES ל־SOP-013 = ארכיון בלבד.
 
 ---
 
@@ -32,7 +32,7 @@
 | Architect decisions source | Architect decisions set | `_COMMUNICATION/_Architects_Decisions/` |
 | Quality gates | `TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` |
 | Knowledge promotion | `TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` |
-| Closure gating (SOP-013) | **קנון יחיד** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
+| Closure gating (SOP-013) | **קנון יחיד** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. נתיב `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` — **ארכיון להקשר בלבד**, לא בסיס משילות פעיל. |
 | Operating standards | `CURSOR_INTERNAL_PLAYBOOK.md`, `PHOENIX_MASTER_BIBLE.md` | `documentation/09-GOVERNANCE/standards/` |
 
 ### 1.2 Governance integrity risk already visible
@@ -124,19 +124,17 @@
 
 ## 6.1 High-priority duplications
 
-1. **Three master indexes with overlapping authority language**:
-   - `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+1. **Master index (POST-FIX 2026-02-18):** קנון יחיד = `00_MASTER_INDEX.md` (שורש הפרויקט). הנתיבים הבאים — deprecated/ארכיון להקשר בלבד:
+   - ~~documentation/00-MANAGEMENT/00_MASTER_INDEX.md~~
    - `documentation/90_ARCHITECTS_DOCUMENTATION/00_MASTER_INDEX.md`
-   - `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md`
+   - `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md` (אינדקס אדריכלות; לא גלובלי)
 2. **Version policy/matrix duplicated in two policy tracks**:
    - `documentation/10-POLICIES/TT2_VERSIONING_POLICY.md` vs `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSIONING_POLICY.md`
    - `documentation/10-POLICIES/TT2_VERSION_MATRIX.md` vs `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX.md`
 
 ### 6.2 High-priority conflicts (with evidence)
 
-1. **Decision source conflict**
-   - `documentation/00-MANAGEMENT/00_MASTER_INDEX.md:16` still points to `_COMMUNICATION/90_Architects_comunication/00_MASTER_INDEX.md` as architect index authority.
-   - Contradicts current governance direction: `_COMMUNICATION/_Architects_Decisions/` as decision source.
+1. **Decision source conflict — RESOLVED (POST-FIX):** קנון גלובלי = `00_MASTER_INDEX.md` (root). לא documentation/00-MANAGEMENT. הפניות פעילות תוקנו ל־root; 90_Architects_comunication לא כסמכות.
 
 2. **Operations charter conflict**
    - `documentation/10-POLICIES/TT2_TEAM_OPERATIONS_CHARTER.md:13-17`
@@ -195,10 +193,9 @@
 1. **Lock canonical authority chain** in one place and propagate:
    - Architect decisions SSOT = `_COMMUNICATION/_Architects_Decisions/`
    - Communication channel = `_COMMUNICATION/90_Architects_comunication/`
-2. **Fix active contradictory governance docs**:
+2. **Fix active contradictory governance docs:** (Master Index: תוקן — קנון = 00_MASTER_INDEX.md ב-root.)
    - `TT2_TEAM_OPERATIONS_CHARTER.md`
    - `TT2_MASTER_WORKSPACE_MAP.md`
-   - `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` authority line
 3. **Close MB3A Gate-0 documentation gap** before any further gate promotion.
 
 ### 9.2 Near-term (P1)

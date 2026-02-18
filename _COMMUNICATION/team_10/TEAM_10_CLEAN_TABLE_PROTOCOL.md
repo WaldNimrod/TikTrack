@@ -6,7 +6,7 @@
 
 **מטרה:** לאפשר סגירה מלאה בלי חורים; הכרזת "Clean Table" **רק** כאשר כל סעיפים A, B, C מסומנים ✅.
 
-**Governance v2.102 (2026-02-13):** סגירת משימות — **רק** באמצעות **Seal Message (SOP-013)**. דוח לבדו לא מתקבל. ראה: `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`.
+**Governance v2.102 (2026-02-13):** סגירת משימות — **רק** באמצעות **Seal Message (SOP-013)**. דוח לבדו לא מתקבל. **קנון SOP-013:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. ראה גם: `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`.
 
 ---
 

@@ -10,8 +10,8 @@
 
 | פריט | פעולה |
 |------|--------|
-| **TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md** | הורחב לנוהל מלא: פורמט הודעת Seal (PHOENIX TASK SEAL), שרשרת פיקוד, PCS (חיתום שלב רק בסיום באץ'), אכיפה (No Seal No Pay, LCI Integrity, **Zero Noise**). |
-| **ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md** | נכתב במלואו — פסיקה, פורמט Seal, שרשרת, אכיפה; הפניה למסמך הנוהל. |
+| **נוהל סגירה (SOP-013)** | **קנון יחיד:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md — פורמט הודעת Seal (PHOENIX TASK SEAL), שרשרת פיקוד, PCS, אכיפה (No Seal No Pay, Zero Noise). אין קובץ נפרד בנתיב 07-POLICIES (הועבר לארכיון). |
+| **ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md** | נכתב במלואו — פסיקה, פורמט Seal, שרשרת, אכיפה; מסמך מחייב מצביע על עצמו כקנון. |
 | **PHOENIX_MASTER_BIBLE.md** | נוסף §7 — SOP-013 (משילות, Seal, PCS, Zero Noise); גרסה v2.9. |
 | **.cursorrules** | נוסף TASK COMPLETION (SOP-013): סגירה רק ב-Seal; Zero Noise; הפניה למסמך הנוהל. |
 | **00_MASTER_INDEX.md** | עדכון שורת Governance — פורמט Seal, PCS, Zero Noise, קישור להנחיית האדריכלית. |

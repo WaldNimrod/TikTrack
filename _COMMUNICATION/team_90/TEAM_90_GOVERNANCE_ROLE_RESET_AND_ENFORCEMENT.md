@@ -52,8 +52,8 @@ Team 90 is **not**:
 
 ## 5) Canonical References
 
-- `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`
-- `documentation/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md`
+- **SOP-013 (חסם סגירה) — קנון יחיד:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` (קובץ 07-POLICIES הועבר לארכיון)
+- `documentation/docs-governance/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md`
 - `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 
 ---

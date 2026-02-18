@@ -54,7 +54,7 @@ HANDOVER_PROMPT: "צוות 90, המשימה מוכנה לבדיקת יושרה. 
 
 ## מקור נוהל מלא
 
-**מסמך מחייב:** `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md`
+**מסמך מחייב (קנון יחיד):** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` (מסמך זה). אין קובץ policy נפרד בנתיב 07-POLICIES — הועבר לארכיון.
 
 חובה על **כל** הצוותים לאמץ את הנוהל במלואו — לא דוח לבד, לא קבצי סיכום מיותרים; Seal Message בלבד לסגירה; PCS רק בסיום באץ'; Zero Noise.
 

@@ -10,7 +10,7 @@
 
 | פעולה | קובץ / תוצר |
 |--------|--------------|
-| **נוהל SOP-013 (חסם סגירה)** | documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md — Seal Message כחסם יחיד; דוח לבדו לא מתקבל. |
+| **נוהל SOP-013 (חסם סגירה)** | **קנון יחיד:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md — Seal Message כחסם יחיד; דוח לבדו לא מתקבל. (קובץ 07-POLICIES הועבר לארכיון.) |
 | **עדכון Clean Table Protocol** | _COMMUNICATION/team_10/TEAM_10_CLEAN_TABLE_PROTOCOL.md — התייחסות ל־Governance v2.102 ו־SOP-013. |
 | **עדכון OPEN_TASKS_MASTER** | _COMMUNICATION/team_10/TEAM_10_OPEN_TASKS_MASTER.md — כלל סגירה: רק Seal Message (SOP-013). |
 | **עדכון Master Task List Protocol** | _COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md — כלל 6: סגירה תקפה רק עם SOP-013. |

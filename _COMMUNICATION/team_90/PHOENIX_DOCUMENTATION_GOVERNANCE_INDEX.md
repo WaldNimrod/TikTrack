@@ -28,11 +28,11 @@
 
 | Domain | Canonical document(s) | Path |
 |---|---|---|
-| Global index | `00_MASTER_INDEX.md` | `documentation/00-MANAGEMENT/00_MASTER_INDEX.md` |
+| Global index (קנון יחיד) | `00_MASTER_INDEX.md` | `00_MASTER_INDEX.md` (שורש הפרויקט) |
 | Architect decisions source | Architect decisions set | `_COMMUNICATION/_Architects_Decisions/` |
 | Quality gates | `TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` |
 | Knowledge promotion | `TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` |
-| Closure gating | `TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` | `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` |
+| Closure gating (SOP-013) | **קנון יחיד** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
 | Operating standards | `CURSOR_INTERNAL_PLAYBOOK.md`, `PHOENIX_MASTER_BIBLE.md` | `documentation/09-GOVERNANCE/standards/` |
 
 ### 1.2 Governance integrity risk already visible

@@ -16,7 +16,7 @@ Before performing any task, you MUST:
 2. Locate and study these MANDATORY FILES:
    - 00_MASTER_INDEX.md (repo root)
    - documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md
-3. Perform a Deep Scan of your assigned directory and /04-ENGINEERING.
+3. Perform a Deep Scan of your assigned directory and documentation/ (Model B).
 4. State: "I have studied the Bible and Playbook. I am ready to operate as Team [ID]. I am providing the READINESS_DECLARATION."
 
 ## COMMAND CHAIN

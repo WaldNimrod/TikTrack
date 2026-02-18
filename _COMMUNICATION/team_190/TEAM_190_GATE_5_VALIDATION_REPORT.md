@@ -47,7 +47,7 @@ Detected implicit assumptions:
 
 1. Schema presence is treated as equivalent to spec completeness.
 2. `state_definitions` and `selector_registry` are assumed testable without any real module payload.
-3. Stage naming is assumed equivalent despite mismatch (`GAP_CLOSURE_PRE_AGENT` vs `GAP_CLOSURE_BEFORE_AGENT_POC`).
+3. Stage naming aligned to canonical: `GAP_CLOSURE_BEFORE_AGENT_POC` (legacy name GAP_CLOSURE_PRE_AGENT deprecated).
 4. Drifted package anchor copy of `00_MASTER_INDEX.md` is assumed harmless.
 5. Legacy references are assumed permanently non-operational without enforcement artifact.
 
@@ -81,7 +81,7 @@ Evidence paths:
 - `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
 
 ### Naming drift
-- Stage identifier drift: package uses `GAP_CLOSURE_PRE_AGENT`; Team 100 canonical reference uses `GAP_CLOSURE_BEFORE_AGENT_POC`.
+- Stage identifier: canonical `GAP_CLOSURE_BEFORE_AGENT_POC`; package content aligned (Team 70 remediation).
 
 Evidence paths:
 - `_COMMUNICATION/team_190/TEAM_190_ACTIVATION_PACKAGE_2026-02-18/02_stage/ACTIVE_STAGE.md`

@@ -1,9 +1,9 @@
-# Architect Decision Request — Gap Closure (GAP_CLOSURE_PRE_AGENT)
+# Architect Decision Request — Gap Closure (GAP_CLOSURE_BEFORE_AGENT_POC)
 
 **id:** ARCHITECT_DECISION_REQUEST_GAP_CLOSURE  
 **from:** Team 10 (The Gateway)  
 **to:** Architect (CC: Team 90, Team 70)  
-**stage:** GAP_CLOSURE_PRE_AGENT  
+**stage:** GAP_CLOSURE_BEFORE_AGENT_POC  
 **date:** 2026-02-18
 
 ---

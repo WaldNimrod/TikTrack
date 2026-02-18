@@ -1,4 +1,4 @@
-# Team 90 -> Team 10 | GAP_CLOSURE_PRE_AGENT Re-Validation Report
+# Team 90 -> Team 10 | GAP_CLOSURE_BEFORE_AGENT_POC Re-Validation Report
 
 **from:** Team 90 (External Validation Unit)  
 **to:** Team 10 (Gateway)  
@@ -72,4 +72,4 @@ Dev-Orchestration POC must remain blocked until the closure delta above is appli
 
 ---
 
-**log_entry | TEAM_90 | GAP_CLOSURE_PRE_AGENT_REVALIDATION | BLOCKED_NOT_CLEAN_FOR_AGENT | 2026-02-18**
+**log_entry | TEAM_90 | GAP_CLOSURE_BEFORE_AGENT_POC_REVALIDATION | BLOCKED_NOT_CLEAN_FOR_AGENT | 2026-02-18**

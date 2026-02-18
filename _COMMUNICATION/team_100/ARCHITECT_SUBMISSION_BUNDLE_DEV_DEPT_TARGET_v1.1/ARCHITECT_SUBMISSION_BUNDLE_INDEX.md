@@ -11,7 +11,7 @@ Status: READY_FOR_ARCHITECT_REVIEW
 ## 2) Governance evidence (reference)
 - `ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` (canonical governance directive)
 - `TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md` (SOP drift resolution)
-- `ACTIVE_STAGE.md` (GAP_CLOSURE_PRE_AGENT stage record)
+- `ACTIVE_STAGE.md` (GAP_CLOSURE_BEFORE_AGENT_POC stage record)
 
 ## 3) Locked decisions reflected in v1.1
 - Team 90 locked as **Dev Validation Authority** (Gate-B PASS/BLOCK).

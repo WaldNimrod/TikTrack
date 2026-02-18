@@ -1,8 +1,8 @@
-# Team 10 — החלטות רשמיות לסגירת פערים (GAP_CLOSURE_PRE_AGENT)
+# Team 10 — החלטות רשמיות לסגירת פערים (GAP_CLOSURE_BEFORE_AGENT_POC)
 
 **id:** TEAM_10_GAP_CLOSURE_FORMAL_DECISIONS  
 **owner:** Team 10 (The Gateway)  
-**stage:** GAP_CLOSURE_PRE_AGENT  
+**stage:** GAP_CLOSURE_BEFORE_AGENT_POC  
 **date:** 2026-02-18  
 **מטרה:** נעילת החלטות כדי לאפשר Gate חוזר של Team 90 (STATUS: CLEAN_FOR_AGENT).
 
@@ -44,7 +44,7 @@
 
 ## 5. Carryover (CARRY-001 … CARRY-015)
 
-**החלטה:** כל 15 הפריטים מסומנים **FORMALLY DECIDED** — יטופלו בשלב/באץ' היעד המפורט ברשימת הפערים; **לא חוסם** את יציאת שלב GAP_CLOSURE_PRE_AGENT או הפעלת POC Agent, בכפוף לכך שכל פריט מקושר ל־target stage ו־owner ב־GAP_CLOSURE_MASTER_LIST.
+**החלטה:** כל 15 הפריטים מסומנים **FORMALLY DECIDED** — יטופלו בשלב/באץ' היעד המפורט ברשימת הפערים; **לא חוסם** את יציאת שלב GAP_CLOSURE_BEFORE_AGENT_POC או הפעלת POC Agent, בכפוף לכך שכל פריט מקושר ל־target stage ו־owner ב־GAP_CLOSURE_MASTER_LIST.
 
 **פירוט:** CARRY-001..003 — Batch 3 readiness; CARRY-004..013 — Page Tracker / Batch 3–6; CARRY-014 — טריאז' לוגיקה (Team 10+20); CARRY-015 — החלטת דיוק (Team 10+20+60). סגירה מלאה של כל פריט — במסגרת הבאצ'ים הרלוונטיים עם Seal (SOP-013).
 

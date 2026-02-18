@@ -103,6 +103,6 @@ After approval of this target model, we will:
 ## 9) Attached evidence (for review)
 - `TEAM_90_TO_TEAM_10_SOP_013_REFERENCE_VALIDATION_RESPONSE.md` (drift resolved confirmation)
 - `ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` (canonical directive)
-- `ACTIVE_STAGE.md` (GAP_CLOSURE_PRE_AGENT stage record)
+- `ACTIVE_STAGE.md` (GAP_CLOSURE_BEFORE_AGENT_POC stage record)
 
 **log_entry | TEAM_100 | ARCHITECT_PACKET_EVIDENCE_ATTACHED | 2026-02-18**

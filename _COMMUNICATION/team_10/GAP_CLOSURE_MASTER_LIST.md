@@ -1,8 +1,8 @@
-# GAP Closure Master List — GAP_CLOSURE_PRE_AGENT
+# GAP Closure Master List — GAP_CLOSURE_BEFORE_AGENT_POC
 
 **id:** GAP_CLOSURE_MASTER_LIST  
 **owner:** Team 10 (The Gateway)  
-**stage:** GAP_CLOSURE_PRE_AGENT  
+**stage:** GAP_CLOSURE_BEFORE_AGENT_POC  
 **last_updated:** 2026-02-18
 
 ---

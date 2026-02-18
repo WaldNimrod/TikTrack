@@ -1,10 +1,10 @@
-# Team 90 → Team 10 | GAP_CLOSURE_PRE_AGENT — דוח אימות
+# Team 90 → Team 10 | GAP_CLOSURE_BEFORE_AGENT_POC — דוח אימות
 
 **from:** Team 90 (External Validation Unit)  
 **to:** Team 10 (The Gateway)  
 **cc:** Architect, Team 70  
 **date:** 2026-02-18  
-**stage:** GAP_CLOSURE_PRE_AGENT
+**stage:** GAP_CLOSURE_BEFORE_AGENT_POC
 
 ---
 
@@ -34,4 +34,4 @@
 
 ---
 
-**log_entry | TEAM_90 | GAP_CLOSURE_PRE_AGENT_VALIDATION | BLOCKED_NOT_CLEAN_FOR_AGENT | 2026-02-18**
+**log_entry | TEAM_90 | GAP_CLOSURE_BEFORE_AGENT_POC_VALIDATION | BLOCKED_NOT_CLEAN_FOR_AGENT | 2026-02-18**

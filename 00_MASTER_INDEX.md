@@ -3,7 +3,7 @@
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  
 **status:** Entry point — canonical structure post Phoenix Cutover  
-**last_updated:** 2026-02-17
+**last_updated:** 2026-02-18
 
 ---
 

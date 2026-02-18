@@ -261,8 +261,8 @@
 ## 🔗 קישורים רלוונטיים
 
 - **Header Unification Mandate:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
-- **תוכנית מימוש:** `documentation/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md`
-- **Page Tracker:** `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
+- **תוכנית מימוש (ארכיון):** `archive/documentation_legacy/snapshots/2026-02-18_0200/documentation/docs-system/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md`
+- **Page Tracker:** `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
 
 ---
 

@@ -1,0 +1,739 @@
+.
+├── .cursor
+├── .cursorrules
+├── .env
+├── .gitignore
+├── .pytest_cache
+│   ├── .gitignore
+│   ├── CACHEDIR.TAG
+│   ├── README.md
+│   └── v
+│       └── cache
+├── .tmp.drivedownload
+├── .tmp.driveupload
+├── .vscode
+│   └── tasks.json
+├── 00_MASTER_INDEX.md
+├── Makefile
+├── TikTrack - Main dev data.gsheet
+├── VERSION
+├── _COMMUNICATION
+│   ├── 90_Architects_comunication
+│   │   ├── EXTERNAL_AUDIT_v1
+│   │   ├── EXTERNAL_AUDIT_v2
+│   │   ├── EXTERNAL_AUDIT_v2.zip
+│   │   ├── EXTERNAL_AUDIT_v3
+│   │   ├── SPY_MAPPING_EVIDENCE_FOR_T10.md
+│   │   ├── TEAM_00_ARCHITECT_QUERY_SESSION_01.md
+│   │   ├── TEAM_10_STAGE_1_REQUIREMENTS_MANDATE.md
+│   │   ├── TEAM_10_TO_ARCHITECT_BATCH_1_2_MODULE_MENU_SSOT_REQUEST.md
+│   │   ├── TEAM_10_TO_ARCHITECT_EXCHANGE_RATES_HISTORY_CONSULTATION.md
+│   │   ├── TEAM_10_TO_ARCHITECT_HEADER_ARCHITECTURE_DECISION.md
+│   │   ├── TEAM_10_TO_ARCHITECT_HEADER_IMPLEMENTATION_COMPLETE.md
+│   │   ├── TEAM_10_TO_ARCHITECT_NAMING_CLARIFICATION.md
+│   │   ├── TEAM_10_TO_ARCHITECT_NAVIGATION_STRATEGY_COMPLETE.md
+│   │   ├── TEAM_10_TO_ARCHITECT_P0_RED_CLEANUP_COMPLETE.md
+│   │   ├── TEAM_10_TO_ARCHITECT_P3_003_SSOT_ALIGNMENT_UPDATE.md
+│   │   ├── TEAM_10_TO_ARCHITECT_PDSC_DECISION_REQUEST.md
+│   │   ├── TEAM_10_TO_ARCHITECT_SYSTEM_STATUS_VALUES_PLAN.md
+│   │   ├── TEAM_20_TO_ARCHITECT_MARKET_DATA_SETTINGS_UI_PLAN.md
+│   │   ├── TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC.md
+│   │   ├── TEAM_20_TO_ARCHITECT_SMART_UPDATE_LOGIC_PROPOSAL.md
+│   │   ├── TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md
+│   │   ├── TEAM_90_BATCH_2_5_FINAL_PASS.md
+│   │   ├── TEAM_90_MARKET_DATA_PLANNING_AUDIT.md
+│   │   ├── TEAM_90_TO_ARCHITECT_BATCH_2_5_SPY_FINAL_REPORT.md
+│   │   ├── TEAM_90_TO_ARCHITECT_BROKER_FEES_ENTITY_DECISION_CONTEXT.md
+│   │   ├── TEAM_90_TO_ARCHITECT_D39_USER_PREFERENCES_SPEC_FOR_APPROVAL.md
+│   │   ├── TEAM_90_TO_ARCHITECT_EXTERNAL_DATA_FINAL_UPDATE.md
+│   │   ├── TEAM_90_TO_ARCHITECT_EXTERNAL_DATA_INDICATORS_UPDATE.md
+│   │   ├── TEAM_90_TO_ARCHITECT_RICH_TEXT_AND_DESIGN_SYSTEM_DECISION_REPORT.md
+│   │   ├── TEAM_90_TO_ARCHITECT_TEAM_70_ORG_AND_ONBOARDING_ACTIVATION.md
+│   │   ├── TEAM_90_TO_ARCHITECT_TEAM_70_PACKAGE_CONDITIONAL_PASS_AND_DECISION_REQUEST.md
+│   │   ├── TEAM_HANDOVER_JS_LOGIC.md
+│   │   ├── TT2_VERSION_MATRIX_v1.0.md
+│   │   └── routes.json
+│   ├── 99-ARCHIVE
+│   │   ├── 2026-01-30_comm_cleanup
+│   │   ├── 2026-02-12
+│   │   ├── 2026-02-13
+│   │   ├── 2026-02-15
+│   │   ├── Bach1_2026_2_2
+│   │   ├── _Cursor_full_design_V1_final_PROJECT_PHOENIX
+│   │   ├── cursor_messages
+│   │   ├── deprecated_indexes_phase_1.7
+│   │   ├── staging
+│   │   └── user_profile_versions
+│   ├── Legace_html_for_blueprint
+│   │   ├── Home.html
+│   │   ├── LEGACY_DOM_AUDIT
+│   │   ├── Legace_DOM
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   └── user_profile.html
+│   ├── _ARCHITECT_INBOX
+│   │   └── 90_ARCHITECTS_DOCUMENTATION
+│   ├── _Architects_Decisions
+│   │   ├── 00_MASTER_INDEX.md
+│   │   ├── ARCHITECT_AUDIT_V2_APPROVAL.md
+│   │   ├── ARCHITECT_BASE_SYSTEMS_DESIGN_MANDATE.md
+│   │   ├── ARCHITECT_BATCH_1_CLOSURE_MANDATE.md
+│   │   ├── ARCHITECT_BATCH_1_FINAL_SEAL.md
+│   │   ├── ARCHITECT_BATCH_1_FINAL_SUMMARY.md
+│   │   ├── ARCHITECT_BROKER_AND_FEES_PIVOT_VERDICT.md
+│   │   ├── ARCHITECT_BROKER_REFERENCE_AND_OTHER_LOGIC.md
+│   │   ├── ARCHITECT_BROKER_REFERENCE_MANDATE.md
+│   │   ├── ARCHITECT_CONSOLIDATED_RESPONSE_PHASE_2.md
+│   │   ├── ARCHITECT_D16_IMPLEMENTATION_MANDATE.md
+│   │   ├── ARCHITECT_DECISION_LEGO_CUBES.md
+│   │   ├── ARCHITECT_DECISION_LEGO_CUBES_FINAL.md
+│   │   ├── ARCHITECT_DECISION_TEMPLATE.md
+│   │   ├── ARCHITECT_DECISION_TEMPLATE_STANDARD.md
+│   │   ├── ARCHITECT_DESIGN_CONTRACTS_MANDATE.md
+│   │   ├── ARCHITECT_DIRECTIVE_AUTH_FIX.md
+│   │   ├── ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md
+│   │   ├── ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md
+│   │   ├── ARCHITECT_DIRECTIVE_TABLES_REACT.md
+│   │   ├── ARCHITECT_DIRECTIVE_TABLES_V2_FINAL.md
+│   │   ├── ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md
+│   │   ├── ARCHITECT_DIRECTIVE_VALIDATION_HYBRID.md
+│   │   ├── ARCHITECT_DOCS_INTEGRITY_MANDATE.md
+│   │   ├── ARCHITECT_DRIFT_FIX_MANDATE.md
+│   │   ├── ARCHITECT_EVALUATION_KIT_INSTRUCTIONS.md
+│   │   ├── ARCHITECT_FILTER_BRIDGE_SPEC_V2.md
+│   │   ├── ARCHITECT_GOVERNANCE_PROCEDURES_V2.md
+│   │   ├── ARCHITECT_HEADER_UNIFICATION_MANDATE.md
+│   │   ├── ARCHITECT_INFRASTRUCTURE_RETROFIT_MANDATE.md
+│   │   ├── ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md
+│   │   ├── ARCHITECT_MANDATE_NAMING_CONVENTION.md
+│   │   ├── ARCHITECT_MANDATE_SINGULAR_NAMING.md
+│   │   ├── ARCHITECT_MODULE_MENU_STYLING_DECISION_LOCKED.md
+│   │   ├── ARCHITECT_P0_RED_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_1_8_DETAILED_STRATEGY.md
+│   │   ├── ARCHITECT_PHASE_1_8_FINAL_RESOLUTION.md
+│   │   ├── ARCHITECT_PHASE_2_BLOCKER_VERDICT_FINAL.md
+│   │   ├── ARCHITECT_PHASE_2_CLOSURE_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_CORE_DECISIONS.md
+│   │   ├── ARCHITECT_PHASE_2_DATA_MODEL_PIVOT_VERDICT.md
+│   │   ├── ARCHITECT_PHASE_2_EXECUTION_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md
+│   │   ├── ARCHITECT_PHASE_2_FINAL_GAPS_VERDICT.md
+│   │   ├── ARCHITECT_PHASE_2_FINAL_RESOLUTION_BLOCKERS.md
+│   │   ├── ARCHITECT_PHASE_2_FULL_KICKOFF_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_FULL_RELEASE_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_GAP_ANALYSIS_REPORT.md
+│   │   ├── ARCHITECT_PHASE_2_KICKOFF_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_REFINED_MANDATE.md
+│   │   ├── ARCHITECT_PHASE_2_STEP_1_CLOSURE_DIRECTIVE.md
+│   │   ├── ARCHITECT_PHASE_2_UNIFIED_CLOSURE_MANDATE.md
+│   │   ├── ARCHITECT_POLICY_HYBRID_SCRIPTS.md
+│   │   ├── ARCHITECT_PORT_LOCK_FINAL.md
+│   │   ├── ARCHITECT_PRE_CODING_MAPPING_MANDATE.md
+│   │   ├── ARCHITECT_RESOLUTION_NAMING_FINAL.md
+│   │   ├── ARCHITECT_RESPONSE_TO_TEAM_90_INFO_REQUEST.md
+│   │   ├── ARCHITECT_RESPONSIVE_CHARTER.md
+│   │   ├── ARCHITECT_TABLE_RESPONSIVITY_DECISIONS.md
+│   │   ├── ARCHITECT_TABLE_RTL_SYNERGY.md
+│   │   ├── ARCHITECT_TEAM_10_70_ROLE_REALIGNMENT.md
+│   │   ├── ARCHITECT_TRADING_ACCOUNTS_RED_FIX_MANDATE.md
+│   │   ├── ARCHITECT_UNIVERSAL_VALIDATION_SOP.md
+│   │   ├── ARCHITECT_VERDICT_BATCH_2_5_PASS_AND_HIERARCHY.md
+│   │   ├── ARCHITECT_VERDICT_MARKET_DATA_STAGE_1.md
+│   │   ├── ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY.md
+│   │   ├── ARCHITECT_WORK_PLAN_APPROVAL.md
+│   │   ├── BATCH_2_5_COMPLETIONS_MANDATE.md
+│   │   ├── FIX_PhoenixFilterContext.jsx
+│   │   ├── FIX_auth-guard.js
+│   │   ├── FIX_transformers.js
+│   │   ├── GUIDELINES_REFRESH_TEAM10.md
+│   │   ├── HEADER_ARCHITECTURE_DECISION.md
+│   │   ├── MISSION_DIRECTIVE_90_02_FINAL.md
+│   │   ├── NOTIFICATION_BATCH_1_CONSOLIDATED_SEAL.md
+│   │   ├── OFFICIAL_QA_HANDBOOK_TEAM50.md
+│   │   ├── PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md
+│   │   ├── PI_STRATEGIC_NARRATIVE_REPORT.md
+│   │   └── TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md
+│   ├── _POC_ARTIFACT_SAMPLE
+│   │   ├── 00_MASTER_INDEX.md
+│   │   ├── ARCHITECT_VERDICT_MARKET_DATA_STAGE_1.md
+│   │   ├── TEAM_10_MB3A_ALERTS_GATE_KP_AND_SEAL.md
+│   │   ├── TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md
+│   │   ├── TEAM_20_TO_TEAM_10_MB3A_ALERTS_API_COMPLETION_REPORT.md
+│   │   ├── TEAM_50_TO_TEAM_10_MB3A_ALERTS_QA_REPORT.md
+│   │   ├── TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md
+│   │   └── TEAM_90_TO_TEAM_10_MB3A_ALERTS_GATE_B_PASS.md
+│   ├── nimrod
+│   │   ├── js_standards_example.js
+│   │   ├── team00-1_GAS.js
+│   │   └── הנחיות פיתוח לוגיקה ו-JS - צוות 10.gdoc
+│   ├── team_01
+│   │   ├── TEAM_01_TO_TEAM_10_D16_ACCTS_VIEW_COMPLETE.md
+│   │   ├── TEAM_30_BATCH_1_HANDOFF_TO_TEAM_10.md
+│   │   └── team_01_staging
+│   ├── team_02
+│   │   └── team_02_staging
+│   ├── team_10
+│   │   ├── ARCHIVE_FULL_2026_02_15_KEEP_LISTS.md
+│   │   ├── CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15.md
+│   │   ├── PHOENIX_COMMAND_ADR_TEMPLATE_GOVERNANCE_ADOPTION_LOCKED.md
+│   │   ├── TEAM_10_CLEAN_TABLE_PROTOCOL.md
+│   │   ├── TEAM_10_GATEWAY_ROLE_AND_PROCESS.md
+│   │   ├── TEAM_10_GATE_B_MD_SETTINGS_BLOCKED_AND_CLOSURE_REQUIREMENTS.md
+│   │   ├── TEAM_10_KNOWLEDGE_PROMOTION_WORKFLOW.md
+│   │   ├── TEAM_10_MARKET_DATA_SETTINGS_UI_ACTIVATION_PROMPTS.md
+│   │   ├── TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md
+│   │   ├── TEAM_10_MASTER_TASK_LIST.md
+│   │   ├── TEAM_10_MASTER_TASK_LIST_PROTOCOL.md
+│   │   ├── TEAM_10_MB3A_ALERTS_ACTIVATION.md
+│   │   ├── TEAM_10_MB3A_ALERTS_EXECUTION_ORDER_AND_PROMPTS_REF.md
+│   │   ├── TEAM_10_MB3A_ALERTS_SCOPE_LOCK.md
+│   │   ├── TEAM_10_MB3A_NOTES_ALERTS_CONTEXT_AND_ACTIVATION_PROMPTS.md
+│   │   ├── TEAM_10_MB3A_NOTES_SCOPE_LOCK.md
+│   │   ├── TEAM_10_MB3A_NOTES_WORK_PLAN_SUMMARY_AND_LINKS.md
+│   │   ├── TEAM_10_MB3A_READINESS_AND_ALERTS_PREP.md
+│   │   ├── TEAM_10_MD_SETTINGS_GATE_B_READY_AND_ACTIVATION_PROMPTS.md
+│   │   ├── TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md
+│   │   ├── TEAM_10_OPEN_TASKS_MASTER.md
+│   │   ├── TEAM_10_P3_003_BLUEPRINT_SCOPE_AND_DRIFT_MATRIX.md
+│   │   ├── TEAM_10_P3_003_MATRIX_AND_MENU_CORRECTIONS.md
+│   │   ├── TEAM_10_P3_003_PAGES_COMPARISON_TABLE.md
+│   │   ├── TEAM_10_SSOT_DELTA_MARKET_DATA_SETTINGS.md
+│   │   ├── TEAM_10_TO_ALL_TEAMS_PHOENIX_DOCUMENTATION_GOVERNANCE_ADOPTION_NOTICE.md
+│   │   ├── TEAM_10_TO_TEAMS_20_30_50_60_MD_SETTINGS_GATE_B_PASS_UPDATE.md
+│   │   ├── TEAM_10_TO_TEAM_20_D35_NOTES_ADD_TAGS_TO_RESPONSE.md
+│   │   ├── TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_20_MARKET_DATA_SETTINGS_UI_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_20_MB3A_NOTES_ALERTS_ACTIVATION_DRAFT.md
+│   │   ├── TEAM_10_TO_TEAM_30_40_MB3A_ALERTS_BUILD_PROMPTS.md
+│   │   ├── TEAM_10_TO_TEAM_30_40_MB3A_NOTES_PROMPTS_UPDATED.md
+│   │   ├── TEAM_10_TO_TEAM_30_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_30_MARKET_DATA_SETTINGS_UI_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_30_MB3A_NOTES_ALERTS_ACTIVATION_DRAFT.md
+│   │   ├── TEAM_10_TO_TEAM_30_MENU_SSOT_ALIGNMENT.md
+│   │   ├── TEAM_10_TO_TEAM_30_NOTES_DESIGN_DATA_COMPATIBILITY_RESPONSE.md
+│   │   ├── TEAM_10_TO_TEAM_31_MB3A_ALERTS_BUILD_ACTIVATION.md
+│   │   ├── TEAM_10_TO_TEAM_31_MB3A_GATE0_ALERTS_PREP_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_31_P3_003_BLUEPRINT_SCOPE_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_31_P3_003_FOLLOW_UP_WHAT_IS_REQUIRED.md
+│   │   ├── TEAM_10_TO_TEAM_31_P3_003_SCOPE_CORRECTIONS_AND_SSOT.md
+│   │   ├── TEAM_10_TO_TEAM_40_MB3A_NOTES_ALERTS_ACTIVATION_DRAFT.md
+│   │   ├── TEAM_10_TO_TEAM_50_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_50_MARKET_DATA_SETTINGS_403_EVIDENCE_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_50_MARKET_DATA_SETTINGS_UI_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_50_MB3A_ALERTS_GATE_A_ACK.md
+│   │   ├── TEAM_10_TO_TEAM_50_MB3A_ALERTS_GATE_A_QA_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_50_MB3A_NOTES_ALERTS_ACTIVATION_DRAFT.md
+│   │   ├── TEAM_10_TO_TEAM_50_MB3A_NOTES_GATE_A_QA_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_60_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_60_MARKET_DATA_SETTINGS_UI_MANDATE.md
+│   │   ├── TEAM_10_TO_TEAM_60_MB3A_NOTES_ALERTS_ACTIVATION_DRAFT.md
+│   │   ├── TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_GATE_B_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_GATE_B_RE_REQUEST.md
+│   │   ├── TEAM_10_TO_TEAM_90_MARKET_DATA_SETTINGS_UI_PLANNING_PACKAGE_SUBMISSION.md
+│   │   ├── TEAM_10_TO_TEAM_90_MB3A_ALERTS_GATE_B_REQUEST.md
+│   │   └── TEAM_10_TO_TEAM_90_MB3A_NOTES_GATE_B_REQUEST.md
+│   ├── team_20
+│   │   ├── ADMIN_ROLE_MAPPING.md
+│   │   ├── API_DOCUMENTATION_ENHANCED.md
+│   │   ├── TEAM_20_30_PDSC_SHARED_BOUNDARY_CONTRACT.md
+│   │   ├── TEAM_20_BACKEND_RESTART_WORK_PROCEDURE.md
+│   │   ├── TEAM_20_MB3A_NOTES_POST_500_EVIDENCE.md
+│   │   ├── TEAM_20_PDSC_ERROR_CONTRACT_SPECIFICATION.md
+│   │   ├── TEAM_20_PDSC_ERROR_SCHEMA.md
+│   │   ├── TEAM_20_PDSC_RESPONSE_CONTRACT.md
+│   │   ├── TEAM_20_TICKER_METADATA_ENRICHMENT_SPEC_PROPOSAL.md
+│   │   ├── TEAM_20_TO_TEAM_10_ADR_TEMPLATE_GOVERNANCE_ACK.md
+│   │   ├── TEAM_20_TO_TEAM_10_MB3A_ALERTS_API_COMPLETION_REPORT.md
+│   │   ├── TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION.md
+│   │   ├── TEAM_20_TO_TEAM_30_MARKET_DATA_SETTINGS_UI_COORDINATION.md
+│   │   ├── TEAM_20_TO_TEAM_30_MB3A_ALERTS_API_IMPLEMENTATION_COMPLETE.md
+│   │   ├── TEAM_20_TO_TEAM_30_NOTES_SUMMARY_ENDPOINT_RESPONSE.md
+│   │   ├── TEAM_20_TO_TEAM_30_PHASE_2_API_INTEGRATION_GUIDE.md
+│   │   ├── TEAM_20_TO_TEAM_50_MB3A_NOTES_POST_500_FIX_RESPONSE.md
+│   │   ├── TEAM_20_TO_TEAM_60_D35_ATTACHMENTS_COORDINATION_REQUEST.md
+│   │   ├── TEAM_20_TO_TEAM_60_EXCHANGE_RATES_DDL_SPEC.md
+│   │   └── TEAM_20_TO_TEAM_60_MARKET_DATA_SYSTEM_SETTINGS_DDL_COORDINATION.md
+│   ├── team_30
+│   │   ├── TEAM_30_MB3A_BUILD_NOTES_ACK.md
+│   │   ├── TEAM_30_TO_TEAMS_10_50_QA_VERIFICATION_RESPONSE.md
+│   │   ├── TEAM_30_TO_TEAM_10_MB3A_ALERTS_HANDOFF_ACK.md
+│   │   ├── TEAM_30_TO_TEAM_10_MB3A_ALERTS_INTEGRATION_COMPLETION.md
+│   │   ├── TEAM_30_TO_TEAM_20_MB3A_ALERTS_API_REQUIREMENTS.md
+│   │   ├── TEAM_30_TO_TEAM_20_NOTES_SUMMARY_ENDPOINT_REQUEST.md
+│   │   ├── TEAM_30_TO_TEAM_40_NOTES_FILTER_BUTTONS_CLASSES_REQUEST.md
+│   │   └── TEAM_30_TO_TEAM_50_MARKET_DATA_SETTINGS_QA_REQUEST.md
+│   ├── team_31
+│   │   ├── README.md
+│   │   ├── TEAM_31_LEGO_REFACTOR_PLAN_V2_REVIEW.md
+│   │   ├── TEAM_31_PAGE_TEMPLATE_README.md
+│   │   ├── TEAM_31_TO_TEAM_10_MB3A_ALERTS_BUILD_ACK_AND_HANDOFF.md
+│   │   ├── TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md
+│   │   └── team_31_staging
+│   ├── team_40
+│   │   ├── TEAM_40_ADR_TEMPLATE_GOVERNANCE_ADOPTION.md
+│   │   ├── TEAM_40_MB3A_ALERTS_BUILD_ACK.md
+│   │   ├── TEAM_40_TO_TEAM_30_MB3A_BUILD_ALERTS_COORDINATION.md
+│   │   ├── TEAM_40_TO_TEAM_30_MB3A_BUILD_NOTES_COORDINATION.md
+│   │   ├── TEAM_40_TO_TEAM_30_NOTES_FILTER_BUTTONS_CLASSES_RESPONSE.md
+│   │   ├── TEAM_40_VISUAL_VALIDATION_CRITERIA.md
+│   │   └── demos
+│   ├── team_50
+│   │   ├── TEAM_50_DEFECT_REPORTING_PROCESS.md
+│   │   ├── TEAM_50_GATE_B_DETAILED_ERROR_REPORT_AND_VERIFICATION_GUIDE.md
+│   │   ├── TEAM_50_QA_REPORT_FORMAT_STANDARD.md
+│   │   ├── TEAM_50_QA_RERUN_SOP.md
+│   │   ├── TEAM_50_TO_TEAM_10_MARKET_DATA_SETTINGS_QA_REPORT.md
+│   │   ├── TEAM_50_TO_TEAM_10_MB3A_ALERTS_QA_REPORT.md
+│   │   ├── TEAM_50_TO_TEAM_10_MB3A_NOTES_QA_REPORT.md
+│   │   ├── TEAM_50_TO_TEAM_10_MD_SETTINGS_403_EVIDENCE.md
+│   │   └── TEAM_50_TO_TEAM_20_MB3A_NOTES_POST_500_FIX_REQUEST.md
+│   ├── team_51
+│   │   ├── README_TEAM_51.md
+│   │   └── TEAM_51_ONBOARDING_COMPREHENSIVE.md
+│   ├── team_60
+│   │   ├── TEAM_60_TO_TEAM_10_ADR_TEMPLATE_GOVERNANCE_ACK.md
+│   │   ├── TEAM_60_TO_TEAM_20_D34_ALERTS_DDL_COORDINATION.md
+│   │   ├── TEAM_60_TO_TEAM_20_D35_NOTE_ATTACHMENTS_DDL_COORDINATION.md
+│   │   ├── TEAM_60_TO_TEAM_20_MARKET_DATA_SYSTEM_SETTINGS_DDL_COORDINATION.md
+│   │   ├── TEAM_60_TO_TEAM_50_MD_SETTINGS_GATE_A_UNBLOCKED.md
+│   │   └── TEAM_60_TO_TEAM_50_MD_SETTINGS_MIGRATION_COMPLETE.md
+│   ├── team_70
+│   │   ├── PHOENIX_DOCUMENTATION_TREE_INVENTORY.md
+│   │   ├── PI-001_PRODUCT_SCOPE_ATLAS.md
+│   │   ├── PI-002_BUSINESS_NARRATIVE_PACK.md
+│   │   ├── PI-003_MARKETING_INPUT_PACK.md
+│   │   ├── PI-004_INVESTOR_PARTNER_INPUT_PACK.md
+│   │   ├── PI-005_GAP_REGISTER.md
+│   │   ├── README.md
+│   │   ├── TEAM_70_7DAY_PACKAGE_DRAFT.md
+│   │   ├── TEAM_70_ARCHITECT_HANDOFF.md
+│   │   ├── TEAM_70_AUTHORITY_DRIFT_REGISTER.md
+│   │   ├── TEAM_70_CUTOVER_CURRENT_STATE_AND_GAPS_ANALYSIS.md
+│   │   ├── TEAM_70_DELIVERABLE_CHECKLIST.md
+│   │   ├── TEAM_70_DOC_MIGRATION_COMPLETENESS_MATRIX.md
+│   │   ├── TEAM_70_DOC_MIGRATION_CUTOVER_PLAN_V2.md
+│   │   ├── TEAM_70_FULL_SCOPE_NARRATIVE.md
+│   │   ├── TEAM_70_HISTORICAL_DIFFERENTIATION.md
+│   │   ├── TEAM_70_INFRASTRUCTURE_STORY.md
+│   │   ├── TEAM_70_MASTER_INDEX_ALIGNMENT_DRAFT.md
+│   │   ├── TEAM_70_MISSION_CHARTER.md
+│   │   ├── TEAM_70_NARRATIVE_PRODUCTION_INDEX.md
+│   │   ├── TEAM_70_ONBOARDING_PACKAGE.md
+│   │   ├── TEAM_70_PRODUCT_PITCH_DECK_TEXT.md
+│   │   ├── TEAM_70_REPORTS_ACTIVE_VS_ARCHIVE_MAP.md
+│   │   ├── TEAM_70_SNAPSHOT_PATH_EXCEPTION_REQUEST.md
+│   │   ├── TEAM_70_TO_ARCHITECT_DOC_MIGRATION_CUTOVER_GATE_FINAL_PASS.md
+│   │   ├── TEAM_70_TO_TEAM_10_ADR_TEMPLATE_GOVERNANCE_INTEGRATION_COMPLETE.md
+│   │   ├── TEAM_70_TO_TEAM_90_10_DOC_MIGRATION_CORRECTION_DELIVERABLES.md
+│   │   ├── TEAM_70_TO_TEAM_90_ADR_TEMPLATE_METADATA_ALIGNMENT_COMPLETE.md
+│   │   ├── TEAM_70_TO_TEAM_90_PHOENIX_CUTOVER_MIGRATION_COMPLETE.md
+│   │   └── TEAM_70_USER_PITCH_PACK.md
+│   ├── team_90
+│   │   ├── GOVERNANCE_SOURCE_MATRIX.md
+│   │   ├── PHOENIX_DOCUMENTATION_GOVERNANCE_INDEX.md
+│   │   ├── PHOENIX_GOVERNANCE_ALIGNMENT_PLAN.md
+│   │   ├── SOP_010_MANUAL_INTENT_SIMULATION_PROTOCOL.md
+│   │   ├── TEAM_90_ARCHITECTS_DECISIONS_FOLDER_ENFORCEMENT_NOTICE.md
+│   │   ├── TEAM_90_AUTHORITY_ALIGNMENT_CLOSURE_CHECKLIST.md
+│   │   ├── TEAM_90_AUTHORITY_DRIFT_REGISTER.md
+│   │   ├── TEAM_90_DOCUMENTATION_ARCHITECTURE_VALIDATION_REPORT.md
+│   │   ├── TEAM_90_GOVERNANCE_ROLE_RESET_AND_ENFORCEMENT.md
+│   │   ├── TEAM_90_POC_ARTIFACT_SAMPLE_READY.md
+│   │   ├── TEAM_90_SPY_VALIDATION_SOP_PHASE_2.md
+│   │   ├── TEAM_90_TO_ALL_TEAMS_SERVER_START_POLICY.md
+│   │   ├── TEAM_90_TO_ALL_TEAMS_SOP_010_PROTOCOL_NOTICE.md
+│   │   ├── TEAM_90_TO_ARCHITECT_GOV_DOC_CUTOVER_FINAL_CLOSURE_REPORT_TEMPLATE.md
+│   │   ├── TEAM_90_TO_ARCHITECT_PHOENIX_GOV_DOC_CLOSURE_REPORT_DRAFT.md
+│   │   ├── TEAM_90_TO_TEAM_10_ADR_METADATA_ALIGNMENT_RECHECK_PASS.md
+│   │   ├── TEAM_90_TO_TEAM_10_ADR_NUMBERING_CONVENTION_REVIEW.md
+│   │   ├── TEAM_90_TO_TEAM_10_ADR_TEMPLATE_LOCK_VALIDATION.md
+│   │   ├── TEAM_90_TO_TEAM_10_CUTOVER_EXECUTION_VALIDATION_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_10_DOCUMENTATION_MIGRATION_GATE_REVALIDATION_AFTER_ROLLBACK.md
+│   │   ├── TEAM_90_TO_TEAM_10_DOCUMENTATION_MIGRATION_GATE_VALIDATION_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_10_DOC_MIGRATION_EXCEPTION_NOTE_TEMP_SOURCE_RESTORE.md
+│   │   ├── TEAM_90_TO_TEAM_10_GATE_AUTHORITY_ALIGNMENT_DECISION_LOCK.md
+│   │   ├── TEAM_90_TO_TEAM_10_GOV_ALIGNMENT_PLAN_SUBMISSION.md
+│   │   ├── TEAM_90_TO_TEAM_10_MB3A_ALERTS_GATE_B_PASS.md
+│   │   ├── TEAM_90_TO_TEAM_10_MB3A_NOTES_GATE_B_PASS.md
+│   │   ├── TEAM_90_TO_TEAM_10_MINI_BATCH_NOTES_ALERTS_MANDATE.md
+│   │   ├── TEAM_90_TO_TEAM_10_MODEL_B_REVALIDATION_STATUS_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_10_MODEL_B_REVALIDATION_V2_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_10_PHOENIX_GOV_DOC_CLOSURE_VALIDATION_REQUIREMENTS.md
+│   │   ├── TEAM_90_TO_TEAM_10_SKELETON_RECHECK_VALIDATION_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_10_TEAM_70_DELIVERABLES_REVALIDATION_V2.md
+│   │   ├── TEAM_90_TO_TEAM_10_TEAM_70_DELIVERABLES_REVALIDATION_V3_PASS.md
+│   │   ├── TEAM_90_TO_TEAM_10_TEAM_70_DELIVERABLES_VALIDATION_REPORT.md
+│   │   ├── TEAM_90_TO_TEAM_70_CUTOVER_EXECUTION_APPROVAL_AND_DIRECTIVE.md
+│   │   ├── TEAM_90_TO_TEAM_70_CUTOVER_EXECUTION_BLOCK_AND_CORRECTIONS.md
+│   │   ├── TEAM_90_TO_TEAM_70_DOCUMENTATION_MIGRATION_CORRECTION_DIRECTIVE.md
+│   │   ├── TEAM_90_TO_TEAM_70_MIGRATION_PACKAGE_CORRECTIONS_V2.md
+│   │   ├── TEAM_90_TO_TEAM_70_MIGRATION_PACKAGE_CORRECTIONS_V3.md
+│   │   ├── TEAM_90_TO_TEAM_70_MODEL_B_FINAL_CORRECTIONS_V4.md
+│   │   ├── TEAM_90_TO_TEAM_70_MODEL_B_LOCKED_CORRECTION_DIRECTIVE.md
+│   │   ├── TEAM_90_TO_TEAM_70_PHOENIX_DOCS_TREE_SKELETON_CORRECTION_DIRECTIVE.md
+│   │   └── TEAM_90_TO_TEAM_70_SKELETON_RECHECK_CORRECTION_DIRECTIVE_V2.md
+│   └── team_91
+│       ├── TEAM_91_PROPOSAL_ROLE_CLARIFICATION_NOTIFICATION.md
+│       ├── TEAM_91_PROPOSAL_TEAM_30_40_WORK_AGREEMENT.md
+│       └── TEAM_91_TO_TEAM_10_PROCESS_FORMALIZATION_MANDATE.md
+├── api
+│   ├── .env
+│   ├── .env.example
+│   ├── __init__.py
+│   ├── app
+│   │   └── services
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   └── database.py
+│   ├── data
+│   │   └── defaults_brokers.json
+│   ├── integrations
+│   │   ├── __init__.py
+│   │   └── market_data
+│   ├── main.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── alerts.py
+│   │   ├── base.py
+│   │   ├── brokers_fees.py
+│   │   ├── cash_flows.py
+│   │   ├── enums.py
+│   │   ├── exchange_rates.py
+│   │   ├── identity.py
+│   │   ├── notes.py
+│   │   ├── positions.py
+│   │   ├── ticker_prices.py
+│   │   ├── ticker_prices_intraday.py
+│   │   ├── tickers.py
+│   │   ├── tokens.py
+│   │   ├── trades.py
+│   │   ├── trading_accounts.py
+│   │   └── user_tickers.py
+│   ├── requirements.txt
+│   ├── routers
+│   │   ├── __init__.py
+│   │   ├── alerts.py
+│   │   ├── api_keys.py
+│   │   ├── auth.py
+│   │   ├── brokers_fees.py
+│   │   ├── cash_flows.py
+│   │   ├── me_tickers.py
+│   │   ├── notes.py
+│   │   ├── positions.py
+│   │   ├── reference.py
+│   │   ├── settings.py
+│   │   ├── system.py
+│   │   ├── tickers.py
+│   │   ├── trading_accounts.py
+│   │   └── users.py
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── alerts.py
+│   │   ├── brokers_fees.py
+│   │   ├── cash_flows.py
+│   │   ├── identity.py
+│   │   ├── notes.py
+│   │   ├── positions.py
+│   │   ├── reference.py
+│   │   ├── tickers.py
+│   │   └── trading_accounts.py
+│   ├── scripts
+│   │   ├── check_users.py
+│   │   ├── create_admin_user.py
+│   │   ├── test_rich_text_roundtrip.py
+│   │   └── verify_db_schema.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── alerts_service.py
+│   │   ├── api_keys.py
+│   │   ├── auth.py
+│   │   ├── brokers_fees_service.py
+│   │   ├── cash_flows.py
+│   │   ├── encryption.py
+│   │   ├── exchange_rates_service.py
+│   │   ├── history_backfill_service.py
+│   │   ├── market_status_service.py
+│   │   ├── note_attachments_service.py
+│   │   ├── notes_service.py
+│   │   ├── password_reset.py
+│   │   ├── positions.py
+│   │   ├── reference_service.py
+│   │   ├── smart_history_engine.py
+│   │   ├── tickers_service.py
+│   │   ├── trading_accounts.py
+│   │   └── user_tickers_service.py
+│   ├── tests
+│   ├── utils
+│   │   ├── RICH_TEXT_SANITIZATION_POLICY.md
+│   │   ├── __init__.py
+│   │   ├── dependencies.py
+│   │   ├── exceptions.py
+│   │   ├── identity.py
+│   │   ├── mime_magic.py
+│   │   └── rich_text_sanitizer.py
+│   └── venv
+│       ├── bin
+│       ├── include
+│       ├── lib
+│       └── pyvenv.cfg
+├── archive
+│   ├── README.md
+│   ├── TikTrackV1-code&docs
+│   │   └── TikTrackApp
+│   ├── code
+│   │   ├── phoenix-legacy
+│   │   ├── tests
+│   │   ├── tiktrack-v1
+│   │   └── ui
+│   ├── documentation
+│   ├── documentation_legacy
+│   │   └── snapshots
+│   ├── market_data
+│   │   ├── daily
+│   │   ├── fx_history
+│   │   └── intraday
+│   └── reports_legacy
+├── blueprints
+│   └── v1_ready
+│       ├── D15_LOGIN.html
+│       ├── D15_REGISTER.html
+│       └── D15_RESET_PWD.html
+├── documentation
+│   ├── docs-governance
+│   │   ├── 00-FOUNDATIONS
+│   │   ├── 01-POLICIES
+│   │   ├── 02-PROCEDURES
+│   │   ├── 06-CONTRACTS
+│   │   ├── 09-GOVERNANCE
+│   │   └── 99-archive
+│   ├── docs-system
+│   │   ├── 01-ARCHITECTURE
+│   │   ├── 02-SERVER
+│   │   ├── 07-DESIGN
+│   │   └── 08-PRODUCT
+│   └── reports
+│       ├── 05-REPORTS
+│       └── 08-REPORTS
+├── raw_inputs
+│   ├── README_INPUTS.md
+│   └── dom_snapshots
+├── repo_tree.txt
+├── scripts
+│   ├── .sync_ticker_prices.lock
+│   ├── .sync_ticker_prices_history_backfill.lock
+│   ├── .sync_ticker_prices_intraday.lock
+│   ├── DEBUG_YAHOO_RESULTS.md
+│   ├── README.md
+│   ├── README_SEED_QA_USER.md
+│   ├── README_SEED_TEST_DATA.md
+│   ├── add_is_test_data_columns.sql
+│   ├── backups
+│   │   ├── TikTrack-phoenix-db_backup_20260207_200257.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260207_200302.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260207_200306.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260210_095753.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260210_095847.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260210_152636.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_175131.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_212159.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_212215.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_222907.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_225002.sql
+│   │   ├── TikTrack-phoenix-db_backup_20260212_225018.sql
+│   │   └── TikTrack-phoenix-db_backup_20260213_103612.sql
+│   ├── check-ports.sh
+│   ├── check_market_data_counts.py
+│   ├── cleanup_market_data.py
+│   ├── create-admin.sh
+│   ├── create_d16_tables.sql
+│   ├── create_d18_brokers_fees_table.sql
+│   ├── create_full_backup.py
+│   ├── db_remove_superfluous_users.py
+│   ├── db_test_clean.py
+│   ├── db_test_data_report.py
+│   ├── debug_market_status.py
+│   ├── debug_notes_post.py
+│   ├── debug_yahoo_one_ticker.py
+│   ├── ensure-skip-live-data-check.sh
+│   ├── ensure_qa_ticker_250d.py
+│   ├── fix-env-after-restart.sh
+│   ├── fix-port-8082.sh
+│   ├── grant_d16_permissions.sql
+│   ├── grant_d18_brokers_fees_permissions.sql
+│   ├── init-full-env.sh
+│   ├── init-servers-for-qa.sh
+│   ├── migrations
+│   │   ├── README_ADR_015_MIGRATION.md
+│   │   ├── README_CURRENCY_CONVERSION_FLOW_TYPE.md
+│   │   ├── README_D16_ACCOUNT_NUMBER_UNIQUE.md
+│   │   ├── README_TRADING_ACCOUNT_FEES_MIGRATION.md
+│   │   ├── add_currency_conversion_flow_type.sql
+│   │   ├── adr_015_brokers_fees_trading_account_id.sql
+│   │   ├── adr_trading_accounts_account_number_unique.sql
+│   │   ├── create_exchange_rates_table.sql
+│   │   ├── d34_alerts.sql
+│   │   ├── d35_note_attachments.sql
+│   │   ├── draft_exchange_rates_history.sql
+│   │   ├── ensure_ticker_prices_partitions.sql
+│   │   ├── md_system_settings.sql
+│   │   ├── migrate_commission_value_to_numeric.sql
+│   │   ├── p3_006_brokers_fees_minimum_precision_20_6.sql
+│   │   ├── p3_013_add_market_cap_to_ticker_prices.sql
+│   │   ├── p3_016_create_ticker_prices_intraday.sql
+│   │   ├── p3_018_exchange_rates_history.sql
+│   │   ├── p3_019_market_cap_precision_mega_caps.sql
+│   │   ├── p3_020_user_tickers_and_ticker_status.sql
+│   │   ├── p3_021_market_data_reference_tables.sql
+│   │   ├── p3_exchange_rates_history_DRAFT.sql
+│   │   └── rename_brokers_fees_to_trading_account_fees.sql
+│   ├── reduce_admin_base_to_minimal.py
+│   ├── restart-all-servers.sh
+│   ├── restart-backend.sh
+│   ├── run-alerts-d34-qa-api.sh
+│   ├── run-external-data-nightly.js
+│   ├── run-external-data-smoke.js
+│   ├── run-market-data-settings-qa-api.sh
+│   ├── run-md-settings-403-evidence.sh
+│   ├── run-nightly-external-data.sh
+│   ├── run-notes-d35-qa-api.sh
+│   ├── run-smoke-external-data.sh
+│   ├── run-user-tickers-qa-api.sh
+│   ├── run_currency_conversion_migration.py
+│   ├── run_d18_table_creation.py
+│   ├── run_market_data_job.sh
+│   ├── run_p3_013_migration.py
+│   ├── seed_admin_notes_demo.sql
+│   ├── seed_base_test_user.py
+│   ├── seed_market_data_tickers.py
+│   ├── seed_nonadmin_for_403.py
+│   ├── seed_nonadmin_for_403.sql
+│   ├── seed_qa_test_user.py
+│   ├── seed_qa_test_user.sql
+│   ├── seed_test_data.py
+│   ├── start-backend.sh
+│   ├── start-frontend.sh
+│   ├── stop-backend.sh
+│   ├── stop-frontend.sh
+│   ├── sync_exchange_rates_eod.py
+│   ├── sync_market_data_eod.sh
+│   ├── sync_ticker_prices_eod.py
+│   ├── sync_ticker_prices_history_backfill.py
+│   ├── sync_ticker_prices_intraday.py
+│   ├── test-providers-direct.py
+│   ├── verify-notes-d35-fix.sh
+│   ├── verify-user-tickers-fix.sh
+│   ├── verify_dual_provider_full_scope.py
+│   ├── verify_live_providers.py
+│   ├── verify_md_system_settings.py
+│   ├── verify_yahoo_250d.py
+│   └── yahoo_heartbeat.py
+├── storage
+│   ├── logs
+│   ├── reports
+│   ├── temp
+│   └── uploads
+│       ├── .gitkeep
+│       └── users
+├── tests
+│   ├── README.md
+│   ├── adr015-gate-a-e2e.test.js
+│   ├── alerts-mb3a-e2e.test.js
+│   ├── api-keys.test.js
+│   ├── auth-flow.test.js
+│   ├── auth-guard-qa-e2e.test.js
+│   ├── batch-2-5-adr017-qa-e2e.test.js
+│   ├── batch-2-5-qa-e2e.test.js
+│   ├── central-status-api-verify.js
+│   ├── central-status-e2e.test.js
+│   ├── currency-conversion-e2e.test.js
+│   ├── currency-conversion-qa.test.js
+│   ├── error-handling.test.js
+│   ├── external-data-gate-b-e2e.test.js
+│   ├── external-data-live-ui-evidence-capture.e2e.test.js
+│   ├── external-data-suite-e-staleness-clock.e2e.test.js
+│   ├── external_data_full_verification.py
+│   ├── external_data_suite_a_contract_schema.py
+│   ├── external_data_suite_b_cache_failover.py
+│   ├── external_data_suite_c_cadence.py
+│   ├── external_data_suite_d_retention.py
+│   ├── fixtures
+│   │   └── market_data
+│   ├── flow-type-ssot-e2e.test.js
+│   ├── gate-a-e2e.test.js
+│   ├── gate-b-e2e.test.js
+│   ├── market-status-qa.e2e.test.js
+│   ├── notes-mb3a-e2e.test.js
+│   ├── option-d-responsive-e2e.test.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── password-change.test.js
+│   ├── phase1-completion-b-validation.test.js
+│   ├── phase2-e2e-selenium.test.js
+│   ├── phase2-runtime.test.js
+│   ├── run-all.js
+│   ├── sanity
+│   │   └── phase1_sanity_checklist.md
+│   ├── scenarios
+│   │   └── auth_scenarios.md
+│   ├── selenium-config.js
+│   ├── smart-history-fill-qa.e2e.test.js
+│   ├── stage1_1_002_exchange_rates_verify.py
+│   ├── summary-endpoints-verify.js
+│   ├── test_external_data_cache_failover_pytest.py
+│   ├── test_gap_fill_smart_history.py
+│   ├── test_market_data_indicators.py
+│   ├── test_retention_cleanup_suite_d.py
+│   ├── trading-accounts-routing.test.js
+│   ├── ui
+│   │   └── src
+│   ├── user-management.test.js
+│   ├── user-tickers-qa.e2e.test.js
+│   ├── validation-comprehensive.test.js
+│   └── verify_p3_013_market_cap.py
+└── ui
+    ├── .env.development
+    ├── .env.example
+    ├── .env.production
+    ├── START_SERVER.sh
+    ├── blueprint-comparison.js
+    ├── check-css-loading.js
+    ├── dist
+    │   ├── assets
+    │   ├── images
+    │   ├── index.html
+    │   └── routes.json
+    ├── index.html
+    ├── infrastructure
+    │   ├── README.md
+    │   └── cube-scaffolding
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    │   ├── images
+    │   └── routes.json
+    ├── scripts
+    │   ├── README_BLUEPRINT_TOOLS.md
+    │   ├── blueprint-diff.js
+    │   ├── compare-blueprint.js
+    │   ├── fix-blueprint-diff.js
+    │   ├── generate-pages.js
+    │   ├── page-manifest.json
+    │   ├── validate-pages.js
+    │   └── visual-diff.js
+    ├── src
+    │   ├── components
+    │   ├── cubes
+    │   ├── logic
+    │   ├── main.jsx
+    │   ├── router
+    │   ├── styles
+    │   ├── utils
+    │   └── views
+    ├── test
+    │   └── test-auth-guard-handlers.js
+    ├── test-auth-guard.html
+    ├── tests
+    └── vite.config.js
+
+138 directories, 599 files

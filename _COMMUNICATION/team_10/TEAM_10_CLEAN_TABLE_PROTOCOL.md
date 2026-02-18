@@ -6,7 +6,7 @@
 
 **מטרה:** לאפשר סגירה מלאה בלי חורים; הכרזת "Clean Table" **רק** כאשר כל סעיפים A, B, C מסומנים ✅.
 
-**Governance v2.102 (2026-02-13):** סגירת משימות — **רק** באמצעות **Seal Message (SOP-013)**. דוח לבדו לא מתקבל. ראה: documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md.
+**Governance v2.102 (2026-02-13):** סגירת משימות — **רק** באמצעות **Seal Message (SOP-013)**. דוח לבדו לא מתקבל. ראה: `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`.
 
 ---
 
@@ -14,12 +14,12 @@
 
 | פריט | קריטריון | סטטוס |
 |------|----------|--------|
-| Auth Guard QA | דוח + ACK קיימים; מופיע כ־✅ ב־OPEN_TASKS_MASTER | ✅ **PASS** |
-| Option D Responsive QA | דוח + ACK קיימים; מופיע כ־✅ ב־OPEN_TASKS_MASTER | ✅ **PASS** |
+| Auth Guard QA | דוח + ACK קיימים; מופיע כ־✅ ברשימות רמה 2 | ✅ **PASS** |
+| Option D Responsive QA | דוח + ACK קיימים; מופיע כ־✅ ברשימות רמה 2 | ✅ **PASS** |
 | D16 Backend API | החלטת Team 10 — אימות קיים מספיק; מופיע כ־✅ | ✅ **PASS** |
 | דבקר ראשון 30/40/50 | דוחות השלמה + דרישות סגירה; 30/40/50 פריטים סגורים | ✅ **PASS** |
 
-**קריטריון כללי:** לכל סעיף קיים מסמך ACK (או החלטה מתועדת) + מופיע כ־✅ ב־TEAM_10_OPEN_TASKS_MASTER.md. **מתאריך 2026-02-13:** סגירה תקפה דורשת **Seal Message (SOP-013)** — לא דוח בלבד (Governance v2.102).
+**קריטריון כללי:** לכל סעיף קיים מסמך ACK (או החלטה מתועדת) + מופיע כ־✅ ברשימות רמה 2 (`TEAM_10_MASTER_TASK_LIST.md`, ובמידת הצורך `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`). **מתאריך 2026-02-13:** סגירה תקפה דורשת **Seal Message (SOP-013)** — לא דוח בלבד (Governance v2.102).
 
 ---
 
@@ -29,7 +29,7 @@
 
 | # | פריט | תוצר מצופה | קריטריון | סטטוס |
 |---|------|-------------|----------|--------|
-| A1 | **Batch 1+2 Closure Report** | מסמך closure רשמי | מופיע ב־OPEN_TASKS_MASTER כ־✅ | ✅ **PASS** — TEAM_10_BATCH_1_2_CLOSURE_REPORT.md |
+| A1 | **Batch 1+2 Closure Report** | מסמך closure רשמי | מופיע ברשימות רמה 2 כ־✅ | ✅ **PASS** — TEAM_10_BATCH_1_2_CLOSURE_REPORT.md |
 | A2 | **Page Tracker — D21 Infra → VERIFIED** | TT2_OFFICIAL_PAGE_TRACKER.md מעודכן | שורת D21 מופיעה כ־VERIFIED | ✅ **PASS** — 2026-02-12 Task 2.1 A2 |
 | A3 | **SLA 30/40 Enforcement** | רישום חריגות או "אין חריגות" + קישור ל־SSOT | סעיף מתועד + ACK | ✅ **PASS** — TEAM_40_TO_TEAM_10_CHECKPOINT_1_COMPLETION_REPORT; אין חריגות |
 | A4 | **make db-test-clean** | אימות ריצה מלאה + תיעוד | מסמך אימות + עדכון ב־Open Tasks | ✅ **PASS** — TEAM_10_1_1_3_DB_TEST_CLEAN_VERIFICATION.md |
@@ -55,7 +55,7 @@
 **אפשר להכריז "Clean Table" רק כאשר:**
 
 1. **כל שלושת הסעיפים A, B, C** — כל הפריטים המפורטים למעלה מסומנים ✅.
-2. **אין שורות "Pending" או "Waiting"** ב־TEAM_10_OPEN_TASKS_MASTER.md (במסגרת פריטי הסגירה A/B/C).
+2. **אין שורות "Pending" או "Waiting"** בפריטי הסגירה A/B/C ברשימות רמה 2 (`TEAM_10_MASTER_TASK_LIST.md` + Carryover).
 
 **סטטוס נוכחי:** ✅ **Clean Table — הוכרז.** כל פריטי A (A1–A6), B1 (Gate B), C1 (Visual Sign-off) מסומנים ✅.
 
@@ -63,16 +63,17 @@
 
 ## 4. מה בוצע (סגירה סופית)
 
-1. **TEAM_10_OPEN_TASKS_MASTER.md** — סיווג סופי עודכן: סעיפים 2.7 (Gate B), 2.8 (G-Lead) → ✅.
+1. **TEAM_10_MASTER_TASK_LIST.md** — סיווג סופי עודכן לפי נוהל רמה 2.
 2. **חתימות** — Gate B (GATE_B_STATUS.md + TEAM_90_GATE_B_REVERIFY_GREEN.md); Visual Sign-off (TEAM_10_G_LEAD_VISUAL_SIGNOFF_LOG.md).
 3. **פריטי Team 10** — ✅ הושלמו (Batch 1+2 Closure Report, Page Tracker D21, make db-test-clean, פלט שלב 1, הכנה ל־G-Lead).
 4. **הודעת "Clean Table"** — הוכרז לאחר יישור Gate B + רישום G-Lead Sign-off + קידום ידע/ארכיון (ARCHIVE_MANIFEST קיים).
 
 ---
 
-## 5. קישור ל־OPEN_TASKS_MASTER
+## 5. קישור לרשימות רמה 2
 
-מסמך זה משלים את TEAM_10_OPEN_TASKS_MASTER.md — Checklist זו היא התנאי להכרזת שולחן נקי. עדכון סטטוסים במסמך זה יבוצע עם סגירת כל פריט.
+מסמך זה משלים את רשימות רמה 2: `TEAM_10_MASTER_TASK_LIST.md` + `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`.  
+`TEAM_10_OPEN_TASKS_MASTER.md` הועבר לארכיון ואינו מקור עבודה פעיל.
 
 ---
 

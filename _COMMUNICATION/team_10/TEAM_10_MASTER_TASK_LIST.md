@@ -5,10 +5,19 @@
 **owner:** Team 10 בלבד — אף צוות אחר לא רשאי לכתוב לקובץ זה  
 **מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
 **נוהל ניהול:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`  
+**רג'יסטרי רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md`  
+**רשימת השלמות רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
-**last_updated:** 2026-02-16
+**last_updated:** 2026-02-18
 
 ---
+**הבהרת מבנה (חד־משמעי):**  
+- רמה 1 = מפת הדרכים (Architect Decisions)  
+- רמה 2 = רשימות משימות (קובץ זה + Carryover)  
+- רמה 3 = תוכניות ביצוע/מנדטים/דוחות בתיקיות הצוותים  
+
+**Legacy deprecation:** `TEAM_10_OPEN_TASKS_MASTER.md` הוצא משימוש והועבר לארכיון: `_COMMUNICATION/99-ARCHIVE/2026-02-18/team_10/TEAM_10_OPEN_TASKS_MASTER.md`.
+
 **תוכנית סגירה פתוחים (2026-02-15):** [TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md](TEAM_10_OPEN_TASKS_CLOSURE_PLAN_AND_ACTIVATION.md) — סדר: P3-003 → P3-010 → P3-004; הודעות הפעלה: 31 (P3-003), 20 (P3-010 + P3-004), 30 (P3-004 Seal), 60 (P3-004 אימות).
 
 ---

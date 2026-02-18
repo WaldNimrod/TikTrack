@@ -1,0 +1,37 @@
+# Team 10 — Registry of Level 2 Task Lists (SSOT)
+
+**id:** `TEAM_10_LEVEL2_LISTS_REGISTRY`  
+**owner:** Team 10 (The Gateway)  
+**status:** 🔒 MANDATORY  
+**level:** 2 (Task Governance)  
+**last_updated:** 2026-02-18
+
+---
+
+## Purpose
+
+Single registry for all Level-2 task lists.  
+Roadmap (Level-1) must link to this registry and to each active Level-2 list.
+
+---
+
+## Level-2 Lists
+
+| List | Path | Status | Notes |
+|---|---|---|---|
+| Master Task List (primary) | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | ACTIVE | Canonical execution list for open/closed master tasks |
+| Completion Carryover List | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` | ACTIVE | Consolidated open items extracted from deprecated/archived docs |
+| Open Tasks Master (legacy) | `_COMMUNICATION/99-ARCHIVE/2026-02-18/team_10/TEAM_10_OPEN_TASKS_MASTER.md` | ARCHIVED | Deprecated duplicate of Level-2 tracking |
+
+---
+
+## Governance Rules
+
+1. No new Level-2 list is allowed without updating this registry.
+2. Any list moved to archive must keep final status here (`ARCHIVED`) + archive path.
+3. Every active Level-2 list must be linked from Level-1 roadmap.
+4. `TEAM_10_MASTER_TASK_LIST.md` remains the primary operational list.
+
+---
+
+**log_entry | TEAM_10 | LEVEL2_LISTS_REGISTRY | CREATED | 2026-02-18**

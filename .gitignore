@@ -17,6 +17,11 @@ _Cursor_full_design_*/
 # D35 Notes — user uploads (keep structure, ignore contents)
 storage/uploads/users/
 
+# Archive (Phoenix 99-ARCHIVE + root archive)
+**/99-ARCHIVE/
+**/99-archive/
+archive/
+
 # OS specific
 .DS_Store
 *.tmp

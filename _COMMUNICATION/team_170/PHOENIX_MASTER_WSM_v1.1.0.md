@@ -39,13 +39,15 @@ Each work package includes: roadmap_id, initiative_id, work_package_id, phase_ow
 | work_package_id | initiative_id | roadmap_id | phase_owner | required_ssm_version | required_active_stage | execution_start_gate | execution_end_gate |
 |-----------------|---------------|------------|-------------|----------------------|------------------------|----------------------|--------------------|
 | L2-INFRA-STAGE-1 | INFRASTRUCTURE_STAGE_1 | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_0 | GATE_1 |
-| L2-INFRA-STAGE-2 | INFRASTRUCTURE_STAGE_2 | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_4 |
-| L2-INFRA-STAGE-3 | INFRASTRUCTURE_STAGE_3 | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_4 |
-| L2-POC-MB3A-ALERTS | PRODUCT_POC_MB3A_ALERTS_WIDGET | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_6 |
+| L2-INFRA-STAGE-2 | INFRASTRUCTURE_STAGE_2 | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_5 |
+| L2-INFRA-STAGE-3 | INFRASTRUCTURE_STAGE_3 | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_5 |
+| L2-POC-MB3A-ALERTS | PRODUCT_POC_MB3A_ALERTS_WIDGET | AGENT_OS_PHASE_1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_7 |
 
 **Structural rule:** Infrastructure and Product POC share the gate chain; distinct initiative_id prevents cross-context ambiguity.
 
-**Canonical guard (mandatory):** No Development Validation (GATE_4) may occur before GATE_3 PASS. Source: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` (Process Freeze Constraints); `_COMMUNICATION/team_100/TEAM_100_TO_ALL_ARCHITECTURE_TEAMS_GATE_AND_IDENTITY_FREEZE.md`.
+**Gate model:** v2.0.0 (GATE_0..GATE_7). Source: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md`.
+
+**Canonical guard (mandatory):** No Dev Validation (GATE_5) may occur before GATE_4 (QA) PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.0.0 (Process Freeze Constraints).
 
 ---
 

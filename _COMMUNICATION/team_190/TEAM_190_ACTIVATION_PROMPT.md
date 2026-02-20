@@ -38,6 +38,8 @@ Use only:
 - Do not edit SSOT directly.
 - Do not perform Team 50 QA or Team 90 Gate 4 tasks.
 - Return evidence-by-path only.
+- Default mode is validator-only (no direct editing).
+- Exception: documentation micro-remediation is allowed only if minimal, non-architectural, and it prevents a redundant review loop; authority/gate/schema semantics must remain unchanged.
 
 ## Required output
 
@@ -50,4 +52,3 @@ The report must include:
 - Evidence file paths
 - Blocking deltas (if any)
 - Explicit statement: constitutional completeness = TRUE/FALSE
-

@@ -23,10 +23,10 @@ promotion_note: Replaced per Team 170 request (Gate 5 F1 remediation — remove 
 * **Visual Integrity:** ולידציה מבנית (DOM/CSS) מול הבלופרינט כחסם קשיח. שימוש בסקרינשוטים ע"י אייג'נטים - אסור.
 * **Authority Model:** הפרדת רשויות מוחלטת בין ארכיטקטורה (100+) לביצוע (10-90).
 
-### Gate signer semantics (ADR-026, Dual-Manifest)
+### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.0.0)
 
-* **Gate 5 (Constitutional / Architectural Validation):** Team 190. Authority: validate spec and artifact alignment to constitution; no execution, no SSOT writes.
-* **Gate 6 (Final sign-off):** Nimrod (Visionary). Authority: final UX/vision approval; no implementation by agent without Gate 6 pass.
+* **Gate 6 (ARCHITECTURAL_VALIDATION — Constitutional / Architectural Validation):** Team 190. Authority: validate spec and artifact alignment to constitution; no execution, no SSOT writes. Source: `04_GATE_MODEL_PROTOCOL_v2.0.0.md`.
+* **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Authority: final UX/vision approval; no implementation by agent without Gate 7 pass.
 
 ---
 

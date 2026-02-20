@@ -26,32 +26,33 @@ This package refines the Gate Model by **formalizing GATE_0 (Structural Feasibil
 ### 2.1 SSM (System State Manifest)
 
 - **Canonical source:** `_COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md`.
-- **Content lock:** Governance core, Gate signer semantics (Gate 5 = Team 190, Gate 6 = Nimrod), Entity ALERT (UUID; is_active, is_triggered, deleted_at only; dom_contract from Alerts spec), ADR Lock Registry, Active Stage Control.
+- **Content lock:** Governance core, Gate signer semantics (Gate 6 = Team 190, Gate 7 = Nimrod; Gate Model v2.0.0), Entity ALERT (UUID; is_active, is_triggered, deleted_at only; dom_contract from Alerts spec), ADR Lock Registry, Active Stage Control.
 
 ### 2.2 WSM (Work State Manifest) — Hierarchy
 
 - **Canonical WSM:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md.
-- **Extension (L0–L3):** This package §3, §3.1. Every L1/L2/L3 node MUST include: **roadmap_parent_id**, **required_ssm_version**, **required_active_stage**, **phase_owner**, **responsible_team**. For L2 Work Packages entering Channel 10↔90: **gate_id** = GATE_4, **validation_status**, **iteration_count**, **max_resubmissions** (see §3.1).
+- **Extension (L0–L3):** This package §3, §3.1. Every L1/L2/L3 node MUST include: **roadmap_parent_id**, **required_ssm_version**, **required_active_stage**, **phase_owner**, **responsible_team**. For L2 Work Packages entering Channel 10↔90: **gate_id** = GATE_5 (Dev Validation per Gate Model v2.0.0), **validation_status**, **iteration_count**, **max_resubmissions** (see §3.1).
 
-### 2.3 GATE ENUM (LOCKED — Canonical)
+### 2.3 GATE ENUM (LOCKED — Canonical v2.0.0)
 
-Source: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. **No redefinition in this package.** Canonical enum only:
+Source: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md`. Directive: `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`. **No redefinition in this package.** Canonical enum only (GATE_0..GATE_7):
 
 | gate_id | canonical_label | authority |
 |---------|-----------------|-----------|
 | GATE_0 | STRUCTURAL_FEASIBILITY | Team 190 |
 | GATE_1 | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190 (constitutional validation), Team 170 (documentation registry enforcement) |
-| GATE_2 | Implementation | Team 10 |
-| GATE_3 | QA | Team 50 |
-| GATE_4 | Dev Validation | Team 90 |
-| GATE_5 | Architectural Validation | Team 190 |
-| GATE_6 | Human UX Approval | Nimrod |
+| GATE_2 | KNOWLEDGE_PROMOTION | Team 170 |
+| GATE_3 | IMPLEMENTATION | Team 10 |
+| GATE_4 | QA | Team 50 |
+| GATE_5 | DEV_VALIDATION | Team 90 |
+| GATE_6 | ARCHITECTURAL_VALIDATION | Team 190 |
+| GATE_7 | HUMAN_UX_APPROVAL | Nimrod |
 
-Canonical protocol: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md`. Canonical enum: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. The above labels and authority are aligned to current canon.
+Previous enum (GATE_0..GATE_6) SUPERSEDED. No aliasing or backward mapping.
 
 ### 2.4 Design-phase interpretation (canonical-aligned)
 
-**Constraint:** GATE_0 and GATE_1 occur **before** WSM execution flow. They are **design-bound gates**, not development gates. The semantics below are aligned to current canonical sources (`04_GATE_MODEL_PROTOCOL.md`, `GATE_ENUM_CANONICAL_v1.0.0.md`). Evidence path for directive history: `_COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md`.
+**Constraint:** GATE_0 and GATE_1 occur **before** WSM execution flow. They are **design-bound gates**, not development gates. The semantics below are aligned to **single canonical source:** `04_GATE_MODEL_PROTOCOL_v2.0.0.md`. Evidence path for directive history: `_COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md`.
 
 ---
 
@@ -112,13 +113,13 @@ Structure unchanged from v1.2.0: L0 (Roadmap) → L1 (Initiative Modules) → L2
 | L2-POC1-001 | L1-POC1 | POC-1 Observer spec (read-only; STATE_SNAPSHOT.json) | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | Team 10 | 170 |
 | L2-MB3A-ALERTS-001 | L1-MB3A | Alerts spec lock (reference; Gate 5 PASS) | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | Team 10 | 170 |
 
-### 3.1 WSM Extension — Channel 10↔90 (GATE_4) per L2 Work Package
+### 3.1 WSM Extension — Channel 10↔90 (GATE_5 DEV_VALIDATION) per L2 Work Package
 
 For every L2 Work Package that enters **CHANNEL_10_90_DEV_VALIDATION**, the following fields apply. No inferred values; values set by request/response artifacts or defaults from channel confirmation.
 
 | Field | Definition | Default / Source |
 |-------|-------------|------------------|
-| gate_id | Gate at which validation loop runs | GATE_4 |
+| gate_id | Gate at which validation loop runs | GATE_5 |
 | validation_status | Current outcome of validation loop | Set by VALIDATION_RESPONSE or BLOCKING_REPORT |
 | iteration_count | Number of validation iterations in this loop | 0 until first request; incremented per resubmission |
 | max_resubmissions | Maximum resubmissions allowed for this work package | 5 (default); override allowed per work package per CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0 |
@@ -159,7 +160,7 @@ Unchanged from v1.2.0. Trigger: GATE_3 PASS. Initiator: Team 10. Owner: Team 90.
 
 ## 6) Phase Ownership Matrix (MANDATORY)
 
-Unchanged from v1.2.0. L2 Work Packages: phase_owner Team 10; gate_id GATE_4 when in Channel 10↔90; next_gate as defined per row.
+Unchanged from v1.2.0. L2 Work Packages: phase_owner Team 10; gate_id GATE_5 when in Channel 10↔90; next_gate as defined per row (Gate Model v2.0.0).
 
 ---
 
@@ -194,11 +195,11 @@ Unchanged from v1.2.0. SSM canonical ALERT entity: UUID; is_active, is_triggered
 | Definition / Item | Source file(s) | Evidence type |
 |-------------------|----------------|----------------|
 | SSM Governance Core + ALERT entity | _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md | Canonical |
-| Gate enum GATE_0 … GATE_6 | _COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md | Canonical confirmation |
+| Gate enum GATE_0 … GATE_7 (v2.0.0) | _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md | Canonical v2.0.0 |
 | GATE_0 design-phase semantics (Structural Feasibility) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
 | GATE_1 design-phase semantics (Architectural Decision Lock LOD 400) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
 | Design-bound constraint (GATE_0, GATE_1 before WSM) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
-| Gate 5 / Gate 6 signers | PHOENIX_MASTER_SSM_v1.0.0.md, 04_GATE_MODEL_PROTOCOL.md | SSM + Gate protocol |
+| Gate 6 / Gate 7 signers (v2.0.0) | PHOENIX_MASTER_SSM_v1.0.0.md, 04_GATE_MODEL_PROTOCOL_v2.0.0.md | SSM + Gate protocol v2.0.0 |
 | Channel 10↔90 identity, paths, termination | _COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md | Canonical confirmation |
 | WSM L0–L3 + Phase Ownership + Channel 10↔90 fields | This document §3, §3.1, §4, §5, §6 | Spec package |
 | Validation Kernel Phase 1 | This document §5 | Spec package |
@@ -213,15 +214,15 @@ Unchanged from v1.2.0. SSM canonical ALERT entity: UUID; is_active, is_triggered
 
 ## 12) No-Guessing Declaration & Gate Refinement Declaration
 
-All definitions in this package are derived from **existing artifacts** and the **directive record** at `_COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md`. §2.3 GATE ENUM is aligned to current **04_GATE_MODEL_PROTOCOL** and **GATE_ENUM_CANONICAL_v1.0.0**: GATE_0 = STRUCTURAL_FEASIBILITY, GATE_1 = ARCHITECTURAL_DECISION_LOCK (LOD 400). §2.4 records design-phase semantics now reflected in the canonical protocol. GATE_1 validation authority is Team 190 only; Team 170 executes effect (move to registry) in documentation-integrity role only and does not hold Gate authority. No inferred gate semantics.
+All definitions in this package are derived from **existing artifacts**. §2.3 GATE ENUM is aligned to **04_GATE_MODEL_PROTOCOL_v2.0.0** (GATE_0..GATE_7); directive: `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`. §2.4 records design-phase semantics for GATE_0/GATE_1. GATE_1 validation authority is Team 190 only; Team 170 executes effect (move to registry) in documentation-integrity role only. No inferred gate semantics.
 
-**Explicit declaration:** **GATE_0 (STRUCTURAL_FEASIBILITY) and GATE_1 (ARCHITECTURAL_DECISION_LOCK LOD 400) are design-bound gates before WSM execution flow.** WSM execution follows only after GATE_1 PASS and handoff to Team 10 for Work Plan generation.
+**Explicit declaration:** **GATE_0 (STRUCTURAL_FEASIBILITY) and GATE_1 (ARCHITECTURAL_DECISION_LOCK LOD 400) are design-bound gates before WSM execution flow.** Execution chain (v2.0.0): GATE_2 (Knowledge Promotion) → GATE_3..GATE_7. No Dev Validation (GATE_5) before GATE_4 (QA) PASS.
 
 ---
 
 ## Submission
 
-This consolidated package (v1.4.0) is submitted to **Team 190 for Gate 5 constitutional review** together with **v1.3.0** (TASK_IDENTITY_BINDING). **Unified validation instruction:** _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md — Team 190 to perform one review covering both v1.3.0 and v1.4.0 in correct version order.  
+This consolidated package (v1.4.0) is submitted to **Team 190 for Gate 6 (ARCHITECTURAL_VALIDATION) constitutional review** together with **v1.3.0** (TASK_IDENTITY_BINDING). **Unified validation instruction:** _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md — Team 190 to perform one review covering both v1.3.0 and v1.4.0 in correct version order.  
 **Change type:** GATE_MODEL_REFINEMENT. **Requires constitutional review:** YES.
 
 **Package artifacts:**
@@ -230,11 +231,11 @@ This consolidated package (v1.4.0) is submitted to **Team 190 for Gate 5 constit
 - _COMMUNICATION/team_170/MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.3.0.md (predecessor; identity binding)
 - _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md (unified validation instruction for Team 190)
 - _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md
-- _COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md
+- _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md
 - _COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md
 - _COMMUNICATION/team_170/POC_1_OBSERVER_SPEC_v1.0.0.md
 - _COMMUNICATION/team_170/ALERTS_WIDGET_SPEC_v1.0.1_FULL_LOCK.md
 
 ---
 
-**log_entry | TEAM_170 | MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.4.0 | GATE_MODEL_REFINEMENT | SUBMITTED_FOR_GATE5 | 2026-02-20**
+**log_entry | TEAM_170 | MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.4.0 | GATE_MODEL_REFINEMENT | SUBMITTED_FOR_GATE6 | 2026-02-20**

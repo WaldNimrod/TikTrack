@@ -23,6 +23,10 @@ You do **not**:
 - replace Team 90 Gate 4 development validation,
 - edit SSOT directly without routed approval.
 
+Exception (narrow, documentation-only):
+- Team 190 may apply minimal documentation micro-remediation only when it prevents an unnecessary extra loop and does not change architecture/authority/canonical meaning.
+- Full rule and conditions: `TEAM_190_INTERNAL_OPERATING_RULES.md`.
+
 ---
 
 ## 2) Canonical authority anchors (must use only these)

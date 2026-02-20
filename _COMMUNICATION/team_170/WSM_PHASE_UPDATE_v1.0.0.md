@@ -50,24 +50,24 @@ Each row is one top-level work package. All fields required per Team 100.
 | roadmap_id | initiative_id | work_package_id | phase_owner | required_ssm_version | required_active_stage | execution_start_gate | execution_end_gate |
 |------------|---------------|-----------------|-------------|----------------------|------------------------|----------------------|--------------------|
 | AGENT_OS_PHASE_1 | INFRASTRUCTURE_STAGE_1 | L2-INFRA-STAGE-1 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_0 | GATE_1 |
-| AGENT_OS_PHASE_1 | INFRASTRUCTURE_STAGE_2 | L2-INFRA-STAGE-2 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_4 |
-| AGENT_OS_PHASE_1 | INFRASTRUCTURE_STAGE_3 | L2-INFRA-STAGE-3 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_4 |
-| AGENT_OS_PHASE_1 | PRODUCT_POC_MB3A_ALERTS_WIDGET | L2-POC-MB3A-ALERTS | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_2 | GATE_6 |
+| AGENT_OS_PHASE_1 | INFRASTRUCTURE_STAGE_2 | L2-INFRA-STAGE-2 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_5 |
+| AGENT_OS_PHASE_1 | INFRASTRUCTURE_STAGE_3 | L2-INFRA-STAGE-3 | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_5 |
+| AGENT_OS_PHASE_1 | PRODUCT_POC_MB3A_ALERTS_WIDGET | L2-POC-MB3A-ALERTS | Team 10 | 1.0.0 | GAP_CLOSURE_BEFORE_AGENT_POC | GATE_3 | GATE_7 |
 
-**Structural rule:** Infrastructure and Product POC **share the same gate chain** (GATE_0 … GATE_6) but maintain **distinct initiative_id** so that infrastructure work is never confused with product POC context.
+**Structural rule:** Infrastructure and Product POC **share the same gate chain** (GATE_0 … GATE_7, Gate Model v2.0.0) but maintain **distinct initiative_id** so that infrastructure work is never confused with product POC context.
 
 ---
 
 ## 5) Execution flow summary
 
-Gate labels are canonical per `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` and `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`.
+Gate labels and numbering per **Gate Model v2.0.0** (GATE_0..GATE_7). Source: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md`; directive: `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`.
 
 - **L2-INFRA-STAGE-1:** Gate Model Finalization — design-bound; GATE_0 (STRUCTURAL_FEASIBILITY) → GATE_1 (ARCHITECTURAL_DECISION_LOCK LOD 400).  
-- **L2-INFRA-STAGE-2:** Validation Kernel (Channel 10↔90) — execution from GATE_2 (Implementation) through GATE_4 (Dev Validation).  
-- **L2-INFRA-STAGE-3:** Secondary Validator (90↔Stage Owner) — execution from GATE_2 through GATE_4.  
-- **L2-POC-MB3A-ALERTS:** Product POC Alerts Widget — full chain GATE_2 (Implementation) through GATE_6 (Human UX Approval).
+- **L2-INFRA-STAGE-2:** Validation Kernel (Channel 10↔90) — execution from GATE_3 (Implementation) through GATE_5 (Dev Validation).  
+- **L2-INFRA-STAGE-3:** Secondary Validator (90↔Stage Owner) — execution from GATE_3 through GATE_5.  
+- **L2-POC-MB3A-ALERTS:** Product POC Alerts Widget — full chain GATE_3 (Implementation) through GATE_7 (Human UX Approval).
 
-**Canonical guard (mandatory):** No Development Validation (GATE_4) may occur before GATE_3 PASS. Source: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` (Process Freeze Constraints); `_COMMUNICATION/team_100/TEAM_100_TO_ALL_ARCHITECTURE_TEAMS_GATE_AND_IDENTITY_FREEZE.md`.
+**Canonical guard (mandatory):** No Dev Validation (GATE_5) may occur before GATE_4 (QA) PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.0.0 (Process Freeze Constraints).
 
 ---
 

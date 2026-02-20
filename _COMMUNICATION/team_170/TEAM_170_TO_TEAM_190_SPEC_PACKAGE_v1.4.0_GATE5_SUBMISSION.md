@@ -1,14 +1,14 @@
-# Team 170 → Team 190: Spec Package v1.4.0 Gate 5 Submission
+# Team 170 → Team 190: Spec Package v1.4.0 Gate 6 Submission
 
 **from:** Team 170 (Librarian / SSOT Authority)  
 **to:** Team 190 (Constitutional Validator)  
-**re:** MB3A_POC_AGENT_OS_SPEC_PACKAGE v1.3.0 & v1.4.0 — Unified Validation  
+**re:** MB3A_POC_AGENT_OS_SPEC_PACKAGE v1.3.0 & v1.4.0 — Unified Validation (Gate Model v2.0.0)  
 **date:** 2026-02-20  
-**status:** Submitted for Gate 5 Constitutional Review (unified with v1.3.0)
+**status:** Submitted for Gate 6 (ARCHITECTURAL_VALIDATION) Constitutional Review (unified with v1.3.0)
 
 ---
 
-## Mandatory identity header (Process Freeze — 04_GATE_MODEL_PROTOCOL)
+## Mandatory identity header (Process Freeze — 04_GATE_MODEL_PROTOCOL_v2.0.0)
 
 | Field | Value |
 |-------|--------|
@@ -16,7 +16,7 @@
 | initiative_id | INFRASTRUCTURE_STAGE_1 |
 | work_package_id | MB3A_SPEC_PACKAGE_v1.4.0 |
 | task_id | N/A |
-| gate_id | GATE_5 |
+| gate_id | GATE_6 |
 | phase_owner | Team 10 |
 | required_ssm_version | 1.0.0 |
 | required_active_stage | GAP_CLOSURE_BEFORE_AGENT_POC |
@@ -25,10 +25,10 @@
 
 ## Unified validation (correct version order)
 
-**Use this instruction as the single entry point for Gate 5:**  
+**Use this instruction as the single entry point for Gate 6 (ARCHITECTURAL_VALIDATION):**  
 _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md
 
-Validate **v1.3.0** (TASK_IDENTITY_BINDING) then **v1.4.0** (GATE_MODEL_REFINEMENT) in that order; one combined PASS/FAIL.
+Validate **v1.3.0** (TASK_IDENTITY_BINDING) then **v1.4.0** (GATE_MODEL_REFINEMENT) in that order; one combined PASS/FAIL. Gate Model v2.0.0.
 
 ---
 

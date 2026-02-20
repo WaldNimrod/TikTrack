@@ -1,10 +1,14 @@
 # GATE_ENUM_CANONICAL_v1.0.0
 
+**status:** **SUPERSEDED** as of 2026-02-20. Canonical Gate Model is now **v2.0.0** (GATE_0..GATE_7). See `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md` and `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`. No aliasing or backward mapping permitted. This file is retained as historical record only.
+
+---
+
 **id:** GATE_ENUM_CANONICAL_v1.0.0  
 **from:** Team 190 (Constitutional Validation)  
 **to:** Team 100, Team 10, Team 90  
 **date:** 2026-02-20  
-**status:** CANONICAL_CONFIRMATION (synced to 04_GATE_MODEL_PROTOCOL canonical update)
+**status:** SUPERSEDED (was CANONICAL_CONFIRMATION)
 
 ---
 

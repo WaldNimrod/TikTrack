@@ -11,10 +11,10 @@
 ## 1) Channel Identity (Confirmed)
 
 - `channel_id`: `CHANNEL_10_90_DEV_VALIDATION`  
-- `channel_scope`: Gate 4 validation loop between Team 10 (request/orchestration) and Team 90 (validation authority)
+- `channel_scope`: Gate 5 (DEV_VALIDATION) validation loop between Team 10 (request/orchestration) and Team 90 (validation authority). Gate Model v2.0.0.
 
 Evidence anchors:
-- Team 90 is Gate 4 validation authority: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md:6`
+- Team 90 is Gate 5 (DEV_VALIDATION) authority: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md`
 - Team 10 is gateway/orchestration owner at organization layer: `00_MASTER_INDEX.md:4`, `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/06_ORG_REALIGNMENT.md:8`
 
 ---
@@ -67,7 +67,7 @@ Naming rule:
 ## 5) Governance Constraints
 
 - Dual-Manifest alignment required (`required_ssm_version`, `required_active_stage` must be present in request payload).
-- Gate chain must remain intact: this channel is Gate 4 only; it cannot redefine Gate 5/6 responsibilities.
+- Gate chain must remain intact: this channel is Gate 5 (DEV_VALIDATION) only; it cannot redefine Gate 6/7 responsibilities. Gate Model v2.0.0.
 - No inferred ownership allowed (`phase_owner`, `responsible_team` explicit only).
 
 ---

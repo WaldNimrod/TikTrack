@@ -1,8 +1,103 @@
 # 7 GATE MODEL PROTOCOL
-Gate 0 – Spec completeness
-Gate 1 – Structural Blueprint validation
-Gate 2 – Implementation
-Gate 3 – QA
-Gate 4 – Dev Validation (Team 90)
-Gate 5 – Architectural Validation (Team 190)
-Gate 6 – Human UX Approval
+
+**status:** LOCKED (canonical update applied)  
+**date:** 2026-02-20  
+**scope:** Gate IDs and authority model for PHOENIX DEV OS
+
+---
+
+## Canonical Gate Enum
+
+| gate_id | gate_label |
+|---|---|
+| `GATE_0` | STRUCTURAL_FEASIBILITY |
+| `GATE_1` | ARCHITECTURAL_DECISION_LOCK (LOD 400) |
+| `GATE_2` | IMPLEMENTATION |
+| `GATE_3` | QA |
+| `GATE_4` | DEV_VALIDATION |
+| `GATE_5` | ARCHITECTURAL_VALIDATION |
+| `GATE_6` | HUMAN_UX_APPROVAL |
+
+---
+
+## GATE_0 — STRUCTURAL_FEASIBILITY
+
+| Field | Value |
+|---|---|
+| Owner | Team 190 |
+| Trigger | High-level architectural concept produced by architects |
+| Purpose | Validate structural compatibility with SSM, ADR registry, system constraints, best practices, and professional field review feedback |
+| PASS state | `STRUCTURALLY_FEASIBLE` |
+| FAIL state | `RETURN_TO_ARCHITECTURE` |
+| Transition | PASS allows production of LOD 400 specification |
+
+---
+
+## GATE_1 — ARCHITECTURAL_DECISION_LOCK (LOD 400)
+
+| Field | Value |
+|---|---|
+| Owners | Team 190 (constitutional validation), Team 170 (documentation registry enforcement) |
+| Trigger | Complete LOD 400 blueprint submitted |
+| Purpose | Lock final architectural decision |
+| PASS state | `ARCHITECTURAL_DECISION_LOCKED` |
+| FAIL state | `RETURN_TO_ARCHITECTURE` |
+| Effect | Promote artifact to canonical registry and transfer authority to Team 10 for Work Plan generation |
+
+---
+
+## GATE_2 — IMPLEMENTATION
+
+| Field | Value |
+|---|---|
+| Owner / Responsible | Team 10 |
+| Trigger | Work Plan generated (post GATE_1 PASS) |
+| Purpose | Execute implementation per Work Plan |
+
+---
+
+## GATE_3 — QA
+
+| Field | Value |
+|---|---|
+| Owner / Responsible | Team 50 |
+| Trigger | Implementation deliverables submitted |
+| Purpose | QA verification and sign-off before Dev Validation |
+
+---
+
+## GATE_4..GATE_6 (Chain)
+
+- `GATE_4` — Dev Validation (Team 90)  
+- `GATE_5` — Architectural Validation (Team 190)  
+- `GATE_6` — Human UX Approval (Nimrod final sign-off)
+
+---
+
+## Authority Boundary (No Gate 5 Overlap)
+
+- `GATE_0` and `GATE_1` are design-bound gates before execution routing.
+- `GATE_5` remains the architectural constitutional validation gate and is not redefined by this update.
+- Team 170 scope at `GATE_1` is registry enforcement/documentation execution; Team 190 remains constitutional validation authority.
+
+---
+
+## Process Freeze Constraints (Effective Immediately)
+
+1. `GATE_0` and `GATE_1` are canonical design gates.
+2. No Work Plan generation is permitted before `GATE_1 = ARCHITECTURAL_DECISION_LOCKED`.
+3. No development validation at `GATE_4` is permitted before `GATE_3` PASS.
+4. All gate and validation artifacts must include full hierarchical task identity fields:
+   - `roadmap_id`
+   - `initiative_id`
+   - `work_package_id`
+   - `task_id` (when applicable)
+   - `gate_id`
+   - `phase_owner`
+   - `required_ssm_version`
+   - `required_active_stage`
+5. Non-compliant artifacts are invalid.
+
+---
+
+**log_entry | TEAM_100 | GATE_PROTOCOL_CANONICAL_UPDATE | LOCKED | 2026-02-20**

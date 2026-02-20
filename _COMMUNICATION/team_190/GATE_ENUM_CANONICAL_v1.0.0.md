@@ -4,7 +4,7 @@
 **from:** Team 190 (Constitutional Validation)  
 **to:** Team 100, Team 10, Team 90  
 **date:** 2026-02-20  
-**status:** CANONICAL_CONFIRMATION
+**status:** CANONICAL_CONFIRMATION (synced to 04_GATE_MODEL_PROTOCOL canonical update)
 
 ---
 
@@ -19,10 +19,10 @@
 
 | gate_id | canonical_label | authority |
 |---|---|---|
-| `GATE_0` | Spec completeness | As defined by gate protocol |
-| `GATE_1` | Structural Blueprint validation | As defined by gate protocol |
-| `GATE_2` | Implementation | As defined by gate protocol |
-| `GATE_3` | QA | As defined by gate protocol |
+| `GATE_0` | STRUCTURAL_FEASIBILITY | Team 190 |
+| `GATE_1` | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190 (constitutional validation), Team 170 (documentation registry enforcement) |
+| `GATE_2` | Implementation | Team 10 |
+| `GATE_3` | QA | Team 50 |
 | `GATE_4` | Dev Validation | Team 90 |
 | `GATE_5` | Architectural Validation | Team 190 |
 | `GATE_6` | Human UX Approval | Nimrod (final sign-off) |
@@ -32,15 +32,18 @@
 ## Explicit Confirmations Requested
 
 - `GATE_4 = Dev Validation (Team 90)` → **CONFIRMED**  
-  Evidence: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md:6`
+  Evidence: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` (`GATE_2..GATE_6` section)
 
 - `GATE_5 = Architectural Validation (Team 190)` → **CONFIRMED**  
-  Evidence: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md:7`
+  Evidence: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` (`GATE_2..GATE_6` section)
 
 - `GATE_6 = Nimrod Final Sign-off` → **CONFIRMED**  
   Evidence chain:  
-  - Human UX Approval at Gate 6: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md:8`  
+  - Human UX Approval at Gate 6: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md` (`GATE_2..GATE_6` section)  
   - Named signer semantics (Gate 6 = Nimrod): `_COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md:29`
+
+Additional canonical sync:
+- `GATE_0` and `GATE_1` labels/authority synced to updated protocol at `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md`.
 
 ---
 
@@ -51,4 +54,4 @@
 
 ---
 
-**log_entry | TEAM_190 | GATE_ENUM_CANONICAL_v1.0.0 | CONFIRMED | 2026-02-20**
+**log_entry | TEAM_190 | GATE_ENUM_CANONICAL_v1.0.0 | SYNCED_TO_GATE_PROTOCOL_UPDATE | 2026-02-20**

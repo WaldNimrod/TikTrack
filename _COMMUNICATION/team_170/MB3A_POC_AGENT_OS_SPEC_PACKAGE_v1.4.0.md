@@ -17,7 +17,7 @@
 
 ## 1) Purpose & North Star
 
-This package refines the Gate Model by **formalizing GATE_0 (Structural Feasibility) and GATE_1 (Architectural Decision Lock)** as **design-bound gates** that occur **before WSM execution flow**. They eliminate ambiguity between design and execution phases. The North Star and all other package content (SSM/WSM, Channel 10↔90, Validation Kernel, Alerts) remain as in v1.2.0.
+This package refines the Gate Model by **formalizing GATE_0 (Structural Feasibility) and GATE_1 (Architectural Decision Lock)** as **design-bound gates** that occur **before WSM execution flow**. They eliminate ambiguity between design and execution phases. The North Star and all other package content (SSM/WSM, Channel 10↔90, Validation Kernel, Alerts, Mandatory Header / identity binding from v1.3.0) remain as in **v1.3.0**.
 
 ---
 
@@ -35,29 +35,31 @@ This package refines the Gate Model by **formalizing GATE_0 (Structural Feasibil
 
 ### 2.3 GATE ENUM (LOCKED — Canonical)
 
-Source: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. No aliases; canonical enum only:
+Source: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. **No redefinition in this package.** Canonical enum only:
 
 | gate_id | canonical_label | authority |
 |---------|-----------------|-----------|
-| GATE_0 | Structural Feasibility (design-bound) | Team 190 |
-| GATE_1 | Architectural Decision Lock — LOD 400 (design-bound) | Team 170, Team 190 |
-| GATE_2 | Implementation | As defined by gate protocol |
-| GATE_3 | QA | As defined by gate protocol |
+| GATE_0 | STRUCTURAL_FEASIBILITY | Team 190 |
+| GATE_1 | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190 (constitutional validation), Team 170 (documentation registry enforcement) |
+| GATE_2 | Implementation | Team 10 |
+| GATE_3 | QA | Team 50 |
 | GATE_4 | Dev Validation | Team 90 |
 | GATE_5 | Architectural Validation | Team 190 |
 | GATE_6 | Human UX Approval | Nimrod |
 
-### 2.4 GATE_0 and GATE_1 — Design-Bound Gates (Pre-WSM)
+Canonical protocol: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md`. Canonical enum: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. The above labels and authority are aligned to current canon.
 
-**Constraint:** GATE_0 and GATE_1 occur **before** WSM execution flow. They are **design-bound gates**, not development gates.
+### 2.4 Design-phase interpretation (canonical-aligned)
+
+**Constraint:** GATE_0 and GATE_1 occur **before** WSM execution flow. They are **design-bound gates**, not development gates. The semantics below are aligned to current canonical sources (`04_GATE_MODEL_PROTOCOL.md`, `GATE_ENUM_CANONICAL_v1.0.0.md`). Evidence path for directive history: `_COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md`.
 
 ---
 
-#### GATE_0 — STRUCTURAL FEASIBILITY
+#### GATE_0 — Structural Feasibility
 
 | Item | Definition |
 |------|------------|
-| **Owner** | Team 190 |
+| **Owner (validation authority)** | Team 190 |
 | **Trigger** | High-level architectural concept produced. |
 | **Purpose** | Validate structural compatibility with: SSM; ADR registry; system constraints; best practice; professional field review feedback. |
 | **PASS state** | STRUCTURALLY_FEASIBLE |
@@ -65,11 +67,12 @@ Source: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. No aliases; can
 
 ---
 
-#### GATE_1 — ARCHITECTURAL DECISION LOCK (LOD 400)
+#### GATE_1 — Architectural Decision Lock (LOD 400)
 
 | Item | Definition |
 |------|------------|
-| **Owners** | Team 170 (documentation integrity); Team 190 (constitutional validation). |
+| **Owner (validation authority)** | Team 190 only. Team 170 has **no** Gate validation authority (per TEAM_170_190_AUTHORITY_SEPARATION). |
+| **Effect execution (post-PASS)** | Move artifact to canonical documentation registry — may be **executed by** Team 170 in documentation-integrity role only; Team 170 does not sign off or validate the gate. |
 | **Trigger** | LOD 400 blueprint produced by architects. |
 | **Purpose** | Lock final architectural decision. |
 | **PASS state** | ARCHITECTURAL_DECISION_LOCKED |
@@ -77,7 +80,7 @@ Source: `_COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md`. No aliases; can
 
 ---
 
-**Design-bound sequence:** Architectural concept → GATE_0 (Team 190) → if PASS (STRUCTURALLY_FEASIBLE) → LOD 400 blueprint → GATE_1 (Team 170 + Team 190) → if PASS (ARCHITECTURAL_DECISION_LOCKED) → artifact in canonical registry, handoff to Team 10 for WSM/Work Plan. WSM execution (L0–L3, Channel 10↔90, etc.) follows only after GATE_1 PASS.
+**Design-bound sequence:** Architectural concept → GATE_0 (Team 190) → if PASS → LOD 400 blueprint → GATE_1 (Team 190 validation only; Team 170 executes registry move per doc-integrity role) → if PASS → handoff to Team 10 for WSM/Work Plan. WSM execution follows only after GATE_1 PASS.
 
 ---
 
@@ -192,9 +195,9 @@ Unchanged from v1.2.0. SSM canonical ALERT entity: UUID; is_active, is_triggered
 |-------------------|----------------|----------------|
 | SSM Governance Core + ALERT entity | _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md | Canonical |
 | Gate enum GATE_0 … GATE_6 | _COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md | Canonical confirmation |
-| GATE_0 redefinition (Structural Feasibility) | Team 100 mandate — GATE 0 & GATE 1 REFINITION UPDATE | This package §2.4 |
-| GATE_1 redefinition (Architectural Decision Lock LOD 400) | Team 100 mandate — GATE 0 & GATE 1 REFINITION UPDATE | This package §2.4 |
-| Design-bound constraint (GATE_0, GATE_1 before WSM) | Team 100 mandate — GATE 0 & GATE 1 REFINITION UPDATE | This package §2.4 |
+| GATE_0 design-phase semantics (Structural Feasibility) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
+| GATE_1 design-phase semantics (Architectural Decision Lock LOD 400) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
+| Design-bound constraint (GATE_0, GATE_1 before WSM) | _COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md, this package §2.4 | Directive record + package |
 | Gate 5 / Gate 6 signers | PHOENIX_MASTER_SSM_v1.0.0.md, 04_GATE_MODEL_PROTOCOL.md | SSM + Gate protocol |
 | Channel 10↔90 identity, paths, termination | _COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md | Canonical confirmation |
 | WSM L0–L3 + Phase Ownership + Channel 10↔90 fields | This document §3, §3.1, §4, §5, §6 | Spec package |
@@ -210,20 +213,22 @@ Unchanged from v1.2.0. SSM canonical ALERT entity: UUID; is_active, is_triggered
 
 ## 12) No-Guessing Declaration & Gate Refinement Declaration
 
-All definitions in this package are derived from **existing artifacts** or the **Team 100 mandate (GATE 0 & GATE 1 REFINITION UPDATE)**. GATE_0 and GATE_1 (owner, trigger, purpose, PASS/FAIL states, effect for GATE_1) and the design-bound constraint are taken verbatim from that mandate. No inferred gate semantics. GATE enum labels for GATE_0 and GATE_1 in §2.3 updated to reflect redefinition; authority and design-bound placement from mandate.
+All definitions in this package are derived from **existing artifacts** and the **directive record** at `_COMMUNICATION/team_170/TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD.md`. §2.3 GATE ENUM is aligned to current **04_GATE_MODEL_PROTOCOL** and **GATE_ENUM_CANONICAL_v1.0.0**: GATE_0 = STRUCTURAL_FEASIBILITY, GATE_1 = ARCHITECTURAL_DECISION_LOCK (LOD 400). §2.4 records design-phase semantics now reflected in the canonical protocol. GATE_1 validation authority is Team 190 only; Team 170 executes effect (move to registry) in documentation-integrity role only and does not hold Gate authority. No inferred gate semantics.
 
-**Explicit declaration:** **GATE_0 (Structural Feasibility) and GATE_1 (Architectural Decision Lock — LOD 400) are design-bound gates occurring before WSM execution flow.** They are not development gates. WSM execution (L0–L3, Channel 10↔90) follows only after GATE_1 PASS and handoff to Team 10 for Work Plan generation.
+**Explicit declaration:** **GATE_0 (STRUCTURAL_FEASIBILITY) and GATE_1 (ARCHITECTURAL_DECISION_LOCK LOD 400) are design-bound gates before WSM execution flow.** WSM execution follows only after GATE_1 PASS and handoff to Team 10 for Work Plan generation.
 
 ---
 
 ## Submission
 
-This consolidated package (v1.4.0) is submitted to **Team 190 for Gate 5 constitutional review**.  
+This consolidated package (v1.4.0) is submitted to **Team 190 for Gate 5 constitutional review** together with **v1.3.0** (TASK_IDENTITY_BINDING). **Unified validation instruction:** _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md — Team 190 to perform one review covering both v1.3.0 and v1.4.0 in correct version order.  
 **Change type:** GATE_MODEL_REFINEMENT. **Requires constitutional review:** YES.
 
 **Package artifacts:**
 
 - _COMMUNICATION/team_170/MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.4.0.md (this document)
+- _COMMUNICATION/team_170/MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.3.0.md (predecessor; identity binding)
+- _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_UNIFIED_VALIDATION_INSTRUCTION_v1.3_v1.4.md (unified validation instruction for Team 190)
 - _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md
 - _COMMUNICATION/team_190/GATE_ENUM_CANONICAL_v1.0.0.md
 - _COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md

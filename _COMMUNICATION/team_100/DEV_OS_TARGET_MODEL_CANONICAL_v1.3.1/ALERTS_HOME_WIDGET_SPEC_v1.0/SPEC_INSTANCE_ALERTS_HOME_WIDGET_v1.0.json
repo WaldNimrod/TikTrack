@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "module_id": "alerts_home_widget",
+  "context": "Home Active Alerts widget binding to Alerts API + DEV bump-new trigger",
+  "sv": "PHOENIX_V2.121",
+  "functional_requirements": [
+    "Fetch alerts summary and NEW alerts list on mount",
+    "Render widget states: loading, empty, error, data, mutating",
+    "Support refresh action",
+    "Support navigate to Alerts page",
+    "Support mark-as-read from widget if API exists; else mark as explicit gap",
+    "Provide DEV/TEST-only bump-new action to deterministically set N alerts to NEW"
+  ],
+  "ui_contract": {
+    "dom_anchors": {
+      "root": {
+        "selector": "[data-section='active-alerts-widget']"
+      },
+      "summary": {
+        "selector": "[data-role='alerts-summary']"
+      },
+      "list": {
+        "selector": "[data-role='alerts-list']"
+      },
+      "row": {
+        "selector": ".js-alert-row",
+        "attributes": [
+          "data-alert-id"
+        ]
+      },
+      "states": {
+        "attribute": "data-state",
+        "values": [
+          "loading",
+          "empty",
+          "error",
+          "data",
+          "mutating"
+        ]
+      }
+    },
+    "selector_registry": [
+      ".js-active-alerts-refresh",
+      ".js-active-alerts-bump-new",
+      ".js-alert-row",
+      ".js-mark-as-read"
+    ],
+    "state_definitions": {
+      "loading": {
+        "description": "Initial load and refresh pending responses"
+      },
+      "empty": {
+        "description": "No NEW alerts to display"
+      },
+      "error": {
+        "description": "API failure for summary or list; show retry"
+      },
+      "data": {
+        "description": "Summary + list loaded successfully"
+      },
+      "mutating": {
+        "description": "Mutation running: mark-as-read or bump-new; disable actions"
+      }
+    }
+  },
+  "data_contract": {
+    "summary_endpoint": {
+      "method": "GET",
+      "path": "/api/alerts/summary",
+      "required_fields": [
+        "new_count"
+      ]
+    },
+    "list_endpoint": {
+      "method": "GET",
+      "path": "/api/alerts",
+      "query": {
+        "status": "NEW",
+        "limit": 5,
+        "sort": "created_at_desc"
+      },
+      "required_fields_per_row": [
+        "id",
+        "status",
+        "created_at"
+      ]
+    },
+    "mark_as_read_endpoint": {
+      "method": "PATCH",
+      "path_template": "/api/alerts/{id}",
+      "note": "Lock exact method/path in v1.0.1 after baseline cross-check"
+    },
+    "dev_bump_new_endpoint": {
+      "method": "POST",
+      "path": "/api/dev/alerts/bump-new",
+      "guard": {
+        "env_allowed": [
+          "dev",
+          "test"
+        ],
+        "feature_flag": "FEATURE_DEBUG_ALERTS_BUMP",
+        "feature_flag_required_value": true
+      },
+      "request": {
+        "count": {
+          "type": "integer",
+          "min": 1,
+          "max": 20,
+          "default": 3
+        }
+      },
+      "response": {
+        "fields": [
+          "requested",
+          "updated",
+          "alert_ids",
+          "new_count_after"
+        ]
+      }
+    }
+  },
+  "acceptance_criteria": [
+    "Widget displays real alerts data (summary + list) on Home",
+    "All states reproducible (loading/empty/error/data/mutating)",
+    "Refresh refetches summary and list",
+    "DEV bump-new works only when env+flag allow; updates NEW count deterministically",
+    "DOM anchors + js selectors exist and remain stable",
+    "No screenshots used for validation; structural DOM/CSS inspection only"
+  ],
+  "test_plan": [
+    "Unit: state machine transitions",
+    "Integration: API fetch and render mapping",
+    "E2E: DOM anchor presence; bump-new -> refetch -> NEW rows visible; error state -> retry",
+    "Security: bump-new endpoint unavailable in prod or when flag disabled"
+  ],
+  "artifact_outputs_expected": [
+    "EXEC_SUMMARY.md",
+    "TECHNICAL_CHANGE_REPORT.md",
+    "MATERIALIZATION_EVIDENCE.json"
+  ]
+}

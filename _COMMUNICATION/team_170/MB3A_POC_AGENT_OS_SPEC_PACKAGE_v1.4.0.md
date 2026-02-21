@@ -10,7 +10,7 @@
 **re:** PHOENIX DEV OS — GATE 0 & GATE 1 REFINITION UPDATE (v1.3.0 → v1.4.0)  
 **date:** 2026-02-20  
 **stage context:** GAP_CLOSURE_BEFORE_AGENT_POC  
-**authority:** Team 170 = SSOT integrity + knowledge promotion only. No Gate authority. No guessing.  
+**authority:** Team 170 = SSOT integrity only (no promotion execution authority in v2.2.0). No Gate authority. No guessing.  
 **context:** Pre-development gates clarified; design-bound (GATE_0, GATE_1) before WSM execution flow.
 
 ---

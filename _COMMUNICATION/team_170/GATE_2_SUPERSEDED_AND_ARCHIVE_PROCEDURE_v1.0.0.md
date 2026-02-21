@@ -1,7 +1,7 @@
 # GATE_2 — SUPERSEDED and Archive Procedure v1.0.0
 
 **id:** GATE_2_SUPERSEDED_AND_ARCHIVE_PROCEDURE_v1.0.0  
-**from:** Team 170 (Executor GATE_2)  
+**from:** Team 170 (Documentation record only; Executor GATE_2 = Team 70 per v2.2.0)  
 **to:** Team 190 (Owner GATE_2), Team 10  
 **re:** Anti-duplication protocol per TEAM_100_TO_170_190_KNOWLEDGE_PROMOTION_ACTIVATION_v1.0.0  
 **date:** 2026-02-20  

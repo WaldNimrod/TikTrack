@@ -7,6 +7,16 @@
 **date:** 2026-02-20  
 **status:** PASS
 
+**architectural_approval_type:** SPEC
+
+---
+
+## 0) Validation scope (mandatory)
+
+- **Validation scope:** SPEC-only (Design/LOD400). This report validates canonical structural completion for SPEC Architectural Re-Approval.
+- **No execution readiness claims.** This validation does not assert or imply that development or implementation is authorized or ready.
+- **No references to post-development validation gates.** Scope excludes GATE_4 and beyond execution-track gates for this submission.
+
 ---
 
 ## 1) Summary

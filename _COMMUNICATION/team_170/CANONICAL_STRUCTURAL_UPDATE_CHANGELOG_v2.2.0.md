@@ -49,16 +49,22 @@ All include full hierarchical identity block. Path: _COMMUNICATION/team_170/CANO
 
 ---
 
-## 5. Validation flow (per directive)
+## 5. Submission type (per TEAM_100_CORRECTION_SPEC_VS_EXEC_ARCH_APPROVAL_v2.2.1)
+
+This submission is **SPEC Architectural Re-Approval (Design/LOD400)** only. Gate context: **GATE_1 — ARCHITECTURAL_DECISION_LOCK**. It does not authorize development execution. Content original for submission: `TEAM_170_CANONICAL_STRUCTURAL_UPDATE_v2.2.0_SUBMISSION_CONTENT_ORIGINAL.md`. Team 190 assembles the submission package from originals only; only Team 190 may create or edit files in the submission folder.
+
+---
+
+## 6. Validation flow (per directive)
 
 1. Team 170 has updated canonical documents (Gate Protocol v2.2.0; SSM/WSM structural update docs; templates; this change log).  
 2. Team 190 to perform full revalidation.  
-3. Team 190 to produce consolidated validation report.  
+3. Team 190 to produce consolidated validation report (SPEC-only scope; see validation report original).  
 4. Full package to be submitted for Architectural Re-Approval. No partial submission permitted.
 
 ---
 
-## 6. Freeze
+## 7. Freeze
 
 No development progression permitted until updated documents receive renewed architectural approval.
 

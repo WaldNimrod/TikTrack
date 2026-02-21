@@ -43,4 +43,29 @@ If any condition is not met, Team 190 must not edit and must issue RETURN/BLOCK.
 
 ---
 
-**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | DOC_MICRO_REMEDIATION_EXCEPTION | 2026-02-20**
+## 4) Architect submission path discipline (mandatory)
+
+All Team 190 architectural submission packages must be placed under:
+
+- `_COMMUNICATION/_ARCHITECT_INBOX/<roadmap>/<initiative>/<work_package>/SUBMISSION_vX.Y.Z/`
+
+Path rules:
+
+1. Do not place new architect submission packages under project-root `_ARCHITECTURAL_INBOX/`.
+2. Use `_COMMUNICATION/_ARCHITECT_INBOX/` as the single operational inbox path for architect-facing submissions.
+3. If a package was created in a wrong location, move it and update all submission references in the same remediation cycle.
+
+---
+
+## 5) Submission package contract (Team 170 ↔ Team 190) — mandatory
+
+Team 190 submits to Architects **both** SPEC (Design/LOD400) and Execution submissions, based on content prepared by **Team 170** and development teams.
+
+- **Submission package** = copy of originals for submission only. **Submission files are exclusively Team 190's responsibility.** No other team may edit submission files or create submission packages.
+- **All content fixes** must be done in **originals** (Team 170 content originals, Team 190 validation report originals). Team 190 then prepares a **new** submission package and **deletes** the previous one.
+- Full contract and procedure: `_COMMUNICATION/team_190/TEAM_190_SUBMISSION_PACKAGE_CONTRACT_AND_PROCEDURE_v1.0.0.md`.
+
+---
+
+**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | DOC_MICRO_REMEDIATION_EXCEPTION_AND_ARCHITECT_INBOX_PATH_DISCIPLINE | 2026-02-20**  
+**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | SUBMISSION_PACKAGE_CONTRACT_SECTION_5 | 2026-02-20**

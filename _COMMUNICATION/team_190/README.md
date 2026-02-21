@@ -23,3 +23,4 @@ This folder is the operational communication area for Team 190.
 
 - Team 190 default mode is validator-only.
 - A narrow documentation micro-remediation exception is allowed only per `TEAM_190_INTERNAL_OPERATING_RULES.md`.
+- Architect submission packages must be created under `_COMMUNICATION/_ARCHITECT_INBOX/` (not under project-root `_ARCHITECTURAL_INBOX/`).

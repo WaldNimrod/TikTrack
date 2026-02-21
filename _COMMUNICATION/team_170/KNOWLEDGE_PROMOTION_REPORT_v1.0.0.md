@@ -1,7 +1,7 @@
 # KNOWLEDGE_PROMOTION_REPORT_v1.0.0
 
 **id:** KNOWLEDGE_PROMOTION_REPORT_v1.0.0  
-**from:** Team 170 (Librarian / SSOT Authority — Executor for GATE_2)  
+**from:** Team 170 (Librarian / SSOT Integrity record; Executor for GATE_2 is Team 70 per v2.2.0)  
 **to:** Team 190 (Owner GATE_2), Team 10, Team 100  
 **re:** GATE_2 — KNOWLEDGE_PROMOTION evidence and status  
 **date:** 2026-02-20  
@@ -51,7 +51,7 @@ Per TEAM_100_TO_170_190_KNOWLEDGE_PROMOTION_ACTIVATION_v1.0.0 (corrected v2.2.0)
 
 **Current:** DURING_GATE_2_COMPLETE. During GATE_2 mandatory obligations (directive lines 63–71) are satisfied: canonical submission in final path; at least one communication artifact marked SUPERSEDED with reference. Only **After GATE_2 PASS** (archive transfer) remains. GATE_2 PASS pending Team 190 re-review.
 
-**When PASS:** Status will be set to KNOWLEDGE_PROMOTED; Team 170 will execute archive transfer to _ARCHIVE/_COMMUNICATION_SNAPSHOTS/<timestamp>/ per procedure.
+**When PASS:** Status will be set to KNOWLEDGE_PROMOTED; Team 70 (Librarian) will execute archive transfer to _ARCHIVE/_COMMUNICATION_SNAPSHOTS/<timestamp>/ per procedure.
 
 ---
 

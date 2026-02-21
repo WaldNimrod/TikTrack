@@ -32,13 +32,18 @@
 
 ## 3) Execution plan (order of operations)
 
-1. **Create physical structure** — `agents_os/documentation/`, `docs-system/`, `docs-governance/`, `runtime/`, `validators/`, `orchestrator/`, `tests/`. ✅  
-2. **Scan repository** — All artifacts referencing Agent_OS, Agents_OS, governance runtime logic; output classification list (TIKTRACK | AGENTS_OS | SHARED).  
-3. **Move AGENTS_OS artifacts** — Physically MOVE (with provenance trail) into `agents_os/`; align naming (e.g. `Agents_OS/` content → `agents_os/`).  
-4. **Add project_domain header** — To ALL markdown documents: `project_domain: TIKTRACK | AGENTS_OS | SHARED`.  
-5. **Consolidate inbox** — Ensure no content under root `_ARCHITECTURAL_INBOX`; all references to canonical `_COMMUNICATION/_ARCHITECT_INBOX`; move any legacy inbox content if it appears.  
-6. **Produce report** — DOMAIN_REFACTOR_COMPLETION_REPORT_v1.0.0.md (structural mapping, evidence-by-path, classification summary).  
-7. **Submit to Team 190** — For verification.
+**Scoping (צמצום היקף):** ראה `TEAM_170_DOMAIN_REFACTOR_SCOPING_v1.0.0.md`. קבצים זמניים/ישנים (מלפני 7+ ימים) → ארכיון או סימון legacy; **רק** תוכניות פעילות, קבצים קבועים/קנוניים ושלבים שלא נסגרו — עוברים עדכון מלא (project_domain + נתיבים).
+
+0. **Phase 0 — Scoping** — ארכיון או סימון legacy לקבצים שלא in-scope; רשימת קבצים חובה לעדכון (active WP S001-P001-WP001, canonical, stages not closed).  
+1. **Create physical structure** — `agents_os/` + subdirs. ✅  
+2. **Scan repository** — Agent_OS/Agents_OS/Governance references; classification (TIKTRACK | AGENTS_OS | SHARED).  
+3. **Move AGENTS_OS artifacts** — MOVE into `agents_os/` with provenance trail.  
+4. **Add project_domain header** — **In-scope only** (active programs, canonical, incomplete stages); legacy/archived = no structural edit or single-line marker.  
+5. **Consolidate inbox** — All references to `_COMMUNICATION/_ARCHITECT_INBOX`; no content under root `_ARCHITECTURAL_INBOX`.  
+6. **Produce report** — DOMAIN_REFACTOR_COMPLETION_REPORT_v1.0.0.md.  
+7. **Submit to Team 190** — בקשת ולידציה (סקופ + דרישה מקורית + קישור למסמך Team 100): `TEAM_170_TO_TEAM_190_DOMAIN_REFACTOR_VALIDATION_REQUEST_v1.0.0.md`.
+
+**תוכנית ביצוע ממוקדת:** `DOMAIN_REFACTOR_EXECUTION_PLAYBOOK_v1.0.0.md` — סריקה אחת, סיווג באצווה, ביצוע לפי שלבים עם נקודות בדיקה.
 
 ---
 

@@ -128,11 +128,20 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 1. GATE_0 and GATE_1 are canonical design gates.  
 2. No Work Plan generation before GATE_1 = ARCHITECTURAL_DECISION_LOCKED.  
-3. **Work Plan / Work Package must be validated by Team 90 (10↔90 loop) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.**  
-4. No Dev Validation (GATE_5) before GATE_4 (QA) PASS.  
+3. **Work Plan / Work Package must be validated by Team 90 (10↔90) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.** (This is a **pre-GATE_3** step; it has no gate number. Team 90 validates the plan only.)  
+4. **No GATE_5 (DEV_VALIDATION) before GATE_4 (QA) PASS.** GATE_5 is the **second** Team 90 (10↔90) touchpoint: after implementation and QA.  
 5. All gate and validation artifacts must include full hierarchical identity block per §1.4.  
 6. Non-compliant artifacts are invalid.  
 7. No development progression until updated documents receive renewed architectural approval (return v2.2.0).
+
+### 6.1 Two Team 90 (10↔90) validation points (deterministic)
+
+| Point | Name | Trigger | Authority | Effect |
+|-------|------|---------|-----------|--------|
+| **Pre-GATE_3** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | No gate number. Only after Team 90 PASS may GATE_3 open. |
+| **GATE_5** | DEV_VALIDATION | GATE_4 (QA) PASS | Team 90 | Gate 5 semantics. Post-implementation / post-QA dev validation. |
+
+One channel (10↔90), two distinct lifecycle phases; no contradiction.
 
 ---
 

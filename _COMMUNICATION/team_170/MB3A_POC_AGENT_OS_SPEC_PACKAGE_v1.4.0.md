@@ -148,15 +148,22 @@ Source: `_COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md`
 
 **Loop termination:** PASS | ESCALATE | STUCK (per CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0).
 
-**Process lock (workflow precision):** Work Package / Work Plan is submitted to Team 90 for validation (10↔90) **before execution (GATE_3)**; only after Team 90 validation PASS may implementation (GATE_3) begin. No document may allow execution before Team 90 validation PASS. Per TEAM_190_TO_TEAM_170_WORKFLOW_PRECISION_ALIGNMENT_REQUEST_v1.0.0 and 04_GATE_MODEL_PROTOCOL_v2.2.0 §6.
+**Two 10↔90 validation phases (deterministic, no mixed triggers):** Per 04_GATE_MODEL_PROTOCOL_v2.2.0 §6.1 and CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.
+
+| Phase | Name | Trigger | Owner | Effect |
+|-------|------|---------|-------|--------|
+| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | **Pre-GATE_3** (no gate number). Only after Team 90 PASS may GATE_3 open. No execution before this PASS. |
+| **Phase 2** | GATE_5 DEV_VALIDATION (Validation Kernel) | **GATE_3 PASS and GATE_4 (QA) PASS** | Team 90 | Post-implementation / post-QA dev validation. |
+
+Same channel, same artifact types; phase is determined by trigger. Phase 1 = before execution; Phase 2 = after implementation and QA.
 
 **Canonical artifact paths:** WORK_PACKAGE_VALIDATION_REQUEST (team_10), VALIDATION_RESPONSE (team_90), BLOCKING_REPORT (team_90) — see v1.2.0 §4 for full templates.
 
 ---
 
-## 5) Validation Kernel v0.1 — Phase 1
+## 5) Validation Kernel v0.1 — Phase 2 only (GATE_5)
 
-Unchanged from v1.2.0. Trigger: GATE_3 PASS. Initiator: Team 10. Owner: Team 90. Blocking authority: Team 90. Escalation target: Team 100 / Architect.
+**Phase 2 of Channel 10↔90.** Trigger: **GATE_3 PASS and GATE_4 (QA) PASS** (not pre-GATE_3). Initiator: Team 10. Owner: Team 90. Blocking authority: Team 90. Escalation target: Team 100 / Architect. This section does not apply to Phase 1 (Work Plan validation before GATE_3).
 
 ---
 

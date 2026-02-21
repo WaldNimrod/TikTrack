@@ -22,7 +22,7 @@ Team 100 issued a **breaking canonical change**: full Gate Model renumbering to 
 |---------|------------|-----------|
 | GATE_0 | STRUCTURAL_FEASIBILITY | Team 190 |
 | GATE_1 | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190, Team 170 (registry only) |
-| GATE_2 | KNOWLEDGE_PROMOTION | Team 190 (owner), Team 170 (executor) |
+| GATE_2 | KNOWLEDGE_PROMOTION | Team 190 (owner), Team 70 (executor ONLY) |
 | GATE_3 | IMPLEMENTATION | Team 10 |
 | GATE_4 | QA | Team 50 |
 | GATE_5 | DEV_VALIDATION | Team 90 |

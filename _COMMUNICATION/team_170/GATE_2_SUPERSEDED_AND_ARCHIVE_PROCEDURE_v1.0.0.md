@@ -9,7 +9,7 @@
 
 ---
 
-## During GATE_2 (Team 170)
+## During GATE_2 (Team 70 — Librarian)
 
 1. **Move canonical files to final documentation paths** (per Team 10/Architect approval and documentation governance).  
 2. **Mark communication artifacts as SUPERSEDED:**  
@@ -20,7 +20,7 @@
 
 ---
 
-## After GATE_2 PASS (Team 170)
+## After GATE_2 PASS (Team 70 — Librarian)
 
 3. **Transfer superseded artifacts to archive:**  
    - Target: `_ARCHIVE/_COMMUNICATION_SNAPSHOTS/<timestamp>/`  

@@ -14,7 +14,7 @@
 |---------|------------|-----------|
 | GATE_0 | STRUCTURAL_FEASIBILITY | Team 190 |
 | GATE_1 | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190 (constitutional validation), Team 170 (documentation registry enforcement) |
-| GATE_2 | KNOWLEDGE_PROMOTION | Team 190 (owner), Team 170 (executor) |
+| GATE_2 | KNOWLEDGE_PROMOTION | Team 190 (owner), Team 70 (executor ONLY) — see v2.2.0 |
 | GATE_3 | IMPLEMENTATION | Team 10 |
 | GATE_4 | QA | Team 50 |
 | GATE_5 | DEV_VALIDATION | Team 90 |
@@ -54,7 +54,7 @@
 | Field | Value |
 |-------|--------|
 | Owner | Team 190 |
-| Executor | Team 170 |
+| Executor | Team 70 (Librarian) ONLY |
 | Trigger | Architect signs ARCHITECTURAL_DECISION_LOCK (GATE_1 PASS). |
 | Purpose | Consolidate validated artifacts; move canonical artifacts to final documentation structure; remove communication-layer duplication; freeze SSM and WSM version references; generate KNOWLEDGE_PROMOTION_REPORT.md. |
 | PASS state | KNOWLEDGE_PROMOTED |

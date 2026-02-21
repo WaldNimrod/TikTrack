@@ -1,6 +1,8 @@
 # GATE_ENUM_CANONICAL_v1.0.0
 
-**status:** **SUPERSEDED** as of 2026-02-20. Canonical Gate Model is now **v2.0.0** (GATE_0..GATE_7). See `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md` and `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`. No aliasing or backward mapping permitted. This file is retained as historical record only.
+**HISTORICAL ONLY / DO NOT USE FOR OPERATIONAL DECISIONS.**
+
+**status:** **SUPERSEDED** as of 2026-02-20. **Canonical source for gate model:** `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.2.0.md` (v2.2.0: GATE_0..GATE_8, PRE_GATE_3 for Pre-GATE_3 artifacts). This file is retained as historical record only. Do not use for validation or routing.
 
 ---
 
@@ -8,18 +10,18 @@
 **from:** Team 190 (Constitutional Validation)  
 **to:** Team 100, Team 10, Team 90  
 **date:** 2026-02-20  
-**status:** SUPERSEDED (was CANONICAL_CONFIRMATION)
+**status:** SUPERSEDED — historical only; do not use
 
 ---
 
-## Canonical Source Anchors
+## Historical Source Anchors (obsolete)
 
 1. `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md`  
 2. `_COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md`
 
 ---
 
-## Full Gate Enum (Canonical)
+## Historical Gate Enum (v1.0.0 — do not use for operational decisions)
 
 | gate_id | canonical_label | authority |
 |---|---|---|

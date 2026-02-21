@@ -17,7 +17,7 @@
 | program_id | S001-P001 |
 | work_package_id | S001-P001-WP001 |
 | task_id | N/A (work-package-level) |
-| gate_id | GATE_3 (Implementation) → GATE_4 (QA) → GATE_5 (DEV_VALIDATION) → GATE_6 (ARCHITECTURAL_VALIDATION) → Stage 7 Documentation |
+| gate_id | Full chain: GATE_3 → GATE_4 → GATE_5 → GATE_6 → GATE_7 → GATE_8. **Lifecycle complete only on GATE_8 PASS.** Per 04_GATE_MODEL_PROTOCOL_v2.2.0. |
 | phase_owner | Team 10 |
 | required_ssm_version | 1.0.0 |
 | required_active_stage | GAP_CLOSURE_BEFORE_AGENT_POC |
@@ -36,7 +36,7 @@
 | **Out of scope** | Widget POC is **not** activated. No widget or product UI build in this WP. |
 | **Execution boundary** | Only infrastructure for 10↔90 validation loop (Channel 10↔90; Team 10 request/orchestration ↔ Team 90 validation). |
 | **Deliverables** | Orchestration flow artifacts; WORK_PACKAGE_VALIDATION_REQUEST / VALIDATION_RESPONSE / BLOCKING_REPORT path compliance; evidence for QA and Architectural Review (EXECUTION). |
-| **Post-completion** | QA (GATE_4) → Architectural Review (EXECUTION) → Stage 7 Documentation. |
+| **Post-completion** | GATE_4 (QA) → GATE_5 (DEV_VALIDATION) → GATE_6 (EXECUTION) → GATE_7 (HUMAN_UX_APPROVAL) → GATE_8 (DOCUMENTATION_CLOSURE). Lifecycle complete only on GATE_8 PASS. |
 
 **Source of record:** SSM §5.1, WSM current execution order lock; CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0; MB3A_POC_AGENT_OS_SPEC_PACKAGE_v1.4.0.
 
@@ -52,13 +52,27 @@
 |----------|--------------|--------|---------|----------------|
 | 0 | Pre-requisite | — | GATE_2 (Knowledge Promotion) complete per governance relock | Development may open only after GATE_2 PASS. |
 | 0b | **Work Package / Work Plan Validation (לפני GATE_3)** | **Team 90** (Channel 10↔90 validation authority) | חבילת עבודה הוכנה (הגדרה + תוכנית + שיוך); Team 10 מגיש ל־Team 90 | **Approved L2 Work Package** — רק לאחר Team 90 validation PASS; מותר לפתוח GATE_3. מקור: CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0; MB3A §7. No execution before Team 90 validation PASS. |
-| 1 | GATE_3 — Implementation | Team 10 | Work Package **approved by Team 90** (10↔90 PASS); orchestration flow build | Orchestration flow implemented; internal verification. |
-| 2 | GATE_4 — QA | Team 50 | Team 10 submits for QA | QA report; 0 SEVERE; readiness for Dev Validation. |
+| 1 | GATE_3 — Implementation | Team 10 | Work Package **approved by Team 90** (10↔90 PASS); orchestration flow build | See §2.1 GATE_3 exit criteria. Only then may Team 10 submit to GATE_4. |
+| 2 | GATE_4 — QA | Team 50 | Team 10 submits for QA (only after GATE_3 exit package complete) | QA report; 0 SEVERE; readiness for Dev Validation. |
 | 3 | GATE_5 — Dev Validation (Channel 10↔90) | Team 90 | Team 10 issues WORK_PACKAGE_VALIDATION_REQUEST | VALIDATION_RESPONSE (PASS) or BLOCKING_REPORT; loop until PASS or ESCALATE/STUCK. |
 | 4 | GATE_6 — Architectural Validation (EXECUTION) | Team 190 | GATE_5 PASS | EXECUTION approval; artifact alignment to constitution. |
-| 5 | Stage 7 — Documentation | Team 70 (executor), Team 190 (validator) | GATE_6 PASS | POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE; AS_MADE; lifecycle doc closure. |
+| 5 | GATE_7 — Human UX Approval | Nimrod | GATE_6 PASS | Final UX/vision sign-off. |
+| 6 | GATE_8 — Documentation Closure (AS_MADE_LOCK) | Team 190 (owner), Team 70 (executor) | GATE_7 PASS | AS_MADE_REPORT; Developer Guides; clean/archive; canonical consistency. **Lifecycle not complete without GATE_8 PASS.** Per 04_GATE_MODEL_PROTOCOL_v2.2.0 §5. |
 
-**No Widget POC activation in this Work Package.** S001-P002 (Alerts POC) remains FROZEN until S001-P001-WP001 completes GATE_8 / Stage 7 per SSM §5.1.
+**No Widget POC activation in this Work Package.** S001-P002 (Alerts POC) remains FROZEN until S001-P001-WP001 completes GATE_8 per SSM §5.1.
+
+### 2.1 GATE_3 exit criteria (mandatory before GATE_4 submission)
+
+Per D5 normalization. Team 10 may not submit to GATE_4 (QA) until the following are complete:
+
+| Item | Requirement | Owner / evidence |
+|------|-------------|------------------|
+| Internal verification | At least one internal verification artifact (e.g. completion report, runbook check, or signed self-check) covering the orchestration flow scope for this WP | Team 10 |
+| Acceptance criteria | Orchestration flow implemented per WP definition; no open SEVERE or BLOCKER from internal check | Team 10 |
+| Sign-off | Phase owner (Team 10) confirms readiness for QA submission | Team 10 |
+| Evidence path | Artifact(s) under `_COMMUNICATION/team_10/` or path referenced in WORK_PACKAGE_DEFINITION; identity header (work_package_id, gate_id GATE_3) present | Team 10 |
+
+Canonical reference: this document; 04_GATE_MODEL_PROTOCOL_v2.2.0.
 
 ---
 
@@ -72,8 +86,9 @@
 | **Channel 10↔90 — validation authority** | Team 90 |
 | **QA (GATE_4)** | Team 50 |
 | **Architectural Review EXECUTION (GATE_6)** | Team 190 |
-| **Stage 7 Documentation executor** | Team 70 |
-| **Stage 7 Documentation validator** | Team 190 |
+| **GATE_7 (Human UX Approval)** | Nimrod |
+| **GATE_8 (Documentation Closure) executor** | Team 70 |
+| **GATE_8 owner/validator** | Team 190 |
 
 Center of Gravity: Team 10 for execution coordination and Work Package lifecycle; Team 90 for Dev Validation loop; Team 190 for EXECUTION sign-off and doc validation.
 

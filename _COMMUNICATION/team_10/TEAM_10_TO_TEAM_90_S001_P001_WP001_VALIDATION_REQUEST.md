@@ -20,7 +20,7 @@
 | program_id | S001-P001 |
 | work_package_id | S001-P001-WP001 |
 | task_id | N/A (work-package-level) |
-| gate_id | Pre-GATE_3 (phase 1 — Work Package validation; no gate number per 04_GATE_MODEL_PROTOCOL_v2.2.0 §6.1) |
+| gate_id | PRE_GATE_3 (canonical reserved value for Pre-GATE_3 artifacts; per CANONICAL_RULE_DECISION_GATE_ID_PRE_GATE3.md and 04_GATE_MODEL_PROTOCOL_v2.2.0 §6.1) |
 | phase_owner | Team 10 |
 | required_ssm_version | 1.0.0 |
 | required_active_stage | GAP_CLOSURE_BEFORE_AGENT_POC |
@@ -54,7 +54,7 @@ Work Package **S001-P001-WP001** (10↔90 Validator Agent — Development Channe
 | # | Target | Description |
 |---|--------|-------------|
 | 1 | Work Package Definition | Identity header complete; scope and execution boundary aligned to SPEC; no Widget POC. |
-| 2 | Gate-aligned execution plan | Sequence 0b (Pre-GATE_3 validation by Team 90) → GATE_3 → GATE_4 → GATE_5 → GATE_6 → Stage 7; two-phase 10↔90 model (Pre-GATE_3 + GATE_5) respected. |
+| 2 | Gate-aligned execution plan | Sequence 0b (Pre-GATE_3 validation by Team 90) → GATE_3 → GATE_4 → GATE_5 → GATE_6 → GATE_7 → GATE_8; lifecycle complete only on GATE_8 PASS; two-phase 10↔90 model (Pre-GATE_3 + GATE_5) respected. |
 | 3 | Owner assignment | phase_owner Team 10; Channel 10↔90 validation authority Team 90; QA Team 50; EXECUTION Team 190; Stage 7 Team 70/190. |
 | 4 | Canonical references | SSM, WSM, Gate Protocol v2.2.0, CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0, MB3A v1.4.0. |
 | 5 | No execution before PASS | Explicit: no GATE_3 or orchestration build until Team 90 returns validation PASS for this Work Package. |

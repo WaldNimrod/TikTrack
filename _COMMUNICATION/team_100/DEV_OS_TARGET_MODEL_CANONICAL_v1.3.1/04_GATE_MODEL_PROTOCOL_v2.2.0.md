@@ -45,7 +45,7 @@ Every artifact in the gate flow MUST include the following block (or equivalent 
 | program_id | YES | L2 identifier. |
 | work_package_id | YES | L3 identifier; gate binding. |
 | task_id | When applicable | L4 identifier; else N/A. |
-| gate_id | YES | GATE_0 … GATE_8. |
+| gate_id | YES | GATE_0 … GATE_8, or **PRE_GATE_3** (reserved: for Pre-GATE_3 Work Plan validation request/response artifacts only; not a gate transition). See §6.1. |
 | phase_owner | YES | Team 10 or as assigned. |
 | required_ssm_version | YES | e.g. 1.0.0. |
 | required_active_stage | YES | e.g. GAP_CLOSURE_BEFORE_AGENT_POC. |
@@ -138,10 +138,10 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 | Point | Name | Trigger | Authority | Effect |
 |-------|------|---------|-----------|--------|
-| **Pre-GATE_3** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | No gate number. Only after Team 90 PASS may GATE_3 open. |
-| **GATE_5** | DEV_VALIDATION | GATE_4 (QA) PASS | Team 90 | Gate 5 semantics. Post-implementation / post-QA dev validation. |
+| **Pre-GATE_3** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | **gate_id = PRE_GATE_3** in request/response artifacts. Only after Team 90 PASS may GATE_3 open. |
+| **GATE_5** | DEV_VALIDATION | GATE_4 (QA) PASS | Team 90 | gate_id = GATE_5. Post-implementation / post-QA dev validation. |
 
-One channel (10↔90), two distinct lifecycle phases; no contradiction.
+One channel (10↔90), two distinct lifecycle phases; no contradiction. **Canonical rule:** For Pre-GATE_3 artifacts, use gate_id = PRE_GATE_3 so identity header remains machine-valid and unambiguous.
 
 ---
 

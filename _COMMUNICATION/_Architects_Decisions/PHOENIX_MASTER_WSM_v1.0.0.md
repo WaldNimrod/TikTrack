@@ -32,6 +32,34 @@ ssm_dependency: 1.0.0
 **GATE_2 (KNOWLEDGE_PROMOTION):** Executor **Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution.  
 **GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 190; Executor Team 70. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
 
+### 0.1 Architectural Approval Package Format Lock (v1.0.0)
+
+Directive: `TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0`.
+
+All architectural approval packages in workflow execution must follow a fixed 7-file structure:
+
+1. `COVER_NOTE.md`
+2. `SPEC_PACKAGE.md` (or `EXECUTION_PACKAGE.md`)
+3. `VALIDATION_REPORT.md`
+4. `DIRECTIVE_RECORD.md`
+5. `SSM_VERSION_REFERENCE.md`
+6. `WSM_VERSION_REFERENCE.md`
+7. `PROCEDURE_AND_CONTRACT_REFERENCE.md`
+
+WSM governance constraints:
+- Submission folder is self-contained.
+- No communication-path links inside submission artifacts.
+- No extra scattered artifacts in the package.
+- Each artifact includes `architectural_approval_type: SPEC | EXECUTION` and full mandatory identity header.
+
+Flow semantic lock:
+- SPEC track submissions bind to `GATE_1` and are SPEC-only (no execution-readiness claims).
+- EXECUTION track submissions must use execution-validation gate context and include implementation evidence.
+
+Role contract in workflow:
+- Team 170 maintains originals only.
+- Team 190 assembles/submits packages and is the only editor in submission folders.
+
 ---
 
 ## 🗺️ LEVEL 1: ROADMAP MODULES (אסטרטגי)
@@ -58,4 +86,14 @@ ssm_dependency: 1.0.0
 - Required SSM: 1.0.0
 - Required Stage: GAP_CLOSURE_BEFORE_AGENT_POC
 
-**log_entry | [Team 10] | WSM_V1_0_0_ACTIVE | GREEN | 2026-02-19**
+---
+
+## CANONICAL ARCHITECTURAL APPROVAL PACKAGE FORMAT (Governance — TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0)
+
+All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical package structure: 7 artifacts (COVER_NOTE, SPEC_PACKAGE or EXECUTION_PACKAGE, VALIDATION_REPORT, DIRECTIVE_RECORD, SSM_VERSION_REFERENCE, WSM_VERSION_REFERENCE, PROCEDURE_AND_CONTRACT_REFERENCE); mandatory header block (architectural_approval_type + Identity Header table) in every file; SPEC vs EXECUTION semantics locked; Team 170 = content originals, Team 190 = submission package owner only. Template: Team 190 ARCHITECTURAL_APPROVAL_PACKAGE_TEMPLATE_v1.0.0. Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0.md.
+
+---
+
+**log_entry | [Team 10] | WSM_V1_0_0_ACTIVE | GREEN | 2026-02-19**  
+**log_entry | TEAM_170 | WSM_GOVERNANCE_EMBEDDED_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | 2026-02-20**
+**log_entry | TEAM_170 | WSM_GOVERNANCE | ARCH_APPROVAL_PACKAGE_FORMAT_EMBEDDED | 2026-02-20**

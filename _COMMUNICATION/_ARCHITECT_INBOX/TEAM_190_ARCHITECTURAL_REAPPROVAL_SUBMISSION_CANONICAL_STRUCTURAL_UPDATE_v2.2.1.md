@@ -25,6 +25,7 @@
 
 This is SPEC Architectural Re-Approval (Design/LOD400) submission only.
 It does not authorize execution or implementation.
+Package format lock applied per `TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0` (7-file canonical structure).
 
 ## Consolidated package location
 

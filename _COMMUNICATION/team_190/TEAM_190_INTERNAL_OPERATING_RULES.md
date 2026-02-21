@@ -67,5 +67,24 @@ Team 190 submits to Architects **both** SPEC (Design/LOD400) and Execution submi
 
 ---
 
+## 6) Architectural approval package format lock (mandatory)
+
+Directive anchor: `TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0`.
+
+For both SPEC and EXECUTION submissions, Team 190 must enforce:
+
+1. Exactly 7 files in the submission package:
+   `COVER_NOTE.md`, `SPEC_PACKAGE.md` or `EXECUTION_PACKAGE.md`, `VALIDATION_REPORT.md`, `DIRECTIVE_RECORD.md`, `SSM_VERSION_REFERENCE.md`, `WSM_VERSION_REFERENCE.md`, `PROCEDURE_AND_CONTRACT_REFERENCE.md`.
+2. Every file includes `architectural_approval_type` and full mandatory identity header table.
+3. SPEC submissions use `gate_id: GATE_1`, SPEC-only validation scope, and no execution-readiness claims.
+4. EXECUTION submissions use execution-validation gate context and include implementation evidence plus post-dev architectural validation scope.
+5. No links to communication paths and no additional scattered artifacts inside the package.
+
+Template anchor:
+- `_COMMUNICATION/team_190/ARCHITECTURAL_APPROVAL_PACKAGE_TEMPLATE_v1.0.0.md`
+
+---
+
 **log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | DOC_MICRO_REMEDIATION_EXCEPTION_AND_ARCHITECT_INBOX_PATH_DISCIPLINE | 2026-02-20**  
-**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | SUBMISSION_PACKAGE_CONTRACT_SECTION_5 | 2026-02-20**
+**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | SUBMISSION_PACKAGE_CONTRACT_SECTION_5 | 2026-02-20**  
+**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_SECTION_6 | 2026-02-20**

@@ -19,10 +19,22 @@ promotion_note: v2.2.0 — Knowledge Promotion Executor = Team 70 only per TEAM_
 ## 0. CANONICAL HIERARCHY & TAXONOMY (v2.2.0)
 
 **Hierarchy:** Roadmap (single) → Stage (שלב) → Program (תכנית) → Work Package (חבילת עבודה) → Task (משימה).  
-**Rule:** Gate binding **only to Work Package** (L3).  
-**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates).  
-**Mandatory identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id (when applicable), gate_id, phase_owner, required_ssm_version, required_active_stage.  
-Full definitions: 04_GATE_MODEL_PROTOCOL_v2.2.0.
+
+**Entity definitions (English & Hebrew):**
+
+| Level | English | Hebrew | Definition |
+|-------|---------|--------|------------|
+| L0 | Roadmap | רואדמפ | Single strategic roadmap; top-level container. |
+| L1 | Stage | שלב | Phase or stage within the roadmap. |
+| L2 | Program | תכנית | Program or initiative within a stage. |
+| L3 | Work Package | חבילת עבודה | Deliverable unit; **Gate binding only at this level.** |
+| L4 | Task | משימה | Atomic task within a work package. |
+
+**Explicit rule:** Gate binding **only to Work Package** (L3). No gate_id at Roadmap, Stage, Program, or Task level for gate-transition purposes.  
+
+**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.2.0 §2.  
+
+**Mandatory identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id (when applicable), gate_id, phase_owner, required_ssm_version, required_active_stage.
 
 ---
 

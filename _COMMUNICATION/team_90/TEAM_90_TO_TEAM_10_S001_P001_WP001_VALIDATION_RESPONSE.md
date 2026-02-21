@@ -10,6 +10,22 @@
 
 ---
 
+## Mandatory identity header
+
+| Field | Value |
+|-------|--------|
+| roadmap_id | L0-PHOENIX / S001 |
+| stage_id | S001 |
+| program_id | S001-P001 |
+| work_package_id | S001-P001-WP001 |
+| task_id | N/A (work-package-level) |
+| gate_id | PRE_GATE_3 |
+| phase_owner | Team 10 |
+| required_ssm_version | 1.0.0 |
+| required_active_stage | GAP_CLOSURE_BEFORE_AGENT_POC |
+
+---
+
 ## 1) Scope validated
 
 Validated package-level readiness only (no execution validation):

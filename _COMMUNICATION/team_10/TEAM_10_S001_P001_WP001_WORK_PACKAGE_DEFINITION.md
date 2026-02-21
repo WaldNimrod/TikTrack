@@ -17,7 +17,7 @@
 | program_id | S001-P001 |
 | work_package_id | S001-P001-WP001 |
 | task_id | N/A (work-package-level) |
-| gate_id | Full chain: GATE_3 → GATE_4 → GATE_5 → GATE_6 → GATE_7 → GATE_8. **Lifecycle complete only on GATE_8 PASS.** Per 04_GATE_MODEL_PROTOCOL_v2.2.0. |
+| gate_id | GATE_3 (first execution gate for this WP; full chain GATE_3→GATE_4→GATE_5→GATE_6→GATE_7→GATE_8 and lifecycle complete only on GATE_8 PASS in §2) |
 | phase_owner | Team 10 |
 | required_ssm_version | 1.0.0 |
 | required_active_stage | GAP_CLOSURE_BEFORE_AGENT_POC |

@@ -2,12 +2,24 @@
 id: PHOENIX_WORK_STATE
 version: 1.0.0
 status: ACTIVE
+structural_revision: v2.2.0
 owner: Team 10
 ssm_dependency: 1.0.0
 ---
 # 🛠️ PHOENIX WORK STATE (WSM) v1.0.0
 
-מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח.
+מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח. **מבנה קנוני v2.2.0** (היררכיה, מספור, GATE_2/GATE_8) per 04_GATE_MODEL_PROTOCOL_v2.2.0.
+
+---
+
+## 0. CANONICAL HIERARCHY & GATE LIFECYCLE (v2.2.0)
+
+**Hierarchy:** Roadmap → Stage (שלב) → Program (תכנית) → Work Package (חבילת עבודה) → Task (משימה).  
+**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no duplicates.  
+**Gate binding:** Only to Work Package (L3).  
+**Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
+**GATE_2 (KNOWLEDGE_PROMOTION):** Executor **Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution.  
+**GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 190; Executor Team 70. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
 
 ---
 

@@ -2,16 +2,27 @@
 id: PHOENIX_SYSTEM_STATE
 version: 1.0.0
 status: LOCKED
+structural_revision: v2.2.0
 owner: Chief Architect
-promotion_authority: Team 170 (proposal); promotion by Team 10 / Architect
+promotion_authority: Team 70 (Librarian) — promotion execution ONLY; Team 170 — SSOT integrity only (no promotion execution); Team 10 / Architect — authority
 validation_authority: Team 190
 active_stage: GAP_CLOSURE_BEFORE_AGENT_POC
 drift_status: CLEAN
-promotion_note: Replaced per Team 170 request (Gate 5 F1 remediation — remove speculative Alerts values) 2026-02-19
+promotion_note: v2.2.0 — Knowledge Promotion Executor = Team 70 only per TEAM_100_RETURN_FOR_CANONICAL_UPDATE_v2.2.0
 ---
 # PHOENIX SYSTEM STATE (SSM) v1.0.0
 
-מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל־Gate 5 remediation: ישות ALERT ממופה לקוד/ספק בלבד (ללא ערכים מניחים).
+מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל־Gate 5 remediation: ישות ALERT ממופה לקוד/ספק בלבד (ללא ערכים מניחים). **מבנה קנוני v2.2.0:** היררכיה ומספור per 04_GATE_MODEL_PROTOCOL_v2.2.0.
+
+---
+
+## 0. CANONICAL HIERARCHY & TAXONOMY (v2.2.0)
+
+**Hierarchy:** Roadmap (single) → Stage (שלב) → Program (תכנית) → Work Package (חבילת עבודה) → Task (משימה).  
+**Rule:** Gate binding **only to Work Package** (L3).  
+**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates).  
+**Mandatory identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id (when applicable), gate_id, phase_owner, required_ssm_version, required_active_stage.  
+Full definitions: 04_GATE_MODEL_PROTOCOL_v2.2.0.
 
 ---
 
@@ -23,10 +34,12 @@ promotion_note: Replaced per Team 170 request (Gate 5 F1 remediation — remove 
 * **Visual Integrity:** ולידציה מבנית (DOM/CSS) מול הבלופרינט כחסם קשיח. שימוש בסקרינשוטים ע"י אייג'נטים - אסור.
 * **Authority Model:** הפרדת רשויות מוחלטת בין ארכיטקטורה (100+) לביצוע (10-90).
 
-### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.0.0)
+### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.2.0)
 
-* **Gate 6 (ARCHITECTURAL_VALIDATION — Constitutional / Architectural Validation):** Team 190. Authority: validate spec and artifact alignment to constitution; no execution, no SSOT writes. Source: `04_GATE_MODEL_PROTOCOL_v2.0.0.md`.
-* **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Authority: final UX/vision approval; no implementation by agent without Gate 7 pass.
+* **Gate 2 (KNOWLEDGE_PROMOTION):** Owner Team 190 (validation). **Executor Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution authority.
+* **Gate 6 (ARCHITECTURAL_VALIDATION):** Team 190. Validate spec and artifact alignment to constitution; no execution, no SSOT writes.
+* **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Final UX/vision approval; no implementation by agent without Gate 7 pass.
+* **Gate 8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70 (Librarian). Purpose: AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete without GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.2.0.
 
 ---
 

@@ -20,18 +20,18 @@ Following canonical Gate renumbering (v2.0.0), **GATE_2 — KNOWLEDGE_PROMOTION*
 
 ---
 
-## GATE_2 DEFINITION
+## GATE_2 DEFINITION (corrected per v2.2.0 — Team 70 ONLY)
 
 | Field | Value |
 |-------|--------|
-| Owner | Team 190 |
-| Executor | Team 170 |
+| Owner | Team 190 (validation authority only) |
+| Executor | **Team 70 (Librarian) ONLY** — Team 170 must not retain promotion execution authority |
 | Trigger | Architect signs ARCHITECTURAL_DECISION_LOCK (GATE_1 PASS). |
 | Purpose | 1. Consolidate validated artifacts. 2. Move canonical artifacts to final documentation structure. 3. Remove communication-layer duplication. 4. Freeze SSM and WSM version references. 5. Generate KNOWLEDGE_PROMOTION_REPORT.md. |
 | PASS state | KNOWLEDGE_PROMOTED |
 | FAIL state | RETURN_TO_LIBRARIAN |
 
-Only after **GATE_2 PASS** may **GATE_3** open.
+Only after **GATE_2 PASS** may **GATE_3** open. **Correction (canonical v2.2.0):** Executor = Team 70 only.
 
 ---
 
@@ -58,11 +58,11 @@ The package must **physically contain**:
 
 ---
 
-## ANTI-DUPLICATION PROTOCOL
+## ANTI-DUPLICATION PROTOCOL (Executor: Team 70 per v2.2.0)
 
 **During GATE_2:**
 
-Team 170 must:
+**Team 70 (Librarian)** must:
 
 1. Move canonical files to final documentation paths.  
 2. Mark communication artifacts as:  

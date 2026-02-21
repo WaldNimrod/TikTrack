@@ -192,8 +192,8 @@ Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1
 | Date | Version / Directive | Change |
 |------|--------------------|--------|
 | 2026-02-19 | GATE_5_F1_REMEDIATION | SSM canonical replacement per Team 170 request. |
-| 2026-02-20 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | §6 Canonical Architectural Approval Package Format embedded. |
-| 2026-02-20 | **TEAM_100_SSM_FINAL_LOCK_v1.0.0** | §1.1 Governance Authority Clause (Team 00, 100, 170, 190, 70, 10) added. §0 Canonical hierarchy lock (Roadmap→Stage(SNNN)→Program(SNNN-PNNN)→WP(SNNN-PNNN-WPNNN)→Task(SNNN-PNNN-WPNNN-TNNN)); gate binding only at WP. §5.1 Current execution order lock: Stage S001 Agent OS Initial Build; Program S001-P001 Agent Core; Work Package S001-P001-WP001 10↔90 Validator Agent ACTIVE; S001-P002 Alerts POC FROZEN until WP001 completes GATE_8. |
+| 2026-02-20 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | Content from Team 170; canonical update per Team 70. §6 Canonical Architectural Approval Package Format embedded. |
+| 2026-02-20 | **TEAM_100_SSM_FINAL_LOCK_v1.0.0** | Content supplied by Team 170; canonical SSM updated per promotion authority (Team 70). §1.1 Governance Authority Clause (Team 00, 100, 170, 190, 70, 10). §0 Canonical hierarchy lock. §5.1 Current execution order lock: S001 / S001-P001 / S001-P001-WP001 ACTIVE; S001-P002 FROZEN until WP001 GATE_8. |
 
 ---
 

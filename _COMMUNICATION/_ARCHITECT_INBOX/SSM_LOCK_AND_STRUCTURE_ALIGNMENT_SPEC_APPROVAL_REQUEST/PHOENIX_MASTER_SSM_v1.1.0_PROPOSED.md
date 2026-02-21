@@ -53,16 +53,16 @@ drift_status: CLEAN
 - **Validator:** Team 190.
 - **Not Team 170.** Team 170 does not execute Knowledge Promotion and does not write to canonical documentation folders. All SSM references to promotion execution point to Team 70; validation to Team 190.
 
-### 1.3 Gate Model (Canonical 0–7)
+### 1.3 Gate Model (Canonical 0–8 — aligned to 04_GATE_MODEL_PROTOCOL_v2.2.0)
 
-Canonical renumbered Gate Model: **GATE_0 … GATE_7.**
+Canonical Gate Model: **GATE_0 … GATE_8** per active protocol v2.2.0.
 
 **Explicit separation:**
 
 - **Architectural Approval (SPEC):** GATE_1 — ARCHITECTURAL_DECISION_LOCK (LOD 400). Validation scope SPEC-only; no execution readiness claims.
 - **Architectural Approval (EXECUTION):** GATE_6 — ARCHITECTURAL_VALIDATION. Post-implementation validation of artifact alignment to constitution.
 
-**Stage 7 (Lifecycle):** POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE. Documentation closure, AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Executor: Team 70. Validator: Team 190. Lifecycle not complete until this stage PASS. (Aligned with documentation-closure gate semantics.)
+**GATE_8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70. Documentation closure, AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete until GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.2.0.
 
 ### 1.4 Iron Rules (unchanged)
 
@@ -121,7 +121,7 @@ Per TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0. Seven artifacts; mandator
 
 | Date | Version / Directive | Change |
 |------|---------------------|--------|
-| 2026-02-20 | **v1.1.0 — SSM_LOCK_AND_STRUCTURE_ALIGNMENT** | §1.1 Team 100 locked as Development Architecture Lead (אחראי סביבת עבודה, תהליכים, אורקסטרציה, ניהול ארגוני; מוסמך לאשר שערים במשילות/תהליך בלבד; כפוף ל-Team 00). §0 Hierarchy canonicalization (Taxonomy Lock): Roadmap single, Stage numbered, Program Stage-prefixed, WP Stage+Program prefix, Task WP-prefixed; Gate flow to every WP. §1.3 Gate Model 0–7; explicit separation Architectural Approval (SPEC) = GATE_1, Architectural Approval (EXECUTION) = GATE_6; Stage 7 (lifecycle) = POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE. §1.2 Knowledge Promotion: Executor Team 70 ONLY, Validator Team 190; not Team 170. |
+| 2026-02-20 | **v1.1.0 — SSM_LOCK_AND_STRUCTURE_ALIGNMENT** | §1.1 Team 100 locked as Development Architecture Lead. §0 Hierarchy canonicalization (Taxonomy Lock). §1.3 Gate Model 0–8 (per 04_GATE_MODEL_PROTOCOL_v2.2.0): GATE_1 = SPEC, GATE_6 = EXECUTION, GATE_8 = DOCUMENTATION_CLOSURE (AS_MADE_LOCK). §1.2 Knowledge Promotion: Executor Team 70 ONLY, Validator Team 190; not Team 170. |
 
 ---
 

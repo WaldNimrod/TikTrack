@@ -17,7 +17,7 @@ Per Team 100 mandate (Development Architecture Lead → Team 170, CC Team 190), 
 
 1. **Lock Team 100 Role Definition** — Team 100 = Development Architecture Lead; אחראי לפיתוח סביבת העבודה, מבנה התהליכים, אורקסטרציה וניהול ארגוני; מוסמך לאשר שערים בתחומי המשילות והתהליך בלבד; כפוף אסטרטגית לאדריכלית הראשית (Team 00).
 2. **Hierarchy Canonicalization (Taxonomy Lock)** — Roadmap (single), Stage (numbered), Program (Stage-prefixed), Work Package (Stage+Program prefix), Task (WP-prefixed); Gate flow applies to every Work Package.
-3. **Gate Model Update** — Canonical Gate Model 0–7; explicit separation Architectural Approval (SPEC) vs Architectural Approval (EXECUTION); Stage 7: POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE.
+3. **Gate Model Update** — Canonical Gate Model 0–8 (per 04_GATE_MODEL_PROTOCOL_v2.2.0); explicit separation Architectural Approval (SPEC) vs Architectural Approval (EXECUTION); GATE_8: DOCUMENTATION_CLOSURE (AS_MADE_LOCK).
 4. **Knowledge Promotion Authority Correction** — Executor: Team 70; Validator: Team 190; not Team 170. SSM references updated accordingly.
 
 ---

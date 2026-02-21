@@ -13,7 +13,7 @@ Scope of update (mandatory) performed:
 
 1. **Lock Team 100 Role Definition** — Team 100 = Development Architecture Lead; אחראי לפיתוח סביבת העבודה, מבנה התהליכים, אורקסטרציה וניהול ארגוני; מוסמך לאשר שערים בתחומי המשילות והתהליך בלבד; כפוף אסטרטגית לאדריכלית הראשית (Team 00). Embedded in proposed SSM §1.1.
 2. **Hierarchy Canonicalization (Taxonomy Lock)** — Roadmap (single), Stage (numbered), Program (Stage-prefixed), Work Package (Stage+Program prefix), Task (WP-prefixed); Gate flow to every Work Package. Embedded in proposed SSM §0.
-3. **Gate Model Update** — Canonical 0–7; explicit separation Architectural Approval (SPEC) vs (EXECUTION); Stage 7: POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE. Embedded in proposed SSM §1.3.
+3. **Gate Model Update** — Canonical 0–8 (per 04_GATE_MODEL_PROTOCOL_v2.2.0); explicit separation Architectural Approval (SPEC) vs (EXECUTION); GATE_8: DOCUMENTATION_CLOSURE (AS_MADE_LOCK). Embedded in proposed SSM §1.3.
 4. **Knowledge Promotion Authority Correction** — Executor: Team 70; Validator: Team 190; not Team 170. Embedded in proposed SSM §1.2 and frontmatter.
 
 ---

@@ -27,7 +27,7 @@
 
 | Location | v1.0.0 | v1.1.0 |
 |----------|--------|--------|
-| Gate signer semantics | Gate 2 (KNOWLEDGE_PROMOTION), Gate 6 (ARCHITECTURAL_VALIDATION), Gate 7 (HUMAN_UX_APPROVAL), Gate 8 (DOCUMENTATION_CLOSURE). | **Canonical Gate Model 0–7.** **Explicit separation:** Architectural Approval (SPEC) = GATE_1; Architectural Approval (EXECUTION) = GATE_6. **Stage 7 (Lifecycle):** POST_EXECUTION_DOCUMENTATION_AND_ARCHIVE — documentation closure, AS_MADE, archive; Executor Team 70, Validator Team 190; lifecycle not complete until PASS. |
+| Gate signer semantics | Gate 2 (KNOWLEDGE_PROMOTION), Gate 6 (ARCHITECTURAL_VALIDATION), Gate 7 (HUMAN_UX_APPROVAL), Gate 8 (DOCUMENTATION_CLOSURE). | **Canonical Gate Model 0–8** (per 04_GATE_MODEL_PROTOCOL_v2.2.0). **Explicit separation:** Architectural Approval (SPEC) = GATE_1; Architectural Approval (EXECUTION) = GATE_6. **GATE_8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** documentation closure, AS_MADE, archive; Owner Team 190, Executor Team 70; lifecycle not complete until GATE_8 PASS. |
 
 ---
 

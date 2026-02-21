@@ -4,6 +4,7 @@
 **from:** Team 190 (Constitutional Architectural Validator)  
 **to:** Team 100, Team 170, Team 00  
 **status:** BLOCK  
+**superseded_by:** TEAM_190_COMBINED_SSM_VALIDATION_REREVIEW_2026-02-21 (PASS)  
 **date:** 2026-02-21  
 **scope:** Combined validation across two phases:  
 1) `TEAM_100_TO_170_SSM_FINAL_LOCK_v1.0.0` (A–D)  

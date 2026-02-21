@@ -8,7 +8,7 @@
 **רג'יסטרי רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md`  
 **רשימת השלמות רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
-**last_updated:** 2026-02-18
+**last_updated:** 2026-02-20
 
 ---
 **הבהרת מבנה (חד־משמעי):**  
@@ -27,7 +27,21 @@
 
 **הערת סטטוס (1-001, 1-003, 1-004):** שער ב' — **PASS**. שלוש המשימות CLOSED. **External Data:** חבילה מ־90. M1 (P3-007) CLOSED. **הגשה מחדש (Resubmission):** ✅ **VERIFIED — CLOSED** (TEAM_90_TO_TEAM_10_EXTERNAL_DATA_RESUBMISSION_VERIFIED). SSOT הורחב; תיקוני ולידציה הוחלו. **מותר להתקדם** — ביצוע P3-008–P3-015 לפי מנדטים. פערים פתוחים (Intraday, Interval, Ticker Status) מסומנים ב־GAPS — יטופלו בהמשך.
 
-**מספור:** כל משימה מקבלת **תחילית לפי מספר השלב במפת הדרכים** + מספר סידורי בתוך השלב: `[שלב]-[סידורי]` (למשל 1-001, 1b-001, P3-001). ראה נוהל.
+**מספור:** כל משימה מקבלת **תחילית לפי מספר השלב במפת הדרכים** + מספר סידורי בתוך השלב: `[שלב]-[סידורי]` (למשל 1-001, 1b-001, P3-001). ראה נוהל. **היררכיה קנונית (SSM §5.1):** Stage S001 → Program S001-P001 → Work Package S001-P001-WP001 (פעיל); S001-P002 (Alerts POC) קפוא עד GATE_8 ל-WP001.
+
+---
+
+## STAGE_1_PROGRAM_01 — Dev Validator 10↔90 (S001-P001-WP001)
+
+**מקור:** Team 100 PROGRAM_ACTIVATION | STAGE_1_PROGRAM_01 | DEV_VALIDATOR_10_90.  
+**תחום:** תשתית אורקסטרציה ללולאת ולידציה 10↔90 בלבד. **לא** הפעלת Widget POC.  
+**תיעוד:** TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md
+
+| # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|------------|------------|------------|------------|------------|
+| S001-P001-WP001 | 10↔90 Validator Agent | תשתית אורקסטרציה ללולאת 10↔90; Build orchestration flow only. שערים: GATE_3 → GATE_4 (QA) → GATE_5 (Dev Validation) → GATE_6 (EXECUTION) → Stage 7 Documentation. Widget POC לא מופעל. | IN_PROGRESS | Stage 1 / Program 01 | Team 10 | TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md | 2026-02-20 | 2026-02-20 | — |
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_ACTIVATED | 2026-02-20**
 
 ---
 

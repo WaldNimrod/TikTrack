@@ -62,6 +62,19 @@ Role contract in workflow:
 
 ---
 
+## 5. CURRENT EXECUTION ORDER LOCK (per SSM §5.1 — authoritative)
+
+| Level | Identifier | Name | Status |
+|-------|------------|------|--------|
+| Stage | S001 | Agent OS Initial Build | ACTIVE |
+| Program | S001-P001 | Agent Core | ACTIVE |
+| Work Package | S001-P001-WP001 | 10↔90 Validator Agent | ACTIVE |
+| Program | S001-P002 | Alerts POC | **FROZEN** until S001-P001-WP001 completes GATE_8 |
+
+Execution order is governed by SSM §5.1. The task list below is legacy/other; active execution focus is S001-P001-WP001.
+
+---
+
 ## 🗺️ LEVEL 1: ROADMAP MODULES (אסטרטגי)
 
 - M1: Identity & Security - ✅ COMPLETED (v1.0.0)
@@ -70,7 +83,7 @@ Role contract in workflow:
 
 ---
 
-## 📋 LEVEL 2: MASTER TASK LIST (מבצעי)
+## 📋 LEVEL 2: MASTER TASK LIST (מבצעי — legacy / other; S001-P002 FROZEN per SSM §5.1)
 
 | Task ID | Description | Owner | Status | Evidence Link |
 | :--- | :--- | :--- | :--- | :--- |
@@ -95,5 +108,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 ---
 
 **log_entry | [Team 10] | WSM_V1_0_0_ACTIVE | GREEN | 2026-02-19**  
-**log_entry | TEAM_170 | WSM_GOVERNANCE_EMBEDDED_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | 2026-02-20**
-**log_entry | TEAM_170 | WSM_GOVERNANCE | ARCH_APPROVAL_PACKAGE_FORMAT_EMBEDDED | 2026-02-20**
+**log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_EXECUTION_ORDER_LOCK | 2026-02-21**

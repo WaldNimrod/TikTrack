@@ -30,13 +30,13 @@
 
 ---
 
-## Team 190 validation (before execution authorized)
+## Team 90 validation (10↔90) before execution; Team 190 EXECUTION (GATE_6) sign-off
 
 - No duplicate canonical artifacts remain.  
 - No orphaned artifacts remain.  
 - No stale gate references exist.  
 
-Only after Team 190 validation PASS may GATE_3 (Implementation) open.
+**Workflow precision (LOCKED):** Only after **Team 90** (10↔90) validation PASS may GATE_3 (Implementation) open. Team 190 is EXECUTION (GATE_6) sign-off authority, not pre-GATE_3 validation.
 
 ---
 

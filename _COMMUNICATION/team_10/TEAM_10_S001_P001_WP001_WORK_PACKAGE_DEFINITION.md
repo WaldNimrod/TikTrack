@@ -44,13 +44,15 @@
 
 ## 2. Gate-aligned execution plan
 
-**כלל ברזל:** שום תהליך בארגון לא עובר ללא ולידציה. חבילת העבודה המוכנה חייבת לקבל **אישור/ולידציה (Approved L2 Work Package)** לפני פתיחת GATE_3.
+**כלל ברזל:** שום תהליך בארגון לא עובר ללא ולידציה. חבילת העבודה המוכנה חייבת לקבל **אישור/ולידציה (Approved L2 Work Package)** לפני פתיחת GATE_3. **אין ביצוע (GATE_3 או אורקסטרציה) לפני ש־Team 90 (ערוץ 10↔90) החזיר validation PASS.**
+
+**Target sequence (LOCKED):** Work Plan prepared → submitted to Team 90 (10↔90) → Team 90 validation PASS → then GATE_3 opens.
 
 | Sequence | Gate / Stage | Owner | Trigger | Exit condition |
 |----------|--------------|--------|---------|----------------|
 | 0 | Pre-requisite | — | GATE_2 (Knowledge Promotion) complete per governance relock | Development may open only after GATE_2 PASS. |
-| 0b | **Work Package Validation (לפני GATE_3)** | Team 190 (or authority per SSM) | חבילת עבודה הוכנה (הגדרה + תוכנית + שיוך) | **Approved L2 Work Package** — חבילה מאושרת; מותר לפתוח GATE_3. מקור: MB3A §7 Channel E — Input: Approved L2 Work Package; "No execution of L3 without Approved L2" (v1.2.0). |
-| 1 | GATE_3 — Implementation | Team 10 | Work Package **approved**; orchestration flow build | Orchestration flow implemented; internal verification. |
+| 0b | **Work Package / Work Plan Validation (לפני GATE_3)** | **Team 90** (Channel 10↔90 validation authority) | חבילת עבודה הוכנה (הגדרה + תוכנית + שיוך); Team 10 מגיש ל־Team 90 | **Approved L2 Work Package** — רק לאחר Team 90 validation PASS; מותר לפתוח GATE_3. מקור: CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0; MB3A §7. No execution before Team 90 validation PASS. |
+| 1 | GATE_3 — Implementation | Team 10 | Work Package **approved by Team 90** (10↔90 PASS); orchestration flow build | Orchestration flow implemented; internal verification. |
 | 2 | GATE_4 — QA | Team 50 | Team 10 submits for QA | QA report; 0 SEVERE; readiness for Dev Validation. |
 | 3 | GATE_5 — Dev Validation (Channel 10↔90) | Team 90 | Team 10 issues WORK_PACKAGE_VALIDATION_REQUEST | VALIDATION_RESPONSE (PASS) or BLOCKING_REPORT; loop until PASS or ESCALATE/STUCK. |
 | 4 | GATE_6 — Architectural Validation (EXECUTION) | Team 190 | GATE_5 PASS | EXECUTION approval; artifact alignment to constitution. |

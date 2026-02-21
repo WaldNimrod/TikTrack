@@ -128,10 +128,11 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 1. GATE_0 and GATE_1 are canonical design gates.  
 2. No Work Plan generation before GATE_1 = ARCHITECTURAL_DECISION_LOCKED.  
-3. No Dev Validation (GATE_5) before GATE_4 (QA) PASS.  
-4. All gate and validation artifacts must include full hierarchical identity block per §1.4.  
-5. Non-compliant artifacts are invalid.  
-6. No development progression until updated documents receive renewed architectural approval (return v2.2.0).
+3. **Work Plan / Work Package must be validated by Team 90 (10↔90 loop) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.**  
+4. No Dev Validation (GATE_5) before GATE_4 (QA) PASS.  
+5. All gate and validation artifacts must include full hierarchical identity block per §1.4.  
+6. Non-compliant artifacts are invalid.  
+7. No development progression until updated documents receive renewed architectural approval (return v2.2.0).
 
 ---
 

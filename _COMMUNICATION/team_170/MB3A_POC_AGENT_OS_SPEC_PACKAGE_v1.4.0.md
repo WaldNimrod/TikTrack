@@ -148,6 +148,8 @@ Source: `_COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md`
 
 **Loop termination:** PASS | ESCALATE | STUCK (per CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0).
 
+**Process lock (workflow precision):** Work Package / Work Plan is submitted to Team 90 for validation (10↔90) **before execution (GATE_3)**; only after Team 90 validation PASS may implementation (GATE_3) begin. No document may allow execution before Team 90 validation PASS. Per TEAM_190_TO_TEAM_170_WORKFLOW_PRECISION_ALIGNMENT_REQUEST_v1.0.0 and 04_GATE_MODEL_PROTOCOL_v2.2.0 §6.
+
 **Canonical artifact paths:** WORK_PACKAGE_VALIDATION_REQUEST (team_10), VALIDATION_RESPONSE (team_90), BLOCKING_REPORT (team_90) — see v1.2.0 §4 for full templates.
 
 ---

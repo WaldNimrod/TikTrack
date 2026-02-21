@@ -11,7 +11,7 @@
 ## 1) Channel Identity (Confirmed)
 
 - `channel_id`: `CHANNEL_10_90_DEV_VALIDATION`  
-- `channel_scope`: Gate 5 (DEV_VALIDATION) validation loop between Team 10 (request/orchestration) and Team 90 (validation authority). Gate Model v2.0.0.
+- `channel_scope`: Gate 5 (DEV_VALIDATION) validation loop between Team 10 (request/orchestration) and Team 90 (validation authority). Gate Model v2.0.0. **Work Package / Work Plan validation by Team 90 (this channel) must occur before execution (GATE_3) starts; only after Team 90 PASS may Team 10 open GATE_3.**
 
 Evidence anchors:
 - Team 90 is Gate 5 (DEV_VALIDATION) authority: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.0.0.md`

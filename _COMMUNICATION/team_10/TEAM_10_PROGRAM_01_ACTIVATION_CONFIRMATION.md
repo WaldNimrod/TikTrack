@@ -32,7 +32,7 @@
 ## Activation plan summary
 
 1. **Work Package:** S001-P001-WP001 (10↔90 Validator Agent). Identity header and scope locked; Widget POC explicitly out of scope.  
-2. **Gates:** Implementation (GATE_3) → QA (GATE_4) → Dev Validation Channel 10↔90 (GATE_5) → Architectural Review EXECUTION (GATE_6) → Stage 7 Documentation.  
+2. **Sequence (LOCKED):** Work Plan prepared → submitted to Team 90 (10↔90) → Team 90 validation PASS → then GATE_3 opens. **Gates:** Pre-GATE_3: Team 90 validation (10↔90); then Implementation (GATE_3) → QA (GATE_4) → Dev Validation Channel 10↔90 (GATE_5) → Architectural Review EXECUTION (GATE_6) → Stage 7 Documentation. No execution before Team 90 validation PASS.  
 3. **Ownership:** Phase owner Team 10; Channel 10↔90 validation authority Team 90; EXECUTION sign-off Team 190; Stage 7 executor Team 70.  
 4. **Level 2:** S001-P001-WP001 recorded in Master Task List; status IN_PROGRESS; last_updated 2026-02-20.
 

@@ -35,6 +35,7 @@
 | **Scope** | Build **orchestration flow only**. Infrastructure for 10↔90 validation loop. |
 | **Out of scope** | Widget POC is **not** activated. No widget or product UI build in this WP. |
 | **Execution boundary** | Only infrastructure for 10↔90 validation loop (Channel 10↔90; Team 10 request/orchestration ↔ Team 90 validation). |
+| **Agents_OS vs TikTrack** | **חבילה זו נפרדת מליבת TikTrack.** צעד ראשון בבניית **Agents_OS** (סיוע בתהליכי פיתוח). יש לבנות **בתיקייה ראשית נפרדת**. **אסור שיהיה שום תלות בקוד** בין Agents_OS ובין TikTrack. |
 | **Deliverables** | Orchestration flow artifacts; WORK_PACKAGE_VALIDATION_REQUEST / VALIDATION_RESPONSE / BLOCKING_REPORT path compliance; evidence for QA and Architectural Review (EXECUTION). |
 | **Post-completion** | GATE_4 (QA) → GATE_5 (DEV_VALIDATION) → GATE_6 (EXECUTION) → GATE_7 (HUMAN_UX_APPROVAL) → GATE_8 (DOCUMENTATION_CLOSURE). Lifecycle complete only on GATE_8 PASS. |
 

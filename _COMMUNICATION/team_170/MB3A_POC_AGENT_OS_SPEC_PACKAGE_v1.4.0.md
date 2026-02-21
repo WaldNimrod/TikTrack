@@ -153,7 +153,7 @@ Source: `_COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md`
 
 | Phase | Name | Trigger | Owner | Effect |
 |-------|------|---------|-------|--------|
-| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | **Pre-GATE_3** (no gate number). Only after Team 90 PASS may GATE_3 open. No execution before this PASS. |
+| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | **Pre-GATE_3** (gate_id = PRE_GATE_3). Only after Team 90 PASS may GATE_3 open. No execution before this PASS. |
 | **Phase 2** | GATE_5 DEV_VALIDATION (Validation Kernel) | **GATE_3 PASS and GATE_4 (QA) PASS** | Team 90 | Post-implementation / post-QA dev validation. |
 
 Same channel, same artifact types; phase is determined by trigger. Phase 1 = before execution; Phase 2 = after implementation and QA.
@@ -176,7 +176,7 @@ Unchanged from v1.2.0. L2 Work Packages: phase_owner Team 10; gate_id GATE_5 whe
 
 ## 7) Channel E Formalization (Team 10 ↔ Dev Teams)
 
-Unchanged from v1.2.0. Input: Approved L2 Work Package. Output: TASK_COMPLETION_REPORT; INITIAL_INTERNAL_VERIFICATION; submission to Team 50 (QA / Gate 3).
+Unchanged from v1.2.0. Input: Approved L2 Work Package. Output: TASK_COMPLETION_REPORT; INITIAL_INTERNAL_VERIFICATION; submission to Team 50 (QA / GATE_4).
 
 ---
 

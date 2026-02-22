@@ -12,17 +12,17 @@
 ## 1) Channel Identity (Confirmed)
 
 - `channel_id`: `CHANNEL_10_90_DEV_VALIDATION`  
-- `channel_scope`: Validation loop between Team 10 (request/orchestration) and Team 90 (validation authority). The channel is used at **two distinct lifecycle phases** (04_GATE_MODEL_PROTOCOL_v2.2.0 §6.1):
+- `channel_scope`: Validation loop between Team 10 (request/orchestration) and Team 90 (validation authority). The channel is used at **two distinct lifecycle phases** (04_GATE_MODEL_PROTOCOL_v2.3.0 §6.1):
 
 | Phase | Name | Trigger | Gate / step | Effect |
 |-------|------|---------|-------------|--------|
-| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | **Pre-GATE_3** (no gate number) | Only after Team 90 PASS may GATE_3 open. |
+| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | **Pre-GATE_3** (`gate_id = PRE_GATE_3`, reserved phase marker) | Only after Team 90 PASS may GATE_3 open. |
 | **Phase 2** | DEV_VALIDATION | GATE_4 (QA) PASS | **GATE_5** | Post-implementation / post-QA dev validation. |
 
 Same channel, same artifact types; phase distinguished by trigger and gate_id in request. No contradiction: Phase 1 before execution, Phase 2 after QA.
 
 Evidence anchors:
-- Team 90 authority and two-point model: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.2.0.md` §6, §6.1
+- Team 90 authority and two-point model: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.3.0.md` §6, §6.1
 - Team 10 gateway/orchestration: `00_MASTER_INDEX.md:4`, `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/06_ORG_REALIGNMENT.md:8`
 
 ---
@@ -75,9 +75,10 @@ Naming rule:
 ## 5) Governance Constraints
 
 - Dual-Manifest alignment required (`required_ssm_version`, `required_active_stage` must be present in request payload).
-- This channel serves **two phases** (Phase 1 pre-GATE_3, Phase 2 GATE_5); it cannot redefine Gate 6/7/8 responsibilities. Gate Model v2.2.0 §6.1.
+- This channel serves **two phases** (Phase 1 pre-GATE_3, Phase 2 GATE_5); it cannot redefine Gate 6/7/8 responsibilities. Gate Model v2.3.0 §6.1.
 - No inferred ownership allowed (`phase_owner`, `responsible_team` explicit only). Request payload must carry `gate_id` or phase indicator (pre-GATE_3 vs GATE_5) for deterministic routing.
 
 ---
 
-**log_entry | TEAM_190 | CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0 | CONFIRMED | 2026-02-20**
+**log_entry | TEAM_190 | CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0 | CONFIRMED | 2026-02-20**  
+**log_entry | TEAM_190 | CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0 | CANONICAL_REFERENCE_REFRESH_v2.3.0 | 2026-02-22**

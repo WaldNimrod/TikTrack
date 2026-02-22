@@ -1,7 +1,7 @@
 # 7 GATE MODEL PROTOCOL
 **project_domain:** TIKTRACK
 
-**status:** **SUPERSEDED** as of 2026-02-20. **Single canonical source:** `04_GATE_MODEL_PROTOCOL_v2.0.0.md` in this folder. Gate Model v2.0.0 (GATE_0..GATE_7). No backward mapping. This file is historical only. Directive: `_COMMUNICATION/team_100/TEAM_100_TO_170_190_GATE_RENUMBERING_v2.0.0.md`.
+**status:** **SUPERSEDED** as of 2026-02-22. **Single canonical source:** `04_GATE_MODEL_PROTOCOL_v2.3.0.md` in this folder. Gate Model v2.3.0 (GATE_0..GATE_8 + PRE_GATE_3 reserved marker). No backward mapping. This file is historical only.
 
 ---
 
@@ -101,4 +101,5 @@
 
 ---
 
-**log_entry | TEAM_100 | GATE_PROTOCOL_CANONICAL_UPDATE | LOCKED | 2026-02-20**
+**log_entry | TEAM_100 | GATE_PROTOCOL_CANONICAL_UPDATE | LOCKED | 2026-02-20**  
+**log_entry | TEAM_100 | GATE_PROTOCOL_CANONICAL_POINTER | UPDATED_TO_v2.3.0 | 2026-02-22**

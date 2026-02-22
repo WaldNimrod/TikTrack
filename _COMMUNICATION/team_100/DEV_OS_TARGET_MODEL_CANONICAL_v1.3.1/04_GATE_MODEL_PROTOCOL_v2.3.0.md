@@ -1,12 +1,11 @@
-# 7 GATE MODEL PROTOCOL v2.2.0
+# 7 GATE MODEL PROTOCOL v2.3.0
 **project_domain:** TIKTRACK
 
-**status:** SUPERSEDED (historical canonical baseline; replaced by v2.3.0)  
-**date:** 2026-02-20  
+**status:** LOCKED (official canonical; includes §6.2 Context Boundary Rule; approved for formal replacement of v2.2.0)  
+**date:** 2026-02-22  
 **scope:** Gate IDs, authority model, hierarchy, numbering for PHOENIX DEV OS  
-**directive:** TEAM_100_RETURN_FOR_CANONICAL_UPDATE_v2.2.0  
-**supersedes:** 04_GATE_MODEL_PROTOCOL_v2.0.0 (adds hierarchy, numbering, GATE_8, Team 70 correction)  
-**superseded_by:** 04_GATE_MODEL_PROTOCOL_v2.3.0 (adds §6.2 Context Boundary Rule)
+**directive:** TEAM_100_TO_TEAM_170_CONTEXT_BOUNDARY_RULE_UPDATE_DIRECTIVE_v1.0.0  
+**supersedes:** 04_GATE_MODEL_PROTOCOL_v2.2.0 (adds §6.2 Context Boundary Rule — drift prevention and context-injection freeze rule)
 
 ---
 
@@ -83,7 +82,7 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 
 ---
 
-## 3. Canonical Gate Enum (v2.2.0)
+## 3. Canonical Gate Enum (v2.3.0)
 
 | gate_id | gate_label | authority |
 |---------|------------|-----------|
@@ -97,7 +96,7 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 | GATE_7 | HUMAN_UX_APPROVAL | Nimrod (final sign-off) |
 | GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 190 (owner), Team 70 (executor) |
 
-**Correction (v2.2.0):** Knowledge Promotion **Executor** is **Team 70 (Librarian) ONLY**. Team 170 does not retain promotion execution authority. Team 190 retains validation authority only for GATE_2.
+**Correction (canonical):** Knowledge Promotion **Executor** is **Team 70 (Librarian) ONLY**. Team 170 does not retain promotion execution authority. Team 190 retains validation authority only for GATE_2.
 
 ---
 
@@ -130,11 +129,11 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 1. GATE_0 and GATE_1 are canonical design gates.  
 2. No Work Plan generation before GATE_1 = ARCHITECTURAL_DECISION_LOCKED.  
-3. **Work Plan / Work Package must be validated by Team 90 (10↔90) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.** (This is a **pre-GATE_3** step; it has no gate number. Team 90 validates the plan only.)  
+3. **Work Plan / Work Package must be validated by Team 90 (10↔90) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.** (This is a **pre-GATE_3** step identified by `gate_id = PRE_GATE_3` as a reserved phase marker, not a gate transition. Team 90 validates the plan only.)  
 4. **No GATE_5 (DEV_VALIDATION) before GATE_4 (QA) PASS.** GATE_5 is the **second** Team 90 (10↔90) touchpoint: after implementation and QA.  
 5. All gate and validation artifacts must include full hierarchical identity block per §1.4.  
 6. Non-compliant artifacts are invalid.  
-7. No development progression until updated documents receive renewed architectural approval (return v2.2.0).
+7. No development progression while canonical governance updates are pending required architectural approval.
 
 ### 6.1 Two Team 90 (10↔90) validation points (deterministic)
 
@@ -145,7 +144,30 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 One channel (10↔90), two distinct lifecycle phases; no contradiction. **Canonical rule:** For Pre-GATE_3 artifacts, use gate_id = PRE_GATE_3 so identity header remains machine-valid and unambiguous.
 
+### 6.2 Context Boundary Rule (Drift Prevention)
+
+Any architectural discussion involving one of the following events **MUST** include explicit SSM/WSM context injection before discussion may proceed:
+
+- Stage transition (Sxxx change)
+- Program creation (new Pxxx under existing stage)
+- Work Package creation (new WPxxx)
+- Domain change (TikTrack ↔ Agents_OS)
+- SSM version change
+- WSM structural change
+- Post-GATE_8 stage closure
+- Any new architectural decision outside an existing active Work Package
+
+**Mandatory injection artifacts:**
+
+- SSM_VERSION_REFERENCE.md
+- WSM_VERSION_REFERENCE.md
+- Mandatory Identity Header (S-P-WP)
+- project_domain field
+
+If missing, Team 100 MUST halt discussion and request completion.
+
+**No architectural decision may be considered valid without context injection.**
+
 ---
 
-**log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | LOCKED | 2026-02-20**  
-**log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | SUPERSEDED_BY_v2.3.0 | 2026-02-22**
+**log_entry | TEAM_100 | GATE_PROTOCOL_v2.3.0 | LOCKED | 2026-02-22**

@@ -2,23 +2,23 @@
 id: PHOENIX_SYSTEM_STATE
 version: 1.0.0
 status: LOCKED
-structural_revision: v2.2.0
+structural_revision: v2.3.0
 owner: Chief Architect
 promotion_authority: Team 70 (Librarian) — promotion execution ONLY; Team 170 — SSOT integrity only (no promotion execution); Team 10 / Architect — authority
 validation_authority: Team 190
 active_stage: GAP_CLOSURE_BEFORE_AGENT_POC
 drift_status: CLEAN
-promotion_note: v2.2.0 — Knowledge Promotion Executor = Team 70 only per TEAM_100_RETURN_FOR_CANONICAL_UPDATE_v2.2.0
+promotion_note: v2.3.0 — Knowledge Promotion Executor = Team 70 only (rule retained; Context Boundary Rule added in Gate Protocol v2.3.0)
 ssm_final_lock: v1.0.0 — Governance Authority, Hierarchy Lock, Execution Order per TEAM_100_TO_170_SSM_FINAL_LOCK_v1.0.0
 ---
 **project_domain:** TIKTRACK
 # PHOENIX SYSTEM STATE (SSM) v1.0.0
 
-מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל־Gate 5 remediation: ישות ALERT ממופה לקוד/ספק בלבד (ללא ערכים מניחים). **מבנה קנוני v2.2.0:** היררכיה ומספור per 04_GATE_MODEL_PROTOCOL_v2.2.0.
+מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל־Gate 5 remediation: ישות ALERT ממופה לקוד/ספק בלבד (ללא ערכים מניחים). **מבנה קנוני v2.3.0:** היררכיה ומספור per 04_GATE_MODEL_PROTOCOL_v2.3.0.
 
 ---
 
-## 0. CANONICAL HIERARCHY & TAXONOMY (v2.2.0)
+## 0. CANONICAL HIERARCHY & TAXONOMY (v2.3.0)
 
 **Hierarchy:** Roadmap (single) → Stage (שלב) → Program (תכנית) → Work Package (חבילת עבודה) → Task (משימה).  
 
@@ -46,7 +46,7 @@ Roadmap (single)
 
 Gate binding allowed **only** at Work Package level.
 
-**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.2.0 §2.  
+**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.  
 
 **Mandatory identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id (when applicable), gate_id, phase_owner, required_ssm_version, required_active_stage.
 
@@ -108,12 +108,12 @@ Role contract lock:
 * **Visual Integrity:** ולידציה מבנית (DOM/CSS) מול הבלופרינט כחסם קשיח. שימוש בסקרינשוטים ע"י אייג'נטים - אסור.
 * **Authority Model:** הפרדת רשויות מוחלטת בין ארכיטקטורה (100+) לביצוע (10-90).
 
-### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.2.0)
+### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.3.0)
 
 * **Gate 2 (KNOWLEDGE_PROMOTION):** Owner Team 190 (validation). **Executor Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution authority.
 * **Gate 6 (ARCHITECTURAL_VALIDATION):** Team 190. Validate spec and artifact alignment to constitution; no execution, no SSOT writes.
 * **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Final UX/vision approval; no implementation by agent without Gate 7 pass.
-* **Gate 8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70 (Librarian). Purpose: AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete without GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.2.0.
+* **Gate 8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70 (Librarian). Purpose: AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete without GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.3.0.
 
 ### 1.2 WSM Operational State Law (TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
 
@@ -159,20 +159,22 @@ Role contract lock:
 
 ---
 
-## 5. ACTIVE STAGE CONTROL
+## 5. EXECUTION ORDER AND STAGE (law only — no operational data)
 
-- Current Stage: GAP_CLOSURE_BEFORE_AGENT_POC
-- Allowed Operations: spec_finalization, structural_alignment, poc_observer_implementation
-- Forbidden Operations: feature_scaling, production_write_access
+**Law:** Active stage, current gate, and execution order state are **not** stored in SSM. They are maintained **solely** in WSM CURRENT_OPERATIONAL_STATE block. SSM states only the following **structural lock**:
 
-### 5.1 Current execution order lock (SSM Final Lock v1.0.0)
+- **Execution order lock:** S001-P002 may not be activated until S001-P001-WP001 completes GATE_8.
 
-| Level | Identifier | Name | Status |
-|-------|------------|------|--------|
-| Stage | S001 | Agent OS Initial Build | ACTIVE |
-| Program | S001-P001 | Agent Core | ACTIVE |
-| Work Package | S001-P001-WP001 | 10↔90 Validator Agent | ACTIVE |
-| Program | S001-P002 | Alerts POC | **FROZEN** until S001-P001-WP001 completes GATE_8 |
+**Stage control (rule only):** Allowed/forbidden operation categories are defined by the active stage; the **current** active stage value lives only in WSM. This section does not store current stage or current gate.
+
+### 5.1 Execution order lock (SSM Final Lock v1.0.0 — structural rule only)
+
+| Level | Identifier | Structural rule |
+|-------|------------|-----------------|
+| Stage | S001 | Agent OS Initial Build — in scope. |
+| Program | S001-P001 | In scope. |
+| Work Package | S001-P001-WP001 | In scope. |
+| Program | S001-P002 | **FROZEN** until S001-P001-WP001 completes GATE_8. |
 
 ---
 
@@ -200,10 +202,13 @@ Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1
 | 2026-02-20 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | Content from Team 170; canonical update per Team 70. §6 Canonical Architectural Approval Package Format embedded. |
 | 2026-02-20 | **TEAM_100_SSM_FINAL_LOCK_v1.0.0** | Content supplied by Team 170; canonical SSM updated per promotion authority (Team 70). §1.1 Governance Authority Clause (Team 00, 100, 170, 190, 70, 10). §0 Canonical hierarchy lock. §5.1 Current execution order lock: S001 / S001-P001 / S001-P001-WP001 ACTIVE; S001-P002 FROZEN until WP001 GATE_8. |
 | 2026-02-22 | **TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0** | §1.2 WSM Operational State Law added: every gate closure requires WSM update before progression; no operational data in SSM; WSM is sole operational state authority. |
+| 2026-02-22 | **TEAM_190_WSM_VALIDATION_FAIL_F2_REMEDIATION** | §5 / §5.1: removed operational data (current stage, ACTIVE/FROZEN status); retained structural lock rule only; current state lives solely in WSM CURRENT_OPERATIONAL_STATE. |
+| 2026-02-22 | **GATE_PROTOCOL_v2.3.0_OFFICIALIZATION** | structural_revision updated to v2.3.0; Gate Model source references updated from v2.2.0 to v2.3.0. |
 
 ---
 
 **log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | GATE_5_F1_REMEDIATION | 2026-02-19**  
 **log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | 2026-02-20**  
 **log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | SSM_FINAL_LOCK_v1.0.0 | 2026-02-20**  
-**log_entry | TEAM_170 | SSM_AMENDMENT_REFERENCE | §1.2_WSM_OPERATIONAL_STATE_LAW | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**
+**log_entry | TEAM_170 | SSM_AMENDMENT_REFERENCE | §1.2_WSM_OPERATIONAL_STATE_LAW | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**  
+**log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | GATE_PROTOCOL_v2.3.0_OFFICIALIZATION_REFERENCE_REFRESH | 2026-02-22**

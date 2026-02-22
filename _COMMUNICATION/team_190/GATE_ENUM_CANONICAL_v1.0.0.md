@@ -3,7 +3,7 @@
 
 **HISTORICAL ONLY / DO NOT USE FOR OPERATIONAL DECISIONS.**
 
-**status:** **SUPERSEDED** as of 2026-02-20. **Canonical source for gate model:** `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.2.0.md` (v2.2.0: GATE_0..GATE_8, PRE_GATE_3 for Pre-GATE_3 artifacts). This file is retained as historical record only. Do not use for validation or routing.
+**status:** **SUPERSEDED** as of 2026-02-20. **Canonical source for gate model:** `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.3.0.md` (v2.3.0: GATE_0..GATE_8, PRE_GATE_3 for Pre-GATE_3 artifacts). This file is retained as historical record only. Do not use for validation or routing.
 
 ---
 
@@ -61,4 +61,5 @@ Additional canonical sync:
 
 ---
 
-**log_entry | TEAM_190 | GATE_ENUM_CANONICAL_v1.0.0 | SYNCED_TO_GATE_PROTOCOL_UPDATE | 2026-02-20**
+**log_entry | TEAM_190 | GATE_ENUM_CANONICAL_v1.0.0 | SYNCED_TO_GATE_PROTOCOL_UPDATE | 2026-02-20**  
+**log_entry | TEAM_190 | GATE_ENUM_CANONICAL_v1.0.0 | CANONICAL_POINTER_REFRESH_v2.3.0 | 2026-02-22**

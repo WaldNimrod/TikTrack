@@ -60,7 +60,7 @@ Validated full cycle conformance for this work package:
 
 GATE_5 (Dev Validation) is approved for `S001-P001-WP001`.
 
-Team 10 may proceed to **GATE_6** submission with Team 190 under standard governance constraints.
+Team 10 may proceed to **GATE_6** execution submission preparation with Team 90 under the current cycle governance instruction.
 
 ---
 

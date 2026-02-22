@@ -54,13 +54,27 @@
 
 ---
 
-## 5. מקורות חובה
+## 5. מבנה תיקיות תעוד (חובה — per Team 170 directive v1.0.0)
+
+**מסמך קנון מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md`
+
+- **קנון משותף (SSM, WSM, נוהל שערים, Directives, Procedures וכו'):** מקום יחיד — `documentation/docs-governance/PHOENIX_CANONICAL/` (לא תחת `AGENTS_OS_GOVERNANCE` ולא תחת `agents_os/`).
+- **בכל קידום ידע ועדכון הפניות:** להפנות SSM, WSM, נוהל שערים — לנתיבים תחת `documentation/docs-governance/PHOENIX_CANONICAL/` (ראה §6).
+- **לא** להחזיר קנון משותף לתיקיות תחת דומיין Agents_OS.
+
+---
+
+## 6. מקורות חובה (נתיבים קנוניים — PHOENIX_CANONICAL)
 
 - `TEAM_70_KNOWLEDGE_LIBRARIAN_ROLE_DEFINITION.md`
-- `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md`
-- `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.2.0.md` (GATE_8)
+- **מבנה תיקיות (קנון):** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md`
+- **נוהל קידום ידע:** `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` (או תחת PHOENIX_CANONICAL/04-PROCEDURES אם יועבר)
+- **נוהל שערים (GATE_8):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`
+- **SSM:** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`
+- **WSM (מצב נוכחי):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
+- **אינדקס נהלים:** `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md`
 - תבניות Team 170 CANONICAL_TEMPLATES (כולל 04_AS_MADE_REPORT.md)
 
 ---
 
-**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | LOCKED | 2026-02-22**
+**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | PHOENIX_CANONICAL_ADOPTED | 2026-02-22**

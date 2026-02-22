@@ -1,4 +1,11 @@
-**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`
+---
+**provenance:** Governance consolidation (Team 170)
+**source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md
+**canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md
+**promotion_date:** 2026-02-22
+**directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
+**classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
+---
 
 ---
 id: PHOENIX_SYSTEM_STATE

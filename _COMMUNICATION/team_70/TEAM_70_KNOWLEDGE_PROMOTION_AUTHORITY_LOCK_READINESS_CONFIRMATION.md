@@ -18,8 +18,10 @@ Team 70 has re-studied:
 |----------|------------------|
 | Knowledge Promotion Protocol | `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` |
 | Knowledge Promotion activation | `_COMMUNICATION/team_100/TEAM_100_TO_170_190_KNOWLEDGE_PROMOTION_ACTIVATION_v1.0.0.md` |
-| Gate Model v2 | `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.2.0.md` |
-| SSM authority | `_COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md` |
+| **Folder structure (canonical)** | **`documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md`** (adopted per TEAM_170_TO_TEAM_70_DOCUMENTATION_FOLDER_STRUCTURE_MANDATORY_UPDATE_v1.0.0) |
+| **Gate Model** | **`documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`** |
+| **SSM authority** | **`documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`** |
+| **WSM (current state)** | **`documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`** |
 
 ---
 

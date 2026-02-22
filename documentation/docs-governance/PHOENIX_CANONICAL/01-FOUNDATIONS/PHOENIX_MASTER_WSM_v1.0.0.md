@@ -1,4 +1,11 @@
-**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
+---
+**provenance:** Governance consolidation (Team 170)
+**source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md
+**canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
+**promotion_date:** 2026-02-22
+**directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
+**classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
+---
 
 ---
 id: PHOENIX_WORK_STATE
@@ -106,7 +113,7 @@ Role contract in workflow:
 
 ## 📋 LEVEL 2: Task list reference (מבצעי — structural catalog only; no operational status)
 
-**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — זה המקור לסטטוס Tasks (OPEN/CLOSED) ולתאריכי סגירה. **Live task/execution status is solely in CURRENT_OPERATIONAL_STATE** (בלוק למעלה). הטבלה להלן היא קטלוג מבני/אחר — לא הרשימה המרכזית.
+**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — this is the source for Task status (OPEN/CLOSED) and closure dates. **Live task/execution status is solely in CURRENT_OPERATIONAL_STATE** (block above). The table below is a structural/other catalog — not the central list.
 
 | Task ID | Description | Owner | Evidence Link |
 | :--- | :--- | :--- | :--- |

@@ -1,4 +1,5 @@
 # Team 70 → Team 100 | KNOWLEDGE_PROMOTION_AUTHORITY_LOCK — Readiness Confirmation
+**project_domain:** TIKTRACK
 
 **from:** Team 70 (Knowledge Librarian)  
 **to:** Team 100 (Spec Engineering)  

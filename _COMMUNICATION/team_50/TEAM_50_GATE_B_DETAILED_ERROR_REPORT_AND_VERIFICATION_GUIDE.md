@@ -1,4 +1,5 @@
 # Team 50 → צוותים: משוב Gate B — מה לתקן ואיך
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_50_GATE_B_DETAILED_ERROR_REPORT_AND_VERIFICATION_GUIDE`  
 **date:** 2026-01-31  

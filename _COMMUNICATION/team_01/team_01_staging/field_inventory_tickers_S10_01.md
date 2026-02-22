@@ -1,4 +1,5 @@
 # 📊 Field Inventory: Tickers Entity (D-05)
+**project_domain:** TIKTRACK
 **Session:** S10.01 | **Team:** 10
 
 ## 1. Core Fields

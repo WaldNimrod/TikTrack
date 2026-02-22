@@ -1,4 +1,5 @@
 # Team 20 → Team 30: תיאום מימוש — Market Data Settings UI
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_20_TO_TEAM_30_MARKET_DATA_SETTINGS_UI_COORDINATION`  
 **from:** Team 20 (Backend)  

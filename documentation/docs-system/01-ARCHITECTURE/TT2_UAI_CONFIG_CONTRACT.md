@@ -1,4 +1,5 @@
 # UAI Config Contract - JSON Schema Specification
+**project_domain:** TIKTRACK
 
 **id:** `TT2_UAI_CONFIG_CONTRACT`  
 **owner:** Team 10 (The Gateway) - SSOT  

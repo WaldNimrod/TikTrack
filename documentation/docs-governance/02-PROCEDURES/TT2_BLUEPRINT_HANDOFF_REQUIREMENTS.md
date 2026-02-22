@@ -1,4 +1,5 @@
 # 📜 דרישות מסירת בלופרינט
+**project_domain:** TIKTRACK
 
 **id:** `TT2_BLUEPRINT_HANDOFF_REQUIREMENTS`  
 **owner:** Team 10 (The Gateway)  

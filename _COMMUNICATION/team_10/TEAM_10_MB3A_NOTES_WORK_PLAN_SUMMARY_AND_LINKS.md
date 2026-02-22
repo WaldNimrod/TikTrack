@@ -1,4 +1,5 @@
 # תקציר תוכנית עבודה — עמוד הערות (D35) + קישורים למסמכים
+**project_domain:** TIKTRACK
 
 **משימה:** notes.html (D35) — MB3A Notes  
 **סטטוס:** CLOSED (Gate-B PASS — Evidence: [TEAM_90_TO_TEAM_10_MB3A_NOTES_GATE_B_PASS.md](../team_90/TEAM_90_TO_TEAM_10_MB3A_NOTES_GATE_B_PASS.md); Gate-KP + Seal)  

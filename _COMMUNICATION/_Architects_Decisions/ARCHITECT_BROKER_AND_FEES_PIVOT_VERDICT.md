@@ -3,6 +3,7 @@ id: ADR-018
 owner: Architect
 status: LOCKED - G-LEAD APPROVED
 ---
+**project_domain:** TIKTRACK
 
 # 🏰 פסיקה אדריכל: מהפך עמלות וניהול ברוקרים
 

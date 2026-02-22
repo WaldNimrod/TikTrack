@@ -12,6 +12,7 @@ knowledge_promotion_validator: Team 190 ONLY
 active_stage: GAP_CLOSURE_BEFORE_AGENT_POC
 drift_status: CLEAN
 ---
+**project_domain:** TIKTRACK
 # PHOENIX SYSTEM STATE (SSM) v1.1.0 — PROPOSED
 
 מניפסט זה מוגש כהצעה לעדכון ונעילה קנונית בהתאם למנדט TEAM_100_SSM_LOCK_AND_STRUCTURE_ALIGNMENT. אין הנחות; מבנה קנוני בלבד.

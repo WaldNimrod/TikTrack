@@ -1,4 +1,5 @@
 # Market Data Coverage Matrix — SSOT (Stage‑1)
+**project_domain:** TIKTRACK
 
 **id:** `MARKET_DATA_COVERAGE_MATRIX`  
 **owner:** Team 10 (SSOT); מקור: Team 90 Draft  

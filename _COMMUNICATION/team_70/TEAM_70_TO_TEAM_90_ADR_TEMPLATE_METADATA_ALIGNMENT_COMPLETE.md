@@ -1,4 +1,5 @@
 # Team 70 → Team 90 | ADR Template Metadata Alignment Complete
+**project_domain:** TIKTRACK
 
 **id:** TEAM_70_ADR_METADATA_ALIGNMENT  
 **from:** Team 70 (Knowledge Librarian)  

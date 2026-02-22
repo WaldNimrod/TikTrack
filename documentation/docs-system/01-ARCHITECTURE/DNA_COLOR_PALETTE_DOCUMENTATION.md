@@ -1,4 +1,5 @@
 # DNA Color Palette - Complete Documentation
+**project_domain:** TIKTRACK
 
 **Version:** 1.0  
 **Date:** 2026-01-31  

@@ -5,6 +5,7 @@ status: ACTIVE
 context: Reset per TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION (DIR-011)
 date: 2026-02-15
 ---
+**project_domain:** TIKTRACK
 
 # Team 70 — אינדקס ייצור הנרטיב
 

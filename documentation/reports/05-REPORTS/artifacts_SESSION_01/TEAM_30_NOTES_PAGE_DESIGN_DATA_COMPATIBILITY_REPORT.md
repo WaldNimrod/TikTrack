@@ -1,4 +1,5 @@
 # Team 30 → Team 10: דוח תאימות עמוד הערות — עיצוב vs מבנה נתונים
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway)  

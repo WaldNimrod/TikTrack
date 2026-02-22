@@ -1,4 +1,5 @@
 # Team 20 → צוות האדריכלות: תוכנית — לוגיקת עדכונים חכמה (Smart Update Logic)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_20_TO_ARCHITECT_SMART_UPDATE_LOGIC_PROPOSAL`  
 **from:** Team 20 (Backend)  

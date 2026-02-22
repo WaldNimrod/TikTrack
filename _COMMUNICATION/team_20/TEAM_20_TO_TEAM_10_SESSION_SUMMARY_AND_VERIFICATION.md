@@ -1,4 +1,5 @@
 # Team 20 → Team 10 | סיכום סשן ובדיקות — MD-SETTINGS + D35 Notes
+**project_domain:** TIKTRACK
 
 **id:** TEAM_20_TO_TEAM_10_SESSION_SUMMARY_AND_VERIFICATION  
 **from:** Team 20 (Backend)  

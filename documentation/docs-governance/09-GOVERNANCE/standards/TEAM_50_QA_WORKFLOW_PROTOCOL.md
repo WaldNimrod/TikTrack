@@ -1,4 +1,5 @@
 # 🧪 נוהל עבודה לבדיקות QA - Team 50 (QA & Fidelity)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_50_QA_WORKFLOW_PROTOCOL`  
 **owner:** Team 50 (QA & Fidelity)  

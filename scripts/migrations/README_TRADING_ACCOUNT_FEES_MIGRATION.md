@@ -1,4 +1,5 @@
 # Migration: brokers_fees → trading_account_fees (ADR-014, ADR-017)
+**project_domain:** TIKTRACK
 
 **Responsibility:** Team 60 (DevOps & Platform)  
 **Plan:** `documentation/05-PROCEDURES/TEAM_20_TRADING_ACCOUNT_FEES_MIGRATION_PLAN.md`  

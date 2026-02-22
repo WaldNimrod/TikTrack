@@ -1,4 +1,5 @@
 # User Tickers QA — DB Connection Checklist
+**project_domain:** TIKTRACK
 
 **מטרה:** תיקון `DATABASE_ERROR` / "Database connection failed" לפני הרצת בדיקות QA.
 

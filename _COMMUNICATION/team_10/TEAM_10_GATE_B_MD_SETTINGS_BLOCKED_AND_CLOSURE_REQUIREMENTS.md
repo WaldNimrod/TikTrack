@@ -1,4 +1,5 @@
 # Gate-B MD-SETTINGS — BLOCKED + דרישות סגירה לפני Gate-B חוזר
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS  
 **פסק דין:** לא לאשר Gate-B עדיין (BLOCKED)  

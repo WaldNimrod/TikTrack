@@ -1,4 +1,5 @@
 # Team 60 → Team 20: תיאום DDL — Market Data System Settings
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_60_TO_TEAM_20_MARKET_DATA_SYSTEM_SETTINGS_DDL_COORDINATION`  
 **from:** Team 60 (DevOps & Platform)  

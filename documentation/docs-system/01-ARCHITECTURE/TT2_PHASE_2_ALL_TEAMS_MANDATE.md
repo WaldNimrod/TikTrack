@@ -1,4 +1,5 @@
 # 📡 הודעה מרוכזת לכל הצוותים - Phase 2 Release & Governance Reinforcement
+**project_domain:** TIKTRACK
 
 **id:** `TT2_PHASE_2_ALL_TEAMS_MANDATE`  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Precision Policy — SSOT (מפת דיוק מספרי)
+**project_domain:** TIKTRACK
 
 **id:** `PRECISION_POLICY_SSOT`  
 **בעלים:** Team 10 (The Gateway)  

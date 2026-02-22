@@ -1,4 +1,5 @@
 # Team 90 → Architect: דוח Spy סופי — בץ 2.5 (ADR-017/ADR-018)
+**project_domain:** TIKTRACK
 
 **מאת:** Team 90 (The Spy)  
 **אל:** אדריכלית (Gemini Bridge)  

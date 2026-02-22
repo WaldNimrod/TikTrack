@@ -1,4 +1,5 @@
 # TikTrack Batch A Specification
+**project_domain:** TIKTRACK
 ## Entities: Auth, Trading Accounts, Settings
 ---
 **Status:** Characterized (LOD 400)

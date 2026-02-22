@@ -1,4 +1,5 @@
 # Team 10 → אדריכלית: תוכנית — רשימת סטטוסים מרכזית למערכת
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** אדריכלית (Gemini Bridge)  

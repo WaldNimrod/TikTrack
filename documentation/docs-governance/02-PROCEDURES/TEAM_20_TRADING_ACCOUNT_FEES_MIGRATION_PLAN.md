@@ -1,4 +1,5 @@
 # Data Migration Plan: brokers_fees → trading_account_fees (ADR-014/ADR-017)
+**project_domain:** TIKTRACK
 
 **מקור:** BATCH_2_5_COMPLETIONS_MANDATE.md (ADR-017 §2), ARCHITECT_PHASE_2_DATA_MODEL_PIVOT_VERDICT.md (ADR-014)  
 **תאריך:** 2026-02-13  

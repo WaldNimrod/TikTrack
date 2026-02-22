@@ -1,4 +1,5 @@
 # Team 10 → אדריכלית: בקשת החלטה רשמית — Module/Menu Styling (Gap #1)
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** אדריכלית (Gemini Bridge)  

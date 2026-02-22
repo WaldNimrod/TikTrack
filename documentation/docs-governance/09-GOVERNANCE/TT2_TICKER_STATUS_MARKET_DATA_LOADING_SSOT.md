@@ -1,4 +1,5 @@
 # סטטוס טיקר והתנהגות טעינת נתונים — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT`  
 **owner:** Team 10 (The Gateway)  

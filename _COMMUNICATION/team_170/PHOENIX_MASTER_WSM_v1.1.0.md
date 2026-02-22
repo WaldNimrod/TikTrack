@@ -5,6 +5,7 @@ status: ACTIVE_CANDIDATE
 owner: Team 10
 ssm_dependency: 1.0.0
 ---
+**project_domain:** TIKTRACK
 # PHOENIX WORK STATE (WSM) v1.1.0
 
 מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח.

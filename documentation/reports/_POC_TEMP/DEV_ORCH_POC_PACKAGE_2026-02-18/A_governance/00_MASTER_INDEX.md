@@ -1,4 +1,5 @@
 # ⚠️ NOT CANONICAL — POC package snapshot only
+**project_domain:** TIKTRACK
 
 **Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
 **This file:** Copy inside Dev-Orchestration POC package. Do not treat as global authority.

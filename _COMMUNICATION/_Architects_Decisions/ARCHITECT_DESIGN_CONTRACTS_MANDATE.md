@@ -1,4 +1,5 @@
 # 🛑 פסיקה אדריכל: דרישת חוזי קונפיגורציה (Integrity Contracts)
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית גשר (Gemini)
 **נושא:** פסילת ה-Design Sprint ודרישת השלמה לחוזים מחייבים

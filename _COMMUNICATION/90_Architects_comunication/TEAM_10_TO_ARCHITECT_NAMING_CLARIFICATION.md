@@ -1,4 +1,5 @@
 # 📡 הודעה לאדריכל: הבהרה על מינוח נתונים
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** Chief Architect  

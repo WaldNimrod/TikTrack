@@ -1,4 +1,5 @@
 # Team 20 → Team 10 | Market Data Settings UI (MD-SETTINGS) — Implementation Evidence
+**project_domain:** TIKTRACK
 
 **Task:** MD-SETTINGS (Market Data Settings UI)  
 **Mandate:** [TEAM_10_TO_TEAM_20_MARKET_DATA_SETTINGS_UI_MANDATE](../../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_20_MARKET_DATA_SETTINGS_UI_MANDATE.md)  

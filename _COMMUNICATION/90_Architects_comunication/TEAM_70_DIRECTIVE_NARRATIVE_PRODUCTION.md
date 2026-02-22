@@ -5,6 +5,7 @@ to: Team 70 (Product Intelligence)
 status: IMMEDIATE ACTION
 context: Course Correction from Audit to Narrative
 ---
+**project_domain:** TIKTRACK
 # 📡 פקודת מבצע: איפוס קונטקסט ומעבר לייצור נרטיב
 
 **צוות 70,**

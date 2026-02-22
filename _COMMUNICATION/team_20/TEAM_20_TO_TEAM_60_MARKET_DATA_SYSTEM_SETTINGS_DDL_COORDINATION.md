@@ -1,4 +1,5 @@
 # Team 20 → Team 60 | market_data.system_settings DDL Coordination
+**project_domain:** TIKTRACK
 
 **Task:** MD-SETTINGS — DB migration for Market Data System Settings  
 **Date:** 2026-01-31  

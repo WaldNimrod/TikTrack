@@ -1,4 +1,5 @@
 # ⚠️ SUPERSEDED - הוחלף במנדט מעודכן
+**project_domain:** TIKTRACK
 
 **סטטוס:** ⚠️ **SUPERSEDED**  
 **תאריך Superseded:** 2026-02-06  

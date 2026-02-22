@@ -1,4 +1,5 @@
 # Team 10 — אישור מוכנות: מה נדרש כעת ליישם את חבילת העבודה הפתוחה
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_S001_P001_WP001_IMPLEMENTATION_READINESS_CONFIRMATION_v1.0.0  
 **from:** Team 10 (The Gateway)  

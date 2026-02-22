@@ -1,4 +1,5 @@
 # CASH_FLOW_PARSER_SPEC — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `CASH_FLOW_PARSER_SPEC`  
 **משימה:** 1-003 (Stage-1)  

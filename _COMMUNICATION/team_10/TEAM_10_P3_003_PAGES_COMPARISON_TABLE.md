@@ -1,4 +1,5 @@
 # טבלת השוואה — רשימות עמודים (מטריצה, תיעוד רשמי, סקופ 31, תפריט ראשי)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_P3_003_PAGES_COMPARISON_TABLE  
 **מקור SSOT:** `documentation/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md`  

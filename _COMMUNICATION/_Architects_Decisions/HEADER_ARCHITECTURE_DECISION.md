@@ -6,6 +6,7 @@ context: Unified Header / Navigation / Route Integrity
 sv: 1.0.0
 last_updated: 2026-02-16
 ---
+**project_domain:** TIKTRACK
 
 # HEADER_ARCHITECTURE_DECISION
 

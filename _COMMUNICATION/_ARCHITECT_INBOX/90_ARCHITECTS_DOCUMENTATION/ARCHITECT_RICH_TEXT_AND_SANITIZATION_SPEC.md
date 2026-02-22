@@ -1,4 +1,5 @@
 # 🖋️ מפרט אדריכלי: Rich-Text & Sanitization (SOP-012)
+**project_domain:** TIKTRACK
 ---
 status: LOCKED | Tooling: TipTap
 

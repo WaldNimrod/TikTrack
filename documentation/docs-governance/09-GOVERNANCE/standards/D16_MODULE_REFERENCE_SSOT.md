@@ -1,4 +1,5 @@
 # 🔒 מודול דוגמה — D16 חשבונות מסחר (SSOT נעול)
+**project_domain:** TIKTRACK
 
 **id:** `D16_MODULE_REFERENCE_SSOT`  
 **owner:** Team 30 (Frontend) + G-Lead  

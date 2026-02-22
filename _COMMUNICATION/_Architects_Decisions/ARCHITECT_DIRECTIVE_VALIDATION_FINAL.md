@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10 (Validation Framework)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (The Gateway)

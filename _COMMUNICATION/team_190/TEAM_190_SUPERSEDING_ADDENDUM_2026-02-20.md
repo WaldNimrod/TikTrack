@@ -1,4 +1,5 @@
 # TEAM 190 — SUPERSEDING ADDENDUM (Process Reality Alignment Review 2026-02-20)
+**project_domain:** TIKTRACK
 
 **from:** Team 190 (Constitutional Architectural Validator)  
 **to:** Team 10, Team 100, Team 170  

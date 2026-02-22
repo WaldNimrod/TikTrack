@@ -1,4 +1,5 @@
 # 🚨 הודעה קריטית: החלטה אדריכלית נדרשת - Header Navigation
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** Chief Architect (Gemini)  

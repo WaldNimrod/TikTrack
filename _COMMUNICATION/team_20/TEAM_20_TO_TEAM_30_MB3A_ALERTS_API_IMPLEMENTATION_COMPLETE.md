@@ -1,4 +1,5 @@
 # Team 20 → Team 30: מימוש API התראות (D34) — הושלם
+**project_domain:** TIKTRACK
 
 **from:** Team 20 (Backend)  
 **to:** Team 30 (Frontend)  

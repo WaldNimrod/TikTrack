@@ -1,4 +1,5 @@
 # Team 31 → Team 10: MB3A Build Alerts — אישור הפעלה ומסירת Blueprint ל-30/40
+**project_domain:** TIKTRACK
 
 **from:** Team 31 (Blueprint)  
 **to:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Team 20 → האדריכלית: תוכנית מפורטת — ממשק הגדרות נתוני שוק
+**project_domain:** TIKTRACK
 
 **from:** Team 20 (Backend)  
 **to:** Chief Architect  

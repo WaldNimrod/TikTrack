@@ -1,4 +1,5 @@
 # ⚠️ DEPRECATED - מידע סותר - אין להשתמש!
+**project_domain:** TIKTRACK
 
 **סטטוס:** ⚠️ **DEPRECATED**  
 **תאריך Deprecation:** 2026-02-06  

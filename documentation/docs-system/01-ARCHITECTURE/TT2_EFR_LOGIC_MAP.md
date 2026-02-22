@@ -1,4 +1,5 @@
 # EFR Logic Map - SSOT Field Mapping Table
+**project_domain:** TIKTRACK
 
 **id:** `TT2_EFR_LOGIC_MAP`  
 **owner:** Team 10 (The Gateway) - SSOT  

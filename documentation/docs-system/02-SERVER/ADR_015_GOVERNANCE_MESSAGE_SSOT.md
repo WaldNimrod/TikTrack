@@ -1,4 +1,5 @@
 # ADR-015 — הודעת משילות "ברוקר אחר" (SSOT)
+**project_domain:** TIKTRACK
 
 **id:** `ADR_015_GOVERNANCE_MESSAGE_SSOT`  
 **owner:** Team 10 / Architect  

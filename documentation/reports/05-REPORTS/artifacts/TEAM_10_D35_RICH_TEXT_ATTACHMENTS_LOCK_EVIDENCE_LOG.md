@@ -1,4 +1,5 @@
 # Evidence Log — D35 Rich Text + Attachments Lock (MB3A)
+**project_domain:** TIKTRACK
 
 **משימת-על:** D35_RICH_TEXT_ATTACHMENTS_LOCK  
 **מקור:** Team 90 Feedback Lock (D35 Notes)  

@@ -1,4 +1,5 @@
 # Team 20 → Team 60: Spec סופי + DDL — exchange_rates
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_20_TO_TEAM_60_EXCHANGE_RATES_DDL_SPEC`  
 **משימה:** 1-002 MARKET_DATA_PIPE  

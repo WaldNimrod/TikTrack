@@ -1,4 +1,5 @@
 # 🎨 Master Palette Spec (v2.1)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_MASTER_PALETTE_SPEC`  
 **owner:** Team 40 (UI Assets & Design)  

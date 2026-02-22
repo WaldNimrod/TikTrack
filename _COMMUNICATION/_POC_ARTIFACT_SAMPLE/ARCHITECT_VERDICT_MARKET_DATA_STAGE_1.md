@@ -1,6 +1,7 @@
 ---
 id: ADR-022 | owner: Architect | status: LOCKED - G-LEAD APPROVED
 ---
+**project_domain:** TIKTRACK
 # 🏰 פסיקה אדריכל: נעילת ספקי נתונים וצינורות המידע
 
 1. **Providers:** Yahoo Finance + Alpha Vantage בלבד. Frankfurter מוסר.

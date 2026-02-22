@@ -1,4 +1,5 @@
 # 🎨 Master Palette Spec (v2.1)
+**project_domain:** TIKTRACK
 
 - Brand Primary: #26baac (Turquoise).
 - Brand Secondary: #fc5a06 (Orange).

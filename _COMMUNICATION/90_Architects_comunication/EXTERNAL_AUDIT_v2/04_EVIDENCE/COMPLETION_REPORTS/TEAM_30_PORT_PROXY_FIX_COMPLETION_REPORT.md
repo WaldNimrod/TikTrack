@@ -1,4 +1,5 @@
 # ✅ דוח השלמה: תיקון שימוש ב-Proxy במקום כתובות ישירות
+**project_domain:** TIKTRACK
 
 **מאת:** Team 30 (Frontend Execution)  
 **אל:** Team 10 (The Gateway)  

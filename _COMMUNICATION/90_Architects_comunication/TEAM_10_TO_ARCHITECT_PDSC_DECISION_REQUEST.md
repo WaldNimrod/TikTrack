@@ -1,4 +1,5 @@
 # Team 10 → אדריכלית / G-Lead: בקשת החלטה — PDSC Boundary Contract
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** אדריכלית / G-Lead (נמרוד)  

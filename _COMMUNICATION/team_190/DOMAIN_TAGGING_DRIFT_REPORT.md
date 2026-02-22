@@ -1,4 +1,5 @@
 # DOMAIN_TAGGING_DRIFT_REPORT
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_190_DOMAIN_TAGGING_DRIFT_REPORT_2026-02-21  
 **owner:** Team 190 (READ_ONLY intelligence)  
@@ -18,7 +19,7 @@
 | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE5_VALIDATION_RESPONSE.md` | Program/WP lacks explicit domain binding | MEDIUM | Includes `roadmap_id/stage_id/program_id/work_package_id` but no `project_domain` field. Domain inferred from context only. |
 | `_COMMUNICATION/team_170/ARCHITECTURAL_APPROVAL_PROTOCOL_FORMALIZATION_v1.0.0.md` | Hybrid SPEC/EXECUTION semantic concentration | LOW | Formalization intentionally contains both SPEC and EXECUTION tracks. Structurally valid, but no domain tagging axis for cross-domain filtering. |
 | `_COMMUNICATION/_ARCHITECT_INBOX/SSM_LOCK_AND_STRUCTURE_ALIGNMENT_SPEC_APPROVAL_REQUEST/EVIDENCE_MAPPING_TO_GOVERNANCE_MODEL.md` | Hybrid references inside approval package | MEDIUM | SPEC approval package includes cross-track terminology (`SPEC`/`EXECUTION`) without domain-scoped metadata classification. |
-| `_ARCHITECTURAL_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/SPEC_PACKAGE.md` | Evidence under non-canonical inbox path | HIGH | Domain package exists under legacy root inbox path; canonical channel is `_COMMUNICATION/_ARCHITECT_INBOX`. Increases traceability drift risk. |
+| `_COMMUNICATION/_ARCHITECT_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/SPEC_PACKAGE.md` | Evidence under non-canonical inbox path | HIGH | Domain package exists under legacy root inbox path; canonical channel is `_COMMUNICATION/_ARCHITECT_INBOX`. Increases traceability drift risk. |
 
 ---
 

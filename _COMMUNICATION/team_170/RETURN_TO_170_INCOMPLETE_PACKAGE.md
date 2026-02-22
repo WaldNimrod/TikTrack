@@ -1,4 +1,5 @@
 # RETURN TO TEAM 170 — INCOMPLETE PACKAGE (Gate 5 FAIL Remediation)
+**project_domain:** TIKTRACK
 
 **id:** RETURN_TO_170_INCOMPLETE_PACKAGE  
 **from:** Team 190 (Constitutional Validator) → Team 170 (SSOT Authority)  

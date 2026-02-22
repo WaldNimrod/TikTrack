@@ -1,4 +1,5 @@
 # Team 10 → Team 50: MB3A Notes — בקשת Gate-A (QA)
+**project_domain:** TIKTRACK
 
 **to:** Team 50 (QA)  
 **from:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Evidence Log: בץ 2.5 (ADR-017/018)
+**project_domain:** TIKTRACK
 
 **מבצע:** Team 30  
 **תאריך:** 2026-02-12  

@@ -1,4 +1,5 @@
 # 📡 שאילתה אדריכלית: Team 00 / Gemini Bridge | Session 01
+**project_domain:** TIKTRACK
 
 **From:** Team 10 (The Gateway)  
 **To:** Team 00 (Lead Architect) / Gemini Bridge (Control Bridge)  

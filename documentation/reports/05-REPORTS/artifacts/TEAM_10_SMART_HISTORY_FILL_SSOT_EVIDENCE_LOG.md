@@ -1,4 +1,5 @@
 # Evidence Log — עדכון SSOT Smart History Fill (נעול)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_10_SMART_HISTORY_FILL_SSOT_EVIDENCE_LOG`  
 **משימה:** עדכון תיעוד מערכת לפי מפרט נעול — ללא סטיות  

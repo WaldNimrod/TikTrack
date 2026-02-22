@@ -1,4 +1,5 @@
 # ⚠️ Not the global Master Index
+**project_domain:** TIKTRACK
 
 **Global canonical index:** repo root `00_MASTER_INDEX.md`  
 **This file:** Architect inbox index only. Do not use as global entry point.

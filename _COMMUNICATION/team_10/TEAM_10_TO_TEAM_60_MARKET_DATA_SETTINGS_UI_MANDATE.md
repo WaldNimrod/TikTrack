@@ -1,4 +1,5 @@
 # Team 10 → Team 60 | Market Data Settings UI — מנדט תשתית
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS (Market Data Settings UI)  
 **מקור:** [TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md](TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md); Team 90 Review  

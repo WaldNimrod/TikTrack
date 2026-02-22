@@ -1,4 +1,5 @@
 # ⚠️ NOT CANONICAL — Package snapshot. Canonical: _COMMUNICATION/team_10/ACTIVE_STAGE.md
+**project_domain:** TIKTRACK
 
 ---
 

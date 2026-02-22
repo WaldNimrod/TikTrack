@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוותי הביצוע (Batch 1 Recap)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** All Teams (10-60)

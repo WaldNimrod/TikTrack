@@ -1,4 +1,5 @@
 # 📑 תבניות ניהול צוותים (P-06) - v2.0
+**project_domain:** TIKTRACK
 
 **id:** `TT2_TEAM_MANAGEMENT_TEMPLATES`  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Team 40 → Team 100: ROLE_RECONFIRMATION | SPEC_ONLY_PHASE | Compliance
+**project_domain:** TIKTRACK
 
 **from:** Team 40 (UI Assets & Design)  
 **to:** Team 100  

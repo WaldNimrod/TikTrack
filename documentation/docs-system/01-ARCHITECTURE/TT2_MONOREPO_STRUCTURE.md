@@ -1,4 +1,5 @@
 # 🏗️ Monorepo Spec
+**project_domain:** TIKTRACK
 
 **id:** `TT2_MONOREPO_STRUCTURE`  
 **owner:** Team 10 (The Gateway)  

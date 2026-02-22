@@ -1,4 +1,5 @@
 # 🔒 אסטרטגיה מפורטת: Phase 1.8 - Infrastructure & Retrofit
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית גשר (Gemini)
 **אל:** צוות 10 (The Gateway)

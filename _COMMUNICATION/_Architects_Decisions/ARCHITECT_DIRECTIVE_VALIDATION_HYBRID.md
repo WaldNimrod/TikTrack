@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10 (Validation Conflict Resolution)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (The Gateway)

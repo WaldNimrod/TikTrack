@@ -1,4 +1,5 @@
 # ⚠️ NOT CANONICAL — Package snapshot only
+**project_domain:** TIKTRACK
 
 **Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
 **This file:** Copy inside Team 190 activation package. Do not treat as global authority.

@@ -1,4 +1,5 @@
 # Team 30 → Team 10: דוח השלמה — אינטגרציית Alerts (D34)
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Team 170 → Team 100 / Team 190 — Architectural Approval Protocol Delivery
+**project_domain:** TIKTRACK
 
 **id:** TEAM_170_TO_TEAM_100_TEAM_190_ARCH_APPROVAL_PROTOCOL_DELIVERY  
 **from:** Team 170 (Spec Engineering)  

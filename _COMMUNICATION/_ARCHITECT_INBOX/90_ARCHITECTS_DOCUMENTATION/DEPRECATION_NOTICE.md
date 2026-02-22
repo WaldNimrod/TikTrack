@@ -1,4 +1,5 @@
 # DEPRECATION NOTICE - documentation/90_ARCHITECTS_DOCUMENTATION
+**project_domain:** TIKTRACK
 
 **status:** DEPRECATED
 **effective_date:** 2026-02-16

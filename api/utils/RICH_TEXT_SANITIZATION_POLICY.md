@@ -1,4 +1,5 @@
 # Rich-Text Sanitization Policy (SOP-012, T20.2)
+**project_domain:** TIKTRACK
 
 **מקור:** `SOP_012_DOMPURIFY_ALLOWLIST.md`, `ARCHITECT_RICH_TEXT_AND_DESIGN_SYSTEM_SPEC.md`  
 **מימוש:** `api/utils/rich_text_sanitizer.py`

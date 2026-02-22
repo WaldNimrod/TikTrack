@@ -1,4 +1,5 @@
 # 📑 תבנית הגדרת קוביה (P-08)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_CUBE_DEFINITION_TEMPLATE`  
 **owner:** Team 10 (The Gateway)  

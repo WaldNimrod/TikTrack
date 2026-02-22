@@ -1,4 +1,5 @@
 # תוכנית עבודה — Market Data Settings UI (מיני-פרויקט תשתיתי)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN  
 **מקור:** Team 90 Review — [TEAM_20_TO_ARCHITECT_MARKET_DATA_SETTINGS_UI_PLAN.md](../90_Architects_comunication/TEAM_20_TO_ARCHITECT_MARKET_DATA_SETTINGS_UI_PLAN.md)  

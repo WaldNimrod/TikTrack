@@ -1,4 +1,5 @@
 # 🏰 דוח ניתוח פערים: סטטוס מאושר (Phase 2.5)
+**project_domain:** TIKTRACK
 ---
 status: LOCKED - G-LEAD APPROVED
 

@@ -1,4 +1,5 @@
 # Team 60 → Team 10: ADR Template Governance — אישור קבלה
+**project_domain:** TIKTRACK
 
 **To:** Team 10 (The Gateway)  
 **From:** Team 60 (DevOps & Platform)  

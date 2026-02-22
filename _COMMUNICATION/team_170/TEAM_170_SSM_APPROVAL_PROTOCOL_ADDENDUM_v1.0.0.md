@@ -1,4 +1,5 @@
 # SSM ADDENDUM — Architectural Approval Protocol (for embedding)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_170_SSM_APPROVAL_PROTOCOL_ADDENDUM_v1.0.0  
 **from:** Team 170  

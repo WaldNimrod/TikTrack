@@ -1,4 +1,5 @@
 # SSOT 1.2.1 — Summary & Currency Conversions Endpoints (Option A)
+**project_domain:** TIKTRACK
 
 **מקור:** TEAM_10_TO_TEAM_20_BACKEND_TASKS_EXECUTION_MANDATE — משימה א'  
 **תאריך:** 2026-02-12  

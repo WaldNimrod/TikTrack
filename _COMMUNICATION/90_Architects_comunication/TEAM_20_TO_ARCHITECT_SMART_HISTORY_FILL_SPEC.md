@@ -1,4 +1,5 @@
 # Team 20 → צוות האדריכלות: אפיון — אחזור היסטוריה חכם (Smart History Fill)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_20_TO_ARCHITECT_SMART_HISTORY_FILL_SPEC`  
 **from:** Team 20 (Backend)  

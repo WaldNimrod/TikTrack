@@ -1,4 +1,5 @@
 # Team 90 -> Team 10 | ADR Metadata Alignment Re-check
+**project_domain:** TIKTRACK
 
 **id:** TEAM_90_ADR_METADATA_RECHECK_2026_02_16  
 **from:** Team 90 (External Validation Unit)  

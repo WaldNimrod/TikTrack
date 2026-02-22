@@ -4,6 +4,7 @@ owner: Chief Architect
 to: Teams 100, 170, 10
 status: ACTIVE
 ---
+**project_domain:** TIKTRACK
 # 📡 פקודת מבצע: הטמעת מודל האייג'נטים v1.2
 
 **תאריך שיגור:** 18.2.2026, 18:03:36

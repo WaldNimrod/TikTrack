@@ -1,4 +1,5 @@
 # FOREX_MARKET_SPEC — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `FOREX_MARKET_SPEC`  
 **משימה:** 1-001 (Stage-1)  

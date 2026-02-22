@@ -1,4 +1,5 @@
 # 🔒 מנדט אדריכל: איחוד תשתיות ו-Shared Layer (Phase 2)
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית גשר (Gemini)
 **אל:** צוות 10 (Gateway), צוות 30 (Frontend)

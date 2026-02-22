@@ -1,4 +1,5 @@
 # COVER_NOTE — Canonical Structural Update v2.2.0 (Corrected SPEC Re-Approval Submission)
+**project_domain:** TIKTRACK
 
 **architectural_approval_type:** SPEC
 

@@ -1,4 +1,5 @@
 # Team 170 — SSM Lock and Structure Alignment Mandate — ACK
+**project_domain:** TIKTRACK
 
 **re:** Team 100 → Team 170 (CC Team 190) | MANDATE | SSM_LOCK_AND_STRUCTURE_ALIGNMENT | REQUIRED  
 **from:** Team 170 (Knowledge Librarian)  

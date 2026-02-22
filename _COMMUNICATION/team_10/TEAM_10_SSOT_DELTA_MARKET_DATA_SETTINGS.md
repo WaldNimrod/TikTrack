@@ -1,4 +1,5 @@
 # SSOT Delta — Market Data Settings UI
+**project_domain:** TIKTRACK
 
 **משימה:** MARKET_DATA_SETTINGS_UI  
 **מקור:** [TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md](TEAM_10_MARKET_DATA_SETTINGS_UI_WORK_PLAN.md)  

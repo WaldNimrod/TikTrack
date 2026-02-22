@@ -1,4 +1,5 @@
 # בדיקת סגנונות תבנית שלב א מול דף הבית
+**project_domain:** TIKTRACK
 
 **תאריך:** 2026-01-31  
 **מטרה:** לזהות מה חסר בתבנית `D15_PAGE_TEMPLATE_STAGE_1.html` מול `D15_INDEX.html`

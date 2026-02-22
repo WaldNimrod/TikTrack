@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED
 context: UI Structural Integrity
 ---
+**project_domain:** TIKTRACK
 # 🏗️ חוזה תבנית עמוד ומבנה קונטיינרים (v1.1)
 
 ## 1. מבנה DOM מחייב (The Skeleton)

@@ -1,4 +1,5 @@
 # Yahoo Finance — סוגי מידע ולוגיקת קריאות
+**project_domain:** TIKTRACK
 
 **מקור:** EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC, MARKET_DATA_PIPE_SPEC  
 **תאריך:** 2026-02-14

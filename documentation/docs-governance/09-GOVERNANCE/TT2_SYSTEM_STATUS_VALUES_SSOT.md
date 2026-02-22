@@ -1,4 +1,5 @@
 # 🏰 סטטוסים מערכתיים — SSOT (רשימת סטטוסים מרכזית)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_SYSTEM_STATUS_VALUES_SSOT`  
 **owner:** Team 10 (The Gateway) — נעילה לפי בקשת Team 30 + החלטה אדריכלית  

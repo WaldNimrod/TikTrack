@@ -1,4 +1,5 @@
 # 🕵️ Team 90 → Architect: Indicators + Market Cap (Stage‑1 Update)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_90_TO_ARCHITECT_EXTERNAL_DATA_INDICATORS_UPDATE`  
 **from:** Team 90 (The Spy)  

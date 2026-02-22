@@ -1,4 +1,5 @@
 # 📋 קריטריוני בדיקת קוד | Team 40
+**project_domain:** TIKTRACK
 
 **From:** Team 40 (UI Assets & Design) - "שומרי ה-DNA"  
 **To:** Team 30 (Frontend), Team 10 (The Gateway)  

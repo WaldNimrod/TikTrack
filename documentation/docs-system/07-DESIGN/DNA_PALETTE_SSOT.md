@@ -1,4 +1,5 @@
 # 🎨 DNA Color Palette - SSOT (Single Source of Truth)
+**project_domain:** TIKTRACK
 
 **id:** `DNA_PALETTE_SSOT`  
 **owner:** Team 40 (UI Assets & Design) - DNA Guardians  

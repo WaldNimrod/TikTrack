@@ -5,6 +5,7 @@ status: SSOT - MASTER NARRATIVE
 context: Product Presentation & Vision Alignment
 system_version: 1.0.0
 ---
+**project_domain:** TIKTRACK
 # 🏰 מניפסט המוצר: סיפורה של פיניקס v1.0
 
 ## 🎯 1. חזון ה-Digital Twin והמורשת

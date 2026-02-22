@@ -1,4 +1,5 @@
 # ⚖️ פקודת אדריכל: תיקון זחילת שמות (Drift Fix)
+**project_domain:** TIKTRACK
 
 **סטטוס:** 🔒 FINAL LOCK | **תאריך:** 2026-02-05
 **סימוכין:** SPY_REPORT_90_02 (Team 90)

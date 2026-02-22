@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10 (Architectural Decisions - Cubes & Fluidity)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (Gateway), Team 30 (Frontend), Team 40 (Design)

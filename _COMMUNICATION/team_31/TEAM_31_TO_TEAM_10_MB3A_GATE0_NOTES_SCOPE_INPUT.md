@@ -1,4 +1,5 @@
 # Team 31 → Team 10: MB3A Gate-0 Notes — מידע לעמוד הערות (D35)
+**project_domain:** TIKTRACK
 
 **from:** Team 31 (Blueprint)  
 **to:** Team 10 (The Gateway)  

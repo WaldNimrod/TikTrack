@@ -1,4 +1,5 @@
 # Team 20 → Team 10: אפיון מוצע — השלמת מטא־דאטה לטיקרים (Ticker Metadata Enrichment)
+**project_domain:** TIKTRACK
 
 **From:** Team 20 (Backend)  
 **To:** Team 10 (The Gateway)  

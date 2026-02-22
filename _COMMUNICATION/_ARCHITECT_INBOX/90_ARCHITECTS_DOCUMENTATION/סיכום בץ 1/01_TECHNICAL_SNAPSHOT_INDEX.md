@@ -1,4 +1,5 @@
 # 🏗️ Snapshot טכני - חבילה 1
+**project_domain:** TIKTRACK
 
 **id:** `TECHNICAL_SNAPSHOT_INDEX`  
 **owner:** Team 10 (The Gateway)  

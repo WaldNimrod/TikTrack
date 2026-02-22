@@ -1,4 +1,5 @@
 # ⚠️ NOT CANONICAL — POC sample only
+**project_domain:** TIKTRACK
 
 **Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
 **This file:** Sample artifact for POC. Do not treat as authority.

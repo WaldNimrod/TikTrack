@@ -1,4 +1,5 @@
 # Team 10 → Team 30: יישור תפריט ל-SSOT רשימת עמודים
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 30 (Frontend)  

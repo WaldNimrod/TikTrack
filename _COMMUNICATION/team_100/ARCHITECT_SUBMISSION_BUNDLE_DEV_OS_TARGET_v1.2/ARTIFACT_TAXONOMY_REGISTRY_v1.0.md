@@ -1,4 +1,5 @@
 # ARTIFACT_TAXONOMY_REGISTRY_v1.0.md
+**project_domain:** TIKTRACK
 
 Version: 1.0 (DRAFT)
 Date: 2026-02-18

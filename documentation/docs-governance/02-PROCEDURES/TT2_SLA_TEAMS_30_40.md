@@ -1,4 +1,5 @@
 # 🤝 אמנת שירות: צוות 30 (Frontend) ↔ צוות 40 (UI Assets & Design)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_SLA_TEAMS_30_40`  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # 📜 פרוטוקול הבטחת איכות — שערי בדיקה
+**project_domain:** TIKTRACK
 
 **id:** `TT2_QUALITY_ASSURANCE_GATE_PROTOCOL`  
 **owner:** Team 10 (The Gateway)  

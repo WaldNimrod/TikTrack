@@ -1,4 +1,5 @@
 # Phase Plan – Immediate Execution Roadmap
+**project_domain:** TIKTRACK
 
 ## Phase A – Spec Finalization
 - Cross-check Alerts endpoints

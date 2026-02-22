@@ -1,4 +1,5 @@
 # 📊 Session 01 Progress Log
+**project_domain:** TIKTRACK
 
 **Session:** SESSION_01 - Authentication & Identity  
 **Start Date:** 2026-01-30  

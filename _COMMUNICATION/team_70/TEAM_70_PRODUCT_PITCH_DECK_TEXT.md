@@ -6,6 +6,7 @@ context: Reset per TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION
 base: PI_STRATEGIC_NARRATIVE_REPORT.md
 date: 2026-02-15
 ---
+**project_domain:** TIKTRACK
 
 # TikTrack Phoenix — Product Pitch Deck (גרסת טקסט)
 

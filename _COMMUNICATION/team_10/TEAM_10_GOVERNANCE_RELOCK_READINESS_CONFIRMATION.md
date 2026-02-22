@@ -1,4 +1,5 @@
 # Team 10 — Governance Relock | Readiness Confirmation
+**project_domain:** TIKTRACK
 
 **re:** Team 100 → Team 10 | GOVERNANCE_RELOCK | ROLE_RECONFIRMATION | MANDATORY  
 **from:** Team 10 (The Gateway)  

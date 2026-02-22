@@ -1,4 +1,5 @@
 # Team 50 → Team 10: דוח Gate-A — MB3A Alerts (D34)
+**project_domain:** TIKTRACK
 
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (The Gateway)  

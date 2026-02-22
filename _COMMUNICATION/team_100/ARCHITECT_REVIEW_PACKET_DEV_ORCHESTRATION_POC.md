@@ -7,6 +7,7 @@ Prepared by: Team 100
 For: Architect (Gemini)
 
 ---
+**project_domain:** TIKTRACK
 
 ## Context Summary
 

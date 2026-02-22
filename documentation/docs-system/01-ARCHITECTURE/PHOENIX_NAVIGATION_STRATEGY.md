@@ -1,4 +1,5 @@
 # ⚓ מדריך אדריכלי: אסטרטגיית ניווט - קישורים סטנדרטיים במבנה היברידי
+**project_domain:** TIKTRACK
 
 **id:** `PHOENIX_NAVIGATION_STRATEGY`  
 **owner:** Team 10 (The Gateway)  

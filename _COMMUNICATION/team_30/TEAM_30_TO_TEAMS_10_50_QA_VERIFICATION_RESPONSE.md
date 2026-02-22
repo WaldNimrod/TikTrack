@@ -1,4 +1,5 @@
 # Team 30 → Teams 10 & 50: תגובה לאימות QA — MB3A Notes
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway), Team 50 (QA)  

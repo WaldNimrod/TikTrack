@@ -1,4 +1,5 @@
 # Market Indicators & Fundamentals — SSOT (Stage‑1)
+**project_domain:** TIKTRACK
 
 **id:** `MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC`  
 **owner:** Team 10 (SSOT); מקור: Team 90 Draft  

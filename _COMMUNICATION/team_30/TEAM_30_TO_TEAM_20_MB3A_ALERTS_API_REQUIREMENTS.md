@@ -1,4 +1,5 @@
 # Team 30 → Team 20: דרישות API — עמוד התראות (Alerts, D34)
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 20 (Backend)  

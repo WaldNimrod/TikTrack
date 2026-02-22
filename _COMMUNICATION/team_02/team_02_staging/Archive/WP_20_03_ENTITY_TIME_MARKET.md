@@ -1,4 +1,5 @@
 # 📑 אפיון LOD 400: זמן וסטטוס שוק (Time & Market Status)
+**project_domain:** TIKTRACK
 
 **משימה:** WP-20.3 | **צוות:** 20
 

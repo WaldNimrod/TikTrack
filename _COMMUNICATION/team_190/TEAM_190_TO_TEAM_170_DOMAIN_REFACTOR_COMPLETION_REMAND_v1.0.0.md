@@ -1,5 +1,7 @@
 # TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_COMPLETION_REMAND_v1.0.0
 
+project_domain: AGENTS_OS
+
 **id:** TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_COMPLETION_REMAND_v1.0.0  
 **from:** Team 190 (Architectural Validator / Spy)  
 **to:** Team 170 (Librarian & Structural Custodian)  

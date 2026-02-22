@@ -2,10 +2,10 @@
 
 **id:** TEAM_170_DOMAIN_REFACTOR_EXECUTION_PLAYBOOK_v1.0.0  
 **from:** Team 170  
-**re:** TEAM_100_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_v1.0.0  
+**re:** TEAM_100_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_v1.0.0 + **TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_EXPANDED_v1.1.0**  
 **date:** 2026-02-21  
 **project_domain:** AGENTS_OS  
-**purpose:** סדר עבודה ממוקד ויעיל — סריקה אחת, החלטות באצווה, ביצוע לפי שלבים עם נקודות בדיקה.
+**purpose:** סדר עבודה ממוקד; יישור מלא ל־E1–E7 ו־7 תוצרי חובה per Team 190 expanded directive.
 
 ---
 
@@ -29,30 +29,30 @@
 | A2 | יצירת `_COMMUNICATION/99-ARCHIVE/` + README | ✅ בוצע |
 | A3 | רשימת קבצי in-scope קבועה: קבצי S001-P001-WP001 (מרשימת WORK_PACKAGE_DEFINITION + MASTER_TASK_LIST), קנון (SSM, Gate protocol, Bible, TT2, Gateway, Master List, רג'יסטרים, תבניות), קבצי GATE נוכחי | קובץ DOMAIN_REFACTOR_IN_SCOPE_LIST_v1.0.0.md |
 
-### שלב B — סריקה וסיווג (פעם אחת)
+### שלב B — סריקה וסיווג (E2 + E3)
+
+| # | פעולה | תוצר חובה (per E2/E3) |
+|---|--------|------------------------|
+| B1 | סריקה מלאה: _COMMUNICATION, documentation, api, ui, tests, scripts, inbox — Agent_OS, Agents_OS, governance runtime | **DOMAIN_REFACTOR_SCAN_RESULTS_v1.0.0.md** (path-level) |
+| B2 | סיווג כל ארטיפקט: TIKTRACK \| AGENTS_OS \| SHARED; action (MOVE/RETAIN/REFERENCE_UPDATE); target_path; provenance_id | **DOMAIN_REFACTOR_CLASSIFICATION_MATRIX_v1.0.0.md** (columns: artifact_path, assigned_domain, classification_rationale, action, target_path, provenance_id) |
+| B3 | החלטה באצווה: legacy/ארכיון vs in-scope (per scoping) | רשימת פעולות |
+
+### שלב C — ביצוע (E4, E5, E6)
+
+| # | פעולה | תוצר חובה (per E4/E5/E6) |
+|---|--------|---------------------------|
+| C1 | ארכיון: העברת קבצים ל־99-ARCHIVE; תיעוד | אין מחיקה בלי ארכיון |
+| C2 | Legacy: שורת project_domain — legacy (אם לא ארכיון) | מינימלי |
+| C3 | In-scope: הוספת `project_domain: TIKTRACK \| AGENTS_OS \| SHARED` + תיקון נתיבים | **DOMAIN_REFACTOR_PROJECT_DOMAIN_HEADER_COVERAGE_v1.0.0.md** (totals, missing, invalid, exceptions) |
+| C4 | איחוד inbox: _ARCHITECTURAL_INBOX → _COMMUNICATION/_ARCHITECT_INBOX; העברת תוכן פיזי; עדכון refs | **DOMAIN_REFACTOR_LEGACY_INBOX_CONSOLIDATION_LOG_v1.0.0.md** |
+| C5 | MOVE כל AGENTS_OS ל־agents_os/; provenance לכל העברה | **DOMAIN_REFACTOR_MOVE_LOG_v1.0.0.md** (from_path, to_path, moved_at, moved_by, provenance_note) |
+
+### שלב D — דוח והגשה (E7 + חבילה)
 
 | # | פעולה | תוצר |
 |---|--------|------|
-| B1 | סריקת repo: כל .md שמזכירים Agent_OS, Agents_OS, Governance runtime | רשימת נתיבים |
-| B2 | לכל קובץ: האם בתוך in-scope? (active WP / canonical / stage not closed) → כן = IN_SCOPE, לא = LEGACY_OR_ARCHIVE | מטריצת סיווג (path \| TIKTRACK/AGENTS_OS/SHARED \| IN_SCOPE/LEGACY/ARCHIVE) |
-| B3 | החלטה באצווה: קבצי LEGACY — ארכיון (העברה ל־99-ARCHIVE) **או** הוספת שורת legacy אחת בלבד (ללא עריכת תוכן) | רשימת פעולות |
-
-### שלב C — ביצוע לפי סדר (מסודר)
-
-| # | פעולה | בדיקה |
-|---|--------|--------|
-| C1 | ארכיון: העברת קבצים שנבחרו ל־99-ARCHIVE; תיעוד ב־REFACTOR_LOG או בדוח | אין קבצים נמחקו בלי מיקום ארכיון |
-| C2 | Legacy: הוספת שורת `project_domain: … — legacy; no structural edit per domain refactor directive.` רק לקבצים שנבחרו ל־legacy (אם לא הועברו) | מינימלי; לא עריכת תוכן |
-| C3 | In-scope: הוספת `project_domain: TIKTRACK \| AGENTS_OS \| SHARED` + תיקון נתיבים (_COMMUNICATION/_ARCHITECT_INBOX) רק לרשימת IN_SCOPE | כל קבצי ה־WP הפעיל + קנון מעודכנים |
-| C4 | איחוד inbox: וידוא שכל האזכורים ל־_ARCHITECTURAL_INBOX מוחלפים ב־_COMMUNICATION/_ARCHITECT_INBOX (בקבצי in-scope); אם קיים תוכן פיזי תחת root inbox — העברה | נתיב קנוני בלבד |
-| C5 | העברת ארטיפקטים AGENTS_OS: MOVE (לא copy) ל־agents_os/ עם provenance (MOVED_FROM בכותרת או REFACTOR_LOG) | אין כפילות; provenance קיים |
-
-### שלב D — דוח והגשה
-
-| # | פעולה | תוצר |
-|---|--------|------|
-| D1 | כתיבת DOMAIN_REFACTOR_COMPLETION_REPORT_v1.0.0.md — מיפוי מבנה, סיווג, evidence-by-path, ארכיון/legacy/in-scope | דוח סופי |
-| D2 | הגשת בקשת ולידציה ל־Team 190 — כולל סקופ, דרישה מקורית, קישור למסמך Team 100 | TEAM_170_TO_TEAM_190_DOMAIN_REFACTOR_VALIDATION_REQUEST_v1.0.0.md |
+| D1 | **DOMAIN_REFACTOR_COMPLETION_REPORT_v1.0.0.md** (E7): Executive status; Scope; Scan totals; Classification totals; Move totals + unresolved; Header coverage; Legacy inbox evidence; Constraints compliance; Open exceptions + owners. כולל סעיף "Root and structure verification" (E1). | דוח סופי |
+| D2 | הגשת חבילה ל־190: 7 קבצים (Scan Results, Classification Matrix, Move Log, Header Coverage, Legacy Inbox Log, Completion Report, Validation Request מעודכן) | TEAM_170_TO_TEAM_190_DOMAIN_REFACTOR_VALIDATION_REQUEST_v1.0.0.md — status: completion-ready |
 
 ---
 
@@ -68,9 +68,10 @@
 ## 4) קישורים
 
 - **דרישת Team 100:** `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_v1.0.0.md`
+- **הוראה מורחבת Team 190 (E1–E7):** `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_EXPANDED_v1.1.0.md`
+- **קליטת מורחבת:** `_COMMUNICATION/team_170/TEAM_170_ACK_TEAM_190_DIRECTIVE_EXPANDED_v1.1.0.md`
 - **סקופינג:** `_COMMUNICATION/team_170/TEAM_170_DOMAIN_REFACTOR_SCOPING_v1.0.0.md`
-- **קליטה:** `_COMMUNICATION/team_170/TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_INTAKE_v1.0.0.md`
-- **בקשת ולידציה (לאחר ביצוע):** `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_DOMAIN_REFACTOR_VALIDATION_REQUEST_v1.0.0.md`
+- **חבילת הגשה (7 קבצים):** Scan Results, Classification Matrix, Move Log, Header Coverage, Legacy Inbox Log, Completion Report, Validation Request — כולם תחת `_COMMUNICATION/team_170/`
 
 ---
 

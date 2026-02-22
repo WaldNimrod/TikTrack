@@ -1,4 +1,5 @@
 # TEAM_100_TO_170_190_KNOWLEDGE_PROMOTION_ACTIVATION_v1.0.0
+**project_domain:** TIKTRACK
 
 **id:** TEAM_100_TO_170_190_KNOWLEDGE_PROMOTION_ACTIVATION_v1.0.0  
 **from:** Team 100 (Spec Engineering)  
@@ -42,7 +43,7 @@ For both **GATE_1** and **GATE_6** submissions:
 Team 190 must generate a **consolidated submission package** under:
 
 ```
-_ARCHITECTURAL_INBOX/<roadmap>/<initiative>/<work_package>/SUBMISSION_vX.Y.Z/
+_COMMUNICATION/_ARCHITECT_INBOX/<roadmap>/<initiative>/<work_package>/SUBMISSION_vX.Y.Z/
 ```
 
 The package must **physically contain**:

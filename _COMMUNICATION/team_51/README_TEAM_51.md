@@ -1,4 +1,5 @@
 # 📁 תיקיית תקשורת: Team 51 (QA Remote)
+**project_domain:** TIKTRACK
 
 **צוות:** Team 51 (QA Remote)  
 **תפקיד:** בדיקות QA מקיפות - Validation Framework  

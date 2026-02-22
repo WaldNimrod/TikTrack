@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10 (Batch 1 Summary & Governance Mandate)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (The Gateway) - For Distribution to All Teams

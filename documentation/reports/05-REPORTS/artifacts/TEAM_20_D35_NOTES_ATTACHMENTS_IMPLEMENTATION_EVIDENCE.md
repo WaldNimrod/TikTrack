@@ -1,4 +1,5 @@
 # Team 20 → Team 10 | D35 Notes (Rich Text + Attachments) — Implementation Evidence
+**project_domain:** TIKTRACK
 
 **Task:** MB3A — D35 Notes API  
 **Mandate:** [TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE](../../_COMMUNICATION/team_10/TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE.md)  

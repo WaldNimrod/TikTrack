@@ -1,6 +1,7 @@
 ---
 id: ARCH-STRAT-002 | owner: Architect | status: APPROVED
 ---
+**project_domain:** TIKTRACK
 # 🏰 ניתוח אדריכלי: נעילת ספקי נתונים (Stage-1)
 
 ## 📊 1. בחירת הספקים והחלופות

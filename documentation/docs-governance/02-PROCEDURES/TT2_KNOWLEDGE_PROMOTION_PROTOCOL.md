@@ -1,4 +1,5 @@
 # 📚 פרוטוקול קידום ידע (Knowledge Promotion Protocol)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_KNOWLEDGE_PROMOTION_PROTOCOL`  
 **owner:** Team 10 (The Gateway)  

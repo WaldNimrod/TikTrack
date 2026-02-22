@@ -1,4 +1,5 @@
 # החלטה: טיפוס עמוד פרופיל משתמש (/profile)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_DECISION_PROFILE_ROUTE`  
 **owner:** Team 10 (The Gateway)  

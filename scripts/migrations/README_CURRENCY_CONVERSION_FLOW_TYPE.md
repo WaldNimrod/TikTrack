@@ -1,4 +1,5 @@
 # Migration: Add CURRENCY_CONVERSION flow_type
+**project_domain:** TIKTRACK
 
 **מטרה:** מזהה ברור להמרת מטבע — לא להשתמש ב-OTHER.
 

@@ -1,4 +1,5 @@
 # Team 10 → אדריכלית: עדכון — יישור קו רשימת עמודים ו־SSOT
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_TO_ARCHITECT_P3_003_SSOT_ALIGNMENT_UPDATE  
 **from:** Team 10 (The Gateway)  

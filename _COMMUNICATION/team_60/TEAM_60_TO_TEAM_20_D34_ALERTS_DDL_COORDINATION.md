@@ -1,4 +1,5 @@
 # Team 60 → Team 20: תיאום DDL — D34 Alerts (עמוד התראות)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_60_TO_TEAM_20_D34_ALERTS_DDL_COORDINATION`  
 **from:** Team 60 (DevOps & Platform)  

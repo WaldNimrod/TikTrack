@@ -1,4 +1,5 @@
 # Team 10 → Team 20: D35 Notes — הוספת `tags` ל־NoteResponse
+**project_domain:** TIKTRACK
 
 **to:** Team 20 (Backend)  
 **from:** Team 10 (The Gateway)  

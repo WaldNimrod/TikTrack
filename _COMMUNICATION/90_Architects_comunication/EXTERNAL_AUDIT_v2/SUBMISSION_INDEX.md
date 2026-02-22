@@ -1,4 +1,5 @@
 # 📦 אינדקס תיקיית הגשה: ביקורת חיצונית v2.0
+**project_domain:** TIKTRACK
 
 **תאריך הגשה:** 2026-02-04  
 **סטטוס:** ✅ **READY FOR ARCHITECT REVIEW**  

@@ -1,4 +1,5 @@
 # Team 60: Evidence — User Tickers Migration (P3-020)
+**project_domain:** TIKTRACK
 
 **date:** 2026-02-14  
 **מקור:** TEAM_20_TO_TEAM_60_USER_TICKERS_MIGRATION_READY; TEAM_10_USER_TICKERS_WORK_PLAN 60.UT.1

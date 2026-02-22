@@ -1,4 +1,5 @@
 # TEAM 190 Gate 5 Validation Report
+**project_domain:** TIKTRACK
 
 **Date:** 2026-02-18  
 **Input package:** `_COMMUNICATION/team_190/TEAM_190_ACTIVATION_PACKAGE_2026-02-18/`  

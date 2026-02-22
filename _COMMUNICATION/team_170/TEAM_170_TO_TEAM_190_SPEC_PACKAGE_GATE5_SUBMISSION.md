@@ -1,4 +1,5 @@
 # Team 170 → Team 190: Spec Package Gate 5 Submission
+**project_domain:** TIKTRACK
 
 **from:** Team 170 (Librarian / SSOT Authority)  
 **to:** Team 190 (Constitutional Validator)  

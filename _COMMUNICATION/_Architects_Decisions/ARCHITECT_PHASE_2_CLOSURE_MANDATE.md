@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED
 supersedes: ARCHITECT_PHASE_2_FINAL_RESOLUTION_BLOCKERS.md
 ---
+**project_domain:** TIKTRACK
 
 # 🏰 מנדט אדריכל: נעילת פייז 2 והנחיות Retrofit (v1.0)
 

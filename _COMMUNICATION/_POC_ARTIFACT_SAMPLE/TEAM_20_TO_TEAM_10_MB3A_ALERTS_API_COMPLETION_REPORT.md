@@ -1,4 +1,5 @@
 # Team 20 → Team 10: דוח השלמה — Alerts API (D34)
+**project_domain:** TIKTRACK
 
 **From:** Team 20 (Backend)  
 **To:** Team 10 (The Gateway)  

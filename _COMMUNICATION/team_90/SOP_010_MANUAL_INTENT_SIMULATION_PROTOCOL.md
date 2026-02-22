@@ -1,4 +1,5 @@
 # 🧭 SOP-010: Manual Intent & Simulation Protocol (Locked)
+**project_domain:** TIKTRACK
 
 **id:** `SOP-010`  
 **owner:** Architect  

@@ -1,4 +1,5 @@
 # 📡 הודעה: צוות 31 → צוות 10 (Blueprint Ready - עמוד חשבונות מסחר)
+**project_domain:** TIKTRACK
 
 **From:** Team 31 (Blueprint)  
 **To:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # 🔐 Database Credentials Configuration - TikTrack Phoenix
+**project_domain:** TIKTRACK
 
 **id:** `TT2_DATABASE_CREDENTIALS`  
 **owner:** Team 60 (DevOps & Platform)  

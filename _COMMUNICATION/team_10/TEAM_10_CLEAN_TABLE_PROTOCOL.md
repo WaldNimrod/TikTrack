@@ -1,4 +1,5 @@
 # Team 10: Clean Table Protocol — רשימת סגירה מסודרת + קריטריונים
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-12  

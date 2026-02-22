@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10, צוות 30, צוות 31 (React Tables Framework)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (The Gateway), Team 30 (Frontend), Team 31 (Blueprint)

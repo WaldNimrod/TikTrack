@@ -1,4 +1,5 @@
 # 🏗️ Section Architecture: Lego UI Engine
+**project_domain:** TIKTRACK
 
 **id:** `TT2_SECTION_ARCHITECTURE_SPEC`  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Team 10 → Teams 30 & 40: פרומטי Build Alerts (D34)
+**project_domain:** TIKTRACK
 
 **date:** 2026-02-16  
 **תנאי:** Gate-0 Alerts ננעל; Build 31 במקביל או לפני. **מסמך מלא:** [TEAM_10_MB3A_ALERTS_ACTIVATION.md](TEAM_10_MB3A_ALERTS_ACTIVATION.md).

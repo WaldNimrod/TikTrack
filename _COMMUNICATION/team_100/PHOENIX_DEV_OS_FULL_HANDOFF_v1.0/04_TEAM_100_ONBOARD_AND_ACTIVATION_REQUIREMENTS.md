@@ -1,4 +1,5 @@
 # Team 100 Onboarding & Activation Mandate
+**project_domain:** TIKTRACK
 
 Team 100 (Spec Engineering) must complete the following before operational authority:
 

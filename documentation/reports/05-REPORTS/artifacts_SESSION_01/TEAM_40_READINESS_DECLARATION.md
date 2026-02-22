@@ -1,4 +1,5 @@
 # ✅ READINESS_DECLARATION | Team 40 (UI Assets)
+**project_domain:** TIKTRACK
 
 **From:** Team 40 (UI Assets)  
 **To:** Team 10 (The Gateway)  

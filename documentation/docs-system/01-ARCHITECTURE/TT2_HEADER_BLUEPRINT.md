@@ -1,4 +1,5 @@
 # 🏗️ Header & Shell Spec — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `TT2_HEADER_BLUEPRINT`  
 **owner:** Team 10 (The Gateway)  

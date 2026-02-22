@@ -1,4 +1,5 @@
 # Evidence: User Tickers + Crypto + European Exchanges — פערים
+**project_domain:** TIKTRACK
 
 **Date:** 2026-01-31  
 **Squad:** Team 50  

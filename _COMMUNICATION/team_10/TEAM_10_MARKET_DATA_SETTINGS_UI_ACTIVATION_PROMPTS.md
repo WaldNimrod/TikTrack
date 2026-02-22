@@ -1,4 +1,5 @@
 # פרומטים להפעלת צוותים — Market Data Settings UI (MD-SETTINGS)
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS  
 **נוהל:** TEAM_10_GATEWAY_ROLE_AND_PROCESS, TEAM_10_MASTER_TASK_LIST_PROTOCOL §1.2.1  

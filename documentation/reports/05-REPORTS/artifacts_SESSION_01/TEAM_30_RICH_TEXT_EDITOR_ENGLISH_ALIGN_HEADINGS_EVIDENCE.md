@@ -1,4 +1,5 @@
 # Evidence: עורך טקסט עשיר — כפתורים באנגלית, H3/H4, יישור, RTL/LTR
+**project_domain:** TIKTRACK
 **Session:** SESSION_01 | **Date:** 2026-01-31
 
 ## דרישות

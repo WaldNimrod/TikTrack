@@ -1,4 +1,5 @@
 # ✅ החלטה אדריכלית נעולה — Module/Menu Styling (SSOT)
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית (Gemini Bridge)  
 **אל:** Team 10  

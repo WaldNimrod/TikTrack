@@ -1,4 +1,5 @@
 # 📢 הצעה להודעה: דיוק תפקידים וחלוקת אחריות - Team 30 ו-Team 40
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_91_PROPOSAL_ROLE_CLARIFICATION_NOTIFICATION`  
 **from:** Team 91 (Code Assist)  

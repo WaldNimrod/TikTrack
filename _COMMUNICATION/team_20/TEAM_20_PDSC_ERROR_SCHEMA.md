@@ -1,4 +1,5 @@
 # 📋 PDSC Error Schema - JSON Schema Definition
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_20_PDSC_ERROR_SCHEMA`  
 **owner:** Team 20 (Backend Implementation)  

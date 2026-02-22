@@ -11,6 +11,7 @@ drift_status: CLEAN
 promotion_note: v2.2.0 — Knowledge Promotion Executor = Team 70 only per TEAM_100_RETURN_FOR_CANONICAL_UPDATE_v2.2.0
 ssm_final_lock: v1.0.0 — Governance Authority, Hierarchy Lock, Execution Order per TEAM_100_TO_170_SSM_FINAL_LOCK_v1.0.0
 ---
+**project_domain:** TIKTRACK
 # PHOENIX SYSTEM STATE (SSM) v1.0.0
 
 מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל־Gate 5 remediation: ישות ALERT ממופה לקוד/ספק בלבד (ללא ערכים מניחים). **מבנה קנוני v2.2.0:** היררכיה ומספור per 04_GATE_MODEL_PROTOCOL_v2.2.0.

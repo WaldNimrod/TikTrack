@@ -1,4 +1,5 @@
 # MARKET_DATA_PIPE_SPEC — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `MARKET_DATA_PIPE_SPEC`  
 **משימה:** 1-002 (Stage-1)  

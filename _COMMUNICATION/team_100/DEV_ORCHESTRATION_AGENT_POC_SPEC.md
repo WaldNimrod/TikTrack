@@ -7,6 +7,7 @@ Owner: Team 100
 Status: READY_FOR_ARCHITECT_REVIEW
 
 ---
+**project_domain:** TIKTRACK
 
 ## 1. Objective
 Implement a Dev-Orchestration Observer CLI capable of reconstructing the current development stage state from repository artifacts.

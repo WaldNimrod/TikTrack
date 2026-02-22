@@ -1,4 +1,5 @@
 # ⚖️ פסיקה אדריכלית: יישוב סתירת שמות (Entity vs ID)
+**project_domain:** TIKTRACK
 
 **סטטוס:** 🔒 MASTER RESOLUTION | **תאריך:** 2026-02-05
 **סימוכין:** SPY_REPORT_90_01 | ARCHITECT_MANDATE_NAMING_CONVENTION v1.3

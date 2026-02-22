@@ -1,4 +1,5 @@
 # TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_EXPANDED_v1.1.0
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_190_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_EXPANDED_v1.1.0  
 **from:** Team 190 (Architectural Validator / Spy)  

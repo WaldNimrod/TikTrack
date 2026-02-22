@@ -1,4 +1,5 @@
 # 🌱 נתוני בדיקה (Test Data Seed) — נוהל הרצה
+**project_domain:** TIKTRACK
 
 **Team 60 (DevOps & Platform)**  
 **מטרה:** הרצת נתוני דוגמה (trading_accounts, brokers_fees, cash_flows) עם `is_test_data = true`.  

@@ -1,4 +1,5 @@
 # DEV OS TARGET MODEL – CANONICAL INDEX v1.3.1
+**project_domain:** TIKTRACK
 Status: LOCKED
 Date: 2026-02-18
 

@@ -4,6 +4,7 @@ owner: Chief Architect
 status: LOCKED - SIGNED OFF
 context: Batch 2.5 Closure & Hierarchy Adoption
 ---
+**project_domain:** TIKTRACK
 # 🏰 פסיקה אדריכלית: חיתום בץ 2.5 ואימוץ משילות משימות
 
 **נמרוד וכל הצוותים,**

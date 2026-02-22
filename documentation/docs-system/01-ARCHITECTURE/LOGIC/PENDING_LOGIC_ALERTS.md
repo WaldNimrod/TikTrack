@@ -1,4 +1,5 @@
 # 🚨 התראות לוגיקה וחוב טכני למימוש (Logic Alerts)
+**project_domain:** TIKTRACK
 
 **id:** `PENDING_LOGIC_ALERTS`  
 **owner:** Team 20 (Backend Implementation)  

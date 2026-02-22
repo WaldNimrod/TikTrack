@@ -1,4 +1,5 @@
 # Team 10 → Team 31: בקשת תשומה — P3-003 Blueprint Scope + Drift
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 31 (Blueprint)  

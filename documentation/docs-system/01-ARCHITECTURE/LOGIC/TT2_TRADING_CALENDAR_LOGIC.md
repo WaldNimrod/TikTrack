@@ -1,4 +1,5 @@
 # 📅 Trading Calendar Engine
+**project_domain:** TIKTRACK
 
 **id:** `TT2_TRADING_CALENDAR_LOGIC`  
 **owner:** Team 20 (Backend Implementation)  

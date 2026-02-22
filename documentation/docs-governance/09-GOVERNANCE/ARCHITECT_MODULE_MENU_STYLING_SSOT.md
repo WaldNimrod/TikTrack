@@ -1,4 +1,5 @@
 # 🏰 החלטה אדריכלית נעולה — Module/Menu Styling (SSOT)
+**project_domain:** TIKTRACK
 
 **id:** `ARCHITECT_MODULE_MENU_STYLING_SSOT`  
 **owner:** Architect  

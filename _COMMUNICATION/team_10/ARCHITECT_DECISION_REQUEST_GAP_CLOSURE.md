@@ -1,4 +1,5 @@
 # Architect Decision Request — Gap Closure (GAP_CLOSURE_BEFORE_AGENT_POC)
+**project_domain:** TIKTRACK
 
 **id:** ARCHITECT_DECISION_REQUEST_GAP_CLOSURE  
 **from:** Team 10 (The Gateway)  

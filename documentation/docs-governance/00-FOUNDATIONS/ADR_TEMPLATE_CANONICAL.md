@@ -8,6 +8,7 @@ doc_schema_version: 1.0
 last_updated: 2026-02-16
 authority: _COMMUNICATION/_Architects_Decisions/ARCHITECT_DECISION_TEMPLATE.md
 ---
+**project_domain:** TIKTRACK
 
 # ADR Template — Canonical Governance Standard
 

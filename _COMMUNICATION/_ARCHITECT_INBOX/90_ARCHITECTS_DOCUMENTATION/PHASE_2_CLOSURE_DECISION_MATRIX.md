@@ -3,6 +3,7 @@ id: DEC-MATRIX-P2-FINAL
 owner: Architect
 status: LOCKED
 ---
+**project_domain:** TIKTRACK
 # 🏰 מטריצת החלטות אדריכלית סופית: סגירת פייז 2
 
 1. **רספונסיביות:** Option D (Sticky Start/End). clamp() מוגדר לפי סוג תוכן.

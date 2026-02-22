@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED - G-LEAD APPROVED
 SV: 1.0.0
 ---
+**project_domain:** TIKTRACK
 # 🏰 מנדט אדריכל: השלמות בץ 2.5 (Cumulative Polish)
 
 ## 🛠️ 1. יישור גרסאות ל-1.0.0

@@ -1,4 +1,5 @@
 # 🏰 אינדקס אדריכל מרכזי (v8.4.0)
+**project_domain:** TIKTRACK
 > **DEPRECATED (2026-02-16):** סמכות אדריכלית פעילה מנוהלת דרך `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md`. תיקייה זו נשמרת כעותק מורשת בלבד ונארכבה תחת `archive/documentation_legacy/90_ARCHITECTS_DOCUMENTATION/`.
 ## 📜 חוקי יסוד (LOCKED 🔒)
 - ADR-014: Data Model Pivot (Account-based Fees).

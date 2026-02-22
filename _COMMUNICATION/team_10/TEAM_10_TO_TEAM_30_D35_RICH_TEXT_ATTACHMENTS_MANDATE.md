@@ -1,4 +1,5 @@
 # Team 10 → Team 30 | D35 Rich Text + Attachments — מנדט ביצוע
+**project_domain:** TIKTRACK
 
 **משימת-על:** D35_RICH_TEXT_ATTACHMENTS_LOCK (MB3A)  
 **מקור:** Team 90 Feedback Lock (D35 Notes); תוכנית: [TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md](TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md) §5  

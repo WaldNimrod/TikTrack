@@ -1,4 +1,5 @@
 # Gate Model Alignment — Architectural Approval Protocol
+**project_domain:** TIKTRACK
 
 **id:** TEAM_170_GATE_MODEL_ALIGNMENT_ARCH_APPROVAL_2026-02-21  
 **from:** Team 170  

@@ -1,4 +1,5 @@
 # Team 60 → Team 100: INFRASTRUCTURE_ALIGNMENT — אישור והתחייבות
+**project_domain:** TIKTRACK
 
 **To:** Team 100  
 **From:** Team 60 (DevOps & Platform)  

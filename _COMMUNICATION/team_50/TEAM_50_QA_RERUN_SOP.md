@@ -1,4 +1,5 @@
 # Team 50 — SOP: ריצת בדיקות + Feedback לצוותים
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_50_QA_RERUN_SOP`  
 **purpose:** תהליך אופטימלי ומהיר לבדיקה חוזרת + העברת משוב מפורט

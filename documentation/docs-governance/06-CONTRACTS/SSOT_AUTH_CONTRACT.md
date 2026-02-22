@@ -1,4 +1,5 @@
 # SSOT Auth Contract — חוזה Auth אחיד
+**project_domain:** TIKTRACK
 
 **מקור:** Team 90 — PDSC Boundary + Auth Contract שלד מחייב  
 **תאריך:** 2026-02-12  

@@ -1,4 +1,5 @@
 # Team 10 — P3-003 Blueprint Scope + Drift (מטריצה ותיעוד)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_P3_003_BLUEPRINT_SCOPE_AND_DRIFT_MATRIX  
 **from:** Team 10 (The Gateway)  

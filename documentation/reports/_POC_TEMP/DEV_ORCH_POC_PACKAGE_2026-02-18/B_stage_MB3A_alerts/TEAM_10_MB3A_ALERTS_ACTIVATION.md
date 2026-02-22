@@ -1,4 +1,5 @@
 # MB3A Alerts — הפעלת תהליך עמוד התראות (D34)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_MB3A_ALERTS_ACTIVATION  
 **owner:** Team 10 (The Gateway)  

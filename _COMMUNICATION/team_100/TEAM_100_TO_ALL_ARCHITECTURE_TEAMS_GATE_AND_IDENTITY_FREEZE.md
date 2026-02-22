@@ -1,4 +1,5 @@
 # TEAM 100 → ALL ARCHITECTURE TEAMS — Gate & Identity Freeze
+**project_domain:** TIKTRACK
 
 **from:** Team 100  
 **to:** All Architecture Teams (Team 10, Team 90, Team 170, Team 190, and all teams in the architecture chain)  

@@ -1,4 +1,5 @@
 # 📚 SSOT Registry - רישום נכסים משותפים
+**project_domain:** TIKTRACK
 
 **id:** `TT2_SSOT_REGISTRY`  
 **owner:** Team 10 (The Gateway)  

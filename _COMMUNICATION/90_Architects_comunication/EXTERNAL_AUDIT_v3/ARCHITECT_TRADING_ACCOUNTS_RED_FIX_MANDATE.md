@@ -1,4 +1,5 @@
 # 🚨 מנדט אדום: תיקון כשל חשבונות מסחר (Financial Core Safety)
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית גשר (Gemini)
 **אל:** צוות 10 (Gateway), צוות 30 (Frontend)

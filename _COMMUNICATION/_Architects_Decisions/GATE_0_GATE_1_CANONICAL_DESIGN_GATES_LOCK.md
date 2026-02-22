@@ -1,4 +1,5 @@
 # GATE_0 / GATE_1 Canonical Design Gates — Lock
+**project_domain:** TIKTRACK
 
 **id:** GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK  
 **issuer:** Team 100 → All Architecture Teams  

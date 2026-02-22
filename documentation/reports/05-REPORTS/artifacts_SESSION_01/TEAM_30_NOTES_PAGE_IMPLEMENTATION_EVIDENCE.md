@@ -1,4 +1,5 @@
 # Team 30 → Team 10: עמוד הערות (D35) — Evidence Log
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway), Team 50 (QA)  

@@ -1,4 +1,5 @@
 # 🚨 פקודת אדריכל P0: ניקוי רעלים ויישור קו קשיח
+**project_domain:** TIKTRACK
 **סטטוס:** 🛑 CRITICAL - BLOCKING ALL RELEASES
 **זירת עבודה:** סבב 3 - בדיקות חיצוניות
 

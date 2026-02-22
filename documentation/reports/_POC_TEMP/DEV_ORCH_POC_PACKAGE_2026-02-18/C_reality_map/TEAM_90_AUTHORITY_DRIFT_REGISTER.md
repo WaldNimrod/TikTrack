@@ -1,4 +1,5 @@
 # Team 90 -> Team 10 | Phase A Deliverable: Authority Drift Register
+**project_domain:** TIKTRACK
 
 **id:** TEAM_90_AUTHORITY_DRIFT_REGISTER_2026_02_16
 **from:** Team 90 (External Validation Unit)

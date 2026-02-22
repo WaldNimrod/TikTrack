@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED
 context: Governance / Release Integrity
 ---
+**project_domain:** TIKTRACK
 
 # 📜 נוהל משילות: ניהול גרסאות אחוד (Versioning Policy)
 

@@ -1,4 +1,5 @@
 # Evidence — Market Data Settings UI | Gate-A אימות סופי
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS  
 **שער:** Gate-A (QA validation)  

@@ -1,4 +1,5 @@
 # Team 50 — MB3A Notes E2E Checklist (ידני)
+**project_domain:** TIKTRACK
 
 **מקור:** TEAM_30_MB3A_NOTES_IMPLEMENTATION_SUMMARY_REPORT §4  
 **תאריך:** 2026-02-16  

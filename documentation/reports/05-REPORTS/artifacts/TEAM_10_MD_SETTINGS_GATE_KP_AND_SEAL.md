@@ -1,4 +1,5 @@
 # Gate-KP + Seal — MD-SETTINGS (Market Data System Settings UI)
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS  
 **תאריך:** 2026-02-15  

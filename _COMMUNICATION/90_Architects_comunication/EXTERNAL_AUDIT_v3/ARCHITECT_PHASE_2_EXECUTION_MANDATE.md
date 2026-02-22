@@ -1,4 +1,5 @@
 # 🚀 פקודת אדריכל: ביצוע פייז 2.0 והטמעת שער קידום (Promotion Gate)
+**project_domain:** TIKTRACK
 
 **סטטוס:** 🟢 **ACTIVE** | **תאריך:** 2026-02-06
 **סימוכין:** SPY_FINAL_GREEN | BATCH_2_PLAN_V1.1

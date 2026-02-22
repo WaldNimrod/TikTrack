@@ -1,4 +1,5 @@
 # Canonical Governance Anchors
+**project_domain:** TIKTRACK
 
 **status:** VALIDATED_BASELINE  
 **date:** 2026-02-18

@@ -1,4 +1,5 @@
 # Team 10 → Team 50: הגשת חבילה ל-QA (GATE_4) + פרומט — S001-P001-WP001
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_TO_TEAM_50_S001_P001_WP001_QA_SUBMISSION_AND_PROMPT  
 **from:** Team 10 (The Gateway)  

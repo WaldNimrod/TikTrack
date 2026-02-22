@@ -1,4 +1,5 @@
 # 🏗️ Backend Lego Architecture (A-09)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_BACKEND_LEGO_SPEC`  
 **owner:** Team 20 (Backend Implementation)  

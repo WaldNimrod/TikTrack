@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED - OFFICIAL RESPONSE
 supersedes: ADR-012
 ---
+**project_domain:** TIKTRACK
 
 # 🏰 פסיקה אדריכל: סגירת חורי אפיון וביצור שער האוטנטיקציה
 

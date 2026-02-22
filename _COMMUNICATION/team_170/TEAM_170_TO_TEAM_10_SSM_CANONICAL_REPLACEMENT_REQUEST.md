@@ -1,4 +1,5 @@
 # Team 170 → Team 10: SSM Canonical Replacement Request (Gate 5 Remediation)
+**project_domain:** TIKTRACK
 
 **from:** Team 170 (Librarian / SSOT Authority)  
 **to:** Team 10 (The Gateway) / Architect  

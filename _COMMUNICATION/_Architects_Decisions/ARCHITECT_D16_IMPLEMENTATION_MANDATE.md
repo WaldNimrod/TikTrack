@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← כל הצוותים (D16 Implementation Plan)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (Gateway), Team 20 (Backend), Team 30 (Frontend), Team 40 (UI/Design)

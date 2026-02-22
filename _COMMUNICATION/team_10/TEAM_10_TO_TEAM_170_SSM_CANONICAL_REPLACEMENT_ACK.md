@@ -1,4 +1,5 @@
 # Team 10 → Team 170: SSM Canonical Replacement — ACK
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 170 (Librarian / SSOT Authority)  

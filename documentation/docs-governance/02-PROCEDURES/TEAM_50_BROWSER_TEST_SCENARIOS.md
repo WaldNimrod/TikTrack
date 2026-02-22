@@ -1,4 +1,5 @@
 # 🧪 תרחישי בדיקה בדפדפן - Team 50 (QA)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_50_BROWSER_TEST_SCENARIOS`  
 **owner:** Team 50 (QA & Fidelity)  

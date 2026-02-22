@@ -1,4 +1,5 @@
 # 📑 GIN-2026-008: הבהרות טכניות סופיות - פייז 1 (Identity & JWT)
+**project_domain:** TIKTRACK
 
 **id:** `GIN_2026_008_TECHNICAL_CLARIFICATIONS`  
 **owner:** Team 10 (The Gateway)  

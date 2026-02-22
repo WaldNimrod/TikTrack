@@ -1,4 +1,5 @@
 # Team 10 — החלטות רשמיות לסגירת פערים (GAP_CLOSURE_BEFORE_AGENT_POC)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_GAP_CLOSURE_FORMAL_DECISIONS  
 **owner:** Team 10 (The Gateway)  

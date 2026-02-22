@@ -1,4 +1,5 @@
 # 📣 הודעה מחייבת: SOP‑010 — Manual Intent & Simulation Protocol
+**project_domain:** TIKTRACK
 
 **מאת:** Team 90 (The Spy)  
 **אל:** כל הצוותים  

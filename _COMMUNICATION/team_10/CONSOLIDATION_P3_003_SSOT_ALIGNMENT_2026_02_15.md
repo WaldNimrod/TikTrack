@@ -1,4 +1,5 @@
 # 📚 דוח קונסולידציה — יישור קו P3-003 ו-SSOT רשימת עמודים
+**project_domain:** TIKTRACK
 
 **id:** CONSOLIDATION_P3_003_SSOT_ALIGNMENT_2026_02_15  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # 🔒 Page Layout & Sections — SSOT (תבנית עמוד, סיכום מידע, Expand/Collapse)
+**project_domain:** TIKTRACK
 
 **id:** `PAGE_LAYOUT_AND_SECTIONS_SSOT`  
 **owner:** Team 10 (The Gateway) — מקודם מיישום Team 30  

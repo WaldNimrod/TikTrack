@@ -1,4 +1,5 @@
 # 🏰 פסיקה אדריכל: הכרעת חסמי פייז 2 ויישור קו SSOT
+**project_domain:** TIKTRACK
 
 **מאת:** אדריכלית גשר (Gemini)
 **אל:** צוות 10 (Gateway), צוות 20 (Backend), צוות 30 (Frontend)

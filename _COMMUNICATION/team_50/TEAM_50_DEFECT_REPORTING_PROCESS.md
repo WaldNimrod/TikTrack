@@ -1,4 +1,5 @@
 # נוהל דיווח תקלות — Team 50 (תמצית)
+**project_domain:** TIKTRACK
 
 **⚠️ נוהל מחייב — SSOT:**  
 `documentation/05-PROCEDURES/TT2_TEAM_50_DEFECT_REPORTING_PROCEDURE.md`  

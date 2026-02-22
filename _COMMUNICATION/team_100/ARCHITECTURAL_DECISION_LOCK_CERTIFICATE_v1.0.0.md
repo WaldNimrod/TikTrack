@@ -1,4 +1,5 @@
 id: ARCHITECTURAL_DECISION_LOCK_CERTIFICATE_v1.0.0
+**project_domain:** TIKTRACK
 from: Team 100 (Spec Engineering)
 to: Team 10, Team 170, Team 190
 date: 2026-02-20

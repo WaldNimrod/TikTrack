@@ -1,4 +1,5 @@
 # Team 70 → Team 10 | ADR Template Governance Integration Complete
+**project_domain:** TIKTRACK
 
 **id:** TEAM_70_ADR_GOVERNANCE_INTEGRATION  
 **from:** Team 70 (Knowledge Librarian)  

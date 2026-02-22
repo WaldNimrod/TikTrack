@@ -1,4 +1,5 @@
 # 📊 מפרט ספק: Yahoo Finance
+**project_domain:** TIKTRACK
 
 **SSOT:** MISSION_DIRECTIVE_90_02_FINAL, MISSION_90_02_LEGACY_YAHOO_INVESTIGATION_REPORT  
 **SOP-015:** Cooldown Protocol enforced.

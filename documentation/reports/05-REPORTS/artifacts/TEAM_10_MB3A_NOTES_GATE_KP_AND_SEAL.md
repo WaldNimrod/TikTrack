@@ -1,4 +1,5 @@
 # MB3A Notes — Gate-KP וסגירה (Seal)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_MB3A_NOTES_GATE_KP_AND_SEAL  
 **owner:** Team 10 (The Gateway)  

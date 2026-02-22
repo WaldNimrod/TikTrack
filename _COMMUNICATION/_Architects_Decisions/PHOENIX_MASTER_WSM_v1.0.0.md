@@ -6,6 +6,7 @@ structural_revision: v2.2.0
 owner: Team 10
 ssm_dependency: 1.0.0
 ---
+**project_domain:** TIKTRACK
 # 🛠️ PHOENIX WORK STATE (WSM) v1.0.0
 
 מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח. **מבנה קנוני v2.2.0** (היררכיה, מספור, GATE_2/GATE_8) per 04_GATE_MODEL_PROTOCOL_v2.2.0.

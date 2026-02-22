@@ -1,4 +1,5 @@
 # 🏗️ TikTrack Phoenix Infrastructure Guide
+**project_domain:** TIKTRACK
 
 **id:** `TT2_INFRASTRUCTURE_GUIDE`  
 **owner:** Team 10 (The Gateway)  

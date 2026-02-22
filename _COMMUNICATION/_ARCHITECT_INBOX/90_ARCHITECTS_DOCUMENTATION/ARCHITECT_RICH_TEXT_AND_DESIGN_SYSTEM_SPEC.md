@@ -1,4 +1,5 @@
 # 🖋️ מפרט אדריכלי: Rich-Text & Design System (SOP-012)
+**project_domain:** TIKTRACK
 ---
 **Tooling:** TipTap (Starter Kit + Link + TextStyle + Attributes).
 

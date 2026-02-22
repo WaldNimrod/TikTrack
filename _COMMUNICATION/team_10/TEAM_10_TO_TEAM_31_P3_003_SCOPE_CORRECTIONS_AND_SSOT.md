@@ -1,4 +1,5 @@
 # Team 10 → Team 31: תיקוני סקופ ויישור ל-SSOT רשימת עמודים
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 31 (Blueprint)  

@@ -1,4 +1,5 @@
 # 🧪 אינדקס בדיקות QA - Team 50
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_50_QA_TEST_INDEX`  
 **owner:** Team 50 (QA & Fidelity)  

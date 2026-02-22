@@ -1,4 +1,5 @@
 # DOMAIN_STRUCTURE_MAP
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_190_DOMAIN_STRUCTURE_MAP_2026-02-21  
 **owner:** Team 190 (READ_ONLY intelligence)  
@@ -18,7 +19,7 @@
 - `./blueprints`
 - `./storage`
 - `./raw_inputs`
-- `./_ARCHITECTURAL_INBOX`
+- `./_COMMUNICATION/_ARCHITECT_INBOX`
 - `./archive`
 - plus technical folders (`.git`, `.cursor`, `.vscode`, caches/temp)
 
@@ -90,18 +91,18 @@ These form the current concrete implementation surface.
   - `_COMMUNICATION/_ARCHITECT_INBOX`: 11 files
   - `_COMMUNICATION/team_100`: 4 files
   - `_COMMUNICATION/_Architects_Decisions`: 3 files
-  - `_ARCHITECTURAL_INBOX/...`: 3 files
+  - `_COMMUNICATION/_ARCHITECT_INBOX/...`: 3 files
 
 Representative evidence paths:
 - `_COMMUNICATION/team_10/TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md`
 - `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_S001_P001_WP001_QA_SUBMISSION_AND_PROMPT.md`
 - `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S001_P001_WP001_QA_REPORT.md`
-- `_ARCHITECTURAL_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/SPEC_PACKAGE.md`
+- `_COMMUNICATION/_ARCHITECT_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/SPEC_PACKAGE.md`
 
 ### C. Legacy inbox path persistence
-- Domain/governance artifacts still exist under root `_ARCHITECTURAL_INBOX/` while canonical submission channel is `_COMMUNICATION/_ARCHITECT_INBOX/`.
+- Domain/governance artifacts still exist under root `_COMMUNICATION/_ARCHITECT_INBOX/` while canonical submission channel is `_COMMUNICATION/_ARCHITECT_INBOX/`.
 - Evidence:
-  - `_ARCHITECTURAL_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/COVER_NOTE.md`
+  - `_COMMUNICATION/_ARCHITECT_INBOX/AGENT_OS_PHASE_1/INFRASTRUCTURE_STAGE_1/MB3A_SPEC_PACKAGE_v1.4.0/SUBMISSION_v1.4.0/COVER_NOTE.md`
 
 ---
 

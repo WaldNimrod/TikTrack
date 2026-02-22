@@ -1,4 +1,5 @@
 # ✅ דוח השלמה: P0 אדום - ניקוי רעלים
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **אל:** אדריכלית גשר (Gemini)  

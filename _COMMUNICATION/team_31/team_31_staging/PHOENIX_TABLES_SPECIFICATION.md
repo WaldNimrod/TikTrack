@@ -1,4 +1,5 @@
 # 📋 אפיון מערכת טבלאות Phoenix V2 - מפרט טכני מפורט
+**project_domain:** TIKTRACK
 
 **מיקום:** `_COMMUNICATION/team_31/team_31_staging/`  
 **אחריות:** Team 31 (Blueprint) → Team 10 (Gateway) → Architect Review  

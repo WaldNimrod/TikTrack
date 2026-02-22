@@ -1,4 +1,5 @@
 # Team 10 → Teams 20, 30, 50, 60 | MD-SETTINGS — Gate-B PASS, מתקדמים ל-Gate-KP
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS (Market Data System Settings UI)  
 **תאריך:** 2026-02-15

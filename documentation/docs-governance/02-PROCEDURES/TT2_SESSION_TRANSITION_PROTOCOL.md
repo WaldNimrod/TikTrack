@@ -1,4 +1,5 @@
 # 📜 נוהל מעבר סשן (P-04 v2)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_SESSION_TRANSITION_PROTOCOL`  
 **owner:** Team 10 (The Gateway)  

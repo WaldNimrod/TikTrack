@@ -1,4 +1,5 @@
 # Team 10 → Team 90 | הגשת חבילת תכנון — ניהול תזמוני נתונים חיצוניים (Market Data Settings UI)
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 90 / האדריכלית  

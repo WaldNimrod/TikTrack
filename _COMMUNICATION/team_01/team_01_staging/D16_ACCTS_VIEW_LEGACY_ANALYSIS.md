@@ -1,4 +1,5 @@
 # 📋 ניתוח לגסי: D16_ACCTS_VIEW.html (ניהול חשבונות מסחר)
+**project_domain:** TIKTRACK
 
 **תאריך ניתוח:** 2026-02-01  
 **צוות:** Team 31 (Blueprint)  

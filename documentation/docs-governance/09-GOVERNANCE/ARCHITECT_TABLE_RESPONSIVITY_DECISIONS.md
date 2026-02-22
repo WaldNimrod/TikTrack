@@ -1,4 +1,5 @@
 # 🏰 פסיקה אדריכל: אסטרטגיית טבלאות נזילות (Phase 2)
+**project_domain:** TIKTRACK
 
 **id:** `ARCHITECT_TABLE_RESPONSIVITY_DECISIONS`
 **owner:** Architect

@@ -1,4 +1,5 @@
 # Team 20 → Team 100 / Team 10: Governance Relock — אישור קבלה
+**project_domain:** TIKTRACK
 
 **To:** Team 100 (Development Architecture Lead), Team 10 (The Gateway)  
 **From:** Team 20 (Backend Engineering)  

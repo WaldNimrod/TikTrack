@@ -1,4 +1,5 @@
 # Cube Scaffolding - תבנית ליצירת קוביות חדשות
+**project_domain:** TIKTRACK
 
 **Team 60 (DevOps & Platform)**  
 **תאריך:** 2026-02-02  

@@ -1,4 +1,5 @@
 # 📊 מטריצת גרסאות נוכחית (Version Matrix)
+**project_domain:** TIKTRACK
 
 **מקור המבנה והכללים:** קבצי האדריכלית — `documentation/90_ARCHITECTS_DOCUMENTATION/TT2_VERSION_MATRIX.md` (או Google Drive).  
 **ערך SV נוכחי:** נקבע ע"י G-Lead — גרסה ראשית **1.0** (במקור האדריכלית הופיע 2.0.0; אותו נוהל Ceiling).  

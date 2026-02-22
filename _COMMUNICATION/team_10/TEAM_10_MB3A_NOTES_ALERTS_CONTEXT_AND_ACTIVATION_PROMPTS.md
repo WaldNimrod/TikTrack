@@ -1,4 +1,5 @@
 # MB3A (Notes → Alerts) — קונטקסט, תאום ופרומטי הפעלה לפי סדר ביצוע
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_MB3A_CONTEXT_AND_ACTIVATION_PROMPTS  
 **owner:** Team 10 (The Gateway)  

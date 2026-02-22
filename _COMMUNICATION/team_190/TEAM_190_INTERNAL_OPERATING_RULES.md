@@ -1,4 +1,5 @@
 # TEAM_190_INTERNAL_OPERATING_RULES
+**project_domain:** TIKTRACK
 
 **team:** Team 190 (Constitutional Architectural Validation)  
 **status:** ACTIVE  
@@ -51,7 +52,7 @@ All Team 190 architectural submission packages must be placed under:
 
 Path rules:
 
-1. Do not place new architect submission packages under project-root `_ARCHITECTURAL_INBOX/`.
+1. Do not place new architect submission packages under any legacy project-root inbox path; use _COMMUNICATION/_ARCHITECT_INBOX/ only.
 2. Use `_COMMUNICATION/_ARCHITECT_INBOX/` as the single operational inbox path for architect-facing submissions.
 3. If a package was created in a wrong location, move it and update all submission references in the same remediation cycle.
 

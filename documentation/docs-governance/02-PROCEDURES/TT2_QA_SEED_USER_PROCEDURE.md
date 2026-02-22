@@ -1,4 +1,5 @@
 # 👤 נוהל: Seed משתמש QA לבדיקות Gate B (Runtime/E2E)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_QA_SEED_USER_PROCEDURE`  
 **owner:** Team 60 (DevOps & Platform) — תיעוד: Team 10 (Gateway)  

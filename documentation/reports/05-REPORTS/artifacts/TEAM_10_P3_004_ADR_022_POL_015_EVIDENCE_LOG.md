@@ -1,4 +1,5 @@
 # Evidence Log — P3-004 (ADR-022 + POL-015 Enforcement)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_P3_004_ADR_022_POL_015_EVIDENCE_LOG  
 **owner:** Team 10 (The Gateway)  

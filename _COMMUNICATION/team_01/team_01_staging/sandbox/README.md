@@ -1,4 +1,5 @@
 # 📦 Sandbox Directory
+**project_domain:** TIKTRACK
 
 ## מטרה
 תיקייה זו מכילה את כל קבצי ה-**Preview/Sandbox** שנוצרו אוטומטית על ידי G-Bridge Validation System.

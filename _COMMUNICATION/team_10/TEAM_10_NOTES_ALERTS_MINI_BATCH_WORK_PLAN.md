@@ -1,4 +1,5 @@
 # תוכנית עבודה — Mini-Batch 3A (Notes → Alerts)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN  
 **owner:** Team 10 (The Gateway)  

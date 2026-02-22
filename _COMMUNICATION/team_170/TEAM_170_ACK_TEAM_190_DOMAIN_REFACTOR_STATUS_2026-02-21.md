@@ -1,4 +1,5 @@
 # Team 170 — אישור סטטוס Domain Refactor (Team 190)
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_170_ACK_TEAM_190_DOMAIN_REFACTOR_STATUS_2026-02-21  
 **from:** Team 170 (Librarian & Structural Custodian)  

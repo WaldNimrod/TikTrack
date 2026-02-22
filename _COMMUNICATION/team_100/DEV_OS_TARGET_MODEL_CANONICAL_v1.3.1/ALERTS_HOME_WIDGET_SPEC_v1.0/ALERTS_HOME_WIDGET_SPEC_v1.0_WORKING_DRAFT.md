@@ -11,6 +11,7 @@ related:
   - _COMMUNICATION/team_170/ALERTS_ENTITY_KNOWLEDGE_BASELINE_v1.0.md
   - docs-governance/00-FOUNDATIONS/ADR_TEMPLATE_CANONICAL.md
 ---
+**project_domain:** TIKTRACK
 
 # Alerts Home Widget — Spec v1.0 (Working Draft)
 

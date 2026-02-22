@@ -1,4 +1,5 @@
 # 🏗️ Architecture Overview
+**project_domain:** TIKTRACK
 
 **id:** `ARCHITECTURE_OVERVIEW`  
 **owner:** Team 10 (The Gateway)  

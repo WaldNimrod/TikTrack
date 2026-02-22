@@ -1,4 +1,5 @@
 # PHOENIX_DEV_DEPARTMENT_TARGET_ARCHITECTURE_SPEC.md
+**project_domain:** TIKTRACK
 
 Version: 1.2 (DRAFT)
 Date: 2026-02-18

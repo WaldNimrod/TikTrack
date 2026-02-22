@@ -1,4 +1,5 @@
 # SPEC_APPROVAL_REQUEST — SSM Lock and Structure Alignment
+**project_domain:** TIKTRACK
 
 **type:** SPEC_APPROVAL_REQUEST  
 **from:** Team 170 (Knowledge Librarian)  

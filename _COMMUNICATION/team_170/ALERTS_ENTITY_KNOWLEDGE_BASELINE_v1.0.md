@@ -1,4 +1,5 @@
 # Alerts Entity — Canonical Knowledge Baseline v1.0
+**project_domain:** TIKTRACK
 
 **id:** ALERTS_ENTITY_KNOWLEDGE_BASELINE_v1.0  
 **owner:** Team 170 (Librarian / SSOT Authority)  

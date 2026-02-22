@@ -8,6 +8,7 @@ validation_authority: Team 190
 active_stage: GAP_CLOSURE_BEFORE_AGENT_POC
 drift_status: CLEAN
 ---
+**project_domain:** TIKTRACK
 # PHOENIX SYSTEM STATE (SSM) v1.0.0 — CANDIDATE AFTER DELTA
 
 מניפסט זה הוא ה-Single Source of Truth (SSOT) החוקתי והטכני של פרויקט פיניקס. גרסה זו עודכנה בהתאם ל-SSM_DELTA_PROPOSAL_v1.0.0 (אין ערכים מניחים; ALERT ממופה לקוד/ספק בלבד).

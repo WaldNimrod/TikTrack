@@ -6,6 +6,7 @@ context: TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION — Task 3
 base: PI_STRATEGIC_NARRATIVE_REPORT.md
 date: 2026-02-15
 ---
+**project_domain:** TIKTRACK
 
 # User Pitch Pack — חומרים לפרזנטציה (Investor/User Deck)
 

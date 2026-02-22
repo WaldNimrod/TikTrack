@@ -1,4 +1,5 @@
 # הגדרות מערכת — נתוני שוק (Market Data System Settings) — SSOT
+**project_domain:** TIKTRACK
 
 **id:** `TT2_MARKET_DATA_SYSTEM_SETTINGS_SSOT`  
 **owner:** Team 10 (The Gateway)  

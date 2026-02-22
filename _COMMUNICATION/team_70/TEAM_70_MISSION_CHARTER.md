@@ -1,4 +1,5 @@
 # Team 70 Mission Charter (Product Intelligence)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_70_MISSION_CHARTER`  
 **owner:** Architect + Team 90  

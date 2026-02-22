@@ -1,4 +1,5 @@
 # TT2_DOMAIN_MODEL_AND_ENTITIES
+**project_domain:** TIKTRACK
 
 **id:** `TT2_DOMAIN_MODEL_AND_ENTITIES`  
 **owner:** Team 20 (Backend) + Team 30 (Frontend)  

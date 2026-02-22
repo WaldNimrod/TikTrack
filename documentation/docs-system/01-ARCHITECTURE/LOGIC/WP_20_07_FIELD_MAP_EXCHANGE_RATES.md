@@ -1,4 +1,5 @@
 # 🗺️ Field Map LOD 400: שערי חליפין (Exchange Rates)
+**project_domain:** TIKTRACK
 
 **id:** `WP_20_07_FIELD_MAP_EXCHANGE_RATES`  
 **owner:** Team 20 (Backend Implementation)  

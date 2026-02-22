@@ -1,4 +1,5 @@
 # 📜 מדיניות סקריפטים: מותר <script src>, אסור Inline
+**project_domain:** TIKTRACK
 
 **id:** `ARCHITECT_POLICY_HYBRID_SCRIPTS`  
 **owner:** Chief Architect (Gemini Bridge)  

@@ -1,4 +1,5 @@
 # Team 100 → Team 170: Gate 0 & Gate 1 Refinition Directive — Record (Evidence-by-Path)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_100_GATE_0_1_REFINITION_DIRECTIVE_RECORD  
 **from:** Team 170 (Librarian / SSOT Authority) — recorded for evidence-by-path  

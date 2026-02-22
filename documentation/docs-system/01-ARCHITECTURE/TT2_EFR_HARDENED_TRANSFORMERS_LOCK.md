@@ -1,4 +1,5 @@
 # EFR Hardened Transformers Lock - SSOT Lock Specification
+**project_domain:** TIKTRACK
 
 **id:** `TT2_EFR_HARDENED_TRANSFORMERS_LOCK`  
 **owner:** Team 10 (The Gateway) - SSOT  

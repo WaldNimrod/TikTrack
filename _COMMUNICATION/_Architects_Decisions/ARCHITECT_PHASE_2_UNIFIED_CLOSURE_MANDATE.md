@@ -4,6 +4,7 @@ owner: Architect
 status: LOCKED
 supersedes: [ADR-008, ADR-009]
 ---
+**project_domain:** TIKTRACK
 
 # 🏰 מנדט אדריכל מאוחד: פקודת סגירת פייז 2 (Final Step 1)
 

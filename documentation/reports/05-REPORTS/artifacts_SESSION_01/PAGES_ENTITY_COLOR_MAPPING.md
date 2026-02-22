@@ -1,4 +1,5 @@
 # מיפוי עמודים לצבעי ישות — SSOT לצוות 10
+**project_domain:** TIKTRACK
 
 **id:** PAGES_ENTITY_COLOR_MAPPING  
 **בעלים:** Team 30 (Frontend)  

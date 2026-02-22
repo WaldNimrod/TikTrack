@@ -1,4 +1,5 @@
 # Team 10 → צוות האדריכלות: התייעצות — היסטוריית שערי חליפין (Exchange Rates History)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_10_TO_ARCHITECT_EXCHANGE_RATES_HISTORY_CONSULTATION`  
 **from:** Team 10 (The Gateway)  

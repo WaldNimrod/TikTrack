@@ -1,4 +1,5 @@
 # GIN-2026-004: התאמת סכימה לבלופרינט ממשק (V2.5)
+**project_domain:** TIKTRACK
 
 **id:** `GIN_004_UI_ALIGNMENT_SPEC`  
 **owner:** Team 40 (UI Assets & Design)  

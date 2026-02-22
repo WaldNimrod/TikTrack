@@ -3,6 +3,7 @@ id: ADR-026
 owner: Chief Architect
 status: LOCKED - MANDATORY
 ---
+**project_domain:** TIKTRACK
 # 🏰 פסיקה אדריכל: אישור מודל הפעלה v1.2 (Agent OS)
 
 1. **מבנה מחלקות:** ארכיטקטורה (100+) מול פיתוח (10-90).

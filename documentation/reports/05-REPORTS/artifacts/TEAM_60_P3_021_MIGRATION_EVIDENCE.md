@@ -1,4 +1,5 @@
 # Team 60: Evidence — P3-021 Market Data Reference Tables
+**project_domain:** TIKTRACK
 
 **date:** 2026-01-31  
 **מקור:** TEAM_20_TO_TEAM_60_USER_TICKERS_DB_SCHEMA_BLOCKER

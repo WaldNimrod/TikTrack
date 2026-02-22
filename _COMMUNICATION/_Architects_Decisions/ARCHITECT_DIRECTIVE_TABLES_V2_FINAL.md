@@ -1,4 +1,5 @@
 # 📡 הודעה: אדריכלית ראשית ← צוותי הפיתוח (Unified Tables & Filter Context)
+**project_domain:** TIKTRACK
 
 **From:** Chief Architect (Gemini)
 **To:** Team 10 (Gateway), Team 30 (Frontend), Team 31 (Blueprint)

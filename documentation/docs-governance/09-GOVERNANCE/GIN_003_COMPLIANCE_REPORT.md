@@ -1,4 +1,5 @@
 # GIN-2026-003: דוח Compliance - הוכחות מימוש לוגי וביצועי
+**project_domain:** TIKTRACK
 
 **id:** `GIN_003_COMPLIANCE_REPORT`  
 **owner:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # TEAM_190_TO_TEAM_170_FULL_DRIFT_REMEDIATION_AND_GATE3_HOLD_2026-02-21
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_190_TO_TEAM_170_FULL_DRIFT_REMEDIATION_AND_GATE3_HOLD_2026-02-21  
 **from:** Team 190 (Constitutional Architectural Validator)  

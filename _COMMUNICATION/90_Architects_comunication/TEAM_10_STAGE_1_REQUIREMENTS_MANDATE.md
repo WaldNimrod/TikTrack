@@ -1,6 +1,7 @@
 ---
 id: MANDATE-T10-S1 | owner: Team 10 | status: ACTIVE
 ---
+**project_domain:** TIKTRACK
 # 📡 דרישות Stage-1 (תלויות תשתית חוסמות)
 
 אין להתחיל קידוד UI בבאץ' 3 ללא אישור המסמכים הבאים:

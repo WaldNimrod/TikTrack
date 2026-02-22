@@ -1,4 +1,5 @@
 # DOMAIN_DRIFT_AUDIT_SUMMARY
+**project_domain:** AGENTS_OS
 
 **id:** TEAM_190_DOMAIN_DRIFT_AUDIT_SUMMARY_2026-02-21  
 **owner:** Team 190 (READ_ONLY intelligence)  
@@ -31,7 +32,7 @@ Risk drivers:
 - Missing physical domain root for Agents_OS while running cross-gate lifecycle.
 - Systemic missing domain header fields in documentation and communication artifacts.
 - Non-canonical `work_package_id` reuse for mandate/doc identifiers.
-- Legacy evidence persistence under `_ARCHITECTURAL_INBOX`.
+- Legacy evidence persistence under `_COMMUNICATION/_ARCHITECT_INBOX`.
 
 ---
 

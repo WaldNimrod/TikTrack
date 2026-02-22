@@ -1,4 +1,5 @@
 # Architectural Approval Package Template v1.0.0
+**project_domain:** TIKTRACK
 
 Use one of the two folders:
 - `SPEC_SUBMISSION_TEMPLATE/`

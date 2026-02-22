@@ -1,4 +1,5 @@
 # תפקיד צוות 10 (The Gateway) — ניהול תהליך והפעלת צוותים
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_10_GATEWAY_ROLE_AND_PROCESS`  
 **owner:** Team 10 (The Gateway)  

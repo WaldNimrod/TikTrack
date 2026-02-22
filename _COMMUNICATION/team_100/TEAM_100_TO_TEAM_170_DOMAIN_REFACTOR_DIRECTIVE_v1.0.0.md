@@ -1,5 +1,7 @@
 # TEAM_100_TO_TEAM_170_DOMAIN_REFACTOR_DIRECTIVE_v1.0.0
 
+project_domain: AGENTS_OS
+
 from: Team 100 (Development Architecture Lead)\
 to: Team 170 (Librarian & Structural Custodian)\
 project_domain: AGENTS_OS\

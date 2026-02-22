@@ -4,6 +4,7 @@ owner: Team 10 / Architect
 status: LOCKED
 context: Task Governance & Traceability
 ---
+**project_domain:** TIKTRACK
 # 🕵️ פרוטוקול משילות משימות (3-Level Task Governance)
 
 כדי למנוע "זחילה" (Drift) בין התכנון לביצוע, המערכת פועלת בשלוש רמות:

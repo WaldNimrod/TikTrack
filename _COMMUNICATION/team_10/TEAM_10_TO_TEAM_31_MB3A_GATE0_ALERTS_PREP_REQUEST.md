@@ -1,4 +1,5 @@
 # Team 10 → Team 31: הכנה ל-Gate-0 Alerts (D34) — MB3A
+**project_domain:** TIKTRACK
 
 **to:** Team 31 (Blueprint)  
 **from:** Team 10 (The Gateway)  

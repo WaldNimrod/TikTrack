@@ -1,4 +1,5 @@
 # 🏗️ TikTrack Phoenix - Infrastructure Documentation
+**project_domain:** TIKTRACK
 
 **Team:** 60 (DevOps & Platform)  
 **Session:** SESSION_01  

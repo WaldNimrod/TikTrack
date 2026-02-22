@@ -1,4 +1,5 @@
 # 📚 תובנות מערכתיות ומבנים כלליים
+**project_domain:** TIKTRACK
 
 **id:** `SYSTEM_WIDE_DESIGN_PATTERNS`  
 **owner:** Team 40 (UI Assets & Design)  

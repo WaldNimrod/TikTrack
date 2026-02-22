@@ -1,4 +1,5 @@
 # Team 10 → Team 100 / Team 170: Intake Readiness Note
+**project_domain:** TIKTRACK
 
 **from:** Team 10 (The Gateway)  
 **to:** Team 100, Team 170  

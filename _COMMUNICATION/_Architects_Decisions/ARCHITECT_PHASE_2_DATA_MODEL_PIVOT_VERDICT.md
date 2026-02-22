@@ -1,6 +1,7 @@
 ---
 id: ADR-014 | owner: Architect | status: LOCKED
 ---
+**project_domain:** TIKTRACK
 # 🏰 פסיקה אדריכל: מהפך מודל נתונים וסגירת חורי משילות
 
 ## 📊 1. הכרעת עמלות: Option B (Account-based Fees)

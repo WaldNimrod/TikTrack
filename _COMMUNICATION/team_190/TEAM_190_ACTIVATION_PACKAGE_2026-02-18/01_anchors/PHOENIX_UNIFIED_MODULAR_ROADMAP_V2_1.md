@@ -5,6 +5,7 @@ status: ACTIVE
 system_version: 1.0.0
 last_updated: 2026-02-18
 ---
+**project_domain:** TIKTRACK
 
 # 🏰 מפת דרכים אסטרטגית: TikTrack Phoenix v1.0
 

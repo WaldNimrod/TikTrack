@@ -1,4 +1,5 @@
 # Phoenix Documentation Tree — Skeleton (SSOT)
+**project_domain:** TIKTRACK
 
 > This is the **canonical skeleton** (not the full tree).  
 > It defines **allowed top-level layers** and the **required sub-structure up to depth 3**.

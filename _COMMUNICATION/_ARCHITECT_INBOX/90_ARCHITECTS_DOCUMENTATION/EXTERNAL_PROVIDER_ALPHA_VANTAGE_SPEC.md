@@ -1,4 +1,5 @@
 # 🚀 מפרט ספק: Alpha Vantage
+**project_domain:** TIKTRACK
 ---
 - **Role:** Primary for FX / Fallback for Prices.
 - **Endpoint:** https://www.alphavantage.co/query

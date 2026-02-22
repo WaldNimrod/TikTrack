@@ -1,4 +1,5 @@
 # 🗺️ Field Map LOD 400: טריידים ופוזיציות (Trades)
+**project_domain:** TIKTRACK
 
 **סשן:** S20.09.C | **מודל:** אגרגציית FIFO (Batch C)
 

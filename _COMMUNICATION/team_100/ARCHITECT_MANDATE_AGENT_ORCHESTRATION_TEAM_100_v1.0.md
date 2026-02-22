@@ -12,6 +12,7 @@ related:
   - DEV_ORCHESTRATION_AGENT_POC_SPEC.md
   - ARCHITECT_REVIEW_PACKET_DEV_ORCHESTRATION_POC.md
 ---
+**project_domain:** TIKTRACK
 
 # Mandate — Dev Orchestration Observer CLI (POC)
 

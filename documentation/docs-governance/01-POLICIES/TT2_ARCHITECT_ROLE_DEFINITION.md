@@ -1,4 +1,5 @@
 # 🏛️ הגדרת תפקיד: אדריכל מערכת (Team 0)
+**project_domain:** TIKTRACK
 
 **id:** `TT2_ARCHITECT_ROLE_DEFINITION`  
 **owner:** Team 10 (The Gateway)  

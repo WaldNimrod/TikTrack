@@ -1,4 +1,5 @@
 # Team 60 → Team 50: MD-SETTINGS Gate-A — חסימה נפתרה, אימות הושלם
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_60_TO_TEAM_50_MD_SETTINGS_GATE_A_UNBLOCKED`  
 **from:** Team 60 (DevOps & Platform)  

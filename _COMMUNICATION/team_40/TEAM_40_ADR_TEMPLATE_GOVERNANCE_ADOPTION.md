@@ -1,4 +1,5 @@
 # Team 40 — אימוץ פקודה: ADR Template Governance Adoption
+**project_domain:** TIKTRACK
 
 **from:** Team 40 (UI Assets & Design)  
 **to:** Team 10 (The Gateway)  

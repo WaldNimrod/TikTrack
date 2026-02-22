@@ -1,4 +1,5 @@
 # Alerts Widget Spec v1.0.1 — FULL SPEC LOCK VERSION
+**project_domain:** TIKTRACK
 
 **id:** ALERTS_WIDGET_SPEC_v1.0.1  
 **owner:** Team 170 (Librarian / SSOT Authority)  

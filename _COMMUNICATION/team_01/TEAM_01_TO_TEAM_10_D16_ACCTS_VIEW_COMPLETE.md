@@ -1,4 +1,5 @@
 # 📨 הודעה לצוות 10: עמוד חשבונות מסחר (D16_ACCTS_VIEW) מוכן לפיתוח
+**project_domain:** TIKTRACK
 
 **מאת:** Team 01 (Identity & Styling)  
 **אל:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # Team 100 → All Architecture Teams: GATE_0 / GATE_1 Canonical Design Gates Mandate
+**project_domain:** TIKTRACK
 
 **from:** Team 100 (Research & Product Engineering / Architecture Department)  
 **to:** All Architecture Teams (10, 70, 90, 170, 190)  

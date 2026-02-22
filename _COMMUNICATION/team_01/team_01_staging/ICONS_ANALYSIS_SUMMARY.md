@@ -1,4 +1,5 @@
 # סיכום ניתוח איקונים - Icon Library Analysis Summary
+**project_domain:** TIKTRACK
 
 **תאריך:** 2026-01-31  
 **צוות:** Team 01  

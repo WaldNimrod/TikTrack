@@ -1,4 +1,5 @@
 # MISSION-90-02: דוח חקירת עומק — הפיצוח של Yahoo Finance
+**project_domain:** TIKTRACK
 
 **id:** MISSION-90-02  
 **owner:** Chief Architect  

@@ -1,4 +1,5 @@
 # MD-SETTINGS — מוכן ל-Gate-B חוזר + פרומטים להפעלה (צוות 10)
+**project_domain:** TIKTRACK
 
 **משימה:** MD-SETTINGS  
 **תאריך:** 2026-02-15  

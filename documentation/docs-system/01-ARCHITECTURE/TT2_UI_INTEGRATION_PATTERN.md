@@ -1,4 +1,5 @@
 # 🏗️ UI Integration Pattern
+**project_domain:** TIKTRACK
 
 **id:** `TT2_UI_INTEGRATION_PATTERN`  
 **owner:** Team 30 (Frontend Execution)  

@@ -1,4 +1,5 @@
 # Team 10 → Team 190: GATE_3 GO Decision — Acknowledgment v1.0.0
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_TO_TEAM_190_GATE3_GO_ACK_v1.0.0  
 **from:** Team 10 (The Gateway)  

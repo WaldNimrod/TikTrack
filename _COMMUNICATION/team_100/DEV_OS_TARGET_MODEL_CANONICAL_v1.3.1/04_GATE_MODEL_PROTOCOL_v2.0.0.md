@@ -1,4 +1,5 @@
 # 7 GATE MODEL PROTOCOL v2.0.0
+**project_domain:** TIKTRACK
 
 **status:** LOCKED (canonical renumbering v2.0.0)  
 **date:** 2026-02-20  

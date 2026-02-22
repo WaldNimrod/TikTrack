@@ -1,4 +1,5 @@
 # Team 10 → Teams 30 & 40: פרומטי Build Notes מעודכנים (קלט Gate-0 מ-31)
+**project_domain:** TIKTRACK
 
 **תאריך:** 2026-02-16  
 **רקע:** צוות 31 סיפקו תשובת Gate-0 ([TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md](../team_31/TEAM_31_TO_TEAM_10_MB3A_GATE0_NOTES_SCOPE_INPUT.md)). **צוותים 30 ו-40 לא קיבלו עד כה את הפרומט הקודם** — להלן הפרומטים המעודכנים להעברה.

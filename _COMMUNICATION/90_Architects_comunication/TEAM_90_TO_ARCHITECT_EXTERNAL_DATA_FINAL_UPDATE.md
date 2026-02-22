@@ -1,4 +1,5 @@
 # 🕵️ Team 90 → Architect: External Market Data — Final Update (Stage‑1)
+**project_domain:** TIKTRACK
 
 **id:** `TEAM_90_TO_ARCHITECT_EXTERNAL_DATA_FINAL_UPDATE`  
 **from:** Team 90 (The Spy)  

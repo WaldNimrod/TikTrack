@@ -1,4 +1,5 @@
 # מפרט: דשבורד נתונים (Data Dashboard)
+**project_domain:** TIKTRACK
 
 **id:** `DATA_DASHBOARD_SPEC`  
 **בעלים:** Team 30 (UI) + Team 10 (Gateway)  

@@ -1,4 +1,5 @@
 # MB3A Alerts — Scope Lock (Gate-0)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_MB3A_ALERTS_SCOPE_LOCK  
 **owner:** Team 10 (The Gateway)  

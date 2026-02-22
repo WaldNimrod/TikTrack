@@ -1,4 +1,5 @@
 # Team 170 — קליטת Remand v1.1.0 ורשימת ביצוע
+**project_domain:** TIKTRACK
 
 **id:** TEAM_170_REMAND_v1.1.0_INTAKE_AND_EXECUTION_CHECKLIST_2026-02-21  
 **from:** Team 170 (Spec Owner / Librarian Flow)  

@@ -1,4 +1,5 @@
 # ⚠️ NOT CANONICAL — Pointer only
+**project_domain:** TIKTRACK
 
 **Single canonical Master Index:** repo root `00_MASTER_INDEX.md`  
 **This file:** Snapshot/pointer for Team 170 intake package. Do not treat as authority.

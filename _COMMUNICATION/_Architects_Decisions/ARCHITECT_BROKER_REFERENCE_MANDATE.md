@@ -1,6 +1,7 @@
 ---
 id: ADR-015 | owner: Architect | status: LOCKED
 ---
+**project_domain:** TIKTRACK
 # 🏰 פסיקה אדריכל: רשימת ברוקרים וניהול עמלות ברירת מחדל
 
 ## 📊 1. מקור הנתונים

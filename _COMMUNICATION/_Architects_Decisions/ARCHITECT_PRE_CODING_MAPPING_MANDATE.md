@@ -1,4 +1,5 @@
 # 🗺️ מנדט אדריכלי: שלב המיפוי המקדים (Pre-coding Mapping)
+**project_domain:** TIKTRACK
 ---
 **חסם ביצוע (BLOCKING):** אין להתחיל כתיבת קוד לפני הגשת:
 1. **Routes Map:** שיוך כל נתיב לטיפוס A/B/C/D.

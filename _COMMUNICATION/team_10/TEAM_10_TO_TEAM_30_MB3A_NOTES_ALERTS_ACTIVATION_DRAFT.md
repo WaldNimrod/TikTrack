@@ -1,4 +1,5 @@
 # Team 10 → Team 30: MB3A Notes/Alerts — הפעלה (טיוטה)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_10_TO_TEAM_30_MB3A_ACTIVATION_DRAFT  
 **סטטוס:** ⚠️ **DRAFT — לא לשליחה. ממתין לאישור Team 90.**  

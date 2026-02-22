@@ -1,4 +1,5 @@
 # Knowledge Promotion Report — Canonical Template v2.2.0
+**project_domain:** TIKTRACK
 
 **directive:** TEAM_100_RETURN_FOR_CANONICAL_UPDATE_v2.2.0  
 **executor:** Team 70 (Librarian) ONLY per 04_GATE_MODEL_PROTOCOL_v2.2.0  

@@ -1,4 +1,5 @@
 # ⚠️ NON-SSOT - COMMUNICATION ONLY
+**project_domain:** TIKTRACK
 
 **⚠️ זהו מסמך תקשורת בלבד - לא SSOT!**
 

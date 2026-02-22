@@ -1,4 +1,5 @@
 # 📡 מפרט טכני מורחב: Phoenix Dynamic Bridge (v2.0)
+**project_domain:** TIKTRACK
 
 **סטטוס:** 🔒 LOCKED | **הקשר:** D16/D18/D21 Navigation
 

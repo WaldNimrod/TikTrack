@@ -1,4 +1,5 @@
 # Team 40 — אישור מסירת Build Alerts (D34) והפעלה
+**project_domain:** TIKTRACK
 
 **from:** Team 40 (UI Assets & Design)  
 **to:** Team 10 (The Gateway)  

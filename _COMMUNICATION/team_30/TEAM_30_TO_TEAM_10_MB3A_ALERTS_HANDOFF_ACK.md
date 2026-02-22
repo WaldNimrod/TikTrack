@@ -1,4 +1,5 @@
 # Team 30 → Team 10: MB3A Alerts — קבלת מסירת Blueprint
+**project_domain:** TIKTRACK
 
 **from:** Team 30 (Frontend)  
 **to:** Team 10 (The Gateway)  

@@ -1,4 +1,5 @@
 # ✅ דוח אימות: P1 - יציבות ארכיטקטונית
+**project_domain:** TIKTRACK
 
 **מאת:** Team 10 (The Gateway)  
 **תאריך:** 2026-02-04  

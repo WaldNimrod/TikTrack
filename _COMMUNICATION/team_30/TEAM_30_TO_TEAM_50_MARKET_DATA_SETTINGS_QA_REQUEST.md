@@ -1,4 +1,5 @@
 # Team 30 → Team 50 | בקשת QA — Market Data Settings UI (Gate-A)
+**project_domain:** TIKTRACK
 
 **id:** TEAM_30_TO_TEAM_50_MARKET_DATA_SETTINGS_QA_REQUEST  
 **from:** Team 30 (Frontend)  

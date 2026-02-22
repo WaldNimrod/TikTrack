@@ -1,4 +1,5 @@
 # 📢 אסטרטגיית מוצר ושיווק
+**project_domain:** TIKTRACK
 
 **id:** `PRODUCT_AND_MARKETING_STRATEGY`  
 **owner:** Team 10 (The Gateway)  

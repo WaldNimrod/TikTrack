@@ -83,26 +83,26 @@ Role contract in workflow:
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon GATE_8 closure (2026-02-22) by **Gate Owner Team 90** after DOCUMENTATION_CLOSED declaration for `S001-P001-WP001`. **S001-P001-WP001 lifecycle: COMPLETE** — not in progress; knowledge promotion performed; task list reflects CLOSED. **S001-P001 (Agents_OS Phase 1):** GATE_1 (SPEC) PASS — LLD400 v1.0.0 validated by Team 190 (2026-02-22); spec package submitted to Architect.
+**Gate-owner update evidence:** This block was updated upon **Pre-GATE_3 PASS** (2026-02-22) by **Gate Owner Team 10** (GATE_3 owner per 04_GATE_MODEL_PROTOCOL_v2.3.0). S001-P001-WP002 approved by Team 90; GATE_3 (Implementation) open. Previous: GATE_8 closure for S001-P001-WP001 by Team 90 (2026-02-22).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
 | active_stage_label | שלב 1 — Stage 1 |
-| active_flow | EXECUTION (no active WP); SPEC track: S001-P001 has approved LLD400 |
-| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — Phase 1 spec approved) |
-| active_work_package_id | — (none; S001-P001-WP001 closed 2026-02-22) |
-| in_progress_work_package_id | — (none) |
+| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_3) |
+| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — WP002 active) |
+| active_work_package_id | S001-P001-WP002 |
+| in_progress_work_package_id | S001-P001-WP002 |
 | last_closed_work_package_id | S001-P001-WP001 (GATE_8 PASS 2026-02-22; lifecycle complete; **domain: orchestration/10↔90**) |
 | s001_p001_program_spec_status | GATE_1 PASS — AGENTS_OS_PHASE_1_LLD400_v1.0.0 (Team 190 validation 2026-02-22); **domain: AGENTS_OS** |
-| allowed_gate_range | GATE_8 (closed) → PRE_GATE_3 (next WP intake); GATE_1 (SPEC) closed for S001-P001 |
-| current_gate | GATE_8 (closed) — no active WP in progress |
-| active_program_id | S001-P001 (Agents_OS Phase 1; WP001 closed; LLD400 approved) |
+| allowed_gate_range | GATE_3 (in progress) → GATE_4 → … → GATE_8 for S001-P001-WP002 |
+| current_gate | GATE_3 (in progress — S001-P001-WP002) |
+| active_program_id | S001-P001 (Agents_OS Phase 1; WP002 in progress) |
 | active_plan_id | S001 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_8 \| PASS \| 2026-02-22 \| _COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S001_P001_WP001_GATE8_VALIDATION_RESPONSE.md, _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE8_VALIDATION_REPORT.md |
-| next_required_action | Team 10 may open S001-P002 by submitting PRE_GATE_3 validation package with canonical identity header; or proceed to Agents_OS Phase 1 implementation per LLD400 when approved by Architect |
-| next_responsible_team | Team 10 (next WP definition and submission), Team 90 (Pre-GATE_3 validation) |
+| last_gate_event | Pre-GATE_3 \| PASS \| 2026-02-22 \| _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP002_VALIDATION_RESPONSE.md |
+| next_required_action | Team 10: implement GATE_3 for S001-P001-WP002 (agents_os/ structure, validator stub, domain isolation); GATE_3 exit → submit to Team 50 (GATE_4) |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -148,4 +148,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_170 | WSM_CANONICAL_APPLY | at Gate Owner request | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**  
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_5 closure 2026-02-21 | 2026-02-22**  
 **log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | GATE_PROTOCOL_v2.3.0_OFFICIALIZATION_REFERENCE_REFRESH | 2026-02-22**  
-**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_8 closure 2026-02-22 | 2026-02-22**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_8 closure 2026-02-22 | 2026-02-22**  
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon Pre-GATE_3 PASS S001-P001-WP002 (GATE_3 open) 2026-02-22 | 2026-02-22**

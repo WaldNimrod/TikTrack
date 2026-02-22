@@ -81,6 +81,8 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 - **Lexicographic ordering:** S001, S002, … ; P001, P002, … within a stage; same for WP and T within program/work package.  
 - **No implicit numbering:** All identifiers are explicit; no inferred or default numbers.  
 - **No duplicate identifiers:** Each full path S{NNN}-P{NNN}-WP{NNN}-T{NNN} is unique.
+- **Uniqueness (mandatory):** Within a given Stage, no two Programs may share the same program number — each program_id of the form Sxxx-Pnnn is unique in the stage. Within a given Program, no two Work Packages may share the same work package number — each work_package_id of the form Sxxx-Pxxx-WPnnn is unique in the program. Hence: one Program per (Stage, P-number); one Work Package per (Program, WP-number).
+- **One domain per Program:** Each Program is assigned to exactly one domain. A Program cannot span multiple domains.
 
 ### 2.3 Validation rules
 

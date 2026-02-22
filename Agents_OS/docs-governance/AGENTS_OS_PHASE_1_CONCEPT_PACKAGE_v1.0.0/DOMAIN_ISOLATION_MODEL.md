@@ -33,3 +33,11 @@ No Agents_OS runtime logic allowed in:
 - Governance canonical files
 
 Violation of this rule is structural failure.
+
+## 5. State (SSM / WSM) — Shared; No Per-Domain State Files
+
+**SSM and WSM are shared** across TikTrack and Agents_OS. There are **no separate** state files (SSM/WSM) for the Agents_OS domain.
+
+- **Canonical location (single source):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `PHOENIX_MASTER_SSM_v1.0.0.md`.
+- **Isolation:** Isolation applies to **domain-specific content** (Agents_OS under `agents_os/`); the **shared layer** (operational state, hierarchy, gates, procedures) lives in `documentation/docs-governance/PHOENIX_CANONICAL/` and is used by both domains.
+- **Procedure reference:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` §1.1.

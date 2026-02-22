@@ -38,6 +38,7 @@ ssm_dependency: 1.0.0
 
 **Rule:** Gate binding **only to Work Package** (L3).  
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
+**Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
 **GATE_2 (KNOWLEDGE_PROMOTION):** Executor **Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution.  
 **GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 190; Executor Team 70. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
@@ -82,21 +83,25 @@ Role contract in workflow:
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon GATE_8 closure (2026-02-22) by **Gate Owner Team 90** after DOCUMENTATION_CLOSED declaration for `S001-P001-WP001`.
+**Gate-owner update evidence:** This block was updated upon GATE_8 closure (2026-02-22) by **Gate Owner Team 90** after DOCUMENTATION_CLOSED declaration for `S001-P001-WP001`. **S001-P001-WP001 lifecycle: COMPLETE** — not in progress; knowledge promotion performed; task list reflects CLOSED. **S001-P001 (Agents_OS Phase 1):** GATE_1 (SPEC) PASS — LLD400 v1.0.0 validated by Team 190 (2026-02-22); spec package submitted to Architect.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
-| active_flow | EXECUTION |
-| active_project_domain | TIKTRACK |
-| allowed_gate_range | GATE_8 (closed) → PRE_GATE_3 (next WP intake) |
-| current_gate | GATE_8 (closed) |
-| active_program_id | S001-P001 |
+| active_stage_label | שלב 1 — Stage 1 |
+| active_flow | EXECUTION (no active WP); SPEC track: S001-P001 has approved LLD400 |
+| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — Phase 1 spec approved) |
+| active_work_package_id | — (none; S001-P001-WP001 closed 2026-02-22) |
+| in_progress_work_package_id | — (none) |
+| last_closed_work_package_id | S001-P001-WP001 (GATE_8 PASS 2026-02-22; lifecycle complete; **domain: orchestration/10↔90**) |
+| s001_p001_program_spec_status | GATE_1 PASS — AGENTS_OS_PHASE_1_LLD400_v1.0.0 (Team 190 validation 2026-02-22); **domain: AGENTS_OS** |
+| allowed_gate_range | GATE_8 (closed) → PRE_GATE_3 (next WP intake); GATE_1 (SPEC) closed for S001-P001 |
+| current_gate | GATE_8 (closed) — no active WP in progress |
+| active_program_id | S001-P001 (Agents_OS Phase 1; WP001 closed; LLD400 approved) |
 | active_plan_id | S001 |
-| active_work_package_id | S001-P001-WP001 |
 | phase_owner_team | Team 10 |
 | last_gate_event | GATE_8 \| PASS \| 2026-02-22 \| _COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S001_P001_WP001_GATE8_VALIDATION_RESPONSE.md, _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE8_VALIDATION_REPORT.md |
-| next_required_action | Team 10 may open S001-P002 by submitting PRE_GATE_3 validation package with canonical identity header |
+| next_required_action | Team 10 may open S001-P002 by submitting PRE_GATE_3 validation package with canonical identity header; or proceed to Agents_OS Phase 1 implementation per LLD400 when approved by Architect |
 | next_responsible_team | Team 10 (next WP definition and submission), Team 90 (Pre-GATE_3 validation) |
 
 ---

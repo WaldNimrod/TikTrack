@@ -14,6 +14,14 @@
 2. **כל המסמכים המשותפים לשני הדומיינים** (TikTrack + Agents_OS) חייבים לשבת **בתיקיות תעוד המשילות הראשיות** — `documentation/docs-governance/` — **לא** בתיקייה של מערכת האיגנטים.
 3. **SSM, WSM, נוהל שערים, Artifact Taxonomy, Retry, Directives, Procedures, Policies, Templates** — הם **משותפים** (Phoenix/Dev OS). מקומם הקנוני: **documentation/docs-governance/PHOENIX_CANONICAL/** (או כפי שיוגדר בסעיף 2). **אסור** שיישבו תחת `agents_os/` או תחת תיקייה בשם `AGENTS_OS_GOVERNANCE`.
 
+### 1.1 מצב (SSM / WSM) — משותף; אין קבצי מצב נפרדים לדומיין
+
+**מקור יחיד למצב:** קובץ ה־WSM וקובץ ה־SSM הם **משותפים** לשני הדומיינים (TikTrack ו־Agents_OS). **אין** קבצי מצב (SSM/WSM) נפרדים לדומיין האיגנטים.
+
+- **נתיב קנוני:** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `PHOENIX_MASTER_SSM_v1.0.0.md`.
+- **בידוד דומיינים:** בידוד מתבטא במיקום **תוכן ייחודי** — כל תוכן ייחודי ל־Agents_OS תחת `agents_os/`; השכבה המשותפת (מצב ריצה, היררכיה, שערים, נהלים) נמצאת ב־`documentation/docs-governance/PHOENIX_CANONICAL/` ומשמשת את שני הדומיינים.
+- **נוהל משלים:** ראה גם `agents_os/docs-governance/AGENTS_OS_PHASE_1_CONCEPT_PACKAGE_v1.0.0/DOMAIN_ISOLATION_MODEL.md` §4 (Domain Enforcement Rule) ו־§5 להלן.
+
 ---
 
 ## 2. מבנה תיקיות תעוד — הנכון (לאחר תיקון)

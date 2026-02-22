@@ -55,7 +55,11 @@ Roadmap (single)
 
 Gate binding allowed **only** at Work Package level.
 
-**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.  
+**Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.
+
+**Uniqueness (mandatory):** Within a Stage, each Program number is unique (no two programs with the same P-number in the same stage). Within a Program, each Work Package number is unique (no two work packages with the same WP-number in the same program). One Program per (Stage, P-number); one Work Package per (Program, WP-number).
+
+**One domain per Program:** Each Program is assigned to exactly one domain; a Program cannot span multiple domains.
 
 **Mandatory identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id (when applicable), gate_id, phase_owner, required_ssm_version, required_active_stage.
 

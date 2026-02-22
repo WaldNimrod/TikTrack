@@ -9,7 +9,7 @@
 **רג'יסטרי רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md`  
 **רשימת השלמות רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
-**last_updated:** 2026-02-19
+**last_updated:** 2026-02-22
 
 **מקור סטטוס שערים (חובה):** סטטוס שער פעיל, current gate ו־last_gate_event הם **ב־WSM בלבד** — `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (בלוק CURRENT_OPERATIONAL_STATE). רשימה זו מתעדת **משימות וסגירתן** (CLOSED + תאריך) **לא** סטטוס שער שוטף; עדכון שער מתבצע ב־WSM על ידי Gate Owner.
 
@@ -30,26 +30,39 @@
 
 **הערת סטטוס (1-001, 1-003, 1-004):** שער ב' — **PASS**. שלוש המשימות CLOSED. **External Data:** חבילה מ־90. M1 (P3-007) CLOSED. **הגשה מחדש (Resubmission):** ✅ **VERIFIED — CLOSED** (TEAM_90_TO_TEAM_10_EXTERNAL_DATA_RESUBMISSION_VERIFIED). SSOT הורחב; תיקוני ולידציה הוחלו. **מותר להתקדם** — ביצוע P3-008–P3-015 לפי מנדטים. פערים פתוחים (Intraday, Interval, Ticker Status) מסומנים ב־GAPS — יטופלו בהמשך.
 
-**מספור:** כל משימה מקבלת **תחילית לפי מספר השלב במפת הדרכים** + מספר סידורי בתוך השלב: `[שלב]-[סידורי]` (למשל 1-001, 1b-001, P3-001). ראה נוהל. **היררכיה קנונית (SSM §5.1):** Stage S001 → Program S001-P001 → Work Package S001-P001-WP001 **CLOSED (GATE_8 PASS 2026-02-22)**; S001-P002 (Alerts POC) מותר לפתיחה לפי WSM — כרגע ב־HOLD להחלטה. **סטטוס שער שוטף:** WSM בלבד.
+**מספור:** כל משימה מקבלת **תחילית לפי מספר השלב במפת הדרכים** + מספר סידורי בתוך השלב: `[שלב]-[סידורי]` (למשל 1-001, 1b-001, P3-001). **מספור לוגי חד־ערכי (SSM + 04_GATE_MODEL):** בתוך שלב — תכנית אחת למספר (אין שני P001 באותו שלב); בתוך תכנית — חבילת עבודה אחת למספר (אין שני WP001 באותה תכנית). **תכנית = דומיין אחד.** **היררכיה קנונית (SSM §5.1):** Stage S001 → Program **S001-P001** (דומיין **AGENTS_OS** בלבד — Phase 1) → Work Package **S001-P001-WP001** (חבילה יחידה תחת P001) **CLOSED (GATE_8 PASS 2026-02-22)**; שער אפיון ברמת תכנית **S001-P001 GATE_1 (SPEC): PASS** — LLD400 (Team 190 2026-02-22). S001-P002 (Alerts POC) מותר לפתיחה לפי WSM — כרגע ב־HOLD. **סטטוס שער שוטף:** WSM בלבד.
 
 ---
 
-## STAGE_1_PROGRAM_01 — Dev Validator 10↔90 (S001-P001-WP001)
+## STAGE_1_PROGRAM_01 — דומיין Agents_OS (S001-P001)
 
-**מקור:** Team 100 PROGRAM_ACTIVATION | STAGE_1_PROGRAM_01 | DEV_VALIDATOR_10_90.  
-**תחום:** תשתית אורקסטרציה ללולאת ולידציה 10↔90 בלבד. **לא** הפעלת Widget POC.  
+**היררכיה:** Stage S001 → Program **S001-P001** (Agents_OS Phase 1). **דומיין:** **AGENTS_OS** — תכנית אחת = דומיין אחד (per SSM/04_GATE_MODEL). **מספור חד־ערכי:** בתוך שלב — מספר תכנית ייחודי; בתוך תכנית — מספר חבילת עבודה ייחודי. תחת S001-P001 יש **חבילת עבודה אחת בלבד:** S001-P001-WP001.
+
+**הבהרה:** GATE_1 (SPEC) הוא **שער ברמת התכנית** (אפיון LLD400) — **לא** חבילת עבודה; אין לו מספר WP. השערים PRE_GATE_3 עד GATE_8 קשורים **רק** ל־Work Package (WP001).
+
+### S001-P001 — שער אפיון ברמת תכנית (GATE_1) — לא חבילת עבודה
+
+| סוג | מזהה תכנית | תיאור | סטטוס | דומיין | צוות מוביל | קובץ תיעוד | תאריך |
+|-----|-------------|------|--------|--------|------------|------------|--------|
+| Program-level SPEC | S001-P001 | אפיון Program (LLD400). Team 170 ייצור; Team 190 ולידציה. שער GATE_1 — אין מספר WP. | PASS (2026-02-22) | AGENTS_OS | Team 170 → Team 190 | _COMMUNICATION/team_170/AGENTS_OS_PHASE_1_LLD400_v1.0.0.md; _COMMUNICATION/team_190/TEAM_190_AGENTS_OS_PHASE_1_LLD400_VALIDATION_RESULT_2026-02-22.md | 2026-02-22 |
+
+### S001-P001-WP001 — חבילת העבודה היחידה תחת S001-P001 (Execution — אורקסטרציה 10↔90)
+
+**מקור:** Team 100 PROGRAM_ACTIVATION \| STAGE_1_PROGRAM_01 \| DEV_VALIDATOR_10_90.  
+**תחום:** תשתית אורקסטרציה ללולאת ולידציה 10↔90 בלבד. **לא** הפעלת Widget POC. **דומיין:** AGENTS_OS.  
 **תיעוד:** TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md  
 **Lifecycle:** Pre-GATE_3 → GATE_3 → GATE_4 (QA) → GATE_5 (Dev Validation) → GATE_6 → GATE_7 → **GATE_8 (Documentation Closure) PASS 2026-02-22.** Evidence: _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE8_VALIDATION_REPORT.md, _COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S001_P001_WP001_GATE8_VALIDATION_RESPONSE.md. **סטטוס שער שוטף:** WSM בלבד (CURRENT_OPERATIONAL_STATE).
 
-| # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
-|---|-----|------|--------|-----|------------|------------|------------|------------|------------|
-| S001-P001-WP001 | 10↔90 Validator Agent | תשתית אורקסטרציה ללולאת 10↔90. Pre-GATE_3 → GATE_3…→ GATE_8 PASS. Lifecycle complete. Per 04_GATE_MODEL_PROTOCOL_v2.3.0. Widget POC לא מופעל. | CLOSED | שלב 1 / Program 01 | Team 10 | TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md | 2026-02-20 | 2026-02-22 | 2026-02-22 |
+| # | שם | תיאור | סטטוס | שלב | דומיין | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|--------|------------|------------|------------|------------|------------|
+| S001-P001-WP001 | 10↔90 Validator Agent | תשתית אורקסטרציה ללולאת 10↔90. Pre-GATE_3 → GATE_3…→ GATE_8 PASS. Lifecycle complete. Per 04_GATE_MODEL_PROTOCOL_v2.3.0. Widget POC לא מופעל. | CLOSED | שלב 1 / Program 01 | AGENTS_OS | Team 10 | TEAM_10_S001_P001_WP001_WORK_PACKAGE_DEFINITION.md | 2026-02-20 | 2026-02-22 | 2026-02-22 |
 
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_GATE8_CLOSED_WSM_SSOT | 2026-02-19** — WP001 הושלם (GATE_8 PASS 2026-02-22). סטטוס שער שוטף ו־current operational state ב־WSM בלבד. רשימה זו מתעדת CLOSED + תאריך סגירה.
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_GATE5_PASS_GATE6_ACTIVE | 2026-02-22** — GATE_5 PASS התקבל מ-Team 90. סטטוס WP001 עודכן ל-GATE_6 פעיל; חבילת EXECUTION להגשה אדריכלית בהכנה.
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_GATE3_COMPLETION_REPORTS | 2026-02-21** — דיווחי השלמה התקבלו מכל ארבעת הצוותים. 0 SEVERE, 0 BLOCKER.
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_PreG3_PASS | 2026-02-21** — Team 90 VALIDATION_RESPONSE PASS ל-Pre-GATE_3.
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_ACTIVATED | 2026-02-20**
+**log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_LLD400_SYNC_AND_DOMAIN | 2026-02-22** — סינכרון עם WSM: S001-P001 (דומיין AGENTS_OS) — GATE_1 (SPEC) PASS (LLD400 v1.0.0, Team 190 2026-02-22); ייחוס דומיין AGENTS_OS ל־Program 01 ו־WP001; מספור מדויק S001-P001 / S001-P001-WP001.
 
 ---
 

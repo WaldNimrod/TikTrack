@@ -76,6 +76,27 @@ Execution order is governed by SSM §5.1. The task list below is legacy/other; a
 
 ---
 
+## CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
+
+**Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
+
+| Field | Value |
+|-------|-------|
+| active_stage_id | S001 |
+| active_flow | EXECUTION |
+| active_project_domain | TIKTRACK |
+| allowed_gate_range | GATE_4 (closed) → GATE_5 (current) |
+| current_gate | GATE_5 |
+| active_program_id | S001-P001 |
+| active_plan_id | S001 |
+| active_work_package_id | S001-P001-WP001 |
+| phase_owner_team | Team 10 |
+| last_gate_event | GATE_4 \| PASS \| 2026-02-21 \| _COMMUNICATION/team_10/TEAM_10_S001_P001_WP001_GATE4_CLOSED_READINESS_FOR_GATE5.md, _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S001_P001_WP001_QA_REPORT.md |
+| next_required_action | GATE_5 validation (Channel 10↔90); Team 90 to return VALIDATION_RESPONSE |
+| next_responsible_team | Team 10 (orchestration); Team 90 (validation response) |
+
+---
+
 ## 🗺️ LEVEL 1: ROADMAP MODULES (אסטרטגי)
 
 - M1: Identity & Security - ✅ COMPLETED (v1.0.0)
@@ -109,4 +130,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 ---
 
 **log_entry | [Team 10] | WSM_V1_0_0_ACTIVE | GREEN | 2026-02-19**  
-**log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_EXECUTION_ORDER_LOCK | 2026-02-21**
+**log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_EXECUTION_ORDER_LOCK | 2026-02-21**  
+**log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**

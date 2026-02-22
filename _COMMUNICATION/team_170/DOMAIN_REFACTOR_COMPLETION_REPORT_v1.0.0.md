@@ -55,7 +55,7 @@ Full execution completed: exhaustive scan, full classification matrix, all AGENT
 |--------|-------|
 | Moves executed | 15 (all AGENTS_OS MOVE entries from matrix) |
 | Moves pending | 0 |
-| Unresolved items | None. Canonical root agents_os/ (lowercase) is the sole root; Agents_OS/ not present. |
+| Unresolved items | One bounded exception: AOS_workpack placeholder payload (source not in repo); see §10. Canonical root agents_os/ is sole root; Agents_OS/ not present. |
 | **Evidence:** DOMAIN_REFACTOR_MOVE_LOG_v1.0.0.md |
 
 ### 5.1) File existence verification (live paths)
@@ -74,12 +74,12 @@ Full execution completed: exhaustive scan, full classification matrix, all AGENT
 
 | metric | value |
 |--------|-------|
-| total markdown scanned (in-scope) | 1740 |
-| files with valid project_domain | 1740 |
+| total markdown scanned (in-scope) | 1054 |
+| files with valid project_domain (first 20 lines) | 1054 |
 | files missing header | 0 |
 | files invalid header | 0 |
 | exception | _COMMUNICATION/99-ARCHIVE/** (bounded) |
-| **Evidence:** DOMAIN_REFACTOR_PROJECT_DOMAIN_HEADER_COVERAGE_v1.0.0.md |
+| **Evidence:** DOMAIN_REFACTOR_PROJECT_DOMAIN_HEADER_COVERAGE_v1.0.0.md (methodology and totals aligned). |
 
 ---
 
@@ -121,7 +121,7 @@ Full execution completed: exhaustive scan, full classification matrix, all AGENT
 
 | exception | owner | remediation cycle |
 |-----------|-------|-------------------|
-| AOS_workpack (agents_os/docs-governance/AOS_workpack/): canonical path and 5 placeholder files exist per MOVE log (PROV-011); full payload from source _COMMUNICATION/team_100/Agents_OS - AOS-workpack not in repo. Placeholders reference this exception. | Team 170 | TBD — restore from archive when available; or accept as bounded exception for E4. |
+| AOS_workpack (agents_os/docs-governance/AOS_workpack/): canonical path and 5 placeholder files exist per MOVE log (PROV-011); full payload from source _COMMUNICATION/team_100/Agents_OS - AOS-workpack not in repo. **Approved as bounded exception for E4 closure** (Team 170 — 2026-02-22). | Team 170 | Remediation: restore from archive when available, or next Domain Refactor remediation phase; due by 2026-Q2. |
 
 ---
 

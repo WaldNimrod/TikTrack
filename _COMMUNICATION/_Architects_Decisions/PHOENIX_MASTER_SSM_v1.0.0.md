@@ -115,6 +115,10 @@ Role contract lock:
 * **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Final UX/vision approval; no implementation by agent without Gate 7 pass.
 * **Gate 8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70 (Librarian). Purpose: AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete without GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.2.0.
 
+### 1.2 WSM Operational State Law (TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
+
+**Every gate closure requires a WSM Operational State update before progression.** No gate progression is allowed without updating the canonical WSM CURRENT_OPERATIONAL_STATE block. No operational data must be stored inside SSM; operational state authority is WSM only. Reference: _COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0.md.
+
 ---
 
 ## 2. ADR LOCK REGISTRY (ספר ההחלטות)
@@ -195,9 +199,11 @@ Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1
 | 2026-02-19 | GATE_5_F1_REMEDIATION | SSM canonical replacement per Team 170 request. |
 | 2026-02-20 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | Content from Team 170; canonical update per Team 70. §6 Canonical Architectural Approval Package Format embedded. |
 | 2026-02-20 | **TEAM_100_SSM_FINAL_LOCK_v1.0.0** | Content supplied by Team 170; canonical SSM updated per promotion authority (Team 70). §1.1 Governance Authority Clause (Team 00, 100, 170, 190, 70, 10). §0 Canonical hierarchy lock. §5.1 Current execution order lock: S001 / S001-P001 / S001-P001-WP001 ACTIVE; S001-P002 FROZEN until WP001 GATE_8. |
+| 2026-02-22 | **TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0** | §1.2 WSM Operational State Law added: every gate closure requires WSM update before progression; no operational data in SSM; WSM is sole operational state authority. |
 
 ---
 
 **log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | GATE_5_F1_REMEDIATION | 2026-02-19**  
 **log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1.0.0 | 2026-02-20**  
-**log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | SSM_FINAL_LOCK_v1.0.0 | 2026-02-20**
+**log_entry | TEAM_70 | SSM_CANONICAL_UPDATE | content_from_Team_170 | SSM_FINAL_LOCK_v1.0.0 | 2026-02-20**  
+**log_entry | TEAM_170 | SSM_AMENDMENT_REFERENCE | §1.2_WSM_OPERATIONAL_STATE_LAW | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**

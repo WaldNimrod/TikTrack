@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_BROKER_REFERENCE_MANDATE.md`
+
 ---
 id: ADR-015 | owner: Architect | status: LOCKED
 ---

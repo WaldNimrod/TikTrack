@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE_STANDARD.md`
+
 ---
 id: ADR-GOV-ARCH-TEMPLATE-001
 owner: Architect

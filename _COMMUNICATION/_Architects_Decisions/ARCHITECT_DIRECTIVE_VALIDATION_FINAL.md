@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md`
+
 # 📡 הודעה: אדריכלית ראשית ← צוות 10 (Validation Framework)
 **project_domain:** TIKTRACK
 

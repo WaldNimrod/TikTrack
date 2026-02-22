@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/04-PROCEDURES/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md`
+
 # 🔒 נוהל משילות מעודכן - סבב 3 וצוות המרגל (v2.0)
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/00_INDEX_CANONICAL.md`
+
 # DEV OS TARGET MODEL – CANONICAL INDEX v1.3.1
 **project_domain:** TIKTRACK
 Status: LOCKED

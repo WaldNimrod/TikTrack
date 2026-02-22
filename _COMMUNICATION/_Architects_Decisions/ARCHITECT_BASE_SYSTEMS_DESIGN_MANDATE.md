@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_BASE_SYSTEMS_DESIGN_MANDATE.md`
+
 # 🔒 מנדט אדריכל: אפיון מערכות ליבה - פלטפורמה v2.0
 **project_domain:** TIKTRACK
 

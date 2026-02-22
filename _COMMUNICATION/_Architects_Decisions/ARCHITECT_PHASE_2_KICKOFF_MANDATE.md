@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_PHASE_2_KICKOFF_MANDATE.md`
+
 # ⚠️ DEPRECATED - מידע סותר - אין להשתמש!
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.2.0.md`
+
 # 7 GATE MODEL PROTOCOL v2.2.0
 **project_domain:** TIKTRACK
 

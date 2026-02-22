@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/06-TEMPLATES/ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY.md`
+
 # 🏰 פסיקה אדריכל: אישור "מפעל התבניות" (Template Factory)
 **project_domain:** TIKTRACK
 

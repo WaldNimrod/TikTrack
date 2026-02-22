@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_BATCH_1_CLOSURE_MANDATE.md`
+
 # 📡 הודעה: אדריכלית ראשית ← צוותי הביצוע (Batch 1 Recap)
 **project_domain:** TIKTRACK
 

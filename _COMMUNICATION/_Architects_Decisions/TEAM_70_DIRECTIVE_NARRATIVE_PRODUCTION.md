@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md`
+
 ---
 id: DIR-011
 owner: Chief Architect

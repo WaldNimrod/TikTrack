@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_PHASE_2_FULL_RELEASE_MANDATE.md`
+
 # ⚠️ SUPERSEDED - הוחלף במנדט מעודכן
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md`
+
 # 📡 הודעה: אדריכלית ראשית ← צוות 10, צוות 31 (Modular Footer Implementation)
 **project_domain:** TIKTRACK
 

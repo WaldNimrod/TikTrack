@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
+
 # 🔒 מנדט אדריכל: איחוד תשתיות ו-Shared Layer (Phase 2)
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_TABLES_V2_FINAL.md`
+
 # 📡 הודעה: אדריכלית ראשית ← צוותי הפיתוח (Unified Tables & Filter Context)
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/08-WORKING_VALIDATION_RECORDS/ARCHITECT_AUDIT_V2_APPROVAL.md`
+
 # 📡 אישור אדריכל סופי: External Audit v2.0 Ready
 **project_domain:** TIKTRACK
   

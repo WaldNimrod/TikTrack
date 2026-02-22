@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_INFRASTRUCTURE_RETROFIT_MANDATE.md`
+
 # 🔒 מנדט אדריכל: ייצוב תשתית ויישור קו (Phase 1.8)
 **project_domain:** TIKTRACK
 

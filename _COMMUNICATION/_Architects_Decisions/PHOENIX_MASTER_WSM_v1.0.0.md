@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
+
 ---
 id: PHOENIX_WORK_STATE
 version: 1.0.0

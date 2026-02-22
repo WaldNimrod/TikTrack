@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_PHASE_2_FULL_KICKOFF_MANDATE.md`
+
 # 🏰 מנדט אדריכל: שחרור פלטפורמה v2.0 וקידום ידע (Consolidation)
 **project_domain:** TIKTRACK
 

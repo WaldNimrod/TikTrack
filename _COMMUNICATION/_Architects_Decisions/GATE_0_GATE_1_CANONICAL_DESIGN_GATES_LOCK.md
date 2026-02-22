@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md`
+
 # GATE_0 / GATE_1 Canonical Design Gates — Lock
 **project_domain:** TIKTRACK
 

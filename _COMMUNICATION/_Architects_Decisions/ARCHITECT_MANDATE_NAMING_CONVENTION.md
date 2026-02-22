@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_MANDATE_NAMING_CONVENTION.md`
+
 # 📡 פקודת משילות: סטנדרט שמות (Naming Convention) v1.3
 **project_domain:** TIKTRACK
   

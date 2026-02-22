@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_P0_RED_MANDATE.md`
+
 # 🚨 פקודת אדריכל P0: ניקוי רעלים ויישור קו קשיח
 **project_domain:** TIKTRACK
 **סטטוס:** 🛑 CRITICAL - BLOCKING ALL RELEASES

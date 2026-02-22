@@ -1,3 +1,5 @@
+**Canonical location (SSOT):** This file is superseded by the canonical copy. Canonical: `documentation/docs-governance/AGENTS_OS_GOVERNANCE/05-CONTRACTS/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md`
+
 # 🛑 פסיקה אדריכל: דרישת חוזי קונפיגורציה (Integrity Contracts)
 **project_domain:** TIKTRACK
 

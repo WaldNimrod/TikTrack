@@ -73,22 +73,22 @@ Role contract in workflow:
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon GATE_5 closure (2026-02-21) by **Gate Owner Team 90** for transition to GATE_6 execution submission.
+**Gate-owner update evidence:** This block was updated upon GATE_8 closure (2026-02-22) by **Gate Owner Team 90** after DOCUMENTATION_CLOSED declaration for `S001-P001-WP001`.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
 | active_flow | EXECUTION |
 | active_project_domain | TIKTRACK |
-| allowed_gate_range | GATE_5 (closed) → GATE_6 (current) |
-| current_gate | GATE_6 |
+| allowed_gate_range | GATE_8 (closed) → PRE_GATE_3 (next WP intake) |
+| current_gate | GATE_8 (closed) |
 | active_program_id | S001-P001 |
 | active_plan_id | S001 |
 | active_work_package_id | S001-P001-WP001 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_5 \| PASS \| 2026-02-21 \| _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S001_P001_WP001_GATE5_VALIDATION_REQUEST.md, _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE5_VALIDATION_RESPONSE.md |
-| next_required_action | Prepare and submit GATE_6 execution architectural package to Architect Inbox (7-file lock) |
-| next_responsible_team | Team 90 (submission package), Team 10 (orchestration), Chief Architect (approval) |
+| last_gate_event | GATE_8 \| PASS \| 2026-02-22 \| _COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S001_P001_WP001_GATE8_VALIDATION_RESPONSE.md, _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP001_GATE8_VALIDATION_REPORT.md |
+| next_required_action | Team 10 may open S001-P002 by submitting PRE_GATE_3 validation package with canonical identity header |
+| next_responsible_team | Team 10 (next WP definition and submission), Team 90 (Pre-GATE_3 validation) |
 
 ---
 
@@ -104,7 +104,7 @@ Role contract in workflow:
 
 ## 📋 LEVEL 2: MASTER TASK LIST (מבצעי — structural catalog only; no operational status)
 
-**Live task/execution status is solely in CURRENT_OPERATIONAL_STATE.** This table is a structural catalog; it does not store operational state. S001-P002 FROZEN per SSM §5.1.
+**Live task/execution status is solely in CURRENT_OPERATIONAL_STATE.** This table is a structural catalog; it does not store operational state. S001-P002 lock condition (SSM §5.1) is satisfied after WP001 GATE_8 PASS; activation is controlled by CURRENT_OPERATIONAL_STATE.
 
 | Task ID | Description | Owner | Evidence Link |
 | :--- | :--- | :--- | :--- |
@@ -133,4 +133,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_4 closure 2026-02-21 | 2026-02-22**  
 **log_entry | TEAM_170 | WSM_CANONICAL_APPLY | at Gate Owner request | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**  
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_5 closure 2026-02-21 | 2026-02-22**  
-**log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | GATE_PROTOCOL_v2.3.0_OFFICIALIZATION_REFERENCE_REFRESH | 2026-02-22**
+**log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | GATE_PROTOCOL_v2.3.0_OFFICIALIZATION_REFERENCE_REFRESH | 2026-02-22**  
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_8 closure 2026-02-22 | 2026-02-22**

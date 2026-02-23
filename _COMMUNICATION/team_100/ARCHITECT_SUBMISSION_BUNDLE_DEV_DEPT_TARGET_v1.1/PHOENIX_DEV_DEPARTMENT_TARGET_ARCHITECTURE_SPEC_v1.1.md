@@ -39,7 +39,6 @@ This spec is the **north star**. Implementation will be **gradual, stage-based**
 - **Nimrod** (Human): product owner, final approver, final visual sign-off
 - **Architect (Gemini)**: principal architect, issues architectural decisions/directives
 - **Team 100 (ChatGPT)**: spec engineering, research, orchestration design, risk analysis
-- **(Optionally) Team 70**: if positioned as “Architectural Knowledge Librarian” (see §4)
 
 **Responsibilities**
 - Produce and approve **module specs** (blueprints) with zero ambiguity.
@@ -91,7 +90,7 @@ Prevents role collision between “blocking authority” and “exploratory inte
 ### 4.1 Target stance (recommended)
 - **Team 70 = Development Knowledge Ops (Librarian)**  
   Owns: documentation aggregation, standards registry, governance matrices, knowledge promotion execution.
-  Has dotted-line support to Architecture Department (accepts direct requests for closing/standardizing docs).
+  Organizationally part of the Development Department only. May provide documentation support to Architecture via a dotted-line request flow, without departmental reassignment.
 
 - **Team 10 = Development Gateway / Orchestrator**  
   Owns: stage activation, routing, gate coordination, publication approvals, index-sync requests (but NOT bulk documentation writing).

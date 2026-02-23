@@ -64,8 +64,9 @@ Confirm that no WP002 evidence remains in non-canonical paths; all one-off evide
 | Check | Result |
 |-------|--------|
 | All WP002 one-off artifacts listed in ARCHIVE_MANIFEST moved to `99-ARCHIVE/2026-02-23/S001_P001_WP002/` | DONE. |
-| No WP002-specific one-off file remains in active team_10/20/50/90/100/170/190 or 90_Architects_comunication except those in KEEP set | Verified. |
+| No WP002-specific one-off file remains in active team_10/20/50/90/100/170/190 or 90_Architects_comunication except those in KEEP set | Verified (post-remediation B1: eight active duplicates removed). |
 | Submission package present in archive (copy) | DONE. |
+| **Remediation B2:** Closure-check statement aligned with repository reality | DONE. This section reflects post-B1 state. |
 
 ---
 
@@ -77,3 +78,4 @@ Canonical paths only; no open evidence outside archive or KEEP set.
 ---
 
 **log_entry | TEAM_70 | CANONICAL_EVIDENCE_CLOSURE_CHECK | S001_P001_WP002 | GATE_8 | 2026-02-23**
+**log_entry | TEAM_70 | REMEDIATION_B2 | S001_P001_WP002 | CLOSURE_CHECK_ALIGNED | 2026-02-23**

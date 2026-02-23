@@ -82,22 +82,22 @@ Operational clarification (2026-02-23, WP002 cycle):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon **GATE_7 APPROVED** (2026-02-23). S001-P001-WP002 — human approval granted and GATE_8 activated.
+**Gate-owner update evidence:** This block was updated upon **GATE_8 PASS** (2026-02-23). S001-P001-WP002 — documentation closure validated and lifecycle completed.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
-| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_8 OPEN: documentation closure) |
-| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — WP002 active) |
-| allowed_gate_range | GATE_8 (OPEN) → DOCUMENTATION_CLOSED |
-| current_gate | GATE_8 (OPEN) |
-| active_program_id | S001-P001 |
+| active_flow | EXECUTION — S001-P001-WP002 lifecycle complete (DOCUMENTATION_CLOSED) |
+| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 completed; awaiting next authorized WP) |
+| allowed_gate_range | DOCUMENTATION_CLOSED → READY_FOR_NEXT_WORK_PACKAGE |
+| current_gate | DOCUMENTATION_CLOSED |
+| active_program_id | S001-P001 (Agents_OS Phase 1 complete) |
 | active_plan_id | S001 |
-| active_work_package_id | S001-P001-WP002 |
+| active_work_package_id | N/A (last closed: S001-P001-WP002) |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_7 \| APPROVED \| 2026-02-23 \| Human approval received (Nimrod) |
-| next_required_action | Team 70 executes GATE_8 closure package (AS_MADE, guide updates, cleanup, archive) and submits validation request to Team 90 |
-| next_responsible_team | Team 70 |
+| last_gate_event | GATE_8 \| PASS \| 2026-02-23 \| Documentation closure validated by Team 90 |
+| next_required_action | Team 10 may open the next authorized work package according to WSM gate order |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -147,3 +147,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 post-GATE_5 architect approval pending (Team100/00 authority) | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_6 OPEN approved by Team 100 decision | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_7 approved; GATE_8 activated | 2026-02-23**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_8 PASS; DOCUMENTATION_CLOSED | 2026-02-23**

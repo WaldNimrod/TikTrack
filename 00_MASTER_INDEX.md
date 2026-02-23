@@ -42,7 +42,8 @@
 | **מצב נוכחי (operational state)** — active Stage, current gate, active Program/Work Package, last_gate_event | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE** בלבד | מקור יחיד; מעודכן על ידי Gate Owner בכל סגירת שער |
 | **כללי היררכיה ומספור** | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; SSM: `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | אין סטטוס שוטף ב־SSM; רק ב־WSM |
 | **רשימת משימות (Tasks) — סטטוס OPEN/CLOSED, תאריכי סגירה** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | רמה 2; מתעדכן על ידי Team 10; סטטוס שער שוטף לא כאן — ב־WSM |
-| **מפת דרכים (Stages)** | `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md` | רמה 1 |
+| **מפת דרכים (Stages)** | `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md` | רמה 1 (נרטיב + קישורי Level-2) |
+| **Portfolio קנוני (Stage/Program/WP)** | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | קטלוג קנוני; runtime רק ב־WSM |
 | **נוהל ניהול רשימות + מי מעדכן WSM ומתי + חובה סנכרון רשימות** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | §1.2.2: Gate Owner מעדכן WSM; Team 10 מסנכרן רשימות בכל הרמות |
 
 **כלל:** שינוי סטטוס Program/Work Package (כולל עדכון WSM) מחייב עדכון רשימות רמה 2 (והתאם רמה 1/3) — ראה נוהל.
@@ -57,7 +58,7 @@
 | Level 2 — Task lists registry | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md` |
 | Level 2 — Master list | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` |
 | Level 2 — Carryover list | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` |
-| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|51|60|70|90|100|170|190/` |
+| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|60|70|90|100|170|190/` |
 
 **Fixed Level-2 filenames (mandatory across all stages):**
 - `TEAM_10_MASTER_TASK_LIST.md`

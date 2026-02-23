@@ -60,7 +60,9 @@ WP002 one-off evidence: G3.5 (work-plan) validation request/response; GATE_3 exi
 | Classification (KEEP vs ARCHIVE) | Done — §2. |
 | No edits in `_Architects_Decisions` | Confirmed. |
 | Physical move to archive | Applied — see ARCHIVE_REPORT. |
+| **Remediation B1 (post Team 90 FAIL):** Active duplicates removed | DONE. Eight files that remained in active paths after initial move were deleted; canonical copies exist only in `99-ARCHIVE/2026-02-23/S001_P001_WP002/`. |
 
 ---
 
 **log_entry | TEAM_70 | COMMUNICATION_CLEANUP_REPORT | S001_P001_WP002 | GATE_8 | 2026-02-23**
+**log_entry | TEAM_70 | REMEDIATION_B1 | S001_P001_WP002 | ACTIVE_DUPLICATES_REMOVED | 2026-02-23**

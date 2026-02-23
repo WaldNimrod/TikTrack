@@ -59,6 +59,7 @@
 | One-off artifacts moved from active _COMMUNICATION into archive (per manifest) | DONE |
 | Submission package copied into archive | DONE |
 | ARCHIVE_MANIFEST.md written and placed in archive root | DONE |
+| **Remediation B1 (post Team 90 FAIL):** Active duplicate copies removed from team_10, team_20, team_50, team_90, team_100, team_170 | DONE. No WP002 one-off files remain in active paths; only archive + KEEP set. |
 
 ---
 

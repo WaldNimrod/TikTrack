@@ -37,6 +37,7 @@ ssm_dependency: 1.0.0
 | L4 | Task | משימה | Atomic task within a work package. |
 
 **Rule:** Gate binding **only to Work Package** (L3).  
+**Portfolio boundary (per PORTFOLIO_CANONICALIZATION):** Runtime state (active stage, current gate, last_gate_event, active_work_package_id) is **stored only in this document** (block CURRENT_OPERATIONAL_STATE). The canonical Portfolio layer (Roadmap/Program/Work Package registries) holds a **mirror** for structural catalog only; they are not a second source of runtime truth. See `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` and `PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.  
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
@@ -82,26 +83,26 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon **GATE_7 APPROVED** (2026-02-23). S001-P001-WP002 — human approval granted and GATE_8 activated.
+**Gate-owner update evidence:** This block was updated upon **GATE_8 PASS** (2026-02-23). S001-P001-WP002 — documentation closure validated and lifecycle completed.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
 | active_stage_label | שלב 1 — Stage 1 |
-| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_8 OPEN: documentation closure) |
-| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — WP002 active) |
-| active_work_package_id | S001-P001-WP002 |
-| in_progress_work_package_id | S001-P001-WP002 |
-| last_closed_work_package_id | S001-P001-WP001 (GATE_8 PASS 2026-02-22; lifecycle complete; **domain: orchestration/10↔90**) |
+| active_flow | EXECUTION — S001-P001-WP002 lifecycle complete (DOCUMENTATION_CLOSED) |
+| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 completed; awaiting next authorized WP) |
+| active_work_package_id | N/A (last closed: S001-P001-WP002) |
+| in_progress_work_package_id | N/A (awaiting next authorized work package) |
+| last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; lifecycle complete; **domain: AGENTS_OS**) |
 | s001_p001_program_spec_status | GATE_1 PASS — AGENTS_OS_PHASE_1_LLD400_v1.0.0 (Team 190 validation 2026-02-22); **domain: AGENTS_OS** |
-| allowed_gate_range | GATE_8 (OPEN) → DOCUMENTATION_CLOSED |
-| current_gate | GATE_8 (OPEN) |
-| active_program_id | S001-P001 (Agents_OS Phase 1; WP002 in progress) |
+| allowed_gate_range | DOCUMENTATION_CLOSED → READY_FOR_NEXT_WORK_PACKAGE |
+| current_gate | DOCUMENTATION_CLOSED |
+| active_program_id | S001-P001 (Agents_OS Phase 1 complete) |
 | active_plan_id | S001 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_7 \| APPROVED \| 2026-02-23 \| Human approval received (Nimrod) |
-| next_required_action | Team 70 executes GATE_8 closure package (AS_MADE, guide updates, cleanup, archive) and submits validation request to Team 90 |
-| next_responsible_team | Team 70 |
+| last_gate_event | GATE_8 \| PASS \| 2026-02-23 \| Documentation closure validated by Team 90 |
+| next_required_action | Team 10 may open the next authorized work package according to WSM gate order |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -153,3 +154,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_6 OPEN approved by Team 100 decision | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_7 approved; GATE_8 activated | 2026-02-23**
 **log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | WSM_OWNER_MATRIX_PATH_DEPRECATION | 2026-02-23**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_8 PASS; DOCUMENTATION_CLOSED | 2026-02-23**

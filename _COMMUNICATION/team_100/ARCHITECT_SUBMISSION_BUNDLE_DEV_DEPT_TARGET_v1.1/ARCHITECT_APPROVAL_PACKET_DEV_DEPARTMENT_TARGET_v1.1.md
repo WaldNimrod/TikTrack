@@ -36,12 +36,12 @@ This packet requests approval of the **final target model** before any POC imple
 - Architect (Gemini): principal decisions, architecture consistency
 - Team 100: spec engineering + orchestration design
 - Team 90: Dev validation authority (Gate-B, PASS/BLOCK)
-- Team 70: knowledge standards support (dotted-line)
 
 ### Development Department
 - Development Engine (agent)
 - Team 10 gateway/orchestrator
 - Teams 20/30/40/50/60/70 execute deliverables
+- Team 70 is Development Knowledge Ops (librarian) and may support Architecture by dotted-line request only (no department reassignment)
 
 ---
 

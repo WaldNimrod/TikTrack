@@ -3,7 +3,7 @@
 **project_domain:** SHARED  
 **id:** TEAM_100_TO_ALL_TEAMS_CANONICAL_GOVERNANCE_ADOPTION_NOTICE_v1.1.0  
 **from:** Team 100 (Development Architecture Lead)  
-**to:** Team 10, Team 20, Team 30, Team 40, Team 50, Team 51, Team 60, Team 70, Team 90, Team 170  
+**to:** Team 10, Team 20, Team 30, Team 40, Team 50, Team 60, Team 70, Team 90, Team 170  
 **cc:** Team 00 (Chief Architect), Team 190  
 **date:** 2026-02-23  
 **status:** MANDATORY_ADOPTION_ACTIVE  

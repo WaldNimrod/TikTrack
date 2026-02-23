@@ -12,7 +12,8 @@
 ## Purpose
 
 Consolidate open items from documents moved to archive, so no task is lost during cleanup.  
-This list is Level-2 and must stay linked from Level-1 roadmap.
+This list is Level-2 and must stay linked from Level-1 roadmap.  
+**תחום רמה 2 (Portfolio boundary):** רשימה זו — Task-level (carryover items) בלבד; Stage/Program/WP status SSOT — WSM + Portfolio registries (PORTFOLIO_INDEX).
 
 ---
 

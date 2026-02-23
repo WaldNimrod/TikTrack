@@ -55,6 +55,8 @@ Roadmap (single)
 
 Gate binding allowed **only** at Work Package level.
 
+**Portfolio boundary (per PORTFOLIO_CANONICALIZATION):** Operational/runtime state (active stage, current gate, last_gate_event) is **not** in SSM; it is **only** in WSM (CURRENT_OPERATIONAL_STATE). The canonical Portfolio layer (Roadmap/Program/Work Package registries) is structural and mirror-only; see PORTFOLIO_INDEX and PORTFOLIO_WSM_SYNC_RULES.
+
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN} (prefix inheritance; no implicit numbering; no duplicates). Validation: parsing, inheritance check, duplicate check, lexicographic — per 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.
 
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique (no two programs with the same P-number in the same stage). Within a Program, each Work Package number is unique (no two work packages with the same WP-number in the same program). One Program per (Stage, P-number); one Work Package per (Program, WP-number).
@@ -110,7 +112,7 @@ Role contract lock:
 | **Team 100 (Development Architecture Authority)** | Owner of development process architecture | Defines gate model, lifecycle contracts, orchestration rules; may approve structural/process gates within its domain; operates under strategic alignment with Team 00. |
 | **Team 170** | Spec Owner | Original documents only. |
 | **Team 190** | Architectural Validator + Submission Owner | Validation and submission package ownership. |
-| **Team 70** | Documentation Authority | Exclusive writer to canonical documentation folders. |
+| **Team 70** | Documentation Authority (Execution Department Librarian) | Organizationally part of the Development Department (10-90). Exclusive writer to canonical documentation folders; may support Architecture via request flow only (no departmental reassignment). |
 | **Team 10** | Execution Orchestrator | Execution coordination. |
 
 ---

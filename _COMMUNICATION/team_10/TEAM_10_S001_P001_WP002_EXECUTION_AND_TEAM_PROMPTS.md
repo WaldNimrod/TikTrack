@@ -6,7 +6,7 @@
 **from:** Team 10 (The Gateway)  
 **re:** תוכנית ביצוע, סדר ותלויות, משימות ספציפיות ופרומטים לכל צוות  
 **date:** 2026-02-22  
-**status:** ACTIVE  
+**status:** CLOSED — GATE_8_PASS (DOCUMENTATION_CLOSED, 2026-02-23)  
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## 1b) השערים כוללים את תהליך הפיתוח — מיקום חבילת העבודה
 
-**השערים מוגדרים כך שתהליך הפיתוח נמצא בתוכם.** חבילת העבודה S001-P001-WP002 **עברה את ולידציית התוכנית** (G3.5, Team 90 PASS) **ונמצאת כעת בשער המרכזי — GATE_3 (Implementation).** זה השער החשוב ביותר והוא **באחריות Team 10.**
+**השערים מוגדרים כך שתהליך הפיתוח נמצא בתוכם.** חבילת העבודה S001-P001-WP002 עברה G3.5 והושלמה במלואה עד **GATE_8 PASS (DOCUMENTATION_CLOSED)**. הקטע הזה נשמר כהיסטוריית הביצוע.
 
 - **GATE_3 = שער הפיתוח (Implementation)** — כולל בתוכו: הפעלת צוותי פיתוח (למשל Team 20), ביצוע פיתוח בפועל (קוד + מבנה), internal verification, GATE_3 exit, והגשה ל־GATE_4.
 - **אחרי** שצוותי הפיתוח מסיימים פיתוח בפועל ומתקיימים תנאי ה־exit של GATE_3 — **מבוצע QA של Team 50** = **GATE_4** (זה השלב הבא אחרי GATE_3).
@@ -326,3 +326,5 @@ GATE_7 PASS הושג. נדרש **GATE_8 — DOCUMENTATION_CLOSURE**: AS_MADE_REP
 ---
 
 **log_entry | TEAM_10 | S001_P001_WP002 | EXECUTION_AND_TEAM_PROMPTS | 2026-02-22**
+
+**log_entry | TEAM_10 | S001_P001_WP002 | WP002_STATUS_UPDATE_GATE8_PASS | 2026-02-23** — המסמך נסגר לאחר GATE_8 PASS ותיעוד סגירת lifecycle.

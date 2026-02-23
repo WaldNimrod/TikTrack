@@ -2,7 +2,7 @@
 
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **from:** Team 190 (Constitutional Architectural Validator)  
-**to:** Team 10, Team 20, Team 30, Team 40, Team 50, Team 51, Team 60, Team 70, Team 90, Team 100, Team 170  
+**to:** Team 10, Team 20, Team 30, Team 40, Team 50, Team 60, Team 70, Team 90, Team 100, Team 170  
 **status:** MANDATORY_ENFORCEMENT  
 **priority:** CRITICAL  
 **date:** 2026-02-23  

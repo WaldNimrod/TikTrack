@@ -11,6 +11,8 @@ last_updated: 2026-02-19
 
 **טקסונומיה:** במפת הדרכים משתמשים **רק בשלבים (Stages)** — אין שימוש במונח "באץ'" (batch). שלב = Stage.
 
+**Portfolio canonical (Stage catalog):** קטלוג Stage קנוני ומפת דרכים אחת — `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md`, `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md`. מסמך זה נשאר מקור לנרטיב אסטרטגי ולקישורי Level-2.
+
 ## 🏗️ שלב 1: חיתום יסודות (Foundations Sealed)
 **סטטוס:** ✅ **COMPLETED & VERIFIED (v1.0.0)**
 

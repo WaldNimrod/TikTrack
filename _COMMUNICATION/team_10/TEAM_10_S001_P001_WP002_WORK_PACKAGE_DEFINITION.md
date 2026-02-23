@@ -80,7 +80,8 @@
 | Role | Assignment |
 |------|------------|
 | **phase_owner** | Team 10 (The Gateway) |
-| **responsible_team (orchestration / implementation)** | Team 10 |
+| **responsible_team (orchestration)** | Team 10 |
+| **implementation (code — development)** | **Team 20** (Backend Implementation); תוצר = קוד ומבנה תחת agents_os/ |
 | **Channel 10↔90 — request/orchestration** | Team 10 |
 | **Channel 10↔90 — validation authority** | Team 90 |
 | **QA (GATE_4)** | Team 50 |

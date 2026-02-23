@@ -435,15 +435,28 @@ def main() -> int:
             gh.ensure_label(label, color)
 
     existing = gh.list_managed_issues()
-    index: Dict[str, dict] = {}
+    by_key: Dict[str, List[dict]] = {}
+    keyless_issues: List[dict] = []
     for issue in existing:
         key = _extract_key(issue.get("body", ""))
-        if key:
-            index[key] = issue
+        if not key:
+            keyless_issues.append(issue)
+            continue
+        by_key.setdefault(key, []).append(issue)
+
+    # Keep exactly one canonical issue per key: highest issue number.
+    index: Dict[str, dict] = {}
+    duplicate_issues: List[dict] = []
+    for key, issues_for_key in by_key.items():
+        sorted_for_key = sorted(issues_for_key, key=lambda it: it.get("number", 0), reverse=True)
+        index[key] = sorted_for_key[0]
+        duplicate_issues.extend(sorted_for_key[1:])
 
     created = 0
     updated = 0
     closed_stale = 0
+    closed_duplicates = 0
+    closed_keyless = 0
     desired_keys = {item.key for item in items}
     for item in items:
         current = index.get(item.key)
@@ -464,6 +477,30 @@ def main() -> int:
         updated += 1
 
     if args.close_stale:
+        # Close duplicate issues first (same key).
+        for dup in duplicate_issues:
+            dup_number = dup["number"]
+            dup_state = dup.get("state", "open")
+            if dup_state == "closed":
+                continue
+            if args.dry_run:
+                print(f"[dry-run] close duplicate issue #{dup_number} (same portfolio_key)")
+            else:
+                gh.close_issue(dup_number)
+            closed_duplicates += 1
+
+        # Close keyless managed issues (orphaned legacy cards).
+        for keyless in keyless_issues:
+            keyless_number = keyless["number"]
+            keyless_state = keyless.get("state", "open")
+            if keyless_state == "closed":
+                continue
+            if args.dry_run:
+                print(f"[dry-run] close keyless managed issue #{keyless_number} (missing portfolio_key)")
+            else:
+                gh.close_issue(keyless_number)
+            closed_keyless += 1
+
         for stale_key, stale_issue in index.items():
             if stale_key in desired_keys:
                 continue
@@ -479,7 +516,9 @@ def main() -> int:
 
     print(
         "Portfolio sync completed: "
-        f"scope={args.scope}, created={created}, updated={updated}, closed_stale={closed_stale}, total={len(items)}"
+        f"scope={args.scope}, created={created}, updated={updated}, "
+        f"closed_duplicates={closed_duplicates}, closed_keyless={closed_keyless}, "
+        f"closed_stale={closed_stale}, total={len(items)}"
     )
     return 0
 

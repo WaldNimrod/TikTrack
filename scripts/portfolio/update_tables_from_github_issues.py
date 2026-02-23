@@ -42,21 +42,58 @@ def _request(owner: str, repo: str, token: str, method: str, path: str, payload:
     req.add_header("X-GitHub-Api-Version", "2022-11-28")
     if data is not None:
         req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req) as resp:
-        raw = resp.read().decode("utf-8")
-        return json.loads(raw) if raw else []
+    try:
+        with urllib.request.urlopen(req) as resp:
+            raw = resp.read().decode("utf-8")
+            return json.loads(raw) if raw else []
+    except urllib.error.HTTPError as e:
+        body = ""
+        if e.fp:
+            try:
+                body = e.fp.read().decode("utf-8")
+            except Exception:
+                pass
+        print(f"GitHub API error: {e.code} {e.reason}")
+        if body:
+            try:
+                msg = json.loads(body)
+                print("Response:", msg.get("message", body[:500]))
+            except Exception:
+                print("Response:", body[:500])
+        raise
 
 
 def list_issues(owner: str, repo: str, token: str) -> List[dict]:
+    # Use Search API (works with default token when List issues returns 403)
     issues: List[dict] = []
     page = 1
     while True:
-        q = urllib.parse.urlencode({"state": "all", "labels": MANAGED_LABEL, "per_page": 100, "page": page})
-        batch = _request(owner, repo, token, "GET", f"/issues?{q}")
-        if not isinstance(batch, list) or not batch:
+        q = f"repo:{owner}/{repo} label:{MANAGED_LABEL} type:issue"
+        path = f"/search/issues?q={urllib.parse.quote(q)}&per_page=100&page={page}"
+        # Search API lives at /search, not under /repos
+        url = f"https://api.github.com{path}"
+        req = urllib.request.Request(url=url, method="GET")
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("Accept", "application/vnd.github+json")
+        req.add_header("X-GitHub-Api-Version", "2022-11-28")
+        try:
+            with urllib.request.urlopen(req) as resp:
+                raw = resp.read().decode("utf-8")
+                data = json.loads(raw) if raw else {}
+        except urllib.error.HTTPError as e:
+            body = e.fp.read().decode("utf-8") if e.fp else ""
+            print(f"GitHub API error: {e.code} {e.reason}")
+            if body:
+                try:
+                    print("Response:", json.loads(body).get("message", body[:500]))
+                except Exception:
+                    print("Response:", body[:500])
+            raise
+        items = data.get("items") if isinstance(data, dict) else []
+        if not items:
             break
-        issues.extend([i for i in batch if "pull_request" not in i])
-        if len(batch) < 100:
+        issues.extend(items)
+        if len(items) < 100:
             break
         page += 1
     return issues

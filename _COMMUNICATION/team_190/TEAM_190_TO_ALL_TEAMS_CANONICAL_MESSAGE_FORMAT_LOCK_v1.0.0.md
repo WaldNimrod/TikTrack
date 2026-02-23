@@ -73,8 +73,8 @@ Every governance-critical message MUST include this exact order:
 | required_ssm_version | YES |
 | required_active_stage | YES |
 
-Canonical rule for Pre-GATE_3 artifacts:
-- use `gate_id = PRE_GATE_3` (reserved phase marker, not gate transition).
+Canonical rule for gate_id (per Gate Governance Realignment v1.1.0):
+- **Allowed values only:** `gate_id = GATE_0 | GATE_1 | … | GATE_8`. Work-plan validation before implementation is inside GATE_3 as sub-stage G3.5; use `gate_id = GATE_3` for those artifacts. No PRE_GATE_3. Reference: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md.
 
 ---
 
@@ -100,7 +100,7 @@ Canonical rule for Pre-GATE_3 artifacts:
 **cc:** <optional>
 **date:** <YYYY-MM-DD>
 **status:** <SUBMITTED | ACTION_REQUIRED | PASS | FAIL | etc.>
-**gate_id:** <PRE_GATE_3 | GATE_0..GATE_8 | N/A>
+**gate_id:** <GATE_0..GATE_8 | N/A> (work-plan validation = GATE_3, sub-stage G3.5)
 **work_package_id:** <Sxxx-Pxxx-WPxxx | N/A>
 
 ---

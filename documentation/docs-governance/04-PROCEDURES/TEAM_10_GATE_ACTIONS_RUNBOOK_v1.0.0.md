@@ -19,6 +19,9 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 - SSM/WSM and Gate Protocol are canonical. Identity header and canonical message format (TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0) apply to all gate-bound artifacts.
 - Team 10 uses TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 for scope (20/30/40/60); activates **every** development team in scope with explicit mandate/prompt.
+- Cross-owner gate artifact contracts are mandatory references:
+  - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
+  - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
 
 ---
 
@@ -67,7 +70,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **Entry** | GATE_5 PASS. |
 | **Owner** | Team 90. |
 | **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists and WSM on PASS. |
-| **Required artifacts** | GATE_6 submission (canonical); Team 90 / architect decision. |
+| **Required artifacts** | GATE_6 submission (canonical); Team 90 / architect decision; route classification per GATE_6 rejection protocol. |
 | **Exit** | GATE_6 PASS (architectural dev validation approved). |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
@@ -80,7 +83,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **Entry** | GATE_6 PASS. |
 | **Owner** | Team 90. |
 | **Team 10 mandatory actions** | (1) Submit request for human UX sign-off (Nimrod / Team 00 per process). (2) Update on signature. |
-| **Required artifacts** | Request and approval record. |
+| **Required artifacts** | Request and approval record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
 | **Exit** | Human sign-off received. |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 

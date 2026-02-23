@@ -52,7 +52,21 @@ Request Team 190 to validate the Gate Governance Realignment execution (v1.1.0) 
 
 ---
 
-## 4) Requested response
+## 4) Self-check performed (2026-02-23)
+
+Team 170 performed an independent self-check before submission:
+- **Criterion 1:** PRE_GATE_3 removed from all active procedural/canonical artifacts; gate_id = GATE_0..GATE_8 only. TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK updated. WP001 artifacts left unchanged per legacy lock.
+- **Criterion 2:** Gate table in 04_GATE_MODEL, SSM, WSM, Runbook matches approved table exactly.
+- **Criterion 3:** GATE_3_SUBSTAGES_DEFINITION_v1.0.0 contains G3.1..G3.9; referenced in protocol and runbook.
+- **Criterion 4:** GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0 documents DOC_ONLY_LOOP / CODE_CHANGE_REQUIRED / escalation.
+- **Criterion 5:** WSM_OWNER_MATRIX_GATES_0_8_v1.0.0 reflected in WSM, runbook, SSM, protocol.
+- **Criterion 6:** PATH_DEPRECATION_90_ARCHITECTS_COMUNICATION_v1.0.0; WSM and CHANNEL_10_90 state path deprecated; active refs → _ARCHITECT_INBOX, _Architects_Decisions.
+- **Criterion 7:** WP002 definition, prompts, execution, GATE6 submission aligned to new model.
+- **Criterion 8:** WP001_LEGACY_LOCK_NO_RETROFIT_v1.0.0; no retrofit to WP001.
+
+---
+
+## 5) Requested response
 
 - Team 190: Perform validation against §3 and any additional checks per mandate.
 - Team 190: Return decision **PASS** / **CONDITIONAL_PASS** / **FAIL** with optional findings.
@@ -60,7 +74,7 @@ Request Team 190 to validate the Gate Governance Realignment execution (v1.1.0) 
 
 ---
 
-## 5) Deliverables index (submission package)
+## 6) Deliverables index (submission package)
 
 | # | Deliverable |
 |---|-------------|

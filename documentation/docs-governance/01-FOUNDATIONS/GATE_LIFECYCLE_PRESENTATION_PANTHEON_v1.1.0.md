@@ -1,0 +1,277 @@
+# GATE_LIFECYCLE_PRESENTATION_PANTHEON_v1.1.0
+
+project_domain: SHARED
+status: ACTIVE
+version: 1.1.0
+purpose: presentation_ready_flowchart
+
+---
+
+## Scope
+
+Presentation-grade lifecycle diagram for GATE_0..GATE_8, including ownership, WSM updates, GATE_3 sub-stages, and rejection routes.
+
+Canonical description:
+`documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md`
+
+Raw Mermaid source:
+`documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_FLOWCHART_PRESENTATION_v1.1.0.mmd`
+
+---
+
+## Mermaid (Presentation)
+
+```mermaid
+%% linked_description_doc: documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md
+---
+config:
+  layout: fixed
+---
+flowchart LR
+ subgraph SPINE["Main Gates"]
+    direction TB
+        G0["GATE_0<br/>SPEC_ARC (LOD 200)<br/>Owner: Team 190"]
+        G1["GATE_1<br/>SPEC_LOCK (LOD 400)<br/>Owner: Team 190"]
+        G2["GATE_2<br/>ARCHITECTURAL_SPEC_VALIDATION<br/>Owner: Team 190"]
+        G3["GATE_3<br/>IMPLEMENTATION<br/>Owner: Team 10"]
+        G4["GATE_4<br/>QA<br/>Owner: Team 10"]
+        G5["GATE_5<br/>DEV_VALIDATION<br/>Owner: Team 90"]
+        G6["GATE_6<br/>ARCHITECTURAL_DEV_VALIDATION<br/>Owner: Team 90"]
+        G7["GATE_7<br/>HUMAN_UX_APPROVAL<br/>Owner: Team 90"]
+        G8["GATE_8<br/>DOCUMENTATION_CLOSURE<br/>(AS_MADE_LOCK)<br/>Owner: Team 90"]
+  end
+
+ subgraph G3SEQ["GATE_3 internal sequence (Team 10)"]
+    direction TB
+        G31["G3.1 SPEC_INTAKE"]
+        G32["G3.2 SPEC_IMPLEMENTATION_REVIEW"]
+        G33["G3.3 ARCH_CLARIFICATION_LOOP"]
+        G34["G3.4 WORK_PACKAGE_DETAILED_BUILD"]
+        G35["G3.5 WORK_PACKAGE_VALIDATION_WITH_TEAM_90"]
+        G36["G3.6 TEAM_ACTIVATION_MANDATES (20/30/40/60)"]
+        G37["G3.7 IMPLEMENTATION_ORCHESTRATION"]
+        G38["G3.8 COMPLETION_COLLECTION_AND_PRECHECK"]
+        G39["G3.9 GATE3_CLOSE_AND_GATE4_QA_REQUEST"]
+        D3{"GATE_3 complete?"}
+        W3["WSM update<br/>GATE_3 PASS<br/>Owner: Team 10"]
+        L3["Back to G3 clarification/build loop"]
+  end
+
+ subgraph S1["Gate 0 Flow"]
+        P0["Process: concept/scope alignment<br/>Architects + Team 190"]
+        D0{"Exit criteria met?"}
+        W0["WSM update<br/>GATE_0 PASS<br/>Owner: Team 190"]
+        L0["Refinement loop"]
+  end
+
+ subgraph S2["Gate 1 Flow"]
+        P1["Process: LOD400 lock verification"]
+        D1{"Exit criteria met?"}
+        W1["WSM update<br/>GATE_1 PASS<br/>Owner: Team 190"]
+        L1["Spec correction loop<br/>Team 170 + Team 190"]
+  end
+
+ subgraph S3["Gate 2 Flow"]
+        P2["Process: architectural SPEC submission and review"]
+        D2{"Architect decision"}
+        W2["WSM update<br/>GATE_2 PASS<br/>Owner: Team 190"]
+        L2["Feedback loop<br/>Team 170 + Team 190"]
+  end
+
+ subgraph S4["Gate 4 Flow"]
+        P4["Process: Team 10 hands QA package to Team 50"]
+        D4{"QA PASS?"}
+        W4["WSM update<br/>GATE_4 PASS<br/>Owner: Team 10"]
+        L4["QA remediation loop"]
+  end
+
+ subgraph S5["Gate 5 Flow"]
+        P5["Process: Team 90 dev validation"]
+        D5{"Validation PASS?"}
+        W5["WSM update<br/>GATE_5 PASS<br/>Owner: Team 90"]
+        L5["Return remediation package to Team 10"]
+  end
+
+ subgraph S6["Gate 6 Flow"]
+        P6["Process: Team 90 submits execution package<br/>to architects (via Team 100/00 governance path)"]
+        D6{"Architect decision"}
+        W6["WSM update<br/>GATE_6 PASS/OPEN_NEXT<br/>Owner: Team 90"]
+        L6A["DOC_ONLY_LOOP<br/>Team 90 updates docs/reports"]
+        L6B["CODE_CHANGE_REQUIRED<br/>Return full package to Team 10"]
+        L6C["Escalate to Team 00"]
+  end
+
+ subgraph S7["Gate 7 Flow"]
+        P7["Process: human UX approval<br/>Team 90 + Nimrod"]
+        D7{"Approved?"}
+        W7["WSM update<br/>GATE_7 PASS<br/>Owner: Team 90"]
+        L7["Team 90 route decision<br/>doc-only or code-change"]
+  end
+
+ subgraph S8["Gate 8 Flow"]
+        P8["Process: documentation closure<br/>Team 70 executes, Team 90 validates"]
+        D8{"Closure PASS?"}
+        W8["WSM update<br/>GATE_8 PASS (CLOSED)<br/>Owner: Team 90"]
+        L8["Closure remediation loop"]
+  end
+
+    G0 -.-> G1
+    G1 -.-> G2
+    G2 -.-> G3
+    G3 -.-> G4
+    G4 -.-> G5
+    G5 -.-> G6
+    G6 -.-> G7
+    G7 -.-> G8
+
+    START["Idea Intake (Nimrod)"] --> G0
+    REMOVED["Policy: PRE_GATE_3 removed"] -.-> G3
+
+    G0 --> P0
+    P0 --> D0
+    D0 -- PASS --> W0
+    W0 --> G1
+    D0 -- REJECT --> L0
+    L0 --> G0
+
+    G1 --> P1
+    P1 --> D1
+    D1 -- PASS --> W1
+    W1 --> G2
+    D1 -- REJECT --> L1
+    L1 --> G1
+
+    G2 --> P2
+    P2 --> D2
+    D2 -- APPROVED --> W2
+    W2 --> G3
+    D2 -- REJECTED --> L2
+    L2 --> G2
+
+    G31 --> G32
+    G32 --> G33
+    G33 --> G34
+    G34 --> G35
+    G35 --> G36
+    G36 --> G37
+    G37 --> G38
+    G38 --> G39
+    G3 --> G31
+    G39 --> D3
+    D3 -- PASS --> W3
+    W3 --> G4
+    D3 -- REJECT --> L3
+    L3 --> G33
+
+    G4 --> P4
+    P4 --> D4
+    D4 -- PASS --> W4
+    W4 --> G5
+    D4 -- FAIL --> L4
+    L4 --> G3
+
+    G5 --> P5
+    P5 --> D5
+    D5 -- PASS --> W5
+    W5 --> G6
+    D5 -- FAIL --> L5
+    L5 --> G3
+
+    G6 --> P6
+    P6 --> D6
+    D6 -- APPROVED --> W6
+    W6 --> G7
+    D6 -- REJECT_DOC_ONLY --> L6A
+    L6A --> G6
+    D6 -- REJECT_CODE_CHANGE --> L6B
+    L6B --> G3
+    D6 -- UNCLEAR_ROUTE --> L6C
+    L6C --> G6
+
+    G7 --> P7
+    P7 --> D7
+    D7 -- PASS --> W7
+    W7 --> G8
+    D7 -- REJECT --> L7
+    L7 --> G6
+
+    G8 --> P8
+    P8 --> D8
+    D8 -- PASS --> W8
+    W8 --> END["Lifecycle Closed"]
+    D8 -- FAIL --> L8
+    L8 --> G8
+
+    G0:::gate190
+    G1:::gate190
+    G2:::gate190
+    G3:::gate10
+    G4:::gate10
+    G5:::gate90
+    G6:::gate90
+    G7:::gate90
+    G8:::gate90
+
+    G31:::gate10
+    G32:::gate10
+    G33:::gate10
+    G34:::gate10
+    G35:::gate10
+    G36:::gate10
+    G37:::gate10
+    G38:::gate10
+    G39:::gate10
+
+    D3:::decision
+    W3:::wsm
+    L3:::loop
+    P0:::process
+    D0:::decision
+    W0:::wsm
+    L0:::loop
+    P1:::process
+    D1:::decision
+    W1:::wsm
+    L1:::loop
+    P2:::process
+    D2:::decision
+    W2:::wsm
+    L2:::loop
+    P5:::process
+    D5:::decision
+    W5:::wsm
+    L5:::loop
+    P4:::process
+    D4:::decision
+    W4:::wsm
+    L4:::loop
+    P6:::process
+    D6:::decision
+    W6:::wsm
+    L6A:::loop
+    L6B:::loop
+    L6C:::loop
+    P7:::process
+    D7:::decision
+    W7:::wsm
+    L7:::loop
+    P8:::process
+    D8:::decision
+    W8:::wsm
+    L8:::loop
+    START:::note
+    END:::note
+    REMOVED:::note
+
+    classDef gate190 fill:#dbeafe,stroke:#1d4ed8,color:#0f172a,stroke-width:1px
+    classDef gate10 fill:#dcfce7,stroke:#15803d,color:#052e16,stroke-width:1px
+    classDef gate90 fill:#ffedd5,stroke:#c2410c,color:#431407,stroke-width:1px
+    classDef process fill:#f8fafc,stroke:#64748b,color:#0f172a,stroke-width:1px
+    classDef decision fill:#fef9c3,stroke:#a16207,color:#422006,stroke-width:1px
+    classDef wsm fill:#f3e8ff,stroke:#7e22ce,color:#3b0764,stroke-width:1px
+    classDef loop fill:#fee2e2,stroke:#b91c1c,color:#450a0a,stroke-width:1px
+    classDef note fill:#e2e8f0,stroke:#475569,color:#0f172a,stroke-width:1px
+    classDef legend fill:#ffffff,stroke:#94a3b8,color:#0f172a,stroke-width:1px
+
+    style END fill:#C8E6C9
+```

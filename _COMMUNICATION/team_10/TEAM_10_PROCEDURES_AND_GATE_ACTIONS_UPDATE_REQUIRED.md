@@ -39,7 +39,7 @@
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` (או גרסה עתידית בנתיב הקנוני) | להוסיף **§ חדש: Team 10 (Gateway) — פעולות נדרשות לכל שער.** לכל gate_id (GATE_0 … GATE_8, ו־PRE_GATE_3): רשימת פעולות חובה של Team 10 (למשל: GATE_3 — הפעלת צוותי פיתוח לפי scope, קבלת תוצרים, internal verification, GATE_3 exit, הגשת חבילת QA ל־Team 50; GATE_4 — הגשת חבילת QA; GATE_5 — הגשת WORK_PACKAGE_VALIDATION_REQUEST; וכו'). |
+| `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` (או גרסה עתידית בנתיב הקנוני) | **§ Team 10 (Gateway) — פעולות נדרשות לכל שער** ב־TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0. לכל gate_id (GATE_0 … GATE_8 only; ולידציית תוכנית = GATE_3 תת־שלב G3.5): רשימת פעולות חובה של Team 10 (GATE_3 — כולל G3.5 לפני G3.6; GATE_4 — הגשת חבילת QA; GATE_5 — הגשת WORK_PACKAGE_VALIDATION_REQUEST; וכו'). |
 
 ### 3.2 הגדרת תפקיד צוות 10 (TEAM_10_GATEWAY_ROLE_AND_PROCESS)
 
@@ -51,7 +51,7 @@
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | בתוך §1.2.1.1 (לאחר Pre-GATE_3 PASS): **להוסיף:** (א) קביעת צוותי הפיתוח בסקופ לפי חלוקת התפקידים הקנונית (20/30/40/60); (ב) הוצאת מנדט/פרומט **לכל** צוות פיתוח בסקופ — לא רק לצוות אחד, אלא לכל ענף רלוונטי (Backend, Frontend, UI, DevOps לפי הצורך). |
+| `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | בתוך §1.2.1.1 (לאחר GATE_3 G3.5 PASS): (א) קביעת צוותי הפיתוח בסקופ לפי חלוקת התפקידים הקנונית (20/30/40/60); (ב) הוצאת מנדט/פרומט **לכל** צוות פיתוח בסקופ — לא רק לצוות אחד, אלא לכל ענף רלוונטי (Backend, Frontend, UI, DevOps לפי הצורך). |
 
 ### 3.4 .cursorrules (מראה בלבד)
 
@@ -79,7 +79,7 @@
 
 | שער | פעולות חובה של Team 10 |
 |-----|--------------------------|
-| **PRE_GATE_3** | הגשת WORK_PACKAGE_DEFINITION + תוכנית ביצוע ל־Team 90; המתנה ל־VALIDATION_RESPONSE PASS; עדכון רשימות ו־WSM כשנפתח GATE_3. |
+| **GATE_3 G3.5** | הגשת WORK_PACKAGE_DEFINITION + תוכנית ביצוע ל־Team 90 (ולידציית תוכנית); המתנה ל־VALIDATION_RESPONSE PASS; עדכון רשימות ו־WSM כשנפתח GATE_3 (ממשיך ל־G3.6). |
 | **GATE_3** | (1) קביעת צוותי פיתוח בסקופ (20/30/40/60 לפי scope). (2) הפעלת כל צוות פיתוח בסקופ — מנדט + פרומט. (3) קבלת תוצרים (קוד/מבנה). (4) Internal verification + GATE_3 exit criteria. (5) חבילת GATE_3 exit; הגשה ל־Team 50 (GATE_4). (6) עדכון WSM (current_gate, last_gate_event, next_required_action). |
 | **GATE_4** | הגשת חבילת QA ל־Team 50 (קונטקסט, קישורים, evidence); המתנה לדוח QA (0 SEVERE); עדכון רשימות; עם PASS — מעבר ל־GATE_5. |
 | **GATE_5** | הגשת WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5) ל־Team 90 עם חבילה מלאה; המתנה ל־VALIDATION_RESPONSE; עדכון רשימות ו־WSM עם PASS. |

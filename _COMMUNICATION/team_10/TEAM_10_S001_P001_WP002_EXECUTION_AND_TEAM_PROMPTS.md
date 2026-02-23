@@ -30,7 +30,7 @@
 
 ## 1b) השערים כוללים את תהליך הפיתוח — מיקום חבילת העבודה
 
-**השערים מוגדרים כך שתהליך הפיתוח נמצא בתוכם.** חבילת העבודה S001-P001-WP002 **עברה את שער האישור האדריכלי** (Pre-GATE_3, Team 90 PASS) **ונמצאת כעת בשער המרכזי — GATE_3 (Implementation).** זה השער החשוב ביותר והוא **באחריות Team 10.**
+**השערים מוגדרים כך שתהליך הפיתוח נמצא בתוכם.** חבילת העבודה S001-P001-WP002 **עברה את ולידציית התוכנית** (G3.5, Team 90 PASS) **ונמצאת כעת בשער המרכזי — GATE_3 (Implementation).** זה השער החשוב ביותר והוא **באחריות Team 10.**
 
 - **GATE_3 = שער הפיתוח (Implementation)** — כולל בתוכו: הפעלת צוותי פיתוח (למשל Team 20), ביצוע פיתוח בפועל (קוד + מבנה), internal verification, GATE_3 exit, והגשה ל־GATE_4.
 - **אחרי** שצוותי הפיתוח מסיימים פיתוח בפועל ומתקיימים תנאי ה־exit של GATE_3 — **מבוצע QA של Team 50** = **GATE_4** (זה השלב הבא אחרי GATE_3).
@@ -65,8 +65,8 @@
 | **Team 20** | פיתוח קוד במסגרת GATE_3 — מימוש agents_os/ (runtime/, validators/, tests/) + validator stub (קוד ממשי, למשל Python) — **צד שרת/runtime** |
 | **Team 60** | (במקרה הצורך) תשתית/runner להרצת validator או מבנה פלטפורמה תחת agents_os/ — **לפי החלטת Team 10 בהתאם לסקופ** |
 | **Team 50** | QA (GATE_4) — אחרי GATE_3 exit; דוח QA, 0 SEVERE |
-| **Team 90** | Pre-GATE_3 (הושלם); GATE_5 Dev Validation |
-| **Team 190** | GATE_6 EXECUTION; בעלים GATE_8 |
+| **Team 90** | G3.5 (הושלם); GATE_5 Dev Validation; GATE_6/7/8 (בעלים) |
+| **Team 90** | GATE_6 EXECUTION; בעלים GATE_6/7/8 |
 | **Nimrod** | GATE_7 Human UX Approval |
 | **Team 70** | מבצע GATE_8 (Documentation Closure) |
 
@@ -74,13 +74,13 @@
 
 | שער | תיאור | צוות מייצר | תוצר סופי של השלב |
 |-----|--------|-------------|---------------------|
-| Pre-GATE_3 | ולידציית חבילת עבודה | **Team 90** | VALIDATION_RESPONSE (PASS) — **הושג**; GATE_3 נפתח |
+| G3.5 | ולידציית חבילת עבודה | **Team 90** | VALIDATION_RESPONSE (PASS) — **הושג**; GATE_3 נפתח |
 | **GATE_3** | **Implementation — שער הפיתוח** | **Team 10** (בעלים), **Team 20** (מימוש קוד) | קוד ומבנה תחת `agents_os/` (runtime/, validators/, tests/, validator stub); internal verification; **GATE_3 exit**; הגשה ל־GATE_4 |
 | GATE_4 | QA | **Team 50** | דוח QA; 0 SEVERE; readiness ל-GATE_5 |
 | GATE_5 | Dev Validation (10↔90) | **Team 90** | VALIDATION_RESPONSE (PASS) או BLOCKING_REPORT |
-| GATE_6 | EXECUTION | **Team 190** | EXECUTION approval |
+| GATE_6 | EXECUTION | **Team 90** | EXECUTION approval |
 | GATE_7 | Human UX Approval | **Nimrod** | חתימת UX/vision |
-| GATE_8 | Documentation Closure | **Team 70** (מבצע), **Team 190** (בעלים) | AS_MADE_REPORT; סגירת lifecycle |
+| GATE_8 | Documentation Closure | **Team 90** | AS_MADE_REPORT; סגירת lifecycle |
 
 ---
 
@@ -88,11 +88,11 @@
 
 | שער | שלב | צוות | תלות | תאום נדרש | תוצר |
 |-----|-----|------|------|------------|------|
-| **GATE_3** | **Implementation (שער הפיתוח)** — כולל פיתוח בפועל + exit | **Team 10** (בעלים), **Team 20** (מימוש) | Pre-GATE_3 PASS (הושג) | Team 10 → 20: מנדט + פרומט §5.0; Team 20 → 10: תוצר קוד + הודעת סיום | קוד ומבנה agents_os/; internal verification; **GATE_3 exit**; הגשה ל־GATE_4 |
+| **GATE_3** | **Implementation (שער הפיתוח)** — כולל פיתוח בפועל + exit | **Team 10** (בעלים), **Team 20** (מימוש) | G3.5 PASS (הושג) | Team 10 → 20: מנדט + פרומט §5.0; Team 20 → 10: תוצר קוד + הודעת סיום | קוד ומבנה agents_os/; internal verification; **GATE_3 exit**; הגשה ל־GATE_4 |
 | GATE_4 | QA | **Team 50** | GATE_3 exit | Team 10 → 50: חבילת QA | דוח QA; 0 SEVERE |
 | GATE_5 | Dev Validation | **Team 90** | GATE_4 PASS | Team 10 → 90: WORK_PACKAGE_VALIDATION_REQUEST (GATE_5) | VALIDATION_RESPONSE (PASS) או BLOCKING_REPORT |
-| GATE_6 | EXECUTION | **Team 190** | GATE_5 PASS | Team 10 → 190: חבילת GATE_6 | EXECUTION approval |
-| GATE_7 | Human UX Approval | **Nimrod** | GATE_6 PASS | — | חתימת UX/vision |
+| GATE_6 | EXECUTION | **Team 90** | GATE_5 PASS | Team 10 → 90: חבילת GATE_6 | EXECUTION approval |
+| GATE_7 | Human UX Approval | **Team 90** | GATE_6 PASS | — | חתימת UX/vision (Nimrod/Team 00) |
 | GATE_8 | Documentation Closure | **Team 70 / 190** | GATE_7 PASS | — | AS_MADE_REPORT; סגירה |
 
 **תלות מרכזית:** השערים ברצף. GATE_3 כולל את תהליך הפיתוח; אין GATE_4 לפני GATE_3 exit; אין דילוג על שער.
@@ -106,9 +106,9 @@
 | **(במסגרת GATE_3)** | **Team 10** | **Team 20** | מנדט פיתוח: WORK_PACKAGE_DEFINITION; EXECUTION_AND_TEAM_PROMPTS; LLD400 §2.4. הוראה: קוד ממשי (Python/סקריפט) — validator stub + מבנה תיקיות. | **§5.0 — TEAM_10_TO_TEAM_20_…_DEVELOPMENT_PROMPT** | בתוך שער הפיתוח (GATE_3). |
 | **(אחרי GATE_3 exit)** | Team 10 | **Team 50** | חבילת QA: WORK_PACKAGE_DEFINITION; EXECUTION_AND_TEAM_PROMPTS; קישורים ל־agents_os/; חבילת GATE_3 exit. | §5.2 — TEAM_10_TO_TEAM_50_…_QA_PROMPT | GATE_4 — אחרי שצוותים סיימו פיתוח. |
 | 2 | Team 10 | **Team 90** | WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5); קישור ל־WORK_PACKAGE_DEFINITION + EXECUTION_AND_TEAM_PROMPTS; דוח QA (0 SEVERE); קישורים לתוצרי agents_os/ ו־evidence. | §5.3 — TEAM_10_TO_TEAM_90_S001_P001_WP002_GATE5_PROMPT | רק אחרי GATE_4 PASS. |
-| 3 | Team 10 | **Team 190** | חבילת GATE_6: WORK_PACKAGE_DEFINITION; EXECUTION_AND_TEAM_PROMPTS; VALIDATION_RESPONSE (GATE_5 PASS); קישורים לארטיפקטים ו־agents_os/. | §5.4 — TEAM_10_TO_TEAM_190_S001_P001_WP002_GATE6_PROMPT | רק אחרי GATE_5 PASS. |
-| 4 | Team 10 | **Nimrod** | קישור ל־WORK_PACKAGE_DEFINITION; הודעה ש־GATE_6 PASS — נדרשת חתימת GATE_7. | §5.5 — TEAM_10_GATE7_S001_P001_WP002_PROMPT | רק אחרי GATE_6 PASS. |
-| 5 | Team 10 | **Team 70** / **Team 190** | קישור ל־WORK_PACKAGE_DEFINITION + 04_GATE_MODEL_PROTOCOL; הודעה ש־GATE_7 PASS — נדרש GATE_8. | §5.6 — TEAM_10_TO_TEAM_70_S001_P001_WP002_GATE8_PROMPT | רק אחרי GATE_7 PASS. |
+| 3 | Team 10 | **Team 90** | חבילת GATE_6: WORK_PACKAGE_DEFINITION; EXECUTION_AND_TEAM_PROMPTS; VALIDATION_RESPONSE (GATE_5 PASS); קישורים לארטיפקטים ו־agents_os/. | §5.4 — GATE_6 submission to Team 90 | רק אחרי GATE_5 PASS. |
+| 4 | Team 10 | **Nimrod / Team 00** | קישור ל־WORK_PACKAGE_DEFINITION; הודעה ש־GATE_6 PASS — נדרשת חתימת GATE_7. | §5.5 — TEAM_10_GATE7_S001_P001_WP002_PROMPT | רק אחרי GATE_6 PASS. |
+| 5 | Team 10 | **Team 90** | קישור ל־WORK_PACKAGE_DEFINITION + 04_GATE_MODEL_PROTOCOL; הודעה ש־GATE_7 PASS — נדרש GATE_8. | §5.6 — GATE_8 coordination | רק אחרי GATE_7 PASS. |
 
 **קבצים משותפים (קונטקסט):**
 - `_COMMUNICATION/team_10/TEAM_10_S001_P001_WP002_WORK_PACKAGE_DEFINITION.md`
@@ -120,19 +120,19 @@
 
 ## 4א) רשימת השלבים — אחריות Team 10 ומיקום נוכחי (WP002)
 
-**מיקום נוכחי של חבילת העבודה 002:** חבילת העבודה **נמצאת כעת ב־GATE_3 (שער הפיתוח — Implementation).** שער האישור האדריכלי (Pre-GATE_3) הושלם. **השלב הפעיל הוא GATE_3 — באחריות Team 10.**
+**מיקום נוכחי של חבילת העבודה 002:** חבילת העבודה **נמצאת כעת ב־GATE_3 (שער הפיתוח — Implementation).** ולידציית התוכנית (G3.5) הושלמה. **השלב הפעיל הוא GATE_3 — באחריות Team 10.**
 
 **כלל השלבים (מסגרת השערים):**
 
 | # | שער | תיאור קצר | באחריות Team 10? | סטטוס WP002 |
 |---|-----|------------|-------------------|--------------|
 | 0 | Pre-requisite / GATE_1 | SPEC לאישור תוכנית | לא (Team 190) | הושלם |
-| 0b | Pre-GATE_3 | ולידציית חבילת עבודה (Team 90) | הגשה ובקשה | **הושלם** — GATE_3 נפתח |
+| 0b | G3.5 | ולידציית חבילת עבודה (Team 90) | הגשה ובקשה | **הושלם** — GATE_3 נפתח |
 | **1** | **GATE_3** | **Implementation — שער הפיתוח** | **כן — בעלים; הפעלת צוות 20, אימות, GATE_3 exit, הגשה ל־QA** | **כאן אנחנו עכשיו** |
 | 2 | GATE_4 | QA (Team 50) | הגשת חבילת QA ל־Team 50 | ממתין ל־GATE_3 exit |
 | 3 | GATE_5 | Dev Validation (Team 90) | הגשת WORK_PACKAGE_VALIDATION_REQUEST | אחרי GATE_4 PASS |
-| 4 | GATE_6 | EXECUTION (Team 190) | העברת חבילה ל־190 | אחרי GATE_5 PASS |
-| 5 | GATE_7 | Human UX Approval (Nimrod) | העברת בקשה לחתימה | אחרי GATE_6 PASS |
+| 4 | GATE_6 | EXECUTION (Team 90) | העברת חבילה ל־90 | אחרי GATE_5 PASS |
+| 5 | GATE_7 | Human UX Approval (Team 90 / Nimrod) | העברת בקשה לחתימה | אחרי GATE_6 PASS |
 | 6 | GATE_8 | Documentation Closure (70/190) | תיאום עם 70/190 | אחרי GATE_7 PASS |
 
 **פירוט מדויק — שלבים באחריות Team 10 (עכשיו ועד סיום GATE_3):**
@@ -143,7 +143,7 @@
 4. **GATE_3 exit:** להכין חבילת GATE_3 exit (evidence, sign-off, Identity Headers); לאשר readiness להגשה ל־QA.
 5. **הגשה ל־GATE_4:** להגיש ל־Team 50 חבילת QA (קישורים ל־WORK_PACKAGE_DEFINITION, EXECUTION_AND_TEAM_PROMPTS, agents_os/, evidence) עם הפרומט §5.2.
 
-**אחרי GATE_3 exit — שלבים נוספים באחריות Team 10:** הגשת חבילה ל־Team 90 (GATE_5), העברה ל־Team 190 (GATE_6), העברה ל־Nimrod (GATE_7), תיאום GATE_8 עם Team 70/190.
+**אחרי GATE_3 exit — שלבים נוספים באחריות Team 10:** הגשת חבילה ל־Team 90 (GATE_5), העברה ל־Team 90 (GATE_6), העברה ל־Nimrod/Team 00 (GATE_7), תיאום GATE_8 עם Team 90.
 
 ---
 
@@ -258,18 +258,18 @@
 
 **משימות ספציפיות — GATE_5 Dev Validation:**
 1. לאמת תוצרי ביצוע (מבנה agents_os/, validator stub, evidence, תאימות לקנון) מול המפרט ובקשת Team 10.
-2. לאמת תאימות מלאה למעגל: Pre-GATE_3 → GATE_3 → GATE_4 → GATE_5; נתיבים קנוניים; Identity Headers.
+2. לאמת תאימות מלאה למעגל: G3.5 → GATE_3 → GATE_4 → GATE_5; נתיבים קנוניים; Identity Headers.
 3. להחזיר VALIDATION_RESPONSE (overall_status PASS) ב-_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S001_P001_WP002_GATE5_VALIDATION_RESPONSE.md או BLOCKING_REPORT בנתיב הקנוני; לולאה עד max_resubmissions (5) או PASS. נהלים: CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0; 04_GATE_MODEL_PROTOCOL_v2.3.0 §6.1.
 ```
 
 ---
 
-### 5.4 Team 190 — GATE_6 EXECUTION (שלב 4 — לאחר GATE_5 PASS)
+### 5.4 Team 90 — GATE_6 EXECUTION (שלב 4 — לאחר GATE_5 PASS)
 
 ```markdown
 **id:** TEAM_10_TO_TEAM_190_S001_P001_WP002_GATE6_PROMPT
 **from:** Team 10 (The Gateway)
-**to:** Team 190 (Constitutional Architectural Validator)
+**to:** Team 90 (GATE_6 owner — Architectural Dev Validation)
 **work_package_id:** S001-P001-WP002
 **gate_id:** GATE_6
 **phase_owner:** Team 10
@@ -278,11 +278,11 @@
 
 ---
 
-אתה פועל כצוות 190 (Constitutional Architectural Validator). Team 10 מעביר לך חבילה לאימות **GATE_6 — ARCHITECTURAL_VALIDATION (EXECUTION)** עבור S001-P001-WP002. GATE_5 (Dev Validation) PASS הושג.
+אתה פועל כצוות 90 (GATE_6 owner). Team 10 מעביר לך חבילה לאימות **GATE_6 — ARCHITECTURAL_DEV_VALIDATION (EXECUTION)** עבור S001-P001-WP002. GATE_5 (Dev Validation) PASS הושג.
 
 **קונטקסט:** _COMMUNICATION/team_10/TEAM_10_S001_P001_WP002_WORK_PACKAGE_DEFINITION.md; _COMMUNICATION/team_10/TEAM_10_S001_P001_WP002_EXECUTION_AND_TEAM_PROMPTS.md.
 
-**משימות ספציפיות:** לאמת יישור ארטיפקטים לחוקה (SSM, WSM, מפרטים מאושרים); להחזיר EXECUTION approval או ממצאים לתיקון. 04_GATE_MODEL_PROTOCOL_v2.3.0 — GATE_6 authority: Team 190.
+**משימות ספציפיות:** לאמת יישור ארטיפקטים לחוקה (SSM, WSM, מפרטים מאושרים); להחזיר EXECUTION approval או ממצאים לתיקון. 04_GATE_MODEL_PROTOCOL_v2.3.0 — GATE_6 owner: Team 90 (realignment v1.1.0).
 ```
 
 ---
@@ -311,7 +311,7 @@ GATE_6 PASS הושג עבור S001-P001-WP002. נדרשת חתימת GATE_7 (Hum
 ```markdown
 **id:** TEAM_10_TO_TEAM_70_S001_P001_WP002_GATE8_PROMPT
 **from:** Team 10 (The Gateway)
-**to:** Team 70 (Executor), Team 190 (Owner)
+**to:** Team 90 (Owner)
 **work_package_id:** S001-P001-WP002
 **gate_id:** GATE_8
 **phase_owner:** Team 10
@@ -320,7 +320,7 @@ GATE_6 PASS הושג עבור S001-P001-WP002. נדרשת חתימת GATE_7 (Hum
 
 ---
 
-GATE_7 PASS הושג. נדרש **GATE_8 — DOCUMENTATION_CLOSURE**: AS_MADE_REPORT, עדכון Developer Guides, ניקוי/ארכוב, עקביות קנונית. Team 70 = executor; Team 190 = owner. Lifecycle לא complete בלי GATE_8 PASS. תוכנית: _COMMUNICATION/team_10/TEAM_10_S001_P001_WP002_WORK_PACKAGE_DEFINITION.md; 04_GATE_MODEL_PROTOCOL_v2.3.0.
+GATE_7 PASS הושג. נדרש **GATE_8 — DOCUMENTATION_CLOSURE**: AS_MADE_REPORT, עדכון Developer Guides, ניקוי/ארכוב, עקביות קנונית. Team 90 = owner. Lifecycle לא complete בלי GATE_8 PASS. תוכנית: _COMMUNICATION/team_10/TEAM_10_S001_P001_WP002_WORK_PACKAGE_DEFINITION.md; 04_GATE_MODEL_PROTOCOL_v2.3.0.
 ```
 
 ---

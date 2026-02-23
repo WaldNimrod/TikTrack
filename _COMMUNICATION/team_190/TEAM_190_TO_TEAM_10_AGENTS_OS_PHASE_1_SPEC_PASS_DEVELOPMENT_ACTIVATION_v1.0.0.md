@@ -40,8 +40,8 @@ Team 10 is authorized to start the **development orchestration process setup** f
 
 1. Prepare a **detailed Work Package** under program `S001-P001` (new WP id per canonical numbering rules).
 2. Build complete execution plan and orchestration package for that WP.
-3. Submit the WP package to Team 90 for **Pre-GATE_3 validation** (`gate_id: PRE_GATE_3`).
-4. Do **not** start execution before Team 90 PASS on Pre-GATE_3.
+3. Submit the WP package to Team 90 for **work-plan validation (GATE_3 sub-stage G3.5)** (`gate_id: GATE_3` per Gate Governance Realignment v1.1.0).
+4. Do **not** start execution before Team 90 PASS on G3.5.
 
 ---
 
@@ -50,7 +50,7 @@ Team 10 is authorized to start the **development orchestration process setup** f
 For this development cycle, Team 10 must follow this deterministic sequence:
 
 1. `GATE_1` PASS (already completed)
-2. `PRE_GATE_3` validation by Team 90 (WP plan/package validation)
+2. GATE_3 G3.5 validation by Team 90 (WP plan/package validation)
 3. `GATE_3` Implementation (Team 10 orchestration)
 4. `GATE_4` QA (Team 50)
 5. `GATE_5` Dev Validation (Team 90)
@@ -70,7 +70,7 @@ Team 10 must produce and submit (for the new WP under `S001-P001`):
 2. `PROMPTS_AND_ORDER_OF_OPERATIONS` (orchestration sequence and team-level operational prompts).
 3. Team allocation plan (relevant execution teams per scope, including dependency/reconciliation points).
 4. Internal verification and GATE_3 exit package definition.
-5. `TEAM_10_TO_TEAM_90_<WP>_VALIDATION_REQUEST` with `gate_id: PRE_GATE_3`.
+5. `TEAM_10_TO_TEAM_90_<WP>_VALIDATION_REQUEST` with `gate_id: GATE_3` (G3.5 work-plan validation).
 6. Update to Team 10 master task list reflecting the new WP and gate state.
 
 All artifacts must include full mandatory identity header and canonical numbering.
@@ -79,10 +79,10 @@ All artifacts must include full mandatory identity header and canonical numberin
 
 ## 5) Control constraints
 
-1. No execution actions before Pre-GATE_3 PASS from Team 90.
+1. No execution actions before GATE_3 G3.5 PASS from Team 90.
 2. No GATE_5 before GATE_4 PASS.
 3. No lifecycle completion before GATE_8 PASS.
-4. Any scope change after Pre-GATE_3 requires revalidation loop with Team 90.
+4. Any scope change after G3.5 requires revalidation loop with Team 90.
 
 ---
 
@@ -92,8 +92,8 @@ Return an activation package notice containing:
 
 - new `work_package_id`
 - list of produced artifacts (path-by-path)
-- explicit confirmation: `PRE_GATE_3 submitted to Team 90`
-- execution status remains `BLOCKED_UNTIL_PRE_GATE_3_PASS`
+- explicit confirmation: work-plan validation request (G3.5) submitted to Team 90
+- execution status remains `BLOCKED_UNTIL_G3.5_PASS` until Team 90 PASS
 
 ---
 

@@ -32,7 +32,7 @@ A Work Package must assign implementation **by domain** — Backend→20, Fronte
 
 ## 3) Team 10 orchestration
 
-Team 10 (Gateway) is owner of GATE_3 (Implementation). For every open Work Package after PRE_GATE_3 PASS:
+Team 10 (Gateway) is owner of GATE_3 (Implementation). For every open Work Package after GATE_3 sub-stage G3.5 (work-plan validation with Team 90) PASS:
 
 1. Determine which squads (20/30/40/60) are in scope from WORK_PACKAGE_DEFINITION.
 2. Issue **one** mandate/prompt per in-scope squad (no single-squad default for full product).

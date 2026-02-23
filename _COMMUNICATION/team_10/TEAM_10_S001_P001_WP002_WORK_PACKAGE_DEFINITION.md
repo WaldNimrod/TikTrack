@@ -6,7 +6,7 @@
 **from:** Team 10 (The Gateway)  
 **re:** PROGRAM S001-P001 (Agents_OS Phase 1) — Work Package 2, post–GATE_1 SPEC PASS  
 **date:** 2026-02-22  
-**status:** ACTIVE — GATE_3_OPEN (Pre-GATE_3 PASS 2026-02-22)  
+**status:** ACTIVE — GATE_3_OPEN (G3.5 work-plan validation PASS 2026-02-22)  
 **source:** TEAM_190_TO_TEAM_10_AGENTS_OS_PHASE_1_SPEC_PASS_DEVELOPMENT_ACTIVATION_v1.0.0; AGENTS_OS_PHASE_1_LLD400_v1.0.0; 04_GATE_MODEL_PROTOCOL_v2.3.0; CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0
 
 ---
@@ -49,20 +49,20 @@
 
 ## 2. Gate-aligned execution plan
 
-**כלל ברזל:** אין ביצוע (GATE_3) לפני ש־Team 90 מחזיר **PASS** על בקשת Pre-GATE_3 (ולידציית חבילת עבודה/תוכנית).
+**כלל ברזל:** אין ביצוע (GATE_3) לפני ש־Team 90 מחזיר **PASS** על ולידציית חבילת עבודה/תוכנית (תת־שלב G3.5).
 
 **Target sequence (LOCKED):**
 
 | Sequence | Gate / Stage | Owner | Trigger | Exit condition |
 |----------|--------------|--------|---------|----------------|
 | 0 | Pre-requisite | — | GATE_1 PASS (SPEC) for S001-P001 | Met (Team 190 activation issued). |
-| 0b | **Pre-GATE_3 — Work Package validation** | **Team 90** | Team 10 submits WORK_PACKAGE_DEFINITION + execution plan + PRE_GATE_3 request | Team 90 VALIDATION_RESPONSE PASS → GATE_3 may open. |
-| 1 | GATE_3 — Implementation | Team 10 | Pre-GATE_3 PASS | §2.1 GATE_3 exit criteria; then submit to GATE_4. |
+| 0b | **GATE_3 G3.5 — Work Package validation** | **Team 90** | Team 10 submits WORK_PACKAGE_DEFINITION + execution plan + validation request (gate_id GATE_3) | Team 90 VALIDATION_RESPONSE PASS → GATE_3 may proceed to G3.6. |
+| 1 | GATE_3 — Implementation | Team 10 | G3.5 PASS | §2.1 GATE_3 exit criteria; then submit to GATE_4. |
 | 2 | GATE_4 — QA | Team 50 | Team 10 submits QA package | QA report; 0 SEVERE; readiness for GATE_5. |
 | 3 | GATE_5 — Dev Validation (10↔90) | Team 90 | Team 10 issues WORK_PACKAGE_VALIDATION_REQUEST (GATE_5) | VALIDATION_RESPONSE (PASS) or BLOCKING_REPORT; loop until PASS or ESCALATE/STUCK. |
-| 4 | GATE_6 — Architectural Validation (EXECUTION) | Team 190 | GATE_5 PASS | EXECUTION approval; artifact alignment. |
-| 5 | GATE_7 — Human UX Approval | Nimrod | GATE_6 PASS | Final sign-off. |
-| 6 | GATE_8 — Documentation Closure | Team 190 (owner), Team 70 (executor) | GATE_7 PASS | AS_MADE_REPORT; canonical consistency. Lifecycle not complete without GATE_8 PASS. |
+| 4 | GATE_6 — Architectural Dev Validation (EXECUTION) | Team 90 | GATE_5 PASS | EXECUTION approval; artifact alignment. |
+| 5 | GATE_7 — Human UX Approval | Team 90 | GATE_6 PASS | Final sign-off (Nimrod/Team 00 per process). |
+| 6 | GATE_8 — Documentation Closure | Team 90 | GATE_7 PASS | AS_MADE_REPORT; canonical consistency. Lifecycle not complete without GATE_8 PASS. |
 
 ### 2.1 GATE_3 exit criteria (mandatory before GATE_4 submission)
 
@@ -85,9 +85,9 @@
 | **Channel 10↔90 — request/orchestration** | Team 10 |
 | **Channel 10↔90 — validation authority** | Team 90 |
 | **QA (GATE_4)** | Team 50 |
-| **GATE_6 (EXECUTION)** | Team 190 |
+| **GATE_6 (EXECUTION)** | Team 90 |
 | **GATE_7** | Nimrod |
-| **GATE_8 executor / owner** | Team 70 / Team 190 |
+| **GATE_8 owner** | Team 90 |
 
 ---
 
@@ -97,5 +97,5 @@ This Work Package is recorded in **Level 2 Master Task List** under program **S0
 
 ---
 
-**log_entry | TEAM_10 | WORK_PACKAGE_DEFINITION | S001_P001_WP002 | PRE_GATE_3_PASS_GATE_3_OPEN | 2026-02-22** — Team 90 VALIDATION_RESPONSE PASS (TEAM_90_TO_TEAM_10_S001_P001_WP002_VALIDATION_RESPONSE.md). סטטוס: ACTIVE; GATE_3 (Implementation) פתוח לביצוע. הערת דיוק: ב־WORK_PACKAGE_DEFINITION gate_id = GATE_3 מסמן שער ביצוע ראשון — ארטיפקטי Pre-GATE_3 נשארים עם PRE_GATE_3.
-**log_entry | TEAM_10 | WORK_PACKAGE_DEFINITION | S001_P001_WP002 | DRAFT_BLOCKED_UNTIL_PRE_GATE_3_PASS | 2026-02-22**
+**log_entry | TEAM_10 | WORK_PACKAGE_DEFINITION | S001_P001_WP002 | G3.5_PASS_GATE_3_OPEN | 2026-02-22** — Team 90 VALIDATION_RESPONSE PASS (TEAM_90_TO_TEAM_10_S001_P001_WP002_VALIDATION_RESPONSE.md). סטטוס: ACTIVE; GATE_3 (Implementation) פתוח לביצוע. Per Gate Governance Realignment v1.1.0: gate_id = GATE_3; work-plan validation = sub-stage G3.5.
+**log_entry | TEAM_10 | WORK_PACKAGE_DEFINITION | S001_P001_WP002 | DRAFT_BLOCKED_UNTIL_G3.5_PASS | 2026-02-22**

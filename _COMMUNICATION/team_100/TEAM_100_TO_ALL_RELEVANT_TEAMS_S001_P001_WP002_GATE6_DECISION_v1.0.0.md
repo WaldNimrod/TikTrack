@@ -47,7 +47,7 @@ Validation findings:
 
 - 7-artifact package structure: PASS  
 - Identity header completeness: PASS  
-- Gate sequence integrity (Pre-GATE_3 → GATE_5): PASS  
+- Gate sequence integrity (G3.5 → GATE_5): PASS  
 - SPEC baseline alignment (LLD400): PASS  
 - Domain isolation (Agents_OS only): PASS  
 - Scope containment within WP002: PASS  

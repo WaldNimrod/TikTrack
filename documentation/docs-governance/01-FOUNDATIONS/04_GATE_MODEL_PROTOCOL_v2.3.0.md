@@ -190,16 +190,21 @@ If missing, Team 100 MUST halt discussion and request completion.
 
 ---
 
-## 7. Team 10 (Gateway) — operational gate actions
+## 7. Operational references (no duplicate gate tables)
 
-**Normative authority:** This protocol defines gate enum, authority, and identity header. **Operational detail** (entry/exit criteria, mandatory actions per gate, WSM update duty, handoff) is in a single canonical runbook only:
+**Normative authority:** This protocol defines gate enum, authority, and identity header.
 
-- **Canonical runbook:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
+Operational detail and artifact contracts are referenced canonically:
 
-Team 10 (Gate Owner for GATE_3) and all teams must use the runbook for deterministic gate execution. No duplicate gate-action tables in other governance docs.
+- **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
+- **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
+- **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
+
+All teams must use these references for deterministic gate execution and artifact naming. No duplicate gate-action tables in other governance docs.
 
 ---
 
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.3.0 | LOCKED | 2026-02-22**
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | TEAM_10_RUNBOOK_REF_ADDED | 2026-02-23**
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | PRE_GATE_3_REMOVED_GATE_TABLE_WSM_OWNERS | 2026-02-23**
+**log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | OPERATIONAL_REFERENCES_HARDENED_GATES_0_2_AND_7 | 2026-02-23**

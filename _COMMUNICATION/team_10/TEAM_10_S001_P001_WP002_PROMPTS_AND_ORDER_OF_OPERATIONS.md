@@ -12,17 +12,17 @@
 
 ## 1) סדר פעולות (Order of Operations)
 
-השרשרת מחייבת. אין דילוג; אין GATE_3 לפני Pre-GATE_3 PASS; אין GATE_5 לפני GATE_4 PASS.
+השרשרת מחייבת. אין דילוג; אין GATE_3 (G3.6+) לפני G3.5 PASS; אין GATE_5 לפני GATE_4 PASS.
 
 | # | שלב | צוות אחראי | טריגר | תוצר / תנאי יציאה |
 |---|-----|-------------|--------|---------------------|
-| 0b | **Pre-GATE_3** (ולידציית חבילה) | Team 90 | Team 10 מגיש WORK_PACKAGE_VALIDATION_REQUEST (PRE_GATE_3) | VALIDATION_RESPONSE PASS → מותר לפתוח GATE_3 |
-| 1 | **GATE_3 — Implementation** | **Team 10** | Pre-GATE_3 PASS | אורקסטרציה + מימוש מבנה תחת agents_os/; GATE_3 exit package מלא (§2.1 הגדרת חבילה) |
+| 0b | **GATE_3 G3.5** (ולידציית חבילה) | Team 90 | Team 10 מגיש WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_3) | VALIDATION_RESPONSE PASS → מותר להמשיך ל־G3.6 |
+| 1 | **GATE_3 — Implementation** | **Team 10** | G3.5 PASS | אורקסטרציה + מימוש מבנה תחת agents_os/; GATE_3 exit package מלא (§2.1 הגדרת חבילה) |
 | 2 | GATE_4 — QA | Team 50 | Team 10 מגיש חבילת QA (רק אחרי GATE_3 exit) | דוח QA; 0 SEVERE; readiness ל-GATE_5 |
 | 3 | GATE_5 — Dev Validation (10↔90) | Team 90 | Team 10 מפרסם WORK_PACKAGE_VALIDATION_REQUEST (GATE_5) | VALIDATION_RESPONSE (PASS) או BLOCKING_REPORT; לולאה עד PASS או ESCALATE/STUCK |
-| 4 | GATE_6 — EXECUTION | Team 190 | GATE_5 PASS | EXECUTION approval; יישור ארטיפקטים |
-| 5 | GATE_7 — Human UX Approval | Nimrod | GATE_6 PASS | חתימת UX/vision |
-| 6 | GATE_8 — Documentation Closure | Team 70 (מבצע), Team 190 (בעלים) | GATE_7 PASS | AS_MADE_REPORT; עקביות קנונית. Lifecycle לא complete בלי GATE_8 PASS. |
+| 4 | GATE_6 — EXECUTION | Team 90 | GATE_5 PASS | EXECUTION approval; יישור ארטיפקטים |
+| 5 | GATE_7 — Human UX Approval | Team 90 | GATE_6 PASS | חתימת UX/vision (Nimrod/Team 00 לפי תהליך) |
+| 6 | GATE_8 — Documentation Closure | Team 90 | GATE_7 PASS | AS_MADE_REPORT; עקביות קנונית. Lifecycle לא complete בלי GATE_8 PASS. |
 
 ---
 
@@ -30,22 +30,22 @@
 
 | צוות | תפקיד ב־WP002 | תוצר נדרש / הערות |
 |------|----------------|---------------------|
-| **Team 10** | phase_owner; אורקסטרציה; מימוש מבנה תיקיות תחת `agents_os/`, validator stub, ואימות בידוד דומיין | WORK_PACKAGE_DEFINITION; PROMPTS_AND_ORDER; הגשת Pre-GATE_3 ל-90; ביצוע GATE_3 (מבנה + stub); internal verification; חבילת GATE_3 exit; הגשת ל-50 (GATE_4) ול-90 (GATE_5) |
-| **Team 90** | סמכות ערוץ 10↔90; Pre-GATE_3 (ולידציית תוכנית); GATE_5 (Dev Validation) | VALIDATION_RESPONSE / BLOCKING_REPORT לפי CHANNEL_10_90 |
+| **Team 10** | phase_owner; אורקסטרציה; מימוש מבנה תיקיות תחת `agents_os/`, validator stub, ואימות בידוד דומיין | WORK_PACKAGE_DEFINITION; PROMPTS_AND_ORDER; הגשת G3.5 ל-90; ביצוע GATE_3 (מבנה + stub); internal verification; חבילת GATE_3 exit; הגשת ל-GATE_4 ול-90 (GATE_5) |
+| **Team 90** | סמכות ערוץ 10↔90; G3.5 (ולידציית תוכנית); GATE_5 (Dev Validation); GATE_6/7/8 (בעלים) | VALIDATION_RESPONSE / BLOCKING_REPORT לפי CHANNEL_10_90 |
 | **Team 50** | QA (GATE_4) | דוח QA לאחר הגשת Team 10; 0 SEVERE ל-readiness ל-GATE_5 |
-| **Team 190** | GATE_6 EXECUTION | אישור יישור ארטיפקטים לחוקה |
+| **Team 90** | GATE_6 EXECUTION | אישור יישור ארטיפקטים לחוקה |
 | **Team 70** | GATE_8 executor | רק לאחר GATE_7 PASS |
 
 **הערה:** סקופ WP002 — תחת `agents_os/` בלבד; אין הפעלת צוותים 20/30/40/60 לחבילה זו אלא אם יוגדר בהמשך תת־משימה שדורשת זאת (למשל סקריפט אימות אוטומטי). כרגע מימוש המבנה וה־stub באחריות Team 10.
 
 ---
 
-## 3) פרומט — צוות 10 (GATE_3 Implementation) — לשימוש לאחר Pre-GATE_3 PASS
+## 3) פרומט — צוות 10 (GATE_3 Implementation) — לשימוש לאחר G3.5 PASS
 
 ```
 אתה פועל כצוות 10 (The Gateway), phase_owner של חבילת העבודה S001-P001-WP002 (Agents_OS Phase 1 — Runtime Structure & Validator Foundation).
 
-**הקשר:** Pre-GATE_3 אושר (Team 90 PASS). אתה בבעלות על שלב הפיתוח (GATE_3).
+**הקשר:** G3.5 אושר (Team 90 PASS). אתה בבעלות על שלב הפיתוח (GATE_3).
 
 **משימתך — GATE_3 Implementation:**
 1. ליישם תחת `agents_os/` את המבנה הקנוני לפי LLD400 §2.4: runtime/, validators/, tests/ (ו־documentation/docs-governance כנדרש).
@@ -60,9 +60,9 @@
 
 ---
 
-## 4) פרומט — Team 90 (Pre-GATE_3) — הגשת הבקשה
+## 4) פרומט — Team 90 (GATE_3 G3.5) — הגשת הבקשה
 
-בקשת Pre-GATE_3 מוגשת במסמך נפרד: `TEAM_10_TO_TEAM_90_S001_P001_WP002_VALIDATION_REQUEST.md` (ראה §5).
+בקשת ולידציית תוכנית (G3.5) מוגשת במסמך נפרד: `TEAM_10_TO_TEAM_90_S001_P001_WP002_VALIDATION_REQUEST.md` (ראה §5).
 
 ---
 

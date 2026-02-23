@@ -32,7 +32,7 @@ This notice is for information + authorization only.
 
 ## Activation constraint
 
-Team 10 may open the next work package only with canonical identity header and full Pre-GATE_3 validation flow.
+Team 10 may open the next work package only with canonical identity header and full GATE_3 G3.5 (work-plan validation) flow.
 
 ---
 

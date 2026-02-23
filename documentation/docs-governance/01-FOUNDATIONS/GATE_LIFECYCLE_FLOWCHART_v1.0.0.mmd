@@ -1,0 +1,65 @@
+%% linked_description_doc: documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.0.0.md
+flowchart LR
+
+subgraph ROOT["Gate Spine Left Root"]
+direction TB
+G0["GATE_0 SPEC_ARC LOD200 | Owner Team190 | WSM Team190"]
+G1["GATE_1 SPEC_LOCK LOD400 | Owner Team190 | WSM Team190"]
+G2["GATE_2 ARCHITECTURAL_SPEC_VALIDATION | Owner Team190 | WSM Team190"]
+G3["GATE_3 IMPLEMENTATION | Owner Team10 | WSM Team10"]
+G4["GATE_4 QA | Owner Team10 | QA Team50 | WSM Team10"]
+G5["GATE_5 DEV_VALIDATION | Owner Team90 | WSM Team90"]
+G6["GATE_6 ARCHITECTURAL_DEV_VALIDATION | Owner Team90 | WSM Team90"]
+G7["GATE_7 HUMAN_UX_APPROVAL | Owner Team90 | WSM Team90"]
+G8["GATE_8 DOCUMENTATION_CLOSURE AS_MADE_LOCK | Owner Team90 | Exec Team70 | WSM Team90"]
+G0 -.-> G1 -.-> G2 -.-> G3 -.-> G4 -.-> G5 -.-> G6 -.-> G7 -.-> G8
+end
+
+START["Idea Intake Nimrod"] --> G0
+REMOVED["PRE_GATE_3 REMOVED"] -. policy .-> G3
+
+G0 --> D0{"PASS?"}
+D0 -- "YES" --> W0["WSM GATE_0 PASS"] --> G1
+D0 -- "NO" --> L0["Refinement loop"] --> G0
+
+G1 --> D1{"PASS?"}
+D1 -- "YES" --> W1["WSM GATE_1 PASS"] --> G2
+D1 -- "NO" --> L1["Spec correction loop"] --> G1
+
+G2 --> D2{"Architect decision"}
+D2 -- "APPROVED" --> W2["WSM GATE_2 PASS"] --> G3
+D2 -- "REJECTED" --> L2["Architect feedback loop"] --> G2
+
+subgraph G3FLOW["GATE_3 Internal Sequence Team10"]
+direction TB
+G31["G3.1 SPEC_INTAKE"] --> G32["G3.2 SPEC_IMPLEMENTATION_REVIEW"] --> G33["G3.3 ARCH_CLARIFICATION_LOOP"] --> G34["G3.4 WORK_PACKAGE_DETAILED_BUILD"] --> G35["G3.5 WORK_PACKAGE_VALIDATION_WITH_TEAM90"] --> G36["G3.6 TEAM_ACTIVATION_MANDATES"] --> G37["G3.7 IMPLEMENTATION_ORCHESTRATION"] --> G38["G3.8 COMPLETION_COLLECTION_PRECHECK"] --> G39["G3.9 GATE3_CLOSE_GATE4_QA_REQUEST"]
+end
+
+G3 --> G31
+G39 --> D3{"GATE3 COMPLETE?"}
+D3 -- "YES" --> W3["WSM GATE_3 PASS"] --> G4
+D3 -- "NO" --> L3["Back to G3 clarification/build"] --> G33
+
+G4 --> D4{"QA PASS?"}
+D4 -- "YES" --> W4["WSM GATE_4 PASS"] --> G5
+D4 -- "NO" --> L4["QA remediation loop"] --> G3
+
+G5 --> D5{"PASS?"}
+D5 -- "YES" --> W5["WSM GATE_5 PASS"] --> G6
+D5 -- "NO" --> L5["Return to Team10 GATE_3"] --> G3
+
+G6 --> D6{"Architect decision"}
+D6 -- "APPROVED" --> W6["WSM GATE_6 PASS OPEN_NEXT"] --> G7
+D6 -- "DOC_ONLY" --> L6A["Team90 docs loop"] --> G6
+D6 -- "CODE_CHANGE" --> L6B["Return full package to Team10 GATE_3"] --> G3
+D6 -- "UNCLEAR" --> L6C["Escalate to Team00"] --> G6
+
+G7 --> D7{"HUMAN APPROVED?"}
+D7 -- "YES" --> W7["WSM GATE_7 PASS"] --> G8
+D7 -- "NO" --> L7["Team90 route decision"] --> G6
+
+G8 --> D8{"PASS?"}
+D8 -- "YES" --> W8["WSM GATE_8 PASS CLOSED"] --> END["Lifecycle Closed"]
+D8 -- "NO" --> L8["Closure remediation Team70 Team90"] --> G8
+
+DOC["Description doc:\nGATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.0.0.md"] -. linked .- ROOT

@@ -54,7 +54,7 @@ Validated package artifacts:
 | Blocker | Status | Validation note |
 |---------|--------|-----------------|
 | B1 — Mandatory identity fields | ✅ CLOSED | All required §1.4 fields now exist across GATE_3/GATE_4/GATE_5 active artifacts. |
-| B2 — Gate chronology consistency | ✅ CLOSED | Canonical sequence is now coherent: Pre-GATE_3 (2026-02-22) → GATE_3 exit / GATE_4 handover / GATE_4 report / GATE_5 request (2026-02-23). |
+| B2 — Gate chronology consistency | ✅ CLOSED | Canonical sequence is now coherent: G3.5 (2026-02-22) → GATE_3 exit / GATE_4 handover / GATE_4 report / GATE_5 request (2026-02-23). |
 
 ---
 

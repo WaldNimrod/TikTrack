@@ -11,7 +11,7 @@
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
 **last_updated:** 2026-02-22
 
-**מקור סטטוס שערים (חובה):** סטטוס שער פעיל, current gate ו־last_gate_event הם **ב־WSM בלבד** — `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (בלוק CURRENT_OPERATIONAL_STATE). רשימה זו מתעדת **משימות וסגירתן** (CLOSED + תאריך) **לא** סטטוס שער שוטף; עדכון שער מתבצע ב־WSM על ידי Gate Owner.
+**מקור סטטוס שערים (חובה):** סטטוס שער פעיל, current gate ו־last_gate_event הם **ב־WSM בלבד** — `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (בלוק CURRENT_OPERATIONAL_STATE). רשימה זו מתעדת **משימות וסגירתן** (CLOSED + תאריך) **לא** סטטוס שער שוטף; עדכון שער מתבצע ב־WSM על ידי Gate Owner.
 
 ---
 **הבהרת מבנה (חד־משמעי):**  

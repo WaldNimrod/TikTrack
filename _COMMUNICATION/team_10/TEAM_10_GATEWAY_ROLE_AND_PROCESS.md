@@ -1,11 +1,11 @@
 # תפקיד צוות 10 (The Gateway) — ניהול תהליך והפעלת צוותים
-**project_domain:** TIKTRACK
+**project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 
 **id:** `TEAM_10_GATEWAY_ROLE_AND_PROCESS`  
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **מחייב — רענון תפקיד ונוהל עבודה**  
-**last_updated:** 2026-02-18  
-**מקורות:** PHOENIX_MASTER_BIBLE, CURSOR_INTERNAL_PLAYBOOK, TEAM_10_MASTER_TASK_LIST_PROTOCOL
+**last_updated:** 2026-02-23  
+**מקורות קנוניים:** Gate Protocol `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; Runbook `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`; מיפוי צוותים `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`; נעילת פורמט הודעות `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`.
 
 ---
 
@@ -34,9 +34,9 @@
 
 ---
 
-## 3. חלוקת צוותי פיתוח — מקור קנוני (חוקי קרסור)
+## 3. חלוקת צוותי פיתוח — מקור קנוני
 
-**מקור מחייב:** `.cursorrules`. תוכנית עבודה חייבת להקצות מימוש **לפי תחום** — לא להניח שצוות אחד מכסה את כל המוצר.
+**מקור מחייב (Governance SSOT):** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`. `.cursorrules` הוא מראה לתפעול כלים בלבד. תוכנית עבודה חייבת להקצות מימוש **לפי תחום** — לא להניח שצוות אחד מכסה את כל המוצר.
 
 | צוות | תפקיד | תחום |
 |------|--------|------|
@@ -78,7 +78,9 @@
 | CURSOR_INTERNAL_PLAYBOOK | נהלי עבודה, תפקידים, תקשורת, ארגון קבצים |
 | TEAM_10_MASTER_TASK_LIST_PROTOCOL | נוהל רשימת משימות, היררכיה, הוצאת הודעות (סעיף 1.2.1) |
 | TEAM_10_MASTER_TASK_LIST | מטריצת משימות — עדכון שוטף |
-| TEAM_10_PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED | רשימת עדכונים נדרשים בנהלים ובהגדרות; פעולות Team 10 לכל שער; חלוקת 20/30/40/60 |
+| TEAM_10_GATE_ACTIONS_RUNBOOK (קנוני) | פעולות Team 10 לכל שער — מקור יחיד: `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` |
+| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | פורמט הודעות חובה — from/to/cc, identity header, log_entry; `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` |
+| TEAM_10_PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED | רשימת עדכונים (טופל — רנבוק ונעילה בקנון) |
 | TEAM_10_LEVEL2_LISTS_REGISTRY | רשימת כל רשימות רמה 2 + סטטוס ACTIVE/ARCHIVED |
 | TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST | רשימת השלמות רמה 2 מפריטים פתוחים במסמכים שעברו ארכוב |
 | TEAM_10_PRE_GATE_B_CHECKLIST_* | צ'קליסט לפני הגשת שער ב' (כאשר רלוונטי) |
@@ -90,3 +92,4 @@
 
 **log_entry | TEAM_10 | GATEWAY_ROLE_AND_PROCESS | REFRESHED | 2026-02-13**
 **log_entry | TEAM_10 | GATEWAY_ROLE_AND_PROCESS | TEAM_70_100_AND_ARCH_CHANNELS_ALIGNMENT | 2026-02-18**
+**log_entry | TEAM_170 | GATEWAY_ROLE_AND_PROCESS | RUNBOOK_ROLE_MAPPING_MESSAGE_LOCK_REF | 2026-02-23**

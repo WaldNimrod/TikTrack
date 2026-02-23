@@ -38,7 +38,7 @@
 | מסמך | נתיב | שימוש |
 |------|------|--------|
 | **CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0** | _COMMUNICATION/team_190/CHANNEL_10_90_CANONICAL_CONFIRMATION_v1.0.0.md | ערוץ 10↔90; Phase 1 = Pre-GATE_3 (ולידציית תוכנית); נתיבי VALIDATION_RESPONSE / BLOCKING_REPORT; max_resubmissions = 5; לולאה PASS / ESCALATE / STUCK. |
-| **04_GATE_MODEL_PROTOCOL_v2.3.0** | documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md (או _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.3.0.md) | §1.4 Identity Header; §6.1 שני נקודות Team 90 (Pre-GATE_3, GATE_5); אין GATE_3 לפני Pre-GATE_3 PASS. |
+| **04_GATE_MODEL_PROTOCOL_v2.3.0** | documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md | §1.4 Identity Header; §6.1 שני נקודות Team 90 (Pre-GATE_3, GATE_5); אין GATE_3 לפני Pre-GATE_3 PASS. |
 | **בקשת הולידציה (מסמך הבקשה)** | _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S001_P001_WP002_VALIDATION_REQUEST.md | מקור האמת לבקשה — חובה לקרוא במלואו לפני ביצוע. |
 
 ---

@@ -1,15 +1,15 @@
 # GOVERNANCE_PROCEDURES_INDEX
 
-**project_domain:** AGENTS_OS  
-**date:** 2026-02-22  
+**project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
+**date:** 2026-02-23  
 **directive:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0  
-**purpose:** Single navigation entrypoint for all governance/procedure docs under PHOENIX_CANONICAL.
+**purpose:** Single navigation entrypoint for all governance/procedure docs under the active governance root.
 
 ---
 
 ## 1) Root
 
-**Canonical governance root:** `documentation/docs-governance/PHOENIX_CANONICAL/`
+**Canonical governance root:** `documentation/docs-governance/`
 
 **Source map (full 341 mapping):** [GOVERNANCE_PROCEDURES_SOURCE_MAP.md](GOVERNANCE_PROCEDURES_SOURCE_MAP.md)
 
@@ -127,10 +127,16 @@
 | [ARCHITECT_AUDIT_V2_APPROVAL.md](../08-WORKING_VALIDATION_RECORDS/ARCHITECT_AUDIT_V2_APPROVAL.md) |
 | [ARCHITECT_WORK_PLAN_APPROVAL.md](../08-WORKING_VALIDATION_RECORDS/ARCHITECT_WORK_PLAN_APPROVAL.md) |
 
-### 99-ARCHIVE
+### 99-archive
 
-[99-ARCHIVE/](../99-ARCHIVE/) — (empty; reserved for future use)
+[99-archive/](../99-archive/) — legacy_hold_stage3, phoenix_canonical_archive, deprecated AGENTS_OS_GOVERNANCE; not active source.
 
 ---
 
-**log_entry | TEAM_170 | GOVERNANCE_PROCEDURES_INDEX | 2026-02-22**
+## 3) Team 10 operational runbook (canonical)
+
+Deterministic gate actions for Team 10 (Gateway): [TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md](../04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md). Gate Protocol (this index §01-FOUNDATIONS) remains normative; runbook is operational detail only.
+
+---
+
+**log_entry | TEAM_170 | GOVERNANCE_PROCEDURES_INDEX | PATH_REPAIR_AND_RUNBOOK_REF | 2026-02-23**

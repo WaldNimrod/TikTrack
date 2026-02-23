@@ -6,7 +6,7 @@
 **status:** 🔒 **מחייב — נוהל עבודה פנימי צוות 10**  
 **last_updated:** 2026-02-19  
 
-**תפקיד וניהול תהליך:** ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md` — ניהול התהליך, סדר משימות וסטטוס, **הפעלת צוותים בהודעות ברורות עם משימות**; משימות צוות 10 ממומשות ישירות. **סטטוס שערים:** מקור האמת היחיד לסטטוס שער פעיל (current gate, last_gate_event) הוא **WSM** — בלוק CURRENT_OPERATIONAL_STATE ב־`documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`; רשימת המשימות המרכזית מתעדת משימות וסגירתן בלבד.
+**תפקיד וניהול תהליך:** ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md` — ניהול התהליך, סדר משימות וסטטוס, **הפעלת צוותים בהודעות ברורות עם משימות**; משימות צוות 10 ממומשות ישירות. **סטטוס שערים:** מקור האמת היחיד לסטטוס שער פעיל (current gate, last_gate_event) הוא **WSM** — בלוק CURRENT_OPERATIONAL_STATE ב־`documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`; רשימת המשימות המרכזית מתעדת משימות וסגירתן בלבד.
 
 ---
 
@@ -73,7 +73,7 @@
 
 **מסמך מרכזי:** מסמך ביצוע אחד (למשל `TEAM_10_<WP>_EXECUTION_AND_TEAM_PROMPTS.md`) שמכיל: קישור לתוכנית המלאה; סדר ביצוע ותלויות; **פרומט לכל צוות לפי סדר הביצוע** — כל פרומט **בתוך בלוק קוד** ו**כולל כותרת קנונית** (Identity Header / כותרת תקנית). אין לייצר מסמכי אישור/acknowledgment נפרדים — מיותר.
 
-**חלוקת צוותי פיתוח (חובה):** לפי חוקי קרסור (.cursorrules) — 20=Backend, 30=Frontend, 40=UI/Design, 60=DevOps. בבניית מסמך הביצוע: (א) לקבוע **אילו צוותי פיתוח (20/30/40/60) בסקופ** לפי WORK_PACKAGE_DEFINITION; (ב) להוציא מנדט/פרומט **לכל** צוות פיתוח בסקופ — לא רק לצוות אחד; כך שהתוצר הוא מוצר שלם ועובד (Backend + Frontend + UI + תשתית לפי הצורך). ראה TEAM_10_GATEWAY_ROLE_AND_PROCESS §3, TEAM_10_PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED.
+**חלוקת צוותי פיתוח (חובה):** מקור קנוני: `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` (20=Backend, 30=Frontend, 40=UI/Design, 60=DevOps). בבניית מסמך הביצוע: (א) לקבוע **אילו צוותי פיתוח (20/30/40/60) בסקופ** לפי WORK_PACKAGE_DEFINITION; (ב) להוציא מנדט/פרומט **לכל** צוות פיתוח בסקופ — לא רק לצוות אחד; כך שהתוצר הוא מוצר שלם ועובד. **פעולות Team 10 לכל שער (פרט):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`. **פורמט הודעות חובה:** `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`.
 
 ---
 
@@ -83,9 +83,9 @@
 
 - **נוהל WSM Operational State:** `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0.md`  
   **מי:** **The Gate Owner** (בעל השער). **מתי:** **immediately upon gate closure** — "Every gate closure (SPEC or EXECUTION) must update the canonical WSM file. No gate progression is allowed without updating WSM. The Gate Owner must update this block immediately upon gate closure."
-- **בלוק ב־WSM:** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE**.  
+- **בלוק ב־WSM:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE**.  
   "Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure."
-- **SSM §1.2 (WSM Operational State Law):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` — "Every gate closure requires a WSM Operational State update before progression."
+- **SSM §1.2 (WSM Operational State Law):** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` — "Every gate closure requires a WSM Operational State update before progression."
 
 ### חובה צמודה: עדכון רשימות בכל הרמות
 
@@ -184,7 +184,7 @@
 3. **עדכון שוטף:** Team 10 מעדכן את הרשימה **כל הזמן** בהתאם להתקדמות ולאישורים סופיים שמתקבלים (דוחות צוותים, אישור Team 90, סגירת Stage (שלב), Work Package וכו').
 4. **יישור למפת דרכים:** כל משימה משויכת לשלב ממפת הדרכים; משימות שלא מופיעות במפה — רק באישור/החלטה רשמית.
 5. **מספור משימות:** כל משימה מקבלת **תחילית לפי מספר/מזהה השלב במפת הדרכים** ואחריה מקף ומספר סידורי (למשל 1-001, 1b-001, P3-001). כך ניתן לזהות מיד מאיזה שלב נגזרה המשימה.
-6. **סגירה (CLOSED):** אסור לסמן משימה כ־CLOSED לפני שעבר נוהל הבדיקות/אימות. **Governance v2.102 (מתאריך 2026-02-13):** סגירה תקפה **רק** עם **Seal Message (SOP-013)** — דוח/דוח השלמה לבדו **לא** מתקבל. **קנון SOP-013 (מיקום + קובץ):** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. ראה גם `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md` + `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`. פרטי נוהל הבדיקות — `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`. PENDING_VERIFICATION = משימה הועברה לשלב אימות לפי אותו נוהל.
+6. **סגירה (CLOSED):** אסור לסמן משימה כ־CLOSED לפני שעבר נוהל הבדיקות/אימות. **Governance v2.102 (מתאריך 2026-02-13):** סגירה תקפה **רק** עם **Seal Message (SOP-013)** — דוח/דוח השלמה לבדו **לא** מתקבל. **קנון SOP-013 (מיקום + קובץ):** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. ראה גם `documentation/reports/05-REPORTS/artifacts/TEAM_10_SOP_013_FULL_IMPLEMENTATION_EVIDENCE.md`. נהלי בדיקות/QA פעילים: `documentation/docs-governance/04-PROCEDURES/` ו־`documentation/docs-governance/99-archive/legacy_hold_stage3/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` (ארכיון). PENDING_VERIFICATION = משימה הועברה לשלב אימות לפי אותו נוהל.
 
 **תחיליות Stage (Roadmap v2.1 — טקסונומיה: Stages בלבד, אין "באץ'"):**
 

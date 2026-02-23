@@ -1,7 +1,7 @@
 ---
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.3.0.md
-**canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md
+**canonical_path:** documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md
 **promotion_date:** 2026-02-22
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
@@ -198,4 +198,15 @@ If missing, Team 100 MUST halt discussion and request completion.
 
 ---
 
+## 7. Team 10 (Gateway) — operational gate actions
+
+**Normative authority:** This protocol defines gate enum, authority, and identity header. **Operational detail** (entry/exit criteria, mandatory actions per gate, WSM update duty, handoff) is in a single canonical runbook only:
+
+- **Canonical runbook:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
+
+Team 10 (Gate Owner for GATE_3) and all teams must use the runbook for deterministic gate execution. No duplicate gate-action tables in other governance docs.
+
+---
+
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.3.0 | LOCKED | 2026-02-22**
+**log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | TEAM_10_RUNBOOK_REF_ADDED | 2026-02-23**

@@ -14,10 +14,10 @@
 |---------|----------|-------------|------|
 | TikTrack Master Documentation Index | נקודת כניסה ראשית; מבנה קנוני Model B; איפה לקרוא Stage/Program/WP/Task, WSM, רשימות | `00_MASTER_INDEX.md` (שורש הפרויקט) | — |
 | מבנה תיקיות התעוד — קנון מחייב | עקרונות הפרדת דומיינים; מיקום SSM/WSM/משותף vs Agents_OS; מיפוי תיקיות | `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` | v1.0.0 |
-| GOVERNANCE_PROCEDURES_INDEX | נקודת כניסה לכל נהלי/מסמכי הממשל תחת PHOENIX_CANONICAL | `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` | 2026-02-22 |
-| GOVERNANCE_PROCEDURES_SOURCE_MAP | מיפוי מלא (341) מקור→קנון לנהלים ומסמכי ממשל | `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` | 2026-02-22 |
-| 00_DOCUMENTATION_STANDARDS_INDEX | תקני תעוד ממשל; תבניות ADR; חלות | `documentation/docs-governance/00-FOUNDATIONS/00_DOCUMENTATION_STANDARDS_INDEX.md` | 1.0.0 |
-| ADR_TEMPLATE_CANONICAL | תבנית מחייבת להחלטות אדריכל (ADR), מנדטים, מדיניות | `documentation/docs-governance/00-FOUNDATIONS/ADR_TEMPLATE_CANONICAL.md` | — |
+| GOVERNANCE_PROCEDURES_INDEX | נקודת כניסה לכל נהלי/מסמכי הממשל תחת שורש governance | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` | 2026-02-23 |
+| GOVERNANCE_PROCEDURES_SOURCE_MAP | מיפוי מלא מקור→קנון לנהלים ומסמכי ממשל | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` | 2026-02-23 |
+| 00_DOCUMENTATION_STANDARDS_INDEX | תקני תעוד ממשל (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/00-FOUNDATIONS/00_DOCUMENTATION_STANDARDS_INDEX.md` | ארכיון |
+| ADR_TEMPLATE_CANONICAL | תבנית ADR (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/00-FOUNDATIONS/ADR_TEMPLATE_CANONICAL.md` | ארכיון |
 
 ---
 
@@ -25,8 +25,8 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| PHOENIX_MASTER_WSM | Work State — היררכיה, חוקי שערים, **בלוק CURRENT_OPERATIONAL_STATE** (מקור יחיד לסטטוס שער פעיל, current gate, last_gate_event) | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
-| PHOENIX_MASTER_SSM | System State — סמכויות, היררכיה קנונית, מספור, חוקי קידום ולידציה; **אין** סטטוס שוטף (רק ב־WSM) | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
+| PHOENIX_MASTER_WSM | Work State — היררכיה, חוקי שערים, **בלוק CURRENT_OPERATIONAL_STATE** (מקור יחיד לסטטוס שער פעיל, current gate, last_gate_event) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
+| PHOENIX_MASTER_SSM | System State — סמכויות, היררכיה קנונית, מספור, חוקי קידום ולידציה; **אין** סטטוס שוטף (רק ב־WSM) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
 | PHOENIX_UNIFIED_MODULAR_ROADMAP | מפת דרכים (רמה 1); שלבים (Stages); תכניות | `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md` | V2_1 |
 
 ---
@@ -46,11 +46,14 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| 04_GATE_MODEL_PROTOCOL | נוהל שערים קנוני — GATE_0..GATE_8, סמכויות, היררכיה, מספור S-P-WP-T, identity header; §4.1 תפקיד Team 170 ב־GATE_1 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` | v2.3.0 |
-| GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK | נעילת Gate 0/1; תפקיד 170 ב־GATE_1 ו־LLD400; הפניה לנוהל פנימי 170 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md` | — |
-| 05_RETRY_PROTOCOL | פרוטוקול ניסיון חוזר וחסימה — BLOCK_REPORT, החזרה לאדריכלות | `documentation/docs-governance/PHOENIX_CANONICAL/03-PROTOCOLS/05_RETRY_PROTOCOL.md` | — |
-| ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע — Team 70 מבצע; Team 170 לא מבצע קידום | `documentation/docs-governance/PHOENIX_CANONICAL/03-PROTOCOLS/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md` | — |
-| ARCHITECT_GOVERNANCE_PROCEDURES_V2 | נהלי ממשל כלליים (ארכיטקט) | `documentation/docs-governance/PHOENIX_CANONICAL/04-PROCEDURES/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md` | V2 |
+| 04_GATE_MODEL_PROTOCOL | נוהל שערים קנוני — GATE_0..GATE_8, סמכויות, היררכיה, מספור S-P-WP-T, identity header; §4.1 תפקיד Team 170 ב־GATE_1 | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` | v2.3.0 |
+| GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK | נעילת Gate 0/1; תפקיד 170 ב־GATE_1 ו־LLD400; הפניה לנוהל פנימי 170 | `documentation/docs-governance/01-FOUNDATIONS/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md` | — |
+| 05_RETRY_PROTOCOL | פרוטוקול ניסיון חוזר וחסימה — BLOCK_REPORT, החזרה לאדריכלות | `documentation/docs-governance/03-PROTOCOLS/05_RETRY_PROTOCOL.md` | — |
+| ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע — Team 70 מבצע; Team 170 לא מבצע קידום | `documentation/docs-governance/03-PROTOCOLS/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md` | — |
+| ARCHITECT_GOVERNANCE_PROCEDURES_V2 | נהלי ממשל כלליים (ארכיטקט) | `documentation/docs-governance/04-PROCEDURES/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md` | V2 |
+| TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (PRE_GATE_3..GATE_8) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
+| TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/60 + אורקסטרציה Team 10 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
+| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
 
 ---
 
@@ -58,10 +61,10 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| 03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION | כללי ברזל וחוקת ממשל — פיניקס | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md` | — |
-| 07_TEAM_190_CONSTITUTION | חוקת Team 190 — ולידטור חוקתי; סמכויות | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/07_TEAM_190_CONSTITUTION.md` | — |
-| 03_ARTIFACT_TAXONOMY_REGISTRY | טקסונומיית ארטיפקטים — סוגי תוצרים מותרים (STATE_SNAPSHOT, EXEC_SUMMARY וכו') | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/03_ARTIFACT_TAXONOMY_REGISTRY.md` | v1.1 |
-| 00_INDEX_CANONICAL | אינדקס קנוני ל־Dev OS Target Model (תוכן 01-FOUNDATIONS) | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/00_INDEX_CANONICAL.md` | v1.3.1 |
+| 03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION | כללי ברזל וחוקת ממשל — פיניקס | `documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md` | — |
+| 07_TEAM_190_CONSTITUTION | חוקת Team 190 — ולידטור חוקתי; סמכויות | `documentation/docs-governance/01-FOUNDATIONS/07_TEAM_190_CONSTITUTION.md` | — |
+| 03_ARTIFACT_TAXONOMY_REGISTRY | טקסונומיית ארטיפקטים — סוגי תוצרים מותרים (STATE_SNAPSHOT, EXEC_SUMMARY וכו') | `documentation/docs-governance/01-FOUNDATIONS/03_ARTIFACT_TAXONOMY_REGISTRY.md` | v1.1 |
+| 00_INDEX_CANONICAL | אינדקס קנוני ל־Dev OS Target Model (תוכן 01-FOUNDATIONS) | `documentation/docs-governance/01-FOUNDATIONS/00_INDEX_CANONICAL.md` | v1.3.1 |
 
 ---
 
@@ -77,11 +80,11 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| ARCHITECT_DECISION_TEMPLATE | תבנית החלטת אדריכל (כתיבה) | `documentation/docs-governance/PHOENIX_CANONICAL/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE.md` | — |
-| ARCHITECT_DECISION_TEMPLATE_STANDARD | תבנית החלטה סטנדרטית | `documentation/docs-governance/PHOENIX_CANONICAL/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE_STANDARD.md` | — |
-| ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY | תבנית ומפעל לעמודי Verdict | `documentation/docs-governance/PHOENIX_CANONICAL/06-TEMPLATES/ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY.md` | — |
-| 08_EXEC_SUMMARY_STANDARD | תקן סיכום ביצוע | `documentation/docs-governance/PHOENIX_CANONICAL/08-WORKING_VALIDATION_RECORDS/08_EXEC_SUMMARY_STANDARD.md` | — |
-| 09_TECHNICAL_REPORT_STANDARD | תקן דוח טכני | `documentation/docs-governance/PHOENIX_CANONICAL/08-WORKING_VALIDATION_RECORDS/09_TECHNICAL_REPORT_STANDARD.md` | — |
+| ARCHITECT_DECISION_TEMPLATE | תבנית החלטת אדריכל (כתיבה) | `documentation/docs-governance/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE.md` | — |
+| ARCHITECT_DECISION_TEMPLATE_STANDARD | תבנית החלטה סטנדרטית | `documentation/docs-governance/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE_STANDARD.md` | — |
+| ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY | תבנית ומפעל לעמודי Verdict | `documentation/docs-governance/06-TEMPLATES/ARCHITECT_VERDICT_PAGE_TEMPLATE_AND_FACTORY.md` | — |
+| 08_EXEC_SUMMARY_STANDARD | תקן סיכום ביצוע | `documentation/docs-governance/08-WORKING_VALIDATION_RECORDS/08_EXEC_SUMMARY_STANDARD.md` | — |
+| 09_TECHNICAL_REPORT_STANDARD | תקן דוח טכני | `documentation/docs-governance/08-WORKING_VALIDATION_RECORDS/09_TECHNICAL_REPORT_STANDARD.md` | — |
 
 ---
 
@@ -89,24 +92,26 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| ARCHITECT_POLICY_HYBRID_SCRIPTS | מדיניות סקריפטים היברידיים | `documentation/docs-governance/PHOENIX_CANONICAL/02-POLICIES/ARCHITECT_POLICY_HYBRID_SCRIPTS.md` | — |
-| ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING | הנחיית חיזוק ממשל (SOP-013, Seal) | `documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` | — |
-| MISSION_DIRECTIVE_90_02_FINAL | מנדט משימה 90-02 | `documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/MISSION_DIRECTIVE_90_02_FINAL.md` | FINAL |
-| TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION | הנחיית Team 70 — ייצור נרטיב | `documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md` | — |
+| ARCHITECT_POLICY_HYBRID_SCRIPTS | מדיניות סקריפטים היברידיים | `documentation/docs-governance/02-POLICIES/ARCHITECT_POLICY_HYBRID_SCRIPTS.md` | — |
+| ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING | הנחיית חיזוק ממשל (SOP-013, Seal) | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` | — |
+| MISSION_DIRECTIVE_90_02_FINAL | מנדט משימה 90-02 | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/MISSION_DIRECTIVE_90_02_FINAL.md` | FINAL |
+| TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION | הנחיית Team 70 — ייצור נרטיב | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md` | — |
 
 ---
 
-## 9. נהלים לפי צוות / תהליך (תעוד משילות — 02-PROCEDURES, 09-GOVERNANCE)
+## 9. נהלים לפי צוות / תהליך (פעיל + ארכיון)
+
+**הנחיה פעילה לשערים ותפקידי צוות:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`.
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| PHOENIX_MASTER_BIBLE | תנ"ך פיניקס — תקנים וכללים מרכזיים לפרויקט | `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` | — |
-| CURSOR_INTERNAL_PLAYBOOK | פלייבוק פנימי Cursor/איגנטים | `documentation/docs-governance/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` | — |
-| TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE | נהל סטנדרטים ו־QA פרונט (צוות 30) | `documentation/docs-governance/02-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md` | — |
-| TEAM_50_QA_WORKFLOW_PROTOCOL | פרוטוקול workflow QA (צוות 50) | `documentation/docs-governance/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md` | — |
-| TEAM_50_QA_TEST_INDEX | אינדקס בדיקות QA | `documentation/docs-governance/09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md` | — |
-| TEAM_170_INTERNAL_WORK_PROCEDURE | נוהל עבודה פנימי צוות 170 — GATE_1, LLD400, ארבע חובות | `_COMMUNICATION/team_170/TEAM_170_INTERNAL_WORK_PROCEDURE.md` | — |
-| TT2_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע (TikTrack) | `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` | — |
+| PHOENIX_MASTER_BIBLE | תנ"ך פיניקס (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` | ארכיון |
+| CURSOR_INTERNAL_PLAYBOOK | פלייבוק פנימי (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` | ארכיון |
+| TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE | נהל סטנדרטים ו־QA פרונט (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/02-PROCEDURES/TEAM_30_FRONTEND_STANDARDS_QA_PROCEDURE.md` | ארכיון |
+| TEAM_50_QA_WORKFLOW_PROTOCOL | פרוטוקול workflow QA (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md` | ארכיון |
+| TEAM_50_QA_TEST_INDEX | אינדקס בדיקות QA (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md` | ארכיון |
+| TEAM_170_INTERNAL_WORK_PROCEDURE | נוהל עבודה פנימי צוות 170 — GATE_1, LLD400 | `_COMMUNICATION/team_170/TEAM_170_INTERNAL_WORK_PROCEDURE.md` | — |
+| TT2_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע (ארכיון) | `documentation/docs-governance/99-archive/legacy_hold_stage3/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` | ארכיון |
 
 ---
 
@@ -127,9 +132,9 @@
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
-| 04_GATE_MODEL_PROTOCOL | נוהל שערים (גרסה בסיסית) | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL.md` | — |
-| 04_GATE_MODEL_PROTOCOL_v2.0.0 | נוהל שערים v2.0 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.0.0.md` | v2.0.0 |
-| 04_GATE_MODEL_PROTOCOL_v2.2.0 | נוהל שערים v2.2 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.2.0.md` | v2.2.0 |
+| 04_GATE_MODEL_PROTOCOL | נוהל שערים (גרסה בסיסית) | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL.md` | — |
+| 04_GATE_MODEL_PROTOCOL_v2.0.0 | נוהל שערים v2.0 | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.0.0.md` | v2.0.0 |
+| 04_GATE_MODEL_PROTOCOL_v2.2.0 | נוהל שערים v2.2 | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.2.0.md` | v2.2.0 |
 
 ---
 

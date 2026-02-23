@@ -5,8 +5,8 @@
 **id:** TEAM_10_PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED  
 **from:** Team 10 (The Gateway)  
 **re:** נעילת הגדרות מדויקות להתנהלות צוות 10 ופעולות נדרשות בכל שער ובכל שלב; חלוקת תפקידי צוותי פיתוח  
-**date:** 2026-01-30  
-**status:** DRAFT — רשימת עדכונים נדרשים  
+**date:** 2026-02-23  
+**status:** ADDRESSED — עדכונים יושמו בקנון (2026-02-23): רנבוק פעולות שער + מיפוי צוותים + נעילת פורמט הודעות  
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## 2. חלוקת תפקידי צוותי פיתוח — מקור קנוני (חוקי קרסור)
 
-**מקור מחייב:** `.cursorrules` (נוהל חוקי קרסור של הפרויקט).
+**מקור מחייב (Governance SSOT):** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`. `.cursorrules` — מראה לתפעול כלים בלבד.
 
 | Squad ID | תפקיד | תחום אחריות |
 |----------|--------|---------------|
@@ -45,7 +45,7 @@
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `_COMMUNICATION/team_10/TEAM_10_GATEWAY_ROLE_AND_PROCESS.md` | (1) **הוספת סעיף:** "חלוקת צוותי פיתוח — מקור קנוני" — הפניה ל־.cursorrules (Team 20=Backend, 30=Frontend, 40=UI, 60=DevOps). (2) **כלל:** בבניית תוכנית ביצוע (מסמך EXECUTION_AND_TEAM_PROMPTS), לקבוע אילו צוותים (20/30/40/60) בסקופ לפי ה־WORK_PACKAGE_DEFINITION ולהפעיל **כל** צוות בסקופ — לא רק צוות אחד אלא לפי תחום. (3) **אופציונלי:** טבלת "פעולות Team 10 לכל שער" (תמצית) או קישור לפרוטוקול השערים §Team 10. |
+| `_COMMUNICATION/team_10/TEAM_10_GATEWAY_ROLE_AND_PROCESS.md` | (1) **הוספת סעיף:** "חלוקת צוותי פיתוח — מקור קנוני" — הפניה ל־TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 (Team 20=Backend, 30=Frontend, 40=UI, 60=DevOps); .cursorrules מראה בלבד. (2) **כלל:** בבניית תוכנית ביצוע (מסמך EXECUTION_AND_TEAM_PROMPTS), לקבוע אילו צוותים (20/30/40/60) בסקופ לפי ה־WORK_PACKAGE_DEFINITION ולהפעיל **כל** צוות בסקופ — לא רק צוות אחד אלא לפי תחום. (3) **אופציונלי:** טבלת "פעולות Team 10 לכל שער" (תמצית) או קישור לפרוטוקול השערים §Team 10. |
 
 ### 3.3 נוהל רשימת המשימות (TEAM_10_MASTER_TASK_LIST_PROTOCOL)
 
@@ -53,24 +53,24 @@
 |------|--------------|
 | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | בתוך §1.2.1.1 (לאחר Pre-GATE_3 PASS): **להוסיף:** (א) קביעת צוותי הפיתוח בסקופ לפי חלוקת התפקידים הקנונית (20/30/40/60); (ב) הוצאת מנדט/פרומט **לכל** צוות פיתוח בסקופ — לא רק לצוות אחד, אלא לכל ענף רלוונטי (Backend, Frontend, UI, DevOps לפי הצורך). |
 
-### 3.4 .cursorrules (חוקי קרסור)
+### 3.4 .cursorrules (מראה בלבד)
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `.cursorrules` | **לוודא** שההגדרות הקיימות של 20/30/40/50/51/60 נשארות מקור אמת. **אופציונלי:** להוסיף שורה אחת: "Team 10 (Gateway) — בעלים GATE_3 (Implementation); תפקיד: אורקסטרציה, הפעלת צוותי פיתוח לפי scope, ואיסוף תוצר עד GATE_3 exit והגשה ל־GATE_4." כך שכל סוכן יידע את חלוקת התפקידים ואת תפקיד 10. |
+| `.cursorrules` | **מראה לתפעול כלים בלבד.** מקור אמת למיפוי 20/30/40/60: `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`. אופציונלי: שורה אחת ב־.cursorrules על Team 10 (Gateway) ו־GATE_3 — להמשך סינכרון עם הקנון. |
 
 ### 3.5 PHOENIX_MASTER_BIBLE / CURSOR_INTERNAL_PLAYBOOK
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` (או הנתיב המעודכן) | אם קיים — להוסיף או לעדכן: (1) חלוקת צוותי פיתוח 20/30/40/60 (כמו ב־.cursorrules). (2) תפקיד Team 10 בכל שער — תמצית או הפניה ל־04_GATE_MODEL_PROTOCOL §Team 10. |
+| Bible/Playbook (ארכיון) | ארכיון: `documentation/docs-governance/99-archive/legacy_hold_stage3/09-GOVERNANCE/standards/`. הנחיה פעילה: חלוקת צוותים — TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0; פעולות שער — TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0. |
 | `06-GOVERNANCE_&_COMPLIANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` (או מקביל) | אם קיים — לוודא התייחסות לרשימת המשימות ולאחריות צוות 10; התייחסות לחלוקת 20/30/40/60 כשבנים תוכנית עבודה. |
 
 ### 3.6 WSM / נוהל עדכון WSM
 
 | קובץ | פעולה נדרשת |
 |------|--------------|
-| `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (או PHOENIX_CANONICAL) | כבר מוגדר: Gate Owner מעדכן CURRENT_OPERATIONAL_STATE בכל סגירת שער. **לוודא** שבמסמכי Team 10 (GATEWAY_ROLE, PROTOCOL) מופיעה הפניה ברורה: Team 10 כבעלים GATE_3 מעדכן WSM עם סגירת GATE_3 (ו־last_gate_event, next_required_action, next_responsible_team). |
+| `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | כבר מוגדר: Gate Owner מעדכן CURRENT_OPERATIONAL_STATE בכל סגירת שער. במסמכי Team 10 (GATEWAY_ROLE, PROTOCOL) — הפניה ברורה: Team 10 כבעלים GATE_3 מעדכן WSM עם סגירת GATE_3 (ו־last_gate_event, next_required_action, next_responsible_team). |
 | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0.md` | אין חובה לשינוי — רק לוודא ש־Team 10 מציית: עדכון WSM מיד עם סגירת שער כשאנחנו Gate Owner. |
 
 ---
@@ -99,4 +99,7 @@
 
 ---
 
-**log_entry | TEAM_10 | PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED | DRAFT | 2026-01-30**
+**יישום בקנון (2026-02-23):** פעולות Team 10 לכל שער — מקור יחיד: `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`. מיפוי צוותים קנוני: `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`. פורמט הודעות חובה: `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`. Gate Protocol עודכן עם הפניה לרנבוק (§7); אין כפילות טבלאות שערים.
+
+**log_entry | TEAM_10 | PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED | DRAFT | 2026-02-23**
+**log_entry | TEAM_170 | PROCEDURES_AND_GATE_ACTIONS_UPDATE_REQUIRED | ADDRESSED_VIA_RUNBOOK_AND_LOCK | 2026-02-23**

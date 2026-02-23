@@ -14,7 +14,7 @@
 Single registry for all Level-2 task lists.  
 Roadmap (Level-1) must link to this registry and to each active Level-2 list.
 
-**Operational state (Stage / Program / Work Package, current gate):** מקור יחיד — בלוק **CURRENT_OPERATIONAL_STATE** ב־`documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`. לא ברשימות רמה 2. ראה גם `00_MASTER_INDEX.md` — "Stage / Program / Work Package / Task — Where to read".
+**Operational state (Stage / Program / Work Package, current gate):** מקור יחיד — בלוק **CURRENT_OPERATIONAL_STATE** ב־`documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`. לא ברשימות רמה 2. ראה גם `00_MASTER_INDEX.md` — "Stage / Program / Work Package / Task — Where to read".
 
 ---
 

@@ -339,17 +339,17 @@ def main() -> int:
     changed = False
     if stages:
         tbl = table_to_markdown(road_header, stages)
-        if replace_table_in_file(ROADMAP_PATH, "Stages (catalog)", tbl, ""):
+        if replace_table_in_file(ROADMAP_PATH, "Stages (catalog)", tbl):
             changed = True
             print("Updated Roadmap (Stages)")
     if programs:
         tbl = table_to_markdown(prog_header, programs)
-        if replace_table_in_file(PROGRAM_PATH, "Programs", tbl, ""):
+        if replace_table_in_file(PROGRAM_PATH, "Programs", tbl):
             changed = True
             print("Updated Program Registry")
     if wps:
         tbl = table_to_markdown(wp_header, wps)
-        if replace_table_in_file(WP_PATH, "Work Packages", tbl, ""):
+        if replace_table_in_file(WP_PATH, "Work Packages", tbl):
             changed = True
             print("Updated Work Package Registry")
 

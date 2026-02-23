@@ -130,6 +130,9 @@ class GhRepo:
             },
         )
 
+    def close_issue(self, number: int) -> dict:
+        return self._request("PATCH", f"/issues/{number}", {"state": "closed"})
+
 
 def _status_label_for_stage(status: str) -> str:
     s = status.lower()
@@ -188,50 +191,83 @@ def _extract_key(body: str) -> Optional[str]:
     return m.group(1).strip() if m else None
 
 
-def build_issue_items(snapshot: dict) -> List[IssueItem]:
+def _program_number(program_id: str) -> int:
+    m = re.search(r"-P(\d+)$", program_id.upper())
+    return int(m.group(1)) if m else 999
+
+
+def _wp_number(work_package_id: str) -> int:
+    m = re.search(r"-WP(\d+)$", work_package_id.upper())
+    return int(m.group(1)) if m else 999
+
+
+def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
     items: List[IssueItem] = []
     runtime = snapshot["runtime"]
+    stages = snapshot["stages"]
+    programs = snapshot["programs"]
+    work_packages = snapshot["work_packages"]
 
-    runtime_key = "runtime:current"
-    runtime_body = "\n".join(
-        [
-            _marker(runtime_key),
-            "## Runtime SSOT (from WSM)",
-            "",
-            f"- active_stage_id: `{runtime.get('active_stage_id','')}`",
-            f"- active_program_id: `{runtime.get('active_program_id','')}`",
-            f"- active_work_package_id: `{runtime.get('active_work_package_id','')}`",
-            f"- current_gate: `{runtime.get('current_gate','')}`",
-            f"- last_gate_event: `{runtime.get('last_gate_event','')}`",
-            f"- next_required_action: `{runtime.get('next_required_action','')}`",
-            f"- next_responsible_team: `{runtime.get('next_responsible_team','')}`",
-            "",
-            "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`",
-        ]
-    )
-    items.append(
-        IssueItem(
-            key=runtime_key,
-            title=f"[PORTFOLIO][RUNTIME] {runtime.get('current_gate','N/A')} | active_wp={runtime.get('active_work_package_id','N/A')}",
-            body=runtime_body,
-            labels=[MANAGED_LABEL, TYPE_LABELS["runtime"], STATUS_LABELS["active"]],
-            state="open",
+    stage_order: Dict[str, int] = {}
+    for idx, stage in enumerate(stages, start=1):
+        stage_order[stage.get("stage_id", "")] = idx
+
+    program_to_stage: Dict[str, str] = {p.get("program_id", ""): p.get("stage_id", "") for p in programs}
+
+    if scope == "full":
+        runtime_key = "runtime:current"
+        runtime_body = "\n".join(
+            [
+                _marker(runtime_key),
+                "## Runtime SSOT (from WSM)",
+                "",
+                f"- active_stage_id: `{runtime.get('active_stage_id','')}`",
+                f"- active_program_id: `{runtime.get('active_program_id','')}`",
+                f"- active_work_package_id: `{runtime.get('active_work_package_id','')}`",
+                f"- current_gate: `{runtime.get('current_gate','')}`",
+                f"- last_gate_event: `{runtime.get('last_gate_event','')}`",
+                f"- next_required_action: `{runtime.get('next_required_action','')}`",
+                f"- next_responsible_team: `{runtime.get('next_responsible_team','')}`",
+                "",
+                "Trigger policy:",
+                "- create: missing runtime card",
+                "- update: any WSM runtime field changed",
+                "- close: never (single runtime card remains open)",
+                "",
+                "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`",
+            ]
         )
-    )
+        items.append(
+            IssueItem(
+                key=runtime_key,
+                title=f"[RUNTIME] {runtime.get('current_gate','N/A')} | active_wp={runtime.get('active_work_package_id','N/A')}",
+                body=runtime_body,
+                labels=[MANAGED_LABEL, TYPE_LABELS["runtime"], STATUS_LABELS["active"]],
+                state="open",
+            )
+        )
 
-    for stage in snapshot["stages"]:
+    for stage in stages:
         sid = stage.get("stage_id", "")
         status = stage.get("status", "")
+        s_ord = stage_order.get(sid, 999)
         key = f"stage:{sid}"
         body = "\n".join(
             [
                 _marker(key),
                 "## Stage",
                 "",
+                f"- hierarchy_order: `P{s_ord:02d}`",
+                f"- hierarchy_path: `STAGE:{sid}`",
                 f"- stage_id: `{sid}`",
                 f"- stage_name: {stage.get('stage_name','')}",
                 f"- planned_scope: {stage.get('planned_scope','')}",
                 f"- status: `{status}`",
+                "",
+                "Trigger policy:",
+                "- create: new stage_id in roadmap",
+                "- update: stage_name/planned_scope/status changed",
+                "- close: status=COMPLETED or stage removed from roadmap (stale cleanup)",
                 "",
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md`",
             ]
@@ -239,28 +275,50 @@ def build_issue_items(snapshot: dict) -> List[IssueItem]:
         items.append(
             IssueItem(
                 key=key,
-                title=f"[PORTFOLIO][STAGE] {sid} | {stage.get('stage_name','')} | {status}",
+                title=f"[P{s_ord:02d}][STAGE] {sid} | {stage.get('stage_name','')} | {status}",
                 body=body,
                 labels=[MANAGED_LABEL, TYPE_LABELS["stage"], _status_label_for_stage(status)],
                 state=_state_for_stage(status),
             )
         )
 
-    for program in snapshot["programs"]:
+    if scope == "stages":
+        return items
+
+    programs_sorted = sorted(
+        programs,
+        key=lambda p: (
+            stage_order.get(p.get("stage_id", ""), 999),
+            _program_number(p.get("program_id", "")),
+            p.get("program_id", ""),
+        ),
+    )
+    for program in programs_sorted:
         pid = program.get("program_id", "")
         status = program.get("status", "")
+        stage_id = program.get("stage_id", "")
+        s_ord = stage_order.get(stage_id, 999)
+        p_ord = _program_number(pid)
         key = f"program:{pid}"
         body = "\n".join(
             [
                 _marker(key),
                 "## Program",
                 "",
+                f"- hierarchy_order: `P{s_ord:02d}.{p_ord:02d}`",
+                f"- hierarchy_path: `STAGE:{stage_id} -> PROGRAM:{pid}`",
+                f"- parent_stage_key: `stage:{stage_id}`",
                 f"- program_id: `{pid}`",
                 f"- program_name: {program.get('program_name','')}",
                 f"- domain: `{program.get('domain','')}`",
-                f"- stage_id: `{program.get('stage_id','')}`",
+                f"- stage_id: `{stage_id}`",
                 f"- status: `{status}`",
                 f"- current_gate_mirror: `{program.get('current_gate_mirror','')}`",
+                "",
+                "Trigger policy:",
+                "- create: new program_id in registry",
+                "- update: domain/stage/status/current_gate_mirror changed",
+                "- close: status=CLOSED/COMPLETE or program removed from registry (stale cleanup)",
                 "",
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`",
             ]
@@ -268,28 +326,51 @@ def build_issue_items(snapshot: dict) -> List[IssueItem]:
         items.append(
             IssueItem(
                 key=key,
-                title=f"[PORTFOLIO][PROGRAM] {pid} | {program.get('program_name','')} | {status}",
+                title=f"[P{s_ord:02d}.{p_ord:02d}][PROGRAM] {pid} | {program.get('program_name','')} | {status}",
                 body=body,
                 labels=[MANAGED_LABEL, TYPE_LABELS["program"], _status_label_for_program(status)],
                 state=_state_for_program(status),
             )
         )
 
-    for wp in snapshot["work_packages"]:
+    work_packages_sorted = sorted(
+        work_packages,
+        key=lambda w: (
+            stage_order.get(program_to_stage.get(w.get("program_id", ""), ""), 999),
+            _program_number(w.get("program_id", "")),
+            _wp_number(w.get("work_package_id", "")),
+            w.get("work_package_id", ""),
+        ),
+    )
+    for wp in work_packages_sorted:
         wid = wp.get("work_package_id", "")
         status = wp.get("status", "")
+        program_id = wp.get("program_id", "")
+        stage_id = program_to_stage.get(program_id, "")
+        s_ord = stage_order.get(stage_id, 999)
+        p_ord = _program_number(program_id)
+        w_ord = _wp_number(wid)
         key = f"work_package:{wid}"
         body = "\n".join(
             [
                 _marker(key),
                 "## Work Package",
                 "",
+                f"- hierarchy_order: `P{s_ord:02d}.{p_ord:02d}.{w_ord:03d}`",
+                f"- hierarchy_path: `STAGE:{stage_id} -> PROGRAM:{program_id} -> WORK_PACKAGE:{wid}`",
+                f"- parent_stage_key: `stage:{stage_id}`",
+                f"- parent_program_key: `program:{program_id}`",
                 f"- work_package_id: `{wid}`",
-                f"- program_id: `{wp.get('program_id','')}`",
+                f"- program_id: `{program_id}`",
                 f"- status: `{status}`",
                 f"- current_gate: `{wp.get('current_gate','')}`",
                 f"- is_active: `{wp.get('is_active', False)}`",
                 f"- active_marker_reason: `{wp.get('active_marker_reason','')}`",
+                "",
+                "Trigger policy:",
+                "- create: new work_package_id in registry",
+                "- update: status/current_gate/is_active/active_marker_reason changed",
+                "- close: status=CLOSED or wp removed from registry (stale cleanup)",
                 "",
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md`",
             ]
@@ -297,7 +378,7 @@ def build_issue_items(snapshot: dict) -> List[IssueItem]:
         items.append(
             IssueItem(
                 key=key,
-                title=f"[PORTFOLIO][WP] {wid} | {status} | {wp.get('current_gate','')}",
+                title=f"[P{s_ord:02d}.{p_ord:02d}.{w_ord:03d}][WP] {wid} | {status} | {wp.get('current_gate','')}",
                 body=body,
                 labels=[MANAGED_LABEL, TYPE_LABELS["work_package"], _status_label_for_wp(status)],
                 state=_state_for_wp(status),
@@ -322,6 +403,17 @@ def main() -> int:
         default=str(ROOT / "portfolio_project/portfolio_snapshot.json"),
         help="Path to snapshot JSON generated by build_portfolio_snapshot.py",
     )
+    parser.add_argument(
+        "--scope",
+        choices=["full", "stages"],
+        default="full",
+        help="Sync scope: full hierarchy (runtime+stage+program+wp) or stages only",
+    )
+    parser.add_argument(
+        "--close-stale",
+        action="store_true",
+        help="Close managed issues whose key is no longer present in snapshot",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Do not write changes")
     args = parser.parse_args()
 
@@ -334,7 +426,7 @@ def main() -> int:
 
     snapshot_path = Path(args.snapshot)
     snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-    items = build_issue_items(snapshot)
+    items = build_issue_items(snapshot, scope=args.scope)
 
     for label, color in LABEL_COLORS.items():
         if args.dry_run:
@@ -351,6 +443,8 @@ def main() -> int:
 
     created = 0
     updated = 0
+    closed_stale = 0
+    desired_keys = {item.key for item in items}
     for item in items:
         current = index.get(item.key)
         if not current:
@@ -369,7 +463,24 @@ def main() -> int:
             gh.update_issue(issue_number, item, keep_labels=current_labels)
         updated += 1
 
-    print(f"Portfolio sync completed: created={created}, updated={updated}, total={len(items)}")
+    if args.close_stale:
+        for stale_key, stale_issue in index.items():
+            if stale_key in desired_keys:
+                continue
+            stale_number = stale_issue["number"]
+            stale_state = stale_issue.get("state", "open")
+            if stale_state == "closed":
+                continue
+            if args.dry_run:
+                print(f"[dry-run] close stale issue #{stale_number} for {stale_key}")
+            else:
+                gh.close_issue(stale_number)
+            closed_stale += 1
+
+    print(
+        "Portfolio sync completed: "
+        f"scope={args.scope}, created={created}, updated={updated}, closed_stale={closed_stale}, total={len(items)}"
+    )
     return 0
 
 

@@ -2,6 +2,20 @@ name: Portfolio Auto Sync
 
 on:
   workflow_dispatch:
+    inputs:
+      sync_scope:
+        description: "Sync scope for GitHub Issues"
+        required: false
+        default: "full"
+        type: choice
+        options:
+          - full
+          - stages
+      close_stale:
+        description: "Close stale managed issues not present in current snapshot"
+        required: false
+        default: true
+        type: boolean
   push:
     branches: ["**"]
     paths:
@@ -88,5 +102,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          python scripts/portfolio/sync_github_portfolio_issues.py \
-            --snapshot portfolio_project/portfolio_snapshot.json
+          SCOPE="${{ github.event.inputs.sync_scope || 'full' }}"
+          CLOSE_STALE="${{ github.event.inputs.close_stale || 'true' }}"
+          if [ "$CLOSE_STALE" = "true" ]; then
+            python scripts/portfolio/sync_github_portfolio_issues.py \
+              --snapshot portfolio_project/portfolio_snapshot.json \
+              --scope "$SCOPE" \
+              --close-stale
+          else
+            python scripts/portfolio/sync_github_portfolio_issues.py \
+              --snapshot portfolio_project/portfolio_snapshot.json \
+              --scope "$SCOPE"
+          fi

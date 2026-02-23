@@ -32,10 +32,12 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 
 כל תוכנית = sub של שלב. סדר: לפי stage_id (Roadmap) ואז program_id. דומיין: TikTrack או Agents_OS.
 
+
 | stage_id | program_id | program_name | domain | status | current_gate_mirror |
-|----------|------------|--------------|--------|--------|---------------------|
+| --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
-| S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | FROZEN | — (not activated; lock until S001-P001-WP001 GATE_8) |
+| S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (not activated; lock until S001-P001-WP001 GATE_8) |
+
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-23). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 

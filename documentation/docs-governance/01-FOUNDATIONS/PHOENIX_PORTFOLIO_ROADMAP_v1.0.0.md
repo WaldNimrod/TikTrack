@@ -31,15 +31,17 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 
 סדר השורות = סדר התצוגה (היררכיה ראשית). שמות קנוניים: שלב 1, שלב 2, … חבילות העבודה הקיימות שתיהן תחת שלב 1 (S001).
 
+
 | stage_id | stage_name | planned_scope | status |
-|----------|-------------|--------------|--------|
-| S-001 | שלב 0 — Prerequisites | תלויות תשתית קשיחות | PLANNED / HOLD |
-| S001 | שלב 1 — Foundations Sealed | חיתום יסודות; Stage 1 | ACTIVE |
+| --- | --- | --- | --- |
+| S-001 | שלב 0 — Prerequisites | — | HOLD |
+| S001 | שלב 1 — Foundations Sealed | — | ACTIVE |
 | S002 | שלב 2 — (ממתין להגדרה) | — | PLANNED |
-| S003 | שלב 3 — Essential Data | שכבת נתונים יסודית | PLANNED |
-| S004 | שלב 4 — Financial Execution | המעגל הפיננסי | PLANNED |
-| S005 | שלב 5 — Trades/Plans | ישויות מורכבות | PLANNED |
-| S006 | שלב 6 — Advanced Analytics | תובנות וניתוח | PLANNED |
+| S003 | שלב 3 — Essential Data | — | PLANNED |
+| S004 | שלב 4 — Financial Execution | — | PLANNED |
+| S005 | שלב 5 — Trades/Plans | — | PLANNED |
+| S006 | שלב 6 — Advanced Analytics | — | PLANNED |
+
 
 **Note:** S-001 = שלב 0 (Prerequisites). S001 = שלב 1; חבילות העבודה הנוכחיות תחת S001.
 

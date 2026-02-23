@@ -43,8 +43,8 @@
 ### Workflow קיים
 
 - **קובץ:** `.github/workflows/portfolio-auto-sync.yml`
-- **מופעל ב:** `workflow_dispatch`, Push ל-**default branch (main)**, Push ל-**phoenix-dev**, ושינויים בנתיבים רלוונטיים.
-- **מעכשיו:** Push ל-main מריץ את ה-workflow על הגרסה העדכנית.
+- **מופעל ב:** `workflow_dispatch`, או Push ל-**default branch (main)** בנתיבים רלוונטיים (docs-governance, scripts/portfolio, ה-workflow).
+- **מעכשיו:** Push ל-main מריץ את ה-workflow; הסנכרון ל-GitHub Issues רץ רק ב-main (או ב-dispatch). ראה `documentation/PORTFOLIO_WORKFLOW_AND_VIEW.md` לתצוגה ההיררכית.
 
 ---
 

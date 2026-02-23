@@ -36,6 +36,11 @@ STATUS_LABELS = {
     "complete": "portfolio-status-complete",
 }
 
+# Domain: TikTrack, Agents_OS. Stage is SHARED; every program and WP has one domain.
+DOMAIN_LABEL_PREFIX = "portfolio-domain-"
+PARENT_STAGE_LABEL_PREFIX = "portfolio-parent-stage-"
+PARENT_PROGRAM_LABEL_PREFIX = "portfolio-parent-program-"
+
 LABEL_COLORS = {
     MANAGED_LABEL: "1f6feb",
     "portfolio-runtime": "8250df",
@@ -48,6 +53,9 @@ LABEL_COLORS = {
     "portfolio-status-in-progress": "fbca04",
     "portfolio-status-closed": "6e7781",
     "portfolio-status-complete": "1d76db",
+    "portfolio-domain-SHARED": "6e7781",
+    "portfolio-domain-TIKTRACK": "1d76db",
+    "portfolio-domain-AGENTS_OS": "8250df",
 }
 
 
@@ -117,6 +125,10 @@ class GhRepo:
 
     def update_issue(self, number: int, item: IssueItem, keep_labels: List[str]) -> dict:
         managed = set([MANAGED_LABEL, *TYPE_LABELS.values(), *STATUS_LABELS.values()])
+        # Domain and parent labels are managed (replaced on update)
+        for lb in keep_labels:
+            if lb.startswith(DOMAIN_LABEL_PREFIX) or lb.startswith(PARENT_STAGE_LABEL_PREFIX) or lb.startswith(PARENT_PROGRAM_LABEL_PREFIX):
+                managed.add(lb)
         preserved = [lb for lb in keep_labels if lb not in managed]
         labels = sorted(set(preserved + item.labels))
         return self._request(
@@ -272,12 +284,16 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md`",
             ]
         )
+        stage_labels = [
+            MANAGED_LABEL, TYPE_LABELS["stage"], _status_label_for_stage(status),
+            f"{DOMAIN_LABEL_PREFIX}SHARED",
+        ]
         items.append(
             IssueItem(
                 key=key,
                 title=f"[P{s_ord:02d}][STAGE] {sid} | {stage.get('stage_name','')} | {status}",
                 body=body,
-                labels=[MANAGED_LABEL, TYPE_LABELS["stage"], _status_label_for_stage(status)],
+                labels=stage_labels,
                 state=_state_for_stage(status),
             )
         )
@@ -323,12 +339,20 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`",
             ]
         )
+        domain = (program.get("domain") or "").strip().upper() or "TIKTRACK"
+        if domain not in ("TIKTRACK", "AGENTS_OS"):
+            domain = "TIKTRACK"
+        program_labels = [
+            MANAGED_LABEL, TYPE_LABELS["program"], _status_label_for_program(status),
+            f"{DOMAIN_LABEL_PREFIX}{domain}",
+            f"{PARENT_STAGE_LABEL_PREFIX}{stage_id}",
+        ]
         items.append(
             IssueItem(
                 key=key,
                 title=f"[P{s_ord:02d}.{p_ord:02d}][PROGRAM] {pid} | {program.get('program_name','')} | {status}",
                 body=body,
-                labels=[MANAGED_LABEL, TYPE_LABELS["program"], _status_label_for_program(status)],
+                labels=program_labels,
                 state=_state_for_program(status),
             )
         )
@@ -362,6 +386,7 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
                 f"- parent_program_key: `program:{program_id}`",
                 f"- work_package_id: `{wid}`",
                 f"- program_id: `{program_id}`",
+                f"- domain: `{wp.get('domain','')}`",
                 f"- status: `{status}`",
                 f"- current_gate: `{wp.get('current_gate','')}`",
                 f"- is_active: `{wp.get('is_active', False)}`",
@@ -375,12 +400,21 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
                 "Source: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md`",
             ]
         )
+        wp_domain = (wp.get("domain") or "").strip().upper() or "TIKTRACK"
+        if wp_domain not in ("TIKTRACK", "AGENTS_OS"):
+            wp_domain = "TIKTRACK"
+        wp_labels = [
+            MANAGED_LABEL, TYPE_LABELS["work_package"], _status_label_for_wp(status),
+            f"{DOMAIN_LABEL_PREFIX}{wp_domain}",
+            f"{PARENT_STAGE_LABEL_PREFIX}{stage_id}",
+            f"{PARENT_PROGRAM_LABEL_PREFIX}{program_id}",
+        ]
         items.append(
             IssueItem(
                 key=key,
                 title=f"[P{s_ord:02d}.{p_ord:02d}.{w_ord:03d}][WP] {wid} | {status} | {wp.get('current_gate','')}",
                 body=body,
-                labels=[MANAGED_LABEL, TYPE_LABELS["work_package"], _status_label_for_wp(status)],
+                labels=wp_labels,
                 state=_state_for_wp(status),
             )
         )
@@ -428,7 +462,12 @@ def main() -> int:
     snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
     items = build_issue_items(snapshot, scope=args.scope)
 
-    for label, color in LABEL_COLORS.items():
+    all_labels = set(LABEL_COLORS)
+    for item in items:
+        all_labels.update(item.labels)
+    default_label_color = "ededed"
+    for label in sorted(all_labels):
+        color = LABEL_COLORS.get(label, default_label_color)
         if args.dry_run:
             print(f"[dry-run] ensure label {label}")
         else:

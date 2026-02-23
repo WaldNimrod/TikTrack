@@ -108,6 +108,27 @@ def _clean_id(value: str) -> str:
     return value.split("(", 1)[0].strip()
 
 
+def _program_number(program_id: str) -> int:
+    m = re.search(r"-P(\d+)$", (program_id or "").upper())
+    return int(m.group(1)) if m else 999
+
+
+def _wp_number(work_package_id: str) -> int:
+    m = re.search(r"-WP(\d+)$", (work_package_id or "").upper())
+    return int(m.group(1)) if m else 999
+
+
+def _stage_number(stage_id: str) -> int:
+    """Extract numeric part: S001 -> 1, S003 -> 3, S-001 -> -1."""
+    if not stage_id:
+        return 999
+    s = (stage_id or "").strip().upper()
+    m = re.search(r"S(-?\d+)$", s)
+    if not m:
+        return 999
+    return int(m.group(1))
+
+
 def build_snapshot() -> Dict[str, object]:
     wsm = _extract_wsm_current_state(_read_text(WSM_PATH))
     roadmap_rows = _table_after_heading(_read_text(ROADMAP_PATH), "Stages (catalog)")
@@ -136,17 +157,58 @@ def build_snapshot() -> Dict[str, object]:
         for r in program_rows
     ]
 
-    work_packages = [
-        {
+    program_by_id = {p["program_id"]: p for p in programs}
+    work_packages = []
+    for r in wp_rows:
+        pid = r.get("program_id", "")
+        domain = (program_by_id.get(pid) or {}).get("domain", "")
+        work_packages.append({
             "work_package_id": r.get("work_package_id", ""),
-            "program_id": r.get("program_id", ""),
+            "program_id": pid,
+            "domain": domain,
             "status": r.get("status", ""),
             "current_gate": r.get("current_gate", ""),
             "is_active": _parse_bool(r.get("is_active", "")),
             "active_marker_reason": r.get("active_marker_reason", ""),
-        }
-        for r in wp_rows
-    ]
+        })
+
+    # True hierarchy: each stage has programs (sub); each program has work_packages (sub). Domains: TikTrack, Agents_OS.
+    stage_order_list = [s.get("stage_id", "") for s in stages]
+    programs_by_stage: Dict[str, List[dict]] = {}
+    for p in programs:
+        sid = p.get("stage_id", "")
+        programs_by_stage.setdefault(sid, []).append(p)
+    for sid in programs_by_stage:
+        programs_by_stage[sid].sort(key=lambda x: (_program_number(x.get("program_id", "")), x.get("program_id", "")))
+    wps_by_program: Dict[str, List[dict]] = {}
+    for w in work_packages:
+        pid = w.get("program_id", "")
+        wps_by_program.setdefault(pid, []).append(w)
+    for pid in wps_by_program:
+        wps_by_program[pid].sort(key=lambda x: (_wp_number(x.get("work_package_id", "")), x.get("work_package_id", "")))
+
+    hierarchy: List[Dict[str, object]] = []
+    for stage in stages:
+        sid = stage.get("stage_id", "")
+        stage_programs = programs_by_stage.get(sid, [])
+        hierarchy.append({
+            "stage_id": sid,
+            "stage_name": stage.get("stage_name", ""),
+            "status": stage.get("status", ""),
+            "planned_scope": stage.get("planned_scope", ""),
+            "domain": "SHARED",
+            "programs": [
+                {
+                    "program_id": p.get("program_id", ""),
+                    "program_name": p.get("program_name", ""),
+                    "domain": p.get("domain", ""),
+                    "status": p.get("status", ""),
+                    "current_gate_mirror": p.get("current_gate_mirror", ""),
+                    "work_packages": wps_by_program.get(p.get("program_id", ""), []),
+                }
+                for p in stage_programs
+            ],
+        })
 
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -169,6 +231,7 @@ def build_snapshot() -> Dict[str, object]:
         "stages": stages,
         "programs": programs,
         "work_packages": work_packages,
+        "hierarchy": hierarchy,
     }
 
 
@@ -246,6 +309,50 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
     return ValidationResult(errors=errors, warnings=warnings)
 
 
+def _build_hierarchy_md(snapshot: Dict[str, object]) -> List[str]:
+    """Build hierarchical roadmap view: Stage (shared) → Program (sub, domain) → Work Package (sub, domain).
+    Domains: TikTrack, Agents_OS. 5 main stages; stage 2 is missing (שלב 2 חסר).
+    """
+    hierarchy = snapshot.get("hierarchy") or []
+    stage_numbers = sorted({_stage_number(h["stage_id"]) for h in hierarchy})
+    missing = [n for n in range(1, max(stage_numbers) + 1) if n > 0 and n not in stage_numbers]
+
+    lines = [
+        "## Roadmap (hierarchical)",
+        "",
+        "**היררכיה:** שלב (משותף לשני הדומיינים) → תוכנית (sub של שלב) → חבילת עבודה (sub של תוכנית).",
+        "**דומיינים:** TikTrack, Agents_OS. כל תוכנית וכל חבילת עבודה משויכות לדומיין אחד.",
+        "",
+    ]
+    if missing:
+        lines.append(f"**שלבים ראשיים:** 5 שלבים (שלב 2 חסר — אין S002 בקטלוג).")
+        lines.append("")
+
+    for node in hierarchy:
+        sid = node.get("stage_id", "")
+        sname = node.get("stage_name", "")
+        sstatus = node.get("status", "")
+        lines.append(f"### Stage: {sid} — {sname} | {sstatus} [SHARED]")
+        lines.append("")
+        for p in node.get("programs", []):
+            pid = p.get("program_id", "")
+            pname = p.get("program_name", "")
+            pstatus = p.get("status", "")
+            domain = (p.get("domain") or "").strip() or "—"
+            lines.append(f"#### Program: {pid} — {pname} | {pstatus} | domain: **{domain}**")
+            lines.append("")
+            for w in p.get("work_packages", []):
+                wid = w.get("work_package_id", "")
+                wstatus = w.get("status", "")
+                wgate = w.get("current_gate", "")
+                wdomain = (w.get("domain") or "").strip() or "—"
+                active = " (active)" if w.get("is_active") else ""
+                lines.append(f"- **WP** `{wid}` | {wstatus} | gate: {wgate} | domain: **{wdomain}**{active}")
+            lines.append("")
+        lines.append("")
+    return lines
+
+
 def build_markdown_summary(snapshot: Dict[str, object], result: ValidationResult) -> str:
     runtime = snapshot["runtime"]
     lines = [
@@ -271,6 +378,7 @@ def build_markdown_summary(snapshot: Dict[str, object], result: ValidationResult
         f"- work_packages: `{len(snapshot['work_packages'])}`",
         "",
     ]
+    lines += _build_hierarchy_md(snapshot)
 
     if result.errors:
         lines += ["## Errors", ""]

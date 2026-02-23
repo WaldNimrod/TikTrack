@@ -55,7 +55,7 @@ Every artifact in the gate flow MUST include the following block (or equivalent 
 | program_id | YES | L2 identifier. |
 | work_package_id | YES | L3 identifier; gate binding. |
 | task_id | When applicable | L4 identifier; else N/A. |
-| gate_id | YES | GATE_0 … GATE_8, or **PRE_GATE_3** (reserved: for Pre-GATE_3 Work Plan validation request/response artifacts only; not a gate transition). See §6.1. |
+| gate_id | YES | GATE_0 … GATE_8 only. (Work-plan validation before implementation is inside GATE_3 as sub-stage G3.5; see §6.1.) |
 | phase_owner | YES | Team 10 or as assigned. |
 | required_ssm_version | YES | e.g. 1.0.0. |
 | required_active_stage | YES | e.g. GAP_CLOSURE_BEFORE_AGENT_POC. |
@@ -95,30 +95,28 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 
 ## 3. Canonical Gate Enum (v2.3.0)
 
-| gate_id | gate_label | authority |
-|---------|------------|-----------|
-| GATE_0 | STRUCTURAL_FEASIBILITY | Team 190 |
-| GATE_1 | ARCHITECTURAL_DECISION_LOCK (LOD 400) | Team 190 (validation), Team 170 (documentation registry enforcement) |
-| GATE_2 | KNOWLEDGE_PROMOTION | Team 190 (owner), **Team 70 (executor ONLY)** |
+| gate_id | gate_label | authority (owner) |
+|---------|------------|-------------------|
+| GATE_0 | SPEC_ARC (LOD 200) | Team 190 |
+| GATE_1 | SPEC_LOCK (LOD 400) | Team 190 |
+| GATE_2 | ARCHITECTURAL_SPEC_VALIDATION | Team 190 |
 | GATE_3 | IMPLEMENTATION | Team 10 |
-| GATE_4 | QA | Team 50 |
+| GATE_4 | QA | Team 10 |
 | GATE_5 | DEV_VALIDATION | Team 90 |
-| GATE_6 | ARCHITECTURAL_VALIDATION | Team 190 |
-| GATE_7 | HUMAN_UX_APPROVAL | Nimrod (final sign-off) |
-| GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 190 (owner), Team 70 (executor) |
+| GATE_6 | ARCHITECTURAL_DEV_VALIDATION | Team 90 |
+| GATE_7 | HUMAN_UX_APPROVAL | Team 90 |
+| GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 90 |
 
-**Correction (canonical):** Knowledge Promotion **Executor** is **Team 70 (Librarian) ONLY**. Team 170 does not retain promotion execution authority. Team 190 retains validation authority only for GATE_2.
+**WSM ownership (deterministic):** Gates 0–2: Team 190 updates WSM. Gates 3–4: Team 10 updates WSM. Gates 5–8: Team 90 updates WSM. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md.
 
 ---
 
-## 4. GATE_0 … GATE_7 (unchanged semantics except GATE_2 executor)
+## 4. GATE_0 … GATE_7 (semantics per canonical table §3)
 
-GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
-
-**GATE_2 — KNOWLEDGE_PROMOTION**  
-- Owner: Team 190 (validation authority only).  
-- **Executor: Team 70 (Librarian) ONLY.** Team 170 must not retain promotion execution authority.  
-- Trigger, Purpose, PASS/FAIL, Constraint unchanged.
+GATE_0 (SPEC_ARC), GATE_1 (SPEC_LOCK), GATE_2 (ARCHITECTURAL_SPEC_VALIDATION): Owner Team 190.  
+GATE_3 (IMPLEMENTATION), GATE_4 (QA): Owner Team 10.  
+GATE_5 (DEV_VALIDATION), GATE_6 (ARCHITECTURAL_DEV_VALIDATION), GATE_7 (HUMAN_UX_APPROVAL): Owner Team 90.  
+Trigger, Purpose, PASS/FAIL, and constraints per runbook and WSM ownership matrix.
 
 ### 4.1 GATE_1 — Team 170 role and LLD400 process (architect-approved)
 
@@ -143,34 +141,28 @@ GATE_0 through GATE_7 definitions remain as in v2.0.0 with the following change:
 
 | Field | Value |
 |-------|--------|
-| Owner | Team 190 |
-| Executor | Team 70 (Librarian) |
+| Owner | Team 90 |
 | Trigger | GATE_7 PASS |
 | Purpose | Produce AS_MADE_REPORT; update Developer Guides; clean communication folders; archive temporary artifacts by Stage; validate canonical consistency. |
 | PASS state | DOCUMENTATION_CLOSED |
-| FAIL state | RETURN_TO_LIBRARIAN |
-| Constraint | **Lifecycle is not complete without GATE_8 PASS.** |
+| FAIL state | RETURN_TO_OWNER |
+| Constraint | **Lifecycle is not complete without GATE_8 PASS.** WSM updated by Team 90 upon closure. |
 
 ---
 
 ## 6. Process Freeze Constraints
 
 1. GATE_0 and GATE_1 are canonical design gates.  
-2. No Work Plan generation before GATE_1 = ARCHITECTURAL_DECISION_LOCKED.  
-3. **Work Plan / Work Package must be validated by Team 90 (10↔90) before execution (GATE_3); no GATE_3 before Team 90 validation PASS.** (This is a **pre-GATE_3** step identified by `gate_id = PRE_GATE_3` as a reserved phase marker, not a gate transition. Team 90 validates the plan only.)  
-4. **No GATE_5 (DEV_VALIDATION) before GATE_4 (QA) PASS.** GATE_5 is the **second** Team 90 (10↔90) touchpoint: after implementation and QA.  
+2. No Work Plan generation before GATE_1 = SPEC_LOCK (LOD 400).  
+3. **Work Plan / Work Package must be validated by Team 90 (10↔90) before execution (GATE_3).** This is **internal to GATE_3** as sub-stage **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)**. gate_id remains GATE_3; no separate PRE_GATE_3. Reference: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md.  
+4. **No GATE_5 (DEV_VALIDATION) before GATE_4 (QA) PASS.** GATE_5 is the second Team 90 (10↔90) touchpoint: after implementation and QA.  
 5. All gate and validation artifacts must include full hierarchical identity block per §1.4.  
 6. Non-compliant artifacts are invalid.  
 7. No development progression while canonical governance updates are pending required architectural approval.
 
-### 6.1 Two Team 90 (10↔90) validation points (deterministic)
+### 6.1 GATE_3 internal sub-stages and Team 90 validation (deterministic)
 
-| Point | Name | Trigger | Authority | Effect |
-|-------|------|---------|-----------|--------|
-| **Pre-GATE_3** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | Team 90 | **gate_id = PRE_GATE_3** in request/response artifacts. Only after Team 90 PASS may GATE_3 open. |
-| **GATE_5** | DEV_VALIDATION | GATE_4 (QA) PASS | Team 90 | gate_id = GATE_5. Post-implementation / post-QA dev validation. |
-
-One channel (10↔90), two distinct lifecycle phases; no contradiction. **Canonical rule:** For Pre-GATE_3 artifacts, use gate_id = PRE_GATE_3 so identity header remains machine-valid and unambiguous.
+GATE_3 has a canonical internal sub-stage sequence **G3.1..G3.9**. Work-plan validation with Team 90 is **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)**. Only after G3.5 PASS may Team 10 proceed to G3.6 (TEAM_ACTIVATION_MANDATES). Full sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md. **GATE_6 rejection routing:** DOC_ONLY_LOOP / CODE_CHANGE_REQUIRED / escalation to Team 00 per _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md.
 
 ### 6.2 Context Boundary Rule (Drift Prevention)
 
@@ -210,3 +202,4 @@ Team 10 (Gate Owner for GATE_3) and all teams must use the runbook for determini
 
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.3.0 | LOCKED | 2026-02-22**
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | TEAM_10_RUNBOOK_REF_ADDED | 2026-02-23**
+**log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | PRE_GATE_3_REMOVED_GATE_TABLE_WSM_OWNERS | 2026-02-23**

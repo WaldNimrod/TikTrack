@@ -5,18 +5,19 @@
 **to:** Team 70 (Knowledge Librarian)  
 **cc:** Team 10, Team 100, Team 00  
 **date:** 2026-02-23  
-**status:** READY_PENDING_GATE7_PASS  
-**trigger_condition:** GATE_7_DECISION = APPROVED (Nimrod)
+**status:** ACTIVATED_GATE8_OPEN  
+**trigger_condition:** SATISFIED — GATE_7_DECISION = APPROVED (Nimrod)
 
 ---
 
-## תנאי הפעלה
+## סטטוס הפעלה
 
-אין להתחיל GATE_8 לפני קבלת אישור אנושי מפורש (`GATE_7_DECISION: APPROVED`) עבור `S001-P001-WP002`.
+GATE_7 אושר (Human approval).  
+בהתאם, GATE_8 מופעל כעת עבור `S001-P001-WP002`.
 
 ---
 
-## לאחר Trigger — משימות GATE_8
+## משימות GATE_8 (לביצוע מיידי)
 
 1. הכנת `AS_MADE_REPORT` עבור WP002.
 2. עדכון מדריכי מפתחים/נהלים רלוונטיים.
@@ -56,3 +57,4 @@
 ---
 
 **log_entry | TEAM_90 | TO_TEAM_70 | S001_P001_WP002 | GATE8_ACTIVATION_CANONICAL_READY_PENDING_GATE7 | 2026-02-23**
+**log_entry | TEAM_90 | TO_TEAM_70 | S001_P001_WP002 | GATE8_ACTIVATED_AFTER_GATE7_APPROVAL | 2026-02-23**

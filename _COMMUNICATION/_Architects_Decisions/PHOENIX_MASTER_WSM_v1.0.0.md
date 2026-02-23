@@ -82,22 +82,22 @@ Operational clarification (2026-02-23, WP002 cycle):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon **GATE_6 OPEN approval** (2026-02-23). S001-P001-WP002 — Team 100 decision approved opening GATE_6.
+**Gate-owner update evidence:** This block was updated upon **GATE_7 APPROVED** (2026-02-23). S001-P001-WP002 — human approval granted and GATE_8 activated.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
-| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_6 OPEN) |
+| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_8 OPEN: documentation closure) |
 | active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — WP002 active) |
-| allowed_gate_range | GATE_6 (OPEN) → GATE_7 (human approval pending) → GATE_8 |
-| current_gate | GATE_6 (OPEN) |
+| allowed_gate_range | GATE_8 (OPEN) → DOCUMENTATION_CLOSED |
+| current_gate | GATE_8 (OPEN) |
 | active_program_id | S001-P001 |
 | active_plan_id | S001 |
 | active_work_package_id | S001-P001-WP002 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_6 \| OPEN_APPROVED \| 2026-02-23 \| _COMMUNICATION/team_100/TEAM_100_TO_ALL_RELEVANT_TEAMS_S001_P001_WP002_GATE6_DECISION_v1.0.0.md |
-| next_required_action | Execute GATE_7 human approval using approved test scenarios; no progression to GATE_8 before explicit human approval |
-| next_responsible_team | Nimrod (GATE_7 owner) with Team 10 support |
+| last_gate_event | GATE_7 \| APPROVED \| 2026-02-23 \| Human approval received (Nimrod) |
+| next_required_action | Team 70 executes GATE_8 closure package (AS_MADE, guide updates, cleanup, archive) and submits validation request to Team 90 |
+| next_responsible_team | Team 70 |
 
 ---
 
@@ -146,3 +146,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_8 closure 2026-02-22 | 2026-02-22**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 post-GATE_5 architect approval pending (Team100/00 authority) | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_6 OPEN approved by Team 100 decision | 2026-02-23**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_7 approved; GATE_8 activated | 2026-02-23**

@@ -25,6 +25,10 @@
 תוצאה מצופה: PASS אם כל שלוש התיקיות קיימות.
 
 ### Scenario 2 — validator stub בר־הרצה
+תנאי הרצה:
+- להריץ משורש הפרויקט: `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix`
+- אם רצים מתוך `agents_os/`, יש להשתמש בפקודה חלופית: `python3 -m validators.validator_stub`
+
 פקודה:
 ```bash
 python3 -m agents_os.validators.validator_stub

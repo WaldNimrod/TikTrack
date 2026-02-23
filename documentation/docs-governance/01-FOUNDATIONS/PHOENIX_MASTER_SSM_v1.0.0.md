@@ -121,12 +121,11 @@ Role contract lock:
 * **Visual Integrity:** ולידציה מבנית (DOM/CSS) מול הבלופרינט כחסם קשיח. שימוש בסקרינשוטים ע"י אייג'נטים - אסור.
 * **Authority Model:** הפרדת רשויות מוחלטת בין ארכיטקטורה (100+) לביצוע (10-90).
 
-### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.3.0)
+### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.3.0, realignment v1.1.0)
 
-* **Gate 2 (KNOWLEDGE_PROMOTION):** Owner Team 190 (validation). **Executor Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution authority.
-* **Gate 6 (ARCHITECTURAL_VALIDATION):** Team 190. Validate spec and artifact alignment to constitution; no execution, no SSOT writes.
-* **Gate 7 (HUMAN_UX_APPROVAL — Final sign-off):** Nimrod (Visionary). Final UX/vision approval; no implementation by agent without Gate 7 pass.
-* **Gate 8 (DOCUMENTATION_CLOSURE — AS_MADE_LOCK):** Owner Team 190; Executor Team 70 (Librarian). Purpose: AS_MADE_REPORT, Developer Guides update, clean communication folders, archive by Stage. Lifecycle not complete without GATE_8 PASS. Source: 04_GATE_MODEL_PROTOCOL_v2.3.0.
+* **Gates 0–2 (SPEC_ARC, SPEC_LOCK, ARCHITECTURAL_SPEC_VALIDATION):** Owner Team 190. WSM updated by Team 190 on closure.
+* **Gates 3–4 (IMPLEMENTATION, QA):** Owner Team 10. WSM updated by Team 10 on closure.
+* **Gates 5–8 (DEV_VALIDATION, ARCHITECTURAL_DEV_VALIDATION, HUMAN_UX_APPROVAL, DOCUMENTATION_CLOSURE):** Owner Team 90. WSM updated by Team 90 on closure. GATE_6 rejection routing: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. Source: 04_GATE_MODEL_PROTOCOL_v2.3.0.
 
 ### 1.2 WSM Operational State Law (TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
 

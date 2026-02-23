@@ -16,13 +16,13 @@
 
 | Phase | Name | Trigger | Gate / step | Effect |
 |-------|------|---------|-------------|--------|
-| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | **Pre-GATE_3** (`gate_id = PRE_GATE_3`, reserved phase marker) | Only after Team 90 PASS may GATE_3 open. |
+| **Phase 1** | Work Plan / Work Package validation | Work Package prepared; Team 10 submits to Team 90 | **GATE_3 sub-stage G3.5** (WORK_PACKAGE_VALIDATION_WITH_TEAM_90); gate_id = GATE_3 | Only after Team 90 PASS may Team 10 proceed to G3.6 (TEAM_ACTIVATION_MANDATES). |
 | **Phase 2** | DEV_VALIDATION | GATE_4 (QA) PASS | **GATE_5** | Post-implementation / post-QA dev validation. |
 
-Same channel, same artifact types; phase distinguished by trigger and gate_id in request. No contradiction: Phase 1 before execution, Phase 2 after QA.
+Same channel, same artifact types; phase distinguished by trigger. Per Gate Governance Realignment v1.1.0: no PRE_GATE_3; work-plan validation is internal to GATE_3. Submission path: _COMMUNICATION/_ARCHITECT_INBOX/; decisions _COMMUNICATION/_Architects_Decisions/. Path 90_Architects_comunication deprecated. Reference: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md, PATH_DEPRECATION_90_ARCHITECTS_COMUNICATION_v1.0.0.md.
 
 Evidence anchors:
-- Team 90 authority and two-point model: `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL_v2.3.0.md` §6, §6.1
+- Team 90 authority and GATE_3 sub-stages: `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` §6, §6.1
 - Team 10 gateway/orchestration: `00_MASTER_INDEX.md:4`, `_COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/06_ORG_REALIGNMENT.md:8`
 
 ---
@@ -75,8 +75,8 @@ Naming rule:
 ## 5) Governance Constraints
 
 - Dual-Manifest alignment required (`required_ssm_version`, `required_active_stage` must be present in request payload).
-- This channel serves **two phases** (Phase 1 pre-GATE_3, Phase 2 GATE_5); it cannot redefine Gate 6/7/8 responsibilities. Gate Model v2.3.0 §6.1.
-- No inferred ownership allowed (`phase_owner`, `responsible_team` explicit only). Request payload must carry `gate_id` or phase indicator (pre-GATE_3 vs GATE_5) for deterministic routing.
+- This channel serves **two phases** (Phase 1 = GATE_3 G3.5 work-plan validation, Phase 2 = GATE_5). Gates 6/7/8 owner Team 90 per Gate Model v2.3.0 realignment v1.1.0.
+- No inferred ownership allowed (`phase_owner`, `responsible_team` explicit only). Request payload must carry `gate_id` (GATE_3 for G3.5, GATE_5 for dev validation) for deterministic routing.
 
 ---
 

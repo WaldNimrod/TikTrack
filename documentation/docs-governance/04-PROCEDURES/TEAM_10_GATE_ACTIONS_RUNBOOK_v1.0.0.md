@@ -22,43 +22,33 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 ---
 
-## 3) PRE_GATE_3
+## 3) GATE_3 (IMPLEMENTATION) — sub-stages G3.1..G3.9
+
+Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md. **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)** is mandatory before G3.6: Team 10 submits work plan to Team 90; only after Team 90 PASS may Team 10 proceed to team activation.
 
 | Item | Content |
 |------|---------|
-| **Entry** | Work Package defined; execution plan ready. |
-| **Team 10 mandatory actions** | (1) Submit WORK_PACKAGE_DEFINITION + execution plan to Team 90. (2) Wait for VALIDATION_RESPONSE PASS. (3) Update task lists and WSM when GATE_3 opens. |
-| **Required artifacts** | PRE_GATE_3 request (canonical message format + identity header); Team 90 response. |
-| **Exit** | Team 90 PASS; GATE_3 open. |
-| **WSM** | Gate Owner (Team 10 for this phase) updates CURRENT_OPERATIONAL_STATE: current_gate, last_gate_event, next_required_action, next_responsible_team. |
+| **Entry** | Work Package defined; execution plan ready. G3.5 PASS (Team 90 work-plan validation) required before G3.6. |
+| **Team 10 mandatory actions** | (1) G3.1–G3.5: Spec intake, implementation review, clarification loop, detailed build, **submit to Team 90 for validation (G3.5)**; wait for PASS. (2) G3.6–G3.9: Issue mandate to each dev team in scope (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING); orchestrate; collect deliverables; pre-check; build GATE_3 exit package; submit to GATE_4 (QA). (3) Update WSM (current_gate, last_gate_event, next_required_action). |
+| **Required artifacts** | EXECUTION_AND_TEAM_PROMPTS (or equivalent); Team 90 G3.5 response; completion reports; GATE_3 exit package to GATE_4. |
+| **Exit** | Implementation complete; package handed to GATE_4 (QA). |
+| **WSM** | Team 10 (Gate Owner for GATE_3) updates WSM immediately upon GATE_3 closure. |
 
 ---
 
-## 4) GATE_3 (IMPLEMENTATION)
+## 4) GATE_4 (QA)
 
 | Item | Content |
 |------|---------|
-| **Entry** | PRE_GATE_3 PASS. |
-| **Team 10 mandatory actions** | (1) Determine dev teams in scope per WORK_PACKAGE_DEFINITION (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING). (2) Issue mandate + prompt to **each** dev team in scope. (3) Collect deliverables (code/structure). (4) Internal verification; GATE_3 exit criteria met. (5) Build GATE_3 exit package; submit to Team 50 (GATE_4). (6) Update WSM (current_gate, last_gate_event, next_required_action). |
-| **Required artifacts** | EXECUTION_AND_TEAM_PROMPTS (or equivalent); completion reports from teams in scope; GATE_3 exit package to Team 50. |
-| **Exit** | Implementation complete; package handed to Team 50. |
-| **WSM** | Team 10 (Gate Owner) updates WSM immediately upon GATE_3 closure. |
+| **Entry** | GATE_3 exit delivered to QA. |
+| **Team 10 mandatory actions** | (1) Deliver QA package (context, links, evidence) to QA per role mapping. (2) Wait for QA report (0 SEVERE). (3) Update task lists; on PASS proceed to GATE_5. |
+| **Required artifacts** | QA handover (canonical format); QA report. |
+| **Exit** | QA PASS (0 SEVERE). |
+| **WSM** | Team 10 (Gate Owner for GATE_4) updates WSM on gate closure. |
 
 ---
 
-## 5) GATE_4 (QA)
-
-| Item | Content |
-|------|---------|
-| **Entry** | GATE_3 exit delivered to Team 50. |
-| **Team 10 mandatory actions** | (1) Deliver QA package to Team 50 (context, links, evidence). (2) Wait for QA report (0 SEVERE). (3) Update task lists; on PASS proceed to GATE_5. |
-| **Required artifacts** | QA handover (canonical format); Team 50 QA report. |
-| **Exit** | Team 50 PASS (0 SEVERE). |
-| **WSM** | Coordinate with Gate Owner; WSM updated on gate closure. |
-
----
-
-## 6) GATE_5 (DEV_VALIDATION)
+## 5) GATE_5 (DEV_VALIDATION)
 
 | Item | Content |
 |------|---------|
@@ -70,45 +60,48 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 ---
 
-## 7) GATE_6 (ARCHITECTURAL_VALIDATION)
+## 6) GATE_6 (ARCHITECTURAL_DEV_VALIDATION)
 
 | Item | Content |
 |------|---------|
 | **Entry** | GATE_5 PASS. |
-| **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 190. (2) Wait for execution approval. (3) Update lists and WSM on PASS. |
-| **Required artifacts** | GATE_6 submission (canonical); Team 190 decision. |
-| **Exit** | Team 190 approval. |
-| **WSM** | Update on closure. |
+| **Owner** | Team 90. |
+| **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists and WSM on PASS. |
+| **Required artifacts** | GATE_6 submission (canonical); Team 90 / architect decision. |
+| **Exit** | GATE_6 PASS (architectural dev validation approved). |
+| **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
 ---
 
-## 8) GATE_7 (HUMAN_UX_APPROVAL)
+## 7) GATE_7 (HUMAN_UX_APPROVAL)
 
 | Item | Content |
 |------|---------|
 | **Entry** | GATE_6 PASS. |
-| **Team 10 mandatory actions** | (1) Submit request for Nimrod (Human UX) sign-off. (2) Update on signature. |
+| **Owner** | Team 90. |
+| **Team 10 mandatory actions** | (1) Submit request for human UX sign-off (Nimrod / Team 00 per process). (2) Update on signature. |
 | **Required artifacts** | Request and approval record. |
 | **Exit** | Human sign-off received. |
-| **WSM** | Update on closure. |
+| **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
 ---
 
-## 9) GATE_8 (DOCUMENTATION_CLOSURE)
+## 8) GATE_8 (DOCUMENTATION_CLOSURE)
 
 | Item | Content |
 |------|---------|
 | **Entry** | GATE_7 PASS. |
-| **Team 10 mandatory actions** | (1) Coordinate with Team 70 (executor) and Team 190 (owner). (2) Ensure AS_MADE_REPORT and lifecycle closure. (3) WSM updated (Gate Owner Team 90). |
+| **Owner** | Team 90. |
+| **Team 10 mandatory actions** | (1) Coordinate with Team 90 (owner). (2) Ensure AS_MADE_REPORT and lifecycle closure. (3) WSM updated by Team 90. |
 | **Required artifacts** | AS_MADE_REPORT; GATE_8 validation response. |
 | **Exit** | DOCUMENTATION_CLOSED; lifecycle complete. |
-| **WSM** | Gate Owner updates WSM; no active WP. |
+| **WSM** | Team 90 (Gate Owner) updates WSM; no active WP. |
 
 ---
 
-## 10) WSM update duty (all gates)
+## 9) WSM update duty (all gates)
 
-When Team 10 is Gate Owner (e.g. GATE_3): update `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE** immediately upon gate closure. Fields: active_stage_id, current_gate, last_gate_event, next_required_action, next_responsible_team, active_work_package_id (or — if closed). Per SSM/WSM law: no gate progression without WSM update.
+**WSM ownership matrix (per _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md):** Gates 0–2 → Team 190 updates WSM. Gates 3–4 → Team 10 updates WSM. Gates 5–8 → Team 90 updates WSM. The Gate Owner must update `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE** immediately upon gate closure. Fields: active_stage_id, current_gate, last_gate_event, next_required_action, next_responsible_team, active_work_package_id (or — if closed). No gate progression without WSM update.
 
 ---
 

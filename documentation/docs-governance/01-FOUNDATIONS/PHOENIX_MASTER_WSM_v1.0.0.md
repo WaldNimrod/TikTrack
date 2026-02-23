@@ -40,8 +40,7 @@ ssm_dependency: 1.0.0
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
-**GATE_2 (KNOWLEDGE_PROMOTION):** Executor **Team 70 (Librarian) ONLY.** Team 170 does not retain promotion execution.  
-**GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 190; Executor Team 70. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
+**Gate ownership (v1.1.0 realignment):** GATE_0–GATE_2 owner Team 190; GATE_3–GATE_4 owner Team 10; GATE_5–GATE_8 owner Team 90. **WSM updater per gate:** Gates 0–2 → Team 190; Gates 3–4 → Team 10; Gates 5–8 → Team 90. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md. **GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 90. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
 
 ### 0.1 Architectural Approval Package Format Lock (v1.0.0)
 
@@ -67,16 +66,9 @@ Flow semantic lock:
 - SPEC track submissions bind to `GATE_1` and are SPEC-only (no execution-readiness claims).
 - EXECUTION track submissions must use execution-validation gate context and include implementation evidence.
 
-Role contract in workflow:
+Role contract in workflow (Gate Governance Realignment v1.1.0):
 - Team 170 maintains originals only.
-- Team 90 assembles/submits post-GATE_5 execution packages to Architect Inbox.
-- Gate-opening authority for GATE_6 is Architect + Team 100 / Team 00.
-- Team 190 is engaged only where explicitly mandated (e.g., GATE_8 ownership), not in WP002 post-GATE_5 phase.
-
-Operational clarification (2026-02-23, WP002 cycle):
-- Post-GATE_5 package preparation and architect submission are executed by Team 90.
-- GATE_6 opening authority is Architect + Team 100 / Team 00.
-- Team 190 is not involved in this phase for WP002.
+- Team 90 owns GATE_5, GATE_6, GATE_7, GATE_8; assembles/submits post-GATE_5 execution packages; submission path _COMMUNICATION/_ARCHITECT_INBOX/; architect decisions _COMMUNICATION/_Architects_Decisions/. Path _COMMUNICATION/90_Architects_comunication/ is deprecated (historical only). Reference: _COMMUNICATION/team_170/PATH_DEPRECATION_90_ARCHITECTS_COMUNICATION_v1.0.0.md.
 
 ---
 
@@ -90,26 +82,26 @@ Operational clarification (2026-02-23, WP002 cycle):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon **GATE_6 OPEN approval** (2026-02-23). S001-P001-WP002 — Team 100 decision approved opening GATE_6. Previous: GATE_5 PASS (2026-02-23).
+**Gate-owner update evidence:** This block was updated upon **GATE_7 APPROVED** (2026-02-23). S001-P001-WP002 — human approval granted and GATE_8 activated.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S001 |
 | active_stage_label | שלב 1 — Stage 1 |
-| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_6 OPEN) |
+| active_flow | EXECUTION — S001-P001-WP002 in progress (GATE_8 OPEN: documentation closure) |
 | active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 — WP002 active) |
 | active_work_package_id | S001-P001-WP002 |
 | in_progress_work_package_id | S001-P001-WP002 |
 | last_closed_work_package_id | S001-P001-WP001 (GATE_8 PASS 2026-02-22; lifecycle complete; **domain: orchestration/10↔90**) |
 | s001_p001_program_spec_status | GATE_1 PASS — AGENTS_OS_PHASE_1_LLD400_v1.0.0 (Team 190 validation 2026-02-22); **domain: AGENTS_OS** |
-| allowed_gate_range | GATE_6 (OPEN) → GATE_7 (human approval pending) → GATE_8 |
-| current_gate | GATE_6 (OPEN) |
+| allowed_gate_range | GATE_8 (OPEN) → DOCUMENTATION_CLOSED |
+| current_gate | GATE_8 (OPEN) |
 | active_program_id | S001-P001 (Agents_OS Phase 1; WP002 in progress) |
 | active_plan_id | S001 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_6 \| OPEN_APPROVED \| 2026-02-23 \| _COMMUNICATION/team_100/TEAM_100_TO_ALL_RELEVANT_TEAMS_S001_P001_WP002_GATE6_DECISION_v1.0.0.md |
-| next_required_action | Execute GATE_7 human approval using approved test scenarios; no progression to GATE_8 before explicit human approval |
-| next_responsible_team | Nimrod (GATE_7 owner) with Team 10 support |
+| last_gate_event | GATE_7 \| APPROVED \| 2026-02-23 \| Human approval received (Nimrod) |
+| next_required_action | Team 70 executes GATE_8 closure package (AS_MADE, guide updates, cleanup, archive) and submits validation request to Team 90 |
+| next_responsible_team | Team 70 |
 
 ---
 
@@ -159,3 +151,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon Pre-GATE_3 PASS S001-P001-WP002 (GATE_3 open) 2026-02-22 | 2026-02-22**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 post-GATE_5 architect approval pending (Team100/00 authority) | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_6 OPEN approved by Team 100 decision | 2026-02-23**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_7 approved; GATE_8 activated | 2026-02-23**
+**log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | WSM_OWNER_MATRIX_PATH_DEPRECATION | 2026-02-23**

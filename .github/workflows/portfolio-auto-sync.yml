@@ -12,9 +12,14 @@ on:
           - full
           - stages
       close_stale:
-        description: "Close stale managed issues not present in current snapshot"
+        description: "Mark non-canon issues as 'ממתין לסיווג' (unclassified) instead of closing"
         required: false
         default: true
+        type: boolean
+      clean_repo_labels:
+        description: "Remove from repo any portfolio-* label not in canon (one-time cleanup)"
+        required: false
+        default: false
         type: boolean
   push:
     branches: ["**"]
@@ -105,13 +110,8 @@ jobs:
         run: |
           SCOPE="${{ github.event.inputs.sync_scope || 'full' }}"
           CLOSE_STALE="${{ github.event.inputs.close_stale || 'true' }}"
-          if [ "$CLOSE_STALE" = "true" ]; then
-            python scripts/portfolio/sync_github_portfolio_issues.py \
-              --snapshot portfolio_project/portfolio_snapshot.json \
-              --scope "$SCOPE" \
-              --close-stale
-          else
-            python scripts/portfolio/sync_github_portfolio_issues.py \
-              --snapshot portfolio_project/portfolio_snapshot.json \
-              --scope "$SCOPE"
-          fi
+          CLEAN_LABELS="${{ github.event.inputs.clean_repo_labels || 'false' }}"
+          CMD="python scripts/portfolio/sync_github_portfolio_issues.py --snapshot portfolio_project/portfolio_snapshot.json --scope $SCOPE"
+          if [ "$CLOSE_STALE" = "true" ]; then CMD="$CMD --close-stale"; fi
+          if [ "$CLEAN_LABELS" = "true" ]; then CMD="$CMD --clean-repo-labels"; fi
+          $CMD

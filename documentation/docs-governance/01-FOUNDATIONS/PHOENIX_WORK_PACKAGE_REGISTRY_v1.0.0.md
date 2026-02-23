@@ -30,10 +30,12 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 
 ## Work Packages
 
-| work_package_id | program_id | status | current_gate | is_active | active_marker_reason |
-|-----------------|-------------|--------|--------------|-----------|----------------------|
-| S001-P001-WP001 | S001-P001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
-| S001-P001-WP002 | S001-P001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
+כל חבילת עבודה = sub של תוכנית. סדר: לפי program_id (Program Registry) ואז work_package_id.
+
+| program_id | work_package_id | status | current_gate | is_active | active_marker_reason |
+|------------|-----------------|--------|--------------|-----------|----------------------|
+| S001-P001 | S001-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
+| S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 
 **Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_work_package_id=N/A`; `last_closed_work_package_id=S001-P001-WP002` (GATE_8 PASS 2026-02-23). No row has `is_active=true`.
 

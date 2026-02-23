@@ -41,6 +41,11 @@ DOMAIN_LABEL_PREFIX = "portfolio-domain-"
 PARENT_STAGE_LABEL_PREFIX = "portfolio-parent-stage-"
 PARENT_PROGRAM_LABEL_PREFIX = "portfolio-parent-program-"
 
+# נושאים שלא בקנון — ממתין לסיווג, תחת "שלב" וירטואלי
+AWAITING_CLASSIFICATION_LABEL = "portfolio-awaiting-classification"
+UNCLASSIFIED_STAGE_LABEL = "portfolio-parent-stage-UNCLASSIFIED"
+
+# רק תוויות מהקנון — כל השאר יוסרו מנושאים; אופציונלי: ניקוי תוויות מהרפו
 LABEL_COLORS = {
     MANAGED_LABEL: "1f6feb",
     "portfolio-runtime": "8250df",
@@ -56,6 +61,8 @@ LABEL_COLORS = {
     "portfolio-domain-SHARED": "6e7781",
     "portfolio-domain-TIKTRACK": "1d76db",
     "portfolio-domain-AGENTS_OS": "8250df",
+    AWAITING_CLASSIFICATION_LABEL: "e99695",
+    UNCLASSIFIED_STAGE_LABEL: "6e7781",
 }
 
 
@@ -123,14 +130,9 @@ class GhRepo:
             {"title": item.title, "body": item.body, "labels": item.labels},
         )
 
-    def update_issue(self, number: int, item: IssueItem, keep_labels: List[str]) -> dict:
-        managed = set([MANAGED_LABEL, *TYPE_LABELS.values(), *STATUS_LABELS.values()])
-        # Domain and parent labels are managed (replaced on update)
-        for lb in keep_labels:
-            if lb.startswith(DOMAIN_LABEL_PREFIX) or lb.startswith(PARENT_STAGE_LABEL_PREFIX) or lb.startswith(PARENT_PROGRAM_LABEL_PREFIX):
-                managed.add(lb)
-        preserved = [lb for lb in keep_labels if lb not in managed]
-        labels = sorted(set(preserved + item.labels))
+    def update_issue(self, number: int, item: IssueItem, keep_labels: Optional[List[str]] = None) -> dict:
+        # רק תוויות מהקנון — מחליפים את כל התוויות (ללא שימור תגיות ישנות)
+        labels = sorted(set(item.labels))
         return self._request(
             "PATCH",
             f"/issues/{number}",
@@ -144,6 +146,24 @@ class GhRepo:
 
     def close_issue(self, number: int) -> dict:
         return self._request("PATCH", f"/issues/{number}", {"state": "closed"})
+
+    def list_repo_labels(self) -> List[dict]:
+        out: List[dict] = []
+        page = 1
+        while True:
+            batch = self._request("GET", f"/labels?per_page=100&page={page}")
+            if not isinstance(batch, list) or not batch:
+                break
+            out.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+        return out
+
+    def delete_label(self, name: str) -> None:
+        # DELETE /repos/{owner}/{repo}/labels/{name} — name must be URL-encoded
+        from urllib.parse import quote
+        self._request("DELETE", f"/labels/{quote(name, safe='')}")
 
 
 def _status_label_for_stage(status: str) -> str:
@@ -252,7 +272,7 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
         items.append(
             IssueItem(
                 key=runtime_key,
-                title=f"[RUNTIME] {runtime.get('current_gate','N/A')} | active_wp={runtime.get('active_work_package_id','N/A')}",
+                title=f"Runtime — {runtime.get('current_gate','N/A')}",
                 body=runtime_body,
                 labels=[MANAGED_LABEL, TYPE_LABELS["runtime"], STATUS_LABELS["active"]],
                 state="open",
@@ -288,10 +308,12 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
             MANAGED_LABEL, TYPE_LABELS["stage"], _status_label_for_stage(status),
             f"{DOMAIN_LABEL_PREFIX}SHARED",
         ]
+        # כותרת פשוטה: שם השלב מהקנון
+        stage_title = (stage.get("stage_name") or sid or "Stage").strip()
         items.append(
             IssueItem(
                 key=key,
-                title=f"[P{s_ord:02d}][STAGE] {sid} | {stage.get('stage_name','')} | {status}",
+                title=stage_title,
                 body=body,
                 labels=stage_labels,
                 state=_state_for_stage(status),
@@ -347,10 +369,12 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
             f"{DOMAIN_LABEL_PREFIX}{domain}",
             f"{PARENT_STAGE_LABEL_PREFIX}{stage_id}",
         ]
+        # כותרת פשוטה: שם התוכנית מהקנון
+        program_title = (program.get("program_name") or pid or "Program").strip()
         items.append(
             IssueItem(
                 key=key,
-                title=f"[P{s_ord:02d}.{p_ord:02d}][PROGRAM] {pid} | {program.get('program_name','')} | {status}",
+                title=program_title,
                 body=body,
                 labels=program_labels,
                 state=_state_for_program(status),
@@ -409,10 +433,12 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
             f"{PARENT_STAGE_LABEL_PREFIX}{stage_id}",
             f"{PARENT_PROGRAM_LABEL_PREFIX}{program_id}",
         ]
+        # כותרת פשוטה: מזהה חבילת העבודה
+        wp_title = wid or f"WP {program_id}"
         items.append(
             IssueItem(
                 key=key,
-                title=f"[P{s_ord:02d}.{p_ord:02d}.{w_ord:03d}][WP] {wid} | {status} | {wp.get('current_gate','')}",
+                title=wp_title,
                 body=body,
                 labels=wp_labels,
                 state=_state_for_wp(status),
@@ -449,6 +475,11 @@ def main() -> int:
         help="Close managed issues whose key is no longer present in snapshot",
     )
     parser.add_argument("--dry-run", action="store_true", help="Do not write changes")
+    parser.add_argument(
+        "--clean-repo-labels",
+        action="store_true",
+        help="Remove from repo any portfolio-* label not in canon (keeps only labels we use)",
+    )
     args = parser.parse_args()
 
     token = os.getenv("GITHUB_TOKEN")
@@ -462,16 +493,36 @@ def main() -> int:
     snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
     items = build_issue_items(snapshot, scope=args.scope)
 
-    all_labels = set(LABEL_COLORS)
+    # רק תוויות מהקנון — מגדירים רק את אלה
+    canon_labels = set(LABEL_COLORS)
     for item in items:
-        all_labels.update(item.labels)
+        canon_labels.update(item.labels)
     default_label_color = "ededed"
-    for label in sorted(all_labels):
+    for label in sorted(canon_labels):
         color = LABEL_COLORS.get(label, default_label_color)
         if args.dry_run:
             print(f"[dry-run] ensure label {label}")
         else:
             gh.ensure_label(label, color)
+
+    # אופציונלי: מחיקת תוויות portfolio-* ברפו שלא בקנון (ניקוי מתגים מניסויים)
+    if args.clean_repo_labels:
+        repo_labels = gh.list_repo_labels()
+        for rl in repo_labels:
+            name = (rl.get("name") or "").strip()
+            if not name.startswith("portfolio-"):
+                continue
+            if name in canon_labels:
+                continue
+            if args.dry_run:
+                print(f"[dry-run] delete repo label {name}")
+            else:
+                try:
+                    gh.delete_label(name)
+                    print(f"Deleted repo label: {name}")
+                except urllib.error.HTTPError as e:
+                    if e.code != 404:
+                        raise
 
     existing = gh.list_managed_issues()
     by_key: Dict[str, List[dict]] = {}
@@ -508,56 +559,61 @@ def main() -> int:
             continue
 
         issue_number = current["number"]
-        current_labels = [lb["name"] for lb in current.get("labels", [])]
         if args.dry_run:
             print(f"[dry-run] update issue #{issue_number} for {item.key}: {item.title}")
         else:
-            gh.update_issue(issue_number, item, keep_labels=current_labels)
+            gh.update_issue(issue_number, item)
         updated += 1
 
+    # כפילויות: שומרים רק נושא אחד לכל key, סוגרים את השאר
     if args.close_stale:
-        # Close duplicate issues first (same key).
         for dup in duplicate_issues:
             dup_number = dup["number"]
-            dup_state = dup.get("state", "open")
-            if dup_state == "closed":
+            if dup.get("state", "open") == "closed":
                 continue
             if args.dry_run:
-                print(f"[dry-run] close duplicate issue #{dup_number} (same portfolio_key)")
+                print(f"[dry-run] close duplicate issue #{dup_number}")
             else:
                 gh.close_issue(dup_number)
             closed_duplicates += 1
 
-        # Close keyless managed issues (orphaned legacy cards).
-        for keyless in keyless_issues:
-            keyless_number = keyless["number"]
-            keyless_state = keyless.get("state", "open")
-            if keyless_state == "closed":
-                continue
-            if args.dry_run:
-                print(f"[dry-run] close keyless managed issue #{keyless_number} (missing portfolio_key)")
-            else:
-                gh.close_issue(keyless_number)
-            closed_keyless += 1
+    # נושאים שלא בקנון: לא סוגרים — מסמנים "ממתין לסיווג" ותחת שלב UNCLASSIFIED
+    unclassified_labels = [
+        MANAGED_LABEL,
+        AWAITING_CLASSIFICATION_LABEL,
+        UNCLASSIFIED_STAGE_LABEL,
+    ]
+    unclassified_body = "סטטוס: ממתין לסיווג. נושא זה אינו מופיע בקנון (Roadmap/Program/WP Registry) ויוקצה לשלב לאחר סיווג."
 
-        for stale_key, stale_issue in index.items():
-            if stale_key in desired_keys:
-                continue
-            stale_number = stale_issue["number"]
-            stale_state = stale_issue.get("state", "open")
-            if stale_state == "closed":
-                continue
-            if args.dry_run:
-                print(f"[dry-run] close stale issue #{stale_number} for {stale_key}")
-            else:
-                gh.close_issue(stale_number)
-            closed_stale += 1
+    def mark_unclassified(issue: dict) -> None:
+        num = issue["number"]
+        current_title = (issue.get("title") or "").strip()
+        new_title = f"ממתין לסיווג — {current_title}" if current_title and not current_title.startswith("ממתין לסיווג") else (current_title or "ממתין לסיווג")
+        item = IssueItem(key="", title=new_title, body=unclassified_body, labels=unclassified_labels, state="open")
+        if args.dry_run:
+            print(f"[dry-run] mark unclassified issue #{num}: {new_title}")
+        else:
+            gh.update_issue(num, item)
+
+    for keyless in keyless_issues:
+        if keyless.get("state", "open") == "closed":
+            continue
+        mark_unclassified(keyless)
+        closed_keyless += 1
+
+    for stale_key, stale_issue in index.items():
+        if stale_key in desired_keys:
+            continue
+        if stale_issue.get("state", "open") == "closed":
+            continue
+        mark_unclassified(stale_issue)
+        closed_stale += 1
 
     print(
         "Portfolio sync completed: "
         f"scope={args.scope}, created={created}, updated={updated}, "
-        f"closed_duplicates={closed_duplicates}, closed_keyless={closed_keyless}, "
-        f"closed_stale={closed_stale}, total={len(items)}"
+        f"closed_duplicates={closed_duplicates}, unclassified_keyless={closed_keyless}, "
+        f"unclassified_stale={closed_stale}, total_canon={len(items)}"
     )
     return 0
 

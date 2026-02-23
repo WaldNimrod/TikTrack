@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Update canonical portfolio tables (Roadmap, Program Registry, WP Registry) from GitHub Issues.
 
-Reads all issues with label portfolio-pipeline, parses hierarchy and fields from labels/body,
-merges with existing table content (preserves fields not set from issues), writes back the
-three markdown files. Run from repo root; requires GITHUB_TOKEN and GITHUB_REPOSITORY.
+Full reset: reads all issues with label portfolio-pipeline, parses hierarchy and fields from
+labels/body, and overwrites the three markdown tables exactly with that data (no merge with
+existing content). Run from repo root; requires GITHUB_TOKEN and GITHUB_REPOSITORY.
 """
 
 from __future__ import annotations
@@ -107,8 +107,13 @@ def _extract_key(body: str) -> Optional[str]:
 
 
 def _body_field(body: str, name: str) -> str:
+    # Backtick-enclosed value (preferred)
     m = re.search(rf"-\s*{re.escape(name)}:\s*`([^`]*)`", body)
-    return (m.group(1).strip() if m else "")
+    if m:
+        return m.group(1).strip()
+    # Plain value to end of line (e.g. planned_scope, stage_name from sync script)
+    m2 = re.search(rf"-\s*{re.escape(name)}:\s*(.+?)(?:\n|$)", body, re.DOTALL)
+    return m2.group(1).strip() if m2 else ""
 
 
 def _label_value(labels: List[str], prefix: str) -> str:
@@ -130,7 +135,7 @@ def _status_from_labels(labels: List[str]) -> str:
             return "ACTIVE"
         if "complete" in s or "closed" in s:
             return "CLOSED" if "closed" in s else "COMPLETE"
-        if "hold" in s:
+        if "hold" in s or "frozen" in s:
             return "HOLD"
         if "in_progress" in s:
             return "IN_PROGRESS"
@@ -156,9 +161,10 @@ def parse_issues(issues: List[dict]) -> Tuple[List[Dict[str, str]], List[Dict[st
             sid = key.replace("stage:", "").strip()
             planned_scope = _body_field(body, "planned_scope") or _body_field(body, "planned scope")
             status = _status_from_labels(labels) or ("COMPLETED" if state == "closed" else "ACTIVE" if "active" in (title + body).lower() else "PLANNED")
+            stage_name = _body_field(body, "stage_name") or title or sid
             stages_by_id[sid] = {
                 "stage_id": sid,
-                "stage_name": title or sid,
+                "stage_name": stage_name,
                 "planned_scope": planned_scope or "—",
                 "status": status,
             }
@@ -170,11 +176,12 @@ def parse_issues(issues: List[dict]) -> Tuple[List[Dict[str, str]], List[Dict[st
             if domain == "SHARED":
                 domain = "TIKTRACK"
             gate = _body_field(body, "current_gate_mirror") or "—"
-            status = _status_from_labels(labels) or ("COMPLETE" if state == "closed" else "FROZEN" if "hold" in (title + body).lower() else "ACTIVE")
+            status = _status_from_labels(labels) or ("COMPLETE" if state == "closed" else "HOLD" if "hold" in (title + body).lower() else "ACTIVE")
+            program_name = _body_field(body, "program_name") or title or pid
             programs_by_id[pid] = {
                 "stage_id": stage_id,
                 "program_id": pid,
-                "program_name": title or pid,
+                "program_name": program_name,
                 "domain": domain.upper(),
                 "status": status,
                 "current_gate_mirror": gate,
@@ -214,63 +221,16 @@ def parse_issues(issues: List[dict]) -> Tuple[List[Dict[str, str]], List[Dict[st
     return stages, programs, wps
 
 
-def read_existing_table(path: Path, heading: str) -> Tuple[List[str], List[Dict[str, str]]]:
-    text = path.read_text(encoding="utf-8")
-    marker = f"## {heading}"
-    start = text.find(marker)
-    if start < 0:
-        return [], []
-    block = text[start + len(marker) :]
-    next_h = block.find("\n## ")
-    if next_h >= 0:
-        block = block[:next_h]
-    lines = [ln.rstrip() for ln in block.splitlines()]
-    table_lines = [ln for ln in lines if ln.strip().startswith("|")]
-    if len(table_lines) < 2:
-        return [], []
-    header = [c.strip() for c in table_lines[0].strip().strip("|").split("|")]
-    rows = []
-    for ln in table_lines[1:]:
-        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
-        if all(re.fullmatch(r"[-:]+", c.replace(" ", "")) for c in cells):
-            continue
-        if len(cells) < len(header):
-            cells += [""] * (len(header) - len(cells))
-        rows.append(dict(zip(header, cells)))
-    return header, rows
-
-
 def _stage_sort_key(sid: str) -> tuple:
     m = re.search(r"S-?(\d+)$", (sid or "").upper())
     n = int(m.group(1)) if m else 999
     return (-1 if sid and "S-" in sid.upper() else 1, n)
 
 
-def merge_stages(from_issues: List[Dict[str, str]], existing_header: List[str], existing_rows: List[Dict[str, str]]) -> List[Dict[str, str]]:
-    by_id = {r.get("stage_id", ""): r for r in existing_rows if r.get("stage_id")}
-    for r in from_issues:
-        sid = r.get("stage_id", "")
-        if sid:
-            by_id[sid] = {**by_id.get(sid, {}), **r}
-    return sorted(by_id.values(), key=lambda r: _stage_sort_key(r.get("stage_id", "")))
-
-
-def merge_programs(from_issues: List[Dict[str, str]], existing_header: List[str], existing_rows: List[Dict[str, str]]) -> List[Dict[str, str]]:
-    by_id = {r.get("program_id", ""): r for r in existing_rows if r.get("program_id")}
-    for r in from_issues:
-        pid = r.get("program_id", "")
-        if pid:
-            by_id[pid] = {**by_id.get(pid, {}), **r}
-    return sorted(by_id.values(), key=lambda r: (_stage_sort_key(r.get("stage_id", "")), r.get("program_id", "")))
-
-
-def merge_wps(from_issues: List[Dict[str, str]], existing_header: List[str], existing_rows: List[Dict[str, str]]) -> List[Dict[str, str]]:
-    by_id = {r.get("work_package_id", ""): r for r in existing_rows if r.get("work_package_id")}
-    for r in from_issues:
-        wid = r.get("work_package_id", "")
-        if wid:
-            by_id[wid] = {**by_id.get(wid, {}), **r}
-    return sorted(by_id.values(), key=lambda r: (r.get("program_id", ""), r.get("work_package_id", "")))
+# Canonical table headers (full reset uses only these)
+ROADMAP_HEADER = ["stage_id", "stage_name", "planned_scope", "status"]
+PROGRAM_HEADER = ["stage_id", "program_id", "program_name", "domain", "status", "current_gate_mirror"]
+WP_HEADER = ["program_id", "work_package_id", "status", "current_gate", "is_active", "active_marker_reason"]
 
 
 def table_to_markdown(header: List[str], rows: List[Dict[str, str]]) -> str:
@@ -320,41 +280,32 @@ def main() -> int:
     issues = list_issues(owner, name, token)
     stages_issues, programs_issues, wps_issues = parse_issues(issues)
 
-    # Merge with existing tables
-    road_header, road_rows = read_existing_table(ROADMAP_PATH, "Stages (catalog)")
-    if not road_header:
-        road_header = ["stage_id", "stage_name", "planned_scope", "status"]
-    stages = merge_stages(stages_issues, road_header, road_rows) if stages_issues else road_rows
-
-    prog_header, prog_rows = read_existing_table(PROGRAM_PATH, "Programs")
-    if not prog_header:
-        prog_header = ["stage_id", "program_id", "program_name", "domain", "status", "current_gate_mirror"]
-    programs = merge_programs(programs_issues, prog_header, prog_rows) if programs_issues else prog_rows
-
-    wp_header, wp_rows = read_existing_table(WP_PATH, "Work Packages")
-    if not wp_header:
-        wp_header = ["program_id", "work_package_id", "status", "current_gate", "is_active", "active_marker_reason"]
-    wps = merge_wps(wps_issues, wp_header, wp_rows) if wps_issues else wp_rows
-
+    # Full reset: overwrite each table exactly with data from Issues (no merge)
     changed = False
-    if stages:
-        tbl = table_to_markdown(road_header, stages)
+    if stages_issues:
+        tbl = table_to_markdown(ROADMAP_HEADER, stages_issues)
         if replace_table_in_file(ROADMAP_PATH, "Stages (catalog)", tbl):
             changed = True
             print("Updated Roadmap (Stages)")
-    if programs:
-        tbl = table_to_markdown(prog_header, programs)
+    else:
+        print("No stage issues found — Roadmap table unchanged")
+    if programs_issues:
+        tbl = table_to_markdown(PROGRAM_HEADER, programs_issues)
         if replace_table_in_file(PROGRAM_PATH, "Programs", tbl):
             changed = True
             print("Updated Program Registry")
-    if wps:
-        tbl = table_to_markdown(wp_header, wps)
+    else:
+        print("No program issues found — Program Registry unchanged")
+    if wps_issues:
+        tbl = table_to_markdown(WP_HEADER, wps_issues)
         if replace_table_in_file(WP_PATH, "Work Packages", tbl):
             changed = True
             print("Updated Work Package Registry")
+    else:
+        print("No work-package issues found — WP Registry unchanged")
 
     if not changed:
-        print("No table changes (issues match existing tables or no portfolio issues found)")
+        print("No table changes (data matched existing or no portfolio issues)")
     return 0
 
 

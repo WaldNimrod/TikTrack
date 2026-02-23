@@ -30,6 +30,20 @@
 
 **הערה:** הסנכרון ל-GitHub Issues (לצורך תצוגת הפרויקט) רץ רק ב-workflow_dispatch או ב-push ל-**main** (default branch), לא ב-push לענפים אחרים.
 
+### כיוון הפוך: עדכון טבלאות מ-Issues
+
+כשמעדכנים **Issues** ב-GitHub (כותרות, תוויות, היררכיה) — ניתן לעדכן את טבלאות הקנון בהתאם.
+
+- **קובץ:** `.github/workflows/portfolio-sync-from-issues.yml`
+- **מופעל:** **ידני** — Actions → **Portfolio Sync From Issues** → Run workflow
+- **פעולה:** קורא את כל ה-Issues עם תווית `portfolio-pipeline`, מחלץ מהם שלבים/תוכניות/חבילות עבודה (מהכותרת, מה-body ומהתוויות), ממזג עם הטבלאות הקיימות, ומעדכן את הקבצים:
+  - `PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` (Stages)
+  - `PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` (Programs)
+  - `PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md` (Work Packages)
+- אם היו שינויים — ה-workflow עושה commit ו-push אוטומטי.
+
+**סקריפט:** `scripts/portfolio/update_tables_from_github_issues.py` (ניתן להריץ גם מקומית עם `GITHUB_TOKEN` ו-`GITHUB_REPOSITORY`).
+
 ---
 
 ## 2. איפה רואים את מפת הדרכים בהיררכיה

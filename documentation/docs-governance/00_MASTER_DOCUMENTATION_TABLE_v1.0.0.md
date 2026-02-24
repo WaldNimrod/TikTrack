@@ -27,9 +27,8 @@
 |---------|----------|-------------|------|
 | PHOENIX_MASTER_WSM | Work State — היררכיה, חוקי שערים, **בלוק CURRENT_OPERATIONAL_STATE** (מקור יחיד לסטטוס שער פעיל, current gate, last_gate_event) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
 | PHOENIX_MASTER_SSM | System State — סמכויות, היררכיה קנונית, מספור, חוקי קידום ולידציה; **אין** סטטוס שוטף (רק ב־WSM) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | v1.0.0 (מבנה v2.3.0) |
-| PHOENIX_UNIFIED_MODULAR_ROADMAP | מפת דרכים (רמה 1); נרטיב אסטרטגי; קישורי Level-2 | `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md` | V2_1 |
+| PHOENIX_PORTFOLIO_ROADMAP | מפת דרכים אחת (קטלוג שלבים, נרטיב, Level-2, חלוקת עמודים) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | v1.0.0 |
 | PORTFOLIO_INDEX | כניסה לשכבת Portfolio קנונית (Roadmap/Program/WP — ללא Task) | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | 2026-02-23 |
-| PHOENIX_PORTFOLIO_ROADMAP | קטלוג Stage קנוני (מפת דרכים אחת — רמת Stage בלבד) | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | v1.0.0 |
 | PHOENIX_PROGRAM_REGISTRY | רג'יסטר תכניות (חד־דומיין); current_gate_mirror מ־WSM | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | v1.0.0 |
 | PHOENIX_WORK_PACKAGE_REGISTRY | רג'יסטר חבילות עבודה; current_gate, is_active, NO_ACTIVE_WORK_PACKAGE | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md` | v1.0.0 |
 | PORTFOLIO_WSM_SYNC_RULES | חוזה סנכרון: עדכון WSM → עדכון mirror ברג'יסטרים | `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md` | v1.0.0 |

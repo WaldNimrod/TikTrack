@@ -4,7 +4,7 @@
 **id:** `TEAM_10_MASTER_TASK_LIST`  
 **היררכיית ניהול:** **רמה 2** — בין מפת הדרכים (רמה 1) לתוכניות ביצוע לצוותים (רמה 3). חובה תאום מלא בין הרמות — ראה נוהל.  
 **owner:** Team 10 בלבד — אף צוות אחר לא רשאי לכתוב לקובץ זה  
-**מפת דרכים (רמה 1):** Roadmap v2.1 — `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`  
+**מפת דרכים (רמה 1):** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md`  
 **נוהל ניהול:** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`  
 **רג'יסטרי רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md`  
 **רשימת השלמות רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`  

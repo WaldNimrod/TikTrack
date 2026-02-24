@@ -5,7 +5,7 @@
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **SSOT - MANDATORY**  
 **תאריך:** 2026-02-15  
-**מקור:** החלטת G-Lead — יישור מטריצה, Page Tracker, תפריט, סקופ צוות 31
+**מקור:** החלטת G-Lead — יישור מטריצה, תפריט, סקופ צוות 31. חלוקה לשלבים: PHOENIX_PORTFOLIO_ROADMAP (סעיף "חלוקת עמודים לשלבים").
 
 ---
 
@@ -116,7 +116,7 @@
 
 | מסמך | נתיב |
 |------|------|
-| Page Tracker | documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md |
+| חלוקת עמודים לשלבים | documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md (סעיף "חלוקת עמודים לשלבים") |
 | מטריצה P3-003 | _COMMUNICATION/team_10/TEAM_10_P3_003_BLUEPRINT_SCOPE_AND_DRIFT_MATRIX.md |
 | טבלת השוואה | _COMMUNICATION/team_10/TEAM_10_P3_003_PAGES_COMPARISON_TABLE.md |
 | routes.json | ui/public/routes.json |

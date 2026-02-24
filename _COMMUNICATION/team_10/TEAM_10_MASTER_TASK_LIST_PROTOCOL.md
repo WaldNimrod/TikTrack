@@ -212,7 +212,7 @@
 ## 6. מפת דרכים (SSOT)
 
 - **מקור:** מפת הדרכים המחייבת היא זו שאושרה ע"י Team 90 / אדריכל (נכון לעכשיו: Roadmap v2.1).
-- **קישור:** `_COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md`
+- **קישור:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md`
 - **חובה:** מפת הדרכים כוללת קישור **לכל** רשימות רמה 2 + סטטוס סופי לכל רשימה.
 - עמודת **"שלב"** ברשימה תעודכן בהתאם לשלבים המופיעים במפת הדרכים.
 

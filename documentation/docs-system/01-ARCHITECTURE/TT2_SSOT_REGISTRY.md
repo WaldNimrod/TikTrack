@@ -263,7 +263,7 @@
 
 - **Header Unification Mandate:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md`
 - **תוכנית מימוש (ארכיון):** `archive/documentation_legacy/snapshots/2026-02-18_0200/documentation/docs-system/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md`
-- **Page Tracker:** `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
+- **חלוקת עמודים לשלבים:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` (סעיף חלוקת עמודים); **רשימת עמודים:** `documentation/docs-system/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md`
 
 ---
 

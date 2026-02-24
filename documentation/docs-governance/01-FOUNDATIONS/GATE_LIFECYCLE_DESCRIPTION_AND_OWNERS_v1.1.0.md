@@ -21,17 +21,21 @@ Canonical readable description of lifecycle GATE_0..GATE_8, owners, WSM ownershi
 
 ## Gate table (approved model)
 
-| Gate ID | Gate Name | Gate Owner | WSM Owner |
-|---|---|---|---|
-| GATE_0 | SPEC_ARC (LOD 200) | Team 190 | Team 190 |
-| GATE_1 | SPEC_LOCK (LOD 400) | Team 190 | Team 190 |
-| GATE_2 | ARCHITECTURAL_SPEC_VALIDATION | Team 190 | Team 190 |
-| GATE_3 | IMPLEMENTATION | Team 10 | Team 10 |
-| GATE_4 | QA | Team 10 | Team 10 |
-| GATE_5 | DEV_VALIDATION | Team 90 | Team 90 |
-| GATE_6 | ARCHITECTURAL_DEV_VALIDATION | Team 90 | Team 90 |
-| GATE_7 | HUMAN_UX_APPROVAL | Team 90 | Team 90 |
-| GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 90 | Team 90 |
+| Gate ID | Gate Name | Gate Owner (execution) | Approval authority | WSM Owner |
+|---------|-----------|------------------------|--------------------|-----------|
+| GATE_0 | SPEC_ARC (LOD 200) | Team 190 | — | Team 190 |
+| GATE_1 | SPEC_LOCK (LOD 400) | Team 190 | — | Team 190 |
+| GATE_2 | ARCHITECTURAL_SPEC_VALIDATION **(Intent gate)** | Team 190 | **Team 100** | Team 190 |
+| GATE_3 | IMPLEMENTATION | Team 10 | — | Team 10 |
+| GATE_4 | QA | Team 10 | — | Team 10 |
+| GATE_5 | DEV_VALIDATION | Team 90 | — | Team 90 |
+| GATE_6 | ARCHITECTURAL_DEV_VALIDATION **(Reality gate)** | Team 90 | **Team 100** | Team 90 |
+| GATE_7 | HUMAN_UX_APPROVAL | Team 90 | — | Team 90 |
+| GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 90 | — | Team 90 |
+
+**Locked semantics (Team 100 directive 2026-02-24):**  
+- **GATE_2 (Intent):** "האם אנחנו מאשרים לבנות את זה?" — Team 100 approves final SPEC before execution.  
+- **GATE_6 (Reality):** "האם מה שנבנה הוא מה שאישרנו?" — Team 100 approves post-execution package; verifies build matches intent approved at GATE_2.
 
 WSM ownership matrix reference: `_COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md`.
 
@@ -61,11 +65,11 @@ Reference: `_COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md`.
 |---|---|---|---|---|---|---|
 | GATE_0 | YES (idea intake + alignment) | YES (Architects + Team 190) | YES (contracted by GATE_0_1_2 spec lifecycle contract) | YES (PASS/REJECT) | YES (to GATE_1 Team 190) | COMPLETE |
 | GATE_1 | YES (LOD400 lock) | YES (Team 170 + Team 190 loop) | YES (contracted by GATE_0_1_2 spec lifecycle contract) | YES | YES (to GATE_2 Team 190) | COMPLETE |
-| GATE_2 | YES (architectural SPEC review) | YES (Team 190 + architect interface) | YES (contracted by GATE_0_1_2 spec lifecycle contract) | YES (approved/rejected) | YES (to GATE_3 Team 10) | COMPLETE |
+| GATE_2 | YES (architectural SPEC review — **Intent gate**) | YES (Team 190 + Team 100 approval authority) | YES (contracted by GATE_0_1_2 spec lifecycle contract) | YES (approved/rejected) | YES (to GATE_3 Team 10) | COMPLETE |
 | GATE_3 | YES | YES (Team 10 + Team 90 at G3.5 + teams 20/30/40/60) | YES (work package, validation response, gate3 exit) | YES | YES (to GATE_4 Team 10) | COMPLETE |
 | GATE_4 | YES | YES (Team 10 + Team 50 QA) | YES (QA handover/report) | YES | YES (to GATE_5 Team 90) | COMPLETE |
 | GATE_5 | YES | YES (Team 10 request, Team 90 validation) | YES (validation request/response) | YES | YES (to GATE_6 Team 90) | COMPLETE |
-| GATE_6 | YES | YES (Team 90 + Team 100/00 architects path; rejection routes) | YES (submission package + decision + route protocol) | YES | YES (to GATE_7 Team 90 or back loops) | COMPLETE |
+| GATE_6 | YES (**Reality gate** — verify build matches GATE_2 intent) | YES (Team 90 + Team 100 approval authority; rejection routes) | YES (submission package + decision + route protocol) | YES | YES (to GATE_7 Team 90 or back loops) | COMPLETE |
 | GATE_7 | YES | YES (Team 90 + Nimrod) | YES (contracted by GATE_7 human UX approval contract) | YES | YES (to GATE_8 Team 90) | COMPLETE |
 | GATE_8 | YES | YES (Team 70 executes, Team 90 validates) | YES (AS_MADE + closure validation package) | YES | YES (lifecycle closed) | COMPLETE |
 

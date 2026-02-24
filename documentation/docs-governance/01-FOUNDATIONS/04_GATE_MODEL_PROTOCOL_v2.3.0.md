@@ -99,24 +99,40 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 |---------|------------|-------------------|
 | GATE_0 | SPEC_ARC (LOD 200) | Team 190 |
 | GATE_1 | SPEC_LOCK (LOD 400) | Team 190 |
-| GATE_2 | ARCHITECTURAL_SPEC_VALIDATION | Team 190 |
+| GATE_2 | ARCHITECTURAL_SPEC_VALIDATION (Intent gate) | Team 190 (execution); **approval authority: Team 100** |
 | GATE_3 | IMPLEMENTATION | Team 10 |
 | GATE_4 | QA | Team 10 |
 | GATE_5 | DEV_VALIDATION | Team 90 |
-| GATE_6 | ARCHITECTURAL_DEV_VALIDATION | Team 90 |
+| GATE_6 | ARCHITECTURAL_DEV_VALIDATION (Reality gate) | Team 90 (execution); **approval authority: Team 100** |
 | GATE_7 | HUMAN_UX_APPROVAL | Team 90 |
 | GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 90 |
 
 **WSM ownership (deterministic):** Gates 0–2: Team 190 updates WSM. Gates 3–4: Team 10 updates WSM. Gates 5–8: Team 90 updates WSM. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md.
 
+**Approval authority (Team 100):** At **GATE_2** and **GATE_6**, **Team 100** (Development Architecture Authority) holds architectural approval authority; execution and WSM update remain with Team 190 (GATE_2) and Team 90 (GATE_6) per table above.
+
 ---
 
 ## 4. GATE_0 … GATE_7 (semantics per canonical table §3)
 
-GATE_0 (SPEC_ARC), GATE_1 (SPEC_LOCK), GATE_2 (ARCHITECTURAL_SPEC_VALIDATION): Owner Team 190.  
+GATE_0 (SPEC_ARC), GATE_1 (SPEC_LOCK), GATE_2 (ARCHITECTURAL_SPEC_VALIDATION): Execution owner Team 190; **GATE_2 approval authority: Team 100**.  
 GATE_3 (IMPLEMENTATION), GATE_4 (QA): Owner Team 10.  
-GATE_5 (DEV_VALIDATION), GATE_6 (ARCHITECTURAL_DEV_VALIDATION), GATE_7 (HUMAN_UX_APPROVAL): Owner Team 90.  
+GATE_5 (DEV_VALIDATION), GATE_6 (ARCHITECTURAL_DEV_VALIDATION), GATE_7 (HUMAN_UX_APPROVAL): Execution owner Team 90; **GATE_6 approval authority: Team 100**.  
 Trigger, Purpose, PASS/FAIL, and constraints per runbook and WSM ownership matrix.
+
+### 4.2 GATE_2 — Intent gate (locked semantics)
+
+**GATE_2** = אישור אדריכלי של האפיון הסופי. Team 100 בוחן ומאשר את ה-SPEC לפני מעבר לשלב ביצוע. **שער כוונה** — האדריכל מאשר **מה שמתכוונים לבנות**.
+
+**Locked distinction:**  
+**GATE_2:** "האם אנחנו מאשרים לבנות את זה?"
+
+### 4.3 GATE_6 — Reality gate (locked semantics)
+
+**GATE_6** = בדיקה אדריכלית של **מה שנבנה בפועל**. לאחר ביצוע, חבילת Execution חוזרת ל-Team 100 לאישור. **שער מציאות** — האדריכל מאמת ש**מה שנבנה תואם את הכוונה שאושרה ב-GATE_2**.
+
+**Locked distinction:**  
+**GATE_6:** "האם מה שנבנה הוא מה שאישרנו?"
 
 ### 4.1 GATE_1 — Team 170 role and LLD400 process (architect-approved)
 

@@ -19,7 +19,9 @@ Define a deterministic artifact contract for the architectural specification pha
 |---|---|---|---|---|---|---|
 | GATE_0 | Idea intake for scope/stage | Scope brief + context injection block (SSM/WSM refs) | Gate result record + WSM update record | PASS or REJECT decision recorded | PASS -> GATE_1 (Team 190) | Team 190 + Architects + Team 00/100 |
 | GATE_1 | LOD400 spec lock candidate | LLD/spec package + gap/clarification list | Gate result record + correction list (if fail) + WSM update record | LOD400 lock approved | PASS -> GATE_2 (Team 190) | Team 170 + Team 190 |
-| GATE_2 | Architect review of detailed spec | Submission package to architects + traceability table | Architect decision record + gate result record + WSM update record + handoff package to Team 10 | Architect APPROVED | PASS -> GATE_3 intake (Team 10) | Team 190 + Team 170 + Team 00/100 + Team 10 |
+| GATE_2 | Architect review of detailed spec (**Intent gate**: "האם אנחנו מאשרים לבנות את זה?") | Submission package to architects + traceability table | Architect decision record + gate result record + WSM update record + handoff package to Team 10 | Architect APPROVED | PASS -> GATE_3 intake (Team 10) | Team 190 + Team 170 + Team 00/100 + Team 10 |
+
+**Approval authority at GATE_2:** Team 100 (Development Architecture Authority) per canonical gate model. Execution and WSM update: Team 190.
 
 ---
 

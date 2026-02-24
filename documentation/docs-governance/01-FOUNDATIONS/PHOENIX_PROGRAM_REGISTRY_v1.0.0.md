@@ -41,9 +41,12 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 
 
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-23). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-24). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+
+**WSM mirror (2026-02-24):** active_stage_id=S002; active_program_id=N/A (no active program). Programs listed above are under S001; no S002 program active.
 
 ---
 
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | v1.0.0_CREATED | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_B1_B5_REMEDIATION | 2026-02-23**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_STAGE_S002_NO_ACTIVE_PROGRAM | 2026-02-24**

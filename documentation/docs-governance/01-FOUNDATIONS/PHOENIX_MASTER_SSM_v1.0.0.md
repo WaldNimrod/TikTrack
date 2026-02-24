@@ -109,7 +109,7 @@ Role contract lock:
 | Team | Role | Authority |
 |------|------|-----------|
 | **Team 00 (Chief Architect)** | Product authority (TikTrack system) | Final SPEC and EXECUTION approval authority. |
-| **Team 100 (Development Architecture Authority)** | Owner of development process architecture | Defines gate model, lifecycle contracts, orchestration rules; may approve structural/process gates within its domain; operates under strategic alignment with Team 00. |
+| **Team 100 (Development Architecture Authority)** | Architectural partner of Team 00 in domain vision and executable plans | Responsible for GATE_0 (LOD200 initial intent) and GATE_1 (SPEC submission to validation); holds **approval authority** at **GATE_2** (final spec approval) and **GATE_6** (post-execution architectural approval). Defines gate model, lifecycle contracts, and orchestration rules; operates in strategic alignment with Team 00. |
 | **Team 170** | Spec Owner | Original documents only. |
 | **Team 190** | Architectural Validator + Submission Owner | Validation and submission package ownership. |
 | **Team 70** | Documentation Authority (Execution Department Librarian) | Organizationally part of the Development Department (10-90). Exclusive writer to canonical documentation folders; may support Architecture via request flow only (no departmental reassignment). |

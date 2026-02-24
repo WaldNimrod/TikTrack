@@ -83,25 +83,24 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated upon **GATE_8 PASS** (2026-02-23). S001-P001-WP002 — documentation closure validated and lifecycle completed.
+**Gate-owner update evidence:** This block was updated **2026-02-24** — תיקון: מעבר לשלב פעיל **S002** (שלב 2); אין תוכנית או חבילת עבודה פעילה. מפת הדרכים והתוכניות מסודרות מול פרויקט גיט האב; WSM לא עודכן בעבר — מתוקן כעת.
 
 | Field | Value |
 |-------|-------|
-| active_stage_id | S001 |
-| active_stage_label | שלב 1 — Stage 1 |
-| active_flow | EXECUTION — S001-P001-WP002 lifecycle complete (DOCUMENTATION_CLOSED) |
-| active_project_domain | TIKTRACK (runtime); **Agents_OS** (Program S001-P001 completed; awaiting next authorized WP) |
-| active_work_package_id | N/A (last closed: S001-P001-WP002) |
-| in_progress_work_package_id | N/A (awaiting next authorized work package) |
-| last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; lifecycle complete; **domain: AGENTS_OS**) |
-| s001_p001_program_spec_status | GATE_1 PASS — AGENTS_OS_PHASE_1_LLD400_v1.0.0 (Team 190 validation 2026-02-22); **domain: AGENTS_OS** |
-| allowed_gate_range | DOCUMENTATION_CLOSED → READY_FOR_NEXT_WORK_PACKAGE |
-| current_gate | DOCUMENTATION_CLOSED |
-| active_program_id | S001-P001 (Agents_OS Phase 1 complete) |
-| active_plan_id | S001 |
+| active_stage_id | S002 |
+| active_stage_label | שלב 2 — Stage 2 |
+| active_flow | READY_FOR_NEXT_WORK_PACKAGE — no active program or work package |
+| active_project_domain | TIKTRACK (runtime) |
+| active_work_package_id | N/A |
+| in_progress_work_package_id | N/A |
+| last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
+| allowed_gate_range | READY_FOR_NEXT_WORK_PACKAGE → next authorized Program/WP under S002 |
+| current_gate | READY_FOR_NEXT_WORK_PACKAGE |
+| active_program_id | N/A |
+| active_plan_id | S002 |
 | phase_owner_team | Team 10 |
-| last_gate_event | GATE_8 \| PASS \| 2026-02-23 \| Documentation closure validated by Team 90 |
-| next_required_action | Team 10 may open the next authorized work package according to WSM gate order |
+| last_gate_event | WSM_CORRECTION \| 2026-02-24 \| Stage transition to S002; no active program/WP |
+| next_required_action | Team 10 may open the next authorized program/work package under Stage 2 per roadmap |
 | next_responsible_team | Team 10 |
 
 ---
@@ -155,3 +154,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_7 approved; GATE_8 activated | 2026-02-23**
 **log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | WSM_OWNER_MATRIX_PATH_DEPRECATION | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_8 PASS; DOCUMENTATION_CLOSED | 2026-02-23**
+**log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | stage_transition_S002_no_active_program_WP | 2026-02-24**

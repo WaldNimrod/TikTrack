@@ -63,12 +63,14 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 
 ---
 
-## 6) GATE_6 (ARCHITECTURAL_DEV_VALIDATION)
+## 6) GATE_6 (ARCHITECTURAL_DEV_VALIDATION — Reality gate)
+
+**Semantic lock:** GATE_6 = "האם מה שנבנה הוא מה שאישרנו?" — Team 100 (approval authority) verifies that what was built matches the intent approved at GATE_2.
 
 | Item | Content |
 |------|---------|
 | **Entry** | GATE_5 PASS. |
-| **Owner** | Team 90. |
+| **Owner** | Team 90 (execution). **Approval authority:** Team 100. |
 | **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists and WSM on PASS. |
 | **Required artifacts** | GATE_6 submission (canonical); Team 90 / architect decision; route classification per GATE_6 rejection protocol. |
 | **Exit** | GATE_6 PASS (architectural dev validation approved). |

@@ -24,7 +24,7 @@
 ## תיעוד נלווה
 
 - טבלת Routes / מיפוי A/B/C/D: `TEAM_10_VISUAL_GAPS_WORK_PLAN.md` §4.6 (תקשורת — ארכיון).
-- Page Tracker: `TT2_OFFICIAL_PAGE_TRACKER.md` — D15.V (פרופיל).
+- רשימת עמודים + חלוקה לשלבים: `TT2_PAGES_SSOT_MASTER_LIST.md`, `PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` (סעיף חלוקת עמודים) — D15.V (פרופיל).
 
 ---
 

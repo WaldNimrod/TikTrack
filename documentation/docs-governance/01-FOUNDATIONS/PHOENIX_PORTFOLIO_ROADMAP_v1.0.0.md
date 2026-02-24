@@ -48,6 +48,21 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 
 ---
 
+## Stage details (pages, server modules, client components)
+
+חובה: בכל תיאור שלב — רשימת העמודים המדויקת, מודולי השרת והקומפוננטות (לקוח) הכלולים/נדרשים לשלב.
+
+| stage_id | pages | server_modules | client_components |
+| --- | --- | --- | --- |
+| S001 | D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S002 | D22, D23 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S003 | D33, D39, D38 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S004 | D36, D37 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S005 | D24, D25, D26, D27, D28, D29 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S006 | D30, D31, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+
+---
+
 ## נרטיב וסקופ (לפי שלבים)
 
 **טקסונומיה:** רק שלבים (Stages) — אין שימוש במונח "באץ'". **דשבורדים** (כולל דף הבית): כרגע עמוד placeholder בלבד; מימוש תוכן בשלבים מאוחרים.

@@ -131,19 +131,38 @@ def _stage_number(stage_id: str) -> int:
 
 def build_snapshot() -> Dict[str, object]:
     wsm = _extract_wsm_current_state(_read_text(WSM_PATH))
-    roadmap_rows = _table_after_heading(_read_text(ROADMAP_PATH), "Stages (catalog)")
+    roadmap_text = _read_text(ROADMAP_PATH)
+    roadmap_rows = _table_after_heading(roadmap_text, "Stages (catalog)")
+    detail_rows: List[Dict[str, str]] = []
+    try:
+        detail_rows = _table_after_heading(roadmap_text, "Stage details (pages, server modules, client components)")
+    except PortfolioError:
+        pass
+    details_by_stage: Dict[str, Dict[str, str]] = {
+        r.get("stage_id", ""): {
+            "pages": r.get("pages", ""),
+            "server_modules": r.get("server_modules", ""),
+            "client_components": r.get("client_components", ""),
+        }
+        for r in detail_rows
+    }
     program_rows = _table_after_heading(_read_text(PROGRAM_PATH), "Programs")
     wp_rows = _table_after_heading(_read_text(WP_PATH), "Work Packages")
 
-    stages = [
-        {
-            "stage_id": r.get("stage_id", ""),
+    stages = []
+    for r in roadmap_rows:
+        sid = r.get("stage_id", "")
+        stage = {
+            "stage_id": sid,
             "stage_name": r.get("stage_name", ""),
             "planned_scope": r.get("planned_scope", ""),
             "status": r.get("status", ""),
         }
-        for r in roadmap_rows
-    ]
+        detail = details_by_stage.get(sid, {})
+        stage["pages"] = detail.get("pages", "")
+        stage["server_modules"] = detail.get("server_modules", "")
+        stage["client_components"] = detail.get("client_components", "")
+        stages.append(stage)
 
     programs = [
         {
@@ -196,6 +215,9 @@ def build_snapshot() -> Dict[str, object]:
             "stage_name": stage.get("stage_name", ""),
             "status": stage.get("status", ""),
             "planned_scope": stage.get("planned_scope", ""),
+            "pages": stage.get("pages", ""),
+            "server_modules": stage.get("server_modules", ""),
+            "client_components": stage.get("client_components", ""),
             "domain": "SHARED",
             "programs": [
                 {

@@ -1,0 +1,217 @@
+{
+  "generated_at_utc": "2026-02-24T12:57:00.570312+00:00",
+  "sources": {
+    "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
+    "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
+    "program_registry": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md",
+    "work_package_registry": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
+  },
+  "runtime": {
+    "active_stage_id": "S002",
+    "active_work_package_id": "N/A",
+    "in_progress_work_package_id": "N/A",
+    "current_gate": "READY_FOR_NEXT_WORK_PACKAGE",
+    "active_program_id": "N/A",
+    "last_gate_event": "WSM_CORRECTION \\",
+    "next_required_action": "Team 10 may open the next authorized program/work package under Stage 2 per roadmap",
+    "next_responsible_team": "Team 10"
+  },
+  "stages": [
+    {
+      "stage_id": "S001",
+      "stage_name": "שלב 1 — Foundations Sealed",
+      "planned_scope": "חיתום יסודות; Stage 1",
+      "status": "COMPLETED",
+      "pages": "D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    },
+    {
+      "stage_id": "S002",
+      "stage_name": "שלב 2 — השלב הפעיל",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "status": "ACTIVE",
+      "pages": "D22, D23",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    },
+    {
+      "stage_id": "S003",
+      "stage_name": "שלב 3 — Essential Data",
+      "planned_scope": "שכבת נתונים יסודית",
+      "status": "PLANNED",
+      "pages": "D33, D39, D38",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    },
+    {
+      "stage_id": "S004",
+      "stage_name": "שלב 4 — Financial Execution",
+      "planned_scope": "המעגל הפיננסי",
+      "status": "PLANNED",
+      "pages": "D36, D37",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    },
+    {
+      "stage_id": "S005",
+      "stage_name": "שלב 5 — Trades/Plans",
+      "planned_scope": "ישויות מורכבות",
+      "status": "PLANNED",
+      "pages": "D24, D25, D26, D27, D28, D29",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    },
+    {
+      "stage_id": "S006",
+      "stage_name": "שלב 6 — Advanced Analytics",
+      "planned_scope": "תובנות וניתוח",
+      "status": "PLANNED",
+      "pages": "D30, D31, D32",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
+    }
+  ],
+  "programs": [
+    {
+      "program_id": "S001-P001",
+      "program_name": "Agents_OS Phase 1",
+      "domain": "AGENTS_OS",
+      "stage_id": "S001",
+      "status": "COMPLETE",
+      "current_gate_mirror": "DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23)"
+    },
+    {
+      "program_id": "S001-P002",
+      "program_name": "Alerts POC (per SSM §5.1)",
+      "domain": "AGENTS_OS",
+      "stage_id": "S001",
+      "status": "HOLD",
+      "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)"
+    }
+  ],
+  "work_packages": [
+    {
+      "work_package_id": "S001-P001-WP001",
+      "program_id": "S001-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-22"
+    },
+    {
+      "work_package_id": "S001-P001-WP002",
+      "program_id": "S001-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-23"
+    }
+  ],
+  "hierarchy": [
+    {
+      "stage_id": "S001",
+      "stage_name": "שלב 1 — Foundations Sealed",
+      "status": "COMPLETED",
+      "planned_scope": "חיתום יסודות; Stage 1",
+      "pages": "D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": [
+        {
+          "program_id": "S001-P001",
+          "program_name": "Agents_OS Phase 1",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23)",
+          "work_packages": [
+            {
+              "work_package_id": "S001-P001-WP001",
+              "program_id": "S001-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-22"
+            },
+            {
+              "work_package_id": "S001-P001-WP002",
+              "program_id": "S001-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-23"
+            }
+          ]
+        },
+        {
+          "program_id": "S001-P002",
+          "program_name": "Alerts POC (per SSM §5.1)",
+          "domain": "AGENTS_OS",
+          "status": "HOLD",
+          "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)",
+          "work_packages": []
+        }
+      ]
+    },
+    {
+      "stage_id": "S002",
+      "stage_name": "שלב 2 — השלב הפעיל",
+      "status": "ACTIVE",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "pages": "D22, D23",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": []
+    },
+    {
+      "stage_id": "S003",
+      "stage_name": "שלב 3 — Essential Data",
+      "status": "PLANNED",
+      "planned_scope": "שכבת נתונים יסודית",
+      "pages": "D33, D39, D38",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": []
+    },
+    {
+      "stage_id": "S004",
+      "stage_name": "שלב 4 — Financial Execution",
+      "status": "PLANNED",
+      "planned_scope": "המעגל הפיננסי",
+      "pages": "D36, D37",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": []
+    },
+    {
+      "stage_id": "S005",
+      "stage_name": "שלב 5 — Trades/Plans",
+      "status": "PLANNED",
+      "planned_scope": "ישויות מורכבות",
+      "pages": "D24, D25, D26, D27, D28, D29",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": []
+    },
+    {
+      "stage_id": "S006",
+      "stage_name": "שלב 6 — Advanced Analytics",
+      "status": "PLANNED",
+      "planned_scope": "תובנות וניתוח",
+      "pages": "D30, D31, D32",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState)",
+      "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
+      "domain": "SHARED",
+      "programs": []
+    }
+  ]
+}

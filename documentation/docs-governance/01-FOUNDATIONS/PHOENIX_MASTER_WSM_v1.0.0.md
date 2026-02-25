@@ -83,24 +83,24 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 100 approval authority decision for GATE_2 (S002-P001) was issued APPROVED and Team 190 advanced flow to GATE_3 intake for Team 10 execution onboarding.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 10 acknowledged GATE_3 intake handoff (S002-P001), opened intake, and created S002-P001-WP001 work package definition. Next: G3.1–G3.5 then G3.5 validation with Team 90.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3_INTAKE_PENDING — GATE_2 APPROVED; Team 10 to open execution intake and create first active work package |
+| active_flow | GATE_3 (S002-P001) — intake opened; WP001 defined; G3.1–G3.5 in progress |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | N/A |
-| in_progress_work_package_id | N/A |
+| active_work_package_id | S002-P001-WP001 |
+| in_progress_work_package_id | S002-P001-WP001 |
 | last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
 | current_gate | GATE_3 |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | GATE_2_APPROVED \| 2026-02-25 \| Team 100 (authority) + Chief Manager override \| Team 190 execution transition to GATE_3 |
-| next_required_action | Team 10 performs GATE_3 intake for S002-P001, creates execution work-package plan (WP001 first), and issues activation mandates per runbook |
+| last_gate_event | GATE_3_INTAKE_OPENED \| 2026-02-25 \| TEAM_10_TO_TEAM_190_S002_P001_GATE3_INTAKE_ACKNOWLEDGMENT \| WP001 definition created |
+| next_required_action | Team 10: complete G3.1–G3.4 (detailed build plan); submit to Team 90 for G3.5 (work-plan validation); after PASS → G3.6 (team activation) |
 | next_responsible_team | Team 10 |
 
 ---

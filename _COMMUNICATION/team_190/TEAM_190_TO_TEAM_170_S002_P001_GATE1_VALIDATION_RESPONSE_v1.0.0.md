@@ -9,7 +9,13 @@ status: BLOCK_FOR_FIX
 gate_id: GATE_1
 scope_id: S002-P001
 in_response_to: TEAM_170_TO_TEAM_190_S002_P001_GATE_1_LLD400_VALIDATION_REQUEST_v1.0.0
+superseded_by: TEAM_190_TO_TEAM_170_S002_P001_GATE1_REVALIDATION_RESPONSE_v1.0.0
 ---
+
+## Historical status note (drift prevention)
+
+This BLOCK_FOR_FIX response is preserved for traceability.  
+Operational status is superseded by the revalidation PASS response.
 
 ## 1) Validation outcome
 

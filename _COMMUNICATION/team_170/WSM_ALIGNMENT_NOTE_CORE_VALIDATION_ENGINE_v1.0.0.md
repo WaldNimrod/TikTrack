@@ -11,6 +11,11 @@
 
 ---
 
+## Historical scope note (drift prevention)
+
+This note captures the **GATE_1 re-submission snapshot** only (state at 2026-02-25 before revalidation PASS).  
+Current runtime state must always be read from WSM canonical `CURRENT_OPERATIONAL_STATE`.
+
 ## Mandatory Identity Header
 
 | Field | Value |

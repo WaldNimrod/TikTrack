@@ -38,16 +38,18 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
 | S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (not activated; lock until S001-P001-WP001 GATE_8) |
-| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | OPEN | GATE_1 (LLD400 submitted for Team 190 validation 2026-02-24) |
+| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24) |
 
 
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-24). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-24):** active_stage_id=S002; active_program_id=N/A (no active program). S002-P001 added per Team 100 activation; LLD400 produced by Team 170 and submitted to Team 190 for GATE_1 validation. WSM update upon gate closure is Team 190 responsibility.
+**WSM mirror (2026-02-24):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_0. Team 100 submitted LOD200 concept package for S002-P001 (Agents_OS Core Validation Engine). Awaiting Team 190 GATE_0 feasibility validation. WSM update upon GATE_0 closure is Team 190 responsibility.
 
 ---
 
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | v1.0.0_CREATED | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_B1_B5_REMEDIATION | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_STAGE_S002_NO_ACTIVE_PROGRAM | 2026-02-24**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P001_ADDED_LLD400_SUBMITTED | 2026-02-24**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_CORRECTED_GATE0_LOD200_SUBMITTED | 2026-02-24**

@@ -83,25 +83,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-24** — תיקון: מעבר לשלב פעיל **S002** (שלב 2); אין תוכנית או חבילת עבודה פעילה. מפת הדרכים והתוכניות מסודרות מול פרויקט גיט האב; WSM לא עודכן בעבר — מתוקן כעת.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 190 completed GATE_0 validation for S002-P001; decision: BLOCK_FOR_FIX; package returned to Team 100 for remediation.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | READY_FOR_NEXT_WORK_PACKAGE — no active program or work package |
-| active_project_domain | TIKTRACK (runtime) |
+| active_flow | GATE_0_BLOCKED — LOD200 concept returned to Team 100 for correction (header completeness + gate model alignment + WSM alignment consistency) |
+| active_project_domain | AGENTS_OS |
 | active_work_package_id | N/A |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
-| allowed_gate_range | READY_FOR_NEXT_WORK_PACKAGE → next authorized Program/WP under S002 |
-| current_gate | READY_FOR_NEXT_WORK_PACKAGE |
-| active_program_id | N/A |
+| allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P001) |
+| current_gate | GATE_0 |
+| active_program_id | S002-P001 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 |
-| last_gate_event | WSM_CORRECTION \| 2026-02-24 \| Stage transition to S002; no active program/WP |
-| next_required_action | Team 10 may open the next authorized program/work package under Stage 2 per roadmap |
-| next_responsible_team | Team 10 |
+| phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
+| last_gate_event | GATE_0_FAIL \| 2026-02-25 \| Team 190 \| BLOCK_FOR_FIX: BF-01 header incompleteness; BF-02 PRE_GATE_3 drift; BF-03 stale WSM binding in roadmap alignment |
+| next_required_action | Team 100 corrects S002-P001 LOD200 package: (1) complete mandatory headers in all 6 files, (2) replace legacy PRE_GATE_3 with canonical G3.5-in-GATE_3 semantics, (3) align ROADMAP_ALIGNMENT WSM mirror to active_program_id=S002-P001; then resubmit to Team 190 |
+| next_responsible_team | Team 100 |
 
 ---
 
@@ -155,3 +155,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | WSM_OWNER_MATRIX_PATH_DEPRECATION | 2026-02-23**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP002 GATE_8 PASS; DOCUMENTATION_CLOSED | 2026-02-23**
 **log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | stage_transition_S002_no_active_program_WP | 2026-02-24**
+**log_entry | TEAM_100 | WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P001 activated; GATE_0 LOD200 submitted; Team 190 next | 2026-02-24**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 BLOCK_FOR_FIX for S002-P001; returned to Team 100 | 2026-02-25**

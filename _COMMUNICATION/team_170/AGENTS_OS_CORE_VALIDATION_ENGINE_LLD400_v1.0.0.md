@@ -40,7 +40,7 @@
 Program **S002-P001: Agents_OS Core Validation Engine** builds the **skeleton for the full automated gate process** by implementing two foundational validation flows:
 
 1. **Spec Validation (170→190)** — Automated structural and governance checks for LLD400 spec submissions (44 deterministic checks across 7 tiers + LLM quality gate). Every architectural spec is validated before implementation begins.
-2. **Execution Validation (10→90)** — Automated checks for work package execution submissions (11 deterministic checks across 2 tiers + LLM gate). Two-phase model: PRE_GATE_3 (work plan) and GATE_5 (execution quality).
+2. **Execution Validation (10→90)** — Automated checks for work package execution submissions (11 deterministic checks across 2 tiers + LLM gate). Two-phase model: **G3.5 within GATE_3** (work plan) and GATE_5 (execution quality).
 
 Design principles (from LOD200): deterministic first; tiered execution; evidence-by-path output; zero assumptions; template locking as foundation for TIER 2.
 
@@ -74,7 +74,7 @@ Design principles (from LOD200): deterministic first; tiered execution; evidence
 | WP | Purpose | Dependencies | High-level deliverables |
 |----|---------|--------------|-------------------------|
 | **S002-P001-WP001** | Spec Validation Engine (170→190) | None (first WP) | Shared base; LOD200/LLD400 templates (T001); 44 checks TIER 1–7; LLM gate framework; validation runner base; tests |
-| **S002-P001-WP002** | Execution Validation Engine (10→90) | WP001 shared base (WP001 GATE_4 before WP002 open) | TIER E1 (E-01–E-06), TIER E2 (E-07–E-11); two-phase routing PRE_GATE_3 / GATE_5; LLM extension; tests |
+| **S002-P001-WP002** | Execution Validation Engine (10→90) | WP001 shared base (WP001 GATE_4 before WP002 open) | TIER E1 (E-01–E-06), TIER E2 (E-07–E-11); two-phase routing **G3.5 within GATE_3** / GATE_5; LLM extension; tests |
 
 Task breakdown, assignments, and timelines are **Team 10's responsibility** (not part of LLD400).
 
@@ -106,7 +106,7 @@ Task breakdown, assignments, and timelines are **Team 10's responsibility** (not
 ### §2.6 Exit Criteria
 
 - **WP001:** All 44 spec validator checks implemented and tested; LOD200 and LLD400 templates locked (T001); LLM quality gate operational (HOLD on negative); validation runner produces canonical PASS/BLOCK/HOLD artifact.
-- **WP002:** All 11 execution validator checks implemented and tested; two-phase routing (PRE_GATE_3 / GATE_5) operational; LLM gate extended for execution context.
+- **WP002:** All 11 execution validator checks implemented and tested; two-phase routing (**G3.5 within GATE_3** / GATE_5) operational; LLM gate extended for execution context.
 - **Program complete:** WP001 GATE_8 PASS and WP002 GATE_8 PASS.
 
 ---

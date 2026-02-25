@@ -38,13 +38,13 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
 | S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (not activated; lock until S001-P001-WP001 GATE_8) |
-| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_1 (GATE_0 PASS 2026-02-25; Team 170 activated for LLD400 submission) |
+| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_3 (GATE_2 APPROVED 2026-02-25; Team 10 execution intake pending) |
 
 
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-25). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-25):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_1. GATE_0 PASS issued by Team 190 (2026-02-25) after LOD200 remediation. Team 100 activating Team 170 for LLD400 production. Next gate owner: Team 190.
+**WSM mirror (2026-02-25):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_3. GATE_2 approval authority decision APPROVED was issued by Team 100 (2026-02-25), and Team 190 advanced flow to Team 10 execution intake.
 
 ---
 
@@ -54,3 +54,4 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P001_ADDED_LLD400_SUBMITTED | 2026-02-24**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_CORRECTED_GATE0_LOD200_SUBMITTED | 2026-02-24**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_GATE0_PASS_GATE1_ACTIVE_TEAM_170_ACTIVATED | 2026-02-25**
+**log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P001_GATE2_APPROVED_GATE3_INTAKE_TEAM10_NEXT | 2026-02-25**

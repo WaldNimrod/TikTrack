@@ -83,25 +83,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 190 completed final GATE_0 revalidation for S002-P001; decision PASS; flow advanced to GATE_1_PENDING.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 100 approval authority decision for GATE_2 (S002-P001) was issued APPROVED and Team 190 advanced flow to GATE_3 intake for Team 10 execution onboarding.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_1_PENDING — LOD200 validated PASS; Team 100 to activate Team 170 for LLD400 submission to Team 190 |
+| active_flow | GATE_3_INTAKE_PENDING — GATE_2 APPROVED; Team 10 to open execution intake and create first active work package |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | N/A |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
-| allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P001) |
-| current_gate | GATE_1 |
+| allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
+| current_gate | GATE_3 |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
-| last_gate_event | GATE_0_PASS \| 2026-02-25 \| Team 190 \| Final revalidation PASS after BF-01/BF-02/BF-02R/BF-03 closure |
-| next_required_action | Team 100 issues LLD400 activation to Team 170; Team 170 prepares and submits GATE_1 package to Team 190 |
-| next_responsible_team | Team 100 |
+| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
+| last_gate_event | GATE_2_APPROVED \| 2026-02-25 \| Team 100 (authority) + Chief Manager override \| Team 190 execution transition to GATE_3 |
+| next_required_action | Team 10 performs GATE_3 intake for S002-P001, creates execution work-package plan (WP001 first), and issues activation mandates per runbook |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -159,3 +159,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 BLOCK_FOR_FIX for S002-P001; returned to Team 100 | 2026-02-25**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 REVALIDATION BLOCK_FOR_FIX (BF-02R only); returned to Team 100 | 2026-02-25**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS for S002-P001; advanced to GATE_1_PENDING | 2026-02-25**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 BLOCK_FOR_FIX for S002-P001; returned to Team 170 for remediation | 2026-02-25**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS for S002-P001; advanced to GATE_2_PENDING | 2026-02-25**
+**log_entry | TEAM_100 | GATE_2_APPROVAL_AUTHORITY_DECISION | S002-P001 | APPROVED (Chief Manager override acknowledged) | 2026-02-25**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_2 APPROVED for S002-P001; advanced to GATE_3_INTAKE_PENDING (Team 10 next) | 2026-02-25**

@@ -4,7 +4,7 @@
 **id:** `TEAM_10_GATEWAY_ROLE_AND_PROCESS`  
 **owner:** Team 10 (The Gateway)  
 **status:** 🔒 **מחייב — רענון תפקיד ונוהל עבודה**  
-**last_updated:** 2026-02-23  
+**last_updated:** 2026-02-25  
 **מקורות קנוניים:** Gate Protocol `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; Runbook `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`; מיפוי צוותים `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`; נעילת פורמט הודעות `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`.
 
 ---
@@ -90,6 +90,50 @@
 
 ---
 
+## 7. הגשה ל־QA בשער 4 (GATE_4) — נוהל חובה
+
+**צוות מקבל:** Team 50 (QA). **מקור:** TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0 §4; Gate Model (GATE_4 | QA | Team 50).
+
+**כלל:** אין להניח ש־Team 50 יבצע QA בלי **מסמך handover רשמי** מ־Team 10. ללא המסמך — Team 50 לא מפעיל מחזור QA (לפי TEAM_50_TO_TEAM_10_*_GATE4_QA_HANDOVER_COMPLETION_REQUIREMENTS).
+
+### 7.1 מתי ליצור handover
+
+- **אחרי G3.9:** סגירת GATE_3, הרכבת חבילת יציאה, **מיד** לפני או עם "הגשה ל־GATE_4" — ליצור את מסמך ה־handover ולהניחו בנתיב הקנוני.
+
+### 7.2 שם ומיקום המסמך (חובה)
+
+- **נתיב:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_<work_package_id>_GATE4_QA_HANDOVER.md`  
+  דוגמה: `TEAM_10_TO_TEAM_50_S002_P001_WP001_GATE4_QA_HANDOVER.md`
+
+### 7.3 תוכן חובה במסמך ה־handover (צ'קליסט — למניעת חזרות)
+
+| # | רכיב | תיאור |
+|---|------|--------|
+| 1 | **Identity header** | מלא: roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id=GATE_4, phase_owner=Team 10, required_ssm_version, required_active_stage, project_domain. |
+| 2 | **Context** | סיכום: Work Package, סקופ, אילו צוותים ביצעו (למשל 20, 70), מה הושלם, G3.8 pre-check PASS; קריטריון יציאה רלוונטי (למשל LLD400 §2.6). |
+| 3 | **Links** | רשימת נתיבים: קוד (agents_os/… או מקביל), תבניות/תיעוד, דוחות השלמה (כל צוות), דוח G3.8. |
+| 4 | **Evidence** | תוצאות בדיקות (pytest / runner / אחר): מספר טסטים, PASS; הוראות הרצה לשחזור. |
+| 5 | **Test scenarios** | תרחישים מומלצים ל־QA: (1) הרצת pytest; (2) הרצת runner/CLI על ארטיפקט; (3) אימות בידוד דומיין או אחר — לפי סקופ ה־WP. |
+| 6 | **Pass criterion** | 0 SEVERE בדוח QA; לאחר PASS — Team 10 מעדכן WSM וממשיך ל־GATE_5. |
+| 7 | **Expected deliverable** | נתיב לדוח QA של Team 50 (למשל `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_<work_package_id>_QA_REPORT.md`). |
+
+**פורמט:** לפי TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK — metadata block, Mandatory identity header, סעיפים ברורים.
+
+### 7.4 רפרנס לתבנית מלאה
+
+- **הפניה קבועה:** `_COMMUNICATION/team_10/TEAM_10_GATE4_QA_ACTIVATION_REFERENCE.md` — מגדיר צוות (Team 50), מידע דרוש, ותבנית handover לדוגמה (S002-P001-WP001). בכל Work Package חדש — להתאים את Context, Links, Evidence ו־Test scenarios ל־WP; המבנה והצ'קליסט נשארים קבועים.
+
+### 7.5 סדר פעולה (לסיכום)
+
+1. G3.8 pre-check PASS → איסוף דוחות השלמה.
+2. G3.9 — סגירת GATE_3; עדכון WSM.
+3. **לפני או עם "הגשה ל־GATE_4":** יצירת `TEAM_10_TO_TEAM_50_<WP_ID>_GATE4_QA_HANDOVER.md` עם כל הרכיבים ב־§7.3; הנחה ב־_COMMUNICATION/team_10/.
+4. Team 50 מריץ תרחישים ומחזיר דוח QA; 0 SEVERE = GATE_4 PASS.
+5. Team 10 מעדכן WSM וממשיך ל־GATE_5.
+
+---
+
 **log_entry | TEAM_10 | GATEWAY_ROLE_AND_PROCESS | REFRESHED | 2026-02-13**
 **log_entry | TEAM_10 | GATEWAY_ROLE_AND_PROCESS | TEAM_70_100_AND_ARCH_CHANNELS_ALIGNMENT | 2026-02-18**
 **log_entry | TEAM_170 | GATEWAY_ROLE_AND_PROCESS | RUNBOOK_ROLE_MAPPING_MESSAGE_LOCK_REF | 2026-02-23**
+**log_entry | TEAM_10 | GATEWAY_ROLE_AND_PROCESS | §7_GATE4_QA_HANDOVER_PROCEDURE_ADDED | 2026-02-25**

@@ -83,25 +83,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 90 G3.5 PASS for S002-P001-WP001; Team 10 authorized to proceed to G3.6 (TEAM_ACTIVATION_MANDATES).
+**Gate-owner update evidence:** This block was updated **2026-02-25** — GATE_4 PASS (Team 50 QA report: GATE_A_PASSED, 0 SEVERE). Next: submit GATE_5 validation request to Team 90.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3 (S002-P001-WP001) — G3.5 PASS; G3.6 TEAM_ACTIVATION_MANDATES next |
+| active_flow | GATE_4 PASS (S002-P001-WP001); GATE_5 (DEV_VALIDATION) next |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | S002-P001-WP001 |
 | in_progress_work_package_id | S002-P001-WP001 |
 | last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
-| current_gate | GATE_3 |
+| current_gate | GATE_5 |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | G3_5_PASS \| 2026-02-25 \| TEAM_90_TO_TEAM_10_S002_P001_WP001_VALIDATION_RESPONSE \| work-plan validation PASS |
-| next_required_action | Team 10: G3.6 — issue mandate/prompt to each dev team in scope (20, 70 per EXECUTION_AND_TEAM_PROMPTS); then G3.7 orchestration, G3.8 completion/pre-check, G3.9 GATE_3 close → GATE_4 |
-| next_responsible_team | Team 10 |
+| phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits request |
+| last_gate_event | GATE_4_PASS \| 2026-02-25 \| TEAM_50_TO_TEAM_10_S002_P001_WP001_QA_REPORT \| GATE_A_PASSED (0 SEVERE) |
+| next_required_action | Team 10: submit WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5) to Team 90 with full package; wait for VALIDATION_RESPONSE |
+| next_responsible_team | Team 10 (submit); Team 90 (validate) |
 
 ---
 
@@ -164,3 +164,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_100 | GATE_2_APPROVAL_AUTHORITY_DECISION | S002-P001 | APPROVED (Chief Manager override acknowledged) | 2026-02-25**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_2 APPROVED for S002-P001; advanced to GATE_3_INTAKE_PENDING (Team 10 next) | 2026-02-25**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.5 PASS S002-P001-WP001 (Team 90 validation response); next G3.6 TEAM_ACTIVATION_MANDATES | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.8 pre-check PASS; Team 20 + Team 70 completion reports collected; next G3.9 GATE_3 close → GATE_4 | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS S002-P001-WP001 (Team 50 QA report GATE_A_PASSED); next GATE_5 submission to Team 90 | 2026-02-25**

@@ -83,24 +83,24 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 190 completed GATE_0 validation for S002-P001; decision: BLOCK_FOR_FIX; package returned to Team 100 for remediation.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 190 completed final GATE_0 revalidation for S002-P001; decision PASS; flow advanced to GATE_1_PENDING.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_0_BLOCKED — LOD200 concept returned to Team 100 for correction (header completeness + gate model alignment + WSM alignment consistency) |
+| active_flow | GATE_1_PENDING — LOD200 validated PASS; Team 100 to activate Team 170 for LLD400 submission to Team 190 |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | N/A |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P001) |
-| current_gate | GATE_0 |
+| current_gate | GATE_1 |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
-| last_gate_event | GATE_0_FAIL \| 2026-02-25 \| Team 190 \| BLOCK_FOR_FIX: BF-01 header incompleteness; BF-02 PRE_GATE_3 drift; BF-03 stale WSM binding in roadmap alignment |
-| next_required_action | Team 100 corrects S002-P001 LOD200 package: (1) complete mandatory headers in all 6 files, (2) replace legacy PRE_GATE_3 with canonical G3.5-in-GATE_3 semantics, (3) align ROADMAP_ALIGNMENT WSM mirror to active_program_id=S002-P001; then resubmit to Team 190 |
+| last_gate_event | GATE_0_PASS \| 2026-02-25 \| Team 190 \| Final revalidation PASS after BF-01/BF-02/BF-02R/BF-03 closure |
+| next_required_action | Team 100 issues LLD400 activation to Team 170; Team 170 prepares and submits GATE_1 package to Team 190 |
 | next_responsible_team | Team 100 |
 
 ---
@@ -157,3 +157,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_170 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | stage_transition_S002_no_active_program_WP | 2026-02-24**
 **log_entry | TEAM_100 | WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P001 activated; GATE_0 LOD200 submitted; Team 190 next | 2026-02-24**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 BLOCK_FOR_FIX for S002-P001; returned to Team 100 | 2026-02-25**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 REVALIDATION BLOCK_FOR_FIX (BF-02R only); returned to Team 100 | 2026-02-25**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS for S002-P001; advanced to GATE_1_PENDING | 2026-02-25**

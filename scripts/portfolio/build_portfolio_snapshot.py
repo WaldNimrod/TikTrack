@@ -333,43 +333,54 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
 
 def _build_hierarchy_md(snapshot: Dict[str, object]) -> List[str]:
     """Build hierarchical roadmap view: Stage (shared) → Program (sub, domain) → Work Package (sub, domain).
-    Domains: TikTrack, Agents_OS. 5 main stages; stage 2 is missing (שלב 2 חסר).
+    Domains: TikTrack, Agents_OS. Uses indentation and tree chars for clarity.
     """
     hierarchy = snapshot.get("hierarchy") or []
     stage_numbers = sorted({_stage_number(h["stage_id"]) for h in hierarchy})
-    missing = [n for n in range(1, max(stage_numbers) + 1) if n > 0 and n not in stage_numbers]
+    missing: List[int] = []
+    if stage_numbers:
+        missing = [n for n in range(1, max(stage_numbers) + 1) if n > 0 and n not in stage_numbers]
 
     lines = [
         "## Roadmap (hierarchical)",
         "",
-        "**היררכיה:** שלב (משותף לשני הדומיינים) → תוכנית (sub של שלב) → חבילת עבודה (sub של תוכנית).",
-        "**דומיינים:** TikTrack, Agents_OS. כל תוכנית וכל חבילת עבודה משויכות לדומיין אחד.",
+        "**היררכיה:** שלב → תוכנית → חבילת עבודה (אינדנטציה = מיקום ברצף).",
+        "**דומיינים:** TikTrack, Agents_OS. כל תוכנית וחבילת עבודה משויכות לדומיין אחד.",
         "",
     ]
     if missing:
-        lines.append(f"**שלבים ראשיים:** 5 שלבים (שלב 2 חסר — אין S002 בקטלוג).")
+        lines.append(f"**הערה:** שלבים חסרים בקטלוג: {missing}.")
         lines.append("")
+    if not hierarchy:
+        lines.append("*אין שלבים בטבלת Roadmap.*")
+        lines.append("")
+        return lines
 
     for node in hierarchy:
         sid = node.get("stage_id", "")
         sname = node.get("stage_name", "")
         sstatus = node.get("status", "")
-        lines.append(f"### Stage: {sid} — {sname} | {sstatus} [SHARED]")
+        lines.append(f"### {sid} — {sname} | {sstatus} [SHARED]")
         lines.append("")
-        for p in node.get("programs", []):
+        programs = node.get("programs", [])
+        for p_idx, p in enumerate(programs):
             pid = p.get("program_id", "")
             pname = p.get("program_name", "")
             pstatus = p.get("status", "")
             domain = (p.get("domain") or "").strip() or "—"
-            lines.append(f"#### Program: {pid} — {pname} | {pstatus} | domain: **{domain}**")
-            lines.append("")
-            for w in p.get("work_packages", []):
+            last_p = p_idx == len(programs) - 1
+            prefix = "└── " if last_p else "├── "
+            lines.append(f"    {prefix}**Program** `{pid}` — {pname} | {pstatus} | domain: **{domain}**")
+            wps = p.get("work_packages", [])
+            for w_idx, w in enumerate(wps):
                 wid = w.get("work_package_id", "")
                 wstatus = w.get("status", "")
                 wgate = w.get("current_gate", "")
                 wdomain = (w.get("domain") or "").strip() or "—"
                 active = " (active)" if w.get("is_active") else ""
-                lines.append(f"- **WP** `{wid}` | {wstatus} | gate: {wgate} | domain: **{wdomain}**{active}")
+                last_w = w_idx == len(wps) - 1
+                wp_prefix = "└── " if last_w else "├── "
+                lines.append(f"        {wp_prefix}**WP** `{wid}` | {wstatus} | gate: {wgate} | domain: **{wdomain}**{active}")
             lines.append("")
         lines.append("")
     return lines

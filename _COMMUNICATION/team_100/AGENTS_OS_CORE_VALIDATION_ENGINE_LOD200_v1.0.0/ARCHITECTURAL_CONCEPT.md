@@ -174,7 +174,7 @@ Builds the automated validator for LLD400 spec submissions:
 ### WP002 — Execution Validation Engine (10→90 Flow)
 
 Builds the automated validator for work package execution submissions:
-- Two-phase model: PRE_GATE_3 (work plan) + GATE_5 (execution quality)
+- Two-phase model: G3.5 within GATE_3 (work plan) + GATE_5 (execution quality)
 - 11 deterministic checks across 2 tiers
 - LLM quality gate (shared framework from WP001)
 

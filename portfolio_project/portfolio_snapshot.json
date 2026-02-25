@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-24T12:57:00.570312+00:00",
+  "generated_at_utc": "2026-02-25T20:48:42.457682+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "N/A",
     "in_progress_work_package_id": "N/A",
-    "current_gate": "READY_FOR_NEXT_WORK_PACKAGE",
-    "active_program_id": "N/A",
-    "last_gate_event": "WSM_CORRECTION \\",
-    "next_required_action": "Team 10 may open the next authorized program/work package under Stage 2 per roadmap",
-    "next_responsible_team": "Team 10"
+    "current_gate": "GATE_1",
+    "active_program_id": "S002-P001",
+    "last_gate_event": "GATE_0_PASS \\",
+    "next_required_action": "Team 100 issues LLD400 activation to Team 170; Team 170 prepares and submits GATE_1 package to Team 190",
+    "next_responsible_team": "Team 100"
   },
   "stages": [
     {
@@ -88,6 +88,14 @@
       "stage_id": "S001",
       "status": "HOLD",
       "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)"
+    },
+    {
+      "program_id": "S002-P001",
+      "program_name": "Agents_OS Core Validation Engine",
+      "domain": "AGENTS_OS",
+      "stage_id": "S002",
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24)"
     }
   ],
   "work_packages": [
@@ -167,7 +175,16 @@
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S002-P001",
+          "program_name": "Agents_OS Core Validation Engine",
+          "domain": "AGENTS_OS",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S003",

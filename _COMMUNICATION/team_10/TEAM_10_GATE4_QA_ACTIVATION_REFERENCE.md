@@ -26,7 +26,7 @@
 
 - **"Deliver QA package (context, links, evidence) to QA per role mapping."**
 - **Required artifacts:** QA handover (canonical format); QA report (מחזיר Team 50).
-- **Exit:** QA PASS = **0 SEVERE**.
+- **Exit:** QA PASS = **כל הבדיקות 100% ירוק** (דרישת Visionary — לא רק 0 SEVERE).
 
 מהתיעוד (הודעת מוכנות שער א' וכו'):
 
@@ -42,7 +42,7 @@
 | **Links** | רשימת נתיבים: קוד (agents_os/…), תבניות (02-TEMPLATES/…), דוחות השלמה (Team 20, Team 70), G3.8 pre-check. |
 | **Evidence** | תוצאות pytest (מספר טסטים, PASS); תוצאת validation_runner על LLD400 (PASS/BLOCK/HOLD); הוראות הרצה לשחזור. |
 | **Test scenarios** | תרחישים מומלצים ל־QA: (1) הרצת pytest agents_os/tests/ — 0 SEVERE; (2) הרצת runner על מסמך LLD400 — תוצאה צפויה; (3) אימות בידוד דומיין (אין TikTrack). |
-| **Pass criterion** | 0 SEVERE בדוח QA של Team 50. |
+| **Pass criterion** | **100% ירוק** בכל בדיקות Team 50 (דרישת Visionary — אין מעבר ל־GATE_5 בלי 100% ירוק). |
 
 ---
 
@@ -58,7 +58,7 @@
   - דוחות: _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP001_COMPLETION_REPORT.md, _COMMUNICATION/team_70/TEAM_70_TO_TEAM_10_S002_P001_WP001_T001_COMPLETION_REPORT.md, _COMMUNICATION/team_10/TEAM_10_S002_P001_WP001_G38_COMPLETION_AND_PRECHECK.md
 - **Evidence:** pytest 18 passed; validation_runner על _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md — מפיק PASS/BLOCK/HOLD.
 - **Test scenarios:** (1) `python3 -m pytest agents_os/tests/ -v` → כל הטסטים ירוקים; (2) `python3 -m agents_os.orchestrator.validation_runner _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` → אימות פלט; (3) אימות שאין import מ־TikTrack.
-- **Pass criterion:** 0 SEVERE בדוח QA; לאחר PASS — Team 10 מעדכן WSM וממשיך ל־GATE_5.
+- **Pass criterion (דרישת Visionary):** **כל הבדיקות 100% ירוק** — לא רק 0 SEVERE; אין מעבר ל־GATE_5 בלי 100% ירוק. לאחר PASS — Team 10 מעדכן WSM וממשיך ל־GATE_5.
 
 ---
 

@@ -46,3 +46,24 @@ def test_tier1_invalid_format():
     v = Tier1IdentityHeaderValidator()
     ec, results = v.run(bad)
     assert ec.value == 1
+
+
+def test_tier1_work_package_na_at_gate1():
+    """V-04: work_package_id=N/A valid for GATE_1 (program-level spec)."""
+    spec_like = """
+## Mandatory identity header
+| Field | Value |
+| roadmap_id | PHOENIX_ROADMAP |
+| stage_id | S002 |
+| program_id | S002-P001 |
+| work_package_id | N/A |
+| gate_id | GATE_1 |
+| phase_owner | Team 170 |
+| required_ssm_version | 1.0.0 |
+| required_active_stage | S002 |
+"""
+    v = Tier1IdentityHeaderValidator()
+    ec, results = v.run(spec_like)
+    assert ec.value == 0
+    v04 = next(r for r in results if r.check_id == "V-04")
+    assert v04.passed

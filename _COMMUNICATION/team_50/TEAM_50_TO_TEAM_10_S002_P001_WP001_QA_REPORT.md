@@ -5,7 +5,7 @@
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (The Gateway)  
 **date:** 2026-02-25  
-**status:** COMPLETED — GATE_A_PASSED  
+**status:** COMPLETED — decision FAIL (0 SEVERE not met; remediation required)  
 **gate_id:** GATE_4  
 **work_package_id:** S002-P001-WP001  
 **in_response_to:** _COMMUNICATION/team_10/TEAM_10_TO_TEAM_50_S002_P001_WP001_GATE4_QA_HANDOVER.md  
@@ -74,10 +74,9 @@
 | פריט | דרישה | תוצאה |
 |------|--------|--------|
 | הרצה | `python3 -m agents_os.orchestrator.validation_runner _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` | בוצע |
-| צפוי | פלט PASS/BLOCK/HOLD קנוני; אין crash | **BLOCK** (exit_code=1, passed=42, failed=2) — פלט קנוני, ללא crash |
+| צפוי (per handover §4) | כל הטסטים ירוקים / פלט קנוני | **BLOCK** — passed=42, **failed=2** |
 
-**Status:** PASS (runner פעיל ומחזיר פלט תקני).  
-**הערה:** המסמך המאומת (LLD400) קיבל 42 עברו, 2 נכשלו — מומלץ ל־Team 170/10 לתקן את 2 הבדיקות הנכשלות לעמידה מלאה ב־LLD400 §2.6. לא מסווג כ־SEVERE לשער (תשתית ה-runner והקוד תקינים).
+**Status:** **FAIL** לתרחיש זה — לא כל 44 הבדיקות על מסמך ה-LLD400 עברו. ה-runner רץ תקין (אין crash), אך **הארטיפקט המאומת** (AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md) נכשל ב-2 בדיקות. קריטריון יציאה LLD400 §2.6 (44 בדיקות spec) לא מתקיים במלואו.
 
 ### 5.3 תרחיש 3 — בידוד דומיין
 
@@ -89,26 +88,25 @@
 
 ---
 
-## 6) Response required / סיכום
+## 6) Response required (canonical)
 
-### Issues
+**Decision:** **FAIL**  
+(per TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0 §6: PASS | CONDITIONAL_PASS | FAIL)
 
-- **SEVERE:** 0  
-- **BLOCKER:** 0  
+**Blocking findings:**
+- תרחיש 2 (validation_runner על מסמך LLD400): 2 בדיקות נכשלו (42 עברו, 2 נכשלו). קריטריון יציאה LLD400 §2.6 (44 בדיקות spec) לא מתקיים. דוח QA עם 0 SEVERE — לא מתקיים.
 
-### Pass criterion
+**Next required action:**  
+תיקון מסמך LLD400 או תצורה כך ש-validation_runner יחזיר 44/44 (PASS). לאחר תיקון — הגשת חבילה מחדש ל־Team 50 לריצת אימות חוזרת.
 
-- **GATE_4 PASS:** דוח QA עם **0 SEVERE** — **מתקיים.**
+**Next responsible team:** Team 170 (מסמך LLD400) / Team 10 (תיאום והגשה מחדש ל־QA).
 
-### GATE_4 Result
+**Evidence-by-path:**  
+דוח זה; תוצאת runner: `python3 -m agents_os.orchestrator.validation_runner _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` → BLOCK, passed=42, failed=2.
 
-**GATE_A_PASSED.**  
-מוכנות ל־Team 10 לעדכון WSM והמשך ל־GATE_5 (Team 90 validation).
-
-### המלצה
-
-תיקון 2 הבדיקות הנכשלות ב-validation_runner על LLD400 (מסמך או תצורה) — לעמידה מלאה ב־44 בדיקות per LLD400 §2.6. לא חוסם מעבר GATE_4.
+**Gate transition:**  
+אין GATE_4 PASS; אין מעבר ל־GATE_5 עד 0 SEVERE (Runbook §4: Exit = QA PASS (0 SEVERE)).
 
 ---
 
-**log_entry | TEAM_50 | TO_TEAM_10 | S002_P001_WP001_QA_REPORT | GATE_4 | GATE_A_PASSED | 2026-02-25**
+**log_entry | TEAM_50 | TO_TEAM_10 | S002_P001_WP001_QA_REPORT | GATE_4 | decision_FAIL | 2026-02-25**

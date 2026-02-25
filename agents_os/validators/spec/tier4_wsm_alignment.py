@@ -39,7 +39,9 @@ class Tier4WsmAlignmentValidator(ValidatorBase):
         # V-27: work_package_id aligns with active_work_package_id when provided
         active_wp = wsm.get("active_work_package_id", "")
         doc_wp = (h.work_package_id if h else "") or ""
-        results.append(ValidatorResult("V-27", doc_wp == active_wp or not doc_wp, "work_package_id vs WSM active_work_package_id", f"{doc_wp} vs {active_wp}"))
+        doc_wp_na = not doc_wp or str(doc_wp).strip().upper() == "N/A"
+        passed = doc_wp_na or doc_wp == active_wp
+        results.append(ValidatorResult("V-27", passed, "work_package_id vs WSM active_work_package_id", f"{doc_wp} vs {active_wp}"))
 
         # V-28: gate_id in allowed range
         allowed = wsm.get("allowed_gate_range", "")

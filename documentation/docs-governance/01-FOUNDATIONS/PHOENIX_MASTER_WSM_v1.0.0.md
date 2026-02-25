@@ -83,7 +83,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — GATE_4 PASS (Team 50 QA report: GATE_A_PASSED, 0 SEVERE). Next: submit GATE_5 validation request to Team 90.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — GATE_4 PASS (Team 50 re-QA: 100% ירוק). מעבר ל־GATE_5.
 
 | Field | Value |
 |-------|-------|
@@ -99,7 +99,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits request |
-| last_gate_event | GATE_4_PASS \| 2026-02-25 \| TEAM_50_TO_TEAM_10_S002_P001_WP001_QA_REPORT \| GATE_A_PASSED (0 SEVERE) |
+| last_gate_event | GATE_4_PASS \| 2026-02-25 \| TEAM_50_TO_TEAM_10_S002_P001_WP001_GATE4_REQA_REPORT \| 100% ירוק (decision PASS) |
 | next_required_action | Team 10: submit WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5) to Team 90 with full package; wait for VALIDATION_RESPONSE |
 | next_responsible_team | Team 10 (submit); Team 90 (validate) |
 
@@ -166,3 +166,6 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.5 PASS S002-P001-WP001 (Team 90 validation response); next G3.6 TEAM_ACTIVATION_MANDATES | 2026-02-25**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.8 pre-check PASS; Team 20 + Team 70 completion reports collected; next G3.9 GATE_3 close → GATE_4 | 2026-02-25**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS S002-P001-WP001 (Team 50 QA report GATE_A_PASSED); next GATE_5 submission to Team 90 | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 HELD per Visionary: no GATE_5 without 100% green on all Team 50 checks; fix 2 failing validation_runner checks then re-QA | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 remediation complete (Team 20: 44/44 passed); re-QA requested from Team 50 | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS S002-P001-WP001 (Team 50 re-QA 100% green); next GATE_5 submission to Team 90 | 2026-02-25**

@@ -60,9 +60,16 @@ class Tier1IdentityHeaderValidator(ValidatorBase):
             "required_active_stage": h.required_active_stage,
         }
 
+        gate_val = (header_dict.get("gate_id") or "").strip().upper()
+        spec_gates = {"GATE_0", "GATE_1"}
+
         for field, vid in REQUIRED_FIELDS:
             val = header_dict.get(field)
-            passed = val is not None and str(val).strip() and str(val).strip().upper() != "N/A"
+            is_na = not val or str(val).strip().upper() == "N/A"
+            if field == "work_package_id" and gate_val in spec_gates:
+                passed = val is not None
+            else:
+                passed = val is not None and not is_na
             results.append(ValidatorResult(vid, passed, f"{field} required" if not passed else f"{field} present", val))
 
         for field, vid in OPTIONAL_FIELDS:

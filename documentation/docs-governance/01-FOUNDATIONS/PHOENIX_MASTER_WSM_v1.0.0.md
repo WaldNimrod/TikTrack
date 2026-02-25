@@ -1,7 +1,7 @@
 ---
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md
-**canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
+**canonical_path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 **promotion_date:** 2026-02-22
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
@@ -83,13 +83,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 10 acknowledged GATE_3 intake handoff (S002-P001), opened intake, and created S002-P001-WP001 work package definition. Next: G3.1–G3.5 then G3.5 validation with Team 90.
+**Gate-owner update evidence:** This block was updated **2026-02-25** — Team 90 G3.5 PASS for S002-P001-WP001; Team 10 authorized to proceed to G3.6 (TEAM_ACTIVATION_MANDATES).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3 (S002-P001) — intake opened; WP001 defined; G3.1–G3.5 in progress |
+| active_flow | GATE_3 (S002-P001-WP001) — G3.5 PASS; G3.6 TEAM_ACTIVATION_MANDATES next |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | S002-P001-WP001 |
 | in_progress_work_package_id | S002-P001-WP001 |
@@ -99,8 +99,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | GATE_3_INTAKE_OPENED \| 2026-02-25 \| TEAM_10_TO_TEAM_190_S002_P001_GATE3_INTAKE_ACKNOWLEDGMENT \| WP001 definition created |
-| next_required_action | Team 10: complete G3.1–G3.4 (detailed build plan); submit to Team 90 for G3.5 (work-plan validation); after PASS → G3.6 (team activation) |
+| last_gate_event | G3_5_PASS \| 2026-02-25 \| TEAM_90_TO_TEAM_10_S002_P001_WP001_VALIDATION_RESPONSE \| work-plan validation PASS |
+| next_required_action | Team 10: G3.6 — issue mandate/prompt to each dev team in scope (20, 70 per EXECUTION_AND_TEAM_PROMPTS); then G3.7 orchestration, G3.8 completion/pre-check, G3.9 GATE_3 close → GATE_4 |
 | next_responsible_team | Team 10 |
 
 ---
@@ -163,3 +163,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS for S002-P001; advanced to GATE_2_PENDING | 2026-02-25**
 **log_entry | TEAM_100 | GATE_2_APPROVAL_AUTHORITY_DECISION | S002-P001 | APPROVED (Chief Manager override acknowledged) | 2026-02-25**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_2 APPROVED for S002-P001; advanced to GATE_3_INTAKE_PENDING (Team 10 next) | 2026-02-25**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.5 PASS S002-P001-WP001 (Team 90 validation response); next G3.6 TEAM_ACTIVATION_MANDATES | 2026-02-25**

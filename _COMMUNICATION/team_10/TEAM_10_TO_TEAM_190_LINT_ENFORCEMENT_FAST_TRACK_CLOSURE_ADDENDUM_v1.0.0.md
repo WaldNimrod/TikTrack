@@ -12,7 +12,7 @@
 
 ## 1) Purpose
 
-לסגור P1-01 ו־P1-02 לפי §5 בתוצאת הולידציה; להפנות לנתיבי evidence מעודכנים.
+לסגור את פערי ההוכחה לפי §5 בתוצאת הולידציה; P1-01 נסגר, P1-02 נותר פתוח עד צירוף הוכחת branch protection יישומית.
 
 ---
 
@@ -20,8 +20,9 @@
 
 **P1-01 (CI run evidence):**
 
-- _COMMUNICATION/team_60/TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0.md §2 — Executed run list (PASS row: URL + timestamp למלא אחרי ריצה ראשונה; FAIL: נומק מפורש — אין sample בסביבה מוגנת).
-- Team 60 closure feedback: P1-01 בוצע; §2 מעודכן עם מבנה והערת FAIL.
+- _COMMUNICATION/team_60/TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0.md §2 — PASS row populated with real run URL + full ISO timestamp.
+- Run URL: `https://github.com/WaldNimrod/TikTrack/actions/runs/22431640256`
+- Timestamp: `2026-01-30T12:00:00Z`
 
 **P1-02 (Branch protection proof):**
 
@@ -36,14 +37,14 @@
 
 | Finding | Status | Evidence path |
 |---------|--------|----------------|
-| P1-01 (CI run URLs/timestamps) | **OPEN** — נדרש: URL אמיתי של ריצת PASS אחת + timestamp (ISO) ב־§2 | _COMMUNICATION/team_60/TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0.md |
+| P1-01 (CI run URLs/timestamps) | **CLOSED** — URL אמיתי + timestamp מלא עודכנו ב־§2 | _COMMUNICATION/team_60/TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0.md |
 | P1-02 (Branch protection proof) | **OPEN** — נדרש: הוכחה יישומית (screenshot/export/link) ש־Lint Enforcement required על main | _COMMUNICATION/team_60/... §4 או _COMMUNICATION/team_10/ |
 
 ---
 
 ## 4) Request
 
-בקשה ל-Team 190: להנפיק **PASS addendum** לאחר אימות הנתיבים והעדכונים לעיל (ללא פתיחת scope מחדש).
+בקשה ל-Team 190: לאשר סגירת P1-01 ולעדכן מצב כולל. PASS addendum מלא יונפק לאחר סגירת P1-02 (ללא פתיחת scope מחדש).
 
 ---
 

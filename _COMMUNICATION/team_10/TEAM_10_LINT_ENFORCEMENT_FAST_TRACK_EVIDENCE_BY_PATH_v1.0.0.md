@@ -54,7 +54,7 @@ Reference: _COMMUNICATION/team_60/TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_IMPLEMENTA
 | Configuration | In GitHub: Settings → Branches → Branch protection rules for `main` → add **Lint Enforcement** as required status check |
 | Result | When the workflow fails, merge to main is blocked until the check passes |
 
-Implementation Report and CI Evidence document the requirement; branch protection must be applied in the repo settings by the repo owner. Evidence can be supplemented with a screenshot of the rule once configured.
+Implementation Report and CI Evidence document the requirement; branch protection must be applied in the repo settings by the repo owner. **P1-02 applied proof:** attach link or screenshot/export at _COMMUNICATION/team_60/evidence/P1_02_BRANCH_PROTECTION_PROOF.md (see that file and TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0.md §4).
 
 ---
 

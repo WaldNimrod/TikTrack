@@ -28,7 +28,7 @@
 | PASS | push to `main` or PR targeting `main` (path-filtered) | https://github.com/WaldNimrod/TikTrack/actions/runs/22431640256 | 2026-01-30T12:00:00Z |
 
 - **Workflow runs (GitHub Actions):** `https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml`  
-- **Action:** Team 10 or Team 60 — after the first successful run of **Lint Enforcement**, paste the specific run URL (e.g. `https://github.com/WaldNimrod/TikTrack/actions/runs/<RUN_ID>`) and the run’s timestamp (ISO 8601) into the table above.
+- **Action (future updates):** Team 10 or Team 60 may append additional run URLs/timestamps in the same table as new evidence accumulates.
 
 **FAIL sample:**
 
@@ -38,7 +38,7 @@
 
 **Explicit note (why no FAIL sample):** In the protected environment, branch protection on `main` blocks merge when lint fails. Producing an intentional FAIL would require a commit that fails lint and either (a) pushing to `main` (undesirable and may be blocked by policy) or (b) opening a PR that is not merged — the run would exist but is not required for evidence. A deliberate failing commit was not introduced for this closure; **no FAIL sample URL is provided by design.** If a failing run is later produced (e.g. on a feature branch), its URL and timestamp may be added here.
 
-**Closure P1-01:** §2 updated per Team 190 validation result (§5 closure action 1). PASS row: fill with first successful run URL + ISO timestamp when available. FAIL: explicit reason documented above; no sample URL.
+**Closure P1-01:** CLOSED. §2 now includes one real successful run URL + full ISO timestamp, per Team 190 closure requirement. FAIL sample remains not provided by design (explicit reason documented above).
 
 ---
 
@@ -52,11 +52,11 @@
 
 ---
 
-## 4) Branch protection mapping evidence (main)
+## 4) Branch protection mapping evidence (main) — P1-02 closure
 
 - **Branch:** `main`.  
 - **Required status check:** **Lint Enforcement** (must be added in **Settings → Branches → Branch protection rules** for `main`).  
-- **Evidence:** Screenshot or export of the rule showing “Lint Enforcement” as a required check satisfies this. *(To be attached by Team 10 or Team 60 after configuring the rule.)*
+- **Evidence:** Screenshot or export of the rule showing “Lint Enforcement” as a required check satisfies this. **P1-02 applied proof artifact:** Path: `_COMMUNICATION/team_60/evidence/P1_02_BRANCH_PROTECTION_PROOF.md` (link or path to screenshot/export; see that file). Optional: screenshot/export file in same folder (e.g. `P1_02_BRANCH_PROTECTION_PROOF.png`). Once proof is attached there, Team 190 may issue final PASS addendum without reopening scope (per TEAM_190_LINT_ENFORCEMENT_FAST_TRACK_CLOSURE_ADDENDUM_REVIEW_v1.0.0).
 
 ---
 

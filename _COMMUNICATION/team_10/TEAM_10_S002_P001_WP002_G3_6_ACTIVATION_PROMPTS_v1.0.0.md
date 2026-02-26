@@ -129,5 +129,112 @@
 
 ---
 
+## 6) GATE_4 — פרומט הפעלה ל־Team 50 (QA)
+
+**מתי להפעיל:** לאחר GATE_3 exit (אימות תוצר Team 20, חבילת exit). Team 10 מגיש חבילת QA ל־Team 50.
+
+```markdown
+**id:** TEAM_10_TO_TEAM_50_S002_P001_WP002_GATE4_QA_PROMPT
+**from:** Team 10 (The Gateway — GATE_3/GATE_4 owner)
+**to:** Team 50 (QA & Fidelity)
+**work_package_id:** S002-P001-WP002
+**gate_id:** GATE_4
+**phase_owner:** Team 10
+**project_domain:** AGENTS_OS
+**date:** 2026-02-26
+**trigger:** GATE_3 implementation complete; Team 20 completion report received; GATE_4 QA required.
+
+---
+
+אתה פועל כצוות 50 (QA & Fidelity). Team 10 מגיש לך חבילת QA עבור **GATE_4** — Work Package **S002-P001-WP002** (Execution Validation Engine, 10→90 flow).
+
+**קונטקסט חובה:**
+- _COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_WORK_PACKAGE_DEFINITION.md
+- _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_WP002_LLD400_v1.0.0.md (§2.5, §6, §7)
+- _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (תוצר GATE_3)
+
+**משימות — GATE_4 QA:**
+1. לאמת ארטיפקטים תחת agents_os/: validators/execution (tier_e1_work_plan.py, tier_e2_code_quality.py), tests/execution (test_tier_e1.py, test_tier_e2.py), הרחבת validation_runner (--mode=execution --phase=1|2), הרחבת quality_judge (Q-01..Q-05).
+2. לאמת בידוד דומיין: אין import או תלות ב־TikTrack; כל הקוד תחת agents_os/.
+3. לאמת regression: WP001 spec mode (validation_runner על LLD400) — 44/44; pytest agents_os/tests/ — exit 0.
+4. לאמת Identity Headers בארטיפקטי שער (work_package_id S002-P001-WP002, gate_id GATE_3/GATE_4).
+5. להפיק דוח QA (0 SEVERE ל-readiness ל־GATE_5). מיקום: _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P001_WP002_QA_REPORT.md.
+
+**דרישה:** 0 SEVERE; readiness ל־GATE_5 (הגשת Team 10 ל־Team 90 Phase 2 validation).
+```
+
+---
+
+## 7) GATE_5 — פרומט הפעלה ל־Team 90 (Phase 2 validation)
+
+**מתי להפעיל:** לאחר GATE_4 PASS. Team 10 מגיש חבילת execution submission ל־Team 90 ל־ולידציית Phase 2 (TIER E1 + E2 + LLM gate).
+
+```markdown
+**id:** TEAM_10_TO_TEAM_90_S002_P001_WP002_GATE5_PHASE2_VALIDATION_REQUEST
+**from:** Team 10 (The Gateway)
+**to:** Team 90 (External Validation Unit — Channel 10↔90)
+**work_package_id:** S002-P001-WP002
+**gate_id:** GATE_5
+**phase_owner:** Team 10 (submitter); GATE_5 owner Team 90
+**project_domain:** AGENTS_OS
+**date:** 2026-02-26
+**trigger:** GATE_4 PASS (Team 50 QA 0 SEVERE); readiness ל־GATE_5.
+
+---
+
+אתה פועל כצוות 90 (External Validation Unit). Team 10 מגיש לך **בקשת ולידציית GATE_5 Phase 2** עבור **S002-P001-WP002** — Execution Validation Engine (תוצר ביצוע מלא).
+
+**היקף:** Phase 2 — **TIER E1** (re-run עם בדיקת קיום פיזי של evidence) + **TIER E2** (E-07..E-11) + **LLM quality gate** (Q-01..Q-05). לא רק G3.5; חבילה עם קוד + דו"חות סיום.
+
+**קונטקסט חובה:**
+- _COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_WORK_PACKAGE_DEFINITION.md
+- _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (evidence)
+- _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P001_WP002_QA_REPORT.md (GATE_4 PASS)
+- _COMMUNICATION/team_100/S002_P001_WP002_EXECUTION_VALIDATOR_ARCHITECTURAL_CONCEPT_v1.0.0.md (§4–§7)
+- documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md (CURRENT_OPERATIONAL_STATE — E-02, E-06)
+
+**משימות:**
+1. להריץ ולידציה Phase 2: `validation_runner --mode=execution --phase=2` על חבילת ההגשה (או לבצע בדיקה ידנית מול E-01..E-11 + LLM gate).
+2. לאמת evidence index: work package definition + לפחות דוח סיום Team 20 (נתיבים קיימים על הדיסק).
+3. להחליט: **PASS** (exit 0) | **BLOCK** (exit 1) | **HOLD** (exit 2 — LLM שלילי, סקירה אנושית).
+4. לפרסם תשובה קנונית: _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P001_WP002_GATE5_PHASE2_VALIDATION_RESPONSE.md (או BLOCKING_REPORT / HOLD לפי התוצאה).
+
+**תוצר צפוי:** VALIDATION_RESPONSE עם overall_status PASS | BLOCK | HOLD; פירוט per check; log_entry.
+```
+
+---
+
+## 8) GATE_5 BLOCK — פרומט תיקון ל־Team 20 (BF-G5-001 / E-09)
+
+**מתי להפעיל:** לאחר TEAM_90_TO_TEAM_10_S002_P001_WP002_GATE5_PHASE2_BLOCKING_REPORT. E-09 (Test Suite Green) נכשל — `pytest agents_os/tests/ -q` חייב להחזיר exit 0 בסביבת הולידציה.
+
+```markdown
+**id:** TEAM_10_TO_TEAM_20_S002_P001_WP002_GATE5_REMEDIATION_E09_PROMPT
+**from:** Team 10 (The Gateway)
+**to:** Team 20 (Backend Implementation)
+**work_package_id:** S002-P001-WP002
+**gate_id:** GATE_5 (remediation)
+**date:** 2026-02-26
+**in_response_to:** _COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P001_WP002_GATE5_PHASE2_BLOCKING_REPORT.md
+
+---
+
+אתה פועל כצוות 20. Team 90 החזיר **BLOCK** על GATE_5 Phase 2 — **BF-G5-001: E-09 Test Suite Green failed.**
+
+**דרישה:** `python3 -m pytest agents_os/tests/ -q` חייב להסתיים ב־**exit code 0** (גם בריצה רגילה וגם בתוך validation_runner --mode=execution --phase=2).
+
+**משימות:**
+1. לשחזר את הכשל: להריץ `python3 -m pytest agents_os/tests/ -q` בסביבתך; לאתר טסט נכשל או timeout.
+2. לתקן עד שהפקודה מחזירה exit 0 באופן דטרמיניסטי (תיקון טסטים/קוד/תלויות לפי הצורך).
+3. להריץ ולתעד:
+   - `python3 -m pytest agents_os/tests/ -q` — פלט מלא (exit 0).
+   - `python3 -m agents_os.orchestrator.validation_runner _COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_WORK_PACKAGE_DEFINITION.md --mode=execution --phase=2 --package .` — פלט מלא (exit 0, passed=11).
+4. לדווח ל־Team 10: נתיבי הקבצים ששונו + ציטוט/קישור ל־evidence (או קובץ עדכון בדוח הסיום). Team 10 יגיש מחדש ל־Team 90 ל־re-validation.
+```
+
+---
+
 **log_entry | TEAM_10 | S002_P001_WP002_G3_6_ACTIVATION_PROMPTS | READY_FOR_USE_AFTER_G3_5_PASS | 2026-02-26**
 **log_entry | TEAM_10 | S002_P001_WP002_G3_6_ACTIVATION_PROMPTS | ROLE_BOUNDARY_ALIGNMENT | 2026-02-26 — מימוש טסטים ב־agents_os/ הועבר ל־Team 20; Team 70 תיעוד בלבד (per TEAM_70_TO_TEAM_10_S002_P001_WP002_G36_ROLE_BOUNDARY_CLARIFICATION).**
+**log_entry | TEAM_10 | S002_P001_WP002_GATE_4 | QA_ACTIVATION_PROMPT_ADDED | 2026-02-26**
+**log_entry | TEAM_10 | S002_P001_WP002_GATE_5 | REMEDIATION_PROMPT_E09_ADDED | 2026-02-26**

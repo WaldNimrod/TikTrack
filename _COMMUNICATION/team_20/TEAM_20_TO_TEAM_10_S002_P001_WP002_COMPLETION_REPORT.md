@@ -48,13 +48,15 @@
 |------|--------|
 | `agents_os/llm_gate/quality_judge.py` | הורחב: `mode="execution"` — EXECUTION_PROMPTS (Q-01–Q-05) |
 
-### 1.4 Tests
+### 1.4 Tests (באחריות Team 20 — per G3.6 Update)
 
 | נתיב | תיאור |
 |------|--------|
 | `agents_os/tests/execution/__init__.py` | Package marker |
 | `agents_os/tests/execution/test_tier_e1.py` | טסטים ל־E-01..E-06 |
 | `agents_os/tests/execution/test_tier_e2.py` | טסטים ל־E-07..E-11 |
+
+*כל הקוד תחת agents_os/ (כולל טסטים) באחריות Team 20 per TEAM_70_KNOWLEDGE_LIBRARIAN_ROLE_DEFINITION.*
 
 ### 1.5 הרצה
 
@@ -98,6 +100,14 @@ python3 -m pytest agents_os/tests/ -q
 ## 4) מסקנה
 
 Team 20 מסיים מימוש GATE_3 עבור S002-P001-WP002. תוצר הקוד, TIER E1 (E-01–E-06), TIER E2 (E-07–E-11), runner extension ו־23 טסטים נמסרו. Team 10 יכול לאסוף את הדוח ולהמשיך ל-G3.7 / GATE_4.
+
+---
+
+## 5) GATE_5 BF-G5-001 Remediation (2026-02-26)
+
+- **כשל:** E-09 (Test Suite Green) — רקורסיה כאשר pytest רץ טסטים שמפעילים validator.
+- **תיקון:** `tier_e2_code_quality.py` — skip subprocess כשנמצאים בתוך pytest (`PYTEST_CURRENT_TEST`).
+- **Evidence:** `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP002_GATE5_E09_REMEDIATION_EVIDENCE.md`
 
 ---
 

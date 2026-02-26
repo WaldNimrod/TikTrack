@@ -52,3 +52,11 @@ def test_e1_e03_criteria():
     ec, results = v.run(WP_DEF_SAMPLE)
     e03 = next(r for r in results if r.check_id == "E-03")
     assert e03.passed
+
+
+def test_e1_all_six_checks():
+    """E-01..E-06: all checks present."""
+    v = TierE1WorkPlanValidator(phase=1)
+    ec, results = v.run(WP_DEF_SAMPLE)
+    ids = {r.check_id for r in results}
+    assert ids >= {"E-01", "E-02", "E-03", "E-04", "E-05", "E-06"}

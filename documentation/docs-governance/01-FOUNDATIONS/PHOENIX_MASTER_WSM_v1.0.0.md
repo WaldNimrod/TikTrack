@@ -85,28 +85,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — G3.5 PASS received from Team 90 (TEAM_90_TO_TEAM_10_S002_P001_WP002_G3_5_PHASE1_VALIDATION_RESPONSE); G3.6 development activation unlocked.
+**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_5 Phase 2 re-validation PASS for S002-P001-WP002 (exit_code=0, passed=11, failed=0).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3_IN_PROGRESS (WP002); G3.5_PASS; READY_FOR_G3.6_ACTIVATION |
+| active_flow | GATE_5_PASS (WP002); READY_FOR_GATE_6_OPENING_WORKFLOW |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | S002-P001-WP002 |
 | in_progress_work_package_id | S002-P001-WP002 |
 | last_closed_work_package_id | S002-P001-WP001 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
-| current_gate | GATE_3 |
+| current_gate | GATE_5 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | G3.5_PASS \| 2026-02-26 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P001_WP002_G3_5_PHASE1_VALIDATION_RESPONSE.md |
-| next_required_action | Team 10: issue G3.6 mandates to Team 20 and Team 70 per _COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_G3_6_ACTIVATION_PROMPTS_v1.0.0.md |
-| next_responsible_team | Team 10 |
+| phase_owner_team | Team 10 (GATE_3–GATE_4 owner); GATE_5–GATE_8 owner Team 90 |
+| last_gate_event | GATE_5_PASS \| 2026-02-26 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P001_WP002_GATE5_PHASE2_VALIDATION_RESPONSE.md |
+| next_required_action | Team 90: prepare and submit GATE_6 opening package for S002-P001-WP002 to _ARCHITECT_INBOX (approval authority Team 100/00) |
+| next_responsible_team | Team 90 |
 
 ---
 
@@ -185,4 +185,9 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | CONSTITUTIONAL_GUARDRAIL | CURRENT_OPERATIONAL_STATE | WP002 is intake-open only; LLD400 from Team 170 required before G3.5/G3 build progression | 2026-02-26**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS S002-P001-WP002 LLD400; G3.5 unlocked for Team 10 | 2026-02-26**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.5 PASS S002-P001-WP002 from Team 90; G3.6 activation unlocked; next: issue mandates to Team 20 and Team 70 | 2026-02-26**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.6 Team 20 completion report received (WP002); GATE_3 exit pending; next: exit package + GATE_4 submission | 2026-02-26**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS WP002 (Team 50 QA); next: submit GATE_5 Phase 2 validation to Team 90 | 2026-02-26**
 **log_entry | TEAM_190 | WSM_CANONICAL_UPDATE | TRACK_MODE_OVERLAY_FIELDS_ADDED | 2026-02-26**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 Phase2 BLOCK S002-P001-WP002 (BF-G5-001 E-09 fail); revalidation required | 2026-02-26**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | BF-G5-001 remediation evidence received (Team 20); re-submit GATE_5 Phase 2 to Team 90 | 2026-02-26**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 Phase2 PASS S002-P001-WP002 (exit_code=0 passed=11 failed=0); next GATE_6 opening workflow | 2026-02-26**

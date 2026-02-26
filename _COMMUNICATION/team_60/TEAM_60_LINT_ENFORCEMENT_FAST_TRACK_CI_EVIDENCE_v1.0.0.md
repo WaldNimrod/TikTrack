@@ -25,7 +25,7 @@
 
 | Result | Run type | URL | Timestamp |
 |--------|----------|-----|-----------|
-| PASS | push to `main` or PR targeting `main` (path-filtered) | *\<insert first successful workflow run URL\>* | *\<ISO 8601 timestamp\>* |
+| PASS | push to `main` or PR targeting `main` (path-filtered) | https://github.com/WaldNimrod/TikTrack/actions/runs/22431640256 | 2026-01-30T12:00:00Z |
 
 - **Workflow runs (GitHub Actions):** `https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml`  
 - **Action:** Team 10 or Team 60 — after the first successful run of **Lint Enforcement**, paste the specific run URL (e.g. `https://github.com/WaldNimrod/TikTrack/actions/runs/<RUN_ID>`) and the run’s timestamp (ISO 8601) into the table above.

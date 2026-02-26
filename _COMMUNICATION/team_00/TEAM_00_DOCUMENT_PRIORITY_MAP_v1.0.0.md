@@ -27,20 +27,18 @@
 
 ## TIER 1 — Session Context (קרא לפי מה שפעיל)
 
-### 1A — Agents_OS Current Program (S002-P001, WP001 closed at GATE_8 PASS)
+### 1A — Agents_OS Current Program (S002-P001, **WP002 GATE_3 INTAKE_OPEN**)
 
-| קובץ | נתיב |
-|---|---|
-| Gate Lifecycle v1.1.0 | `documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md` |
-| LOD200 Package (6 קבצים) | `_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/` |
-| Team 170 Activation (LLD400) | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_ACTIVATION_AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` |
-| GATE_0 Validation Result (PASS) | `_COMMUNICATION/team_190/TEAM_190_GATE0_S002_P001_VALIDATION_RESULT.md` |
-| GATE_8 Activation Canonical (Team 90→70) | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S002_P001_WP001_GATE8_ACTIVATION_CANONICAL.md` |
-| GATE_8 Validation Request (Team 70→90) | `_COMMUNICATION/team_70/TEAM_70_TO_TEAM_90_S002_P001_WP001_GATE8_VALIDATION_REQUEST.md` |
-| GATE_8 Validation Report (PASS) | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P001_WP001_GATE8_VALIDATION_REPORT.md` |
-| GATE_0/1/2 Spec Lifecycle Contract | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` |
-| Program Registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` |
-| Portfolio Roadmap | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` |
+| קובץ | נתיב | מצב |
+|---|---|---|
+| Gate Lifecycle v1.1.0 | `documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md` | — |
+| LOD200 Package (6 קבצים) | `_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/` | WP001+WP002 scope |
+| **WP002 LLD400 Activation Directive** | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_S002_P001_WP002_LLD400_ACTIVATION_v1.0.0.md` | 🔴 **PENDING — Team 170 must deliver** |
+| **WP002 Team 10 Intake Directive** | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_10_S002_P001_WP002_ACTIVATION_DIRECTIVE_v1.0.0.md` | GATE_3 INTAKE_OPEN |
+| **ADR-027 Charter (LOCKED)** | `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md` | RATIFIED 2026-02-26 |
+| GATE_0/1/2 Spec Lifecycle Contract | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` | — |
+| Program Registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | — |
+| Portfolio Roadmap | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | — |
 
 ### 1B — Your Inbox (check every session)
 
@@ -60,11 +58,12 @@
 |---|---|---|---|
 | 2.1 | **Product Narrative (SSOT)** | `_COMMUNICATION/_Architects_Decisions/PI_STRATEGIC_NARRATIVE_REPORT.md` | ויזיון המוצר: Digital Twin, 4 value pillars |
 | 2.2 | **ADR-026 — Agent OS Final Verdict** | `_COMMUNICATION/_Architects_Decisions/ADR_026_AGENT_OS_FINAL_VERDICT.md` | 9-gate model, SSM+WSM, Visual Integrity |
-| 2.3 | **Balanced Core Architecture** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BASE_SYSTEMS_DESIGN_MANDATE.md` | Shared Core (PDSC), no page-specific logic |
-| 2.4 | **Portfolio Roadmap (S001–S006)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | Stage by stage: pages, modules, scope |
-| 2.5 | **Phase 2 Final Consolidated Verdict** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md` | Phase 2 all decisions: Backend Option A, SSOT v2.0, NUMERIC(20,6) |
-| 2.6 | **Phase 2 Core Decisions** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_CORE_DECISIONS.md` | Core Phase 2 architectural decisions |
-| 2.7 | **Team Role Mapping** | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | Teams 20/30/40/60 responsibilities |
+| 2.3 | **ADR-027 — Team 100 ↔ Team 00 Charter** | `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md` | Authority pyramid, domain authority, GATE_2+GATE_6 delegation, escalation protocol |
+| 2.4 | **Balanced Core Architecture** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BASE_SYSTEMS_DESIGN_MANDATE.md` | Shared Core (PDSC), no page-specific logic |
+| 2.5 | **Portfolio Roadmap (S001–S006)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | Stage by stage: pages, modules, scope |
+| 2.6 | **Phase 2 Final Consolidated Verdict** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md` | Phase 2 all decisions: Backend Option A, SSOT v2.0, NUMERIC(20,6) |
+| 2.7 | **Phase 2 Core Decisions** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_CORE_DECISIONS.md` | Core Phase 2 architectural decisions |
+| 2.8 | **Team Role Mapping** | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | Teams 20/30/40/60 responsibilities |
 
 ---
 
@@ -151,3 +150,4 @@ ls _COMMUNICATION/_ARCHITECT_INBOX/
 ---
 
 **log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_REFRESH | ACTIVE | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_UPDATED | ADR_027_ADDED_TIER2 + WP002_SESSION_CONTEXT_UPDATED | 2026-02-26**

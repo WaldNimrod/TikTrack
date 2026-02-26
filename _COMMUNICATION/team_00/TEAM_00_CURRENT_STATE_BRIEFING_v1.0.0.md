@@ -107,6 +107,7 @@ All of the following are LOCKED and binding on all teams:
 | Decision | Status | Key Content |
 |---|---|---|
 | **ADR-026** | LOCKED | 9-gate lifecycle, SSM+WSM dual-state, architecture (100+) vs development (10-90) |
+| **ADR-027** | LOCKED — RATIFIED 2026-02-26 | Team 100 ↔ Team 00 charter: authority pyramid, domain authority, escalation protocol, GATE_2+GATE_6 delegated to Team 100 |
 | **Balanced Core (PDSC)** | LOCKED | Shared Core model, no page-specific logic, UAI/PDSC/EFR/GED systems |
 | **Visual Integrity** | LOCKED | DOM/CSS structural validation only — no screenshots |
 | **NUMERIC(20,8) precision** | LOCKED | Financial calculations to 8 decimal places — zero rounding errors |
@@ -132,3 +133,4 @@ All of the following are LOCKED and binding on all teams:
 ---
 
 **log_entry | TEAM_00 | TEAM_00_CURRENT_STATE_BRIEFING_v1.0.0_REFRESH | SNAPSHOT_2026-02-26 | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_00_CURRENT_STATE_BRIEFING_v1.0.0_UPDATED | ADR_027_RATIFIED + WP002_GATE3_INTAKE_OPEN + DECISION_POINTS_REFRESHED | 2026-02-26**

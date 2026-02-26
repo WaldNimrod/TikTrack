@@ -23,8 +23,8 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | program_name | Short label |
 | domain | Single domain only (e.g. AGENTS_OS, TIKTRACK) |
 | stage_id | S{NNN} |
-| status | ACTIVE \| CLOSED \| HOLD |
-| current_gate_mirror | Mirror of current gate from WSM (informational; WSM is SSOT) |
+| status | ACTIVE \| COMPLETE \| CLOSED \| HOLD \| FROZEN \| PIPELINE \| PLANNED |
+| current_gate_mirror | Informational mirror from WSM (Program has no independent gate lifecycle authority) |
 
 ---
 
@@ -38,14 +38,14 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
 | S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (lock released 2026-02-22; activation decision pending Team 00) |
-| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_3; active_flow=GATE_3_IN_PROGRESS (WP002); LLD400_VALIDATED_PASS; READY_FOR_G3.5_PLAN_VALIDATION; active_work_package_id=S002-P001-WP002 |
+| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A |
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision) |
 
 
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-26):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_3; active_work_package_id=S002-P001-WP002; active_flow=GATE_3_IN_PROGRESS (WP002); LLD400_VALIDATED_PASS; READY_FOR_G3.5_PLAN_VALIDATION.
+**WSM mirror (2026-02-26):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_8; active_work_package_id=N/A; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete.
 
 ---
 

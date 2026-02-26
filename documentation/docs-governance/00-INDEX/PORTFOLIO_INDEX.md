@@ -34,6 +34,17 @@
 Roadmap → Stage → Program → Work Package → Task.  
 Task-level is **not** in Portfolio; it is internal to Team 10 and execution teams.
 
+Canonical identifiers and parent binding:
+
+- `stage_id`: `S{NNN}` (example: `S002`)
+- `program_id`: `S{NNN}-P{NNN}` and must belong to its parent `stage_id` (example: `S002-P001`)
+- `work_package_id`: `S{NNN}-P{NNN}-WP{NNN}` and must belong to its parent `program_id` (example: `S002-P001-WP002`)
+
+Lifecycle rule:
+
+- Gate lifecycle is managed only at **Work Package** level (`GATE_3..GATE_8`).
+- Stage and Program are packaging/catalog layers. Program `current_gate_mirror` is informational mirror from WSM and not an independent runtime gate-state authority.
+
 ---
 
 **log_entry | TEAM_170 | PORTFOLIO_INDEX | CREATED | 2026-02-23**

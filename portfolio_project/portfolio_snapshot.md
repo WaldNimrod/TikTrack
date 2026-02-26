@@ -1,8 +1,8 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-02-25T20:48:42.457682+00:00`
-- Validation: `FAIL`
-- Errors: `1`
+- Generated (UTC): `2026-02-26T18:19:08.089158+00:00`
+- Validation: `PASS`
+- Errors: `0`
 - Warnings: `0`
 
 ## Runtime (from WSM)
@@ -10,14 +10,14 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P001`
 - active_work_package_id: `N/A`
-- current_gate: `GATE_1`
-- next_required_action: `Team 100 issues LLD400 activation to Team 170; Team 170 prepares and submits GATE_1 package to Team 190`
+- current_gate: `GATE_8`
+- next_required_action: `Team 10 + Team 100: define and activate next authorized program/stage flow`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `3`
-- work_packages: `2`
+- programs: `4`
+- work_packages: `4`
 
 ## Roadmap (hierarchical)
 
@@ -35,7 +35,11 @@
 
 ### S002 — שלב 2 — השלב הפעיל | ACTIVE [SHARED]
 
-    └── **Program** `S002-P001` — Agents_OS Core Validation Engine | ACTIVE | domain: **AGENTS_OS**
+    ├── **Program** `S002-P001` — Agents_OS Core Validation Engine | ACTIVE | domain: **AGENTS_OS**
+        ├── **WP** `S002-P001-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+        └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+
+    └── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
@@ -49,8 +53,4 @@
 
 ### S006 — שלב 6 — Advanced Analytics | PLANNED [SHARED]
 
-
-## Errors
-
-- Program gate mirror mismatch for S002-P001: mirror='GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24)' vs WSM current_gate='GATE_1'
 

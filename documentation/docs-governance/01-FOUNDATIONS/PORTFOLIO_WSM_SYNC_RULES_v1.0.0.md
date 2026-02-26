@@ -37,7 +37,28 @@ Automation lock:
 
 ---
 
-## 3) Allowed state: NO_ACTIVE_WORK_PACKAGE
+## 3) Hierarchy and ID invariants (locked)
+
+Hierarchy is strict and parent-bound:
+
+- Stage: `S{NNN}`
+- Program: `S{NNN}-P{NNN}` (must belong to its Stage prefix)
+- Work Package: `S{NNN}-P{NNN}-WP{NNN}` (must belong to its Program prefix)
+
+Operational boundary:
+
+- Gate lifecycle (`GATE_3..GATE_8`) is a **Work Package** lifecycle only.
+- Program and Stage do not own gate progression; they are packaging/catalog layers.
+- Program `current_gate_mirror` is informational mirror from WSM runtime state only.
+
+Automation lock:
+
+- Snapshot validator enforces hierarchy and parent binding:
+  `scripts/portfolio/build_portfolio_snapshot.py --check`
+
+---
+
+## 4) Allowed state: NO_ACTIVE_WORK_PACKAGE
 
 - When no Work Package is active, WSM shall carry `active_work_package_id` as `—` or equivalent, and **PHOENIX_WORK_PACKAGE_REGISTRY** shall reflect:
   - No row with `is_active=true`, **or**
@@ -46,13 +67,13 @@ Automation lock:
 
 ---
 
-## 4) No Task-level in Portfolio
+## 5) No Task-level in Portfolio
 
 Portfolio registries contain **only** Stage, Program, Work Package. Task-level is **excluded** and remains internal to Team 10 and execution teams.
 
 ---
 
-## 5) Date discipline and anti-backward-time rule
+## 6) Date discipline and anti-backward-time rule
 
 To prevent context drift from wrong dates in operational artifacts:
 

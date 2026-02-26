@@ -23,6 +23,13 @@ ROADMAP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORT
 PROGRAM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"
 WP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
 
+STAGE_ID_RE = re.compile(r"^S\d{3}$")
+PROGRAM_ID_RE = re.compile(r"^S\d{3}-P\d{3}$")
+WORK_PACKAGE_ID_RE = re.compile(r"^S\d{3}-P\d{3}-WP\d{3}$")
+
+PROGRAM_ALLOWED_STATUSES = {"ACTIVE", "COMPLETE", "CLOSED", "HOLD", "FROZEN", "PIPELINE", "PLANNED"}
+WORK_PACKAGE_ALLOWED_STATUSES = {"IN_PROGRESS", "CLOSED", "HOLD"}
+
 
 class PortfolioError(RuntimeError):
     pass
@@ -286,6 +293,40 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
     wp_ids = [w["work_package_id"] for w in work_packages if w.get("work_package_id")]
     if len(wp_ids) != len(set(wp_ids)):
         errors.append("Duplicate work_package_id values in WP registry")
+
+    # Hierarchy and identifier invariants
+    for s in stages:
+        sid = (s.get("stage_id") or "").strip()
+        if not STAGE_ID_RE.fullmatch(sid):
+            errors.append(f"Stage identifier invalid: '{sid}' (expected S{{NNN}})")
+
+    for p in programs:
+        pid = (p.get("program_id") or "").strip()
+        sid = (p.get("stage_id") or "").strip()
+        status = (p.get("status") or "").strip().upper()
+        domain = (p.get("domain") or "").strip().upper()
+
+        if not PROGRAM_ID_RE.fullmatch(pid):
+            errors.append(f"Program identifier invalid: '{pid}' (expected S{{NNN}}-P{{NNN}})")
+        if pid and sid and pid.split("-P", 1)[0] != sid:
+            errors.append(f"Program parent mismatch: program_id='{pid}' does not belong to stage_id='{sid}'")
+        if status and status not in PROGRAM_ALLOWED_STATUSES:
+            errors.append(f"Program {pid} has invalid status '{status}'")
+        if domain and domain not in {"AGENTS_OS", "TIKTRACK"}:
+            errors.append(f"Program {pid} has invalid domain '{domain}' (must be single-domain: AGENTS_OS or TIKTRACK)")
+
+    for w in work_packages:
+        wid = (w.get("work_package_id") or "").strip()
+        pid = (w.get("program_id") or "").strip()
+        status = (w.get("status") or "").strip().upper()
+
+        if not WORK_PACKAGE_ID_RE.fullmatch(wid):
+            errors.append(f"Work package identifier invalid: '{wid}' (expected S{{NNN}}-P{{NNN}}-WP{{NNN}})")
+        expected_pid = wid.rsplit("-WP", 1)[0] if wid else ""
+        if pid and expected_pid and pid != expected_pid:
+            errors.append(f"Work package parent mismatch: work_package_id='{wid}' does not belong to program_id='{pid}'")
+        if status and status not in WORK_PACKAGE_ALLOWED_STATUSES:
+            errors.append(f"Work package {wid} has invalid status '{status}'")
 
     # Required fields
     for p in programs:

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-25T20:48:42.457682+00:00",
+  "generated_at_utc": "2026-02-26T18:19:08.089158+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "N/A",
     "in_progress_work_package_id": "N/A",
-    "current_gate": "GATE_1",
+    "current_gate": "GATE_8",
     "active_program_id": "S002-P001",
-    "last_gate_event": "GATE_0_PASS \\",
-    "next_required_action": "Team 100 issues LLD400 activation to Team 170; Team 170 prepares and submits GATE_1 package to Team 190",
-    "next_responsible_team": "Team 100"
+    "last_gate_event": "GATE_8_PASS \\",
+    "next_required_action": "Team 10 + Team 100: define and activate next authorized program/stage flow",
+    "next_responsible_team": "Team 10 / Team 100"
   },
   "stages": [
     {
@@ -87,7 +87,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S001",
       "status": "HOLD",
-      "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)"
+      "current_gate_mirror": "— (lock released 2026-02-22; activation decision pending Team 00)"
     },
     {
       "program_id": "S002-P001",
@@ -95,7 +95,15 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24)"
+      "current_gate_mirror": "GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A"
+    },
+    {
+      "program_id": "S002-P002",
+      "program_name": "Full Pipeline Orchestrator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S002",
+      "status": "PIPELINE",
+      "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)"
     }
   ],
   "work_packages": [
@@ -116,6 +124,24 @@
       "current_gate": "GATE_8 (PASS)",
       "is_active": false,
       "active_marker_reason": "Lifecycle complete 2026-02-23"
+    },
+    {
+      "work_package_id": "S002-P001-WP001",
+      "program_id": "S002-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-26"
+    },
+    {
+      "work_package_id": "S002-P001-WP002",
+      "program_id": "S002-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-26"
     }
   ],
   "hierarchy": [
@@ -161,7 +187,7 @@
           "program_name": "Alerts POC (per SSM §5.1)",
           "domain": "AGENTS_OS",
           "status": "HOLD",
-          "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)",
+          "current_gate_mirror": "— (lock released 2026-02-22; activation decision pending Team 00)",
           "work_packages": []
         }
       ]
@@ -181,7 +207,34 @@
           "program_name": "Agents_OS Core Validation Engine",
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_0 (LOD200 concept submitted by Team 100; awaiting Team 190 feasibility validation 2026-02-24)",
+          "current_gate_mirror": "GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A",
+          "work_packages": [
+            {
+              "work_package_id": "S002-P001-WP001",
+              "program_id": "S002-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-26"
+            },
+            {
+              "work_package_id": "S002-P001-WP002",
+              "program_id": "S002-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-26"
+            }
+          ]
+        },
+        {
+          "program_id": "S002-P002",
+          "program_name": "Full Pipeline Orchestrator",
+          "domain": "AGENTS_OS",
+          "status": "PIPELINE",
+          "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)",
           "work_packages": []
         }
       ]

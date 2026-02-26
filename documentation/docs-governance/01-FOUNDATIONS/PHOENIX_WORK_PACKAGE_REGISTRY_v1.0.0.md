@@ -22,7 +22,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | work_package_id | S{NNN}-P{NNN}-WP{NNN} |
 | program_id | S{NNN}-P{NNN} |
 | status | IN_PROGRESS \| CLOSED \| HOLD |
-| current_gate | GATE_3 \| GATE_4 \| … \| GATE_8 (mirror from WSM) |
+| current_gate | GATE_3 \| GATE_4 \| … \| GATE_8 \| GATE_8 (PASS) (mirror from WSM) |
 | is_active | true \| false |
 | active_marker_reason | Reason this WP is active, or `NO_ACTIVE_WORK_PACKAGE` when none |
 
@@ -39,11 +39,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P001 | S002-P001-WP002 | IN_PROGRESS | GATE_3 | true | GATE_3_IN_PROGRESS (WP002); LLD400_VALIDATED_PASS; READY_FOR_G3.5_PLAN_VALIDATION |
+| S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P001`, `current_gate=GATE_3`, `active_work_package_id=S002-P001-WP002`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P001`, `current_gate=GATE_8`, `active_work_package_id=N/A`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

@@ -266,13 +266,31 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
         messages.append(f"WP registry: marked {active_wp} as active=true")
 
     if last_closed_wp and not _is_no_active(last_closed_wp):
+        current_gate_upper = (current_gate or "").upper()
+        active_flow_upper = (active_flow or "").upper()
+        last_gate_event_upper = (last_gate_event or "").upper()
+        closed_on_gate8_pass = (
+            current_gate_upper == "GATE_8"
+            and (
+                "PASS" in active_flow_upper
+                or "PASS" in last_gate_event_upper
+                or "DOCUMENTATION_CLOSED" in active_flow_upper
+            )
+        )
         for row in rows:
             if row.get("work_package_id", "").strip() == last_closed_wp:
                 row["status"] = "CLOSED"
-                if row.get("current_gate", "").strip() == "GATE_8":
+                if closed_on_gate8_pass:
                     row["current_gate"] = "GATE_8 (PASS)"
-                if row.get("is_active", "").strip().lower() == "true" and row.get("work_package_id", "").strip() != active_wp:
-                    row["is_active"] = "false"
+                    row["active_marker_reason"] = f"Lifecycle complete {event_date}"
+                else:
+                    row["current_gate"] = _normalize_gate_for_wp(
+                        row.get("current_gate", "").strip(),
+                        last_gate_event,
+                        "CLOSED",
+                    )
+                row["is_active"] = "false"
+                messages.append(f"WP registry: marked {last_closed_wp} as CLOSED")
                 break
 
     rows.sort(key=lambda r: (r.get("program_id", ""), r.get("work_package_id", "")))

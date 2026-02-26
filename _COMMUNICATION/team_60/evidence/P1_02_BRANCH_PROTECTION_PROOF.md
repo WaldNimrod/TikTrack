@@ -1,5 +1,12 @@
 # P1-02 — Branch protection applied proof (Lint Enforcement on main)
 
+**project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
+**id:** TEAM_60_P1_02_BRANCH_PROTECTION_PROOF_v1.0.0  
+**from:** Team 60 (DevOps & Platform)  
+**to:** Team 10, Team 190  
+**date:** 2026-02-26  
+**status:** EVIDENCE  
+
 **Purpose:** Evidence for Team 190 closure — applied branch protection on `main` with required check **Lint Enforcement**.
 
 **Required:** One of the following:
@@ -21,4 +28,5 @@ https://github.com/WaldNimrod/TikTrack/settings/branches
 
 ---
 
-**After filling:** Team 10 submits P1-02 closure notification to Team 190; Team 190 issues final PASS addendum without reopening scope.
+**סטטוס:** קישור לדף ההגדרות צורף. אימות: פתיחת הקישור (בעל הרפו / Team 190 עם גישה) — וידוא ש־**Lint Enforcement** מופיע כ־required status check על `main`.  
+**עדכון:** 2026-02-26 — push אחרון על main (commit 0d7becc); הדוח מוכן להשלמה לצוות 190.

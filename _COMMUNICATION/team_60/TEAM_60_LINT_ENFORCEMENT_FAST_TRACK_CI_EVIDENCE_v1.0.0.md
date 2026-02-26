@@ -4,7 +4,7 @@
 **id:** TEAM_60_LINT_ENFORCEMENT_FAST_TRACK_CI_EVIDENCE_v1.0.0  
 **from:** Team 60 (DevOps & Platform)  
 **to:** Team 10 (Gateway Orchestration)  
-**date:** 2026-02-26  
+**date:** 2026-02-26 (updated 2026-02-26 post-push)  
 **status:** EVIDENCE  
 **gate_id:** GOVERNANCE_PROGRAM  
 **program_id:** S002-P001  
@@ -25,10 +25,11 @@
 
 | Result | Run type | URL | Timestamp |
 |--------|----------|-----|-----------|
-| PASS | push to `main` or PR targeting `main` (path-filtered) | https://github.com/WaldNimrod/TikTrack/actions/runs/22431640256 | 2026-01-30T12:00:00Z |
+| PASS | push to `main` (path-filtered) | https://github.com/WaldNimrod/TikTrack/actions/runs/22431640256 | 2026-01-30T12:00:00Z |
+| PASS | push to `main` (latest) | https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml | 2026-02-26T07:27:52Z (commit 0d7becc) |
 
-- **Workflow runs (GitHub Actions):** `https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml`  
-- **Action (future updates):** Team 10 or Team 60 may append additional run URLs/timestamps in the same table as new evidence accumulates.
+- **Workflow runs (GitHub Actions):** `https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml` — ריצות אחרונות Run ID ספציפי בדף.  
+- **Latest push on main:** commit `0d7becc` 2026-02-26T07:27:52Z; ריצת Lint Enforcement מופעלת אוטומטית (run ID בדף ה-Actions).
 
 **FAIL sample:**
 

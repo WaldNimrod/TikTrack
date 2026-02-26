@@ -46,5 +46,22 @@ Portfolio registries contain **only** Stage, Program, Work Package. Task-level i
 
 ---
 
+## 5) Date discipline and anti-backward-time rule
+
+To prevent context drift from wrong dates in operational artifacts:
+
+1. `date` in changed governance/communication markdown files must be valid `YYYY-MM-DD`.
+2. `date` must not be in the future relative to UTC day.
+3. For edited files, `date` must not move backward relative to previous committed version.
+4. For newly created files, `date` must be `>=` WSM reference event date (`CURRENT_OPERATIONAL_STATE.last_gate_event`) unless explicitly marked historical.
+5. Intentional historical backfill is allowed only with explicit marker: `historical_record: true`.
+
+CI enforcement (check-only, changed files only):
+- Script: `scripts/lint_governance_dates.sh`
+- Workflow: `.github/workflows/lint-enforcement.yml` (job `Lint Enforcement`)
+
+---
+
 **log_entry | TEAM_170 | PORTFOLIO_WSM_SYNC_RULES | v1.0.0_CREATED | 2026-02-23**
 **log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | TRACK_MODE_RUNTIME_BOUNDARY_CLARIFIED | 2026-02-26**
+**log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | DATE_DISCIPLINE_ENFORCEMENT_LOCK_ADDED | 2026-02-26**

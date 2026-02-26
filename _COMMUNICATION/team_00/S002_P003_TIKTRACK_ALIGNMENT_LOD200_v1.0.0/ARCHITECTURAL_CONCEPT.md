@@ -27,6 +27,18 @@ effective_date: 2026-02-26
 | WP001 | D22 — השלמת פיצ'ר חסר (filter UI) | Team 30 | עצמאי |
 | WP002 | D22+D34+D35 — Final Acceptance Validation | Team 50 | WP001 לD22; עצמאי לD34/D35 |
 
+### 2.1 שרשרת שערים קנונית מחייבת (No Bypass)
+
+```
+GATE_0 (Team 190): LOD200 constitutional validation
+→ GATE_1 (Team 170 submit, Team 190 validate): LLD400 spec lock
+→ GATE_2 (Team 190 + Team 100/00 authority): architect approval
+→ GATE_3 (Team 10): intake + execution activation for WP001/WP002
+→ GATE_4..GATE_8 (Team 10/50/90/70 per protocol)
+```
+
+אין הפעלה של Team 10/30/50 לביצוע בפועל לפני `GATE_2 PASS` ופתיחת `GATE_3`.
+
 ---
 
 ## 3) WP001 — D22 Filter/Search UI (Team 30)

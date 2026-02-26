@@ -43,7 +43,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P001`, `current_gate=GATE_8`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_1`, `active_work_package_id=N/A`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

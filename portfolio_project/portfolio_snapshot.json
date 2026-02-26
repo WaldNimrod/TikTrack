@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-26T18:19:08.089158+00:00",
+  "generated_at_utc": "2026-02-26T18:33:49.415302+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "N/A",
     "in_progress_work_package_id": "N/A",
-    "current_gate": "GATE_8",
-    "active_program_id": "S002-P001",
-    "last_gate_event": "GATE_8_PASS \\",
-    "next_required_action": "Team 10 + Team 100: define and activate next authorized program/stage flow",
-    "next_responsible_team": "Team 10 / Team 100"
+    "current_gate": "GATE_1",
+    "active_program_id": "S002-P003",
+    "last_gate_event": "GATE_0_PASS \\",
+    "next_required_action": "Team 100: activate Team 170 to produce and submit S002-P003 LLD400 package to Team 190 for GATE_1 validation (no Team 10 execution before GATE_2 PASS).",
+    "next_responsible_team": "Team 100"
   },
   "stages": [
     {
@@ -104,6 +104,14 @@
       "stage_id": "S002",
       "status": "PIPELINE",
       "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)"
+    },
+    {
+      "program_id": "S002-P003",
+      "program_name": "TikTrack Alignment (D22+D34+D35)",
+      "domain": "TIKTRACK",
+      "stage_id": "S002",
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_1; active_flow=GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission; active_work_package_id=N/A"
     }
   ],
   "work_packages": [
@@ -235,6 +243,14 @@
           "domain": "AGENTS_OS",
           "status": "PIPELINE",
           "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S002-P003",
+          "program_name": "TikTrack Alignment (D22+D34+D35)",
+          "domain": "TIKTRACK",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_1; active_flow=GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission; active_work_package_id=N/A",
           "work_packages": []
         }
       ]

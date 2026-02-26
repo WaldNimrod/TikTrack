@@ -12,7 +12,7 @@ effective_date: 2026-02-26
 # הודעה ארכיטקטונית — הפעלת S002-P003: TikTrack Alignment
 
 **מאת:** Team 00 — Chief Architect
-**אל:** Team 10 (Gateway) → Team 30 (Frontend) + Team 50 (QA) → Team 90 (Validation) → Team 70 (Docs)
+**אל:** Team 190 (Constitutional Architectural Validator), Team 100 (Development Architecture Authority), Team 170 (Spec Owner)
 **נושא:** LOD200 — אפיון ארכיטקטוני להפעלת חבילת יישור הקו TikTrack (D22 + D34 + D35)
 **תאריך:** 2026-02-26
 
@@ -27,26 +27,29 @@ effective_date: 2026-02-26
 
 ---
 
-## ניתוב והוראות הפעלה
+## ניתוב והוראות הפעלה (לפי מודל שערים קנוני)
 
 | צוות | פעולה | בסיס |
 |------|--------|-------|
-| **Team 10** | קרא מסמך זה + ARCHITECTURAL_CONCEPT.md. הפעל Team 30 ל-WP001; הפעל Team 50 ל-WP002. | מיידי |
-| **Team 30** | קבל הוראות WP001 (D22 filter UI). בצע. דווח לTeam 10 עם SOP-013. | לאחר הפעלת Team 10 |
-| **Team 50** | קבל הוראות WP002 (D22+D34+D35 FAV). WP002 לD34/D35 — מיידי. WP002 לD22 — לאחר Team 30. | לאחר הפעלת Team 10 |
-| **Team 90** | ממתין לעדויות FAV מTeam 50. מאשר gate לכל עמוד. | לאחר Team 50 |
-| **Team 70** | מעדכן תיעוד D22/D34/D35 לאחר PASS. | לאחר Team 90 |
+| **Team 190** | מבצע GATE_0 validation ל-LOD200 ומעדכן WSM. | מיידי |
+| **Team 100** | לאחר GATE_0 PASS: מפעיל Team 170 להפקת LLD400. | לפי נוהל GATE_0→GATE_1 |
+| **Team 170** | מפיק LLD400 ומגיש ל-190 ל-GATE_1 validation. | אחרי הפעלת Team 100 |
+| **Team 190** | מבצע GATE_1 validation, ואז GATE_2 flow/decision יחד עם הארכיטקטורה. | לפי חוזה GATE_0_1_2 |
+| **Team 10** | מקבל handoff רק לאחר GATE_2 PASS, ופותח GATE_3 intake לביצוע WP001/WP002. | אחרי GATE_2 בלבד |
 
 ---
 
-## עדיפויות ריצה
+## שרשרת שערים מחייבת (No bypass)
 
 ```
-[מיידי]     Team 50 → מתחיל D34 + D35 FAV (לא מחכה ל-D22 UI)
-[מיידי]     Team 30 → מתחיל D22 filter UI
-[אחרי Team 30] Team 50 → מוסיף D22 E2E + API script
-[אחרי כל] Team 90 → gate sign-off per page
+GATE_0 (Team 190): LOD200 constitutional validation
+→ GATE_1 (Team 190, input from Team 170): LLD400 spec lock
+→ GATE_2 (Team 190 + Team 100/00 approval authority): architect approval
+→ GATE_3 (Team 10): intake + execution activation
+→ GATE_4..GATE_8 (Team 10/50/90/70 per protocol)
 ```
+
+אין הפעלת Team 30/Team 50 לפני GATE_2 PASS ופתיחת GATE_3.
 
 ---
 

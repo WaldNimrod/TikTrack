@@ -85,28 +85,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_8 PASS validated for S002-P001-WP002; lifecycle closed by Team 90.
+**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_0 PASS validated for S002-P003; program advanced to GATE_1 and routed to Team 100/170 for LLD400.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete |
-| active_project_domain | AGENTS_OS |
+| active_flow | GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission |
+| active_project_domain | TIKTRACK |
 | active_work_package_id | N/A (pending next authorized intake) |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
-| current_gate | GATE_8 |
+| allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P003) |
+| current_gate | GATE_1 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
-| active_program_id | S002-P001 |
+| active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3–GATE_4 owner); GATE_5–GATE_8 owner Team 90 |
-| last_gate_event | GATE_8_PASS \| 2026-02-26 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P001_WP002_GATE8_VALIDATION_REPORT.md |
-| next_required_action | Team 10 + Team 100: define and activate next authorized program/stage flow |
-| next_responsible_team | Team 10 / Team 100 |
+| phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
+| last_gate_event | GATE_0_PASS \| 2026-02-26 \| Team 190 \| TEAM_190_GATE0_S002_P003_VALIDATION_RESULT.md |
+| next_required_action | Team 100: activate Team 170 to produce and submit S002-P003 LLD400 package to Team 190 for GATE_1 validation (no Team 10 execution before GATE_2 PASS). |
+| next_responsible_team | Team 100 |
 
 ---
 
@@ -197,3 +197,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS S002-P001-WP002 confirmed by Nimrod | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 activated for S002-P001-WP002; Team 70 execution requested | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P001-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-02-26**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_1 and routed to Team 100/170 for LLD400 | 2026-02-26**

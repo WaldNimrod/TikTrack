@@ -2,7 +2,7 @@
 id: TEAM_190_GATE0_ACTIVATION_S002_P003
 from: Team 00 (Chief Architect)
 to: Team 190 (Constitutional Architectural Validator)
-cc: Team 10 (Gateway)
+cc: Team 100 (Development Architecture Authority), Team 170 (Spec Owner), Team 10 (Gateway)
 gate: GATE_0 — SPEC_ARC
 program: S002-P003
 status: ACTIVATION — OPEN
@@ -22,7 +22,7 @@ effective_date: 2026-02-26
 | roadmap_id | TIKTRACK_ROADMAP_LOCKED (sv 1.0.0, 2026-02-26) |
 | stage_id | S002 |
 | program_id | S002-P003 |
-| work_package_id | S002-P003-WP001, S002-P003-WP002 |
+| work_package_id | N/A (program-level GATE_0 validation) |
 | task_id | N/A |
 | gate_id | GATE_0 — SPEC_ARC (LOD200) |
 | phase_owner | Team 190 |
@@ -126,24 +126,25 @@ documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 
 שנה את שדות ה-S002-P003:
 - `program_status`: `GATE_0_VALIDATED`
-- `current_gate`: `GATE_1` *(GATE_0 complete, GATE_1 = SPEC_LOCK / LOD400 — לא רלוונטי לחבילת alignment זו)*
-- `next_responsible_team`: `Team 10`
+- `current_gate`: `GATE_1` *(GATE_0 complete; waiting LLD400 submission)*
+- `next_required_action`: `Team 100 activates Team 170 to produce and submit LLD400 for S002-P003 Gate 1`
+- `next_responsible_team`: `Team 100`
 - `gate_0_completed`: `2026-02-26`
 
-**הערה לחבילת Alignment:** LOD200 כבר נכתב על ידי Team 00. אין LOD400 נפרד לחבילה זו — ה-ARCHITECTURAL_CONCEPT.md כולל רמת פירוט מספקת לביצוע ישיר. לכן: לאחר GATE_0 PASS → Team 10 מפעיל ישירות את Team 30 + Team 50.
+**הערה קנונית מחייבת:** אין bypass של GATE_1/GATE_2. גם בחבילת alignment חייב להיות LLD400 קנוני (Team 170) לפני כל handoff ל-Team 10.
 
-### שלב ג — ניתוב לTeam 10
+### שלב ג — ניתוב לTeam 100/170 (GATE_1)
 
-כתוב מסמך handoff קצר ל-Team 10:
+כתוב הודעת הפעלה קצרה ל-Team 100 ו-Team 170:
 ```
-_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_GATE0_HANDOFF.md
+_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_170_S002_P003_GATE1_ACTIVATION_NOTICE_v1.0.0.md
 ```
 
-תוכן ה-handoff:
+תוכן ההודעה:
 - GATE_0 PASS (תוצאות 8 הבדיקות)
-- הוראה: הפעל Team 30 ל-WP001 (D22 filter UI) — מיידי
-- הוראה: הפעל Team 50 ל-WP002 D34+D35 — מיידי (עצמאי מWP001)
-- הוראה: הפעל Team 50 ל-WP002 D22 — לאחר Team 30 מסיים WP001 ומגיש SOP-013
+- הוראה: Team 100 מפעיל Team 170 להפקת LLD400 לתוכנית S002-P003
+- הוראה: Team 170 מגיש ל-Team 190 בקשת GATE_1 validation
+- הוראה: אין הפעלה של Team 10/30/50 לפני GATE_2 PASS ופתיחת GATE_3
 - ייחוס: `_COMMUNICATION/team_00/S002_P003_TIKTRACK_ALIGNMENT_LOD200_v1.0.0/ARCHITECTURAL_CONCEPT.md`
 
 ---
@@ -154,7 +155,7 @@ _COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_GATE0_HANDOFF.md
 |------|-------|------|
 | LOD200 Validation Report | `_COMMUNICATION/team_190/TEAM_190_GATE0_S002_P003_VALIDATION_RESULT.md` | תוצאות 8 בדיקות, GATE_0 PASS/FAIL, הערות |
 | WSM update | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | S002-P003 status = GATE_0_VALIDATED |
-| Team 10 Handoff | `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_GATE0_HANDOFF.md` | GATE_0 PASS + routing instructions |
+| Gate 1 Activation Notice | `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_170_S002_P003_GATE1_ACTIVATION_NOTICE_v1.0.0.md` | GATE_0 PASS + Team 100/170 next actions |
 
 ---
 
@@ -164,7 +165,7 @@ _COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_GATE0_HANDOFF.md
 ✅ קריאת כל 5 המסמכים חובה לפני פעולה
 ✅ 8/8 LOD200 validation checks — PASS
 ✅ WSM מעודכן: S002-P003 → GATE_0_VALIDATED
-✅ Team 10 קיבל handoff ברור עם routing instructions
+✅ Team 100/170 קיבלו הנחיית GATE_1 ברורה (LLD400 submission)
 ✅ אין הערות חוקתיות פתוחות שחוסמות ביצוע
 ```
 
@@ -176,8 +177,7 @@ _COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_GATE0_HANDOFF.md
 |-----|-------|-------|
 | D23 מחוץ לסקופ | D23 (דשבורד נתונים) דחוי — לא חלק מS002-P003 | אל תכלול, אל תתעד |
 | LOD200 מ-Team 00 | כתוב ישירות על ידי Chief Architect — תקין לAlignment Package | אמת, אל תכתוב מחדש |
-| Team 30 + Team 50 — ריצה מקבילה | D34+D35 FAV ו-D22 filter UI מתחילים במקביל | ניתוב כפול בhandoff |
-| אין LOD400 נפרד | רמת הפירוט ב-ARCHITECTURAL_CONCEPT.md מספיקה לביצוע | ציין בhandoff שביצוע מתחיל ישירות |
+| Team 10 לפני GATE_3 | אסור להעביר לביצוע לפני GATE_2 PASS | העבר רק ל-Team 100/170 בשלב זה |
 
 ---
 
@@ -198,7 +198,7 @@ documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md
 
 - **אל תבנה** — אתה מאמת בלבד
 - **אל תשנה** ARCHITECTURAL_CONCEPT.md — אם יש הערות, תעד אותן בValidation Report
-- **אל תפעיל** Team 30 / Team 50 ישירות — רק Team 10 עושה זאת (לאחר handoff שלך)
+- **אל תפעיל** Team 10 / Team 30 / Team 50 בשלב זה — מותר רק ניתוב GATE_1 ל-Team 100/170
 - **אל תכתוב** ל-`_COMMUNICATION/team_30/` או `_COMMUNICATION/team_50/`
 
 ---

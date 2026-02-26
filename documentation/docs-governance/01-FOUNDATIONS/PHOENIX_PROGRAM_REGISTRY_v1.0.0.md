@@ -40,12 +40,13 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (lock released 2026-02-22; activation decision pending Team 00) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A |
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision) |
+| S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_1; active_flow=GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission; active_work_package_id=N/A |
 
 
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-26):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_8; active_work_package_id=N/A; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete.
+**WSM mirror (2026-02-26):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_1; active_work_package_id=N/A; active_flow=GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission.
 
 ---
 
@@ -58,3 +59,4 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P001_GATE2_APPROVED_GATE3_INTAKE_TEAM10_NEXT | 2026-02-25**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_WP001_GATE8_PASS_WP002_ACTIVATED_S002_P002_PIPELINE_ADDED | 2026-02-26**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_WP002_GATE3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**
+**log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P003_ADDED_GATE0_PASS_G1_PENDING | 2026-02-26**

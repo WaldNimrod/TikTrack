@@ -26,3 +26,4 @@ archive/
 .DS_Store
 *.tmp
 .tmp.driveupload/
+.claude/worktrees/

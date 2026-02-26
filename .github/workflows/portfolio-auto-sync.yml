@@ -63,6 +63,10 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Standardize registry mirrors from WSM (check-only)
+        run: |
+          python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check
+
       - name: Build and validate portfolio snapshot
         run: |
           python scripts/portfolio/build_portfolio_snapshot.py --check \
@@ -104,6 +108,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Standardize registry mirrors from WSM (check-only)
+        run: |
+          python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check
 
       - name: Rebuild snapshot (fresh in this job)
         run: |

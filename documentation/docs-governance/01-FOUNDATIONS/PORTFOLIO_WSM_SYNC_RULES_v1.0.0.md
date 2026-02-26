@@ -29,6 +29,12 @@ When WSM CURRENT_OPERATIONAL_STATE is updated, the following are the binding fie
 
 Updater of WSM (Gate Owner per WSM_OWNER_MATRIX) is responsible for ensuring registries are updated per these rules, or delegating the registry update to the designated owner (Team 170 / Team 10 as per process).
 
+Automation lock:
+- Standardization script (deterministic mirror from WSM): `scripts/portfolio/sync_registry_mirrors_from_wsm.py`
+- Local apply mode: `python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --write`
+- CI enforcement mode: `python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check`
+- CI trigger points: `.github/workflows/lint-enforcement.yml`, `.github/workflows/portfolio-auto-sync.yml`
+
 ---
 
 ## 3) Allowed state: NO_ACTIVE_WORK_PACKAGE

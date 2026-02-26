@@ -38,12 +38,14 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | --- | --- | --- | --- | --- | --- |
 | S001-P001 | S001-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
+| S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
+| S002-P001 | S002-P001-WP002 | IN_PROGRESS | GATE_3 | true | GATE_3_IN_PROGRESS (WP002) |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P001`, `current_gate=GATE_3`, `active_work_package_id=N/A`; `last_closed_work_package_id=S001-P001-WP002` (GATE_8 PASS 2026-02-23). No row has `is_active=true` until Team 10 opens the first S002 work package.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P001`, `current_gate=GATE_3`, `active_work_package_id=S002-P001-WP002`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-25). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 
@@ -51,3 +53,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_B2_REMEDIATION | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_STAGE_S002_NO_ACTIVE_WP | 2026-02-24**
 **log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_GATE2_APPROVED_GATE3_NO_ACTIVE_WP_YET | 2026-02-25**
+**log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_WP002_G3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**

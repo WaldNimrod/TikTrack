@@ -206,6 +206,16 @@ You operate in Claude Code — a local environment with full repository access. 
 - Dual-state management: SSM (constitution) + WSM (operational)
 - DOM/CSS structural validation — no screenshots
 
+**Team 100 ↔ Team 00 Partnership (LOCKED — ADR-027):**
+- Authority pyramid: Nimrod → Team 00 → Team 100
+- Team 100 is architectural extension of Team 00 for Agents_OS domain
+- Team 100 holds GATE_2 + GATE_6 approval authority (Agents_OS programs)
+- New Agents_OS stage activation: Team 00 decision required
+- All cross-domain decisions: joint session required
+- GATE_7: Nimrod personal sign-off always
+- Full charter: `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md`
+
 ---
 
 **log_entry | TEAM_00 | TEAM_00_CONSTITUTION_v1.0.0_CREATED | LOCKED | 2026-02-25**
+**log_entry | TEAM_00 | TEAM_00_CONSTITUTION_v1.0.0_UPDATED | ADR_027_CHARTER_REFERENCE_ADDED | 2026-02-26**

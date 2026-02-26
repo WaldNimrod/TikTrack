@@ -21,14 +21,15 @@
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
 | active_program_id | S002-P001 |
-| current_gate | GATE_8 |
-| active_flow | GATE_8 PASS (S002-P001-WP001); DOCUMENTATION_CLOSED; awaiting Team 10 next work-package intake |
+| current_gate | GATE_3 |
+| active_flow | GATE_3_INTAKE_OPEN (WP002); LLD400_PENDING_FROM_TEAM_170; NO_G3_BUILD_BEFORE_SPEC |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | N/A (pending next intake) |
-| phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits requests |
-| last_gate_event | GATE_8_PASS \| 2026-02-26 \| Team 90 |
-| next_required_action | Team 10 opens next authorized work package under S002-P001 per runbook |
-| next_responsible_team | Team 10 |
+| active_work_package_id | S002-P001-WP002 |
+| last_closed_work_package_id | S002-P001-WP001 (GATE_8 PASS 2026-02-26) |
+| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
+| last_gate_event | GATE_3_INTAKE_OPEN \| 2026-02-26 \| Team 10 |
+| next_required_action | Team 170: submit WP002 LLD400 package to unlock G3.5 planning validation and downstream G3 build sequence |
+| next_responsible_team | Team 170 |
 
 ---
 
@@ -47,27 +48,30 @@ Both work packages closed. S001 lifecycle is finished.
 
 ---
 
-## 3. STAGE S002 — ACTIVE (WP001 CLOSED)
+## 3. STAGE S002 — ACTIVE (WP001 CLOSED; WP002 GATE_3 INTAKE_OPEN)
 
 ### S002-P001: Agents_OS Core Validation Engine
 
 **What this program is:** A Python-based automated validation engine that automates governance checks:
-- **WP001** — Spec Validator (170→190 flow): 44 deterministic checks + LLM quality gate
-- **WP002** — Execution Validator (10→90 flow): 11 deterministic checks + LLM quality gate
+- **WP001** ✅ CLOSED (GATE_8 PASS 2026-02-26) — Spec Validator (170→190 flow): 44 deterministic checks + LLM quality gate
+- **WP002** 🟡 GATE_3 INTAKE_OPEN — Execution Validator (10→90 flow): 11 deterministic checks + LLM quality gate
 
 This is the infrastructure that will replace manual LLM validation for all future programs.
 
-**Gate timeline (S002-P001-WP001):**
+**Gate timeline (S002-P001-WP001 — CLOSED):**
 - GATE_0 PASS: 2026-02-25
 - GATE_1 PASS: 2026-02-25
 - GATE_2 APPROVED: 2026-02-25
 - GATE_3..GATE_4 completed (implementation + QA)
 - GATE_5 PASS and GATE_6 approved (Team 90 / Team 100 authority model)
 - GATE_7 PASS: 2026-02-26
-- GATE_8 PASS: 2026-02-26 (`DOCUMENTATION_CLOSED`)
+- GATE_8 PASS: 2026-02-26 (`DOCUMENTATION_CLOSED`) ✅
 
-**LOD200 Package (GATE_0 approved):**
-`_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/`
+**WP002 current status:**
+- GATE_3 INTAKE_OPEN (Team 10 acknowledged 2026-02-26)
+- **Blocked at G3.5**: Team 170 must submit WP002 LLD400 package before build sequence begins
+- LOD200 reference: `_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/`
+- WP002 Activation Directive: `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_S002_P001_WP002_LLD400_ACTIVATION_v1.0.0.md`
 
 ---
 
@@ -89,9 +93,8 @@ Questions for you:
 
 | Priority | Decision | Context | Who's Waiting |
 |---|---|---|---|
-| 🔴 HIGH | **Next WP authorization — S002-P001** | WP001 is closed at GATE_8; confirm priority/authorization for next work package intake | Team 10 / Team 100 |
+| 🔴 HIGH | **WP002 unblocking — LLD400 from Team 170** | WP002 GATE_3 intake open; Team 170 must submit LLD400 to unlock G3.5 → G3 build sequence | Team 170 |
 | 🔴 HIGH | **S001-P002 Activation — Alerts POC** | Execution order lock released; strategic decision on timing and priority | Team 100 |
-| 🟡 MEDIUM | **S002 Strategic Alignment (post-WP001)** | Confirm next S002 package scope and sequencing against product vision | Team 100 |
 | 🟡 MEDIUM | **S003–S006 Sequencing** | Any updated priority, timeline, or dependency guidance? | Team 100 |
 | 🟢 LOW | **Gemini Knowledge Integration** | Knowledge extraction questionnaire sent to Gemini; results need to be formalized into decision files | Team 00 (you) |
 

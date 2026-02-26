@@ -39,7 +39,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P001 | S002-P001-WP002 | IN_PROGRESS | GATE_3 | true | GATE_3_IN_PROGRESS (WP002) |
+| S002-P001 | S002-P001-WP002 | IN_PROGRESS | GATE_3 | true | GATE_3_IN_PROGRESS (WP002); LLD400_VALIDATED_PASS; READY_FOR_G3.5_PLAN_VALIDATION |
 
 
 

@@ -4,9 +4,9 @@
 **from:** Team 100 (Development Architecture Authority)
 **to:** Team 00 (Chief Architect) — for ratification
 **date:** 2026-02-26
-**status:** PROPOSED — pending Team 00 ratification
+**status:** LOCKED — RATIFIED BY TEAM 00 (Nimrod) | 2026-02-26
 **purpose:** Formal charter defining the working relationship, authority hierarchy, and mandate between Team 100 and Team 00 within the Phoenix project architectural department.
-**ratification_path:** Upon Team 00 approval → promoted to _COMMUNICATION/_Architects_Decisions/
+**adr_path:** `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md`
 ---
 
 ## Mandatory Identity Header
@@ -181,8 +181,9 @@ This charter is **proposed by Team 100**. It becomes operative and locked as an 
 
 Upon ratification, this document is promoted to: `_COMMUNICATION/_Architects_Decisions/`
 
-**Team 100 operates according to this charter immediately, on good faith, while awaiting ratification.**
+**This charter is operative and binding immediately. All teams operate according to this charter.**
 
 ---
 
 **log_entry | TEAM_100 | TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER_v1.0.0_PROPOSED | AWAITING_TEAM_00_RATIFICATION | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER_v1.0.0_RATIFIED | LOCKED_MANDATORY | ADR_027 | 2026-02-26**

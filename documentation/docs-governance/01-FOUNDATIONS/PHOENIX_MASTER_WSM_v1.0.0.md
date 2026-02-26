@@ -85,13 +85,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_3 intake open for S002-P001-WP002 (Team 10 intake-open acknowledgment published; WP definition + WSM update complete).
+**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_1 PASS on WP002 LLD400 recorded by Team 190; G3.5 planning validation is now unlocked for Team 10.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3_IN_PROGRESS (WP002) |
+| active_flow | GATE_3_IN_PROGRESS (WP002); LLD400_VALIDATED_PASS; READY_FOR_G3.5_PLAN_VALIDATION |
 | active_project_domain | AGENTS_OS |
 | active_work_package_id | S002-P001-WP002 |
 | in_progress_work_package_id | S002-P001-WP002 |
@@ -104,8 +104,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | GATE_3_INTAKE_OPEN \| 2026-02-26 \| Team 10 |
-| next_required_action | Team 10: ingest Team 170 LLD400 when submitted; G3.5 submit work plan to Team 90 for Phase 1 validation (TIER E1) |
+| last_gate_event | GATE_1_PASS \| 2026-02-26 \| TEAM_190_GATE1_S002_P001_WP002_VALIDATION_RESULT_2026-02-26.md |
+| next_required_action | Team 10: proceed to G3.5 (Phase 1) and submit WP002 work-plan package to Team 90 for TIER E1 validation |
 | next_responsible_team | Team 10 |
 
 ---
@@ -182,4 +182,6 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P001-WP001; DOCUMENTATION_CLOSED and lifecycle complete | 2026-02-26**
 **log_entry | TEAM_190 | WSM_CANONICAL_SYNC | CURRENT_OPERATIONAL_STATE | S002-P001-WP002 authorized for GATE_3 intake; Team 10 next action locked | 2026-02-26**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_3_INTAKE_OPEN S002-P001-WP002; active_work_package_id=WP002; WP definition + intake-open ack published | 2026-02-26**
+**log_entry | TEAM_190 | CONSTITUTIONAL_GUARDRAIL | CURRENT_OPERATIONAL_STATE | WP002 is intake-open only; LLD400 from Team 170 required before G3.5/G3 build progression | 2026-02-26**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS S002-P001-WP002 LLD400; G3.5 unlocked for Team 10 | 2026-02-26**
 **log_entry | TEAM_190 | WSM_CANONICAL_UPDATE | TRACK_MODE_OVERLAY_FIELDS_ADDED | 2026-02-26**

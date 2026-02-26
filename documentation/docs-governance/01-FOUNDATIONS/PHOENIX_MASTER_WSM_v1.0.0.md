@@ -3,6 +3,7 @@
 **source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md
 **canonical_path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 **promotion_date:** 2026-02-22
+**date:** 2026-02-22
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
 ---
@@ -16,6 +17,7 @@ owner: Team 10
 ssm_dependency: 1.0.0
 ---
 **project_domain:** TIKTRACK
+**date:** 2026-02-22
 # 🛠️ PHOENIX WORK STATE (WSM) v1.0.0
 
 מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח. **מבנה קנוני v2.3.0** (היררכיה, מספור, GATE_2/GATE_8) per 04_GATE_MODEL_PROTOCOL_v2.3.0.
@@ -85,28 +87,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_0 PASS validated for S002-P003; program advanced to GATE_1 and routed to Team 100/170 for LLD400.
+**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_2 SPEC submission for S002-P003 was delivered to Team 00; waiting architect decision.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_1_PENDING (S002-P003); GATE_0_PASS validated; waiting Team 100 activation of Team 170 for LLD400 submission |
+| active_flow | GATE_2_PENDING (S002-P003); SPEC package submitted to Team 00; awaiting APPROVED/REJECTED decision |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | N/A (pending next authorized intake) |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P003) |
-| current_gate | GATE_1 |
+| current_gate | GATE_2 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
-| last_gate_event | GATE_0_PASS \| 2026-02-26 \| Team 190 \| TEAM_190_GATE0_S002_P003_VALIDATION_RESULT.md |
-| next_required_action | Team 100: activate Team 170 to produce and submit S002-P003 LLD400 package to Team 190 for GATE_1 validation (no Team 10 execution before GATE_2 PASS). |
-| next_responsible_team | Team 100 |
+| last_gate_event | GATE_1_PASS \| 2026-02-26 \| Team 190 \| TEAM_190_GATE1_S002_P003_VALIDATION_RESULT.md |
+| next_required_action | Team 00: review S002-P003 GATE_2 SPEC submission package and issue APPROVED/REJECTED decision (with findings if rejected). |
+| next_responsible_team | Team 00 |
 
 ---
 
@@ -197,4 +199,6 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS S002-P001-WP002 confirmed by Nimrod | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 activated for S002-P001-WP002; Team 70 execution requested | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P001-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-02-26**
-**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_1 and routed to Team 100/170 for LLD400 | 2026-02-26**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_1 and routed to Team 00/170 for LLD400 | 2026-02-26**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_2_PENDING for architect approval flow | 2026-02-26**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P003 GATE_2 SPEC package submitted to Team 00; awaiting architect decision | 2026-02-26**

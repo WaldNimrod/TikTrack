@@ -19,6 +19,7 @@ related:
   - _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_CATS.md
 ---
 **project_domain:** TIKTRACK
+**date:** 2026-02-26
 
 # ARCHITECT DIRECTIVE — TIKTRACK ROADMAP LOCKED (S002–S006)
 

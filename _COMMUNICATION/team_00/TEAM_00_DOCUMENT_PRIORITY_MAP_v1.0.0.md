@@ -8,146 +8,91 @@
 
 # TEAM 00 — DOCUMENT PRIORITY MAP v1.0.0
 
-מפת קריאה לאדריכל הראשי. 88+ קבצים ממוינים לפי עדיפות וקטגוריה.
+מפת קריאה מחייבת לצוות 00 לפי שכבות סמכות, סטטוס ריצה, וחוזי שער.
 
 ---
 
-## TIER 0 — Law Layer (קרא בכל סשן ראשון)
+## TIER -1 — CONTEXT ANCHORS (READ FIRST IF UNCERTAIN)
 
-אלה הקבצים שמגדירים את הכל. קרא אותם לפני כל דבר אחר.
-
-| # | קובץ | נתיב | מה הוא נותן לך |
-|---|---|---|---|
-| 0.1 | **WSM — מצב מבצעי** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | מה קורה עכשיו: stage, gate, program, next action |
-| 0.2 | **SSM — חוקה** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | Authority model, hierarchy, governance rules |
-| 0.3 | **Iron Rules** | `documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md` | 8 כללי ברזל — non-negotiable |
-| 0.4 | **Gate Model v2.3.0** | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` | Gate enum, authority, hierarchy, numbering |
-
----
-
-## TIER 1 — Session Context (קרא לפי מה שפעיל)
-
-### 1A — Agents_OS Current Program (S002-P001, **WP002 GATE_3 INTAKE_OPEN**)
-
-| קובץ | נתיב | מצב |
+| Document | Path | Purpose |
 |---|---|---|
-| Gate Lifecycle v1.1.0 | `documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md` | — |
-| LOD200 Package (6 קבצים) | `_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/` | WP001+WP002 scope |
-| **WP002 LLD400 Activation Directive** | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_S002_P001_WP002_LLD400_ACTIVATION_v1.0.0.md` | 🔴 **PENDING — Team 170 must deliver** |
-| **WP002 Team 10 Intake Directive** | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_10_S002_P001_WP002_ACTIVATION_DIRECTIVE_v1.0.0.md` | GATE_3 INTAKE_OPEN |
-| **ADR-027 Charter (LOCKED)** | `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md` | RATIFIED 2026-02-26 |
-| GATE_0/1/2 Spec Lifecycle Contract | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` | — |
-| Program Registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | — |
-| Portfolio Roadmap | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | — |
-
-### 1B — Your Inbox (check every session)
-
-| קובץ | נתיב |
-|---|---|
-| Architect Inbox | `_COMMUNICATION/_ARCHITECT_INBOX/` — list folder |
-| Your communications folder | `_COMMUNICATION/team_00/` — list folder |
-| Architect Decisions Index | `_COMMUNICATION/_Architects_Decisions/00_MASTER_INDEX.md` |
+| Master index | `00_MASTER_INDEX.md` | Canonical entry and path policy |
+| Session identity anchor | `CLAUDE.md` | Team 00 runtime identity lock |
+| Environment rule anchor | `.cursorrules` | Operational environment constraints |
+| Portfolio index | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | Portfolio authority boundaries |
 
 ---
 
-## TIER 2 — TikTrack Product (מוצר ווייזון)
+## TIER 0 — LAW LAYER (MANDATORY EVERY SESSION)
 
-קרא אלה כשיש שאלות על המוצר, הפיצ'רים, או כשמגיע GATE_2/GATE_7.
-
-| # | קובץ | נתיב | תוכן |
+| # | Document | Path | Why |
 |---|---|---|---|
-| 2.1 | **Product Narrative (SSOT)** | `_COMMUNICATION/_Architects_Decisions/PI_STRATEGIC_NARRATIVE_REPORT.md` | ויזיון המוצר: Digital Twin, 4 value pillars |
-| 2.2 | **ADR-026 — Agent OS Final Verdict** | `_COMMUNICATION/_Architects_Decisions/ADR_026_AGENT_OS_FINAL_VERDICT.md` | 9-gate model, SSM+WSM, Visual Integrity |
-| 2.3 | **ADR-027 — Team 100 ↔ Team 00 Charter** | `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md` | Authority pyramid, domain authority, GATE_2+GATE_6 delegation, escalation protocol |
-| 2.4 | **Balanced Core Architecture** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BASE_SYSTEMS_DESIGN_MANDATE.md` | Shared Core (PDSC), no page-specific logic |
-| 2.5 | **Portfolio Roadmap (S001–S006)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | Stage by stage: pages, modules, scope |
-| 2.6 | **Phase 2 Final Consolidated Verdict** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FINAL_CONSOLIDATED_VERDICT.md` | Phase 2 all decisions: Backend Option A, SSOT v2.0, NUMERIC(20,6) |
-| 2.7 | **Phase 2 Core Decisions** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_CORE_DECISIONS.md` | Core Phase 2 architectural decisions |
-| 2.8 | **Team Role Mapping** | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | Teams 20/30/40/60 responsibilities |
+| 0.1 | WSM runtime state | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | Active stage/program/gate/next action |
+| 0.2 | SSM constitution | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | Governance and hierarchy rules |
+| 0.3 | Gate model protocol v2.3.0 | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` | Gate semantics + authority model |
+| 0.4 | Gate lifecycle owners v1.1.0 | `documentation/docs-governance/01-FOUNDATIONS/GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md` | Gate owners and WSM updater by gate |
+| 0.5 | GATE_0..2 contract | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` | Input/output schema for spec gates |
+| 0.6 | Portfolio/WSM sync rules | `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md` | Runtime-vs-mirror discipline |
+| 0.7 | Fast-track protocol | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | Optional fast mode rules |
 
 ---
 
-## TIER 3 — Active Mandates & Directives
+## TIER 1 — TEAM 00 ROLE AND OPERATING PACK
 
-אלה ההחלטות שעדיין פעילות ומחייבות את כל הצוותים.
-
-### Governance
-
-| קובץ | נתיב |
+| Document | Path |
 |---|---|
-| Governance Procedures V2 | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md` |
-| Directive: Governance Strengthening | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` |
-| Knowledge Promotion Protocol | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md` |
-| Team 10/70 Role Realignment | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_TEAM_10_70_ROLE_REALIGNMENT.md` |
-| Gate 0/1 Design Gates Lock | `_COMMUNICATION/_Architects_Decisions/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md` |
-| Design Contracts Mandate | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DESIGN_CONTRACTS_MANDATE.md` |
-| Docs Integrity Mandate | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DOCS_INTEGRITY_MANDATE.md` |
-
-### TikTrack Implementation Mandates
-
-| קובץ | נתיב |
-|---|---|
-| Directive: Form Validation | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_VALIDATION_FINAL.md` |
-| Directive: Auth Fix | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_AUTH_FIX.md` |
-| Broker Reference Mandate | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BROKER_REFERENCE_MANDATE.md` |
-| Trading Accounts Red Fix | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_TRADING_ACCOUNTS_RED_FIX_MANDATE.md` |
-| Header Unification | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_HEADER_UNIFICATION_MANDATE.md` |
-| Infrastructure Retrofit | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_INFRASTRUCTURE_RETROFIT_MANDATE.md` |
-| Phase 2 Execution Mandate | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_EXECUTION_MANDATE.md` |
-| Phase 2 Full Release | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FULL_RELEASE_MANDATE.md` |
-| D16 Implementation | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_D16_IMPLEMENTATION_MANDATE.md` |
-| Phase 2 Blocker Verdict | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_BLOCKER_VERDICT_FINAL.md` |
-| Universal Validation SOP | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_UNIVERSAL_VALIDATION_SOP.md` |
-| Responsive Charter | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_RESPONSIVE_CHARTER.md` |
-| Policy: Hybrid Scripts | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_POLICY_HYBRID_SCRIPTS.md` |
-| Port Lock Final | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PORT_LOCK_FINAL.md` |
-| P0 Red Mandate | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_P0_RED_MANDATE.md` |
+| Team 00 constitution | `_COMMUNICATION/team_00/TEAM_00_CONSTITUTION_v1.0.0.md` |
+| Team 00 activation prompt | `_COMMUNICATION/team_00/TEAM_00_ACTIVATION_PROMPT_v1.0.0.md` |
+| Team 00 current state briefing | `_COMMUNICATION/team_00/TEAM_00_CURRENT_STATE_BRIEFING_v1.0.0.md` |
+| Team 190 constitution | `documentation/docs-governance/01-FOUNDATIONS/07_TEAM_190_CONSTITUTION.md` |
 
 ---
 
-## TIER 4 — Historical Reference
+## TIER 2 — ACTIVE DECISION SET (CURRENT: S002-P003 GATE_2)
 
-ארכיון שימושי — קרא אם צריך לחפש החלטה ספציפית.
-
-### Phase History
-
-| קובץ | נתיב |
-|---|---|
-| Phase 1.8 Strategy | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_1_8_DETAILED_STRATEGY.md` |
-| Phase 1.8 Final Resolution | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_1_8_FINAL_RESOLUTION.md` |
-| Batch 1 Final Seal | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BATCH_1_FINAL_SEAL.md` |
-| Batch 1 Closure | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_BATCH_1_CLOSURE_MANDATE.md` |
-| Phase 2 Full Kickoff | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_PHASE_2_FULL_KICKOFF_MANDATE.md` |
-
-### S001 Closure Records
-
-| קובץ | נתיב |
-|---|---|
-| WP001 GATE_8 Validation | `_COMMUNICATION/team_90/` (search for WP001 GATE_8) |
-| WP002 GATE_8 Validation | `_COMMUNICATION/team_90/` (search for WP002 GATE_8) |
-| WP Registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md` |
+| Priority | Document | Path | Status |
+|---|---|---|---|
+| P0 | Architect inbox package (7 files) | `_COMMUNICATION/_ARCHITECT_INBOX/TIKTRACK_PHASE_2/INFRASTRUCTURE_STAGE_2/S002_P003_GATE2_SPEC_APPROVAL/SUBMISSION_v1.0.0/` | ACTION REQUIRED |
+| P0 | Team 190 gate request package | `_COMMUNICATION/team_190/TEAM_190_GATE2_S002_P003_REQUEST_PACKAGE.md` | SUBMITTED |
+| P0 | Team 190 approval request | `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_S002_P003_GATE2_SPEC_APPROVAL_REQUEST_v1.0.0.md` | ACTION REQUIRED |
+| P1 | Team 190 Gate 1 validation result | `_COMMUNICATION/team_190/TEAM_190_GATE1_S002_P003_VALIDATION_RESULT.md` | PASS |
+| P1 | Team 190 Gate 0 validation result | `_COMMUNICATION/team_190/TEAM_190_GATE0_S002_P003_VALIDATION_RESULT.md` | PASS |
+| P1 | Team 170 LLD400 source | `_COMMUNICATION/team_170/TIKTRACK_ALIGNMENT_S002_P003_LLD400_v1.0.0.md` | INPUT |
 
 ---
 
-## Search Guide (Claude Code)
+## TIER 3 — STRATEGIC PORTFOLIO CONTEXT
 
-When you need to find something fast:
+| Document | Path | Use |
+|---|---|---|
+| Portfolio roadmap | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | Stage and long-range pipeline |
+| Program registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | Program status mirror |
+| Work package registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md` | WP mirror and active marker |
+
+---
+
+## TIER 4 — HISTORICAL ONBOARDING CONTEXT (REFERENCE ONLY)
+
+| Document | Path |
+|---|---|
+| Previous onboarding cover | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_00_ONBOARDING_COVER_NOTE_v1.0.0.md` |
+| Gemini extraction responses | `_COMMUNICATION/team_00/TEAM_00_GEMINI_KNOWLEDGE_EXTRACTION_RESPONSES_v1.0.0.md` |
+
+---
+
+## QUICK CHECK COMMANDS
 
 ```bash
-# Find all files mentioning a topic
-grep -r "TOPIC" _COMMUNICATION/ --include="*.md" -l
+# WSM live runtime fields
+rg -n "active_stage_id|active_program_id|current_gate|active_flow|next_required_action|next_responsible_team" documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 
-# Find a specific decision
-ls _COMMUNICATION/_Architects_Decisions/ | grep KEYWORD
+# Current Gate-2 package files
+find _COMMUNICATION/_ARCHITECT_INBOX/TIKTRACK_PHASE_2/INFRASTRUCTURE_STAGE_2/S002_P003_GATE2_SPEC_APPROVAL/SUBMISSION_v1.0.0 -maxdepth 1 -type f | sort
 
-# Find recent activity
-ls -lt _COMMUNICATION/team_190/ | head -20
-
-# Check what's in a folder
-ls _COMMUNICATION/_ARCHITECT_INBOX/
+# Team 190 S002-P003 records
+ls -1 _COMMUNICATION/team_190/*S002_P003* | sort
 ```
 
 ---
 
-**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_REFRESH | ACTIVE | 2026-02-26**
-**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_UPDATED | ADR_027_ADDED_TIER2 + WP002_SESSION_CONTEXT_UPDATED | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_REFRESH | CONTEXT_ANCHORS + LAW_LAYER + S002_P003_GATE2_DECISION_SET | 2026-02-26**

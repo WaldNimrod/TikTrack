@@ -43,8 +43,8 @@ gate_id: GATE_0
 scope_id: S002-P003  
 decision: PASS  
 blocking_findings: NONE  
-next_required_action: Team 100 to activate Team 170 for S002-P003 LLD400 package submission to Team 190 under GATE_1 (no execution handoff before GATE_2 PASS).  
-next_responsible_team: Team 100  
+next_required_action: Team 00 to activate Team 170 for S002-P003 LLD400 package submission to Team 190 under GATE_1 (no execution handoff before GATE_2 PASS).  
+next_responsible_team: Team 00  
 wsm_update_reference: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` CURRENT_OPERATIONAL_STATE updated by Team 190 (`GATE_0_PASS | 2026-02-26 | Team 190 | TEAM_190_GATE0_S002_P003_VALIDATION_RESULT.md`).
 
 ## Constitutional Scope Note

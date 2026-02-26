@@ -3,7 +3,7 @@
 **id:** TEAM_00_CONSTITUTION_v1.0.0
 **owner:** Team 00 (Chief Architect)
 **status:** LOCKED
-**date:** 2026-02-25
+**date:** 2026-02-26
 **authority:** Chief Architect / Nimrod
 ---
 
@@ -215,7 +215,19 @@ You operate in Claude Code — a local environment with full repository access. 
 - GATE_7: Nimrod personal sign-off always
 - Full charter: `_COMMUNICATION/_Architects_Decisions/ADR_027_TEAM_100_TEAM_00_ARCHITECTURAL_CHARTER.md`
 
+### 10.1 Program-specific runtime authority interpretation (operational lock)
+
+When generic lifecycle text and active runtime routing differ, precedence is:
+
+1. WSM `CURRENT_OPERATIONAL_STATE`
+2. Active gate request package for the specific program
+3. Generic lifecycle description
+
+For current TikTrack program `S002-P003`, active runtime routing assigns GATE_2 decision authority directly to Team 00.
+This does not rewrite the global delegated model for Agents_OS under ADR-027.
+
 ---
 
 **log_entry | TEAM_00 | TEAM_00_CONSTITUTION_v1.0.0_CREATED | LOCKED | 2026-02-25**
 **log_entry | TEAM_00 | TEAM_00_CONSTITUTION_v1.0.0_UPDATED | ADR_027_CHARTER_REFERENCE_ADDED | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_00_CONSTITUTION_v1.0.0_UPDATED | PROGRAM_SPECIFIC_RUNTIME_AUTHORITY_PRECEDENCE_ADDED | 2026-02-26**

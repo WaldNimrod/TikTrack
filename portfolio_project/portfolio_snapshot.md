@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-02-26T18:33:49.415302+00:00`
+- Generated (UTC): `2026-02-26T19:10:37.704939+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `N/A`
-- current_gate: `GATE_1`
-- next_required_action: `Team 100: activate Team 170 to produce and submit S002-P003 LLD400 package to Team 190 for GATE_1 validation (no Team 10 execution before GATE_2 PASS).`
+- current_gate: `GATE_2`
+- next_required_action: `Team 00: review S002-P003 GATE_2 SPEC submission package and issue APPROVED/REJECTED decision (with findings if rejected).`
 
 ## Portfolio Counts
 

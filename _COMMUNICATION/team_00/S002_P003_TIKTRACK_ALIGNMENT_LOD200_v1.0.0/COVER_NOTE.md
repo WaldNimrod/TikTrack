@@ -8,11 +8,12 @@ sv: 1.0.0
 effective_date: 2026-02-26
 ---
 **project_domain:** TIKTRACK
+**date:** 2026-02-26
 
 # הודעה ארכיטקטונית — הפעלת S002-P003: TikTrack Alignment
 
 **מאת:** Team 00 — Chief Architect
-**אל:** Team 190 (Constitutional Architectural Validator), Team 100 (Development Architecture Authority), Team 170 (Spec Owner)
+**אל:** Team 190 (Constitutional Architectural Validator), Team 170 (Spec Owner), Team 100 (for visibility)
 **נושא:** LOD200 — אפיון ארכיטקטוני להפעלת חבילת יישור הקו TikTrack (D22 + D34 + D35)
 **תאריך:** 2026-02-26
 
@@ -32,8 +33,8 @@ effective_date: 2026-02-26
 | צוות | פעולה | בסיס |
 |------|--------|-------|
 | **Team 190** | מבצע GATE_0 validation ל-LOD200 ומעדכן WSM. | מיידי |
-| **Team 100** | לאחר GATE_0 PASS: מפעיל Team 170 להפקת LLD400. | לפי נוהל GATE_0→GATE_1 |
-| **Team 170** | מפיק LLD400 ומגיש ל-190 ל-GATE_1 validation. | אחרי הפעלת Team 100 |
+| **Team 00** | לאחר GATE_0 PASS: מפעיל Team 170 להפקת LLD400. | לפי נוהל GATE_0→GATE_1 |
+| **Team 170** | מפיק LLD400 ומגיש ל-190 ל-GATE_1 validation. | אחרי הפעלת Team 00 |
 | **Team 190** | מבצע GATE_1 validation, ואז GATE_2 flow/decision יחד עם הארכיטקטורה. | לפי חוזה GATE_0_1_2 |
 | **Team 10** | מקבל handoff רק לאחר GATE_2 PASS, ופותח GATE_3 intake לביצוע WP001/WP002. | אחרי GATE_2 בלבד |
 
@@ -44,7 +45,7 @@ effective_date: 2026-02-26
 ```
 GATE_0 (Team 190): LOD200 constitutional validation
 → GATE_1 (Team 190, input from Team 170): LLD400 spec lock
-→ GATE_2 (Team 190 + Team 100/00 approval authority): architect approval
+→ GATE_2 (Team 190 + Team 00 approval authority): architect approval
 → GATE_3 (Team 10): intake + execution activation
 → GATE_4..GATE_8 (Team 10/50/90/70 per protocol)
 ```

@@ -8,6 +8,7 @@ sv: 1.0.0
 effective_date: 2026-02-26
 ---
 **project_domain:** TIKTRACK
+**date:** 2026-02-26
 
 # LOD200 — אפיון ארכיטקטוני: S002-P003 TikTrack Alignment
 
@@ -32,7 +33,7 @@ effective_date: 2026-02-26
 ```
 GATE_0 (Team 190): LOD200 constitutional validation
 → GATE_1 (Team 170 submit, Team 190 validate): LLD400 spec lock
-→ GATE_2 (Team 190 + Team 100/00 authority): architect approval
+→ GATE_2 (Team 190 + Team 00 authority): architect approval
 → GATE_3 (Team 10): intake + execution activation for WP001/WP002
 → GATE_4..GATE_8 (Team 10/50/90/70 per protocol)
 ```

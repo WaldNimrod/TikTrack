@@ -30,8 +30,8 @@
 ## 3) סדר הפעלה (G3.6)
 
 1. **Team 10** מפרסם הודעת הפעלה: G3.5 PASS התקבל; G3.6 פתוח.  
-2. **Team 10** מעביר ל־**Team 20** את פרומט §4.0 (מימוש קוד).  
-3. **Team 10** מעביר ל־**Team 70** את פרומט §4.1 (טסטים).  
+2. **Team 10** מעביר ל־**Team 20** את פרומט §4.0 (מימוש קוד + טסטים תחת agents_os/).  
+3. **Team 10** מעביר ל־**Team 70** את פרומט §4.1 (תיעוד בלבד — per יישור גבול אחריות).  
 4. Team 20 ו־Team 70 מבצעים; עם סיום — דו"חות סיום ל־Team 10.  
 5. Team 10: אימות, GATE_3 exit, הגשה ל־Team 50 (GATE_4).
 
@@ -78,47 +78,43 @@
 
 4. **בידוד דומיין:** כל קוד תחת `agents_os/`; אסור import או תלות ב־TikTrack או בקוד מחוץ ל־agents_os (מלבד stdlib ו־pip). E-07, E-11 מטפלים בזה; הקוד חייב לעמוד בהם.
 
-5. **תוצר סיום:** להודיע ל־Team 10 עם נתיבי הקבצים ו־הודעת סיום; לפרסם _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (לפי evidence index של WP002).
+5. **תיקיית טסטים (per LLD400 §2.5) — באחריות Team 20:** מימוש קוד תחת `agents_os/` (כולל טסטים) שייך ל־Team 20 per הגדרת תפקיד. ליצור:
+   - `agents_os/tests/execution/__init__.py`
+   - `agents_os/tests/execution/test_tier_e1.py` — טסטים ל־E-01..E-06.
+   - `agents_os/tests/execution/test_tier_e2.py` — טסטים ל־E-07..E-11.
+   דרישה: `python3 -m pytest agents_os/tests/ -q` exit 0 (E-09).
 
-**אל תדלג:** ליצור את הקבצים המפורטים ב־LLD400 §2.5; להריץ pytest על agents_os/tests/ ולוודא שאין שבירת WP001 spec mode.
+6. **תוצר סיום:** להודיע ל־Team 10 עם נתיבי הקבצים ו־הודעת סיום; לפרסם _COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (לפי evidence index של WP002).
+
+**אל תדלג:** ליצור את כל הקבצים המפורטים ב־LLD400 §2.5 (validators/execution + tests/execution); להריץ pytest ולוודא שאין שבירת WP001 spec mode.
 ```
 
 ---
 
-### 4.1 Team 70 — טסטים (Execution validation suite)
+### 4.1 Team 70 — תיעוד בלבד (במסגרת תפקיד Knowledge Librarian)
+
+**יישור גבול אחריות (per TEAM_70_TO_TEAM_10_S002_P001_WP002_G36_ROLE_BOUNDARY_CLARIFICATION):** מימוש קוד וטסטים תחת `agents_os/` שייך ל־**Team 20**. Team 70 — תיעוד קנוני תחת `documentation/`, GATE_8; לא כתיבת קוד ב־agents_os/.
 
 ```markdown
-**id:** TEAM_10_TO_TEAM_70_S002_P001_WP002_G3_6_TESTS_PROMPT
+**id:** TEAM_10_TO_TEAM_70_S002_P001_WP002_G3_6_DOCUMENTATION_PROMPT
 **from:** Team 10 (The Gateway)
-**to:** Team 70 (Knowledge Librarian — Tests/Docs)
+**to:** Team 70 (Knowledge Librarian)
 **work_package_id:** S002-P001-WP002
-**gate_id:** GATE_3 (G3.6 — Implementation)
+**gate_id:** GATE_3 (G3.6)
 **phase_owner:** Team 10
 **project_domain:** AGENTS_OS
 **date:** 2026-02-26
-**trigger:** G3.5 PASS received from Team 90; G3.6 activation.
+**trigger:** G3.5 PASS; G3.6 activation. תפקיד Team 70 = תיעוד בלבד (per TEAM_70_KNOWLEDGE_LIBRARIAN_ROLE_DEFINITION).
 
 ---
 
-אתה פועל כצוות 70 (Knowledge Librarian). Team 10 מפעיל אותך לכתיבת **טסטים** עבור Work Package **S002-P001-WP002** — Execution Validation Engine.
+אתה פועל כצוות 70 (Knowledge Librarian). Team 10 מפעיל אותך לתוצרי **תיעוד** עבור WP002 — לא קוד תחת agents_os/.
 
-**קונטקסט חובה:**
-- _COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_WORK_PACKAGE_DEFINITION.md
-- _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_WP002_LLD400_v1.0.0.md (§2.5, §7)
-- מודולי ה־validators/execution (tier_e1_work_plan, tier_e2_code_quality) — תלויים בתוצר של Team 20.
+**משימות — במסגרת התפקיד (תיעוד):**
+1. תוכנית טסטים (מסמך) תחת documentation/ — למשל `documentation/02-DEVELOPMENT/agents_os/WP002_EXECUTION_VALIDATOR_TEST_PLAN.md` — מתאר scope הטסטים (E-01..E-11), מבנה tests/execution/, ודרישת pytest; או עדכון/הוספת פריט רלוונטי במבנה התיעוד הקיים.
+2. עם סיום — לפרסם _COMMUNICATION/team_70/TEAM_70_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (תוכן תיעודי/מבנה; evidence index של WP002).
 
-**משימות — לבצע בפועל:**
-
-1. **תיקיית טסטים (per LLD400 §2.5):**
-   - `agents_os/tests/execution/__init__.py`
-   - `agents_os/tests/execution/test_tier_e1.py` — טסטים ל־E-01..E-06 (work plan checks).
-   - `agents_os/tests/execution/test_tier_e2.py` — טסטים ל־E-07..E-11 (code quality checks).
-
-2. **דרישה:** `python3 -m pytest agents_os/tests/ -q` מחזיר exit 0 (E-09). לכסות edge cases רלוונטיים; לא טסטים טריוויאליים.
-
-3. **תוצר סיום:** להודיע ל־Team 10; לפרסם _COMMUNICATION/team_70/TEAM_70_TO_TEAM_10_S002_P001_WP002_COMPLETION_REPORT.md (לפי evidence index של WP002).
-
-**תיאום:** אם Team 20 עדיין לא סיים את tier_e1/tier_e2 — לתאם עם Team 10 או להמתין למודולים ואז להשלים טסטים.
+**לא במסגרת:** כתיבת קבצי Python או pytest תחת agents_os/ — אלה באחריות Team 20.
 ```
 
 ---
@@ -134,3 +130,4 @@
 ---
 
 **log_entry | TEAM_10 | S002_P001_WP002_G3_6_ACTIVATION_PROMPTS | READY_FOR_USE_AFTER_G3_5_PASS | 2026-02-26**
+**log_entry | TEAM_10 | S002_P001_WP002_G3_6_ACTIVATION_PROMPTS | ROLE_BOUNDARY_ALIGNMENT | 2026-02-26 — מימוש טסטים ב־agents_os/ הועבר ל־Team 20; Team 70 תיעוד בלבד (per TEAM_70_TO_TEAM_10_S002_P001_WP002_G36_ROLE_BOUNDARY_CLARIFICATION).**

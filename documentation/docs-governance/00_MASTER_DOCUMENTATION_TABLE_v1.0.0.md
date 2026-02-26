@@ -58,7 +58,8 @@
 | TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (GATE_3..GATE_8; G3.5 ולידציית תוכנית בתוך GATE_3) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
 | FAST_TRACK_EXECUTION_PROTOCOL | מסלול מקוצר אופציונלי (לא ברירת מחדל): FAST_0..FAST_4, בלעדיות מסלול, track_mode, SLA 48h, ורפרנס מחייב ל־GATE_3 | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | v1.0.0 |
 | TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/60 + אורקסטרציה Team 10 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
-| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
+| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry (מסמכים כקבצים) | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
+| PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE | **פרונט יחיד** — מתי מסמך (קובץ) ומתי פרומט להעתקה (בלוק); מפנה ל־190 lock ול־G36 prompts | `_COMMUNICATION/PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE_v1.0.0.md` | v1.0.0 |
 
 ---
 

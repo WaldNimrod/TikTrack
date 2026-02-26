@@ -3,7 +3,8 @@
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  
 **status:** Entry point — canonical structure post Phoenix Cutover  
-**last_updated:** 2026-02-19
+**last_updated:** 2026-02-26
+**deprecated_alias_notice:** Legacy prefix `documentation/docs-governance/PHOENIX_CANONICAL/` is deprecated for active authority routing; use `documentation/docs-governance/01-FOUNDATIONS/` canonical paths.
 
 ---
 
@@ -14,7 +15,7 @@
 | Location | Contents |
 |----------|----------|
 | `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT |
-| `documentation/docs-governance/` | **PHOENIX_CANONICAL** (SSM, WSM, Gate Model, Directives — משותף; לא תחת דומיין איגנטים), 00-FOUNDATIONS, 01-POLICIES, 02-PROCEDURES, 06-CONTRACTS, 09-GOVERNANCE. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
+| `documentation/docs-governance/` | 00-INDEX, 01-FOUNDATIONS (SSM/WSM/Gate Model), 02-POLICIES, 04-PROCEDURES, 05-CONTRACTS, 06-TEMPLATES, 07-DIRECTIVES_AND_DECISIONS, 08-WORKING_VALIDATION_RECORDS, AGENTS_OS_GOVERNANCE, 99-archive. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
 | `archive/` | documentation, code |
 | `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_70, team_90, team_100, team_170, team_190) |
@@ -39,8 +40,8 @@
 
 | מה צריך | איפה (נתיב מלא) | הערה |
 |---------|-------------------|------|
-| **מצב נוכחי (operational state)** — active Stage, current gate, active Program/Work Package, last_gate_event | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE** בלבד | מקור יחיד; מעודכן על ידי Gate Owner בכל סגירת שער |
-| **כללי היררכיה ומספור** | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; SSM: `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | אין סטטוס שוטף ב־SSM; רק ב־WSM |
+| **מצב נוכחי (operational state)** — active Stage, current gate, active Program/Work Package, last_gate_event | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE** בלבד | מקור יחיד; מעודכן על ידי Gate Owner בכל סגירת שער |
+| **כללי היררכיה ומספור** | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; SSM: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | אין סטטוס שוטף ב־SSM; רק ב־WSM |
 | **רשימת משימות (Tasks) — סטטוס OPEN/CLOSED, תאריכי סגירה** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | רמה 2; מתעדכן על ידי Team 10; סטטוס שער שוטף לא כאן — ב־WSM |
 | **מפת דרכים (Stages)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | מפת דרכים אחת (קטלוג, נרטיב, Level-2, חלוקת עמודים) |
 | **Portfolio קנוני (Stage/Program/WP)** | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | קטלוג קנוני; runtime רק ב־WSM |

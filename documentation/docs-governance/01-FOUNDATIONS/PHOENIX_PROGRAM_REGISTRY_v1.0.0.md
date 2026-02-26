@@ -37,14 +37,15 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | stage_id | program_id | program_name | domain | status | current_gate_mirror |
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
-| S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (not activated; lock until S001-P001-WP001 GATE_8) |
-| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_3 (GATE_2 APPROVED 2026-02-25; Team 10 execution intake pending) |
+| S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (lock released 2026-02-22; activation decision pending Team 00) |
+| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | WP001 GATE_8 PASS 2026-02-26 (DOCUMENTATION_CLOSED); WP002 ACTIVATED — Team 10 GATE_3 intake |
+| S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision) |
 
 
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-25). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-26). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-25):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_3. GATE_2 approval authority decision APPROVED was issued by Team 100 (2026-02-25), and Team 190 advanced flow to Team 10 execution intake.
+**WSM mirror (2026-02-26):** active_stage_id=S002; active_program_id=S002-P001; current_gate=GATE_8 PASS (WP001 DOCUMENTATION_CLOSED); WP002 activation issued by Team 100 — Team 10 to open GATE_3.
 
 ---
 
@@ -55,3 +56,4 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_CORRECTED_GATE0_LOD200_SUBMITTED | 2026-02-24**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_GATE0_PASS_GATE1_ACTIVE_TEAM_170_ACTIVATED | 2026-02-25**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P001_GATE2_APPROVED_GATE3_INTAKE_TEAM10_NEXT | 2026-02-25**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_WP001_GATE8_PASS_WP002_ACTIVATED_S002_P002_PIPELINE_ADDED | 2026-02-26**

@@ -11,7 +11,7 @@ Before performing any task, you MUST:
    - Team 51: QA Remote (Remote QA team working on validation framework)
    - Team 60: DevOps & Platform (Infrastructure)
    - Team 170: Librarian / SSOT Authority (documentation integrity, index consistency; routes via Team 10)
-   - Team 190: Constitutional Architectural Validator (Gate 0-2; spec/ADR validation; routes via Team 10)
+   - Team 190: Constitutional Architectural Validator (Gate 0-2 owner + cross-program non-gate constitutional validation; routes via Team 10)
 2. Locate and study these MANDATORY FILES:
    - 00_MASTER_INDEX.md (repo root — global entry point; D15_SYSTEM_INDEX deprecated)
    - documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md

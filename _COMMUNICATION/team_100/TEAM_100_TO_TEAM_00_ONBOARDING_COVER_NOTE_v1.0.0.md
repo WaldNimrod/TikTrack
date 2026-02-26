@@ -3,7 +3,7 @@
 **id:** TEAM_100_TO_TEAM_00_ONBOARDING_COVER_NOTE_v1.0.0
 **from:** Team 100 (Development Architecture Authority)
 **to:** Team 00 (Chief Architect — Claude Code Session)
-**date:** 2026-02-25
+**date:** 2026-02-26
 **status:** ACTIVE
 **purpose:** Formal routing notice for Team 00 onboarding package — lists all files created, reading order, and next steps
 ---
@@ -45,7 +45,7 @@ This package was produced at Nimrod's request to support the transition of the C
 | 1 | `TEAM_00_CONSTITUTION_v1.0.0.md` | Canonical identity, authority scope, 8 Iron Rules, gate authority, team interfaces, writing rules, product vision — **read every session** |
 | 2 | `TEAM_00_ACTIVATION_PROMPT_v1.0.0.md` | Full onboarding prompt for new Claude Code sessions — startup checklist, current state, portfolio, pending decisions, how to issue decisions |
 | 3 | `TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0.md` | Tiered document map: what to read first, second, in which session contexts — 88+ files organized by tier |
-| 4 | `TEAM_00_CURRENT_STATE_BRIEFING_v1.0.0.md` | Snapshot (2026-02-25): WSM state, S001 closure, S002-P001 GATE_1 blocked, S001-P002 HOLD, open decision points |
+| 4 | `TEAM_00_CURRENT_STATE_BRIEFING_v1.0.0.md` | Snapshot (2026-02-26): WSM state, S002-P001-WP001 GATE_8 PASS + DOCUMENTATION_CLOSED, next intake and open decision points |
 
 ### B. Repository Root
 
@@ -105,23 +105,23 @@ Upon activation, Team 00 has the following open decisions:
 
 | Priority | Decision | Status |
 |---|---|---|
-| 🔴 HIGH | **GATE_2 approval — S002-P001** | Pending GATE_1 PASS by Team 170 (currently remediating BF-G1-01, BF-G1-02) |
+| 🔴 HIGH | **Next WP authorization — S002-P001** | WP001 closed at GATE_8; readiness confirmed, next intake decision required |
 | 🔴 HIGH | **S001-P002 Alerts POC activation** | Execution lock released; strategic timing decision required |
-| 🟡 MEDIUM | **S002 strategic alignment (D22, D23)** | Confirm scope still matches product vision before GATE_2 |
+| 🟡 MEDIUM | **S002 strategic alignment (next WP scope)** | Confirm follow-up package scope still matches product vision |
 | 🟡 MEDIUM | **S003–S006 sequencing guidance** | Any priority, timeline, or dependency updates |
 | 🟢 LOW | **Gemini knowledge formalization** | Once extraction responses received, formalize undocumented decisions |
 
 ---
 
-## Current Operational State (Snapshot — 2026-02-25)
+## Current Operational State (Snapshot — 2026-02-26)
 
 | Field | Value |
 |---|---|
 | active_stage_id | S002 |
 | active_program_id | S002-P001 — Agents_OS Core Validation Engine |
-| current_gate | GATE_1 |
-| active_flow | GATE_1_BLOCKED — LLD400 returned to Team 170 for remediation |
-| next_responsible_team | Team 170 (remediation) → Team 190 (revalidation) → Team 00 (GATE_2) |
+| current_gate | GATE_8 |
+| active_flow | GATE_8 PASS (S002-P001-WP001); DOCUMENTATION_CLOSED; awaiting Team 10 next work-package intake |
+| next_responsible_team | Team 10 (next intake orchestration) |
 
 **Live state always in:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
 
@@ -135,8 +135,8 @@ Upon activation, Team 00 has the following open decisions:
 
 3. **Decision template:** When Team 00 issues locked decisions, use the canonical template at `documentation/docs-governance/06-TEMPLATES/ARCHITECT_DECISION_TEMPLATE.md`.
 
-4. **Version note:** These onboarding files are v1.0.0 snapshots as of 2026-02-25. As the project evolves, Team 100 will issue updated briefings as needed.
+4. **Version note:** These onboarding files are v1.0.0 snapshots refreshed on 2026-02-26. Team 00 must always treat WSM as the live source of truth.
 
 ---
 
-**log_entry | TEAM_100 | TEAM_100_TO_TEAM_00_ONBOARDING_COVER_NOTE_v1.0.0_CREATED | 2026-02-25**
+**log_entry | TEAM_100 | TEAM_100_TO_TEAM_00_ONBOARDING_COVER_NOTE_v1.0.0_REFRESH | 2026-02-26**

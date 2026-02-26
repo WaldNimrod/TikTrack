@@ -3,7 +3,7 @@
 **id:** TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0
 **owner:** Team 00 (Chief Architect)
 **status:** ACTIVE
-**date:** 2026-02-25
+**date:** 2026-02-26
 ---
 
 # TEAM 00 — DOCUMENT PRIORITY MAP v1.0.0
@@ -27,7 +27,7 @@
 
 ## TIER 1 — Session Context (קרא לפי מה שפעיל)
 
-### 1A — Agents_OS Current Program (S002-P001, GATE_1 active)
+### 1A — Agents_OS Current Program (S002-P001, WP001 closed at GATE_8 PASS)
 
 | קובץ | נתיב |
 |---|---|
@@ -35,7 +35,9 @@
 | LOD200 Package (6 קבצים) | `_COMMUNICATION/team_100/AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_v1.0.0/` |
 | Team 170 Activation (LLD400) | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_ACTIVATION_AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` |
 | GATE_0 Validation Result (PASS) | `_COMMUNICATION/team_190/TEAM_190_GATE0_S002_P001_VALIDATION_RESULT.md` |
-| GATE_1 Validation Result (current) | `_COMMUNICATION/team_190/TEAM_190_GATE1_S002_P001_VALIDATION_RESULT.md` |
+| GATE_8 Activation Canonical (Team 90→70) | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S002_P001_WP001_GATE8_ACTIVATION_CANONICAL.md` |
+| GATE_8 Validation Request (Team 70→90) | `_COMMUNICATION/team_70/TEAM_70_TO_TEAM_90_S002_P001_WP001_GATE8_VALIDATION_REQUEST.md` |
+| GATE_8 Validation Report (PASS) | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P001_WP001_GATE8_VALIDATION_REPORT.md` |
 | GATE_0/1/2 Spec Lifecycle Contract | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` |
 | Program Registry | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` |
 | Portfolio Roadmap | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` |
@@ -148,4 +150,4 @@ ls _COMMUNICATION/_ARCHITECT_INBOX/
 
 ---
 
-**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_CREATED | ACTIVE | 2026-02-25**
+**log_entry | TEAM_00 | TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0_REFRESH | ACTIVE | 2026-02-26**

@@ -83,25 +83,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_7 PASS received for S002-P001-WP001; GATE_8 activated by Team 90.
+**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_8 PASS validated for S002-P001-WP001; lifecycle closed by Team 90.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_8 active (S002-P001-WP001); documentation closure execution pending Team 70 submission |
+| active_flow | GATE_8 PASS (S002-P001-WP001); DOCUMENTATION_CLOSED; awaiting Team 10 next work-package intake |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | S002-P001-WP001 |
-| in_progress_work_package_id | S002-P001-WP001 |
-| last_closed_work_package_id | S001-P001-WP002 (GATE_8 PASS 2026-02-23; **domain: AGENTS_OS**) |
+| active_work_package_id | N/A (pending next intake) |
+| in_progress_work_package_id | N/A |
+| last_closed_work_package_id | S002-P001-WP001 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
 | current_gate | GATE_8 |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits request |
-| last_gate_event | GATE_7_PASS \| 2026-02-26 \| TEAM_90_TO_TEAM_10_S002_P001_WP001_GATE7_PASS_AND_GATE8_ACTIVATION \| GATE_8 activated |
-| next_required_action | Team 70: execute GATE_8 closure tasks and submit TEAM_70_TO_TEAM_90_S002_P001_WP001_GATE8_VALIDATION_REQUEST |
-| next_responsible_team | Team 70 (executor) / Team 90 (validator) |
+| last_gate_event | GATE_8_PASS \| 2026-02-26 \| TEAM_90_TO_TEAM_10_S002_P001_WP001_GATE8_VALIDATION_REPORT \| DOCUMENTATION_CLOSED |
+| next_required_action | Team 10: open next authorized work package under S002-P001 per runbook and dependency model |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -174,3 +174,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 approved for S002-P001-WP001; GATE_7 opened and human scenarios issued | 2026-02-25**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed by Nimrod for S002-P001-WP001 | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 activated for S002-P001-WP001; Team 70 execution requested | 2026-02-26**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P001-WP001; DOCUMENTATION_CLOSED and lifecycle complete | 2026-02-26**

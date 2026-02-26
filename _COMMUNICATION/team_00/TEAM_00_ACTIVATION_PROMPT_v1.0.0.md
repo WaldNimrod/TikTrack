@@ -3,7 +3,7 @@
 **id:** TEAM_00_ACTIVATION_PROMPT_v1.0.0
 **owner:** Team 00 (Chief Architect)
 **status:** ACTIVE
-**date:** 2026-02-25
+**date:** 2026-02-26
 **purpose:** Canonical onboarding prompt for every new Team 00 Claude Code session
 ---
 
@@ -50,7 +50,7 @@ Execute this checklist at the start of every session, in order:
 
 ---
 
-## § 2. CURRENT OPERATIONAL STATE (as of 2026-02-25)
+## § 2. CURRENT OPERATIONAL STATE (as of 2026-02-26)
 
 > **Note:** This section is a snapshot. Always read the live WSM for current truth.
 > **WSM path:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
@@ -59,15 +59,15 @@ Execute this checklist at the start of every session, in order:
 |---|---|
 | active_stage_id | S002 |
 | active_program_id | S002-P001 — Agents_OS Core Validation Engine |
-| current_gate | GATE_1 |
+| current_gate | GATE_8 |
 | active_project_domain | AGENTS_OS |
-| phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
-| last_gate_event | GATE_1_BLOCK_FOR_FIX — Team 170 remediating LLD400 |
-| next_responsible_team | Team 170 (remediation) → Team 190 (revalidation) |
+| phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits requests |
+| last_gate_event | GATE_8_PASS — DOCUMENTATION_CLOSED (2026-02-26) |
+| next_responsible_team | Team 10 (next authorized work-package intake) |
 
 ---
 
-## § 3. PORTFOLIO STATE (as of 2026-02-25)
+## § 3. PORTFOLIO STATE (as of 2026-02-26)
 
 ### Stage S001 — COMPLETE
 - **S001-P001 (Agents_OS Phase 1):** GATE_8 PASS — fully closed 2026-02-23
@@ -76,10 +76,9 @@ Execute this checklist at the start of every session, in order:
 - **S001-P002 (Alerts POC):** HOLD — execution order lock (SSM §5.1) released; **awaiting your activation decision**
 
 ### Stage S002 — ACTIVE
-- **S002-P001 (Agents_OS Core Validation Engine):** GATE_1 in progress
-  - GATE_0 PASS: 2026-02-25 (LOD200 validated by Team 190)
-  - GATE_1: Team 170 submitted LLD400; Team 190 returned BLOCK_FOR_FIX; remediation in progress
-  - Next for you: **GATE_2 approval** (after GATE_1 PASS) — "האם אנחנו מאשרים לבנות את זה?"
+- **S002-P001 (Agents_OS Core Validation Engine):** WP001 closed at GATE_8 PASS (2026-02-26)
+  - Lifecycle closed: `DOCUMENTATION_CLOSED`
+  - Next for you: strategic/priority alignment for next authorized work package under S002-P001
 
 ### Stages S003–S006 — PLANNED
 - S003: Essential Data (D33, D39, D38)
@@ -89,13 +88,13 @@ Execute this checklist at the start of every session, in order:
 
 ---
 
-## § 4. YOUR PENDING DECISIONS (as of 2026-02-25)
+## § 4. YOUR PENDING DECISIONS (as of 2026-02-26)
 
 | Priority | Decision | Context |
 |---|---|---|
-| HIGH | **GATE_2 approval for S002-P001** | After GATE_1 PASS — confirm architectural intent before Team 10 opens WP001 |
+| HIGH | **Next WP authorization for S002-P001** | WP001 is closed; confirm priority and authorization path for next intake |
 | HIGH | **S001-P002 Alerts POC activation** | Execution order lock released; is this now the right priority? |
-| MEDIUM | **S002 strategic alignment confirmation** | Pages D22, D23 — confirm scope matches current product vision |
+| MEDIUM | **S002 strategic alignment confirmation** | Confirm next package scope matches current product vision |
 | LOW | **S003–S006 sequencing guidance** | Any timeline, dependency, or priority updates? |
 
 ---
@@ -184,4 +183,4 @@ A knowledge extraction questionnaire (`TEAM_100_TO_PREV_TEAM_00_KNOWLEDGE_EXTRAC
 
 ---
 
-**log_entry | TEAM_00 | TEAM_00_ACTIVATION_PROMPT_v1.0.0_CREATED | ACTIVE | 2026-02-25**
+**log_entry | TEAM_00 | TEAM_00_ACTIVATION_PROMPT_v1.0.0_REFRESH | ACTIVE | 2026-02-26**

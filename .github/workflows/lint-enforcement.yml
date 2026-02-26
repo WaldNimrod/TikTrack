@@ -1,0 +1,52 @@
+# Lint Enforcement Fast-Track — S002-P001 GOVERNANCE_PROGRAM
+# Team 60 | Check-only: no auto-fix, no repository writes.
+# Branch protection: required on main only; phoenix-dev out of scope (backup branch).
+
+name: Lint Enforcement
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "00_MASTER_INDEX.md"
+      - "pyproject.toml"
+      - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "documentation/docs-governance/**"
+      - "api/**"
+      - "ui/**"
+      - ".github/workflows/lint-enforcement.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "00_MASTER_INDEX.md"
+      - "pyproject.toml"
+      - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "documentation/docs-governance/**"
+      - "api/**"
+      - "ui/**"
+      - ".github/workflows/lint-enforcement.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lint_enforcement:
+    name: Lint Enforcement
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ripgrep (bootstrap script dependency)
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      - name: Bootstrap lint (docs/governance)
+        run: ./scripts/lint_source_authority_bootstrap_paths.sh
+
+      # UI ESLint: configured in ui/.eslintrc.cjs + npm run lint; added to CI when codebase aligned (follow-up)
+      - name: Lint API (Ruff check-only)
+        run: |
+          pip install --no-cache-dir ruff
+          ruff check api/ --output-format=concise

@@ -41,6 +41,7 @@ ssm_dependency: 1.0.0
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
+**Fast-track runtime overlay (optional):** `track_mode` indicates active runtime mode (`NORMAL` / `FAST`) while `gate_id` remains canonical (`GATE_0..GATE_8`) per 04_GATE_MODEL_PROTOCOL_v2.3.0 §6.3 and FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.
 **Gate ownership (v1.1.0 realignment):** GATE_0–GATE_2 owner Team 190; GATE_3–GATE_4 owner Team 10; GATE_5–GATE_8 owner Team 90. **WSM updater per gate:** Gates 0–2 → Team 190; Gates 3–4 → Team 10; Gates 5–8 → Team 90. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md. **GATE_8 (DOCUMENTATION_CLOSURE):** Owner Team 90. Trigger: GATE_7 PASS. Lifecycle **not complete** without GATE_8 PASS.
 
 ### 0.1 Architectural Approval Package Format Lock (v1.0.0)
@@ -82,6 +83,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 ## CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
 
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
+**Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
 **Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_8 PASS validated for S002-P001-WP001; lifecycle closed by Team 90.
 
@@ -96,6 +98,9 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_work_package_id | S002-P001-WP001 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P001) |
 | current_gate | GATE_8 |
+| track_mode | NORMAL |
+| suspended_track_state | FAST:IDLE |
+| hold_reason | N/A |
 | active_program_id | S002-P001 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5–GATE_8 owner); Team 10 submits request |
@@ -175,3 +180,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed by Nimrod for S002-P001-WP001 | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 activated for S002-P001-WP001; Team 70 execution requested | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P001-WP001; DOCUMENTATION_CLOSED and lifecycle complete | 2026-02-26**
+**log_entry | TEAM_190 | WSM_CANONICAL_UPDATE | TRACK_MODE_OVERLAY_FIELDS_ADDED | 2026-02-26**

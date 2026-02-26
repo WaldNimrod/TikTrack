@@ -41,11 +41,13 @@
 | מה צריך | איפה (נתיב מלא) | הערה |
 |---------|-------------------|------|
 | **מצב נוכחי (operational state)** — active Stage, current gate, active Program/Work Package, last_gate_event | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — בלוק **CURRENT_OPERATIONAL_STATE** בלבד | מקור יחיד; מעודכן על ידי Gate Owner בכל סגירת שער |
+| **מצב מסלול (NORMAL/FAST) + HOLD reason** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — fields `track_mode`, `suspended_track_state`, `hold_reason` | `gate_id` נשאר קנוני; תצוגת מסלול: `GATE_X [NORMAL/FAST]` |
 | **כללי היררכיה ומספור** | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; SSM: `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` | אין סטטוס שוטף ב־SSM; רק ב־WSM |
 | **רשימת משימות (Tasks) — סטטוס OPEN/CLOSED, תאריכי סגירה** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | רמה 2; מתעדכן על ידי Team 10; סטטוס שער שוטף לא כאן — ב־WSM |
 | **מפת דרכים (Stages)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | מפת דרכים אחת (קטלוג, נרטיב, Level-2, חלוקת עמודים) |
 | **Portfolio קנוני (Stage/Program/WP)** | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | קטלוג קנוני; runtime רק ב־WSM |
 | **נוהל ניהול רשימות + מי מעדכן WSM ומתי + חובה סנכרון רשימות** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | §1.2.2: Gate Owner מעדכן WSM; Team 10 מסנכרן רשימות בכל הרמות |
+| **נוהל מסלול מקוצר (אופציונלי, לא ברירת מחדל)** | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | FAST_0..FAST_4; בלעדיות מסלול; SLA 48h; FAST_2 מפנה ל־GATE_3 canonical |
 
 **כלל:** שינוי סטטוס Program/Work Package (כולל עדכון WSM) מחייב עדכון רשימות רמה 2 (והתאם רמה 1/3) — ראה נוהל.
 

@@ -13,6 +13,7 @@
 - **Runtime state** is stored **only** in `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE**.
 - Every **gate closure** (or gate-open decision) that updates WSM **MUST** be reflected in Portfolio registries as a **mirror** (no second source of truth for runtime).
 - **Portfolio registries** updated: `PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`, `PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md`.
+- Runtime `track_mode` (`NORMAL` / `FAST`) is a WSM runtime field and is not an additional Portfolio authority source.
 
 ---
 
@@ -46,3 +47,4 @@ Portfolio registries contain **only** Stage, Program, Work Package. Task-level i
 ---
 
 **log_entry | TEAM_170 | PORTFOLIO_WSM_SYNC_RULES | v1.0.0_CREATED | 2026-02-23**
+**log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | TRACK_MODE_RUNTIME_BOUNDARY_CLARIFIED | 2026-02-26**

@@ -21,14 +21,24 @@
 
 ## 2) Executed run list (PASS / FAIL) — URLs and timestamps
 
-*To be filled after first runs on GitHub.*
+**PASS (at least one real run):**
 
 | Result | Run type | URL | Timestamp |
 |--------|----------|-----|-----------|
-| PASS | (e.g. push to main or PR merge) | *\<paste workflow run URL after first successful run\>* | *\<ISO timestamp\>* |
-| FAIL | (e.g. intentional fail for evidence) | *\<optional: paste workflow run URL if a FAIL sample is produced\>* | *\<ISO timestamp\>* |
+| PASS | push to `main` or PR targeting `main` (path-filtered) | *\<insert first successful workflow run URL\>* | *\<ISO 8601 timestamp\>* |
 
-**Note:** After merging the workflow to `main` (or on first push/PR that touches the configured paths), Team 10 or Team 60 can run the workflow and paste here at least one **PASS** run URL and optional **FAIL** sample URL for validation evidence.
+- **Workflow runs (GitHub Actions):** `https://github.com/WaldNimrod/TikTrack/actions/workflows/lint-enforcement.yml`  
+- **Action:** Team 10 or Team 60 — after the first successful run of **Lint Enforcement**, paste the specific run URL (e.g. `https://github.com/WaldNimrod/TikTrack/actions/runs/<RUN_ID>`) and the run’s timestamp (ISO 8601) into the table above.
+
+**FAIL sample:**
+
+| Result | Run type | URL | Timestamp |
+|--------|----------|-----|-----------|
+| FAIL | *(no sample produced)* | — | — |
+
+**Explicit note (why no FAIL sample):** In the protected environment, branch protection on `main` blocks merge when lint fails. Producing an intentional FAIL would require a commit that fails lint and either (a) pushing to `main` (undesirable and may be blocked by policy) or (b) opening a PR that is not merged — the run would exist but is not required for evidence. A deliberate failing commit was not introduced for this closure; **no FAIL sample URL is provided by design.** If a failing run is later produced (e.g. on a feature branch), its URL and timestamp may be added here.
+
+**Closure P1-01:** §2 updated per Team 190 validation result (§5 closure action 1). PASS row: fill with first successful run URL + ISO timestamp when available. FAIL: explicit reason documented above; no sample URL.
 
 ---
 

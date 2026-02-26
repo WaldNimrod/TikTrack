@@ -11,7 +11,7 @@
 
 ## 1) Boundary rule
 
-**Runtime state** (active stage, current gate, last_gate_event, active_work_package_id) — **sole SSOT:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE**.
+**Runtime state** (active stage, current gate, `track_mode`, last_gate_event, active_work_package_id) — **sole SSOT:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE**.
 
 **Portfolio state** (Stage/Program/Work Package structural catalog and gate mirror) — canonical artifacts below. No Task-level in Portfolio.
 
@@ -37,3 +37,4 @@ Task-level is **not** in Portfolio; it is internal to Team 10 and execution team
 ---
 
 **log_entry | TEAM_170 | PORTFOLIO_INDEX | CREATED | 2026-02-23**
+**log_entry | TEAM_190 | PORTFOLIO_INDEX | WSM_TRACK_MODE_RUNTIME_FIELD_NOTED | 2026-02-26**

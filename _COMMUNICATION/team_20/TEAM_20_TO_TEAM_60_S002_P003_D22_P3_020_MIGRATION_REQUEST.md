@@ -6,7 +6,7 @@
 **to:** Team 60 (DevOps & Platform)  
 **cc:** Team 10, Team 50  
 **date:** 2026-01-31  
-**status:** REQUEST_ISSUED  
+**status:** ACKNOWLEDGED — TEAM_60_TO_TEAM_20_S002_P003_D22_P3_020_MIGRATION_RESPONSE_v1.0.0  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  
 
@@ -68,4 +68,12 @@ make migrate-p3-020
 
 ---
 
-**log_entry | TEAM_20 | TO_TEAM_60 | S002_P003_D22_P3_020_MIGRATION_REQUEST | REQUEST_ISSUED | 2026-01-31**
+---
+
+## 6) תולדה
+
+**TEAM_60_TO_TEAM_20_S002_P003_D22_P3_020_MIGRATION_RESPONSE_v1.0.0** — Team 60 אישר ביצוע: migration קיים; נוסף ל־fix-env-after-restart.sh. Team 20 / Team 50 יכולים לאמת FAV.
+
+---
+
+**log_entry | TEAM_20 | TO_TEAM_60 | S002_P003_D22_P3_020_MIGRATION_REQUEST | ACKNOWLEDGED | 2026-02-26**

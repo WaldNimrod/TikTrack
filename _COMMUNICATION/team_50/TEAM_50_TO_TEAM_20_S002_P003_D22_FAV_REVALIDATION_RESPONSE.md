@@ -7,7 +7,7 @@
 **to:** Team 20 (Backend Implementation)  
 **cc:** Team 10  
 **date:** 2026-01-31  
-**status:** PARTIAL_PASS — filter תוקן; POST עדיין 500  
+**status:** PARTIAL_PASS — filter תוקן; POST עדיין 500 (לאחר מיגרציה מלאה: סיבה = ORM metadata)  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  
 
@@ -15,7 +15,22 @@
 
 ## 1) מטרה
 
-דיווח תוצאות אימות מחדש לאחר תיקוני Team 20 (REMEDIATION_RESPONSE §4). **אתחול:** הופעל `scripts/fix-env-after-restart.sh` — כל 6 השלבים, כולל **[3/6] P3-020 migration** (DO, CREATE TABLE, CREATE INDEX…); לאחר מכן עצירה/הפעלת Backend ו־`scripts/run-tickers-d22-qa-api.sh` מול Backend פעיל.
+דיווח תוצאות אימות מחדש לאחר תיקוני Team 20 (REMEDIATION_RESPONSE §4). **אתחול:** הופעל `scripts/fix-env-after-restart.sh` — כל 6 השלבים, כולל **[3/6] P3-020** ו־**[4/7] P3-021**; לאחר מכן עצירה/הפעלת Backend ו־`scripts/run-tickers-d22-qa-api.sh` מול Backend פעיל.
+
+---
+
+## 1.1) בדיקה חוזרת לאחר מיגרציה מלאה (עדכון 2026-01-31)
+
+הצוותים השלימו את המיגרציה (P3-021 — TEAM_60_TO_TEAM_20_S002_P003_D22_P3_021_MIGRATION_RESPONSE). Team 50 ביצע:
+
+1. **אתחול:** `scripts/fix-env-after-restart.sh` — [1/7]–[7/7]; **[3/7] P3-020** ו־**[4/7] P3-021** הורצו בהצלחה (פלט: "P3-020 migration complete", "P3-021 migration complete").
+2. **ריצת FAV:** `scripts/run-tickers-d22-qa-api.sh`.
+
+**תוצאה:** Admin Login, GET summary, GET list, GET filters (ticker_type, is_active, search) — כולם ✅. **POST /tickers עדיין 500.**
+
+**שגיאה (עם DEBUG=true):** אותה השגיאה — `NoReferencedTableError: Foreign key associated with column 'tickers.exchange_id' could not find table 'market_data.exchanges'`.  
+**מסקנה:** הטבלאות נוצרו ב-DB (מיגרציה רצה), אך השגיאה היא ב-**SQLAlchemy ORM metadata**: מודל `Ticker` מפנה ל־`market_data.exchanges` (ול־sectors, industries, market_cap_groups) ואין ב-API מודל/טבלה רשומים עבורן, ולכן SQLAlchemy לא מוצא את הטבלה ב-metadata.  
+**פעולה נדרשת (Team 20):** להוסיף מודלים מינימליים ל־`market_data.exchanges`, `market_data.sectors`, `market_data.industries`, `market_data.market_cap_groups` (או לרשום את הטבלאות ב-metadata), או להשתמש ב־`use_alter=True` ב-FK כדי שלא יידרש resolve בזמן בניית ה-mapper.
 
 ---
 

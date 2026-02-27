@@ -9,6 +9,7 @@ from .enums import UserRole, ResetMethod, ApiProvider
 from .trading_accounts import TradingAccount
 from .cash_flows import CashFlow
 from .trades import Trade
+from .market_reference import Exchange, Sector, Industry, MarketCapGroup  # before Ticker — FK metadata
 from .tickers import Ticker
 from .user_tickers import UserTicker
 from .ticker_prices import TickerPrice
@@ -17,6 +18,10 @@ from .brokers_fees import BrokerFee
 from .exchange_rates import ExchangeRate
 
 __all__ = [
+    "Exchange",
+    "Sector",
+    "Industry",
+    "MarketCapGroup",
     "User",
     "PasswordResetRequest",
     "UserApiKey",

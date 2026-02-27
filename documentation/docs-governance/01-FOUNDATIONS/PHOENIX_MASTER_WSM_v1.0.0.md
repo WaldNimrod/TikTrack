@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-01-31** — Team 10 acknowledged Team 20 D22 remediation; Team 50 to re-run FAV and report.
+**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 10 recorded GATE_4 PASS S002-P003-WP002 (Team 50 report 12/12); next GATE_5 (Team 90).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; Team 20 D22 remediation complete; next Team 50 re-run FAV → GATE_4 |
+| active_flow | S002-P003; GATE_4 PASS (D22 FAV 12/12); next GATE_5 DEV_VALIDATION (Team 90) |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | S002-P003 D22 remediation complete \| 2026-01-31 \| Team 20 (TEAM_10_S002_P003_D22_REMEDIATION_ACK) |
+| last_s002_p003_milestone | GATE_4 PASS \| 2026-02-27 \| Team 50 report 12/12 (TEAM_10_S002_P003_GATE4_PASS_ACK) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_3 → GATE_4 (QA re-run pending) |
+| current_gate | GATE_5 (DEV_VALIDATION — Team 90 owner) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | S002_P003_D22_REMEDIATION_COMPLETE \| 2026-01-31 \| Team 10 \| TEAM_10_S002_P003_D22_REMEDIATION_ACK.md |
-| next_required_action | Team 50: re-run scripts/run-tickers-d22-qa-api.sh (backend with updated code); report GATE_4 result (PASS/FAIL) to Team 10. Team 10 advances to GATE_4 PASS when QA PASS. |
-| next_responsible_team | Team 50 (re-run FAV) → Team 10 (GATE_4 decision) |
+| phase_owner_team | Team 90 (GATE_5–GATE_8 owner) |
+| last_gate_event | GATE_4_PASS \| 2026-02-27 \| Team 10 \| TEAM_10_S002_P003_GATE4_PASS_ACK.md |
+| next_required_action | Team 90: run GATE_5 DEV_VALIDATION for S002-P003-WP002 (D22/D34/D35); update WSM on GATE_5 closure. Team 10 has handed off to GATE_5. |
+| next_responsible_team | Team 90 (GATE_5) |
 
 ---
 

@@ -50,14 +50,14 @@
 
 **אתחול:** הופעל `scripts/fix-env-after-restart.sh` — PostgreSQL (Docker `tiktrack-postgres-dev`) + Backend (port 8082) עלו; `/health` ו־`/health/detailed` 200; Login תקין.
 
-**הרצת סקריפט:** `scripts/run-tickers-d22-qa-api.sh` (Backend פעיל):
+**הרצת סקריפט:** `scripts/run-tickers-d22-qa-api.sh` (Backend פעיל, לאחר אתחול + מיגרציה מלאה P3-020 + P3-021):
 
 | תוצאה | כמות | פרטים |
 |--------|------|--------|
-| עברו | 5 | Admin Login; GET /tickers/summary → 200; GET /tickers → 200; GET ?is_active=true → 200; GET ?search=A → 200 |
-| נכשלו | 7 | GET ?ticker_type=STOCK → 500; POST /tickers → SERVER_ERROR (no id); GET/PUT/DELETE /tickers/:id → 307/404 |
+| עברו | **12** | Admin Login; GET /tickers/summary; GET /tickers; GET ?ticker_type=STOCK; GET ?is_active=true; GET ?search=A; POST /tickers → 201; GET /tickers/:id; GET /tickers/:id/data-integrity; PUT /tickers/:id; DELETE /tickers/:id; GET /tickers/:id after delete → 404 |
+| נכשלו | 0 | — |
 
-**ממצאים לתאום:** (1) `GET /tickers?ticker_type=STOCK` מחזיר 500 — יש לבדוק ב־Team 20 (Backend). (2) `POST /tickers` מחזיר `{"detail":"Failed to create ticker","error_code":"SERVER_ERROR"}` — ייתכן constraint/validation ב־DB או בשירות. (3) 307 על GET/PUT/DELETE :id — ייתכן redirect (trailing slash או base path). **המלצה:** Team 50 מגיש תאום ל־Team 20 (API contract / backend) לפי §3.1 ב־TEAM_10_S002_P003_GATE3_ACTIVATION_PROMPTS — עד פתרון: 100% PASS לא מתקיים; הסקריפטים וה־E2E מוכנים לריצה חוזרת לאחר תיקון.
+**Exit code:** 0.
 
 ---
 
@@ -79,7 +79,17 @@
 
 ---
 
-## 5) Seal (SOP-013)
+## 5) החלטה (Decision)
+
+| ערך | פירוט |
+|-----|------|
+| **PASS** | 0 SEVERE, 12/12 בדיקות עברו (exit_code 0). |
+| **Blocking findings** | none. |
+| **Gate transition** | GATE_4 PASS → Team 10 רשאי לעדכן WSM ולהעביר ל־**GATE_5**. |
+
+---
+
+## 6) Seal (SOP-013)
 
 ---
 --- PHOENIX TASK SEAL ---
@@ -89,10 +99,11 @@ WORK_PACKAGE_ID: S002-P003-WP002
 FILES_CREATED:
   - scripts/run-tickers-d22-qa-api.sh
   - tests/tickers-d22-e2e.test.js
-D22: API script (env, JSON summary, exit codes); E2E (filter UI, CRUD, data integrity, summary)
-D34/D35: FAV status per §3 above
-PRE_FLIGHT: Env initialized (fix-env-after-restart.sh); D22 API script run: 5 passed, 7 failed (filter 500, create SERVER_ERROR, CRUD 307/404) — coordination to Team 20 per §2.1
-HANDOVER_PROMPT: "Team 10, D22 FAV תוצרים נמסרו וריצה בוצעה. אתחול שרתים הושלם; תוצאות חלקיות — נדרש תאום Team 20 לפתרון 500 ו-create. סקריפט ו־E2E מוכנים לריצה חוזרת."
+D22: API script run 12/12 passed (after P3-020 + P3-021 migration). E2E per artifacts.
+D34/D35: FAV status per §3 above.
+PRE_FLIGHT: fix-env-after-restart.sh; run-tickers-d22-qa-api.sh — 12/12 passed, exit 0.
+HANDOVER_PROMPT: "Team 10, D22 FAV הושלם. 12/12 בדיקות עברו. רשאי לעדכן WSM ולהעביר ל־GATE_5."
+DECISION: PASS (0 SEVERE, 12/12 passed; exit_code 0)
 --- END SEAL ---
 ---
 

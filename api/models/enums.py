@@ -61,6 +61,17 @@ class AlertPriority(str, enum.Enum):
     CRITICAL = "CRITICAL"
 
 
+class TickerType(str, enum.Enum):
+    """Ticker type enum - maps to market_data.ticker_type (D22)"""
+    STOCK = "STOCK"
+    ETF = "ETF"
+    OPTION = "OPTION"
+    FUTURE = "FUTURE"
+    FOREX = "FOREX"
+    CRYPTO = "CRYPTO"
+    INDEX = "INDEX"
+
+
 # SQLAlchemy Enum types for use in Column definitions
 user_role_enum = Enum(UserRole, name="user_role", schema="user_data", create_type=False)
 reset_method_enum = Enum(ResetMethod, name="reset_method", schema="user_data", create_type=False)
@@ -68,3 +79,4 @@ api_provider_enum = Enum(ApiProvider, name="api_provider", schema="user_data", c
 note_category_enum = Enum(NoteCategory, name="note_category", schema="user_data", create_type=False)
 alert_type_enum = Enum(AlertType, name="alert_type", schema="user_data", create_type=False)
 alert_priority_enum = Enum(AlertPriority, name="alert_priority", schema="user_data", create_type=False)
+ticker_type_enum = Enum(TickerType, name="ticker_type", schema="market_data", create_type=False)

@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func, cast, String
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 import logging
 
 from ..models.tickers import Ticker
@@ -63,7 +64,10 @@ class TickersService:
                 )
             )
         if ticker_type:
-            stmt = stmt.where(Ticker.ticker_type == ticker_type.upper())
+            # Cast enum to string for robust comparison (DB has market_data.ticker_type ENUM)
+            stmt = stmt.where(
+                func.upper(cast(Ticker.ticker_type, String)) == ticker_type.upper()
+            )
         if is_active is not None:
             stmt = stmt.where(Ticker.is_active == is_active)
         stmt = stmt.order_by(Ticker.symbol.asc())
@@ -176,9 +180,37 @@ class TickersService:
             is_active=is_active,
         )
         db.add(ticker)
-        await db.commit()
-        await db.refresh(ticker)
-        return _ticker_to_response(ticker)
+        try:
+            await db.commit()
+            await db.refresh(ticker)
+            return _ticker_to_response(ticker)
+        except ProgrammingError as e:
+            await db.rollback()
+            err = str(e).lower()
+            # Schema mismatch: column missing (p3_020 not run) — return actionable 503
+            if ("column" in err and "does not exist" in err) or "undefinedcolumn" in err:
+                logger.error(f"Tickers schema mismatch (likely p3_020 not run): {e}", exc_info=True)
+                raise HTTPExceptionWithCode(
+                    status_code=503,
+                    detail="market_data.tickers schema outdated. Run: make migrate-p3-020",
+                    error_code=ErrorCodes.SERVER_ERROR,
+                )
+            raise
+        except IntegrityError as e:
+            await db.rollback()
+            error_msg = str(e.orig) if hasattr(e, "orig") else str(e)
+            if "tickers_symbol_exchange_unique" in error_msg or "symbol" in error_msg.lower():
+                raise HTTPExceptionWithCode(
+                    status_code=409,
+                    detail=f"Ticker symbol '{symbol}' already exists",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
+            logger.error(f"IntegrityError creating ticker: {error_msg}", exc_info=True)
+            raise HTTPExceptionWithCode(
+                status_code=409,
+                detail="Ticker creation failed due to constraint violation",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
 
     async def update_ticker(
         self,

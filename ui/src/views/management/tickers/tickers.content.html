@@ -92,6 +92,24 @@
         <span class="index-section__header-count" id="tableTickersCount">0 טיקרים</span>
       </div>
       <div class="index-section__header-actions">
+        <div class="filter-buttons-container tickers-filter-bar" data-role="tickers-filter">
+          <label for="tickersFilterType" class="sr-only">סוג טיקר</label>
+          <select id="tickersFilterType" class="index-section__header-filter-select js-tickers-filter-type" aria-label="סינון לפי סוג טיקר" data-filter="ticker_type">
+            <option value="">כל הסוגים</option>
+            <option value="STOCK">STOCK</option>
+            <option value="ETF">ETF</option>
+            <option value="OPTION">OPTION</option>
+            <option value="FUTURE">FUTURE</option>
+            <option value="FOREX">FOREX</option>
+            <option value="CRYPTO">CRYPTO</option>
+            <option value="INDEX">INDEX</option>
+          </select>
+          <div class="filter-buttons-container filter-buttons-container--inline" data-filter-group="is_active">
+            <button type="button" class="filter-icon-btn filter-icon-btn--active js-tickers-filter-active" data-is-active="" aria-label="הצג הכל" title="הצג הכל">הכל</button>
+            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="true" aria-label="פעילים בלבד" title="פעילים בלבד">פעיל</button>
+            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="false" aria-label="לא פעילים בלבד" title="לא פעילים בלבד">לא פעיל</button>
+          </div>
+        </div>
         <button class="index-section__header-action-btn js-add-ticker" aria-label="הוסף טיקר" title="הוסף טיקר חדש">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14"></path>

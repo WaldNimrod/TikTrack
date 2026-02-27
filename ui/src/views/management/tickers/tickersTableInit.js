@@ -1,6 +1,7 @@
 /**
  * Tickers Table Initialization - ניהול טיקרים
  * CRUD: הוספה, עריכה, מחיקה
+ * S002-P003-WP001 (D22): filter bar (ticker_type, is_active); loadTickersData params; state across pagination
  */
 
 import sharedServices from '../../../components/core/sharedServices.js';
@@ -27,6 +28,8 @@ const formatChangePct = (pct) => {
   let tableData = { data: [], total: 0 };
   let currentSortKey = 'symbol';
   let currentSortDir = 'asc';
+  /** Filter state — preserved across pagination (S002-P003-WP001 D22) */
+  let filterState = { ticker_type: null, is_active: null };
 
   function isAuthenticated() {
     try {
@@ -37,11 +40,17 @@ const formatChangePct = (pct) => {
     }
   }
 
-  async function loadTickersData() {
+  async function loadTickersData(filters = {}) {
     try {
       await sharedServices.init();
+      const params = {};
+      if (filters.ticker_type) params.ticker_type = filters.ticker_type;
+      if (filters.is_active !== undefined && filters.is_active !== null && filters.is_active !== '') {
+        params.is_active = filters.is_active === true || filters.is_active === 'true';
+      }
+      if (filters.search) params.search = filters.search;
       const [listRes, summaryRes] = await Promise.all([
-        sharedServices.get('/tickers', {}),
+        sharedServices.get('/tickers', params),
         sharedServices.get('/tickers/summary', {}),
       ]);
       const data = listRes?.data ?? listRes ?? [];
@@ -222,6 +231,28 @@ const formatChangePct = (pct) => {
     });
   }
 
+  function initFilterHandlers() {
+    const typeSelect = document.getElementById('tickersFilterType') || document.querySelector('.js-tickers-filter-type');
+    const activeBtns = document.querySelectorAll('.js-tickers-filter-active');
+    if (typeSelect) {
+      typeSelect.addEventListener('change', function () {
+        filterState.ticker_type = this.value || null;
+        currentPage = 1;
+        loadAllData();
+      });
+    }
+    activeBtns.forEach((btn) => {
+      btn.addEventListener('click', function () {
+        const val = this.getAttribute('data-is-active');
+        filterState.is_active = val === '' ? null : val === 'true';
+        activeBtns.forEach((b) => b.classList.remove('filter-icon-btn--active'));
+        this.classList.add('filter-icon-btn--active');
+        currentPage = 1;
+        loadAllData();
+      });
+    });
+  }
+
   function initPaginationHandlers() {
     const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="tickersTable"]');
     const prevBtn = document.getElementById('prevPageBtn');
@@ -279,7 +310,7 @@ const formatChangePct = (pct) => {
 
   async function loadAllData() {
     try {
-      const result = await loadTickersData();
+      const result = await loadTickersData(filterState);
       tableData = result.table;
       updateSummary(result.summary);
       updateTable(tableData.data);
@@ -319,6 +350,7 @@ const formatChangePct = (pct) => {
   }
 
   function runInit() {
+    initFilterHandlers();
     initSortHandlers();
     initPaginationHandlers();
     if (isAuthenticated()) {

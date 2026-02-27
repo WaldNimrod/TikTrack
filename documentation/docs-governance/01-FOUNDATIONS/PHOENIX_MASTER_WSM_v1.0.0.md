@@ -87,28 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 10 opened GATE_3 intake for S002-P003 (WP001/WP002 defined, ACK to Team 190, mandates issued to Team 30 and Team 50).
+**Gate-owner update evidence:** This block was updated **2026-01-31** — Team 10 acknowledged Team 20 D22 remediation; Team 50 to re-run FAV and report.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3_INTAKE_OPEN (S002-P003); WP001 (Team 30) and WP002 (Team 50) mandates issued per LLD400 dependency order |
+| active_flow | S002-P003; Team 20 D22 remediation complete; next Team 50 re-run FAV → GATE_4 |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | S002-P003-WP001 (D22 Filter UI); S002-P003-WP002 open in parallel for D34/D35 |
-| in_progress_work_package_id | S002-P003-WP001, S002-P003-WP002 (parallel execution) |
+| active_work_package_id | S002-P003-WP002 |
+| in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
+| last_s002_p003_milestone | S002-P003 D22 remediation complete \| 2026-01-31 \| Team 20 (TEAM_10_S002_P003_D22_REMEDIATION_ACK) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_3 |
+| current_gate | GATE_3 → GATE_4 (QA re-run pending) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | GATE_3_INTAKE_OPEN \| 2026-02-27 \| Team 10 \| TEAM_10_TO_TEAM_190_S002_P003_GATE3_INTAKE_OPEN_ACK.md |
-| next_required_action | Team 20: publish D22 API contract confirmation. Then Team 30 (WP001 frontend), Team 50 (WP002 D34/D35 immediate; D22 after WP001). Coordination messages required across layers. Team 10 to advance gate on WP completion. |
-| next_responsible_team | Team 10 |
+| last_gate_event | S002_P003_D22_REMEDIATION_COMPLETE \| 2026-01-31 \| Team 10 \| TEAM_10_S002_P003_D22_REMEDIATION_ACK.md |
+| next_required_action | Team 50: re-run scripts/run-tickers-d22-qa-api.sh (backend with updated code); report GATE_4 result (PASS/FAIL) to Team 10. Team 10 advances to GATE_4 PASS when QA PASS. |
+| next_responsible_team | Team 50 (re-run FAV) → Team 10 (GATE_4 decision) |
 
 ---
 

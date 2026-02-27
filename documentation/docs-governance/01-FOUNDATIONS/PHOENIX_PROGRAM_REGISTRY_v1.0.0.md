@@ -37,10 +37,16 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | stage_id | program_id | program_name | domain | status | current_gate_mirror |
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
-| S001 | S001-P002 | Alerts POC (per SSM §5.1) | AGENTS_OS | HOLD | — (lock released 2026-02-22; activation decision pending Team 00) |
-| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | ACTIVE | GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A |
-| S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision) |
+| S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
+| S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
+| S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 v1.0.0 ready; activates when S001-P002 enters GATE_3) |
 | S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A |
+| S003 | S003-P0XX | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
+| S004 | S004-P0XX | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS program completes; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
+| S005 | S005-P0XX | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; scope: multi-entity consistency, state machine completeness, business rule coverage) |
+| S005 | S005-P0YY | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; highest ROI per-token in Phase 5) |
+| S006 | S006-P0XX | Analytics Quality Validator | AGENTS_OS | PLANNED | — (placeholder; scope: analytics calculation declaration, output format compliance) |
+| S006 | S006-P0YY | Spec Draft Generator | AGENTS_OS | PLANNED | — (placeholder; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost) |
 
 
 
@@ -60,3 +66,4 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S002_P001_WP001_GATE8_PASS_WP002_ACTIVATED_S002_P002_PIPELINE_ADDED | 2026-02-26**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_WP002_GATE3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P003_ADDED_GATE0_PASS_G1_PENDING | 2026-02-26**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S001_P002_STATUS_PIPELINE_ACTIVATION_AUTHORIZED + S002_P001_STATUS_COMPLETE + S003_S006_AGENTS_OS_PLACEHOLDERS_ADDED | 2026-02-27**

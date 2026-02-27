@@ -72,7 +72,16 @@ make migrate-p3-020
 
 ## 6) תולדה
 
-**TEAM_60_TO_TEAM_20_S002_P003_D22_P3_020_MIGRATION_RESPONSE_v1.0.0** — Team 60 אישר ביצוע: migration קיים; נוסף ל־fix-env-after-restart.sh. Team 20 / Team 50 יכולים לאמת FAV.
+**תשובת Team 60 (רשמי):** _COMMUNICATION/team_60/TEAM_60_TO_TEAM_20_S002_P003_D22_P3_020_MIGRATION_RESPONSE_v1.0.0.md  
+
+מתועד: `make migrate-p3-020` קיים ב-Makefile; המיגרציה נכנסה ל־`scripts/fix-env-after-restart.sh` בשלב **[3/6]** (לפני Restart Backend). Team 50 יכול להריץ FAV לאחר אתחול ובדיקה חוזרת.
+
+**אתחול שבוצע:**
+- `scripts/fix-env-after-restart.sh` הופעל: [1/6] Postgres — רץ, [2/6] api/.env — תקין, [3/6] P3-020 migration — הושלם (DO, CREATE TABLE, CREATE INDEX…), [4/6] venv — קיים, [5/6] Restart Backend — בוצע, /health 200, [6/6] /health/detailed — 200.
+
+**בדיקה חוזרת D22:** הופעל `scripts/run-tickers-d22-qa-api.sh`. **תוצאה: 6/7 עברו; POST /tickers עדיין מחזיר 500.**
+
+**הערת מעקב:** אם אצלך המיגרציה כבר רצה קודם והסביבה שונה, ייתכן ש-POST יעבור. אם גם אצלך נשאר 500 — לבדוק לוג Backend בעת קריאת POST /tickers (ו־stack trace) ולוודא שטבלת `market_data.tickers` כוללת את כל העמודות שהמודל מצפה להן (כולל `status` ו־`deleted_at`). המשך טיפול: Team 20 / לוג Backend.
 
 ---
 

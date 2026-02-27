@@ -26,7 +26,7 @@ echo "=========================================="
 ERRORS=0
 
 # ─── 1. PostgreSQL ───────────────────────────────────────────────────────────
-echo -e "\n${YELLOW}[1/6] PostgreSQL (Docker)${NC}"
+echo -e "\n${YELLOW}[1/7] PostgreSQL (Docker)${NC}"
 if command -v docker &>/dev/null; then
   if docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "tiktrack-postgres-dev"; then
     if ! docker ps --format "{{.Names}}" | grep -q "tiktrack-postgres-dev"; then
@@ -58,7 +58,7 @@ else
 fi
 
 # ─── 2. api/.env ─────────────────────────────────────────────────────────────
-echo -e "\n${YELLOW}[2/6] api/.env${NC}"
+echo -e "\n${YELLOW}[2/7] api/.env${NC}"
 ENV_FILE="$API_DIR/.env"
 if [ ! -f "$ENV_FILE" ]; then
   echo -e "  ${RED}❌ api/.env not found${NC}"
@@ -89,7 +89,7 @@ else
 fi
 
 # ─── 3. P3-020 migration (user_tickers + tickers.status) ─────────────────────
-echo -e "\n${YELLOW}[3/6] P3-020 migration (D22 / POST /tickers)${NC}"
+echo -e "\n${YELLOW}[3/7] P3-020 migration (D22 / POST /tickers)${NC}"
 if command -v docker &>/dev/null && docker ps --format "{{.Names}}" 2>/dev/null | grep -q "tiktrack-postgres-dev"; then
   if docker exec tiktrack-postgres-dev pg_isready -U tiktrack -d TikTrack-phoenix-db &>/dev/null; then
     cd "$PROJECT_ROOT" && make migrate-p3-020 2>/dev/null && echo -e "  ${GREEN}✅ P3-020 migration OK${NC}" || echo -e "  ${YELLOW}⚠️  make migrate-p3-020 failed or not available${NC}"
@@ -101,16 +101,29 @@ else
   echo -e "  ${YELLOW}⚠️  Docker/PostgreSQL not available — run make migrate-p3-020 manually if needed${NC}"
 fi
 
-# ─── 4. Backend venv ────────────────────────────────────────────────────────
-echo -e "\n${YELLOW}[4/6] Backend venv${NC}"
+# ─── 4. P3-021 migration (market_data reference tables — tickers FK) ─────────
+echo -e "\n${YELLOW}[4/7] P3-021 migration (exchanges, sectors, industries, market_cap_groups)${NC}"
+if command -v docker &>/dev/null && docker ps --format "{{.Names}}" 2>/dev/null | grep -q "tiktrack-postgres-dev"; then
+  if docker exec tiktrack-postgres-dev pg_isready -U tiktrack -d TikTrack-phoenix-db &>/dev/null; then
+    cd "$PROJECT_ROOT" && make migrate-p3-021 2>/dev/null && echo -e "  ${GREEN}✅ P3-021 migration OK${NC}" || echo -e "  ${YELLOW}⚠️  make migrate-p3-021 failed or not available${NC}"
+    cd - >/dev/null
+  else
+    echo -e "  ${YELLOW}⚠️  PostgreSQL not ready — skip migration${NC}"
+  fi
+else
+  echo -e "  ${YELLOW}⚠️  Docker/PostgreSQL not available — run make migrate-p3-021 manually if needed${NC}"
+fi
+
+# ─── 5. Backend venv ────────────────────────────────────────────────────────
+echo -e "\n${YELLOW}[5/7] Backend venv${NC}"
 if [ -d "$API_DIR/venv" ]; then
   echo -e "  ${GREEN}✅ api/venv exists${NC}"
 else
   echo -e "  ${YELLOW}⚠️  api/venv not found — run start-backend.sh (it will create)${NC}"
 fi
 
-# ─── 5. Restart Backend ──────────────────────────────────────────────────────
-echo -e "\n${YELLOW}[5/6] Restart Backend${NC}"
+# ─── 6. Restart Backend ──────────────────────────────────────────────────────
+echo -e "\n${YELLOW}[6/7] Restart Backend${NC}"
 bash "$SCRIPT_DIR/stop-backend.sh" 2>/dev/null || true
 sleep 2
 cd "$PROJECT_ROOT"
@@ -126,8 +139,8 @@ for i in {1..30}; do
   sleep 1
 done
 
-# ─── 6. Health / detailed (DB + Auth) ────────────────────────────────────────
-echo -e "\n${YELLOW}[6/6] Health /detailed (DB + Auth)${NC}"
+# ─── 7. Health / detailed (DB + Auth) ────────────────────────────────────────
+echo -e "\n${YELLOW}[7/7] Health /detailed (DB + Auth)${NC}"
 DETAILED=$(curl -s http://localhost:8082/health/detailed 2>/dev/null || echo "{}")
 if echo "$DETAILED" | grep -q '"status":"ok"'; then
   echo -e "  ${GREEN}✅ DB + AuthService OK — Login should work${NC}"

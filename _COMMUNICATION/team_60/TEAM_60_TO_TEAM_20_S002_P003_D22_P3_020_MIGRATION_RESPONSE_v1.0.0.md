@@ -59,11 +59,13 @@
 2. `scripts/run-tickers-d22-qa-api.sh` — 7/7 בדיקות.
 3. POST /tickers → 201 + id.
 
+**תוצאת אימות שבוצעה:** אתחול fix-env-after-restart.sh (כל 6 שלבים, כולל [3/6] P3-020) + הרצת run-tickers-d22-qa-api.sh — **6/7 עברו; POST /tickers מחזיר 500.** המיגרציה רצה בהצלחה (עמודת `status` וטבלת `user_data.user_tickers` קיימות). אם POST נשאר 500 — מומלץ לבדוק לוג Backend בעת הקריאה ולוודא שכל עמודות `market_data.tickers` תואמות למודל (כולל status, deleted_at); המשך טיפול ב-Team 20.
+
 ---
 
 ## 5) Response required
 
-אין פעולה חוסמת. Team 20 / Team 50 יכולים לאמת FAV לאחר הרצת המיגרציה בסביבה הרלוונטית.
+אין פעולה חוסמת מצד Team 60. Team 20 / Team 50 יכולים לאמת FAV בסביבה הרלוונטית; טיפול ב-POST 500 (לוג ומודל) — באחריות Team 20.
 
 ---
 

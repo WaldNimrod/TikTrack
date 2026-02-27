@@ -47,6 +47,7 @@ cd tests && npm run test:phase2-e2e   # E2E
 ### 5. יצירת Feedback
 - קובץ: `TEAM_50_GATE_B_FEEDBACK_TO_TEAMS.md`
 - לכל כישלון: תיאור, שגיאה מדויקת, צוות, פעולה נדרשת
+- **בכשל — ובמיוחד כשל חוזר — חובה לכלול מידע מפורט לתיקון:** בקשת HTTP מדויקת (method, URL, body), תשובה מלאה (status, body), הקשר ריצה, צעדי שחזור, והנחיה להפקת שגיאה מדויקת (DEBUG=true / לוג Backend). **נוהל מחייב:** `TEAM_50_QA_FAILURE_REPORTING_SOP_v1.0.0.md`
 
 ### 6. פורמט דוח (חובה)
 **בכל דוח בדיקות** לכלול:

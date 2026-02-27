@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-26T19:10:37.704939+00:00",
+  "generated_at_utc": "2026-02-27T02:05:41.603422+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "N/A",
     "in_progress_work_package_id": "N/A",
-    "current_gate": "GATE_2",
+    "current_gate": "GATE_3",
     "active_program_id": "S002-P003",
-    "last_gate_event": "GATE_1_PASS \\",
-    "next_required_action": "Team 00: review S002-P003 GATE_2 SPEC submission package and issue APPROVED/REJECTED decision (with findings if rejected).",
-    "next_responsible_team": "Team 00"
+    "last_gate_event": "GATE_2_APPROVED \\",
+    "next_required_action": "Team 10: open GATE_3 intake for S002-P003, issue WP001 (D22) mandate to Team 30, and issue WP002 (D34/D35) mandates to Team 50 in parallel (WP002 D22 only after WP001 completion).",
+    "next_responsible_team": "Team 10"
   },
   "stages": [
     {
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_2; active_flow=GATE_2_PENDING (S002-P003); SPEC package submitted to Team 00; awaiting APPROVED/REJECTED decision; active_work_package_id=N/A"
+      "current_gate_mirror": "GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A"
     }
   ],
   "work_packages": [
@@ -250,7 +250,7 @@
           "program_name": "TikTrack Alignment (D22+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_2; active_flow=GATE_2_PENDING (S002-P003); SPEC package submitted to Team 00; awaiting APPROVED/REJECTED decision; active_work_package_id=N/A",
+          "current_gate_mirror": "GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A",
           "work_packages": []
         }
       ]

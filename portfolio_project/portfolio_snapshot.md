@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-02-26T19:10:37.704939+00:00`
+- Generated (UTC): `2026-02-27T02:05:41.603422+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `N/A`
-- current_gate: `GATE_2`
-- next_required_action: `Team 00: review S002-P003 GATE_2 SPEC submission package and issue APPROVED/REJECTED decision (with findings if rejected).`
+- current_gate: `GATE_3`
+- next_required_action: `Team 10: open GATE_3 intake for S002-P003, issue WP001 (D22) mandate to Team 30, and issue WP002 (D34/D35) mandates to Team 50 in parallel (WP002 D22 only after WP001 completion).`
 
 ## Portfolio Counts
 

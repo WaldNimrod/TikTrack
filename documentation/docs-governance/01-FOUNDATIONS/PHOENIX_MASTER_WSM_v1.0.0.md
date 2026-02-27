@@ -87,28 +87,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-26** — GATE_2 SPEC submission for S002-P003 was delivered to Team 00; waiting architect decision.
+**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 00 approved GATE_2 for S002-P003; Team 190 advanced state to GATE_3 intake and handed off to Team 10.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_2_PENDING (S002-P003); SPEC package submitted to Team 00; awaiting APPROVED/REJECTED decision |
+| active_flow | GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | N/A (pending next authorized intake) |
+| active_work_package_id | N/A (Team 10 intake open; WP identifiers will be opened by Team 10) |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| allowed_gate_range | GATE_0 → GATE_2 (spec gates for S002-P003) |
-| current_gate | GATE_2 |
+| allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
+| current_gate | GATE_3 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 190 (GATE_0–GATE_2 owner) |
-| last_gate_event | GATE_1_PASS \| 2026-02-26 \| Team 190 \| TEAM_190_GATE1_S002_P003_VALIDATION_RESULT.md |
-| next_required_action | Team 00: review S002-P003 GATE_2 SPEC submission package and issue APPROVED/REJECTED decision (with findings if rejected). |
-| next_responsible_team | Team 00 |
+| phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
+| last_gate_event | GATE_2_APPROVED \| 2026-02-27 \| Team 00 \| ARCHITECT_GATE2_S002_P003_DECISION.md |
+| next_required_action | Team 10: open GATE_3 intake for S002-P003, issue WP001 (D22) mandate to Team 30, and issue WP002 (D34/D35) mandates to Team 50 in parallel (WP002 D22 only after WP001 completion). |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -202,3 +202,5 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_0 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_1 and routed to Team 00/170 for LLD400 | 2026-02-26**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS S002-P003 (TIKTRACK ALIGNMENT); advanced to GATE_2_PENDING for architect approval flow | 2026-02-26**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P003 GATE_2 SPEC package submitted to Team 00; awaiting architect decision | 2026-02-26**
+**log_entry | TEAM_00 | GATE_2_DECISION | S002-P003 | APPROVED | 2026-02-27**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_2 APPROVED S002-P003; advanced to GATE_3_INTAKE_OPEN and handed off to Team 10 | 2026-02-27**

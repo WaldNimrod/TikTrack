@@ -87,16 +87,16 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 00 approved GATE_2 for S002-P003; Team 190 advanced state to GATE_3 intake and handed off to Team 10.
+**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 10 opened GATE_3 intake for S002-P003 (WP001/WP002 defined, ACK to Team 190, mandates issued to Team 30 and Team 50).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order |
+| active_flow | GATE_3_INTAKE_OPEN (S002-P003); WP001 (Team 30) and WP002 (Team 50) mandates issued per LLD400 dependency order |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | N/A (Team 10 intake open; WP identifiers will be opened by Team 10) |
-| in_progress_work_package_id | N/A |
+| active_work_package_id | S002-P003-WP001 (D22 Filter UI); S002-P003-WP002 open in parallel for D34/D35 |
+| in_progress_work_package_id | S002-P003-WP001, S002-P003-WP002 (parallel execution) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
 | current_gate | GATE_3 |
@@ -106,8 +106,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3–GATE_4 owner) |
-| last_gate_event | GATE_2_APPROVED \| 2026-02-27 \| Team 00 \| ARCHITECT_GATE2_S002_P003_DECISION.md |
-| next_required_action | Team 10: open GATE_3 intake for S002-P003, issue WP001 (D22) mandate to Team 30, and issue WP002 (D34/D35) mandates to Team 50 in parallel (WP002 D22 only after WP001 completion). |
+| last_gate_event | GATE_3_INTAKE_OPEN \| 2026-02-27 \| Team 10 \| TEAM_10_TO_TEAM_190_S002_P003_GATE3_INTAKE_OPEN_ACK.md |
+| next_required_action | Team 20: publish D22 API contract confirmation. Then Team 30 (WP001 frontend), Team 50 (WP002 D34/D35 immediate; D22 after WP001). Coordination messages required across layers. Team 10 to advance gate on WP completion. |
 | next_responsible_team | Team 10 |
 
 ---

@@ -73,6 +73,11 @@ Authority interpretation for this active program:
 - Global generic gate docs describe delegated approval to Team 100 at GATE_2/GATE_6.
 - For the active TikTrack program S002-P003, CURRENT_OPERATIONAL_STATE and active Team 190 routing artifacts define Team 00 as current decision authority.
 - If a contradiction appears, use precedence: WSM CURRENT_OPERATIONAL_STATE -> active gate request package -> generic lifecycle description.
+- **Precedence Rule:** In case of contradiction between governance documents, authority is resolved with the following precedence:
+  1. WSM `CURRENT_OPERATIONAL_STATE`
+  2. Active gate request package for the specific program
+  3. Generic lifecycle description
+- **Application to S002-P003:** While generic docs may delegate GATE_2 approval to Team 100, the WSM and active routing artifacts for the `TIKTRACK` program `S002-P003` assign decision authority directly to **Team 00**. This is the binding authority for the current task.
 
 ---
 
@@ -182,3 +187,4 @@ Before ending the session verify:
 ---
 
 **log_entry | TEAM_00 | TEAM_00_ACTIVATION_PROMPT_v1.0.0_REFRESH | DETAILED_ONBOARDING_LOCK + CONTEXT_ANCHORS + GATE2_RUNTIME_FLOW | 2026-02-26**
+**log_entry | TEAM_00 | TEAM_00_ACTIVATION_PROMPT_v1.0.0_CLARIFY | AUTHORITY_INTERPRETATION_PRECEDENCE_RULE_REFINED | 2026-02-26**

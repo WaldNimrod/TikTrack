@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-01T13:49:04.267904+00:00",
+  "generated_at_utc": "2026-03-01T21:28:33.872788+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "S002-P003-WP002",
     "in_progress_work_package_id": "S002-P003-WP002",
-    "current_gate": "GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED)",
+    "current_gate": "GATE_3 (rollback loop on HOLD pending pre-remediation planning package)",
     "active_program_id": "S002-P003",
-    "last_gate_event": "GATE_6_REJECT \\",
-    "next_required_action": "Team 10: execute CODE_CHANGE_REQUIRED remediation cycle, return through GATE_4, then re-submit GATE_5 to Team 90. Team 90: enforce new GATE_6 8-artifact package on future resubmission.",
-    "next_responsible_team": "Team 10 (GATE_3 rollback / remediation loop)"
+    "last_gate_event": "GATE_7_REJECT \\",
+    "next_required_action": "Team 00 / Team 100: review pre-remediation alignment package and approve/adjust the remediation frame. Team 90: on approval, convert frame into structured execution package for Team 10.",
+    "next_responsible_team": "Team 00 / Team 100, then Team 90"
   },
   "stages": [
     {
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED); active_flow=S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10; active_work_package_id=S002-P003-WP002"
+      "current_gate_mirror": "GATE_3 (rollback loop on HOLD pending pre-remediation planning package); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); pre-remediation architect package submitted; awaiting approval before Team 10 execution; active_work_package_id=S002-P003-WP002"
     },
     {
       "program_id": "S002-P004",
@@ -332,9 +332,9 @@
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED)",
+      "current_gate": "GATE_3 (rollback loop on HOLD pending pre-remediation planning package)",
       "is_active": true,
-      "active_marker_reason": "S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10"
+      "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); pre-remediation architect package submitted; awaiting approval before Team 10 execution"
     }
   ],
   "hierarchy": [
@@ -435,16 +435,16 @@
           "program_name": "TikTrack Alignment (D22+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED); active_flow=S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10; active_work_package_id=S002-P003-WP002",
+          "current_gate_mirror": "GATE_3 (rollback loop on HOLD pending pre-remediation planning package); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); pre-remediation architect package submitted; awaiting approval before Team 10 execution; active_work_package_id=S002-P003-WP002",
           "work_packages": [
             {
               "work_package_id": "S002-P003-WP002",
               "program_id": "S002-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED)",
+              "current_gate": "GATE_3 (rollback loop on HOLD pending pre-remediation planning package)",
               "is_active": true,
-              "active_marker_reason": "S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10"
+              "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); pre-remediation architect package submitted; awaiting approval before Team 10 execution"
             }
           ]
         },

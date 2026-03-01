@@ -85,9 +85,10 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 |------|---------|
 | **Entry** | GATE_6 PASS. |
 | **Owner** | Team 90. |
-| **Team 10 mandatory actions** | (1) Submit request for human UX sign-off (Nimrod / Team 00 per process). (2) Update on signature. |
-| **Required artifacts** | Request and approval record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
-| **Exit** | Human sign-off received. |
+| **Team 10 mandatory actions** | (1) Provide clarifications only if Team 90 requests them. (2) Wait for human decision routed by Team 90. (3) Do not operate GATE_7 directly. |
+| **Required artifacts** | Team 90 browser-scenario request + human decision record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
+| **Execution mode** | Human browser/UI review only: real pages, user actions, visible outcomes, edge cases. No terminal/log review as primary approval path. |
+| **Exit** | Human sign-off (`אישור`) received and normalized by Team 90 into canonical decision artifact. |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
 ---

@@ -78,7 +78,22 @@ If any of the four steps is missing, gate handling is incomplete.
 
 ---
 
-## 3.3) WSM update SLA (Team 90-owned gates)
+## 3.3) GATE_7 operating mode lock (human approval semantics)
+
+For every GATE_7 cycle, Team 90 must:
+
+1. Issue a browser-based scenario artifact to the human approver.
+2. Define concrete UI flows (for example: create, edit, delete, toggle, filter, validation errors).
+3. Include edge cases and wrong-value checks where relevant.
+4. Ensure the scenarios cover the intended API surface through UI behavior, not through direct API commands by the human approver.
+5. Explicitly avoid terminal commands, shell scripts, log review, `/tmp` checks, or file-presence checks as the main human approval method.
+6. Accept human response in Hebrew (`אישור` / `פסילה`) and normalize it into the canonical GATE_7 decision artifact.
+
+If Team 90 issues a command-line-based GATE_7 prompt as the primary approval route, that GATE_7 package is procedurally non-compliant and must be corrected before human execution.
+
+---
+
+## 3.4) WSM update SLA (Team 90-owned gates)
 
 Decision -> WSM update -> next-gate trigger, same cycle.
 No deferred updates and no partial closure.

@@ -1,5 +1,6 @@
 # DIRECTIVE_RECORD — Execution Track (S002-P003-WP002)
 **project_domain:** TIKTRACK
+**date:** 2026-03-01
 
 **architectural_approval_type:** EXECUTION
 

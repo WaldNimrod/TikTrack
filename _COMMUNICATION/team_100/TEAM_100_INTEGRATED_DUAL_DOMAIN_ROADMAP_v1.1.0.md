@@ -14,6 +14,8 @@
 
 ## Change Log vs. v1.0.0
 
+### Round 1 — Team 00 Conditional Approval + Team 190 Prevalidation (v1.1.0 initial)
+
 | # | Source | Change |
 |---|---|---|
 | A1 | Team 00 ISSUE-01 | S002→S003 transition gate: S001-P002 GATE_7 PASS (not GATE_8) |
@@ -25,11 +27,22 @@
 | A7 | Team 00 Q-02 | S002-P002 LOD200 trigger: S001-P002 GATE_0 PASS (earlier) |
 | A8 | Team 00 Q-04 | PARALLEL column added to Master Sequence Table |
 | A9 | Team 00 Q-03 | All Agents_OS program IDs now canonical (registry-aligned) |
-| P0-02 | Team 190 | Replaced ALL non-canonical IDs. Proposed canonical IDs for TikTrack programs. Removed P-ADMIN pseudo-IDs. |
-| P1-01 | Team 190 | Gate reference disclaimer added — all gate refs are WP planning shorthand |
-| P1-02 | Team 190 | Escalation Protocol marked as PROPOSED_PENDING_FORMAL_DIRECTIVE |
-| P1-03 | Team 190 | SSOT reconciliation status added (D31, D40, D38/D39) |
-| P1-04 | Team 190 | Strategic planning markers labelled (P-ADMIN package, AGENTS_OS COMPLETE GATE) |
+| P0-02 | Team 190 prevalidation | Replaced ALL non-canonical IDs. Proposed canonical IDs for TikTrack programs. Removed P-ADMIN pseudo-IDs. |
+| P1-01 | Team 190 prevalidation | Gate reference disclaimer added — all gate refs are WP planning shorthand |
+| P1-02 | Team 190 prevalidation | Escalation Protocol marked as PROPOSED_PENDING_FORMAL_DIRECTIVE |
+| P1-03 | Team 190 prevalidation | SSOT reconciliation status added (D31, D40, D38/D39) |
+| P1-04 | Team 190 prevalidation | Strategic planning markers labelled (P-ADMIN package, AGENTS_OS COMPLETE GATE) |
+
+### Round 2 — Team 190 Post-Validation Alignment Patch (v1.1.0 updated 2026-03-01)
+
+| # | Source | Change |
+|---|---|---|
+| PA-A1 | Team 190 alignment feedback | Document status updated: `TEAM_190_VALIDATED_AWAITING_TEAM_00_FINAL_RATIFICATION` |
+| PA-A2 | Team 190 alignment feedback | `phase_owner` updated: post-Team 190 validation state |
+| PA-A3 | Team 190 alignment feedback | Program ID note updated: "pending registration" → "registered in PHOENIX_PROGRAM_REGISTRY_v1.0.0.md" |
+| PA-A4 | Team 190 alignment feedback | Section 9 updated: Team 190 validation complete; Team 00 ratification as active next step |
+| PA-A5 | Team 190 alignment feedback | Section 10 converted from active request to completed validation record with full validation chain |
+| PA-Q1 | Team 190 quality note | S002-P003 gate qualifier labelled as "status snapshot: 2026-03-01 — live state: WSM" |
 
 ---
 
@@ -162,7 +175,7 @@ PRINCIPLE 5 — STAGE GOVERNANCE PACKAGE MANDATORY BEFORE NEXT STAGE
 |---|---|---|---|
 | S002-P001 | Core Validation Engine | AGENTS_OS | ✅ COMPLETE |
 | S002-P002 | Full Pipeline Orchestrator¹ | AGENTS_OS | ⏳ PIPELINE |
-| S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | 🔄 ACTIVE (GATE_5) |
+| S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | 🔄 ACTIVE `[status snapshot: 2026-03-01 — live state: WSM]` |
 | S002-P004 ᴾ | Admin Review S002 `[Stage Governance Package]` | TIKTRACK | 📋 |
 
 > ¹ **S002-P002 LOD200 timing (A7):** LOD200 authoring begins when S001-P002 passes **GATE_0**
@@ -588,31 +601,73 @@ Requires dedicated Team 00 + Team 100 architectural session. Candidates:
 
 ---
 
-## 9. Review Request — Team 00
+## 9. Review Record — Team 00
 
-> ✅ **REVIEW COMPLETE — 2026-03-01**
+> ✅ **CONDITIONAL APPROVAL COMPLETE — 2026-03-01**
 > Response: `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_100_INTEGRATED_ROADMAP_RESPONSE_v1.0.0.md`
 > Verdict: APPROVED_WITH_CONDITIONS — 9 action items (A1–A9)
-> This v1.1.0 incorporates all A1–A9. Team 00 final ratification expected after Team 190 validation.
+> All A1–A9 incorporated in this v1.1.0.
+>
+> ⏳ **TEAM 190 STRUCTURAL VALIDATION: COMPLETE** — `STRUCTURALLY_VALID_WITH_CORRECTIONS`
+> See: `_COMMUNICATION/team_190/TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_VALIDATION_v1.1.0.md`
+> + `TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_REVALIDATION_ADDENDUM_v1.0.0.md`
+> + `TEAM_190_TO_TEAM_100_TEAM_00_INTEGRATED_ROADMAP_FINAL_STATUS_NOTICE_v1.0.0.md`
+>
+> ⭐ **NEXT ACTIVE STEP: Team 00 final ratification** — all structural blockers cleared.
 
 ---
 
-## 10. Review Request — Team 190
+## 10. Validation Record — Team 190 (Completed)
 
-> **Status: SUBMITTED FOR FORMAL VALIDATION — this is v1.1.0, the correct validation target.**
-> Prevalidation: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_PREVALIDATION_RESPONSE_v1.0.0.md`
-> All P0/P1/P2 corrections from prevalidation have been incorporated.
+> ✅ **STRUCTURAL VALIDATION COMPLETE — 2026-03-01**
+> Verdict: `STRUCTURALLY_VALID_WITH_CORRECTIONS`
+> All structural blockers (B1–B5) closed through Team 170 reconciliation.
+> No further Team 190 revalidation cycle required unless substance changes.
+
+### Validation Chain (in order)
+
+| Document | Location | Outcome |
+|---|---|---|
+| Prevalidation response | `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_PREVALIDATION_RESPONSE_v1.0.0.md` | STRUCTURAL_CORRECTIONS_REQUIRED — resolved in v1.1.0 |
+| Formal structural validation | `_COMMUNICATION/team_190/TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_VALIDATION_v1.1.0.md` | STRUCTURALLY_VALID_WITH_CORRECTIONS |
+| Revalidation addendum | `_COMMUNICATION/team_190/TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_REVALIDATION_ADDENDUM_v1.0.0.md` | Blockers B1–B5 CLOSED |
+| Final status notice | `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_00_INTEGRATED_ROADMAP_FINAL_STATUS_NOTICE_v1.0.0.md` | CLEARED FOR TEAM 00 FINAL RATIFICATION |
+
+### Archived: Original 10-Check Request Summary
+
+> The following table records the original 10-check request submitted with v1.1.0 and its outcome.
+> Full check details are preserved in the formal validation documents above.
+
+| Check | Topic | Outcome |
+|---|---|---|
+| 1 | Gate Model Compliance | COMPLIANT (Escalation Protocol PROPOSED accepted) |
+| 2 | Program Registry Consistency | CONSISTENT (post Team 170 registration) |
+| 3 | SSOT Discrepancies | B1–B5 CLOSED via Team 170 reconciliation |
+| 4 | Inter-Program Dependencies | VALID |
+| 5 | Stage Governance Package Protocol | REQUIRES_DIRECTIVE (OD-02 outstanding) |
+| 6 | AGENTS_OS COMPLETE GATE + Analytics Scope | REQUIRES_FORMALIZATION (OD-05 outstanding) |
+| 7 | Writing Authority | WITHIN_AUTHORITY |
+| 8 | S001-P002 Transition Gate Correction | STRUCTURALLY_VALID |
+| 9 | Escalation Protocol Governance | GOVERNED / REQUIRES_DIRECTIVE (OD-02) |
+| 10 | S002-P002 Cross-Stage Completion | VALID |
+
+### Post-Validation Alignment (Team 190 Feedback 2026-03-01)
+
+> `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_INTEGRATED_ROADMAP_POST_VALIDATION_ALIGNMENT_FEEDBACK.md`
+> Status-alignment patch applied (A1–A5 + Q1). No new revalidation cycle triggered.
 
 ---
 
-### 📋 TEAM 190 FORMAL VALIDATION REQUEST (v1.1.0 — 10 checks)
+### 📋 TEAM 190 FORMAL VALIDATION REQUEST (v1.1.0 — 10 checks) [ARCHIVED — FULFILLED]
 
 ```
+[ARCHIVED — REQUEST FULFILLED 2026-03-01]
 FORMAL STRUCTURAL VALIDATION REQUEST
 Document: TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.1.0.md  ← THIS FILE
 Submitted by: Team 100
 Date: 2026-03-01
 Type: Constitutional structural validation (non-gate review)
+Outcome: STRUCTURALLY_VALID_WITH_CORRECTIONS — all checks resolved
 
 ═══════════════════════════════════════════════════════════════
 CONTEXT
@@ -764,3 +819,6 @@ REFERENCE FILES (read in this order)
 **log_entry | TEAM_00 | INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.0.0_REVIEWED | APPROVED_WITH_CONDITIONS | A1-A9 | 2026-03-01**
 **log_entry | TEAM_190 | INTEGRATED_DUAL_DOMAIN_ROADMAP_PREVALIDATION | STRUCTURAL_CORRECTIONS_REQUIRED | P0-P2 | 2026-03-01**
 **log_entry | TEAM_100 | INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.1.0_SUBMITTED | ALL_CORRECTIONS_INCORPORATED | TO_TEAM_190_FORMAL_VALIDATION | 2026-03-01**
+**log_entry | TEAM_190 | INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.1.0_FORMAL_VALIDATION | STRUCTURALLY_VALID_WITH_CORRECTIONS | B1-B5_CLOSED | 2026-03-01**
+**log_entry | TEAM_190 | INTEGRATED_DUAL_DOMAIN_ROADMAP_POST_VALIDATION_ALIGNMENT_FEEDBACK | STATUS_ALIGNMENT_REQUIRED_NO_NEW_REVALIDATION | A1-A5_Q1 | 2026-03-01**
+**log_entry | TEAM_100 | INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.1.0_ALIGNMENT_PATCH | PA-A1_PA-A2_PA-A3_PA-A4_PA-A5_PA-Q1_APPLIED | AWAITING_TEAM_00_FINAL_RATIFICATION | 2026-03-01**

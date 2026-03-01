@@ -40,21 +40,29 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     Handler for Pydantic validation errors.
     
     PDSC Error Schema (Team 90): error_code, detail, field_errors, trace_id.
+    BF-G5R-001: malformed JSON (JSON decode error) → 400 per architect contract.
     """
     logger.debug(f"RequestValidationError caught: {exc.errors()}")
+    errors = exc.errors()
+    first_msg = errors[0].get("msg", "Validation error") if errors else "Validation error"
+    # BF-G5R-001: malformed JSON must return 400, not 422
+    is_malformed_json = (
+        "JSON decode error" in first_msg
+        or any(e.get("type", "").endswith("json_decode") or "json" in str(e.get("type", "")).lower() for e in errors)
+    )
+    status_code = 400 if is_malformed_json else 422
     # Build field_errors per Team 90 SSOT (PDSC Error Schema)
     field_errors = []
-    for e in exc.errors():
+    for e in errors:
         loc = e.get("loc", ())
-        # Extract field name: ('body','x') -> 'x', ('query','y') -> 'y'
         field_name = loc[-1] if len(loc) > 1 else (loc[0] if loc else "body")
         field_errors.append({"field": str(field_name), "message": e.get("msg", "Validation error")})
     content = {
         "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT,
-        "detail": exc.errors()[0].get("msg", "Validation error") if exc.errors() else "Validation error",
+        "detail": first_msg,
         "field_errors": field_errors
     }
-    return JSONResponse(status_code=422, content=content)
+    return JSONResponse(status_code=status_code, content=content)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 

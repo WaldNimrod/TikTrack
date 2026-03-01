@@ -59,6 +59,20 @@ async function fetchAlerts(filters = {}) {
 }
 
 /**
+ * Fetch single alert by ID
+ * GET /api/v1/alerts/:id
+ */
+async function fetchAlertById(id) {
+  try {
+    await sharedServices.init();
+    return await sharedServices.get(`/alerts/${id}`);
+  } catch (error) {
+    maskedLog('[Alerts Data Loader] Error fetching alert:', { id, errorCode: (error && error.code) });
+    return null;
+  }
+}
+
+/**
  * Load all data for Alerts View
  */
 async function loadAlertsData(filters = {}) {
@@ -80,4 +94,4 @@ async function loadAlertsData(filters = {}) {
   }
 }
 
-export { fetchAlertsSummary, fetchAlerts, loadAlertsData };
+export { fetchAlertsSummary, fetchAlerts, fetchAlertById, loadAlertsData };

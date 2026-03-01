@@ -7,6 +7,9 @@
  */
 
 import { loadAlertsData } from './alertsDataLoader.js';
+import { openAlertsForm } from './alertsForm.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 const EMPTY_ROW_HTML = `
@@ -129,7 +132,7 @@ function renderAlertRow(alert) {
   const isActive = (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
   const isTriggered = (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) === true;
   const created = formatDate(alert.created_at != null ? alert.created_at : alert.createdAt);
-  const id = alert.id;
+  const id = alert.id || alert.external_ulid || '';
 
   return `
     <tr class="phoenix-table__row" data-alert-id="${id}" role="row">
@@ -145,6 +148,9 @@ function renderAlertRow(alert) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
           </button>
           <div class="table-actions-menu">
+            <button class="table-action-btn js-action-toggle" data-action="toggle-active" aria-label="החלף סטטוס פעיל" data-alert-id="${id}" title="החלף פעיל/לא פעיל">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>
+            </button>
             <button class="table-action-btn js-action-view" aria-label="פרטים" data-alert-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
@@ -227,12 +233,76 @@ function bindFilters() {
   });
 }
 
+async function refreshAlertsTable() {
+  try {
+    const filters = (window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {};
+    const result = await loadAlertsData({ targetType: filters.targetType === 'all' ? undefined : filters.targetType });
+    renderSummary(result.summary);
+    renderTable(result.alerts);
+  } catch (err) {
+    maskedLog('[Alerts] Refresh error:', { message: (err && err.message) || 'Unknown' });
+  }
+}
+
 function bindAddButton() {
   const addBtn = document.querySelector('.js-add-alert');
   if (!addBtn) return;
-  addBtn.addEventListener('click', () => {
-    // TODO: Alerts form/modal — Phase 2. API ready for POST /alerts.
-    alert('הוספת התראה — טופס הוספה בתהליך פיתוח. API זמין.');
+  addBtn.addEventListener('click', () => openAlertsForm(null, refreshAlertsTable));
+}
+
+function bindRowActions() {
+  const tbody = document.getElementById('alertsTableBody');
+  if (!tbody) return;
+  tbody.addEventListener('click', async (e) => {
+    const editBtn = e.target.closest('.js-action-edit');
+    const delBtn = e.target.closest('.js-action-delete');
+    const toggleBtn = e.target.closest('.js-action-toggle');
+    const viewBtn = e.target.closest('.js-action-view');
+    const id = (editBtn || delBtn || toggleBtn || viewBtn)?.dataset?.alertId;
+    if (!id) return;
+    const alertItem = (tableData.data || []).find((a) => String(a.id || a.external_ulid || '') === String(id));
+    if (editBtn) {
+      openAlertsForm(alertItem, refreshAlertsTable);
+      return;
+    }
+    if (toggleBtn) {
+      try {
+        await sharedServices.init();
+        const current = (alertItem && (alertItem.is_active != null ? alertItem.is_active : alertItem.isActive)) !== false;
+        await sharedServices.patch(`/alerts/${id}`, { is_active: !current });
+        refreshAlertsTable();
+      } catch (err) {
+        maskedLog('[Alerts] Toggle error:', { message: (err && err.message) || 'Unknown' });
+        window.alert('שגיאה בעדכון סטטוס');
+      }
+      return;
+    }
+    if (delBtn) {
+      createModal({
+        title: 'מחיקת התראה',
+        content: '<p>האם אתה בטוח שברצונך למחוק התראה זו?</p>',
+        entity: 'alert',
+        showSaveButton: true,
+        confirmMode: true,
+        saveButtonText: 'מחיקה',
+        cancelButtonText: 'ביטול',
+        onSave: async () => {
+          try {
+            await sharedServices.init();
+            await sharedServices.delete(`/alerts/${id}`);
+            document.getElementById('phoenix-modal-backdrop')?.remove();
+            refreshAlertsTable();
+          } catch (err) {
+            maskedLog('[Alerts] Delete error:', { message: (err && err.message) || 'Unknown' });
+            window.alert('שגיאה במחיקה');
+          }
+        }
+      });
+      return;
+    }
+    if (viewBtn && alertItem) {
+      openAlertsForm(alertItem, () => {}); // view-only would need showSaveButton: false — for now reuse form as read
+    }
   });
 }
 
@@ -256,6 +326,7 @@ function initAlertsTable(data, config) {
   initSortManager();
   bindFilters();
   bindAddButton();
+  bindRowActions();
   bindSummaryToggle();
 }
 

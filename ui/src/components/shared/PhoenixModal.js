@@ -29,7 +29,8 @@ export function createModal(options = {}) {
     showSaveButton = true,
     saveButtonText = 'שמירה',
     cancelButtonText = 'לבטל',
-    entity = null
+    entity = null,
+    confirmMode = false
   } = options;
 
   // Remove existing modal if any
@@ -99,7 +100,8 @@ export function createModal(options = {}) {
 
   if (showSaveButton && onSave) {
     const saveButton = document.createElement('button');
-    saveButton.className = 'phoenix-modal__save-btn';
+    saveButton.className = 'phoenix-modal__save-btn' + (confirmMode ? ' phoenix-modal__confirm-btn' : '');
+    if (confirmMode) saveButton.setAttribute('data-action', 'confirm-delete');
     saveButton.type = 'button';
     saveButton.textContent = saveButtonText;
     footer.appendChild(saveButton);

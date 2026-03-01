@@ -55,6 +55,12 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _read_optional_text(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    return path.read_text(encoding="utf-8")
+
+
 def _find_heading_block(text: str, heading: str) -> str:
     marker = f"## {heading}"
     start = text.find(marker)
@@ -467,6 +473,31 @@ def build_markdown_summary(snapshot: Dict[str, object], result: ValidationResult
     return "\n".join(lines)
 
 
+def _snapshot_json_text(snapshot: Dict[str, object]) -> str:
+    return json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n"
+
+
+def _snapshot_md_text(summary: str) -> str:
+    return summary.rstrip("\n") + "\n"
+
+
+def _normalized_snapshot_for_check(snapshot: Dict[str, object]) -> Dict[str, object]:
+    normalized = dict(snapshot)
+    normalized["generated_at_utc"] = "__IGNORED_IN_CHECK__"
+    return normalized
+
+
+def _normalized_summary_for_check(text: str) -> str:
+    lines = text.rstrip("\n").splitlines()
+    normalized: List[str] = []
+    for line in lines:
+        if line.startswith("- Generated (UTC): `"):
+            normalized.append("- Generated (UTC): `__IGNORED_IN_CHECK__`")
+        else:
+            normalized.append(line)
+    return "\n".join(normalized)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build + validate portfolio snapshot")
     parser.add_argument(
@@ -485,23 +516,60 @@ def main() -> int:
     snapshot = build_snapshot()
     result = validate_snapshot(snapshot)
     summary = build_markdown_summary(snapshot, result)
+    snapshot_json_text = _snapshot_json_text(snapshot)
+    snapshot_md_text = _snapshot_md_text(summary)
 
     out_json = Path(args.out_json)
     out_md = Path(args.out_md)
-    out_json.parent.mkdir(parents=True, exist_ok=True)
-    out_md.parent.mkdir(parents=True, exist_ok=True)
 
-    out_json.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    out_md.write_text(summary + "\n", encoding="utf-8")
+    artifact_errors: List[str] = []
+    if args.check:
+        existing_json_text = _read_optional_text(out_json)
+        existing_md_text = _read_optional_text(out_md)
 
-    if result.errors:
+        if existing_json_text is None:
+            artifact_errors.append(f"Missing snapshot artifact: {out_json}")
+        else:
+            try:
+                existing_json = json.loads(existing_json_text)
+            except json.JSONDecodeError as exc:
+                artifact_errors.append(f"Invalid snapshot JSON at {out_json}: {exc.msg}")
+            else:
+                if _normalized_snapshot_for_check(existing_json) != _normalized_snapshot_for_check(snapshot):
+                    artifact_errors.append(
+                        f"Snapshot JSON out of date: {out_json} (run build_portfolio_snapshot.py to refresh)"
+                    )
+
+        if existing_md_text is None:
+            artifact_errors.append(f"Missing snapshot artifact: {out_md}")
+        else:
+            if _normalized_summary_for_check(existing_md_text) != _normalized_summary_for_check(summary):
+                artifact_errors.append(
+                    f"Snapshot markdown out of date: {out_md} (run build_portfolio_snapshot.py to refresh)"
+                )
+    else:
+        out_json.parent.mkdir(parents=True, exist_ok=True)
+        out_md.parent.mkdir(parents=True, exist_ok=True)
+        out_json.write_text(snapshot_json_text, encoding="utf-8")
+        out_md.write_text(snapshot_md_text, encoding="utf-8")
+
+    validation_failed = bool(result.errors)
+
+    if validation_failed:
         print("Portfolio snapshot validation FAILED:")
         for err in result.errors:
             print(f" - {err}")
-        if args.check:
-            return 1
     else:
         print("Portfolio snapshot validation PASSED")
+
+    if artifact_errors:
+        print("SNAPSHOT CHECK: FAIL")
+        for err in artifact_errors:
+            print(f" - {err}")
+    if args.check and (validation_failed or artifact_errors):
+        return 1
+    if args.check:
+        print("SNAPSHOT CHECK: PASS (artifacts are current)")
 
     if result.warnings:
         print("Warnings:")

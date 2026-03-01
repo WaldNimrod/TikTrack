@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-01T13:05:31.068781+00:00`
+- Generated (UTC): `2026-03-01T13:49:04.267904+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_6 (opening workflow after GATE_5 PASS)`
-- next_required_action: `Team 100 / Team 00: review architect inbox submission and issue GATE_6 decision. Team 10: maintain traceability and await approval decision.`
+- current_gate: `GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED)`
+- next_required_action: `Team 10: execute CODE_CHANGE_REQUIRED remediation cycle, return through GATE_4, then re-submit GATE_5 to Team 90. Team 90: enforce new GATE_6 8-artifact package on future resubmission.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_6 (opening workflow after GATE_5 PASS) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
@@ -99,5 +99,3 @@
     ├── **Program** `S006-P003` — Level-1 Dashboards | PLANNED | domain: **TIKTRACK**
 
     └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
-
-

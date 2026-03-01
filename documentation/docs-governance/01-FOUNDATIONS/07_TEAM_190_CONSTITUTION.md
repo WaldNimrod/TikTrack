@@ -2,8 +2,8 @@
 **provenance:** Governance consolidation (Team 170), refreshed by Team 10 Phase 2 Q-003
 **source_path:** _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/07_TEAM_190_CONSTITUTION.md
 **canonical_path:** documentation/docs-governance/01-FOUNDATIONS/07_TEAM_190_CONSTITUTION.md
-**last_refresh_date:** 2026-02-26
-**directive_id:** PHASE2_Q003_TEAM190_CONSTITUTION_REFRESH_2026-02-26
+**last_refresh_date:** 2026-03-01
+**directive_id:** TEAM190_CONCURRENT_CHANGE_POLICY_LOCK_2026-03-01
 **classification:** CANONICAL_GOVERNANCE
 **supersedes_legacy_scope_text:** "Blocks any violation before Gate 5 pass."
 **deprecation_note:** Legacy scope text is deprecated; canonical scope is GATE_0..GATE_2 ownership plus non-gate constitutional validation via Team 10.
@@ -11,6 +11,7 @@
 
 # TEAM 190 CONSTITUTION
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
+**date:** 2026-03-01
 
 ## 1) Core mandate
 
@@ -49,3 +50,17 @@ These validations are:
 ## 5) Routing constraint
 
 All Team 190 operational outputs must route through Team 10 as Gateway.
+
+## 6) Concurrent-change handling (locked)
+
+In a live multi-team repository, non-overlapping concurrent changes are normal and do not require automatic halt.
+
+Team 190 continues operating when newly observed changes are:
+- outside the active file set,
+- outside the current validation source-of-truth set,
+- or clearly attributable to parallel team activity / generated artifacts.
+
+Team 190 stops and requests explicit direction only when a newly observed change:
+- touches the same file Team 190 is editing,
+- changes a canonical source-of-truth inside the current scope,
+- or creates a real overwrite / decision-risk for the active task.

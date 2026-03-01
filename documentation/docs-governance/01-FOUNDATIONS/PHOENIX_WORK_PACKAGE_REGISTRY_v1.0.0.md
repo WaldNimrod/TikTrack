@@ -40,11 +40,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_6 (opening workflow after GATE_5 PASS) | true | S002-P003; GATE_5 PASS on WP002 (re-validation complete); GATE_6 approval package submitted and awaiting Team 100 / Team 00 decision |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED) | true | S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10 |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_6 (opening workflow after GATE_5 PASS)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED)`, `active_work_package_id=S002-P003-WP002`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-01). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

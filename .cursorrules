@@ -58,6 +58,12 @@ In every page or interface implementation:
 ## 📅 REPORT DATES (MANDATORY)
 - **תאריך מדויק:** כל דוח, הודעת Seal, log_entry ומסמך תאום חייבים לשאת את **תאריך היום האמיתי** (למשל 2026-02-16). אסור לדוחות של Team 10 ושל הצוותים לעבור עם תאריך לא מדויק.
 
+## 🔀 CONCURRENT REPO CHANGES (MANDATORY)
+- ברפו רב-צוותי, שינויים מקבילים בזמן עבודה הם מצב רגיל ואינם עילה לעצירה אוטומטית.
+- **עצירה נדרשת רק** כאשר שינוי חדש חופף לאותו קובץ פעיל, או משנה מקור אמת קנוני בתחום העבודה הנוכחי (`WSM`, registries, roadmap, contracts) כך שנוצר סיכון דריסה או החלטה שגויה.
+- שינויים מקבילים **לא חופפים** (כולל קבצים חדשים מצוותים אחרים, artifacts גנרטיביים, handoff packages, approvals) אינם חוסמים עבודה; יש להמשיך תוך בידוד ה-scope הפעיל.
+- סקריפטי `--check` חייבים להיות **check-only**: הם רשאים להיכשל על drift, אך אסור להם לייצר שינויי קבצים.
+
 ## 🏁 TASK COMPLETION (SOP-013 — LOCKED)
 - **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח/דוח השלמה לבד **לא** נחשב סגירה. פורמט: `--- PHOENIX TASK SEAL ---` + TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT. **Canonical SOP-013:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 - **Zero Noise:** קבצי תיעוד "זמניים" בתיקיות הצוותים שלא זוקקים ל-PCS (חיתום שלב) — **יימחקו**. Evidence רק כחלק מ-Seal או לפי הנחיית Team 10.

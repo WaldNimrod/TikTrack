@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-01T12:59:14.712031+00:00",
+  "generated_at_utc": "2026-03-01T13:02:47.949871+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_6 (opening workflow after GATE_5 PASS); active_flow=S002-P003; GATE_5 PASS on WP002; GATE_6 approval package submitted and awaiting Team 100/00 decision; active_work_package_id=S002-P003-WP002"
+      "current_gate_mirror": "GATE_6 (opening workflow after GATE_5 PASS); active_flow=S002-P003; GATE_5 PASS on WP002 (re-validation complete); GATE_6 approval package submitted and awaiting Team 100 / Team 00 decision; active_work_package_id=S002-P003-WP002"
     },
     {
       "program_id": "S002-P004",
@@ -332,9 +332,9 @@
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
+      "current_gate": "GATE_6 (opening workflow after GATE_5 PASS)",
       "is_active": true,
-      "active_marker_reason": "S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation"
+      "active_marker_reason": "S002-P003; GATE_5 PASS on WP002 (re-validation complete); GATE_6 approval package submitted and awaiting Team 100 / Team 00 decision"
     }
   ],
   "hierarchy": [
@@ -435,16 +435,16 @@
           "program_name": "TikTrack Alignment (D22+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_6 (opening workflow after GATE_5 PASS); active_flow=S002-P003; GATE_5 PASS on WP002; GATE_6 approval package submitted and awaiting Team 100/00 decision; active_work_package_id=S002-P003-WP002",
+          "current_gate_mirror": "GATE_6 (opening workflow after GATE_5 PASS); active_flow=S002-P003; GATE_5 PASS on WP002 (re-validation complete); GATE_6 approval package submitted and awaiting Team 100 / Team 00 decision; active_work_package_id=S002-P003-WP002",
           "work_packages": [
             {
               "work_package_id": "S002-P003-WP002",
               "program_id": "S002-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
+              "current_gate": "GATE_6 (opening workflow after GATE_5 PASS)",
               "is_active": true,
-              "active_marker_reason": "S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation"
+              "active_marker_reason": "S002-P003; GATE_5 PASS on WP002 (re-validation complete); GATE_6 approval package submitted and awaiting Team 100 / Team 00 decision"
             }
           ]
         },

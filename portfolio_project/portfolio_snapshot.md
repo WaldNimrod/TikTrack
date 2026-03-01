@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-01T12:59:14.712031+00:00`
+- Generated (UTC): `2026-03-01T13:02:47.949871+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_5 (DEV_VALIDATION — Team 90 owner) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_6 (opening workflow after GATE_5 PASS) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

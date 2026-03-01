@@ -4,19 +4,19 @@
 **id:** TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE
 **from:** Team 90 (External Validation Unit — GATE_5 owner)
 **to:** Team 10 (Execution Orchestrator)
-**cc:** Team 50, Team 20, Team 30, Team 60, Team 190
+**cc:** Team 50, Team 20, Team 60, Team 190, Team 00, Team 100
 **date:** 2026-03-01
-**status:** PASS
+**status:** COMPLETED_WITH_BLOCK
 **gate_id:** GATE_5
 **work_package_id:** S002-P003-WP002
-**in_response_to:** _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REVALIDATION_REQUEST.md
+**in_response_to:** _COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REVALIDATION_REQUEST_G6_ROLLBACK.md
 
 ---
 
 ## Mandatory identity header
 
 | Field | Value |
-|-------|--------|
+|---|---|
 | roadmap_id | TIKTRACK_ROADMAP_LOCKED |
 | stage_id | S002 |
 | program_id | S002-P003 |
@@ -34,40 +34,30 @@
 
 | Target | Result | Notes |
 |---|---|---|
-| BF-G5-001..004 artifact closure | PASS | All four previously missing canonical D34/D35 artifacts now exist at exact required paths. |
-| D34/D35 remediation evidence package | PASS | Team 30 UI remediation complete, Team 20 backend parity PASS, Team 60 infra READY_FOR_RERUN. |
-| Final rerun result integrity | PASS | Team 50 final rerun reports `5/5` pass for D34 and `5/5` pass for D35, both exit code `0`. |
-| Runtime evidence-by-path | PASS | `/tmp/s002_p003_d34_final_e2e_after_init.log` and `/tmp/s002_p003_d35_final_e2e_after_init.log` exist and show 100% pass summaries. |
-| Scope containment (D22/D34/D35 only) | PASS | Re-validation remains within S002-P003-WP002 scope; no D23/S003 expansion detected. |
+| GF-G6-001 closure (D22 E2E runtime evidence) | PASS | `10/10`, exit `0`, runtime log present. |
+| GF-G6-002 closure (D34/D35 SOP-013 seals) | PASS | D34 and D35 seal blocks are present in Team 50 remediation report. |
+| GF-G6-003 D34 error-contract closure | BLOCK | Implemented negative checks do not match the architect-mandated D34 contract set. |
+| GF-G6-003 D35 error-contract closure | BLOCK | Required invalid content-type negative check is missing from the Option A implementation. |
+| Runtime evidence package presence | PASS | D22/D34/D35 runtime logs exist at the referenced `/tmp` paths. |
+| Evidence-by-path integrity | PASS with note | Team 60 reference has path drift; non-blocking in this cycle because runtime evidence exists. |
 
 ---
 
 ## Decision
 
-**overall_status: PASS**
+**overall_status: BLOCK**
 
-GATE_5 re-validation is complete. The prior blocker loop is closed.
-
----
-
-## Closure of prior blocking findings
-
-- `BF-G5-001`: CLOSED
-- `BF-G5-002`: CLOSED
-- `BF-G5-003`: CLOSED
-- `BF-G5-004`: CLOSED
-
-Prior blocking report remains historical evidence only:
+Canonical blocking report:
 `/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT.md`
 
----
-
-## Gate transition
-
-- **GATE_5:** PASS
-- **Next gate flow:** `GATE_6` opening workflow is now unlocked.
-- Team 90, as post-GATE_5 gate owner, opens the GATE_6 workflow and updates WSM accordingly.
+`GATE_5` remains open. `GATE_6` must not be re-opened or re-submitted from this rollback cycle.
 
 ---
 
-**log_entry | TEAM_90 | TO_TEAM_10 | S002_P003_WP002_GATE5_VALIDATION_RESPONSE | PASS | 2026-03-01**
+## WSM update
+
+WSM current operational state is updated by Team 90 to reflect `GATE_5_BLOCK` for `S002-P003-WP002` in the rollback cycle. Ownership returns to Team 10 for remediation.
+
+---
+
+**log_entry | TEAM_90 | TO_TEAM_10 | S002_P003_WP002_GATE5_VALIDATION_RESPONSE | BLOCK | 2026-03-01**

@@ -2,12 +2,14 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 **id:** TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.1.0
 **from:** Team 100 (Development Architecture Authority — Agents_OS)
-**to:** Team 190 (Constitutional Architectural Validator) — for formal structural validation (10-check)
-**cc:** Team 00 (Chief Architect)
+**to:** Team 00 (Chief Architect) — pending final ratification
+**cc:** Team 190 (Constitutional Architectural Validator), Team 170, Team 10
 **date:** 2026-03-01
 **supersedes:** TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.0.0.md
-**status:** SUBMITTED_FOR_TEAM_190_FORMAL_VALIDATION
-**purpose:** Single integrated view of all programs across both domains (TikTrack + Agents_OS), S001–S006+, with optimal sequencing. Incorporates all Team 00 action items A1–A9 (APPROVED_WITH_CONDITIONS, 2026-03-01) and all Team 190 prevalidation corrections P0-01 through P2-01 (2026-03-01).
+**status:** TEAM_190_VALIDATED_AWAITING_TEAM_00_FINAL_RATIFICATION
+**team_190_verdict:** STRUCTURALLY_VALID_WITH_CORRECTIONS — validated 2026-03-01
+**team_190_validation_record:** `_COMMUNICATION/team_190/TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_VALIDATION_v1.1.0.md` + `TEAM_190_INTEGRATED_ROADMAP_STRUCTURAL_REVALIDATION_ADDENDUM_v1.0.0.md` + `TEAM_190_TO_TEAM_100_TEAM_00_INTEGRATED_ROADMAP_FINAL_STATUS_NOTICE_v1.0.0.md`
+**purpose:** Single integrated view of all programs across both domains (TikTrack + Agents_OS), S001–S006+, with optimal sequencing. Incorporates all Team 00 action items A1–A9 (APPROVED_WITH_CONDITIONS, 2026-03-01), all Team 190 prevalidation corrections P0-01 through P2-01 (2026-03-01), and Team 190 post-validation alignment corrections A1–A5 (2026-03-01).
 ---
 
 ## Change Log vs. v1.0.0
@@ -38,7 +40,7 @@
 | roadmap_id | PHOENIX_ROADMAP |
 | stage_id | SHARED (S001–S006+) |
 | domain | TIKTRACK + AGENTS_OS |
-| phase_owner | Team 100 (submitted for Team 190 structural validation) |
+| phase_owner | Team 100 (post-Team 190 validation; pending Team 00 final ratification) |
 | authority_reference | ARCHITECT_DIRECTIVE_TIKTRACK_ROADMAP_LOCKED.md (2026-02-26) |
 | agents_os_reference | TEAM_100_AGENTS_OS_MASTER_PROGRAM_MAP_v1.0.0.md (revised 2026-03-01) |
 | team_00_ratification | APPROVED_WITH_CONDITIONS — TEAM_00_TO_TEAM_100_INTEGRATED_ROADMAP_RESPONSE_v1.0.0.md |
@@ -61,16 +63,16 @@
 
 ---
 
-## ⚠️ PROGRAM ID CONVENTIONS IN THIS DOCUMENT (P0-02)
+## PROGRAM ID CONVENTIONS IN THIS DOCUMENT (P0-02 — updated post Team 170 registration)
 
 > **Agents_OS PLANNED programs** (S003–S005): IDs are canonical, aligned to PHOENIX_PROGRAM_REGISTRY_v1.0.0.md.
 >
-> **TikTrack PLANNED programs** (S003–S006): IDs are **PROPOSED — pending formal Team 170 registry
-> registration**. They do not conflict with existing Agents_OS IDs. Team 170 must register these
-> before GATE_0 of each program opens.
+> **TikTrack PLANNED programs** (S003–S006): IDs are **registered in PHOENIX_PROGRAM_REGISTRY_v1.0.0.md**
+> (Team 170 registration confirmed per canonical registry and Team 190 Final Status Notice).
+> ᴾ marker retained in document text as a historical notation from pre-registration state.
 >
 > **Admin Review packages** (formerly "P-ADMIN"): classified as **Stage Governance Packages**.
-> Proposed canonical IDs provided. Must be formally registered by Team 170.
+> Canonical IDs registered in PHOENIX_PROGRAM_REGISTRY_v1.0.0.md.
 > Label: `[Stage Governance Package — not a gate enum addition]`
 
 ---

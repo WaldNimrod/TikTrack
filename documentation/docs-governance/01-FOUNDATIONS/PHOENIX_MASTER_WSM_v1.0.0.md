@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 10 accepted rollback remediation completion (GF-G6-001..003 closed), marked GATE_4 re-verification PASS, and re-submitted GATE_5 validation request to Team 90.
+**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 90 executed rollback-cycle GATE_5 re-validation and recorded BLOCK (architect-mandated error-contract closure still incomplete).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; rollback remediation completed; GATE_4 re-verification PASS; GATE_5 re-validation re-submitted to Team 90 |
+| active_flow | S002-P003; GATE_5 BLOCK on WP002 in G6 rollback cycle; remediation incomplete for GF-G6-003 and returned to Team 10 |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_5 re-validation pending) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_5 blocked; remediation loop) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | G3 rollback remediation PASS \| 2026-03-01 \| Team 10 accepted GF-G6-001..003 closure package |
+| last_s002_p003_milestone | GATE_5 BLOCK \| 2026-03-01 \| Team 90 rollback-cycle re-validation block (TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_5 (re-validation pending with Team 90) |
+| current_gate | GATE_5 (rollback-cycle re-validation blocked) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_5 owner; Team 10 completed rollback orchestration and submission) |
-| last_gate_event | GATE_5_REVALIDATION_RESUBMITTED \| 2026-03-01 \| Team 10 \| TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REVALIDATION_REQUEST_G6_ROLLBACK.md |
-| next_required_action | Team 90: execute GATE_5 re-validation on rollback-cycle package and return PASS/BLOCK. If PASS, open GATE_6 resubmission workflow with new 8-artifact package (includes GATE6_READINESS_MATRIX) for Team 100/00 authority review. |
-| next_responsible_team | Team 90 (GATE_5 re-validation), then Team 100/00 authority at GATE_6 |
+| phase_owner_team | Team 90 (GATE_5 owner; remediation action now with Team 10) |
+| last_gate_event | GATE_5_BLOCK \| 2026-03-01 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT.md |
+| next_required_action | Team 10: fix remaining GF-G6-003 contract gaps (D34 alerts negative coverage, D35 invalid content-type negative coverage), correct Team 60 evidence drift, then re-submit GATE_5 to Team 90. |
+| next_responsible_team | Team 10 (remediation loop), then Team 90 (GATE_5 re-validation) |
 
 ---
 
@@ -209,3 +209,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P003-WP002 on re-validation; GATE_6 opening workflow started | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 approval package submitted for S002-P003-WP002; awaiting Team 100 / Team 00 decision | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 REJECT S002-P003-WP002 (CODE_CHANGE_REQUIRED); rollback to GATE_3 routed to Team 10 | 2026-03-01**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P003-WP002 in rollback cycle; GF-G6-003 still incomplete | 2026-03-01**

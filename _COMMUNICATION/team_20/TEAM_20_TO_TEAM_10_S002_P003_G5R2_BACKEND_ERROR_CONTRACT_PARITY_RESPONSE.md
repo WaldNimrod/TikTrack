@@ -28,7 +28,7 @@
 | **D34 alerts** | 422 missing required `alert_type` | 422 | 422 | ✅ |
 | **D34 alerts** | 401 no auth | 401 | 401 | ✅ |
 | **D34 alerts** | 400 malformed JSON | 400 | 400 | ✅ |
-| **D35 notes** | 422 missing required field | 422 | 422 | ✅ |
+| **D35 notes** | 422 missing title | 422 | 422 | ✅ |
 | **D35 notes** | 422 invalid content-type | 422 | 422 | ✅ |
 | **D35 notes** | 401 no auth | 401 | 401 | ✅ |
 
@@ -36,7 +36,7 @@
 
 ## 3) D35 schema note
 
-`NoteCreate` has **content** required, **title** optional. The case "422 missing content" (required field) returns 422. If contract specifies "422 missing title" literally, a schema change would be needed; current validation covers required-field 422 per D35 Option A.
+Per Team 50 G5R2 parity request, `NoteCreate.title` was changed from optional to **required**. Missing title now returns 422 (BF-G5R-002 closure).
 
 ---
 

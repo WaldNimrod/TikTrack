@@ -26,24 +26,36 @@ async function apiRequest(path, options = {}) {
 }
 
 async function runNegativeApiChecks(token) {
+  // Required set #1: 422 missing title
   let status = await apiRequest('/notes', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({
+      parent_type: 'general',
+      content: '<p>D35 required negative test</p>',
+    }),
   }).catch(() => 0);
-  logResult('D35_NEG_422_CREATE_INVALID', status === 422, `expected 422, got ${status}`);
+  logResult('D35_NEG_422_MISSING_TITLE', status === 422, `expected 422, got ${status}`);
 
-  status = await apiRequest('/notes/not-a-uuid', {
-    method: 'GET',
+  // Required set #2: 422 invalid content-type (content must be string)
+  status = await apiRequest('/notes', {
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      parent_type: 'general',
+      title: 'D35 invalid content type',
+      content: 12345,
+    }),
   }).catch(() => 0);
-  logResult('D35_NEG_422_INVALID_UUID', status === 422, `expected 422, got ${status}`);
+  logResult('D35_NEG_422_INVALID_CONTENT_TYPE', status === 422, `expected 422, got ${status}`);
 
+  // Required set #3: 401 GET without token
   status = await apiRequest('/notes', { method: 'GET' }).catch(() => 0);
   logResult('D35_NEG_401_UNAUTHORIZED', status === 401, `expected 401, got ${status}`);
 }

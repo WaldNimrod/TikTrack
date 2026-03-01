@@ -98,27 +98,40 @@ else
   echo "⚠️ Skipped CRUD checks (create failed)"
 fi
 
-# 11) Negative error contracts (GF-G6-003)
-# 11.1) 422 — body validation failure
-CODE=$(curl -s -o "$OUT/neg_422_body.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/alerts" \
+# 11) Negative error contracts (G5R2 exact mandatory set)
+# 11.1) POST invalid condition_value type (string) -> 422
+CODE=$(curl -s -o "$OUT/neg_422_condition_type.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/alerts" \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{}')
-[ "$CODE" = "422" ] && _ok "NEG 422 #1 POST /alerts invalid body -> 422" || _fail "NEG 422 #1 expected 422, got $CODE"
+  -d '{"target_type":"ticker","alert_type":"PRICE","priority":"MEDIUM","title":"D34 NEG condition_value","condition_value":"abc"}')
+[ "$CODE" = "422" ] && _ok "NEG D34-1 invalid condition_value(string) -> 422" || _fail "NEG D34-1 expected 422, got $CODE"
 
-# 11.2) 422 — path UUID validation failure
-CODE=$(curl -s -o "$OUT/neg_422_uuid.json" -w "%{http_code}" \
-  -H "Authorization: Bearer $ADMIN_TOKEN" "$BACKEND/api/v1/alerts/not-a-uuid")
-[ "$CODE" = "422" ] && _ok "NEG 422 #2 GET /alerts/not-a-uuid -> 422" || _fail "NEG 422 #2 expected 422, got $CODE"
+# 11.2) POST missing required alert_type -> 422
+CODE=$(curl -s -o "$OUT/neg_422_missing_alert_type.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/alerts" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"target_type":"ticker","title":"D34 NEG missing alert_type"}')
+[ "$CODE" = "422" ] && _ok "NEG D34-2 missing alert_type -> 422" || _fail "NEG D34-2 expected 422, got $CODE"
 
-# 11.3) 401 — missing auth token
-CODE=$(curl -s -o "$OUT/neg_401.json" -w "%{http_code}" "$BACKEND/api/v1/alerts")
-[ "$CODE" = "401" ] && _ok "NEG 401 GET /alerts without auth -> 401" || _fail "NEG 401 expected 401, got $CODE"
+# 11.3) GET /alerts/:id without Authorization -> 401
+NEG_ALERT_ID=$(curl -s -X POST "$BACKEND/api/v1/alerts" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"target_type":"ticker","alert_type":"PRICE","priority":"MEDIUM","title":"D34 NEG auth target"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || echo "")
+if [ -n "$NEG_ALERT_ID" ]; then
+  CODE=$(curl -s -o "$OUT/neg_401_get_by_id_no_auth.json" -w "%{http_code}" "$BACKEND/api/v1/alerts/$NEG_ALERT_ID")
+  [ "$CODE" = "401" ] && _ok "NEG D34-3 GET /alerts/:id without token -> 401" || _fail "NEG D34-3 expected 401, got $CODE"
+else
+  _fail "NEG D34-3 setup failed (could not create alert id)"
+fi
 
-# 11.4) 400 — invalid me/tickers contract (authenticated, missing required query)
-CODE=$(curl -s -o "$OUT/neg_400.json" -w "%{http_code}" -X POST \
-  -H "Authorization: Bearer $ADMIN_TOKEN" "$BACKEND/api/v1/me/tickers")
-[ "$CODE" = "400" ] && _ok "NEG 400 POST /me/tickers missing ticker_id/symbol -> 400" || _fail "NEG 400 expected 400, got $CODE"
+# 11.4) POST malformed JSON body on alerts request -> 400
+CODE=$(curl -s -o "$OUT/neg_400_malformed_json.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/alerts" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data-binary "{")
+[ "$CODE" = "400" ] && _ok "NEG D34-4 malformed JSON on /alerts -> 400" || _fail "NEG D34-4 expected 400, got $CODE"
 
 EXIT_CODE=0
 [ "$FAILED" -gt 0 ] && EXIT_CODE=1

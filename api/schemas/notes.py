@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 class NoteCreate(BaseModel):
     parent_type: str = Field(..., description="trade|trade_plan|ticker|account|general")
     parent_id: Optional[str] = None
-    title: Optional[str] = Field(None, max_length=200)
+    title: str = Field(..., max_length=200, description="Required per G5R2 error-contract parity (BF-G5R-002)")
     content: str = Field(..., description="Rich Text HTML — sanitized server-side")
     category: str = Field(default="GENERAL")
     is_pinned: bool = False

@@ -1,4 +1,6 @@
-name: Portfolio Auto Sync
+# Trial mode (2026-03-01): check-only enforcement.
+# This workflow must not commit/push to main during the trial.
+name: Portfolio Auto Sync (Trial Check-Only)
 
 on:
   workflow_dispatch:
@@ -44,7 +46,7 @@ on:
       - ".github/workflows/portfolio-auto-sync.yml"
 
 permissions:
-  contents: write
+  contents: read
   issues: write
 
 jobs:
@@ -63,24 +65,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Standardize registry mirrors from WSM (auto-fix)
-        run: |
-          python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --write
-
-      - name: Verify registry mirrors are standardized
+      - name: Verify registry mirrors are standardized (trial check-only)
         run: |
           python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check
-
-      - name: Commit standardized registry mirrors (default branch only)
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        run: |
-          if ! git diff --quiet -- documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md
-            git commit -m "chore(portfolio): standardize registry mirrors from WSM"
-            git push origin "${GITHUB_REF_NAME}"
-          fi
 
       - name: Build and validate portfolio snapshot
         run: |
@@ -124,11 +111,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Standardize registry mirrors from WSM (auto-fix)
-        run: |
-          python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --write
-
-      - name: Verify registry mirrors are standardized
+      - name: Verify registry mirrors are standardized (trial check-only)
         run: |
           python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check
 

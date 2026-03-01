@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 90 adopted the architect GATE_6 decision (`REJECT / CODE_CHANGE_REQUIRED`) and routed rollback to Team 10.
+**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 10 accepted rollback remediation completion (GF-G6-001..003 closed), marked GATE_4 re-verification PASS, and re-submitted GATE_5 validation request to Team 90.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_6 REJECT on WP002 (CODE_CHANGE_REQUIRED); flow rolled back to GATE_3 remediation loop under Team 10 |
+| active_flow | S002-P003; rollback remediation completed; GATE_4 re-verification PASS; GATE_5 re-validation re-submitted to Team 90 |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (rollback to GATE_3 remediation) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_5 re-validation pending) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_6 REJECT \| 2026-03-01 \| Team 00 decision (ARCHITECT_GATE6_DECISION_S002_P003_WP002) |
+| last_s002_p003_milestone | G3 rollback remediation PASS \| 2026-03-01 \| Team 10 accepted GF-G6-001..003 closure package |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_3 (rollback loop after GATE_6 REJECT / CODE_CHANGE_REQUIRED) |
+| current_gate | GATE_5 (re-validation pending with Team 90) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (rollback remediation owner; Team 90 resumes ownership at next GATE_5 submission) |
-| last_gate_event | GATE_6_REJECT \| 2026-03-01 \| Team 00 / Team 90 route adoption \| ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.0.0.md |
-| next_required_action | Team 10: execute CODE_CHANGE_REQUIRED remediation cycle, return through GATE_4, then re-submit GATE_5 to Team 90. Team 90: enforce new GATE_6 8-artifact package on future resubmission. |
-| next_responsible_team | Team 10 (GATE_3 rollback / remediation loop) |
+| phase_owner_team | Team 90 (GATE_5 owner; Team 10 completed rollback orchestration and submission) |
+| last_gate_event | GATE_5_REVALIDATION_RESUBMITTED \| 2026-03-01 \| Team 10 \| TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REVALIDATION_REQUEST_G6_ROLLBACK.md |
+| next_required_action | Team 90: execute GATE_5 re-validation on rollback-cycle package and return PASS/BLOCK. If PASS, open GATE_6 resubmission workflow with new 8-artifact package (includes GATE6_READINESS_MATRIX) for Team 100/00 authority review. |
+| next_responsible_team | Team 90 (GATE_5 re-validation), then Team 100/00 authority at GATE_6 |
 
 ---
 

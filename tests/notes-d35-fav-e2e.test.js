@@ -20,6 +20,34 @@ function logResult(name, pass, msg = '') {
   }
 }
 
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${TEST_CONFIG.apiBaseUrl}${path}`, options);
+  return response.status;
+}
+
+async function runNegativeApiChecks(token) {
+  let status = await apiRequest('/notes', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  }).catch(() => 0);
+  logResult('D35_NEG_422_CREATE_INVALID', status === 422, `expected 422, got ${status}`);
+
+  status = await apiRequest('/notes/not-a-uuid', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).catch(() => 0);
+  logResult('D35_NEG_422_INVALID_UUID', status === 422, `expected 422, got ${status}`);
+
+  status = await apiRequest('/notes', { method: 'GET' }).catch(() => 0);
+  logResult('D35_NEG_401_UNAUTHORIZED', status === 401, `expected 401, got ${status}`);
+}
+
 async function login(driver) {
   await driver.get(`${TEST_CONFIG.frontendUrl}/login`);
   await driver.sleep(1500);
@@ -42,6 +70,13 @@ async function run() {
       logger.log('D35_Login', 'SKIP', { message: 'Login failed' });
       results.skipped++;
       return results;
+    }
+
+    const accessToken = await getLocalStorageValue(driver, 'access_token');
+    if (!accessToken) {
+      logResult('D35_NEG_PRECHECK_TOKEN', false, 'access token not found after login');
+    } else {
+      await runNegativeApiChecks(accessToken);
     }
 
     await driver.get(`${TEST_CONFIG.frontendUrl}/notes.html`);

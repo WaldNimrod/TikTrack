@@ -98,6 +98,28 @@ else
   echo "⚠️ Skipped CRUD checks (create failed)"
 fi
 
+# 11) Negative error contracts (GF-G6-003)
+# 11.1) 422 — body validation failure
+CODE=$(curl -s -o "$OUT/neg_422_body.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/alerts" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}')
+[ "$CODE" = "422" ] && _ok "NEG 422 #1 POST /alerts invalid body -> 422" || _fail "NEG 422 #1 expected 422, got $CODE"
+
+# 11.2) 422 — path UUID validation failure
+CODE=$(curl -s -o "$OUT/neg_422_uuid.json" -w "%{http_code}" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" "$BACKEND/api/v1/alerts/not-a-uuid")
+[ "$CODE" = "422" ] && _ok "NEG 422 #2 GET /alerts/not-a-uuid -> 422" || _fail "NEG 422 #2 expected 422, got $CODE"
+
+# 11.3) 401 — missing auth token
+CODE=$(curl -s -o "$OUT/neg_401.json" -w "%{http_code}" "$BACKEND/api/v1/alerts")
+[ "$CODE" = "401" ] && _ok "NEG 401 GET /alerts without auth -> 401" || _fail "NEG 401 expected 401, got $CODE"
+
+# 11.4) 400 — invalid me/tickers contract (authenticated, missing required query)
+CODE=$(curl -s -o "$OUT/neg_400.json" -w "%{http_code}" -X POST \
+  -H "Authorization: Bearer $ADMIN_TOKEN" "$BACKEND/api/v1/me/tickers")
+[ "$CODE" = "400" ] && _ok "NEG 400 POST /me/tickers missing ticker_id/symbol -> 400" || _fail "NEG 400 expected 400, got $CODE"
+
 EXIT_CODE=0
 [ "$FAILED" -gt 0 ] && EXIT_CODE=1
 python3 -c "

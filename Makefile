@@ -3,7 +3,7 @@
 # Team 60 (DevOps & Platform)
 # ============================================
 
-.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help
+.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook
 
 # Database connection (from .env)
 DATABASE_URL ?= $(shell grep DATABASE_URL api/.env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
@@ -14,6 +14,17 @@ DB_URL := $(shell echo $(DATABASE_URL) | sed 's/postgresql+asyncpg:\/\//postgres
 # ============================================
 # Database Backup (before seed — mandatory)
 # ============================================
+
+## Validate WSM/registry/snapshot consistency before push when outgoing commits touch portfolio authority files.
+portfolio-pre-push-guard:
+	@bash scripts/portfolio/guard_wsm_registry_sync_before_push.sh
+
+## Install the versioned pre-push hook locally for this clone.
+install-pre-push-hook:
+	@mkdir -p .git/hooks
+	@cp scripts/git-hooks/pre-push .git/hooks/pre-push
+	@chmod +x .git/hooks/pre-push
+	@echo "✅ Installed local pre-push hook."
 
 ## Full DB backup + verify (run before seed). Exit 0 only if backup created and verified.
 db-backup:

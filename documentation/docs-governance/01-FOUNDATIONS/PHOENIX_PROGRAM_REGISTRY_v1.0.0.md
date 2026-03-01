@@ -42,13 +42,28 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 v1.0.0 ready; activates when S001-P002 enters GATE_3) |
 | S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A |
 | S003 | S003-P0XX | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
-| S004 | S004-P0XX | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS program completes; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
-| S005 | S005-P0XX | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; scope: multi-entity consistency, state machine completeness, business rule coverage) |
-| S005 | S005-P0YY | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; highest ROI per-token in Phase 5) |
-| S006 | S006-P0XX | Analytics Quality Validator | AGENTS_OS | PLANNED | — (placeholder; scope: analytics calculation declaration, output format compliance) |
-| S006 | S006-P0YY | Spec Draft Generator | AGENTS_OS | PLANNED | — (placeholder; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost) |
+| S003 | S003-P0YY | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
+| S004 | S004-P0XX | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
+| S004 | S004-P0YY | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins) |
+| S004 | S004-P0ZZ | Spec Draft Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins) |
+| S005 | S005-P0XX | Analytics Quality Validator | AGENTS_OS | PLANNED | — (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work) |
 
 
+
+---
+
+## Agents_OS Completion Gate
+
+```
+★ AGENTS_OS SYSTEM COMPLETE GATE ★
+Triggered when: S004-P0ZZ (Spec Draft Generator) reaches GATE_8 PASS
+Effect: All Agents_OS capability phases 1–5 operational.
+        S005 TikTrack development may proceed with full automation infrastructure.
+Mandate: S005 TikTrack GATE_0 may not open until this gate is reached.
+Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
+```
+
+---
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-27). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
@@ -67,3 +82,4 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | SYNC_WSM_WP002_GATE3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | S002_P003_ADDED_GATE0_PASS_G1_PENDING | 2026-02-26**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S001_P002_STATUS_PIPELINE_ACTIVATION_AUTHORIZED + S002_P001_STATUS_COMPLETE + S003_S006_AGENTS_OS_PLACEHOLDERS_ADDED | 2026-02-27**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | SEQUENCING_REVISED_GENERATION_LAYER_ACCELERATED: TEST_TEMPLATE_GENERATOR→S003 + BUSINESS_LOGIC_VALIDATOR→S004 + SPEC_DRAFT_GENERATOR→S004 + ANALYTICS_VALIDATOR→S005 + AGENTS_OS_COMPLETE_GATE_ADDED | 2026-03-01**

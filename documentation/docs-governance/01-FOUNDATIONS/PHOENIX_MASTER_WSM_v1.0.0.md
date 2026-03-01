@@ -87,18 +87,18 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 10 recorded GATE_4 PASS S002-P003-WP002 (Team 50 report 12/12); next GATE_5 (Team 90).
+**Gate-owner update evidence:** This block was updated **2026-02-27** — Team 90 recorded GATE_5 BLOCK S002-P003-WP002 (missing canonical D34/D35 FAV artifacts); remediation loop returned to Team 10.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_4 PASS (D22 FAV 12/12); next GATE_5 DEV_VALIDATION (Team 90) |
+| active_flow | S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | N/A |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_4 PASS \| 2026-02-27 \| Team 50 report 12/12 (TEAM_10_S002_P003_GATE4_PASS_ACK) |
+| last_s002_p003_milestone | GATE_5 BLOCK \| 2026-02-27 \| Team 90 blocking report (TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT) |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
 | current_gate | GATE_5 (DEV_VALIDATION — Team 90 owner) |
 | track_mode | NORMAL |
@@ -107,9 +107,9 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5–GATE_8 owner) |
-| last_gate_event | GATE_4_PASS \| 2026-02-27 \| Team 10 \| TEAM_10_S002_P003_GATE4_PASS_ACK.md |
-| next_required_action | Team 90: run GATE_5 DEV_VALIDATION for S002-P003-WP002 (D22/D34/D35); update WSM on GATE_5 closure. Team 10 has handed off to GATE_5. |
-| next_responsible_team | Team 90 (GATE_5) |
+| last_gate_event | GATE_5_BLOCK \| 2026-02-27 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT.md |
+| next_required_action | Team 10: coordinate remediation for BF-G5-001..004 (missing D34/D35 canonical artifacts), update evidence package, and re-submit GATE_5 validation request to Team 90. |
+| next_responsible_team | Team 10 (remediation loop), then Team 90 (GATE_5 re-validation) |
 
 ---
 
@@ -205,3 +205,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P003 GATE_2 SPEC package submitted to Team 00; awaiting architect decision | 2026-02-26**
 **log_entry | TEAM_00 | GATE_2_DECISION | S002-P003 | APPROVED | 2026-02-27**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_2 APPROVED S002-P003; advanced to GATE_3_INTAKE_OPEN and handed off to Team 10 | 2026-02-27**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P003-WP002 (BF-G5-001..004 missing canonical D34/D35 FAV artifacts); remediation loop returned to Team 10 | 2026-02-27**

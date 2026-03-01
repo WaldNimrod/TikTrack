@@ -31,8 +31,8 @@
 ## 3) צעד הבא (GATE_5)
 
 - **GATE_5 (DEV_VALIDATION)** — בעלים: **Team 90** (per 04_GATE_MODEL_PROTOCOL_v2.3.0).
-- **Team 10** מעביר את הזרימה ל־Team 90: S002-P003-WP002 (D22 + D34/D35) עבר GATE_4; נדרש validation ב־GATE_5.
-- **Team 90:** להריץ Dev Validation לפי runbook; לעדכן WSM upon GATE_5 closure.
+- **פרומפט הפעלה ל־Team 90 (חובה):** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_GATE5_ACTIVATION_PROMPT.md` — מנדט ביצוע מפורש: משימות, קונטקסט, תוצר מצופה (VALIDATION_RESPONSE), ועדכון WSM.
+- **Team 90:** לפעול לפי הפרומפט הנ"ל; להריץ Dev Validation; להחזיר TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE; לעדכן WSM upon GATE_5 closure.
 
 ---
 

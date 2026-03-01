@@ -40,7 +40,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 v1.0.0 ready; activates when S001-P002 enters GATE_3) |
-| S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A |
+| S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_5 (DEV_VALIDATION — Team 90 owner); active_flow=S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation; active_work_package_id=S002-P003-WP002 |
 | S003 | S003-P0XX | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
 | S003 | S003-P0YY | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
 | S004 | S004-P0XX | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
@@ -51,7 +51,6 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 
 
 ---
-
 ## Agents_OS Completion Gate
 
 ```
@@ -65,9 +64,9 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-27). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-01). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-02-27):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_3; active_work_package_id=N/A; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order.
+**WSM mirror (2026-03-01):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_5 (DEV_VALIDATION — Team 90 owner); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation.
 
 ---
 

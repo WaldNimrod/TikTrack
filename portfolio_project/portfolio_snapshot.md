@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-01T08:36:48.371651+00:00`
+- Generated (UTC): `2026-03-01T12:56:48.669066+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,13 +10,13 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_5 (DEV_VALIDATION — Team 90 owner)`
-- next_required_action: `Team 10: coordinate remediation for BF-G5-001..004 (missing D34/D35 canonical artifacts), update evidence package, and re-submit GATE_5 validation request to Team 90.`
+- current_gate: `GATE_6 (opening workflow after GATE_5 PASS)`
+- next_required_action: `Team 100 / Team 00: review architect inbox submission and issue GATE_6 decision. Team 10: maintain traceability and await approval decision.`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `11`
+- programs: `27`
 - work_packages: `5`
 
 ## Roadmap (hierarchical)
@@ -41,15 +41,25 @@
 
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
-    └── **Program** `S002-P003` — TikTrack Alignment (D22+D34+D35) | ACTIVE | domain: **TIKTRACK**
+    ├── **Program** `S002-P003` — TikTrack Alignment (D22+D34+D35) | ACTIVE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_5 (DEV_VALIDATION — Team 90 owner) | domain: **TIKTRACK** (active)
+
+    └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
 
     ├── **Program** `S003-P001` — Data Model Validator | PLANNED | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P002` — Test Template Generator | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P002` — Test Template Generator | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P003` — System Settings (D39+D40) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P005` — Tags & Watch Lists (D38+D26) | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -58,14 +68,36 @@
 
     ├── **Program** `S004-P002` — Business Logic Validator | PLANNED | domain: **AGENTS_OS**
 
-    └── **Program** `S004-P003` — Spec Draft Generator | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S004-P003` — Spec Draft Generator | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S004-P004` — Executions (D36) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S004-P005` — Data Import (D37) | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S004-P006` — Admin Review S004 | PLANNED | domain: **TIKTRACK**
 
 
 ### S005 — שלב 5 — Trades/Plans | PLANNED [SHARED]
 
-    └── **Program** `S005-P001` — Analytics Quality Validator | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S005-P001` — Analytics Quality Validator | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S005-P002` — Trade Entities (D29+D24) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S005-P003` — Market Intelligence (D27+D25) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S005-P004` — Journal & History (D28+D31) | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S005-P005` — Admin Review S005 | PLANNED | domain: **TIKTRACK**
 
 
 ### S006 — שלב 6 — Advanced Analytics | PLANNED [SHARED]
+
+    ├── **Program** `S006-P001` — Portfolio State (D32) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S006-P002` — Analysis & Closure (D30) | PLANNED | domain: **TIKTRACK**
+
+    ├── **Program** `S006-P003` — Level-1 Dashboards | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
 
 

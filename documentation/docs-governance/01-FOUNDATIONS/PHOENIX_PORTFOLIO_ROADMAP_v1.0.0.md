@@ -56,10 +56,10 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | --- | --- | --- | --- |
 | S001 | D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S002 | D22, D23 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S003 | D33, D39, D38 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S003 | D33, D39, D40, D38, D26 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, WatchLists, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S004 | D36, D37 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S005 | D24, D25, D26, D27, D28, D29 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S006 | D30, D31, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S005 | D24, D25, D27, D28, D29, D31 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S006 | D30, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 
 ---
 
@@ -73,7 +73,7 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 
 ### שלב 3 — שכבת נתונים יסודית (Essential Data)
 
-D15_SETTINGS (Preferences), ALERTS & NOTES, USER_TICKERS & TICKERS_MGR.
+D15_SETTINGS (Preferences), SYSTEM_MANAGEMENT (D40), TAG_MANAGEMENT + WATCH_LISTS (D38+D26), ALERTS & NOTES, USER_TICKERS & TICKERS_MGR.
 
 ### שלב 4 — המעגל הפיננסי (Financial Execution)
 
@@ -81,11 +81,11 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 
 ### שלב 5 — ישויות מורכבות (Trades/Plans)
 
-תוכניות טריידים, טריידים, רשימות צפייה, דשבורד טיקר, יומן מסחר.
+תוכניות טריידים, טריידים, דשבורד טיקר, יומן מסחר והיסטוריית טרייד (D31).
 
 ### שלב 6 — תובנות וניתוח (Advanced Analytics)
 
-ניתוח אסטרטגיות, היסטוריית טרייד, מצב תיק; מימוש דשבורדים רמה 1.
+ניתוח אסטרטגיות, מצב תיק; מימוש דשבורדים רמה 1.
 
 ---
 
@@ -123,15 +123,15 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 | 16 | D37 | data_import | ייבוא נתונים | S004 |
 | 17 | D24 | trade_plans | תוכניות טריידים | S005 |
 | 18 | D25 | ai_analysis | אנליזת AI | S005 |
-| 19 | D26 | watch_lists | רשימות צפייה | S005 |
+| 19 | D26 | watch_lists | רשימות צפייה | S003 |
 | 20 | D27 | ticker_dashboard | דשבורד טיקר | S005 |
 | 21 | D28 | trading_journal | יומן מסחר | S005 |
 | 22 | D29 | trades | ניהול טריידים | S005 |
 | 23 | D30 | strategy_analysis | ניתוח אסטרטגיות | S006 |
-| 24 | D31 | trades_history | היסטוריית טרייד | S006 |
+| 24 | D31 | trades_history | היסטוריית טרייד | S005 |
 | 25 | D32 | portfolio_state | מצב תיק היסטורי | S006 |
 | 26 | D38 | tag_management | ניהול תגיות | S003 |
-| 27 | D40 | system_management | ניהול מערכת | — |
+| 27 | D40 | system_management | ניהול מערכת | S003 |
 | 28 | D41 | design_system | ניהול עיצובים | — |
 
 **דשבורדים רמה 1** (בית, תכנון, מעקב, מחקר, נתונים, ניהול): מימוש תוכן — **שלב 6 ומאוחר יותר**.

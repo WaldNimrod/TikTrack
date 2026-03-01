@@ -6,6 +6,7 @@
 **to:** Team 10 (Execution Orchestrator)  
 **cc:** Team 60, Team 20, Team 30, Team 90  
 **date:** 2026-01-31  
+**historical_record:** true
 **status:** BLOCK  
 **gate_id:** GATE_5 (remediation loop)  
 **work_package_id:** S002-P003-WP002  

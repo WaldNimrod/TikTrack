@@ -7,6 +7,7 @@ gate: STRATEGIC_RATIFICATION (GATE_2 equivalent for roadmap-level submissions)
 program: SHARED (TIKTRACK + AGENTS_OS)
 decision: APPROVED_WITH_CONDITIONS
 sv: 1.0.0
+date: 2026-03-01
 effective_date: 2026-03-01
 project_domain: TIKTRACK + AGENTS_OS
 in_response_to: TEAM_100_INTEGRATED_DUAL_DOMAIN_ROADMAP_v1.0.0.md

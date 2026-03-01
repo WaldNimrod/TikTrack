@@ -6,6 +6,7 @@
 **to:** Team 10 (The Gateway)  
 **cc:** Team 50, Team 30  
 **date:** 2026-01-31  
+**historical_record:** true  
 **status:** REMEDIATION_COMPLETE  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

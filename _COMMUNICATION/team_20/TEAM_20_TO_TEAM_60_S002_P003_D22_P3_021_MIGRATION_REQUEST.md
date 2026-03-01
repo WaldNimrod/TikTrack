@@ -6,6 +6,7 @@
 **to:** Team 60 (DevOps & Platform)  
 **cc:** Team 10, Team 50  
 **date:** 2026-02-26  
+**historical_record:** true  
 **status:** ACKNOWLEDGED — TEAM_60_TO_TEAM_20_S002_P003_D22_P3_021_MIGRATION_RESPONSE_v1.0.0  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

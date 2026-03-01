@@ -7,6 +7,7 @@ program: S001-P002
 gate: PRE-GATE_0 (LOD200 authoring brief)
 sv: 1.0.0
 effective_date: 2026-02-27
+date: 2026-02-27
 project_domain: AGENTS_OS / TIKTRACK
 ---
 

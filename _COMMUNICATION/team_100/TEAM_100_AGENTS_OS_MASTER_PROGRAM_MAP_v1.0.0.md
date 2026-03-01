@@ -163,8 +163,8 @@ TikTrack feature development from S003 onward runs through a **fully automated g
 
 | Program | Name | Domain | Status | Capability Phase | Purpose | Key Deliverable |
 |---|---|---|---|---|---|---|
-| S003-P0XX | Data Model Validator | AGENTS_OS | **PLANNED** | Phase 4 | Validate data model contracts in specs; check schema declarations and cross-entity consistency | New TIER spec checks: S-45 to S-52 (data model specifics); new TIER exec checks: E-12 to E-14 (migration safety, schema compliance) |
-| S003-P0YY | **⚡ Test Template Generator** | AGENTS_OS | **PLANNED** | **Phase 5 — ACCELERATED** | Generate Selenium/pytest test templates from spec DOMs and API contracts | `agents_os/generators/test_template_generator.py` — reduces test authoring cost by ~60% for ALL future TikTrack features |
+| S003-P001 | Data Model Validator | AGENTS_OS | **PLANNED** | Phase 4 | Validate data model contracts in specs; check schema declarations and cross-entity consistency | New TIER spec checks: S-45 to S-52 (data model specifics); new TIER exec checks: E-12 to E-14 (migration safety, schema compliance) |
+| S003-P002 | **⚡ Test Template Generator** | AGENTS_OS | **PLANNED** | **Phase 5 — ACCELERATED** | Generate Selenium/pytest test templates from spec DOMs and API contracts | `agents_os/generators/test_template_generator.py` — reduces test authoring cost by ~60% for ALL future TikTrack features |
 
 **Data Model Validator — new check categories (LOD200 to define):**
 
@@ -196,9 +196,9 @@ TikTrack feature development from S003 onward runs through a **fully automated g
 
 | Program | Name | Domain | Status | Capability Phase | Purpose | Key Deliverable |
 |---|---|---|---|---|---|---|
-| S004-P0XX | Financial Precision Validator | AGENTS_OS | **PLANNED** | Phase 4 | Enforce NUMERIC(20,8) Iron Rule through automated code scanning; validate data import schema compliance | New TIER exec checks: E-18 to E-24 (financial precision, import format) |
-| S004-P0YY | **⚡ Business Logic Validator** | AGENTS_OS | **PLANNED** | **Phase 4 — ACCELERATED** | Validate multi-entity consistency, state machine completeness, and business rule coverage in specs and code | New spec checks: S-53+ (cross-entity consistency); new exec checks: E-25+ (state machine coverage, fixture quality) |
-| S004-P0ZZ | **⚡ Spec Draft Generator** | AGENTS_OS | **PLANNED** | **Phase 5 — ACCELERATED** | LLM-assisted first draft of LOD200/LLD400 from product requirements | `agents_os/generators/spec_draft_generator.py` — ~70% reduction in spec authoring token cost for all S005–S006 TikTrack features |
+| S004-P001 | Financial Precision Validator | AGENTS_OS | **PLANNED** | Phase 4 | Enforce NUMERIC(20,8) Iron Rule through automated code scanning; validate data import schema compliance | New TIER exec checks: E-18 to E-24 (financial precision, import format) |
+| S004-P002 | **⚡ Business Logic Validator** | AGENTS_OS | **PLANNED** | **Phase 4 — ACCELERATED** | Validate multi-entity consistency, state machine completeness, and business rule coverage in specs and code | New spec checks: S-53+ (cross-entity consistency); new exec checks: E-25+ (state machine coverage, fixture quality) |
+| S004-P003 | **⚡ Spec Draft Generator** | AGENTS_OS | **PLANNED** | **Phase 5 — ACCELERATED** | LLM-assisted first draft of LOD200/LLD400 from product requirements | `agents_os/generators/spec_draft_generator.py` — ~70% reduction in spec authoring token cost for all S005–S006 TikTrack features |
 
 **Financial Precision Validator — new check categories (LOD200 to define):**
 
@@ -253,7 +253,7 @@ TikTrack feature development from S003 onward runs through a **fully automated g
 
 | Program | Name | Domain | Status | Capability Phase | Purpose | Key Deliverable |
 |---|---|---|---|---|---|---|
-| S005-P0XX | Analytics Quality Validator | AGENTS_OS | **PLANNED** | Phase 5B | Validate analytics calculation correctness declarations; enforce output format compliance | New spec checks: Calculation logic declaration; new exec checks: Output format compliance, calculation test coverage |
+| S005-P001 | Analytics Quality Validator | AGENTS_OS | **PLANNED** | Phase 5B | Validate analytics calculation correctness declarations; enforce output format compliance | New spec checks: Calculation logic declaration; new exec checks: Output format compliance, calculation test coverage |
 
 **Sequencing logic:** S005 Agents_OS work is PREPARATION for S006 TikTrack, not a prerequisite for S005 TikTrack. By the time TikTrack enters S006 analytics development, Analytics Quality Validator is tested and operational.
 
@@ -304,17 +304,17 @@ After S001-P002:  + Proven: full pipeline works on real TikTrack feature
 After S002-P002:  + Automated gate triggering + WSM proposal flow
 
   ── S003 era ──────────────────────────────────────────────────────────
-After S003-P0XX:  + Data model validation (schema, migrations, relationships)
-After S003-P0YY:  + Test template generation (domain-agnostic, serves all future stages)
+After S003-P001:  + Data model validation (schema, migrations, relationships)
+After S003-P002:  + Test template generation (domain-agnostic, serves all future stages)
 
   ── S004 era ──────────────────────────────────────────────────────────
-After S004-P0XX:  + Financial precision enforcement (no float arithmetic)
-After S004-P0YY:  + Business logic validation (multi-entity, state machines)
-After S004-P0ZZ:  + Spec draft generation (LOD200/LLD400 first drafts from requirements)
+After S004-P001:  + Financial precision enforcement (no float arithmetic)
+After S004-P002:  + Business logic validation (multi-entity, state machines)
+After S004-P003:  + Spec draft generation (LOD200/LLD400 first drafts from requirements)
 
   ★ SYSTEM COMPLETE — S005 TIKTRACK BEGINS ★
   ── S005 era ──────────────────────────────────────────────────────────
-After S005-P0XX:  + Analytics quality validation (calc correctness, output format)
+After S005-P001:  + Analytics quality validation (calc correctness, output format)
 
   ── S006 era ──────────────────────────────────────────────────────────
   [TikTrack analytics development on full Agents_OS — no new programs]
@@ -381,7 +381,7 @@ Team 00 is requested to:
 
 1. **Ratify this revised long-term program map** — promote to `_COMMUNICATION/_Architects_Decisions/` upon approval
 2. **Confirm acceleration mandate** — does Team 00 endorse front-loading Test Template Generator to S003 and Spec Draft Generator + Business Logic Validator to S004?
-3. **Confirm S003-P0YY LOD200 trigger** — shall Test Template Generator LOD200 authoring begin immediately alongside Data Model Validator when S002-P002 enters GATE_3?
+3. **Confirm S003-P002 LOD200 trigger** — shall Test Template Generator LOD200 authoring begin immediately alongside Data Model Validator when S002-P002 enters GATE_3?
 4. **Provide direction on Post-S006 scope** — which autonomy programs are in vision vs. aspirational only?
 
 ---

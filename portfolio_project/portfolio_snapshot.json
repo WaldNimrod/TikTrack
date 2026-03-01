@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-27T02:05:41.603422+00:00",
+  "generated_at_utc": "2026-03-01T08:36:48.371651+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S002",
-    "active_work_package_id": "N/A",
+    "active_work_package_id": "S002-P003-WP002",
     "in_progress_work_package_id": "N/A",
-    "current_gate": "GATE_3",
+    "current_gate": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
     "active_program_id": "S002-P003",
-    "last_gate_event": "GATE_2_APPROVED \\",
-    "next_required_action": "Team 10: open GATE_3 intake for S002-P003, issue WP001 (D22) mandate to Team 30, and issue WP002 (D34/D35) mandates to Team 50 in parallel (WP002 D22 only after WP001 completion).",
-    "next_responsible_team": "Team 10"
+    "last_gate_event": "GATE_5_BLOCK \\",
+    "next_required_action": "Team 10: coordinate remediation for BF-G5-001..004 (missing D34/D35 canonical artifacts), update evidence package, and re-submit GATE_5 validation request to Team 90.",
+    "next_responsible_team": "Team 10 (remediation loop), then Team 90 (GATE_5 re-validation)"
   },
   "stages": [
     {
@@ -83,19 +83,19 @@
     },
     {
       "program_id": "S001-P002",
-      "program_name": "Alerts POC (per SSM §5.1)",
+      "program_name": "Alerts POC",
       "domain": "AGENTS_OS",
       "stage_id": "S001",
-      "status": "HOLD",
-      "current_gate_mirror": "— (lock released 2026-02-22; activation decision pending Team 00)"
+      "status": "PIPELINE",
+      "current_gate_mirror": "— (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress)"
     },
     {
       "program_id": "S002-P001",
       "program_name": "Agents_OS Core Validation Engine",
       "domain": "AGENTS_OS",
       "stage_id": "S002",
-      "status": "ACTIVE",
-      "current_gate_mirror": "GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A"
+      "status": "COMPLETE",
+      "current_gate_mirror": "DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26)"
     },
     {
       "program_id": "S002-P002",
@@ -103,7 +103,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "PIPELINE",
-      "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)"
+      "current_gate_mirror": "— (LOD200 v1.0.0 ready; activates when S001-P002 enters GATE_3)"
     },
     {
       "program_id": "S002-P003",
@@ -111,7 +111,55 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A"
+      "current_gate_mirror": "GATE_5 (DEV_VALIDATION — Team 90 owner)"
+    },
+    {
+      "program_id": "S003-P001",
+      "program_name": "Data Model Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14)"
+    },
+    {
+      "program_id": "S003-P002",
+      "program_name": "Test Template Generator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token)"
+    },
+    {
+      "program_id": "S004-P001",
+      "program_name": "Financial Precision Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)"
+    },
+    {
+      "program_id": "S004-P002",
+      "program_name": "Business Logic Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)"
+    },
+    {
+      "program_id": "S004-P003",
+      "program_name": "Spec Draft Generator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)"
+    },
+    {
+      "program_id": "S005-P001",
+      "program_name": "Analytics Quality Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)"
     }
   ],
   "work_packages": [
@@ -150,6 +198,15 @@
       "current_gate": "GATE_8 (PASS)",
       "is_active": false,
       "active_marker_reason": "Lifecycle complete 2026-02-26"
+    },
+    {
+      "work_package_id": "S002-P003-WP002",
+      "program_id": "S002-P003",
+      "domain": "TIKTRACK",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
+      "is_active": true,
+      "active_marker_reason": "Active per WSM CURRENT_OPERATIONAL_STATE (GATE_5 BLOCK remediation loop; re-validation pending)"
     }
   ],
   "hierarchy": [
@@ -192,10 +249,10 @@
         },
         {
           "program_id": "S001-P002",
-          "program_name": "Alerts POC (per SSM §5.1)",
+          "program_name": "Alerts POC",
           "domain": "AGENTS_OS",
-          "status": "HOLD",
-          "current_gate_mirror": "— (lock released 2026-02-22; activation decision pending Team 00)",
+          "status": "PIPELINE",
+          "current_gate_mirror": "— (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress)",
           "work_packages": []
         }
       ]
@@ -214,8 +271,8 @@
           "program_id": "S002-P001",
           "program_name": "Agents_OS Core Validation Engine",
           "domain": "AGENTS_OS",
-          "status": "ACTIVE",
-          "current_gate_mirror": "GATE_8; active_flow=GATE_8_PASS (WP002); DOCUMENTATION_CLOSED; S002-P001 program complete; active_work_package_id=N/A",
+          "status": "COMPLETE",
+          "current_gate_mirror": "DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26)",
           "work_packages": [
             {
               "work_package_id": "S002-P001-WP001",
@@ -242,7 +299,7 @@
           "program_name": "Full Pipeline Orchestrator",
           "domain": "AGENTS_OS",
           "status": "PIPELINE",
-          "current_gate_mirror": "— (LOD200 concept ready; pending S002-P001 completion + Team 00 activation decision)",
+          "current_gate_mirror": "— (LOD200 v1.0.0 ready; activates when S001-P002 enters GATE_3)",
           "work_packages": []
         },
         {
@@ -250,8 +307,18 @@
           "program_name": "TikTrack Alignment (D22+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_3; active_flow=GATE_3_INTAKE_OPEN (S002-P003); Team 10 authorized to open WP intake and start execution orchestration per approved LLD400 dependency order; active_work_package_id=N/A",
-          "work_packages": []
+          "current_gate_mirror": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
+          "work_packages": [
+            {
+              "work_package_id": "S002-P003-WP002",
+              "program_id": "S002-P003",
+              "domain": "TIKTRACK",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_5 (DEV_VALIDATION — Team 90 owner)",
+              "is_active": true,
+              "active_marker_reason": "Active per WSM CURRENT_OPERATIONAL_STATE (GATE_5 BLOCK remediation loop; re-validation pending)"
+            }
+          ]
         }
       ]
     },
@@ -264,7 +331,24 @@
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S003-P001",
+          "program_name": "Data Model Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P002",
+          "program_name": "Test Template Generator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S004",
@@ -275,7 +359,32 @@
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S004-P001",
+          "program_name": "Financial Precision Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P002",
+          "program_name": "Business Logic Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P003",
+          "program_name": "Spec Draft Generator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S005",
@@ -286,7 +395,16 @@
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S005-P001",
+          "program_name": "Analytics Quality Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S006",

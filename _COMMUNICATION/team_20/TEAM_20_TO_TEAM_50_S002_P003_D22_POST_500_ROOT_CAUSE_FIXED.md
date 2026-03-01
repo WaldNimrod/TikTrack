@@ -6,6 +6,7 @@
 **to:** Team 50 (QA / FAV)  
 **cc:** Team 10, Team 60  
 **date:** 2026-02-26  
+**historical_record:** true  
 **status:** FIXED — 12/12 בדיקות עברו  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

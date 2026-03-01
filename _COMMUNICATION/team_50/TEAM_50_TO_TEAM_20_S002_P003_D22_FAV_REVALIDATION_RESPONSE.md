@@ -7,6 +7,7 @@
 **to:** Team 20 (Backend Implementation)  
 **cc:** Team 10  
 **date:** 2026-01-31  
+**historical_record:** true  
 **status:** PARTIAL_PASS — filter תוקן; POST עדיין 500 (לאחר מיגרציה מלאה: סיבה = ORM metadata)  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

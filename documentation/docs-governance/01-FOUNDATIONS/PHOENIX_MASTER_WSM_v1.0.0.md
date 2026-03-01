@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 90 completed G5R2 re-validation with PASS and submitted the GATE_6 resubmission package.
+**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 90 received GATE_6 approval, activated GATE_7, and issued human approval scenarios.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_5 G5R2 PASS; GATE_6 resubmission package submitted and awaiting Team 100 / Team 00 decision |
+| active_flow | S002-P003; GATE_6 PASS; GATE_7 HUMAN_UX_APPROVAL active and waiting for Nimrod decision |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_6 resubmission pending) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_7 human approval pending) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_5 PASS \| 2026-03-01 \| Team 90 validated G5R2 and reopened GATE_6 resubmission flow |
+| last_s002_p003_milestone | GATE_6 PASS \| 2026-03-01 \| Team 00 approval v1.1.0 received; Team 90 activated GATE_7 |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_6 (resubmission pending authority decision) |
+| current_gate | GATE_7 (HUMAN_UX_APPROVAL active) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | N/A |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_6 workflow owner until authority decision; approval authority Team 100/00) |
-| last_gate_event | GATE_5_PASS \| 2026-03-01 \| Team 90 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE.md |
-| next_required_action | Team 100 / Team 00: review the updated 8-artifact GATE_6 resubmission package and issue a decision. Team 10: maintain traceability and await authority response. |
-| next_responsible_team | Team 100 / Team 00 (GATE_6 approval authority) |
+| phase_owner_team | Team 90 (GATE_7 owner; waiting for human approver decision) |
+| last_gate_event | GATE_6_PASS \| 2026-03-01 \| Team 00 / Team 90 activation \| ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.1.0.md |
+| next_required_action | Nimrod: execute GATE_7 human approval scenarios and return PASS/FAIL. Team 90: on PASS activate GATE_8; on FAIL route rejection per protocol. |
+| next_responsible_team | Nimrod (human approver), then Team 90 |
 
 ---
 
@@ -212,3 +212,4 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P003-WP002 in rollback cycle; GF-G6-003 still incomplete | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P003-WP002 in G5R2; blocker loop closed | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 resubmission package submitted for S002-P003-WP002 under 8-artifact rule | 2026-03-01**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 PASS S002-P003-WP002; GATE_7 activated and human scenarios issued | 2026-03-01**

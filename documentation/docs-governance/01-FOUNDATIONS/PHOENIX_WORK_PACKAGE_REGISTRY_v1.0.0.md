@@ -40,13 +40,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_5 (DEV_VALIDATION — Team 90 owner) | true | Active per WSM CURRENT_OPERATIONAL_STATE (GATE_5 BLOCK remediation loop; re-validation pending) |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_5 (DEV_VALIDATION — Team 90 owner) | true | S002-P003; GATE_5 BLOCK on WP002 (BF-G5-001..004: missing canonical D34/D35 FAV artifacts); remediation required before re-validation |
 
 
 
-**Current active WP state (mirror from WSM):** **S002-P003-WP002 ACTIVE** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_5 (DEV_VALIDATION — Team 90 owner)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_5 (DEV_VALIDATION — Team 90 owner)`, `active_work_package_id=S002-P003-WP002`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-02-27). Exactly one active row must match WSM `active_work_package_id` when runtime flow has an active WP; otherwise use explicit `NO_ACTIVE_WORK_PACKAGE`.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-01). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

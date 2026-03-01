@@ -12,10 +12,12 @@ on:
       - "00_MASTER_INDEX.md"
       - "pyproject.toml"
       - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "scripts/lint_agents_os_case_paths.sh"
       - "scripts/lint_governance_dates.sh"
       - "scripts/portfolio/sync_registry_mirrors_from_wsm.py"
       - "_COMMUNICATION/**"
       - "documentation/docs-governance/**"
+      - "agents_os/**"
       - "api/**"
       - "ui/**"
       - ".github/workflows/lint-enforcement.yml"
@@ -26,10 +28,12 @@ on:
       - "00_MASTER_INDEX.md"
       - "pyproject.toml"
       - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "scripts/lint_agents_os_case_paths.sh"
       - "scripts/lint_governance_dates.sh"
       - "scripts/portfolio/sync_registry_mirrors_from_wsm.py"
       - "_COMMUNICATION/**"
       - "documentation/docs-governance/**"
+      - "agents_os/**"
       - "api/**"
       - "ui/**"
       - ".github/workflows/lint-enforcement.yml"
@@ -54,6 +58,9 @@ jobs:
 
       - name: Bootstrap lint (docs/governance)
         run: ./scripts/lint_source_authority_bootstrap_paths.sh
+
+      - name: Agents_OS case-path lint (lowercase root only)
+        run: ./scripts/lint_agents_os_case_paths.sh
 
       - name: Governance metadata date lint (changed files only)
         run: |

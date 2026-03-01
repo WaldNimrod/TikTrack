@@ -1,6 +1,7 @@
 """Tests for tier_e1_work_plan."""
 
 import pytest
+import agents_os.validators.execution.tier_e1_work_plan as tier_e1_module
 from agents_os.validators.execution.tier_e1_work_plan import TierE1WorkPlanValidator
 
 
@@ -31,7 +32,17 @@ team_20 completion report, team_70 completion report
 """
 
 
-def test_e1_pass():
+def _stable_wsm_state():
+    return {
+        "active_work_package_id": "S002-P001-WP002",
+        "last_closed_work_package_id": "S002-P001-WP001",
+        "allowed_gate_range": "GATE_3 -> GATE_8",
+        "last_gate_event": "GATE_3_INTAKE_OPEN | 2026-02-27 | Team 10",
+    }
+
+
+def test_e1_pass(monkeypatch):
+    monkeypatch.setattr(tier_e1_module, "read_wsm_state", _stable_wsm_state)
     v = TierE1WorkPlanValidator(phase=1)
     ec, results = v.run(WP_DEF_SAMPLE)
     assert ec.value == 0
@@ -47,15 +58,17 @@ def test_e1_missing_header():
     assert not e01.passed
 
 
-def test_e1_e03_criteria():
+def test_e1_e03_criteria(monkeypatch):
+    monkeypatch.setattr(tier_e1_module, "read_wsm_state", _stable_wsm_state)
     v = TierE1WorkPlanValidator(phase=1)
     ec, results = v.run(WP_DEF_SAMPLE)
     e03 = next(r for r in results if r.check_id == "E-03")
     assert e03.passed
 
 
-def test_e1_all_six_checks():
+def test_e1_all_six_checks(monkeypatch):
     """E-01..E-06: all checks present."""
+    monkeypatch.setattr(tier_e1_module, "read_wsm_state", _stable_wsm_state)
     v = TierE1WorkPlanValidator(phase=1)
     ec, results = v.run(WP_DEF_SAMPLE)
     ids = {r.check_id for r in results}

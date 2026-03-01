@@ -9,7 +9,7 @@ Per work plan: UNIQUE (user_id, ticker_id) WHERE deleted_at IS NULL.
 
 import uuid
 from datetime import datetime
-from sqlalchemy import ForeignKey, TIMESTAMP
+from sqlalchemy import ForeignKey, TIMESTAMP, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
@@ -51,6 +51,17 @@ class UserTicker(Base):
     )
     deleted_at: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP(timezone=True),
+        nullable=True,
+    )
+    # G7 M-001: canonical status + user notes
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="active",
+        server_default="'active'",
+    )
+    notes: Mapped[Optional[str]] = mapped_column(
+        Text,
         nullable=True,
     )
 

@@ -159,58 +159,21 @@ class TickersService:
     async def create_ticker(
         self, db: AsyncSession, symbol: str, company_name: Optional[str], ticker_type: str, is_active: bool
     ) -> TickerResponse:
-        # Check symbol uniqueness
-        stmt = select(Ticker).where(
-            and_(
-                Ticker.symbol == symbol.upper(),
-                Ticker.deleted_at.is_(None),
-            )
+        from .canonical_ticker_service import create_system_ticker
+        from ..core.config import settings
+        ticker = await create_system_ticker(
+            db=db,
+            symbol=symbol,
+            ticker_type=ticker_type,
+            company_name=company_name,
+            skip_live_check=settings.debug,
+            status="active",
         )
-        existing = await db.execute(stmt)
-        if existing.scalar_one_or_none():
-            raise HTTPExceptionWithCode(
-                status_code=409,
-                detail=f"Ticker symbol '{symbol}' already exists",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
-            )
-        ticker = Ticker(
-            symbol=symbol.upper(),
-            company_name=company_name or None,
-            ticker_type=ticker_type.upper(),
-            is_active=is_active,
-        )
-        db.add(ticker)
-        try:
-            await db.commit()
-            await db.refresh(ticker)
-            return _ticker_to_response(ticker)
-        except ProgrammingError as e:
-            await db.rollback()
-            err = str(e).lower()
-            # Schema mismatch: column missing (p3_020 not run) — return actionable 503
-            if ("column" in err and "does not exist" in err) or "undefinedcolumn" in err:
-                logger.error(f"Tickers schema mismatch (likely p3_020 not run): {e}", exc_info=True)
-                raise HTTPExceptionWithCode(
-                    status_code=503,
-                    detail="market_data.tickers schema outdated. Run: make migrate-p3-020",
-                    error_code=ErrorCodes.SERVER_ERROR,
-                )
-            raise
-        except IntegrityError as e:
-            await db.rollback()
-            error_msg = str(e.orig) if hasattr(e, "orig") else str(e)
-            if "tickers_symbol_exchange_unique" in error_msg or "symbol" in error_msg.lower():
-                raise HTTPExceptionWithCode(
-                    status_code=409,
-                    detail=f"Ticker symbol '{symbol}' already exists",
-                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
-                )
-            logger.error(f"IntegrityError creating ticker: {error_msg}", exc_info=True)
-            raise HTTPExceptionWithCode(
-                status_code=409,
-                detail="Ticker creation failed due to constraint violation",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
-            )
+        if not is_active:
+            ticker.is_active = False
+        await db.commit()
+        await db.refresh(ticker)
+        return _ticker_to_response(ticker)
 
     async def update_ticker(
         self,

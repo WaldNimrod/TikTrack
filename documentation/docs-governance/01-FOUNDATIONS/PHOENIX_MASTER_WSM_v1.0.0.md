@@ -87,28 +87,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 10 received the canonical G7 remediation directive package from Team 00 and re-opened GATE_3 execution orchestration for WP002.
+**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 10 consumed Team 170 OA-01 reconciliation response (Option 2), closed the scope gap, and released GATE_3 execution under four-scope acceptance boundary.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package |
+| active_flow | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution released under D22 + D33 + D34 + D35 boundary |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | S002-P003-WP002 (rollback loop after GATE_7 REJECT / CODE_CHANGE_REQUIRED) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | last_s002_p003_milestone | GATE_7 REJECT \| 2026-03-01 \| Nimrod human review rejected WP002; Team 90 routed CODE_CHANGE_REQUIRED |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_3 (rollback loop ACTIVE under Team 10 orchestration) |
+| current_gate | GATE_3 (rollback loop EXECUTION_ACTIVE) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3 execution owner after architect remediation directive intake) |
-| last_gate_event | GATE_3_REENTRY_EXECUTION_OPEN \| 2026-03-01 \| Team 10 intake of architect remediation directives \| TEAM_10_S002_P003_G7_REMEDIATION_MASTER_PLAN_v1.0.0.md |
-| next_required_action | Team 20/30/40/50/60 execute assigned remediation streams and submit completion evidence to Team 10 for GATE_4 package assembly. |
+| phase_owner_team | Team 10 (GATE_3 execution owner; OA-01 closed) |
+| last_gate_event | GATE_3_EXECUTION_RELEASED \| 2026-03-01 \| Team 170 OA-01 Option 2 reconciled and consumed by Team 10 \| S002_P003_WP002_ACCEPTANCE_BOUNDARY_RECONCILIATION_NOTE_v1.0.0.md |
+| next_required_action | Team 20/30/40/50/60 execute remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 before GATE_4 packaging by Team 10. |
 | next_responsible_team | Team 20, Team 30, Team 40, Team 50, Team 60 (orchestrated by Team 10) |
 
 ---

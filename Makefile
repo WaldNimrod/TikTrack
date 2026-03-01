@@ -100,6 +100,61 @@ migrate-d35-notes:
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/d35_note_attachments.sql
 	@echo "✅ D35 note_attachments migration complete."
 
+## G7 S002-P003-WP002 Phase A — M-001..M-007 (ARCHITECT_DIRECTIVE_G7_REMEDIATION)
+migrate-g7-M001:
+	@echo "🔄 G7 M-001 — user_tickers status, notes"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M001_user_tickers_status_notes.sql
+	@echo "✅ G7 M-001 complete."
+
+migrate-g7-M002:
+	@echo "🔄 G7 M-002 — alerts trigger_status"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M002_alerts_trigger_status.sql
+	@echo "✅ G7 M-002 complete."
+
+migrate-g7-M003:
+	@echo "🔄 G7 M-003 — notifications table"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M003_notifications.sql
+	@echo "✅ G7 M-003 complete."
+
+migrate-g7-M004:
+	@echo "🔄 G7 M-004 — admin_data schema"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M004_admin_data_schema.sql
+	@echo "✅ G7 M-004 complete."
+
+migrate-g7-M005:
+	@echo "🔄 G7 M-005 — job_run_log"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005_job_run_log.sql
+	@echo "✅ G7 M-005 complete."
+
+migrate-g7-M005b:
+	@echo "🔄 G7 M-005b — grant TikTrackDbAdmin on admin_data"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005b_grant_admin_data.sql
+	@echo "✅ G7 M-005b complete."
+
+migrate-g7-M006:
+	@echo "🔄 G7 M-006 — tickers status verify"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M006_tickers_status_verify.sql
+	@echo "✅ G7 M-006 complete."
+
+migrate-g7-M007:
+	@echo "🔄 G7 M-007 — alerts data migration"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M007_alerts_data_migration.sql
+	@echo "✅ G7 M-007 complete."
+
+migrate-g7-all: migrate-g7-M001 migrate-g7-M002 migrate-g7-M003 migrate-g7-M004 migrate-g7-M005 migrate-g7-M006 migrate-g7-M007
+	@echo "✅ G7 Phase A migrations M-001..M-007 complete."
+
+## G7 Phase A rollback (reverse order: M007..M001; M006 optional)
+rollback-g7-all:
+	@echo "🔄 G7 Rollback M-007..M-001"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M007_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M004_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M003_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M002_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M001_rollback.sql
+	@echo "✅ G7 Phase A rollback complete."
+
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
 	@echo "🔄 P3-019 — market_cap precision (24,4)"

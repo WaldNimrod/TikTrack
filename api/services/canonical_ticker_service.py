@@ -1,0 +1,150 @@
+"""
+Canonical Ticker Service - Single creation path for D22 + D33
+ARCHITECT_DIRECTIVE_G7_REMEDIATION_S002_P003_WP002_v1.0.0 §3.1
+
+THE canonical path for creating a system ticker.
+Admin (D22) and user (D33) creation both delegate here.
+"""
+
+import os
+import uuid
+from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, and_
+from sqlalchemy.exc import IntegrityError, ProgrammingError
+import logging
+
+from ..models.tickers import Ticker
+from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+
+logger = logging.getLogger(__name__)
+
+_USER_CREATED_TICKER_STATUS = "pending"
+
+
+def _is_live_check_bypass() -> bool:
+    """Dev/QA only: SKIP_LIVE_DATA_CHECK=true bypasses provider fetch."""
+    return os.environ.get("SKIP_LIVE_DATA_CHECK", "").strip().lower() in ("true", "1", "yes")
+
+
+async def _live_data_check(
+    symbol: str,
+    ticker_type: str = "STOCK",
+    market: Optional[str] = None,
+) -> bool:
+    """Live data-load check per architect directive. Yahoo → Alpha fallback."""
+    if _is_live_check_bypass():
+        logger.info("Live data check bypassed for %s", symbol)
+        return True
+    from ..integrations.market_data.providers.yahoo_provider import YahooProvider
+    from ..integrations.market_data.providers.alpha_provider import AlphaProvider
+    from ..integrations.market_data.provider_mapping_utils import (
+        get_provider_mapping,
+        resolve_symbols_for_fetch,
+    )
+    pm = get_provider_mapping(symbol, ticker_type, market, metadata=None)
+    yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type, pm)
+    for provider_cls in (YahooProvider,):
+        try:
+            provider = provider_cls(mode="LIVE")
+            result = await provider.get_ticker_price(yahoo_sym)
+            if result and result.price and result.price > 0:
+                return True
+        except Exception as e:
+            logger.warning("Live check %s failed for %s: %s", provider_cls.__name__, yahoo_sym, e)
+    try:
+        provider = AlphaProvider(mode="LIVE")
+        if ticker_type == "CRYPTO":
+            result = await provider.get_ticker_price_crypto(alpha_sym, alpha_market)
+        else:
+            result = await provider.get_ticker_price(alpha_sym)
+        if result and result.price and result.price > 0:
+            return True
+    except Exception as e:
+        logger.warning("Live check AlphaProvider failed for %s: %s", alpha_sym, e)
+    return False
+
+
+async def create_system_ticker(
+    db: AsyncSession,
+    symbol: str,
+    ticker_type: str = "STOCK",
+    exchange_id: Optional[uuid.UUID] = None,
+    company_name: Optional[str] = None,
+    metadata: Optional[dict] = None,
+    skip_live_check: bool = False,
+    status: str = "pending",
+) -> Ticker:
+    """
+    THE canonical path for creating a system ticker.
+    1. Check symbol uniqueness in market_data.tickers
+    2. Validate live market data (unless skip_live_check=True and dev)
+    3. Create ticker with status
+    4. Return Ticker ORM object
+    """
+    from ..core.config import settings
+    symbol_uc = symbol.strip().upper()
+    ticker_type_uc = ticker_type.upper()
+
+    # Uniqueness check
+    stmt = select(Ticker).where(
+        and_(Ticker.symbol == symbol_uc, Ticker.deleted_at.is_(None))
+    )
+    existing = (await db.execute(stmt)).scalar_one_or_none()
+    if existing:
+        raise HTTPExceptionWithCode(
+            status_code=409,
+            detail=f"Ticker symbol '{symbol_uc}' already exists",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+        )
+
+    # Live validation (skip only when explicitly bypassed for dev)
+    do_live = not skip_live_check or (skip_live_check and not settings.debug)
+    if do_live and not _is_live_check_bypass():
+        live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc)
+        if not live_ok:
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="Provider could not fetch data for this symbol. Ticker not created.",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+
+    ticker = Ticker(
+        symbol=symbol_uc,
+        company_name=company_name or None,
+        ticker_type=ticker_type_uc,
+        exchange_id=exchange_id,
+        is_active=True,
+        status=status,
+        ticker_metadata=metadata or {},
+    )
+    db.add(ticker)
+    try:
+        await db.flush()
+        await db.refresh(ticker)
+        return ticker
+    except ProgrammingError as e:
+        await db.rollback()
+        err = str(e).lower()
+        if "column" in err and "does not exist" in err:
+            logger.error("Tickers schema mismatch: %s", e)
+            raise HTTPExceptionWithCode(
+                status_code=503,
+                detail="market_data.tickers schema outdated. Run migrations.",
+                error_code=ErrorCodes.SERVER_ERROR,
+            )
+        raise
+    except IntegrityError as e:
+        await db.rollback()
+        error_msg = str(e.orig) if hasattr(e, "orig") else str(e)
+        if "symbol" in error_msg.lower():
+            raise HTTPExceptionWithCode(
+                status_code=409,
+                detail=f"Ticker symbol '{symbol_uc}' already exists",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        raise HTTPExceptionWithCode(
+            status_code=409,
+            detail="Ticker creation failed",
+            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+        )

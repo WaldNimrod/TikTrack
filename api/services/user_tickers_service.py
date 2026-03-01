@@ -215,24 +215,22 @@ class UserTickersService:
                     detail="Provider could not fetch data for this symbol. Check ALPHA_VANTAGE_API_KEY in api/.env and Yahoo availability. Ticker not created.",
                     error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
                 )
-            # Check if ticker already exists; canonical symbol from mapping (e.g. BTC-USD for crypto)
+            from .canonical_ticker_service import create_system_ticker
             lookup_sym, _, _ = resolve_symbols_for_fetch(symbol, ticker_type_uc, pm)
             stmt = select(Ticker).where(
                 and_(Ticker.symbol == lookup_sym, Ticker.deleted_at.is_(None))
             )
             ticker = (await db.execute(stmt)).scalar_one_or_none()
             if not ticker:
-                meta = {"provider_mapping_data": pm}
-                ticker = Ticker(
+                ticker = await create_system_ticker(
+                    db=db,
                     symbol=lookup_sym,
-                    company_name=company_name or None,
                     ticker_type=ticker_type_uc,
-                    is_active=True,
+                    company_name=company_name,
+                    metadata={"provider_mapping_data": pm},
+                    skip_live_check=True,
                     status=_USER_CREATED_TICKER_STATUS,
-                    ticker_metadata=meta,
                 )
-                db.add(ticker)
-                await db.flush()
         # Link to user (avoid duplicate)
         existing = await db.execute(
             select(UserTicker).where(

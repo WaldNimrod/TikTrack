@@ -79,6 +79,12 @@ class Alert(Base):
         server_default="false",
         nullable=False,
     )
+    trigger_status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="untriggered",
+        server_default="'untriggered'",
+    )
     triggered_at: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=True,

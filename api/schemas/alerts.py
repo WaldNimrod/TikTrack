@@ -26,6 +26,7 @@ class AlertCreate(BaseModel):
 
 class AlertUpdate(BaseModel):
     is_active: Optional[bool] = None
+    trigger_status: Optional[str] = Field(None, description="untriggered|triggered_read|triggered_unread")
     title: Optional[str] = Field(None, max_length=200)
     message: Optional[str] = None
     condition_field: Optional[str] = None
@@ -50,6 +51,7 @@ class AlertResponse(BaseModel):
     message: Optional[str] = None
     is_active: bool
     is_triggered: bool
+    trigger_status: Optional[str] = None
     triggered_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
     created_at: datetime

@@ -71,6 +71,7 @@ def _alert_to_response(
         "message": alert.message,
         "is_active": alert.is_active,
         "is_triggered": alert.is_triggered,
+        "trigger_status": getattr(alert, "trigger_status", None) or ("triggered_unread" if alert.is_triggered else "untriggered"),
         "triggered_at": alert.triggered_at,
         "expires_at": alert.expires_at,
         "created_at": alert.created_at,
@@ -272,6 +273,12 @@ class AlertsService:
 
         if "is_active" in data:
             alert.is_active = bool(data["is_active"])
+        if "trigger_status" in data:
+            ts = data.get("trigger_status")
+            if ts in ("untriggered", "triggered_unread", "triggered_read"):
+                alert.trigger_status = ts
+                if ts == "untriggered":
+                    alert.is_triggered = False
         if "title" in data:
             alert.title = data["title"]
         if "message" in data:

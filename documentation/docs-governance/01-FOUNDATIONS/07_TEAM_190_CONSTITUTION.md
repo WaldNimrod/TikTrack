@@ -64,3 +64,11 @@ Team 190 stops and requests explicit direction only when a newly observed change
 - touches the same file Team 190 is editing,
 - changes a canonical source-of-truth inside the current scope,
 - or creates a real overwrite / decision-risk for the active task.
+
+## 7) Warning handling (locked)
+
+Operational warnings emitted by enforced local guards are not informational only.
+
+- Any pre-push warning that indicates mixed-scope, drift-risk, or governance misalignment is treated as a required remediation event.
+- The push must be corrected and re-attempted after the warning condition is removed.
+- Team 190 treats unresolved guard warnings as constitutional process debt, not as ignorable output.

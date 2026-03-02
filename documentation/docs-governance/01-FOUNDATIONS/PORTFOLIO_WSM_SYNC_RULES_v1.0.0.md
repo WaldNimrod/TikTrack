@@ -35,6 +35,7 @@ Automation lock:
 - CI enforcement mode: `python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check`
 - CI trigger points: `.github/workflows/lint-enforcement.yml`, `.github/workflows/portfolio-auto-sync.yml`
 - `--check` modes in portfolio enforcement scripts are check-only by contract: they may fail on drift, but must not mutate repository artifacts.
+- Local pre-push guard warnings are treated as blocking remediation signals: the push must be corrected and retried, not ignored.
 
 ---
 
@@ -94,3 +95,4 @@ CI enforcement (check-only, changed files only):
 **log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | TRACK_MODE_RUNTIME_BOUNDARY_CLARIFIED | 2026-02-26**
 **log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | DATE_DISCIPLINE_ENFORCEMENT_LOCK_ADDED | 2026-02-26**
 **log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | CHECK_ONLY_NON_MUTATION_RULE_ADDED | 2026-03-01**
+**log_entry | TEAM_190 | PORTFOLIO_WSM_SYNC_RULES | PRE_PUSH_WARNING_REMEDIATION_RULE_LOCKED | 2026-03-02**

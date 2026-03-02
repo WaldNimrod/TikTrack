@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-02T16:13:22.481934+00:00",
+  "generated_at_utc": "2026-03-02T16:52:59.177643+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -13,8 +13,8 @@
     "current_gate": "GATE_3 (rollback loop EXECUTION_ACTIVE)",
     "active_program_id": "S002-P003",
     "last_gate_event": "GATE_3_EXECUTION_RELEASED \\",
-    "next_required_action": "Team 20/30/40/50/60 execute remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 before GATE_4 packaging by Team 10.",
-    "next_responsible_team": "Team 20, Team 30, Team 40, Team 50, Team 60 (orchestrated by Team 10)"
+    "next_required_action": "Team 20/30/50/60 execute active remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 and background-task orchestration/addendum deliverables before GATE_4 packaging by Team 10. Team 40 remains advisory-only and is engaged only if Team 30 opens a design-assets sub-stream.",
+    "next_responsible_team": "Team 20, Team 30, Team 50, Team 60 (orchestrated by Team 10); Team 40 advisory on-demand only"
   },
   "stages": [
     {
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_3 (rollback loop EXECUTION_ACTIVE); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; active_work_package_id=S002-P003-WP002"
+      "current_gate_mirror": "GATE_3 (rollback loop EXECUTION_ACTIVE); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; active_work_package_id=S002-P003-WP002"
     },
     {
       "program_id": "S002-P004",
@@ -332,9 +332,9 @@
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_3 (rollback loop ACTIVE under Team 10 orchestration)",
+      "current_gate": "GATE_3 (rollback loop EXECUTION_ACTIVE)",
       "is_active": true,
-      "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; scope extended 2026-03-02: +background_task_orchestration (APScheduler migration) +display_name on user_tickers; ref: ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION_v1.0.0.md + G7_ADDENDUM_v1.0.0.md"
+      "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope"
     }
   ],
   "hierarchy": [
@@ -435,16 +435,16 @@
           "program_name": "TikTrack Alignment (D22+D33+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_3 (rollback loop EXECUTION_ACTIVE); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; active_work_package_id=S002-P003-WP002",
+          "current_gate_mirror": "GATE_3 (rollback loop EXECUTION_ACTIVE); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; active_work_package_id=S002-P003-WP002",
           "work_packages": [
             {
               "work_package_id": "S002-P003-WP002",
               "program_id": "S002-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_3 (rollback loop ACTIVE under Team 10 orchestration)",
+              "current_gate": "GATE_3 (rollback loop EXECUTION_ACTIVE)",
               "is_active": true,
-              "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; scope extended 2026-03-02: +background_task_orchestration (APScheduler migration) +display_name on user_tickers; ref: ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION_v1.0.0.md + G7_ADDENDUM_v1.0.0.md"
+              "active_marker_reason": "S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope"
             }
           ]
         },

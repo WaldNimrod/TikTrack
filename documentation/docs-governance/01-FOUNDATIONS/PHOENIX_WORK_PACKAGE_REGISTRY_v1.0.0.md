@@ -40,13 +40,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (rollback loop ACTIVE under Team 10 orchestration) | true | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; scope extended 2026-03-02: +background_task_orchestration (APScheduler migration) +display_name on user_tickers; ref: ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION_v1.0.0.md + G7_ADDENDUM_v1.0.0.md |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (rollback loop EXECUTION_ACTIVE) | true | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_3 (rollback loop ACTIVE under Team 10 orchestration)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_3 (rollback loop EXECUTION_ACTIVE)`, `active_work_package_id=S002-P003-WP002`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-01). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-02). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

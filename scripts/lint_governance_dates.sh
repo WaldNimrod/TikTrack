@@ -23,18 +23,20 @@ if [[ ! -f "$WSM_PATH" ]]; then
   exit 1
 fi
 
-WSM_REF_DATE="$(rg -n 'last_gate_event' "$WSM_PATH" | rg -o '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || true)"
+WSM_REF_DATE="$(grep -n 'last_gate_event' "$WSM_PATH" | grep -Eo '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || true)"
 if [[ -z "$WSM_REF_DATE" ]]; then
   WSM_REF_DATE="$TODAY_UTC"
 fi
 
 extract_date_from_stream() {
-  rg --pcre2 -o '^\*\*date:\*\*\s*\K[0-9]{4}-[0-9]{2}-[0-9]{2}|^date:\s*\K[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1
+  grep -Eo '^\*\*date:\*\*[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}|^date:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}' \
+    | grep -Eo '[0-9]{4}-[0-9]{2}-[0-9]{2}' \
+    | head -1
 }
 
 has_historical_override() {
   local file="$1"
-  rg -qi '^\s*historical_record:\s*true\s*$|\*\*historical_record:\*\*\s*true\s*$' "$file"
+  grep -Eqi '^[[:space:]]*historical_record:[[:space:]]*true[[:space:]]*$|^\*\*historical_record:\*\*[[:space:]]*true[[:space:]]*$' "$file"
 }
 
 changed_docs=()
@@ -42,7 +44,7 @@ while IFS= read -r file; do
   [[ -n "$file" ]] && changed_docs+=("$file")
 done < <(
   git diff --name-only "$BASE_REF" "$HEAD_REF" \
-    | rg -N '^(?:_COMMUNICATION/|documentation/docs-governance/).+\.md$' \
+    | grep -E '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$' \
     || true
 )
 

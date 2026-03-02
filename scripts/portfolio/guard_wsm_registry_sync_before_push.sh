@@ -35,6 +35,38 @@ if [[ "$OUTGOING_COUNT" == "0" ]]; then
   exit 0
 fi
 
+ALL_OUTGOING_FILES="$(git diff --name-only "$RANGE" || true)"
+
+warn_count=0
+category_governance=0
+category_architect_inbox=0
+category_code=0
+category_team_comms=0
+while IFS= read -r path; do
+  [[ -z "$path" ]] && continue
+  if [[ "$path" == _COMMUNICATION/_ARCHITECT_INBOX/* ]]; then
+    category_architect_inbox=1
+  fi
+  if [[ "$path" == _COMMUNICATION/* || "$path" == documentation/docs-governance/* ]]; then
+    category_governance=1
+  fi
+  if [[ "$path" == _COMMUNICATION/team_*/* ]]; then
+    category_team_comms=1
+  fi
+  if [[ "$path" == api/* || "$path" == ui/* || "$path" == agents_os/* || "$path" == tests/* || "$path" == scripts/* ]]; then
+    category_code=1
+  fi
+done <<< "$ALL_OUTGOING_FILES"
+
+warn_count=$((category_governance + category_architect_inbox + category_code + category_team_comms))
+if [[ "$warn_count" -ge 3 ]]; then
+  echo "PORTFOLIO PRE-PUSH GUARD: WARNING (wide mixed-scope outgoing push; review commit width)." >&2
+  echo "  categories: governance=$category_governance architect_inbox=$category_architect_inbox team_comms=$category_team_comms code=$category_code" >&2
+fi
+
+echo "PORTFOLIO PRE-PUSH GUARD: running date-lint for outgoing range ${RANGE}"
+bash scripts/lint_governance_dates.sh "${UPSTREAM_REF:-}" HEAD
+
 TOUCHED_FILES="$(git diff --name-only "$RANGE" -- "${PORTFOLIO_AUTHORITY_FILES[@]}")"
 if [[ -z "$TOUCHED_FILES" ]]; then
   echo "PORTFOLIO PRE-PUSH GUARD: PASS (outgoing commits do not touch portfolio authority files)."

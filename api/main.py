@@ -6,6 +6,7 @@ Status: COMPLETED
 Main FastAPI application with all routes and middleware.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -17,12 +18,24 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications, background_jobs
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from . import __version__
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """APScheduler start/stop per ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION."""
+    from .background.scheduler_startup import start_scheduler, stop_scheduler
+    await start_scheduler()
+    logger.info("APScheduler started — background jobs active")
+    yield
+    await stop_scheduler()
+    logger.info("APScheduler stopped")
+
 
 # Create FastAPI app (version SSOT: api/__init__.py)
 app = FastAPI(
@@ -30,7 +43,8 @@ app = FastAPI(
     version=__version__,
     description="Unified API Specification (Fortress Protocol)",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Register exception handlers BEFORE routers to ensure they're used
@@ -110,6 +124,7 @@ app.include_router(system.router, prefix=settings.api_v1_prefix)
 app.include_router(notes.router, prefix=settings.api_v1_prefix)
 app.include_router(alerts.router, prefix=settings.api_v1_prefix)
 app.include_router(notifications.router, prefix=settings.api_v1_prefix)
+app.include_router(background_jobs.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health")

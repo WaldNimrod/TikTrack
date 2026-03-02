@@ -1,0 +1,6 @@
+JOB_EVIDENCE_CHECK_QUERY_EXIT 0
+job_name|has_completed_target_runtime
+check_alert_conditions|f
+sync_intraday|f
+(2 rows)
+JOB_EVIDENCE_CHECK_EXIT 1

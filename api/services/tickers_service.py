@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError, ProgrammingError
 import logging
 
 from ..models.tickers import Ticker
+from ..models.user_tickers import UserTicker
 from ..models.ticker_prices import TickerPrice
 from ..models.ticker_prices_intraday import TickerPriceIntraday
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
@@ -216,6 +217,11 @@ class TickersService:
         return _ticker_to_response(ticker)
 
     async def delete_ticker(self, db: AsyncSession, ticker_id: str) -> None:
+        """
+        Soft-delete system ticker. Per ARCHITECT_DIRECTIVE_G7:
+        - Set ticker status='cancelled', deleted_at=now()
+        - Cascade: all linked user_tickers → status='cancelled', deleted_at=now()
+        """
         try:
             ticker_uuid = ulid_to_uuid(ticker_id)
         except Exception:
@@ -235,7 +241,21 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
-        ticker.deleted_at = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
+        ticker.status = "cancelled"
+        ticker.deleted_at = now
+        ticker.is_active = False
+        # Status cascade: all linked user_tickers → cancelled + deleted_at
+        user_ticker_stmt = select(UserTicker).where(
+            and_(
+                UserTicker.ticker_id == ticker_uuid,
+                UserTicker.deleted_at.is_(None),
+            )
+        )
+        ut_result = await db.execute(user_ticker_stmt)
+        for ut in ut_result.scalars().all():
+            ut.status = "cancelled"
+            ut.deleted_at = now
         await db.commit()
 
     async def get_summary(self, db: AsyncSession) -> dict:

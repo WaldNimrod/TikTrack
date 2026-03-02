@@ -1,0 +1,4 @@
+ENDPOINT /background-jobs ERROR timeout:timed out
+ENDPOINT /background-jobs/health ERROR timeout:timed out
+ENDPOINT /background-jobs/runs ERROR timeout:timed out
+BACKGROUND_JOBS_ENDPOINTS_EXIT 1

@@ -2,22 +2,20 @@
 Notifications Router - G7 (Notification Bell Widget)
 ARCHITECT_DIRECTIVE_G7_REMEDIATION_S002_P003_WP002_SUPPLEMENT Gap C
 
-GET  /api/v1/notifications
+GET   /api/v1/notifications
 PATCH /api/v1/notifications/{id}/read
 PATCH /api/v1/notifications/read-all
 """
 
 import uuid
 from typing import Optional
-from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
 
 from ..core.database import get_db
 from ..utils.dependencies import get_current_user
 from ..models.identity import User
-from ..models.notification import Notification
+from ..services.notifications_service import get_notifications_service
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
@@ -31,39 +29,14 @@ async def list_notifications(
     db: AsyncSession = Depends(get_db),
 ):
     """List notifications for current user. Response: { count, items }."""
-    base = and_(
-        Notification.user_id == current_user.id,
-        Notification.deleted_at.is_(None),
+    svc = get_notifications_service()
+    return await svc.list_notifications(
+        db=db,
+        user_id=current_user.id,
+        is_read=is_read,
+        limit=limit,
+        offset=offset,
     )
-    if is_read is not None:
-        base = and_(base, Notification.is_read == is_read)
-
-    count_stmt = select(func.count()).select_from(Notification).where(base)
-    total = (await db.execute(count_stmt)).scalar() or 0
-
-    stmt = (
-        select(Notification)
-        .where(base)
-        .order_by(Notification.created_at.desc())
-        .offset(offset)
-        .limit(limit)
-    )
-    result = await db.execute(stmt)
-    rows = result.scalars().all()
-
-    items = [
-        {
-            "id": str(n.id),
-            "alert_id": str(n.alert_id) if n.alert_id else None,
-            "type": n.type,
-            "title": n.title,
-            "message": n.message,
-            "is_read": n.is_read,
-            "created_at": n.created_at,
-        }
-        for n in rows
-    ]
-    return {"count": total if is_read is None else total, "items": items}
 
 
 @router.patch("/read-all", status_code=204)
@@ -72,18 +45,8 @@ async def mark_all_read(
     db: AsyncSession = Depends(get_db),
 ):
     """Mark all notifications as read for current user."""
-    stmt = select(Notification).where(
-        and_(
-            Notification.user_id == current_user.id,
-            Notification.is_read == False,
-            Notification.deleted_at.is_(None),
-        )
-    )
-    result = await db.execute(stmt)
-    for n in result.scalars().all():
-        n.is_read = True
-        n.read_at = datetime.now(timezone.utc)
-    await db.commit()
+    svc = get_notifications_service()
+    await svc.mark_all_read(db=db, user_id=current_user.id)
 
 
 @router.patch("/{notification_id}/read", status_code=204)
@@ -93,17 +56,7 @@ async def mark_notification_read(
     db: AsyncSession = Depends(get_db),
 ):
     """Mark one notification as read."""
-    stmt = select(Notification).where(
-        and_(
-            Notification.id == notification_id,
-            Notification.user_id == current_user.id,
-            Notification.deleted_at.is_(None),
-        )
-    )
-    result = await db.execute(stmt)
-    n = result.scalar_one_or_none()
-    if not n:
+    svc = get_notifications_service()
+    ok = await svc.mark_one_read(db=db, user_id=current_user.id, notification_id=notification_id)
+    if not ok:
         raise HTTPException(status_code=404, detail="Notification not found")
-    n.is_read = True
-    n.read_at = datetime.now(timezone.utc)
-    await db.commit()

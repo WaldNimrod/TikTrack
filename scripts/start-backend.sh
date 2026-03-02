@@ -38,9 +38,9 @@ fi
 echo -e "${GREEN}📦 Activating virtual environment...${NC}"
 source venv/bin/activate
 
-# Check if requirements are installed
-if [ ! -f "venv/bin/uvicorn" ]; then
-    echo -e "${YELLOW}⚠️  Dependencies not installed. Installing...${NC}"
+# Check if requirements are installed (uvicorn + apscheduler required for lifespan)
+if [ ! -f "venv/bin/uvicorn" ] || ! python -c "import apscheduler" 2>/dev/null; then
+    echo -e "${YELLOW}⚠️  Dependencies missing or stale. Installing/updating...${NC}"
     pip install -r requirements.txt
     echo -e "${GREEN}✅ Dependencies installed${NC}"
 fi

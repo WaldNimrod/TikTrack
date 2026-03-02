@@ -5,6 +5,7 @@ ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION §2.1, §4.2
 
 import logging
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -13,7 +14,7 @@ from .scheduler_registry import JOB_REGISTRY
 
 logger = logging.getLogger(__name__)
 
-_scheduler: AsyncIOScheduler | None = None
+_scheduler: Optional[AsyncIOScheduler] = None
 
 
 def _get_minutes(job_config: dict) -> int:
@@ -76,5 +77,5 @@ async def stop_scheduler():
         logger.info("APScheduler stopped")
 
 
-def get_scheduler() -> AsyncIOScheduler | None:
+def get_scheduler() -> Optional[AsyncIOScheduler]:
     return _scheduler

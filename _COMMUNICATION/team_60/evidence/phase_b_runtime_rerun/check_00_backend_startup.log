@@ -1,0 +1,91 @@
+---
+pid: 44885
+cwd: "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix"
+command: "cd /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix && . api/venv/bin/activate && PYTHONPATH=\"/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api:$PYTHONPATH\" uvicorn api.main:app --host 0.0.0.0 --port 8082"
+started_at: 2026-03-02T21:36:54.500Z
+running_for_seconds: 0     
+---
+INFO:     Started server process [44891]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/starlette/routing.py", line 694, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/fastapi/routing.py", line 153, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 175, in __aenter__
+    return await self.gen.__anext__()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/main.py", line 32, in lifespan
+    from .background.scheduler_startup import start_scheduler, stop_scheduler
+  File "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/background/scheduler_startup.py", line 9, in <module>
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+ModuleNotFoundError: No module named 'apscheduler'
+
+ERROR:    Application startup failed. Exiting.
+
+---
+exit_code: 3
+elapsed_ms: 871
+ended_at: 2026-03-02T21:36:55.371Z
+---

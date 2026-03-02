@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # D35: Attachments storage base (Team 60 provides path; default relative to project root)
     storage_uploads_base: str = os.getenv("STORAGE_UPLOADS_BASE", "storage/uploads")
     
+    # Background jobs (ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION)
+    intraday_interval_minutes: int = 15
+    
     # Debug: include exception detail in 500 responses (set DEBUG=true in api/.env)
     debug: bool = False
     

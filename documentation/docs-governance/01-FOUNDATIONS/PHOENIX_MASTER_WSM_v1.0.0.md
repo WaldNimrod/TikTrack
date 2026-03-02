@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-01** — Team 10 consumed Team 170 OA-01 reconciliation response (Option 2), closed the scope gap, and released GATE_3 execution under four-scope acceptance boundary.
+**Gate-owner update evidence:** This block was updated **2026-03-02** — Team 10 consumed Team 190 canonical alignment validation note (`PASS_WITH_OPEN_ITEMS`) and applied the required WSM precision corrections (background-task orchestration explicitly included; Team 40 routing set to advisory-only).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution released under D22 + D33 + D34 + D35 boundary |
+| active_flow | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | S002-P003-WP002 (rollback loop after GATE_7 REJECT / CODE_CHANGE_REQUIRED) |
@@ -108,8 +108,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (GATE_3 execution owner; OA-01 closed) |
 | last_gate_event | GATE_3_EXECUTION_RELEASED \| 2026-03-01 \| Team 170 OA-01 Option 2 reconciled and consumed by Team 10 \| S002_P003_WP002_ACCEPTANCE_BOUNDARY_RECONCILIATION_NOTE_v1.0.0.md |
-| next_required_action | Team 20/30/40/50/60 execute remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 before GATE_4 packaging by Team 10. |
-| next_responsible_team | Team 20, Team 30, Team 40, Team 50, Team 60 (orchestrated by Team 10) |
+| next_required_action | Team 20/30/50/60 execute active remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 and background-task orchestration/addendum deliverables before GATE_4 packaging by Team 10. Team 40 remains advisory-only and is engaged only if Team 30 opens a design-assets sub-stream. |
+| next_responsible_team | Team 20, Team 30, Team 50, Team 60 (orchestrated by Team 10); Team 40 advisory on-demand only |
 
 ---
 

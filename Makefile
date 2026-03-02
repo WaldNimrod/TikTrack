@@ -137,6 +137,23 @@ migrate-g7-M005:
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005_job_run_log.sql
 	@echo "✅ G7 M-005 complete."
 
+migrate-g7-M005b-extended:
+	@echo "🔄 G7 M-005b — job_run_log extended schema"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M005b_job_run_log_extended.sql
+	@echo "✅ G7 M-005b complete."
+
+## G7 Phase A (PHASE_A_ACTIVATION order: M-001..M-004, M-005b, M-006, M-007)
+migrate-g7-phase-a:
+	@echo "🔄 G7 Phase A — migrations (ON_ERROR_STOP=1)"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M001_user_tickers_status_notes.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M002_alerts_trigger_status.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M003_notifications.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M004_admin_data_schema.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M005b_job_run_log_extended.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M006_tickers_status_verify.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M007_alerts_data_migration.sql
+	@echo "✅ G7 Phase A complete."
+
 migrate-g7-M005b:
 	@echo "🔄 G7 M-005b — grant TikTrackDbAdmin on admin_data"
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005b_grant_admin_data.sql

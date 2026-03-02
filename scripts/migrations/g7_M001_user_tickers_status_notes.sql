@@ -30,3 +30,41 @@ BEGIN
         COMMENT ON COLUMN user_data.user_tickers.notes IS 'User personal subtitle/memo for this ticker';
     END IF;
 END $$;
+
+-- display_name: user-defined display label (ADDENDUM)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'user_data' AND table_name = 'user_tickers' AND column_name = 'display_name'
+    ) THEN
+        ALTER TABLE user_data.user_tickers
+        ADD COLUMN display_name VARCHAR(100) NULL;
+        COMMENT ON COLUMN user_data.user_tickers.display_name IS 'User-defined display label (personal alias, optional)';
+    END IF;
+END $$;
+
+-- updated_at, updated_by: audit fields (PHASE_A_ACTIVATION)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'user_data' AND table_name = 'user_tickers' AND column_name = 'updated_at'
+    ) THEN
+        ALTER TABLE user_data.user_tickers
+        ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
+        COMMENT ON COLUMN user_data.user_tickers.updated_at IS 'Last update timestamp';
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'user_data' AND table_name = 'user_tickers' AND column_name = 'updated_by'
+    ) THEN
+        ALTER TABLE user_data.user_tickers
+        ADD COLUMN updated_by UUID REFERENCES user_data.users(id);
+        COMMENT ON COLUMN user_data.user_tickers.updated_by IS 'User who last updated';
+    END IF;
+END $$;

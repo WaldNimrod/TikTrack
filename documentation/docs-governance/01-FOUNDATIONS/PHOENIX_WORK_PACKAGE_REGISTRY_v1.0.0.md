@@ -40,7 +40,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (rollback loop ACTIVE under Team 10 orchestration) | true | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (rollback loop ACTIVE under Team 10 orchestration) | true | S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; scope extended 2026-03-02: +background_task_orchestration (APScheduler migration) +display_name on user_tickers; ref: ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION_v1.0.0.md + G7_ADDENDUM_v1.0.0.md |
 
 
 
@@ -55,3 +55,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_STAGE_S002_NO_ACTIVE_WP | 2026-02-24**
 **log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_GATE2_APPROVED_GATE3_NO_ACTIVE_WP_YET | 2026-02-25**
 **log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_WP002_G3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**
+**log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | TEAM_00_ALIGNMENT_SCOPE_EXTENSION_NOTE_APPLIED | 2026-03-02**

@@ -56,9 +56,9 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | --- | --- | --- | --- |
 | S001 | D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S002 | D22, D23 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S003 | D33, D39, D40, D38, D26 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, WatchLists, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S003 | D33, D39, D40, D26 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, WatchLists, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S004 | D36, D37 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S005 | D24, D25, D27, D28, D29, D31 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S005 | D24, D25, D27, D28, D29, D31, D38, D26-Phase2 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory, TagRegistry, WatchListsEnhancement) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S006 | D30, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 
 ---
@@ -73,7 +73,7 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 
 ### שלב 3 — שכבת נתונים יסודית (Essential Data)
 
-D15_SETTINGS (Preferences), SYSTEM_MANAGEMENT (D40), TAG_MANAGEMENT + WATCH_LISTS (D38+D26), ALERTS & NOTES, USER_TICKERS & TICKERS_MGR.
+D15_SETTINGS (Preferences), SYSTEM_MANAGEMENT (D40), WATCH_LISTS (D26), ALERTS & NOTES, USER_TICKERS & TICKERS_MGR.
 
 ### שלב 4 — המעגל הפיננסי (Financial Execution)
 
@@ -81,11 +81,19 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 
 ### שלב 5 — ישויות מורכבות (Trades/Plans)
 
-תוכניות טריידים, טריידים, דשבורד טיקר, יומן מסחר והיסטוריית טרייד (D31).
+תוכניות טריידים, טריידים, דשבורד טיקר, יומן מסחר והיסטוריית טרייד (D31), וניהול תגיות (D38).
+בנוסף: D26-Phase2 (watch_lists enhancement) נפתח לאחר D29 GATE_8 PASS ומוסיף Position, P/L, P/L%, ATR(14) ו-flag_color filtering משופר.
 
 ### שלב 6 — תובנות וניתוח (Advanced Analytics)
 
 ניתוח אסטרטגיות, מצב תיק; מימוש דשבורדים רמה 1.
+D32 (portfolio_state) מחייב אפיון ארכיטקטוני ייעודי ומאושר Nimrod לפני פתיחת S006 GATE_0, כולל: daily_portfolio_snapshots job, סכימת snapshots, backfill, retention policy, וכללי chart granularity לפי טווח זמן.
+
+### Tag Assignment Rollout (S004 onward)
+
+Inline tag assignment נבנה יחד עם כל עמוד ישות החל מ-S004, ולא כרטרופיט מאוחר.
+ישויות חובה לתמיכת tags: user_ticker, alert, trade, trade_plan, execution, cash_flow.
+D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום התגיות; ההשמה inline בישויות היא מסלול נפרד ומדורג לפי שלבים.
 
 ---
 
@@ -120,7 +128,7 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 | 13 | D33 | user_tickers | הטיקרים שלי | S003 |
 | 14 | D39 | preferences | העדפות | S003 |
 | 15 | D36 | executions | ביצועים | S004 |
-| 16 | D37 | data_import | ייבוא נתונים | S004 |
+| 16 | D37 | data_import | ייבוא נתונים (dual mode: cash_flows + executions; IBKR + IBI; BaseConnector; archive + audit log) | S004 |
 | 17 | D24 | trade_plans | תוכניות טריידים | S005 |
 | 18 | D25 | ai_analysis | אנליזת AI | S005 |
 | 19 | D26 | watch_lists | רשימות צפייה | S003 |
@@ -130,7 +138,8 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 | 23 | D30 | strategy_analysis | ניתוח אסטרטגיות | S006 |
 | 24 | D31 | trades_history | היסטוריית טרייד | S005 |
 | 25 | D32 | portfolio_state | מצב תיק היסטורי | S006 |
-| 26 | D38 | tag_management | ניהול תגיות | S003 |
+| 26 | D38 | tag_management | ניהול תגיות | S005 |
+| 26.1 | D26-Phase2 | watch_lists (enhancement) | שדרוג רשימות צפייה: Position, P/L, P/L%, ATR(14), flag_color filter | S005 |
 | 27 | D40 | system_management | ניהול מערכת | S003 |
 | 28 | D41 | design_system | ניהול עיצובים | — |
 
@@ -140,3 +149,4 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | v1.0.0_CREATED | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | SINGLE_ROADMAP_NARRATIVE_AND_PAGES | 2026-02-23**
+**log_entry | TEAM_170 | ROADMAP_AMENDED | 5_AMENDMENTS_PER_DIRECTIVE_v1.0.0 | 2026-03-02**

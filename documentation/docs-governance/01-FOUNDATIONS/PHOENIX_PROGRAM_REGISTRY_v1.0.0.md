@@ -40,13 +40,13 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era) |
-| S002 | S002-P003 | TikTrack Alignment (D22+D34+D35) | TIKTRACK | ACTIVE | GATE_3 (rollback loop ACTIVE under Team 10 orchestration); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; active_work_package_id=S002-P003-WP002 |
+| S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | ACTIVE | GATE_3 (rollback loop EXECUTION_ACTIVE); active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package; active_work_package_id=S002-P003-WP002 |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
 | S003 | S003-P003 | System Settings (D39+D40) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
-| S003 | S003-P005 | Tags & Watch Lists (D38+D26) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
+| S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins) |
@@ -67,6 +67,14 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 
 
 ---
+### S005 stage context notes (TikTrack)
+
+- D38 (tag_management): added to S005 from S003 per architectural decision 2026-03-02.
+- D26-Phase2 (watch_lists enhancement): new WP in S005 after D29 GATE_8 PASS (scope: ATR, Position, P&L%, P&L columns; flag_color filter enhancement).
+- Tag assignment: built inline per entity page as each page is built (S003 onward per entity).
+
+---
+
 ## Agents_OS Completion Gate
 
 ```
@@ -82,7 +90,7 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-01). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-01):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_3 (rollback loop ACTIVE under Team 10 orchestration); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package.
+**WSM mirror (2026-03-01):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_3 (rollback loop EXECUTION_ACTIVE); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); canonical remediation directives approved and converted to Team 10 execution package.
 
 ---
 
@@ -99,3 +107,4 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S001_P002_STATUS_PIPELINE_ACTIVATION_AUTHORIZED + S002_P001_STATUS_COMPLETE + S003_S006_AGENTS_OS_PLACEHOLDERS_ADDED | 2026-02-27**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | SEQUENCING_REVISED_GENERATION_LAYER_ACCELERATED: TEST_TEMPLATE_GENERATOR→S003 + BUSINESS_LOGIC_VALIDATOR→S004 + SPEC_DRAFT_GENERATOR→S004 + ANALYTICS_VALIDATOR→S005 + AGENTS_OS_COMPLETE_GATE_ADDED | 2026-03-01**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | INTEGRATED_ROADMAP_V1_1_0_RECONCILIATION_B4_B5_APPLIED | 2026-03-01**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | TEAM_00_CANONICAL_ALIGNMENT_CORRECTIONS_APPLIED | 2026-03-02**

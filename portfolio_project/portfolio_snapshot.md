@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-01T21:29:35.781764+00:00`
+- Generated (UTC): `2026-03-02T16:13:22.481934+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_3 (rollback loop ACTIVE under Team 10 orchestration)`
-- next_required_action: `Team 20/30/40/50/60 execute assigned remediation streams and submit completion evidence to Team 10 for GATE_4 package assembly.`
+- current_gate: `GATE_3 (rollback loop EXECUTION_ACTIVE)`
+- next_required_action: `Team 20/30/40/50/60 execute remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 before GATE_4 packaging by Team 10.`
 
 ## Portfolio Counts
 
@@ -41,7 +41,7 @@
 
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
-    ├── **Program** `S002-P003` — TikTrack Alignment (D22+D34+D35) | ACTIVE | domain: **TIKTRACK**
+    ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_3 (rollback loop ACTIVE under Team 10 orchestration) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
@@ -57,7 +57,7 @@
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P005` — Tags & Watch Lists (D38+D26) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P005` — Watch Lists (D26) | PLANNED | domain: **TIKTRACK**
 
     └── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 

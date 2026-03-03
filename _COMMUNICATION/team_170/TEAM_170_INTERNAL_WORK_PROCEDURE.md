@@ -1,10 +1,11 @@
 # Team 170 — נוהל עבודה פנימי (מחייב)
 **project_domain:** TIKTRACK / AGENTS_OS
+**date:** 2026-03-03
 
 **id:** TEAM_170_INTERNAL_WORK_PROCEDURE  
 **owner:** Team 170 (Specification Engineering / SSOT Authority)  
 **status:** 🔒 **מחייב** — נוהל עבודה פנימי צוות 170  
-**last_updated:** 2026-02-26  
+**last_updated:** 2026-03-03  
 **מקור:** הנחיית אדריכלית — אפין אדריכלים; תפקיד צוות 170 ליישור, תאימות, הפקת Program קנוני והגשה לולידציה.
 
 ---

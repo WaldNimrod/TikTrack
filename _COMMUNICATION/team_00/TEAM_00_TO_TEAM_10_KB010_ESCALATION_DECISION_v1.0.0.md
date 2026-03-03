@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 10 | KB-010 Escalation Decision
 **Document ID:** TEAM_00_TO_TEAM_10_KB010_ESCALATION_DECISION_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 10 (Gateway)
 **CC:** Team 20 (Backend)

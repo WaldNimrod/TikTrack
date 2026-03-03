@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 170 | DDL Reconciliation Activation
 **Document ID:** TEAM_00_TO_TEAM_170_DDL_RECONCILIATION_ACTIVATION_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 170 (Spec / Governance / Documentation)
 **Authority:** ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0

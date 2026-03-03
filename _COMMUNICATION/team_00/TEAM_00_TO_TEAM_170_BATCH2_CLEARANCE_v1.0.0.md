@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 170 | Batch 2 Clearance — DDL V2.6
 **Document ID:** TEAM_00_TO_TEAM_170_BATCH2_CLEARANCE_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 170 (Spec / Governance / Documentation)
 **Re:** Team 20 schema handoff delivered — cleared to produce DDL V2.6

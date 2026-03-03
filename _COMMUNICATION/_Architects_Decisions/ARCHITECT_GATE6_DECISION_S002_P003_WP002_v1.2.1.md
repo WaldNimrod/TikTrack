@@ -1,7 +1,7 @@
 # ARCHITECT GATE_6 DECISION — S002-P003-WP002
 **Document ID:** ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.2.1
 **Version:** 1.2.1
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **Authority:** Team 00 (Chief Architect)
 **Decision:** ✅ GATE_6 APPROVED
 **Package reviewed:** SUBMISSION_v1.2.1 (DOC_ONLY_LOOP remediation)

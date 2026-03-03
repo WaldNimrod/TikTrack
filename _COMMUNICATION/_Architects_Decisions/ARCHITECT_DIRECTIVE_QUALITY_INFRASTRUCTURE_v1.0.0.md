@@ -1,7 +1,7 @@
 # ARCHITECT DIRECTIVE — Quality Infrastructure Lock
 **ID:** ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0
 **Version:** 1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **Authority:** Team 00 (Chief Architect)
 **Status:** LOCKED — Iron Rules established
 **Trigger:** Team 10 KB Lock Request (CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md)

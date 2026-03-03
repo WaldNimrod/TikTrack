@@ -1,4 +1,5 @@
 # TEAM_20 → TEAM_170 | PRODUCTION SCHEMA CONFIRMATION
+historical_record: true
 
 **project_domain:** TIKTRACK  
 **id:** TEAM_20_PRODUCTION_SCHEMA_CONFIRMATION_v1.0.0  

@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 90 | Batch 2 Clearance — GATE_6 DOC_ONLY
 **Document ID:** TEAM_00_TO_TEAM_90_BATCH2_CLEARANCE_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 90 (Validation)
 **Re:** GF-G6-101 resolved — cleared to execute v1.2.1 submission

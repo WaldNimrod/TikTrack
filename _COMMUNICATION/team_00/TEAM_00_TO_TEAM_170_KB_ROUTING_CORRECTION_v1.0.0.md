@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 170 | KB Routing Correction + DDL V2.6 Critical Note
 **Document ID:** TEAM_00_TO_TEAM_170_KB_ROUTING_CORRECTION_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 170 (Spec / Governance)
 **CC:** Team 10 (Gateway)

@@ -1,6 +1,6 @@
 # TEAM 00 → TEAM 10 | KB Decision Package
 **Document ID:** TEAM_00_TO_TEAM_10_KB_DECISION_PACKAGE_v1.0.0
-**Date:** 2026-03-03
+**date:** 2026-03-03
 **From:** Team 00 (Chief Architect)
 **To:** Team 10 (Gateway)
 **CC:** Team 100 (Architecture Review — awareness)

@@ -3,8 +3,22 @@ name: Phoenix CI Quality Gate
 on:
   push:
     branches: [main, develop]
+    paths-ignore:
+      - "documentation/**"
+      - "_COMMUNICATION/**"
+      - "agents_os/**"
+      - "blueprints/**"
+      - "raw_inputs/**"
+      - "*.md"
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - "documentation/**"
+      - "_COMMUNICATION/**"
+      - "agents_os/**"
+      - "blueprints/**"
+      - "raw_inputs/**"
+      - "*.md"
 
 jobs:
   backend-quality:
@@ -21,7 +35,7 @@ jobs:
         run: |
           cd api
           python3 -m venv venv
-          . venv/bin/activate
+          source venv/bin/activate
           pip install --upgrade pip
           pip --version
           pip install -r requirements.txt -q
@@ -29,31 +43,42 @@ jobs:
 
       - name: Unit Tests [BLOCKING]
         run: |
-          . api/venv/bin/activate
+          source api/venv/bin/activate
           python3 -m pytest tests/unit/ -v --tb=short
         # BLOCKING: failure here = PR cannot merge
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+          JWT_SECRET_KEY: "ci-test-key-must-be-at-least-64-characters-long-for-validation-to-pass-abcdefghijklmnop"
+          ENCRYPTION_KEY: "ci-test-encryption-key-32chars-ab"
 
-      - name: Security Scan - Bandit HIGH [BLOCKING]
+      - name: Suite B Cache Failover [BLOCKING]
         run: |
-          . api/venv/bin/activate
+          source api/venv/bin/activate
+          python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v
+        # BLOCKING: external-data replay path must stay healthy
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+          JWT_SECRET_KEY: "ci-test-key-must-be-at-least-64-characters-long-for-validation-to-pass-abcdefghijklmnop"
+          ENCRYPTION_KEY: "ci-test-encryption-key-32chars-ab"
+
+      - name: Security Scan Bandit HIGH [BLOCKING]
+        run: |
+          source api/venv/bin/activate
           bandit -r api/ --exclude api/venv -lll
         # BLOCKING: HIGH severity security issues = PR cannot merge
-        # -lll = only HIGH confidence, HIGH severity
 
       - name: Dependency Audit [INFORMATIONAL]
         run: |
-          . api/venv/bin/activate
+          source api/venv/bin/activate
           pip-audit --format columns || true
         # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
-        # Non-blocking until KB-010/011 resolved (|| true keeps CI green)
         continue-on-error: true
 
-      - name: Type Safety - mypy [INFORMATIONAL]
+      - name: Type Safety mypy [INFORMATIONAL]
         run: |
-          . api/venv/bin/activate
+          source api/venv/bin/activate
           mypy api/ --config-file api/mypy.ini || true
         # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
-        # Non-blocking until KB-006 is resolved
         continue-on-error: true
 
   frontend-quality:
@@ -65,9 +90,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "ui/package-lock.json"
 
       - name: Install dependencies
-        run: cd ui && npm install
+        run: cd ui && npm ci
 
       - name: Frontend Build [BLOCKING]
         run: cd ui && npx vite build
@@ -76,11 +103,9 @@ jobs:
       - name: ESLint [INFORMATIONAL]
         run: cd ui && ./node_modules/.bin/eslint . --ext js,jsx --report-unused-disable-directives || true
         # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
-        # Non-blocking until KB-008/009 resolved
         continue-on-error: true
 
       - name: npm Security Audit [INFORMATIONAL]
         run: cd ui && npm audit || true
         # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
-        # Non-blocking until KB-012/013 resolved
         continue-on-error: true

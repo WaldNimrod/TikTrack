@@ -105,7 +105,7 @@ class TestAccessTokenCreation:
         assert jti1 != jti2
 
     def test_create_access_token_decodable(self, auth_service):
-        from jose import jwt
+        import jwt
         from api.core.config import settings
 
         user = self._make_user()

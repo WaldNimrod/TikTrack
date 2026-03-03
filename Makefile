@@ -3,7 +3,7 @@
 # Team 60 (DevOps & Platform)
 # ============================================
 
-.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook
+.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook bootstrap-quality-tools verify-quality-tools install-pre-commit run-pre-commit-all
 
 # Database connection (from .env)
 DATABASE_URL ?= $(shell grep DATABASE_URL api/.env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
@@ -25,6 +25,23 @@ install-pre-push-hook:
 	@cp scripts/git-hooks/pre-push .git/hooks/pre-push
 	@chmod +x .git/hooks/pre-push
 	@echo "✅ Installed local pre-push hook."
+
+## Install reproducible quality toolchain (bandit, pip-audit, detect-secrets, mypy) in api/venv.
+bootstrap-quality-tools:
+	@bash scripts/bootstrap-quality-tools.sh
+
+## Verify quality tools are available in api/venv.
+verify-quality-tools:
+	@bash -lc '. api/venv/bin/activate && bandit --version && pip-audit --version && detect-secrets --version && mypy --version'
+
+## Install pre-commit hooks for this clone.
+install-pre-commit:
+	@bash -lc '. api/venv/bin/activate && pre-commit install'
+	@echo "✅ Installed pre-commit hooks."
+
+## Run pre-commit hooks across entire repository.
+run-pre-commit-all:
+	@bash -lc '. api/venv/bin/activate && pre-commit run --all-files'
 
 ## Full DB backup + verify (run before seed). Exit 0 only if backup created and verified.
 db-backup:
@@ -295,6 +312,10 @@ help:
 	@echo "  make db-test-clean       - Delete all test data (is_test_data = true)"
 	@echo "  make db-test-fill        - Seed test data only (no backup)"
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
+	@echo "  make bootstrap-quality-tools - Install quality tools in api/venv (bandit, pip-audit, detect-secrets, mypy)"
+	@echo "  make verify-quality-tools - Verify quality tools are available in api/venv"
+	@echo "  make install-pre-commit - Install pre-commit hooks in .git/hooks"
+	@echo "  make run-pre-commit-all - Run pre-commit hooks for all files"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
 	@echo "  make seed-tickers       - Seed market_data.tickers (required before sync)"

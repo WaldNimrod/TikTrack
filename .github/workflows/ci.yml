@@ -1,0 +1,86 @@
+name: Phoenix CI Quality Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-quality:
+    name: Backend Tests & Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd api
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip --version
+          pip install -r requirements.txt -q
+          pip install -r requirements-quality-tools.txt -q
+
+      - name: Unit Tests [BLOCKING]
+        run: |
+          . api/venv/bin/activate
+          python3 -m pytest tests/unit/ -v --tb=short
+        # BLOCKING: failure here = PR cannot merge
+
+      - name: Security Scan - Bandit HIGH [BLOCKING]
+        run: |
+          . api/venv/bin/activate
+          bandit -r api/ --exclude api/venv -lll
+        # BLOCKING: HIGH severity security issues = PR cannot merge
+        # -lll = only HIGH confidence, HIGH severity
+
+      - name: Dependency Audit [INFORMATIONAL]
+        run: |
+          . api/venv/bin/activate
+          pip-audit --format columns || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
+        # Non-blocking until KB-010/011 resolved (|| true keeps CI green)
+        continue-on-error: true
+
+      - name: Type Safety - mypy [INFORMATIONAL]
+        run: |
+          . api/venv/bin/activate
+          mypy api/ --config-file api/mypy.ini || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
+        # Non-blocking until KB-006 is resolved
+        continue-on-error: true
+
+  frontend-quality:
+    name: Frontend Build & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: cd ui && npm install
+
+      - name: Frontend Build [BLOCKING]
+        run: cd ui && npx vite build
+        # BLOCKING: build must succeed for merge
+
+      - name: ESLint [INFORMATIONAL]
+        run: cd ui && ./node_modules/.bin/eslint . --ext js,jsx --report-unused-disable-directives || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
+        # Non-blocking until KB-008/009 resolved
+        continue-on-error: true
+
+      - name: npm Security Audit [INFORMATIONAL]
+        run: cd ui && npm audit || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
+        # Non-blocking until KB-012/013 resolved
+        continue-on-error: true

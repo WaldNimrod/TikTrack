@@ -228,7 +228,7 @@ function generateVisualDiffHTML(report, blueprintContent, reactContent) {
 /**
  * Main function
  */
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   
   if (args.length < 2) {
@@ -270,7 +270,10 @@ function main() {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
 
 export { generateVisualDiffHTML };

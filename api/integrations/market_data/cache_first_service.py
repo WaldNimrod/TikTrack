@@ -34,7 +34,7 @@ STALENESS_NA_HOURS = 24
 # FX: Alpha → Yahoo | Prices: Yahoo → Alpha
 
 
-def _persist_price_to_db(db: AsyncSession, ticker_id: UUID, price: PriceResult) -> None:
+async def _persist_price_to_db(db: AsyncSession, ticker_id: UUID, price: PriceResult) -> None:
     """Gate B — persist fetched price to ticker_prices so cache builds from API calls."""
     now = datetime.now(timezone.utc)
     ts = price.as_of or now
@@ -54,7 +54,7 @@ def _persist_price_to_db(db: AsyncSession, ticker_id: UUID, price: PriceResult) 
     )
     db.add(row)
     try:
-        db.flush()
+        await db.flush()
     except Exception as e:
         logger.warning("Persist ticker price failed for %s: %s", price.symbol, e)
 
@@ -210,7 +210,7 @@ async def get_ticker_price_cache_first(
         try:
             price = await provider.get_ticker_price(symbol)
             if price:
-                _persist_price_to_db(db, ticker_id, price)
+                await _persist_price_to_db(db, ticker_id, price)
                 return price, "ok"
         except Exception as e:
             logger.warning("Provider %s failed for %s: %s",

@@ -80,14 +80,14 @@ function createAlertFormHTML(data = null) {
       <div class="form-group">
         <label for="alertTargetType">מקושר ל</label>
         ${isEdit
-          ? `<span id="alertTargetTypeDisplay" class="form-readonly-value" aria-readonly="true">${targetLabel}</span>`
+          ? `<span id="alertTargetType" class="form-readonly-value" aria-readonly="true">${esc(targetLabel)}</span>`
           : `<select id="alertTargetType" name="target_type">${targetOpts}</select>`
         }
       </div>
       <div class="form-group">
         <label for="alertAlertType">סוג התראה</label>
         ${isEdit
-          ? `<span id="alertAlertTypeDisplay" class="form-readonly-value" aria-readonly="true">${alertType}</span>`
+          ? `<span id="alertAlertType" class="form-readonly-value" aria-readonly="true">${esc(alertType)}</span>`
           : `<select id="alertAlertType" name="alert_type">${alertTypeOpts}</select>`
         }
       </div>

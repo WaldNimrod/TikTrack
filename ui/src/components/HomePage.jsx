@@ -453,8 +453,8 @@ const HomePage = () => {
                       {/* First Row: Summary Stats */}
                       <div className="info-summary__row info-summary__row--first">
                         <div className="info-summary__content">
-                          <div>סה"כ טריידים: <strong id="totalTrades">82</strong></div>
-                          <div>סה"כ התראות: <strong id="totalAlerts">3</strong></div>
+                          <div>סה&quot;כ טריידים: <strong id="totalTrades">82</strong></div>
+                          <div>סה&quot;כ התראות: <strong id="totalAlerts">3</strong></div>
                           <div>יתרה נוכחית: <strong id="currentBalance"><span className="numeric-value-positive" dir="ltr">+$372,660.00</span></strong></div>
                           <div>רווח/הפסד: <strong id="totalPnL"><span className="numeric-value-positive" dir="ltr">+$1,768.00</span></strong></div>
                         </div>

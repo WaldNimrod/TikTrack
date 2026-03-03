@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-03** — Team 90 prepared and submitted the canonical `GATE_6` execution approval package (`SUBMISSION_v1.2.0`) for `S002-P003-WP002` after `GATE_5` PASS.
+**Gate-owner update evidence:** This block was updated **2026-03-03** — Team 90 consumed `ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.2.1.md` (`GATE_6 APPROVED`) and activated `GATE_7` for `S002-P003-WP002`.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_5 PASS on WP002 after G7 rollback remediation; acceptance boundary closed under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; GATE_6 submission v1.2.0 sent to Team 100 / Team 00 and awaiting decision |
+| active_flow | S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | S002-P003-WP002 (rollback loop after GATE_7 REJECT / CODE_CHANGE_REQUIRED) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | last_s002_p003_milestone | GATE_7 REJECT \| 2026-03-01 \| Nimrod human review rejected WP002; Team 90 routed CODE_CHANGE_REQUIRED |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
+| current_gate | GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_5-8 owner; post-GATE_5 package routing active) |
-| last_gate_event | GATE_6_SUBMISSION_SENT \| 2026-03-03 \| Team 90 submitted the canonical 8-artifact execution approval package (`SUBMISSION_v1.2.0`) for S002-P003-WP002 \| TEAM_90_EXECUTION_APPROVAL_SUBMISSION_S002_P003_WP002_v1.2.0.md |
-| next_required_action | Team 100 / Team 00 review the submitted GATE_6 package and issue APPROVED / ADJUSTED / REJECTED. Team 90 maintains the gate state and relays the decision. |
-| next_responsible_team | Team 100, Team 00 (decision authority); Team 90 (gate state owner) |
+| phase_owner_team | Team 90 (GATE_5-8 owner; GATE_7 orchestrator) |
+| last_gate_event | GATE_6_APPROVED \| 2026-03-03 \| Team 00 approved the corrected documentation package and cleared WP002 to advance to GATE_7 \| ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.2.1.md |
+| next_required_action | Nimrod performs GATE_7 browser-based walkthrough on D22, D33, D34, and D35 using Team 90 scenarios, then returns `אישור` or `פסילה` in Hebrew. Team 90 records and routes the decision. |
+| next_responsible_team | Nimrod (human approver); Team 90 (gate state owner) |
 
 ---
 

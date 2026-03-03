@@ -1,0 +1,213 @@
+{
+  "schema_version": "2.0.0",
+  "produced_at_iso": "2026-03-03T22:34:27.610437+00:00",
+  "agent_role": "POC-1-OBSERVER",
+  "read_only": true,
+  "governance": {
+    "wsm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
+    "operational_state": "upon",
+    "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
+    "master_index_path": "00_MASTER_INDEX.md"
+  },
+  "codebase": {
+    "backend": {
+      "models": [
+        "alerts",
+        "base",
+        "brokers_fees",
+        "cash_flows",
+        "enums",
+        "exchange_rates",
+        "identity",
+        "notes",
+        "positions",
+        "ticker_prices",
+        "ticker_prices_intraday",
+        "tickers",
+        "tokens",
+        "trades",
+        "trading_accounts",
+        "user_tickers"
+      ],
+      "routers": [
+        "alerts",
+        "api_keys",
+        "auth",
+        "brokers_fees",
+        "cash_flows",
+        "me_tickers",
+        "notes",
+        "positions",
+        "reference",
+        "settings",
+        "system",
+        "tickers",
+        "trading_accounts",
+        "users"
+      ],
+      "services": [
+        "alerts_service",
+        "api_keys",
+        "auth",
+        "brokers_fees_service",
+        "cash_flows",
+        "encryption",
+        "exchange_rates_service",
+        "history_backfill_service",
+        "market_status_service",
+        "note_attachments_service",
+        "notes_service",
+        "password_reset",
+        "positions",
+        "reference_service",
+        "smart_history_engine",
+        "tickers_service",
+        "trading_accounts",
+        "user_tickers_service"
+      ],
+      "schemas": [
+        "alerts",
+        "brokers_fees",
+        "cash_flows",
+        "identity",
+        "notes",
+        "positions",
+        "reference",
+        "tickers",
+        "trading_accounts"
+      ],
+      "integrations": true
+    },
+    "frontend": {
+      "pages": [
+        "ai_analysis",
+        "ai_analysis.content",
+        "alerts",
+        "alerts.content",
+        "brokers_fees",
+        "brokers_fees.content",
+        "cash_flows",
+        "cash_flows.content",
+        "data_dashboard",
+        "data_dashboard.content",
+        "data_import",
+        "data_import.content",
+        "executions",
+        "executions.content",
+        "footer",
+        "notes",
+        "notes.content",
+        "page-base-template",
+        "portfolio_state",
+        "portfolio_state.content",
+        "preferences",
+        "preferences.content",
+        "strategy_analysis",
+        "strategy_analysis.content",
+        "system_management",
+        "tag_management",
+        "tag_management.content",
+        "ticker_dashboard",
+        "ticker_dashboard.content",
+        "tickers",
+        "tickers.content",
+        "trade_plans",
+        "trade_plans.content",
+        "trades",
+        "trades.content",
+        "trades_history",
+        "trades_history.content",
+        "trading_accounts",
+        "trading_accounts.content",
+        "trading_journal",
+        "trading_journal.content",
+        "unified-header",
+        "user_tickers",
+        "user_tickers.content",
+        "watch_lists",
+        "watch_lists.content"
+      ],
+      "route_count": 27,
+      "has_react": true
+    },
+    "database": {
+      "migration_count": 19,
+      "has_ddl": true
+    }
+  },
+  "quality": {
+    "unit_test_files": 3,
+    "has_eslint_config": true,
+    "has_mypy_config": true,
+    "has_ci_pipeline": true,
+    "python_dependencies": 21
+  },
+  "artifact_checks": [
+    {
+      "path": "00_MASTER_INDEX.md",
+      "exists": true,
+      "source": "POC_1_OBSERVER_SPEC"
+    },
+    {
+      "path": "api/main.py",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "api/core/config.py",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "api/core/database.py",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "api/.env.example",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "ui/package.json",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "ui/vite.config.js",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": "ui/public/routes.json",
+      "exists": true,
+      "source": "codebase"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "exists": true,
+      "source": "ci_cd"
+    },
+    {
+      "path": "api/mypy.ini",
+      "exists": true,
+      "source": "quality_tooling"
+    },
+    {
+      "path": "ui/.eslintrc.cjs",
+      "exists": true,
+      "source": "quality_tooling"
+    },
+    {
+      "path": "Makefile",
+      "exists": true,
+      "source": "devops"
+    },
+    {
+      "path": "AGENTS.md",
+      "exists": true,
+      "source": "agent_guidance"
+    }
+  ],
+  "no_ssot_writes": true
+}

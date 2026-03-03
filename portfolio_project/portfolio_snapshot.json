@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-03T10:04:17.725916+00:00",
+  "generated_at_utc": "2026-03-03T23:02:41.328013+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "S002-P003-WP002",
     "in_progress_work_package_id": "S002-P003-WP002",
-    "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
+    "current_gate": "GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE)",
     "active_program_id": "S002-P003",
-    "last_gate_event": "GATE_6_SUBMISSION_SENT \\",
-    "next_required_action": "Team 100 / Team 00 review the submitted GATE_6 package and issue APPROVED / ADJUSTED / REJECTED. Team 90 maintains the gate state and relays the decision.",
-    "next_responsible_team": "Team 100, Team 00 (decision authority); Team 90 (gate state owner)"
+    "last_gate_event": "GATE_6_APPROVED \\",
+    "next_required_action": "Nimrod performs GATE_7 browser-based walkthrough on D22, D33, D34, and D35 using Team 90 scenarios, then returns `אישור` or `פסילה` in Hebrew. Team 90 records and routes the decision.",
+    "next_responsible_team": "Nimrod (human approver); Team 90 (gate state owner)"
   },
   "stages": [
     {
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_6 (SUBMITTED_AWAITING_DECISION); active_flow=S002-P003; GATE_5 PASS on WP002 after G7 rollback remediation; acceptance boundary closed under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; GATE_6 submission v1.2.0 sent to Team 100 / Team 00 and awaiting decision; active_work_package_id=S002-P003-WP002"
+      "current_gate_mirror": "GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE); active_flow=S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision; active_work_package_id=S002-P003-WP002"
     },
     {
       "program_id": "S002-P004",
@@ -340,9 +340,9 @@
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
+      "current_gate": "GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE)",
       "is_active": true,
-      "active_marker_reason": "S002-P003; GATE_5 PASS on WP002 after G7 rollback remediation; acceptance boundary closed under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; GATE_6 submission v1.2.0 sent to Team 100 / Team 00 and awaiting decision"
+      "active_marker_reason": "S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision"
     }
   ],
   "hierarchy": [
@@ -443,16 +443,16 @@
           "program_name": "TikTrack Alignment (D22+D33+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_6 (SUBMITTED_AWAITING_DECISION); active_flow=S002-P003; GATE_5 PASS on WP002 after G7 rollback remediation; acceptance boundary closed under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; GATE_6 submission v1.2.0 sent to Team 100 / Team 00 and awaiting decision; active_work_package_id=S002-P003-WP002",
+          "current_gate_mirror": "GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE); active_flow=S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision; active_work_package_id=S002-P003-WP002",
           "work_packages": [
             {
               "work_package_id": "S002-P003-WP002",
               "program_id": "S002-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
+              "current_gate": "GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE)",
               "is_active": true,
-              "active_marker_reason": "S002-P003; GATE_5 PASS on WP002 after G7 rollback remediation; acceptance boundary closed under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope; GATE_6 submission v1.2.0 sent to Team 100 / Team 00 and awaiting decision"
+              "active_marker_reason": "S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision"
             }
           ]
         },

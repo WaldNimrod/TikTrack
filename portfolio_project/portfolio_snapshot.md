@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-03T10:04:17.725916+00:00`
+- Generated (UTC): `2026-03-03T23:02:41.328013+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
-- next_required_action: `Team 100 / Team 00 review the submitted GATE_6 package and issue APPROVED / ADJUSTED / REJECTED. Team 90 maintains the gate state and relays the decision.`
+- current_gate: `GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE)`
+- next_required_action: `Nimrod performs GATE_7 browser-based walkthrough on D22, D33, D34, and D35 using Team 90 scenarios, then returns `אישור` or `פסילה` in Hebrew. Team 90 records and routes the decision.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_6 (SUBMITTED_AWAITING_DECISION) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

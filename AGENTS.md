@@ -38,10 +38,41 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 - **Suite E** (UI): Requires ChromeDriver + running servers.
 - See `Makefile` for all test targets.
 
-### Linting
+### Linting & Type Checking
 
-- Frontend ESLint is configured in `ui/package.json` scripts but no `.eslintrc` config file exists. `npm run lint` will fail without one.
-- `vite build` from `ui/` succeeds and serves as a build-time code quality check.
+- **ESLint**: Config at `ui/.eslintrc.cjs`. Run: `cd ui && ./node_modules/.bin/eslint . --ext js,jsx`. Note: `scripts/` files use Node.js globals (overridden in config).
+- **mypy**: Config at `api/mypy.ini`. Run: `source api/venv/bin/activate && mypy api/ --config-file api/mypy.ini`. Currently 131 issues in 33 files (tracked as KB-006).
+- **Vite build**: `cd ui && npx vite build` — succeeds and serves as build-time check.
+
+### Security Scanning
+
+- **bandit** (Python SAST): `bandit -r api/ --exclude api/venv -ll` — 0 High, 1 Medium (expected 0.0.0.0 bind).
+- **pip-audit**: `pip-audit` — checks Python dependencies for CVEs.
+- **npm audit**: `cd ui && npm audit` — checks Node.js dependencies for vulnerabilities.
+- Install tools: `pip install bandit pip-audit detect-secrets`
+
+### Unit Tests
+
+- **New unit tests** at `tests/unit/` (30 tests, all passing):
+  - `test_auth_service.py` — password hashing, JWT tokens, init validation (17 tests)
+  - `test_trading_accounts_service.py` — ULID validation, 404s, duplicates (7 tests)
+  - `test_cash_flows_service.py` — flow_type validation, ULID handling (6 tests)
+- Run: `python3 -m pytest tests/unit/ -v`
+
+### Quality Gate — Recommended Pre-Commit Checks
+
+Before every commit, run:
+```bash
+source api/venv/bin/activate
+python3 -m pytest tests/unit/ -v --tb=short       # unit tests
+python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v  # Suite B
+bandit -r api/ --exclude api/venv -ll              # security
+cd ui && npx vite build                            # frontend build
+```
+
+### Known Issues Tracker
+
+See `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md` for 21 tracked known bugs (KB-001 through KB-021).
 
 ### Environment Variables
 

@@ -71,12 +71,12 @@ This cadence is an operational batching rule, not a gate override.
 
 ---
 
-## Active Known Bugs
+## Known Bugs
 
 | bug_id | date_added | domain | scope_id | severity | status | owner_team | orchestrator | summary | evidence_path | remediation_mode | target_cycle |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| KB-2026-03-03-01 | 2026-03-03 | TIKTRACK | S002-P003-WP002 | BLOCKING | OPEN | Team 20 | Team 10 | `sync_intraday` may insert duplicate rows for the same ticker because fallback executes inside provider loop | `api/background/jobs/sync_intraday.py:114` | IMMEDIATE | Current rollback cycle |
-| KB-2026-03-03-02 | 2026-03-03 | TIKTRACK | S002-P003-WP002 | BLOCKING | OPEN | Team 30 | Team 10 | Alerts edit form allows changing `target_type` / `alert_type` although API update contract does not persist them | `ui/src/views/data/alerts/alertsForm.js:77` | IMMEDIATE | Current rollback cycle |
+| KB-2026-03-03-01 | 2026-03-03 | TIKTRACK | S002-P003-WP002 | BLOCKING | CLOSED | Team 20 | Team 10 | `sync_intraday` may insert duplicate rows for the same ticker because fallback executes inside provider loop | `api/background/jobs/sync_intraday.py:114` | IMMEDIATE | Closed in current rollback cycle (Team 190 validated 2026-03-03) |
+| KB-2026-03-03-02 | 2026-03-03 | TIKTRACK | S002-P003-WP002 | BLOCKING | CLOSED | Team 30 | Team 10 | Alerts edit form allows changing `target_type` / `alert_type` although API update contract does not persist them | `ui/src/views/data/alerts/alertsForm.js:77` | IMMEDIATE | Closed in current rollback cycle (Team 190 validated 2026-03-03) |
 
 ---
 
@@ -90,6 +90,8 @@ This cadence is an operational batching rule, not a gate override.
 - `scripts/sync_ticker_prices_intraday.py:135`
 - Team 190 blocking remediation routing:
   - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_WP002_BLOCKING_BUG_REMEDIATION_PROMPT_v1.0.0.md`
+- Closure validation:
+  - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_WP002_BLOCKING_BUGS_CLOSURE_VALIDATION_RESULT_v1.0.0.md`
 
 ### KB-2026-03-03-02
 
@@ -98,6 +100,8 @@ This cadence is an operational batching rule, not a gate override.
 - `api/schemas/alerts.py:38`
 - Team 190 blocking remediation routing:
   - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_WP002_BLOCKING_BUG_REMEDIATION_PROMPT_v1.0.0.md`
+- Closure validation:
+  - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_S002_P003_WP002_BLOCKING_BUGS_CLOSURE_VALIDATION_RESULT_v1.0.0.md`
 
 ---
 
@@ -117,3 +121,4 @@ Operational maintenance model:
 
 **log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | v1.0.0_CREATED | 2026-03-03**
 **log_entry | TEAM_170 | KNOWN_BUGS_REGISTER | CENTRAL_GOVERNANCE_PROCEDURE_LINKED_AND_MAINTENANCE_MODEL_ACTIVATED | 2026-03-03**
+**log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | KB_2026_03_03_01_AND_02_CLOSED_AFTER_REVALIDATION | 2026-03-03**

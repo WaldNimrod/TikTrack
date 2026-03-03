@@ -29,6 +29,7 @@ Included scope:
 - D33 my-tickers flows and validation evidence
 - D34 alerts flows, error contracts, and behavioral coverage
 - D35 notes flows, error contracts, and behavioral coverage
+- Known blocking bug closure for current-cycle classified bugs `B-01` and `B-02`
 - Background-task orchestration and addendum scope tied to the current cycle
 - Runtime clear and single-flight evidence required by the current acceptance boundary
 
@@ -46,6 +47,8 @@ Excluded scope:
 | D33 E2E | PASS (6/6, exit 0) |
 | D34 API | PASS (14/14, exit 0; includes required 422/422/401/400 set) |
 | D35 E2E/API | PASS (8/8, exit 0; includes required negatives) |
+| B-01 targeted closure | PASS (Team 20 completion + Team 50 targeted QA rerun) |
+| B-02 targeted closure | PASS (Team 30 completion + Team 50 targeted QA rerun) |
 | Background jobs smoke | PASS |
 | DB single-flight evidence | PASS |
 | Team 60 runtime final clear | PASS |
@@ -57,7 +60,10 @@ Excluded scope:
 - `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_S002_P003_WP002_FINAL_EF_STOP_CLEAR_ADDENDUM_v1.0.0.md`
 - `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_EF_STOP_BLOCKER_HOTFIX_COMPLETION_REPORT_v1.0.0.md`
 - `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_PHASE_C_CARRYOVER_DEPENDENCY_CLOSURE_v1.0.0.md`
+- `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_B01_REMEDIATION_COMPLETION_REPORT_v1.0.0.md`
 - `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P003_WP002_PHASE_D_UX_DISPLAY_COMPLETION_REPORT_v1.0.0.md`
+- `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P003_WP002_B02_BLOCKING_BUG_REMEDIATION_COMPLETION_v1.0.0.md`
+- `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P003_WP002_KNOWN_BUGS_B01_B02_TARGETED_QA_RERUN_REPORT_v1.0.0.md`
 - `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE_v1.0.0.md`
 
 ## Requested decision

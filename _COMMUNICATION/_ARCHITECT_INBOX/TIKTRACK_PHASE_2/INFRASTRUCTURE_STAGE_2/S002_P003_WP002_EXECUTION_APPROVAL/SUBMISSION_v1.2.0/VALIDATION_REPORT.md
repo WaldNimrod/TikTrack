@@ -37,6 +37,7 @@ Validated against:
 | Identity header completeness in submission artifacts | PASS |
 | 8-artifact package completeness | PASS |
 | Acceptance boundary completeness (`D22 + D33 + D34 + D35`) | PASS |
+| Known blocking bug closure lineage (`B-01` + `B-02`) | PASS |
 | Team 50 Phase E QA/FAV package | PASS |
 | Team 60 runtime final clear | PASS |
 | Carryover dependency closure in active cycle | PASS |
@@ -46,6 +47,9 @@ Validated against:
 
 - Team 50 is the primary execution-proof source for the current cycle and reports all mandatory suites green.
 - Team 30's older `PASS_WITH_ACTIONS` report is not blocking the current cycle because the cited D33 API dependency is now present in the active backend and Team 50 reports `D33 6/6 PASS`.
+- Team 190-classified known blocking bugs are now explicitly attached in the active lineage:
+  - `B-01` closure: Team 20 completion report + Team 50 targeted QA rerun PASS
+  - `B-02` closure: Team 30 completion report + Team 50 targeted QA rerun PASS
 - No active `GATE_5` blocker remains in the submitted package.
 - This package supersedes prior `S002-P003-WP002` execution submissions for active review.
 

@@ -28,6 +28,7 @@ Current-cycle basis:
 - `GATE_5` validation closed in PASS by Team 90
 - Team 50 Phase E package is green across all mandatory suites
 - Team 60 runtime final clear is PASS
+- Post-submission lineage refresh applied: Team 190-classified blocking bugs `B-01` and `B-02` are now attached as closed with implementation + targeted QA evidence
 - Package follows the locked **8-artifact** format including `GATE6_READINESS_MATRIX`
 
 ## Package contents (8-file lock)

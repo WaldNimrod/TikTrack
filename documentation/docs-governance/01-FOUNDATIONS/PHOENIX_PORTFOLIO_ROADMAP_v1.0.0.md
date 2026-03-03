@@ -106,6 +106,12 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 | Master Task List | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | ACTIVE |
 | Completion Carryover List | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` | ACTIVE |
 
+## Known Bugs Register (קישור חובה)
+
+| Register | Path | Status |
+|---|---|---|
+| Known Bugs Register | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | ACTIVE |
+
 ---
 
 ## חלוקת עמודים לשלבים (סדר תצוגה)

@@ -64,6 +64,11 @@ class UserTicker(Base):
         Text,
         nullable=True,
     )
+    # D33 Phase D: user display name (max 100 chars)
+    display_name: Mapped[Optional[str]] = mapped_column(
+        String(100),
+        nullable=True,
+    )
 
     user = relationship("User", back_populates="user_tickers")
     ticker = relationship("Ticker", back_populates="user_tickers")

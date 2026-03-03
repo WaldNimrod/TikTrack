@@ -1,0 +1,8 @@
+JOB_LOG_QUERY_EXIT 0
+job_name|has_qualifying|last_qualifying_started_at
+check_alert_conditions|t|2026-03-02 22:10:08.922684+00
+sync_ticker_prices_intraday|t|2026-03-02 22:10:08.921911+00
+(2 rows)
+---STDERR---
+
+JOB_LOG_QUALIFY_EXIT 0

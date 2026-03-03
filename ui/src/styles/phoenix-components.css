@@ -650,6 +650,14 @@ body .page-wrapper .page-container main {
   border-block-end: none;
 }
 
+/* D34: Alert trigger status row treatment */
+.phoenix-table__row.trigger-unread {
+  background: rgba(0, 122, 255, 0.08);
+}
+.phoenix-table__row.trigger-read {
+  background: rgba(0, 122, 255, 0.04);
+}
+
 /* Table Header Cell */
 .phoenix-table__header {
   display: table-cell;

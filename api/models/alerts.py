@@ -65,7 +65,7 @@ class Alert(Base):
         server_default="MEDIUM",
     )
     condition_field: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    condition_operator: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    condition_operator: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     condition_value: Mapped[Optional[Decimal]] = mapped_column(Numeric(20, 8), nullable=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

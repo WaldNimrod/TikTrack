@@ -8,25 +8,26 @@ import { createModal, closeModal } from '../../../components/shared/PhoenixModal
 import sharedServices from '../../../components/core/sharedServices.js';
 import { createPhoenixRichTextEditor } from '../../../components/shared/phoenixRichTextEditor.js';
 import { getPhoenixRichTextToolbarHTML } from '../../../components/shared/phoenixRichTextToolbarConfig.js';
+import { loadOptionsForParentType } from '../../../utils/entityOptionLoader.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 let richTextInstance = null;
 const MAX_ATTACHMENTS = 3;
 const MAX_FILE_BYTES = 1048576; // 1MB
 
+/** Phase C: Backend allows trade|trade_plan|ticker|account only — no general */
 const PARENT_TYPES = [
-  { value: 'general', label: 'כללי' },
+  { value: 'ticker', label: 'טיקר' },
   { value: 'account', label: 'חשבון מסחר' },
   { value: 'trade', label: 'טרייד' },
-  { value: 'trade_plan', label: 'תוכנית' },
-  { value: 'ticker', label: 'טיקר' }
+  { value: 'trade_plan', label: 'תוכנית' }
 ];
 
 function createFormHTML(data = null) {
   const isEdit = !!(data && data.id);
   const title = (data && data.title != null ? data.title : '') || '';
   const content = (data && data.content != null ? data.content : '') || '';
-  const parentType = (data && data.parent_type != null ? data.parent_type : (data && data.parentType)) || 'general';
+  const parentType = (data && data.parent_type != null ? data.parent_type : (data && data.parentType)) || 'ticker';
   const parentId = (data && data.parent_id != null ? data.parent_id : (data && data.parentId)) || '';
 
   const parentOptions = PARENT_TYPES.map(t => `<option value="${t.value}" ${parentType === t.value ? 'selected' : ''}>${t.label}</option>`).join('');
@@ -35,11 +36,13 @@ function createFormHTML(data = null) {
     <form id="noteForm" class="phoenix-form phoenix-form--two-col">
       <div class="form-group">
         <label for="noteParentType">סוג ישות מקושרת</label>
-        <select id="noteParentType" name="parentType">${parentOptions}</select>
+        <select id="noteParentType" name="parentType" data-entity-options-trigger>${parentOptions}</select>
       </div>
-      <div class="form-group">
-        <label for="noteParentId">מזהה ישות (אופציונלי)</label>
-        <input type="text" id="noteParentId" name="parentId" placeholder="UUID" value="${parentId}" />
+      <div class="form-group form-group--parent-entity">
+        <label for="noteParentId">ישות מקושרת (אופציונלי)</label>
+        <select id="noteParentId" name="parentId" class="js-entity-options-select" aria-label="בחירת ישות">
+          <option value="">—ללא קישור—</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="noteTitle">כותרת <span class="form-label-asterisk">*</span></label>
@@ -110,11 +113,11 @@ function initAttachmentHandlers(noteId) {
     const total = attachmentState.existing.length + attachmentState.pending.length - attachmentState.toDelete.length;
     for (const file of files) {
       if (total >= MAX_ATTACHMENTS) {
-        alert(`מקסימום ${MAX_ATTACHMENTS} קבצים להערה`);
+        createModal({ title: 'שגיאה', content: `<p>מקסימום ${MAX_ATTACHMENTS} קבצים להערה</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
         break;
       }
       if (file.size > MAX_FILE_BYTES) {
-        alert(`הקובץ ${file.name} חורג מ־1MB`);
+        createModal({ title: 'שגיאה', content: `<p>הקובץ ${file.name} חורג מ־1MB</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
         continue;
       }
       attachmentState.pending.push(file);
@@ -160,7 +163,7 @@ export async function openNotesForm(noteId = null) {
       }));
     } catch (err) {
       maskedLog('[Notes Form] Error fetching note:', { status: (err && err.status) });
-      alert('שגיאה בטעינת ההערה');
+      createModal({ title: 'שגיאה', content: '<p>שגיאה בטעינת ההערה</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
       return;
     }
   }
@@ -181,7 +184,7 @@ export async function openNotesForm(noteId = null) {
 
   async function performSave() {
     const content = (richTextInstance && richTextInstance.getHTML ? richTextInstance.getHTML() : null) || '';
-    const parentType = (document.getElementById('noteParentType') && document.getElementById('noteParentType').value) || 'general';
+    const parentType = (document.getElementById('noteParentType') && document.getElementById('noteParentType').value) || 'ticker';
     const parentId = (document.getElementById('noteParentId') && document.getElementById('noteParentId').value) ? document.getElementById('noteParentId').value.trim() : null;
     const titleEl = document.getElementById('noteTitle');
     let title = (titleEl && titleEl.value) ? titleEl.value.trim() : null;
@@ -189,7 +192,7 @@ export async function openNotesForm(noteId = null) {
     if (!title) title = 'הערה';
 
     if (!content || content === '<p></p>') {
-      alert('תוכן חובה');
+      createModal({ title: 'שגיאה', content: '<p>תוכן חובה</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
       return;
     }
 
@@ -202,7 +205,7 @@ export async function openNotesForm(noteId = null) {
           await sharedServices.delete(`/notes/${noteId}/attachments/${attId}`);
         }
       } else {
-        const res = await sharedServices.post('/notes', { content, parentType, parentId: parentId || null, title });
+        const res = await sharedServices.post('/notes', { content, parent_type: parentType, parent_id: parentId || null, title });
         const created = (res && res.data) ? res.data : res;
         savedNoteId = created?.id ?? created?.external_ulid;
       }
@@ -224,7 +227,7 @@ export async function openNotesForm(noteId = null) {
       else if (status === 415) msg = 'סוג הקובץ לא נתמך. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
       else if (status === 422) msg = 'מכסה של 3 קבצים להערה הושלמה. הסר קובץ כדי להוסיף אחר.';
       else msg = err?.message_i18n || err?.message || 'שגיאה בשמירה';
-      alert(msg);
+      createModal({ title: 'שגיאה', content: `<p>${String(msg).replace(/</g, '&lt;')}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
     }
   }
 
@@ -243,7 +246,7 @@ export async function openNotesForm(noteId = null) {
     }
   });
 
-  setTimeout(() => {
+  setTimeout(async () => {
     const container = document.getElementById('content-editor-container');
     if (container) {
       richTextInstance = createPhoenixRichTextEditor(container, {
@@ -255,6 +258,27 @@ export async function openNotesForm(noteId = null) {
 
     initAttachmentHandlers(noteId);
     renderAttachmentsList();
+
+    const parentTypeSelect = document.getElementById('noteParentType');
+    const parentIdSelect = document.getElementById('noteParentId');
+    const initialParentId = data && (data.parent_id ?? data.parentId) ? String(data.parent_id ?? data.parentId) : '';
+    async function populateEntityOptions() {
+      if (!parentIdSelect || !parentTypeSelect) return;
+      const pt = parentTypeSelect.value || 'ticker';
+      const opts = await loadOptionsForParentType(pt);
+      const currentVal = parentIdSelect.value || initialParentId;
+      parentIdSelect.innerHTML = '<option value="">—ללא קישור—</option>' +
+        opts.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`).join('');
+      if (currentVal && !opts.some(o => String(o.value) === currentVal)) {
+        const opt = document.createElement('option');
+        opt.value = currentVal;
+        opt.textContent = `${currentVal.slice(0, 8)}… (נוכחי)`;
+        opt.selected = true;
+        parentIdSelect.insertBefore(opt, parentIdSelect.firstChild.nextSibling);
+      }
+    }
+    if (parentTypeSelect) parentTypeSelect.addEventListener('change', populateEntityOptions);
+    await populateEntityOptions();
 
     const formEl = document.getElementById('noteForm');
     if (formEl) formEl.addEventListener('submit', (e) => {

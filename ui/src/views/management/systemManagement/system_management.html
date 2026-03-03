@@ -56,6 +56,31 @@
             </div>
           </tt-section>
 
+          <tt-section data-section="background-jobs">
+            <div class="index-section__header">
+              <div class="index-section__header-title">
+                <img src="/images/icons/entities/home.svg" alt="משימות רקע" class="index-section__header-icon" width="35" height="35">
+                <h1 class="index-section__header-text">משימות רקע</h1>
+              </div>
+              <div class="index-section__header-actions">
+                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6l6 -6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="index-section__body">
+              <tt-section-row>
+                <div class="col-12">
+                  <div id="backgroundJobsPanel" class="settings-panel">
+                    <p class="settings-note">טוען משימות רקע...</p>
+                  </div>
+                </div>
+              </tt-section-row>
+            </div>
+          </tt-section>
+
         </tt-container>
       </main>
     </div>
@@ -63,6 +88,7 @@
   
   <script src="/src/components/core/sectionToggleHandler.js"></script>
   <script type="module" src="/src/views/management/systemManagement/systemManagementSettingsInit.js"></script>
+  <script type="module" src="/src/views/management/systemManagement/systemManagementBackgroundJobsInit.js"></script>
   <script src="/src/views/shared/footerLoader.js"></script>
 </body>
 </html>

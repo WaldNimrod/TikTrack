@@ -76,6 +76,27 @@ class NotificationsService:
             n.read_at = now
         await db.commit()
 
+    async def create_notification(
+        self,
+        db: AsyncSession,
+        user_id: uuid.UUID,
+        alert_id: Optional[uuid.UUID],
+        title: str,
+        message: str,
+        notification_type: str = "alert_trigger",
+    ) -> Notification:
+        """Create a notification row (G7 Phase C — alert trigger)."""
+        n = Notification(
+            user_id=user_id,
+            alert_id=alert_id,
+            type=notification_type,
+            title=title,
+            message=message,
+        )
+        db.add(n)
+        await db.flush()
+        return n
+
     async def mark_one_read(
         self,
         db: AsyncSession,

@@ -7,7 +7,7 @@ Auth + tenant. List, add (existing or create new + live data check), remove.
 """
 
 from typing import Optional
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, Path, Query, Body, status
 import logging
 
 from ..core.database import get_db
@@ -15,6 +15,7 @@ from ..models.identity import User
 from ..utils.dependencies import get_current_user
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..schemas.tickers import TickerResponse, TickerListResponse
+from pydantic import BaseModel, Field
 from ..services.user_tickers_service import get_user_tickers_service
 
 logger = logging.getLogger(__name__)
@@ -117,6 +118,37 @@ async def add_my_ticker(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to add ticker",
+            error_code=ErrorCodes.SERVER_ERROR,
+        )
+
+
+class PatchMyTickerRequest(BaseModel):
+    """Request for PATCH /me/tickers/{ticker_id} — update display_name."""
+    display_name: Optional[str] = Field(None, max_length=100)
+
+
+@router.patch("/tickers/{ticker_id}", response_model=TickerResponse)
+async def update_my_ticker(
+    ticker_id: str = Path(..., description="Ticker ULID to update"),
+    body: PatchMyTickerRequest = Body(default=PatchMyTickerRequest()),
+    current_user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Update display_name for a ticker in user's list."""
+    data = body.model_dump(exclude_unset=True) if body else {}
+    display_name = data.get("display_name")
+    try:
+        service = get_user_tickers_service()
+        return await service.update_user_ticker(
+            db=db, user_id=current_user.id, ticker_id=ticker_id, display_name=display_name
+        )
+    except HTTPExceptionWithCode:
+        raise
+    except Exception as e:
+        logger.error("Update my ticker failed: %s", e, exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update ticker",
             error_code=ErrorCodes.SERVER_ERROR,
         )
 

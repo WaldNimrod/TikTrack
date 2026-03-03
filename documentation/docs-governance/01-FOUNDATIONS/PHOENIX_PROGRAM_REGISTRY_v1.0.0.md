@@ -44,7 +44,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
-| S003 | S003-P003 | System Settings (D39+D40) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
+| S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | PLANNED | — (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion) |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
@@ -54,6 +54,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S004 | S004-P004 | Executions (D36) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S004 | S004-P005 | Data Import (D37) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S004 | S004-P006 | Admin Review S004 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
+| S004 | S004-P007 | Indicators Infrastructure | TIKTRACK | PLANNED | — (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint) |
 | S005 | S005-P001 | Analytics Quality Validator | AGENTS_OS | PLANNED | — (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work) |
 | S005 | S005-P002 | Trade Entities (D29+D24) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S005 | S005-P003 | Market Intelligence (D27+D25) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
@@ -87,6 +88,20 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 
 ---
 
+## Pending LOD200 Inputs (S003 preparation locks)
+
+- **D39 Preferences (S003-P003):** Canonical field set locked to 23 fields across 6 groups; JSONB settings storage; `default_commission` excluded; trading-hours fields excluded from D39; `primary_currency` included in Group A; Group B contains 6 trading-default fields.
+- **D40 System Management (S003-P003):** Locked to 7 sections; Market Data Settings includes `trading_hours_start`, `trading_hours_end`, `trading_timezone`; admin-only scope.
+- **D33 User Tickers (S003-P004):** Iron Rule display lock requires `last_price` + `last_change` in table rows; live price INCLUDED; scope includes filtering, sorting, pagination.
+- **D41 User Management (S003-P003 companion):** Added per ROADMAP_AMENDMENT_v2 §B3.
+- **D36/D37 P&L policy:** Option B (Delta-Reset via enhanced D37 import) locked for S004; Option C (Direct Broker API) deferred to S006+ roadmap.
+
+Source directives:
+- `ARCHITECT_DIRECTIVE_S003_PREP_DECISIONS_v1.0.0.md`
+- `ARCHITECT_DIRECTIVE_PL_RECONCILIATION_POLICY_v1.0.0.md`
+
+---
+
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-02). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
 **WSM mirror (2026-03-02):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_3 (rollback loop EXECUTION_ACTIVE); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; GATE_7 REJECT on WP002 (CODE_CHANGE_REQUIRED); OA-01 reconciled by Team 170; remediation execution active under D22 + D33 + D34 + D35 plus background-task orchestration/addendum scope.
@@ -107,3 +122,4 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | SEQUENCING_REVISED_GENERATION_LAYER_ACCELERATED: TEST_TEMPLATE_GENERATOR→S003 + BUSINESS_LOGIC_VALIDATOR→S004 + SPEC_DRAFT_GENERATOR→S004 + ANALYTICS_VALIDATOR→S005 + AGENTS_OS_COMPLETE_GATE_ADDED | 2026-03-01**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | INTEGRATED_ROADMAP_V1_1_0_RECONCILIATION_B4_B5_APPLIED | 2026-03-01**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | TEAM_00_CANONICAL_ALIGNMENT_CORRECTIONS_APPLIED | 2026-03-02**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_GOVERNANCE_ALIGNMENT_D01_D04_AND_LOD200_INPUTS_APPLIED | 2026-03-03**

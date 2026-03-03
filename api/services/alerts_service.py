@@ -93,6 +93,7 @@ class AlertsService:
         db: AsyncSession,
         user_id: uuid.UUID,
         target_type: Optional[str] = None,
+        ticker_id: Optional[uuid.UUID] = None,
         page: int = 1,
         per_page: int = 25,
         sort: str = "created_at",
@@ -101,6 +102,8 @@ class AlertsService:
         base = and_(Alert.user_id == user_id, Alert.deleted_at.is_(None))
         if target_type and target_type in VALID_TARGET_TYPES:
             base = and_(base, Alert.target_type == target_type)
+        if ticker_id is not None:
+            base = and_(base, Alert.ticker_id == ticker_id)
 
         count_stmt = select(func.count()).select_from(Alert).where(base)
         total = (await db.execute(count_stmt)).scalar() or 0

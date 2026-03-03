@@ -19,6 +19,7 @@ class TickerResponse(BaseModel):
     """Ticker response schema."""
     id: str = Field(..., description="External ULID identifier")
     symbol: str = Field(..., description="Ticker symbol (e.g., AAPL, BTC)")
+    display_name: Optional[str] = Field(None, max_length=100, description="User display name (from user_tickers)")
     company_name: Optional[str] = Field(None, description="Company name")
     ticker_type: str = Field(..., description="Ticker type (STOCK, CRYPTO, ETF, etc.)")
     is_active: bool = Field(..., description="Active status")

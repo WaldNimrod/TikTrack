@@ -115,7 +115,7 @@ class NotesService:
 
         note = Note(
             user_id=user_id,
-            parent_type=data.get("parent_type", "general"),
+            parent_type=data.get("parent_type", "ticker"),
             parent_id=parent_id,
             title=data.get("title"),
             content=sanitized,
@@ -230,7 +230,7 @@ class NotesService:
             .group_by(Note.parent_type)
         )
         parent_result = (await db.execute(parent_stmt)).all()
-        notes_by_parent_type = {pt: 0 for pt in ("ticker", "trade", "trade_plan", "account", "general")}
+        notes_by_parent_type = {pt: 0 for pt in ("ticker", "trade", "trade_plan", "account")}
         for row in parent_result:
             notes_by_parent_type[row.parent_type] = row.cnt
 

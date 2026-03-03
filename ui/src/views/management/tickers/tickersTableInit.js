@@ -5,6 +5,7 @@
  */
 
 import sharedServices from '../../../components/core/sharedServices.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
@@ -338,15 +339,26 @@ const formatChangePct = (pct) => {
   }
 
   async function handleDelete(tickerId) {
-    if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) return;
-    try {
-      await sharedServices.init();
-      await sharedServices.delete(`/tickers/${tickerId}`);
-      await loadAllData();
-    } catch (e) {
-      maskedLog('[Tickers] Delete error:', { errorCode: e?.code });
-      alert('שגיאה במחיקת הטיקר');
-    }
+    createModal({
+      title: 'מחיקת טיקר',
+      content: '<p>האם אתה בטוח שברצונך למחוק את הטיקר?</p>',
+      entity: 'ticker',
+      showSaveButton: true,
+      confirmMode: true,
+      saveButtonText: 'מחיקה',
+      cancelButtonText: 'ביטול',
+      onSave: async () => {
+        try {
+          await sharedServices.init();
+          await sharedServices.delete(`/tickers/${tickerId}`);
+          document.getElementById('phoenix-modal-backdrop')?.remove();
+          await loadAllData();
+        } catch (e) {
+          maskedLog('[Tickers] Delete error:', { errorCode: e?.code });
+          createModal({ title: 'שגיאה', content: '<p>שגיאה במחיקת הטיקר</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+        }
+      }
+    });
   }
 
   function runInit() {

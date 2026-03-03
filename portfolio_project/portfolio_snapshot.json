@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-02T16:52:59.177643+00:00",
+  "generated_at_utc": "2026-03-03T09:21:09.455435+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -40,8 +40,8 @@
       "stage_name": "שלב 3 — Essential Data",
       "planned_scope": "שכבת נתונים יסודית",
       "status": "PLANNED",
-      "pages": "D33, D39, D40, D26",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, WatchLists, Alerts, Notes)",
+      "pages": "D33, D39, D40, D41, D26",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     },
     {
@@ -49,8 +49,8 @@
       "stage_name": "שלב 4 — Financial Execution",
       "planned_scope": "המעגל הפיננסי",
       "status": "PLANNED",
-      "pages": "D36, D37",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "pages": "D36, D37, S004-PXXX (Indicators Infrastructure)",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     },
     {
@@ -139,11 +139,11 @@
     },
     {
       "program_id": "S003-P003",
-      "program_name": "System Settings (D39+D40)",
+      "program_name": "System Settings (D39+D40+D41)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
       "status": "PLANNED",
-      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+      "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)"
     },
     {
       "program_id": "S003-P004",
@@ -216,6 +216,14 @@
       "stage_id": "S004",
       "status": "PLANNED",
       "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S004-P007",
+      "program_name": "Indicators Infrastructure",
+      "domain": "TIKTRACK",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)"
     },
     {
       "program_id": "S005-P001",
@@ -463,8 +471,8 @@
       "stage_name": "שלב 3 — Essential Data",
       "status": "PLANNED",
       "planned_scope": "שכבת נתונים יסודית",
-      "pages": "D33, D39, D40, D26",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, WatchLists, Alerts, Notes)",
+      "pages": "D33, D39, D40, D41, D26",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
       "programs": [
@@ -486,10 +494,10 @@
         },
         {
           "program_id": "S003-P003",
-          "program_name": "System Settings (D39+D40)",
+          "program_name": "System Settings (D39+D40+D41)",
           "domain": "TIKTRACK",
           "status": "PLANNED",
-          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)",
           "work_packages": []
         },
         {
@@ -523,8 +531,8 @@
       "stage_name": "שלב 4 — Financial Execution",
       "status": "PLANNED",
       "planned_scope": "המעגל הפיננסי",
-      "pages": "D36, D37",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "pages": "D36, D37, S004-PXXX (Indicators Infrastructure)",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
       "programs": [
@@ -574,6 +582,14 @@
           "domain": "TIKTRACK",
           "status": "PLANNED",
           "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P007",
+          "program_name": "Indicators Infrastructure",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)",
           "work_packages": []
         }
       ]

@@ -6,6 +6,8 @@
 **status:** 🔒 **SSOT - MANDATORY**  
 **תאריך:** 2026-02-15  
 **מקור:** החלטת G-Lead — יישור מטריצה, תפריט, סקופ צוות 31. חלוקה לשלבים: PHOENIX_PORTFOLIO_ROADMAP (סעיף "חלוקת עמודים לשלבים").
+**canonical_location:** documentation/docs-system/01-ARCHITECTURE/TT2_PAGES_SSOT_MASTER_LIST.md  
+**cross_reference:** PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md governs stage assignments
 
 ---
 
@@ -86,6 +88,8 @@
 | D38 | D38 | tag_management | ניהול תגיות | ✅ נדרש | הגדרות → ניהול תגיות | **נדרש אפיון** |
 | D39 | D39 | preferences | העדפות | ✅ נדרש | הגדרות → העדפות | **נדרש אפיון** |
 
+**הערת שלב D38:** Stage: S005. Originally S003; relocated to S005 per `ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0` Amendment A1 (2026-03-02, Nimrod-approved). Rationale: tag registry is effective after taggable entities exist (D29, D30, D36).
+
 ### 2.7 ניהול (Management) — ללא Blueprint
 
 | # | מזהה | Route | תיאור | בלופרינט? | תפריט | אפיון |
@@ -93,9 +97,23 @@
 | — | — | **ניהול** (דשבורד) | דשבורד ניהול | דשבורד — לא נדרש | ניהול (רמה 1) | — |
 | D40 | D40 | system_management | ניהול מערכת | ✅ נדרש | ניהול → ניהול מערכת | נדרש אפיון |
 | — | — | tickers | ניהול טיקרים | ✅ קיים | ניהול → ניהול טיקרים | (D22) |
-| D41 | D41 | design_system | ניהול עיצובים | **כבר קיים** | ניהול → ניהול עיצובים | קיים |
+| D41 | D41 | user_management | ניהול משתמשים (Admin User Control) | ✅ נדרש | ניהול → ניהול משתמשים | נדרש אפיון (admin-only; users list, status, role changes) |
 
-### 2.8 לא נדרש (Out of Scope)
+### 2.8 S005 Enhancement Entries (SSOT alignment)
+
+| # | מזהה | Route | תיאור | Stage | Type | Trigger | Scope |
+|---|------|-------|-------|-------|------|---------|-------|
+| 26.1 | D26-Phase2 | watch_lists (enhancement) | הרחבת רשימות צפייה | S005 | Enhancement WP (not a new page) | D29 (trades) GATE_8 PASS | ATR(14), Position, P/L%, P/L columns + flag-color filter enhancement |
+
+---
+
+## Notes parent_type canonical lock
+
+Valid `parent_type` values for notes (canonical — Nimrod-locked 2026-03-02): `ticker | user_ticker | alert | trade | trade_plan | account | datetime`.
+
+Note: `general` parent_type was deprecated per `ARCHITECT_DIRECTIVE_G7_REMEDIATION_S002_P003_WP002_v1.0.0` and locked as invalid per Team 00 Iron Rule (2026-03-02).
+
+### 2.9 לא נדרש (Out of Scope)
 
 | Route | הערה |
 |--------|------|
@@ -125,3 +143,5 @@
 ---
 
 **log_entry | TEAM_10 | TT2_PAGES_SSOT_MASTER_LIST | CREATED | 2026-02-15**
+**log_entry | TEAM_170 | SSOT_CORRECTIONS | per_ARCHITECT_DIRECTIVE_SSOT_CORRECTIONS_v1.0.0 | 2026-03-03**
+**log_entry | TEAM_170 | TT2_PAGES_SSOT_MASTER_LIST | ROADMAP_AMENDMENT_v2_B3_APPLIED_D41_USER_MANAGEMENT | 2026-03-03**

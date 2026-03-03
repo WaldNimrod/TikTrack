@@ -1,0 +1,5 @@
+SCRIPT_CHECK_EXIT 0
+---STDOUT---
+✅ check_alert_conditions: checked=2 triggered=0 errors=0
+---STDERR---
+

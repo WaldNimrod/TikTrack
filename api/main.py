@@ -18,7 +18,7 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications, background_jobs
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications, background_jobs, trades, trade_plans
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from . import __version__
 
@@ -125,6 +125,8 @@ app.include_router(notes.router, prefix=settings.api_v1_prefix)
 app.include_router(alerts.router, prefix=settings.api_v1_prefix)
 app.include_router(notifications.router, prefix=settings.api_v1_prefix)
 app.include_router(background_jobs.router, prefix=settings.api_v1_prefix)
+app.include_router(trades.router, prefix=settings.api_v1_prefix)
+app.include_router(trade_plans.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health")

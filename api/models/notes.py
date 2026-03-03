@@ -24,7 +24,7 @@ class Note(Base):
     __tablename__ = "notes"
     __table_args__ = (
         CheckConstraint(
-            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account', 'general')",
+            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account')",
             name="notes_parent_type_check",
         ),
         {"schema": "user_data"},

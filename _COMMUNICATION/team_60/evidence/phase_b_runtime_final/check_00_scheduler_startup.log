@@ -1,0 +1,24 @@
+---
+pid: 47332
+cwd: "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix"
+command: "lsof -ti:8082 2>/dev/null | xargs -r kill -9; sleep 1; cd /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix && . api/venv/bin/activate && PYTHONPATH=\"/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api:$PYTHONPATH\" uvicorn api.main:app --host 0.0.0.0 --port 8082"
+started_at: 2026-03-02T21:45:43.614Z
+running_for_seconds: 15    
+---
+INFO:     Started server process [47352]
+INFO:     Waiting for application startup.
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_ticker_prices_intraday (interval=15m)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job check_alert_conditions (interval=15m)
+INFO:apscheduler.scheduler:Added job "sync_ticker_prices_intraday" to job store "default"
+INFO:apscheduler.scheduler:Added job "check_alert_conditions" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:api.background.scheduler_startup:APScheduler started — background jobs active
+INFO:api.main:APScheduler started — background jobs active
+INFO:     Application startup complete.
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 00:00:45 IST)" (scheduled at 2026-03-02 21:45:45.395544+00:00)
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 00:00:45 IST)" (scheduled at 2026-03-02 21:45:45.395707+00:00)
+INFO:     Uvicorn running on http://0.0.0.0:8082 (Press CTRL+C to quit)
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 00:00:45 IST)" executed successfully
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 00:00:45 IST)" executed successfully

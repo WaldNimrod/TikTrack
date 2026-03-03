@@ -46,6 +46,15 @@ function formatDate(iso) {
   }
 }
 
+function formatTriggerStatus(ts) {
+  const labels = {
+    untriggered: 'ממתין להפעלה',
+    triggered_unread: 'הופעל — לא נקרא',
+    triggered_read: 'הופעל — נקרא'
+  };
+  return labels[ts] || ts || '—';
+}
+
 function renderSummary(summary) {
   const el = (id) => document.getElementById(id);
   if (!el('totalAlerts')) return;
@@ -128,14 +137,21 @@ function renderAlertRow(alert) {
   const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
   const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '—';
   const ticker = (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) || '—';
-  const condition = (alert.condition_field != null ? alert.condition_field : alert.conditionField) || (alert.condition_summary || '—');
+  const condField = alert.condition_field != null ? alert.condition_field : alert.conditionField;
+  const condOp = alert.condition_operator != null ? alert.condition_operator : alert.conditionOperator;
+  const condVal = alert.condition_value != null ? alert.condition_value : alert.conditionValue;
+  const condition = alert.condition_summary || (condField && condOp
+    ? `${condField} ${condOp} ${condVal != null ? condVal : ''}`.trim()
+    : null) || '—';
   const isActive = (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
   const isTriggered = (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) === true;
+  const triggerStatus = (alert.trigger_status != null ? alert.trigger_status : alert.triggerStatus) || (isTriggered ? 'triggered_unread' : 'untriggered');
   const created = formatDate(alert.created_at != null ? alert.created_at : alert.createdAt);
   const id = alert.id || alert.external_ulid || '';
+  const triggerClass = triggerStatus === 'triggered_unread' ? 'trigger-unread' : (triggerStatus === 'triggered_read' ? 'trigger-read' : '');
 
   return `
-    <tr class="phoenix-table__row" data-alert-id="${id}" role="row">
+    <tr class="phoenix-table__row ${triggerClass}" data-alert-id="${id}" role="row">
       <td class="phoenix-table__cell col-linked-object" data-field="target_type"><span class="linked-object-badge entity-${targetType}">${typeLabel}</span></td>
       <td class="phoenix-table__cell col-ticker" data-field="ticker_id">${ticker}</td>
       <td class="phoenix-table__cell col-condition" data-field="condition_field">${condition}</td>
@@ -144,20 +160,20 @@ function renderAlertRow(alert) {
       <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
       <td class="phoenix-table__cell col-actions phoenix-table__cell--actions">
         <div class="table-actions-tooltip">
-          <button class="table-actions-trigger" aria-label="פעולות">
+          <button class="table-actions-trigger" aria-label="פעולות" title="פעולות">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-toggle" data-action="toggle-active" aria-label="החלף סטטוס פעיל" data-alert-id="${id}" title="החלף פעיל/לא פעיל">
+            <button class="table-action-btn js-action-toggle" data-action="toggle-active" aria-label="החלף סטטוס פעיל" title="החלף פעיל/לא פעיל" data-alert-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>
             </button>
-            <button class="table-action-btn js-action-view" aria-label="פרטים" data-alert-id="${id}">
+            <button class="table-action-btn js-action-view" aria-label="הצג פרטי התראה" title="הצג פרטי התראה" data-alert-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
-            <button class="table-action-btn js-action-edit" aria-label="לערוך" data-alert-id="${id}">
+            <button class="table-action-btn js-action-edit" aria-label="ערוך התראה" title="ערוך התראה" data-alert-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="למחוק" data-alert-id="${id}">
+            <button class="table-action-btn js-action-delete" aria-label="מחק התראה" title="מחק התראה" data-alert-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           </div>
@@ -244,6 +260,73 @@ async function refreshAlertsTable() {
   }
 }
 
+async function handleViewAlert(alertItem) {
+  const id = alertItem.id || alertItem.external_ulid || '';
+  const title = (alertItem.title || '').trim() || '—';
+  const condition = alertItem.condition_summary || (alertItem.condition_field && alertItem.condition_operator
+    ? `${alertItem.condition_field} ${alertItem.condition_operator} ${alertItem.condition_value ?? ''}`.trim()
+    : null) || '—';
+  const triggerStatus = (alertItem.trigger_status != null ? alertItem.trigger_status : alertItem.triggerStatus) || 'untriggered';
+  const triggeredAt = formatDate(alertItem.triggered_at != null ? alertItem.triggered_at : alertItem.triggeredAt);
+  const canRearm = triggerStatus === 'triggered_read' || triggerStatus === 'triggered_unread';
+
+  if (triggerStatus === 'triggered_unread') {
+    try {
+      await sharedServices.init();
+      await sharedServices.patch(`/alerts/${id}`, { trigger_status: 'triggered_read' });
+    } catch (err) {
+      maskedLog('[Alerts] Mark read error:', { message: (err && err.message) || 'Unknown' });
+    }
+  }
+
+  const rearmHtml = canRearm ? `
+    <div class="form-group" style="margin-top:12px;">
+      <button type="button" class="phoenix-modal__save-btn js-alert-rearm-btn" data-alert-id="${id}">הפעל מחדש</button>
+    </div>
+  ` : '';
+
+  const html = `
+    <div class="phoenix-form alert-detail-content">
+      <div class="form-group"><strong>כותרת:</strong> ${title}</div>
+      <div class="form-group"><strong>תנאי:</strong> ${condition}</div>
+      <div class="form-group"><strong>מצב הפעלה:</strong> ${formatTriggerStatus(triggerStatus)}</div>
+      <div class="form-group"><strong>הופעל ב:</strong> ${triggeredAt}</div>
+      ${rearmHtml}
+    </div>
+  `;
+
+  createModal({
+    title: 'פרטי התראה',
+    content: html,
+    entity: 'alert',
+    showSaveButton: false,
+    cancelButtonText: 'ביטול',
+    onClose: () => {}
+  });
+  const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
+  if (cancelBtn) cancelBtn.textContent = 'סגור';
+
+  const rearmBtn = document.querySelector('.js-alert-rearm-btn');
+  if (rearmBtn) {
+    rearmBtn.addEventListener('click', async () => {
+      try {
+        await sharedServices.init();
+        await sharedServices.patch(`/alerts/${id}`, { trigger_status: 'untriggered' });
+        document.getElementById('phoenix-modal-backdrop')?.remove();
+        refreshAlertsTable();
+      } catch (err) {
+        maskedLog('[Alerts] Re-arm error:', { message: (err && err.message) || 'Unknown' });
+        createModal({
+          title: 'שגיאה',
+          content: '<p>שגיאה בהפעלה מחדש</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול'
+        });
+      }
+    });
+  }
+}
+
 function bindAddButton() {
   const addBtn = document.querySelector('.js-add-alert');
   if (!addBtn) return;
@@ -273,7 +356,12 @@ function bindRowActions() {
         refreshAlertsTable();
       } catch (err) {
         maskedLog('[Alerts] Toggle error:', { message: (err && err.message) || 'Unknown' });
-        window.alert('שגיאה בעדכון סטטוס');
+        createModal({
+          title: 'שגיאה',
+          content: '<p>שגיאה בעדכון סטטוס</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול'
+        });
       }
       return;
     }
@@ -294,14 +382,19 @@ function bindRowActions() {
             refreshAlertsTable();
           } catch (err) {
             maskedLog('[Alerts] Delete error:', { message: (err && err.message) || 'Unknown' });
-            window.alert('שגיאה במחיקה');
+            createModal({
+              title: 'שגיאה',
+              content: '<p>שגיאה במחיקה</p>',
+              showSaveButton: false,
+              cancelButtonText: 'ביטול'
+            });
           }
         }
       });
       return;
     }
     if (viewBtn && alertItem) {
-      openAlertsForm(alertItem, () => {}); // view-only would need showSaveButton: false — for now reuse form as read
+      handleViewAlert(alertItem);
     }
   });
 }

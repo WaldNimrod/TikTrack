@@ -19,6 +19,7 @@ from sqlalchemy import text
 logger = logging.getLogger(__name__)
 
 STALE_LOCK_MINUTES = 30
+STALE_RUNNING_MINUTES = 5  # Mark 'running' older than this as 'timeout' (orphaned from reload/kill)
 
 
 async def run_job(
@@ -35,6 +36,18 @@ async def run_job(
     started_at = datetime.now(timezone.utc)
     result = {"run_id": str(run_id), "status": "running", "exit_code": 0}
     try:
+        # Clear orphaned 'running' rows (from reload/kill) so they don't block new runs
+        await db.execute(
+            text("""
+                UPDATE admin_data.job_run_log
+                SET status = 'timeout', completed_at = NOW()
+                WHERE job_name = :job_name AND status = 'running'
+                  AND started_at < NOW() - make_interval(mins => :mins)
+            """),
+            {"job_name": job_name, "mins": STALE_RUNNING_MINUTES},
+        )
+        await db.commit()
+
         stale_check = await db.execute(
             text("""
                 SELECT id FROM admin_data.job_run_log

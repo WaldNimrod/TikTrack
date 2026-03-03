@@ -888,6 +888,19 @@ button:disabled,
   margin-block-end: var(--spacing-md, 16px);
 }
 
+/* Phase C D34: Condition builder row */
+.condition-builder-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 8px);
+  align-items: center;
+}
+.condition-builder-row select,
+.condition-builder-row input[type="number"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+
 /* Form Control - Inherits from base input/textarea/select styles */
 .form-control {
   /* Uses base styles defined above */

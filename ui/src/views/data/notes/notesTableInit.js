@@ -7,6 +7,7 @@
  */
 
 import { fetchNotes, loadNotesData } from './notesDataLoader.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 /** State for pagination/sort — same pattern as brokersFees, userTicker */
@@ -16,13 +17,13 @@ let currentPageSize = 25;
 let currentSortKey = null;
 let currentSortDir = 'asc';
 
+/** Phase C: general removed — backend allows trade|trade_plan|ticker|account only */
 const PARENT_TYPE_LABELS = {
   all: 'הכל',
   account: 'חשבון מסחר',
   trade: 'טרייד',
   trade_plan: 'תוכנית',
-  ticker: 'טיקר',
-  general: 'כללי'
+  ticker: 'טיקר'
 };
 
 /**
@@ -113,7 +114,7 @@ function renderNoteRow(note) {
       <td class="phoenix-table__cell col-updated phoenix-table__cell--date">${updated}</td>
       <td class="phoenix-table__cell col-actions phoenix-table__cell--actions">
         <div class="table-actions-tooltip">
-          <button class="table-actions-trigger" aria-label="פעולות">
+          <button class="table-actions-trigger" aria-label="פעולות" title="פעולות">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="1"></circle>
               <circle cx="12" cy="5" r="1"></circle>
@@ -121,19 +122,19 @@ function renderNoteRow(note) {
             </svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-view" aria-label="פרטים" data-note-id="${id}">
+            <button class="table-action-btn js-action-view" aria-label="הצג פרטי הערה" title="הצג פרטי הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
-            <button class="table-action-btn js-action-edit" aria-label="לערוך" data-note-id="${id}">
+            <button class="table-action-btn js-action-edit" aria-label="ערוך הערה" title="ערוך הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="למחוק" data-note-id="${id}">
+            <button class="table-action-btn js-action-delete" aria-label="מחק הערה" title="מחק הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -257,7 +258,6 @@ async function handleViewNote(noteId) {
     const parentType = PARENT_TYPE_LABELS[(n && n.parent_type) || (n && n.parentType)] || (n && n.parent_type) || '—';
     const created = formatDate((n && n.created_at) || (n && n.createdAt));
     const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
-    const { createModal, closeModal } = await import('../../../components/shared/PhoenixModal.js');
     const html = `
       <div class="note-view-content phoenix-form">
         ${title ? `<div class="form-group"><strong>כותרת:</strong> ${title}</div>` : ''}
@@ -272,15 +272,21 @@ async function handleViewNote(noteId) {
       content: html,
       entity: 'note',
       showSaveButton: false,
+      cancelButtonText: 'ביטול',
       onClose: function() {}
     });
     setTimeout(function() {
       const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
-      if (cancelBtn) cancelBtn.textContent = 'לסגור';
+      if (cancelBtn) cancelBtn.textContent = 'סגור';
     }, 0);
   } catch (err) {
     maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
-    alert('שגיאה בטעינת פרטי ההערה');
+    createModal({
+      title: 'שגיאה',
+      content: '<p>שגיאה בטעינת פרטי ההערה</p>',
+      showSaveButton: false,
+      cancelButtonText: 'ביטול'
+    });
   }
 }
 
@@ -367,7 +373,12 @@ function bindAddButton() {
       openNotesForm();
     } catch (err) {
       maskedLog('[Notes] Form load error:', { message: (err && err.message) || 'Unknown' });
-      alert('שגיאה בטעינת טופס הוספת הערה');
+      createModal({
+        title: 'שגיאה',
+        content: '<p>שגיאה בטעינת טופס הוספת הערה</p>',
+        showSaveButton: false,
+        cancelButtonText: 'ביטול'
+      });
     }
   });
 }
@@ -389,19 +400,34 @@ function bindRowActions() {
     } else if (editBtn && window.openNotesForm) {
       window.openNotesForm(id);
     } else if (delBtn) {
-      if (confirm('למחוק את ההערה?')) {
-        try {
-          const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
-          await sharedServices.init();
-          await sharedServices.delete(`/notes/${id}`);
-          const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
-          renderSummary(result.summary);
-          renderTable(result.notes);
-        } catch (err) {
-          maskedLog('[Notes] Delete error:', { status: (err && err.status) });
-          alert('שגיאה במחיקה');
+      createModal({
+        title: 'מחיקת הערה',
+        content: '<p>האם למחוק את ההערה?</p>',
+        entity: 'note',
+        showSaveButton: true,
+        confirmMode: true,
+        saveButtonText: 'מחיקה',
+        cancelButtonText: 'ביטול',
+        onSave: async () => {
+          try {
+            const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+            await sharedServices.init();
+            await sharedServices.delete(`/notes/${id}`);
+            document.getElementById('phoenix-modal-backdrop')?.remove();
+            const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
+            renderSummary(result.summary);
+            renderTable(result.notes);
+          } catch (err) {
+            maskedLog('[Notes] Delete error:', { status: (err && err.status) });
+            createModal({
+              title: 'שגיאה',
+              content: '<p>שגיאה במחיקה</p>',
+              showSaveButton: false,
+              cancelButtonText: 'ביטול'
+            });
+          }
         }
-      }
+      });
     }
   });
 }

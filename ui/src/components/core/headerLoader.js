@@ -239,6 +239,14 @@
       }, 300);
     }
     
+    // Load notificationBell.js (Phase D — notification bell widget)
+    if (!document.querySelector('script[src*="notificationBell.js"]')) {
+      const bellScript = document.createElement('script');
+      bellScript.type = 'module';
+      bellScript.src = '/src/components/core/notificationBell.js';
+      document.head.appendChild(bellScript);
+    }
+    
     // Load headerLinksUpdater.js if not already loaded (for dynamic user profile link + management menu visibility)
     if (!document.querySelector('script[src*="headerLinksUpdater.js"]')) {
       const headerLinksScript = document.createElement('script');

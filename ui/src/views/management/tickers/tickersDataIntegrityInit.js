@@ -7,6 +7,7 @@
  */
 
 import sharedServices from '../../../components/core/sharedServices.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import authService from '../../../cubes/identity/services/auth.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
@@ -217,7 +218,22 @@ function formatTs(ts) {
 
   async function doForceReload(tickerId) {
     if (!tickerId) return;
-    if (!window.confirm('פעולה זו מוחקת את כל נתוני ההיסטוריה וטוענת מחדש. להמשיך?')) return;
+    createModal({
+      title: 'טעינת נתונים מחדש',
+      content: '<p>פעולה זו מוחקת את כל נתוני ההיסטוריה וטוענת מחדש. להמשיך?</p>',
+      entity: 'ticker',
+      showSaveButton: true,
+      confirmMode: true,
+      saveButtonText: 'המשך',
+      cancelButtonText: 'ביטול',
+      onSave: () => {
+        document.getElementById('phoenix-modal-backdrop')?.remove();
+        doForceReloadExec(tickerId);
+      }
+    });
+  }
+
+  async function doForceReloadExec(tickerId) {
     const btn = document.getElementById('tickerDataIntegrityForceReloadBtn');
     if (btn) {
       btn.disabled = true;
@@ -237,6 +253,7 @@ function formatTs(ts) {
         btn.disabled = false;
         btn.textContent = 'טען מחדש (מחיקה)';
       }
+      createModal({ title: 'שגיאה', content: `<p>${String(msg).replace(/</g, '&lt;')}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
       detailEl.insertAdjacentHTML('beforeend', `<p class="data-integrity-error">${msg}</p>`);
     }
   }

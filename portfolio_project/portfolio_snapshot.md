@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-02T16:52:59.177643+00:00`
+- Generated (UTC): `2026-03-03T09:21:09.455435+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -16,7 +16,7 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `27`
+- programs: `28`
 - work_packages: `5`
 
 ## Roadmap (hierarchical)
@@ -53,7 +53,7 @@
 
     ├── **Program** `S003-P002` — Test Template Generator | PLANNED | domain: **AGENTS_OS**
 
-    ├── **Program** `S003-P003` — System Settings (D39+D40) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | PLANNED | domain: **TIKTRACK**
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
@@ -74,7 +74,9 @@
 
     ├── **Program** `S004-P005` — Data Import (D37) | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S004-P006` — Admin Review S004 | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S004-P006` — Admin Review S004 | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S004-P007` — Indicators Infrastructure | PLANNED | domain: **TIKTRACK**
 
 
 ### S005 — שלב 5 — Trades/Plans | PLANNED [SHARED]

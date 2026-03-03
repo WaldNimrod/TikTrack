@@ -7,6 +7,8 @@
 **status:** LOCKED  
 **purpose:** Single canonical source for development squad roles and Team 10 orchestration rule. `.cursorrules` is a tooling mirror only; this document is governance SSOT.
 
+**IRON RULE:** Team 50 = QA + FAV. NEVER assign QA/testing/FAV to Team 40. Team 40 = UI Assets & Design ONLY. Source: `ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md` (2026-03-02, Nimrod-approved).
+
 ---
 
 ## 1) Development squad mapping (canonical)
@@ -16,7 +18,13 @@
 | **Team 20** | Backend Implementation | Server-side: API, logic, DB, services, runtime. |
 | **Team 30** | Frontend Execution | Client-side: components, pages, API integration. |
 | **Team 40** | UI Assets & Design | Design, design tokens, UI assets, visual consistency. |
+| **Team 50** | QA & FAV | Test scripts, E2E suites, regression, final acceptance validation (FAV), SOP-013 seals. |
 | **Team 60** | DevOps & Platform | Infrastructure, runtimes, CI/CD, platform. |
+| **Team 70** | Documentation | Technical writing, release notes, knowledge promotion. |
+| **Team 90** | Validation & Gate Management | GATE_5-GATE_8 validation process, validation packages, quality gate coordination. |
+| **Team 100** | Architectural Review | Stage-level architectural authority, GATE_6 architectural review, program authority. |
+| **Team 170** | Spec & Governance | LOD contracts, canonical document maintenance, registry synchronization. |
+| **Team 190** | Constitutional Validation | GATE_0-GATE_2 constitutional integrity and validation authority. |
 
 ---
 
@@ -44,6 +52,11 @@ Team 10 (Gateway) is owner of GATE_3 (Implementation). For every open Work Packa
 
 `.cursorrules` may mirror this mapping for tooling; governance SSOT for role and scope is this document.
 
+## 5) Roster Maintenance Rule
+
+This document must be updated whenever a new squad is added. Missing squad definition causes operational confusion and invalid routing.
+
 ---
 
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | v1.0.0_LOCKED | 2026-02-23**
+**log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_ROSTER_LOCK_APPLIED_v1.0.0 | 2026-03-03**

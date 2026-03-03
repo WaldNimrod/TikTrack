@@ -57,7 +57,7 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | S001 | D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S002 | D22, D23 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S003 | D33, D39, D40, D41, D26 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S004 | D36, D37, S004-PXXX (Indicators Infrastructure) | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S004 | D36, D37, S004-P007 (Indicators Infrastructure) | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S005 | D24, D25, D27, D28, D29, D31, D38, D26-Phase2 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory, TagRegistry, WatchListsEnhancement) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S006 | D30, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 
@@ -78,7 +78,7 @@ Note: D38 (tag_management) was in S003 but relocated to S005 per Amendment A1 (2
 
 ### שלב 4 — המעגל הפיננסי (Financial Execution)
 
-EXECUTIONS & IMPORT CENTER (Cash Flows + Executions, IBKR + IBI via BaseConnector), plus S004-PXXX Indicators Infrastructure.
+EXECUTIONS & IMPORT CENTER (Cash Flows + Executions, IBKR + IBI via BaseConnector), plus S004-P007 Indicators Infrastructure.
 
 ### שלב 5 — ישויות מורכבות (Trades/Plans)
 
@@ -131,16 +131,16 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 | 15 | D36 | executions | ביצועים | S004 |
 | 16 | D37 | data_import | ייבוא נתונים (dual mode: cash_flows + executions; IBKR + IBI; BaseConnector; archive + audit log) | S004 |
 | 17 | D24 | trade_plans | תוכניות טריידים | S005 |
-| 18 | D25 | ai_analysis | אנליזת AI (Prerequisite: S004-PXXX Indicators Infrastructure GATE_8 PASS) | S005 |
+| 18 | D25 | ai_analysis | אנליזת AI (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
 | 19 | D26 | watch_lists | רשימות צפייה | S003 |
 | 20 | D27 | ticker_dashboard | דשבורד טיקר | S005 |
-| 21 | D28 | trading_journal | יומן מסחר (Prerequisite: S004-PXXX Indicators Infrastructure GATE_8 PASS) | S005 |
+| 21 | D28 | trading_journal | יומן מסחר (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
 | 22 | D29 | trades | ניהול טריידים | S005 |
 | 23 | D30 | strategy_analysis | ניתוח אסטרטגיות | S006 |
-| 24 | D31 | trades_history | היסטוריית טרייד (Prerequisite: S004-PXXX Indicators Infrastructure GATE_8 PASS) | S005 |
+| 24 | D31 | trades_history | היסטוריית טרייד (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
 | 25 | D32 | portfolio_state | מצב תיק היסטורי | S006 |
 | 26 | D38 | tag_management | ניהול תגיות | S005 |
-| 26.1 | D26-Phase2 | watch_lists (enhancement) | שדרוג רשימות צפייה: Position, P/L, P/L%, ATR(14), flag_color filter. Prerequisite: S004-PXXX Indicators Infrastructure GATE_8 PASS | S005 |
+| 26.1 | D26-Phase2 | watch_lists (enhancement) | שדרוג רשימות צפייה: Position, P/L, P/L%, ATR(14), flag_color filter. Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS | S005 |
 | 27 | D40 | system_management | system_management — Admin Control Panel (admin-only, 7 sections: System Overview, Market Data Settings, Background Tasks, Alert System Monitor, Notifications Monitor, Audit Log, Feature Flags/Code Flags) | S003 |
 | 28 | D41 | user_management | user_management — Admin User Control (admin-only) | S003 |
 
@@ -161,3 +161,4 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 **log_entry | TEAM_170 | ROADMAP_AMENDED | 5_AMENDMENTS_PER_DIRECTIVE_v1.0.0 | 2026-03-02**
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ROADMAP_AMENDED_v2_3_AMENDMENTS_PER_ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v2.0.0 | 2026-03-03**
 **log_entry | TEAM_170 | ROADMAP_AMENDMENTS_COMPLETE_v1+v2 | 2026-03-03**
+**log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**

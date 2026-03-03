@@ -6,6 +6,7 @@
 **to:** Team 10  
 **cc:** Team 30  
 **date:** 2026-03-02  
+**historical_record:** true  
 **status:** PASS_READY_ON_DEMAND  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

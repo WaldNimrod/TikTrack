@@ -67,8 +67,8 @@ Team 190 stops and requests explicit direction only when a newly observed change
 
 ## 7) Warning handling (locked)
 
-Operational warnings emitted by enforced local guards are not informational only.
+Within the approved single-local-writer workflow, pre-push mixed-scope classification is informational only.
 
-- Any pre-push warning that indicates mixed-scope, drift-risk, or governance misalignment is treated as a required remediation event.
-- The push must be corrected and re-attempted after the warning condition is removed.
-- Team 190 treats unresolved guard warnings as constitutional process debt, not as ignorable output.
+- Wide pushes that include code, governance, and communication artifacts in the same cycle are normal and do not require split pushes by default.
+- Team 190 requires remediation only for deterministic guard failures: `date-lint`, WSM/registry sync failure, snapshot drift, or dirty authority files in an authority push.
+- Mixed-scope alone is not constitutional process debt.

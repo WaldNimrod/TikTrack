@@ -6,6 +6,7 @@
 **to:** Team 10  
 **cc:** Team 20, Team 90  
 **date:** 2026-03-02  
+**historical_record:** true  
 **status:** BLOCK  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

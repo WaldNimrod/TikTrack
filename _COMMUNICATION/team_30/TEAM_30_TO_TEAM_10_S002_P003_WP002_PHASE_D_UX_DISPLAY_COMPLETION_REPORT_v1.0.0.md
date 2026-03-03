@@ -6,6 +6,7 @@
 **to:** Team 10 (Execution Orchestrator)  
 **cc:** Team 20, Team 40, Team 50, Team 60, Team 90  
 **date:** 2026-01-31  
+**historical_record:** true  
 **status:** PASS_WITH_ACTIONS  
 **gate_id:** GATE_3  
 **work_package_id:** S002-P003-WP002  

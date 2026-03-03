@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-03T09:21:09.455435+00:00`
+- Generated (UTC): `2026-03-03T09:40:31.183684+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_3 (rollback loop EXECUTION_ACTIVE)`
-- next_required_action: `Team 20/30/50/60 execute active remediation mandates and submit PASS evidence for D22 + D33 + D34 + D35 and background-task orchestration/addendum deliverables before GATE_4 packaging by Team 10. Team 40 remains advisory-only and is engaged only if Team 30 opens a design-assets sub-stream.`
+- current_gate: `GATE_6 (PACKAGE_ROUTING_ACTIVE)`
+- next_required_action: `Team 90 prepares and routes the canonical GATE_6 architect submission package for S002-P003-WP002 under the current execution-approval procedure; Team 10 remains informed for traceability only.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_3 (rollback loop EXECUTION_ACTIVE) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_6 (PACKAGE_ROUTING_ACTIVE) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

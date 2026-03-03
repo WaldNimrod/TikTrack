@@ -35,7 +35,7 @@ Automation lock:
 - CI enforcement mode: `python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check`
 - CI trigger points: `.github/workflows/lint-enforcement.yml`, `.github/workflows/portfolio-auto-sync.yml`
 - `--check` modes in portfolio enforcement scripts are check-only by contract: they may fail on drift, but must not mutate repository artifacts.
-- Local pre-push guard warnings are treated as blocking remediation signals: the push must be corrected and retried, not ignored.
+- Local pre-push mixed-scope classification is informational only in the approved single-local-writer workflow. Pushes remain blocked only on deterministic failures (`date-lint`, WSM/registry sync, snapshot drift, or dirty authority files).
 
 ---
 

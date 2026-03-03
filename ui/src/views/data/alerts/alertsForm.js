@@ -59,6 +59,9 @@ function createAlertFormHTML(data = null) {
   const alertTypeOpts = ALERT_TYPES.map(t =>
     `<option value="${t}" ${alertType === t ? 'selected' : ''}>${t}</option>`
   ).join('');
+  // B-02: In edit mode, target_type and alert_type are non-editable (API does not persist them)
+  const targetLabel = (TARGET_TYPES.find(t => t.value === targetType) || { label: targetType }).label;
+  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   const fieldOpts = [{ value: '', label: '—ללא תנאי—' }, ...CONDITION_FIELDS].map(f =>
     `<option value="${f.value}" ${conditionField === f.value ? 'selected' : ''}>${f.label}</option>`
   ).join('');
@@ -76,11 +79,17 @@ function createAlertFormHTML(data = null) {
       </div>
       <div class="form-group">
         <label for="alertTargetType">מקושר ל</label>
-        <select id="alertTargetType" name="target_type">${targetOpts}</select>
+        ${isEdit
+          ? `<span id="alertTargetTypeDisplay" class="form-readonly-value" aria-readonly="true">${targetLabel}</span>`
+          : `<select id="alertTargetType" name="target_type">${targetOpts}</select>`
+        }
       </div>
       <div class="form-group">
         <label for="alertAlertType">סוג התראה</label>
-        <select id="alertAlertType" name="alert_type">${alertTypeOpts}</select>
+        ${isEdit
+          ? `<span id="alertAlertTypeDisplay" class="form-readonly-value" aria-readonly="true">${alertType}</span>`
+          : `<select id="alertAlertType" name="alert_type">${alertTypeOpts}</select>`
+        }
       </div>
       <div class="form-group form-group--condition-builder">
         <label>תנאי (אופציונלי)</label>

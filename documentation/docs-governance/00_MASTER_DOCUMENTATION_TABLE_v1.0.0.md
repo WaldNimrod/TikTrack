@@ -55,6 +55,8 @@
 | 05_RETRY_PROTOCOL | פרוטוקול ניסיון חוזר וחסימה — BLOCK_REPORT, החזרה לאדריכלות | `documentation/docs-governance/03-PROTOCOLS/05_RETRY_PROTOCOL.md` | — |
 | ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע — Team 70 מבצע; Team 170 לא מבצע קידום | `documentation/docs-governance/03-PROTOCOLS/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md` | — |
 | ARCHITECT_GOVERNANCE_PROCEDURES_V2 | נהלי ממשל כלליים (ארכיטקט) | `documentation/docs-governance/04-PROCEDURES/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md` | V2 |
+| KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE | נוהל קנוני מרכזי ל־known bugs: intake, routing, batched/immediate, closure | `documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md` | v1.0.0 |
+| KNOWN_BUGS_REGISTER | רג'יסטר קנוני יחיד לבאגים מאומתים | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | v1.0.0 |
 | TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (GATE_3..GATE_8; G3.5 ולידציית תוכנית בתוך GATE_3) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
 | FAST_TRACK_EXECUTION_PROTOCOL | מסלול מקוצר אופציונלי (לא ברירת מחדל): FAST_0..FAST_4, בלעדיות מסלול, track_mode, SLA 48h, ורפרנס מחייב ל־GATE_3 | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | v1.0.0 |
 | TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/60 + אורקסטרציה Team 10 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
@@ -148,3 +150,4 @@
 
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | DELIVERED | 2026-02-22**
 **log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | FAST_TRACK_PROTOCOL_REFERENCE_ADDED | 2026-02-26**
+**log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | KNOWN_BUGS_PROCEDURE_AND_REGISTER_LINKED | 2026-03-03**

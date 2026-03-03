@@ -1,0 +1,9 @@
+DUPLICATE_WINDOW_QUERY_EXIT 0
+tag|started_at|completed_at|duration_ms|distinct_tickers|total_rows|duplicated_ticker_count
+LATEST_SYNC_WINDOW|2026-03-03 10:23:51.615969+00|2026-03-03 10:24:43.203186+00|51587|5|5|0
+(1 row)
+ticker_id|row_count
+(0 rows)
+---STDERR---
+
+DUPLICATE_APPEND_EXIT 0

@@ -1,0 +1,26 @@
+INFO:     Started server process [52501]
+INFO:     Waiting for application startup.
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_ticker_prices_intraday (interval=15m)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job check_alert_conditions (interval=15m)
+INFO:apscheduler.scheduler:Added job "sync_ticker_prices_intraday" to job store "default"
+INFO:apscheduler.scheduler:Added job "check_alert_conditions" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:api.background.scheduler_startup:APScheduler started — background jobs active
+INFO:api.main:APScheduler started — background jobs active
+INFO:     Application startup complete.
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 12:59:00 IST)" (scheduled at 2026-03-03 10:44:00.873050+00:00)
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 12:59:00 IST)" (scheduled at 2026-03-03 10:44:00.873135+00:00)
+INFO:     Uvicorn running on http://127.0.0.1:8091 (Press CTRL+C to quit)
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 12:59:00 IST)" executed successfully
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d&range=1mo "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v8/finance/chart/AMZN?interval=1d&range=1mo "HTTP/1.1 429 Too Many Requests"
+INFO:     127.0.0.1:61144 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:api.background.scheduler_startup:APScheduler stopped
+INFO:api.main:APScheduler stopped
+INFO:apscheduler.scheduler:Scheduler has been shut down
+INFO:     Application shutdown complete.
+INFO:     Finished server process [52501]

@@ -46,6 +46,8 @@
 | **רשימת משימות (Tasks) — סטטוס OPEN/CLOSED, תאריכי סגירה** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | רמה 2; מתעדכן על ידי Team 10; סטטוס שער שוטף לא כאן — ב־WSM |
 | **מפת דרכים (Stages)** | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | מפת דרכים אחת (קטלוג, נרטיב, Level-2, חלוקת עמודים) |
 | **Portfolio קנוני (Stage/Program/WP)** | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | קטלוג קנוני; runtime רק ב־WSM |
+| **Known Bugs Register (canonical)** | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | רג'יסטר קנוני יחיד לבאגים מאומתים (BLOCKING/באטצ'ד) |
+| **Known Bugs Procedure (central)** | `documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md` | נוהל קנוני: intake/routing/closure ל־known bugs |
 | **נוהל ניהול רשימות + מי מעדכן WSM ומתי + חובה סנכרון רשימות** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | §1.2.2: Gate Owner מעדכן WSM; Team 10 מסנכרן רשימות בכל הרמות |
 | **נוהל מסלול מקוצר (אופציונלי, לא ברירת מחדל)** | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | FAST_0..FAST_4; בלעדיות מסלול; SLA 48h; FAST_2 מפנה ל־GATE_3 canonical |
 

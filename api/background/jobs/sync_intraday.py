@@ -100,7 +100,7 @@ async def _fetch_prices_for_tickers(
     for ticker_id, symbol, ticker_type, metadata in tickers:
         pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
         yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
-        pr = None
+        # B-01: for...else — fallback runs exactly once, ONLY after all providers exhausted
         for provider, name, use_sym, use_crypto in [
             (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
             (alpha, "ALPHA_VANTAGE", alpha_sym, ticker_type == "CRYPTO"),
@@ -134,10 +134,11 @@ async def _fetch_prices_for_tickers(
             except Exception as e:
                 if _is_429(e):
                     set_cooldown(name, cooldown_min)
-            else:
-                last = await _get_last_known_price(db, ticker_id, symbol)
-                if last:
-                    results.append(last)
+        else:
+            # No break — all providers exhausted without usable price. Fallback exactly once.
+            last = await _get_last_known_price(db, ticker_id, symbol)
+            if last:
+                results.append(last)
         if delay_sec > 0:
             await asyncio.sleep(delay_sec)
     return results

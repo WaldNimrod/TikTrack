@@ -3,7 +3,7 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** KNOWN_BUGS_REGISTER  
 **version:** 1.0.0  
-**owner:** Team 190 (validation intake); canonical procedure to be maintained by Team 170 once adopted  
+**owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
 **last_updated:** 2026-03-03  
 **status:** ACTIVE  
@@ -103,13 +103,17 @@ This cadence is an operational batching rule, not a gate override.
 
 ## Maintenance Note
 
-The canonical process for this register must be added by Team 170 to the central governance procedure set.
+Canonical process entry point (active):
 
-Until that procedure update is completed:
-1. Team 190 may add validated bugs here,
-2. Team 10 must use this register as the reference for batched remediation rounds,
-3. Team 170 must preserve this file as the canonical bug ledger.
+`documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md`
+
+Operational maintenance model:
+1. Team 190 validates and routes defects into canonical intake.
+2. Team 170 maintains register consistency and governance integrity.
+3. Team 10 orchestrates immediate and batched remediation rounds using canonical `bug_id`.
+4. Team 90/Team 190 consume canonical `bug_id` in follow-up validation.
 
 ---
 
 **log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | v1.0.0_CREATED | 2026-03-03**
+**log_entry | TEAM_170 | KNOWN_BUGS_REGISTER | CENTRAL_GOVERNANCE_PROCEDURE_LINKED_AND_MAINTENANCE_MODEL_ACTIVATED | 2026-03-03**

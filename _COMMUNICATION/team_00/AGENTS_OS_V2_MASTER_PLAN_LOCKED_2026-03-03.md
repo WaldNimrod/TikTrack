@@ -52,51 +52,48 @@ An **Orchestrator** that automates the routing of conversations between team age
 
 **Problem:** LLM agents drift from their role and forget rules over time.
 
-**Solution:** Every LLM call from the Orchestrator includes a **Context Injection Block** — a structured prefix that reminds the agent of its identity, role, current state, and constraints.
+**Solution:** The Orchestrator generates every message using the **existing Canonical Message Format** (TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md) + **Context Loading Protocol** (TEAM_100_SUCCESSOR_HANDOFF_PACKAGE/04_TEAM_100_CONTEXT_LOADING_PROTOCOL.md), implemented programmatically.
 
-```
-┌─────────────────────────────────────────────────┐
-│  CONTEXT INJECTION BLOCK (prepended to EVERY call) │
-├─────────────────────────────────────────────────┤
-│                                                   │
-│  LAYER 1: IDENTITY (who you are)                  │
-│    "You are Team 90 (The Spy)."                   │
-│    "Your role: code validation, integrity checks." │
-│    "You report to Team 10."                       │
-│    "You own GATE_5, 6, 7, 8."                    │
-│                                                   │
-│  LAYER 2: GOVERNANCE (the rules)                  │
-│    "Task closure requires Seal Message (SOP-013)."│
-│    "VALIDATION_RESPONSE must include: identity    │
-│     header, overall_status, blocking_findings."   │
-│    "Max resubmissions: 5."                        │
-│                                                   │
-│  LAYER 3: STATE (where we are now)                │
-│    "Active WP: S002-P002-WP001"                   │
-│    "Current gate: GATE_5"                         │
-│    "Previous gate result: GATE_4 PASS"            │
-│    "Approved spec: [reference to LLD400]"         │
-│                                                   │
-│  LAYER 4: TASK (what to do now)                   │
-│    [The actual request for this gate]             │
-│                                                   │
-└─────────────────────────────────────────────────┘
-```
+**No new format invented.** The existing governance already defines:
+- **Mandatory Identity Header** (roadmap_id, stage_id, program_id, work_package_id, gate_id, phase_owner, required_ssm_version, required_active_stage)
+- **Fixed section order:** Purpose → Context/Inputs → Required actions → Deliverables → Validation criteria → Response required
+- **Context Loading triggers:** Stage change, domain change, new program, gate transition, handoff
+- **Drift Prevention rules** (TEAM_100_SUCCESSOR_HANDOFF_PACKAGE/05_DRIFT_PREVENTION_RULES.md)
+- **Context Reset preamble:** `TEAM_XX_CONTEXT_RESET – Load attached SSM and WSM. Confirm active stage, active flow, active domain, and allowed gate range before proceeding.`
 
-**Every single LLM call gets all 4 layers.** This means:
-- No drift — agent is reminded of its role every time
-- No context loss — current state is always injected
-- No governance violations — rules are always present
-- Idempotent — same call produces same behavior regardless of conversation history
+**What V2 adds:** Programmatic assembly of these existing formats. The `context/injection.py` module:
+1. Reads the team's Onboarding Package (Layer 1 — Identity)
+2. Reads Canonical Message Format + gate rules (Layer 2 — Governance)
+3. Reads STATE_SNAPSHOT + WSM (Layer 3 — State)
+4. Inserts the specific task/request (Layer 4 — Task)
+
+All assembled into the Canonical Message Format structure that all teams already adopted.
+
+**Source packages per team (already in repo):**
+
+| Team | Identity Source |
+|------|---------------|
+| 00/100 | `_COMMUNICATION/team_100/TEAM_100_SUCCESSOR_HANDOFF_PACKAGE_v1.0.0/` |
+| 10 | `_COMMUNICATION/team_10/TEAM_10_GATEWAY_ROLE_AND_PROCESS.md` |
+| 20–60 | Mandate format from `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_XX_*_ACTIVATION_DRAFT.md` |
+| 70 | `_COMMUNICATION/team_70/TEAM_70_ONBOARDING_PACKAGE.md` |
+| 90 | `TEAM_100_SUCCESSOR_HANDOFF_PACKAGE/02_TEAM_190_SPY_DOCTRINE.md` |
+| 170 | `_COMMUNICATION/team_100/TEAM_170_ACTIVATION_PACKAGE/` |
+| 190 | `_COMMUNICATION/team_190/TEAM_190_ONBOARDING_PACKAGE.md` + `TEAM_190_ACTIVATION_PROMPT.md` |
+
+**Canonical formats (already in repo):**
+- Message format: `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`
+- Context loading: `_COMMUNICATION/team_100/TEAM_100_SUCCESSOR_HANDOFF_PACKAGE_v1.0.0/04_TEAM_100_CONTEXT_LOADING_PROTOCOL.md`
+- Drift prevention: `_COMMUNICATION/team_100/TEAM_100_SUCCESSOR_HANDOFF_PACKAGE_v1.0.0/05_DRIFT_PREVENTION_RULES.md`
 
 **When refresh happens:**
 
 | Trigger | What's refreshed |
 |---------|-----------------|
-| Every LLM call | Full 4-layer injection (always) |
-| Gate transition | LAYER 3 updated with new gate state |
-| Retry (after FAIL) | LAYER 4 updated with failure details |
-| Implementation pause (Cursor) | Mandates include full context for paste |
+| Every LLM call | Full canonical message with identity header + context (always) |
+| Gate transition | State section updated with new gate state |
+| Retry (after FAIL) | Task section updated with failure details |
+| Implementation pause (Cursor) | Mandates include full context per existing mandate format |
 
 ### 3.3 File Structure
 

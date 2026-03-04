@@ -7,11 +7,11 @@ repos:
   - repo: local
     hooks:
       - id: phoenix-unit-tests
-        name: "Phoenix Unit Tests [BLOCKING]"
+        name: "Phoenix Unit Tests [BLOCKING on Python changes]"
         entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; python3 -m pytest tests/unit/ -q --tb=short"
         language: system
         pass_filenames: false
-        always_run: true
+        files: '^(api/.*\.py|tests/.*\.py)$'
         stages: [pre-commit]
 
       - id: phoenix-bandit-security
@@ -28,6 +28,7 @@ repos:
         language: system
         pass_filenames: true
         files: '.*'
+        exclude: '^_COMMUNICATION/.*/evidence/runtime/.*\.log$'
         stages: [pre-commit]
 
       - id: phoenix-frontend-build

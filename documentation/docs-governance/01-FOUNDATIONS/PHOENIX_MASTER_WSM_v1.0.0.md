@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-03** — Team 90 consumed the human `GATE_7` rejection and locked `CODE_CHANGE_REQUIRED` with `PRE_REMEDIATION_ALIGNMENT_REQUIRED` for `S002-P003-WP002`.
+**Gate-owner update evidence:** This block was updated **2026-03-04** — Team 90 converted the approved architect remediation frame into one unified execution package for Team 10 for `S002-P003-WP002`.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_7 REJECT on WP002 after human browser review; CODE_CHANGE_REQUIRED with PRE_REMEDIATION_ALIGNMENT_REQUIRED before direct Team 10 execution handoff; global top-filter alignment recorded as deferred carryover |
+| active_flow | S002-P003; GATE_7 REJECT remediation frame approved by Team 00; unified execution package issued to Team 10 for D22+D33+D34+D35; global top-filter alignment remains deferred carryover |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (rollback loop after GATE_7 REJECT / CODE_CHANGE_REQUIRED) |
+| in_progress_work_package_id | S002-P003-WP002 (approved remediation execution cycle active under Team 10) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_7 REJECT \| 2026-03-01 \| Nimrod human review rejected WP002; Team 90 routed CODE_CHANGE_REQUIRED |
+| last_s002_p003_milestone | GATE_7 REMEDIATION EXECUTION PACKAGE ISSUED \| 2026-03-04 \| Team 90 converted architect-approved frame into one unified Team 10 execution package |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED) |
+| current_gate | GATE_7 (REJECTED_EXECUTION_PACKAGE_ISSUED) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_5-8 owner; pre-remediation framing owner) |
-| last_gate_event | GATE_7_REJECT \| 2026-03-03 \| Nimrod rejected WP002 after browser review; Team 90 locked CODE_CHANGE_REQUIRED with PRE_REMEDIATION_ALIGNMENT_REQUIRED \| NIMROD_GATE7_S002_P003_WP002_DECISION_v1.2.1.md |
-| next_required_action | Team 90 prepares the structured pre-remediation frame (impact map, grouped remediation streams, architect clarifications if needed). Only after that frame is locked may Team 10 receive a direct execution remediation package. |
-| next_responsible_team | Team 90 |
+| phase_owner_team | Team 10 (execution owner under Team 90 gate lineage) |
+| last_gate_event | GATE_7_REMEDIATION_EXECUTION_PACKAGE_ISSUED \| 2026-03-04 \| Team 90 issued one unified execution package to Team 10 under ARCHITECT_GATE7_REMEDIATION_FRAME_S002_P003_WP002_v1.0.0 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE7_REMEDIATION_EXECUTION_PACKAGE_v1.0.0.md |
+| next_required_action | Team 10 executes all four remediation streams, completes required migrations and data corrections, and submits one full-scope GATE_4 QA handover for D22+D33+D34+D35. |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -216,6 +216,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 REJECT S002-P003-WP002 (CODE_CHANGE_REQUIRED); rolled back to remediation under Team 10 | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | S002-P003-WP002 remediation held pending pre-remediation impact map, decision lock, and architect approval before Team 10 execution | 2026-03-01**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | Pre-remediation architect package submitted for S002-P003-WP002; awaiting Team 00 / Team 100 decision | 2026-03-01**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | Team 00 approved the remediation frame; Team 90 issued one unified execution package to Team 10 for S002-P003-WP002 | 2026-03-04**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

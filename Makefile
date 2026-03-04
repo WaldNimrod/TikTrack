@@ -304,6 +304,10 @@ test-suite-e:
 	@cd tests && npm run test:external-data-suite-e
 	@echo "✅ Suite E complete."
 
+## D33 Parallel Create — G7R Batch5 integration test (requires api/.env, DB)
+test-d33-parallel:
+	@bash scripts/run-d33-parallel-create-test.sh
+
 ## Help
 help:
 	@echo "Available targets:"
@@ -337,5 +341,6 @@ help:
 	@echo "  make test-external-data-smoke - Suites A+B+D (PR smoke)"
 	@echo "  make test-suite-d      - Suite D: Retention & Cleanup (Smoke/Nightly)"
 	@echo "  make test-suite-e      - Suite E: UI Staleness Clock + Tooltip (Nightly)"
+	@echo "  make test-d33-parallel - D33 Parallel Create (G7R Batch5; needs api/.env, DB)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

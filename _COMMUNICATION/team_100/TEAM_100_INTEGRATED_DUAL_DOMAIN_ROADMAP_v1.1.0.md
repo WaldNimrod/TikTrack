@@ -553,29 +553,28 @@ Requires dedicated Team 00 + Team 100 architectural session. Candidates:
 
 ## 7. Open Items and Blockers
 
+> **Status updated: 2026-03-04.** All SSOT blockers resolved and all OD-02–OD-05 directives issued.
+> See ratification: `ARCHITECT_RATIFICATION_INTEGRATED_ROADMAP_FINAL_v1.0.0.md`
+
 ### SSOT Reconciliation Status (P1-03)
 
-| Item | Status | Evidence | Impact |
-|---|---|---|---|
-| **D31 → S005** | ⚠️ UNVERIFIED — must check `TT2_PAGES_SSOT_MASTER_LIST.md` | Per locked directive §6 rule 7 | BLOCKER for S005-P004 spec authoring if not resolved |
-| **D40 → S003** | ⚠️ UNVERIFIED — currently marked "not required (essential)" in SSOT | `TT2_PAGES_SSOT_MASTER_LIST.md:94` | BLOCKER for S003-P003 spec authoring if not resolved |
-| **D38/D39 discrepancy** | ⚠️ UNRESOLVED — Roadmap v2.5 ≠ canonical SSOT | Team 00 MEMORY note | BLOCKER for S003 GATE_0 if not resolved |
+| Item | Status | Evidence |
+|---|---|---|
+| **D31 → S005** | ✅ RESOLVED | Team 170 reconciliation — `ARCHITECT_RATIFICATION_INTEGRATED_ROADMAP_FINAL_v1.0.0.md §2 Condition 3` |
+| **D40 → S003** | ✅ RESOLVED | Team 170 reconciliation — same evidence |
+| **D38/D39 discrepancy** | ✅ RESOLVED | Team 170 reconciliation — same evidence |
 
-> **Required action:** Team 170 must verify and update SSOT for D31, D40. Team 00 + Team 190
-> must resolve D38/D39 discrepancy before S003 GATE_0. These are confirmed BLOCKERS per
-> Team 190 prevalidation (P1-03, P1-04-SSOT).
+### Open Items — Current State
 
-### Other Open Items
-
-| # | Item | Blocking | Owner | Timing |
+| # | Item | Status | Owner | Timing |
 |---|---|---|---|---|
-| OD-01 | D29+D24 arch session | S005-P002 GATE_0 | Team 00 + Nimrod | After S004-P006 GATE_8 |
-| OD-02 | Escalation Protocol formal directive | Protocol binding | Team 00 → issue directive | Before S003 GATE_0 |
-| OD-03 | TikTrack program IDs formal registration | S003 GATE_0 | Team 170 (register proposed IDs) | Before S003 programs open |
-| OD-04 | Admin Review IDs formal registration | Stage transitions | Team 170 | Before each stage transition |
-| OD-05 | AGENTS_OS COMPLETE GATE formal directive | Gate mandate binding | Team 00 → issue directive | Before S004 P-ADMIN |
-| OD-06 | S001-P002 LOD200 activation | S001-P002 GATE_0 | Team 100 | NOW |
-| OD-07 | Post-S006 Phase 6 scope | Phase 6 programs | Team 00 session | After S006 P-ADMIN |
+| OD-01 | D29+D24 arch session | ⏳ OPEN | Team 00 + Nimrod | After S004-P006 GATE_8 |
+| OD-02 | Escalation Protocol formal directive | ✅ CLOSED | `ARCHITECT_DIRECTIVE_ESCALATION_PROTOCOL_v1.0.0.md` — 2026-03-04 | — |
+| OD-03 | TikTrack program IDs formal registration | ✅ CLOSED | Confirmed in ratification §2 Condition 1 | — |
+| OD-04 | Admin Review IDs formal registration | ✅ CLOSED | `ARCHITECT_DIRECTIVE_STAGE_GOVERNANCE_PACKAGE_v1.0.0.md` + ratification §2 Condition 1 | — |
+| OD-05 | AGENTS_OS COMPLETE GATE formal directive | ✅ CLOSED | `ARCHITECT_DIRECTIVE_AGENTS_OS_COMPLETE_GATE_v1.0.0.md` — 2026-03-04 | — |
+| OD-06 | S001-P002 GATE_0 package submission | 🔄 ACTIVE | Team 100 — placement decision issued (Option A); 7-file package to assemble | NOW — parallel with S002-P003-WP002 GATE_7→8 |
+| OD-07 | Post-S006 Phase 6 scope | ⏳ OPEN | Team 00 session | After S006-P004 GATE_8 |
 
 ---
 

@@ -65,6 +65,13 @@ In every page or interface implementation:
 - סקריפטי `--check` חייבים להיות **check-only**: הם רשאים להיכשל על drift, אך אסור להם לייצר שינויי קבצים.
 - ב־single-local-writer mode, mixed-scope ב־pre-push הוא מצב עבודה טבעי ואינו חריגה. סיווג mixed-scope הוא informational only ואינו מחייב פיצול push.
 
+## 🚀 SERVER & TEST INFRASTRUCTURE (MANDATORY)
+- **Initialization is part of the job.** When tests require a running backend/DB, start the server proactively:
+  - Backend: `bash scripts/start-backend.sh` (or `scripts/init-servers-for-qa.sh` for full stack)
+  - Verify: `curl -s http://localhost:8082/health` → 200
+- **Scripts available:** `scripts/start-backend.sh`, `scripts/stop-backend.sh`, `scripts/init-servers-for-qa.sh`
+- **DB-dependent tests:** Load `api/.env` for DATABASE_URL. Example: `make test-d33-parallel`, `bash scripts/run-d33-parallel-create-test.sh`
+
 ## 🏁 TASK COMPLETION (SOP-013 — LOCKED)
 - **סגירת משימה:** **רק** באמצעות **הודעת Seal (SOP-013)** — דוח/דוח השלמה לבד **לא** נחשב סגירה. פורמט: `--- PHOENIX TASK SEAL ---` + TASK_ID, STATUS, FILES_MODIFIED, PRE_FLIGHT, HANDOVER_PROMPT. **Canonical SOP-013:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 - **Zero Noise:** קבצי תיעוד "זמניים" בתיקיות הצוותים שלא זוקקים ל-PCS (חיתום שלב) — **יימחקו**. Evidence רק כחלק מ-Seal או לפי הנחיית Team 10.

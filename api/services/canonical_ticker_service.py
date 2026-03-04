@@ -65,6 +65,13 @@ async def _live_data_check(
     return False
 
 
+def _symbol_advisory_key(symbol: str) -> int:
+    """G7R Batch5: Deterministic bigint for pg_advisory_xact_lock (single-create invariant)."""
+    import hashlib
+    h = hashlib.sha256(symbol.strip().upper().encode()).digest()
+    return int.from_bytes(h[:8], "big") % (2**63)
+
+
 async def create_system_ticker(
     db: AsyncSession,
     symbol: str,
@@ -77,26 +84,30 @@ async def create_system_ticker(
 ) -> Ticker:
     """
     THE canonical path for creating a system ticker.
-    1. Check symbol uniqueness in market_data.tickers
-    2. Validate live market data (unless skip_live_check=True and dev)
-    3. Create ticker with status
-    4. Return Ticker ORM object
+    G7R Batch5: Advisory lock enforces single-create under concurrency.
+    1. Acquire advisory lock by symbol (serialize concurrent creates)
+    2. Check symbol uniqueness in market_data.tickers
+    3. Validate live market data (unless skip_live_check=True and dev)
+    4. Create ticker with status OR return existing on IntegrityError
+    5. Return Ticker ORM object
     """
+    from sqlalchemy import text
     from ..core.config import settings
     symbol_uc = symbol.strip().upper()
     ticker_type_uc = ticker_type.upper()
 
-    # Uniqueness check
+    # G7R Batch5: Serialize concurrent create for same symbol
+    lock_key = _symbol_advisory_key(symbol_uc)
+    await db.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": lock_key})
+
+    # Uniqueness check (after lock; another txn cannot have created meanwhile)
+    # G7R Batch5: Return existing instead of 409 — idempotent get-or-create for concurrency
     stmt = select(Ticker).where(
         and_(Ticker.symbol == symbol_uc, Ticker.deleted_at.is_(None))
     )
     existing = (await db.execute(stmt)).scalar_one_or_none()
     if existing:
-        raise HTTPExceptionWithCode(
-            status_code=409,
-            detail=f"Ticker symbol '{symbol_uc}' already exists",
-            error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
-        )
+        return existing
 
     # Live validation (skip only when explicitly bypassed for dev)
     do_live = not skip_live_check or (skip_live_check and not settings.debug)
@@ -137,12 +148,14 @@ async def create_system_ticker(
     except IntegrityError as e:
         await db.rollback()
         error_msg = str(e.orig) if hasattr(e, "orig") else str(e)
-        if "symbol" in error_msg.lower():
-            raise HTTPExceptionWithCode(
-                status_code=409,
-                detail=f"Ticker symbol '{symbol_uc}' already exists",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+        if "symbol" in error_msg.lower() or "unique" in error_msg.lower():
+            # G7R Batch5: Concurrent insert — return existing (no duplicate)
+            stmt = select(Ticker).where(
+                and_(Ticker.symbol == symbol_uc, Ticker.deleted_at.is_(None))
             )
+            existing = (await db.execute(stmt)).scalar_one_or_none()
+            if existing:
+                return existing
         raise HTTPExceptionWithCode(
             status_code=409,
             detail="Ticker creation failed",

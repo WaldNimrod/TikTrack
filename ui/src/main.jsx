@@ -46,6 +46,7 @@ import './styles/D15_IDENTITY_STYLES.css';
     await sharedServices.init();
     sharedServices.on401 = () => authService.handle401Logout();
     authService.checkTokenExpiryOnBoot();
+    if (authService.isAuthenticated()) authService.startProactiveRefreshScheduler();
   } catch (_) {}
 })();
 

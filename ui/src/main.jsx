@@ -35,6 +35,21 @@ import './styles/phoenix-header.css';
 import './styles/D15_IDENTITY_STYLES.css';
 
 /**
+ * G7R §3E: Auth boot — token expiry check + 401 handler
+ */
+(async () => {
+  try {
+    const [{ default: sharedServices }, { default: authService }] = await Promise.all([
+      import('./components/core/sharedServices.js'),
+      import('./cubes/identity/services/auth.js')
+    ]);
+    await sharedServices.init();
+    sharedServices.on401 = () => authService.handle401Logout();
+    authService.checkTokenExpiryOnBoot();
+  } catch (_) {}
+})();
+
+/**
  * Application Bootstrap
  * 
  * @description Initializes React root and renders AppRouter

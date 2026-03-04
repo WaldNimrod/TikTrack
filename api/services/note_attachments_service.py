@@ -146,6 +146,38 @@ class NoteAttachmentsService:
         await db.refresh(attachment)
         return (_attachment_to_response(attachment), None, None)
 
+    async def get_attachment_download(
+        self,
+        db: AsyncSession,
+        note_id: uuid.UUID,
+        attachment_id: uuid.UUID,
+        user_id: uuid.UUID,
+    ) -> Optional[Tuple[Path, str, str]]:
+        """
+        G7R Batch3: Return (full_path, content_type, original_filename) for download.
+        Returns None if note/attachment not found or not owned.
+        """
+        note_stmt = select(Note).where(
+            and_(Note.id == note_id, Note.user_id == user_id, Note.deleted_at.is_(None))
+        )
+        if (await db.execute(note_stmt)).scalar_one_or_none() is None:
+            return None
+
+        stmt = select(NoteAttachment).where(
+            and_(
+                NoteAttachment.id == attachment_id,
+                NoteAttachment.note_id == note_id,
+            )
+        )
+        result = await db.execute(stmt)
+        a = result.scalar_one_or_none()
+        if not a:
+            return None
+        full_path = _full_path(a.storage_path)
+        if not full_path.exists():
+            return None
+        return (full_path, a.content_type, a.original_filename)
+
     async def get_attachment(
         self,
         db: AsyncSession,

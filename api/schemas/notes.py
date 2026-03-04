@@ -54,6 +54,7 @@ class NoteResponse(BaseModel):
     parent_type: Optional[str] = None
     parent_id: Optional[str] = None
     parent_datetime: Optional[datetime] = None
+    linked_entity_display: Optional[str] = None  # G7R Batch3: resolved entity name
     title: Optional[str] = None
     content: str
     category: str

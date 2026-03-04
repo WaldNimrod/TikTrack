@@ -83,6 +83,7 @@ class AlertResponse(BaseModel):
     target_id: Optional[str] = None
     ticker_id: Optional[str] = None
     ticker_symbol: Optional[str] = None
+    target_display_name: Optional[str] = None
     alert_type: str
     priority: str
     condition_field: Optional[str] = None

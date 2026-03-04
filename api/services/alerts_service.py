@@ -13,6 +13,9 @@ from sqlalchemy import select, and_, func
 
 from ..models.alerts import Alert
 from ..models.tickers import Ticker
+from ..models.trades import Trade
+from ..models.trade_plans import TradePlan
+from ..models.trading_accounts import TradingAccount
 from ..models.enums import AlertType, AlertPriority
 
 
@@ -22,6 +25,51 @@ VALID_TRIGGER_STATUS = frozenset(("untriggered", "triggered_unread", "triggered_
 VALID_ALERT_TYPES = frozenset(("PRICE", "VOLUME", "TECHNICAL", "NEWS", "CUSTOM"))
 VALID_PRIORITIES = frozenset(("LOW", "MEDIUM", "HIGH", "CRITICAL"))
 NEW_ALERTS_DAYS = 10
+
+
+async def _resolve_target_display_names(
+    db: AsyncSession,
+    alerts: List[Alert],
+    user_id: uuid.UUID,
+) -> dict:
+    """G7R Batch2: Resolve target_id -> display name for trade, trade_plan, account."""
+    out = {}
+    trade_ids = []
+    plan_ids = []
+    account_ids = []
+    for a in alerts:
+        if not a.target_id:
+            continue
+        if a.target_type == "trade":
+            trade_ids.append(a.target_id)
+        elif a.target_type == "trade_plan":
+            plan_ids.append(a.target_id)
+        elif a.target_type == "account":
+            account_ids.append(a.target_id)
+    if trade_ids:
+        stmt = (
+            select(Trade.id, Ticker.symbol, Trade.direction)
+            .join(Ticker, Trade.ticker_id == Ticker.id)
+            .where(Trade.id.in_(trade_ids), Trade.user_id == user_id)
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade", row[0])] = f"{row[1] or '?'} {row[2] or ''}".strip()
+    if plan_ids:
+        stmt = select(TradePlan.id, TradePlan.plan_name).where(
+            TradePlan.id.in_(plan_ids), TradePlan.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade_plan", row[0])] = row[1] or str(row[0])
+    if account_ids:
+        stmt = select(TradingAccount.id, TradingAccount.account_name).where(
+            TradingAccount.id.in_(account_ids), TradingAccount.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("account", row[0])] = row[1] or str(row[0])
+    return out
 
 
 def _condition_summary(field: Optional[str], op: Optional[str], val) -> Optional[str]:
@@ -42,6 +90,7 @@ def _condition_summary(field: Optional[str], op: Optional[str], val) -> Optional
 def _alert_to_response(
     alert: Alert,
     ticker_symbol: Optional[str] = None,
+    target_display_name: Optional[str] = None,
 ) -> dict:
     cond_val = alert.condition_value
     cv = float(cond_val) if cond_val is not None else None
@@ -52,6 +101,7 @@ def _alert_to_response(
         "target_id": str(alert.target_id) if alert.target_id else None,
         "ticker_id": str(alert.ticker_id) if alert.ticker_id else None,
         "ticker_symbol": ticker_symbol,
+        "target_display_name": target_display_name,
         "alert_type": (
             alert.alert_type.value
             if hasattr(alert.alert_type, "value")
@@ -97,6 +147,8 @@ class AlertsService:
         user_id: uuid.UUID,
         target_type: Optional[str] = None,
         ticker_id: Optional[uuid.UUID] = None,
+        is_active: Optional[bool] = None,
+        trigger_status: Optional[str] = None,
         page: int = 1,
         per_page: int = 25,
         sort: str = "created_at",
@@ -107,6 +159,10 @@ class AlertsService:
             base = and_(base, Alert.target_type == target_type)
         if ticker_id is not None:
             base = and_(base, Alert.ticker_id == ticker_id)
+        if is_active is not None:
+            base = and_(base, Alert.is_active.is_(is_active))
+        if trigger_status is not None and trigger_status in VALID_TRIGGER_STATUS:
+            base = and_(base, Alert.trigger_status == trigger_status)
 
         count_stmt = select(func.count()).select_from(Alert).where(base)
         total = (await db.execute(count_stmt)).scalar() or 0
@@ -130,11 +186,18 @@ class AlertsService:
         )
         result = await db.execute(stmt)
         rows = result.all()
+        alert_objs = [row[0] for row in rows]
+        display_map = await _resolve_target_display_names(db, alert_objs, user_id) if alert_objs else {}
 
-        data = [
-            _alert_to_response(row[0], ticker_symbol=row[1] if row[1] else None)
-            for row in rows
-        ]
+        data = []
+        for row in rows:
+            alert, ticker_sym = row[0], row[1] if row[1] else None
+            tdn = None
+            if alert.target_type and alert.target_id:
+                tdn = display_map.get((alert.target_type, alert.target_id))
+            data.append(
+                _alert_to_response(alert, ticker_symbol=ticker_sym, target_display_name=tdn)
+            )
         return data, total
 
     async def get_alerts_summary(self, db: AsyncSession, user_id: uuid.UUID) -> dict:
@@ -187,7 +250,12 @@ class AlertsService:
         row = result.one_or_none()
         if not row:
             return None
-        return _alert_to_response(row[0], ticker_symbol=row[1] if row[1] else None)
+        alert, ticker_sym = row[0], row[1] if row[1] else None
+        tdn = None
+        if alert.target_type and alert.target_id:
+            display_map = await _resolve_target_display_names(db, [alert], user_id)
+            tdn = display_map.get((alert.target_type, alert.target_id))
+        return _alert_to_response(alert, ticker_symbol=ticker_sym, target_display_name=tdn)
 
     async def create_alert(
         self,
@@ -301,9 +369,12 @@ class AlertsService:
         if alert.ticker_id:
             ticker_stmt = select(Ticker.symbol).where(Ticker.id == alert.ticker_id)
             ticker_res = await db.execute(ticker_stmt)
-            sym = ticker_res.scalar_one_or_none()
-            ticker_symbol = sym
-        return _alert_to_response(alert, ticker_symbol=ticker_symbol)
+            ticker_symbol = ticker_res.scalar_one_or_none()
+        tdn = None
+        if alert.target_type and alert.target_id and alert.target_type in ("trade", "trade_plan", "account"):
+            display_map = await _resolve_target_display_names(db, [alert], user_id)
+            tdn = display_map.get((alert.target_type, alert.target_id))
+        return _alert_to_response(alert, ticker_symbol=ticker_symbol, target_display_name=tdn)
 
     async def update_alert(
         self,
@@ -330,7 +401,7 @@ class AlertsService:
             ts = data.get("trigger_status")
             if ts in VALID_TRIGGER_STATUS:
                 alert.trigger_status = ts
-                if ts == "untriggered":
+                if ts in ("untriggered", "rearmed"):
                     alert.is_triggered = False
         if "title" in data:
             alert.title = data["title"]
@@ -356,7 +427,11 @@ class AlertsService:
             ticker_stmt = select(Ticker.symbol).where(Ticker.id == alert.ticker_id)
             ticker_res = await db.execute(ticker_stmt)
             ticker_symbol = ticker_res.scalar_one_or_none()
-        return _alert_to_response(alert, ticker_symbol=ticker_symbol)
+        tdn = None
+        if alert.target_type and alert.target_id and alert.target_type in ("trade", "trade_plan", "account"):
+            display_map = await _resolve_target_display_names(db, [alert], user_id)
+            tdn = display_map.get((alert.target_type, alert.target_id))
+        return _alert_to_response(alert, ticker_symbol=ticker_symbol, target_display_name=tdn)
 
     async def delete_alert(
         self,

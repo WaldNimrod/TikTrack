@@ -76,6 +76,8 @@ logger.info("APScheduler started — background jobs active")
 
 **Runtime note:** Full startup proof requires: `pip install -r api/requirements.txt` (includes `apscheduler>=3.10.0`), then `uvicorn api.main:app`. Startup logs will show the above line when lifespan runs.
 
+**Behavioral update (2026-03-04):** `run_after` in `scheduler_registry.py` is actively enforced at runtime. Dependent jobs are delayed by one interval on startup and are triggered immediately only after successful parent completion (no immediate trigger on parent failure).
+
 ---
 
 ## 5) Job run proof (runtime_class)
@@ -133,6 +135,8 @@ $ find . -name '*.plist'
 ### scheduler_registry.py is the only job registry
 
 **Evidence:** `api/background/scheduler_startup.py` imports `JOB_REGISTRY` from `scheduler_registry` and registers all jobs from it. No other job definitions in `api/background/`.
+  
+**Technical history note (2026-03-04):** runtime enforcement of `run_after` moved scheduler behavior from "simultaneous startup firing" to dependency-aware startup delay + parent-success chaining.
 
 ---
 

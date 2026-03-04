@@ -27,6 +27,8 @@ class SharedServices {
     this.apiBaseUrl = null;
     this.backendPort = null;
     this.token = null;
+    /** G7R §3E: 401 handler — set by app init for immediate logout */
+    this.on401 = null;
   }
   
   /**
@@ -380,7 +382,9 @@ class SharedServices {
           code: errorData.code
         });
         
-        // Return error object instead of throwing to prevent SEVERE console errors
+        // G7R §3E: 401 = immediate logout, no refresh
+        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
+        
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -390,6 +394,8 @@ class SharedServices {
       
       return await this.handleResponse(response);
     } catch (error) {
+      // G7R §3E: 401 from pre-throw (e.g. guest access)
+      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
       // Use masked log for security compliance (prevents token leakage)
       // Gate B Fix: Don't log full error object to prevent SEVERE console errors
       maskedLog('[Shared Services] GET request failed:', { 
@@ -476,7 +482,7 @@ class SharedServices {
           status: response.status,
           code: errorData.code
         });
-        
+        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -486,6 +492,7 @@ class SharedServices {
       
       return await this.handleResponse(response);
     } catch (error) {
+      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
       // Use masked log for security compliance (prevents token leakage)
       maskedLog('[Shared Services] POST request failed:', { 
         endpoint,
@@ -529,6 +536,7 @@ class SharedServices {
             errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
           }
         } catch (_) {}
+        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -687,6 +695,7 @@ class SharedServices {
           }
         } catch (e) {}
         maskedLog('[Shared Services] PATCH failed:', { endpoint, status: response.status });
+        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -697,6 +706,7 @@ class SharedServices {
       }
       return await this.handleResponse(response);
     } catch (error) {
+      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
       maskedLog('[Shared Services] PATCH failed:', { endpoint, errorCode: error.code, errorMessage: error.message });
       throw error;
     }
@@ -769,7 +779,7 @@ class SharedServices {
           status: response.status,
           code: errorData.code
         });
-        
+        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -780,7 +790,7 @@ class SharedServices {
       if (response.status === 204) return {};
       return await this.handleResponse(response);
     } catch (error) {
-      // Use masked log for security compliance (prevents token leakage)
+      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
       maskedLog('[Shared Services] DELETE request failed:', { 
         endpoint,
         errorCode: error.code || 'UNKNOWN',

@@ -40,6 +40,8 @@ async def list_alerts(
         description="account|trade|trade_plan|ticker|datetime",
     ),
     ticker_id: Optional[str] = Query(None, description="Filter by ticker (ULID)"),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
+    trigger_status: Optional[str] = Query(None, description="untriggered|triggered_unread|triggered_read|rearmed"),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     sort: str = Query("created_at", description="created_at|target_type|is_active|..."),
@@ -49,6 +51,7 @@ async def list_alerts(
 ):
     """
     TEAM_30 request — רשימת התראות עם סינון, pagination ומיון.
+    G7R Batch2: is_active, trigger_status filter wiring.
     """
     ticker_uuid = None
     if ticker_id:
@@ -62,6 +65,8 @@ async def list_alerts(
         user_id=current_user.id,
         target_type=target_type,
         ticker_id=ticker_uuid,
+        is_active=is_active,
+        trigger_status=trigger_status,
         page=page,
         per_page=per_page,
         sort=sort,

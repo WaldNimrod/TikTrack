@@ -10,11 +10,69 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
 
 from ..models.notes import Note, NoteAttachment
+from ..models.tickers import Ticker
+from ..models.trades import Trade
+from ..models.trade_plans import TradePlan
+from ..models.trading_accounts import TradingAccount
 from ..models.enums import NoteCategory
 from ..utils.rich_text_sanitizer import sanitize_rich_text
 
 
-def _note_to_response(note: Note) -> dict:
+async def _resolve_parent_display_names(
+    db: AsyncSession,
+    notes: List[Note],
+    user_id: uuid.UUID,
+) -> dict:
+    """G7R Batch3: Resolve parent_id -> display name for ticker, trade, trade_plan, account."""
+    out = {}
+    ticker_ids = []
+    trade_ids = []
+    plan_ids = []
+    account_ids = []
+    for n in notes:
+        if not n.parent_id:
+            continue
+        if n.parent_type == "ticker":
+            ticker_ids.append(n.parent_id)
+        elif n.parent_type == "trade":
+            trade_ids.append(n.parent_id)
+        elif n.parent_type == "trade_plan":
+            plan_ids.append(n.parent_id)
+        elif n.parent_type == "account":
+            account_ids.append(n.parent_id)
+    if ticker_ids:
+        stmt = select(Ticker.id, Ticker.symbol).where(Ticker.id.in_(ticker_ids))
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("ticker", row[0])] = row[1] or str(row[0])
+    if trade_ids:
+        stmt = (
+            select(Trade.id, Ticker.symbol, Trade.direction)
+            .join(Ticker, Trade.ticker_id == Ticker.id)
+            .where(Trade.id.in_(trade_ids), Trade.user_id == user_id)
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade", row[0])] = f"{row[1] or '?'} {row[2] or ''}".strip()
+    if plan_ids:
+        stmt = select(TradePlan.id, TradePlan.plan_name).where(
+            TradePlan.id.in_(plan_ids), TradePlan.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade_plan", row[0])] = row[1] or str(row[0])
+    if account_ids:
+        stmt = select(TradingAccount.id, TradingAccount.account_name).where(
+            TradingAccount.id.in_(account_ids), TradingAccount.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("account", row[0])] = row[1] or str(row[0])
+    return out
+
+
+def _note_to_response(note: Note, linked_entity_display: Optional[str] = None) -> dict:
+    """G7R Batch3: linked_entity_display = resolved entity name for parent (ticker/trade/trade_plan/account)."""
     tags_val = note.tags
     if tags_val is not None and not isinstance(tags_val, list):
         tags_val = list(tags_val) if tags_val else None
@@ -24,6 +82,7 @@ def _note_to_response(note: Note) -> dict:
         "parent_type": note.parent_type,
         "parent_id": str(note.parent_id) if note.parent_id else None,
         "parent_datetime": getattr(note, "parent_datetime", None),
+        "linked_entity_display": linked_entity_display,
         "title": note.title,
         "content": note.content,
         "category": (
@@ -68,7 +127,11 @@ class NotesService:
         stmt = select(Note).where(and_(*conditions)).order_by(Note.created_at.desc())
         result = await db.execute(stmt)
         notes = result.scalars().all()
-        return [_note_to_response(n) for n in notes]
+        display_map = await _resolve_parent_display_names(db, notes, user_id) if notes else {}
+        return [
+            _note_to_response(n, linked_entity_display=display_map.get((n.parent_type, n.parent_id)) if n.parent_id else None)
+            for n in notes
+        ]
 
     async def get_note(
         self,
@@ -85,7 +148,11 @@ class NotesService:
         )
         result = await db.execute(stmt)
         note = result.scalar_one_or_none()
-        return _note_to_response(note) if note else None
+        if not note:
+            return None
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def create_note(
         self,
@@ -156,7 +223,9 @@ class NotesService:
         db.add(note)
         await db.flush()
         await db.refresh(note)
-        return _note_to_response(note)
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def update_note(
         self,
@@ -194,7 +263,9 @@ class NotesService:
         note.updated_by = user_id
         await db.flush()
         await db.refresh(note)
-        return _note_to_response(note)
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def delete_note(
         self,

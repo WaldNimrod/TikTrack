@@ -93,6 +93,17 @@
 | `make sync-history-backfill` | Backfill 250d OHLCV |
 | `make cleanup-market-data` | Retention + archive |
 
+### 6.1 Scheduler runtime behavior (run_after enforcement)
+
+- פירוט קנוני להתנהגות ה־scheduler ברמת runtime נמצא ב:
+  - `documentation/docs-system/02-SERVER/BACKGROUND_TASK_SCHEDULER_BEHAVIOR.md`
+- **עדכון מחייב (2026-03-04):** `run_after` מתוך `api/background/scheduler_registry.py` נאכף בזמן ריצה.
+- המשמעות התפעולית:
+  - jobs תלויים (`run_after`) אינם רצים סימולטנית עם ה־parent בעת startup.
+  - job תלוי נדחה במחזור אחד בתחילת startup.
+  - לאחר הצלחת parent, wrapper מפעיל את התלוי מיידית דרך `_scheduler.modify_job()`.
+  - אם ה־parent נכשל, אין trigger מיידי לתלוי; נשמרת התנהגות fallback לפי interval בלבד.
+
 ---
 
 ## 7. מיפוי סקריפטים ↔ משימות Cursor (.vscode/tasks.json)

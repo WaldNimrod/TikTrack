@@ -36,8 +36,7 @@ function normalizeAuthResponse(raw) {
 }
 
 /**
- * Request with 401 retry (refresh token flow)
- * For protected endpoints - on 401, refresh and retry once
+ * Request with 401 handling — G7R §3E: NO refresh on 401, immediate logout
  * @param {Function} requestFn - Async function that makes the request
  * @returns {Promise<Object>} Response
  */
@@ -46,16 +45,8 @@ async function requestWithRefresh(requestFn) {
     return await requestFn();
   } catch (error) {
     if (error?.status === 401 || error?.code === 'HTTP_401') {
-      try {
-        audit.log('Auth', 'Token expired, attempting refresh');
-        await authService.refreshToken();
-        return await requestFn();
-      } catch (refreshError) {
-        audit.error('Auth', 'Token refresh failed', refreshError);
-        localStorage.removeItem('access_token');
-        window.dispatchEvent(new CustomEvent('auth:token-expired', { detail: { error: refreshError } }));
-        throw refreshError;
-      }
+      authService.handle401Logout();
+      throw error;
     }
     throw error;
   }
@@ -347,6 +338,35 @@ const authService = {
   getAccessToken() {
     return localStorage.getItem('access_token');
   },
+
+  /** G7R §3E: Handle 401 — immediate logout, redirect, preserve usernameOrEmail only */
+  handle401Logout() {
+    const usernameOrEmail = localStorage.getItem('usernameOrEmail');
+    localStorage.clear();
+    sessionStorage.clear();
+    if (usernameOrEmail) localStorage.setItem('usernameOrEmail', usernameOrEmail);
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+    audit.log('Auth', '401 logout — redirecting to login');
+    if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+  },
+
+  /** G7R §3E: App boot — if token expired, clear auth and redirect */
+  checkTokenExpiryOnBoot() {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    if (!token || token.trim() === '') return;
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) return;
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp;
+      if (exp && exp < Date.now() / 1000) {
+        audit.log('Auth', 'Token expired on boot — clearing and redirecting');
+        this.handle401Logout();
+      }
+    } catch {
+      // Invalid token
+    }
+  }
 };
 
 export default authService;

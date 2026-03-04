@@ -258,26 +258,107 @@ function renderTable(notes) {
 }
 
 /**
- * Handle view note (Details)
+ * Build attachments HTML for note details modal (§3D — proof hooks for download/remove)
+ */
+function buildAttachmentsHtml(attachments, noteId) {
+  if (!attachments || !attachments.length) return '<p>אין קבצים מצורפים</p>';
+  return attachments.map((att) => {
+    const name = att.original_filename || att.originalFilename || att.filename || 'קובץ';
+    const attId = att.id || att.external_ulid;
+    const icon = getFormatIcon(att.content_type || att.contentType, name);
+    const downloadUrl = att.download_url || `/api/v1/notes/${noteId}/attachments/${attId}/download`;
+    const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    return `
+      <div class="note-attachment-row" data-note-id="${noteId}" data-attachment-id="${attId}">
+        <span class="attachment-icon">${icon}</span>
+        <a href="${downloadUrl}" class="note-attachment-download js-attachment-download" data-attachment-id="${attId}" data-note-id="${noteId}" title="הורדה">${esc(name)}</a>
+        <button type="button" class="table-action-btn js-attachment-remove" data-attachment-id="${attId}" data-note-id="${noteId}" aria-label="מחק קובץ" title="מחק קובץ">✕</button>
+      </div>`;
+  }).join('');
+}
+
+/** Bind attachment download/remove handlers in note details modal — G7R Batch3 proof */
+function bindNoteAttachmentHandlers(noteId) {
+  const container = document.querySelector('.note-attachments-list');
+  if (!container) return;
+
+  container.querySelectorAll('.js-attachment-download').forEach((link) => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const attId = link.dataset.attachmentId;
+      const filename = (link.textContent || '').trim() || 'download';
+      if (!attId || !noteId) return;
+      try {
+        const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+        await sharedServices.init();
+        const url = sharedServices.buildUrl(`/notes/${noteId}/attachments/${attId}/download`);
+        const token = sharedServices.getToken();
+        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (err) {
+        maskedLog('[Notes] Download attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בהורדת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+
+  container.querySelectorAll('.js-attachment-remove').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const attId = btn.dataset.attachmentId;
+      if (!attId || !noteId) return;
+      try {
+        const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+        await sharedServices.init();
+        await sharedServices.delete(`/notes/${noteId}/attachments/${attId}`);
+        const row = btn.closest('.note-attachment-row');
+        if (row) row.remove();
+        if (!container.querySelector('.note-attachment-row')) container.innerHTML = '<p>אין קבצים מצורפים</p>';
+      } catch (err) {
+        maskedLog('[Notes] Remove attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בהסרת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+}
+
+/**
+ * Handle view note (Details) — §3D full required field list
  */
 async function handleViewNote(noteId) {
   try {
     const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
     await sharedServices.init();
-    const note = await sharedServices.get('/notes/' + noteId);
-    const n = (note && note.data) ? note.data : note;
+    const [noteRes, attachmentsRes] = await Promise.all([
+      sharedServices.get('/notes/' + noteId),
+      sharedServices.get('/notes/' + noteId + '/attachments').catch(() => ({ data: [] }))
+    ]);
+    const n = (noteRes && noteRes.data) ? noteRes.data : noteRes;
+    const attList = Array.isArray(attachmentsRes) ? attachmentsRes : (attachmentsRes?.data ?? attachmentsRes?.attachments ?? []) || [];
     const content = (n && n.content) ? n.content : '';
     const title = (n && n.title) ? n.title : '';
+    const tags = (n && n.tags) ? n.tags : [];
     const linkedEntityHtml = formatLinkedEntityDisplay(n || {});
     const created = formatDate((n && n.created_at) || (n && n.createdAt));
     const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
+    const tagsHtml = tags.length ? `<div class="form-group"><strong>תגיות:</strong> ${tags.map(t => `<span class="badge tag-badge">${String(t).replace(/</g, '&lt;')}</span>`).join(' ')}</div>` : '';
+    const attachmentsHtml = buildAttachmentsHtml(attList, noteId);
+
     const html = `
       <div class="note-view-content phoenix-form">
         ${title ? `<div class="form-group"><strong>כותרת:</strong> ${title}</div>` : ''}
         <div class="form-group"><strong>מקושר ל:</strong> ${linkedEntityHtml}</div>
+        ${tagsHtml}
         <div class="form-group"><strong>נוצר:</strong> ${created} <strong>עודכן:</strong> ${updated}</div>
         <div class="form-group"><strong>תוכן:</strong></div>
-        <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:200px;overflow-y:auto;">${content || '—'}</div>
+        <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:300px;overflow-y:auto;">${content || '—'}</div>
+        <div class="form-group"><strong>קבצים מצורפים:</strong></div>
+        <div class="note-attachments-list">${attachmentsHtml}</div>
       </div>
     `;
     createModal({
@@ -288,6 +369,8 @@ async function handleViewNote(noteId) {
       cancelButtonText: 'ביטול',
       onClose: function() {}
     });
+
+    setTimeout(() => bindNoteAttachmentHandlers(noteId), 0);
   } catch (err) {
     maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
     createModal({

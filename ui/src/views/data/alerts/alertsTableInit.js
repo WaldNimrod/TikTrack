@@ -285,16 +285,31 @@ async function refreshAlertsTable() {
   }
 }
 
+/** G7R Batch2: Priority badge classes per §3D */
+const PRIORITY_CLASSES = { LOW: 'priority-low', MEDIUM: 'priority-medium', HIGH: 'priority-high', CRITICAL: 'priority-critical' };
+function formatPriorityBadge(priority) {
+  const p = (priority || 'MEDIUM').toUpperCase();
+  const cls = PRIORITY_CLASSES[p] || 'priority-medium';
+  const labels = { LOW: 'נמוך', MEDIUM: 'בינוני', HIGH: 'גבוה', CRITICAL: 'קריטי' };
+  return `<span class="badge ${cls}">${labels[p] || p}</span>`;
+}
+
 async function handleViewAlert(alertItem) {
   const id = alertItem.id || alertItem.external_ulid || '';
   const title = (alertItem.title || '').trim() || '—';
+  const alertType = (alertItem.alert_type != null ? alertItem.alert_type : alertItem.alertType) || 'PRICE';
+  const priority = (alertItem.priority ?? alertItem.priorityVal) || 'MEDIUM';
+  const isActive = (alertItem.is_active != null ? alertItem.is_active : alertItem.isActive) !== false;
   const condF = alertItem.condition_field ?? alertItem.conditionField;
   const condO = alertItem.condition_operator ?? alertItem.conditionOperator;
   const condV = alertItem.condition_value ?? alertItem.conditionValue;
-  const condition = alertItem.condition_summary || formatConditionDisplay(condF, condO, condV) || '—';
+  const condition = alertItem.condition_summary || formatConditionDisplay(condF, condO, condV) || 'ללא תנאי';
   const triggerStatus = (alertItem.trigger_status != null ? alertItem.trigger_status : alertItem.triggerStatus) || 'untriggered';
   const triggeredAt = formatDate(alertItem.triggered_at != null ? alertItem.triggered_at : alertItem.triggeredAt);
-  const canRearm = triggerStatus === 'triggered_read' || triggerStatus === 'triggered_unread';
+  const expiresAt = formatDate(alertItem.expires_at != null ? alertItem.expires_at : alertItem.expiresAt);
+  const created = formatDate(alertItem.created_at != null ? alertItem.created_at : alertItem.createdAt);
+  const updated = formatDate(alertItem.updated_at != null ? alertItem.updated_at : alertItem.updatedAt);
+  const canRearm = triggerStatus === 'triggered_read';
 
   if (triggerStatus === 'triggered_unread') {
     try {
@@ -315,10 +330,15 @@ async function handleViewAlert(alertItem) {
   const html = `
     <div class="phoenix-form alert-detail-content">
       <div class="form-group"><strong>כותרת:</strong> ${title}</div>
+      <div class="form-group"><strong>סוג התראה:</strong> <span class="badge alert-type-badge">${alertType}</span></div>
       <div class="form-group"><strong>מקושר ל:</strong> ${linkedEntityHtml}</div>
       <div class="form-group"><strong>תנאי:</strong> ${condition}</div>
+      <div class="form-group"><strong>עדיפות:</strong> ${formatPriorityBadge(priority)}</div>
+      <div class="form-group"><strong>סטטוס:</strong> <span class="badge">${isActive ? 'פעיל' : 'מבוטל'}</span></div>
       <div class="form-group"><strong>מצב הפעלה:</strong> ${formatTriggerStatus(triggerStatus)}</div>
-      <div class="form-group"><strong>הופעל ב:</strong> ${triggeredAt}</div>
+      ${triggeredAt && triggeredAt !== '—' ? `<div class="form-group"><strong>הופעל ב:</strong> ${triggeredAt}</div>` : ''}
+      ${expiresAt && expiresAt !== '—' ? `<div class="form-group"><strong>תפוגה:</strong> ${expiresAt}</div>` : ''}
+      <div class="form-group"><strong>נוצר:</strong> ${created} <strong>עודכן:</strong> ${updated}</div>
       ${rearmHtml}
     </div>
   `;

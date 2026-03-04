@@ -25,7 +25,7 @@
 | File | Change |
 |------|--------|
 | `api/routers/background_jobs.py` | Added `/health`, `/runs`; optimized list with single batch query; error handling for missing `job_run_log`; renamed `is_running` → `is_scheduled` |
-| `api/background/scheduler_startup.py` | Added `next_run_time=datetime.now(timezone.utc)` so jobs run immediately on startup |
+| `api/background/scheduler_startup.py` | Historical (2026-01-31): immediate startup run alignment. **Superseded on 2026-03-04** by active `run_after` enforcement (dependents delayed by one interval + parent-success immediate chaining). |
 | `api/background/job_runner.py` | Failure path now writes `duration_ms` and `completed_at` on exception |
 
 ---
@@ -70,7 +70,8 @@
 - On success: `UPDATE` sets `status='completed'`, `duration_ms`, `records_processed`, `records_updated`, `error_count`.
 - On exception: `UPDATE` sets `status='failed'`, `duration_ms`, `error_class` (unchanged: `runtime_class` set on INSERT).
 
-**Immediate first run:** Jobs run on startup via `next_run_time=datetime.now(timezone.utc)` in scheduler.
+**Scheduler behavior update (2026-03-04):** `run_after` declarations are enforced at runtime.  
+Parent jobs may run at startup; dependent jobs are delayed by one interval and are triggered immediately only after successful parent completion.
 
 ---
 

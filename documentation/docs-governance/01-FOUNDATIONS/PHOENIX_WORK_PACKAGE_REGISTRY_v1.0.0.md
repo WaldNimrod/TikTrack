@@ -40,11 +40,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_3 (REENTRY_IMPLEMENTATION_ACTIVE_UNDER_G7_REJECTION_ROUTE) | true | S002-P003; GATE_7 rejection route is active; Team 10 is in GATE_3 re-entry implementation cycle under Team 90 lineage package for D22+D33+D34+D35; global top-filter alignment remains deferred carryover |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_6 (SUBMITTED_AWAITING_DECISION) | true | S002-P003; GATE_5 PASS on unified remediation cycle for D22+D33+D34+D35; GATE_6 execution package submitted by Team 90 and awaiting Team 00 / Team 100 decision; global top-filter alignment remains deferred carryover |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_3 (REENTRY_IMPLEMENTATION_ACTIVE_UNDER_G7_REJECTION_ROUTE)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_6 (SUBMITTED_AWAITING_DECISION)`, `active_work_package_id=S002-P003-WP002`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-04). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
@@ -56,4 +56,6 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_GATE2_APPROVED_GATE3_NO_ACTIVE_WP_YET | 2026-02-25**
 **log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_WP002_G3_INTAKE_PENDING_TEAM10_OPEN_REQUIRED | 2026-02-26**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | TEAM_00_ALIGNMENT_SCOPE_EXTENSION_NOTE_APPLIED | 2026-03-02**
+**log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G5_PASS_GATE6_ROUTING_PREPARATION_ACTIVE | 2026-03-04**
+**log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G6_SUBMITTED_AWAITING_DECISION | 2026-03-04**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_REMEDIATION_EXECUTION_PACKAGE_ISSUED_TO_TEAM10 | 2026-03-04**

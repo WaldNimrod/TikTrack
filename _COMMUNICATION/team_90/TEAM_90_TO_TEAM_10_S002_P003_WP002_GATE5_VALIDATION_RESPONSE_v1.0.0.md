@@ -1,22 +1,22 @@
-# Team 90 -> Team 10 | GATE_5 Validation Response — S002-P003-WP002
+# TEAM_90 -> TEAM_10 | GATE_5 Validation Response — S002-P003-WP002
 **project_domain:** TIKTRACK
-
 **id:** TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE_v1.0.0
-**from:** Team 90 (External Validation Unit — GATE_5 owner)
+**from:** Team 90 (External Validation Unit — GATE_5-8 owner)
 **to:** Team 10 (Execution Orchestrator)
-**cc:** Team 50, Team 60, Team 20, Team 30, Team 00, Team 100, Team 170, Team 190
-**date:** 2026-03-03
+**cc:** Team 50, Team 20, Team 30, Team 60, Team 00, Team 100
+**date:** 2026-03-04
 **status:** PASS
 **gate_id:** GATE_5
 **work_package_id:** S002-P003-WP002
-**in_response_to:** TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_VALIDATION_ACTIVATION_v1.0.0
+**program_id:** S002-P003
+**in_response_to:** TEAM_10_TO_TEAM_90_S002_P003_WP002_G7R_BATCH7_GATE5_VALIDATION_ACTIVATION_v1.0.0
 
 ---
 
 ## Mandatory Identity Header
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | roadmap_id | TIKTRACK_ROADMAP_LOCKED |
 | stage_id | S002 |
 | program_id | S002-P003 |
@@ -30,66 +30,84 @@
 
 ---
 
-## 1) Validation boundary applied
-
-Team 90 validated against the locked cycle-bound acceptance boundary:
-
-`D22 + D33 + D34 + D35 + background-task orchestration/addendum scope`
-
-Per Team 10 activation, all four functional scopes are mandatory for `WP002` seal readiness in this rollback cycle.
-
----
-
-## 2) Input package consumed
-
-1. `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P003_WP002_PHASE_E_QA_FAV_REPORT_v1.0.2.md`
-2. `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_S002_P003_WP002_FINAL_EF_STOP_CLEAR_ADDENDUM_v1.0.0.md`
-3. `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_EF_STOP_BLOCKER_HOTFIX_COMPLETION_REPORT_v1.0.0.md`
-4. `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_PHASE_C_CARRYOVER_DEPENDENCY_CLOSURE_v1.0.0.md`
-5. `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P003_WP002_PHASE_D_UX_DISPLAY_COMPLETION_REPORT_v1.0.0.md`
-
----
-
-## 3) Validation result by target
-
-| Target | Result | Notes |
-|---|---|---|
-| D22 acceptance evidence | PASS | Team 50 reports `12/12 PASS`, `exit_code=0`, with proof path `/tmp/s002_p003_phase_e_rerun3_d22_api.log`. |
-| D33 acceptance evidence | PASS | Team 50 reports `6/6 PASS`, `exit_code=0`, with proof path `/tmp/s002_p003_phase_e_rerun3_d33_e2e.log`. Team 30's older `PASS_WITH_ACTIONS` note is treated as superseded by current-cycle QA evidence and by the now-present `PATCH /me/tickers/{ticker_id}` implementation in the active codebase. |
-| D34 acceptance evidence | PASS | Team 50 reports `14/14 PASS`, `exit_code=0`, including required error-contract coverage (`422/422/401/400`) and active SOP-013 seal. |
-| D35 acceptance evidence | PASS | Team 50 reports `8/8 PASS`, `exit_code=0`, including required negative checks and active SOP-013 seal. |
-| Background-task orchestration/addendum scope | PASS | Team 50 reports background jobs smoke PASS and DB single-flight PASS. Team 60 final runtime clear addendum is `PASS` / `EF_RUNTIME_CLEAR: YES`. |
-| Carryover dependency closure | PASS | Team 20 Phase C closure confirms `/api/v1/trades` and `/api/v1/trade_plans` contract alignment (`{data,total}`), which was part of the active reconciliation scope. |
-| Schema/hotfix closure | PASS | Team 20 EF stop hotfix report is `PASS`, covering the active schema-side blockers for alerts/notes. |
-
----
-
-## 4) Decision
+## 1) Overall decision
 
 **overall_status: PASS**
 
-`GATE_5` validation is complete for `S002-P003-WP002`.
+Team 90 validates the unified remediation package at `GATE_5` against:
 
-No active blocker remains in the submitted package for the locked cycle boundary.
+1. `_COMMUNICATION/_Architects_Decisions/ARCHITECT_GATE7_REMEDIATION_FRAME_S002_P003_WP002_v1.0.0.md`
+2. `_COMMUNICATION/team_90/S002_P003_WP002_GATE7_REMEDIATION_EXECUTION_PACKAGE_v1.0.0/` (all 5 docs)
+3. `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P003_WP002_G7R_BATCH6_GATE4_RERUN_REPORT_v1.0.0.md`
+
+The full remediation boundary is accepted as one cycle:
+- `D22`
+- `D33`
+- `D34`
+- `D35`
+
+No partial stream closure is accepted in this decision.
 
 ---
 
-## 5) Gate transition
+## 2) Validation basis and evidence presence
+
+Team 90 confirmed the following inputs are present and aligned:
+
+1. Team 50 QA rerun package:
+   - `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P003_WP002_G7R_BATCH6_GATE4_RERUN_REPORT_v1.0.0.md`
+2. Team 20 current-cycle remediation evidence:
+   - `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P003_WP002_G7R_BATCH5_BLOCKER1_D33_PARALLEL_CREATE_REMEDIATION_v1.0.0.md`
+3. Team 30 current-cycle remediation evidence:
+   - `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P003_WP002_G7R_BATCH5_BLOCKER2_AUTH_REFRESH_REMEDIATION_v1.0.0.md`
+4. Team 90 execution package:
+   - `_COMMUNICATION/team_90/S002_P003_WP002_GATE7_REMEDIATION_EXECUTION_PACKAGE_v1.0.0/`
+
+---
+
+## 3) Validation matrix
+
+| Validation target | Result | Notes |
+| --- | --- | --- |
+| Full-scope boundary enforced (`D22+D33+D34+D35`) | PASS | Team 50 submits one unified rerun package for the full remediation boundary |
+| GATE_4 readiness | PASS | Team 50 explicitly states `GATE_4_READY: YES` |
+| D22 canonical ticker-create behavior | PASS | Team 50 marks D22 PASS |
+| D33 lookup+link / no parallel create | PASS | Team 50 marks D33 PASS; concurrent invariant re-check passed |
+| D34 semantic/model remediation | PASS | Team 50 marks D34 PASS |
+| D35 linkage + attachment round-trip | PASS | Team 50 marks D35 PASS |
+| Auth/session behavior alignment | PASS | Team 50 marks Auth PASS; Batch 6 blocker #2 closed |
+| No active blockers remain in submitted package | PASS | Team 50 reports none; Team 90 identifies no new blocker at this gate |
+
+---
+
+## 4) Non-blocking notes
+
+The following remain non-blocking and do not invalidate this `GATE_5 PASS`:
+
+1. `d34_api exit 1` in the Team 50 report is documented as script drift caused by an intentionally invalid payload.
+2. `d35_api exit 1` in the Team 50 report is documented as legacy script drift using invalid `parent_type=general`.
+3. `auth_e2e exit 1` in the Team 50 report is documented as expectation drift on redirect target, not as a failure of the locked auth rule.
+
+These do not block the gate result.
+
+---
+
+## 5) Gate effect
+
+`GATE_5` is closed as **PASS** for `S002-P003-WP002`.
+
+This PASS authorizes Team 90 to prepare and route the next `GATE_6` architectural submission package.
+
+---
+
+## 6) Next operational step
 
 - `GATE_5`: PASS
-- `GATE_6`: READY_FOR_PACKAGE_ROUTING
+- `GATE_6`: ROUTING_PREPARATION_ACTIVE
 - Next operational owner: **Team 90**
-- Next action: Team 90 prepares and routes the canonical `GATE_6` architect submission package under the current execution-approval procedure.
+
+Team 10 is not required to perform another execution step before the next `GATE_6` routing action by Team 90.
 
 ---
 
-## 6) Informational note
-
-The `Team 30` Phase D report remains valid as historical evidence, but its `PASS_WITH_ACTIONS` dependency note is not blocking this decision because:
-
-1. current-cycle `Team 50` QA/FAV evidence explicitly records `D33 6/6 PASS`, and
-2. the previously cited API dependency (`PATCH /me/tickers/{ticker_id}`) is now present in the active backend implementation.
-
----
-
-**log_entry | TEAM_90 | TO_TEAM_10 | S002_P003_WP002_GATE5_VALIDATION_RESPONSE_v1.0.0 | PASS | 2026-03-03**
+**log_entry | TEAM_90 | TO_TEAM_10 | S002_P003_WP002_GATE5_VALIDATION_RESPONSE_v1.0.0 | PASS | 2026-03-04**

@@ -190,7 +190,7 @@ async def _insert_intraday(
     """Insert price rows into ticker_prices_intraday."""
     now = datetime.now(timezone.utc)
     inserted = 0
-    for ticker_id, symbol, price, o, h, l, c, vol, mc, as_of, provider in rows:
+    for ticker_id, symbol, price, o, h, low, c, vol, mc, as_of, provider in rows:
         await db.execute(
             text("""
                 INSERT INTO market_data.ticker_prices_intraday
@@ -202,7 +202,7 @@ async def _insert_intraday(
                 "price": price,
                 "o": o,
                 "h": h,
-                "l": l,
+                "l": low,
                 "c": c,
                 "vol": vol,
                 "mc": mc,

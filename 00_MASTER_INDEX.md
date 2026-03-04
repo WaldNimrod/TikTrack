@@ -18,7 +18,7 @@
 | `documentation/docs-governance/` | 00-INDEX, 01-FOUNDATIONS (SSM/WSM/Gate Model), 02-POLICIES, 04-PROCEDURES, 05-CONTRACTS, 06-TEMPLATES, 07-DIRECTIVES_AND_DECISIONS, 08-WORKING_VALIDATION_RECORDS, AGENTS_OS_GOVERNANCE, 99-archive. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
 | `archive/` | documentation, code |
-| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_70, team_90, team_100, team_170, team_190) |
+| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_61, team_70, team_90, team_100, team_170, team_190) |
 
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 
@@ -63,7 +63,7 @@
 | Level 2 — Task lists registry | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md` |
 | Level 2 — Master list | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` |
 | Level 2 — Carryover list | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` |
-| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|60|70|90|100|170|190/` |
+| Level 3 — Execution plans/reports | `_COMMUNICATION/team_20|30|31|40|50|60|61|70|90|100|170|190/` |
 
 **Fixed Level-2 filenames (mandatory across all stages):**
 - `TEAM_10_MASTER_TASK_LIST.md`

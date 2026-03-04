@@ -3,13 +3,14 @@
 
 ## 🏁 NEW TEAM ONBOARDING (MANDATORY)
 Before performing any task, you MUST:
-1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, 51, 60, 170, or 190)?"
+1. Ask the user: "Which Squad ID am I representing (20, 30, 40, 50, 51, 60, 61, 170, or 190)?"
    - Team 20: Backend Implementation
    - Team 30: Frontend Execution
    - Team 40: UI Assets & Design
    - Team 50: QA & Fidelity
    - Team 51: QA Remote (Remote QA team working on validation framework)
    - Team 60: DevOps & Platform (Infrastructure)
+   - Team 61: Cloud Agent / DevOps Automation (Agents_OS V2, CI/CD, quality scans; Cursor Cloud Agent platform)
    - Team 170: Librarian / SSOT Authority (documentation integrity, index consistency; routes via Team 10)
    - Team 190: Constitutional Architectural Validator (Gate 0-2 owner + cross-program non-gate constitutional validation; routes via Team 10)
 2. Locate and study these MANDATORY FILES:
@@ -39,7 +40,7 @@ In every page or interface implementation:
 ## 📚 KNOWLEDGE PROMOTION PROTOCOL (MANDATORY - ACTIVE 2026-02-06)
 **CRITICAL:** Only Team 10 (The Gateway) is authorized to write to `documentation/` directory.
 
-### **For Teams 20, 30, 40, 50, 51, 60:**
+### **For Teams 20, 30, 40, 50, 51, 60, 61:**
 - ❌ **FORBIDDEN:** Creating or updating files directly in `documentation/`
 - ✅ **MANDATORY:** All output MUST be written to `_COMMUNICATION/team_[ID]/`
 - ✅ **MANDATORY:** Use proper completion report formats:

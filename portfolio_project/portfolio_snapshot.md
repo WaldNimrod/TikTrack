@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-04T09:34:50.050614+00:00`
+- Generated (UTC): `2026-03-04T15:11:55.143461+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED)`
-- next_required_action: `Team 90 prepares the structured pre-remediation frame (impact map, grouped remediation streams, architect clarifications if needed). Only after that frame is locked may Team 10 receive a direct execution remediation package.`
+- current_gate: `GATE_3 (REENTRY_IMPLEMENTATION_ACTIVE_UNDER_G7_REJECTION_ROUTE)`
+- next_required_action: `Team 10 runs one coordinated GATE_3 implementation cycle (D22+D33+D34+D35) using mandatory batch orchestration gates, then submits a single full-scope GATE_4 QA handover to Team 50.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_3 (REENTRY_IMPLEMENTATION_ACTIVE_UNDER_G7_REJECTION_ROUTE) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

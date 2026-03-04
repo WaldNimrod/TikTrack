@@ -6,6 +6,7 @@
 **to:** Team 60 (DevOps & Platform)  
 **cc:** Team 10  
 **date:** 2026-01-31  
+**historical_record:** true  
 **status:** PENDING_EXECUTION  
 **reference:** S002_P003_WP002_G7R_BATCH1_STREAM1_FOUNDATIONS
 

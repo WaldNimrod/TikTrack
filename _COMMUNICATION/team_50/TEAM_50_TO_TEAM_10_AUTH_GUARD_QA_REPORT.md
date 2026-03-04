@@ -3,6 +3,8 @@
 **מאת:** Team 50 (QA & Fidelity)
 **אל:** Team 10 (The Gateway)
 **תאריך:** 2026-02-12
+**date:** 2026-02-12
+**historical_record:** true
 **מקור:** TEAM_10_TO_TEAM_50_FINAL_CLOSURE_DEMAND — הרצת Auth Guard QA על המצב הקיים
 
 ---

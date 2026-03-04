@@ -6,6 +6,7 @@
 **to:** Team 20 (Backend)  
 **cc:** Team 10  
 **date:** 2026-03-03  
+**historical_record:** true  
 **status:** BLOCK  
 **reference:** S002_P003_WP002_G7R_BATCH1_STREAM1_FOUNDATIONS  
 **in_response_to:** TEAM_20_TO_TEAM_60_G7R_STREAM1_MIGRATION_FIX_RESPONSE_v1.0.0  

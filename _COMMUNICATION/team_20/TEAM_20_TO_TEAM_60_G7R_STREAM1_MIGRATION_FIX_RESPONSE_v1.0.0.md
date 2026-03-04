@@ -6,6 +6,7 @@
 **to:** Team 60 (DevOps & Platform)  
 **cc:** Team 10  
 **date:** 2026-01-31  
+**historical_record:** true  
 **status:** FIX_APPLIED — READY_FOR_RERUN  
 **in_response_to:** TEAM_60_TO_TEAM_20_G7R_STREAM1_MIGRATION_EXECUTION_RESPONSE_v1.0.0  
 

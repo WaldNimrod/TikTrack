@@ -28,85 +28,100 @@
 
 ## 1) Purpose
 
-בקשה להוספת Team 61 (Cloud Agent / DevOps Automation) למבנה הארגוני הרשמי של הפרויקט, ועדכון כל התיעוד הנדרש. Team 61 הוקם ע"י Team 00 (Chief Architect) בסשן עבודה ב-2026-03-03 ופועל בסביבת Cursor Cloud Agent.
+בקשה להוספת Team 61 (Cloud Agent / DevOps Automation) למבנה הארגוני הרשמי של הפרויקט. Team 61 הוקם ע"י Team 00 (Chief Architect) בסשן עבודה ב-2026-03-03. נדרש עדכון תיעוד משילות להוספת הצוות בצורה תקינה ומלאה.
 
 ## 2) Context / Inputs
 
-1. **Team Development Role Mapping:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
-2. **.cursorrules:** `.cursorrules` (repo root) — team ID list in §NEW TEAM ONBOARDING
-3. **Iron Rules Constitution:** `documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md`
-4. **Master Index:** `00_MASTER_INDEX.md`
-5. **Team 61 creation authority:** Team 00 (Chief Architect) directive, session 2026-03-03
+1. `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` — SSOT למיפוי צוותים
+2. `.cursorrules` (repo root) — רשימת Squad IDs בסעיף NEW TEAM ONBOARDING
+3. `documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md`
+4. `00_MASTER_INDEX.md`
+5. סמכות הקמה: Team 00 (Chief Architect), session 2026-03-03
 
-### Team 61 Definition
+### הגדרת Team 61 המלאה
 
 | Field | Value |
 |---|---|
 | **Team ID** | 61 |
 | **Name** | Cloud Agent / DevOps Automation |
-| **Platform** | Cursor Cloud Agent |
-| **Role** | Automated development environment management, CI/CD pipeline, code quality scanning, Agents_OS V2 infrastructure |
-| **Scope** | `agents_os_v2/`, `.github/workflows/`, quality tooling (ESLint config, mypy config), unit test infrastructure, automated quality scans |
-| **Reports to** | Team 10 (Gateway) for task orchestration; Team 00 (Architect) for strategic direction |
-| **Authority** | ✔ Create and maintain CI/CD pipelines; ✔ Run automated quality scans (bandit, pip-audit, mypy, ESLint); ✔ Create and maintain unit test infrastructure; ✔ Build and maintain Agents_OS V2 orchestrator; ✔ Produce quality scan reports and Known Bugs documentation |
-| **Non-authority** | ✘ Does not modify production application code (api/, ui/) without mandate from Team 10; ✘ Does not write to documentation/ (Knowledge Promotion via Team 10/70); ✘ Does not approve gates (executes validation, does not decide); ✘ Does not replace Team 90 validation authority or Team 50 QA authority |
+| **Platform** | Cursor Cloud Agent — סביבת VM מבודדת עם Docker, PostgreSQL, Git, Python, Node.js. פועל ברקע, ללא ממשק UI של Cursor IDE. גישה ל-Git push/pull, הרצת טסטים, build, וסריקות אבטחה. |
+| **Role** | אוטומציה של תהליכי פיתוח: CI/CD pipelines, סריקות איכות קוד (bandit, mypy, ESLint, pip-audit), תשתית Agents_OS V2 (Orchestrator שמאטמט זרימת שערים), יצירת unit tests, ודוחות Known Bugs. |
+| **Reports to** | Team 10 (Gateway) לתזמור משימות; Team 00 (Architect) לכיוון אסטרטגי |
+| **Scope** | `agents_os_v2/` (Orchestrator code), `.github/workflows/` (CI/CD), `tests/unit/` (unit test infrastructure), quality tooling configs (`ui/.eslintrc.cjs`, `api/mypy.ini`), quality scan reports |
+| **Authority** | ✔ יצירה ותחזוקת CI/CD pipelines; ✔ הרצת סריקות איכות (bandit, pip-audit, mypy, ESLint, npm audit); ✔ יצירת unit tests; ✔ בנייה ותחזוקת Agents_OS V2 Orchestrator; ✔ הפקת דוחות סריקה ו-Known Bugs |
+| **Non-authority** | ✘ לא משנה production code (api/, ui/) ללא mandate מ-Team 10; ✘ לא כותב ל-documentation/ (Knowledge Promotion דרך Team 10/70); ✘ לא מאשר שערים (מייצר data, לא מחליט PASS/FAIL); ✘ לא מחליף סמכות Team 90 (validation) או Team 50 (QA) |
 | **Communication folder** | `_COMMUNICATION/team_61/` |
-| **Engine** | Cursor Cloud Agent (subscription) |
+| **Current Engine** | Cursor Cloud Agent (subscription) |
 
-### Work Already Completed by Team 61
+### הגדרת גבולות מול צוותים קיימים
 
-| Deliverable | Path | Status |
+| גבול | Team 60 (DevOps & Platform) | Team 61 (Cloud Agent / DevOps Automation) |
 |---|---|---|
-| CI/CD pipeline | `.github/workflows/ci.yml` | ✅ Implemented |
-| POC-1 Observer | `agents_os/observers/state_reader.py` + `agents_os_v2/observers/state_reader.py` | ✅ Implemented |
-| ESLint config | `ui/.eslintrc.cjs` | ✅ Implemented |
-| mypy config | `api/mypy.ini` | ✅ Implemented |
-| Unit tests (auth, trading, cashflows) | `tests/unit/` (30 tests) | ✅ Implemented |
-| Quality scan report | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md` | ✅ Produced |
-| Known Bugs (KB-001–KB-021) | Same report | ✅ Documented |
-| Agents_OS V2 (Phases 0–5) | `agents_os_v2/` (39 files, 37 tests) | ✅ Implemented |
-| V2 Master Plan | `_COMMUNICATION/team_00/AGENTS_OS_V2_MASTER_PLAN_LOCKED_2026-03-03.md` | ✅ Locked |
-| Team 60 CI/CD communication | `_COMMUNICATION/team_60/CLOUD_AGENT_CI_CD_IMPLEMENTATION_2026-03-03.md` | ✅ Delivered |
-| Team 190 validation report | `_COMMUNICATION/team_190/CLOUD_AGENT_VALIDATION_REPORT_2026-03-03.md` | ✅ Delivered |
+| **תחום** | Infrastructure ידנית — server scripts, Docker, migrations, Makefile | אוטומציה — CI/CD pipelines, quality scans, Agents_OS V2 |
+| **סביבה** | Cursor Composer (IDE) | Cursor Cloud Agent (VM) |
+| **דוגמאות** | `scripts/start-backend.sh`, `scripts/init-full-env.sh`, Makefile targets | `.github/workflows/ci.yml`, `agents_os_v2/`, `tests/unit/` |
+| **מתי פועל** | כשמנדט מ-Team 10 דורש שינוי תשתית | אוטומטי (CI) + כש-Team 10/00 מבקש סריקה/בנייה |
+
+| גבול | Team 90 (The Spy) | Team 61 (Cloud Agent / DevOps Automation) |
+|---|---|---|
+| **תחום** | Validation authority — מחליט PASS/FAIL | מייצר validation data — טסטים, סריקות, דוחות |
+| **סמכות** | Gate owner (GATE_5, 6, 7, 8) | לא gate owner — מספק כלים ותשומות ל-Team 90 |
+| **דוגמאות** | VALIDATION_RESPONSE, BLOCKING_REPORT | Unit test results, bandit output, mypy findings |
+
+### עבודה שכבר בוצעה ע"י Team 61
+
+| # | תוצר | נתיב (ב-branch `cursor/development-environment-setup-6742`) |
+|---|---|---|
+| 1 | CI/CD pipeline | `.github/workflows/ci.yml` |
+| 2 | ESLint config | `ui/.eslintrc.cjs` |
+| 3 | mypy config | `api/mypy.ini` |
+| 4 | 30 unit tests | `tests/unit/test_auth_service.py`, `test_trading_accounts_service.py`, `test_cash_flows_service.py` |
+| 5 | POC-1 Observer | `agents_os/observers/state_reader.py`, `agents_os_v2/observers/state_reader.py` |
+| 6 | Agents_OS V2 (59 files) | `agents_os_v2/` — Orchestrator, engines, context, validators, conversations |
+| 7 | Quality scan report | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md` |
+| 8 | 21 Known Bugs | KB-001 through KB-021 in quality scan report |
+| 9 | V2 Master Plan | `_COMMUNICATION/team_00/AGENTS_OS_V2_MASTER_PLAN_LOCKED_2026-03-03.md` |
+| 10 | AGENTS.md | `AGENTS.md` (repo root) — Cloud development instructions |
 
 ## 3) Required actions
 
-1. **הוספת Team 61 ל-TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md** — הוספת שורה לטבלת הצוותים עם כל השדות המוגדרים בסעיף 2 לעיל.
+1. **הוספת Team 61 ל-TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md** — הוספת שורה לטבלת הצוותים בדיוק לפי ההגדרה בסעיף 2. הקפדה על כל השדות: ID, Name, Role, Scope, Authority, Non-authority, Reports to.
 
-2. **עדכון .cursorrules** — הוספת Team 61 לרשימת Squad IDs בסעיף NEW TEAM ONBOARDING:
+2. **עדכון .cursorrules** — הוספת Team 61 לרשימת Squad IDs בסעיף `§ NEW TEAM ONBOARDING (MANDATORY)`:
    ```
-   - Team 61: Cloud Agent / DevOps Automation (Agents_OS V2, CI/CD, quality scans)
+   - Team 61: Cloud Agent / DevOps Automation (Agents_OS V2, CI/CD, quality scans; Cursor Cloud Agent platform)
    ```
 
-3. **עדכון Iron Rules Constitution** — אם נדרש, הוספת Team 61 לרשימת הצוותים המורשים בסעיפים הרלוונטיים.
+3. **הוספת `_COMMUNICATION/team_61/` ל-00_MASTER_INDEX.md** — אם נדרש לפי מבנה האינדקס.
 
-4. **אימות קנוני** — וידוא שהוספת Team 61 לא יוצרת חפיפת תחומים עם Team 60 (DevOps & Platform) או Team 90 (The Spy). הגבולות:
-   - **Team 60:** Infrastructure, server scripts, Docker, manual DevOps → **נשאר כמו שהוא**
-   - **Team 61:** Automated CI/CD, quality scans, Agents_OS V2, Cloud Agent sessions → **חדש**
-   - **Team 90:** Validation authority, gate execution → **נשאר כמו שהוא**. Team 61 מייצר validation data, Team 90 מחליט PASS/FAIL.
+4. **עדכון Iron Rules Constitution** — אם רלוונטי, הוספת Team 61 לסעיפים שמפרטים רשימת צוותים (כמו סעיף Knowledge Promotion Protocol שמפרט: "Teams 20, 30, 40, 50, 51, 60").
 
-5. **עדכון 00_MASTER_INDEX.md** — אם נדרש, הוספת `_COMMUNICATION/team_61/` לאינדקס.
+5. **ולידציה קנונית** — וידוא שהוספת Team 61 אינה:
+   - יוצרת חפיפת scope עם צוות אחר (ראה גבולות בסעיף 2)
+   - שוברת domain isolation
+   - סותרת Iron Rules או Gate Protocol
 
 ## 4) Deliverables and paths
 
-1. `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` — updated with Team 61 row
-2. `.cursorrules` — updated with Team 61 in squad list
-3. `00_MASTER_INDEX.md` — updated if needed
-4. `_COMMUNICATION/team_190/TEAM_190_TEAM_61_REGISTRATION_VALIDATION_RESULT.md` — validation result
+1. `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` — עדכון עם Team 61
+2. `.cursorrules` — עדכון עם Team 61 ב-Squad ID list
+3. `00_MASTER_INDEX.md` — עדכון אם נדרש
+4. `_COMMUNICATION/team_190/TEAM_190_TEAM_61_REGISTRATION_VALIDATION_RESULT.md` — תוצאת ולידציה
 
 ## 5) Validation criteria (PASS/FAIL)
 
-1. Team 61 is defined in TEAM_DEVELOPMENT_ROLE_MAPPING with complete role, scope, authority, and non-authority fields
-2. No scope overlap with existing teams (60, 90) without clear boundary definition
-3. Team 61 appears in .cursorrules squad list
-4. Communication folder `_COMMUNICATION/team_61/` is indexed
-5. All updates follow canonical message format
+1. Team 61 מוגדר ב-TEAM_DEVELOPMENT_ROLE_MAPPING עם כל השדות (ID, Name, Role, Scope, Authority, Non-authority, Reports to)
+2. אין חפיפת scope עם Team 60 או Team 90 (גבולות ברורים מוגדרים)
+3. Team 61 מופיע ב-.cursorrules Squad ID list
+4. `_COMMUNICATION/team_61/` מאונדקס
+5. כל העדכונים בפורמט קנוני
+6. אין שבירת Iron Rules או Gate Protocol
 
 ## 6) Response required
 
 - Decision: PASS / CONDITIONAL_PASS / BLOCK
-- Specific documents updated (paths)
-- Blocking findings (if any, with evidence-by-path)
-- Confirmation that Team 61 is constitutionally registered
+- רשימת מסמכים שעודכנו (paths מלאים)
+- Blocking findings (אם יש, עם evidence-by-path)
+- אישור שTeam 61 רשום קנונית בכל המסמכים הנדרשים
 
 log_entry | TEAM_61 | TEAM_REGISTRATION_REQUEST | ACTION_REQUIRED | 2026-03-04

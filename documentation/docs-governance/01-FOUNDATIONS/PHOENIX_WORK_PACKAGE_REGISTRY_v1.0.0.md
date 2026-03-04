@@ -40,7 +40,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_6 (SUBMITTED_AWAITING_DECISION) | true | S002-P003; GATE_5 PASS on unified remediation cycle for D22+D33+D34+D35; GATE_6 execution package submitted by Team 90 and awaiting Team 00 / Team 100 decision; global top-filter alignment remains deferred carryover |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_6 (SUBMITTED_AWAITING_DECISION) | true | S002-P003; GATE_5 PASS on the unified remediation cycle for D22+D33+D34+D35; GATE_6 execution package submitted by Team 90 and awaiting Team 00 / Team 100 decision; global top-filter alignment remains deferred carryover |
 
 
 

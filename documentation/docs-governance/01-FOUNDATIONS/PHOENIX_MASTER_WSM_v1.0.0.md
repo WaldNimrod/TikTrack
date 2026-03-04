@@ -87,28 +87,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-04** — Team 90 prepared and submitted the `GATE_6` execution package for `S002-P003-WP002` after the unified remediation cycle passed GATE_5.
+**Gate-owner update evidence:** This block was updated **2026-03-04** — Team 90 received conditional GATE_6 architectural approval and submitted an RFM completion addendum; GATE_7 progression remains blocked pending closure.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_5 PASS on the unified remediation cycle for D22+D33+D34+D35; GATE_6 execution package submitted by Team 90 and awaiting Team 00 / Team 100 decision; global top-filter alignment remains deferred carryover |
+| active_flow | S002-P003; GATE_6 conditionally approved (GREEN_AMBER) with two RFM clarification items; Team 90 submitted RFM completion addendum; no progression to GATE_7 until conditional closure is issued by Team 00 / Team 100 |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_6 package submitted; awaiting approval decision) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_6 conditional completion loop active; RFM addendum submitted) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_6 SUBMITTED \| 2026-03-04 \| Team 90 routed the new execution-approval package to the Architect Inbox |
+| last_s002_p003_milestone | GATE_6 CONDITIONAL_APPROVAL \| 2026-03-04 \| Team 00 issued GREEN_AMBER with RFM completion required; Team 90 submitted addendum package |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
+| current_gate | GATE_6 (CONDITIONAL_APPROVED_RFM_PENDING) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 routing owner) |
-| last_gate_event | GATE_6_SUBMITTED \| 2026-03-04 \| Team 90 submitted the v1.3.0 execution-approval package for S002-P003-WP002 \| TEAM_90_EXECUTION_APPROVAL_SUBMISSION_S002_P003_WP002_v1.3.0.md |
-| next_required_action | Await Team 00 / Team 100 architectural decision on the submitted GATE_6 package. No progression to GATE_7 re-entry without explicit approval. |
+| last_gate_event | GATE_6_CONDITIONAL_APPROVAL_RFM_ADDENDUM_SUBMITTED \| 2026-03-04 \| Team 90 submitted conditional completion package for ADR-GATE6-001 \| TEAM_90_GATE6_RFM_COMPLETION_SUBMISSION_S002_P003_WP002_v1.0.0.md |
+| next_required_action | Await Team 00 / Team 100 closure decision on the submitted RFM completion addendum. Do not activate GATE_7 before explicit closure. |
 | next_responsible_team | Team 00 / Team 100 |
 
 ---
@@ -219,6 +219,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P003-WP002 (Batch 7 unified remediation validation); GATE_6 routing preparation active | 2026-03-04**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 execution package submitted for S002-P003-WP002 (v1.3.0); awaiting Team 00 / Team 100 decision | 2026-03-04**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | Team 00 approved the remediation frame; Team 90 issued one unified execution package to Team 10 for S002-P003-WP002 | 2026-03-04**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 conditional approval received (GREEN_AMBER); progression to GATE_7 blocked pending RFM closure | 2026-03-04**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 RFM completion addendum submitted to architect inbox; waiting Team 00 / Team 100 closure decision | 2026-03-04**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

@@ -78,6 +78,9 @@ if (fs.existsSync(routesPath)) {
   };
 }
 
+// SPA-only routes (React Router): no static HTML file — let Vite serve index.html
+const SPA_ONLY_ROUTES = ['/login', '/register', '/reset-password'];
+
 // Custom Vite plugin to serve HTML files before React Router
 const htmlPagesPlugin = () => {
   return {
@@ -97,6 +100,11 @@ const htmlPagesPlugin = () => {
             url.includes('.svg') ||
             url.includes('.png') ||
             url.includes('.jpg')) {
+          return next();
+        }
+        
+        // SPA-only routes: no static HTML; hand off to Vite/React (avoids "File not found" log on /login etc.)
+        if (SPA_ONLY_ROUTES.includes(url)) {
           return next();
         }
         

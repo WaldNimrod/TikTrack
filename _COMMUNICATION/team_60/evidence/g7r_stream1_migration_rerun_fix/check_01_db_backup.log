@@ -1,0 +1,21 @@
+💾 Creating full database backup...
+============================================================
+Full Database Backup
+Team 60 (DevOps & Platform)
+============================================================
+
+📊 Database: TikTrack-phoenix-db
+🖥️  Host: localhost:5432
+👤 User: TikTrackDbAdmin
+💾 Backup file: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/scripts/backups/TikTrack-phoenix-db_backup_20260304_122431.sql
+
+⚠️  pg_dump not found. Trying Python-based backup...
+📄 Connecting to database...
+✅ Connected. Creating backup...
+📊 Found 55 tables
+✅ Backup created successfully!
+✅ Backup verified (file exists, non-empty, valid content).
+📁 Location: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/scripts/backups/TikTrack-phoenix-db_backup_20260304_122431.sql
+📊 Size: 0.82 MB
+✅ Backup created and verified. Safe to run seed.
+DB_BACKUP_EXIT:0

@@ -16,7 +16,9 @@ from ..models.tickers import Ticker
 from ..models.enums import AlertType, AlertPriority
 
 
-VALID_TARGET_TYPES = frozenset(("ticker", "trade", "trade_plan", "account", "general"))
+# G7R Stream1: general removed; datetime added
+VALID_TARGET_TYPES = frozenset(("ticker", "trade", "trade_plan", "account", "datetime"))
+VALID_TRIGGER_STATUS = frozenset(("untriggered", "triggered_unread", "triggered_read", "rearmed"))
 VALID_ALERT_TYPES = frozenset(("PRICE", "VOLUME", "TECHNICAL", "NEWS", "CUSTOM"))
 VALID_PRIORITIES = frozenset(("LOW", "MEDIUM", "HIGH", "CRITICAL"))
 NEW_ALERTS_DAYS = 10
@@ -45,7 +47,8 @@ def _alert_to_response(
     cv = float(cond_val) if cond_val is not None else None
     return {
         "id": str(alert.id),
-        "target_type": alert.target_type,
+        "target_type": alert.target_type or None,
+        "target_datetime": getattr(alert, "target_datetime", None),
         "target_id": str(alert.target_id) if alert.target_id else None,
         "ticker_id": str(alert.ticker_id) if alert.ticker_id else None,
         "ticker_symbol": ticker_symbol,
@@ -192,9 +195,47 @@ class AlertsService:
         user_id: uuid.UUID,
         data: dict,
     ) -> dict:
-        target_type = (data.get("target_type") or "general").lower()
-        if target_type not in VALID_TARGET_TYPES:
-            target_type = "general"
+        # G7R Stream1: general removed; target_type can be None
+        target_type_raw = data.get("target_type")
+        target_type = (target_type_raw.strip().lower() if isinstance(target_type_raw, str) and target_type_raw.strip() else None) or None
+        if target_type is not None and target_type not in VALID_TARGET_TYPES:
+            target_type = None
+
+        # Validation: datetime type requires target_datetime; entity type requires target_id (or ticker_id for ticker)
+        target_datetime = data.get("target_datetime")
+        target_id = data.get("target_id")
+        ticker_id_val = data.get("ticker_id")
+        if target_type == "datetime":
+            if not target_datetime:
+                from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                raise HTTPExceptionWithCode(
+                    status_code=422,
+                    detail="target_datetime required when target_type=datetime",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
+            target_id = None
+        elif target_type in ("ticker", "trade", "trade_plan", "account"):
+            if target_datetime:
+                from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                raise HTTPExceptionWithCode(
+                    status_code=422,
+                    detail="target_datetime not allowed when target_type is entity; use target_id or ticker_id",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
+            if target_type == "ticker" and not data.get("ticker_id") and not data.get("target_id"):
+                from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                raise HTTPExceptionWithCode(
+                    status_code=422,
+                    detail="ticker_id or target_id required when target_type=ticker",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
+            if target_type != "ticker" and not target_id:
+                from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                raise HTTPExceptionWithCode(
+                    status_code=422,
+                    detail="target_id required when target_type is trade, trade_plan, or account",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
 
         alert_type_val = (data.get("alert_type") or "PRICE").upper()
         if alert_type_val not in VALID_ALERT_TYPES:
@@ -220,6 +261,14 @@ class AlertsService:
             except (ValueError, TypeError):
                 pass
 
+        target_datetime_val = data.get("target_datetime")
+        if target_datetime_val and isinstance(target_datetime_val, str):
+            try:
+                from datetime import datetime as dt
+                target_datetime_val = dt.fromisoformat(target_datetime_val.replace("Z", "+00:00"))
+            except (ValueError, TypeError):
+                target_datetime_val = None
+
         cond_val = data.get("condition_value")
         if cond_val is not None:
             try:
@@ -232,6 +281,7 @@ class AlertsService:
             target_type=target_type,
             target_id=target_id,
             ticker_id=ticker_id,
+            target_datetime=target_datetime_val,
             alert_type=alert_type,
             priority=priority,
             condition_field=data.get("condition_field"),
@@ -278,7 +328,7 @@ class AlertsService:
             alert.is_active = bool(data["is_active"])
         if "trigger_status" in data:
             ts = data.get("trigger_status")
-            if ts in ("untriggered", "triggered_unread", "triggered_read"):
+            if ts in VALID_TRIGGER_STATUS:
                 alert.trigger_status = ts
                 if ts == "untriggered":
                     alert.is_triggered = False

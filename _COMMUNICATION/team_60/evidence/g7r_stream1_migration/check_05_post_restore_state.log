@@ -1,0 +1,12 @@
+POST_RESTORE_CHECK_EXIT 0
+is_nullable
+NO
+(1 row)
+conname|def
+alerts_target_type_check|CHECK (((target_type)::text = ANY ((ARRAY['ticker'::character varying, 'trade'::character varying, 'trade_plan'::character varying, 'account'::character varying, 'general'::character varying])::text[])))
+(1 row)
+target_type_general_count
+2
+(1 row)
+---STDERR---
+

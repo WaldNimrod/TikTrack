@@ -8,12 +8,14 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 
-VALID_PARENT_TYPES = frozenset(("trade", "trade_plan", "ticker", "account"))
+# G7R Stream1: datetime added for temporal linkage
+VALID_PARENT_TYPES = frozenset(("trade", "trade_plan", "ticker", "account", "datetime"))
 
 
 class NoteCreate(BaseModel):
-    parent_type: str = Field(..., description="trade|trade_plan|ticker|account (general removed per Phase C)")
+    parent_type: str = Field(default="ticker", description="trade|trade_plan|ticker|account|datetime")
     parent_id: Optional[str] = None
+    parent_datetime: Optional[datetime] = None
     title: str = Field(..., min_length=1, max_length=200, description="Required per G5R2 error-contract parity (BF-G5R-002)")
     content: str = Field(..., description="Rich Text HTML — sanitized server-side")
     category: str = Field(default="GENERAL")
@@ -30,9 +32,11 @@ class NoteCreate(BaseModel):
 
     @field_validator("parent_type")
     @classmethod
-    def parent_type_not_general(cls, v: str) -> str:
+    def parent_type_valid(cls, v):
+        if v is None or v == "":
+            return None
         if v not in VALID_PARENT_TYPES:
-            raise ValueError(f"parent_type must be one of {sorted(VALID_PARENT_TYPES)}, got '{v}' (general removed)")
+            raise ValueError(f"parent_type must be one of {sorted(VALID_PARENT_TYPES)}, got '{v}'")
         return v
 
 
@@ -47,8 +51,9 @@ class NoteUpdate(BaseModel):
 class NoteResponse(BaseModel):
     id: str
     user_id: str
-    parent_type: str
+    parent_type: Optional[str] = None
     parent_id: Optional[str] = None
+    parent_datetime: Optional[datetime] = None
     title: Optional[str] = None
     content: str
     category: str

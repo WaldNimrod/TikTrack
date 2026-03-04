@@ -1,0 +1,7 @@
+NOTICE:  column "target_datetime" of relation "alerts" already exists, skipping
+ALTER TABLE
+NOTICE:  column "parent_datetime" of relation "notes" already exists, skipping
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ERROR:  check constraint "alerts_target_type_check" of relation "alerts" is violated by some row

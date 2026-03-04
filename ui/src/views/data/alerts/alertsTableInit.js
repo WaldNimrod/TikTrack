@@ -36,6 +36,34 @@ const TARGET_TYPE_LABELS = {
   ticker: 'טיקר'
 };
 
+/** G7R Batch1: Entity icon paths for linked entity display (§3D) */
+const ALERT_ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
+
+/** Format alert linked entity: icon + resolved name */
+function formatAlertLinkedEntity(alert) {
+  const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
+  const resolvedName = alert.linked_entity_display ?? alert.target_display_name ?? (alert.ticker_symbol ?? alert.tickerSymbol) ?? '';
+  const targetId = (alert.target_id != null ? alert.target_id : alert.targetId) || '';
+  const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '';
+  const displayName = resolvedName || (targetId ? typeLabel + ' ' + String(targetId).slice(0, 8) + '…' : typeLabel || '—');
+  const iconPath = targetType ? ALERT_ENTITY_ICON_MAP[targetType] : null;
+  if (!targetType && !targetId) return '<span class="linked-object-badge">—</span>';
+  const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
+  return `<span class="linked-object-badge entity-${targetType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
+}
+
+/** G7R Batch1: Condition field/operator labels for formatted display */
+const CONDITION_FIELD_LABELS = { price: 'מחיר', open_price: 'מחיר פתיחה', high_price: 'מחיר גבוה', low_price: 'מחיר נמוך', close_price: 'מחיר סגירה', volume: 'נפח', market_cap: 'שווי שוק' };
+const CONDITION_OP_LABELS = { '>': '>', '<': '<', '>=': '>=', '<=': '<=', '=': '=', crosses_above: 'חוצה כלפי מעלה', crosses_below: 'חוצה כלפי מטה' };
+
+function formatConditionDisplay(field, op, value) {
+  if (!field || !op) return null;
+  const fLabel = CONDITION_FIELD_LABELS[field] || field;
+  const oLabel = CONDITION_OP_LABELS[op] || op;
+  const v = value != null && value !== '' ? String(value) : '';
+  return `${fLabel} ${oLabel} ${v}`.trim();
+}
+
 function formatDate(iso) {
   if (!iso) return '—';
   try {
@@ -134,15 +162,11 @@ function renderTableFromState() {
 }
 
 function renderAlertRow(alert) {
-  const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
-  const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '—';
-  const ticker = (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) || '—';
+  const linkedEntityHtml = formatAlertLinkedEntity(alert);
   const condField = alert.condition_field != null ? alert.condition_field : alert.conditionField;
   const condOp = alert.condition_operator != null ? alert.condition_operator : alert.conditionOperator;
   const condVal = alert.condition_value != null ? alert.condition_value : alert.conditionValue;
-  const condition = alert.condition_summary || (condField && condOp
-    ? `${condField} ${condOp} ${condVal != null ? condVal : ''}`.trim()
-    : null) || '—';
+  const condition = alert.condition_summary || formatConditionDisplay(condField, condOp, condVal) || '—';
   const isActive = (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
   const isTriggered = (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) === true;
   const triggerStatus = (alert.trigger_status != null ? alert.trigger_status : alert.triggerStatus) || (isTriggered ? 'triggered_unread' : 'untriggered');
@@ -150,9 +174,10 @@ function renderAlertRow(alert) {
   const id = alert.id || alert.external_ulid || '';
   const triggerClass = triggerStatus === 'triggered_unread' ? 'trigger-unread' : (triggerStatus === 'triggered_read' ? 'trigger-read' : '');
 
+  const ticker = (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) || '—';
   return `
     <tr class="phoenix-table__row ${triggerClass}" data-alert-id="${id}" role="row">
-      <td class="phoenix-table__cell col-linked-object" data-field="target_type"><span class="linked-object-badge entity-${targetType}">${typeLabel}</span></td>
+      <td class="phoenix-table__cell col-linked-object" data-field="target_type">${linkedEntityHtml}</td>
       <td class="phoenix-table__cell col-ticker" data-field="ticker_id">${ticker}</td>
       <td class="phoenix-table__cell col-condition" data-field="condition_field">${condition}</td>
       <td class="phoenix-table__cell col-status" data-field="is_active">${isActive ? 'פעיל' : 'לא פעיל'}</td>
@@ -263,9 +288,10 @@ async function refreshAlertsTable() {
 async function handleViewAlert(alertItem) {
   const id = alertItem.id || alertItem.external_ulid || '';
   const title = (alertItem.title || '').trim() || '—';
-  const condition = alertItem.condition_summary || (alertItem.condition_field && alertItem.condition_operator
-    ? `${alertItem.condition_field} ${alertItem.condition_operator} ${alertItem.condition_value ?? ''}`.trim()
-    : null) || '—';
+  const condF = alertItem.condition_field ?? alertItem.conditionField;
+  const condO = alertItem.condition_operator ?? alertItem.conditionOperator;
+  const condV = alertItem.condition_value ?? alertItem.conditionValue;
+  const condition = alertItem.condition_summary || formatConditionDisplay(condF, condO, condV) || '—';
   const triggerStatus = (alertItem.trigger_status != null ? alertItem.trigger_status : alertItem.triggerStatus) || 'untriggered';
   const triggeredAt = formatDate(alertItem.triggered_at != null ? alertItem.triggered_at : alertItem.triggeredAt);
   const canRearm = triggerStatus === 'triggered_read' || triggerStatus === 'triggered_unread';
@@ -279,6 +305,7 @@ async function handleViewAlert(alertItem) {
     }
   }
 
+  const linkedEntityHtml = formatAlertLinkedEntity(alertItem);
   const rearmHtml = canRearm ? `
     <div class="form-group" style="margin-top:12px;">
       <button type="button" class="phoenix-modal__save-btn js-alert-rearm-btn" data-alert-id="${id}">הפעל מחדש</button>
@@ -288,6 +315,7 @@ async function handleViewAlert(alertItem) {
   const html = `
     <div class="phoenix-form alert-detail-content">
       <div class="form-group"><strong>כותרת:</strong> ${title}</div>
+      <div class="form-group"><strong>מקושר ל:</strong> ${linkedEntityHtml}</div>
       <div class="form-group"><strong>תנאי:</strong> ${condition}</div>
       <div class="form-group"><strong>מצב הפעלה:</strong> ${formatTriggerStatus(triggerStatus)}</div>
       <div class="form-group"><strong>הופעל ב:</strong> ${triggeredAt}</div>
@@ -303,8 +331,6 @@ async function handleViewAlert(alertItem) {
     cancelButtonText: 'ביטול',
     onClose: () => {}
   });
-  const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
-  if (cancelBtn) cancelBtn.textContent = 'סגור';
 
   const rearmBtn = document.querySelector('.js-alert-rearm-btn');
   if (rearmBtn) {

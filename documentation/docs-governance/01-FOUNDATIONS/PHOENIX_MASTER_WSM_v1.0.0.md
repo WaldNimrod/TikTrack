@@ -93,22 +93,22 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_7 REJECT remediation frame approved by Team 00; unified execution package issued to Team 10 for D22+D33+D34+D35; global top-filter alignment remains deferred carryover |
+| active_flow | S002-P003; GATE_7 rejection route is active; Team 10 is in GATE_3 re-entry implementation cycle under Team 90 lineage package for D22+D33+D34+D35; global top-filter alignment remains deferred carryover |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | S002-P003-WP002 (approved remediation execution cycle active under Team 10) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | last_s002_p003_milestone | GATE_7 REMEDIATION EXECUTION PACKAGE ISSUED \| 2026-03-04 \| Team 90 converted architect-approved frame into one unified Team 10 execution package |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_7 (REJECTED_EXECUTION_PACKAGE_ISSUED) |
+| current_gate | GATE_3 (REENTRY_IMPLEMENTATION_ACTIVE_UNDER_G7_REJECTION_ROUTE) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (execution owner under Team 90 gate lineage) |
+| phase_owner_team | Team 10 (GATE_3 execution owner; Team 90 owns post-QA gate lineage GATE_5-8) |
 | last_gate_event | GATE_7_REMEDIATION_EXECUTION_PACKAGE_ISSUED \| 2026-03-04 \| Team 90 issued one unified execution package to Team 10 under ARCHITECT_GATE7_REMEDIATION_FRAME_S002_P003_WP002_v1.0.0 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE7_REMEDIATION_EXECUTION_PACKAGE_v1.0.0.md |
-| next_required_action | Team 10 executes all four remediation streams, completes required migrations and data corrections, and submits one full-scope GATE_4 QA handover for D22+D33+D34+D35. |
+| next_required_action | Team 10 runs one coordinated GATE_3 implementation cycle (D22+D33+D34+D35) using mandatory batch orchestration gates, then submits a single full-scope GATE_4 QA handover to Team 50. |
 | next_responsible_team | Team 10 |
 
 ---

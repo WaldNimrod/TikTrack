@@ -23,12 +23,16 @@ const PARENT_TYPES = [
   { value: 'trade_plan', label: 'תוכנית' }
 ];
 
+const PARENT_TYPE_LABELS = Object.fromEntries(PARENT_TYPES.map(t => [t.value, t.label]));
+
 function createFormHTML(data = null) {
   const isEdit = !!(data && data.id);
   const title = (data && data.title != null ? data.title : '') || '';
   const content = (data && data.content != null ? data.content : '') || '';
   const parentType = (data && data.parent_type != null ? data.parent_type : (data && data.parentType)) || 'ticker';
   const parentId = (data && data.parent_id != null ? data.parent_id : (data && data.parentId)) || '';
+  const linkedDisplay = (data && (data.linked_entity_name ?? data.linked_entity_display ?? data.linked_display_name)) || (parentId ? `${parentId.slice(0, 8)}…` : '—ללא קישור—');
+  const typeLabel = PARENT_TYPE_LABELS[parentType] || parentType;
 
   const parentOptions = PARENT_TYPES.map(t => `<option value="${t.value}" ${parentType === t.value ? 'selected' : ''}>${t.label}</option>`).join('');
 
@@ -36,13 +40,19 @@ function createFormHTML(data = null) {
     <form id="noteForm" class="phoenix-form phoenix-form--two-col">
       <div class="form-group">
         <label for="noteParentType">סוג ישות מקושרת</label>
-        <select id="noteParentType" name="parentType" data-entity-options-trigger>${parentOptions}</select>
+        ${isEdit
+          ? `<span id="noteParentTypeDisplay" class="form-readonly-value" aria-readonly="true">${typeLabel}${parentId ? ' · ' + String(linkedDisplay).replace(/</g, '&lt;') : ' —ללא קישור—'}</span>`
+          : `<select id="noteParentType" name="parentType" data-entity-options-trigger>${parentOptions}</select>`
+        }
       </div>
       <div class="form-group form-group--parent-entity">
         <label for="noteParentId">ישות מקושרת (אופציונלי)</label>
-        <select id="noteParentId" name="parentId" class="js-entity-options-select" aria-label="בחירת ישות">
+        ${isEdit
+          ? `<span id="noteParentIdDisplay" class="form-readonly-value" aria-readonly="true">${parentId ? String(linkedDisplay).replace(/</g, '&lt;') : '—ללא קישור—'}</span>`
+          : `<select id="noteParentId" name="parentId" class="js-entity-options-select" aria-label="בחירת ישות">
           <option value="">—ללא קישור—</option>
-        </select>
+        </select>`
+        }
       </div>
       <div class="form-group">
         <label for="noteTitle">כותרת <span class="form-label-asterisk">*</span></label>
@@ -236,7 +246,8 @@ export async function openNotesForm(noteId = null) {
     content: createFormHTML(data),
     entity: 'note',
     showSaveButton: true,
-    saveButtonText: 'שמירה',
+    saveButtonText: 'שמור',
+    cancelButtonText: 'ביטול',
     onSave: performSave,
     onClose: function() {
       if (richTextInstance) {
@@ -261,24 +272,26 @@ export async function openNotesForm(noteId = null) {
 
     const parentTypeSelect = document.getElementById('noteParentType');
     const parentIdSelect = document.getElementById('noteParentId');
-    const initialParentId = data && (data.parent_id ?? data.parentId) ? String(data.parent_id ?? data.parentId) : '';
-    async function populateEntityOptions() {
-      if (!parentIdSelect || !parentTypeSelect) return;
-      const pt = parentTypeSelect.value || 'ticker';
-      const opts = await loadOptionsForParentType(pt);
-      const currentVal = parentIdSelect.value || initialParentId;
-      parentIdSelect.innerHTML = '<option value="">—ללא קישור—</option>' +
-        opts.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`).join('');
-      if (currentVal && !opts.some(o => String(o.value) === currentVal)) {
-        const opt = document.createElement('option');
-        opt.value = currentVal;
-        opt.textContent = `${currentVal.slice(0, 8)}… (נוכחי)`;
-        opt.selected = true;
-        parentIdSelect.insertBefore(opt, parentIdSelect.firstChild.nextSibling);
+    if (parentTypeSelect && parentIdSelect) {
+      const initialParentId = data && (data.parent_id ?? data.parentId) ? String(data.parent_id ?? data.parentId) : '';
+      async function populateEntityOptions() {
+        if (!parentIdSelect || !parentTypeSelect) return;
+        const pt = parentTypeSelect.value || 'ticker';
+        const opts = await loadOptionsForParentType(pt);
+        const currentVal = parentIdSelect.value || initialParentId;
+        parentIdSelect.innerHTML = '<option value="">—ללא קישור—</option>' +
+          opts.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`).join('');
+        if (currentVal && !opts.some(o => String(o.value) === currentVal)) {
+          const opt = document.createElement('option');
+          opt.value = currentVal;
+          opt.textContent = `${currentVal.slice(0, 8)}… (נוכחי)`;
+          opt.selected = true;
+          parentIdSelect.insertBefore(opt, parentIdSelect.firstChild.nextSibling);
+        }
       }
+      parentTypeSelect.addEventListener('change', populateEntityOptions);
+      await populateEntityOptions();
     }
-    if (parentTypeSelect) parentTypeSelect.addEventListener('change', populateEntityOptions);
-    await populateEntityOptions();
 
     const formEl = document.getElementById('noteForm');
     if (formEl) formEl.addEventListener('submit', (e) => {

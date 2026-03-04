@@ -23,6 +23,7 @@ def _note_to_response(note: Note) -> dict:
         "user_id": str(note.user_id),
         "parent_type": note.parent_type,
         "parent_id": str(note.parent_id) if note.parent_id else None,
+        "parent_datetime": getattr(note, "parent_datetime", None),
         "title": note.title,
         "content": note.content,
         "category": (
@@ -104,6 +105,32 @@ class NotesService:
             except (ValueError, TypeError):
                 pass
 
+        parent_type_val = (data.get("parent_type") or "ticker").lower()
+        if parent_type_val not in ("trade", "trade_plan", "ticker", "account", "datetime"):
+            parent_type_val = "ticker"
+
+        parent_datetime_val = data.get("parent_datetime")
+        if parent_datetime_val and isinstance(parent_datetime_val, str):
+            try:
+                parent_datetime_val = datetime.fromisoformat(parent_datetime_val.replace("Z", "+00:00"))
+            except (ValueError, TypeError):
+                parent_datetime_val = None
+
+        if parent_type_val == "datetime" and not parent_datetime_val:
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="parent_datetime required when parent_type=datetime",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        if parent_type_val != "datetime" and data.get("parent_datetime"):
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="parent_datetime not allowed when parent_type is entity",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+
         cat_val = (data.get("category") or "GENERAL").upper()
         if cat_val not in ("TRADE", "PSYCHOLOGY", "ANALYSIS", "GENERAL"):
             cat_val = "GENERAL"
@@ -115,8 +142,9 @@ class NotesService:
 
         note = Note(
             user_id=user_id,
-            parent_type=data.get("parent_type", "ticker"),
-            parent_id=parent_id,
+            parent_type=parent_type_val,
+            parent_id=parent_id if parent_type_val != "datetime" else None,
+            parent_datetime=parent_datetime_val if parent_type_val == "datetime" else None,
             title=data.get("title"),
             content=sanitized,
             category=category,

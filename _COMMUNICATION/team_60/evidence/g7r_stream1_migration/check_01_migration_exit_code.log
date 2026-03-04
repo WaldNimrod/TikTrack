@@ -1,0 +1,11 @@
+MIGRATION_EXIT 3
+---STDOUT---
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+---STDERR---
+NOTICE:  column "target_datetime" of relation "alerts" already exists, skipping
+NOTICE:  column "parent_datetime" of relation "notes" already exists, skipping
+NOTICE:  constraint "alerts_target_type_check" of relation "alerts" does not exist, skipping
+ERROR:  check constraint "alerts_target_type_check" of relation "alerts" is violated by some row

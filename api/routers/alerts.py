@@ -37,7 +37,7 @@ async def get_alerts_summary(
 async def list_alerts(
     target_type: Optional[str] = Query(
         None,
-        description="account|trade|trade_plan|ticker|general",
+        description="account|trade|trade_plan|ticker|datetime",
     ),
     ticker_id: Optional[str] = Query(None, description="Filter by ticker (ULID)"),
     page: int = Query(1, ge=1),

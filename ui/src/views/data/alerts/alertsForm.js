@@ -132,7 +132,7 @@ export function openAlertsForm(alert, onSuccess) {
     content: formHTML,
     entity: 'alert',
     showSaveButton: true,
-    saveButtonText: 'שמירה',
+    saveButtonText: 'שמור',
     cancelButtonText: 'ביטול',
     onSave: async function () {
       const form = document.getElementById('alertForm');
@@ -156,6 +156,20 @@ export function openAlertsForm(alert, onSuccess) {
       const condValRaw = form.querySelector('[name="condition_value"]')?.value;
       const condVal = condValRaw !== '' && condValRaw != null && !Number.isNaN(parseFloat(condValRaw))
         ? parseFloat(condValRaw) : null;
+
+      // G7R Batch1: All-or-none validation — field, operator, value must all be set or all empty
+      const condSet = [condField, condOp, condVal != null && condVal !== ''];
+      const anySet = condSet.some(Boolean);
+      const allSet = condSet[0] && condSet[1] && condSet[2];
+      if (anySet && !allSet) {
+        createModal({
+          title: 'שגיאה',
+          content: '<p>תנאי: יש למלא שדה תנאי, אופרטור וערך יחד — או להשאיר את כולם ריקים.</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול'
+        });
+        return;
+      }
 
       try {
         await sharedServices.init();

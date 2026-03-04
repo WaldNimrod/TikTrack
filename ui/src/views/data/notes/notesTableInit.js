@@ -26,6 +26,22 @@ const PARENT_TYPE_LABELS = {
   ticker: 'טיקר'
 };
 
+/** G7R Batch1: Entity icon paths for linked entity display (§3D — icon + name) */
+const ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
+
+/** Build linked entity display: icon + resolved name (§3D — linked_entity_display from API when available) */
+function formatLinkedEntityDisplay(note) {
+  const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || '';
+  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
+  const resolvedName = note.linked_entity_display ?? note.linked_entity_name ?? '';
+  const typeLabel = PARENT_TYPE_LABELS[parentType] || parentType || '';
+  const displayName = resolvedName || (parentId ? typeLabel + ' ' + String(parentId).slice(0, 8) + '…' : typeLabel || '—');
+  const iconPath = parentType ? ENTITY_ICON_MAP[parentType] : null;
+  if (!parentType && !parentId) return '<span class="linked-object-badge">—ללא קישור—</span>';
+  const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
+  return `<span class="linked-object-badge entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
+}
+
 /**
  * Format date for display
  */
@@ -96,18 +112,15 @@ function renderSummary(summary) {
  */
 function renderNoteRow(note) {
   const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || 'general';
-  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
-  const typeLabel = (PARENT_TYPE_LABELS[parentType] != null ? PARENT_TYPE_LABELS[parentType] : parentType) || parentType;
   const contentPreview = stripHtml(note.content != null ? note.content : '') || (note.title != null ? note.title : '—');
   const created = formatDate(note.created_at != null ? note.created_at : note.createdAt);
   const updated = formatDate(note.updated_at != null ? note.updated_at : note.updatedAt);
   const id = note.id;
+  const linkedEntityHtml = formatLinkedEntityDisplay(note);
 
   return `
     <tr class="phoenix-table__row" data-note-id="${id}" role="row">
-      <td class="phoenix-table__cell col-linked-object" data-field="parent_type">
-        <span class="linked-object-badge entity-${parentType}">${typeLabel}${parentId ? ' ' + parentId.slice(0, 8) + '…' : ''}</span>
-      </td>
+      <td class="phoenix-table__cell col-linked-object" data-field="parent_type">${linkedEntityHtml}</td>
       <td class="phoenix-table__cell col-content" data-field="content">${contentPreview}</td>
       <td class="phoenix-table__cell col-attachment" data-field="attachment">${getAttachmentDisplay(note)}</td>
       <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
@@ -255,13 +268,13 @@ async function handleViewNote(noteId) {
     const n = (note && note.data) ? note.data : note;
     const content = (n && n.content) ? n.content : '';
     const title = (n && n.title) ? n.title : '';
-    const parentType = PARENT_TYPE_LABELS[(n && n.parent_type) || (n && n.parentType)] || (n && n.parent_type) || '—';
+    const linkedEntityHtml = formatLinkedEntityDisplay(n || {});
     const created = formatDate((n && n.created_at) || (n && n.createdAt));
     const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
     const html = `
       <div class="note-view-content phoenix-form">
         ${title ? `<div class="form-group"><strong>כותרת:</strong> ${title}</div>` : ''}
-        <div class="form-group"><strong>אובייקט מקושר:</strong> ${parentType}</div>
+        <div class="form-group"><strong>מקושר ל:</strong> ${linkedEntityHtml}</div>
         <div class="form-group"><strong>נוצר:</strong> ${created} <strong>עודכן:</strong> ${updated}</div>
         <div class="form-group"><strong>תוכן:</strong></div>
         <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:200px;overflow-y:auto;">${content || '—'}</div>
@@ -275,10 +288,6 @@ async function handleViewNote(noteId) {
       cancelButtonText: 'ביטול',
       onClose: function() {}
     });
-    setTimeout(function() {
-      const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
-      if (cancelBtn) cancelBtn.textContent = 'סגור';
-    }, 0);
   } catch (err) {
     maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
     createModal({

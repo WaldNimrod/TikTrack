@@ -1,0 +1,7 @@
+DIAG_EXIT 0
+target_type|count
+general|2
+ticker|16
+(2 rows)
+---STDERR---
+

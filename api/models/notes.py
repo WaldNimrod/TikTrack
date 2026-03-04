@@ -1,10 +1,11 @@
 """
 Notes Model - SQLAlchemy ORM (D35)
 TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE
-Maps to user_data.notes table per PHX_DB_SCHEMA_V2.5
+G7R Stream1: parent_datetime added for temporal linkage.
 """
 
 import uuid
+from datetime import datetime
 from typing import Optional
 from sqlalchemy import String, Text, ForeignKey, CheckConstraint, BigInteger
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
@@ -24,7 +25,7 @@ class Note(Base):
     __tablename__ = "notes"
     __table_args__ = (
         CheckConstraint(
-            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account')",
+            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account', 'datetime')",
             name="notes_parent_type_check",
         ),
         {"schema": "user_data"},
@@ -80,6 +81,10 @@ class Note(Base):
         server_default=func.now(),
     )
     deleted_at: Mapped[Optional[object]] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=True,
+    )
+    parent_datetime: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=True,
     )

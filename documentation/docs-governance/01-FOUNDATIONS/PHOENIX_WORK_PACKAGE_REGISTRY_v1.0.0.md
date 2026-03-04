@@ -40,13 +40,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE) | true | S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED) | true | S002-P003; GATE_7 REJECT on WP002 after human browser review; CODE_CHANGE_REQUIRED with PRE_REMEDIATION_ALIGNMENT_REQUIRED before direct Team 10 execution handoff; global top-filter alignment recorded as deferred carryover |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED)`, `active_work_package_id=S002-P003-WP002`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-03). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-04). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

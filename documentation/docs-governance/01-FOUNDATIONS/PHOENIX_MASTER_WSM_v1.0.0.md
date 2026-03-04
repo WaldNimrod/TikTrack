@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-03** — Team 90 consumed `ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.2.1.md` (`GATE_6 APPROVED`) and activated `GATE_7` for `S002-P003-WP002`.
+**Gate-owner update evidence:** This block was updated **2026-03-03** — Team 90 consumed the human `GATE_7` rejection and locked `CODE_CHANGE_REQUIRED` with `PRE_REMEDIATION_ALIGNMENT_REQUIRED` for `S002-P003-WP002`.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_6 APPROVED on WP002 (full scope: D22 + D33 + D34 + D35 + background-task orchestration); GATE_7 human browser approval is active and awaiting Nimrod decision |
+| active_flow | S002-P003; GATE_7 REJECT on WP002 after human browser review; CODE_CHANGE_REQUIRED with PRE_REMEDIATION_ALIGNMENT_REQUIRED before direct Team 10 execution handoff; global top-filter alignment recorded as deferred carryover |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
 | in_progress_work_package_id | S002-P003-WP002 (rollback loop after GATE_7 REJECT / CODE_CHANGE_REQUIRED) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
 | last_s002_p003_milestone | GATE_7 REJECT \| 2026-03-01 \| Nimrod human review rejected WP002; Team 90 routed CODE_CHANGE_REQUIRED |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_7 (HUMAN_BROWSER_APPROVAL_ACTIVE) |
+| current_gate | GATE_7 (REJECTED_PRE_REMEDIATION_ALIGNMENT_REQUIRED) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_5-8 owner; GATE_7 orchestrator) |
-| last_gate_event | GATE_6_APPROVED \| 2026-03-03 \| Team 00 approved the corrected documentation package and cleared WP002 to advance to GATE_7 \| ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.2.1.md |
-| next_required_action | Nimrod performs GATE_7 browser-based walkthrough on D22, D33, D34, and D35 using Team 90 scenarios, then returns `אישור` or `פסילה` in Hebrew. Team 90 records and routes the decision. |
-| next_responsible_team | Nimrod (human approver); Team 90 (gate state owner) |
+| phase_owner_team | Team 90 (GATE_5-8 owner; pre-remediation framing owner) |
+| last_gate_event | GATE_7_REJECT \| 2026-03-03 \| Nimrod rejected WP002 after browser review; Team 90 locked CODE_CHANGE_REQUIRED with PRE_REMEDIATION_ALIGNMENT_REQUIRED \| NIMROD_GATE7_S002_P003_WP002_DECISION_v1.2.1.md |
+| next_required_action | Team 90 prepares the structured pre-remediation frame (impact map, grouped remediation streams, architect clarifications if needed). Only after that frame is locked may Team 10 receive a direct execution remediation package. |
+| next_responsible_team | Team 90 |
 
 ---
 

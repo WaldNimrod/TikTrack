@@ -11,10 +11,10 @@
 
 | # | קריטריון | סטטוס | הערה |
 |---|----------|-------|------|
-| - | Type A (/login) — accessible without auth | **SKIP** |  |
-| - | Type C (unauth) — redirect to Home | **FAIL** |  |
-| - | Type C — authenticated access to D16/D18/D21 | **SKIP** |  |
-| - | Auth Guard loaded on protected pages | **SKIP** |  |
+| - | Type A (/login) — accessible without auth | **PASS** | /login loads and shows login form without auth |
+| - | Type C (unauth) — redirect to Home | **FAIL** | Expected redirect to /, got: /login |
+| - | Type C — authenticated access to D16/D18/D21 | **PASS** | D16, D18, D21 load when authenticated |
+| - | Auth Guard loaded on protected pages | **PASS** | window.AuthGuard initialized on trading_accounts |
 
 ---
 

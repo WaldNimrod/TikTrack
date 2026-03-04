@@ -1,3 +1,11 @@
 
 === Auth Guard QA (Team 50) ===
 
+
+--- Criteria ---
+  Type A (/login) — accessible without auth: PASS
+  Type C (unauth) — redirect to Home: FAIL
+  Type C — authenticated access to D16/D18/D21: PASS
+  Auth Guard loaded on protected pages: PASS
+
+Report: _COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_AUTH_GUARD_QA_REPORT.md

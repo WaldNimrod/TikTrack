@@ -6,7 +6,7 @@
 **to:** Team 10 (Execution Orchestrator)
 **cc:** Team 00, Team 100, Team 50, Team 20, Team 30, Nimrod
 **date:** 2026-03-04
-**status:** GATE_6_CONDITIONAL_APPROVAL_RFM_PENDING_GATE7_HOLD
+**status:** SUPERSEDED_BY_GATE6_FINAL_PASS_v1.3.0
 **gate_id:** GATE_6
 **work_package_id:** S002-P003-WP002
 **in_response_to:** ADR-GATE6-001 (Mother Architect, 2026-03-04)
@@ -31,6 +31,9 @@
 ---
 
 ## 1) Decision state
+
+**Historical note:** This file is preserved for traceability only and was superseded by:
+`_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE6_FINAL_PASS_AND_GATE7_ACTIVATION_v1.3.0.md`
 
 - Architect decision state: **CONDITIONALLY APPROVED** (`GREEN_AMBER`)
 - Required completion items: **RFM-1** (D34/D35 script drift clarification), **RFM-2** (auth redirect target clarification)
@@ -57,3 +60,4 @@ Team 10 remains in traceability mode until the architect closure decision is rec
 ---
 
 **log_entry | TEAM_90 | S002_P003_WP002 | GATE_6_CONDITIONAL_APPROVAL_RFM_PENDING_GATE7_HOLD | 2026-03-04**
+**log_entry | TEAM_90 | S002_P003_WP002 | SUPERSEDED_BY_G6_FINAL_PASS_v1_3_0 | 2026-03-04**

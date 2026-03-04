@@ -40,7 +40,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
 | S002 | S002-P002 | Full Pipeline Orchestrator | AGENTS_OS | PIPELINE | — (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era) |
-| S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | ACTIVE | GATE_6 (CONDITIONAL_APPROVED_RFM_PENDING); active_flow=S002-P003; GATE_6 received Team 00 conditional approval (GREEN_AMBER) with two RFM clarification items; Team 90 submitted RFM completion addendum package; no progression to GATE_7 before explicit closure by Team 00 / Team 100; active_work_package_id=S002-P003-WP002 |
+| S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | ACTIVE | GATE_7 (REJECTED_CODE_CHANGE_REQUIRED); active_flow=S002-P003; Nimrod rejected GATE_7 with 26 blockers; Team 90 issued full-scope remediation activation to Team 10; active_work_package_id=S002-P003-WP002 |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
@@ -104,7 +104,7 @@ Source directives:
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-04). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-04):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_6 (CONDITIONAL_APPROVED_RFM_PENDING); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; GATE_6 received Team 00 conditional approval (GREEN_AMBER) with two RFM clarification items; Team 90 submitted RFM completion addendum package; no progression to GATE_7 before explicit closure by Team 00 / Team 100.
+**WSM mirror (2026-03-04):** active_stage_id=S002; active_program_id=S002-P003; current_gate=GATE_7 (REJECTED_CODE_CHANGE_REQUIRED); active_work_package_id=S002-P003-WP002; active_flow=S002-P003; Nimrod rejected GATE_7 with 26 blockers; Team 90 issued full-scope remediation activation to Team 10.
 
 ---
 
@@ -126,4 +126,4 @@ Source directives:
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | INTEGRATED_ROADMAP_V1_1_0_RECONCILIATION_B4_B5_APPLIED | 2026-03-01**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | TEAM_00_CANONICAL_ALIGNMENT_CORRECTIONS_APPLIED | 2026-03-02**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_GOVERNANCE_ALIGNMENT_D01_D04_AND_LOD200_INPUTS_APPLIED | 2026-03-03**
-**log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S002_P003_WP002_G6_CONDITIONAL_APPROVED_RFM_PENDING_SYNCED_TO_WSM | 2026-03-04**
+**log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S002_P003_WP002_G7_REJECTED_CODE_CHANGE_REQUIRED_SYNCED_TO_WSM | 2026-03-04**

@@ -5,7 +5,7 @@
 **to:** Team 00 (Mother Architect), Team 100 (Architecture Authority)
 **cc:** Team 10, Team 50, Team 20, Team 30, Nimrod
 **date:** 2026-03-04
-**status:** SUBMITTED_FOR_CONDITIONAL_PASS_COMPLETION
+**status:** SUPERSEDED_BY_G6_FINAL_PASS_v1.3.0
 **gate_id:** GATE_6
 **work_package_id:** S002-P003-WP002
 **in_response_to:** ADR-GATE6-001 (CONDITIONALLY APPROVED)
@@ -19,6 +19,9 @@
 ---
 
 ## Purpose
+
+**Historical note:** This addendum was accepted and superseded by final architectural pass:
+`_COMMUNICATION/_Architects_Decisions/ARCHITECT_GATE6_DECISION_S002_P003_WP002_v1.3.0.md`
 
 This package closes the two RFM clarifications requested in ADR-GATE6-001:
 
@@ -36,3 +39,4 @@ Confirm that the conditional clarifications are fully satisfied and issue final 
 ---
 
 **log_entry | TEAM_90 | ARCHITECT_INBOX | S002_P003_WP002 | GATE6_RFM_COMPLETION_SUBMITTED_v1_0_0 | 2026-03-04**
+**log_entry | TEAM_90 | ARCHITECT_INBOX | S002_P003_WP002 | RFM_ADDENDUM_SUPERSEDED_BY_G6_FINAL_PASS_v1_3_0 | 2026-03-04**

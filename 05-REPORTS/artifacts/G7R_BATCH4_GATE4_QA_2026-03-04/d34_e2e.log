@@ -1,0 +1,20 @@
+✅ [PASS] D34_PageLoaded
+   alerts page loaded
+✅ [PASS] D34_Create
+   create flow submitted
+✅ [PASS] D34_Edit
+   edit flow submitted
+✅ [PASS] D34_ToggleActive
+   toggle action executed
+✅ [PASS] D34_Delete
+   delete flow executed
+
+============================================================
+TEST SUMMARY
+============================================================
+Total Tests: 5
+✅ Passed: 5
+❌ Failed: 0
+⏸️  Skipped: 0
+Pass Rate: 100.00%
+============================================================

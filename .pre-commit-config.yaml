@@ -35,7 +35,7 @@ repos:
         entry: bash -c "cd ui && npx vite build --mode development --outDir /tmp/phoenix-precommit-dist --emptyOutDir"
         language: system
         pass_filenames: false
-        files: \.(jsx?|css|html|json)$
+        files: '^(ui/.*\.(jsx?|css|html|json)|ui/vite\.config\.js|ui/package(-lock)?\.json)$'
         stages: [pre-commit]
 
   # Informational hooks (non-blocking; keep commented until phase-2 promotion)

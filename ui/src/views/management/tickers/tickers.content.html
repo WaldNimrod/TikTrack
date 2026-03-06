@@ -7,7 +7,7 @@
   <tt-section data-section="summary">
     <div class="index-section__header">
       <div class="index-section__header-title">
-        <img src="/images/icons/entities/home.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
+        <img src="/images/icons/entities/tickers.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
         <h1 class="index-section__header-text">ניהול טיקרים</h1>
       </div>
       <div class="index-section__header-actions">
@@ -85,7 +85,7 @@
   <tt-section data-section="tickers-management">
     <div class="index-section__header">
       <div class="index-section__header-title">
-        <img src="/images/icons/entities/home.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
+        <img src="/images/icons/entities/tickers.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
         <h1 class="index-section__header-text">רשימת טיקרים</h1>
       </div>
       <div class="index-section__header-meta">
@@ -105,9 +105,9 @@
             <option value="INDEX">INDEX</option>
           </select>
           <div class="filter-buttons-container filter-buttons-container--inline" data-filter-group="is_active">
-            <button type="button" class="filter-icon-btn filter-icon-btn--active js-tickers-filter-active" data-is-active="" aria-label="הצג הכל" title="הצג הכל">הכל</button>
-            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="true" aria-label="פעילים בלבד" title="פעילים בלבד">פעיל</button>
-            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="false" aria-label="לא פעילים בלבד" title="לא פעילים בלבד">לא פעיל</button>
+            <button type="button" class="filter-icon-btn filter-icon-btn--active js-tickers-filter-active" data-is-active="" data-filter-type="ticker" aria-label="הצג הכל" title="הצג הכל"><img src="/images/icons/entities/tickers.svg" alt="" width="20" height="20" aria-hidden="true"></button>
+            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="true" data-filter-type="ticker" aria-label="פעילים בלבד" title="פעילים בלבד"><img src="/images/icons/tabler/check.svg" alt="" width="20" height="20" aria-hidden="true"></button>
+            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="false" data-filter-type="ticker" aria-label="לא פעילים בלבד" title="לא פעילים בלבד"><img src="/images/icons/tabler/x.svg" alt="" width="20" height="20" aria-hidden="true"></button>
           </div>
         </div>
         <button class="index-section__header-action-btn js-add-ticker" aria-label="הוסף טיקר" title="הוסף טיקר חדש">

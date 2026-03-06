@@ -37,6 +37,7 @@ def _ticker_to_response(t: Ticker, price_data: Optional[Dict[str, Any]] = None) 
         symbol=t.symbol,
         company_name=t.company_name,
         ticker_type=t.ticker_type,
+        status=t.status or "active",
         is_active=t.is_active,
         delisted_date=t.delisted_date,
         created_at=t.created_at,
@@ -183,6 +184,7 @@ class TickersService:
         symbol: Optional[str] = None,
         company_name: Optional[str] = None,
         ticker_type: Optional[str] = None,
+        status: Optional[str] = None,
         is_active: Optional[bool] = None,
     ) -> TickerResponse:
         try:
@@ -204,16 +206,46 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
+        # BF-G7-009: Duplicate symbol check (API-level, DB enforces via uix_tickers_symbol_exchange_active)
         if symbol is not None:
-            ticker.symbol = symbol.upper()
+            new_sym = symbol.strip().upper()
+            dup_stmt = select(Ticker).where(
+                and_(
+                    Ticker.symbol == new_sym,
+                    Ticker.exchange_id == ticker.exchange_id,
+                    Ticker.deleted_at.is_(None),
+                    Ticker.id != ticker_uuid,
+                )
+            )
+            dup = (await db.execute(dup_stmt)).scalar_one_or_none()
+            if dup:
+                raise HTTPExceptionWithCode(
+                    status_code=409,
+                    detail=f"Symbol '{new_sym}' already exists for this exchange",
+                    error_code=ErrorCodes.TICKER_SYMBOL_DUPLICATE,
+                )
+            ticker.symbol = new_sym
         if company_name is not None:
             ticker.company_name = company_name or None
         if ticker_type is not None:
             ticker.ticker_type = ticker_type.upper()
+        if status is not None:
+            ticker.status = status
         if is_active is not None:
             ticker.is_active = is_active
-        await db.commit()
-        await db.refresh(ticker)
+        try:
+            await db.commit()
+            await db.refresh(ticker)
+        except IntegrityError as e:
+            await db.rollback()
+            err = str(e.orig) if hasattr(e, "orig") else str(e)
+            if "unique" in err.lower() or "symbol" in err.lower():
+                raise HTTPExceptionWithCode(
+                    status_code=409,
+                    detail="Symbol already exists (duplicate)",
+                    error_code=ErrorCodes.TICKER_SYMBOL_DUPLICATE,
+                )
+            raise
         return _ticker_to_response(ticker)
 
     async def delete_ticker(self, db: AsyncSession, ticker_id: str) -> None:

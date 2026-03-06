@@ -33,7 +33,8 @@ const TARGET_TYPE_LABELS = {
   account: 'חשבון מסחר',
   trade: 'טרייד',
   trade_plan: 'תוכנית',
-  ticker: 'טיקר'
+  ticker: 'טיקר',
+  datetime: 'תאריך/שעה'
 };
 
 /** G7R Batch1: Entity icon paths for linked entity display (§3D) */
@@ -47,6 +48,14 @@ function formatAlertLinkedEntity(alert) {
   const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '';
   const displayName = resolvedName || (targetId ? typeLabel + ' ' + String(targetId).slice(0, 8) + '…' : typeLabel || '—');
   const iconPath = targetType ? ALERT_ENTITY_ICON_MAP[targetType] : null;
+  const targetDt = alert.target_datetime ?? alert.targetDatetime;
+  if (targetType === 'datetime' && targetDt) {
+    try {
+      const dt = new Date(targetDt);
+      const dtStr = dt.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${dtStr}</span>`;
+    } catch (_) {}
+  }
   if (!targetType && !targetId) return '<span class="linked-object-badge">—</span>';
   const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
   return `<span class="linked-object-badge entity-${targetType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;

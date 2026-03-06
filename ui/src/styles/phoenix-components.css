@@ -1482,6 +1482,19 @@ body .page-wrapper .page-container main {
   height: 16px;
 }
 
+/* BF-G7-019: #notesPageNumbers — no wrap, horizontal layout */
+#notesPaginationControls {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+}
+#notesPageNumbers {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--spacing-xs, 4px);
+}
+
 /* ============================================
    ACCOUNT MOVEMENTS SUMMARY CARDS
    ============================================
@@ -1615,6 +1628,24 @@ body .page-wrapper .page-container main {
 .info-summary strong {
   color: var(--apple-text-primary, #1d1d1f);
   font-weight: 600;
+}
+
+/* BF-G7-016: #alertsSummaryToggleSize alignment — pinned to row end, no wrap, horizontal */
+#alertsSummaryStats .info-summary__row--first {
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#alertsSummaryStats .info-summary__row--first .info-summary__content {
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+}
+#alertsSummaryStats .portfolio-summary__toggle-btn {
+  flex-shrink: 0;
+  margin-inline-start: auto;
 }
 
 /* ============================================
@@ -2032,6 +2063,17 @@ body .page-wrapper .page-container main {
 .notes-attachment-remove:hover {
   background: rgba(255, 59, 48, 0.12);
   color: var(--apple-system-red, #ff3b30);
+}
+
+/* BF-G7-021: File error styled as error (semantic color) */
+.notes-attachment-error {
+  color: var(--color-error-red, #dc2626);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-sm, 8px);
+  padding: var(--spacing-sm, 8px);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: 4px;
+  border-inline-start: 3px solid var(--color-error-red, #dc2626);
 }
 
 /* ============================================

@@ -17,7 +17,7 @@ VALID_TRIGGER_STATUS = frozenset(("untriggered", "triggered_unread", "triggered_
 
 
 class AlertCreate(BaseModel):
-    target_type: Optional[str] = Field(None, description="ticker|trade|trade_plan|account|datetime|null")
+    target_type: str = Field(..., description="ticker|trade|trade_plan|account|datetime — required (BF-G7-017)")
     target_id: Optional[str] = None
     target_datetime: Optional[datetime] = None
     ticker_id: Optional[str] = None
@@ -32,12 +32,22 @@ class AlertCreate(BaseModel):
     expires_at: Optional[datetime] = None
 
     @model_validator(mode="after")
+    def validate_target_and_general(self):
+        """BF-G7-014: Reject 'general' linkage explicitly."""
+        tt = (self.target_type or "").strip().lower()
+        if tt == "general":
+            raise ValueError("target_type 'general' is not allowed. Use ticker, trade, trade_plan, account, or datetime.")
+        if tt and tt not in VALID_TARGET_TYPES:
+            raise ValueError(f"target_type must be one of {sorted(VALID_TARGET_TYPES)}, got '{self.target_type}'")
+        return self
+
+    @model_validator(mode="after")
     def validate_condition_canonical(self):
         if self.condition_field is not None and self.condition_field not in CONDITION_FIELDS:
             raise ValueError(f"condition_field must be one of {sorted(CONDITION_FIELDS)}")
         if self.condition_operator is not None and self.condition_operator not in CONDITION_OPERATORS:
             raise ValueError(f"condition_operator must be one of {sorted(CONDITION_OPERATORS)}")
-        # G7R Batch2: all-or-none — partial condition is validation error
+        # BF-G7-013: Entity alerts require condition; datetime may omit
         has_field = self.condition_field is not None and str(self.condition_field).strip() != ""
         has_op = self.condition_operator is not None and str(self.condition_operator).strip() != ""
         has_val = self.condition_value is not None
@@ -47,10 +57,20 @@ class AlertCreate(BaseModel):
                 "Condition requires all three fields (condition_field, condition_operator, condition_value) "
                 "or all empty. Partial condition is invalid."
             )
+        # BF-G7-013: Entity alerts (ticker, trade, trade_plan, account) require condition; datetime may omit
+        if filled == 0 and self.target_type and self.target_type != "datetime":
+            raise ValueError(
+                "Condition is required for entity alerts. Provide condition_field, condition_operator, and condition_value."
+            )
         return self
 
 
 class AlertUpdate(BaseModel):
+    """BF-G7-018: Supports linked_entity change via target_type, target_id, ticker_id, target_datetime."""
+    target_type: Optional[str] = Field(None, description="ticker|trade|trade_plan|account|datetime")
+    target_id: Optional[str] = None
+    ticker_id: Optional[str] = None
+    target_datetime: Optional[datetime] = None
     is_active: Optional[bool] = None
     trigger_status: Optional[str] = Field(None, description="untriggered|triggered_read|triggered_unread|rearmed")
     title: Optional[str] = Field(None, max_length=200)
@@ -59,6 +79,17 @@ class AlertUpdate(BaseModel):
     condition_operator: Optional[str] = Field(None, description=">|<|>=|<=|=|crosses_above|crosses_below")
     condition_value: Optional[float] = None
     expires_at: Optional[datetime] = None
+
+    @model_validator(mode="after")
+    def validate_target_update(self):
+        """BF-G7-014: Reject 'general'; BF-G7-018: validate linked entity fields."""
+        if self.target_type is not None:
+            tt = str(self.target_type).strip().lower()
+            if tt == "general":
+                raise ValueError("target_type 'general' is not allowed.")
+            if tt not in VALID_TARGET_TYPES:
+                raise ValueError(f"target_type must be one of {sorted(VALID_TARGET_TYPES)}")
+        return self
 
     @model_validator(mode="after")
     def validate_condition_canonical(self):

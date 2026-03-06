@@ -40,6 +40,7 @@ def _ticker_to_response(
         symbol=t.symbol,
         company_name=t.company_name,
         ticker_type=t.ticker_type,
+        status=t.status or "active",
         is_active=t.is_active,
         delisted_date=t.delisted_date,
         created_at=t.created_at,

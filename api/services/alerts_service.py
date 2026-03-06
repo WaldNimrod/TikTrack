@@ -32,7 +32,7 @@ async def _resolve_target_display_names(
     alerts: List[Alert],
     user_id: uuid.UUID,
 ) -> dict:
-    """G7R Batch2: Resolve target_id -> display name for trade, trade_plan, account."""
+    """G7R Batch2/3: Resolve target_id -> display name for trade, trade_plan, account; datetime -> formatted."""
     out = {}
     trade_ids = []
     plan_ids = []
@@ -92,8 +92,13 @@ def _alert_to_response(
     ticker_symbol: Optional[str] = None,
     target_display_name: Optional[str] = None,
 ) -> dict:
+    """BF-G7-012: Returns linked entity type (target_type) + record name (ticker_symbol/target_display_name)."""
     cond_val = alert.condition_value
     cv = float(cond_val) if cond_val is not None else None
+    # BF-G7-012: datetime has no target_id; use formatted target_datetime as display
+    if alert.target_type == "datetime" and getattr(alert, "target_datetime", None) and not target_display_name:
+        dt_val = alert.target_datetime
+        target_display_name = dt_val.strftime("%Y-%m-%d %H:%M UTC") if hasattr(dt_val, "strftime") else str(dt_val)
     return {
         "id": str(alert.id),
         "target_type": alert.target_type or None,
@@ -263,11 +268,18 @@ class AlertsService:
         user_id: uuid.UUID,
         data: dict,
     ) -> dict:
-        # G7R Stream1: general removed; target_type can be None
+        # BF-G7-017: target_type required; BF-G7-014: reject 'general'
         target_type_raw = data.get("target_type")
         target_type = (target_type_raw.strip().lower() if isinstance(target_type_raw, str) and target_type_raw.strip() else None) or None
-        if target_type is not None and target_type not in VALID_TARGET_TYPES:
-            target_type = None
+        if not target_type:
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(status_code=422, detail="target_type is required (ticker, trade, trade_plan, account, or datetime)", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+        if target_type == "general":
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(status_code=422, detail="target_type 'general' is not allowed", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+        if target_type not in VALID_TARGET_TYPES:
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(status_code=422, detail=f"target_type must be one of {sorted(VALID_TARGET_TYPES)}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
 
         # Validation: datetime type requires target_datetime; entity type requires target_id (or ticker_id for ticker)
         target_datetime = data.get("target_datetime")
@@ -344,6 +356,16 @@ class AlertsService:
             except Exception:
                 cond_val = None
 
+        # BF-G7-015: Sanitize rich-text message (HTML allowed, sanitized per SOP-012)
+        message_raw = data.get("message")
+        message_sanitized = None
+        if message_raw:
+            try:
+                from ..utils.rich_text_sanitizer import sanitize_rich_text
+                message_sanitized = sanitize_rich_text(str(message_raw))
+            except Exception:
+                message_sanitized = str(message_raw)[:10000]  # fallback: truncate plain text
+
         alert = Alert(
             user_id=user_id,
             target_type=target_type,
@@ -356,7 +378,7 @@ class AlertsService:
             condition_operator=data.get("condition_operator"),
             condition_value=cond_val,
             title=data.get("title", ""),
-            message=data.get("message"),
+            message=message_sanitized,
             is_active=data.get("is_active", True),
             expires_at=data.get("expires_at"),
             created_by=user_id,
@@ -395,6 +417,55 @@ class AlertsService:
         if not alert:
             return None
 
+        # BF-G7-018: Apply linked_entity change (target_type, target_id, ticker_id, target_datetime)
+        if "target_type" in data or "target_id" in data or "ticker_id" in data or "target_datetime" in data:
+            target_type_raw = data.get("target_type", alert.target_type)
+            target_type = (target_type_raw.strip().lower() if isinstance(target_type_raw, str) and target_type_raw.strip() else alert.target_type) or None
+            if target_type and target_type not in VALID_TARGET_TYPES:
+                target_type = alert.target_type
+            if target_type == "general":
+                from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                raise HTTPExceptionWithCode(status_code=422, detail="target_type 'general' is not allowed.", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+
+            if target_type == "datetime":
+                target_datetime_val = data.get("target_datetime")
+                if target_datetime_val and isinstance(target_datetime_val, str):
+                    try:
+                        from datetime import datetime as dt
+                        target_datetime_val = dt.fromisoformat(target_datetime_val.replace("Z", "+00:00"))
+                    except (ValueError, TypeError):
+                        target_datetime_val = None
+                if not target_datetime_val:
+                    from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                    raise HTTPExceptionWithCode(status_code=422, detail="target_datetime required when target_type=datetime", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+                alert.target_type = target_type
+                alert.target_id = None
+                alert.ticker_id = None
+                alert.target_datetime = target_datetime_val
+            elif target_type in ("ticker", "trade", "trade_plan", "account"):
+                ticker_id_val = None
+                if data.get("ticker_id"):
+                    try:
+                        ticker_id_val = uuid.UUID(data["ticker_id"])
+                    except (ValueError, TypeError):
+                        pass
+                target_id_val = None
+                if data.get("target_id"):
+                    try:
+                        target_id_val = uuid.UUID(data["target_id"])
+                    except (ValueError, TypeError):
+                        pass
+                if target_type == "ticker" and not ticker_id_val and not target_id_val:
+                    from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                    raise HTTPExceptionWithCode(status_code=422, detail="ticker_id or target_id required when target_type=ticker", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+                if target_type != "ticker" and not target_id_val:
+                    from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                    raise HTTPExceptionWithCode(status_code=422, detail="target_id required when target_type is trade, trade_plan, or account", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+                alert.target_type = target_type
+                alert.target_id = target_id_val
+                alert.ticker_id = ticker_id_val
+                alert.target_datetime = None
+
         if "is_active" in data:
             alert.is_active = bool(data["is_active"])
         if "trigger_status" in data:
@@ -406,7 +477,15 @@ class AlertsService:
         if "title" in data:
             alert.title = data["title"]
         if "message" in data:
-            alert.message = data.get("message")
+            msg_raw = data.get("message")
+            if msg_raw:
+                try:
+                    from ..utils.rich_text_sanitizer import sanitize_rich_text
+                    alert.message = sanitize_rich_text(str(msg_raw))
+                except Exception:
+                    alert.message = str(msg_raw)[:10000]
+            else:
+                alert.message = None
         if "condition_field" in data:
             alert.condition_field = data.get("condition_field")
         if "condition_operator" in data:

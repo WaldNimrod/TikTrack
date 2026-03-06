@@ -104,6 +104,28 @@
   border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
 }
 
+/* Tickers Entity (D22 — ניהול טיקרים) — Management tickers add/edit and data-integrity modals */
+.phoenix-modal[data-entity="tickers"] .phoenix-modal__header,
+.phoenix-modal[data-entity="ticker"] .phoenix-modal__header,
+.phoenix-modal.modal-entity-tickers .phoenix-modal__header,
+.phoenix-modal.modal-entity-ticker .phoenix-modal__header {
+  background-color: var(--entity-ticker-light, #c5f4ea);
+  border-bottom-color: var(--entity-ticker-dark, #138496);
+}
+.phoenix-modal[data-entity="tickers"] .phoenix-modal__title,
+.phoenix-modal[data-entity="ticker"] .phoenix-modal__title,
+.phoenix-modal.modal-entity-tickers .phoenix-modal__title,
+.phoenix-modal.modal-entity-ticker .phoenix-modal__title {
+  color: var(--entity-ticker-dark, #138496);
+}
+.phoenix-modal[data-entity="tickers"] .phoenix-modal__close,
+.phoenix-modal[data-entity="ticker"] .phoenix-modal__close,
+.phoenix-modal.modal-entity-tickers .phoenix-modal__close,
+.phoenix-modal.modal-entity-ticker .phoenix-modal__close {
+  color: var(--entity-ticker-dark, #138496);
+  border-color: var(--entity-ticker-dark, #138496);
+}
+
 /* User Tickers Entity ("הטיקרים שלי") — Plural per ARCHITECT_RESOLUTION_NAMING_FINAL */
 .phoenix-modal[data-entity="user_tickers"] .phoenix-modal__header,
 .phoenix-modal.modal-entity-user_tickers .phoenix-modal__header {
@@ -281,6 +303,16 @@
 .phoenix-modal__body textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+/* Validation Summary (concise inline summary per BF-G7-003) */
+.phoenix-modal__body .form-validation-summary {
+  color: var(--color-error-red, #dc2626);
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-md, 16px);
+  padding: var(--spacing-sm, 8px);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: 6px;
 }
 
 /* Error Messages */

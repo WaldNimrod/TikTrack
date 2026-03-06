@@ -1,7 +1,7 @@
 """
 Note Attachments Service - D35
 TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE
-Max 3 per note, 1MB per file, MIME magic-bytes validated.
+Max 3 per note, 2.5MB per file (BF-G7-025), MIME magic-bytes validated.
 Storage: storage/uploads/users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}
 """
 
@@ -17,7 +17,7 @@ from ..models.notes import Note, NoteAttachment
 from ..core.config import settings
 from ..utils.mime_magic import validate_mime_magic
 
-MAX_FILE_BYTES = 1048576  # 1MB
+MAX_FILE_BYTES = 2621440  # 2.5MB (BF-G7-025)
 MAX_ATTACHMENTS_PER_NOTE = 3
 
 
@@ -107,9 +107,9 @@ class NoteAttachmentsService:
         if not note:
             return (None, 404, "Note not found")
 
-        # 413: file > 1MB
+        # 413: file > 2.5MB (BF-G7-025)
         if len(file_content) > MAX_FILE_BYTES:
-            return (None, 413, "File exceeds 1MB limit")
+            return (None, 413, "File exceeds 2.5MB limit")
 
         # 415: MIME validation (magic-bytes) — before quota (422) per D35/Gate-A
         ok, mime_or_err = validate_mime_magic(file_content, claimed_content_type)

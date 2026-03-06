@@ -111,7 +111,7 @@ class Note(Base):
 class NoteAttachment(Base):
     """
     NoteAttachment model - maps to user_data.note_attachments table.
-    D35: Max 3 per note, 1MB per file, MIME magic-bytes validated.
+    D35: Max 3 per note, 2.5MB per file (BF-G7-025), MIME magic-bytes validated.
     """
     __tablename__ = "note_attachments"
     __table_args__ = {"schema": "user_data"}

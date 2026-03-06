@@ -611,6 +611,8 @@ class SharedServices {
             errorData.code = errorBody.error.code || errorData.code;
             errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
             errorData.details = errorBody.error.details || {};
+          } else if (errorBody.detail) {
+            errorData.message = typeof errorBody.detail === 'string' ? errorBody.detail : (errorBody.detail.msg || JSON.stringify(errorBody.detail));
           }
         } catch (e) {
           // Ignore JSON parse errors
@@ -769,6 +771,8 @@ class SharedServices {
             errorData.code = errorBody.error.code || errorData.code;
             errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
             errorData.details = errorBody.error.details || {};
+          } else if (errorBody.detail) {
+            errorData.message = typeof errorBody.detail === 'string' ? errorBody.detail : (errorBody.detail.msg || JSON.stringify(errorBody.detail));
           }
         } catch (e) {
           // Ignore JSON parse errors

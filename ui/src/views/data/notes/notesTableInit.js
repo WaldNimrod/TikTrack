@@ -69,16 +69,18 @@ function getFormatIcon(contentType, filename) {
 }
 
 /**
- * Render attachment cell: format icon + 20 chars of filename
+ * Render attachment cell: icon + count or first filename (BF-G7-023)
+ * When API returns attachment_count or attachments array, show indicator
  */
 function getAttachmentDisplay(note) {
+  const count = note.attachment_count ?? (note.attachments && Array.isArray(note.attachments) ? note.attachments.length : 0);
+  if (!count) return '—';
   const att = note.attachments && note.attachments[0];
   const name = att && (att.original_filename || att.originalFilename || att.filename);
   const contentType = att && (att.content_type || att.contentType);
-  if (!name) return '—';
   const icon = getFormatIcon(contentType, name);
-  const truncated = name.length > 20 ? name.slice(0, 17) + '…' : name;
-  return `<span class="attachment-cell" title="${(name || '').replace(/"/g, '&quot;')}">${icon} ${truncated}</span>`;
+  const label = count > 1 ? `📎 ${count} קבצים` : (name ? `${icon} ${(name.length > 18 ? name.slice(0, 15) + '…' : name).replace(/"/g, '&quot;')}` : `📎 1`);
+  return `<span class="attachment-cell attachment-indicator" title="${count > 1 ? count + ' קבצים מצורפים' : (name || '').replace(/"/g, '&quot;')}">${label}</span>`;
 }
 
 /**
@@ -258,7 +260,7 @@ function renderTable(notes) {
 }
 
 /**
- * Build attachments HTML for note details modal (§3D — proof hooks for download/remove)
+ * Build attachments HTML for note details modal (§3D, BF-G7-024 — download, open, preview)
  */
 function buildAttachmentsHtml(attachments, noteId) {
   if (!attachments || !attachments.length) return '<p>אין קבצים מצורפים</p>';
@@ -271,39 +273,67 @@ function buildAttachmentsHtml(attachments, noteId) {
     return `
       <div class="note-attachment-row" data-note-id="${noteId}" data-attachment-id="${attId}">
         <span class="attachment-icon">${icon}</span>
-        <a href="${downloadUrl}" class="note-attachment-download js-attachment-download" data-attachment-id="${attId}" data-note-id="${noteId}" title="הורדה">${esc(name)}</a>
+        <span class="attachment-name">${esc(name)}</span>
+        <span class="attachment-actions">
+          <a href="#" class="note-attachment-open js-attachment-open" data-attachment-id="${attId}" data-note-id="${noteId}" title="פתח בחלון חדש (תצוגה מקדימה)">🔗 פתח</a>
+          <a href="#" class="note-attachment-download js-attachment-download" data-attachment-id="${attId}" data-note-id="${noteId}" title="הורדה">⬇ הורד</a>
+        </span>
         <button type="button" class="table-action-btn js-attachment-remove" data-attachment-id="${attId}" data-note-id="${noteId}" aria-label="מחק קובץ" title="מחק קובץ">✕</button>
       </div>`;
   }).join('');
 }
 
-/** Bind attachment download/remove handlers in note details modal — G7R Batch3 proof */
+/** Bind attachment download/open/remove handlers (BF-G7-024) */
 function bindNoteAttachmentHandlers(noteId) {
   const container = document.querySelector('.note-attachments-list');
   if (!container) return;
+
+  async function fetchAttachmentBlob(attId, filename) {
+    const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+    await sharedServices.init();
+    const url = sharedServices.buildUrl(`/notes/${noteId}/attachments/${attId}/download`);
+    const token = sharedServices.getToken();
+    const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.blob();
+  }
 
   container.querySelectorAll('.js-attachment-download').forEach((link) => {
     link.addEventListener('click', async (e) => {
       e.preventDefault();
       const attId = link.dataset.attachmentId;
-      const filename = (link.textContent || '').trim() || 'download';
+      const row = link.closest('.note-attachment-row');
+      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'download';
       if (!attId || !noteId) return;
       try {
-        const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
-        await sharedServices.init();
-        const url = sharedServices.buildUrl(`/notes/${noteId}/attachments/${attId}/download`);
-        const token = sharedServices.getToken();
-        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const blob = await res.blob();
+        const blob = await fetchAttachmentBlob(attId, filename);
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = filename;
+        a.download = filename || 'download';
         a.click();
         URL.revokeObjectURL(a.href);
       } catch (err) {
         maskedLog('[Notes] Download attachment error:', { message: (err && err.message) || 'Unknown' });
         createModal({ title: 'שגיאה', content: '<p>שגיאה בהורדת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+
+  container.querySelectorAll('.js-attachment-open').forEach((link) => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const attId = link.dataset.attachmentId;
+      const row = link.closest('.note-attachment-row');
+      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'file';
+      if (!attId || !noteId) return;
+      try {
+        const blob = await fetchAttachmentBlob(attId, filename);
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener,noreferrer');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      } catch (err) {
+        maskedLog('[Notes] Open attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בפתיחת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
       }
     });
   });
@@ -506,9 +536,12 @@ function bindRowActions() {
             await sharedServices.init();
             await sharedServices.delete(`/notes/${id}`);
             document.getElementById('phoenix-modal-backdrop')?.remove();
-            const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
-            renderSummary(result.summary);
-            renderTable(result.notes);
+            if (window.refreshNotesTable) await window.refreshNotesTable();
+            else {
+              const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
+              renderSummary(result.summary);
+              renderTable(result.notes);
+            }
           } catch (err) {
             maskedLog('[Notes] Delete error:', { status: (err && err.status) });
             createModal({

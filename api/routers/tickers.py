@@ -263,6 +263,7 @@ async def update_ticker(
             symbol=payload.symbol,
             company_name=payload.company_name,
             ticker_type=payload.ticker_type,
+            status=payload.status,
             is_active=payload.is_active,
         )
     except HTTPExceptionWithCode:

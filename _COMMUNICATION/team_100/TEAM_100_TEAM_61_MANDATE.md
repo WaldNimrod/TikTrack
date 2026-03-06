@@ -1,10 +1,11 @@
 ---
 **project_domain:** AGENTS_OS
-**id:** TEAM_100_TEAM_61_MANDATE_v1.0.0
+**id:** TEAM_100_TEAM_61_MANDATE_v1.1.0
 **from:** Team 100 (Development Architecture Authority — Agents_OS)
 **to:** Team 61 (Cursor Cloud Agent)
-**date:** 2026-03-04
-**status:** ACTIVE — MANDATE_ISSUED
+**date:** 2026-03-05
+**status:** ACTIVE — MANDATE_UPDATED (v1.1.0 — architectural changes added)
+**supersedes:** v1.0.0 (2026-03-04)
 **mandate_type:** Role Authorization + Remediation Assignment + Standing Operating Procedures
 ---
 
@@ -362,4 +363,109 @@ The 5 remediations are small. The foundation is correct.
 
 ---
 
-log_entry | TEAM_100 | TEAM_61_MANDATE | ACTIVE | 2026-03-04
+---
+
+## MANDATE UPDATE v1.1.0 — 2026-03-05
+
+### שינויים אדריכליים שנוספו (לאחר בחינה עם Nimrod)
+
+#### שינוי 1 — GATE_2 + GATE_6: Human Approval Layer (חובה)
+
+כל בקשת architectural approval (GATE_2, GATE_6) חייבת לעבור דרך **שלוש שכבות**:
+
+```
+GATE_2 (spec approval):
+  שכבה 1: team_190 (OpenAI) — constitutional validation
+  שכבה 2: team_100 (Gemini) — architectural analysis + recommendation (must explain + convince)
+  שכבה 3: HUMAN PAUSE — Nimrod decides: --approve gate2 / --reject gate2 / --query gate2
+
+GATE_6 (reality check):
+  שכבה 1: team_90 (OpenAI) — code vs spec validation
+  שכבה 2: team_100 (Gemini) — architectural analysis of validation results
+  שכבה 3: HUMAN PAUSE — Nimrod decides: --approve gate6 / --reject gate6 / --query gate6
+```
+
+Pipeline כעת כולל **4 human pause points**:
+1. GATE_2 (spec approval by Nimrod)
+2. G3.6 (Cursor implementation)
+3. GATE_6 (reality approval by Nimrod)
+4. GATE_7 (UX approval by Nimrod)
+
+#### שינוי 2 — Engine mapping updates (חובה)
+
+```python
+# config.py — שינויים נדרשים:
+TEAM_ENGINE_MAP = {
+    "team_00":  "human",    # WAS: "claude" — Nimrod is always human
+    ...
+    "team_61":  "cursor",   # NEW: Cursor Cloud Agent
+    ...
+    "team_100": "gemini",   # WAS: "claude" — eliminate self-approval
+    ...
+}
+```
+
+#### שינוי 3 — Gate router updates (חובה)
+
+```python
+# gate_router.py — GATE_2 + GATE_6 split into 3 sub-keys each:
+GATE_TEAM_MAP = {
+    ...
+    "GATE_2_VALIDATE":    "team_190",
+    "GATE_2_ANALYZE":     "team_100",
+    "GATE_2_HUMAN":       "team_00",
+    ...
+    "GATE_4_COORD":       "team_10",
+    "GATE_4_EXECUTE":     "team_50",
+    ...
+    "GATE_6_VALIDATE":    "team_90",
+    "GATE_6_ANALYZE":     "team_100",
+    "GATE_6_HUMAN":       "team_00",
+    ...
+}
+```
+
+#### שינוי 4 — CLI flags נוספים (חובה)
+
+```bash
+--approve gate2     # approves GATE_2 human pause and continues
+--reject gate2 --reason "..."
+--query gate2 --question "..."   # asks Team 100 (Gemini) a follow-up, then re-pauses
+--approve gate6
+--reject gate6 --reason "..."
+--query gate6 --question "..."
+```
+
+#### שינוי 5 — Human pause display format (חובה)
+
+בכל human pause, הoutput חייב להיות:
+
+```
+╔══════════════════════════════════════════════════════════╗
+║  [GATE NAME] — Nimrod Approval Required                  ║
+╠══════════════════════════════════════════════════════════╣
+║  VALIDATION: [Team 190/90 result + key findings]         ║
+╠══════════════════════════════════════════════════════════╣
+║  ARCHITECTURAL ANALYSIS (Team 100):                      ║
+║  Recommendation: APPROVE | REJECT | OPTION_A | OPTION_B  ║
+║  Reasoning: [must explain — not just "looks good"]       ║
+╠══════════════════════════════════════════════════════════╣
+║  YOUR DECISION:                                          ║
+║  --approve [gate]   --reject [gate] --reason "..."       ║
+║  --query [gate] --question "..."                         ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+### GATE_0 checklist מעודכן — 18 פריטים (v1.1)
+
+כל 18 הפריטים מGATE_0 CHECKLIST ב-`TEAM_100_TO_TEAM_61_URGENT_ALIGNMENT_v1.0.0.md` תקפים וחלים.
+
+### המלצות נוספות (אופציונלי אך מומלץ)
+
+- הוסף `--dry-run` flag (כל הpipeline עם stub responses — ללא API calls)
+- הוסף cost tracking ל-PipelineState (`total_tokens: dict[str, int]`)
+- שמור gate results כJSON artifacts ל-`_COMMUNICATION/agents_os/gates/`
+
+---
+
+log_entry | TEAM_100 | TEAM_61_MANDATE | UPDATED_v1.1 | 2026-03-05

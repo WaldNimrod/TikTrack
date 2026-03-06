@@ -13,7 +13,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
 
 let richTextInstance = null;
 const MAX_ATTACHMENTS = 3;
-const MAX_FILE_BYTES = 1048576; // 1MB
+/** BF-G7-025: 2.5MB per file; coordinate with Team 20 if API limit differs */
+const MAX_FILE_BYTES = 2621440; // 2.5MB
 
 /** Phase C: Backend allows trade|trade_plan|ticker|account only — no general */
 const PARENT_TYPES = [
@@ -68,9 +69,10 @@ function createFormHTML(data = null) {
         <div class="notes-attachments-area">
           <input type="file" id="noteAttachmentInput" accept=".jpg,.jpeg,.png,.webp,.pdf,.xls,.xlsx,.doc,.docx" multiple style="display:none" />
           <div class="notes-attachments-header">
-            <span class="form-hint">עד ${MAX_ATTACHMENTS} קבצים, 1MB לכל קובץ</span>
+            <span class="form-hint">עד ${MAX_ATTACHMENTS} קבצים, 2.5MB לכל קובץ</span>
             <button type="button" class="notes-upload-trigger phoenix-btn phoenix-btn--secondary js-upload-attachment" title="צרוף קובץ">צרוף קובץ</button>
           </div>
+          <div id="noteAttachmentError" class="form-error notes-attachment-error" role="alert" hidden></div>
           <div id="noteAttachmentsList" class="notes-attachments-table" role="table" aria-label="קבצים מצורפים"></div>
         </div>
       </div>
@@ -121,13 +123,15 @@ function initAttachmentHandlers(noteId) {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
     const total = attachmentState.existing.length + attachmentState.pending.length - attachmentState.toDelete.length;
+    const errEl = document.getElementById('noteAttachmentError');
+    if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
     for (const file of files) {
       if (total >= MAX_ATTACHMENTS) {
-        createModal({ title: 'שגיאה', content: `<p>מקסימום ${MAX_ATTACHMENTS} קבצים להערה</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
+        if (errEl) { errEl.textContent = `מקסימום ${MAX_ATTACHMENTS} קבצים להערה`; errEl.hidden = false; }
         break;
       }
       if (file.size > MAX_FILE_BYTES) {
-        createModal({ title: 'שגיאה', content: `<p>הקובץ ${file.name} חורג מ־1MB</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
+        if (errEl) { errEl.textContent = `הקובץ ${file.name} חורג מ־2.5MB`; errEl.hidden = false; }
         continue;
       }
       attachmentState.pending.push(file);
@@ -220,10 +224,34 @@ export async function openNotesForm(noteId = null) {
         savedNoteId = created?.id ?? created?.external_ulid;
       }
       if (savedNoteId && attachmentState.pending.length > 0) {
-        for (const file of attachmentState.pending) {
-          const formData = new FormData();
-          formData.append('file', file);
-          await sharedServices.postFormData(`/notes/${savedNoteId}/attachments`, formData);
+        const errEl = document.getElementById('noteAttachmentError');
+        if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+        const toUpload = [...attachmentState.pending];
+        attachmentState.pending = [];
+        renderAttachmentsList();
+        for (const file of toUpload) {
+          try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const uploaded = await sharedServices.postFormData(`/notes/${savedNoteId}/attachments`, formData);
+            const att = (uploaded && uploaded.data) ? uploaded.data : uploaded;
+            if (att && (att.id || att.external_ulid)) {
+              attachmentState.existing.push({ id: att.id || att.external_ulid, name: att.original_filename || att.originalFilename || file.name, original_filename: att.original_filename || att.originalFilename || file.name });
+              renderAttachmentsList();
+            }
+          } catch (upErr) {
+            attachmentState.pending.push(file);
+            renderAttachmentsList();
+            const status = upErr && upErr.status;
+            let msg;
+            if (status === 413) msg = 'הקובץ חורג מ־2.5MB. נסה שוב עם קובץ קטן יותר.';
+            else if (status === 415) msg = 'סוג הקובץ לא נתמך.';
+            else if (status === 422) msg = 'מכסה של 3 קבצים הושלמה. הסר קובץ כדי להוסיף אחר.';
+            else msg = upErr?.message || upErr?.message_i18n || 'שגיאה בהעלאת הקובץ. נסה שוב.';
+            if (errEl) { errEl.textContent = msg; errEl.hidden = false; }
+            maskedLog('[Notes Form] Upload error:', { status: upErr?.status, message: upErr?.message });
+            return;
+          }
         }
       }
       closeModal();
@@ -231,13 +259,15 @@ export async function openNotesForm(noteId = null) {
       if (window.refreshNotesTable) await window.refreshNotesTable();
     } catch (err) {
       maskedLog('[Notes Form] Save error:', { status: (err && err.status) });
+      const errEl = document.getElementById('noteAttachmentError');
       const status = err && err.status;
       let msg;
-      if (status === 413) msg = 'הקובץ חורג מ־1MB. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
+      if (status === 413) msg = 'הקובץ חורג מ־2.5MB. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
       else if (status === 415) msg = 'סוג הקובץ לא נתמך. ההערה נשמרה, אך העלאת הקובץ נכשלה.';
       else if (status === 422) msg = 'מכסה של 3 קבצים להערה הושלמה. הסר קובץ כדי להוסיף אחר.';
       else msg = err?.message_i18n || err?.message || 'שגיאה בשמירה';
-      createModal({ title: 'שגיאה', content: `<p>${String(msg).replace(/</g, '&lt;')}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
+      const attachErrEl = document.getElementById('noteAttachmentError');
+      if (attachErrEl) { attachErrEl.textContent = msg; attachErrEl.hidden = false; } else { createModal({ title: 'שגיאה', content: `<p>${String(msg).replace(/</g, '&lt;')}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' }); }
     }
   }
 

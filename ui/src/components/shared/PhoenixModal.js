@@ -16,7 +16,7 @@
  * @param {Function} options.onSave - Callback when save button is clicked (optional)
  * @param {boolean} options.showSaveButton - Whether to show save button (default: true)
  * @param {string} options.saveButtonText - Save button text (default: "שמירה")
- * @param {string} options.cancelButtonText - Cancel button text (default: "לבטל")
+ * @param {string} options.cancelButtonText - Cancel button text (default: "ביטול")
  * @param {string} options.entity - Entity for header color (trading_account | brokers_fees | cash_flow)
  * @returns {HTMLElement} Modal element
  */
@@ -28,7 +28,7 @@ export function createModal(options = {}) {
     onSave = null,
     showSaveButton = true,
     saveButtonText = 'שמירה',
-    cancelButtonText = 'לבטל',
+    cancelButtonText = 'ביטול',
     entity = null,
     confirmMode = false
   } = options;

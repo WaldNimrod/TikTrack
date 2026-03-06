@@ -1,7 +1,8 @@
 # GATE_3 Batch 1 — T190-Price runtime evidence (Team 60)
 
 **Purpose:** Runtime corroboration for T190-Price (Intraday Price Surface Staleness).  
-**Activation:** TEAM_10_TO_TEAM_60_S002_P003_WP002_GATE3_BATCH1_ACTIVATION_v1.0.0
+**Activation:** TEAM_10_TO_TEAM_60_S002_P003_WP002_GATE3_BATCH1_ACTIVATION_v1.0.0  
+**date:** 2026-03-06
 
 ## Checks to run (optional re-run for this batch)
 

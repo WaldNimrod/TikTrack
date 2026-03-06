@@ -15,7 +15,9 @@
 
 מסמך זה הוא **מטריצת הסגירה הנעולה האחת** ל־26 BF + 19 gaps כנדרש ב־R-002.  
 כל שורה עומדת בפורמט: **id | owner | status=CLOSED | evidence_path | verification_report | verifier | closed_date**.  
-**מקור נתונים:** שורות 26 BF ו־19 gaps הועתקו מ־`TEAM_50_S002_P003_WP002_G5_BLOCK_CLOSURE_MATRIX_v1.0.0.md`; עמודות **verifier** ו־**closed_date** נוספו (ברירת מחדל: verifier = Team 50, closed_date = 2026-03-06 אלא אם צוין אחרת).
+**מקור נתונים:** שורות 26 BF ו־19 gaps הועתקו מ־`TEAM_50_S002_P003_WP002_G5_BLOCK_CLOSURE_MATRIX_v1.0.0.md`; עמודות **verifier** ו־**closed_date** נוספו (ברירת מחדל: verifier = Team 50, closed_date = 2026-03-06 אלא אם צוין אחרת).  
+**R-001:** מקור 19 הפערים להגשה — רק `TEAM_10_G7_OPEN_ITEMS_CLOSURE_LOCKED_v1.0.0.md`; ראו `TEAM_10_G5_SUBMISSION_SOURCE_OF_TRUTH_v1.0.0.md`.  
+**R-002:** מסמך זה הוא מטריצת הסגירה הנעולה האחת (26+19).
 
 ---
 
@@ -82,7 +84,28 @@
 
 ---
 
-## 4) מקור ונוֹעַל
+## 4) R-Remediation (R-005..R-014) — evidence מדוחות 20/30
+
+מקור: TEAM_20_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md, TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md.
+
+| R | owner | status | evidence_path | verification_report | verifier | closed_date |
+|---|-------|--------|---------------|----------------------|----------|-------------|
+| R-005 | Team 20 + 30 | CLOSED | api/schemas/notes.py (validate_linked_entity_required); ui notesForm.js parent_id validation | TEAM_20/30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 20, Team 30 | 2026-03-06 |
+| R-006 | Team 20 + 30 | CLOSED | api/services/tickers_service.py _get_price_with_fallback, api/schemas/tickers.py; ui tickersTableInit, userTickerTableInit | TEAM_20/30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 20, Team 30 | 2026-03-06 |
+| R-007 | Team 30 | CLOSED | entityLinks.js, formatAlertLinkedEntity, formatLinkedEntityDisplay | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+| R-008 | Team 20 + 30 | CLOSED | api/routers/notes.py, api/services/note_attachments_service.py; ui notesForm.js, notesTableInit.js | TEAM_20/30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 20, Team 30 | 2026-03-06 |
+| R-009 | Team 30 | CLOSED | loadAllData, refreshAlertsTable, refreshNotesTable | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+| R-010 | Team 20 + 30 | CLOSED | api canonical_ticker_service, tickers_service, user_tickers_service; ui tickersTableInit, tickersForm | TEAM_20/30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 20, Team 30 | 2026-03-06 |
+| R-011 | Team 30 | CLOSED | title + aria-label בכל הטבלאות | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+| R-012 | Team 30 | CLOSED | PhoenixModal cancelButtonText "ביטול" | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+| R-013 | Team 30 | CLOSED | phoenix-components.css, notes.html (notesSummaryToggleSize, pagination) | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+| R-014 | Team 30 | CLOSED | phoenix-modal.css, entityLinks.js (צבעי ישות, מקושרים) | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
+
+**הערה:** R-003 (008/012/024 E2E/חריג) ו־R-004 (Auth) — ימולאו לאחר דוח Team 50 + חתימות.
+
+---
+
+## 5) מקור ונוֹעַל
 
 - **מקור שורות:** TEAM_50_S002_P003_WP002_G5_BLOCK_CLOSURE_MATRIX_v1.0.0.md  
 - **נעילה:** ארטיפקט זה הוא המקור המאושר היחיד למטריצת 26+19 בהגשת GATE_5 Re-validation (R-002).  
@@ -90,4 +113,4 @@
 
 ---
 
-**log_entry | TEAM_10 | G5_CLOSURE_MATRIX_LOCKED | R-002 | S002_P003_WP002 | 2026-03-06**
+**log_entry | TEAM_10 | G5_CLOSURE_MATRIX_LOCKED | R-002 | R-005..R-014 from 20/30 | S002_P003_WP002 | 2026-03-06**

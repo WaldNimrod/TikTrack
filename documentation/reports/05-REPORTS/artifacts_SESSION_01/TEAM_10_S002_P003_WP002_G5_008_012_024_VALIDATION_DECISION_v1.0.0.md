@@ -1,67 +1,61 @@
-# TEAM_10 | S002-P003-WP002 GATE_5 — החלטת אימות 008/012/024 (R-003) (v1.0.0)
+# TEAM_10 | S002-P003-WP002 GATE_5 — דוח אימות 008/012/024 (R-003) (v1.0.0)
 
 **project_domain:** TIKTRACK  
 **id:** TEAM_10_S002_P003_WP002_G5_008_012_024_VALIDATION_DECISION_v1.0.0  
 **owner:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-06  
-**status:** DRAFT — למלא אופציה A או B  
-**gate_id:** GATE_5 (BLOCKED)  
+**status:** DRAFT — ימולא לאחר קבלת תוצאות מ־Team 50 (אופציה A או B)  
+**gate_id:** GATE_5  
 **work_package_id:** S002-P003-WP002  
-**authority:** TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md (R-003)  
+**authority:** R-003 — TEAM_90_TO_TEAM_10_*_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md  
 
 ---
 
 ## 1) מטרה
 
-R-003 דורש החלטה מבצעית קשיחה לסעיפים **008, 012, 024**:
-
-- **אופציה A:** E2E PASS לשלושת הסעיפים (תוצאות E2E מתועדות).
-- **אופציה B:** חריג חתום מראש (Team 90 / ארכיטקט) שמאשר **code-only** עבור שלושתם.
-
-מסמך זה הוא התבנית לתיעוד ההחלטה. יש למלא את אחד הסעיפים להלן ולעדכן status ל־CLOSED.
+תיעוד **החלטה מבצעית קשיחה** לסעיפים 008, 012, 024 — **אופציה A** (E2E PASS) או **אופציה B** (חריג חתום מראש — Team 90/ארכיטקט — code-only). ללא A או B: חוסם הגשה.
 
 ---
 
 ## 2) אופציה A — E2E PASS
 
-(למלא כאשר Team 50 הריץ E2E ושלושת הפריטים עברו.)
+אם Team 50 הריץ E2E ושלושת הפריטים עברו:
 
-| פריט | תיאור | תוצאה | evidence_path | verification_report |
-|------|--------|--------|---------------|----------------------|
-| 008 | סמל לא תקין — הודעת שגיאה ב־UI | PASS / FAIL | | |
-| 012 | "מקושר ל" — שם רשומה + קישור | PASS / FAIL | | |
-| 024 | פרטי הערה + קבצים — פתח/הורד | PASS / FAIL | | |
+| BF | תיאור | תוצאה | evidence_path | verification_report |
+|----|--------|--------|---------------|----------------------|
+| 008 | סמל לא תקין — הודעת שגיאה ב־UI | PASS/FAIL | | |
+| 012 | "מקושר ל" — שם רשומה + קישור | PASS/FAIL | | |
+| 024 | פרטי הערה + קבצים — פתח/הורד | PASS/FAIL | | |
 
 **קובץ תוצאות E2E:** _________________  
 **verified_by:** Team 50  
-**closed_date:** _________
+**closed_date:** _________________
 
 ---
 
 ## 3) אופציה B — חריג חתום (code-only)
 
-(למלא כאשר התקבלה החלטת חריג מ־Team 90 או ארכיטקט.)
+אם אושר חריג על ידי Team 90 או ארכיטקט — סגירה באימות קוד בלבד ל־008, 012, 024:
 
-**החלטה:** סגירה באימות קוד בלבד עבור 008, 012, 024 — מקובלת לפתיחת GATE_5 Re-validation.
+| פריט | הנמקה | מסמך חריג חתום |
+|------|--------|-----------------|
+| 008 | | |
+| 012 | | |
+| 024 | | |
 
-**חתום על ידי:** _________________ (Team 90 / ארכיטקט)  
+**חתום על ידי:** _________________ (Team 90 / Architect)  
 **תאריך:** _________________  
-**מסמך חריג (אם נפרד):** _________________
-
-| פריט | evidence_path (קוד) | verification_type |
-|------|---------------------|-------------------|
-| 008 | ui tickersForm.js #tickerFormValidationSummary #tickerSymbolError; API 422 | CODE_REVIEW |
-| 012 | ui alertsTableInit.js formatAlertLinkedEntity getEntityDetailUrl | CODE_REVIEW |
-| 024 | ui notesTableInit.js buildAttachmentsHtml bindNoteAttachmentHandlers | CODE_REVIEW |
+**artifact_path למסמך החתום:** _________________
 
 ---
 
-## 4) סטטוס סופי (לעדכן בהגשה)
+## 4) סטטוס נוכחי
 
-- [ ] אופציה A מולאה — E2E PASS מתועד.  
-- [ ] אופציה B מולאה — חריג חתום מצורף.  
-- **אין** הגשת handoff ל־Team 90 בלי אחת מהאפשרויות.
+- [ ] **אופציה A** — תוצאות E2E מולאו למעלה.  
+- [ ] **אופציה B** — מסמך חריג חתום צורף ומולא למעלה.  
+
+עד למילוי אחד מהאפשרויות — R-003 לא סגור והגשה ל־Team 90 חסומה.
 
 ---
 
-**log_entry | TEAM_10 | G5_008_012_024_VALIDATION_DECISION | SHELL | S002_P003_WP002 | 2026-03-06**
+**log_entry | TEAM_10 | G5_008_012_024_VALIDATION_DECISION | SHELL_CREATED | 2026-03-06**

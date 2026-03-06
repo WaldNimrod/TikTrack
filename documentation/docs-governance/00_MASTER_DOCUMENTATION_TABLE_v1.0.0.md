@@ -101,6 +101,7 @@
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
 | ARCHITECT_POLICY_HYBRID_SCRIPTS | מדיניות סקריפטים היברידיים | `documentation/docs-governance/02-POLICIES/ARCHITECT_POLICY_HYBRID_SCRIPTS.md` | — |
+| POL-015_TT2_PAGE_TEMPLATE_CONTRACT | חוזה תבנית עמוד קנוני (מבנה shell, סדר טעינה, אכיפה בסקריפטים) | `documentation/docs-governance/02-POLICIES/POL-015_TT2_PAGE_TEMPLATE_CONTRACT_v1.0.0.md` | v1.0.0 |
 | ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING | הנחיית חיזוק ממשל (SOP-013, Seal) | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` | — |
 | MISSION_DIRECTIVE_90_02_FINAL | מנדט משימה 90-02 | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/MISSION_DIRECTIVE_90_02_FINAL.md` | FINAL |
 | TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION | הנחיית Team 70 — ייצור נרטיב | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md` | — |
@@ -151,3 +152,4 @@
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | DELIVERED | 2026-02-22**
 **log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | FAST_TRACK_PROTOCOL_REFERENCE_ADDED | 2026-02-26**
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | KNOWN_BUGS_PROCEDURE_AND_REGISTER_LINKED | 2026-03-03**
+**log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | POL_015_CANONICAL_POLICY_ENTRY_ADDED | 2026-03-06**

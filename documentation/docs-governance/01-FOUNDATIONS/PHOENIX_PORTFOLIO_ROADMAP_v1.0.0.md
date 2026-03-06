@@ -36,7 +36,7 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | stage_id | stage_name | planned_scope | status |
 | --- | --- | --- | --- |
 | S001 | שלב 1 — Foundations Sealed | חיתום יסודות; Stage 1 | COMPLETED |
-| S002 | שלב 2 — השלב הפעיל | מה שפתוח משלב 1 + הכנה לשלב 3 | ACTIVE |
+| S002 | שלב 2 — השלב הפעיל | מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002 | ACTIVE |
 | S003 | שלב 3 — Essential Data | שכבת נתונים יסודית | PLANNED |
 | S004 | שלב 4 — Financial Execution | המעגל הפיננסי | PLANNED |
 | S005 | שלב 5 — Trades/Plans | ישויות מורכבות | PLANNED |
@@ -168,3 +168,4 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ROADMAP_AMENDED_v2_3_AMENDMENTS_PER_ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v2.0.0 | 2026-03-03**
 **log_entry | TEAM_170 | ROADMAP_AMENDMENTS_COMPLETE_v1+v2 | 2026-03-03**
 **log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**
+**log_entry | TEAM_190 | PHOENIX_PORTFOLIO_ROADMAP | S002_SCOPE_NOTE_UPDATED_FOR_MCP_QA_TRANSITION_PACKAGING | 2026-03-06**

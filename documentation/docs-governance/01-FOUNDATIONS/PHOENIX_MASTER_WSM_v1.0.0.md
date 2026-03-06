@@ -87,28 +87,28 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-04** — Nimrod issued GATE_7 human rejection; Team 90 locked 26 blockers and opened remediation routing to Team 10.
+**Gate-owner update evidence:** This block was updated **2026-03-06** — Team 10 submitted GATE_4_READY handoff for re-entry; Team 90 validated and issued GATE_5 BLOCK due unresolved 26+19 closure requirements.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_7 human review rejected with 26 blocking findings; Team 90 opened remediation activation package for Team 10 (full-scope D22+D33+D34+D35 corrections) |
+| active_flow | S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_7 rejection remediation cycle active) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_5 re-validation blocked; remediation continues) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_7 REJECT \| 2026-03-04 \| Nimrod issued human rejection with 26 blocking findings |
+| last_s002_p003_milestone | GATE_5 BLOCK \| 2026-03-06 \| Team 90 rejected re-validation handoff pending deterministic closure of 26 BF + 19 gaps |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_7 (REJECTED_CODE_CHANGE_REQUIRED) |
+| current_gate | GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 routing owner) |
-| last_gate_event | GATE_7_HUMAN_REJECT_LOCKED \| 2026-03-04 \| Team 90 registered Nimrod decision and issued remediation activation \| NIMROD_GATE7_S002_P003_WP002_DECISION_v1.3.0.md |
-| next_required_action | Team 10 execute canonical remediation package issued by Team 90 and return to GATE_4/GATE_5 re-validation cycle. |
+| last_gate_event | GATE_5_BLOCK_v1_1_0 \| 2026-03-06 \| Team 90 blocked re-validation due unresolved closure matrix requirements \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT_v1.1.0.md |
+| next_required_action | Team 10 submit deterministic closure matrix for 26 BF + 19 gaps with full evidence-by-path, then request new GATE_5 re-validation. |
 | next_responsible_team | Team 10 |
 
 ---
@@ -225,6 +225,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 final pass confirmed; GATE_7 human sign-off activated for S002-P003-WP002 | 2026-03-04**
 **log_entry | NIMROD | GATE_7 | S002_P003_WP002 | REJECT | CODE_CHANGE_REQUIRED | 2026-03-04**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 rejected with 26 blockers; remediation activation package issued to Team 10 | 2026-03-04**
+**log_entry | TEAM_10 | GATE_4_READY_HANDOFF | S002_P003_WP002 | SUBMITTED_TO_TEAM90_FOR_GATE5 | 2026-03-06**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P003-WP002 (v1.1.0); unresolved deterministic closure for 26 BF + 19 gaps | 2026-03-06**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

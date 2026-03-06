@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-06T16:52:25.846708+00:00",
+  "generated_at_utc": "2026-03-06T22:37:59.700778+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,10 +10,10 @@
     "active_stage_id": "S002",
     "active_work_package_id": "S002-P003-WP002",
     "in_progress_work_package_id": "S002-P003-WP002",
-    "current_gate": "GATE_7 (REJECTED_CODE_CHANGE_REQUIRED)",
+    "current_gate": "GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE)",
     "active_program_id": "S002-P003",
-    "last_gate_event": "GATE_7_HUMAN_REJECT_LOCKED \\",
-    "next_required_action": "Team 10 execute canonical remediation package issued by Team 90 and return to GATE_4/GATE_5 re-validation cycle.",
+    "last_gate_event": "GATE_5_BLOCK_v1_1_0 \\",
+    "next_required_action": "Team 10 submit deterministic closure matrix for 26 BF + 19 gaps with full evidence-by-path, then request new GATE_5 re-validation.",
     "next_responsible_team": "Team 10"
   },
   "stages": [
@@ -29,7 +29,7 @@
     {
       "stage_id": "S002",
       "stage_name": "שלב 2 — השלב הפעיל",
-      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002",
       "status": "ACTIVE",
       "pages": "D22, D23",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
@@ -103,7 +103,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "PIPELINE",
-      "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era)"
+      "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era; MCP-QA Hybrid Transition package queued as immediate scope extension after S002-P003-WP002 closure)"
     },
     {
       "program_id": "S002-P003",
@@ -111,7 +111,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_7 (REJECTED_CODE_CHANGE_REQUIRED); active_flow=S002-P003; GATE_7 human review rejected with 26 blocking findings; Team 90 opened remediation activation package for Team 10 (full-scope D22+D33+D34+D35 corrections); active_work_package_id=S002-P003-WP002"
+      "current_gate_mirror": "GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE); active_flow=S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence; active_work_package_id=S002-P003-WP002"
     },
     {
       "program_id": "S002-P004",
@@ -340,9 +340,9 @@
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_7 (REJECTED_CODE_CHANGE_REQUIRED)",
+      "current_gate": "GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE)",
       "is_active": true,
-      "active_marker_reason": "S002-P003; GATE_7 human review rejected with 26 blocking findings; Team 90 opened remediation activation package for Team 10 (full-scope D22+D33+D34+D35 corrections)"
+      "active_marker_reason": "S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence"
     }
   ],
   "hierarchy": [
@@ -397,7 +397,7 @@
       "stage_id": "S002",
       "stage_name": "שלב 2 — השלב הפעיל",
       "status": "ACTIVE",
-      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002",
       "pages": "D22, D23",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
@@ -435,7 +435,7 @@
           "program_name": "Full Pipeline Orchestrator",
           "domain": "AGENTS_OS",
           "status": "PIPELINE",
-          "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era)",
+          "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era; MCP-QA Hybrid Transition package queued as immediate scope extension after S002-P003-WP002 closure)",
           "work_packages": []
         },
         {
@@ -443,16 +443,16 @@
           "program_name": "TikTrack Alignment (D22+D33+D34+D35)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_7 (REJECTED_CODE_CHANGE_REQUIRED); active_flow=S002-P003; GATE_7 human review rejected with 26 blocking findings; Team 90 opened remediation activation package for Team 10 (full-scope D22+D33+D34+D35 corrections); active_work_package_id=S002-P003-WP002",
+          "current_gate_mirror": "GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE); active_flow=S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence; active_work_package_id=S002-P003-WP002",
           "work_packages": [
             {
               "work_package_id": "S002-P003-WP002",
               "program_id": "S002-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_7 (REJECTED_CODE_CHANGE_REQUIRED)",
+              "current_gate": "GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE)",
               "is_active": true,
-              "active_marker_reason": "S002-P003; GATE_7 human review rejected with 26 blocking findings; Team 90 opened remediation activation package for Team 10 (full-scope D22+D33+D34+D35 corrections)"
+              "active_marker_reason": "S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence"
             }
           ]
         },

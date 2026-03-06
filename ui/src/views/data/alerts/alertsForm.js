@@ -80,6 +80,7 @@ function createAlertFormHTML(data = null) {
 
   return `
     <form id="alertForm" class="phoenix-form">
+      <div id="alertFormValidationSummary" class="form-validation-summary" role="alert" aria-live="polite" data-testid="alert-form-validation-summary" hidden></div>
       <div class="form-group">
         <label for="alertTitle">כותרת <span class="form-label-asterisk">*</span></label>
         <input type="text" id="alertTitle" name="title" maxlength="200" required value="${String(title).replace(/"/g, '&quot;')}" placeholder="התראת מחיר" data-action="save-alert" />
@@ -152,15 +153,14 @@ export function openAlertsForm(alert, onSuccess) {
       const form = document.getElementById('alertForm');
       if (!form) return;
       const titleVal = (form.querySelector('[name="title"]') || form.querySelector('#alertTitle'))?.value?.trim();
+      const summaryEl = document.getElementById('alertFormValidationSummary');
+      const clearSummary = () => { if (summaryEl) { summaryEl.textContent = ''; summaryEl.hidden = true; } };
+      const showSummary = (msg) => { if (summaryEl) { summaryEl.textContent = msg; summaryEl.hidden = false; } };
       if (!titleVal) {
-        createModal({
-          title: 'שגיאה',
-          content: '<p>יש להזין כותרת</p>',
-          showSaveButton: false,
-          cancelButtonText: 'ביטול'
-        });
+        showSummary('יש להזין כותרת');
         return;
       }
+      clearSummary();
       const targetTypeVal = form.querySelector('[name="target_type"]')?.value || 'ticker';
       const targetIdVal = (form.querySelector('[name="target_id"]') || form.querySelector('#alertTargetId'))?.value?.trim() || null;
       const targetDtVal = form.querySelector('[name="target_datetime"]')?.value || null;
@@ -176,12 +176,7 @@ export function openAlertsForm(alert, onSuccess) {
 
       // BF-G7-013: Condition required — all three must be set
       if (!condField || !condOp || condVal == null || condVal === '') {
-        createModal({
-          title: 'שגיאה',
-          content: '<p>תנאי חובה: יש למלא שדה תנאי, אופרטור וערך.</p>',
-          showSaveButton: false,
-          cancelButtonText: 'ביטול'
-        });
+        showSummary('תנאי חובה: יש למלא שדה תנאי, אופרטור וערך.');
         return;
       }
 
@@ -189,24 +184,15 @@ export function openAlertsForm(alert, onSuccess) {
       if (targetTypeVal !== 'datetime') {
         const entityId = targetIdVal || form.querySelector('#alertTargetId')?.value?.trim();
         if (!entityId) {
-          createModal({
-            title: 'שגיאה',
-            content: '<p>יש לבחור ישות מקושרת.</p>',
-            showSaveButton: false,
-            cancelButtonText: 'ביטול'
-          });
+          showSummary('יש לבחור ישות מקושרת.');
           return;
         }
       }
       if (targetTypeVal === 'datetime' && !targetDtVal) {
-        createModal({
-          title: 'שגיאה',
-          content: '<p>יש להזין תאריך ושעה.</p>',
-          showSaveButton: false,
-          cancelButtonText: 'ביטול'
-        });
+        showSummary('יש להזין תאריך ושעה.');
         return;
       }
+      clearSummary();
 
       try {
         await sharedServices.init();
@@ -243,12 +229,7 @@ export function openAlertsForm(alert, onSuccess) {
       } catch (e) {
         maskedLog('[Alerts] Save error:', { status: e?.status, message: e?.message });
         const msg = String(e?.message ?? e?.detail ?? 'שגיאה בשמירה').trim();
-        createModal({
-          title: 'שגיאה',
-          content: `<p>${msg.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`,
-          showSaveButton: false,
-          cancelButtonText: 'ביטול'
-        });
+        showSummary(msg.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
       }
     }
   });

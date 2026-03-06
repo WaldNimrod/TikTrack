@@ -110,14 +110,16 @@ async def create_system_ticker(
         return existing
 
     # Live validation (skip only when explicitly bypassed for dev)
-    do_live = not skip_live_check or (skip_live_check and not settings.debug)
+    # BF-G7-008: VALIDATE_SYMBOL_ALWAYS=true forces validation even when skip_live_check (E2E)
+    force_validate = os.environ.get("VALIDATE_SYMBOL_ALWAYS", "").strip().lower() in ("true", "1", "yes")
+    do_live = force_validate or (not skip_live_check or (skip_live_check and not settings.debug))
     if do_live and not _is_live_check_bypass():
         live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc)
         if not live_ok:
             raise HTTPExceptionWithCode(
                 status_code=422,
-                detail="Provider could not fetch data for this symbol. Ticker not created.",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                detail="Provider could not fetch data for this symbol. Ticker not created. Verify symbol exists and try again.",
+                error_code=ErrorCodes.TICKER_SYMBOL_INVALID,
             )
 
     ticker = Ticker(

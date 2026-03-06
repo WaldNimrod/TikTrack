@@ -32,12 +32,16 @@ async def _resolve_target_display_names(
     alerts: List[Alert],
     user_id: uuid.UUID,
 ) -> dict:
-    """G7R Batch2/3: Resolve target_id -> display name for trade, trade_plan, account; datetime -> formatted."""
+    """G7R Batch2/3: Resolve target_id -> display name for ticker, trade, trade_plan, account; datetime in _alert_to_response."""
     out = {}
+    ticker_ids = []
     trade_ids = []
     plan_ids = []
     account_ids = []
     for a in alerts:
+        if a.target_type == "ticker" and (a.ticker_id or a.target_id):
+            tid = a.ticker_id or a.target_id
+            ticker_ids.append(tid)
         if not a.target_id:
             continue
         if a.target_type == "trade":
@@ -46,6 +50,11 @@ async def _resolve_target_display_names(
             plan_ids.append(a.target_id)
         elif a.target_type == "account":
             account_ids.append(a.target_id)
+    if ticker_ids:
+        stmt = select(Ticker.id, Ticker.symbol).where(Ticker.id.in_(ticker_ids))
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("ticker", row[0])] = row[1] or str(row[0])
     if trade_ids:
         stmt = (
             select(Trade.id, Ticker.symbol, Trade.direction)
@@ -200,6 +209,9 @@ class AlertsService:
             tdn = None
             if alert.target_type and alert.target_id:
                 tdn = display_map.get((alert.target_type, alert.target_id))
+            # BF-G7-012: ticker symbol from join or from display_map when only target_id is set
+            if alert.target_type == "ticker" and not ticker_sym:
+                ticker_sym = display_map.get(("ticker", alert.ticker_id or alert.target_id))
             data.append(
                 _alert_to_response(alert, ticker_symbol=ticker_sym, target_display_name=tdn)
             )
@@ -256,10 +268,10 @@ class AlertsService:
         if not row:
             return None
         alert, ticker_sym = row[0], row[1] if row[1] else None
-        tdn = None
-        if alert.target_type and alert.target_id:
-            display_map = await _resolve_target_display_names(db, [alert], user_id)
-            tdn = display_map.get((alert.target_type, alert.target_id))
+        display_map = await _resolve_target_display_names(db, [alert], user_id)
+        tdn = display_map.get((alert.target_type, alert.target_id)) if alert.target_type and alert.target_id else None
+        if alert.target_type == "ticker" and not ticker_sym:
+            ticker_sym = display_map.get(("ticker", alert.ticker_id or alert.target_id))
         return _alert_to_response(alert, ticker_symbol=ticker_sym, target_display_name=tdn)
 
     async def create_alert(

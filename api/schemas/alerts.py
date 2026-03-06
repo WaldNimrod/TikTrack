@@ -33,12 +33,20 @@ class AlertCreate(BaseModel):
 
     @model_validator(mode="after")
     def validate_target_and_general(self):
-        """BF-G7-014: Reject 'general' linkage explicitly."""
+        """BF-G7-014: Reject 'general'. BF-G7-017: linked entity mandatory (target_id/ticker_id for entity types)."""
         tt = (self.target_type or "").strip().lower()
         if tt == "general":
             raise ValueError("target_type 'general' is not allowed. Use ticker, trade, trade_plan, account, or datetime.")
         if tt and tt not in VALID_TARGET_TYPES:
             raise ValueError(f"target_type must be one of {sorted(VALID_TARGET_TYPES)}, got '{self.target_type}'")
+        # BF-G7-017: Entity types require target_id or ticker_id
+        if tt in ("ticker", "trade", "trade_plan", "account"):
+            has_ticker = bool(self.ticker_id and str(self.ticker_id).strip())
+            has_target = bool(self.target_id and str(self.target_id).strip())
+            if tt == "ticker" and not has_ticker and not has_target:
+                raise ValueError("ticker_id or target_id required when target_type=ticker. Please select a linked entity.")
+            if tt != "ticker" and not has_target:
+                raise ValueError("target_id required when target_type is trade, trade_plan, or account. Please select a linked entity.")
         return self
 
     @model_validator(mode="after")

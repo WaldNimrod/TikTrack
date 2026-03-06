@@ -34,7 +34,7 @@ function createTickerFormHTML(data = null) {
 
   return `
     <form id="tickerForm" class="phoenix-form phoenix-form--two-col">
-      <div id="tickerFormValidationSummary" class="form-validation-summary" role="alert" aria-live="polite" hidden></div>
+      <div id="tickerFormValidationSummary" class="form-validation-summary" role="alert" aria-live="polite" data-testid="ticker-form-validation-summary" hidden></div>
       <div class="form-row">
         <div class="form-group">
           <label for="tickerSymbol">סמל <span class="form-label-asterisk">*</span></label>
@@ -48,7 +48,7 @@ function createTickerFormHTML(data = null) {
             placeholder="AAPL"
             ${isEdit ? 'readonly' : ''}
           />
-          <span class="form-error" id="tickerSymbolError"></span>
+          <span class="form-error" id="tickerSymbolError" role="alert" data-testid="ticker-symbol-error"></span>
         </div>
         <div class="form-group">
           <label for="tickerCompanyName">שם חברה</label>

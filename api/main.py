@@ -74,6 +74,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     content = {
         "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT,
         "detail": first_msg,
+        "message": first_msg,  # BF-G7-017: UI compatibility (error.message ?? error.detail)
         "field_errors": field_errors
     }
     return JSONResponse(status_code=status_code, content=content)
@@ -204,11 +205,12 @@ async def detailed_health_check():
 
 @app.exception_handler(HTTPExceptionWithCode)
 async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionWithCode):
-    """Handler for HTTPExceptionWithCode - always includes error_code."""
+    """Handler for HTTPExceptionWithCode - always includes error_code. BF-G7-008: message alias for UI (error.message ?? error.detail)."""
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "detail": exc.detail,
+            "message": exc.detail,  # BF-G7-008: UI compatibility (error.message ?? error.detail)
             "error_code": exc.error_code
         },
         headers=exc.headers
@@ -239,6 +241,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={
             "detail": exc.detail,
+            "message": exc.detail,  # BF-G7-008/017: UI compatibility (error.message ?? error.detail)
             "error_code": error_code
         },
         headers=exc.headers

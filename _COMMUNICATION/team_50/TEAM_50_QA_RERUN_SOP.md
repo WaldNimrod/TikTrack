@@ -1,9 +1,11 @@
 # Team 50 — SOP: ריצת בדיקות + Feedback לצוותים
 **project_domain:** TIKTRACK
-**date:** 2026-03-01
+**date:** 2026-03-06
 
 **id:** `TEAM_50_QA_RERUN_SOP`  
 **purpose:** תהליך אופטימלי ומהיר לבדיקה חוזרת + העברת משוב מפורט
+
+**סטנדרט מינימלי:** כל סבב בדיקה חייב לעמוד **לפחות** ברמת הבדיקה המתועדת ב־`TEAM_50_ROLE_AND_PROCEDURES_README.md` §סטנדרט בדיקה מינימלי (מפרט אימות ממוספר, ריצת E2E+API אמיתית, בדיקות עומק — ולידציות, מקושר חובה, תצוגה בטבלה, רענון טבלה — ודוח מבוסס ריצה עם ראיה). במקרה של אימות שער/ממצאים חוסמים — להריץ גם את סוויטות 26-BF ו־Deep E2E ואת סקריפטי ה־API הרלוונטיים.
 
 ---
 
@@ -34,6 +36,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/
 cd tests && npm run test:phase2        # Runtime
 cd tests && npm run test:phase2-e2e   # E2E
 ```
+- **בסבב אימות שער / ממצאים חוסמים (למשל GATE_4, 26 BF):** בנוסף — `node tests/g7-26bf-e2e-validation.test.js`, `node tests/g7-26bf-deep-e2e.test.js`, ו־`scripts/run-tickers-d22-qa-api.sh`, `run-user-tickers-qa-api.sh`, `run-alerts-d34-fav-api.sh`, `run-notes-d35-qa-api.sh`. מפרט: `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_G7_26BF_VERIFICATION_SPEC_v1.0.0.md`.
 
 ### 3. איסוף Evidence
 - `documentation/05-REPORTS/artifacts_SESSION_01/phase2-e2e-artifacts/console_logs.json`

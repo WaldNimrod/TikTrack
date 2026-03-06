@@ -82,8 +82,9 @@ class ErrorCodes:
     # ADR-018: Broker "other" / unsupported - block API/import
     BROKER_NOT_SUPPORTED_FOR_API_IMPORT = "BROKER_NOT_SUPPORTED_FOR_API_IMPORT"
     
-    # Ticker Errors (G7R Batch2 Stream B)
+    # Ticker Errors (G7R Batch2 Stream B, Batch5 BF-G7-008)
     TICKER_SYMBOL_DUPLICATE = "TICKER_SYMBOL_DUPLICATE"
+    TICKER_SYMBOL_INVALID = "TICKER_SYMBOL_INVALID"  # Invalid symbol (provider cannot fetch)
     TICKER_IN_USE = "TICKER_IN_USE"  # Delete rejected when referenced
 
     # API Key Errors

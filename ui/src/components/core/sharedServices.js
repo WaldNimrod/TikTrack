@@ -432,7 +432,8 @@ class SharedServices {
       const headers = this.buildHeaders(options.headers);
 
       // Transform body (camelCase → snake_case); when useQueryParams, body is already in URL
-      const apiBody = reactToApi(body);
+      // skipTransform: send body as-is (e.g. notes parent_id must stay string, avoid any conversion)
+      const apiBody = (options.skipTransform === true) ? body : reactToApi(body);
       
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
       let response;
@@ -663,7 +664,7 @@ class SharedServices {
       }
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
-      const apiBody = reactToApi(body);
+      const apiBody = (options.skipTransform === true) ? body : reactToApi(body);
       let response;
       try {
         response = await fetch(url, {

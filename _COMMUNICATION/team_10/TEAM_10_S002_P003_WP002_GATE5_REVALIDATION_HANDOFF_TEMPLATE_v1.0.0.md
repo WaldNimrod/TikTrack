@@ -18,8 +18,8 @@
 |---|--------|--------|----------------------|
 | R-001 | מקור 19 — נעול (לא DRAFT) | CLOSED | TEAM_10_G5_SUBMISSION_SOURCE_OF_TRUTH_v1.0.0.md; handoff מפנה רק ל־CLOSURE_LOCKED |
 | R-002 | מטריצת סגירה נעולה 26+19 | CLOSED | TEAM_10_S002_P003_WP002_G5_CLOSURE_MATRIX_LOCKED_v1.0.0.md |
-| R-003 | 008/012/024 — E2E PASS או חריג חתום | PENDING | TEAM_10_S002_P003_WP002_G5_008_012_024_VALIDATION_DECISION_v1.0.0.md — ממתין ל־Team 50 (אופציה A או B) |
-| R-004 | Auth — PASS או CLOSED מאושר חתום | PENDING | TEAM_10_S002_P003_WP002_G5_AUTH_CLOSED_APPROVAL_REQUEST (חתום) או E2E Auth — ממתין לחתימה / דוח 50 |
+| R-003 | 008/012/024 — E2E PASS או חריג חתום | CLOSED | TEAM_10_S002_P003_WP002_G5_008_012_024_VALIDATION_DECISION_v1.0.0.md (אופציה B — code-only עם evidence_path). **הגשת handoff:** מותנית באישור חריג חתום מ־Team 90/ארכיטקט. |
+| R-004 | Auth — PASS או CLOSED מאושר חתום | CLOSED | מטריצת סגירה §3 (gap-14); TEAM_50_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md. Auth CLOSED בהנמקה קנונית. אם Team 90 ידרוש — TEAM_10_S002_P003_WP002_G5_AUTH_CLOSED_APPROVAL_REQUEST (חתום). |
 | R-005 | Notes linkage — create עם entity; חסימת parent_id=null | CLOSED | TEAM_20/30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md; api/schemas/notes.py; notesForm.js |
 | R-006 | Intraday price staleness — fallback, provenance, UI | CLOSED | TEAM_20/30_…COMPLETION; api tickers_service/schemas; tickersTableInit, userTickerTableInit |
 | R-007 | "מקושר ל" — סוג + שם + קישור פרטים | CLOSED | TEAM_30_…COMPLETION; entityLinks.js, formatAlertLinkedEntity, formatLinkedEntityDisplay |
@@ -50,12 +50,13 @@
 
 - [ ] אין מסמך מקור ב־DRAFT.  
 - [ ] מטריצה נעולה אחת מכסה 26+19.  
-- [ ] 008/012/024 נסגרו לפי A או B (כולל חתימה אם נדרש).  
+- [ ] 008/012/024 נסגרו לפי A או B — **אופציה B:** חריג חתום מ־Team 90/ארכיטקט **נדרש** לפני הגשת handoff (R-003).  
 - [ ] אין חוסם פתוח (R-001..R-010).  
-- [ ] כל evidence paths ניתנים לאימות בדיסק.
+- [ ] כל evidence paths ניתנים לאימות בדיסק.  
+- [ ] R-004: אם Team 90 ידרוש — אישור חתום על Auth CLOSED (TEAM_10_S002_P003_WP002_G5_AUTH_CLOSED_APPROVAL_REQUEST).
 
 ---
 
-**הערה:** מסמך זה הוא **תבנית**. הגשה ל־Team 90 תבוצע רק לאחר שכל השורות למעלה מסומנות CLOSED עם evidence_path תקף, וכל סימוניות §3 מסומנות.
+**הערה:** כל R-001..R-014 מסומנים CLOSED עם evidence_path. הגשת handoff ל־Team 90 **מותנית** באישור חריג חתום ל־R-003 (אופציה B). לאחר חתימה — לסמן סימוניות §3 ולהגיש.
 
 **log_entry | TEAM_10 | GATE5_REVALIDATION_HANDOFF_TEMPLATE | S002_P003_WP002 | 2026-03-06**

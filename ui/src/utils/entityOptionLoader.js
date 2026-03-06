@@ -101,10 +101,12 @@ async function loadUserTickerOptions() {
     const res = await sharedServices.get('/me/tickers', {});
     const data = res?.data ?? res ?? [];
     const arr = Array.isArray(data) ? data : [];
-    return arr.map((t) => ({
-      value: String(t.id ?? t.external_ulid ?? t.ticker_id ?? ''),
-      label: (t.symbol ?? t.ticker_symbol ?? t.name ?? '').trim() || t.id || '—'
-    })).filter((o) => o.value);
+    return arr.map((t) => {
+      // Notes parent_id must be ticker ULID; /me/tickers returns TickerResponse with id=ticker ULID
+      const val = String(t.id ?? t.external_ulid ?? t.ticker_id ?? '').trim();
+      const label = (t.symbol ?? t.ticker_symbol ?? t.name ?? '').trim() || val || '—';
+      return { value: val, label };
+    }).filter((o) => o.value.length > 0);
   } catch (e) {
     maskedLog('[entityOptionLoader] me/tickers error:', { status: e?.status });
     return [];

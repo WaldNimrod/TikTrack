@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-06** — Team 10 submitted GATE_4_READY handoff for re-entry; Team 90 validated and issued GATE_5 BLOCK due unresolved 26+19 closure requirements.
+**Gate-owner update evidence:** This block was updated **2026-03-06** — Team 90 submitted GATE_6 execution package (`SUBMISSION_v1.4.0`) to Team 00/Team 100 after GATE_5 PASS (`v1.2.0`).
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; remediation re-entry reached GATE_5 validation; Team 90 issued BLOCK because 26 BF + 19 gaps are not deterministically closed in submitted evidence |
+| active_flow | S002-P003; GATE_5 re-validation passed under approved R-003/R-004 conditions; GATE_6 package submitted and awaiting architect decision |
 | active_project_domain | TIKTRACK |
 | active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_5 re-validation blocked; remediation continues) |
+| in_progress_work_package_id | S002-P003-WP002 (GATE_6 submitted; awaiting Team 00/Team 100 decision) |
 | last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_5 BLOCK \| 2026-03-06 \| Team 90 rejected re-validation handoff pending deterministic closure of 26 BF + 19 gaps |
+| last_s002_p003_milestone | GATE_6 SUBMITTED \| 2026-03-06 \| Team 90 submitted execution package v1.4.0 to architect authority |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE) |
+| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 routing owner) |
-| last_gate_event | GATE_5_BLOCK_v1_1_0 \| 2026-03-06 \| Team 90 blocked re-validation due unresolved closure matrix requirements \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT_v1.1.0.md |
-| next_required_action | Team 10 submit deterministic closure matrix for 26 BF + 19 gaps with full evidence-by-path, then request new GATE_5 re-validation. |
-| next_responsible_team | Team 10 |
+| last_gate_event | GATE_6_SUBMITTED_v1_4_0 \| 2026-03-06 \| Team 90 submitted execution package to Team 00/Team 100 \| TEAM_90_EXECUTION_APPROVAL_SUBMISSION_S002_P003_WP002_v1.4.0.md |
+| next_required_action | Team 00/Team 100 to review `SUBMISSION_v1.4.0` and issue GATE_6 decision artifact; Team 90 to relay decision and update WSM. |
+| next_responsible_team | Team 00 / Team 100 (decision authority) |
 
 ---
 
@@ -227,6 +227,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 rejected with 26 blockers; remediation activation package issued to Team 10 | 2026-03-04**
 **log_entry | TEAM_10 | GATE_4_READY_HANDOFF | S002_P003_WP002 | SUBMITTED_TO_TEAM90_FOR_GATE5 | 2026-03-06**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P003-WP002 (v1.1.0); unresolved deterministic closure for 26 BF + 19 gaps | 2026-03-06**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P003-WP002 (v1.2.0); GATE_6 routing preparation activated | 2026-03-06**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submission v1.4.0 sent to Team 00/Team 100; awaiting decision | 2026-03-06**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

@@ -20,7 +20,8 @@ import {
 } from './phoenixRTStyleMark.js';
 import { sanitizeRichTextHtml } from '../../utils/dompurifyRichText.js';
 
-/** Disable extensions that produce tags not in SOP allowlist */
+/** Disable extensions that produce tags not in SOP allowlist.
+ *  TipTap 3 StarterKit includes Link+Underline by default — disable to avoid duplicate, add our configured versions below. */
 const STARTER_KIT_CONFIG = {
   blockquote: false,
   code: false,
@@ -28,6 +29,8 @@ const STARTER_KIT_CONFIG = {
   heading: false,
   horizontalRule: false,
   strike: false,
+  link: false,
+  underline: false,
 };
 
 const DEFAULT_EXTENSIONS = (placeholderText) => [

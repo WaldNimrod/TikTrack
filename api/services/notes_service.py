@@ -16,6 +16,7 @@ from ..models.trade_plans import TradePlan
 from ..models.trading_accounts import TradingAccount
 from ..models.enums import NoteCategory
 from ..utils.rich_text_sanitizer import sanitize_rich_text
+from ..utils.identity import ulid_to_uuid, uuid_to_ulid
 
 
 async def _resolve_parent_display_names(
@@ -88,7 +89,7 @@ def _note_to_response(
         "id": str(note.id),
         "user_id": str(note.user_id),
         "parent_type": note.parent_type,
-        "parent_id": str(note.parent_id) if note.parent_id else None,
+        "parent_id": uuid_to_ulid(note.parent_id) if note.parent_id else None,
         "parent_datetime": getattr(note, "parent_datetime", None),
         "linked_entity_display": linked_entity_display,
         "attachment_count": count,
@@ -130,9 +131,14 @@ class NotesService:
             conditions.append(Note.parent_type == parent_type)
         if parent_id:
             try:
-                conditions.append(Note.parent_id == uuid.UUID(parent_id))
-            except ValueError:
-                pass
+                pid_uuid = ulid_to_uuid(str(parent_id).strip())
+                if pid_uuid is not None:
+                    conditions.append(Note.parent_id == pid_uuid)
+            except (ValueError, TypeError):
+                try:
+                    conditions.append(Note.parent_id == uuid.UUID(str(parent_id).strip()))
+                except (ValueError, TypeError):
+                    pass
         stmt = select(Note).where(and_(*conditions)).order_by(Note.created_at.desc())
         result = await db.execute(stmt)
         notes = result.scalars().all()
@@ -188,10 +194,15 @@ class NotesService:
 
         parent_id = None
         if data.get("parent_id"):
-            try:
-                parent_id = uuid.UUID(data["parent_id"])
-            except (ValueError, TypeError):
-                pass
+            pid_str = str(data["parent_id"]).strip()
+            if pid_str:
+                try:
+                    parent_id = ulid_to_uuid(pid_str)
+                except Exception:
+                    try:
+                        parent_id = uuid.UUID(pid_str)
+                    except (ValueError, TypeError):
+                        pass
 
         parent_type_val = (data.get("parent_type") or "ticker").lower()
         if parent_type_val == "general":
@@ -295,10 +306,14 @@ class NotesService:
             else:
                 parent_id_val = None
                 if data.get("parent_id"):
-                    try:
-                        parent_id_val = uuid.UUID(data["parent_id"])
-                    except (ValueError, TypeError):
-                        pass
+                    pid_str = str(data["parent_id"]).strip()
+                    if pid_str:
+                        parent_id_val = ulid_to_uuid(pid_str)
+                        if parent_id_val is None:
+                            try:
+                                parent_id_val = uuid.UUID(pid_str)
+                            except (ValueError, TypeError):
+                                pass
                 if not parent_id_val:
                     from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
                     raise HTTPExceptionWithCode(status_code=422, detail=f"parent_id required when parent_type is {parent_type_val}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)

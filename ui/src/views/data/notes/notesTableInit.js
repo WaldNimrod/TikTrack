@@ -18,24 +18,30 @@ let currentPageSize = 25;
 let currentSortKey = null;
 let currentSortDir = 'asc';
 
-/** Phase C: general removed — backend allows trade|trade_plan|ticker|account only */
+/** Phase C: general removed — backend allows trade|trade_plan|ticker|account|datetime */
 const PARENT_TYPE_LABELS = {
   all: 'הכל',
   account: 'חשבון מסחר',
   trade: 'טרייד',
   trade_plan: 'תוכנית',
-  ticker: 'טיקר'
+  ticker: 'טיקר',
+  datetime: 'תאריך/שעה'
 };
 
 /** G7R Batch1: Entity icon paths for linked entity display (§3D — icon + name) */
 const ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
 
-/** Build linked entity display: icon + resolved name (§3D — linked_entity_display from API when available) */
+/** Build linked entity display: icon + resolved name (§3D — linked_entity_display from API when available); datetime: formatted parent_datetime */
 function formatLinkedEntityDisplay(note) {
   const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || '';
   const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
-  const resolvedName = note.linked_entity_display ?? note.linked_entity_name ?? '';
+  const parentDt = note.parent_datetime ?? note.parentDatetime;
   const typeLabel = PARENT_TYPE_LABELS[parentType] || parentType || '';
+  if (parentType === 'datetime' && parentDt) {
+    const dtStr = typeof parentDt === 'string' ? parentDt : new Date(parentDt).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${String(dtStr).replace(/</g, '&lt;')}</span>`;
+  }
+  const resolvedName = note.linked_entity_display ?? note.linked_entity_name ?? '';
   const displayName = resolvedName || (parentId ? typeLabel + ' ' + String(parentId).slice(0, 8) + '…' : typeLabel || '—');
   const iconPath = parentType ? ENTITY_ICON_MAP[parentType] : null;
   if (!parentType && !parentId) return '<span class="linked-object-badge">—ללא קישור—</span>';
@@ -121,7 +127,7 @@ function renderSummary(summary) {
  */
 function renderNoteRow(note) {
   const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || 'general';
-  const contentPreview = stripHtml(note.content != null ? note.content : '') || (note.title != null ? note.title : '—');
+  const titleDisplay = (note.title != null ? String(note.title).trim() : '') || stripHtml(note.content != null ? note.content : '') || '—';
   const created = formatDate(note.created_at != null ? note.created_at : note.createdAt);
   const updated = formatDate(note.updated_at != null ? note.updated_at : note.updatedAt);
   const id = note.id;
@@ -130,7 +136,7 @@ function renderNoteRow(note) {
   return `
     <tr class="phoenix-table__row" data-note-id="${id}" role="row">
       <td class="phoenix-table__cell col-linked-object" data-field="parent_type">${linkedEntityHtml}</td>
-      <td class="phoenix-table__cell col-content" data-field="content">${contentPreview}</td>
+      <td class="phoenix-table__cell col-content col-title" data-field="title">${titleDisplay}</td>
       <td class="phoenix-table__cell col-attachment" data-field="attachment">${getAttachmentDisplay(note)}</td>
       <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
       <td class="phoenix-table__cell col-updated phoenix-table__cell--date">${updated}</td>

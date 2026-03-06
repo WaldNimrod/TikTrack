@@ -100,8 +100,8 @@
 | R-012 | Team 30 | CLOSED | PhoenixModal cancelButtonText "ביטול" | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
 | R-013 | Team 30 | CLOSED | phoenix-components.css, notes.html (notesSummaryToggleSize, pagination) | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
 | R-014 | Team 30 | CLOSED | phoenix-modal.css, entityLinks.js (צבעי ישות, מקושרים) | TEAM_30_S002_P003_WP002_G5_R_REMEDIATION_COMPLETION_v1.0.0.md | Team 30 | 2026-03-06 |
-
-**הערה:** R-003 (008/012/024 E2E/חריג) ו־R-004 (Auth) — ימולאו לאחר דוח Team 50 + חתימות.
+| **R-003** | Team 50 | CLOSED | TEAM_10_S002_P003_WP002_G5_008_012_024_VALIDATION_DECISION_v1.0.0.md; tickersForm.js, alertsTableInit.js, notesTableInit.js | TEAM_50_…COMPLETION; E2E_VERIFICATION_RUN; אופציה B. **חריג חתום אושר:** TEAM_90_TO_TEAM_10_S002_P003_WP002_G5_R_REMEDIATION_DECISION_RESPONSE_v1.0.0.md (D-001 APPROVED). Carry-over E2E בסבב הבא. | Team 50 | 2026-03-06 |
+| **R-004** | Team 50 | CLOSED | TEAM_50_…BLOCK_CLOSURE_MATRIX §3 (gap-14); TEAM_50_…R_REMEDIATION_COMPLETION | Auth CLOSED בהנמקה קנונית. **קבלה ל־G5 entry:** TEAM_90_…_DECISION_RESPONSE_v1.0.0.md (D-002 ACCEPTED_FOR_G5_ENTRY). Follow-up Auth בסבב תחזוקה. | Team 50 | 2026-03-06 |
 
 ---
 

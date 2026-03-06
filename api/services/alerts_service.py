@@ -17,6 +17,7 @@ from ..models.trades import Trade
 from ..models.trade_plans import TradePlan
 from ..models.trading_accounts import TradingAccount
 from ..models.enums import AlertType, AlertPriority
+from ..utils.identity import ulid_to_uuid, uuid_to_ulid
 
 
 # G7R Stream1: general removed; datetime added
@@ -112,8 +113,8 @@ def _alert_to_response(
         "id": str(alert.id),
         "target_type": alert.target_type or None,
         "target_datetime": getattr(alert, "target_datetime", None),
-        "target_id": str(alert.target_id) if alert.target_id else None,
-        "ticker_id": str(alert.ticker_id) if alert.ticker_id else None,
+        "target_id": uuid_to_ulid(alert.target_id) if alert.target_id else None,
+        "ticker_id": uuid_to_ulid(alert.ticker_id) if alert.ticker_id else None,
         "ticker_symbol": ticker_symbol,
         "target_display_name": target_display_name,
         "alert_type": (
@@ -341,17 +342,27 @@ class AlertsService:
 
         target_id = None
         if data.get("target_id"):
-            try:
-                target_id = uuid.UUID(data["target_id"])
-            except (ValueError, TypeError):
-                pass
+            tid_str = str(data["target_id"]).strip()
+            if tid_str:
+                try:
+                    target_id = ulid_to_uuid(tid_str)
+                except Exception:
+                    try:
+                        target_id = uuid.UUID(tid_str)
+                    except (ValueError, TypeError):
+                        pass
 
         ticker_id = None
         if data.get("ticker_id"):
-            try:
-                ticker_id = uuid.UUID(data["ticker_id"])
-            except (ValueError, TypeError):
-                pass
+            tkr_str = str(data["ticker_id"]).strip()
+            if tkr_str:
+                try:
+                    ticker_id = ulid_to_uuid(tkr_str)
+                except Exception:
+                    try:
+                        ticker_id = uuid.UUID(tkr_str)
+                    except (ValueError, TypeError):
+                        pass
 
         target_datetime_val = data.get("target_datetime")
         if target_datetime_val and isinstance(target_datetime_val, str):
@@ -457,16 +468,26 @@ class AlertsService:
             elif target_type in ("ticker", "trade", "trade_plan", "account"):
                 ticker_id_val = None
                 if data.get("ticker_id"):
-                    try:
-                        ticker_id_val = uuid.UUID(data["ticker_id"])
-                    except (ValueError, TypeError):
-                        pass
+                    tkr_str = str(data["ticker_id"]).strip()
+                    if tkr_str:
+                        try:
+                            ticker_id_val = ulid_to_uuid(tkr_str)
+                        except Exception:
+                            try:
+                                ticker_id_val = uuid.UUID(tkr_str)
+                            except (ValueError, TypeError):
+                                pass
                 target_id_val = None
                 if data.get("target_id"):
-                    try:
-                        target_id_val = uuid.UUID(data["target_id"])
-                    except (ValueError, TypeError):
-                        pass
+                    tid_str = str(data["target_id"]).strip()
+                    if tid_str:
+                        try:
+                            target_id_val = ulid_to_uuid(tid_str)
+                        except Exception:
+                            try:
+                                target_id_val = uuid.UUID(tid_str)
+                            except (ValueError, TypeError):
+                                pass
                 if target_type == "ticker" and not ticker_id_val and not target_id_val:
                     from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
                     raise HTTPExceptionWithCode(status_code=422, detail="ticker_id or target_id required when target_type=ticker", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)

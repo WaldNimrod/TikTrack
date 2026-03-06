@@ -213,7 +213,7 @@ export function openAlertsForm(alert, onSuccess) {
             payload.target_type = targetTypeVal;
           }
           if (targetTypeVal === 'datetime' && targetDtVal) payload.target_datetime = targetDtVal;
-          await sharedServices.patch(`/alerts/${alertId}`, payload);
+          await sharedServices.patch(`/alerts/${alertId}`, payload, { skipTransform: true });
         } else {
           const payload = {
             target_type: targetTypeVal,
@@ -223,12 +223,12 @@ export function openAlertsForm(alert, onSuccess) {
             is_active: true
           };
           if (targetTypeVal === 'datetime' && targetDtVal) payload.target_datetime = targetDtVal;
-          else if (targetTypeVal === 'ticker' && targetIdVal) payload.ticker_id = targetIdVal;
-          else if (targetIdVal) payload.target_id = targetIdVal;
+          else if (targetTypeVal === 'ticker' && targetIdVal) payload.ticker_id = String(targetIdVal).trim();
+          else if (targetIdVal) payload.target_id = String(targetIdVal).trim();
           if (condField) payload.condition_field = condField;
           if (condOp) payload.condition_operator = condOp;
           if (condVal != null) payload.condition_value = condVal;
-          await sharedServices.post('/alerts', payload);
+          await sharedServices.post('/alerts', payload, { skipTransform: true });
         }
         document.getElementById('phoenix-modal-backdrop')?.remove();
         if (typeof onSuccess === 'function') onSuccess();

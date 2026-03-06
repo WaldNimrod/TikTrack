@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-04T21:57:10.982807+00:00`
+- Generated (UTC): `2026-03-06T16:52:25.846708+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
-- next_required_action: `Await Team 00 / Team 100 architectural decision on the submitted GATE_6 package. No progression to GATE_7 re-entry without explicit approval.`
+- current_gate: `GATE_7 (REJECTED_CODE_CHANGE_REQUIRED)`
+- next_required_action: `Team 10 execute canonical remediation package issued by Team 90 and return to GATE_4/GATE_5 re-validation cycle.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_6 (SUBMITTED_AWAITING_DECISION) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_7 (REJECTED_CODE_CHANGE_REQUIRED) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

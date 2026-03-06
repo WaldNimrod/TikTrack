@@ -5,7 +5,7 @@
 **from:** Team 10 (Execution Orchestrator)  
 **work_package_id:** S002-P003-WP002  
 **gate_id:** GATE_7 remediation (v1.3.0)  
-**date:** 2026-03-04  
+**date:** 2026-03-06  
 **status:** DRAFT — רשימה פתוחה; יתווספו סעיפים. לאחר סגירת הרשימה — הכנת באצ'ים מסודרים.
 
 ---

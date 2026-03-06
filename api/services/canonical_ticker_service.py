@@ -122,12 +122,14 @@ async def create_system_ticker(
                 error_code=ErrorCodes.TICKER_SYMBOL_INVALID,
             )
 
+    # G7-v1.2.1: Ticker without market data NOT is_active=true (status=pending = no data yet)
+    is_active = status.lower() != "pending"
     ticker = Ticker(
         symbol=symbol_uc,
         company_name=company_name or None,
         ticker_type=ticker_type_uc,
         exchange_id=exchange_id,
-        is_active=True,
+        is_active=is_active,
         status=status,
         ticker_metadata=metadata or {},
     )

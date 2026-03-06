@@ -32,6 +32,8 @@ class TickerResponse(BaseModel):
     updated_at: datetime = Field(..., description="Last update timestamp")
     current_price: Optional[Decimal] = Field(None, description="Last known price from ticker_prices")
     daily_change_pct: Optional[Decimal] = Field(None, description="Daily change percentage")
+    price_source: Optional[str] = Field(None, description="EOD | INTRADAY_FALLBACK — T190-Price provenance")
+    price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of price — T190-Price provenance")
 
 
 class TickerCreateRequest(BaseModel):

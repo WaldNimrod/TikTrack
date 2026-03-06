@@ -4,46 +4,35 @@
 **id:** TEAM_10_S002_P003_WP002_GATE5_REOPEN_REQUIREMENTS_v1.0.0  
 **owner:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-06  
-**status:** ACTIVE  
+**status:** SUPERSEDED_BY_INSTRUCTIONS  
 **gate_id:** GATE_5 (BLOCKED)  
 **work_package_id:** S002-P003-WP002  
-**authority:** TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT_v1.1.0.md; החלטת שער על ההגשה החוזרת  
+**authority:** TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT_v1.1.0.md  
 
 ---
 
-## מטרה
+## מקור קנוני (מחליף מסמך זה)
 
-רשימה **דטרמיניסטית** של מה נדרש כדי ש־**GATE_5 ייפתח מחדש** (ולא יישאר BLOCK). עד שכל הדרישות מתקיימות — **אין** להגיש חבילת GATE_5 כמוכנה לאימות.
+**כל דרישות פתיחת GATE_5 מחדש מוגדרות במסמך המפורט No-Guess של Team 90:**
 
----
+`_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md`
 
-## דרישות לפתיחת GATE_5 מחדש
+- **R-001 .. R-014** — 10 חוסמים (R-001–R-010) + 4 משלימים (R-011–R-014).  
+- **פורמט evidence:** לכל סעיף — `id | status | owner | artifact_path | verification_report | verification_type | verified_by | closed_date | notes`.  
+- **תנאי כניסה ל־Team 90:** §5 במסמך ההוראות.  
+- **תוצרים נדרשים:** §4 במסמך ההוראות (מטריצה נעולה, דוח 008/012/024, מקור 19 נעול, חבילת handoff).  
+- **No-Guess Rule:** §6 — רק CLOSED + evidence-by-path + verification_report.
 
-| # | דרישה | בעלים / הערה |
-|---|--------|---------------|
-| **1** | **מטריצת סגירה נעולה אחת** ל־**26 BF + 19 gaps** — כל שורה עם **CLOSED** + **evidence-by-path** (נתיב קובץ/מזהה + verification_report). מטריצה זו חייבת להיות **המקור המאושר** להגשה; לא גרסת טיוטה. | Team 10 (איחוד) + Team 50 (מילוי) + 20/30/60 (evidence לשורותיהם) |
-| **2** | **להסיר תלות ב־DRAFT כמקור הגשה.** ארטיפקט רשימת 19 הפערים חייב להיות **נעול** (לא DRAFT) ומוגדר כמצב **דטרמיניסטי** — כל סעיף עם סטטוס CLOSED ו־evidence_path. | Team 10 + Team 50 |
-| **3** | **לסגור 008 / 012 / 024** באחת משתי דרכים: **(א)** **E2E תקין** — ריצת E2E שמעידה PASS לשלושת הפריטים (סמל לא תקין ב־UI, מקושר ל תצוגה/קישור, פרטי הערה + קבצים פתח/הורד); **או** **(ב)** **החלטת חריג חתומה מראש** (ארכיטקט / Team 90) שמאשרת **code-only** על 008, 012, 024 ומתועדת בארטיפקט הגשה. | (א) Team 50 (E2E) + 20/30 (תיקון backend/סלקטורים); (ב) ארכיטקט / Team 90 |
-| **4** | **להגיש מחדש חבילת GATE_5 מלאה ומסונכרנת** מול BF IDs — קישור למטריצה הנעולה, לרשימת 19 הנעולה, לדוחות 20/30/50; ללא CLOSED_PENDING, ללא DRAFT, ללא תגיות חוסם פתוחות. | Team 10 |
-
----
-
-## סיכום תנאי סף
-
-- **מטריצה:** אחת, נעולה, 26+19, evidence-by-path לכל שורה.  
-- **מקור 19:** לא DRAFT; נעול ודטרמיניסטי.  
-- **008/012/024:** E2E PASS **או** החלטת חריג חתומה (code-only).  
-- **Auth (סעיף 14):** PASS מוכח **או** CLOSED עם הנמקה מאושרת במפורש על ידי Team 90 — כך שזה לא ייחשב סיבה חוסמת.  
-- **חבילה:** מלאה ומסונכרנת; הגשה רק לאחר עמידה בכל האמור לעיל.
+מסמך זה נשאר להפניה היסטורית; **ביצוע ובדיקה** — אך ורק לפי ה־Instructions לעיל.
 
 ---
 
 ## הפניות
 
+- **הוראות תיקון (קנוני):** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md`  
+- ACK קבלת הוראות: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REMEDIATION_INSTRUCTIONS_ACK_v1.0.0.md`  
 - דוח חסימה: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCKING_REPORT_v1.1.0.md`  
-- תגובת ולידציה: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_VALIDATION_RESPONSE_v1.1.0.md`  
-- ACK החלטה (הגשה חוזרת): `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P003_WP002_GATE5_BLOCK_RESUBMISSION_ACK_v1.0.0.md`  
 
 ---
 
-**log_entry | TEAM_10 | GATE5_REOPEN_REQUIREMENTS | S002_P003_WP002 | 2026-03-06**
+**log_entry | TEAM_10 | GATE5_REOPEN_REQUIREMENTS | SUPERSEDED_BY_INSTRUCTIONS | S002_P003_WP002 | 2026-03-06**

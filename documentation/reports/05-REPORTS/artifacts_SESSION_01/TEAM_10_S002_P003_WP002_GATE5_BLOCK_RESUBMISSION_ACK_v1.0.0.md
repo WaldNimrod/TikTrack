@@ -42,7 +42,9 @@
 
 ## 4) דרישות לפתיחת GATE_5 מחדש
 
-מסמך ייעודי: `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P003_WP002_GATE5_REOPEN_REQUIREMENTS_v1.0.0.md`
+**מקור קנוני (No-Guess):** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md` — R-001..R-014, פורמט evidence, תוצרים (§4), תנאי כניסה (§5), No-Guess (§6).  
+**ACK קבלה:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REMEDIATION_INSTRUCTIONS_ACK_v1.0.0.md`  
+(מסמך REOPEN_REQUIREMENTS הוחלף על ידי Instructions כהפניה יחידה.)
 
 ---
 

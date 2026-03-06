@@ -66,10 +66,11 @@ Team 10 **אינו** מגיש ל־Team 90 כחבילה "מוכנה לאימות"
 
 ## 6) GATE_5 — החלטה על ההגשה החוזרת
 
-בדיקת ההגשה החוזרת הובילה ל־**GATE_5 = BLOCK** (לא PASS). סיבות חוסמות ו־**דרישות לפתיחת GATE_5 מחדש** מתועדות ב:
+בדיקת ההגשה החוזרת הובילה ל־**GATE_5 = BLOCK** (לא PASS). **דרישות לפתיחה מחדש** מוגדרות במסמך ההוראות No-Guess של Team 90 (R-001..R-014):
 
-- **ACK:** `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P003_WP002_GATE5_BLOCK_RESUBMISSION_ACK_v1.0.0.md`
-- **דרישות לפתיחה מחדש:** `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P003_WP002_GATE5_REOPEN_REQUIREMENTS_v1.0.0.md`
+- **הוראות תיקון (קנוני):** `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE5_BLOCK_REMEDIATION_INSTRUCTIONS_v1.0.0.md`
+- **ACK החלטה:** `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P003_WP002_GATE5_BLOCK_RESUBMISSION_ACK_v1.0.0.md`
+- **ACK קבלת הוראות:** `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P003_WP002_GATE5_REMEDIATION_INSTRUCTIONS_ACK_v1.0.0.md`
 
 SSOT עודכן: GATE_5 blocked (PHOENIX_MASTER_WSM, PROGRAM_REGISTRY, WORK_PACKAGE_REGISTRY).
 

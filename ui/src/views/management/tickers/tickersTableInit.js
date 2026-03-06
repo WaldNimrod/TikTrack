@@ -128,9 +128,17 @@ const formatChangePct = (pct) => {
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
+      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
+      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
+        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
+        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
+      } else if (priceSource && priceSource !== 'EOD') {
+        priceSpan.title = 'מקור: ' + priceSource;
+      }
       priceCell.appendChild(priceSpan);
       row.appendChild(priceCell);
 

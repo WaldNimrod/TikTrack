@@ -903,6 +903,19 @@ body .page-wrapper .page-container main {
 .phoenix-table__cell.col-linked-object {
   min-width: clamp(100px, 12%, 180px);
 }
+
+/* T50-1: Linked object badge as link to entity details — no underline, pointer cursor */
+.linked-object-badge-link,
+a.linked-object-badge--link {
+  text-decoration: none !important;
+  color: inherit;
+  cursor: pointer;
+  display: inline-block;
+}
+.linked-object-badge-link:hover .linked-object-badge,
+a.linked-object-badge--link:hover {
+  text-decoration: underline;
+}
 .phoenix-table__header.col-content,
 .phoenix-table__cell.col-content {
   min-width: clamp(150px, 20%, 300px);
@@ -1631,6 +1644,22 @@ body .page-wrapper .page-container main {
 }
 
 /* BF-G7-016: #alertsSummaryToggleSize alignment — pinned to row end, no wrap, horizontal */
+/* T50-4: Notes summary — נתונים במרכז, כפתור בצד שמאל (כמו טיקרים) */
+.info-summary__row--notes-toggle {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.info-summary__row--notes-toggle .info-summary__content {
+  flex: 1;
+  justify-content: center;
+}
+.info-summary__row--notes-toggle .portfolio-summary__toggle-btn {
+  margin-inline-start: var(--spacing-md, 16px);
+  flex-shrink: 0;
+}
+
 #alertsSummaryStats .info-summary__row--first {
   flex-wrap: nowrap;
   display: flex;

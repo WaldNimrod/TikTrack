@@ -39,6 +39,7 @@ function createFormHTML(data = null) {
 
   return `
     <form id="noteForm" class="phoenix-form phoenix-form--two-col">
+      <div id="noteFormValidationSummary" class="form-validation-summary" role="alert" data-testid="note-form-validation-summary" hidden></div>
       <div class="form-group">
         <label for="noteParentType">סוג ישות מקושרת</label>
         ${isEdit
@@ -47,11 +48,11 @@ function createFormHTML(data = null) {
         }
       </div>
       <div class="form-group form-group--parent-entity">
-        <label for="noteParentId">ישות מקושרת (אופציונלי)</label>
+        <label for="noteParentId">ישות מקושרת <span class="form-label-asterisk">*</span></label>
         ${isEdit
-          ? `<span id="noteParentIdDisplay" class="form-readonly-value" aria-readonly="true">${parentId ? String(linkedDisplay).replace(/</g, '&lt;') : '—ללא קישור—'}</span>`
+          ? `<span id="noteParentIdDisplay" class="form-readonly-value" aria-readonly="true">${parentId ? String(linkedDisplay).replace(/</g, '&lt;') : '—'}</span>`
           : `<select id="noteParentId" name="parentId" class="js-entity-options-select" aria-label="בחירת ישות">
-          <option value="">—ללא קישור—</option>
+          <option value="">—בחר—</option>
         </select>`
         }
       </div>
@@ -122,7 +123,7 @@ function initAttachmentHandlers(noteId) {
   fileInput.addEventListener('change', (e) => {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
-    const total = attachmentState.existing.length + attachmentState.pending.length - attachmentState.toDelete.length;
+    let total = attachmentState.existing.length + attachmentState.pending.length - attachmentState.toDelete.length;
     const errEl = document.getElementById('noteAttachmentError');
     if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
     for (const file of files) {
@@ -157,9 +158,10 @@ function initAttachmentHandlers(noteId) {
 /**
  * Open Notes form modal
  * @param {string|null} noteId - For edit mode
+ * @param {Object} [preselection] - For create: { parent_type, parent_id } e.g. from user_tickers "הערה" action
  */
-export async function openNotesForm(noteId = null) {
-  let data = null;
+export async function openNotesForm(noteId = null, preselection = null) {
+  let data = preselection && !noteId ? { parent_type: preselection.parent_type || 'ticker', parent_id: preselection.parent_id || '' } : null;
   attachmentState = { existing: [], pending: [], toDelete: [] };
   if (noteId) {
     try {
@@ -207,6 +209,14 @@ export async function openNotesForm(noteId = null) {
 
     if (!content || content === '<p></p>') {
       createModal({ title: 'שגיאה', content: '<p>תוכן חובה</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      return;
+    }
+
+    // T190-Notes, T50-6: parent_id חובה בהוספת הערה
+    if (!noteId && !parentId) {
+      const summaryEl = document.getElementById('noteFormValidationSummary');
+      if (summaryEl) { summaryEl.textContent = 'יש לבחור ישות מקושרת.'; summaryEl.hidden = false; }
+      else createModal({ title: 'שגיאה', content: '<p>יש לבחור ישות מקושרת.</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
       return;
     }
 
@@ -309,7 +319,7 @@ export async function openNotesForm(noteId = null) {
         const pt = parentTypeSelect.value || 'ticker';
         const opts = await loadOptionsForParentType(pt);
         const currentVal = parentIdSelect.value || initialParentId;
-        parentIdSelect.innerHTML = '<option value="">—ללא קישור—</option>' +
+        parentIdSelect.innerHTML = '<option value="">—בחר ישות—</option>' +
           opts.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`).join('');
         if (currentVal && !opts.some(o => String(o.value) === currentVal)) {
           const opt = document.createElement('option');

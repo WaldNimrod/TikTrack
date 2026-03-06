@@ -99,16 +99,17 @@
             </div>
           </div>
           <!-- Summary Information -->
-          <div class="info-summary" id="notesSummaryStats" style="margin-top: var(--spacing-md, 16px);">
-            <div class="info-summary__row info-summary__row--first">
+          <!-- T50-4: נתונים במרכז, כפתור בצד שמאל (כמו טיקרים) -->
+          <div class="info-summary info-summary--notes" id="notesSummaryStats" style="margin-top: var(--spacing-md, 16px);">
+            <div class="info-summary__row info-summary__row--first info-summary__row--notes-toggle">
               <div class="info-summary__content">
                 <div>סה"כ הערות: <strong id="totalNotes">0</strong></div>
                 <div>הערות חדשות (10 ימים): <strong id="recentNotes">0</strong></div>
                 <div>סה"כ קישורים (מצורפים): <strong id="totalLinks">0</strong></div>
-                <button class="portfolio-summary__toggle-btn" id="notesSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
-                </button>
               </div>
+              <button class="portfolio-summary__toggle-btn" id="notesSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
+              </button>
             </div>
             <div class="info-summary__row info-summary__row--second" id="notesSummaryContent" style="display: none;">
               <span>הערות מוצמדות: <strong id="pinnedNotes">0</strong></span>

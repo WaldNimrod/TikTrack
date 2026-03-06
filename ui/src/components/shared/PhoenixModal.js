@@ -93,14 +93,14 @@ export function createModal(options = {}) {
   footer.className = 'phoenix-modal__footer';
 
   const cancelButton = document.createElement('button');
-  cancelButton.className = 'phoenix-modal__cancel-btn';
+  cancelButton.className = 'phoenix-modal__cancel-btn phoenix-btn phoenix-btn--secondary';
   cancelButton.type = 'button';
   cancelButton.textContent = cancelButtonText;
   footer.appendChild(cancelButton);
 
   if (showSaveButton && onSave) {
     const saveButton = document.createElement('button');
-    saveButton.className = 'phoenix-modal__save-btn' + (confirmMode ? ' phoenix-modal__confirm-btn' : '');
+    saveButton.className = 'phoenix-modal__save-btn phoenix-btn phoenix-btn--primary' + (confirmMode ? ' phoenix-modal__confirm-btn' : '');
     if (confirmMode) saveButton.setAttribute('data-action', 'confirm-delete');
     saveButton.type = 'button';
     saveButton.textContent = saveButtonText;

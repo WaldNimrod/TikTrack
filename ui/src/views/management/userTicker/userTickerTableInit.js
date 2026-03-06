@@ -136,9 +136,17 @@ const formatChangePct = (pct) => {
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
+      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
+      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
+        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
+        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
+      } else if (priceSource && priceSource !== 'EOD') {
+        priceSpan.title = 'מקור: ' + priceSource;
+      }
       priceCell.appendChild(priceSpan);
       row.appendChild(priceCell);
 
@@ -193,6 +201,15 @@ const formatChangePct = (pct) => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button class="table-action-btn js-action-note" aria-label="הוסף הערה לטיקר" title="הוסף הערה לטיקר" data-ticker-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
               </svg>
             </button>
             <button class="table-action-btn js-action-edit" aria-label="שנה שם תצוגה" title="שנה שם תצוגה" data-ticker-id="${id}" data-edits="display_name">
@@ -282,6 +299,15 @@ const formatChangePct = (pct) => {
         const id = btn.getAttribute('data-ticker-id');
         const t = tableData.data.find((x) => (x.id || x.external_ulid) === id);
         if (t) handleView(t);
+      };
+    });
+    document.querySelectorAll('.js-action-note').forEach((btn) => {
+      btn.onclick = async (e) => {
+        e.preventDefault();
+        const id = btn.getAttribute('data-ticker-id');
+        if (!id) return;
+        const { openNotesForm } = await import('../../data/notes/notesForm.js');
+        openNotesForm(null, { parent_type: 'ticker', parent_id: id });
       };
     });
     document.querySelectorAll('.js-action-edit').forEach((btn) => {

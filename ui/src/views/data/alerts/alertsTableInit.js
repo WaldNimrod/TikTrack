@@ -11,6 +11,7 @@ import { openAlertsForm } from './alertsForm.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { getEntityDetailUrl } from '../../../utils/entityLinks.js';
 
 const EMPTY_ROW_HTML = `
   <tr class="phoenix-table__row phoenix-table__row--empty" role="row">
@@ -40,11 +41,14 @@ const TARGET_TYPE_LABELS = {
 /** G7R Batch1: Entity icon paths for linked entity display (§3D) */
 const ALERT_ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
 
-/** Format alert linked entity: icon + resolved name */
+/** T50-1: Map alert target_type to entity type for links (account → trading_accounts) */
+const ALERT_TYPE_TO_ENTITY = { ticker: 'ticker', account: 'trading_account', trade: 'trade', trade_plan: 'trade_plan' };
+
+/** Format alert linked entity: icon + resolved name + link to details (T50-1) */
 function formatAlertLinkedEntity(alert) {
   const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
   const resolvedName = alert.linked_entity_display ?? alert.target_display_name ?? (alert.ticker_symbol ?? alert.tickerSymbol) ?? '';
-  const targetId = (alert.target_id != null ? alert.target_id : alert.targetId) || '';
+  const targetId = (alert.target_id != null ? alert.target_id : alert.targetId) || (alert.ticker_id ?? alert.tickerId) || '';
   const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '';
   const displayName = resolvedName || (targetId ? typeLabel + ' ' + String(targetId).slice(0, 8) + '…' : typeLabel || '—');
   const iconPath = targetType ? ALERT_ENTITY_ICON_MAP[targetType] : null;
@@ -54,11 +58,15 @@ function formatAlertLinkedEntity(alert) {
       const dt = new Date(targetDt);
       const dtStr = dt.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${dtStr}</span>`;
-    } catch (_) {}
+    } catch (_) { /* ignore invalid date */ }
   }
   if (!targetType && !targetId) return '<span class="linked-object-badge">—</span>';
   const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
-  return `<span class="linked-object-badge entity-${targetType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
+  const entityType = ALERT_TYPE_TO_ENTITY[targetType];
+  const href = entityType && targetId ? getEntityDetailUrl(entityType, targetId) : null;
+  const badgeHtml = `<span class="linked-object-badge entity-${targetType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
+  if (href) return `<a href="${href}" class="linked-object-badge-link" data-entity-type="${entityType}" data-entity-id="${String(targetId).replace(/"/g, '&quot;')}">${badgeHtml}</a>`;
+  return badgeHtml;
 }
 
 /** G7R Batch1: Condition field/operator labels for formatted display */

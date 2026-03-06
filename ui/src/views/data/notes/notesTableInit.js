@@ -9,6 +9,7 @@
 import { fetchNotes, loadNotesData } from './notesDataLoader.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { getEntityDetailUrl } from '../../../utils/entityLinks.js';
 
 /** State for pagination/sort — same pattern as brokersFees, userTicker */
 let tableData = { data: [], total: 0 };
@@ -39,7 +40,13 @@ function formatLinkedEntityDisplay(note) {
   const iconPath = parentType ? ENTITY_ICON_MAP[parentType] : null;
   if (!parentType && !parentId) return '<span class="linked-object-badge">—ללא קישור—</span>';
   const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
-  return `<span class="linked-object-badge entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
+  const entityType = parentType === 'account' ? 'trading_account' : parentType;
+  const href = parentId ? getEntityDetailUrl(entityType, parentId) : null;
+  const badgeHtml = `${iconHtml} ${displayName}`;
+  if (href) {
+    return `<a href="${href}" class="linked-object-badge linked-object-badge--link entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${badgeHtml}</a>`;
+  }
+  return `<span class="linked-object-badge entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${badgeHtml}</span>`;
 }
 
 /**

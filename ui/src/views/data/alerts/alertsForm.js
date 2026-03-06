@@ -85,14 +85,20 @@ function createAlertFormHTML(data = null) {
         <label for="alertTitle">כותרת <span class="form-label-asterisk">*</span></label>
         <input type="text" id="alertTitle" name="title" maxlength="200" required value="${String(title).replace(/"/g, '&quot;')}" placeholder="התראת מחיר" data-action="save-alert" />
       </div>
-      <div class="form-group">
-        <label for="alertTargetType">מקושר ל <span class="form-label-asterisk">*</span></label>
-        <select id="alertTargetType" name="target_type">${targetOpts}</select>
-        <div id="alertEntityWrap" class="alert-entity-wrap">
-          <select id="alertTargetId" name="target_id" class="js-alert-entity-select" aria-label="בחירת ישות מקושרת"><option value="">—בחר—</option></select>
+      <!-- T50-7: שדות הקישור בשתי עמודות -->
+      <div class="form-row form-row--two-col">
+        <div class="form-group">
+          <label for="alertTargetType">מקושר ל <span class="form-label-asterisk">*</span></label>
+          <select id="alertTargetType" name="target_type" title="סוג ישות מקושרת" aria-label="סוג ישות מקושרת">${targetOpts}</select>
         </div>
-        <div id="alertDatetimeWrap" class="alert-datetime-wrap" style="display:none">
-          <input type="datetime-local" id="alertTargetDatetime" name="target_datetime" aria-label="תאריך ושעה" />
+        <div class="form-group">
+          <label for="alertTargetId">ישות <span class="form-label-asterisk">*</span></label>
+          <div id="alertEntityWrap" class="alert-entity-wrap">
+            <select id="alertTargetId" name="target_id" class="js-alert-entity-select" aria-label="בחירת ישות מקושרת" title="בחירת ישות מקושרת"><option value="">—בחר—</option></select>
+          </div>
+          <div id="alertDatetimeWrap" class="alert-datetime-wrap" style="display:none">
+            <input type="datetime-local" id="alertTargetDatetime" name="target_datetime" aria-label="תאריך ושעה" title="תאריך ושעה" />
+          </div>
         </div>
       </div>
       <div class="form-group">

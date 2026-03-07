@@ -36,7 +36,7 @@
 | 4 | G3.4 | Team 60 — תשתית MCP ל־Chrome + runtime + Ed25519 + signing service | Team 60 | Completion report to Team 10 with evidence_path |
 | 5 | **G3.5** | **Checkpoint: תשתית readiness (Team 60)** | **Team 10** | **Mandatory:** Team 60 completion confirmed (תשתית MCP+Chrome, runtime, signing); evidence verifiable on disk. No G3.6 until G3.5 PASS. Team 61 לא חוסם בשלב ראשון. |
 | 6 | **G3.6** | **Team 50 — hybrid QA activation (MCP + Selenium parity runs)** | **Team 50** | **PASS** — TEAM_10_S002_P002_G3.6_CHECKPOINT_SIGNOFF_v1.0.0.md |
-| 7 | G3.7 | Team 90 — evidence validation protocol activation (GATE_5/GATE_6 checkpoints) | Team 90 | Protocol defined and communicated to Team 10 |
+| 7 | **G3.7** | **Team 90 — evidence validation protocol activation (GATE_5/GATE_6 checkpoints)** | **Team 90** | **PASS** — TEAM_10_S002_P002_G3.7_CHECKPOINT_SIGNOFF_v1.0.0.md |
 | 8 | G3.8 | Pre-GATE_4 consolidation — all first-cycle deliverables verified | Team 10 | All evidence paths valid; WSM updated as needed |
 | 9 | G3.9 | GATE_3 close → GATE_4 open (per gate model) | Team 10 | Gate handoff package to self (GATE_4 owner); QA phase starts |
 
@@ -63,6 +63,24 @@ Every MATERIALIZATION_EVIDENCE.json in this program must include:
 1. **provenance tag:** `TARGET_RUNTIME` | `LOCAL_DEV_NON_AUTHORITATIVE` | `SIMULATION`
 2. **signature block:** `Ed25519`, `key_id`, `signature_base64`, `signed_payload_sha256`, `signed_at_utc`, `signed_by_team`
 3. **gate context** and **traceable artifact path**
+
+---
+
+## 4) מנדט צוות 10 — השלמת שער 3 עד אישור ולידציה בשער 4
+
+**תפקיד Team 10 (Gateway):** לבצע באופן מסודר ומלא את כל שלבי שער 3 (GATE_3_PREPARATION) עד **אישור ולידציה בשער 4 (GATE_4) על ידי Team 90** — לקידום חבילת MCP (S002-P002).
+
+**הצעדים הנותרים (אחרי G3.7 PASS):**
+
+| שלב | תיאור | בעלים |
+|-----|--------|--------|
+| **G3.8** | Pre-GATE_4 consolidation — אימות כל תוצרי המחזור הראשון (evidence paths תקפים; WSM לפי צורך) | Team 10 |
+| **G3.9** | GATE_3 close → GATE_4 open (חבילת מעבר ל־GATE_4; מודל השער) | Team 10 |
+| **GATE_4** | ולידציה — אישור Team 90 לקידום חבילת MCP | Team 90 |
+
+Team 10 ממשיך ב־G3.8 ואז G3.9; לאחר פתיחת GATE_4 — הגשת חבילה ל־Team 90 לאישור ולידציה.
+
+**סטטוס ומה נותר:** `TEAM_10_S002_P002_GATE3_STATUS_AND_REMAINING_v1.0.0.md` — צ'קליסט G3.8, G3.9 ועדכון סטטוס עם כל התקדמות.
 
 ---
 

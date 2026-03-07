@@ -109,28 +109,16 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
     );
   }
 
-  // Type D (Admin-only): Guest → Home; Logged-in but not admin → block message (per product decision)
+  // Type D (Admin-only): Guest → Home; Logged-in but not admin → redirect to Home (GATE_4: explicit destination per ADR-013)
   if (requireAdmin && !isAuthenticated) {
     debugLog('Auth', 'ProtectedRoute: Guest on admin route → redirect to Home');
     return <Navigate to="/" replace />;
   }
   if (requireAdmin && isAuthenticated && !isAdmin) {
-    debugLog('Auth', 'ProtectedRoute: User not authorized for admin route (show block message)', {
+    debugLog('Auth', 'ProtectedRoute: USER on admin route → redirect to Home (/) per ADR-013', {
       role: authService.getUserRole()
     });
-    return (
-      <div className="auth-layout-root" dir="rtl">
-        <tt-container>
-          <tt-section>
-            <div className="auth-block-message" role="alert">
-              <h2>אין הרשאה</h2>
-              <p>אין לך הרשאה לגשת לעמוד זה. נדרשת הרשאת מנהל.</p>
-              <a href="/" className="phx-btn phx-btn--primary">חזרה לדף הבית</a>
-            </div>
-          </tt-section>
-        </tt-container>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Type C (Auth-only): Guest → redirect to Home (not /login per ADR-013)

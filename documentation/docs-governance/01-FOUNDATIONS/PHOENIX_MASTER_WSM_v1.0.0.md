@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-07** by **Team 10** — post GATE_8 PASS S002-P003-WP002; synchronization to next authorized program S002-P002 (MCP-QA Transition) per Team 190 GATE_2 approval and activation prompt.
+**Gate-owner update evidence:** This block was updated **2026-03-07** by **Team 90** — GATE_6 submission package for S002-P002 sent to Team 00/Team 100; awaiting approval decision.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003 closed at GATE_8; **next authorized program:** S002-P002 (MCP-QA Transition; GATE_2 approved by Team 190) |
-| active_project_domain | SHARED (TIKTRACK + AGENTS_OS) for S002-P002; TIKTRACK for closed S002-P003 |
-| active_work_package_id | NONE |
+| active_flow | S002-P002 (MCP-QA Transition) — GATE_6 submission sent; awaiting Team 00/Team 100 decision |
+| active_project_domain | SHARED (TIKTRACK + AGENTS_OS) for S002-P002 |
+| active_work_package_id | NONE (program-level) |
 | in_progress_work_package_id | NONE |
 | last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; **domain: TIKTRACK**) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_3_PREPARATION (S002-P002); execution GATE_3..GATE_8 when triggers satisfied |
-| current_gate | GATE_3_PREPARATION (S002-P002 intake) |
+| allowed_gate_range | GATE_6 (S002-P002); execution GATE_6..GATE_8 after GATE_5 PASS |
+| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (GATE_3_PREPARATION owner; next: verify triggers, issue first-cycle mandates) |
-| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED \| 2026-03-07 \| Team 90 → Team 10 GATE_8 validation report; S002-P003-WP002 lifecycle COMPLETE \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE8_VALIDATION_REPORT.md |
-| next_required_action | Team 10: verify S002-P002 activation triggers (GATE_8 PASS confirmed; S002-P002 spec chain open per Team 190; WSM synced to S002-P002). Then issue first-cycle mandate set per TEAM_190_TO_TEAM_10_S002_P002_MCP_QA_TRANSITION_ACTIVATION_PROMPT_v1.0.0.md. |
-| next_responsible_team | Team 10 (Gateway Orchestration; WSM/SSM updater; S002-P002 activation owner) |
+| phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 submission owner) |
+| last_gate_event | GATE_6_SUBMITTED \| 2026-03-07 \| execution approval package submitted to Team 00/Team 100 \| TEAM_90_TO_TEAM_00_S002_P002_GATE6_EXECUTION_SUBMISSION_v1.0.0.md |
+| next_required_action | Team 00/Team 100 return GATE_6 architectural decision for S002-P002; Team 90 then updates WSM and triggers GATE_7 if approved. |
+| next_responsible_team | Team 00 + Team 100 (approval authority), Team 90 (state/routing follow-up) |
 
 ---
 
@@ -234,6 +234,14 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P003-WP002; GATE_8 activated and Team 70 execution requested | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P003-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-07**
 **log_entry | TEAM_10 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | post GATE_8 S002-P003-WP002; active_program_id → S002-P002; next_required_action S002-P002 activation triggers + first-cycle mandates per Team 190 prompt | 2026-03-07**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.8 pre-check PASS S002-P002 (60/50/90 completion reports collected); G3.9 GATE_3 close; GATE_4 open; handover to Team 50 per TEAM_10_TO_TEAM_50_S002_P002_GATE4_QA_HANDOVER.md | 2026-03-07**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 NOT PASS S002-P002 per Team 50 QA report (7 PASS, 3 FAIL, 2 SKIP); remediation routed to Teams 20, 30, 60 | 2026-03-07**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 re-QA S002-P002: 7 PASS, 5 FAIL, 0 SKIP (Login fixed); 5 blockers → Team 30 remediation (Guest flow, Type C redirect, User Icon Guest, 0 SEVERE) | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 BLOCK S002-P002; deterministic QA evidence mismatch (R3 report vs Gate-A artifact and counts) | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P002 on re-validation; BF-G5-S002P002-001..003 closed deterministically | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 routing preparation started for S002-P002 after GATE_5 PASS | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submission package created for S002-P002 (8-artifact format) | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted to Team 00/Team 100 for S002-P002; awaiting decision | 2026-03-07**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

@@ -25,7 +25,7 @@ const DesignSystemDashboard = () => {
   debugLog('Admin', 'DesignSystemDashboard: Component mounted');
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper admin-dashboard-placeholder">
       <div className="page-container">
         <main>
           <tt-container>

@@ -13,6 +13,23 @@
 
 ---
 
+## 0) הגשה תקינה — Entry Conditions (Handoff Status)
+
+**כניסה ל־G3.7 מאושרת.** תנאי השער מולאו:
+
+| Condition | Status | Reference |
+|-----------|--------|-----------|
+| G3.5 — תשתית readiness (Team 60) | PASS | TEAM_10_S002_P002_G3.5_CHECKPOINT_SIGNOFF_v1.0.0.md |
+| G3.6 — Hybrid QA (Team 50) | PASS | TEAM_10_S002_P002_G3.6_CHECKPOINT_SIGNOFF_v1.0.0.md |
+
+**מה נמסר ל־Team 90 במסגרת הגשה זו:**
+- מסמך זה (מנדט G3.7).
+- תוכנית ביצוע: `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P002_MCP_QA_TRANSITION_GATE3_EXECUTION_PLAN_v1.0.0.md`.
+- Evidence Contract (§2 למטה) — חוזה ל־MATERIALIZATION_EVIDENCE.json.
+- דוגמאות evidence חתום: `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_S002_P002_G3.6_MATERIALIZATION_EVIDENCE.json`; תשתית: `infrastructure/s002_p002_mcp_qa/` (generate_evidence.py, RUNTIME_IDENTITY.md, MCP_CHROME_SETUP.md).
+
+---
+
 ## Mandatory Identity Header
 
 | Field | Value |
@@ -50,22 +67,35 @@ Define and publish **verification checkpoints** that Team 90 will use to validat
 
 ---
 
-## 3) Deliverables and Response
+## 3) Deliverables and Response (תוצרים נדרשים)
 
-- **Deliverables:** Protocol or checklist document that defines the verification checkpoints for GATE_5/GATE_6 materialization evidence; published and communicated to Team 10 (and execution teams as needed).
-- **Response:** Confirm to Team 10 when the protocol is defined and where it is published (artifact path).
+- **Deliverable 1 — פרוטוקול / checklist:** מסמך שמגדיר את verification checkpoints ל־GATE_5/GATE_6 materialization evidence; מפורסם ומועבר ל־Team 10 (ולצוותי ביצוע לפי צורך).
+  - **נתיב מומלץ:** `documentation/reports/05-REPORTS/artifacts_SESSION_01/S002_P002_G3.7_EVIDENCE_VALIDATION_PROTOCOL_v1.0.0.md` (או בתיקיית `_COMMUNICATION/team_90/` אם מתאים לארגון התקשורת).
+- **Deliverable 2 — דוח השלמה ל־Team 10:** אישור שהפרוטוקול הוגדר והיכן מפורסם (artifact_path); תגובה פורמלית.
+  - **שם מומלץ:** `TEAM_90_TO_TEAM_10_S002_P002_G3.7_EVIDENCE_VALIDATION_PROTOCOL_COMPLETION_v1.0.0.md`.
+  - **מיקום מומלץ:** `_COMMUNICATION/team_90/` או `documentation/reports/05-REPORTS/artifacts_SESSION_01/`.
+  - **תוכן מינימלי:** program_id S002-P002, gate_id GATE_3_PREPARATION (G3.7), artifact_path לפרוטוקול, status (COMPLETE), date.
+
+**Exit criterion (מתוך תוכנית הביצוע):** Protocol defined and communicated to Team 10.
 
 ---
 
 ## 4) Sequencing
 
-This mandate is **unlocked after G3.5 PASS** (automation and runtime readiness). Team 10 may request Team 90 to define the protocol in parallel with or after G3.6 (Team 50 hybrid QA) so that checkpoints are ready before GATE_5 submission (G3.7 step).
+This mandate is **unlocked after G3.5 PASS** (automation and runtime readiness). **G3.5 and G3.6 are PASS**; Team 90 may define the protocol so that checkpoints are ready before GATE_5 submission (G3.7 step).
 
 ---
 
-## 5) Reference
+## 5) Reference (מקורות)
 
-- Execution plan: `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P002_MCP_QA_TRANSITION_GATE3_EXECUTION_PLAN_v1.0.0.md` (G3.7 step).
+| נושא | נתיב |
+|------|------|
+| Execution plan (G3.7) | `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P002_MCP_QA_TRANSITION_GATE3_EXECUTION_PLAN_v1.0.0.md` |
+| G3.5 sign-off | `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P002_G3.5_CHECKPOINT_SIGNOFF_v1.0.0.md` |
+| G3.6 sign-off | `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_S002_P002_G3.6_CHECKPOINT_SIGNOFF_v1.0.0.md` |
+| Evidence Contract (in plan) | §3 in execution plan above |
+| דוגמת evidence חתום (G3.6) | `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_S002_P002_G3.6_MATERIALIZATION_EVIDENCE.json` |
+| תשתית evidence + provenance | `infrastructure/s002_p002_mcp_qa/` (generate_evidence.py, RUNTIME_IDENTITY.md, KEY_CUSTODY.md) |
 
 ---
 

@@ -76,6 +76,9 @@ const authService = {
       if (loginData.accessToken) {
         localStorage.setItem('access_token', loginData.accessToken);
         this.startProactiveRefreshScheduler();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:login'));
+        }
       }
 
       audit.log('Auth', 'Login successful', { userId: loginData.user?.externalUlids });
@@ -103,6 +106,9 @@ const authService = {
       if (registerData.accessToken) {
         localStorage.setItem('access_token', registerData.accessToken);
         this.startProactiveRefreshScheduler();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:login'));
+        }
       }
 
       audit.log('Auth', 'Register successful', { userId: registerData.user?.externalUlids });

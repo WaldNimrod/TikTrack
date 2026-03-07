@@ -69,6 +69,15 @@ echo "📍 API Docs: http://localhost:8082/docs"
 echo "=========================================="
 echo ""
 
+# Load api/.env into shell environment so os.environ in Python (e.g. SKIP_LIVE_DATA_CHECK) matches .env
+if [ -f "$API_DIR/.env" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  source "$API_DIR/.env"
+  set +a
+  echo -e "${GREEN}✅ Loaded api/.env into environment${NC}"
+fi
+
 # Change to project root and run with api.main:app to handle relative imports
 cd "$PROJECT_ROOT"
 PYTHONPATH="$API_DIR:$PYTHONPATH" uvicorn api.main:app --reload --host 0.0.0.0 --port 8082

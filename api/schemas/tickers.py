@@ -58,6 +58,7 @@ class TickerUpdateRequest(BaseModel):
     ticker_type: Optional[str] = Field(None)
     status: Optional[str] = Field(None, description="pending|active|inactive|cancelled")
     is_active: Optional[bool] = Field(None)
+    exchange_id: Optional[str] = Field(None, description="Exchange ULID (בורסה); when changed, provider validation runs")
 
     @field_validator("status")
     @classmethod

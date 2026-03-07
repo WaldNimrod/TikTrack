@@ -13,7 +13,20 @@
   let pollTimer = null;
   let dropdownEl = null;
 
+  /**
+   * GATE_4 R2: Do NOT call notifications API when guest (no token).
+   * Prevents 401 SEVERE errors — API correctly returns 401 for unauthenticated requests.
+   */
+  function hasAuthToken() {
+    const t = localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
+      sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken');
+    return !!(t && t.trim());
+  }
+
   async function fetchNotifications() {
+    if (!hasAuthToken()) {
+      return { items: [], count: 0 };
+    }
     try {
       const { default: sharedServices } = await import('./sharedServices.js');
       await sharedServices.init();

@@ -1,11 +1,11 @@
 # Gate A QA Report
-**Date:** 2026-03-07T01:33:21.341Z
+**Date:** 2026-03-07T22:10:14.943Z
 **Source:** tests/gate-a-e2e.test.js
 
 ## Results
-- Passed: 6
-- Failed: 3
-- Skipped: 2
+- Passed: 11
+- Failed: 0
+- Skipped: 0
 
 ## Scenarios Tested (SSOT/ADR-013 aligned)
 1. Type B (Home): Guest stays on Home (no redirect), sees Guest Container only — independent of public_routes

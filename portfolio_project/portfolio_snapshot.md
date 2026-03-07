@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-07T01:25:04.953014+00:00`
+- Generated (UTC): `2026-03-07T22:43:11.704078+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
 - active_work_package_id: `NONE`
-- current_gate: `GATE_3_PREPARATION (S002-P002 intake)`
-- next_required_action: `Team 10: verify S002-P002 activation triggers (GATE_8 PASS confirmed; S002-P002 spec chain open per Team 190; WSM synced to S002-P002). Then issue first-cycle mandate set per TEAM_190_TO_TEAM_10_S002_P002_MCP_QA_TRANSITION_ACTIVATION_PROMPT_v1.0.0.md.`
+- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
+- next_required_action: `Team 00/Team 100 return GATE_6 architectural decision for S002-P002; Team 90 then updates WSM and triggers GATE_7 if approved.`
 
 ## Portfolio Counts
 

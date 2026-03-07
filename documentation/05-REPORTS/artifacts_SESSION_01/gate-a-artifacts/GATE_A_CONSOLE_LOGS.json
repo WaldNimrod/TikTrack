@@ -2,756 +2,981 @@
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847138908
+    "timestamp": 1772921348153
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847138916
+    "timestamp": 1772921348160
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847138918
+    "timestamp": 1772921348162
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847138928
+    "timestamp": 1772921348170
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847138928
+    "timestamp": 1772921348170
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847138928
+    "timestamp": 1772921348171
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847140461
+    "timestamp": 1772921349703
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847140461
+    "timestamp": 1772921349703
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847140461
+    "timestamp": 1772921349703
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847140660
+    "timestamp": 1772921349849
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Fetch failed (network error):\" Object",
-    "timestamp": 1772847144182
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921353351
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] POST request failed:\" Object",
-    "timestamp": 1772847144182
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921353351
   },
   {
-    "level": "SEVERE",
-    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failure\" Error: Network error: Failed to fetch\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js?t=1772841226629:453:30)\n    at async Object.login (http://127.0.0.1:8080/src/cub",
-    "timestamp": 1772847144182
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921353351
   },
   {
-    "level": "SEVERE",
-    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][ErrorHandler] ERROR: Network/CORS error\" Error: Network error: Failed to fetch\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js?t=1772841226629:453:30)\n    at async Object.login (http://127.0.0.1",
-    "timestamp": 1772847144183
-  },
-  {
-    "level": "SEVERE",
-    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failed\" Object",
-    "timestamp": 1772847144183
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921353351
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847144193
+    "timestamp": 1772921353367
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847144199
+    "timestamp": 1772921353372
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847144200
+    "timestamp": 1772921353379
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847144208
+    "timestamp": 1772921353385
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847144208
+    "timestamp": 1772921353385
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921356392
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921356392
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921356393
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921356393
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921356393
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921356394
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921359452
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921359456
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921359457
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921359464
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921359464
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847144209
+    "timestamp": 1772921359464
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847146216
+    "timestamp": 1772921361471
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847146217
+    "timestamp": 1772921361471
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847146217
+    "timestamp": 1772921361471
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847149263
+    "timestamp": 1772921364533
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847149268
+    "timestamp": 1772921364540
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847149269
+    "timestamp": 1772921364540
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847149277
+    "timestamp": 1772921364548
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847149277
+    "timestamp": 1772921364548
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847149278
+    "timestamp": 1772921364548
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847151285
+    "timestamp": 1772921366554
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847151285
+    "timestamp": 1772921366554
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847151285
+    "timestamp": 1772921366554
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847151285
+    "timestamp": 1772921366554
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847154368
+    "timestamp": 1772921369634
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847154376
+    "timestamp": 1772921369641
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847154381
+    "timestamp": 1772921369642
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847154392
+    "timestamp": 1772921369649
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847154392
+    "timestamp": 1772921369649
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847154392
+    "timestamp": 1772921369649
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847156397
+    "timestamp": 1772921371656
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847156398
+    "timestamp": 1772921371656
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847159772
+    "timestamp": 1772921375620
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[UAI] Starting initialization...\" Object",
-    "timestamp": 1772847159773
+    "timestamp": 1772921375620
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"✅ CSS Load Order Verified\"",
-    "timestamp": 1772847159774
+    "timestamp": 1772921375621
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[DOM Stage] ✅ CSS Load Order Verified\" Object",
-    "timestamp": 1772847159774
+    "timestamp": 1772921375621
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Trading Accounts Data Loader] Guest detected, skipping loadAllContainers\"",
-    "timestamp": 1772847159776
+    "timestamp": 1772921375622
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: accountsTable\"",
-    "timestamp": 1772847159776
+    "timestamp": 1772921375623
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: accountActivityTable\"",
-    "timestamp": 1772847159777
+    "timestamp": 1772921375623
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[PhoenixTableSortManager] Initialized for table: positionsTable\"",
-    "timestamp": 1772847159777
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847159779
+    "timestamp": 1772921375623
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847159779
+    "timestamp": 1772921375626
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: Initializing Auth Guard\" Object",
-    "timestamp": 1772847159780
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.624Z] Auth Guard: Initializing Auth Guard\" Object",
+    "timestamp": 1772921375626
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: DOM already ready, running check\"",
-    "timestamp": 1772847159780
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: Running authentication check\"",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: localStorage is accessible\"",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: Checking page access\" Object",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.780Z] Auth Guard: Checking authentication\" Object",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.781Z] Auth Guard: Type C (Auth-only) page detected\" Object",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.781Z] Auth Guard: User not authenticated for Type C page\" Object",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T01:32:39.781Z] Auth Guard: Redirecting to Home (Type C: Auth-only)\" Object",
-    "timestamp": 1772847159781
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847159805
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: DOM already ready, running check\"",
+    "timestamp": 1772921375626
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847159811
+    "timestamp": 1772921375626
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847159813
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847159819
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847159819
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: Running authentication check\"",
+    "timestamp": 1772921375626
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847164829
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 102:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: localStorage is accessible\"",
+    "timestamp": 1772921375626
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: Checking page access\" Object",
+    "timestamp": 1772921375626
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: Checking authentication\" Object",
+    "timestamp": 1772921375626
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: Type C (Auth-only) page detected\" Object",
+    "timestamp": 1772921375626
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: User not authenticated for Type C page\" Object",
+    "timestamp": 1772921375626
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 100:12 \"[2026-03-07T22:09:35.625Z] Auth Guard: Redirecting to Home (Type C: Auth-only)\" Object",
+    "timestamp": 1772921375626
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847164830
+    "timestamp": 1772921375630
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847164830
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[UAI] DOM stage completed\"",
+    "timestamp": 1772921375631
   },
   {
     "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847164830
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Bridge Stage] PhoenixBridge initialized successfully\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[UAI] Bridge stage completed\"",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Data Stage] User not authenticated, skipping data loading\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[UAI] Data stage completed\"",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Render Stage] Components identified:\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Render Stage] Table init function not found for:\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Render Stage] Rendering completed\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[UAI] Render stage completed\"",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Ready Stage] Initialization finalized\" Object",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Ready Stage] Page ready signal emitted\"",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[UAI] Ready stage completed\"",
+    "timestamp": 1772921375632
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[UAI] Initialization completed successfully\" Object",
+    "timestamp": 1772921375632
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847164875
+    "timestamp": 1772921375642
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847164878
+    "timestamp": 1772921375649
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847164881
+    "timestamp": 1772921375651
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847164889
+    "timestamp": 1772921375657
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847164889
+    "timestamp": 1772921375657
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921380664
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921380664
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921380665
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921380681
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921380686
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921380689
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921380697
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921380697
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847164890
+    "timestamp": 1772921380699
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847166401
+    "timestamp": 1772921382206
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847166401
+    "timestamp": 1772921382206
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847166401
+    "timestamp": 1772921382206
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847166489
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847170026
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847170032
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847170037
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847170044
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847170044
+    "timestamp": 1772921385786
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847173555
+    "timestamp": 1772921385787
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921385787
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847173555
+    "timestamp": 1772921385787
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847173555
+    "timestamp": 1772921385788
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921385807
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921385813
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921385814
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921385820
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921385820
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921389322
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921389323
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921389323
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921389323
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921389324
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921389324
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921389355
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921389360
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921389361
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921389369
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921389369
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
+    "timestamp": 1772921389369
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921390875
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921390875
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
+    "timestamp": 1772921390875
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
+    "timestamp": 1772921390875
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921395060
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921395060
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921395060
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921395062
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921395062
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921395088
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921395095
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921395103
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921395110
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921395111
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399112
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921399113
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399113
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399114
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399114
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399115
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921399115
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"Phoenix Header Loader: Header already exists. Skipping load.\"",
-    "timestamp": 1772847173556
+    "timestamp": 1772921399116
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847173556
+    "timestamp": 1772921399116
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847173607
+    "timestamp": 1772921399143
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847173609
+    "timestamp": 1772921399148
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847173609
+    "timestamp": 1772921399149
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847173615
+    "timestamp": 1772921399155
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847173615
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847173616
+    "timestamp": 1772921399155
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847175123
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847175123
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847175123
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/register - [DOM] Input elements should have autocomplete attributes (suggested: \"new-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847175123
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847179350
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847179394
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847179398
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847179402
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847179410
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847179410
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847181918
+    "timestamp": 1772921401665
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847181919
+    "timestamp": 1772921401665
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847181919
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847181920
+    "timestamp": 1772921401666
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847181956
+    "timestamp": 1772921401697
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847181963
+    "timestamp": 1772921401702
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847181967
+    "timestamp": 1772921401702
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847181976
+    "timestamp": 1772921401708
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847181976
+    "timestamp": 1772921401708
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"Phoenix Header Loader: Auth page detected, skipping header load.\" Object",
-    "timestamp": 1772847181979
+    "timestamp": 1772921401708
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847183488
+    "timestamp": 1772921401715
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847183489
+    "timestamp": 1772921403219
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/login - [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
-    "timestamp": 1772847183489
+    "timestamp": 1772921403219
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847183574
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847187111
-  },
-  {
-    "level": "DEBUG",
-    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847187117
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847187117
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847187125
-  },
-  {
-    "level": "WARNING",
-    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847187125
+    "timestamp": 1772921406787
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847190132
+    "timestamp": 1772921406788
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921406788
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847190133
+    "timestamp": 1772921406790
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847190133
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847190134
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Fetch failed (network error):\" Object",
-    "timestamp": 1772847196226
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] GET request failed:\" Object",
-    "timestamp": 1772847196226
+    "timestamp": 1772921406790
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847196237
+    "timestamp": 1772921406816
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847196242
+    "timestamp": 1772921406822
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847196249
+    "timestamp": 1772921406825
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847196257
+    "timestamp": 1772921406834
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847196257
+    "timestamp": 1772921406834
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847199264
+    "timestamp": 1772921409837
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921409838
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921409838
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847199265
+    "timestamp": 1772921409838
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847199265
+    "timestamp": 1772921409838
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847199266
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Fetch failed (network error):\" Object",
-    "timestamp": 1772847199296
-  },
-  {
-    "level": "INFO",
-    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] GET request failed:\" Object",
-    "timestamp": 1772847199296
+    "timestamp": 1772921409838
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
-    "timestamp": 1772847199312
+    "timestamp": 1772921409863
   },
   {
     "level": "DEBUG",
     "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
-    "timestamp": 1772847199314
+    "timestamp": 1772921409868
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
-    "timestamp": 1772847199314
+    "timestamp": 1772921409869
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
-    "timestamp": 1772847199321
+    "timestamp": 1772921409874
   },
   {
     "level": "WARNING",
     "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
-    "timestamp": 1772847199321
+    "timestamp": 1772921409874
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847199329
+    "timestamp": 1772921412884
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
-    "timestamp": 1772847201334
+    "timestamp": 1772921412884
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847201335
+    "timestamp": 1772921412884
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 494:8 \"[vite] connecting...\"",
+    "timestamp": 1772921412916
+  },
+  {
+    "level": "DEBUG",
+    "message": "http://127.0.0.1:8080/@vite/client 617:14 \"[vite] connected.\"",
+    "timestamp": 1772921412922
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/chunk-PJEEZAML.js?v=62de2260 21550:24 \"%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools\" \"font-weight:bold\"",
+    "timestamp": 1772921412923
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see http",
+    "timestamp": 1772921412929
+  },
+  {
+    "level": "WARNING",
+    "message": "http://127.0.0.1:8080/node_modules/.vite/deps/react-router-dom.js?v=62de2260 4435:12 \"⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactroute",
+    "timestamp": 1772921412929
   },
   {
     "level": "INFO",
     "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
-    "timestamp": 1772847201335
+    "timestamp": 1772921414936
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 76:12 \"[Header Loader] Header inserted before .page-wrapper (via parentNode)\"",
+    "timestamp": 1772921414937
+  },
+  {
+    "level": "INFO",
+    "message": "http://127.0.0.1:8080/src/utils/maskedLog.js 74:12 \"[Shared Services] Initialized:\" Object",
+    "timestamp": 1772921414937
   }
 ]

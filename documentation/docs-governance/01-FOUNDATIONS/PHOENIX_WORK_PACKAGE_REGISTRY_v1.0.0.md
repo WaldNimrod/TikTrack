@@ -40,11 +40,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_6 (SUBMITTED_AWAITING_DECISION) | true | S002-P003; GATE_5 re-validation passed (v1.2.0); Team 90 submitted `SUBMISSION_v1.4.0` to Team 00/Team 100 and awaits decision |
+| S002-P003 | S002-P003-WP002 | IN_PROGRESS | GATE_7 (HUMAN_SIGNOFF_ACTIVE) | true | S002-P003; GATE_6 approved; Team 90 activated Nimrod Option C browser sign-off scenarios |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_6 (SUBMITTED_AWAITING_DECISION)`, `active_work_package_id=S002-P003-WP002`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_7 (HUMAN_SIGNOFF_ACTIVE)`, `active_work_package_id=S002-P003-WP002`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-06). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
@@ -63,3 +63,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G5_BLOCKED_REMEDIATION_INCOMPLETE_SYNCED_TO_WSM | 2026-03-06**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G5_PASS_GATE6_ROUTING_PREPARATION_ACTIVE_SYNCED_TO_WSM | 2026-03-06**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G6_SUBMITTED_AWAITING_DECISION_SYNCED_TO_WSM | 2026-03-06**
+**log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G6_APPROVED_GATE7_HUMAN_SIGNOFF_ACTIVE_SYNCED_TO_WSM | 2026-03-06**

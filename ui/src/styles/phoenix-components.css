@@ -1660,21 +1660,23 @@ a.linked-object-badge--link:hover {
   flex-shrink: 0;
 }
 
-#alertsSummaryStats .info-summary__row--first {
+/* T50-4: אחידות סיכום מידע — הערות והתראות זהים (נתונים במרכז, כפתור בצד) */
+.info-summary--notes .info-summary__row--first,
+.info-summary--alerts .info-summary__row--first {
+  display: flex !important;
   flex-wrap: nowrap;
-  display: flex;
   align-items: center;
   justify-content: space-between;
 }
-#alertsSummaryStats .info-summary__row--first .info-summary__content {
-  flex-wrap: nowrap;
+.info-summary--notes .info-summary__row--first .info-summary__content,
+.info-summary--alerts .info-summary__row--first .info-summary__content {
   flex: 1;
-  min-width: 0;
-  justify-content: flex-start;
+  justify-content: center;
 }
-#alertsSummaryStats .portfolio-summary__toggle-btn {
+.info-summary--notes .info-summary__row--first .portfolio-summary__toggle-btn,
+.info-summary--alerts .info-summary__row--first .portfolio-summary__toggle-btn {
+  margin-inline-start: var(--spacing-md, 16px);
   flex-shrink: 0;
-  margin-inline-start: auto;
 }
 
 /* ============================================

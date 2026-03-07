@@ -44,9 +44,9 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P003`, `current_gate=GATE_8`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_3_PREPARATION`, `active_work_package_id=NONE`. S002-P003-WP002 closed at GATE_8 (2026-03-07).
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-07). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-07 by Team 10). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 
@@ -64,3 +64,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G5_PASS_GATE6_ROUTING_PREPARATION_ACTIVE_SYNCED_TO_WSM | 2026-03-06**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G6_SUBMITTED_AWAITING_DECISION_SYNCED_TO_WSM | 2026-03-06**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P003_WP002_G6_APPROVED_GATE7_HUMAN_SIGNOFF_ACTIVE_SYNCED_TO_WSM | 2026-03-06**
+**log_entry | TEAM_10 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_POST_GATE8_S002_P002_ACTIVE_NO_ACTIVE_WP | 2026-03-07**

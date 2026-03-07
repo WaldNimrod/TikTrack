@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-07** — Team 70 closure package validated by Team 90; GATE_8 PASS recorded and S002-P003-WP002 lifecycle closed.
+**Gate-owner update evidence:** This block was updated **2026-03-07** by **Team 10** — post GATE_8 PASS S002-P003-WP002; synchronization to next authorized program S002-P002 (MCP-QA Transition) per Team 190 GATE_2 approval and activation prompt.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_8 PASS; DOCUMENTATION_CLOSED for S002-P003-WP002 |
-| active_project_domain | TIKTRACK |
+| active_flow | S002-P003 closed at GATE_8; **next authorized program:** S002-P002 (MCP-QA Transition; GATE_2 approved by Team 190) |
+| active_project_domain | SHARED (TIKTRACK + AGENTS_OS) for S002-P002; TIKTRACK for closed S002-P003 |
 | active_work_package_id | NONE |
 | in_progress_work_package_id | NONE |
 | last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; **domain: TIKTRACK**) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_8 |
+| allowed_gate_range | GATE_3_PREPARATION (S002-P002); execution GATE_3..GATE_8 when triggers satisfied |
+| current_gate | GATE_3_PREPARATION (S002-P002 intake) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| active_program_id | S002-P003 |
+| active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 routing owner) |
-| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED \| 2026-03-07 \| Team 90 issued GATE_8 PASS after Team 70 validation request \| TEAM_90_TO_TEAM_70_S002_P003_WP002_GATE8_VALIDATION_RESPONSE.md |
-| next_required_action | Team 10 and Team 90 coordinate next authorized roadmap activation after S002-P003 closure (no open execution WP in progress). |
-| next_responsible_team | Team 90 (gate owner state management) + Team 10 (next intake coordination) |
+| phase_owner_team | Team 10 (GATE_3_PREPARATION owner; next: verify triggers, issue first-cycle mandates) |
+| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED \| 2026-03-07 \| Team 90 → Team 10 GATE_8 validation report; S002-P003-WP002 lifecycle COMPLETE \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE8_VALIDATION_REPORT.md |
+| next_required_action | Team 10: verify S002-P002 activation triggers (GATE_8 PASS confirmed; S002-P002 spec chain open per Team 190; WSM synced to S002-P002). Then issue first-cycle mandate set per TEAM_190_TO_TEAM_10_S002_P002_MCP_QA_TRANSITION_ACTIVATION_PROMPT_v1.0.0.md. |
+| next_responsible_team | Team 10 (Gateway Orchestration; WSM/SSM updater; S002-P002 activation owner) |
 
 ---
 
@@ -233,6 +233,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | NIMROD | GATE_7 | S002_P003_WP002 | PASS | HUMAN_SIGNOFF_APPROVED | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P003-WP002; GATE_8 activated and Team 70 execution requested | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P003-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-07**
+**log_entry | TEAM_10 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | post GATE_8 S002-P003-WP002; active_program_id → S002-P002; next_required_action S002-P002 activation triggers + first-cycle mandates per Team 190 prompt | 2026-03-07**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

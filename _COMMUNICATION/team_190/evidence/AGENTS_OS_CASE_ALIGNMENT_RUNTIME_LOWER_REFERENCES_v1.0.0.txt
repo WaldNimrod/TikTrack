@@ -1,0 +1,77 @@
+./agents_os/orchestrator/validation_runner.py:11:from agents_os.validators.base.validator_base import ExitCode, ValidatorResult
+./agents_os/orchestrator/validation_runner.py:12:from agents_os.validators.base.response_generator import generate_response
+./agents_os/orchestrator/validation_runner.py:13:from agents_os.validators.spec.tier1_identity_header import Tier1IdentityHeaderValidator
+./agents_os/orchestrator/validation_runner.py:14:from agents_os.validators.spec.tier2_section_structure import Tier2SectionStructureValidator
+./agents_os/orchestrator/validation_runner.py:15:from agents_os.validators.spec.tier3_gate_model import Tier3GateModelValidator
+./agents_os/orchestrator/validation_runner.py:16:from agents_os.validators.spec.tier4_wsm_alignment import Tier4WsmAlignmentValidator
+./agents_os/orchestrator/validation_runner.py:17:from agents_os.validators.spec.tier5_domain_isolation import Tier5DomainIsolationValidator
+./agents_os/orchestrator/validation_runner.py:18:from agents_os.validators.spec.tier6_package_completeness import Tier6PackageCompletenessValidator
+./agents_os/orchestrator/validation_runner.py:19:from agents_os.validators.spec.tier7_lod200_traceability import Tier7Lod200TraceabilityValidator
+./agents_os/orchestrator/validation_runner.py:20:from agents_os.validators.execution.tier_e1_work_plan import TierE1WorkPlanValidator
+./agents_os/orchestrator/validation_runner.py:21:from agents_os.validators.execution.tier_e2_code_quality import TierE2CodeQualityValidator
+./agents_os/orchestrator/validation_runner.py:22:from agents_os.llm_gate.quality_judge import quality_judge
+./agents_os/orchestrator/validation_runner.py:27:    while p.name and p.name != "agents_os":
+./agents_os/orchestrator/validation_runner.py:29:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/llm_gate/quality_judge.py:8:from agents_os.validators.base.validator_base import ExitCode
+./agents_os/validators/base/__init__.py:7:from agents_os.validators.base.message_parser import parse_message
+./agents_os/validators/base/__init__.py:8:from agents_os.validators.base.validator_base import ValidatorBase, ExitCode
+./agents_os/validators/base/response_generator.py:8:from agents_os.validators.base.validator_base import ExitCode, ValidatorResult
+./agents_os/validators/base/wsm_state_reader.py:16:    while p.name and p.name != "agents_os":
+./agents_os/validators/base/wsm_state_reader.py:18:    if p.name == "agents_os":
+./agents_os/validators/execution/tier_e2_code_quality.py:12:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/execution/tier_e2_code_quality.py:20:    while p.name and p.name != "agents_os":
+./agents_os/validators/execution/tier_e2_code_quality.py:22:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/validators/execution/tier_e2_code_quality.py:27:    agents = root / "agents_os"
+./agents_os/validators/execution/tier_e2_code_quality.py:48:    agents = root / "agents_os"
+./agents_os/validators/execution/tier_e1_work_plan.py:9:from agents_os.validators.base.message_parser import parse_message
+./agents_os/validators/execution/tier_e1_work_plan.py:10:from agents_os.validators.base.wsm_state_reader import read_wsm_state
+./agents_os/validators/execution/tier_e1_work_plan.py:11:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/execution/tier_e1_work_plan.py:21:    while p.name and p.name != "agents_os":
+./agents_os/validators/execution/tier_e1_work_plan.py:23:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/validators/spec/tier4_wsm_alignment.py:8:from agents_os.validators.base.message_parser import parse_message
+./agents_os/validators/spec/tier4_wsm_alignment.py:9:from agents_os.validators.base.wsm_state_reader import read_wsm_state
+./agents_os/validators/spec/tier4_wsm_alignment.py:10:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier5_domain_isolation.py:10:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier5_domain_isolation.py:17:    while p.name and p.name != "agents_os":
+./agents_os/validators/spec/tier5_domain_isolation.py:19:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/validators/spec/tier5_domain_isolation.py:25:    agents_dir = root / "agents_os"
+./agents_os/validators/spec/tier5_domain_isolation.py:55:        agents = root / "agents_os"
+./agents_os/validators/spec/tier6_package_completeness.py:9:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier7_lod200_traceability.py:8:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier3_gate_model.py:9:from agents_os.validators.base.message_parser import parse_message
+./agents_os/validators/spec/tier3_gate_model.py:10:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/README.md:32:- **Tests:** `python3 -m pytest agents_os/tests/` — 18 tests.
+./agents_os/validators/spec/tier1_identity_header.py:9:from agents_os.validators.base.message_parser import parse_message, ParsedMessage
+./agents_os/validators/spec/tier1_identity_header.py:10:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier2_section_structure.py:9:from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
+./agents_os/validators/spec/tier2_section_structure.py:17:    while p.name and p.name != "agents_os":
+./agents_os/validators/spec/tier2_section_structure.py:19:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/tests/test_validator_stub.py:14:from agents_os.validators.validator_stub import run_validation_stub
+./agents_os/tests/execution/test_tier_e1.py:4:from agents_os.validators.execution.tier_e1_work_plan import TierE1WorkPlanValidator
+./agents_os/tests/execution/test_tier_e2.py:4:from agents_os.validators.execution.tier_e2_code_quality import TierE2CodeQualityValidator
+./agents_os/tests/spec/test_base.py:4:from agents_os.validators.base.message_parser import parse_message
+./agents_os/tests/spec/test_base.py:5:from agents_os.validators.base.validator_base import ValidatorBase, ExitCode, ValidatorResult
+./agents_os/tests/spec/test_base.py:6:from agents_os.validators.base.response_generator import generate_response
+./agents_os/tests/spec/test_base.py:7:from agents_os.validators.base.seal_generator import generate_seal
+./agents_os/tests/spec/test_base.py:8:from agents_os.validators.base.wsm_state_reader import read_wsm_state
+./agents_os/tests/spec/test_tier1.py:4:from agents_os.validators.spec.tier1_identity_header import Tier1IdentityHeaderValidator
+./agents_os/tests/spec/test_validation_runner.py:6:from agents_os.orchestrator.validation_runner import run_spec_validation
+./agents_os/tests/spec/test_validation_runner.py:11:    while p.name and p.name != "agents_os":
+./agents_os/tests/spec/test_validation_runner.py:13:    return p.parent if p.name == "agents_os" else Path.cwd()
+./agents_os/tests/spec/test_llm_gate.py:4:from agents_os.llm_gate.quality_judge import quality_judge
+./agents_os/tests/spec/test_llm_gate.py:5:from agents_os.validators.base.validator_base import ExitCode
+./agents_os/tests/spec/test_tier3_tier7.py:4:from agents_os.validators.spec.tier3_gate_model import Tier3GateModelValidator
+./agents_os/tests/spec/test_tier3_tier7.py:5:from agents_os.validators.spec.tier5_domain_isolation import Tier5DomainIsolationValidator
+./agents_os/tests/spec/test_tier3_tier7.py:6:from agents_os.validators.spec.tier7_lod200_traceability import Tier7Lod200TraceabilityValidator
+./_COMMUNICATION/team_10/TEAM_10_GATE4_QA_ACTIVATION_REFERENCE.md:60:- **Test scenarios:** (1) `python3 -m pytest agents_os/tests/ -v` → כל הטסטים ירוקים; (2) `python3 -m agents_os.orchestrator.validation_runner _COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_LLD400_v1.0.0.md` → אימות פלט; (3) אימות שאין import מ־TikTrack.
+./_COMMUNICATION/_ARCHITECT_INBOX/AGENT_OS_PHASE_2/INFRASTRUCTURE_STAGE_2/S002_P001_WP002_EXECUTION_APPROVAL/SUBMISSION_v1.0.0/VALIDATION_REPORT.md:43:- `python3 -m pytest agents_os/tests/ -q` -> `25 passed`
+./_COMMUNICATION/team_170/AGENTS_OS_CORE_VALIDATION_ENGINE_WP002_LLD400_v1.0.0.md:183:| E-09 | Test Suite Green | `python3 -m pytest agents_os/tests/ -q` exit 0 | exit ≠ 0 | 2 only |
+./_COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_G3_6_ACTIVATION_PROMPTS_v1.0.0.md:85:   דרישה: `python3 -m pytest agents_os/tests/ -q` exit 0 (E-09).
+./_COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_G3_6_ACTIVATION_PROMPTS_v1.0.0.md:224:**דרישה:** `python3 -m pytest agents_os/tests/ -q` חייב להסתיים ב־**exit code 0** (גם בריצה רגילה וגם בתוך validation_runner --mode=execution --phase=2).
+./_COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_G3_6_ACTIVATION_PROMPTS_v1.0.0.md:227:1. לשחזר את הכשל: להריץ `python3 -m pytest agents_os/tests/ -q` בסביבתך; לאתר טסט נכשל או timeout.
+./_COMMUNICATION/team_10/TEAM_10_S002_P001_WP002_G3_6_ACTIVATION_PROMPTS_v1.0.0.md:230:   - `python3 -m pytest agents_os/tests/ -q` — פלט מלא (exit 0).
+./_COMMUNICATION/team_100/S002_P001_WP002_EXECUTION_VALIDATOR_ARCHITECTURAL_CONCEPT_v1.0.0.md:133:| E-09 | Test Suite Green | `python3 -m pytest agents_os/tests/ -q` returns exit code 0 | Any test failure (exit code ≠ 0) |
+./_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_SYSTEM_VALIDATION_PRELAUNCH_v1.0.0.md:66:python3 -m pytest agents_os/tests/ -v --tb=short 2>&1 | tee /tmp/agents_os_test_report.txt
+./_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_SYSTEM_VALIDATION_PRELAUNCH_v1.0.0.md:85:python3 -m pytest agents_os/tests/ --co -q 2>&1 | grep "test session starts" -A 200 | tee /tmp/agents_os_test_collection.txt
+./_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_SYSTEM_VALIDATION_PRELAUNCH_v1.0.0.md:86:python3 -m pytest agents_os/tests/ --co -q 2>&1 | tail -5
+./_COMMUNICATION/_ARCHITECT_INBOX/AGENT_OS_PHASE_2/INFRASTRUCTURE_STAGE_2/S002_P001_WP001_EXECUTION_APPROVAL/SUBMISSION_v1.0.0/VALIDATION_REPORT.md:43:- `python3 -m pytest agents_os/tests/ -q` -> `19 passed`

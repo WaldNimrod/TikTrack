@@ -10,19 +10,89 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
 
 from ..models.notes import Note, NoteAttachment
+from ..models.tickers import Ticker
+from ..models.trades import Trade
+from ..models.trade_plans import TradePlan
+from ..models.trading_accounts import TradingAccount
 from ..models.enums import NoteCategory
 from ..utils.rich_text_sanitizer import sanitize_rich_text
+from ..utils.identity import ulid_to_uuid, uuid_to_ulid
 
 
-def _note_to_response(note: Note) -> dict:
+async def _resolve_parent_display_names(
+    db: AsyncSession,
+    notes: List[Note],
+    user_id: uuid.UUID,
+) -> dict:
+    """G7R Batch3: Resolve parent_id -> display name for ticker, trade, trade_plan, account."""
+    out = {}
+    ticker_ids = []
+    trade_ids = []
+    plan_ids = []
+    account_ids = []
+    for n in notes:
+        if not n.parent_id:
+            continue
+        if n.parent_type == "ticker":
+            ticker_ids.append(n.parent_id)
+        elif n.parent_type == "trade":
+            trade_ids.append(n.parent_id)
+        elif n.parent_type == "trade_plan":
+            plan_ids.append(n.parent_id)
+        elif n.parent_type == "account":
+            account_ids.append(n.parent_id)
+    if ticker_ids:
+        stmt = select(Ticker.id, Ticker.symbol).where(Ticker.id.in_(ticker_ids))
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("ticker", row[0])] = row[1] or str(row[0])
+    if trade_ids:
+        stmt = (
+            select(Trade.id, Ticker.symbol, Trade.direction)
+            .join(Ticker, Trade.ticker_id == Ticker.id)
+            .where(Trade.id.in_(trade_ids), Trade.user_id == user_id)
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade", row[0])] = f"{row[1] or '?'} {row[2] or ''}".strip()
+    if plan_ids:
+        stmt = select(TradePlan.id, TradePlan.plan_name).where(
+            TradePlan.id.in_(plan_ids), TradePlan.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("trade_plan", row[0])] = row[1] or str(row[0])
+    if account_ids:
+        stmt = select(TradingAccount.id, TradingAccount.account_name).where(
+            TradingAccount.id.in_(account_ids), TradingAccount.user_id == user_id
+        )
+        res = await db.execute(stmt)
+        for row in res.all():
+            out[("account", row[0])] = row[1] or str(row[0])
+    return out
+
+
+def _note_to_response(
+    note: Note,
+    linked_entity_display: Optional[str] = None,
+    attachment_count: Optional[int] = None,
+) -> dict:
+    """G7R Batch3: linked_entity_display (BF-G7-012); attachment_count (BF-G7-023)."""
+    if note.parent_type == "datetime" and getattr(note, "parent_datetime", None) and not linked_entity_display:
+        dt_val = note.parent_datetime
+        linked_entity_display = dt_val.strftime("%Y-%m-%d %H:%M UTC") if hasattr(dt_val, "strftime") else str(dt_val)
     tags_val = note.tags
     if tags_val is not None and not isinstance(tags_val, list):
         tags_val = list(tags_val) if tags_val else None
+    count = attachment_count if attachment_count is not None else len(getattr(note, "attachments", []))
     return {
         "id": str(note.id),
         "user_id": str(note.user_id),
         "parent_type": note.parent_type,
-        "parent_id": str(note.parent_id) if note.parent_id else None,
+        "parent_id": uuid_to_ulid(note.parent_id) if note.parent_id else None,
+        "parent_datetime": getattr(note, "parent_datetime", None),
+        "linked_entity_display": linked_entity_display,
+        "attachment_count": count,
         "title": note.title,
         "content": note.content,
         "category": (
@@ -61,13 +131,34 @@ class NotesService:
             conditions.append(Note.parent_type == parent_type)
         if parent_id:
             try:
-                conditions.append(Note.parent_id == uuid.UUID(parent_id))
-            except ValueError:
-                pass
+                pid_uuid = ulid_to_uuid(str(parent_id).strip())
+                if pid_uuid is not None:
+                    conditions.append(Note.parent_id == pid_uuid)
+            except (ValueError, TypeError):
+                try:
+                    conditions.append(Note.parent_id == uuid.UUID(str(parent_id).strip()))
+                except (ValueError, TypeError):
+                    pass
         stmt = select(Note).where(and_(*conditions)).order_by(Note.created_at.desc())
         result = await db.execute(stmt)
         notes = result.scalars().all()
-        return [_note_to_response(n) for n in notes]
+        note_ids = [n.id for n in notes]
+        count_subq = (
+            select(NoteAttachment.note_id, func.count(NoteAttachment.id).label("cnt"))
+            .where(NoteAttachment.note_id.in_(note_ids))
+            .group_by(NoteAttachment.note_id)
+        )
+        count_res = await db.execute(count_subq)
+        count_map = {row[0]: row[1] for row in count_res.all()}
+        display_map = await _resolve_parent_display_names(db, notes, user_id) if notes else {}
+        return [
+            _note_to_response(
+                n,
+                linked_entity_display=display_map.get((n.parent_type, n.parent_id)) if n.parent_id else None,
+                attachment_count=count_map.get(n.id, 0),
+            )
+            for n in notes
+        ]
 
     async def get_note(
         self,
@@ -84,7 +175,11 @@ class NotesService:
         )
         result = await db.execute(stmt)
         note = result.scalar_one_or_none()
-        return _note_to_response(note) if note else None
+        if not note:
+            return None
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def create_note(
         self,
@@ -99,10 +194,48 @@ class NotesService:
 
         parent_id = None
         if data.get("parent_id"):
+            pid_str = str(data["parent_id"]).strip()
+            if pid_str:
+                try:
+                    parent_id = ulid_to_uuid(pid_str)
+                except Exception:
+                    try:
+                        parent_id = uuid.UUID(pid_str)
+                    except (ValueError, TypeError):
+                        pass
+
+        parent_type_val = (data.get("parent_type") or "ticker").lower()
+        if parent_type_val == "general":
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(status_code=422, detail="parent_type 'general' is not allowed", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+        if parent_type_val not in ("trade", "trade_plan", "ticker", "account", "datetime"):
+            parent_type_val = "ticker"
+
+        parent_datetime_val = data.get("parent_datetime")
+        if parent_datetime_val and isinstance(parent_datetime_val, str):
             try:
-                parent_id = uuid.UUID(data["parent_id"])
+                parent_datetime_val = datetime.fromisoformat(parent_datetime_val.replace("Z", "+00:00"))
             except (ValueError, TypeError):
-                pass
+                parent_datetime_val = None
+
+        if parent_type_val == "datetime" and not parent_datetime_val:
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="parent_datetime required when parent_type=datetime",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        if parent_type_val != "datetime" and data.get("parent_datetime"):
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="parent_datetime not allowed when parent_type is entity",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
+        # BF-G7-017: entity types require parent_id
+        if parent_type_val in ("ticker", "trade", "trade_plan", "account") and not parent_id:
+            from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+            raise HTTPExceptionWithCode(status_code=422, detail=f"parent_id required when parent_type is {parent_type_val}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
 
         cat_val = (data.get("category") or "GENERAL").upper()
         if cat_val not in ("TRADE", "PSYCHOLOGY", "ANALYSIS", "GENERAL"):
@@ -115,8 +248,9 @@ class NotesService:
 
         note = Note(
             user_id=user_id,
-            parent_type=data.get("parent_type", "general"),
-            parent_id=parent_id,
+            parent_type=parent_type_val,
+            parent_id=parent_id if parent_type_val != "datetime" else None,
+            parent_datetime=parent_datetime_val if parent_type_val == "datetime" else None,
             title=data.get("title"),
             content=sanitized,
             category=category,
@@ -128,7 +262,9 @@ class NotesService:
         db.add(note)
         await db.flush()
         await db.refresh(note)
-        return _note_to_response(note)
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def update_note(
         self,
@@ -149,6 +285,42 @@ class NotesService:
         if not note:
             return None
 
+        # BF-G7-018: Apply linked_entity change (parent_type, parent_id, parent_datetime)
+        if "parent_type" in data or "parent_id" in data or "parent_datetime" in data:
+            parent_type_val = (data.get("parent_type") or note.parent_type or "ticker").lower()
+            if parent_type_val not in ("trade", "trade_plan", "ticker", "account", "datetime"):
+                parent_type_val = note.parent_type or "ticker"
+            if parent_type_val == "datetime":
+                parent_datetime_val = data.get("parent_datetime")
+                if parent_datetime_val and isinstance(parent_datetime_val, str):
+                    try:
+                        parent_datetime_val = datetime.fromisoformat(parent_datetime_val.replace("Z", "+00:00"))
+                    except (ValueError, TypeError):
+                        parent_datetime_val = None
+                if not parent_datetime_val:
+                    from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                    raise HTTPExceptionWithCode(status_code=422, detail="parent_datetime required when parent_type=datetime", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+                note.parent_type = parent_type_val
+                note.parent_id = None
+                note.parent_datetime = parent_datetime_val
+            else:
+                parent_id_val = None
+                if data.get("parent_id"):
+                    pid_str = str(data["parent_id"]).strip()
+                    if pid_str:
+                        parent_id_val = ulid_to_uuid(pid_str)
+                        if parent_id_val is None:
+                            try:
+                                parent_id_val = uuid.UUID(pid_str)
+                            except (ValueError, TypeError):
+                                pass
+                if not parent_id_val:
+                    from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+                    raise HTTPExceptionWithCode(status_code=422, detail=f"parent_id required when parent_type is {parent_type_val}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+                note.parent_type = parent_type_val
+                note.parent_id = parent_id_val
+                note.parent_datetime = None
+
         if "title" in data:
             note.title = data["title"]
         if "content" in data:
@@ -166,7 +338,9 @@ class NotesService:
         note.updated_by = user_id
         await db.flush()
         await db.refresh(note)
-        return _note_to_response(note)
+        display_map = await _resolve_parent_display_names(db, [note], user_id)
+        led = display_map.get((note.parent_type, note.parent_id)) if note.parent_id else None
+        return _note_to_response(note, linked_entity_display=led)
 
     async def delete_note(
         self,
@@ -230,7 +404,7 @@ class NotesService:
             .group_by(Note.parent_type)
         )
         parent_result = (await db.execute(parent_stmt)).all()
-        notes_by_parent_type = {pt: 0 for pt in ("ticker", "trade", "trade_plan", "account", "general")}
+        notes_by_parent_type = {pt: 0 for pt in ("ticker", "trade", "trade_plan", "account")}
         for row in parent_result:
             notes_by_parent_type[row.parent_type] = row.cnt
 

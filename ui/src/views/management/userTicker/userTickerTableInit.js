@@ -9,6 +9,8 @@
 
 import sharedServices from '../../../components/core/sharedServices.js';
 import { showUserTickerAddModal } from './userTickerAddForm.js';
+import { showUserTickerEditModal } from './userTickerEditForm.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
 
@@ -126,16 +128,25 @@ const formatChangePct = (pct) => {
 
       const symbolCell = document.createElement('td');
       symbolCell.className = 'phoenix-table__cell col-symbol';
-      symbolCell.textContent = t.symbol ?? '';
+      const displayVal = (t.display_name || t.displayName || t.symbol || '').trim() || t.symbol || '';
+      symbolCell.textContent = displayVal;
       row.appendChild(symbolCell);
 
       const priceCell = document.createElement('td');
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
+      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
+      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
+        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
+        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
+      } else if (priceSource && priceSource !== 'EOD') {
+        priceSpan.title = 'מקור: ' + priceSource;
+      }
       priceCell.appendChild(priceSpan);
       row.appendChild(priceCell);
 
@@ -186,13 +197,28 @@ const formatChangePct = (pct) => {
             </svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-view" aria-label="צפה" data-ticker-id="${id}">
+            <button class="table-action-btn js-action-view" aria-label="צפה בפרטי טיקר" title="צפה בפרטי טיקר" data-ticker-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="הסר מרשימה" data-ticker-id="${id}">
+            <button class="table-action-btn js-action-note" aria-label="הוסף הערה לטיקר" title="הוסף הערה לטיקר" data-ticker-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </button>
+            <button class="table-action-btn js-action-edit" aria-label="שנה שם תצוגה" title="שנה שם תצוגה" data-ticker-id="${id}" data-edits="display_name">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="table-action-btn js-action-delete" aria-label="הסר מרשימה" title="הסר מרשימה" data-ticker-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -275,6 +301,23 @@ const formatChangePct = (pct) => {
         if (t) handleView(t);
       };
     });
+    document.querySelectorAll('.js-action-note').forEach((btn) => {
+      btn.onclick = async (e) => {
+        e.preventDefault();
+        const id = btn.getAttribute('data-ticker-id');
+        if (!id) return;
+        const { openNotesForm } = await import('../../data/notes/notesForm.js');
+        openNotesForm(null, { parent_type: 'ticker', parent_id: id });
+      };
+    });
+    document.querySelectorAll('.js-action-edit').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const id = btn.getAttribute('data-ticker-id');
+        const t = tableData.data.find((x) => (x.id || x.external_ulid) === id);
+        if (t) handleEdit(t);
+      };
+    });
     document.querySelectorAll('.js-action-delete').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
@@ -305,10 +348,36 @@ const formatChangePct = (pct) => {
 
   function handleView(ticker) {
     const sym = ticker.symbol ?? '';
+    const displayName = (ticker.display_name || ticker.displayName || '').trim() || sym;
     const name = ticker.company_name ?? ticker.companyName ?? '';
     const price = formatCurrency(ticker.current_price ?? ticker.currentPrice);
-    const msg = `${sym}${name ? ` — ${name}` : ''}\nמחיר: ${price}`;
-    alert(msg);
+    const change = formatChangePct(ticker.daily_change_pct ?? ticker.dailyChangePct);
+    const html = `
+      <div class="phoenix-form">
+        <div class="form-group"><strong>סמל:</strong> ${sym}</div>
+        ${displayName !== sym ? `<div class="form-group"><strong>שם תצוגה:</strong> ${displayName}</div>` : ''}
+        <div class="form-group"><strong>שם חברה:</strong> ${name || '—'}</div>
+        <div class="form-group"><strong>מחיר אחרון:</strong> ${price}</div>
+        <div class="form-group"><strong>שינוי יומי:</strong> ${change}</div>
+      </div>
+    `;
+    createModal({
+      title: 'פרטי טיקר',
+      content: html,
+      entity: 'user_tickers',
+      showSaveButton: false,
+      cancelButtonText: 'ביטול',
+      onClose: () => {}
+    });
+    const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
+    if (cancelBtn) cancelBtn.textContent = 'סגור';
+  }
+
+  function handleEdit(ticker) {
+    showUserTickerEditModal({
+      ticker,
+      onSuccess: () => loadAllData()
+    });
   }
 
   async function handleAdd() {
@@ -326,15 +395,31 @@ const formatChangePct = (pct) => {
   }
 
   async function handleRemove(tickerId) {
-    if (!confirm('האם להסיר את הטיקר מהרשימה שלי?')) return;
-    try {
-      await sharedServices.init();
-      await sharedServices.delete(`/me/tickers/${tickerId}`);
-      await loadAllData();
-    } catch (e) {
-      maskedLog('[UserTicker] DELETE error:', { errorCode: e?.code, status: e?.status });
-      alert('שגיאה בהסרת הטיקר מהרשימה');
-    }
+    createModal({
+      title: 'הסרת טיקר',
+      content: '<p>האם להסיר את הטיקר מהרשימה שלי?</p>',
+      entity: 'user_tickers',
+      showSaveButton: true,
+      confirmMode: true,
+      saveButtonText: 'הסרה',
+      cancelButtonText: 'ביטול',
+      onSave: async () => {
+        try {
+          await sharedServices.init();
+          await sharedServices.delete(`/me/tickers/${tickerId}`);
+          document.getElementById('phoenix-modal-backdrop')?.remove();
+          await loadAllData();
+        } catch (e) {
+          maskedLog('[UserTicker] DELETE error:', { errorCode: e?.code, status: e?.status });
+          createModal({
+            title: 'שגיאה',
+            content: '<p>שגיאה בהסרת הטיקר מהרשימה</p>',
+            showSaveButton: false,
+            cancelButtonText: 'ביטול'
+          });
+        }
+      }
+    });
   }
 
   function runInit() {

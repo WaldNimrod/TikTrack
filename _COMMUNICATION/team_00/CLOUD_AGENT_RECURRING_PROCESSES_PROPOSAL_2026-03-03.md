@@ -1,5 +1,5 @@
 # Recurring Quality Processes — Cloud Agent Proposal
-**Date:** 2026-03-03  
+**date:** 2026-03-03  
 **Source:** Cursor Cloud Agent  
 **Target:** Team 00 (Architecture) + Team 10 (Gateway)
 

@@ -15,23 +15,25 @@
       </div>
     </div>
     <div class="index-section__body">
-      <tt-section-row><div class="col-12">
-        <div class="info-summary" id="alertsSummaryStats">
-          <div class="info-summary__row info-summary__row--first">
-            <div class="info-summary__content">
-              <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
-              <div>התראות פעילות: <strong id="activeAlerts">0</strong></div>
-              <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+      <tt-section-row>
+        <div class="col-12">
+          <div class="info-summary info-summary--alerts" id="alertsSummaryStats">
+            <div class="info-summary__row info-summary__row--first info-summary__row--notes-toggle">
+              <div class="info-summary__content">
+                <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
+                <div>התראות פעילות: <strong id="activeAlerts">0</strong></div>
+                <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+              </div>
               <button class="portfolio-summary__toggle-btn" id="alertsSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
               </button>
             </div>
-          </div>
-          <div class="info-summary__row info-summary__row--second" id="alertsSummaryContent" style="display: none;">
-            <span>התראות שהופעלו: <strong id="triggeredAlerts">0</strong></span>
+            <div class="info-summary__row info-summary__row--second" id="alertsSummaryContent" style="display: none;">
+              <span>התראות שהופעלו: <strong id="triggeredAlerts">0</strong></span>
+            </div>
           </div>
         </div>
-      </div></tt-section-row>
+      </tt-section-row>
     </div>
   </tt-section>
 

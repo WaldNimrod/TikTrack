@@ -12,9 +12,11 @@ from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func, cast, String
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 import logging
 
 from ..models.tickers import Ticker
+from ..models.user_tickers import UserTicker
 from ..models.ticker_prices import TickerPrice
 from ..models.ticker_prices_intraday import TickerPriceIntraday
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
@@ -24,7 +26,108 @@ from ..schemas.tickers import TickerResponse, TickerDataIntegrityResponse
 logger = logging.getLogger(__name__)
 
 
-def _ticker_to_response(t: Ticker, price_data: Optional[Dict[str, Any]] = None) -> TickerResponse:
+# T190-Price: EOD stale threshold (hours) — beyond this, fallback to intraday
+EOD_STALE_HOURS = 48
+
+
+async def _get_price_with_fallback(
+    db: AsyncSession,
+    ticker_ids: List[uuid.UUID],
+    active_ticker_ids: Optional[set] = None,
+) -> Dict[uuid.UUID, Dict[str, Any]]:
+    """
+    T190-Price: EOD first; if stale (>48h), fallback to intraday for active tickers.
+    Returns map: ticker_id -> {current_price, daily_change_pct, price_source, price_as_of_utc}.
+    """
+    now = datetime.now(timezone.utc)
+    stale_cutoff = now.timestamp() - (EOD_STALE_HOURS * 3600)
+    out: Dict[uuid.UUID, Dict[str, Any]] = {}
+
+    # 1. EOD latest per ticker
+    latest_eod = select(
+        TickerPrice.ticker_id,
+        func.max(TickerPrice.price_timestamp).label("max_ts"),
+    ).where(TickerPrice.ticker_id.in_(ticker_ids)).group_by(TickerPrice.ticker_id).subquery()
+    eod_stmt = select(
+        TickerPrice.ticker_id,
+        TickerPrice.price,
+        TickerPrice.open_price,
+        TickerPrice.close_price,
+        TickerPrice.price_timestamp,
+    ).join(
+        latest_eod,
+        and_(
+            TickerPrice.ticker_id == latest_eod.c.ticker_id,
+            TickerPrice.price_timestamp == latest_eod.c.max_ts,
+        ),
+    )
+    eod_rows = (await db.execute(eod_stmt)).all()
+
+    need_intraday: List[uuid.UUID] = []
+    for row in eod_rows:
+        tid, price, open_p, close_p, ts = row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
+        price_val = price or Decimal("0")
+        prev = open_p or close_p or price_val
+        daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
+        ts_utc = ts.replace(tzinfo=timezone.utc) if ts and ts.tzinfo is None else ts
+        if ts_utc and ts_utc.timestamp() < stale_cutoff:
+            need_intraday.append(tid)
+        else:
+            out[tid] = {
+                "current_price": price_val,
+                "daily_change_pct": daily_pct,
+                "price_source": "EOD",
+                "price_as_of_utc": ts_utc,
+            }
+
+    missing = set(ticker_ids) - {row.ticker_id for row in eod_rows}
+    need_intraday.extend(missing)
+
+    # 2. Intraday fallback for stale/missing (active tickers only)
+    if need_intraday and (active_ticker_ids is None or active_ticker_ids):
+        ids_to_try = list(need_intraday) if active_ticker_ids is None else [t for t in need_intraday if t in (active_ticker_ids or set())]
+        if ids_to_try:
+            latest_intra = select(
+                TickerPriceIntraday.ticker_id,
+                func.max(TickerPriceIntraday.price_timestamp).label("max_ts"),
+            ).where(TickerPriceIntraday.ticker_id.in_(ids_to_try)).group_by(TickerPriceIntraday.ticker_id).subquery()
+            intra_stmt = select(
+                TickerPriceIntraday.ticker_id,
+                TickerPriceIntraday.price,
+                TickerPriceIntraday.open_price,
+                TickerPriceIntraday.close_price,
+                TickerPriceIntraday.price_timestamp,
+            ).join(
+                latest_intra,
+                and_(
+                    TickerPriceIntraday.ticker_id == latest_intra.c.ticker_id,
+                    TickerPriceIntraday.price_timestamp == latest_intra.c.max_ts,
+                ),
+            )
+            intra_rows = (await db.execute(intra_stmt)).all()
+            for row in intra_rows:
+                tid, price, open_p, close_p, ts = row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
+                if tid in out:
+                    continue
+                price_val = price or Decimal("0")
+                prev = open_p or close_p or price_val
+                daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
+                ts_utc = ts.replace(tzinfo=timezone.utc) if ts and ts.tzinfo is None else ts
+                out[tid] = {
+                    "current_price": price_val,
+                    "daily_change_pct": daily_pct,
+                    "price_source": "INTRADAY_FALLBACK",
+                    "price_as_of_utc": ts_utc,
+                }
+    return out
+
+
+def _ticker_to_response(
+    t: Ticker,
+    price_data: Optional[Dict[str, Any]] = None,
+    price_source: Optional[str] = None,
+    price_as_of_utc: Optional[datetime] = None,
+) -> TickerResponse:
     current_price = None
     daily_change_pct = None
     if price_data:
@@ -35,12 +138,15 @@ def _ticker_to_response(t: Ticker, price_data: Optional[Dict[str, Any]] = None) 
         symbol=t.symbol,
         company_name=t.company_name,
         ticker_type=t.ticker_type,
+        status=t.status or "active",
         is_active=t.is_active,
         delisted_date=t.delisted_date,
         created_at=t.created_at,
         updated_at=t.updated_at,
         current_price=current_price,
         daily_change_pct=daily_change_pct,
+        price_source=price_source,
+        price_as_of_utc=price_as_of_utc,
     )
 
 
@@ -63,46 +169,29 @@ class TickersService:
                 )
             )
         if ticker_type:
-            stmt = stmt.where(Ticker.ticker_type == ticker_type.upper())
+            # Cast enum to string for robust comparison (DB has market_data.ticker_type ENUM)
+            stmt = stmt.where(
+                func.upper(cast(Ticker.ticker_type, String)) == ticker_type.upper()
+            )
         if is_active is not None:
             stmt = stmt.where(Ticker.is_active == is_active)
         stmt = stmt.order_by(Ticker.symbol.asc())
         result = await db.execute(stmt)
         rows = result.scalars().all()
         ticker_ids = [r.id for r in rows]
+        active_ids = {r.id for r in rows if r.is_active} if rows else None
 
         price_map: Dict[uuid.UUID, Dict[str, Any]] = {}
         if ticker_ids:
-            latest_subq = select(
-                TickerPrice.ticker_id,
-                func.max(TickerPrice.price_timestamp).label("max_ts"),
-            ).where(TickerPrice.ticker_id.in_(ticker_ids)).group_by(TickerPrice.ticker_id).subquery()
-            price_stmt = select(
-                TickerPrice.ticker_id,
-                TickerPrice.price.label("price"),
-                TickerPrice.open_price,
-                TickerPrice.close_price,
-            ).join(
-                latest_subq,
-                and_(
-                    TickerPrice.ticker_id == latest_subq.c.ticker_id,
-                    TickerPrice.price_timestamp == latest_subq.c.max_ts,
-                ),
-            )
-            price_result = await db.execute(price_stmt)
-            for row in price_result.all():
-                price_val = row.price or Decimal("0")
-                prev = row.open_price or row.close_price or price_val
-                daily_pct = (
-                    ((price_val - prev) / prev * 100) if prev and prev > 0 else None
-                )
-                price_map[row.ticker_id] = {
-                    "current_price": price_val,
-                    "daily_change_pct": daily_pct,
-                }
+            price_map = await _get_price_with_fallback(db, ticker_ids, active_ids)
 
         return [
-            _ticker_to_response(r, price_map.get(r.id))
+            _ticker_to_response(
+                r,
+                price_map.get(r.id),
+                price_source=price_map.get(r.id, {}).get("price_source"),
+                price_as_of_utc=price_map.get(r.id, {}).get("price_as_of_utc"),
+            )
             for r in rows
         ]
 
@@ -128,54 +217,31 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
-        price_map = {}
-        latest_subq = select(
-            TickerPrice.ticker_id,
-            func.max(TickerPrice.price_timestamp).label("max_ts"),
-        ).where(TickerPrice.ticker_id == ticker_uuid).group_by(TickerPrice.ticker_id).subquery()
-        price_stmt = select(
-            TickerPrice.price.label("price"),
-            TickerPrice.open_price,
-            TickerPrice.close_price,
-        ).join(
-            latest_subq,
-            and_(
-                TickerPrice.ticker_id == latest_subq.c.ticker_id,
-                TickerPrice.price_timestamp == latest_subq.c.max_ts,
-            ),
+        active_ids = {row.id} if row.is_active else set()
+        price_map = await _get_price_with_fallback(db, [row.id], active_ticker_ids=active_ids)
+        pd = price_map.get(row.id) or {}
+        return _ticker_to_response(
+            row,
+            pd,
+            price_source=pd.get("price_source"),
+            price_as_of_utc=pd.get("price_as_of_utc"),
         )
-        price_row = (await db.execute(price_stmt)).first()
-        if price_row:
-            price_val = price_row.price or Decimal("0")
-            prev = price_row.open_price or price_row.close_price or price_val
-            daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
-            price_map[row.id] = {"current_price": price_val, "daily_change_pct": daily_pct}
-        return _ticker_to_response(row, price_map.get(row.id))
 
     async def create_ticker(
         self, db: AsyncSession, symbol: str, company_name: Optional[str], ticker_type: str, is_active: bool
     ) -> TickerResponse:
-        # Check symbol uniqueness
-        stmt = select(Ticker).where(
-            and_(
-                Ticker.symbol == symbol.upper(),
-                Ticker.deleted_at.is_(None),
-            )
+        from .canonical_ticker_service import create_system_ticker
+        from ..core.config import settings
+        ticker = await create_system_ticker(
+            db=db,
+            symbol=symbol,
+            ticker_type=ticker_type,
+            company_name=company_name,
+            skip_live_check=settings.debug,
+            status="active",
         )
-        existing = await db.execute(stmt)
-        if existing.scalar_one_or_none():
-            raise HTTPExceptionWithCode(
-                status_code=409,
-                detail=f"Ticker symbol '{symbol}' already exists",
-                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
-            )
-        ticker = Ticker(
-            symbol=symbol.upper(),
-            company_name=company_name or None,
-            ticker_type=ticker_type.upper(),
-            is_active=is_active,
-        )
-        db.add(ticker)
+        if not is_active:
+            ticker.is_active = False
         await db.commit()
         await db.refresh(ticker)
         return _ticker_to_response(ticker)
@@ -187,6 +253,7 @@ class TickersService:
         symbol: Optional[str] = None,
         company_name: Optional[str] = None,
         ticker_type: Optional[str] = None,
+        status: Optional[str] = None,
         is_active: Optional[bool] = None,
     ) -> TickerResponse:
         try:
@@ -208,19 +275,54 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
+        # BF-G7-009: Duplicate symbol check (API-level, DB enforces via uix_tickers_symbol_exchange_active)
         if symbol is not None:
-            ticker.symbol = symbol.upper()
+            new_sym = symbol.strip().upper()
+            dup_stmt = select(Ticker).where(
+                and_(
+                    Ticker.symbol == new_sym,
+                    Ticker.exchange_id == ticker.exchange_id,
+                    Ticker.deleted_at.is_(None),
+                    Ticker.id != ticker_uuid,
+                )
+            )
+            dup = (await db.execute(dup_stmt)).scalar_one_or_none()
+            if dup:
+                raise HTTPExceptionWithCode(
+                    status_code=409,
+                    detail=f"Symbol '{new_sym}' already exists for this exchange",
+                    error_code=ErrorCodes.TICKER_SYMBOL_DUPLICATE,
+                )
+            ticker.symbol = new_sym
         if company_name is not None:
             ticker.company_name = company_name or None
         if ticker_type is not None:
             ticker.ticker_type = ticker_type.upper()
+        if status is not None:
+            ticker.status = status
         if is_active is not None:
             ticker.is_active = is_active
-        await db.commit()
-        await db.refresh(ticker)
+        try:
+            await db.commit()
+            await db.refresh(ticker)
+        except IntegrityError as e:
+            await db.rollback()
+            err = str(e.orig) if hasattr(e, "orig") else str(e)
+            if "unique" in err.lower() or "symbol" in err.lower():
+                raise HTTPExceptionWithCode(
+                    status_code=409,
+                    detail="Symbol already exists (duplicate)",
+                    error_code=ErrorCodes.TICKER_SYMBOL_DUPLICATE,
+                )
+            raise
         return _ticker_to_response(ticker)
 
     async def delete_ticker(self, db: AsyncSession, ticker_id: str) -> None:
+        """
+        Soft-delete system ticker. Per ARCHITECT_DIRECTIVE_G7:
+        - Set ticker status='cancelled', deleted_at=now()
+        - Cascade: all linked user_tickers → status='cancelled', deleted_at=now()
+        """
         try:
             ticker_uuid = ulid_to_uuid(ticker_id)
         except Exception:
@@ -240,7 +342,21 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
-        ticker.deleted_at = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
+        ticker.status = "cancelled"
+        ticker.deleted_at = now
+        ticker.is_active = False
+        # Status cascade: all linked user_tickers → cancelled + deleted_at
+        user_ticker_stmt = select(UserTicker).where(
+            and_(
+                UserTicker.ticker_id == ticker_uuid,
+                UserTicker.deleted_at.is_(None),
+            )
+        )
+        ut_result = await db.execute(user_ticker_stmt)
+        for ut in ut_result.scalars().all():
+            ut.status = "cancelled"
+            ut.deleted_at = now
         await db.commit()
 
     async def get_summary(self, db: AsyncSession) -> dict:

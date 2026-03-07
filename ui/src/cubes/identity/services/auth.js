@@ -16,6 +16,9 @@ import sharedServices from '../../../components/core/sharedServices.js';
 /** Fetch options for auth endpoints - credentials required for refresh token (httpOnly cookies) */
 const AUTH_CREDENTIALS = { credentials: 'include' };
 
+/** G7R Batch5: Pre-expiry window in seconds — refresh permitted ONLY when exp - now <= REFRESH_WINDOW_SEC */
+const REFRESH_WINDOW_SEC = 300;
+
 /**
  * Ensure Shared_Services is initialized before auth calls
  * @returns {Promise<void>}
@@ -36,8 +39,7 @@ function normalizeAuthResponse(raw) {
 }
 
 /**
- * Request with 401 retry (refresh token flow)
- * For protected endpoints - on 401, refresh and retry once
+ * Request with 401 handling — G7R §3E: NO refresh on 401, immediate logout
  * @param {Function} requestFn - Async function that makes the request
  * @returns {Promise<Object>} Response
  */
@@ -46,16 +48,8 @@ async function requestWithRefresh(requestFn) {
     return await requestFn();
   } catch (error) {
     if (error?.status === 401 || error?.code === 'HTTP_401') {
-      try {
-        audit.log('Auth', 'Token expired, attempting refresh');
-        await authService.refreshToken();
-        return await requestFn();
-      } catch (refreshError) {
-        audit.error('Auth', 'Token refresh failed', refreshError);
-        localStorage.removeItem('access_token');
-        window.dispatchEvent(new CustomEvent('auth:token-expired', { detail: { error: refreshError } }));
-        throw refreshError;
-      }
+      authService.handle401Logout();
+      throw error;
     }
     throw error;
   }
@@ -81,6 +75,7 @@ const authService = {
 
       if (loginData.accessToken) {
         localStorage.setItem('access_token', loginData.accessToken);
+        this.startProactiveRefreshScheduler();
       }
 
       audit.log('Auth', 'Login successful', { userId: loginData.user?.externalUlids });
@@ -107,6 +102,7 @@ const authService = {
 
       if (registerData.accessToken) {
         localStorage.setItem('access_token', registerData.accessToken);
+        this.startProactiveRefreshScheduler();
       }
 
       audit.log('Auth', 'Register successful', { userId: registerData.user?.externalUlids });
@@ -118,10 +114,36 @@ const authService = {
   },
 
   /**
+   * G7R Batch5: Check if token is inside 5-min pre-expiry window.
+   * Returns true ONLY when: token exists AND exp - now <= 300 AND exp > now (not expired).
+   */
+  isInsideRefreshWindow() {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    if (!token || token.trim() === '') return false;
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) return false;
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp;
+      if (!exp || typeof exp !== 'number') return false;
+      const now = Date.now() / 1000;
+      if (exp <= now) return false; // Expired — do NOT refresh
+      if (exp - now > REFRESH_WINDOW_SEC) return false; // Outside window
+      return true; // Inside 5-min window
+    } catch {
+      return false;
+    }
+  },
+
+  /**
    * Refresh Token - רענון access token
-   * SSOT Fix: apiToReact yields accessToken (camelCase) - save to access_token
+   * G7R Batch5: Refresh permitted ONLY inside 5-min pre-expiry window.
    */
   async refreshToken() {
+    if (!this.isInsideRefreshWindow()) {
+      audit.log('Auth', 'Refresh rejected — outside 5-min pre-expiry window');
+      throw new Error('Refresh only permitted within 5-min pre-expiry window');
+    }
     audit.log('Auth', 'Token refresh started');
 
     try {
@@ -154,6 +176,7 @@ const authService = {
     } catch (error) {
       audit.error('Auth', 'Logout API error (clearing storage anyway)', error);
     } finally {
+      this.stopProactiveRefreshScheduler();
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_token');
       sessionStorage.removeItem('access_token');
@@ -347,6 +370,60 @@ const authService = {
   getAccessToken() {
     return localStorage.getItem('access_token');
   },
+
+  /** G7R §3E: Handle 401 — immediate logout, redirect, preserve usernameOrEmail only */
+  handle401Logout() {
+    this.stopProactiveRefreshScheduler();
+    const usernameOrEmail = localStorage.getItem('usernameOrEmail');
+    localStorage.clear();
+    sessionStorage.clear();
+    if (usernameOrEmail) localStorage.setItem('usernameOrEmail', usernameOrEmail);
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+    audit.log('Auth', '401 logout — redirecting to login');
+    if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+  },
+
+  /** G7R §3E: App boot — if token expired, clear auth and redirect */
+  checkTokenExpiryOnBoot() {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    if (!token || token.trim() === '') return;
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) return;
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp;
+      if (exp && exp < Date.now() / 1000) {
+        audit.log('Auth', 'Token expired on boot — clearing and redirecting');
+        this.handle401Logout();
+      }
+    } catch {
+      // Invalid token
+    }
+  },
+
+  /** G7R Batch5: Proactive refresh scheduler — refresh ONLY inside 5-min window. Cleared on logout. */
+  _refreshIntervalId: null,
+  startProactiveRefreshScheduler() {
+    if (this._refreshIntervalId) return;
+    const CHECK_MS = 60 * 1000; // Check every 60 seconds
+    this._refreshIntervalId = setInterval(async () => {
+      if (!this.isInsideRefreshWindow()) return;
+      try {
+        await this.refreshToken();
+        audit.log('Auth', 'Proactive refresh completed (within 5-min window)');
+      } catch (err) {
+        if (err?.message?.includes('outside 5-min')) return;
+        audit.error('Auth', 'Proactive refresh failed', err);
+      }
+    }, CHECK_MS);
+    audit.log('Auth', 'Proactive refresh scheduler started');
+  },
+  stopProactiveRefreshScheduler() {
+    if (this._refreshIntervalId) {
+      clearInterval(this._refreshIntervalId);
+      this._refreshIntervalId = null;
+    }
+  }
 };
 
 export default authService;

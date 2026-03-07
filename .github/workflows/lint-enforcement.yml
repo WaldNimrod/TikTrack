@@ -1,0 +1,87 @@
+# Lint Enforcement Fast-Track — S002-P001 GOVERNANCE_PROGRAM
+# Team 60 | Check-only: no auto-fix, no repository writes.
+# Branch protection: required on main only; phoenix-dev out of scope (backup branch).
+
+name: Lint Enforcement
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "00_MASTER_INDEX.md"
+      - "pyproject.toml"
+      - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "scripts/lint_agents_os_case_paths.sh"
+      - "scripts/lint_governance_dates.sh"
+      - "scripts/portfolio/sync_registry_mirrors_from_wsm.py"
+      - "_COMMUNICATION/**"
+      - "documentation/docs-governance/**"
+      - "agents_os/**"
+      - "api/**"
+      - "ui/**"
+      - ".github/workflows/lint-enforcement.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "00_MASTER_INDEX.md"
+      - "pyproject.toml"
+      - "scripts/lint_source_authority_bootstrap_paths.sh"
+      - "scripts/lint_agents_os_case_paths.sh"
+      - "scripts/lint_governance_dates.sh"
+      - "scripts/portfolio/sync_registry_mirrors_from_wsm.py"
+      - "_COMMUNICATION/**"
+      - "documentation/docs-governance/**"
+      - "agents_os/**"
+      - "api/**"
+      - "ui/**"
+      - ".github/workflows/lint-enforcement.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lint_enforcement:
+    name: Lint Enforcement
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: false
+          persist-credentials: false
+
+      - name: Install ripgrep (bootstrap script dependency)
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      - name: Bootstrap lint (docs/governance)
+        run: ./scripts/lint_source_authority_bootstrap_paths.sh
+
+      - name: Agents_OS case-path lint (lowercase root only)
+        run: ./scripts/lint_agents_os_case_paths.sh
+
+      - name: Governance metadata date lint (changed files only)
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+
+          if [[ -z "${BASE_SHA}" || "${BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+            BASE_SHA="$(git rev-parse HEAD~1)"
+          fi
+
+          ./scripts/lint_governance_dates.sh "${BASE_SHA}" "${{ github.sha }}"
+
+      - name: WSM->Registry mirror sync check (no drift)
+        run: |
+          python3 scripts/portfolio/sync_registry_mirrors_from_wsm.py --check
+
+      # UI ESLint: configured in ui/.eslintrc.cjs + npm run lint; added to CI when codebase aligned (follow-up)
+      - name: Lint API (Ruff check-only)
+        run: |
+          pip install --no-cache-dir ruff
+          ruff check api/ --output-format=concise

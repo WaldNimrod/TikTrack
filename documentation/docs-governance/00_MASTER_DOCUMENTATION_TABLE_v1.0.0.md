@@ -55,9 +55,13 @@
 | 05_RETRY_PROTOCOL | פרוטוקול ניסיון חוזר וחסימה — BLOCK_REPORT, החזרה לאדריכלות | `documentation/docs-governance/03-PROTOCOLS/05_RETRY_PROTOCOL.md` | — |
 | ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL | נוהל קידום ידע — Team 70 מבצע; Team 170 לא מבצע קידום | `documentation/docs-governance/03-PROTOCOLS/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md` | — |
 | ARCHITECT_GOVERNANCE_PROCEDURES_V2 | נהלי ממשל כלליים (ארכיטקט) | `documentation/docs-governance/04-PROCEDURES/ARCHITECT_GOVERNANCE_PROCEDURES_V2.md` | V2 |
+| KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE | נוהל קנוני מרכזי ל־known bugs: intake, routing, batched/immediate, closure | `documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md` | v1.0.0 |
+| KNOWN_BUGS_REGISTER | רג'יסטר קנוני יחיד לבאגים מאומתים | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | v1.0.0 |
 | TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (GATE_3..GATE_8; G3.5 ולידציית תוכנית בתוך GATE_3) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
+| FAST_TRACK_EXECUTION_PROTOCOL | מסלול מקוצר אופציונלי (לא ברירת מחדל): FAST_0..FAST_4, בלעדיות מסלול, track_mode, SLA 48h, ורפרנס מחייב ל־GATE_3 | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | v1.0.0 |
 | TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/60 + אורקסטרציה Team 10 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
-| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
+| TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry (מסמכים כקבצים) | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
+| PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE | **פרונט יחיד** — מתי מסמך (קובץ) ומתי פרומט להעתקה (בלוק); מפנה ל־190 lock ול־G36 prompts | `_COMMUNICATION/PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE_v1.0.0.md` | v1.0.0 |
 
 ---
 
@@ -97,6 +101,7 @@
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
 | ARCHITECT_POLICY_HYBRID_SCRIPTS | מדיניות סקריפטים היברידיים | `documentation/docs-governance/02-POLICIES/ARCHITECT_POLICY_HYBRID_SCRIPTS.md` | — |
+| POL-015_TT2_PAGE_TEMPLATE_CONTRACT | חוזה תבנית עמוד קנוני (מבנה shell, סדר טעינה, אכיפה בסקריפטים) | `documentation/docs-governance/02-POLICIES/POL-015_TT2_PAGE_TEMPLATE_CONTRACT_v1.0.0.md` | v1.0.0 |
 | ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING | הנחיית חיזוק ממשל (SOP-013, Seal) | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md` | — |
 | MISSION_DIRECTIVE_90_02_FINAL | מנדט משימה 90-02 | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/MISSION_DIRECTIVE_90_02_FINAL.md` | FINAL |
 | TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION | הנחיית Team 70 — ייצור נרטיב | `documentation/docs-governance/07-DIRECTIVES_AND_DECISIONS/TEAM_70_DIRECTIVE_NARRATIVE_PRODUCTION.md` | — |
@@ -145,3 +150,6 @@
 **הערה:** מסמכי 07-DIRECTIVES_AND_DECISIONS (כל ה־ARCHITECT_* mandates) מפורטים ב־GOVERNANCE_PROCEDURES_INDEX; כאן הובאו נציגים. למיפוי מלא — GOVERNANCE_PROCEDURES_SOURCE_MAP.
 
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | DELIVERED | 2026-02-22**
+**log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | FAST_TRACK_PROTOCOL_REFERENCE_ADDED | 2026-02-26**
+**log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | KNOWN_BUGS_PROCEDURE_AND_REGISTER_LINKED | 2026-03-03**
+**log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | POL_015_CANONICAL_POLICY_ENTRY_ADDED | 2026-03-06**

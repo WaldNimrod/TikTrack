@@ -3,7 +3,7 @@
 # Team 60 (DevOps & Platform)
 # ============================================
 
-.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help
+.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook bootstrap-quality-tools verify-quality-tools install-pre-commit run-pre-commit-all
 
 # Database connection (from .env)
 DATABASE_URL ?= $(shell grep DATABASE_URL api/.env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
@@ -14,6 +14,34 @@ DB_URL := $(shell echo $(DATABASE_URL) | sed 's/postgresql+asyncpg:\/\//postgres
 # ============================================
 # Database Backup (before seed — mandatory)
 # ============================================
+
+## Validate WSM/registry/snapshot consistency before push when outgoing commits touch portfolio authority files.
+portfolio-pre-push-guard:
+	@bash scripts/portfolio/guard_wsm_registry_sync_before_push.sh
+
+## Install the versioned pre-push hook locally for this clone.
+install-pre-push-hook:
+	@mkdir -p .git/hooks
+	@cp scripts/git-hooks/pre-push .git/hooks/pre-push
+	@chmod +x .git/hooks/pre-push
+	@echo "✅ Installed local pre-push hook."
+
+## Install reproducible quality toolchain (bandit, pip-audit, detect-secrets, mypy) in api/venv.
+bootstrap-quality-tools:
+	@bash scripts/bootstrap-quality-tools.sh
+
+## Verify quality tools are available in api/venv.
+verify-quality-tools:
+	@bash -lc '. api/venv/bin/activate && bandit --version && pip-audit --version && detect-secrets --version && mypy --version'
+
+## Install pre-commit hooks for this clone.
+install-pre-commit:
+	@bash -lc '. api/venv/bin/activate && pre-commit install'
+	@echo "✅ Installed pre-commit hooks."
+
+## Run pre-commit hooks across entire repository.
+run-pre-commit-all:
+	@bash -lc '. api/venv/bin/activate && pre-commit run --all-files'
 
 ## Full DB backup + verify (run before seed). Exit 0 only if backup created and verified.
 db-backup:
@@ -99,6 +127,78 @@ migrate-d35-notes:
 	@echo "🔄 D35 — user_data.note_attachments"
 	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/d35_note_attachments.sql
 	@echo "✅ D35 note_attachments migration complete."
+
+## G7 S002-P003-WP002 Phase A — M-001..M-007 (ARCHITECT_DIRECTIVE_G7_REMEDIATION)
+migrate-g7-M001:
+	@echo "🔄 G7 M-001 — user_tickers status, notes"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M001_user_tickers_status_notes.sql
+	@echo "✅ G7 M-001 complete."
+
+migrate-g7-M002:
+	@echo "🔄 G7 M-002 — alerts trigger_status"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M002_alerts_trigger_status.sql
+	@echo "✅ G7 M-002 complete."
+
+migrate-g7-M003:
+	@echo "🔄 G7 M-003 — notifications table"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M003_notifications.sql
+	@echo "✅ G7 M-003 complete."
+
+migrate-g7-M004:
+	@echo "🔄 G7 M-004 — admin_data schema"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M004_admin_data_schema.sql
+	@echo "✅ G7 M-004 complete."
+
+migrate-g7-M005:
+	@echo "🔄 G7 M-005 — job_run_log"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005_job_run_log.sql
+	@echo "✅ G7 M-005 complete."
+
+migrate-g7-M005b-extended:
+	@echo "🔄 G7 M-005b — job_run_log extended schema"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M005b_job_run_log_extended.sql
+	@echo "✅ G7 M-005b complete."
+
+## G7 Phase A (PHASE_A_ACTIVATION order: M-001..M-004, M-005b, M-006, M-007)
+migrate-g7-phase-a:
+	@echo "🔄 G7 Phase A — migrations (ON_ERROR_STOP=1)"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M001_user_tickers_status_notes.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M002_alerts_trigger_status.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M003_notifications.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M004_admin_data_schema.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M005b_job_run_log_extended.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M006_tickers_status_verify.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db -v ON_ERROR_STOP=1 < scripts/migrations/g7_M007_alerts_data_migration.sql
+	@echo "✅ G7 Phase A complete."
+
+migrate-g7-M005b:
+	@echo "🔄 G7 M-005b — grant TikTrackDbAdmin on admin_data"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005b_grant_admin_data.sql
+	@echo "✅ G7 M-005b complete."
+
+migrate-g7-M006:
+	@echo "🔄 G7 M-006 — tickers status verify"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M006_tickers_status_verify.sql
+	@echo "✅ G7 M-006 complete."
+
+migrate-g7-M007:
+	@echo "🔄 G7 M-007 — alerts data migration"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M007_alerts_data_migration.sql
+	@echo "✅ G7 M-007 complete."
+
+migrate-g7-all: migrate-g7-M001 migrate-g7-M002 migrate-g7-M003 migrate-g7-M004 migrate-g7-M005 migrate-g7-M006 migrate-g7-M007
+	@echo "✅ G7 Phase A migrations M-001..M-007 complete."
+
+## G7 Phase A rollback (reverse order: M007..M001; M006 optional)
+rollback-g7-all:
+	@echo "🔄 G7 Rollback M-007..M-001"
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M007_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M005_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M004_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M003_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M002_rollback.sql
+	@docker exec -i tiktrack-postgres-dev psql -U tiktrack -d TikTrack-phoenix-db < scripts/migrations/g7_M001_rollback.sql
+	@echo "✅ G7 Phase A rollback complete."
 
 ## P3-019: market_cap NUMERIC(24,4) for mega caps (>1T overflow fix)
 migrate-p3-019:
@@ -204,6 +304,10 @@ test-suite-e:
 	@cd tests && npm run test:external-data-suite-e
 	@echo "✅ Suite E complete."
 
+## D33 Parallel Create — G7R Batch5 integration test (requires api/.env, DB)
+test-d33-parallel:
+	@bash scripts/run-d33-parallel-create-test.sh
+
 ## Help
 help:
 	@echo "Available targets:"
@@ -212,6 +316,10 @@ help:
 	@echo "  make db-test-clean       - Delete all test data (is_test_data = true)"
 	@echo "  make db-test-fill        - Seed test data only (no backup)"
 	@echo "  make db-test-report     - Report users + record counts (base vs test)"
+	@echo "  make bootstrap-quality-tools - Install quality tools in api/venv (bandit, pip-audit, detect-secrets, mypy)"
+	@echo "  make verify-quality-tools - Verify quality tools are available in api/venv"
+	@echo "  make install-pre-commit - Install pre-commit hooks in .git/hooks"
+	@echo "  make run-pre-commit-all - Run pre-commit hooks for all files"
 	@echo "  make db-base-seed       - Seed base dataset for test_user"
 	@echo "  make db-admin-minimal   - Reduce TikTrackAdmin base to minimal"
 	@echo "  make seed-tickers       - Seed market_data.tickers (required before sync)"
@@ -233,5 +341,6 @@ help:
 	@echo "  make test-external-data-smoke - Suites A+B+D (PR smoke)"
 	@echo "  make test-suite-d      - Suite D: Retention & Cleanup (Smoke/Nightly)"
 	@echo "  make test-suite-e      - Suite E: UI Staleness Clock + Tooltip (Nightly)"
+	@echo "  make test-d33-parallel - D33 Parallel Create (G7R Batch5; needs api/.env, DB)"
 	@echo ""
 	@echo "Database operations preserve base data and schema structure."

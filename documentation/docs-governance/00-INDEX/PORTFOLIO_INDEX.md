@@ -11,7 +11,7 @@
 
 ## 1) Boundary rule
 
-**Runtime state** (active stage, current gate, last_gate_event, active_work_package_id) — **sole SSOT:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE**.
+**Runtime state** (active stage, current gate, `track_mode`, last_gate_event, active_work_package_id) — **sole SSOT:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE**.
 
 **Portfolio state** (Stage/Program/Work Package structural catalog and gate mirror) — canonical artifacts below. No Task-level in Portfolio.
 
@@ -34,6 +34,18 @@
 Roadmap → Stage → Program → Work Package → Task.  
 Task-level is **not** in Portfolio; it is internal to Team 10 and execution teams.
 
+Canonical identifiers and parent binding:
+
+- `stage_id`: `S{NNN}` (example: `S002`)
+- `program_id`: `S{NNN}-P{NNN}` and must belong to its parent `stage_id` (example: `S002-P001`)
+- `work_package_id`: `S{NNN}-P{NNN}-WP{NNN}` and must belong to its parent `program_id` (example: `S002-P001-WP002`)
+
+Lifecycle rule:
+
+- Gate lifecycle is managed only at **Work Package** level (`GATE_3..GATE_8`).
+- Stage and Program are packaging/catalog layers. Program `current_gate_mirror` is informational mirror from WSM and not an independent runtime gate-state authority.
+
 ---
 
 **log_entry | TEAM_170 | PORTFOLIO_INDEX | CREATED | 2026-02-23**
+**log_entry | TEAM_190 | PORTFOLIO_INDEX | WSM_TRACK_MODE_RUNTIME_FIELD_NOTED | 2026-02-26**

@@ -125,10 +125,11 @@ Team 90 operates in two distinct phases — this ambiguity was a major historica
 
 | Phase | Gate | Trigger | Validates |
 |---|---|---|---|
-| Phase 1 | PRE_GATE_3 | WP work plan submitted | Work plan completeness, gate sequencing, criteria |
+| Phase 1 | G3.5 (within GATE_3) | WP work plan submitted at G3.5 sub-stage | Work plan completeness, gate sequencing, criteria |
 | Phase 2 | GATE_5 | GATE_4 (QA) PASS | Execution quality, architecture alignment, code standards |
 
-The engine routes by `gate_id` field in the submission: `PRE_GATE_3` → Phase 1 validator; `GATE_5` → Phase 2 validator.
+The engine routes by `gate_id` field in the submission: `G3.5` → Phase 1 validator; `GATE_5` → Phase 2 validator.
+Note: `PRE_GATE_3` is removed from the active canonical gate model (Gate Lifecycle v1.1.0 §Core transition rules). Work-plan validation is canonically G3.5, a sub-stage within GATE_3.
 
 ---
 
@@ -147,8 +148,8 @@ Gate Lifecycle — Automated Coverage After This Program
 GATE_0 ──► [future]
 GATE_1 ──► SPEC VALIDATOR (170→190) ✓ WP001
 GATE_2 ──► Team 100 (architectural judgment — human)
-PRE_GATE_3 ──► EXECUTION VALIDATOR Phase 1 (10→90) ✓ WP002
-GATE_3 ──► Team 10 opens WP
+GATE_3 / G3.5 ──► EXECUTION VALIDATOR Phase 1 (10→90) ✓ WP002
+GATE_3 ──► Team 10 opens WP (G3.5 = work plan validation sub-stage)
 GATE_4 ──► [future]
 GATE_5 ──► EXECUTION VALIDATOR Phase 2 (10→90) ✓ WP002
 GATE_6 ──► Nimrod (human review — irreplaceable)
@@ -173,7 +174,7 @@ Builds the automated validator for LLD400 spec submissions:
 ### WP002 — Execution Validation Engine (10→90 Flow)
 
 Builds the automated validator for work package execution submissions:
-- Two-phase model: PRE_GATE_3 (work plan) + GATE_5 (execution quality)
+- Two-phase model: G3.5 within GATE_3 (work plan) + GATE_5 (execution quality)
 - 11 deterministic checks across 2 tiers
 - LLM quality gate (shared framework from WP001)
 
@@ -242,7 +243,7 @@ documentation/docs-governance/AGENTS_OS_GOVERNANCE/02-TEMPLATES/
 
 **WP002 complete when:**
 - All 11 execution validator checks implemented and tested
-- Two-phase routing operational (PRE_GATE_3 → plan validator; GATE_5 → execution validator)
+- Two-phase routing operational (G3.5 → plan validator; GATE_5 → execution validator)
 - LLM quality gate extended for execution context
 
 **Program complete when:** WP001 GATE_8 + WP002 GATE_8 both passed.
@@ -250,3 +251,4 @@ documentation/docs-governance/AGENTS_OS_GOVERNANCE/02-TEMPLATES/
 ---
 
 **log_entry | TEAM_100 | AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_CONCEPT | GATE_0 | 2026-02-24**
+**log_entry | TEAM_100 | ARCHITECTURAL_CONCEPT_REMEDIATION | BF-02_PRE_GATE_3_REMOVED | GATE_0_BLOCK_FOR_FIX_RESPONSE | 2026-02-25**

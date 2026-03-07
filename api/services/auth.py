@@ -13,7 +13,7 @@ import hashlib
 import bcrypt
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
-from jose import JWTError, jwt
+import jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 import logging
@@ -140,7 +140,7 @@ class AuthService:
             "exp": expires_at,
         }
         
-        # Create token
+        # Create token (PyJWT; KB-010: replaces python-jose)
         token = jwt.encode(
             payload,
             settings.jwt_secret_key,
@@ -217,7 +217,7 @@ class AuthService:
             
             return payload
             
-        except JWTError as e:
+        except jwt.PyJWTError as e:
             raise TokenError(f"Invalid token: {str(e)}")
     
     async def validate_refresh_token(
@@ -630,7 +630,7 @@ class AuthService:
                     expires_at=expires_at
                 )
                 db.add(revoked_token)
-        except JWTError:
+        except jwt.PyJWTError:
             # If token is invalid, still try to revoke refresh token
             pass
         

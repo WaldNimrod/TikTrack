@@ -1,0 +1,5 @@
+has_lifespan_param=True
+imports_scheduler_startup=True
+calls_start_scheduler=True
+calls_stop_scheduler=True
+SCHEDULER_BOOT_CODE_CHECK_EXIT 0

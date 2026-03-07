@@ -71,30 +71,10 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
             debugLog('Auth', 'ProtectedRoute: User authenticated');
           }
         } catch (error) {
-          // Token might be expired, try to refresh
-          debugLog('Auth', 'ProtectedRoute: Token validation failed, attempting refresh');
-          
-          try {
-            await authService.refreshToken();
-            setIsAuthenticated(true);
-            
-            // Check admin role after refresh if required
-            if (requireAdmin) {
-              const userIsAdmin = authService.isAdmin();
-              setIsAdmin(userIsAdmin);
-              debugLog('Auth', 'ProtectedRoute: Token refreshed successfully', { 
-                isAdmin: userIsAdmin 
-              });
-            } else {
-              setIsAdmin(false);
-              debugLog('Auth', 'ProtectedRoute: Token refreshed successfully');
-            }
-          } catch (refreshError) {
-            // Refresh failed - user needs to login
-            setIsAuthenticated(false);
-            setIsAdmin(false);
-            audit.error('Auth', 'ProtectedRoute: Token refresh failed', refreshError);
-          }
+          // G7R §3E: No refresh on failure — 401 triggers handle401Logout redirect
+          debugLog('Auth', 'ProtectedRoute: Token validation failed');
+          setIsAuthenticated(false);
+          setIsAdmin(false);
         }
       } catch (error) {
         setIsAuthenticated(false);

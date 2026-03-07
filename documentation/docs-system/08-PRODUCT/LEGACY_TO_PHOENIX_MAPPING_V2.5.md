@@ -226,8 +226,10 @@ CONSTRAINT executions_broker_id_unique
 - **חדש:** `expires_at TIMESTAMPTZ`
 - **שופר:** Full audit trail
 
-**Polymorphic Targets:**
-- ticker, trade, trade_plan, account, general
+**Polymorphic Targets (canonical):**
+- ticker, user_ticker, alert, trade, trade_plan, account, datetime
+
+**Note:** `general` parent_type was deprecated per `ARCHITECT_DIRECTIVE_G7_REMEDIATION_S002_P003_WP002_v1.0.0` and locked as invalid by Team 00 Iron Rule (2026-03-02).
 
 **Migration Notes:**
 - Consolidate multiple alert types into one table
@@ -246,8 +248,10 @@ CONSTRAINT executions_broker_id_unique
 - **חדש:** `is_pinned BOOLEAN`
 - **שופר:** Full audit trail + tags
 
-**Polymorphic Parents:**
-- trade, trade_plan, ticker, account, general
+**Polymorphic Parents (canonical):**
+- ticker, user_ticker, alert, trade, trade_plan, account, datetime
+
+**Note:** `general` parent_type was deprecated per `ARCHITECT_DIRECTIVE_G7_REMEDIATION_S002_P003_WP002_v1.0.0` and locked as invalid by Team 00 Iron Rule (2026-03-02).
 
 **Migration Notes:**
 - Consolidate multiple note types
@@ -713,3 +717,5 @@ WHERE ticker_id = '<uuid>';
 **Version:** 2.5  
 **Date:** 2026-01-26  
 **Status:** ✅ Complete & Ready for Team 20
+  
+**log_entry | TEAM_170 | SSOT_CORRECTIONS | per_ARCHITECT_DIRECTIVE_SSOT_CORRECTIONS_v1.0.0 | 2026-03-03**

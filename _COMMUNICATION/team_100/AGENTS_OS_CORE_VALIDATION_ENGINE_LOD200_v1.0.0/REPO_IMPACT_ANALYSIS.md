@@ -12,6 +12,8 @@
 | roadmap_id | PHOENIX_ROADMAP |
 | stage_id | S002 |
 | program_id | S002-P001 |
+| work_package_id | N/A |
+| task_id | N/A |
 | gate_id | GATE_0 |
 | phase_owner | Team 100 |
 | required_ssm_version | 1.0.0 |

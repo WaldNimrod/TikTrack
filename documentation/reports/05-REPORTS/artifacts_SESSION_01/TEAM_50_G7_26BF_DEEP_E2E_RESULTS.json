@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-03-06T10:06:48.700Z",
+  "work_package_id": "S002-P003-WP002",
+  "gate_id": "GATE_4",
+  "deepResults": {
+    "BF-G7-003": {
+      "status": "PASS",
+      "evidence": "validation summary visible: \"יש לתקן את השדות המסומנים לפני שמירה\""
+    },
+    "BF-G7-008": {
+      "status": "FAIL",
+      "evidence": "no error message after invalid symbol"
+    },
+    "BF-G7-012": {
+      "status": "PASS",
+      "evidence": "linked column exists; first cell: \"טיקר\""
+    },
+    "BF-G7-017": {
+      "status": "PASS",
+      "evidence": "blocked with \"יש לבחור ישות מקושרת\""
+    },
+    "BF-G7-026": {
+      "status": "PASS",
+      "evidence": "table refreshed: company now \"Company E2E1772757626058 E2E1772791604757\""
+    }
+  }
+}

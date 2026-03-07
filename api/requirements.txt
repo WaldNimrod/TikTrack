@@ -10,8 +10,8 @@ sqlalchemy>=2.0.0
 asyncpg>=0.29.0
 psycopg2-binary>=2.9.9
 
-# Authentication & Security
-python-jose[cryptography]>=3.3.0
+# Authentication & Security (KB-010: PyJWT replaces python-jose — no ecdsa dependency)
+PyJWT>=2.8.0  # KB-010: Replaces python-jose (no ecdsa dependency)
 bcrypt>=5.0.0  # Direct bcrypt usage (replaced passlib)
 cryptography>=41.0.0
 slowapi>=0.1.9  # Rate limiting for FastAPI
@@ -23,6 +23,10 @@ pydantic>=2.5.0
 bleach[css]>=6.0.0
 pydantic-settings>=2.1.0
 email-validator>=2.0.0  # Required for Pydantic EmailStr validation
+
+# Background tasks (ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION)
+# Required for FastAPI lifespan — backend startup fails without it
+apscheduler>=3.10.0
 
 # Utilities
 python-dotenv>=1.0.0
@@ -39,3 +43,4 @@ yfinance>=0.2.36
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 httpx>=0.25.0
+pre-commit>=3.7.0

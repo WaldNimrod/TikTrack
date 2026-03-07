@@ -36,7 +36,7 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | stage_id | stage_name | planned_scope | status |
 | --- | --- | --- | --- |
 | S001 | שלב 1 — Foundations Sealed | חיתום יסודות; Stage 1 | COMPLETED |
-| S002 | שלב 2 — השלב הפעיל | מה שפתוח משלב 1 + הכנה לשלב 3 | ACTIVE |
+| S002 | שלב 2 — השלב הפעיל | מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002 | ACTIVE |
 | S003 | שלב 3 — Essential Data | שכבת נתונים יסודית | PLANNED |
 | S004 | שלב 4 — Financial Execution | המעגל הפיננסי | PLANNED |
 | S005 | שלב 5 — Trades/Plans | ישויות מורכבות | PLANNED |
@@ -56,10 +56,10 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 | --- | --- | --- | --- |
 | S001 | D15.L, D15.R, D15.P, D15.I, D15.V, D16, D18, D21, D34, D35 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 | S002 | D22, D23 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S003 | D33, D39, D38 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S004 | D36, D37 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S005 | D24, D25, D26, D27, D28, D29 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
-| S006 | D30, D31, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S003 | D33, D39, D40, D41, D26 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S004 | D36, D37, S004-P007 (Indicators Infrastructure) | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S005 | D24, D25, D27, D28, D29, D31, D38, D26-Phase2 | Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory, TagRegistry, WatchListsEnhancement) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
+| S006 | D30, D32 | Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState) | tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header |
 
 ---
 
@@ -73,19 +73,28 @@ This document is the **single canonical roadmap** for Portfolio (Stage-level onl
 
 ### שלב 3 — שכבת נתונים יסודית (Essential Data)
 
-D15_SETTINGS (Preferences), ALERTS & NOTES, USER_TICKERS & TICKERS_MGR.
+S003 pages: D33 (user_tickers), D39 (preferences), D40 (system_management), D41 (user_management), D26 (watch_lists).
+Note: D38 (tag_management) was in S003 but relocated to S005 per Amendment A1 (2026-03-02).
 
 ### שלב 4 — המעגל הפיננסי (Financial Execution)
 
-EXECUTIONS & IMPORT CENTER (Cash Flows).
+EXECUTIONS & IMPORT CENTER (Cash Flows + Executions, IBKR + IBI via BaseConnector), plus S004-P007 Indicators Infrastructure.
 
 ### שלב 5 — ישויות מורכבות (Trades/Plans)
 
-תוכניות טריידים, טריידים, רשימות צפייה, דשבורד טיקר, יומן מסחר.
+תוכניות טריידים, טריידים, דשבורד טיקר, יומן מסחר והיסטוריית טרייד (D31), וניהול תגיות (D38).
+בנוסף: D26-Phase2 (watch_lists enhancement) נפתח לאחר D29 GATE_8 PASS ומוסיף Position, P/L, P/L%, ATR(14) ו-flag_color filtering משופר.
 
 ### שלב 6 — תובנות וניתוח (Advanced Analytics)
 
-ניתוח אסטרטגיות, היסטוריית טרייד, מצב תיק; מימוש דשבורדים רמה 1.
+ניתוח אסטרטגיות, מצב תיק; מימוש דשבורדים רמה 1.
+D32 (portfolio_state) מחייב אפיון ארכיטקטוני ייעודי ומאושר Nimrod לפני פתיחת S006 GATE_0, כולל: daily_portfolio_snapshots job, סכימת snapshots, backfill, retention policy, וכללי chart granularity לפי טווח זמן.
+
+### Tag Assignment Rollout (S004 onward)
+
+Inline tag assignment נבנה יחד עם כל עמוד ישות החל מ-S004, ולא כרטרופיט מאוחר.
+ישויות חובה לתמיכת tags: user_ticker, alert, trade, trade_plan, execution, cash_flow.
+D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום התגיות; ההשמה inline בישויות היא מסלול נפרד ומדורג לפי שלבים.
 
 ---
 
@@ -96,6 +105,12 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 | Registry (all Level-2 lists) | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md` | ACTIVE |
 | Master Task List | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` | ACTIVE |
 | Completion Carryover List | `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` | ACTIVE |
+
+## Known Bugs Register (קישור חובה)
+
+| Register | Path | Status |
+|---|---|---|
+| Known Bugs Register | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | ACTIVE |
 
 ---
 
@@ -120,19 +135,28 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 | 13 | D33 | user_tickers | הטיקרים שלי | S003 |
 | 14 | D39 | preferences | העדפות | S003 |
 | 15 | D36 | executions | ביצועים | S004 |
-| 16 | D37 | data_import | ייבוא נתונים | S004 |
+| 16 | D37 | data_import | ייבוא נתונים (dual mode: cash_flows + executions; IBKR + IBI; BaseConnector; archive + audit log) | S004 |
 | 17 | D24 | trade_plans | תוכניות טריידים | S005 |
-| 18 | D25 | ai_analysis | אנליזת AI | S005 |
-| 19 | D26 | watch_lists | רשימות צפייה | S005 |
+| 18 | D25 | ai_analysis | אנליזת AI (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
+| 19 | D26 | watch_lists | רשימות צפייה | S003 |
 | 20 | D27 | ticker_dashboard | דשבורד טיקר | S005 |
-| 21 | D28 | trading_journal | יומן מסחר | S005 |
+| 21 | D28 | trading_journal | יומן מסחר (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
 | 22 | D29 | trades | ניהול טריידים | S005 |
 | 23 | D30 | strategy_analysis | ניתוח אסטרטגיות | S006 |
-| 24 | D31 | trades_history | היסטוריית טרייד | S006 |
+| 24 | D31 | trades_history | היסטוריית טרייד (Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS) | S005 |
 | 25 | D32 | portfolio_state | מצב תיק היסטורי | S006 |
-| 26 | D38 | tag_management | ניהול תגיות | S003 |
-| 27 | D40 | system_management | ניהול מערכת | — |
-| 28 | D41 | design_system | ניהול עיצובים | — |
+| 26 | D38 | tag_management | ניהול תגיות | S005 |
+| 26.1 | D26-Phase2 | watch_lists (enhancement) | שדרוג רשימות צפייה: Position, P/L, P/L%, ATR(14), flag_color filter. Prerequisite: S004-P007 Indicators Infrastructure GATE_8 PASS | S005 |
+| 27 | D40 | system_management | system_management — Admin Control Panel (admin-only, 7 sections: System Overview, Market Data Settings, Background Tasks, Alert System Monitor, Notifications Monitor, Audit Log, Feature Flags/Code Flags) | S003 |
+| 28 | D41 | user_management | user_management — Admin User Control (admin-only) | S003 |
+
+---
+
+## Future Stages (deferred infrastructure)
+
+| ID | Stage | Name | Type | Priority | Scope | Status |
+|---|---|---|---|---|---|---|
+| S008-NOTIFICATION-TOAST-SYSTEM | S008 (post-S006) | General Notification & Toast System | Cross-cutting infrastructure | NON-URGENT | Replace all browser alert/confirm with unified in-app NotificationService; add toast levels SUCCESS/WARNING/ERROR/INFO; add in-app alert notification panel; complete universal modal/toast migration using legacy notification system as reference. | DEFERRED |
 
 **דשבורדים רמה 1** (בית, תכנון, מעקב, מחקר, נתונים, ניהול): מימוש תוכן — **שלב 6 ומאוחר יותר**.
 
@@ -140,3 +164,8 @@ EXECUTIONS & IMPORT CENTER (Cash Flows).
 
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | v1.0.0_CREATED | 2026-02-23**
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | SINGLE_ROADMAP_NARRATIVE_AND_PAGES | 2026-02-23**
+**log_entry | TEAM_170 | ROADMAP_AMENDED | 5_AMENDMENTS_PER_DIRECTIVE_v1.0.0 | 2026-03-02**
+**log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ROADMAP_AMENDED_v2_3_AMENDMENTS_PER_ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v2.0.0 | 2026-03-03**
+**log_entry | TEAM_170 | ROADMAP_AMENDMENTS_COMPLETE_v1+v2 | 2026-03-03**
+**log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**
+**log_entry | TEAM_190 | PHOENIX_PORTFOLIO_ROADMAP | S002_SCOPE_NOTE_UPDATED_FOR_MCP_QA_TRANSITION_PACKAGING | 2026-03-06**

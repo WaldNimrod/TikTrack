@@ -38,6 +38,12 @@ const LoginForm = () => {
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   
+  // G7R §3E: Populate usernameOrEmail from localStorage (after 401/expiry redirect)
+  useEffect(() => {
+    const saved = localStorage.getItem('usernameOrEmail');
+    if (saved) setFormData(prev => ({ ...prev, usernameOrEmail: saved }));
+  }, []);
+
   // Add auth-layout-root class to body on mount (matches blueprint)
   useEffect(() => {
     document.body.classList.add('auth-layout-root');
@@ -205,9 +211,10 @@ const LoginForm = () => {
       
       debugLog('Auth', 'Login successful', { userId: response.user?.externalUlids });
       
-      // Store remember me preference (if needed)
+      // Store remember me + usernameOrEmail per §3E (preserve after 401/expiry redirect)
       if (formData.rememberMe) {
         localStorage.setItem('remember_me', 'true');
+        localStorage.setItem('usernameOrEmail', formData.usernameOrEmail);
       }
       
       // Redirect to dashboard (only on success, not on error)

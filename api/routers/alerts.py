@@ -14,6 +14,8 @@ from ..utils.dependencies import get_current_user
 from ..models.identity import User
 from ..services.alerts_service import get_alerts_service
 from ..schemas.alerts import AlertCreate, AlertUpdate
+from ..schemas.alert_conditions import CONDITION_FIELDS, CONDITION_OPERATORS
+from ..utils.identity import ulid_to_uuid
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
@@ -35,8 +37,11 @@ async def get_alerts_summary(
 async def list_alerts(
     target_type: Optional[str] = Query(
         None,
-        description="account|trade|trade_plan|ticker|general",
+        description="account|trade|trade_plan|ticker|datetime",
     ),
+    ticker_id: Optional[str] = Query(None, description="Filter by ticker (ULID)"),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
+    trigger_status: Optional[str] = Query(None, description="untriggered|triggered_unread|triggered_read|rearmed"),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     sort: str = Query("created_at", description="created_at|target_type|is_active|..."),
@@ -46,18 +51,42 @@ async def list_alerts(
 ):
     """
     TEAM_30 request — רשימת התראות עם סינון, pagination ומיון.
+    G7R Batch2: is_active, trigger_status filter wiring.
     """
+    ticker_uuid = None
+    if ticker_id:
+        try:
+            ticker_uuid = ulid_to_uuid(ticker_id)
+        except Exception:
+            pass  # invalid ULID → ignore filter
     service = get_alerts_service()
     data, total = await service.list_alerts(
         db=db,
         user_id=current_user.id,
         target_type=target_type,
+        ticker_id=ticker_uuid,
+        is_active=is_active,
+        trigger_status=trigger_status,
         page=page,
         per_page=per_page,
         sort=sort,
         order=order,
     )
     return {"data": data, "total": total}
+
+
+@router.get("/condition-options", response_model=dict)
+async def get_condition_options(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    TEAM_30 Phase C — Condition builder canonical contract.
+    Returns allowed condition_field and condition_operator values.
+    """
+    return {
+        "condition_fields": sorted(CONDITION_FIELDS),
+        "condition_operators": sorted(CONDITION_OPERATORS),
+    }
 
 
 @router.post("", response_model=dict, status_code=201)

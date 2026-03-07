@@ -5,8 +5,8 @@
 **to:** Team 170 (Specification Engineering)
 **cc:** Team 190, Team 00
 **date:** 2026-02-24
-**status:** PENDING_GATE_0_PASS — activate only after Team 190 GATE_0 PASS
-**gate_id:** GATE_0
+**status:** ACTIVE — GATE_0 PASS issued by Team 190 (2026-02-25); directive now in effect
+**gate_id:** GATE_1
 **architectural_approval_type:** SPEC
 ---
 
@@ -131,3 +131,4 @@ The LLD400 must address how each of the following will be testable (this is the 
 ---
 
 **log_entry | TEAM_100 | TEAM_100_TO_TEAM_170_ACTIVATION_LLD400_CORE_VALIDATION_ENGINE | PENDING_GATE_0_PASS | 2026-02-24**
+**log_entry | TEAM_100 | TEAM_170_ACTIVATION_ISSUED | GATE_0_PASS_CONDITION_MET | GATE_1_ACTIVE | 2026-02-25**

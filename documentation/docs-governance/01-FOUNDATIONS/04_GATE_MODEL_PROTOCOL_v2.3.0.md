@@ -56,6 +56,7 @@ Every artifact in the gate flow MUST include the following block (or equivalent 
 | work_package_id | YES | L3 identifier; gate binding. |
 | task_id | When applicable | L4 identifier; else N/A. |
 | gate_id | YES | GATE_0 … GATE_8 only. (Work-plan validation before implementation is inside GATE_3 as sub-stage G3.5; see §6.1.) |
+| track_mode | Conditional | `NORMAL` or `FAST` in runtime contexts where fast-track is used. `gate_id` remains canonical and is not replaced by FAST enums. |
 | phase_owner | YES | Team 10 or as assigned. |
 | required_ssm_version | YES | e.g. 1.0.0. |
 | required_active_stage | YES | e.g. GAP_CLOSURE_BEFORE_AGENT_POC. |
@@ -206,6 +207,20 @@ If missing, Team 100 MUST halt discussion and request completion.
 
 ---
 
+### 6.3 Fast-track overlay rule (optional, non-default)
+
+Fast-track is an optional execution mode for urgent blocking items; it does not redefine the gate enum.
+
+1. `gate_id` stays canonical (`GATE_0..GATE_8`).
+2. Fast-track status is represented by `track_mode` (`NORMAL` / `FAST`) in WSM/runtime context.
+3. Only one track can be active at a time:
+  - `track_mode=FAST` requires normal flow HOLD.
+  - `track_mode=NORMAL` means fast-track is inactive or scheduled-next.
+4. FAST stages are operational only (`FAST_0..FAST_4`) and reference canonical gates, especially GATE_3 internals.
+5. Full protocol: `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`.
+
+---
+
 ## 7. Operational references (no duplicate gate tables)
 
 **Normative authority:** This protocol defines gate enum, authority, and identity header.
@@ -213,6 +228,7 @@ If missing, Team 100 MUST halt discussion and request completion.
 Operational detail and artifact contracts are referenced canonically:
 
 - **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
+- **Fast-track overlay (optional, non-default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`
 - **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
 - **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
 
@@ -224,3 +240,4 @@ All teams must use these references for deterministic gate execution and artifac
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | TEAM_10_RUNBOOK_REF_ADDED | 2026-02-23**
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | PRE_GATE_3_REMOVED_GATE_TABLE_WSM_OWNERS | 2026-02-23**
 **log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | OPERATIONAL_REFERENCES_HARDENED_GATES_0_2_AND_7 | 2026-02-23**
+**log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | FAST_TRACK_OVERLAY_RULE_AND_REFERENCE_ADDED | 2026-02-26**

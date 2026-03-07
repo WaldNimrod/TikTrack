@@ -12,6 +12,8 @@
 | roadmap_id | PHOENIX_ROADMAP |
 | stage_id | S002 |
 | program_id | S002-P001 |
+| work_package_id | N/A |
+| task_id | N/A |
 | gate_id | GATE_0 |
 | phase_owner | Team 100 |
 | required_ssm_version | 1.0.0 |
@@ -26,12 +28,12 @@ Per `PHOENIX_MASTER_WSM_v1.0.0.md` CURRENT_OPERATIONAL_STATE (as of 2026-02-24):
 | WSM Field | Value | This Program |
 |---|---|---|
 | `active_stage_id` | S002 | ✓ Binds to S002 |
-| `active_program_id` | N/A (none active) | S002-P001 = next authorized |
-| `active_work_package_id` | N/A | WP001 = first WP in program |
+| `active_program_id` | S002-P001 | ✓ This program is now active |
+| `active_work_package_id` | N/A | No WP open yet — pending GATE_0 PASS → GATE_1 → GATE_2 → Team 10 |
 | `last_closed_work_package_id` | S001-P001-WP002 | Predecessor completed 2026-02-23 |
-| `current_gate` | READY_FOR_NEXT_WORK_PACKAGE | ✓ Program open is authorized |
+| `current_gate` | GATE_0 | LOD200 concept submitted; GATE_0 in progress |
 
-**This program is the next authorized action in S002.**
+**This program is the active program in S002. WSM source of truth: `PHOENIX_MASTER_WSM_v1.0.0.md` → CURRENT_OPERATIONAL_STATE.**
 
 ---
 
@@ -68,13 +70,12 @@ Per `PHOENIX_MASTER_SSM_v1.0.0.md`:
 | GATE_0 | Team 190 | Validates this LOD200 concept (structural feasibility) |
 | GATE_1 | Team 190 | Validates LLD400 produced by Team 170 |
 | GATE_2 | Team 100 | Architectural approval ("approve to build") |
-| PRE_GATE_3 | Team 90 | Work plan validation (WP001 work plan) |
-| GATE_3 | Team 10 | Opens WP001 development |
-| GATE_4 | Team 50 | QA validation |
+| GATE_3 | Team 10 | Opens WP development (G3.5 = work plan validation sub-stage, Team 10+90) |
+| GATE_4 | Team 10 | QA handoff |
 | GATE_5 | Team 90 | Development validation |
-| GATE_6 | Team 00 | Human review (Nimrod) |
-| GATE_7 | Team 90 | Final approval trigger |
-| GATE_8 | Team 90 | Documentation closure |
+| GATE_6 | Team 90 | Architectural dev validation (Team 00 authority) |
+| GATE_7 | Team 90 | Human UX approval (Nimrod) |
+| GATE_8 | Team 90 | Documentation closure (AS_MADE_LOCK) |
 
 WSM updates: GATE_0–GATE_2 → Team 190; GATE_3–GATE_4 → Team 10; GATE_5–GATE_8 → Team 90 (per Gate Governance Realignment v1.1.0).
 
@@ -93,3 +94,4 @@ WSM updates: GATE_0–GATE_2 → Team 190; GATE_3–GATE_4 → Team 10; GATE_5�
 ---
 
 **log_entry | TEAM_100 | AGENTS_OS_CORE_VALIDATION_ENGINE_LOD200_ROADMAP_ALIGNMENT | GATE_0 | 2026-02-24**
+**log_entry | TEAM_100 | ROADMAP_ALIGNMENT_REMEDIATION | BF-01_BF-02_BF-03 | GATE_0_BLOCK_FOR_FIX_RESPONSE | 2026-02-25**

@@ -16,7 +16,7 @@
  * @param {Function} options.onSave - Callback when save button is clicked (optional)
  * @param {boolean} options.showSaveButton - Whether to show save button (default: true)
  * @param {string} options.saveButtonText - Save button text (default: "שמירה")
- * @param {string} options.cancelButtonText - Cancel button text (default: "לבטל")
+ * @param {string} options.cancelButtonText - Cancel button text (default: "ביטול")
  * @param {string} options.entity - Entity for header color (trading_account | brokers_fees | cash_flow)
  * @returns {HTMLElement} Modal element
  */
@@ -28,8 +28,9 @@ export function createModal(options = {}) {
     onSave = null,
     showSaveButton = true,
     saveButtonText = 'שמירה',
-    cancelButtonText = 'לבטל',
-    entity = null
+    cancelButtonText = 'ביטול',
+    entity = null,
+    confirmMode = false
   } = options;
 
   // Remove existing modal if any
@@ -92,14 +93,15 @@ export function createModal(options = {}) {
   footer.className = 'phoenix-modal__footer';
 
   const cancelButton = document.createElement('button');
-  cancelButton.className = 'phoenix-modal__cancel-btn';
+  cancelButton.className = 'phoenix-modal__cancel-btn phoenix-btn phoenix-btn--secondary';
   cancelButton.type = 'button';
   cancelButton.textContent = cancelButtonText;
   footer.appendChild(cancelButton);
 
   if (showSaveButton && onSave) {
     const saveButton = document.createElement('button');
-    saveButton.className = 'phoenix-modal__save-btn';
+    saveButton.className = 'phoenix-modal__save-btn phoenix-btn phoenix-btn--primary' + (confirmMode ? ' phoenix-modal__confirm-btn' : '');
+    if (confirmMode) saveButton.setAttribute('data-action', 'confirm-delete');
     saveButton.type = 'button';
     saveButton.textContent = saveButtonText;
     footer.appendChild(saveButton);

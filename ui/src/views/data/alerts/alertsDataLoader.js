@@ -36,18 +36,21 @@ async function fetchAlertsSummary() {
 /**
  * Fetch Alerts
  * GET /api/v1/alerts?target_type=...&page=...&per_page=...&sort=...&order=...
+ * Phase C: Correct query pass-through — target_type, page, per_page, sort, order, ticker_id
  */
 async function fetchAlerts(filters = {}) {
   try {
     await sharedServices.init();
     const params = {};
-    if (filters.targetType && filters.targetType !== 'all') {
-      params.target_type = filters.targetType;
+    const targetType = filters.targetType ?? filters.target_type;
+    if (targetType && targetType !== 'all') {
+      params.target_type = targetType;
     }
     if (filters.page != null) params.page = filters.page;
     if (filters.per_page != null) params.per_page = filters.per_page;
     if (filters.sort) params.sort = filters.sort;
     if (filters.order) params.order = filters.order;
+    if (filters.tickerId || filters.ticker_id) params.ticker_id = filters.tickerId || filters.ticker_id;
     const response = await sharedServices.get('/alerts', params);
     const data = Array.isArray(response) ? response : (response?.data ?? response?.alerts ?? response?.results ?? response?.items ?? []) || [];
     const total = Math.max(data.length, (response.total != null ? response.total : response.total_count) || 0);
@@ -55,6 +58,20 @@ async function fetchAlerts(filters = {}) {
   } catch (error) {
     maskedLog('[Alerts Data Loader] Error fetching alerts:', { errorCode: (error && error.code), status: (error && error.status) });
     return { data: [], total: 0 };
+  }
+}
+
+/**
+ * Fetch single alert by ID
+ * GET /api/v1/alerts/:id
+ */
+async function fetchAlertById(id) {
+  try {
+    await sharedServices.init();
+    return await sharedServices.get(`/alerts/${id}`);
+  } catch (error) {
+    maskedLog('[Alerts Data Loader] Error fetching alert:', { id, errorCode: (error && error.code) });
+    return null;
   }
 }
 
@@ -80,4 +97,4 @@ async function loadAlertsData(filters = {}) {
   }
 }
 
-export { fetchAlertsSummary, fetchAlerts, loadAlertsData };
+export { fetchAlertsSummary, fetchAlerts, fetchAlertById, loadAlertsData };

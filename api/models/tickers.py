@@ -18,6 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enums import ticker_type_enum
 
 
 class Ticker(Base):
@@ -47,7 +48,12 @@ class Ticker(Base):
         nullable=True
     )
     company_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    ticker_type: Mapped[str] = mapped_column(String(20), nullable=False, default="STOCK", server_default="STOCK")
+    ticker_type: Mapped[str] = mapped_column(
+        ticker_type_enum,
+        nullable=False,
+        default="STOCK",
+        server_default="STOCK",
+    )
     
     # Metadata
     sector_id: Mapped[Optional[uuid.UUID]] = mapped_column(

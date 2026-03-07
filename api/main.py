@@ -6,6 +6,7 @@ Status: COMPLETED
 Main FastAPI application with all routes and middleware.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -17,12 +18,24 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts
+from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications, background_jobs, trades, trade_plans
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from . import __version__
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """APScheduler start/stop per ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION."""
+    from .background.scheduler_startup import start_scheduler, stop_scheduler
+    await start_scheduler()
+    logger.info("APScheduler started — background jobs active")
+    yield
+    await stop_scheduler()
+    logger.info("APScheduler stopped")
+
 
 # Create FastAPI app (version SSOT: api/__init__.py)
 app = FastAPI(
@@ -30,7 +43,8 @@ app = FastAPI(
     version=__version__,
     description="Unified API Specification (Fortress Protocol)",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Register exception handlers BEFORE routers to ensure they're used
@@ -40,21 +54,30 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     Handler for Pydantic validation errors.
     
     PDSC Error Schema (Team 90): error_code, detail, field_errors, trace_id.
+    BF-G5R-001: malformed JSON (JSON decode error) → 400 per architect contract.
     """
     logger.debug(f"RequestValidationError caught: {exc.errors()}")
+    errors = exc.errors()
+    first_msg = errors[0].get("msg", "Validation error") if errors else "Validation error"
+    # BF-G5R-001: malformed JSON must return 400, not 422
+    is_malformed_json = (
+        "JSON decode error" in first_msg
+        or any(e.get("type", "").endswith("json_decode") or "json" in str(e.get("type", "")).lower() for e in errors)
+    )
+    status_code = 400 if is_malformed_json else 422
     # Build field_errors per Team 90 SSOT (PDSC Error Schema)
     field_errors = []
-    for e in exc.errors():
+    for e in errors:
         loc = e.get("loc", ())
-        # Extract field name: ('body','x') -> 'x', ('query','y') -> 'y'
         field_name = loc[-1] if len(loc) > 1 else (loc[0] if loc else "body")
         field_errors.append({"field": str(field_name), "message": e.get("msg", "Validation error")})
     content = {
         "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT,
-        "detail": exc.errors()[0].get("msg", "Validation error") if exc.errors() else "Validation error",
+        "detail": first_msg,
+        "message": first_msg,  # BF-G7-017: UI compatibility (error.message ?? error.detail)
         "field_errors": field_errors
     }
-    return JSONResponse(status_code=422, content=content)
+    return JSONResponse(status_code=status_code, content=content)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
@@ -101,6 +124,10 @@ app.include_router(settings_router.router, prefix=settings.api_v1_prefix)
 app.include_router(system.router, prefix=settings.api_v1_prefix)
 app.include_router(notes.router, prefix=settings.api_v1_prefix)
 app.include_router(alerts.router, prefix=settings.api_v1_prefix)
+app.include_router(notifications.router, prefix=settings.api_v1_prefix)
+app.include_router(background_jobs.router, prefix=settings.api_v1_prefix)
+app.include_router(trades.router, prefix=settings.api_v1_prefix)
+app.include_router(trade_plans.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health")
@@ -178,11 +205,12 @@ async def detailed_health_check():
 
 @app.exception_handler(HTTPExceptionWithCode)
 async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionWithCode):
-    """Handler for HTTPExceptionWithCode - always includes error_code."""
+    """Handler for HTTPExceptionWithCode - always includes error_code. BF-G7-008: message alias for UI (error.message ?? error.detail)."""
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "detail": exc.detail,
+            "message": exc.detail,  # BF-G7-008: UI compatibility (error.message ?? error.detail)
             "error_code": exc.error_code
         },
         headers=exc.headers
@@ -213,6 +241,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={
             "detail": exc.detail,
+            "message": exc.detail,  # BF-G7-008/017: UI compatibility (error.message ?? error.detail)
             "error_code": error_code
         },
         headers=exc.headers

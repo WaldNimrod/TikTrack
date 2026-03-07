@@ -9,7 +9,7 @@
 **רג'יסטרי רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md`  
 **רשימת השלמות רמה 2:** `_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md`  
 **תפקיד:** ניהול תהליך, סדר משימות וסטטוס, **הפעלת צוותים — הודעות ברורות עם משימות** (ראה `TEAM_10_GATEWAY_ROLE_AND_PROCESS.md`).  
-**last_updated:** 2026-02-23
+**last_updated:** 2026-02-25
 
 **מקור סטטוס שערים (חובה):** סטטוס שער פעיל, current gate ו־last_gate_event הם **ב־WSM בלבד** — `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (בלוק CURRENT_OPERATIONAL_STATE). רשימה זו מתעדת **משימות וסגירתן** (CLOSED + תאריך) **לא** סטטוס שער שוטף; עדכון שער מתבצע ב־WSM על ידי Gate Owner.  
 **תחום רמה 2 (Portfolio boundary):** רמה 2 היא **Task-level פנימי בלבד**; אין SSOT ל־Stage/Program/WP status בקובץ זה. מקור סטטוס Portfolio (Stage/Program/WP) — WSM + רשומות הפורטפוליו הקנוניות (`documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md`).
@@ -80,6 +80,20 @@
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_G3.5_PASS | 2026-02-21** — Team 90 VALIDATION_RESPONSE PASS ל־ולידציית תוכנית (G3.5).
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_WP001_ACTIVATED | 2026-02-20**
 **log_entry | TEAM_10 | MASTER_TASK_LIST | S001_P001_LLD400_SYNC_AND_DOMAIN | 2026-02-22** — סינכרון עם WSM: S001-P001 (דומיין AGENTS_OS) — GATE_1 (SPEC) PASS (LLD400 v1.0.0, Team 190 2026-02-22); ייחוס דומיין AGENTS_OS ל־Program 01 ו־WP001; מספור מדויק S001-P001 / S001-P001-WP001.
+
+---
+
+## STAGE_2_PROGRAM_01 — דומיין Agents_OS (S002-P001)
+
+**היררכיה:** Stage S002 → Program **S002-P001** (Agents_OS Core Validation Engine).  
+**מצב שוטף (SSOT):** WSM בלבד — `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (CURRENT_OPERATIONAL_STATE).  
+**עיקרון מניעת דריפט:** קובץ זה מתעד Work Packages ומשימות; סטטוס שער חי נקרא מה-WSM בלבד.
+
+| # | שם | תיאור | סטטוס | שלב | דומיין | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|--------|------------|------------|------------|------------|------------|
+| S002-P001-WP001 | Spec Validation Engine (170→190) | T001 templates (LOD200/LLD400), shared validator infra, 44 checks (TIER1-7), LLM gate, validation runner, tests. תלות: WP002 רק אחרי WP001 GATE_4. | DRAFT (PENDING_G3.5_PASS) | Stage S002 / Program S002-P001 | AGENTS_OS | Team 10 | TEAM_10_S002_P001_WP001_WORK_PACKAGE_DEFINITION.md | 2026-02-25 | 2026-02-25 | — |
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | S002_P001_WP001_ADDED_G3_INTAKE_ACTIVE | 2026-02-25** — GATE_3 intake אושר ע"י Team 190; Team 10 פתח WP001. WSM עודכן ל־current_gate=GATE_3, active_work_package_id=S002-P001-WP001; next_required_action: G3.1–G3.4 ואז G3.5 validation מול Team 90 לפני G3.6.
 
 ---
 

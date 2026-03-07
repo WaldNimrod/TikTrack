@@ -1,0 +1,3 @@
+JOB_MODULE_CHECK sync_ticker_prices_intraday OK module=api.background.jobs.sync_intraday function=run
+JOB_MODULE_CHECK check_alert_conditions OK module=api.background.jobs.check_alert_conditions function=run
+JOB_MODULES_EXIT 0

@@ -6,6 +6,7 @@ TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.database import get_db
@@ -33,7 +34,7 @@ async def get_notes_summary(
 
 @router.get("", response_model=list)
 async def list_notes(
-    parent_type: Optional[str] = Query(None, description="trade|trade_plan|ticker|account|general"),
+    parent_type: Optional[str] = Query(None, description="trade|trade_plan|ticker|account"),
     parent_id: Optional[str] = Query(None),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -149,6 +150,30 @@ async def get_attachment(
     if not attachment:
         raise HTTPException(status_code=404, detail="Attachment not found")
     return attachment
+
+
+@router.get("/{note_id}/attachments/{attachment_id}/download")
+async def download_attachment(
+    note_id: uuid.UUID,
+    attachment_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    G7R Batch3: Attachment proof flow — stream file with Content-Disposition.
+    """
+    service = get_note_attachments_service()
+    result = await service.get_attachment_download(
+        db=db, note_id=note_id, attachment_id=attachment_id, user_id=current_user.id
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="Attachment not found")
+    full_path, content_type, original_filename = result
+    return FileResponse(
+        path=full_path,
+        media_type=content_type,
+        filename=original_filename,
+    )
 
 
 @router.delete("/{note_id}/attachments/{attachment_id}", status_code=204)

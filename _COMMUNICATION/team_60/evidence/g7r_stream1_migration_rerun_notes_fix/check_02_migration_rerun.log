@@ -1,0 +1,19 @@
+MIGRATION_RERUN_EXIT 0
+---STDOUT---
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 0
+ALTER TABLE
+ALTER TABLE
+UPDATE 23
+ALTER TABLE
+COMMENT
+COMMENT
+ALTER TABLE
+ALTER TABLE
+---STDERR---
+NOTICE:  column "target_datetime" of relation "alerts" already exists, skipping
+NOTICE:  column "parent_datetime" of relation "notes" already exists, skipping
+NOTICE:  constraint "notes_parent_type_check" of relation "notes" does not exist, skipping

@@ -23,11 +23,12 @@ class Alert(Base):
     """
     Alert model - maps to user_data.alerts table.
     D34: Price alerts and notifications (polymorphic).
+    G7R Stream1: target_type general removed; datetime added; target_datetime added.
     """
     __tablename__ = "alerts"
     __table_args__ = (
         CheckConstraint(
-            "target_type IN ('ticker', 'trade', 'trade_plan', 'account', 'general')",
+            "target_type IS NULL OR target_type IN ('ticker', 'trade', 'trade_plan', 'account', 'datetime')",
             name="alerts_target_type_check",
         ),
         {"schema": "user_data"},
@@ -44,7 +45,7 @@ class Alert(Base):
         ForeignKey("user_data.users.id", ondelete="CASCADE"),
         nullable=False,
     )
-    target_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    target_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     target_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True),
         nullable=True,
@@ -65,7 +66,7 @@ class Alert(Base):
         server_default="MEDIUM",
     )
     condition_field: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    condition_operator: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    condition_operator: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     condition_value: Mapped[Optional[Decimal]] = mapped_column(Numeric(20, 8), nullable=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -79,7 +80,17 @@ class Alert(Base):
         server_default="false",
         nullable=False,
     )
+    trigger_status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="untriggered",
+        server_default="'untriggered'",
+    )
     triggered_at: Mapped[Optional[datetime]] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=True,
+    )
+    target_datetime: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=True,
     )

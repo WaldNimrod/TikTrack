@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T22:41:35.856Z",
+  "work_package_id": "S002-P003-WP002",
+  "batch": 3,
+  "results": {
+    "item1": {
+      "status": "FAIL",
+      "evidence": "No error in #tickerFormValidationSummary or #tickerSymbolError after invalid symbol"
+    },
+    "item2": {
+      "status": "FAIL",
+      "evidence": "Linked column: text=\"טיקר\" link=false"
+    },
+    "item3": {
+      "status": "FAIL",
+      "evidence": "element not interactable\n  (Session info: chrome=145.0.7632.159)"
+    }
+  }
+}

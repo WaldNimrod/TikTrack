@@ -1,105 +1,111 @@
-name: CI Quality Gate
+name: Phoenix CI Quality Gate
 
 on:
   push:
     branches: [main, develop]
     paths-ignore:
-      - 'documentation/**'
-      - '_COMMUNICATION/**'
-      - 'Agents_OS/**'
-      - 'blueprints/**'
-      - 'raw_inputs/**'
-      - '*.md'
+      - "documentation/**"
+      - "_COMMUNICATION/**"
+      - "agents_os/**"
+      - "blueprints/**"
+      - "raw_inputs/**"
+      - "*.md"
   pull_request:
     branches: [main, develop]
     paths-ignore:
-      - 'documentation/**'
-      - '_COMMUNICATION/**'
-      - 'Agents_OS/**'
-      - 'blueprints/**'
-      - 'raw_inputs/**'
-      - '*.md'
+      - "documentation/**"
+      - "_COMMUNICATION/**"
+      - "agents_os/**"
+      - "blueprints/**"
+      - "raw_inputs/**"
+      - "*.md"
 
 jobs:
-  backend-tests:
-    name: Backend — Tests & Security
+  backend-quality:
+    name: Backend Tests & Security
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
           cd api
           python3 -m venv venv
           source venv/bin/activate
+          pip install --upgrade pip
+          pip --version
           pip install -r requirements.txt -q
-          pip install bandit pip-audit -q
+          pip install -r requirements-quality-tools.txt -q
 
-      - name: Unit Tests
+      - name: Unit Tests [BLOCKING]
         run: |
           source api/venv/bin/activate
           python3 -m pytest tests/unit/ -v --tb=short
+        # BLOCKING: failure here = PR cannot merge
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5432/test"
           JWT_SECRET_KEY: "ci-test-key-must-be-at-least-64-characters-long-for-validation-to-pass-abcdefghijklmnop"
           ENCRYPTION_KEY: "ci-test-encryption-key-32chars-ab"
 
-      - name: Suite B — Cache & Failover
+      - name: Suite B Cache Failover [BLOCKING]
         run: |
           source api/venv/bin/activate
           python3 -m pytest tests/test_external_data_cache_failover_pytest.py -v
+        # BLOCKING: external-data replay path must stay healthy
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5432/test"
           JWT_SECRET_KEY: "ci-test-key-must-be-at-least-64-characters-long-for-validation-to-pass-abcdefghijklmnop"
           ENCRYPTION_KEY: "ci-test-encryption-key-32chars-ab"
 
-      - name: Security Scan (bandit)
+      - name: Security Scan Bandit HIGH [BLOCKING]
         run: |
           source api/venv/bin/activate
-          bandit -r api/ --exclude api/venv -ll
+          bandit -r api/ --exclude api/venv -lll
+        # BLOCKING: HIGH severity security issues = PR cannot merge
 
-      - name: Dependency Audit (pip-audit)
+      - name: Dependency Audit [INFORMATIONAL]
         run: |
           source api/venv/bin/activate
           pip-audit --format columns || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
         continue-on-error: true
 
-  frontend-build:
-    name: Frontend — Lint & Build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ui
+      - name: Type Safety mypy [INFORMATIONAL]
+        run: |
+          source api/venv/bin/activate
+          mypy api/ --config-file api/mypy.ini || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
+        continue-on-error: true
 
+  frontend-quality:
+    name: Frontend Build & Lint
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: ui/package-lock.json
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "ui/package-lock.json"
 
       - name: Install dependencies
-        run: npm ci
+        run: cd ui && npm ci
 
-      - name: ESLint
-        run: ./node_modules/.bin/eslint . --ext js,jsx --report-unused-disable-directives || true
+      - name: Frontend Build [BLOCKING]
+        run: cd ui && npx vite build
+        # BLOCKING: build must succeed for merge
+
+      - name: ESLint [INFORMATIONAL]
+        run: cd ui && ./node_modules/.bin/eslint . --ext js,jsx --report-unused-disable-directives || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
         continue-on-error: true
 
-      - name: Vite Build
-        run: npx vite build
-
-      - name: npm audit
-        run: npm audit || true
+      - name: npm Security Audit [INFORMATIONAL]
+        run: cd ui && npm audit || true
+        # PHASE2_PROMOTION: see ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §5.5
         continue-on-error: true

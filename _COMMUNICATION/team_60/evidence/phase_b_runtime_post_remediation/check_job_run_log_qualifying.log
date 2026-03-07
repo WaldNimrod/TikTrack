@@ -1,0 +1,14 @@
+---
+check: job_run_log qualifying rows
+date: 2026-03-02
+---
+=== SYNC INTRADAY RECENT ===
+sync_ticker_prices_intraday|completed|TARGET_RUNTIME|100152
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME|None
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME|None
+
+=== QUALIFY CHECK ===
+sync_ticker_prices_intraday: PASS
+check_alert_conditions: PASS
+
+QUALIFY_CHECK_EXIT 0

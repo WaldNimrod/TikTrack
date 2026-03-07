@@ -1,0 +1,4 @@
+ENDPOINT /admin/background-jobs/health ERROR URLError:<urlopen error [Errno 61] Connection refused>
+ENDPOINT /admin/background-jobs ERROR URLError:<urlopen error [Errno 61] Connection refused>
+ENDPOINT /admin/background-jobs/runs ERROR URLError:<urlopen error [Errno 61] Connection refused>
+BACKGROUND_JOBS_ENDPOINTS_EXIT 1

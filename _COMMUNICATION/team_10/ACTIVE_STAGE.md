@@ -1,6 +1,9 @@
 # Active Stage — GAP_CLOSURE_BEFORE_AGENT_POC
 **project_domain:** TIKTRACK
 
+> **Historical stage record (closed):** this file documents the closed GAP_CLOSURE stage.  
+> **Current runtime stage SSOT:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (CURRENT_OPERATIONAL_STATE) — currently `stage_id=S002`, `current_gate=GATE_3`, `active_work_package_id=S002-P001-WP001`.
+
 **Stage ID:** GAP_CLOSURE_BEFORE_AGENT_POC  
 **Owner:** Team 10 (The Gateway)  
 **Status:** **CLEAN_FOR_AGENT** — Stage closed  

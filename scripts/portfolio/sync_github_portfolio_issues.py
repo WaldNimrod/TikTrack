@@ -245,6 +245,8 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
         stage_order[stage.get("stage_id", "")] = idx
 
     program_to_stage: Dict[str, str] = {p.get("program_id", ""): p.get("stage_id", "") for p in programs}
+    stage_by_id: Dict[str, dict] = {s.get("stage_id", ""): s for s in stages}
+    program_by_id: Dict[str, dict] = {p.get("program_id", ""): p for p in programs}
 
     if scope == "full":
         runtime_key = "runtime:current"
@@ -281,12 +283,24 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
 
     for stage in stages:
         sid = stage.get("stage_id", "")
+        sname = (stage.get("stage_name") or "").strip() or sid
         status = stage.get("status", "")
         s_ord = stage_order.get(sid, 999)
         key = f"stage:{sid}"
+        hierarchy_block = [
+            "## מיקום בהיררכיה (שלב → תוכנית → חבילת עבודה)",
+            "",
+            "```",
+            f"STAGE: {sid} — {sname}",
+            "```",
+            "",
+            "תמונה מלאה: כל ה-Issues עם תווית `portfolio-pipeline` או קובץ portfolio_snapshot.md (סעיף Roadmap hierarchical).",
+            "",
+        ]
         body = "\n".join(
             [
                 _marker(key),
+                *hierarchy_block,
                 "## Stage",
                 "",
                 f"- hierarchy_order: `P{s_ord:02d}`",
@@ -336,14 +350,29 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
     )
     for program in programs_sorted:
         pid = program.get("program_id", "")
+        pname = (program.get("program_name") or "").strip() or pid
         status = program.get("status", "")
         stage_id = program.get("stage_id", "")
         s_ord = stage_order.get(stage_id, 999)
         p_ord = _program_number(pid)
         key = f"program:{pid}"
+        parent_stage = stage_by_id.get(stage_id, {})
+        parent_sname = (parent_stage.get("stage_name") or "").strip() or stage_id
+        hierarchy_block = [
+            "## מיקום בהיררכיה (שלב → תוכנית → חבילת עבודה)",
+            "",
+            "```",
+            f"STAGE: {stage_id} — {parent_sname}",
+            f"  └── PROGRAM: {pid} — {pname}",
+            "```",
+            "",
+            "תמונה מלאה: כל ה-Issues עם תווית `portfolio-pipeline` או portfolio_snapshot.md (Roadmap hierarchical).",
+            "",
+        ]
         body = "\n".join(
             [
                 _marker(key),
+                *hierarchy_block,
                 "## Program",
                 "",
                 f"- hierarchy_order: `P{s_ord:02d}.{p_ord:02d}`",
@@ -402,9 +431,26 @@ def build_issue_items(snapshot: dict, scope: str = "full") -> List[IssueItem]:
         p_ord = _program_number(program_id)
         w_ord = _wp_number(wid)
         key = f"work_package:{wid}"
+        parent_stage = stage_by_id.get(stage_id, {})
+        parent_program = program_by_id.get(program_id, {})
+        parent_sname = (parent_stage.get("stage_name") or "").strip() or stage_id
+        parent_pname = (parent_program.get("program_name") or "").strip() or program_id
+        hierarchy_block = [
+            "## מיקום בהיררכיה (שלב → תוכנית → חבילת עבודה)",
+            "",
+            "```",
+            f"STAGE: {stage_id} — {parent_sname}",
+            f"  └── PROGRAM: {program_id} — {parent_pname}",
+            f"      └── WORK_PACKAGE: {wid}",
+            "```",
+            "",
+            "תמונה מלאה: כל ה-Issues עם תווית `portfolio-pipeline` או portfolio_snapshot.md (Roadmap hierarchical).",
+            "",
+        ]
         body = "\n".join(
             [
                 _marker(key),
+                *hierarchy_block,
                 "## Work Package",
                 "",
                 f"- hierarchy_order: `P{s_ord:02d}.{p_ord:02d}.{w_ord:03d}`",

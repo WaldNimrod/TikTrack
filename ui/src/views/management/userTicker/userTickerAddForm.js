@@ -124,6 +124,7 @@ export function showUserTickerAddModal(options = {}) {
     entity: 'user_tickers',
     showSaveButton: true,
     saveButtonText: 'הוספה',
+    cancelButtonText: 'ביטול',
     onSave: async function () {
       const form = document.getElementById('userTickerAddForm');
       if (!form) return;
@@ -199,7 +200,12 @@ export function showUserTickerAddModal(options = {}) {
         } else if (symbolErr) {
           symbolErr.textContent = msg;
         } else {
-          alert(msg);
+          createModal({
+            title: 'שגיאה',
+            content: `<p>${msg.replace(/</g, '&lt;')}</p>`,
+            showSaveButton: false,
+            cancelButtonText: 'ביטול'
+          });
         }
       }
     },

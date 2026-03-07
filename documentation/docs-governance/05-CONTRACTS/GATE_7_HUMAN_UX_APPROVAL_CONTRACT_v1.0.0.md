@@ -10,6 +10,7 @@ scope: GATE_7
 ## 1) Purpose
 
 Define deterministic artifacts and routing for GATE_7 (HUMAN_UX_APPROVAL), including reject routing and transition readiness to GATE_8.
+This gate is a human browser/UI review gate, not a terminal/log inspection gate.
 
 ---
 
@@ -20,16 +21,23 @@ Define deterministic artifacts and routing for GATE_7 (HUMAN_UX_APPROVAL), inclu
 | Entry | GATE_6 PASS (architectural dev validation approved). |
 | Gate owner | Team 90. |
 | Human approver | Team 00 / Nimrod (per current governance process). |
-| Core process | Team 90 submits approval package, receives decision, routes by outcome, updates WSM. |
+| Core process | Team 90 prepares human-facing browser scenarios, receives human decision, normalizes it into canonical decision artifact, routes by outcome, updates WSM. |
 | Exit | PASS only on explicit human approval decision artifact. |
 | Next action | PASS -> Team 90 activates GATE_8 with Team 70 execution package. |
+
+### Locked execution semantics
+
+1. GATE_7 is executed by a human approver through the product UI in a browser.
+2. Team 90 must provide scenario-based validation instructions that cover real user flows and edge cases.
+3. Team 90 must not require terminal commands, log inspection, shell scripts, `/tmp` artifacts, or file-existence checks from the human approver as the core approval path.
+4. API coverage in GATE_7 is achieved indirectly through UI workflows (create, edit, toggle, delete, filter, validation), not through direct API tooling by the human approver.
 
 ---
 
 ## 3) Canonical artifact names (deterministic templates)
 
 1. Approval request:
-`_COMMUNICATION/team_90/TEAM_90_TO_NIMROD_<WP_ID>_GATE7_HUMAN_UX_APPROVAL_REQUEST.md`
+`_COMMUNICATION/team_90/TEAM_90_TO_NIMROD_<WP_ID>_GATE7_HUMAN_APPROVAL_SCENARIOS.md`
 2. Human decision record:
 `_COMMUNICATION/_Architects_Decisions/NIMROD_GATE7_<WP_ID>_DECISION.md`
 3. Gate 8 activation notice (on PASS):
@@ -58,6 +66,26 @@ Every GATE_7 decision artifact must include:
 5. `next_required_action`
 6. `next_responsible_team`
 7. `wsm_update_reference`
+
+### Human response intake rule (locked)
+
+1. The human approver may respond in Hebrew plain text.
+2. Accepted human response tokens:
+   - `אישור`
+   - `פסילה`
+3. On `פסילה`, the human response should include numbered findings in plain language.
+4. Team 90 is responsible for converting the human response into the canonical decision artifact and classification route.
+
+### Mandatory scenario content rule
+
+Every GATE_7 scenario artifact issued by Team 90 must include:
+
+1. UI pages to open.
+2. Exact user actions to perform in browser.
+3. Expected visible result after each action.
+4. Edge cases / invalid values to test.
+5. Clear PASS vs FAIL rule.
+6. Human response format in Hebrew.
 
 ---
 

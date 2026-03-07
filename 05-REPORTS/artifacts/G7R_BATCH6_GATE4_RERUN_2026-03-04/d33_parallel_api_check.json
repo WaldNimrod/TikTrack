@@ -1,0 +1,9 @@
+{
+  "symbol": "BATCH6PAR398000",
+  "codes": [
+    201,
+    409
+  ],
+  "status": "PASS",
+  "invariant_201_201_forbidden": true
+}

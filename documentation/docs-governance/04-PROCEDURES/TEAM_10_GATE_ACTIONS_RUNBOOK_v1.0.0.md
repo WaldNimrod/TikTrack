@@ -19,6 +19,7 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 - SSM/WSM and Gate Protocol are canonical. Identity header and canonical message format (TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0) apply to all gate-bound artifacts.
 - Team 10 uses TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 for scope (20/30/40/60); activates **every** development team in scope with explicit mandate/prompt.
+- Fast-track operations (when declared) are governed by `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`; this runbook remains the canonical execution reference for GATE_3 internals.
 - Cross-owner gate artifact contracts are mandatory references:
   - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
   - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
@@ -84,9 +85,10 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 |------|---------|
 | **Entry** | GATE_6 PASS. |
 | **Owner** | Team 90. |
-| **Team 10 mandatory actions** | (1) Submit request for human UX sign-off (Nimrod / Team 00 per process). (2) Update on signature. |
-| **Required artifacts** | Request and approval record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
-| **Exit** | Human sign-off received. |
+| **Team 10 mandatory actions** | (1) Provide clarifications only if Team 90 requests them. (2) Wait for human decision routed by Team 90. (3) Do not operate GATE_7 directly. |
+| **Required artifacts** | Team 90 browser-scenario request + human decision record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
+| **Execution mode** | Human browser/UI review only: real pages, user actions, visible outcomes, edge cases. No terminal/log review as primary approval path. |
+| **Exit** | Human sign-off (`אישור`) received and normalized by Team 90 into canonical decision artifact. |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
 ---
@@ -110,4 +112,18 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 
 ---
 
+## 10) Fast-track reference (optional, non-default)
+
+When a fast-track is formally declared, Team 10 must:
+
+1. Keep `gate_id` canonical and use WSM `track_mode` to represent active mode.
+2. Execute FAST_2 by reference to canonical GATE_3 sequence (G3.1..G3.9; G3.5 mandatory).
+3. Enforce track exclusivity in WSM (`FAST` active => normal flow HOLD with reason).
+
+Normative fast-track protocol:
+`documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`
+
+---
+
 **log_entry | TEAM_170 | TEAM_10_GATE_ACTIONS_RUNBOOK | v1.0.0_LOCKED | 2026-02-23**
+**log_entry | TEAM_190 | TEAM_10_GATE_ACTIONS_RUNBOOK | FAST_TRACK_REFERENCE_ADDED | 2026-02-26**

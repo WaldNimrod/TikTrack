@@ -1,0 +1,6 @@
+LOGIN_HTTP 200
+LOGIN_TOKEN_PRESENT True
+ENDPOINT /admin/background-jobs/health HTTP 200
+ENDPOINT /admin/background-jobs HTTP 200
+ENDPOINT /admin/background-jobs/runs?limit=20 HTTP 200
+ENDPOINTS_EXIT 0

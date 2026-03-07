@@ -1,0 +1,23 @@
+=== D22 Tickers QA — FAV API ===
+Backend: http://127.0.0.1:8082
+✅ Admin Login
+✅ GET /tickers/summary → 200
+✅ GET /tickers → 200
+✅ GET /tickers?ticker_type=STOCK → 200
+✅ GET /tickers?is_active=true → 200
+✅ GET /tickers?search=A → 200
+✅ POST /tickers → 201 (id=7328YPMAS99GQBSMMQ8TEDZJ1R)
+✅ GET /tickers/:id → 200
+✅ GET /tickers/:id/data-integrity → 200
+✅ PUT /tickers/:id → 200
+✅ DELETE /tickers/:id → 204
+✅ GET /tickers/:id after delete → 404
+{
+  "passed": 12,
+  "failed": 0,
+  "exit_code": 0,
+  "backend": "http://127.0.0.1:8082",
+  "work_package_id": "S002-P003-WP002",
+  "domain": "D22"
+}
+=== D22 Tickers API QA Done ===

@@ -1,10 +1,11 @@
 """
 Notes Model - SQLAlchemy ORM (D35)
 TEAM_10_TO_TEAM_20_D35_RICH_TEXT_ATTACHMENTS_MANDATE
-Maps to user_data.notes table per PHX_DB_SCHEMA_V2.5
+G7R Stream1: parent_datetime added for temporal linkage.
 """
 
 import uuid
+from datetime import datetime
 from typing import Optional
 from sqlalchemy import String, Text, ForeignKey, CheckConstraint, BigInteger
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
@@ -24,7 +25,7 @@ class Note(Base):
     __tablename__ = "notes"
     __table_args__ = (
         CheckConstraint(
-            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account', 'general')",
+            "parent_type IN ('trade', 'trade_plan', 'ticker', 'account', 'datetime')",
             name="notes_parent_type_check",
         ),
         {"schema": "user_data"},
@@ -83,6 +84,10 @@ class Note(Base):
         TIMESTAMP(timezone=True),
         nullable=True,
     )
+    parent_datetime: Mapped[Optional[datetime]] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=True,
+    )
     metadata_: Mapped[Optional[dict]] = mapped_column(
         "metadata",
         JSONB,
@@ -106,7 +111,7 @@ class Note(Base):
 class NoteAttachment(Base):
     """
     NoteAttachment model - maps to user_data.note_attachments table.
-    D35: Max 3 per note, 1MB per file, MIME magic-bytes validated.
+    D35: Max 3 per note, 2.5MB per file (BF-G7-025), MIME magic-bytes validated.
     """
     __tablename__ = "note_attachments"
     __table_args__ = {"schema": "user_data"}

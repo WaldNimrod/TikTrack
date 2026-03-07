@@ -73,26 +73,27 @@ def test_db_schema_exchange_rates():
         from psycopg2.extras import RealDictCursor
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
+        # KB-004 CORRECTION: DB uses conversion_rate (not rate). DDL V2.6 documents conversion_rate.
         cur.execute("""
             SELECT column_name, data_type, numeric_precision, numeric_scale
             FROM information_schema.columns
             WHERE table_schema='market_data' AND table_name='exchange_rates'
-            AND column_name IN ('conversion_rate', 'last_sync_time')
+            AND column_name IN ('rate', 'conversion_rate', 'last_sync_time')
         """)
         rows = {r["column_name"]: r for r in cur.fetchall()}
         cur.close()
         conn.close()
-        if "conversion_rate" not in rows:
-            fail("db_exchange_rates", "column conversion_rate missing"); return
-        cr = rows["conversion_rate"]
-        if cr.get("numeric_precision") != 20 or cr.get("numeric_scale") != 8:
-            fail("db_precision", f"conversion_rate not 20,8: {cr}"); return
+        rate_col = rows.get("conversion_rate") or rows.get("rate")
+        if not rate_col:
+            fail("db_exchange_rates", "column conversion_rate or rate missing"); return
+        if rate_col.get("numeric_precision") != 20 or rate_col.get("numeric_scale") != 8:
+            fail("db_precision", f"rate column not 20,8: {rate_col}"); return
         ok("db_exchange_rates")
     except Exception as e:
         fail("db_exchange_rates", str(e))
 
 def test_db_schema_ticker_prices():
-    """DB: ticker_prices price/market_cap precision 20,8 (skip if no DB)"""
+    """DB: ticker_prices precision — price 20,8; market_cap 24,4 per p3_019 (KB-005 RATIFIED)"""
     db_url = os.getenv("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
     if not db_url or "postgresql" not in db_url:
         ok("ticker_prices_schema (skipped: no DB)"); return
@@ -110,9 +111,15 @@ def test_db_schema_ticker_prices():
         rows = list(cur.fetchall())
         cur.close()
         conn.close()
-        for r in rows:
-            if r.get("numeric_precision") != 20 or r.get("numeric_scale") != 8:
-                fail("ticker_prices_precision", f"{r['column_name']} not 20,8"); return
+        row_map = {r["column_name"]: r for r in rows}
+        # price: NUMERIC(20,8) per Iron Rule
+        pr = row_map.get("price")
+        if pr and (pr.get("numeric_precision") != 20 or pr.get("numeric_scale") != 8):
+            fail("ticker_prices_precision", f"price not 20,8: {pr}"); return
+        # KB-005: market_cap NUMERIC(24,4) RATIFIED (display field, trillion-dollar safe)
+        mc = row_map.get("market_cap")
+        if mc and (mc.get("numeric_precision") != 24 or mc.get("numeric_scale") != 4):
+            fail("ticker_prices_precision", f"market_cap not 24,4 per p3_019: {mc}"); return
         ok("ticker_prices_schema")
     except Exception as e:
         fail("ticker_prices_schema", str(e))

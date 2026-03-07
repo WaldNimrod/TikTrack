@@ -1,0 +1,22 @@
+JOB_LOG_QUERY_EXIT 0
+job_name|has_qualifying|last_qualifying_started_at
+check_alert_conditions|t|2026-03-03 09:08:29.739145+00
+sync_ticker_prices_intraday|t|2026-03-02 22:10:08.921911+00
+(2 rows)
+job_name|runtime_class|status|duration_ms|exit_code|started_at|completed_at
+check_alert_conditions|TARGET_RUNTIME|completed|54|0|2026-03-03 09:08:29.739145+00|2026-03-03 09:08:29.793559+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|skipped_concurrent||0|2026-03-03 09:08:29.738569+00|2026-03-03 09:08:29.785095+00
+check_alert_conditions|TARGET_RUNTIME|completed|54|0|2026-03-03 09:08:03.734145+00|2026-03-03 09:08:03.788494+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|skipped_concurrent||0|2026-03-03 09:08:03.733018+00|2026-03-03 09:08:03.778914+00
+check_alert_conditions|TARGET_RUNTIME|completed|47|0|2026-03-03 09:07:23.074631+00|2026-03-03 09:07:23.122473+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|skipped_concurrent||0|2026-03-03 09:07:23.073585+00|2026-03-03 09:07:23.113009+00
+check_alert_conditions|TARGET_RUNTIME|completed|202|0|2026-03-03 09:06:22.914284+00|2026-03-03 09:06:23.116817+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|running|||2026-03-03 09:06:22.91119+00|
+check_alert_conditions|TARGET_RUNTIME|completed|165|0|2026-03-02 22:10:08.922684+00|2026-03-02 22:10:09.088395+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|completed|100152|0|2026-03-02 22:10:08.921911+00|2026-03-02 22:11:49.07477+00
+check_alert_conditions|TARGET_RUNTIME|completed|16|0|2026-03-02 22:00:45.405076+00|2026-03-02 22:00:45.421873+00
+sync_ticker_prices_intraday|TARGET_RUNTIME|skipped_concurrent||0|2026-03-02 22:00:45.400691+00|2026-03-02 22:00:45.405103+00
+(12 rows)
+---STDERR---
+
+JOB_LOG_QUALIFY_EXIT 0

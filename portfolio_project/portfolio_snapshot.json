@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-24T12:57:00.570312+00:00",
+  "generated_at_utc": "2026-03-07T00:54:09.026472+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S002",
-    "active_work_package_id": "N/A",
-    "in_progress_work_package_id": "N/A",
-    "current_gate": "READY_FOR_NEXT_WORK_PACKAGE",
-    "active_program_id": "N/A",
-    "last_gate_event": "WSM_CORRECTION \\",
-    "next_required_action": "Team 10 may open the next authorized program/work package under Stage 2 per roadmap",
-    "next_responsible_team": "Team 10"
+    "active_work_package_id": "NONE",
+    "in_progress_work_package_id": "NONE",
+    "current_gate": "GATE_8",
+    "active_program_id": "S002-P003",
+    "last_gate_event": "GATE_8_PASS_DOCUMENTATION_CLOSED \\",
+    "next_required_action": "Team 10 and Team 90 coordinate next authorized roadmap activation after S002-P003 closure (no open execution WP in progress).",
+    "next_responsible_team": "Team 90 (gate owner state management) + Team 10 (next intake coordination)"
   },
   "stages": [
     {
@@ -29,7 +29,7 @@
     {
       "stage_id": "S002",
       "stage_name": "שלב 2 — השלב הפעיל",
-      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002",
       "status": "ACTIVE",
       "pages": "D22, D23",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
@@ -40,8 +40,8 @@
       "stage_name": "שלב 3 — Essential Data",
       "planned_scope": "שכבת נתונים יסודית",
       "status": "PLANNED",
-      "pages": "D33, D39, D38",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes)",
+      "pages": "D33, D39, D40, D41, D26",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     },
     {
@@ -49,8 +49,8 @@
       "stage_name": "שלב 4 — Financial Execution",
       "planned_scope": "המעגל הפיננסי",
       "status": "PLANNED",
-      "pages": "D36, D37",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "pages": "D36, D37, S004-P007 (Indicators Infrastructure)",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     },
     {
@@ -58,8 +58,8 @@
       "stage_name": "שלב 5 — Trades/Plans",
       "planned_scope": "ישויות מורכבות",
       "status": "PLANNED",
-      "pages": "D24, D25, D26, D27, D28, D29",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists)",
+      "pages": "D24, D25, D27, D28, D29, D31, D38, D26-Phase2",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory, TagRegistry, WatchListsEnhancement)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     },
     {
@@ -67,7 +67,7 @@
       "stage_name": "שלב 6 — Advanced Analytics",
       "planned_scope": "תובנות וניתוח",
       "status": "PLANNED",
-      "pages": "D30, D31, D32",
+      "pages": "D30, D32",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header"
     }
@@ -83,11 +83,219 @@
     },
     {
       "program_id": "S001-P002",
-      "program_name": "Alerts POC (per SSM §5.1)",
+      "program_name": "Alerts POC",
       "domain": "AGENTS_OS",
       "stage_id": "S001",
-      "status": "HOLD",
-      "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)"
+      "status": "PIPELINE",
+      "current_gate_mirror": "— (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress)"
+    },
+    {
+      "program_id": "S002-P001",
+      "program_name": "Agents_OS Core Validation Engine",
+      "domain": "AGENTS_OS",
+      "stage_id": "S002",
+      "status": "COMPLETE",
+      "current_gate_mirror": "DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26)"
+    },
+    {
+      "program_id": "S002-P002",
+      "program_name": "Full Pipeline Orchestrator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S002",
+      "status": "PIPELINE",
+      "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era; MCP-QA Hybrid Transition package queued as immediate scope extension after S002-P003-WP002 closure)"
+    },
+    {
+      "program_id": "S002-P003",
+      "program_name": "TikTrack Alignment (D22+D33+D34+D35)",
+      "domain": "TIKTRACK",
+      "stage_id": "S002",
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_8; active_flow=S002-P003; GATE_8 PASS; DOCUMENTATION_CLOSED for S002-P003-WP002; active_work_package_id=NONE"
+    },
+    {
+      "program_id": "S002-P004",
+      "program_name": "Admin Review S002",
+      "domain": "TIKTRACK",
+      "stage_id": "S002",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S003-P001",
+      "program_name": "Data Model Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14)"
+    },
+    {
+      "program_id": "S003-P002",
+      "program_name": "Test Template Generator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token)"
+    },
+    {
+      "program_id": "S003-P003",
+      "program_name": "System Settings (D39+D40+D41)",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)"
+    },
+    {
+      "program_id": "S003-P004",
+      "program_name": "User Tickers (D33)",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S003-P005",
+      "program_name": "Watch Lists (D26)",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S003-P006",
+      "program_name": "Admin Review S003",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S004-P001",
+      "program_name": "Financial Precision Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)"
+    },
+    {
+      "program_id": "S004-P002",
+      "program_name": "Business Logic Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)"
+    },
+    {
+      "program_id": "S004-P003",
+      "program_name": "Spec Draft Generator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)"
+    },
+    {
+      "program_id": "S004-P004",
+      "program_name": "Executions (D36)",
+      "domain": "TIKTRACK",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S004-P005",
+      "program_name": "Data Import (D37)",
+      "domain": "TIKTRACK",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S004-P006",
+      "program_name": "Admin Review S004",
+      "domain": "TIKTRACK",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S004-P007",
+      "program_name": "Indicators Infrastructure",
+      "domain": "TIKTRACK",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)"
+    },
+    {
+      "program_id": "S005-P001",
+      "program_name": "Analytics Quality Validator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)"
+    },
+    {
+      "program_id": "S005-P002",
+      "program_name": "Trade Entities (D29+D24)",
+      "domain": "TIKTRACK",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S005-P003",
+      "program_name": "Market Intelligence (D27+D25)",
+      "domain": "TIKTRACK",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S005-P004",
+      "program_name": "Journal & History (D28+D31)",
+      "domain": "TIKTRACK",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S005-P005",
+      "program_name": "Admin Review S005",
+      "domain": "TIKTRACK",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S006-P001",
+      "program_name": "Portfolio State (D32)",
+      "domain": "TIKTRACK",
+      "stage_id": "S006",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S006-P002",
+      "program_name": "Analysis & Closure (D30)",
+      "domain": "TIKTRACK",
+      "stage_id": "S006",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S006-P003",
+      "program_name": "Level-1 Dashboards",
+      "domain": "TIKTRACK",
+      "stage_id": "S006",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S006-P004",
+      "program_name": "Admin Review S006 FINAL",
+      "domain": "TIKTRACK",
+      "stage_id": "S006",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
     }
   ],
   "work_packages": [
@@ -108,6 +316,33 @@
       "current_gate": "GATE_8 (PASS)",
       "is_active": false,
       "active_marker_reason": "Lifecycle complete 2026-02-23"
+    },
+    {
+      "work_package_id": "S002-P001-WP001",
+      "program_id": "S002-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-26"
+    },
+    {
+      "work_package_id": "S002-P001-WP002",
+      "program_id": "S002-P001",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-02-26"
+    },
+    {
+      "work_package_id": "S002-P003-WP002",
+      "program_id": "S002-P003",
+      "domain": "TIKTRACK",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-03-07"
     }
   ],
   "hierarchy": [
@@ -150,10 +385,10 @@
         },
         {
           "program_id": "S001-P002",
-          "program_name": "Alerts POC (per SSM §5.1)",
+          "program_name": "Alerts POC",
           "domain": "AGENTS_OS",
-          "status": "HOLD",
-          "current_gate_mirror": "— (not activated; lock until S001-P001-WP001 GATE_8)",
+          "status": "PIPELINE",
+          "current_gate_mirror": "— (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress)",
           "work_packages": []
         }
       ]
@@ -162,56 +397,298 @@
       "stage_id": "S002",
       "stage_name": "שלב 2 — השלב הפעיל",
       "status": "ACTIVE",
-      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3",
+      "planned_scope": "מה שפתוח משלב 1 + הכנה לשלב 3 + MCP-QA Hybrid Transition packaging under S002-P002",
       "pages": "D22, D23",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S002-P001",
+          "program_name": "Agents_OS Core Validation Engine",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26)",
+          "work_packages": [
+            {
+              "work_package_id": "S002-P001-WP001",
+              "program_id": "S002-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-26"
+            },
+            {
+              "work_package_id": "S002-P001-WP002",
+              "program_id": "S002-P001",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-02-26"
+            }
+          ]
+        },
+        {
+          "program_id": "S002-P002",
+          "program_name": "Full Pipeline Orchestrator",
+          "domain": "AGENTS_OS",
+          "status": "PIPELINE",
+          "current_gate_mirror": "— (LOD200 authoring trigger: S001-P002 GATE_0 PASS; execution completion may occur in S003 era; MCP-QA Hybrid Transition package queued as immediate scope extension after S002-P003-WP002 closure)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S002-P003",
+          "program_name": "TikTrack Alignment (D22+D33+D34+D35)",
+          "domain": "TIKTRACK",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_8; active_flow=S002-P003; GATE_8 PASS; DOCUMENTATION_CLOSED for S002-P003-WP002; active_work_package_id=NONE",
+          "work_packages": [
+            {
+              "work_package_id": "S002-P003-WP002",
+              "program_id": "S002-P003",
+              "domain": "TIKTRACK",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-03-07"
+            }
+          ]
+        },
+        {
+          "program_id": "S002-P004",
+          "program_name": "Admin Review S002",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S003",
       "stage_name": "שלב 3 — Essential Data",
       "status": "PLANNED",
       "planned_scope": "שכבת נתונים יסודית",
-      "pages": "D33, D39, D38",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, Alerts, Notes)",
+      "pages": "D33, D39, D40, D41, D26",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Tickers_Mgr, Preferences, SystemMgmt, UserMgmt, WatchLists)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S003-P001",
+          "program_name": "Data Model Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P002",
+          "program_name": "Test Template Generator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P003",
+          "program_name": "System Settings (D39+D40+D41)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P004",
+          "program_name": "User Tickers (D33)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P005",
+          "program_name": "Watch Lists (D26)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P006",
+          "program_name": "Admin Review S003",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S004",
       "stage_name": "שלב 4 — Financial Execution",
       "status": "PLANNED",
       "planned_scope": "המעגל הפיננסי",
-      "pages": "D36, D37",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser)",
+      "pages": "D36, D37, S004-P007 (Indicators Infrastructure)",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, Executions, CashFlowParser, IndicatorsInfra)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S004-P001",
+          "program_name": "Financial Precision Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P002",
+          "program_name": "Business Logic Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P003",
+          "program_name": "Spec Draft Generator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P004",
+          "program_name": "Executions (D36)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P005",
+          "program_name": "Data Import (D37)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P006",
+          "program_name": "Admin Review S004",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P007",
+          "program_name": "Indicators Infrastructure",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S005",
       "stage_name": "שלב 5 — Trades/Plans",
       "status": "PLANNED",
       "planned_scope": "ישויות מורכבות",
-      "pages": "D24, D25, D26, D27, D28, D29",
-      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, WatchLists)",
+      "pages": "D24, D25, D27, D28, D29, D31, D38, D26-Phase2",
+      "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Identity, Financial, TradePlans, Trades, TradeHistory, TagRegistry, WatchListsEnhancement)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S005-P001",
+          "program_name": "Analytics Quality Validator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S005-P002",
+          "program_name": "Trade Entities (D29+D24)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S005-P003",
+          "program_name": "Market Intelligence (D27+D25)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S005-P004",
+          "program_name": "Journal & History (D28+D31)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S005-P005",
+          "program_name": "Admin Review S005",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        }
+      ]
     },
     {
       "stage_id": "S006",
       "stage_name": "שלב 6 — Advanced Analytics",
       "status": "PLANNED",
       "planned_scope": "תובנות וניתוח",
-      "pages": "D30, D31, D32",
+      "pages": "D30, D32",
       "server_modules": "Atoms (Core), Molecules (Repositories), Organisms (Analytics, Strategy, PortfolioState)",
       "client_components": "tt-container, tt-section, tt-section-row, phoenix-base, phoenix-components, phoenix-header",
       "domain": "SHARED",
-      "programs": []
+      "programs": [
+        {
+          "program_id": "S006-P001",
+          "program_name": "Portfolio State (D32)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S006-P002",
+          "program_name": "Analysis & Closure (D30)",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S006-P003",
+          "program_name": "Level-1 Dashboards",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S006-P004",
+          "program_name": "Admin Review S006 FINAL",
+          "domain": "TIKTRACK",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        }
+      ]
     }
   ]
 }

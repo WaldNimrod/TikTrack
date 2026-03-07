@@ -1,0 +1,10 @@
+M005B_CHECK_EXIT 0
+has_runtime_class|has_duration_ms|has_exit_code
+t|t|t
+(1 row)
+runtime_class_target_rows|completed_with_duration|total_rows
+44|17|44
+(1 row)
+---STDERR---
+
+M005B_FIELDS_EXIT 0

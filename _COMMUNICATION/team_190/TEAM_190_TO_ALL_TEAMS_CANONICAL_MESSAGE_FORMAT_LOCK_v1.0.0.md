@@ -8,6 +8,8 @@
 **date:** 2026-02-23  
 **scope:** Canonical team-to-team messages, gate-bound communications, validation requests/responses
 
+**מדריך מאוחד (אין כפילות):** מתי מסמך (קובץ) ומתי פרומט להעתקה (בלוק) — `_COMMUNICATION/PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE_v1.0.0.md`. המסמך הזה חל על **מסמכים כקבצים** בלבד.
+
 ---
 
 ## 1) Objective

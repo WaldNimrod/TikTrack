@@ -1,0 +1,98 @@
+{
+  "passed": 15,
+  "failed": 1,
+  "results": [
+    {
+      "check": "login",
+      "status": "PASS",
+      "code": 200
+    },
+    {
+      "check": "ticker_seed_available",
+      "status": "PASS",
+      "code": 200,
+      "ticker_id": "683FBMN1N68ERVQ0MEC646NTK4"
+    },
+    {
+      "check": "d34_all_or_none_partial_rejected",
+      "status": "PASS",
+      "code": 422,
+      "detail": "Value error, Condition requires all three fields (condition_field, condition_operator, condition_value) or all empty. Partial condition is invalid."
+    },
+    {
+      "check": "d34_create_valid",
+      "status": "PASS",
+      "code": 201,
+      "alert_id": "187dc538-a0af-480c-97b3-184f0186c60b",
+      "condition_summary": "price >= 123.45"
+    },
+    {
+      "check": "d34_rearmed_patch",
+      "status": "PASS",
+      "code": 200
+    },
+    {
+      "check": "d34_rearmed_persist_get",
+      "status": "PASS",
+      "code": 200,
+      "trigger_status": "rearmed",
+      "condition_summary": "price >= 123.45"
+    },
+    {
+      "check": "d34_filter_is_active_wired",
+      "status": "PASS",
+      "code": 200,
+      "count": 2
+    },
+    {
+      "check": "d34_filter_trigger_status_wired",
+      "status": "PASS",
+      "code": 200
+    },
+    {
+      "check": "d35_create_note_linked",
+      "status": "PASS",
+      "code": 201,
+      "note_id": "ba36d188-a7be-48c0-8681-30f34cc08805"
+    },
+    {
+      "check": "d35_attachment_upload",
+      "status": "PASS",
+      "code": 201,
+      "attachment_id": "31afe299-131a-4541-9de6-79283525ad8b"
+    },
+    {
+      "check": "d35_attachment_visible",
+      "status": "PASS",
+      "code": 200
+    },
+    {
+      "check": "d35_attachment_download",
+      "status": "PASS",
+      "code": 200,
+      "size": 20
+    },
+    {
+      "check": "d35_attachment_remove",
+      "status": "PASS",
+      "code": 204
+    },
+    {
+      "check": "d35_attachment_removed_confirm",
+      "status": "PASS",
+      "code": 200
+    },
+    {
+      "check": "d35_parent_type_immutability",
+      "status": "PASS",
+      "update_code": 200,
+      "get_code": 200,
+      "parent_type": "ticker"
+    },
+    {
+      "check": "auth_refresh_preexpiry_window_only",
+      "status": "FAIL",
+      "detail": "No pre-expiry refresh-window enforcement found in ui/src/cubes/identity/services/auth.js"
+    }
+  ]
+}

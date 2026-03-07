@@ -1,9 +1,11 @@
 /**
  * Tickers Table Initialization - ניהול טיקרים
  * CRUD: הוספה, עריכה, מחיקה
+ * S002-P003-WP001 (D22): filter bar (ticker_type, is_active); loadTickersData params; state across pagination
  */
 
 import sharedServices from '../../../components/core/sharedServices.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
@@ -27,6 +29,8 @@ const formatChangePct = (pct) => {
   let tableData = { data: [], total: 0 };
   let currentSortKey = 'symbol';
   let currentSortDir = 'asc';
+  /** Filter state — preserved across pagination (S002-P003-WP001 D22) */
+  let filterState = { ticker_type: null, is_active: null };
 
   function isAuthenticated() {
     try {
@@ -37,11 +41,17 @@ const formatChangePct = (pct) => {
     }
   }
 
-  async function loadTickersData() {
+  async function loadTickersData(filters = {}) {
     try {
       await sharedServices.init();
+      const params = {};
+      if (filters.ticker_type) params.ticker_type = filters.ticker_type;
+      if (filters.is_active !== undefined && filters.is_active !== null && filters.is_active !== '') {
+        params.is_active = filters.is_active === true || filters.is_active === 'true';
+      }
+      if (filters.search) params.search = filters.search;
       const [listRes, summaryRes] = await Promise.all([
-        sharedServices.get('/tickers', {}),
+        sharedServices.get('/tickers', params),
         sharedServices.get('/tickers/summary', {}),
       ]);
       const data = listRes?.data ?? listRes ?? [];
@@ -118,9 +128,17 @@ const formatChangePct = (pct) => {
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
+      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
+      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
+        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
+        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
+      } else if (priceSource && priceSource !== 'EOD') {
+        priceSpan.title = 'מקור: ' + priceSource;
+      }
       priceCell.appendChild(priceSpan);
       row.appendChild(priceCell);
 
@@ -164,7 +182,7 @@ const formatChangePct = (pct) => {
       actionsCell.className = 'phoenix-table__cell col-actions phoenix-table__cell--actions';
       actionsCell.innerHTML = `
         <div class="table-actions-tooltip">
-          <button class="table-actions-trigger" aria-label="פעולות">
+          <button class="table-actions-trigger" aria-label="פעולות שורה">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="1"></circle>
               <circle cx="12" cy="5" r="1"></circle>
@@ -172,13 +190,13 @@ const formatChangePct = (pct) => {
             </svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-edit" aria-label="ערוך" data-ticker-id="${id}">
+            <button class="table-action-btn js-action-edit" aria-label="ערוך טיקר" title="ערוך טיקר" data-ticker-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="מחק" data-ticker-id="${id}">
+            <button class="table-action-btn js-action-delete" aria-label="מחק טיקר" title="מחק טיקר" data-ticker-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -219,6 +237,28 @@ const formatChangePct = (pct) => {
         currentSortDir = sortDirection;
         updateTable(tableData.data);
       }
+    });
+  }
+
+  function initFilterHandlers() {
+    const typeSelect = document.getElementById('tickersFilterType') || document.querySelector('.js-tickers-filter-type');
+    const activeBtns = document.querySelectorAll('.js-tickers-filter-active');
+    if (typeSelect) {
+      typeSelect.addEventListener('change', function () {
+        filterState.ticker_type = this.value || null;
+        currentPage = 1;
+        loadAllData();
+      });
+    }
+    activeBtns.forEach((btn) => {
+      btn.addEventListener('click', function () {
+        const val = this.getAttribute('data-is-active');
+        filterState.is_active = val === '' ? null : val === 'true';
+        activeBtns.forEach((b) => b.classList.remove('filter-icon-btn--active'));
+        this.classList.add('filter-icon-btn--active');
+        currentPage = 1;
+        loadAllData();
+      });
     });
   }
 
@@ -279,7 +319,7 @@ const formatChangePct = (pct) => {
 
   async function loadAllData() {
     try {
-      const result = await loadTickersData();
+      const result = await loadTickersData(filterState);
       tableData = result.table;
       updateSummary(result.summary);
       updateTable(tableData.data);
@@ -307,18 +347,33 @@ const formatChangePct = (pct) => {
   }
 
   async function handleDelete(tickerId) {
-    if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) return;
-    try {
-      await sharedServices.init();
-      await sharedServices.delete(`/tickers/${tickerId}`);
-      await loadAllData();
-    } catch (e) {
-      maskedLog('[Tickers] Delete error:', { errorCode: e?.code });
-      alert('שגיאה במחיקת הטיקר');
-    }
+    createModal({
+      title: 'מחיקת טיקר',
+      content: '<p>האם אתה בטוח שברצונך למחוק את הטיקר?</p>',
+      entity: 'ticker',
+      showSaveButton: true,
+      confirmMode: true,
+      saveButtonText: 'מחיקה',
+      cancelButtonText: 'ביטול',
+      onSave: async () => {
+        try {
+          await sharedServices.init();
+          await sharedServices.delete(`/tickers/${tickerId}`);
+          document.getElementById('phoenix-modal-backdrop')?.remove();
+          await loadAllData();
+        } catch (e) {
+          maskedLog('[Tickers] Delete error:', { errorCode: e?.code, status: e?.status });
+          const msg = String(e?.message ?? e?.detail ?? 'שגיאה במחיקת הטיקר').trim();
+          const escaped = String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          document.getElementById('phoenix-modal-backdrop')?.remove();
+          createModal({ title: 'שגיאה במחיקה', content: `<p>${escaped}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
+        }
+      }
+    });
   }
 
   function runInit() {
+    initFilterHandlers();
     initSortHandlers();
     initPaginationHandlers();
     if (isAuthenticated()) {

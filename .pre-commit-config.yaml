@@ -1,0 +1,56 @@
+# Phoenix Project - Pre-commit Quality Gate
+# See: ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE_v1.0.0 §6
+# PHASE2_PROMOTION: add mypy/ESLint/audit hooks once KB-006/008/009/010-013 cleared
+
+repos:
+  # Blocking hooks (all must pass for commit to proceed)
+  - repo: local
+    hooks:
+      - id: phoenix-unit-tests
+        name: "Phoenix Unit Tests [BLOCKING on Python changes]"
+        entry: bash -c 'git diff --cached --name-only --diff-filter=ACMR | grep -Eq "^(api/.*\.py|tests/.*\.py)$" || exit 0; source api/venv/bin/activate 2>/dev/null || true; DEBUG=false python3 -m pytest tests/unit/ -q --tb=short'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: phoenix-bandit-security
+        name: "Phoenix Security Scan - Bandit HIGH [BLOCKING]"
+        entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; bandit -r api/ --exclude api/venv -lll"
+        language: system
+        pass_filenames: false
+        types: [python]
+        stages: [pre-commit]
+
+      - id: phoenix-detect-secrets
+        name: "Phoenix Secret Scan - detect-secrets [BLOCKING]"
+        entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; detect-secrets-hook --baseline .secrets.baseline"
+        language: system
+        pass_filenames: true
+        files: '.*'
+        exclude: '^_COMMUNICATION/.*/evidence/runtime/.*\.log$'
+        stages: [pre-commit]
+
+      - id: phoenix-frontend-build
+        name: "Phoenix Frontend Build [BLOCKING on JS changes]"
+        entry: bash -c "cd ui && npx vite build --mode development --outDir /tmp/phoenix-precommit-dist --emptyOutDir"
+        language: system
+        pass_filenames: false
+        files: '^(ui/.*\.(jsx?|css|html|json)|ui/vite\.config\.js|ui/package(-lock)?\.json)$'
+        stages: [pre-commit]
+
+  # Informational hooks (non-blocking; keep commented until phase-2 promotion)
+  # - repo: local
+  #   hooks:
+  #     - id: phoenix-mypy
+  #       name: "mypy Type Check [INFORMATIONAL - enable after KB-006]"
+  #       entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; mypy api/ --config-file api/mypy.ini; exit 0"
+  #       language: system
+  #       pass_filenames: false
+  #       types: [python]
+  #
+  #     - id: phoenix-eslint
+  #       name: "ESLint [INFORMATIONAL - enable after KB-008/009]"
+  #       entry: bash -c "cd ui && ./node_modules/.bin/eslint . --ext js,jsx || exit 0"
+  #       language: system
+  #       pass_filenames: false
+  #       files: \.(jsx?)$

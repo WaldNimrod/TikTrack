@@ -1,0 +1,392 @@
+---
+pid: 27444
+cwd: "/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix"
+command: "bash -lc 'bash scripts/init-servers-for-qa.sh 2>&1 | tee /tmp/s002_p003_phase_e_rerun2_init.log'"
+started_at: 2026-03-03T09:20:25.395Z
+running_for_seconds: 470   
+---
+[0;32m==========================================[0m
+[0;32m  איתחול שרתים לבדיקות QA[0m
+[0;32m==========================================[0m
+[1;33m[1/4] עצירת שרתים קיימים...[0m
+[1;33m🛑 Stopping TikTrack Phoenix Backend Server[0m
+==========================================
+[1;33m⚠️  No process found on port 8082[0m
+[1;33m🛑 Stopping TikTrack Phoenix Frontend Dev Server[0m
+==========================================
+[1;33m⚠️  No process found on port 8080[0m
+[1;33m[2/4] הפעלת Backend (פורט 8082)...[0m
+[0;32m🚀 Starting TikTrack Phoenix Backend Server[0m
+==========================================
+[0;32m📦 Activating virtual environment...[0m
+[0;32m🚀 Starting FastAPI server on port 8082...[0m
+==========================================
+📍 API Base URL: http://localhost:8082/api/v1
+📍 Health Check: http://localhost:8082/health
+📍 API Docs: http://localhost:8082/docs
+==========================================
+
+INFO:     Will watch for changes in these directories: ['/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix']
+INFO:     Uvicorn running on http://0.0.0.0:8082 (Press CTRL+C to quit)
+INFO:     Started reloader process [27490] using WatchFiles
+INFO:     Started server process [27492]
+INFO:     Waiting for application startup.
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_ticker_prices_intraday (interval=15m)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job check_alert_conditions (interval=15m)
+INFO:apscheduler.scheduler:Added job "sync_ticker_prices_intraday" to job store "default"
+INFO:apscheduler.scheduler:Added job "check_alert_conditions" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:api.background.scheduler_startup:APScheduler started — background jobs active
+INFO:api.main:APScheduler started — background jobs active
+INFO:     Application startup complete.
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 11:35:28 IST)" (scheduled at 2026-03-03 09:20:28.442486+00:00)
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 11:35:28 IST)" (scheduled at 2026-03-03 09:20:28.442572+00:00)
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 11:35:28 IST)" executed successfully
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-03 11:35:28 IST)" executed successfully
+INFO:     127.0.0.1:56395 - "GET /health HTTP/1.1" 200 OK
+[0;32m✅ Backend זמין (8082)[0m
+[1;33m[3/4] הפעלת Frontend (פורט 8080)...[0m
+[0;32m🚀 Starting TikTrack Phoenix Frontend Dev Server[0m
+==========================================
+[0;32m🚀 Starting Vite dev server on port 8080 (V2)...[0m
+==========================================
+📍 Frontend URL: http://localhost:8080
+📍 API Proxy: /api -> http://localhost:8082
+==========================================
+
+
+> tiktrack-phoenix-ui@1.0.0 dev
+> vite
+
+[Vite Config] ✅ Loaded routes from routes.json: 49 routes
+[Vite Config] Route mappings: {
+  '/login': '/login',
+  '/register': '/register',
+  '/reset-password': '/reset-password',
+  '/trade_plans.html': '/trade_plans.html',
+  '/trade_plans': '/trade_plans.html',
+  '/ai_analysis.html': '/ai_analysis.html',
+  '/ai_analysis': '/ai_analysis.html',
+  '/watch_lists.html': '/watch_lists.html',
+  '/watch_lists': '/watch_lists.html',
+  '/ticker_dashboard.html': '/ticker_dashboard.html',
+  '/ticker_dashboard': '/ticker_dashboard.html',
+  '/trading_journal.html': '/trading_journal.html',
+  '/trading_journal': '/trading_journal.html',
+  '/trades.html': '/trades.html',
+  '/trades': '/trades.html',
+  '/strategy-analysis.html': '/strategy-analysis.html',
+  '/strategy-analysis': '/strategy-analysis.html',
+  '/trades_history.html': '/trades_history.html',
+  '/trades_history': '/trades_history.html',
+  '/portfolio-state.html': '/portfolio-state.html',
+  '/portfolio-state': '/portfolio-state.html',
+  '/trading_accounts.html': '/trading_accounts.html',
+  '/trading_accounts': '/trading_accounts.html',
+  '/brokers_fees.html': '/brokers_fees.html',
+  '/brokers_fees': '/brokers_fees.html',
+  '/cash_flows.html': '/cash_flows.html',
+  '/cash_flows': '/cash_flows.html',
+  '/data_dashboard.html': '/data_dashboard.html',
+  '/data_dashboard': '/data_dashboard.html',
+  '/alerts.html': '/alerts.html',
+  '/alerts': '/alerts.html',
+  '/notes.html': '/notes.html',
+  '/notes': '/notes.html',
+  '/user_tickers.html': '/user_tickers.html',
+  '/user_tickers': '/user_tickers.html',
+  '/executions.html': '/executions.html',
+  '/executions': '/executions.html',
+  '/profile': '/profile',
+  '/data_import.html': '/data_import.html',
+  '/data_import': '/data_import.html',
+  '/tag_management.html': '/tag_management.html',
+  '/tag_management': '/tag_management.html',
+  '/preferences.html': '/preferences.html',
+  '/preferences': '/preferences.html',
+  '/system_management.html': '/system_management.html',
+  '/system_management': '/system_management.html',
+  '/tickers.html': '/tickers.html',
+  '/tickers': '/tickers.html',
+  '/admin/design-system': '/admin/design-system'
+}
+
+[HTML Plugin] ✅ Plugin registered - HTML pages will be served before React Router
+
+
+  VITE v5.4.21  ready in 141 ms
+
+  ➜  Local:   http://localhost:8080/
+  ➜  Network: http://192.168.1.170:8080/
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+INFO:     127.0.0.1:56412 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+[0;32m✅ Frontend זמין (8080)[0m
+[1;33m[4/4] איתחול הושלם.[0m
+[0;32m==========================================[0m
+  Backend:  http://localhost:8082
+  Frontend: http://localhost:8080
+[0;32m==========================================[0m
+INFO:     127.0.0.1:56504 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56547 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56550 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56551 - "GET /api/v1/tickers/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56552 - "GET /api/v1/tickers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56553 - "GET /api/v1/tickers?ticker_type=STOCK HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56554 - "GET /api/v1/tickers?is_active=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56555 - "GET /api/v1/tickers?search=A HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56556 - "POST /api/v1/tickers HTTP/1.1" 201 Created
+INFO:     127.0.0.1:56557 - "GET /api/v1/tickers/19EX55Z6GZ8YW8TJW5B0JBY3ME HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v8/finance/chart/QA_D22_29006?interval=1d&range=1y "HTTP/1.1 404 Not Found"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo v8/chart failed for QA_D22_29006 (attempt 1/3): Client error '404 Not Found' for url 'https://query1.finance.yahoo.com/v8/finance/chart/QA_D22_29006?interval=1d&range=1y'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v8/finance/chart/QA_D22_29006?interval=1d&range=1y "HTTP/1.1 429 Too Many Requests"
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v8/finance/chart/QA_D22_29006?interval=1d&range=1y "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo v8/chart 429 — cooldown 15 min (SOP-015)
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo v8/chart failed for QA_D22_29006 (attempt 3/3): Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v8/finance/chart/QA_D22_29006?interval=1d&range=1y'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/api/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ERROR:yfinance:HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: QA_D22_29006"}}}
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo yfinance fallback failed for QA_D22_29006: history() got an unexpected keyword argument 'debug'
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=QA_D22_29006&outputsize=compact&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:56558 - "GET /api/v1/tickers/19EX55Z6GZ8YW8TJW5B0JBY3ME/data-integrity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56592 - "PUT /api/v1/tickers/19EX55Z6GZ8YW8TJW5B0JBY3ME HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56593 - "DELETE /api/v1/tickers/19EX55Z6GZ8YW8TJW5B0JBY3ME HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:56594 - "GET /api/v1/tickers/19EX55Z6GZ8YW8TJW5B0JBY3ME HTTP/1.1" 404 Not Found
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56595 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56596 - "GET /api/v1/alerts/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56597 - "GET /api/v1/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56598 - "POST /api/v1/alerts HTTP/1.1" 201 Created
+INFO:     127.0.0.1:56599 - "GET /api/v1/alerts/65b9fdff-6886-4206-894b-76b31b0eb7b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56600 - "PATCH /api/v1/alerts/65b9fdff-6886-4206-894b-76b31b0eb7b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56601 - "GET /api/v1/alerts?target_type=ticker HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56602 - "GET /api/v1/alerts?page=1&per_page=5&sort=created_at&order=desc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56603 - "DELETE /api/v1/alerts/65b9fdff-6886-4206-894b-76b31b0eb7b6 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:56604 - "GET /api/v1/alerts/65b9fdff-6886-4206-894b-76b31b0eb7b6 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56605 - "POST /api/v1/alerts HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:56606 - "POST /api/v1/alerts HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:56607 - "POST /api/v1/alerts HTTP/1.1" 201 Created
+INFO:     127.0.0.1:56608 - "GET /api/v1/alerts/304d37c6-af91-4cab-bfbc-717c28169a94 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56609 - "POST /api/v1/alerts HTTP/1.1" 400 Bad Request
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /login
+[HTML Plugin] Full URL: /login
+[HTML Plugin] ✅ Mapped route: /login -> /login -> /login
+[HTML Plugin] File path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+[HTML Plugin] File exists: false
+[HTML Plugin] ❌ File not found!
+[HTML Plugin] Attempted path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+[HTML Plugin] Trying alternative: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/ui/src/login
+[HTML Plugin] Trying alternative: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56635 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56638 - "GET /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56639 - "GET /api/v1/users/me HTTP/1.1" 200 OK
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+INFO:     127.0.0.1:56643 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56644 - "POST /api/v1/notes HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:56645 - "POST /api/v1/notes HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:56644 - "GET /api/v1/notes HTTP/1.1" 401 Unauthorized
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /notes.html
+[HTML Plugin] Full URL: /notes.html
+[HTML Plugin] ✅ Mapped route: /notes.html -> /notes.html -> /views/data/notes/notes.html
+[HTML Plugin] File path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/views/data/notes/notes.html
+[HTML Plugin] File exists: true
+[HTML Plugin] ✅✅✅ SERVED: /notes.html -> /views/data/notes/notes.html
+11:22:54 AM [vite] warning: 
+/Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/components/core/stages/DataStage.js
+189|        
+190|        // Dynamic import for ES modules
+191|        const module = await import(importPath);
+   |                                    ^^^^^^^^^^
+192|        
+193|        // Store the module for later use
+The above dynamic import cannot be analyzed by Vite.
+See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations for supported dynamic import formats. If this is intended to be left as-is, you can use the /* @vite-ignore */ comment inside the import() call to suppress this warning.
+
+  Plugin: vite:import-analysis
+  File: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/components/core/stages/DataStage.js
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/footer.html
+[HTML Plugin] Full URL: /src/views/shared/footer.html
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+INFO:     127.0.0.1:56649 - "GET /api/v1/notes/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56650 - "GET /api/v1/notes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56651 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56655 - "GET /api/v1/me/tickers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56658 - "POST /api/v1/notes HTTP/1.1" 201 Created
+INFO:     127.0.0.1:56661 - "GET /api/v1/notes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56659 - "GET /api/v1/notes/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56664 - "GET /api/v1/notes/63789e18-b948-44d1-a842-01c3b4ce87eb HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56665 - "GET /api/v1/notes/63789e18-b948-44d1-a842-01c3b4ce87eb/attachments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56667 - "GET /api/v1/me/tickers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56669 - "PUT /api/v1/notes/63789e18-b948-44d1-a842-01c3b4ce87eb HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56673 - "GET /api/v1/notes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56672 - "GET /api/v1/notes/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56675 - "DELETE /api/v1/notes/63789e18-b948-44d1-a842-01c3b4ce87eb HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:56679 - "GET /api/v1/notes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/v1/notes/summary HTTP/1.1" 200 OK
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+INFO:     127.0.0.1:56710 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /login
+[HTML Plugin] Full URL: /login
+[HTML Plugin] ✅ Mapped route: /login -> /login -> /login
+[HTML Plugin] File path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+[HTML Plugin] File exists: false
+[HTML Plugin] ❌ File not found!
+[HTML Plugin] Attempted path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+[HTML Plugin] Trying alternative: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/ui/src/login
+[HTML Plugin] Trying alternative: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/login
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56719 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56721 - "GET /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56722 - "GET /api/v1/users/me HTTP/1.1" 200 OK
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+INFO:     127.0.0.1:56725 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 200 OK
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /user_tickers.html
+[HTML Plugin] Full URL: /user_tickers.html
+[HTML Plugin] ✅ Mapped route: /user_tickers.html -> /user_tickers.html -> /views/management/userTicker/user_tickers.html
+[HTML Plugin] File path: /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix/ui/src/views/management/userTicker/user_tickers.html
+[HTML Plugin] File exists: true
+[HTML Plugin] ✅✅✅ SERVED: /user_tickers.html -> /views/management/userTicker/user_tickers.html
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/unified-header.html
+[HTML Plugin] Full URL: /src/views/shared/unified-header.html
+
+[HTML Plugin] ============================================
+[HTML Plugin] Request: GET /src/views/shared/footer.html
+[HTML Plugin] Full URL: /src/views/shared/footer.html
+INFO:     127.0.0.1:56729 - "GET /api/v1/me/tickers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56730 - "GET /api/v1/reference/exchange-rates HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56732 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:56731 - "GET /api/v1/system/market-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56754 - "GET /api/v1/me/tickers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56755 - "GET /api/v1/tickers HTTP/1.1" 200 OK
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56757 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56758 - "POST /api/v1/me/tickers?symbol=ZZZZZZZFAKE999 HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:56761 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56778 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56779 - "GET /api/v1/trades?limit=5 HTTP/1.1" 200 OK
+WARNING:api.services.trade_plans_service:trade_plans list failed (table may not exist): (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "user_data.trade_plans" does not exist
+[SQL: 
+                SELECT tp.id, tp.plan_name, t.symbol
+                FROM user_data.trade_plans tp
+                LEFT JOIN market_data.tickers t ON t.id = tp.ticker_id
+                WHERE tp.user_id = $1 AND tp.deleted_at IS NULL
+                ORDER BY tp.created_at DESC
+                LIMIT $2
+            ]
+[parameters: ('83f8ae69-6f7e-4eab-ac9f-fb2e4bc3ed29', 5)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:56780 - "GET /api/v1/trade_plans?limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56781 - "GET /api/v1/admin/background-jobs/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56782 - "GET /api/v1/admin/background-jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56783 - "GET /api/v1/admin/background-jobs/runs?limit=20 HTTP/1.1" 200 OK
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:56788 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56789 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 11:38:51 IST)" (scheduled at 2026-03-03 09:23:51.566609+00:00)
+INFO:     127.0.0.1:56792 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+WARNING:apscheduler.scheduler:Execution of job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 09:23:51 UTC)" skipped: maximum number of running instances reached (1)
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:56807 - "GET /api/v1/admin/background-jobs/runs?limit=10 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:56838 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=GOOGL&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=MSFT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+WARNING:api.integrations.market_data.providers.alpha_provider:Alpha Vantage rate limit for MSFT: We have detected your API key as Z103KQWGWCQ1USLL and our standard API rate limit is 25 requests per day. Please subscri
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=TSLA&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+WARNING:api.integrations.market_data.providers.alpha_provider:Alpha Vantage rate limit for TSLA: We have detected your API key as Z103KQWGWCQ1USLL and our standard API rate limit is 25 requests per day. Please subscri
+INFO:     127.0.0.1:56903 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=ZZZZZZZFAKE999&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+WARNING:api.integrations.market_data.providers.alpha_provider:Alpha Vantage rate limit for ZZZZZZZFAKE999: We have detected your API key as Z103KQWGWCQ1USLL and our standard API rate limit is 25 requests per day. Please subscri
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[0:15:00], next run at: 2026-03-03 11:38:51 IST)" executed successfully
+INFO:     127.0.0.1:56947 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57016 - "GET /api/v1/notifications?is_read=false&limit=20 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57080 - "GET /health HTTP/1.1" 200 OK

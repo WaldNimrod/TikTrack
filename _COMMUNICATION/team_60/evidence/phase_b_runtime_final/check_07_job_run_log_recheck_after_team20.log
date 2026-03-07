@@ -1,0 +1,9 @@
+QUALIFY_RECHECK_EXIT 0
+job_name|ok
+check_alert_conditions|t
+sync_ticker_prices_intraday|t
+(2 rows)
+---STDERR---
+
+QUALIFY_RECHECK_RESULT_EXIT 0
+CHECK_07_EXIT:0

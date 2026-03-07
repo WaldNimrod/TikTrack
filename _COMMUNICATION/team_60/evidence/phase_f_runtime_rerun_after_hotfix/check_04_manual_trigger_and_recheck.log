@@ -1,0 +1,39 @@
+LOGIN_HTTP 200
+LOGIN_TOKEN_PRESENT True
+TRIGGER_sync_ticker_prices_intraday_HTTP 200
+TRIGGER_sync_ticker_prices_intraday_BODY {"job_name":"sync_ticker_prices_intraday","triggered":true,"message":"Job queued"}
+TRIGGER_check_alert_conditions_HTTP 200
+TRIGGER_check_alert_conditions_BODY {"job_name":"check_alert_conditions","triggered":true,"message":"Job queued"}
+POST_TRIGGER_QUERY_EXIT 0
+job_name|status|runtime_class|duration_ms|started_at|completed_at
+check_alert_conditions|completed|TARGET_RUNTIME|27|2026-03-03 09:09:52.768681+00|2026-03-03 09:09:52.796115+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-03 09:09:52.747143+00|2026-03-03 09:09:52.766673+00
+check_alert_conditions|completed|TARGET_RUNTIME|49|2026-03-03 09:09:05.190775+00|2026-03-03 09:09:05.240734+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-03 09:09:05.190177+00|2026-03-03 09:09:05.23142+00
+check_alert_conditions|completed|TARGET_RUNTIME|54|2026-03-03 09:08:29.739145+00|2026-03-03 09:08:29.793559+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-03 09:08:29.738569+00|2026-03-03 09:08:29.785095+00
+check_alert_conditions|completed|TARGET_RUNTIME|54|2026-03-03 09:08:03.734145+00|2026-03-03 09:08:03.788494+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-03 09:08:03.733018+00|2026-03-03 09:08:03.778914+00
+check_alert_conditions|completed|TARGET_RUNTIME|47|2026-03-03 09:07:23.074631+00|2026-03-03 09:07:23.122473+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-03 09:07:23.073585+00|2026-03-03 09:07:23.113009+00
+check_alert_conditions|completed|TARGET_RUNTIME|202|2026-03-03 09:06:22.914284+00|2026-03-03 09:06:23.116817+00
+sync_ticker_prices_intraday|running|TARGET_RUNTIME||2026-03-03 09:06:22.91119+00|
+check_alert_conditions|completed|TARGET_RUNTIME|165|2026-03-02 22:10:08.922684+00|2026-03-02 22:10:09.088395+00
+sync_ticker_prices_intraday|completed|TARGET_RUNTIME|100152|2026-03-02 22:10:08.921911+00|2026-03-02 22:11:49.07477+00
+check_alert_conditions|completed|TARGET_RUNTIME|16|2026-03-02 22:00:45.405076+00|2026-03-02 22:00:45.421873+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-02 22:00:45.400691+00|2026-03-02 22:00:45.405103+00
+check_alert_conditions|success|TARGET_RUNTIME||2026-03-02 21:46:28.834514+00|2026-03-02 21:46:28.865407+00
+check_alert_conditions|completed|TARGET_RUNTIME|46|2026-03-02 21:45:45.398255+00|2026-03-02 21:45:45.44507+00
+sync_ticker_prices_intraday|skipped_concurrent|TARGET_RUNTIME||2026-03-02 21:45:45.397638+00|2026-03-02 21:45:45.43163+00
+check_alert_conditions|completed|TARGET_RUNTIME|61|2026-03-02 21:42:59.447182+00|2026-03-02 21:42:59.509078+00
+(20 rows)
+---STDERR---
+
+RECENT_QUALIFY_QUERY_EXIT 0
+job_name|has_recent_qualifying
+check_alert_conditions|t
+sync_ticker_prices_intraday|f
+(2 rows)
+---RECENT_STDERR---
+
+RECENT_QUALIFY_EXIT 1

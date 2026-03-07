@@ -15,18 +15,25 @@ from pydantic import BaseModel, Field, field_validator
 TICKER_TYPES = ("STOCK", "ETF", "OPTION", "FUTURE", "FOREX", "CRYPTO", "INDEX")
 
 
+TICKER_STATUS_VALUES = ("pending", "active", "inactive", "cancelled")
+
+
 class TickerResponse(BaseModel):
     """Ticker response schema."""
     id: str = Field(..., description="External ULID identifier")
     symbol: str = Field(..., description="Ticker symbol (e.g., AAPL, BTC)")
+    display_name: Optional[str] = Field(None, max_length=100, description="User display name (from user_tickers)")
     company_name: Optional[str] = Field(None, description="Company name")
     ticker_type: str = Field(..., description="Ticker type (STOCK, CRYPTO, ETF, etc.)")
+    status: str = Field(..., description="Ticker lifecycle status (pending|active|inactive|cancelled)")
     is_active: bool = Field(..., description="Active status")
     delisted_date: Optional[date] = Field(None, description="Delisting date")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
     current_price: Optional[Decimal] = Field(None, description="Last known price from ticker_prices")
     daily_change_pct: Optional[Decimal] = Field(None, description="Daily change percentage")
+    price_source: Optional[str] = Field(None, description="EOD | INTRADAY_FALLBACK — T190-Price provenance")
+    price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of price — T190-Price provenance")
 
 
 class TickerCreateRequest(BaseModel):
@@ -49,7 +56,17 @@ class TickerUpdateRequest(BaseModel):
     symbol: Optional[str] = Field(None, min_length=1, max_length=20)
     company_name: Optional[str] = Field(None, max_length=255)
     ticker_type: Optional[str] = Field(None)
+    status: Optional[str] = Field(None, description="pending|active|inactive|cancelled")
     is_active: Optional[bool] = Field(None)
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        if v.lower() not in TICKER_STATUS_VALUES:
+            raise ValueError(f"status must be one of: {TICKER_STATUS_VALUES}")
+        return v.lower()
 
     @field_validator("ticker_type")
     @classmethod

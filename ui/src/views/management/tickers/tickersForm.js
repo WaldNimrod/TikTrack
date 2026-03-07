@@ -34,6 +34,7 @@ function createTickerFormHTML(data = null) {
 
   return `
     <form id="tickerForm" class="phoenix-form phoenix-form--two-col">
+      <div id="tickerFormValidationSummary" class="form-validation-summary" role="alert" aria-live="polite" data-testid="ticker-form-validation-summary" hidden></div>
       <div class="form-row">
         <div class="form-group">
           <label for="tickerSymbol">סמל <span class="form-label-asterisk">*</span></label>
@@ -47,7 +48,7 @@ function createTickerFormHTML(data = null) {
             placeholder="AAPL"
             ${isEdit ? 'readonly' : ''}
           />
-          <span class="form-error" id="tickerSymbolError"></span>
+          <span class="form-error" id="tickerSymbolError" role="alert" data-testid="ticker-symbol-error"></span>
         </div>
         <div class="form-group">
           <label for="tickerCompanyName">שם חברה</label>
@@ -102,10 +103,16 @@ export function showTickerFormModal(data, onSave) {
       if (!form) return;
 
       if (!form.checkValidity()) {
+        const summaryEl = document.getElementById('tickerFormValidationSummary');
+        if (summaryEl) {
+          summaryEl.textContent = 'יש לתקן את השדות המסומנים לפני שמירה';
+          summaryEl.hidden = false;
+        }
         form.reportValidity();
         return;
       }
 
+      document.getElementById('tickerFormValidationSummary')?.setAttribute('hidden', '');
       const symbol = document.getElementById('tickerSymbol')?.value?.trim() ?? '';
       const companyName = document.getElementById('tickerCompanyName')?.value?.trim() || null;
       const tickerType = document.getElementById('tickerType')?.value ?? 'STOCK';
@@ -113,10 +120,16 @@ export function showTickerFormModal(data, onSave) {
       const isActive = status !== 'cancelled';
 
       document.querySelectorAll('#tickerForm .form-error').forEach((el) => { el.textContent = ''; });
+      document.getElementById('tickerFormValidationSummary')?.setAttribute('hidden', '');
 
       if (!symbol) {
         const errEl = document.getElementById('tickerSymbolError');
         if (errEl) errEl.textContent = 'חובה להזין סמל';
+        const summaryEl = document.getElementById('tickerFormValidationSummary');
+        if (summaryEl) {
+          summaryEl.textContent = 'חובה להזין סמל';
+          summaryEl.hidden = false;
+        }
         return;
       }
 
@@ -137,8 +150,14 @@ export function showTickerFormModal(data, onSave) {
           closeModal();
         } catch (error) {
           maskedLog('[Tickers Form] Error saving:', { errorCode: error?.code, status: error?.status });
+          const msg = String(error?.message ?? error?.detail ?? 'שגיאה בשמירה').trim();
           const errEl = document.getElementById('tickerSymbolError');
-          if (errEl) errEl.textContent = error?.detail ?? 'שגיאה בשמירה';
+          if (errEl) errEl.textContent = msg;
+          const summaryEl = document.getElementById('tickerFormValidationSummary');
+          if (summaryEl) {
+            summaryEl.textContent = msg;
+            summaryEl.hidden = false;
+          }
         }
       } else {
         closeModal();

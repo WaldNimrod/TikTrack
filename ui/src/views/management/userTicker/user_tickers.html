@@ -111,10 +111,11 @@
         <span class="index-section__header-count" id="tableTickersCount">0 טיקרים</span>
       </div>
       <div class="index-section__header-actions">
-        <button class="index-section__header-action-btn js-add-ticker" aria-label="הוסף טיקר" title="הוסף טיקר לרשימה שלי">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="index-section__header-action-btn js-add-ticker" aria-label="הוספת טיקר לרשימה שלי" title="הוספת טיקר לרשימה שלי">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 5v14M5 12h14"></path>
           </svg>
+          <span class="index-section__header-action-text">הוספת טיקר</span>
         </button>
         <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -133,7 +134,7 @@
               <thead class="phoenix-table__head" role="rowgroup">
                 <tr class="phoenix-table__row" role="row">
                   <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">סמל</span>
+                    <span class="phoenix-table__header-text">סמל / שם תצוגה</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M8 9l4 -4l4 4"></path>

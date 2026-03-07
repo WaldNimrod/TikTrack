@@ -7,7 +7,9 @@
  */
 
 import { fetchNotes, loadNotesData } from './notesDataLoader.js';
+import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
+import { getEntityDetailUrl } from '../../../utils/entityLinks.js';
 
 /** State for pagination/sort — same pattern as brokersFees, userTicker */
 let tableData = { data: [], total: 0 };
@@ -16,14 +18,42 @@ let currentPageSize = 25;
 let currentSortKey = null;
 let currentSortDir = 'asc';
 
+/** Phase C: general removed — backend allows trade|trade_plan|ticker|account|datetime */
 const PARENT_TYPE_LABELS = {
   all: 'הכל',
   account: 'חשבון מסחר',
   trade: 'טרייד',
   trade_plan: 'תוכנית',
   ticker: 'טיקר',
-  general: 'כללי'
+  datetime: 'תאריך/שעה'
 };
+
+/** G7R Batch1: Entity icon paths for linked entity display (§3D — icon + name) */
+const ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
+
+/** Build linked entity display: icon + resolved name (§3D — linked_entity_display from API when available); datetime: formatted parent_datetime */
+function formatLinkedEntityDisplay(note) {
+  const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || '';
+  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
+  const parentDt = note.parent_datetime ?? note.parentDatetime;
+  const typeLabel = PARENT_TYPE_LABELS[parentType] || parentType || '';
+  if (parentType === 'datetime' && parentDt) {
+    const dtStr = typeof parentDt === 'string' ? parentDt : new Date(parentDt).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${String(dtStr).replace(/</g, '&lt;')}</span>`;
+  }
+  const resolvedName = note.linked_entity_display ?? note.linked_entity_name ?? '';
+  const displayName = resolvedName || (parentId ? typeLabel + ' ' + String(parentId).slice(0, 8) + '…' : typeLabel || '—');
+  const iconPath = parentType ? ENTITY_ICON_MAP[parentType] : null;
+  if (!parentType && !parentId) return '<span class="linked-object-badge">—ללא קישור—</span>';
+  const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
+  const entityType = parentType === 'account' ? 'trading_account' : parentType;
+  const href = parentId ? getEntityDetailUrl(entityType, parentId) : null;
+  const badgeHtml = `${iconHtml} ${displayName}`;
+  if (href) {
+    return `<a href="${href}" class="linked-object-badge linked-object-badge--link entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${badgeHtml}</a>`;
+  }
+  return `<span class="linked-object-badge entity-${parentType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${badgeHtml}</span>`;
+}
 
 /**
  * Format date for display
@@ -52,16 +82,18 @@ function getFormatIcon(contentType, filename) {
 }
 
 /**
- * Render attachment cell: format icon + 20 chars of filename
+ * Render attachment cell: icon + count or first filename (BF-G7-023)
+ * When API returns attachment_count or attachments array, show indicator
  */
 function getAttachmentDisplay(note) {
+  const count = note.attachment_count ?? (note.attachments && Array.isArray(note.attachments) ? note.attachments.length : 0);
+  if (!count) return '—';
   const att = note.attachments && note.attachments[0];
   const name = att && (att.original_filename || att.originalFilename || att.filename);
   const contentType = att && (att.content_type || att.contentType);
-  if (!name) return '—';
   const icon = getFormatIcon(contentType, name);
-  const truncated = name.length > 20 ? name.slice(0, 17) + '…' : name;
-  return `<span class="attachment-cell" title="${(name || '').replace(/"/g, '&quot;')}">${icon} ${truncated}</span>`;
+  const label = count > 1 ? `📎 ${count} קבצים` : (name ? `${icon} ${(name.length > 18 ? name.slice(0, 15) + '…' : name).replace(/"/g, '&quot;')}` : `📎 1`);
+  return `<span class="attachment-cell attachment-indicator" title="${count > 1 ? count + ' קבצים מצורפים' : (name || '').replace(/"/g, '&quot;')}">${label}</span>`;
 }
 
 /**
@@ -95,19 +127,16 @@ function renderSummary(summary) {
  */
 function renderNoteRow(note) {
   const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || 'general';
-  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
-  const typeLabel = (PARENT_TYPE_LABELS[parentType] != null ? PARENT_TYPE_LABELS[parentType] : parentType) || parentType;
-  const contentPreview = stripHtml(note.content != null ? note.content : '') || (note.title != null ? note.title : '—');
+  const titleDisplay = (note.title != null ? String(note.title).trim() : '') || stripHtml(note.content != null ? note.content : '') || '—';
   const created = formatDate(note.created_at != null ? note.created_at : note.createdAt);
   const updated = formatDate(note.updated_at != null ? note.updated_at : note.updatedAt);
   const id = note.id;
+  const linkedEntityHtml = formatLinkedEntityDisplay(note);
 
   return `
     <tr class="phoenix-table__row" data-note-id="${id}" role="row">
-      <td class="phoenix-table__cell col-linked-object" data-field="parent_type">
-        <span class="linked-object-badge entity-${parentType}">${typeLabel}${parentId ? ' ' + parentId.slice(0, 8) + '…' : ''}</span>
-      </td>
-      <td class="phoenix-table__cell col-content" data-field="content">${contentPreview}</td>
+      <td class="phoenix-table__cell col-linked-object" data-field="parent_type">${linkedEntityHtml}</td>
+      <td class="phoenix-table__cell col-content col-title" data-field="title">${titleDisplay}</td>
       <td class="phoenix-table__cell col-attachment" data-field="attachment">${getAttachmentDisplay(note)}</td>
       <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
       <td class="phoenix-table__cell col-updated phoenix-table__cell--date">${updated}</td>
@@ -121,19 +150,19 @@ function renderNoteRow(note) {
             </svg>
           </button>
           <div class="table-actions-menu">
-            <button class="table-action-btn js-action-view" aria-label="פרטים" data-note-id="${id}">
+            <button class="table-action-btn js-action-view" aria-label="הצג פרטי הערה" title="הצג פרטי הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
-            <button class="table-action-btn js-action-edit" aria-label="לערוך" data-note-id="${id}">
+            <button class="table-action-btn js-action-edit" aria-label="ערוך הערה" title="ערוך הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="table-action-btn js-action-delete" aria-label="למחוק" data-note-id="${id}">
+            <button class="table-action-btn js-action-delete" aria-label="מחק הערה" title="מחק הערה" data-note-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -244,27 +273,135 @@ function renderTable(notes) {
 }
 
 /**
- * Handle view note (Details)
+ * Build attachments HTML for note details modal (§3D, BF-G7-024 — download, open, preview)
+ */
+function buildAttachmentsHtml(attachments, noteId) {
+  if (!attachments || !attachments.length) return '<p>אין קבצים מצורפים</p>';
+  return attachments.map((att) => {
+    const name = att.original_filename || att.originalFilename || att.filename || 'קובץ';
+    const attId = att.id || att.external_ulid;
+    const icon = getFormatIcon(att.content_type || att.contentType, name);
+    const downloadUrl = att.download_url || `/api/v1/notes/${noteId}/attachments/${attId}/download`;
+    const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    return `
+      <div class="note-attachment-row" data-note-id="${noteId}" data-attachment-id="${attId}">
+        <span class="attachment-icon">${icon}</span>
+        <span class="attachment-name">${esc(name)}</span>
+        <span class="attachment-actions">
+          <a href="#" class="note-attachment-open js-attachment-open" data-attachment-id="${attId}" data-note-id="${noteId}" title="פתח בחלון חדש (תצוגה מקדימה)">🔗 פתח</a>
+          <a href="#" class="note-attachment-download js-attachment-download" data-attachment-id="${attId}" data-note-id="${noteId}" title="הורדה">⬇ הורד</a>
+        </span>
+        <button type="button" class="table-action-btn js-attachment-remove" data-attachment-id="${attId}" data-note-id="${noteId}" aria-label="מחק קובץ" title="מחק קובץ">✕</button>
+      </div>`;
+  }).join('');
+}
+
+/** Bind attachment download/open/remove handlers (BF-G7-024) */
+function bindNoteAttachmentHandlers(noteId) {
+  const container = document.querySelector('.note-attachments-list');
+  if (!container) return;
+
+  async function fetchAttachmentBlob(attId, filename) {
+    const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+    await sharedServices.init();
+    const url = sharedServices.buildUrl(`/notes/${noteId}/attachments/${attId}/download`);
+    const token = sharedServices.getToken();
+    const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.blob();
+  }
+
+  container.querySelectorAll('.js-attachment-download').forEach((link) => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const attId = link.dataset.attachmentId;
+      const row = link.closest('.note-attachment-row');
+      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'download';
+      if (!attId || !noteId) return;
+      try {
+        const blob = await fetchAttachmentBlob(attId, filename);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename || 'download';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (err) {
+        maskedLog('[Notes] Download attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בהורדת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+
+  container.querySelectorAll('.js-attachment-open').forEach((link) => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const attId = link.dataset.attachmentId;
+      const row = link.closest('.note-attachment-row');
+      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'file';
+      if (!attId || !noteId) return;
+      try {
+        const blob = await fetchAttachmentBlob(attId, filename);
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener,noreferrer');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      } catch (err) {
+        maskedLog('[Notes] Open attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בפתיחת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+
+  container.querySelectorAll('.js-attachment-remove').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const attId = btn.dataset.attachmentId;
+      if (!attId || !noteId) return;
+      try {
+        const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+        await sharedServices.init();
+        await sharedServices.delete(`/notes/${noteId}/attachments/${attId}`);
+        const row = btn.closest('.note-attachment-row');
+        if (row) row.remove();
+        if (!container.querySelector('.note-attachment-row')) container.innerHTML = '<p>אין קבצים מצורפים</p>';
+      } catch (err) {
+        maskedLog('[Notes] Remove attachment error:', { message: (err && err.message) || 'Unknown' });
+        createModal({ title: 'שגיאה', content: '<p>שגיאה בהסרת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+      }
+    });
+  });
+}
+
+/**
+ * Handle view note (Details) — §3D full required field list
  */
 async function handleViewNote(noteId) {
   try {
     const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
     await sharedServices.init();
-    const note = await sharedServices.get('/notes/' + noteId);
-    const n = (note && note.data) ? note.data : note;
+    const [noteRes, attachmentsRes] = await Promise.all([
+      sharedServices.get('/notes/' + noteId),
+      sharedServices.get('/notes/' + noteId + '/attachments').catch(() => ({ data: [] }))
+    ]);
+    const n = (noteRes && noteRes.data) ? noteRes.data : noteRes;
+    const attList = Array.isArray(attachmentsRes) ? attachmentsRes : (attachmentsRes?.data ?? attachmentsRes?.attachments ?? []) || [];
     const content = (n && n.content) ? n.content : '';
     const title = (n && n.title) ? n.title : '';
-    const parentType = PARENT_TYPE_LABELS[(n && n.parent_type) || (n && n.parentType)] || (n && n.parent_type) || '—';
+    const tags = (n && n.tags) ? n.tags : [];
+    const linkedEntityHtml = formatLinkedEntityDisplay(n || {});
     const created = formatDate((n && n.created_at) || (n && n.createdAt));
     const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
-    const { createModal, closeModal } = await import('../../../components/shared/PhoenixModal.js');
+    const tagsHtml = tags.length ? `<div class="form-group"><strong>תגיות:</strong> ${tags.map(t => `<span class="badge tag-badge">${String(t).replace(/</g, '&lt;')}</span>`).join(' ')}</div>` : '';
+    const attachmentsHtml = buildAttachmentsHtml(attList, noteId);
+
     const html = `
       <div class="note-view-content phoenix-form">
         ${title ? `<div class="form-group"><strong>כותרת:</strong> ${title}</div>` : ''}
-        <div class="form-group"><strong>אובייקט מקושר:</strong> ${parentType}</div>
+        <div class="form-group"><strong>מקושר ל:</strong> ${linkedEntityHtml}</div>
+        ${tagsHtml}
         <div class="form-group"><strong>נוצר:</strong> ${created} <strong>עודכן:</strong> ${updated}</div>
         <div class="form-group"><strong>תוכן:</strong></div>
-        <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:200px;overflow-y:auto;">${content || '—'}</div>
+        <div class="note-view-body" style="border:1px solid var(--apple-border-light);padding:12px;border-radius:6px;max-height:300px;overflow-y:auto;">${content || '—'}</div>
+        <div class="form-group"><strong>קבצים מצורפים:</strong></div>
+        <div class="note-attachments-list">${attachmentsHtml}</div>
       </div>
     `;
     createModal({
@@ -272,15 +409,19 @@ async function handleViewNote(noteId) {
       content: html,
       entity: 'note',
       showSaveButton: false,
+      cancelButtonText: 'ביטול',
       onClose: function() {}
     });
-    setTimeout(function() {
-      const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
-      if (cancelBtn) cancelBtn.textContent = 'לסגור';
-    }, 0);
+
+    setTimeout(() => bindNoteAttachmentHandlers(noteId), 0);
   } catch (err) {
     maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
-    alert('שגיאה בטעינת פרטי ההערה');
+    createModal({
+      title: 'שגיאה',
+      content: '<p>שגיאה בטעינת פרטי ההערה</p>',
+      showSaveButton: false,
+      cancelButtonText: 'ביטול'
+    });
   }
 }
 
@@ -367,7 +508,12 @@ function bindAddButton() {
       openNotesForm();
     } catch (err) {
       maskedLog('[Notes] Form load error:', { message: (err && err.message) || 'Unknown' });
-      alert('שגיאה בטעינת טופס הוספת הערה');
+      createModal({
+        title: 'שגיאה',
+        content: '<p>שגיאה בטעינת טופס הוספת הערה</p>',
+        showSaveButton: false,
+        cancelButtonText: 'ביטול'
+      });
     }
   });
 }
@@ -389,19 +535,37 @@ function bindRowActions() {
     } else if (editBtn && window.openNotesForm) {
       window.openNotesForm(id);
     } else if (delBtn) {
-      if (confirm('למחוק את ההערה?')) {
-        try {
-          const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
-          await sharedServices.init();
-          await sharedServices.delete(`/notes/${id}`);
-          const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
-          renderSummary(result.summary);
-          renderTable(result.notes);
-        } catch (err) {
-          maskedLog('[Notes] Delete error:', { status: (err && err.status) });
-          alert('שגיאה במחיקה');
+      createModal({
+        title: 'מחיקת הערה',
+        content: '<p>האם למחוק את ההערה?</p>',
+        entity: 'note',
+        showSaveButton: true,
+        confirmMode: true,
+        saveButtonText: 'מחיקה',
+        cancelButtonText: 'ביטול',
+        onSave: async () => {
+          try {
+            const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+            await sharedServices.init();
+            await sharedServices.delete(`/notes/${id}`);
+            document.getElementById('phoenix-modal-backdrop')?.remove();
+            if (window.refreshNotesTable) await window.refreshNotesTable();
+            else {
+              const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
+              renderSummary(result.summary);
+              renderTable(result.notes);
+            }
+          } catch (err) {
+            maskedLog('[Notes] Delete error:', { status: (err && err.status) });
+            createModal({
+              title: 'שגיאה',
+              content: '<p>שגיאה במחיקה</p>',
+              showSaveButton: false,
+              cancelButtonText: 'ביטול'
+            });
+          }
         }
-      }
+      });
     }
   });
 }

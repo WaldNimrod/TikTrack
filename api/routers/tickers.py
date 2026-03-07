@@ -12,6 +12,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, Path, status
 
 from ..core.database import get_db
+from ..core.config import settings
 from ..utils.dependencies import require_admin_role
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..models.identity import User
@@ -234,9 +235,14 @@ async def create_ticker(
         raise
     except Exception as e:
         logger.error(f"Error creating ticker: {e}", exc_info=True)
+        detail = (
+            f"Failed to create ticker: {type(e).__name__}: {str(e)[:200]}"
+            if settings.debug
+            else "Failed to create ticker"
+        )
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create ticker",
+            detail=detail,
             error_code=ErrorCodes.SERVER_ERROR,
         )
 
@@ -257,6 +263,7 @@ async def update_ticker(
             symbol=payload.symbol,
             company_name=payload.company_name,
             ticker_type=payload.ticker_type,
+            status=payload.status,
             is_active=payload.is_active,
         )
     except HTTPExceptionWithCode:

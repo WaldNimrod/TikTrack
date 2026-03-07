@@ -1,5 +1,5 @@
 # Cloud Agent Quality Scan Report — Team 00 (Architecture)
-**Date:** 2026-03-03  
+**date:** 2026-03-03  
 **Source:** Cursor Cloud Agent — Full Codebase Quality Scan  
 **Status:** ACTION REQUIRED
 
@@ -68,6 +68,23 @@
 | KB-020 | 14 מתוך 18 services ב-backend עדיין ללא unit tests | **High** |
 | KB-021 | Pydantic V2 deprecation warnings: 15 schemas משתמשים ב-`class Config` במקום `ConfigDict` | **Medium** |
 
+### 2.6 Background Tasks — Management & Runtime Feedback Gaps
+
+| ID | תיאור | חומרה |
+|----|-------|-------|
+| KB-022 | ממשק ניהול משימות רק עם כפתור הרצה (Run-only) ללא מסך הגדרה מלא לפרמטרים/תזמון/מדיניות ריצה | **High** |
+| KB-023 | אין משוב תוצאתי מלא לאחר ריצה (success/failure + סיבת כשל + סיכום פעולה) | **High** |
+| KB-024 | אין לוג ריצה מובנה ונגיש מתוך הממשק (כולל היסטוריה לפי משימה) | **Medium** |
+| KB-025 | אין מדד תפעולי לכמות/איכות המידע שהובא בכל ריצה (data coverage / freshness / effective rows) | **Medium** |
+
+### 2.7 UI Precision — מודולים וטבלאות
+
+| ID | תיאור | חומרה |
+|----|-------|-------|
+| KB-026 | חוסר אחידות עיצובית במודולים מול blueprint קנוני (צבעי ישות, היררכיית שדות, פעולות, כפתור `ביטול`) | **High** |
+| KB-027 | חוסר אחידות בטבלאות (טולטיפים בתפריט פעולות, רינדור עמודות קשר, פידבק מיידי אחרי CRUD) | **High** |
+| KB-028 | סטיות layout בטבלאות/סיכומים (יישור אלמנטים וכפתורי pagination) פוגעות בקריאות ובשימושיות | **Medium** |
+
 ---
 
 ## 3. פעולות נדרשות מצוות האדריכלות
@@ -81,6 +98,10 @@
 4. **Dependencies (KB-010/011/012/013):** יש לבדוק ולשדרג חבילות פגיעות.
 
 5. **Pre-commit Hooks (KB-016):** יש להגדיר Husky או pre-commit hooks.
+
+6. **Background Tasks UX/Observability (KB-022/023/024/025):** להגדיר מסך ניהול מלא למשימות רקע + סטנדרט תוצאות ריצה + לוג מובנה + מדדי תפוקה.
+
+7. **UI Precision Baseline (KB-026/027/028):** לנעול design contract אחיד למודולים וטבלאות ולהחיל אותו רוחבית לפני הרחבת פיצ'רים חדשים.
 
 ---
 

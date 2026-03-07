@@ -23,6 +23,13 @@ ROADMAP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORT
 PROGRAM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"
 WP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
 
+STAGE_ID_RE = re.compile(r"^S\d{3}$")
+PROGRAM_ID_RE = re.compile(r"^S\d{3}-P\d{3}$")
+WORK_PACKAGE_ID_RE = re.compile(r"^S\d{3}-P\d{3}-WP\d{3}$")
+
+PROGRAM_ALLOWED_STATUSES = {"ACTIVE", "COMPLETE", "CLOSED", "HOLD", "FROZEN", "PIPELINE", "PLANNED"}
+WORK_PACKAGE_ALLOWED_STATUSES = {"IN_PROGRESS", "CLOSED", "HOLD"}
+
 
 class PortfolioError(RuntimeError):
     pass
@@ -45,6 +52,12 @@ def _normalize_cell(cell: str) -> str:
 def _read_text(path: Path) -> str:
     if not path.exists():
         raise PortfolioError(f"Missing required file: {path}")
+    return path.read_text(encoding="utf-8")
+
+
+def _read_optional_text(path: Path) -> str | None:
+    if not path.exists():
+        return None
     return path.read_text(encoding="utf-8")
 
 
@@ -287,6 +300,40 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
     if len(wp_ids) != len(set(wp_ids)):
         errors.append("Duplicate work_package_id values in WP registry")
 
+    # Hierarchy and identifier invariants
+    for s in stages:
+        sid = (s.get("stage_id") or "").strip()
+        if not STAGE_ID_RE.fullmatch(sid):
+            errors.append(f"Stage identifier invalid: '{sid}' (expected S{{NNN}})")
+
+    for p in programs:
+        pid = (p.get("program_id") or "").strip()
+        sid = (p.get("stage_id") or "").strip()
+        status = (p.get("status") or "").strip().upper()
+        domain = (p.get("domain") or "").strip().upper()
+
+        if not PROGRAM_ID_RE.fullmatch(pid):
+            errors.append(f"Program identifier invalid: '{pid}' (expected S{{NNN}}-P{{NNN}})")
+        if pid and sid and pid.split("-P", 1)[0] != sid:
+            errors.append(f"Program parent mismatch: program_id='{pid}' does not belong to stage_id='{sid}'")
+        if status and status not in PROGRAM_ALLOWED_STATUSES:
+            errors.append(f"Program {pid} has invalid status '{status}'")
+        if domain and domain not in {"AGENTS_OS", "TIKTRACK"}:
+            errors.append(f"Program {pid} has invalid domain '{domain}' (must be single-domain: AGENTS_OS or TIKTRACK)")
+
+    for w in work_packages:
+        wid = (w.get("work_package_id") or "").strip()
+        pid = (w.get("program_id") or "").strip()
+        status = (w.get("status") or "").strip().upper()
+
+        if not WORK_PACKAGE_ID_RE.fullmatch(wid):
+            errors.append(f"Work package identifier invalid: '{wid}' (expected S{{NNN}}-P{{NNN}}-WP{{NNN}})")
+        expected_pid = wid.rsplit("-WP", 1)[0] if wid else ""
+        if pid and expected_pid and pid != expected_pid:
+            errors.append(f"Work package parent mismatch: work_package_id='{wid}' does not belong to program_id='{pid}'")
+        if status and status not in WORK_PACKAGE_ALLOWED_STATUSES:
+            errors.append(f"Work package {wid} has invalid status '{status}'")
+
     # Required fields
     for p in programs:
         if not p["domain"]:
@@ -333,43 +380,54 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
 
 def _build_hierarchy_md(snapshot: Dict[str, object]) -> List[str]:
     """Build hierarchical roadmap view: Stage (shared) → Program (sub, domain) → Work Package (sub, domain).
-    Domains: TikTrack, Agents_OS. 5 main stages; stage 2 is missing (שלב 2 חסר).
+    Domains: TikTrack, Agents_OS. Uses indentation and tree chars for clarity.
     """
     hierarchy = snapshot.get("hierarchy") or []
     stage_numbers = sorted({_stage_number(h["stage_id"]) for h in hierarchy})
-    missing = [n for n in range(1, max(stage_numbers) + 1) if n > 0 and n not in stage_numbers]
+    missing: List[int] = []
+    if stage_numbers:
+        missing = [n for n in range(1, max(stage_numbers) + 1) if n > 0 and n not in stage_numbers]
 
     lines = [
         "## Roadmap (hierarchical)",
         "",
-        "**היררכיה:** שלב (משותף לשני הדומיינים) → תוכנית (sub של שלב) → חבילת עבודה (sub של תוכנית).",
-        "**דומיינים:** TikTrack, Agents_OS. כל תוכנית וכל חבילת עבודה משויכות לדומיין אחד.",
+        "**היררכיה:** שלב → תוכנית → חבילת עבודה (אינדנטציה = מיקום ברצף).",
+        "**דומיינים:** TikTrack, Agents_OS. כל תוכנית וחבילת עבודה משויכות לדומיין אחד.",
         "",
     ]
     if missing:
-        lines.append(f"**שלבים ראשיים:** 5 שלבים (שלב 2 חסר — אין S002 בקטלוג).")
+        lines.append(f"**הערה:** שלבים חסרים בקטלוג: {missing}.")
         lines.append("")
+    if not hierarchy:
+        lines.append("*אין שלבים בטבלת Roadmap.*")
+        lines.append("")
+        return lines
 
     for node in hierarchy:
         sid = node.get("stage_id", "")
         sname = node.get("stage_name", "")
         sstatus = node.get("status", "")
-        lines.append(f"### Stage: {sid} — {sname} | {sstatus} [SHARED]")
+        lines.append(f"### {sid} — {sname} | {sstatus} [SHARED]")
         lines.append("")
-        for p in node.get("programs", []):
+        programs = node.get("programs", [])
+        for p_idx, p in enumerate(programs):
             pid = p.get("program_id", "")
             pname = p.get("program_name", "")
             pstatus = p.get("status", "")
             domain = (p.get("domain") or "").strip() or "—"
-            lines.append(f"#### Program: {pid} — {pname} | {pstatus} | domain: **{domain}**")
-            lines.append("")
-            for w in p.get("work_packages", []):
+            last_p = p_idx == len(programs) - 1
+            prefix = "└── " if last_p else "├── "
+            lines.append(f"    {prefix}**Program** `{pid}` — {pname} | {pstatus} | domain: **{domain}**")
+            wps = p.get("work_packages", [])
+            for w_idx, w in enumerate(wps):
                 wid = w.get("work_package_id", "")
                 wstatus = w.get("status", "")
                 wgate = w.get("current_gate", "")
                 wdomain = (w.get("domain") or "").strip() or "—"
                 active = " (active)" if w.get("is_active") else ""
-                lines.append(f"- **WP** `{wid}` | {wstatus} | gate: {wgate} | domain: **{wdomain}**{active}")
+                last_w = w_idx == len(wps) - 1
+                wp_prefix = "└── " if last_w else "├── "
+                lines.append(f"        {wp_prefix}**WP** `{wid}` | {wstatus} | gate: {wgate} | domain: **{wdomain}**{active}")
             lines.append("")
         lines.append("")
     return lines
@@ -415,6 +473,31 @@ def build_markdown_summary(snapshot: Dict[str, object], result: ValidationResult
     return "\n".join(lines)
 
 
+def _snapshot_json_text(snapshot: Dict[str, object]) -> str:
+    return json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n"
+
+
+def _snapshot_md_text(summary: str) -> str:
+    return summary.rstrip("\n") + "\n"
+
+
+def _normalized_snapshot_for_check(snapshot: Dict[str, object]) -> Dict[str, object]:
+    normalized = dict(snapshot)
+    normalized["generated_at_utc"] = "__IGNORED_IN_CHECK__"
+    return normalized
+
+
+def _normalized_summary_for_check(text: str) -> str:
+    lines = text.rstrip("\n").splitlines()
+    normalized: List[str] = []
+    for line in lines:
+        if line.startswith("- Generated (UTC): `"):
+            normalized.append("- Generated (UTC): `__IGNORED_IN_CHECK__`")
+        else:
+            normalized.append(line)
+    return "\n".join(normalized)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build + validate portfolio snapshot")
     parser.add_argument(
@@ -433,23 +516,60 @@ def main() -> int:
     snapshot = build_snapshot()
     result = validate_snapshot(snapshot)
     summary = build_markdown_summary(snapshot, result)
+    snapshot_json_text = _snapshot_json_text(snapshot)
+    snapshot_md_text = _snapshot_md_text(summary)
 
     out_json = Path(args.out_json)
     out_md = Path(args.out_md)
-    out_json.parent.mkdir(parents=True, exist_ok=True)
-    out_md.parent.mkdir(parents=True, exist_ok=True)
 
-    out_json.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    out_md.write_text(summary + "\n", encoding="utf-8")
+    artifact_errors: List[str] = []
+    if args.check:
+        existing_json_text = _read_optional_text(out_json)
+        existing_md_text = _read_optional_text(out_md)
 
-    if result.errors:
+        if existing_json_text is None:
+            artifact_errors.append(f"Missing snapshot artifact: {out_json}")
+        else:
+            try:
+                existing_json = json.loads(existing_json_text)
+            except json.JSONDecodeError as exc:
+                artifact_errors.append(f"Invalid snapshot JSON at {out_json}: {exc.msg}")
+            else:
+                if _normalized_snapshot_for_check(existing_json) != _normalized_snapshot_for_check(snapshot):
+                    artifact_errors.append(
+                        f"Snapshot JSON out of date: {out_json} (run build_portfolio_snapshot.py to refresh)"
+                    )
+
+        if existing_md_text is None:
+            artifact_errors.append(f"Missing snapshot artifact: {out_md}")
+        else:
+            if _normalized_summary_for_check(existing_md_text) != _normalized_summary_for_check(summary):
+                artifact_errors.append(
+                    f"Snapshot markdown out of date: {out_md} (run build_portfolio_snapshot.py to refresh)"
+                )
+    else:
+        out_json.parent.mkdir(parents=True, exist_ok=True)
+        out_md.parent.mkdir(parents=True, exist_ok=True)
+        out_json.write_text(snapshot_json_text, encoding="utf-8")
+        out_md.write_text(snapshot_md_text, encoding="utf-8")
+
+    validation_failed = bool(result.errors)
+
+    if validation_failed:
         print("Portfolio snapshot validation FAILED:")
         for err in result.errors:
             print(f" - {err}")
-        if args.check:
-            return 1
     else:
         print("Portfolio snapshot validation PASSED")
+
+    if artifact_errors:
+        print("SNAPSHOT CHECK: FAIL")
+        for err in artifact_errors:
+            print(f" - {err}")
+    if args.check and (validation_failed or artifact_errors):
+        return 1
+    if args.check:
+        print("SNAPSHOT CHECK: PASS (artifacts are current)")
 
     if result.warnings:
         print("Warnings:")

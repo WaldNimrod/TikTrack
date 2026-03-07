@@ -1,0 +1,25 @@
+VALIDATION_EXIT 0
+column_name
+target_datetime
+(1 row)
+column_name
+parent_datetime
+(1 row)
+target_type_null_count
+2
+(1 row)
+target_type_general_count
+0
+(1 row)
+conname|def
+alerts_trigger_status_check|CHECK (((trigger_status)::text = ANY ((ARRAY['untriggered'::character varying, 'triggered_unread'::character varying, 'triggered_read'::character varying, 'rearmed'::character varying])::text[])))
+(1 row)
+conname|def
+notes_parent_type_check|CHECK (((parent_type)::text = ANY ((ARRAY['trade'::character varying, 'trade_plan'::character varying, 'ticker'::character varying, 'account'::character varying, 'datetime'::character varying])::text[])))
+(1 row)
+parent_type|count
+account|1
+ticker|27
+(2 rows)
+---STDERR---
+

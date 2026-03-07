@@ -1,0 +1,17 @@
+[
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failure\" Error: Network error: Failed to fetch\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js?t=1772841226629:453:30)\n    at async Object.login (http://127.0.0.1:8080/src/cubes/identity/services/auth.js?t=1772841988806:73:19)\n    at async handleSubmit (http://127.0.0.1:8080/src/cubes/identity/components/auth/LoginForm.jsx?t=1772841988806:141:24)",
+    "timestamp": 1772847144182
+  },
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][ErrorHandler] ERROR: Network/CORS error\" Error: Network error: Failed to fetch\n    at SharedServices.post (http://127.0.0.1:8080/src/components/core/sharedServices.js?t=1772841226629:453:30)\n    at async Object.login (http://127.0.0.1:8080/src/cubes/identity/services/auth.js?t=1772841988806:73:19)\n    at async handleSubmit (http://127.0.0.1:8080/src/cubes/identity/components/auth/LoginForm.jsx?t=1772841988806:141:24)",
+    "timestamp": 1772847144183
+  },
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/src/utils/audit.js 98:12 \"❌ [Phoenix Audit][Auth] ERROR: Login failed\" Object",
+    "timestamp": 1772847144183
+  }
+]

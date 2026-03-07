@@ -86,12 +86,12 @@
 | id | D4 |
 | status | CLOSED |
 | owner | Team 60 |
-| artifact_path | `scripts/signing/sign_evidence.py` |
+| artifact_path | `scripts/signing/sign_evidence.py`, `infrastructure/s002_p002_mcp_qa/generate_evidence.py`, `infrastructure/s002_p002_mcp_qa/sample_MATERIALIZATION_EVIDENCE.json` |
 | verification_report | `infrastructure/s002_p002_mcp_qa/sample_MATERIALIZATION_EVIDENCE.json` |
 | verification_type | API |
 | verified_by | Team 10 |
 | closed_date | 2026-03-07 |
-| notes | Produces signature block (Ed25519, key_id, signature_base64, signed_payload_sha256, signed_at_utc, signed_by_team). Operational; key created and test run successful. |
+| notes | sign_evidence.py signs payload; generate_evidence.py builds MATERIALIZATION_EVIDENCE.json with provenance/gate/artifact and --sign. Key in scripts/signing/keys/ (gitignored); test run successful. |
 
 ---
 
@@ -99,13 +99,13 @@
 
 | Deliverable | status | artifact_path |
 |-------------|--------|---------------|
-| D1 — תשתית MCP ל־Chrome | | |
-| D2 — Runtime hardening | | |
-| D3 — Ed25519 key custody | | |
-| D4 — Signing service setup | | |
+| D1 — תשתית MCP ל־Chrome | CLOSED | infrastructure/s002_p002_mcp_qa/MCP_CHROME_SETUP.md |
+| D2 — Runtime hardening | CLOSED | infrastructure/s002_p002_mcp_qa/RUNTIME_IDENTITY.md |
+| D3 — Ed25519 key custody | CLOSED | infrastructure/s002_p002_mcp_qa/KEY_CUSTODY.md, scripts/signing/README.md |
+| D4 — Signing service setup | CLOSED | scripts/signing/sign_evidence.py, infrastructure/s002_p002_mcp_qa/generate_evidence.py, infrastructure/s002_p002_mcp_qa/sample_MATERIALIZATION_EVIDENCE.json |
 
 **G3.4 exit:** דוח השלמה זה, עם evidence_path תקף לכל ארבעת הפריטים (D1..D4), משלים את G3.4. נדרש ל־G3.5 checkpoint (חתימת Team 10).
 
 ---
 
-**log_entry | TEAM_60 | S002_P002_MCP_QA_RUNTIME_AND_SIGNING_COMPLETION | SKELETON | TO_TEAM_10 | 2026-03-07**
+**log_entry | TEAM_60 | S002_P002_MCP_QA_RUNTIME_AND_SIGNING_COMPLETION | COMPLETE | TO_TEAM_10 | 2026-03-07**

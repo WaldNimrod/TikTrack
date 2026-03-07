@@ -35,7 +35,7 @@
 | 3 | G3.3 | Team 61 — ייעוץ/תיאום (remote repo); אין deliverable חובה בשלב ראשון | Team 61 | אופציונלי: המלצות/מסמכים; לא חוסם G3.5 |
 | 4 | G3.4 | Team 60 — תשתית MCP ל־Chrome + runtime + Ed25519 + signing service | Team 60 | Completion report to Team 10 with evidence_path |
 | 5 | **G3.5** | **Checkpoint: תשתית readiness (Team 60)** | **Team 10** | **Mandatory:** Team 60 completion confirmed (תשתית MCP+Chrome, runtime, signing); evidence verifiable on disk. No G3.6 until G3.5 PASS. Team 61 לא חוסם בשלב ראשון. |
-| 6 | G3.6 | Team 50 — hybrid QA activation (MCP + Selenium parity runs) | Team 50 | Completion report to Team 10 with evidence_path |
+| 6 | **G3.6** | **Team 50 — hybrid QA activation (MCP + Selenium parity runs)** | **Team 50** | **PASS** — TEAM_10_S002_P002_G3.6_CHECKPOINT_SIGNOFF_v1.0.0.md |
 | 7 | G3.7 | Team 90 — evidence validation protocol activation (GATE_5/GATE_6 checkpoints) | Team 90 | Protocol defined and communicated to Team 10 |
 | 8 | G3.8 | Pre-GATE_4 consolidation — all first-cycle deliverables verified | Team 10 | All evidence paths valid; WSM updated as needed |
 | 9 | G3.9 | GATE_3 close → GATE_4 open (per gate model) | Team 10 | Gate handoff package to self (GATE_4 owner); QA phase starts |

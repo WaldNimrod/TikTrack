@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-06T22:37:59.700778+00:00`
+- Generated (UTC): `2026-03-07T00:17:46.564975+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P003`
 - active_work_package_id: `S002-P003-WP002`
-- current_gate: `GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE)`
-- next_required_action: `Team 10 submit deterministic closure matrix for 26 BF + 19 gaps with full evidence-by-path, then request new GATE_5 re-validation.`
+- current_gate: `GATE_7 (HUMAN_SIGNOFF_ACTIVE)`
+- next_required_action: `Nimrod executes Option C browser scenarios and returns `אישור` or `פסילה`; Team 90 normalizes decision artifact and updates WSM.`
 
 ## Portfolio Counts
 
@@ -42,7 +42,7 @@
     ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_5 (BLOCKED_REMEDIATION_INCOMPLETE) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P003-WP002` | IN_PROGRESS | gate: GATE_7 (HUMAN_SIGNOFF_ACTIVE) | domain: **TIKTRACK** (active)
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 

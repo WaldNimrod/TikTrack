@@ -202,7 +202,7 @@ function renderAlertRow(alert) {
       <td class="phoenix-table__cell col-created phoenix-table__cell--date">${created}</td>
       <td class="phoenix-table__cell col-actions phoenix-table__cell--actions">
         <div class="table-actions-tooltip">
-          <button class="table-actions-trigger" aria-label="פעולות" title="פעולות">
+          <button class="table-actions-trigger" aria-label="פעולות">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
           </button>
           <div class="table-actions-menu">

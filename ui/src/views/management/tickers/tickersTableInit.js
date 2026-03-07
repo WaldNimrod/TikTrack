@@ -182,7 +182,7 @@ const formatChangePct = (pct) => {
       actionsCell.className = 'phoenix-table__cell col-actions phoenix-table__cell--actions';
       actionsCell.innerHTML = `
         <div class="table-actions-tooltip">
-          <button class="table-actions-trigger" aria-label="פעולות שורה" title="פעולות שורה">
+          <button class="table-actions-trigger" aria-label="פעולות שורה">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="1"></circle>
               <circle cx="12" cy="5" r="1"></circle>

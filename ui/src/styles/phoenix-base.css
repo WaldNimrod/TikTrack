@@ -503,29 +503,34 @@ body.entity-system {
 
 /* ============================================
    [data-tooltip] — טולטיפ גלובלי זמין לכל העמודים
+   סגנון: לבן ברקע, צבע במסגרת ובטקסט (כמו הכפתור)
    ============================================ */
 [data-tooltip] {
   position: relative;
-  cursor: help;
 }
 [data-tooltip]:hover::after,
 [data-tooltip]:focus-visible::after {
   content: attr(data-tooltip);
+  display: block;
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 12px;
-  background: #1e293b;
-  color: #fff;
+  background: var(--apple-bg-primary, #ffffff);
+  color: inherit;
+  border: 1px solid currentColor;
   font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   border-radius: 6px;
   z-index: var(--z-tooltip, 1070);
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* טולטיפ: כפתורי פילטרים ופעולות משתמשים ב-title (טולטיפ דפדפן מקורי בלבד) */
+/* תפריט פעולות (table-actions-trigger) — ללא טולטיפ כדי לא ליצור בלג עם התפריט */
 
 /* HTML root settings */
 html {

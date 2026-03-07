@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-06** — GATE_6 approved; Team 90 activated GATE_7 human sign-off (Option C browser walkthrough) and issued active scenario pack to Nimrod.
+**Gate-owner update evidence:** This block was updated **2026-03-07** — Team 70 closure package validated by Team 90; GATE_8 PASS recorded and S002-P003-WP002 lifecycle closed.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P003; GATE_6 approved; GATE_7 human sign-off active with Nimrod (Option C browser full walkthrough) |
+| active_flow | S002-P003; GATE_8 PASS; DOCUMENTATION_CLOSED for S002-P003-WP002 |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | S002-P003-WP002 |
-| in_progress_work_package_id | S002-P003-WP002 (GATE_7 human sign-off in progress) |
-| last_closed_work_package_id | S002-P001-WP002 (GATE_8 PASS 2026-02-26; **domain: AGENTS_OS**) |
-| last_s002_p003_milestone | GATE_6 APPROVED \| 2026-03-06 \| approved after Team 90 v1.4.0 submission; moved to GATE_7 human sign-off |
+| active_work_package_id | NONE |
+| in_progress_work_package_id | NONE |
+| last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; **domain: TIKTRACK**) |
+| last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_3 → GATE_8 (execution gates for S002-P003 work packages) |
-| current_gate | GATE_7 (HUMAN_SIGNOFF_ACTIVE) |
+| current_gate | GATE_8 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P003 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 routing owner) |
-| last_gate_event | GATE_6_APPROVED_v1_4_0 \| 2026-03-06 \| approval relayed and GATE_7 activated by Team 90 \| TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE6_APPROVED_AND_GATE7_ACTIVATION_v1.4.0.md |
-| next_required_action | Nimrod executes Option C browser scenarios and returns `אישור` or `פסילה`; Team 90 normalizes decision artifact and updates WSM. |
-| next_responsible_team | Nimrod (Human Approval Authority) + Team 90 (gate operator) |
+| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED \| 2026-03-07 \| Team 90 issued GATE_8 PASS after Team 70 validation request \| TEAM_90_TO_TEAM_70_S002_P003_WP002_GATE8_VALIDATION_RESPONSE.md |
+| next_required_action | Team 10 and Team 90 coordinate next authorized roadmap activation after S002-P003 closure (no open execution WP in progress). |
+| next_responsible_team | Team 90 (gate owner state management) + Team 10 (next intake coordination) |
 
 ---
 
@@ -230,6 +230,9 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P003-WP002 (v1.2.0); GATE_6 routing preparation activated | 2026-03-06**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submission v1.4.0 sent to Team 00/Team 100; awaiting decision | 2026-03-06**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 approved; GATE_7 human sign-off activated with Option C scenarios issued to Nimrod | 2026-03-06**
+**log_entry | NIMROD | GATE_7 | S002_P003_WP002 | PASS | HUMAN_SIGNOFF_APPROVED | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P003-WP002; GATE_8 activated and Team 70 execution requested | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P003-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-07**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

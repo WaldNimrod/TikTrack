@@ -39,7 +39,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
 | S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
-| S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | SHARED (TIKTRACK + AGENTS_OS) | ACTIVE | GATE_3_PREPARATION (S002-P002 intake); active_flow=S002-P003 closed at GATE_8; **next authorized program:** S002-P002 (MCP-QA Transition; GATE_2 approved by Team 190); active_work_package_id=NONE |
+| S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | AGENTS_OS | ACTIVE | GATE_3_PREPARATION (S002-P002 intake); active_flow=S002-P003 closed at GATE_8; **next authorized program:** S002-P002 (MCP-QA Transition; GATE_2 approved by Team 190); active_work_package_id=NONE |
 | S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | COMPLETE | GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED; lifecycle complete (Team 90 validation report) |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |

@@ -32,9 +32,9 @@
 |------|-----|-------------|--------|----------------|
 | 1 | G3.1 | Intake open — WP Definition + Gate3 Plan published | Team 10 | This document + WORK_PACKAGE_DEFINITION published |
 | 2 | G3.2 | First-cycle mandates issued to Teams 61, 60, 50, 90 | Team 10 | Four mandate artifacts published and communicated |
-| 3 | G3.3 | Team 61 — repo automation activation (CI, tooling, evidence hooks) | Team 61 | Completion report to Team 10 with evidence_path |
-| 4 | G3.4 | Team 60 — runtime hardening + Ed25519 custody + signing service | Team 60 | Completion report to Team 10 with evidence_path |
-| 5 | **G3.5** | **Checkpoint: Automation and runtime readiness sign-off** | **Team 10** | **Mandatory:** Team 61 and Team 60 completion confirmed; evidence verifiable on disk. No G3.6 until G3.5 PASS. |
+| 3 | G3.3 | Team 61 — ייעוץ/תיאום (remote repo); אין deliverable חובה בשלב ראשון | Team 61 | אופציונלי: המלצות/מסמכים; לא חוסם G3.5 |
+| 4 | G3.4 | Team 60 — תשתית MCP ל־Chrome + runtime + Ed25519 + signing service | Team 60 | Completion report to Team 10 with evidence_path |
+| 5 | **G3.5** | **Checkpoint: תשתית readiness (Team 60)** | **Team 10** | **Mandatory:** Team 60 completion confirmed (תשתית MCP+Chrome, runtime, signing); evidence verifiable on disk. No G3.6 until G3.5 PASS. Team 61 לא חוסם בשלב ראשון. |
 | 6 | G3.6 | Team 50 — hybrid QA activation (MCP + Selenium parity runs) | Team 50 | Completion report to Team 10 with evidence_path |
 | 7 | G3.7 | Team 90 — evidence validation protocol activation (GATE_5/GATE_6 checkpoints) | Team 90 | Protocol defined and communicated to Team 10 |
 | 8 | G3.8 | Pre-GATE_4 consolidation — all first-cycle deliverables verified | Team 10 | All evidence paths valid; WSM updated as needed |
@@ -46,14 +46,14 @@
 
 **G3.5** is a **hard gate** between automation/runtime setup and QA/validation activation.
 
-**Entry conditions (all required):**
-- Team 61 has delivered repo automation activation per mandate (CI, tooling integration, evidence generation hooks) and reported completion with evidence_path.
-- Team 60 has delivered runtime hardening, Ed25519 key custody, and signing service setup per mandate and reported completion with evidence_path.
-- All MATERIALIZATION_EVIDENCE.json (if any produced in G3.3/G3.4) comply with Evidence Contract (§6 activation prompt): provenance tag, signature block, gate context, artifact path.
+**Entry conditions (phase one — all required):**
+- Team 60 has delivered: (1) תשתית MCP ל־Chrome (בנוסף ל־Selenium) כך ש־50/90/190 יכולים להשתמש ב־MCP לבדיקות ועבודה מול Chrome; (2) runtime hardening; (3) Ed25519 key custody; (4) signing service setup — and reported completion with evidence_path.
+- Evidence (if any) from Team 60 complies with Evidence Contract: provenance tag, signature block, gate context, artifact path.
+- Team 61: no mandatory deliverable in phase one; optional advisory input does not block G3.5.
 
-**Exit criterion:** Team 10 signs off G3.5 PASS and records in execution tracking. Only then may Team 10 issue or unlock G3.6 (Team 50) and G3.7 (Team 90) execution.
+**Exit criterion:** Team 10 signs off G3.5 PASS and records in execution tracking. Only then may Team 10 unlock G3.6 (Team 50) and G3.7 (Team 90).
 
-**Failure:** If G3.5 is not passed, Team 10 does not advance to G3.6/G3.7; remediation with Team 61/60 as needed.
+**Failure:** If G3.5 is not passed, Team 10 does not advance to G3.6/G3.7; remediation with Team 60 as needed.
 
 ---
 

@@ -27,36 +27,28 @@
 
 ---
 
-## 1) Boundary (Locked)
+## 1) Boundary and role in this phase
 
-Team 61 controls **repo-automation lane only**. No drift into runtime custody or gate ownership.
-
----
-
-## 2) Mandate — Repo Automation Activation
-
-Execute the following and report completion to Team 10 with **evidence_path** for each deliverable:
-
-1. **CI integration**  
-   Ensure CI pipeline (or equivalent) supports S002-P002 program context: runs relevant to MCP-QA transition are triggerable and results are traceable (e.g. artifact paths, gate context).
-
-2. **Tooling integration**  
-   Integrate tooling required for MCP-QA hybrid parity (e.g. MCP client/server tooling, Selenium/runner hooks) into the repo automation lane so that evidence-generation and parity runs can be invoked from a single orchestration point where applicable.
-
-3. **Evidence generation hooks**  
-   Provide hooks or scripts that produce **MATERIALIZATION_EVIDENCE.json** conforming to the Evidence Contract:
-   - **provenance tag:** `TARGET_RUNTIME` | `LOCAL_DEV_NON_AUTHORITATIVE` | `SIMULATION`
-   - **signature block:** `Ed25519`, `key_id`, `signature_base64`, `signed_payload_sha256`, `signed_at_utc`, `signed_by_team`
-   - **gate context** and **traceable artifact path**
-
-   Team 60 owns key custody and signing service; Team 61 integrates the **calling** of signing and the **writing** of evidence artifacts in the repo/CI lane.
+Team 61 works on a **remote repo**. In this **first phase** — **advisor and coordinator** for the agent system later. **Not** the builder of the on-repo MCP/Chrome infrastructure; that is built by **Team 60**. No drift into runtime custody or gate ownership.
 
 ---
 
-## 3) Deliverables and Response
+## 2) Mandate — Advisory / coordination (first phase)
 
-- **Deliverables:** CI integration, tooling integration, evidence-generation hooks as above.
-- **Response:** Completion report to Team 10 with artifact paths (evidence_path) for each item. Report format: id, status, owner, artifact_path, verification_report, verification_type, verified_by, closed_date (per §2-style evidence).
+In phase one, Team 61 is **not** required to deliver CI integration or evidence hooks in this repo. The infrastructure that enables 50/90/190 to use MCP with Chrome (in addition to Selenium) is delivered by **Team 60**.
+
+Team 61 may:
+- Advise on automation and agent-system coordination when relevant.
+- When engagement deepens (later phase): coordinate integration with the remote agent system; CI/evidence hooks in the remote context as agreed.
+
+**No mandatory deliverables in this repo for phase one.** If Team 61 provides optional inputs (e.g. recommendations, docs), report to Team 10 with artifact path; otherwise no completion report required for G3.5.
+
+---
+
+## 3) Deliverables and Response (phase one)
+
+- **Deliverables:** None mandatory. Optional: recommendations or coordination docs (artifact path to Team 10 if provided).
+- **Response:** No completion report required for G3.5 in phase one. G3.5 sign-off depends on Team 60 (and optionally Team 61 advisory input).
 
 ---
 

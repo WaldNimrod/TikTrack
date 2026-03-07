@@ -33,20 +33,23 @@ Team 60 controls **runtime/platform** and **signing-key custody only**. No drift
 
 ---
 
-## 2) Mandate — Runtime and Signing Activation
+## 2) Mandate — Runtime, MCP+Chrome Infrastructure, and Signing
+
+**מטרה שלב ראשון:** תשתית שתיבנה על ידי צוות 60 ותאפשר **לצוותים 50, 90, 190** להשתמש ב־**MCP** לצורך בדיקות ועבודה מול **Chrome** — **במקום ובנוסף ל־Selenium** שממומש היום. צוות 61 עובד על repo מרוחק וישמש יועץ/מתאם בהמשך; התשתית ב-repo הזה — צוות 60.
 
 Execute the following and report completion to Team 10 with **evidence_path** for each deliverable:
 
-1. **Runtime hardening**  
-   Harden runtime/platform so that S002-P002 MCP-QA transition runs (e.g. MCP + Selenium parity) can execute in a well-defined environment. Document target runtime identity and any constraints (e.g. TARGET_RUNTIME vs LOCAL_DEV_NON_AUTHORITATIVE) for Evidence Contract provenance.
+1. **תשתית MCP ל־Chrome (בנוסף ל־Selenium)**  
+   Infrastructure (runtime, tooling, integration) that enables teams 50, 90, 190 to run tests and work with **Chrome via MCP** — in addition to existing Selenium. This is the primary deliverable for the first phase.
 
-2. **Ed25519 key custody**  
-   Establish or confirm Ed25519 key custody for the program: keys used for signing MATERIALIZATION_EVIDENCE.json payloads are under Team 60 control; access and usage are documented and traceable.
+2. **Runtime hardening**  
+   Harden runtime/platform so that MCP + Selenium runs execute in a well-defined environment. Document target runtime identity and constraints (e.g. TARGET_RUNTIME vs LOCAL_DEV_NON_AUTHORITATIVE) for Evidence Contract provenance.
 
-3. **Signing service setup**  
-   Provide or configure a signing service that produces the **signature block** required by the Evidence Contract:
-   - `Ed25519`, `key_id`, `signature_base64`, `signed_payload_sha256`, `signed_at_utc`, `signed_by_team`  
-   So that artifacts (e.g. from Team 61 evidence hooks) can be signed and submitted with valid MATERIALIZATION_EVIDENCE.json.
+3. **Ed25519 key custody**  
+   Establish or confirm Ed25519 key custody: keys for signing MATERIALIZATION_EVIDENCE.json under Team 60 control; access and usage documented and traceable.
+
+4. **Signing service setup**  
+   Provide or configure a signing service that produces the **signature block** required by the Evidence Contract (`Ed25519`, `key_id`, `signature_base64`, `signed_payload_sha256`, `signed_at_utc`, `signed_by_team`) so that evidence artifacts can be signed and submitted.
 
 ---
 

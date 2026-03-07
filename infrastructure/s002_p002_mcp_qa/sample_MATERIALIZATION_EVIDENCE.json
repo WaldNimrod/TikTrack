@@ -1,0 +1,15 @@
+{
+  "program_id": "S002-P002",
+  "gate_id": "GATE_3_PREPARATION",
+  "provenance": "TARGET_RUNTIME",
+  "artifact_path": "_COMMUNICATION/team_60/evidence/s002_p002_sample.json",
+  "generated_at_utc": "2026-03-07T01:22:42Z",
+  "signature_block": {
+    "algorithm": "Ed25519",
+    "key_id": "team60-s002-p002-001",
+    "signature_base64": "A5Kmp56NLm44KZAltPtdiw9kf0E1Q4qTN7+h55c+mY70MI/IF3kn8bx5sPHCf9U1hSTaP4TsSZIzinOzGog+CQ==",
+    "signed_payload_sha256": "f6589b44fa59ad2bac2c0b31645ef8aaec3483821e2ce517769c87cbe848dc45",
+    "signed_at_utc": "2026-03-07T01:22:42Z",
+    "signed_by_team": "Team_60"
+  }
+}

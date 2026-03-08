@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-07T22:43:11.704078+00:00`
+- Generated (UTC): `2026-03-08T21:49:31.267043+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
 - active_work_package_id: `NONE`
-- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
-- next_required_action: `Team 00/Team 100 return GATE_6 architectural decision for S002-P002; Team 90 then updates WSM and triggers GATE_7 if approved.`
+- current_gate: `GATE_8 (DOCUMENTATION_CLOSURE_ACTIVE)`
+- next_required_action: `Team 70 executes GATE_8 closure package (as-made, knowledge updates, communication cleanup, archive, closure check) and submits validation request to Team 90.`
 
 ## Portfolio Counts
 

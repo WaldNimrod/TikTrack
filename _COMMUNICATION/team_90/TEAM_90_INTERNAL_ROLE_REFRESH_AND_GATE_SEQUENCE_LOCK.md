@@ -80,6 +80,10 @@ If any of the four steps is missing, gate handling is incomplete.
 
 ## 3.3) GATE_7 operating mode lock (human approval semantics)
 
+Program-scope override (architect-authorized):
+- If Team 00/Team 100 decision explicitly defines GATE_7 as infrastructure/program-level human routing (non-UX), Team 90 executes document/process scenarios instead of Nimrod browser UX scenarios.
+- Such override must be explicit by path in the activation artifact and WSM `next_required_action`.
+
 For every GATE_7 cycle, Team 90 must:
 
 1. Issue a browser-based scenario artifact to the human approver.
@@ -133,3 +137,4 @@ This document is Team 90 permanent internal operating lock and applies across al
 
 **log_entry | TEAM_90 | INTERNAL_ROLE_REFRESH_GLOBAL | ALL_STAGES_ALL_WORK_PACKAGES | LOCKED_FOR_OPERATION | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_DUTY_LOCK | PASS_REQUIRES_NEXT_GATE_TRIGGER | 2026-02-26**
+**log_entry | TEAM_90 | GATE7_SCOPE_OVERRIDE_RULE | ARCHITECT_AUTHORIZED_INFRA_ROUTING_ALLOWED | 2026-03-08**

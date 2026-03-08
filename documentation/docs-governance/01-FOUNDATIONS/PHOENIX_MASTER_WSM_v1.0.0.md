@@ -87,29 +87,29 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-07** by **Team 90** — GATE_6 submission package for S002-P002 sent to Team 00/Team 100; awaiting approval decision.
+**Gate-owner update evidence:** This block was updated **2026-03-08** by **Team 90** — GATE_7 PASS accepted for S002-P002; GATE_8 activated for Team 70 documentation closure.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002 (MCP-QA Transition) — GATE_6 submission sent; awaiting Team 00/Team 100 decision |
+| active_flow | S002-P002 (MCP-QA Transition) — GATE_7 PASS; GATE_8 documentation closure execution active (Team 70) |
 | active_project_domain | SHARED (TIKTRACK + AGENTS_OS) for S002-P002 |
 | active_work_package_id | NONE (program-level) |
 | in_progress_work_package_id | NONE |
 | last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; **domain: TIKTRACK**) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_6 (S002-P002); execution GATE_6..GATE_8 after GATE_5 PASS |
-| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
+| allowed_gate_range | GATE_8 (S002-P002); execution GATE_5..GATE_8 under Team 90 |
+| current_gate | GATE_8 (DOCUMENTATION_CLOSURE_ACTIVE) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 submission owner) |
-| last_gate_event | GATE_6_SUBMITTED \| 2026-03-07 \| execution approval package submitted to Team 00/Team 100 \| TEAM_90_TO_TEAM_00_S002_P002_GATE6_EXECUTION_SUBMISSION_v1.0.0.md |
-| next_required_action | Team 00/Team 100 return GATE_6 architectural decision for S002-P002; Team 90 then updates WSM and triggers GATE_7 if approved. |
-| next_responsible_team | Team 00 + Team 100 (approval authority), Team 90 (state/routing follow-up) |
+| last_gate_event | GATE_7_PASS \| 2026-03-08 \| human approval accepted and normalized by Team 90 \| _COMMUNICATION/_Architects_Decisions/NIMROD_GATE7_S002_P002_DECISION_v1.0.0.md |
+| next_required_action | Team 70 executes GATE_8 closure package (as-made, knowledge updates, communication cleanup, archive, closure check) and submits validation request to Team 90. |
+| next_responsible_team | Team 70 (executor), Team 90 (validator/gate owner) |
 
 ---
 
@@ -242,6 +242,10 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 routing preparation started for S002-P002 after GATE_5 PASS | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submission package created for S002-P002 (8-artifact format) | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted to Team 00/Team 100 for S002-P002; awaiting decision | 2026-03-07**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 APPROVED for S002-P002 per Team 00 decision ARCHITECT_GATE6_DECISION_S002_P002_v1.0.0 | 2026-03-08**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 routing activated for S002-P002 (infrastructure human-approval scope; no Nimrod browser UX sign-off required) | 2026-03-08**
+**log_entry | NIMROD | GATE_7 | S002_P002 | PASS | HUMAN_APPROVAL_ACCEPTED | 2026-03-08**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS accepted for S002-P002; GATE_8 activation issued to Team 70 | 2026-03-08**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

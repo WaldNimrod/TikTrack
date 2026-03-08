@@ -87,29 +87,30 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-08** by **Team 90** — GATE_7 PASS accepted for S002-P002; GATE_8 activated for Team 70 documentation closure.
+**Gate-owner update evidence:** This block was updated **2026-03-08** by **Team 90** — GATE_8 PASS validated for S002-P002; lifecycle DOCUMENTATION_CLOSED.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002 (MCP-QA Transition) — GATE_7 PASS; GATE_8 documentation closure execution active (Team 70) |
+| active_flow | S002-P002 (MCP-QA Transition) — GATE_8 PASS; DOCUMENTATION_CLOSED (program-level cycle complete) |
 | active_project_domain | SHARED (TIKTRACK + AGENTS_OS) for S002-P002 |
 | active_work_package_id | NONE (program-level) |
 | in_progress_work_package_id | NONE |
-| last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; **domain: TIKTRACK**) |
+| last_closed_work_package_id | N/A (program-level closure) |
+| last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_8 (S002-P002); execution GATE_5..GATE_8 under Team 90 |
-| current_gate | GATE_8 (DOCUMENTATION_CLOSURE_ACTIVE) |
+| allowed_gate_range | CLOSED_FOR_S002_P002 (awaiting next authorized activation) |
+| current_gate | GATE_8 (PASS_DOCUMENTATION_CLOSED) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_5-8 owner; GATE_6 submission owner) |
-| last_gate_event | GATE_7_PASS \| 2026-03-08 \| human approval accepted and normalized by Team 90 \| _COMMUNICATION/_Architects_Decisions/NIMROD_GATE7_S002_P002_DECISION_v1.0.0.md |
-| next_required_action | Team 70 executes GATE_8 closure package (as-made, knowledge updates, communication cleanup, archive, closure check) and submits validation request to Team 90. |
-| next_responsible_team | Team 70 (executor), Team 90 (validator/gate owner) |
+| last_gate_event | GATE_8_PASS \| 2026-03-08 \| Team 90 validated Team 70 closure package \| _COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S002_P002_GATE8_VALIDATION_RESPONSE.md |
+| next_required_action | S002-P002 closed. Await next roadmap/program activation by Team 00/Team 100 with Team 10 orchestration handoff. |
+| next_responsible_team | Team 00 + Team 100 (activation authority), Team 10 (next-cycle orchestration) |
 
 ---
 
@@ -246,6 +247,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 routing activated for S002-P002 (infrastructure human-approval scope; no Nimrod browser UX sign-off required) | 2026-03-08**
 **log_entry | NIMROD | GATE_7 | S002_P002 | PASS | HUMAN_APPROVAL_ACCEPTED | 2026-03-08**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS accepted for S002-P002; GATE_8 activation issued to Team 70 | 2026-03-08**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P002; Team 70 closure package validated; DOCUMENTATION_CLOSED | 2026-03-08**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

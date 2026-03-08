@@ -32,7 +32,7 @@ async def _live_data_check(
     ticker_type: str = "STOCK",
     market: Optional[str] = None,
 ) -> bool:
-    """Live data-load check per architect directive. Yahoo → Alpha fallback."""
+    """Live data-load check per architect directive. Yahoo → Alpha fallback. Used for create and edit."""
     if _is_live_check_bypass():
         logger.info("Live data check bypassed for %s", symbol)
         return True
@@ -65,6 +65,29 @@ async def _live_data_check(
     return False
 
 
+async def validate_ticker_with_providers(
+    symbol: str,
+    ticker_type: str = "STOCK",
+    market: Optional[str] = None,
+) -> None:
+    """
+    Public validation: run live provider check; raise 422 if symbol has no market data.
+    Use for edit when symbol/ticker_type/exchange changes. Create uses _live_data_check inside create_system_ticker.
+    """
+    from ..core.config import settings
+    if not getattr(settings, "run_live_symbol_validation", True):
+        return
+    symbol_uc = symbol.strip().upper()
+    ticker_type_uc = ticker_type.upper()
+    live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc, market=market)
+    if not live_ok:
+        raise HTTPExceptionWithCode(
+            status_code=422,
+            detail="Provider could not fetch data for this symbol. Ticker not updated. Verify symbol exists and try again.",
+            error_code=ErrorCodes.TICKER_SYMBOL_INVALID,
+        )
+
+
 def _symbol_advisory_key(symbol: str) -> int:
     """G7R Batch5: Deterministic bigint for pg_advisory_xact_lock (single-create invariant)."""
     import hashlib
@@ -81,6 +104,7 @@ async def create_system_ticker(
     metadata: Optional[dict] = None,
     skip_live_check: bool = False,
     status: str = "pending",
+    market: Optional[str] = None,
 ) -> Ticker:
     """
     THE canonical path for creating a system ticker.
@@ -109,12 +133,13 @@ async def create_system_ticker(
     if existing:
         return existing
 
-    # Live validation (skip only when explicitly bypassed for dev)
-    # BF-G7-008: VALIDATE_SYMBOL_ALWAYS=true forces validation even when skip_live_check (E2E)
+    # Live validation: default ON (TEAM_50). Only skip when skip_live_check=True and not force_validate; never run if bypass.
+    # RUN_LIVE_SYMBOL_VALIDATION=false or SKIP_LIVE_DATA_CHECK=true disables for dev only.
     force_validate = os.environ.get("VALIDATE_SYMBOL_ALWAYS", "").strip().lower() in ("true", "1", "yes")
-    do_live = force_validate or (not skip_live_check or (skip_live_check and not settings.debug))
-    if do_live and not _is_live_check_bypass():
-        live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc)
+    run_validation = getattr(settings, "run_live_symbol_validation", True)
+    do_live = run_validation and not _is_live_check_bypass() and (force_validate or not skip_live_check)
+    if do_live:
+        live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc, market=market)
         if not live_ok:
             raise HTTPExceptionWithCode(
                 status_code=422,

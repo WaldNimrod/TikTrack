@@ -217,9 +217,9 @@ const LoginForm = () => {
         localStorage.setItem('usernameOrEmail', formData.usernameOrEmail);
       }
       
-      // Redirect to dashboard (only on success, not on error)
-      debugLog('Auth', 'Redirecting to dashboard');
-      navigate('/dashboard');
+      // Redirect to Home (/) per GATE_4 mandate — Login → Home
+      debugLog('Auth', 'Redirecting to Home');
+      navigate('/');
       
     } catch (err) {
       // CRITICAL: Prevent any navigation or refresh on error

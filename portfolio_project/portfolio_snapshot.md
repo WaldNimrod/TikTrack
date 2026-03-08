@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-07T00:54:09.026472+00:00`
+- Generated (UTC): `2026-03-07T22:43:11.704078+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,10 +8,10 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S002`
-- active_program_id: `S002-P003`
+- active_program_id: `S002-P002`
 - active_work_package_id: `NONE`
-- current_gate: `GATE_8`
-- next_required_action: `Team 10 and Team 90 coordinate next authorized roadmap activation after S002-P003 closure (no open execution WP in progress).`
+- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
+- next_required_action: `Team 00/Team 100 return GATE_6 architectural decision for S002-P002; Team 90 then updates WSM and triggers GATE_7 if approved.`
 
 ## Portfolio Counts
 
@@ -39,9 +39,9 @@
         ├── **WP** `S002-P001-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
         └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
-    ├── **Program** `S002-P002` — Full Pipeline Orchestrator | PIPELINE | domain: **AGENTS_OS**
+    ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **AGENTS_OS**
 
-    ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | ACTIVE | domain: **TIKTRACK**
+    ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
 
     └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**

@@ -9,6 +9,8 @@ __pycache__/
 scripts/*.log
 scripts/*.tmp
 scripts/.sync_ticker_prices.lock
+# S002-P002 Team 60 signing keys (custody)
+scripts/signing/keys/
 
 # Staging/Communication - נשארים בדרייב בלבד, לא נכנסים לגיט
 communication/

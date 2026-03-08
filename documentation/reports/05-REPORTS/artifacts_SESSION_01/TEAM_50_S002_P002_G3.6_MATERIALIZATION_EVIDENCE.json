@@ -1,0 +1,15 @@
+{
+  "program_id": "S002-P002",
+  "gate_id": "GATE_3_PREPARATION",
+  "provenance": "LOCAL_DEV_NON_AUTHORITATIVE",
+  "artifact_path": "documentation/reports/05-REPORTS/artifacts_SESSION_01/gate-a-artifacts/GATE_A_QA_REPORT.md",
+  "generated_at_utc": "2026-03-07T01:33:29Z",
+  "signature_block": {
+    "algorithm": "Ed25519",
+    "key_id": "team60-s002-p002-001",
+    "signature_base64": "j+NFT6dGIuyK2wW2Z4eXxB/invEPyuXLYMUuDCsqVi7fM4yHAbzLVTJCR+DcOxeZtXvzusyHk0ByvduyEELMBw==",
+    "signed_payload_sha256": "d5418a8e6f71a9dfa9147545f5ce4d15c81684d173e2febc1e7c5fd89eee7d05",
+    "signed_at_utc": "2026-03-07T01:33:29Z",
+    "signed_by_team": "Team_60"
+  }
+}

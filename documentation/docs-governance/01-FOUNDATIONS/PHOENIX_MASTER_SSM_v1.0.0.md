@@ -3,6 +3,7 @@
 **source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_SSM_v1.0.0.md
 **canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md
 **promotion_date:** 2026-02-22
+**date:** 2026-02-22
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
 ---
@@ -218,6 +219,7 @@ Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1
 | 2026-02-22 | **TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0** | §1.2 WSM Operational State Law added: every gate closure requires WSM update before progression; no operational data in SSM; WSM is sole operational state authority. |
 | 2026-02-22 | **TEAM_190_WSM_VALIDATION_FAIL_F2_REMEDIATION** | §5 / §5.1: removed operational data (current stage, ACTIVE/FROZEN status); retained structural lock rule only; current state lives solely in WSM CURRENT_OPERATIONAL_STATE. |
 | 2026-02-22 | **GATE_PROTOCOL_v2.3.0_OFFICIALIZATION** | structural_revision updated to v2.3.0; Gate Model source references updated from v2.2.0 to v2.3.0. |
+| 2026-03-07 | **TEAM_10_WSM_SSM_SYNC_POST_GATE8** | Team 10 (Gateway) updated WSM per TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE8_VALIDATION_REPORT (GATE_8 PASS; S002-P003-WP002 COMPLETE). Next authorized program S002-P002 (MCP-QA Transition) — GATE_2 approved by Team 190; activation prompt received. Operational state remains in WSM only; this changelog entry is audit. |
 
 ---
 

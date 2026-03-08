@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     
     # Debug: include exception detail in 500 responses (set DEBUG=true in api/.env)
     debug: bool = False
+
+    # Live symbol validation (TEAM_50): default True — validate new/edited ticker symbol vs providers (Yahoo→Alpha).
+    # Set RUN_LIVE_SYMBOL_VALIDATION=false only for dev when providers unavailable. Never disable in production.
+    run_live_symbol_validation: bool = True
     
     class Config:
         env_file = str(_env_file) if _env_file.exists() else ".env"

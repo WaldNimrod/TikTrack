@@ -231,14 +231,15 @@ class TickersService:
         self, db: AsyncSession, symbol: str, company_name: Optional[str], ticker_type: str, is_active: bool
     ) -> TickerResponse:
         from .canonical_ticker_service import create_system_ticker
-        from ..core.config import settings
+        # TEAM_50: single path — live validation runs by default (run_live_symbol_validation + skip_live_check=False).
         ticker = await create_system_ticker(
             db=db,
             symbol=symbol,
             ticker_type=ticker_type,
             company_name=company_name,
-            skip_live_check=settings.debug,
+            skip_live_check=False,
             status="active",
+            market=None,
         )
         if not is_active:
             ticker.is_active = False
@@ -255,6 +256,7 @@ class TickersService:
         ticker_type: Optional[str] = None,
         status: Optional[str] = None,
         is_active: Optional[bool] = None,
+        exchange_id: Optional[str] = None,
     ) -> TickerResponse:
         try:
             ticker_uuid = ulid_to_uuid(ticker_id)
@@ -275,13 +277,36 @@ class TickersService:
                 detail="Ticker not found",
                 error_code=ErrorCodes.RESOURCE_NOT_FOUND,
             )
+        # TEAM_50: validate with providers when symbol or ticker_type or exchange_id changes (same as create path).
+        new_sym = symbol.strip().upper() if symbol else None
+        new_ticker_type = ticker_type.upper() if ticker_type else None
+        exchange_uuid: Optional[uuid.UUID] = None
+        if exchange_id is not None:
+            try:
+                exchange_uuid = ulid_to_uuid(exchange_id)
+            except Exception:
+                raise HTTPExceptionWithCode(
+                    status_code=400,
+                    detail="Invalid exchange_id format",
+                    error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                )
+        symbol_changed = new_sym is not None and new_sym != (ticker.symbol or "").strip().upper()
+        ticker_type_changed = new_ticker_type is not None and new_ticker_type != (ticker.ticker_type or "").upper()
+        exchange_changed = exchange_uuid is not None and exchange_uuid != ticker.exchange_id
+        if symbol_changed or ticker_type_changed or exchange_changed:
+            from .canonical_ticker_service import validate_ticker_with_providers
+            sym_to_validate = new_sym if new_sym else (ticker.symbol or "").strip().upper()
+            type_to_validate = new_ticker_type if new_ticker_type else (ticker.ticker_type or "STOCK").upper()
+            await validate_ticker_with_providers(sym_to_validate, ticker_type=type_to_validate, market=None)
+
         # BF-G7-009: Duplicate symbol check (API-level, DB enforces via uix_tickers_symbol_exchange_active)
+        exchange_for_dup = exchange_uuid if exchange_uuid is not None else ticker.exchange_id
         if symbol is not None:
             new_sym = symbol.strip().upper()
             dup_stmt = select(Ticker).where(
                 and_(
                     Ticker.symbol == new_sym,
-                    Ticker.exchange_id == ticker.exchange_id,
+                    (Ticker.exchange_id == exchange_for_dup) if exchange_for_dup is not None else Ticker.exchange_id.is_(None),
                     Ticker.deleted_at.is_(None),
                     Ticker.id != ticker_uuid,
                 )
@@ -294,6 +319,8 @@ class TickersService:
                     error_code=ErrorCodes.TICKER_SYMBOL_DUPLICATE,
                 )
             ticker.symbol = new_sym
+        if exchange_uuid is not None:
+            ticker.exchange_id = exchange_uuid
         if company_name is not None:
             ticker.company_name = company_name or None
         if ticker_type is not None:

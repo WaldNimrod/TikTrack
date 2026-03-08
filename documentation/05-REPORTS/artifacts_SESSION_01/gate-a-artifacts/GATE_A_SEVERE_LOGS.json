@@ -1,0 +1,22 @@
+[
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/api/v1/notifications?is_read=false&limit=20 - Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "timestamp": 1772920984010
+  },
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/api/v1/notifications?is_read=false&limit=20 - Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "timestamp": 1772921005058
+  },
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/api/v1/notifications?is_read=false&limit=20 - Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "timestamp": 1772921016310
+  },
+  {
+    "level": "SEVERE",
+    "message": "http://127.0.0.1:8080/api/v1/notifications?is_read=false&limit=20 - Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "timestamp": 1772921024419
+  }
+]

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Base conversation handler — shared interface for all gates."""
 
 from dataclasses import dataclass, field

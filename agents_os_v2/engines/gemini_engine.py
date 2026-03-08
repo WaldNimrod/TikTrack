@@ -4,8 +4,13 @@ Teams: 10 (Gateway), 50 (QA), 70 (Librarian), 170 (SSOT)
 Used for: GATE_1 (production), GATE_3, GATE_4, GATE_8
 """
 
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None  # type: ignore
+    types = None  # type: ignore
+
 from .base import BaseEngine, EngineResponse
 from ..config import GEMINI_API_KEY, GEMINI_MODEL
 
@@ -14,6 +19,8 @@ class GeminiEngine(BaseEngine):
     engine_type = "gemini"
 
     def __init__(self, model: str = GEMINI_MODEL, api_key: str = GEMINI_API_KEY):
+        if genai is None:
+            raise ImportError("google-genai package not installed. Run: pip install google-genai")
         self.client = genai.Client(api_key=api_key)
         self.model_name = model
 

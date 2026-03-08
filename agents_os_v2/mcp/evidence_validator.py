@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Evidence Validator — validates MATERIALIZATION_EVIDENCE.json artifacts.
 Used by V2 Orchestrator to verify evidence before gate advancement.

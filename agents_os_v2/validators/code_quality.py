@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Code Quality Validator — wraps pytest, mypy, bandit, vite build.
 Returns structured pass/fail results.

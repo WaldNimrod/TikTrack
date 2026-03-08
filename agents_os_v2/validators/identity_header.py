@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 V-01–V-13: Identity Header Validator
 Validates mandatory identity header per Canonical Message Format Lock v1.0.0.

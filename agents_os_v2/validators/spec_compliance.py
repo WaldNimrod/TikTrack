@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Spec Compliance Validator
 Compares implementation files against LLD400 requirements.

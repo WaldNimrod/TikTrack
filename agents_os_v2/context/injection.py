@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Agents_OS V2 — Context Injection
 Builds canonical messages per TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.

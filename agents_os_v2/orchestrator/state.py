@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Pipeline State Manager — tracks gate progress across the pipeline.
 """

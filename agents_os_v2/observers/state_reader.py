@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 POC-1 Observer — State Reader
 Agents_OS | ADR-026 | POC_1_OBSERVER_SPEC v1.0.0

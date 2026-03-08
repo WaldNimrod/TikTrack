@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 V-30–V-33: Domain Isolation Validator
 Ensures no cross-domain imports or path violations.

@@ -4,7 +4,11 @@ Teams: 90 (The Spy), 190 (Constitutional Validator)
 Used for: GATE_0, GATE_1, G3.5, GATE_5, GATE_8
 """
 
-from openai import AsyncOpenAI
+try:
+    from openai import AsyncOpenAI
+except ImportError:
+    AsyncOpenAI = None  # type: ignore
+
 from .base import BaseEngine, EngineResponse
 from ..config import OPENAI_API_KEY, OPENAI_MODEL
 
@@ -13,6 +17,8 @@ class OpenAIEngine(BaseEngine):
     engine_type = "openai"
 
     def __init__(self, model: str = OPENAI_MODEL, api_key: str = OPENAI_API_KEY):
+        if AsyncOpenAI is None:
+            raise ImportError("openai package not installed. Run: pip install openai")
         self.client = AsyncOpenAI(api_key=api_key)
         self.model = model
 

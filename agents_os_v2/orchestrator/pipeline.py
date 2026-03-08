@@ -47,10 +47,10 @@ GATE_CONFIG = {
     "G3_5":      {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
-    "GATE_4":    {"owner": "team_50",  "engine": "cursor",  "desc": "QA — automated tests + MCP browser tests"},
+    "GATE_4":    {"owner": "team_10",  "engine": "cursor",  "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 dev validation (code vs spec)"},
-    "GATE_6":    {"owner": "team_100", "engine": "claude",  "desc": "Team 100 reality vs intent check"},
-    "GATE_7":    {"owner": "team_00",  "engine": "human",   "desc": "Nimrod reviews UX"},
+    "GATE_6":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 executes; Team 100 approval authority"},
+    "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
 }
 

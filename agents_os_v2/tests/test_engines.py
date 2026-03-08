@@ -15,11 +15,23 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from agents_os_v2.engines.base import EngineResponse
-from agents_os_v2.engines.openai_engine import OpenAIEngine
-from agents_os_v2.engines.gemini_engine import GeminiEngine
 from agents_os_v2.engines.claude_engine import ClaudeEngine
 from agents_os_v2.engines.cursor_engine import CursorEngine
-from agents_os_v2.config import OPENAI_API_KEY, GEMINI_API_KEY
+
+try:
+    from agents_os_v2.engines.openai_engine import OpenAIEngine
+    _HAS_OPENAI = True
+except ImportError:
+    _HAS_OPENAI = False
+
+try:
+    from agents_os_v2.engines.gemini_engine import GeminiEngine
+    _HAS_GEMINI = True
+except ImportError:
+    _HAS_GEMINI = False
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 
 class TestEngineResponse:
@@ -34,7 +46,7 @@ class TestEngineResponse:
         assert r.error == "fail"
 
 
-@pytest.mark.skipif(not OPENAI_API_KEY, reason="OPENAI_API_KEY not set")
+@pytest.mark.skipif(not _HAS_OPENAI or not OPENAI_API_KEY, reason="openai not installed or OPENAI_API_KEY not set")
 class TestOpenAIEngine:
     @pytest.mark.asyncio
     async def test_simple_call(self):
@@ -59,7 +71,7 @@ class TestOpenAIEngine:
         assert "PASS" in response.content or "pass" in response.content
 
 
-@pytest.mark.skipif(not GEMINI_API_KEY, reason="GEMINI_API_KEY not set")
+@pytest.mark.skipif(not _HAS_GEMINI or not GEMINI_API_KEY, reason="google-genai not installed or GEMINI_API_KEY not set")
 class TestGeminiEngine:
     @pytest.mark.asyncio
     async def test_simple_call(self):

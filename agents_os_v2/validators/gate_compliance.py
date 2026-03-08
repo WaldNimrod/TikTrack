@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 V-21–V-24: Gate Model Compliance Validator
 Validates gate enum, version references, lifecycle chain.

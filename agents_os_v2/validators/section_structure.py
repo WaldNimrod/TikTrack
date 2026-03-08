@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 V-14–V-20: Section Structure Validator
 Validates canonical message section order per CANONICAL_MESSAGE_FORMAT_LOCK.

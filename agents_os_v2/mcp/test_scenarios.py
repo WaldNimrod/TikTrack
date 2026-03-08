@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 MCP Test Scenarios — Full CRUD + Validation + Display coverage.
 Each scenario defines steps for MCP browser tools (cursor-ide-browser).

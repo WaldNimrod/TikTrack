@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 V-25–V-29: WSM/SSM Alignment Validator
 Cross-references artifact against live WSM state.

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 GATE_5 — DEV_VALIDATION
 Owner: Team 90

@@ -49,8 +49,17 @@ class TestGateRouter:
     def test_gate_0_uses_openai(self):
         assert get_engine_for_gate("GATE_0") == "openai"
 
+    def test_gate_0_uses_openai(self):
+        assert get_engine_for_gate("GATE_0") == "openai"
+
     def test_gate_2_uses_claude(self):
         assert get_engine_for_gate("GATE_2") == "claude"
+
+    def test_gate_4_owner_is_team_10(self):
+        assert get_team_for_gate("GATE_4") == "team_10"
+
+    def test_gate_7_owner_is_team_90(self):
+        assert get_team_for_gate("GATE_7") == "team_90"
 
     def test_gate_3_plan_uses_gemini(self):
         assert get_engine_for_gate("GATE_3_PLAN") == "gemini"
@@ -58,8 +67,8 @@ class TestGateRouter:
     def test_gate_5_uses_openai(self):
         assert get_engine_for_gate("GATE_5") == "openai"
 
-    def test_gate_7_is_team_00(self):
-        assert get_team_for_gate("GATE_7") == "team_00"
+    def test_gate_6_owner_is_team_90(self):
+        assert get_team_for_gate("GATE_6") == "team_90"
 
 
 class TestGateResult:

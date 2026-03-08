@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Agents_OS V2 — Pipeline Orchestrator (Redesigned)
 Deterministic state machine that replaces Team 10 chat.

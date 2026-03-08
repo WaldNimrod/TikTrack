@@ -1,0 +1,17 @@
+{
+  "work_package_id": "N/A",
+  "stage_id": "S002",
+  "spec_brief": "",
+  "current_gate": "GATE_0",
+  "gates_completed": [],
+  "gates_failed": [
+    "GATE_0"
+  ],
+  "lld400_content": "",
+  "work_plan": "",
+  "mandates": "",
+  "implementation_files": [],
+  "implementation_endpoints": [],
+  "started_at": "",
+  "last_updated": "2026-03-08T22:58:34.282959+00:00"
+}

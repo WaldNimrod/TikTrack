@@ -36,14 +36,18 @@ async def _get_price_with_fallback(
     active_ticker_ids: Optional[set] = None,
 ) -> Dict[uuid.UUID, Dict[str, Any]]:
     """
-    T190-Price: EOD first; if stale (>48h), fallback to intraday for active tickers.
+    T190-Price PHASE_1: Always preserve EOD; no null regression when stale.
+    - EOD fresh → price_source=EOD
+    - EOD stale + no intraday → price_source=EOD_STALE (keep EOD value, never null)
+    - EOD stale + intraday (active) → price_source=INTRADAY_FALLBACK (override)
+    - No EOD + intraday (active) → price_source=INTRADAY_FALLBACK
     Returns map: ticker_id -> {current_price, daily_change_pct, price_source, price_as_of_utc}.
     """
     now = datetime.now(timezone.utc)
     stale_cutoff = now.timestamp() - (EOD_STALE_HOURS * 3600)
     out: Dict[uuid.UUID, Dict[str, Any]] = {}
 
-    # 1. EOD latest per ticker
+    # 1. EOD latest per ticker — ALWAYS preserve (no null when EOD exists)
     latest_eod = select(
         TickerPrice.ticker_id,
         func.max(TickerPrice.price_timestamp).label("max_ts"),
@@ -63,62 +67,80 @@ async def _get_price_with_fallback(
     )
     eod_rows = (await db.execute(eod_stmt)).all()
 
-    need_intraday: List[uuid.UUID] = []
+    stale_for_intraday: List[uuid.UUID] = []
     for row in eod_rows:
-        tid, price, open_p, close_p, ts = row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
+        tid, price, open_p, close_p, ts = (
+            row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
+        )
         price_val = price or Decimal("0")
         prev = open_p or close_p or price_val
         daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
         ts_utc = ts.replace(tzinfo=timezone.utc) if ts and ts.tzinfo is None else ts
-        if ts_utc and ts_utc.timestamp() < stale_cutoff:
-            need_intraday.append(tid)
-        else:
+        is_stale = ts_utc is not None and ts_utc.timestamp() < stale_cutoff
+
+        # PHASE_1: Always add EOD to out (preserve — no null regression)
+        # PHASE_2: last_close from EOD (close_price or price)
+        last_close = close_p or price_val
+        out[tid] = {
+            "current_price": price_val,
+            "daily_change_pct": daily_pct,
+            "price_source": "EOD_STALE" if is_stale else "EOD",
+            "price_as_of_utc": ts_utc,
+            "last_close_price": last_close,
+            "last_close_as_of_utc": ts_utc,
+        }
+        if is_stale:
+            stale_for_intraday.append(tid)
+
+    missing_eod = [tid for tid in ticker_ids if tid not in out]
+
+    # 2. Intraday override for stale EOD (active only) or missing EOD (active only)
+    ids_to_try: List[uuid.UUID] = []
+    if active_ticker_ids is None:
+        ids_to_try = stale_for_intraday + missing_eod
+    else:
+        active_set = active_ticker_ids or set()
+        ids_to_try = [t for t in stale_for_intraday + missing_eod if t in active_set]
+
+    if ids_to_try:
+        latest_intra = select(
+            TickerPriceIntraday.ticker_id,
+            func.max(TickerPriceIntraday.price_timestamp).label("max_ts"),
+        ).where(TickerPriceIntraday.ticker_id.in_(ids_to_try)).group_by(
+            TickerPriceIntraday.ticker_id
+        ).subquery()
+        intra_stmt = select(
+            TickerPriceIntraday.ticker_id,
+            TickerPriceIntraday.price,
+            TickerPriceIntraday.open_price,
+            TickerPriceIntraday.close_price,
+            TickerPriceIntraday.price_timestamp,
+        ).join(
+            latest_intra,
+            and_(
+                TickerPriceIntraday.ticker_id == latest_intra.c.ticker_id,
+                TickerPriceIntraday.price_timestamp == latest_intra.c.max_ts,
+            ),
+        )
+        intra_rows = (await db.execute(intra_stmt)).all()
+        for row in intra_rows:
+            tid, price, open_p, close_p, ts = (
+                row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
+            )
+            price_val = price or Decimal("0")
+            prev = open_p or close_p or price_val
+            daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
+            ts_utc = ts.replace(tzinfo=timezone.utc) if ts and ts.tzinfo is None else ts
+            # Override: stale EOD or add if missing EOD (preserve last_close when from EOD)
+            prev_entry = out.get(tid, {})
             out[tid] = {
                 "current_price": price_val,
                 "daily_change_pct": daily_pct,
-                "price_source": "EOD",
+                "price_source": "INTRADAY_FALLBACK",
                 "price_as_of_utc": ts_utc,
+                "last_close_price": prev_entry.get("last_close_price"),
+                "last_close_as_of_utc": prev_entry.get("last_close_as_of_utc"),
             }
-
-    missing = set(ticker_ids) - {row.ticker_id for row in eod_rows}
-    need_intraday.extend(missing)
-
-    # 2. Intraday fallback for stale/missing (active tickers only)
-    if need_intraday and (active_ticker_ids is None or active_ticker_ids):
-        ids_to_try = list(need_intraday) if active_ticker_ids is None else [t for t in need_intraday if t in (active_ticker_ids or set())]
-        if ids_to_try:
-            latest_intra = select(
-                TickerPriceIntraday.ticker_id,
-                func.max(TickerPriceIntraday.price_timestamp).label("max_ts"),
-            ).where(TickerPriceIntraday.ticker_id.in_(ids_to_try)).group_by(TickerPriceIntraday.ticker_id).subquery()
-            intra_stmt = select(
-                TickerPriceIntraday.ticker_id,
-                TickerPriceIntraday.price,
-                TickerPriceIntraday.open_price,
-                TickerPriceIntraday.close_price,
-                TickerPriceIntraday.price_timestamp,
-            ).join(
-                latest_intra,
-                and_(
-                    TickerPriceIntraday.ticker_id == latest_intra.c.ticker_id,
-                    TickerPriceIntraday.price_timestamp == latest_intra.c.max_ts,
-                ),
-            )
-            intra_rows = (await db.execute(intra_stmt)).all()
-            for row in intra_rows:
-                tid, price, open_p, close_p, ts = row.ticker_id, row.price, row.open_price, row.close_price, row.price_timestamp
-                if tid in out:
-                    continue
-                price_val = price or Decimal("0")
-                prev = open_p or close_p or price_val
-                daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
-                ts_utc = ts.replace(tzinfo=timezone.utc) if ts and ts.tzinfo is None else ts
-                out[tid] = {
-                    "current_price": price_val,
-                    "daily_change_pct": daily_pct,
-                    "price_source": "INTRADAY_FALLBACK",
-                    "price_as_of_utc": ts_utc,
-                }
     return out
 
 
@@ -127,12 +149,18 @@ def _ticker_to_response(
     price_data: Optional[Dict[str, Any]] = None,
     price_source: Optional[str] = None,
     price_as_of_utc: Optional[datetime] = None,
+    last_close_price: Optional[Decimal] = None,
+    last_close_as_of_utc: Optional[datetime] = None,
 ) -> TickerResponse:
     current_price = None
     daily_change_pct = None
     if price_data:
         current_price = price_data.get("current_price")
         daily_change_pct = price_data.get("daily_change_pct")
+        if last_close_price is None:
+            last_close_price = price_data.get("last_close_price")
+        if last_close_as_of_utc is None:
+            last_close_as_of_utc = price_data.get("last_close_as_of_utc")
     return TickerResponse(
         id=uuid_to_ulid(t.id),
         symbol=t.symbol,
@@ -147,6 +175,8 @@ def _ticker_to_response(
         daily_change_pct=daily_change_pct,
         price_source=price_source,
         price_as_of_utc=price_as_of_utc,
+        last_close_price=last_close_price,
+        last_close_as_of_utc=last_close_as_of_utc,
     )
 
 

@@ -789,6 +789,24 @@ body .page-wrapper .page-container main {
   width: 60px;
 }
 
+/* Price Reliability PHASE_2 — source, as-of, last-close */
+.phoenix-table__cell.col-source,
+.phoenix-table__cell.col-last-close {
+  text-align: center;
+}
+.phoenix-table__cell.col-last-close {
+  font-family: inherit;
+}
+.phoenix-table__cell-meta.price-as-of {
+  font-size: 0.8em;
+  color: var(--apple-text-tertiary, #888);
+  margin-top: 2px;
+}
+.phoenix-table__cell.price-source-stale {
+  color: var(--apple-text-warning, #b45309);
+  font-weight: 500;
+}
+
 /* ============================================
    FLUID COLUMN WIDTHS (Option D - ADR-010)
    ============================================

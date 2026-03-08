@@ -143,7 +143,7 @@
                     </span>
                   </th>
                   <th class="phoenix-table__header col-price phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">מחיר אחרון</span>
+                    <span class="phoenix-table__header-text">מחיר</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M8 9l4 -4l4 4"></path>
@@ -151,7 +151,13 @@
                       </svg>
                     </span>
                   </th>
-                  <th class="phoenix-table__header col-change phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="daily_change_pct" data-sort-type="numeric" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0">
+                  <th class="phoenix-table__header col-source" data-sortable="false" role="columnheader">
+                    <span class="phoenix-table__header-text">מקור</span>
+                  </th>
+                  <th class="phoenix-table__header col-last-close phoenix-table__header--numeric" data-sortable="false" role="columnheader">
+                    <span class="phoenix-table__header-text">סגירה</span>
+                  </th>
+                  <th class="phoenix-table__header col-change phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="daily_change_pct" data-sort-type="numeric" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
                     <span class="phoenix-table__header-text">שינוי יומי</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -160,7 +166,7 @@
                       </svg>
                     </span>
                   </th>
-                  <th class="phoenix-table__header col-company js-table-sort-trigger" data-sortable="true" data-sort-key="company_name" data-sort-type="string" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
+                  <th class="phoenix-table__header col-company js-table-sort-trigger" data-sortable="true" data-sort-key="company_name" data-sort-type="string" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
                     <span class="phoenix-table__header-text">שם חברה</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -169,7 +175,7 @@
                       </svg>
                     </span>
                   </th>
-                  <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="ticker_type" data-sort-type="string" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
+                  <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="ticker_type" data-sort-type="string" data-column-index="6" role="columnheader" aria-sort="none" tabindex="0">
                     <span class="phoenix-table__header-text">סוג</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -178,7 +184,7 @@
                       </svg>
                     </span>
                   </th>
-                  <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="is_active" data-sort-type="boolean" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
+                  <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="is_active" data-sort-type="boolean" data-column-index="7" role="columnheader" aria-sort="none" tabindex="0">
                     <span class="phoenix-table__header-text">סטטוס</span>
                     <span class="phoenix-table__sort-indicator js-sort-indicator">
                       <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

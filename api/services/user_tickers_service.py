@@ -33,20 +33,17 @@ def _ticker_to_response(
     price_data: Optional[Dict[str, Any]] = None,
     display_name: Optional[str] = None,
 ) -> TickerResponse:
-    return TickerResponse(
-        id=uuid_to_ulid(t.id),
-        symbol=t.symbol,
-        company_name=t.company_name,
-        ticker_type=t.ticker_type,
-        status=t.status or "active",
-        is_active=t.is_active,
-        delisted_date=t.delisted_date,
-        created_at=t.created_at,
-        updated_at=t.updated_at,
-        current_price=price_data.get("current_price") if price_data else None,
-        daily_change_pct=price_data.get("daily_change_pct") if price_data else None,
-        display_name=display_name,
-    )
+    """Uses shared TickerResponse; price_data from tickers_service._get_price_with_fallback (PHASE_1+2)."""
+    from .tickers_service import _ticker_to_response as _shared_response
+    pd = price_data or {}
+    return _shared_response(
+        t,
+        price_data=price_data,
+        price_source=pd.get("price_source"),
+        price_as_of_utc=pd.get("price_as_of_utc"),
+        last_close_price=pd.get("last_close_price"),
+        last_close_as_of_utc=pd.get("last_close_as_of_utc"),
+    ).model_copy(update={"display_name": display_name})
 
 
 def _get_provider_mapping(symbol: str, ticker_type: str, market: Optional[str], provider_mapping: Optional[Dict[str, Any]]) -> Dict[str, Any]:
@@ -77,35 +74,11 @@ class UserTickersService:
         tickers = [r[0] for r in rows]
         display_names = {r[0].id: r[1] for r in rows}
         ticker_ids = [t.id for t in tickers]
+        active_ids = {t.id for t in tickers if t.is_active} if tickers else None
         price_map: Dict[uuid.UUID, Dict[str, Any]] = {}
         if ticker_ids:
-            from sqlalchemy import func
-            latest_subq = (
-                select(
-                    TickerPrice.ticker_id,
-                    func.max(TickerPrice.price_timestamp).label("max_ts"),
-                )
-                .where(TickerPrice.ticker_id.in_(ticker_ids))
-                .group_by(TickerPrice.ticker_id)
-            ).subquery()
-            price_stmt = select(
-                TickerPrice.ticker_id,
-                TickerPrice.price,
-                TickerPrice.open_price,
-                TickerPrice.close_price,
-            ).join(
-                latest_subq,
-                and_(
-                    TickerPrice.ticker_id == latest_subq.c.ticker_id,
-                    TickerPrice.price_timestamp == latest_subq.c.max_ts,
-                ),
-            )
-            price_result = await db.execute(price_stmt)
-            for row in price_result.all():
-                price_val = row.price or Decimal("0")
-                prev = row.open_price or row.close_price or price_val
-                daily_pct = ((price_val - prev) / prev * 100) if prev and prev > 0 else None
-                price_map[row.ticker_id] = {"current_price": price_val, "daily_change_pct": daily_pct}
+            from .tickers_service import _get_price_with_fallback
+            price_map = await _get_price_with_fallback(db, ticker_ids, active_ids)
         return [
             _ticker_to_response(t, price_map.get(t.id), display_names.get(t.id))
             for t in tickers

@@ -9,6 +9,7 @@ import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
+import { getPriceSourceLabel, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
 
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
@@ -108,7 +109,7 @@ const formatChangePct = (pct) => {
     if (!pageData.length) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="7" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
+      row.innerHTML = '<td colspan="9" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -133,14 +134,27 @@ const formatChangePct = (pct) => {
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
-      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
-        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
-        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
-      } else if (priceSource && priceSource !== 'EOD') {
-        priceSpan.title = 'מקור: ' + priceSource;
-      }
+      priceSpan.setAttribute('data-price-source', priceSource || '');
       priceCell.appendChild(priceSpan);
+      const asOfSpan = document.createElement('div');
+      asOfSpan.className = 'price-as-of phoenix-table__cell-meta';
+      asOfSpan.textContent = formatPriceAsOf(priceAsOf);
+      priceCell.appendChild(asOfSpan);
       row.appendChild(priceCell);
+
+      const sourceCell = document.createElement('td');
+      sourceCell.className = 'phoenix-table__cell col-source';
+      const sourceLabel = getPriceSourceLabel(priceSource);
+      sourceCell.textContent = sourceLabel;
+      if (priceSource === 'EOD_STALE') sourceCell.classList.add('price-source-stale');
+      row.appendChild(sourceCell);
+
+      const lastCloseCell = document.createElement('td');
+      lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
+      lastCloseCell.setAttribute('dir', 'ltr');
+      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+      lastCloseCell.textContent = formatCurrency(lastClose);
+      row.appendChild(lastCloseCell);
 
       const changeCell = document.createElement('td');
       changeCell.className = 'phoenix-table__cell col-change phoenix-table__cell--numeric';

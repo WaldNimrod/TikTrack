@@ -13,6 +13,7 @@ import { showUserTickerEditModal } from './userTickerEditForm.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
+import { getPriceSourceLabel, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
 
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
@@ -115,7 +116,7 @@ const formatChangePct = (pct) => {
     if (!pageData.length) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="7" class="phoenix-table__cell phoenix-table__cell--empty">אין טיקרים ברשימה שלי. הוסף טיקר קיים או טיקר חדש.</td>';
+      row.innerHTML = '<td colspan="9" class="phoenix-table__cell phoenix-table__cell--empty">אין טיקרים ברשימה שלי. הוסף טיקר קיים או טיקר חדש.</td>';
       tbody.appendChild(row);
       return;
     }
@@ -141,14 +142,27 @@ const formatChangePct = (pct) => {
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
       priceSpan.textContent = formatCurrency(priceVal);
-      if (priceSource === 'INTRADAY_FALLBACK' && priceVal != null) {
-        priceSpan.title = 'מקור: עדכון תוך־יומי' + (priceAsOf ? ` (${new Date(priceAsOf).toLocaleString('he-IL')})` : '');
-        priceSpan.setAttribute('data-price-source', 'INTRADAY_FALLBACK');
-      } else if (priceSource && priceSource !== 'EOD') {
-        priceSpan.title = 'מקור: ' + priceSource;
-      }
+      priceSpan.setAttribute('data-price-source', priceSource || '');
       priceCell.appendChild(priceSpan);
+      const asOfSpan = document.createElement('div');
+      asOfSpan.className = 'price-as-of phoenix-table__cell-meta';
+      asOfSpan.textContent = formatPriceAsOf(priceAsOf);
+      priceCell.appendChild(asOfSpan);
       row.appendChild(priceCell);
+
+      const sourceCell = document.createElement('td');
+      sourceCell.className = 'phoenix-table__cell col-source';
+      const sourceLabel = getPriceSourceLabel(priceSource);
+      sourceCell.textContent = sourceLabel;
+      if (priceSource === 'EOD_STALE') sourceCell.classList.add('price-source-stale');
+      row.appendChild(sourceCell);
+
+      const lastCloseCell = document.createElement('td');
+      lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
+      lastCloseCell.setAttribute('dir', 'ltr');
+      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+      lastCloseCell.textContent = formatCurrency(lastClose);
+      row.appendChild(lastCloseCell);
 
       const changeCell = document.createElement('td');
       changeCell.className = 'phoenix-table__cell col-change phoenix-table__cell--numeric';
@@ -352,12 +366,18 @@ const formatChangePct = (pct) => {
     const name = ticker.company_name ?? ticker.companyName ?? '';
     const price = formatCurrency(ticker.current_price ?? ticker.currentPrice);
     const change = formatChangePct(ticker.daily_change_pct ?? ticker.dailyChangePct);
+    const sourceLabel = getPriceSourceLabel(ticker.price_source ?? ticker.priceSource ?? '');
+    const asOf = formatPriceAsOf(ticker.price_as_of_utc ?? ticker.priceAsOfUtc ?? null);
+    const lastClose = formatCurrency(ticker.last_close_price ?? ticker.lastClosePrice ?? null);
     const html = `
       <div class="phoenix-form">
         <div class="form-group"><strong>סמל:</strong> ${sym}</div>
         ${displayName !== sym ? `<div class="form-group"><strong>שם תצוגה:</strong> ${displayName}</div>` : ''}
         <div class="form-group"><strong>שם חברה:</strong> ${name || '—'}</div>
-        <div class="form-group"><strong>מחיר אחרון:</strong> ${price}</div>
+        <div class="form-group"><strong>מחיר:</strong> ${price}</div>
+        <div class="form-group"><strong>מקור:</strong> ${sourceLabel}</div>
+        <div class="form-group"><strong>עודכן ב:</strong> ${asOf}</div>
+        <div class="form-group"><strong>סגירה:</strong> ${lastClose}</div>
         <div class="form-group"><strong>שינוי יומי:</strong> ${change}</div>
       </div>
     `;

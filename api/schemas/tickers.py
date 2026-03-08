@@ -30,10 +30,15 @@ class TickerResponse(BaseModel):
     delisted_date: Optional[date] = Field(None, description="Delisting date")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    current_price: Optional[Decimal] = Field(None, description="Last known price from ticker_prices")
+    current_price: Optional[Decimal] = Field(None, description="Best-available display price (PHASE_2)")
     daily_change_pct: Optional[Decimal] = Field(None, description="Daily change percentage")
-    price_source: Optional[str] = Field(None, description="EOD | INTRADAY_FALLBACK — T190-Price provenance")
-    price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of price — T190-Price provenance")
+    price_source: Optional[str] = Field(
+        None,
+        description="EOD | EOD_STALE | INTRADAY_FALLBACK — T190-Price provenance (PHASE_1)",
+    )
+    price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of current price (PHASE_2)")
+    last_close_price: Optional[Decimal] = Field(None, description="Last EOD close value — separate from current (PHASE_2)")
+    last_close_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of last close (PHASE_2)")
 
 
 class TickerCreateRequest(BaseModel):

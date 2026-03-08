@@ -1,4 +1,5 @@
 # PROCEDURE_AND_CONTRACT_REFERENCE — S002-P002 Price Reliability 3-Phase
+**date:** 2026-03-08
 
 ## Canonical procedures/contracts referenced
 

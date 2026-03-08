@@ -5,7 +5,7 @@
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 60 (Runtime/Platform)  
 **date:** 2026-03-08  
-**status:** MANDATE_BLOCKED (await PHASE_2_PASS)  
+**status:** MANDATE_ACTIVE  
 **phase:** PHASE_3  
 **authority:** TEAM_190_TO_TEAM_10_TEAMS_20_30_50_60_90_MANDATORY_3_PHASE_PRICE_RELIABILITY_EXECUTION_MANDATE_v1.0.0  
 
@@ -13,7 +13,7 @@
 
 ## 1) Prerequisite
 
-**PHASE_2_PASS** — מנדט זה יופעל רק לאחר ש־Team 20 + Team 30 השלימו PHASE_2 ו־Team 50 הנפיק PASS.
+**PHASE_2_PASS** — ✅ הושג (TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE2_QA_REPORT).
 
 ---
 

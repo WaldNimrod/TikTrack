@@ -5,14 +5,14 @@
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 90 (External Validation Unit)  
 **date:** 2026-03-08  
-**status:** MANDATE_BLOCKED (await PHASE_3_PASS)  
+**status:** MANDATE_ACTIVE  
 **authority:** TEAM_190_TO_TEAM_10_TEAMS_20_30_50_60_90_MANDATORY_3_PHASE_PRICE_RELIABILITY_EXECUTION_MANDATE_v1.0.0  
 
 ---
 
 ## 1) Prerequisite
 
-**PHASE_3_PASS** — מנדט זה יופעל רק לאחר ש־Team 60 השלים PHASE_3 ו־Team 50 הנפיק PHASE_3 QA PASS.
+**PHASE_3_PASS** — ✅ הושג (TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE3_QA_REPORT).
 
 ---
 
@@ -40,10 +40,10 @@ All must be true:
 
 | # | Artifact |
 |---|----------|
-| 1 | TEAM_20_TO_TEAM_10_PRICE_RELIABILITY_PHASE1_COMPLETION |
-| 2 | TEAM_20 + TEAM_30 PHASE_2 completion reports |
-| 3 | TEAM_60_TO_TEAM_10_PRICE_RELIABILITY_PHASE3_COMPLETION |
-| 4 | TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_3_PHASE_QA_CONSOLIDATED_REPORT |
+| 1 | TEAM_20 PHASE_1 completion + TEAM_50 PHASE_1 QA PASS |
+| 2 | TEAM_20 + TEAM_30 PHASE_2 completion + TEAM_50 PHASE_2 QA PASS |
+| 3 | TEAM_60 PHASE_3 completion + TEAM_50 PHASE_3 QA REPORT |
+| 4 | All 3 phases: QA PASS; Evidence paths documented |
 
 ---
 

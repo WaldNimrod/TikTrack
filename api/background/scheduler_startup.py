@@ -31,6 +31,17 @@ def _get_minutes(job_config: dict) -> int:
     return int(minutes) if minutes else 15
 
 
+def _get_sync_intraday_minutes() -> int:
+    """PHASE_3: Current cadence for sync_ticker_prices_intraday (market-open vs off-hours)."""
+    try:
+        from ..integrations.market_data.market_data_settings import get_current_cadence_minutes
+        return get_current_cadence_minutes()
+    except Exception:
+        return _get_minutes(
+            next((c for c in JOB_REGISTRY if c.get("job_name") == "sync_ticker_prices_intraday"), {})
+        )
+
+
 def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
     """Create wrapper that gets db and calls job_runner.run_job.
 
@@ -53,8 +64,8 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
             await run_job(job_name, fn, db, runtime_class)
         # Enforce run_after: trigger dependent jobs only after successful completion.
         # If run_job raised, we never reach here — dependents stay on their interval.
+        now = datetime.now(timezone.utc)
         if _dependents and _scheduler:
-            now = datetime.now(timezone.utc)
             for dep_id in _dependents:
                 try:
                     _scheduler.modify_job(dep_id, next_run_time=now)
@@ -66,6 +77,28 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
                     logger.warning(
                         "APScheduler: could not trigger dependent %s: %s", dep_id, exc
                     )
+        # PHASE_3 Price Reliability: dynamic cadence for intraday sync (market-open vs off-hours).
+        if job_name == "sync_ticker_prices_intraday" and _scheduler:
+            try:
+                from ..integrations.market_data.market_data_settings import (
+                    get_current_cadence_minutes,
+                    get_intraday_interval_minutes,
+                    get_off_hours_interval_minutes,
+                )
+                cadence = get_current_cadence_minutes()
+                next_run = now + timedelta(minutes=cadence)
+                _scheduler.modify_job(
+                    job_name,
+                    next_run_time=next_run,
+                    trigger=IntervalTrigger(minutes=cadence),
+                )
+                mode = "off_hours" if cadence == get_off_hours_interval_minutes() else "market_open"
+                logger.info(
+                    "PHASE_3 price sync cadence: mode=%s interval_min=%d next_run=%s",
+                    mode, cadence, next_run.isoformat(),
+                )
+            except Exception as exc:
+                logger.warning("PHASE_3 cadence reschedule failed: %s", exc)
 
     return _wrapper
 
@@ -97,7 +130,8 @@ async def start_scheduler():
         try:
             dependents = dep_map.get(cfg["job_name"], [])
             wrapper = _make_job_wrapper(cfg, dependents)
-            mins = _get_minutes(cfg)
+            # PHASE_3: intraday sync uses dynamic cadence (market-open vs off-hours).
+            mins = _get_sync_intraday_minutes() if cfg["job_name"] == "sync_ticker_prices_intraday" else _get_minutes(cfg)
             is_dependent = bool(cfg.get("run_after"))
             # Dependent jobs wait one interval on startup; parent will trigger them sooner.
             first_run = now if not is_dependent else now + timedelta(minutes=mins)

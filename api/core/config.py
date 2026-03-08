@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     
     # Background jobs (ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION)
     intraday_interval_minutes: int = 15
+    # PHASE_3 Price Reliability: off-hours cadence (lower frequency when market closed)
+    off_hours_interval_minutes: int = 60
     
     # Debug: include exception detail in 500 responses (set DEBUG=true in api/.env)
     debug: bool = False

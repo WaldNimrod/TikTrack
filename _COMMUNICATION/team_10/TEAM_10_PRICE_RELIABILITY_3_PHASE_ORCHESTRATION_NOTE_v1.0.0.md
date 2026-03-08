@@ -30,8 +30,8 @@
 | Phase | Status | Blocking |
 |-------|--------|----------|
 | PHASE_1 | ✅ **PASS** — TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE1_RE_QA_PASS_v1.0.0 | — |
-| PHASE_2 | COMPLETION_RECEIVED — Team 20 + Team 30 done; **awaiting Team 50 QA** | — |
-| PHASE_3 | BLOCKED (await PHASE_2_PASS) | — |
+| PHASE_2 | ✅ **PASS** — TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE2_QA_REPORT | — |
+| PHASE_3 | QA_PASS — Team 50 done; **awaiting Team 90 final validation** | — |
 
 ---
 

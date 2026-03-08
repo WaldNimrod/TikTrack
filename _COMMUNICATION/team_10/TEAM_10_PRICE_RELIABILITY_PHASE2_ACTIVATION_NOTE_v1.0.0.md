@@ -3,7 +3,7 @@
 **project_domain:** TIKTRACK  
 **id:** TEAM_10_PRICE_RELIABILITY_PHASE2_ACTIVATION_NOTE_v1.0.0  
 **from:** Team 10 (Gateway Orchestration)  
-**date:** 2026-03-09  
+**date:** 2026-03-08  
 **status:** PHASE_2_OPEN  
 **trigger:** TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE1_RE_QA_PASS_v1.0.0  
 
@@ -41,4 +41,4 @@ Team 10 יפתח PHASE_3 — מנדט ל־Team 60 (off-hours cadence).
 
 ---
 
-**log_entry | TEAM_10 | PRICE_RELIABILITY_PHASE2_ACTIVATION | OPEN | 2026-03-09**
+**log_entry | TEAM_10 | PRICE_RELIABILITY_PHASE2_ACTIVATION | OPEN | 2026-03-08**

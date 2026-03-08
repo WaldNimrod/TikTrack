@@ -4,7 +4,7 @@
 **id:** TEAM_10_TO_TEAM_50_PRICE_RELIABILITY_PHASE2_QA_REQUEST  
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 50 (QA & Fidelity)  
-**date:** 2026-03-09  
+**date:** 2026-03-08  
 **status:** ACTION_REQUIRED  
 **phase:** PHASE_2  
 **trigger:** TEAM_20_TO_TEAM_10_PRICE_RELIABILITY_PHASE2_API_COMPLETION + TEAM_30_TO_TEAM_10_PRICE_RELIABILITY_PHASE2_COMPLETION  
@@ -54,4 +54,4 @@ Team 10 יפתח PHASE_3 — מנדט ל־Team 60 (off-hours cadence).
 
 ---
 
-**log_entry | TEAM_10 | PRICE_RELIABILITY_PHASE2_QA_REQUEST | TO_TEAM_50 | 2026-03-09**
+**log_entry | TEAM_10 | PRICE_RELIABILITY_PHASE2_QA_REQUEST | TO_TEAM_50 | 2026-03-08**

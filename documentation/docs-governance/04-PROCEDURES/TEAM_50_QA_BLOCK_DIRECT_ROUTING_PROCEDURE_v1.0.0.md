@@ -3,7 +3,7 @@
 **project_domain:** TIKTRACK  
 **id:** TEAM_50_QA_BLOCK_DIRECT_ROUTING_PROCEDURE_v1.0.0  
 **owner:** Team 50 (QA & Fidelity)  
-**date:** 2026-03-09  
+**date:** 2026-03-08  
 **status:** LOCKED  
 **canonical:** GOVERNANCE_PROCEDURES_INDEX §04-PROCEDURES  
 
@@ -70,4 +70,4 @@
 
 ---
 
-**log_entry | TEAM_50 | QA_BLOCK_DIRECT_ROUTING_PROCEDURE | PASS_RULE_ADDED | 2026-03-09**
+**log_entry | TEAM_50 | QA_BLOCK_DIRECT_ROUTING_PROCEDURE | PASS_RULE_ADDED | 2026-03-08**

@@ -4,7 +4,7 @@
 **id:** TEAM_50_TO_TEAM_10_PRICE_RELIABILITY_PHASE1_RE_QA_PASS_v1.0.0  
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (Gateway Orchestration)  
-**date:** 2026-03-09  
+**date:** 2026-03-08  
 **status:** **PASS** — PHASE_1 QA אושר  
 **phase:** PHASE_1  
 **trigger:** TEAM_50_TO_TEAM_20_PRICE_RELIABILITY_PHASE1_BLOCK_FIX_REQUEST (תיקון אומת)  
@@ -66,4 +66,4 @@ test_missing_eod_intraday_active_returns_intraday_fallback PASSED
 
 ---
 
-**log_entry | TEAM_50 | PRICE_RELIABILITY_PHASE1_RE_QA_PASS | TO_TEAM_10 | 2026-03-09**
+**log_entry | TEAM_50 | PRICE_RELIABILITY_PHASE1_RE_QA_PASS | TO_TEAM_10 | 2026-03-08**

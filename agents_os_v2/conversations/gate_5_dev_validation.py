@@ -10,6 +10,7 @@ from ..context.injection import build_full_agent_prompt, build_canonical_message
 from ..validators.code_quality import run_all_quality_checks
 from ..validators.spec_compliance import validate_spec_compliance
 from .base import GateResult
+from .response_parser import parse_gate_decision
 
 
 async def run_gate_5(
@@ -82,7 +83,7 @@ async def run_gate_5(
     if not response.success:
         return GateResult(gate_id="GATE_5", status="FAIL", message=f"Engine error: {response.error}")
 
-    status = "PASS" if "PASS" in response.content.upper() and "BLOCK" not in response.content.upper() else "FAIL"
+    status, reason = parse_gate_decision(response.content)
 
     return GateResult(
         gate_id="GATE_5",

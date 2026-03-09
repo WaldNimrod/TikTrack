@@ -93,3 +93,19 @@ See `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md` for 2
 
 - Backend: `api/.env` (copy from `api/.env.example`). Key vars: `DATABASE_URL`, `JWT_SECRET_KEY` (64+ chars), `ENCRYPTION_KEY`, `SKIP_LIVE_DATA_CHECK=true` for dev.
 - Frontend: `ui/.env.development` already committed with correct defaults (API URL points to localhost:8082).
+
+### Branch Protocol for Team 61
+
+**Commit format:**
+```
+S{NNN}-P{NNN}-WP{NNN}: Team 61 — [Category X-XX]: [brief description]
+```
+
+**Branch naming:** Work on `main` for approved mandates. Use feature branches (`team61/feature-name`) for experimental work.
+
+**Push rules:**
+- Always push to `main` for approved Phase 1 items
+- Run `python3 -m pytest agents_os_v2/tests/ -v -k "not OpenAI and not Gemini"` before push
+- Verify 0 test failures before push
+
+**Pre-GATE_4 check:** Pipeline warns if no new commits since last run. Ensure implementation is committed before continuing to GATE_4.

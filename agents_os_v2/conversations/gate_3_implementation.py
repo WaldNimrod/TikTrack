@@ -7,6 +7,53 @@ Includes: planning, G3.5 validation by Team 90, mandate generation, Cursor pause
 from ..engines.base import BaseEngine
 from ..context.injection import build_full_agent_prompt, build_canonical_message
 from .base import GateResult
+from .response_parser import parse_gate_decision
+
+
+async def run_g35_build_work_plan(engine: BaseEngine, lld400_content: str, stage_id: str = "S002") -> GateResult:
+    """G3 PLAN: Team 10 builds a structured work plan from approved spec."""
+    system_prompt = build_full_agent_prompt(
+        team_id="team_10",
+        gate_id="GATE_3",
+        task_message="",
+    )
+
+    user_message = build_canonical_message(
+        team_from="team_10",
+        team_to="team_10",
+        gate_id="GATE_3",
+        purpose="Build a structured work plan from the approved LLD400 spec.",
+        context_inputs=["LLD400 spec (GATE_2 PASS) provided below"],
+        required_actions=[
+            "List files to create/modify per team (20, 30, 40, 60)",
+            "Define execution order with dependencies",
+            "Define MCP test scenarios for each page/endpoint",
+            "Define acceptance criteria per deliverable",
+        ],
+        deliverables=["Structured work plan with per-team breakdown"],
+        validation_criteria=[
+            "All spec requirements covered",
+            "Team assignments match role mapping",
+            "Deliverables are concrete and verifiable",
+        ],
+        stage_id=stage_id,
+        subject="G3_PLAN_BUILD_WORK_PLAN",
+    )
+    user_message += f"\n\n---\n\n## LLD400 Spec\n\n{lld400_content[:4000]}"
+
+    response = await engine.call_with_retry(system_prompt, user_message, max_retries=3)
+
+    if not response.success:
+        return GateResult(gate_id="G3_PLAN", status="FAIL", message=f"Engine error: {response.error}")
+
+    status, reason = parse_gate_decision(response.content)
+
+    return GateResult(
+        gate_id="G3_PLAN",
+        status=status,
+        message=response.content[:500],
+        engine_response=response.content,
+    )
 
 
 async def run_g35_work_plan_validation(engine_90: BaseEngine, work_plan: str, wp_id: str = "N/A", stage_id: str = "S002") -> GateResult:
@@ -47,7 +94,7 @@ async def run_g35_work_plan_validation(engine_90: BaseEngine, work_plan: str, wp
     if not response.success:
         return GateResult(gate_id="GATE_3_G35", status="FAIL", message=f"Engine error: {response.error}")
 
-    status = "PASS" if "PASS" in response.content.upper() and "BLOCK" not in response.content.upper() else "FAIL"
+    status, reason = parse_gate_decision(response.content)
 
     return GateResult(
         gate_id="GATE_3_G35",

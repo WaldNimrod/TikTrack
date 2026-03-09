@@ -15,7 +15,7 @@ OPENAI_MODEL = "gpt-4o"
 GEMINI_MODEL = "gemini-2.0-flash"
 
 TEAM_ENGINE_MAP = {
-    "team_00":  "claude",
+    "team_00":  "human",
     "team_10":  "gemini",
     "team_20":  "cursor",
     "team_30":  "cursor",
@@ -24,7 +24,8 @@ TEAM_ENGINE_MAP = {
     "team_60":  "cursor",
     "team_70":  "gemini",
     "team_90":  "openai",
-    "team_100": "claude",
+    "team_61":  "cursor",
+    "team_100": "gemini",
     "team_170": "gemini",
     "team_190": "openai",
 }

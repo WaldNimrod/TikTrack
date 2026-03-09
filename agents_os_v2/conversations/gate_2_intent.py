@@ -7,6 +7,7 @@ Question: "Do we approve building this?"
 from ..engines.base import BaseEngine
 from ..context.injection import build_full_agent_prompt, build_canonical_message
 from .base import GateResult
+from .response_parser import parse_gate_decision
 
 
 async def run_gate_2(engine_100: BaseEngine, lld400_content: str, stage_id: str = "S002") -> GateResult:
@@ -43,7 +44,7 @@ async def run_gate_2(engine_100: BaseEngine, lld400_content: str, stage_id: str 
     if not response.success:
         return GateResult(gate_id="GATE_2", status="FAIL", message=f"Engine error: {response.error}")
 
-    status = "PASS" if "APPROVED" in response.content.upper() or "PASS" in response.content.upper() else "FAIL"
+    status, reason = parse_gate_decision(response.content)
 
     return GateResult(
         gate_id="GATE_2",

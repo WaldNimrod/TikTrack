@@ -8,6 +8,7 @@ from ..engines.base import BaseEngine
 from ..context.injection import build_full_agent_prompt, build_canonical_message
 from ..validators.identity_header import validate_identity_header
 from .base import GateResult
+from .response_parser import parse_gate_decision
 
 
 async def run_gate_0(engine: BaseEngine, spec_brief: str, stage_id: str = "S002") -> GateResult:
@@ -53,7 +54,7 @@ async def run_gate_0(engine: BaseEngine, spec_brief: str, stage_id: str = "S002"
             message=f"Engine error: {response.error}",
         )
 
-    status = "PASS" if "PASS" in response.content.upper() and "BLOCK" not in response.content.upper() else "FAIL"
+    status, reason = parse_gate_decision(response.content)
 
     return GateResult(
         gate_id="GATE_0",

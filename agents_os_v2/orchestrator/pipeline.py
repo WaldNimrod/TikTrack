@@ -31,6 +31,7 @@ from ..context.injection import (
     build_state_summary,
     load_team_identity,
 )
+from ..conversations.gate_3_implementation import run_g35_build_work_plan
 
 
 GATE_SEQUENCE = [

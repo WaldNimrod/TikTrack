@@ -55,4 +55,4 @@ def run_vite_build() -> QualityResult:
 
 
 def run_all_quality_checks() -> list[QualityResult]:
-    return [run_unit_tests(), run_bandit(), run_vite_build()]
+    return [run_unit_tests(), run_mypy(), run_bandit(), run_vite_build()]

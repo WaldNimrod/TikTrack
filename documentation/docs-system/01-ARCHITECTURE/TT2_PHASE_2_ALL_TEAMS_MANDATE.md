@@ -36,9 +36,10 @@
 
 ### 🚨 **חובה על כל צוות לעצור ולבצע רענון למידה לנהלים הבאים:**
 
-#### **1. "התנ"ך שלנו" - חובת קריאה חוזרת**
-- 📖 **קובץ:** `documentation/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`
-- 📖 **קובץ:** `00_MASTER_INDEX.md` (root)
+#### **1. קונטקסט איגנטים וקנון (חובת קריאה)**
+- 📖 **קנון פעיל:** `00_MASTER_INDEX.md` (root) — סעיף §Active agent context
+- 📖 **נוהל עבודה:** `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`; תפקידים: `01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
+- 📖 **הערה:** `09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` לא פעיל — הועבר לארכיון
 - 📖 **קובץ:** כל מסמכי ה-Blueprints ב-`documentation/01-ARCHITECTURE/`
 
 **חובה:** כל ראש צוות (20, 30, 40, 50, 60) **חייב לחתום על למידה חוזרת** של התנ"ך והגדרות התפקיד.
@@ -81,7 +82,7 @@
 ### **Team 20 (Backend Implementation)**
 
 #### **משימה ראשונה: חתימה על למידה חוזרת**
-- [ ] קריאה חוזרת של `PHOENIX_MASTER_BIBLE.md`
+- [ ] קריאה חוזרת של קנון איגנטים (`00_MASTER_INDEX.md` §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES)
 - [ ] קריאה חוזרת של `documentation/00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (SSOT)
 - [ ] חתימה על READINESS_DECLARATION
 
@@ -106,7 +107,7 @@
 ### **Team 30 (Frontend Execution)**
 
 #### **משימה ראשונה: חתימה על למידה חוזרת**
-- [ ] קריאה חוזרת של `PHOENIX_MASTER_BIBLE.md`
+- [ ] קריאה חוזרת של קנון איגנטים (`00_MASTER_INDEX.md` §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES)
 - [ ] קריאה חוזרת של `documentation/00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (SSOT)
 - [ ] קריאה חוזרת של `TT2_UI_INTEGRATION_PATTERN.md` (Hybrid Bridge)
 - [ ] קריאה חוזרת של `TT2_JS_STANDARDS_PROTOCOL.md` (Hybrid Scripts Policy)
@@ -138,7 +139,7 @@
 ### **Team 40 (UI Assets & Design)**
 
 #### **משימה ראשונה: חתימה על למידה חוזרת**
-- [ ] קריאה חוזרת של `PHOENIX_MASTER_BIBLE.md`
+- [ ] קריאה חוזרת של קנון איגנטים (`00_MASTER_INDEX.md` §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES)
 - [ ] קריאה חוזרת של `documentation/00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (SSOT)
 - [ ] קריאה חוזרת של `TT2_MASTER_PALETTE_SPEC.md`
 - [ ] קריאה חוזרת של `documentation/90_ARCHITECTS_DOCUMENTATION/סיכום בץ 1/LOD_400_FIDELITY_STANDARDS_FINAL.md`
@@ -164,9 +165,9 @@
 ### **Team 50 (QA & Fidelity)**
 
 #### **משימה ראשונה: חתימה על למידה חוזרת**
-- [ ] קריאה חוזרת של `PHOENIX_MASTER_BIBLE.md`
+- [ ] קריאה חוזרת של קנון איגנטים (`00_MASTER_INDEX.md` §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES)
 - [ ] קריאה חוזרת של `documentation/00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (SSOT)
-- [ ] קריאה חוזרת של `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`
+- [ ] קריאה חוזרת של נוהל QA (קנון: `documentation/docs-governance/04-PROCEDURES/` או ארכיון 09-GOVERNANCE/standards)
 - [ ] חתימה על READINESS_DECLARATION
 
 #### **משימות Phase 2.1: Brokers Fees (D18)**
@@ -182,16 +183,16 @@
 - [ ] ולידציה של Fidelity (LOD 400)
 
 **קריאה חובה:**
-- `documentation/09-GOVERNANCE/standards/TEAM_50_QA_WORKFLOW_PROTOCOL.md`
+- נוהל QA: `documentation/docs-governance/04-PROCEDURES/` (או ארכיון 09-GOVERNANCE/standards)
 - `documentation/05-PROCEDURES/TEAM_50_BROWSER_TEST_SCENARIOS.md`
-- `documentation/09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md`
+- אינדקס בדיקות QA: ארכיון או docs-governance
 
 ---
 
 ### **Team 60 (DevOps & Platform)**
 
 #### **משימה ראשונה: חתימה על למידה חוזרת**
-- [ ] קריאה חוזרת של `PHOENIX_MASTER_BIBLE.md`
+- [ ] קריאה חוזרת של קנון איגנטים (`00_MASTER_INDEX.md` §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES)
 - [ ] קריאה חוזרת של `documentation/00-MANAGEMENT/PHOENIX_ORGANIZATIONAL_STRUCTURE.md` (SSOT)
 - [ ] קריאה חוזרת של `documentation/10-POLICIES/TT2_TEAM_60_DEFINITION.md`
 - [ ] חתימה על READINESS_DECLARATION

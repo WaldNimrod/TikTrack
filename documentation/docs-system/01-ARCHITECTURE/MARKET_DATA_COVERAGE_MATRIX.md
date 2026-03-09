@@ -30,7 +30,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 
 ## 3) Stage‑1 Rules
 
-1. **Intraday** רק לטיקרים עם **`is_active = true`** (מצב נוכחי ב-DB). סטטוס טיקר וקצב: מקור אמת [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md). System Settings: תזמון Intraday ניתן להגדרה.  
+1. **Intraday** רק לטיקרים עם **`is_active = true`** (מצב נוכחי ב-DB). סטטוס טיקר וקצב: מקור אמת (ארכיון): `archive/documentation_legacy/snapshots/2026-02-17_0000/09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md`. System Settings: תזמון Intraday ניתן להגדרה.  
 2. **Historical daily** data is required to compute ATR/MA/CCI.  
 3. **No intraday retention for full 250‑day range.**  
 4. **Market Cap** is required now; EPS deferred to advanced fundamentals.  
@@ -46,7 +46,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 
 ## 4) SSOT References
 
-- **סטטוס טיקר וקצב טעינה:** [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) — מצב נוכחי: is_active (true/false); יעד: שדה status.
+- **סטטוס טיקר וקצב טעינה:** ארכיון — `archive/.../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md`; מצב נוכחי: is_active; יעד: שדה status.
 - `MARKET_DATA_PIPE_SPEC.md` — hierarchy, guardrails, cadence.  
 - `FOREX_MARKET_SPEC.md` — FX cadence + providers + precision.  
 - `WP_20_09_FIELD_MAP_TICKERS_MAPPINGS.md` — provider mapping.  

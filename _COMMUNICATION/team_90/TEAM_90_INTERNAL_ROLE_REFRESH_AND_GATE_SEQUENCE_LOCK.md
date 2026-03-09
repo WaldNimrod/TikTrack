@@ -13,6 +13,7 @@
 
 ## 1) Canonical anchors (must-use)
 
+0. `00_MASTER_INDEX.md` (root) §Active agent context — רשימת מסמכים פעילים; נוהל איגנטים: AGENTS_OS_V2_OPERATING_PROCEDURES.
 1. `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`
 2. `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`
 3. `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`

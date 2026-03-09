@@ -2,7 +2,7 @@
 **project_domain:** TIKTRACK
 
 **תאריך:** 2026-01-31  
-**מנדט:** PHOENIX_MASTER_BIBLE — לקבל נתונים תקינים משני הספקים לכל 4 הטיקרים  
+**מנדט:** קנון איגנטים (00_MASTER_INDEX §Active agent context) — לקבל נתונים תקינים משני הספקים לכל 4 הטיקרים  
 **סקריפט:** `python3 scripts/test-providers-direct.py`
 
 ---

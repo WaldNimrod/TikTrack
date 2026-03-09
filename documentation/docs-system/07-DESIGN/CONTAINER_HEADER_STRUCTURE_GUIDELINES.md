@@ -281,7 +281,8 @@
 
 ## 🔗 קישורים רלוונטיים
 
-- `documentation/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` - ספר החוקים המאסטר
+- `00_MASTER_INDEX.md` (שורש) + `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` — מקורות קנוניים למצב ולמבנה
+- `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` — נוהל פעיל לתזרימת V2
 - `_COMMUNICATION/team_31/team_31_staging/D15_DASHBOARD_STYLES.css` - יישום בפועל
 
 ---

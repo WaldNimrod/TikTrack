@@ -63,7 +63,7 @@ Contains:
 - `_COMMUNICATION/team_90/GOVERNANCE_SOURCE_MATRIX.md`
 - `_COMMUNICATION/team_90/TEAM_90_GOVERNANCE_ROLE_RESET_AND_ENFORCEMENT.md`
 - `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
-- `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`
+- `00_MASTER_INDEX.md` (שורש; כולל §Active agent context) + `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` + `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` (נוהל פעיל יחיד)
 - `_COMMUNICATION/team_100/PHOENIX_DEV_OS_FINAL_BUNDLE_v1.3.1/PHOENIX_DEV_OS_TARGET_MODEL_v1.3.1_FINAL.md`
 
 ---

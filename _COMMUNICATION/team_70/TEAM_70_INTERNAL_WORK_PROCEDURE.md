@@ -58,23 +58,26 @@
 
 **מסמך קנון מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md`
 
-- **קנון משותף (SSM, WSM, נוהל שערים, Directives, Procedures וכו'):** מקום יחיד — `documentation/docs-governance/PHOENIX_CANONICAL/` (לא תחת `AGENTS_OS_GOVERNANCE` ולא תחת `agents_os/`).
-- **בכל קידום ידע ועדכון הפניות:** להפנות SSM, WSM, נוהל שערים — לנתיבים תחת `documentation/docs-governance/PHOENIX_CANONICAL/` (ראה §6).
+- **קנון משותף (SSM, WSM, נוהל שערים, Directives, Procedures):** `documentation/docs-governance/01-FOUNDATIONS/`, `04-PROCEDURES/`. עוגן איגנטים: `00_MASTER_INDEX.md` (root) §Active agent context. **לא פעיל:** `PHOENIX_CANONICAL/` (deprecated); `09-GOVERNANCE/standards/` בארכיון.
+- **בכל קידום ידע ועדכון הפניות:** להפנות ל־`documentation/docs-governance/` (01-FOUNDATIONS, 04-PROCEDURES) ו־`00_MASTER_INDEX.md` (ראה §6).
 - **לא** להחזיר קנון משותף לתיקיות תחת דומיין Agents_OS.
 
 ---
 
-## 6. מקורות חובה (נתיבים קנוניים — PHOENIX_CANONICAL)
+## 6. מקורות חובה (נתיבים קנוניים — נוהל V2 פעיל)
 
+- **עוגן איגנטים:** `00_MASTER_INDEX.md` (root) §Active agent context — רשימת מסמכים פעילים בלבד.
+- **נוהל עבודה פעיל:** `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`
+- **מיפוי תפקידים:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
 - `TEAM_70_KNOWLEDGE_LIBRARIAN_ROLE_DEFINITION.md`
 - **מבנה תיקיות (קנון):** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md`
-- **נוהל קידום ידע:** `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` (או תחת PHOENIX_CANONICAL/04-PROCEDURES אם יועבר)
-- **נוהל שערים (GATE_8):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`
-- **SSM:** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`
-- **WSM (מצב נוכחי):** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
-- **אינדקס נהלים:** `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md`
+- **נוהל קידום ידע:** `documentation/docs-governance/02-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` (או 04-PROCEDURES)
+- **נוהל שערים (GATE_8):** `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`
+- **SSM:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`
+- **WSM:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
+- **אינדקס נהלים:** `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` (או GOVERNANCE_PROCEDURES_SOURCE_MAP)
 - תבניות Team 170 CANONICAL_TEMPLATES (כולל 04_AS_MADE_REPORT.md)
 
 ---
 
-**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | PHOENIX_CANONICAL_ADOPTED | 2026-02-22**
+**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | V2_ACTIVE_CONTEXT_ALIGNED | 2026-02-26**

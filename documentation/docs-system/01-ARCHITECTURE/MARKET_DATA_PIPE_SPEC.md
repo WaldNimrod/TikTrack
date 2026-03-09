@@ -72,7 +72,7 @@
 ## 2.4 Cadence Policy (Stage‑1 — Intraday required)
 
 - **FX:** EOD בלבד.
-- **Prices:** Intraday לטיקרים עם **`is_active = true`** (מצב נוכחי); EOD ליתר. סטטוס טיקר וקצב: ממתין/פתוח/סגור/מבוטל — **מקור אמת:** [TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT](../09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md) (מצב נוכחי: is_active; יעד: שדה status).
+- **Prices:** Intraday לטיקרים עם **`is_active = true`** (מצב נוכחי); EOD ליתר. סטטוס טיקר וקצב: ממתין/פתוח/סגור/מבוטל — **מקור אמת (ארכיון):** `archive/documentation_legacy/snapshots/2026-02-17_0000/09-GOVERNANCE/TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.md` (מצב נוכחי: is_active; יעד: שדה status).
 - **Historical daily:** 250 trading days retention (OHLCV) — נדרש ל־Indicators (ATR/MA/CCI).
 - **Market Cap:** Daily (EOD). **Indicators:** ATR(14), MA(20/50/150/200), CCI(20) — Daily, derived from 250d history.
 

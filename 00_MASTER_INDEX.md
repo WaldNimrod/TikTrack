@@ -6,6 +6,19 @@
 **last_updated:** 2026-02-26
 **deprecated_alias_notice:** Legacy prefix `documentation/docs-governance/PHOENIX_CANONICAL/` is deprecated for active authority routing; use `documentation/docs-governance/01-FOUNDATIONS/` canonical paths.
 
+### Active agent context (all agents — single source of truth)
+
+**כל האיגנטים (Cursor, Cloud Agent, וכל רץ אחר) מחויבים להשתמש רק במסמכים הבאים.** אין שימוש פעיל בנתיבי נוהל legacy.
+
+| Purpose | Path |
+|--------|------|
+| Squad ID + mandatory files | `.cursorrules` (repo root) |
+| Role mapping (20/30/40/50/60/61/70/90/100/170/190) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` |
+| **Active workflow & orchestration** | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
+| WSM + Gate Model | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `04_GATE_MODEL_PROTOCOL_v2.3.0.md` |
+
+**לא פעיל (הועבר לארכיון):** `documentation/docs-governance/09-GOVERNANCE/standards/` (כולל PHOENIX_MASTER_BIBLE, CURSOR_INTERNAL_PLAYBOOK) — לא קיים בנתיב פעיל; הוחלף במסמכים למעלה וב־V2 Operating Procedures.
+
 ---
 
 ## Canonical Structure — Model B (Approved)
@@ -18,7 +31,8 @@
 | `documentation/docs-governance/` | 00-INDEX, 01-FOUNDATIONS (SSM/WSM/Gate Model), 02-POLICIES, 04-PROCEDURES, 05-CONTRACTS, 06-TEMPLATES, 07-DIRECTIVES_AND_DECISIONS, 08-WORKING_VALIDATION_RECORDS, AGENTS_OS_GOVERNANCE, 99-archive. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS |
 | `archive/` | documentation, code |
-| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team-* (כולל team_10, team_61, team_70, team_90, team_100, team_170, team_190) |
+| `agents_os_v2/` | V2 Orchestrator (pipeline, config, context/identity, context/governance, mcp/test_scenarios, validators); canonical per Team 61 mandate 2026-03-09 |
+| `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team_* (כולל team_10, team_61, team_70, team_90, team_100, team_170, team_190) |
 
 **Architect decisions (חוקי יסוד):** `_COMMUNICATION/_Architects_Decisions/`
 

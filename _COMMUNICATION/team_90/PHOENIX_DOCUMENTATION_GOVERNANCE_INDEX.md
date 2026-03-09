@@ -34,7 +34,7 @@
 | Quality gates | `TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` |
 | Knowledge promotion | `TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` | `documentation/05-PROCEDURES/TT2_KNOWLEDGE_PROMOTION_PROTOCOL.md` |
 | Closure gating (SOP-013) | **קנון יחיד** | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`. נתיב `documentation/07-POLICIES/TT2_GOVERNANCE_V2_102_SOP_013_CLOSURE_GATE.md` — **ארכיון להקשר בלבד**, לא בסיס משילות פעיל. |
-| Operating standards | `CURSOR_INTERNAL_PLAYBOOK.md`, `PHOENIX_MASTER_BIBLE.md` | `documentation/09-GOVERNANCE/standards/` |
+| Operating standards / agent context | **נוהל פעיל:** `.cursorrules`, `AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`, `TEAM_DEVELOPMENT_ROLE_MAPPING` | `.cursorrules` (root); `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`; `01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`. **לא פעיל:** `documentation/09-GOVERNANCE/standards/` (PHOENIX_MASTER_BIBLE, CURSOR_INTERNAL_PLAYBOOK) — הועבר לארכיון; כל האיגנטים משתמשים רק במסמכים הפעילים. |
 
 ### 1.2 Governance integrity risk already visible
 
@@ -50,7 +50,7 @@
 | Architecture specs | `documentation/01-ARCHITECTURE/` | Rich and broad; active |
 | Engineering/DDL | `documentation/06-ENGINEERING/` | Active addendums + schema evolution |
 | API contracts | `documentation/07-CONTRACTS/` | Active but fragmented (main spec + multiple addendums) |
-| Governance docs | `documentation/09-GOVERNANCE/` | Active; contains standards and locks |
+| Governance docs | `documentation/docs-governance/` (01-FOUNDATIONS, 04-PROCEDURES) | Active. Legacy `09-GOVERNANCE/standards/` not in use; see `00_MASTER_INDEX.md` §Active agent context. |
 | Procedures | `documentation/05-PROCEDURES/` | Active and operational |
 | Product/business | `documentation/03-PRODUCT_&_BUSINESS/` | **Sparse** (single mapping file) |
 | Architect overview pack | `documentation/90_ARCHITECTS_DOCUMENTATION/OVERVIEW_PACK/` | Useful executive package; some outdated path references |

@@ -72,7 +72,7 @@
 | `_COMMUNICATION/team_170/TEAM_170_GATE_1_ROLE_PRECISION_PROPOSAL_FOR_GOVERNANCE.md` | הצעת דיוק תפקיד GATE_1 לנוהל השערים (להכללה בקנון). |
 | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_170_ACTIVATION_AGENTS_OS_PHASE_1_LLD400_v1.0.0.md` | מנדט הפעלה ל־LLD400; מבנה חובה, deliverables, איסורים. |
 | `_COMMUNICATION/team_100/AGENTS_OS_GATE_1_PROGRAM_LAYER_LLD400_TEMPLATE_v1.2.0.md` | תבנית קנונית למסמך LLD400 ברמת Program. |
-| `00_MASTER_INDEX.md` — "Stage / Program / Work Package / Task — Where to read" | מיקום WSM, SSM, רשימות, מפת דרכים. |
+| `00_MASTER_INDEX.md` (root) §Active agent context | עוגן איגנטים — רשימת מסמכים פעילים; מיקום WSM, SSM, רשימות, מפת דרכים. נוהל פעיל: AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0. |
 | `documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md` | נוהל קנוני לבאגים מאומתים: intake, routing, closure, IMMEDIATE/BATCHED. |
 | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | רג'יסטר קנוני יחיד לבאגים מאומתים — תחזוקה צוות 170. |
 

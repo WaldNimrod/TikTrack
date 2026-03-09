@@ -21,7 +21,7 @@
 1. **האינדקס המאוחד:** המקור היחיד הוא `00_MASTER_INDEX.md` (שורש הפרויקט). כל שאר האינדקסים מבוטלים (Deprecated).
 2. **טקסונומיה קשיחה:**
    - **01-ARCHITECTURE:** החלטות (ADRs) ובלופרינטים.
-   - **09-GOVERNANCE:** פרוטוקולים מחייבים (RTL, DNA).
+   - **Governance פעיל:** `documentation/docs-governance/` (01-FOUNDATIONS, 04-PROCEDURES); 09-GOVERNANCE הועבר לארכיון — ראה `00_MASTER_INDEX.md` §Active agent context.
    - **_COMMUNICATION:** טיוטות ודיווחים בלבד. לעולם לא SSOT.
 3. **חובת Metadata:** כל מסמך SSOT יתחיל בבלוק נתונים (id, owner, status, supersedes).
 

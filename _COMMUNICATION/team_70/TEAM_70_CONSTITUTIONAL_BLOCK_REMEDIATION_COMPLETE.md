@@ -13,7 +13,7 @@
 
 Team 70 has re-studied:
 - Role definition (Knowledge Librarian — documentation integrity, index consistency)
-- PHOENIX_MASTER_BIBLE, 00_MASTER_INDEX (root), governance procedures
+- 00_MASTER_INDEX (root) §Active agent context, TEAM_DEVELOPMENT_ROLE_MAPPING, AGENTS_OS_V2_OPERATING_PROCEDURES, governance procedures
 - TEAM_170_190_AUTHORITY_SEPARATION (Team 170 Librarian / Team 190 Gate 5)
 - SOP-013 canonical anchor: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`
 
@@ -44,7 +44,7 @@ Team 70 has re-studied:
 
 - **.cursorrules (repo root):**
   - Squad list extended: **Team 170** (Librarian/SSOT), **Team 190** (Constitutional Architectural Validator).
-  - Mandatory files: **00_MASTER_INDEX.md (root)** + **documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md**; D15_SYSTEM_INDEX deprecated.
+  - Mandatory files: **00_MASTER_INDEX.md (root)** (§Active agent context) + **documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md** + **01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md**; D15_SYSTEM_INDEX deprecated. Legacy 09-GOVERNANCE/standards (Bible/Playbook) not in active use.
   - SOP-013 anchor: **`_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GOVERNANCE_STRENGTHENING.md`** (replaced old 07-POLICIES path).
   - Deep Scan target: **documentation/** (Model B).
 - **CURSOR_RULES_CONFIG.txt** (Team 170 intake package): Same Team 170/190 routing and mandatory-file/SOP anchor alignment.

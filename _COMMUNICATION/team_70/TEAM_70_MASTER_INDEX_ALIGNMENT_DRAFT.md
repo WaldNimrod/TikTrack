@@ -50,8 +50,7 @@
 
 | Reference | Target |
 |-----------|--------|
-| PHOENIX_MASTER_BIBLE | `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` |
-| CURSOR_INTERNAL_PLAYBOOK | `documentation/docs-governance/09-GOVERNANCE/standards/CURSOR_INTERNAL_PLAYBOOK.md` |
+| קנון איגנטים (במקום Bible/Playbook) | `00_MASTER_INDEX.md` §Active agent context + `04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`; Bible/Playbook בארכיון |
 | Architect decisions index | `_COMMUNICATION/_Architects_Decisions/` |
 
 ---

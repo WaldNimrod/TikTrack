@@ -30,7 +30,7 @@ References to SOP-013 have been aligned to the canonical path above in:
 | **Governance Source Matrix** | `_COMMUNICATION/team_90/GOVERNANCE_SOURCE_MATRIX.md` — added dedicated row "SOP-013 (Closure/Seal policy)" with Authority Source = full path; Notes = Canonical location + file name LOCKED. |
 | **Related procedures** | `TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` — rule 6: canonical path cited first. |
 | | `TEAM_10_CLEAN_TABLE_PROTOCOL.md` — canonical path cited. |
-| | `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md` — §7: explicit "קנון (מיקום + שם קובץ)" line. |
+| | קנון איגנטים: `00_MASTER_INDEX.md` §Active agent context; נוהל פעיל: `04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`. (09-GOVERNANCE/standards בארכיון.) |
 | | `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md` — §3 closure note + §4 הפניות: SOP-013 canonical path. |
 
 ---

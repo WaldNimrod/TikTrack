@@ -18,7 +18,7 @@
 
 ## Required Actions (Team 10) — בוצעו
 
-- ✅ קידום למסמך SSOT: `documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md`
+- ✅ קידום למסמך SSOT (היסטורי): התוכן בארכיון; קנון תיעוד: `00_MASTER_INDEX.md`. נתיב legacy: `documentation/09-GOVERNANCE/ARCHITECT_MODULE_MENU_STYLING_SSOT.md` — לא פעיל.
 - ✅ הוספה ל-00_MASTER_INDEX
 - ✅ הכנסה לתוכנית העבודה (שלב Module/Menu Styling)
 - ✅ הוצאת משימות מדויקות לצוות 40 (עיצוב) + צוות 30 (יישום/בדיקות)

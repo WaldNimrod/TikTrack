@@ -46,7 +46,7 @@
 | `01-POLICIES/` | (קיים) | |
 | `02-PROCEDURES/` | (קיים) | |
 | `06-CONTRACTS/` | (קיים) | |
-| `09-GOVERNANCE/` | standards, GINs (קיים) | |
+| `09-GOVERNANCE/` | **לא פעיל** — הועבר לארכיון; קונטקסט איגנטים: `00_MASTER_INDEX.md` §Active agent context | |
 
 ### 2.2 תעוד דומיין Agents_OS בלבד
 

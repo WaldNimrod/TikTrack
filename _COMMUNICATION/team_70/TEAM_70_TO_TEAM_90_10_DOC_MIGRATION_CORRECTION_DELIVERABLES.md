@@ -12,7 +12,7 @@
 
 ## Compliance
 
-Team 70 has studied the organizational structure (PHOENIX_ORGANIZATIONAL_STRUCTURE, CURSOR_INTERNAL_PLAYBOOK, GOVERNANCE_SOURCE_MATRIX) and the Team 70 role definition. Operating as **Knowledge Librarian** — keeper of the library, responsible for writing and documentation work.
+Team 70 has studied the organizational structure (PHOENIX_ORGANIZATIONAL_STRUCTURE, GOVERNANCE_SOURCE_MATRIX, קנון איגנטים: 00_MASTER_INDEX §Active agent context + AGENTS_OS_V2_OPERATING_PROCEDURES) and the Team 70 role definition. Operating as **Knowledge Librarian** — keeper of the library, responsible for writing and documentation work.
 
 ---
 

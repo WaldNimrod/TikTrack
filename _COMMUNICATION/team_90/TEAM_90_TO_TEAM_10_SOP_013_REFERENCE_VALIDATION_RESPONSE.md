@@ -13,11 +13,11 @@
 
 Validated per request in:
 
-1. `00_MASTER_INDEX.md`
+1. `00_MASTER_INDEX.md` (root) §Active agent context
 2. `_COMMUNICATION/team_90/GOVERNANCE_SOURCE_MATRIX.md`
 3. `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md`
 4. `_COMMUNICATION/team_10/TEAM_10_CLEAN_TABLE_PROTOCOL.md`
-5. `documentation/docs-governance/09-GOVERNANCE/standards/PHOENIX_MASTER_BIBLE.md`
+5. קנון איגנטים: `00_MASTER_INDEX.md` §Active agent context + `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` (09-GOVERNANCE/standards בארכיון)
 6. `documentation/docs-governance/02-PROCEDURES/TT2_QUALITY_ASSURANCE_GATE_PROTOCOL.md`
 
 ---

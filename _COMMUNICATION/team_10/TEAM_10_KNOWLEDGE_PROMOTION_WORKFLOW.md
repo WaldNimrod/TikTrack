@@ -64,7 +64,7 @@
    - **`documentation/01-ARCHITECTURE/`** - החלטות אדריכליות, דפוסים
    - **`documentation/02-DEVELOPMENT/`** - מדריכי פיתוח, ספציפיקציות
    - **`documentation/05-PROCEDURES/`** - נהלי עבודה, workflows
-   - **`documentation/09-GOVERNANCE/`** - תקנים, מדיניות
+   - **`documentation/docs-governance/`** (01-FOUNDATIONS, 04-PROCEDURES) — תקנים, מדיניות, נוהל פעיל; 09-GOVERNANCE בארכיון (ראה 00_MASTER_INDEX §Active agent context)
    - **`documentation/08-REPORTS/`** - דוחות סיכום (אם רלוונטי)
 
 #### **שלב 3: יצירת/עדכון מסמכי SSOT**
@@ -85,7 +85,7 @@
 
 2. **עדכון אינדקסים ספציפיים** (אם רלוונטי):
    - `documentation/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md`
-   - `documentation/09-GOVERNANCE/standards/TEAM_50_QA_TEST_INDEX.md`
+   - אינדקס בדיקות QA: ארכיון או `documentation/docs-governance/` (קנון פעיל: 00_MASTER_INDEX §Active agent context)
    - וכו'
 
 #### **שלב 5: ארכוב דוחות תקשורת**

@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Governance & agent context (single source of truth)
+
+**All agents (Cursor, Cloud Agent, and any other runner) must use only these context documents.** No legacy procedure paths are active.
+
+| Purpose | Document / path |
+|--------|------------------------------------------|
+| Squad ID list + mandatory files | `.cursorrules` (repo root) |
+| Role mapping (20/30/40/50/60/61/70/90/100/170/190) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` |
+| Active workflow & orchestration | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
+| Global entry + WSM | `00_MASTER_INDEX.md`, `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
+
+**Deprecated (do not use as active procedure):** References to `PHOENIX_MASTER_BIBLE` or `CURSOR_INTERNAL_PLAYBOOK` under `documentation/09-GOVERNANCE/standards/` or `06-GOVERNANCE_&_COMPLIANCE/standards/` — those paths are not in active use; superseded by the documents above and by V2 Operating Procedures.
+
+---
+
 ## Cursor Cloud specific instructions
 
 ### Architecture Overview

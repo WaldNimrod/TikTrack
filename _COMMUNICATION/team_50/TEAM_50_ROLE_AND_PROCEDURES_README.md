@@ -109,6 +109,7 @@
 
 | מסמך | שימוש |
 |------|--------|
+| 00_MASTER_INDEX.md (root) §Active agent context | קנון איגנטים — רשימת מסמכים פעילים; נוהל עבודה: AGENTS_OS_V2_OPERATING_PROCEDURES |
 | TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md | תפקידי צוותים; scope-by-domain |
 | TEAM_10_S002_P003_WP002_WORK_PACKAGE_DEFINITION.md | scope WP002, D22/D34/D35, exit criteria |
 | TEAM_10_S002_P003_GATE3_ACTIVATION_PROMPTS | פרומט Team 50 §4.2; סדר ביצוע; הודעות תאום §3.1 |

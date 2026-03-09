@@ -23,7 +23,7 @@
 
 ### 3) Communication-history links in master index
 - Remove communication-history links from:
-  - `documentation/00-MANAGEMENT/00_MASTER_INDEX.md`
+  - **קנון:** `00_MASTER_INDEX.md` (שורש הפרויקט — repo root). לא `documentation/00-MANAGEMENT/`.
 - Preserve history under dedicated archive/history path (no deletion).
 
 ### 4) `documentation/90_ARCHITECTS_DOCUMENTATION`

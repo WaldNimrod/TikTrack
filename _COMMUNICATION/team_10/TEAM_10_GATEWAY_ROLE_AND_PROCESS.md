@@ -17,6 +17,7 @@
 - **לאחר אישור חבילת עבודה (GATE_3 G3.5 — work-plan validation PASS):** **להוציא את התוכנית לפועל** = להעביר לכל צוות: (1) **קישור לתוכנית המלאה** כקונטקסט, (2) **סדר ביצוע** כולל תלויות ותאומים דרושים, (3) **משימות ספציפיות** לאותו צוות. מסמך מרכזי אחד + פרומט לכל צוות (בבלוק קוד, עם כותרת קנונית) לפי סדר הביצוע.
 - **משימות צוותים:** מיד הודעה ברורה עם משימות, תוצרים נדרשים ודיווח. הצוותים ממתינים להוראות מאיתנו.
 - **משימות צוות 10:** לממש ישירות — אנחנו צוות 10.
+- **אופציה V2 (Agents_OS V2):** בנוסף לצ'אט ב-Cursor Composer, Team 10 יכול להפעיל את **V2 Orchestrator** (CLI) לניהול state, ייצור prompts ומנדטים דטרמיניסטיים. ראה `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` — Pipeline Usage Guide, Per-team instructions, ו־Context injection. כשמשתמשים ב-V2, הפקודה `python3 -m agents_os_v2.orchestrator.pipeline --generate-prompt GATE_X` מייצרת את הפרומט המלא (4 שכבות); הצוותים מקבלים mandates מ-V2 ולא רק מצ'אט ידני.
 
 ---
 
@@ -88,8 +89,10 @@
 
 | מסמך | שימוש |
 |------|--------|
-| PHOENIX_MASTER_BIBLE | מבנה ארגוני, עקרונות, אחריות Gateway |
-| CURSOR_INTERNAL_PLAYBOOK | נהלי עבודה, תפקידים, תקשורת, ארגון קבצים |
+| 00_MASTER_INDEX.md (root) §Active agent context | עוגן קונטקסט איגנטים — רשימת מסמכים פעילים בלבד |
+| TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 | מיפוי תפקידים (20/30/40/50/60/61/70/90/100/170/190) |
+| AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0 | נוהל עבודה ואורקסטרציה פעיל יחיד (כל האיגנטים) |
+| PHOENIX_MASTER_WSM_v1.0.0, 04_GATE_MODEL | WSM, Gate Model |
 | TEAM_10_MASTER_TASK_LIST_PROTOCOL | נוהל רשימת משימות, היררכיה, הוצאת הודעות (סעיף 1.2.1) |
 | TEAM_10_MASTER_TASK_LIST | מטריצת משימות — עדכון שוטף |
 | TEAM_10_GATE_ACTIONS_RUNBOOK (קנוני) | פעולות Team 10 לכל שער — מקור יחיד: `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` |

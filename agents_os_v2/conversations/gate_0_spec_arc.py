@@ -44,7 +44,7 @@ async def run_gate_0(engine: BaseEngine, spec_brief: str, stage_id: str = "S002"
 
     user_message += f"\n\n---\n\n## Scope Brief\n\n{spec_brief}"
 
-    response = await engine.call(system_prompt, user_message)
+    response = await engine.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(

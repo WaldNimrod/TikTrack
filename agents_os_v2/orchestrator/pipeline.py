@@ -43,14 +43,14 @@ GATE_SEQUENCE = [
 GATE_CONFIG = {
     "GATE_0":    {"owner": "team_190", "engine": "codex",   "desc": "Team 190 validates LOD200 scope"},
     "GATE_1":    {"owner": "team_190", "engine": "codex",   "desc": "Team 170 produces LLD400 → Team 190 validates"},
-    "GATE_2":    {"owner": "team_100", "engine": "claude",  "desc": "Team 100 approves architectural intent"},
+    "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Team 100 analysis → human pause for approval"},
     "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",  "desc": "Build work plan from approved spec"},
     "G3_5":      {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
     "GATE_4":    {"owner": "team_10",  "engine": "cursor",  "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 dev validation (code vs spec)"},
-    "GATE_6":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 executes; Team 100 approval authority"},
+    "GATE_6":    {"owner": "team_90",  "engine": "codex+human",   "desc": "Team 90 analysis → human pause for approval"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
 }
@@ -67,6 +67,23 @@ def _save_prompt(filename: str, content: str) -> Path:
     path = prompts_dir / filename
     path.write_text(content, encoding="utf-8")
     return path
+
+
+def _print_human_approval_prompt(gate_name: str, analysis: str, summary: str):
+    print(f"\n╔══════════════════════════════════════════════════════════╗")
+    print(f"║  🛑 HUMAN APPROVAL REQUIRED — {gate_name:<24}  ║")
+    print(f"╠══════════════════════════════════════════════════════════╣")
+    print(f"║  Team 100 Analysis:")
+    for line in analysis[:500].split("\n"):
+        print(f"║    {line}")
+    print(f"║")
+    print(f"║  Summary: {summary[:60]}")
+    print(f"╠══════════════════════════════════════════════════════════╣")
+    print(f"║  Actions:")
+    print(f"║    --approve {gate_name}              → PASS and continue")
+    print(f"║    --reject  {gate_name} --reason '…' → FAIL with reason")
+    print(f"║    --query   {gate_name} --question '…'→ Ask follow-up")
+    print(f"╚══════════════════════════════════════════════════════════╝")
 
 
 def show_status():
@@ -109,6 +126,10 @@ def show_next(state: PipelineState | None = None):
     if cfg["engine"] == "codex":
         print(f"║  → Open Codex session for {cfg['owner']}")
         print(f"║  → Paste prompt from: agents_os_v2 --generate-prompt {gate}")
+    elif cfg["engine"] == "codex+human":
+        print(f"║  → Codex analysis + human approval required")
+        print(f"║  → Paste prompt from: agents_os_v2 --generate-prompt {gate}")
+        print(f"║  → Then: --approve {gate} / --reject {gate} --reason '…'")
     elif cfg["engine"] == "claude":
         print(f"║  → Open Claude Code session")
         print(f"║  → Paste prompt from: agents_os_v2 --generate-prompt {gate}")
@@ -209,7 +230,9 @@ def _generate_gate_2_prompt(state: PipelineState) -> str:
         f"Question: Do we approve building this?\n\n"
         f"## Approved Spec (LLD400 from GATE_1)\n\n"
         f"{state.lld400_content[:4000] if state.lld400_content else '[LLD400 not yet produced — paste from GATE_1 output]'}\n\n"
-        f"Respond with: APPROVED or REJECTED + reasoning."
+        f"Respond with: APPROVED or REJECTED + reasoning.\n\n"
+        f"**NOTE:** After Team 100 analysis, the pipeline will PAUSE for human decision.\n"
+        f"Use --approve GATE_2 / --reject GATE_2 --reason '…' to continue."
     )
 
 
@@ -371,10 +394,21 @@ def _generate_gate_8_prompt(state: PipelineState) -> str:
     )
 
 
-def start_pipeline(spec: str, stage: str = "S002"):
+def start_pipeline(spec: str, stage: str = "S002", wp_id: str = ""):
+    import re
+    if not re.match(r"S\d{3}-P\d{3}-WP\d{3}", wp_id or ""):
+        _log("ERROR: --wp required (format: S###-P###-WP###)")
+        return
+
+    _log("INIT: Updating STATE_SNAPSHOT.json...")
+    from ..observers.state_reader import main as update_snapshot
+    update_snapshot()
+    _log("INIT: STATE_SNAPSHOT updated.")
+
     state = PipelineState(
         spec_brief=spec,
         stage_id=stage,
+        work_package_id=wp_id,
         current_gate="GATE_0",
         started_at=datetime.now(timezone.utc).isoformat(),
     )
@@ -420,6 +454,11 @@ def main():
     parser.add_argument("--reason", type=str, default="", help="Failure reason")
     parser.add_argument("--generate-prompt", type=str, metavar="GATE", help="Generate prompt for gate")
     parser.add_argument("--stage", type=str, default="S002", help="Stage ID")
+    parser.add_argument("--approve", type=str, metavar="GATE", help="Approve gate (GATE_2, GATE_6, GATE_7)")
+    parser.add_argument("--reject", type=str, metavar="GATE", help="Reject gate (GATE_2, GATE_6, GATE_7)")
+    parser.add_argument("--query", type=str, metavar="GATE", help="Query gate for follow-up (GATE_2, GATE_6)")
+    parser.add_argument("--question", type=str, default="", help="Follow-up question for --query")
+    parser.add_argument("--wp", type=str, default="", help="Work package ID (format: S###-P###-WP###)")
     args = parser.parse_args()
 
     if args.status:
@@ -427,9 +466,30 @@ def main():
     elif args.next:
         show_next()
     elif args.spec:
-        start_pipeline(args.spec, args.stage)
+        start_pipeline(args.spec, args.stage, args.wp)
     elif args.advance:
         advance_gate(args.advance[0], args.advance[1], args.reason)
+    elif args.approve:
+        gate = args.approve
+        if gate in ("GATE_2", "GATE_6", "GATE_7"):
+            _log(f"Human APPROVED {gate}")
+            advance_gate(gate, "PASS")
+        else:
+            _log(f"ERROR: --approve only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
+    elif args.reject:
+        gate = args.reject
+        if gate in ("GATE_2", "GATE_6", "GATE_7"):
+            _log(f"Human REJECTED {gate}: {args.reason}")
+            advance_gate(gate, "FAIL", args.reason)
+        else:
+            _log(f"ERROR: --reject only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
+    elif args.query:
+        gate = args.query
+        if gate in ("GATE_2", "GATE_6"):
+            _log(f"QUERY on {gate}: {args.question}")
+            _log(f"Re-run --generate-prompt {gate} with updated context, or ask in the Codex/Claude session.")
+        else:
+            _log(f"ERROR: --query only valid for GATE_2, GATE_6 (got {gate})")
     elif args.generate_prompt:
         generate_prompt(args.generate_prompt)
     else:

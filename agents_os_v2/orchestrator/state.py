@@ -4,6 +4,7 @@ Pipeline State Manager — tracks gate progress across the pipeline.
 """
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
@@ -17,7 +18,8 @@ STATE_FILE = AGENTS_OS_OUTPUT_DIR / "pipeline_state.json"
 
 @dataclass
 class PipelineState:
-    work_package_id: str = "N/A"
+    pipe_run_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    work_package_id: str = "REQUIRED"
     stage_id: str = "S002"
     spec_brief: str = ""
     current_gate: str = "NOT_STARTED"
@@ -44,7 +46,7 @@ class PipelineState:
         return cls()
 
     def advance_gate(self, gate_id: str, status: str):
-        if status in ("PASS", "MANDATES_READY", "PRODUCED", "MANUAL"):
+        if status in ("PASS", "MANDATES_READY", "PRODUCED", "MANUAL", "CONDITIONAL_PASS"):
             self.gates_completed.append(gate_id)
         else:
             self.gates_failed.append(gate_id)

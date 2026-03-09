@@ -18,11 +18,12 @@ async def run_gate_8(engine_90: BaseEngine, engine_70: BaseEngine, wp_id: str = 
         work_package_id=wp_id,
     )
 
-    response_70 = await engine_70.call(
+    response_70 = await engine_70.call_with_retry(
         system_prompt_70,
         f"Produce AS_MADE_REPORT for work package {wp_id}. "
         f"Document what was built, list all files created/modified, "
         f"and confirm documentation indexes are updated.",
+        max_retries=3,
     )
 
     # Team 90 validates closure
@@ -33,11 +34,12 @@ async def run_gate_8(engine_90: BaseEngine, engine_70: BaseEngine, wp_id: str = 
         work_package_id=wp_id,
     )
 
-    response_90 = await engine_90.call(
+    response_90 = await engine_90.call_with_retry(
         system_prompt_90,
         f"Validate documentation closure for work package {wp_id}.\n\n"
         f"AS_MADE_REPORT:\n{response_70.content[:3000] if response_70.success else 'ERROR: Team 70 failed'}\n\n"
         f"Verify: all files present, indexes updated, communication cleaned.",
+        max_retries=3,
     )
 
     if not response_90.success:

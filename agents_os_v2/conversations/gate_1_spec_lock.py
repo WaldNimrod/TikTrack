@@ -45,7 +45,7 @@ async def run_gate_1_produce(engine_170: BaseEngine, spec_brief: str, gate_0_res
 
     user_message += f"\n\n---\n\n## Scope Brief\n\n{spec_brief}"
 
-    response = await engine_170.call(system_prompt, user_message)
+    response = await engine_170.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(gate_id="GATE_1", status="FAIL", message=f"Engine error: {response.error}")
@@ -93,7 +93,7 @@ async def run_gate_1_validate(engine_190: BaseEngine, lld400_content: str, stage
     )
     user_message += f"\n\n---\n\n## LLD400 Document\n\n{lld400_content}"
 
-    response = await engine_190.call(system_prompt, user_message)
+    response = await engine_190.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(gate_id="GATE_1", status="FAIL", message=f"Engine error: {response.error}")

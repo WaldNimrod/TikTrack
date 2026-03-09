@@ -77,7 +77,7 @@ async def run_gate_5(
     )
     user_message += f"\n\n---\n\n## LLD400 Spec\n\n{lld400_content[:4000]}"
 
-    response = await engine_90.call(system_prompt, user_message)
+    response = await engine_90.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(gate_id="GATE_5", status="FAIL", message=f"Engine error: {response.error}")

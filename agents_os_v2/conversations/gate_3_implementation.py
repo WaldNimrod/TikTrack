@@ -42,7 +42,7 @@ async def run_g35_work_plan_validation(engine_90: BaseEngine, work_plan: str, wp
     )
     user_message += f"\n\n---\n\n## Work Plan\n\n{work_plan}"
 
-    response = await engine_90.call(system_prompt, user_message)
+    response = await engine_90.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(gate_id="GATE_3_G35", status="FAIL", message=f"Engine error: {response.error}")
@@ -79,7 +79,7 @@ async def run_g36_build_mandates(engine_10: BaseEngine, lld400_content: str, wor
         f"## Work Plan\n\n{work_plan[:2000]}"
     )
 
-    response = await engine_10.call(system_prompt, user_message)
+    response = await engine_10.call_with_retry(system_prompt, user_message, max_retries=3)
 
     if not response.success:
         return GateResult(gate_id="GATE_3_G36", status="FAIL", message=f"Engine error: {response.error}")

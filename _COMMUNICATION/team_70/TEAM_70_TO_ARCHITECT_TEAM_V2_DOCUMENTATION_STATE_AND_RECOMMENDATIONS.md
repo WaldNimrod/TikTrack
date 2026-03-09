@@ -4,6 +4,7 @@
 **from:** Team 70 (Knowledge Librarian)  
 **to:** צוות אדריכלי (Architect Team), Team 10 (Gateway), Team 61  
 **date:** 2026-02-26  
+**historical_record:** true
 **status:** דוח סופי — משוב על משימת עדכון תיעוד ל־V2  
 **related:** TEAM_70_CONTEXT_ALIGNMENT_AND_LEGACY_CLEANUP_COMPLETION.md, TEAM_70_TEAM_FOLDERS_AND_INTERNAL_PROCEDURES_V2_ALIGNMENT_COMPLETION.md
 

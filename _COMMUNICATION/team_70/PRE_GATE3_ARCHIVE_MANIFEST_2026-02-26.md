@@ -4,6 +4,7 @@
 **from:** Team 70 (Knowledge Librarian)  
 **to:** Team 10, צוות אדריכלי  
 **date:** 2026-02-26  
+**historical_record:** true
 **purpose:** הגדרת מה נשאר בתקיות התקשורת (מינימום למשילות) ומה הועבר לארכיון — הכנה ל־Gate 3 וסבב פיתוח חדש.
 
 ---

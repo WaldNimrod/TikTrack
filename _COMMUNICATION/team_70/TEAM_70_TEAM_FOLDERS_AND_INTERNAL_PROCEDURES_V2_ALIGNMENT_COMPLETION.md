@@ -4,6 +4,7 @@
 **from:** Team 70 (Knowledge Librarian)  
 **to:** Team 10 (Gateway), Team 61, כל צוותי התקשורת  
 **date:** 2026-02-26  
+**historical_record:** true
 **status:** COMPLETE
 
 ---

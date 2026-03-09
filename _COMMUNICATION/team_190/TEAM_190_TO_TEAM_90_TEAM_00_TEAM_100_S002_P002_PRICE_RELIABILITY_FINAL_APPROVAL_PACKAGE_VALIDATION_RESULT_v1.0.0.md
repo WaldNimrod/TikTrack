@@ -5,6 +5,7 @@ from: Team 190 (Constitutional Architectural Validator)
 to: Team 90 (Validation Owner)
 cc: Team 00 (Chief Architect), Team 100 (Development Architecture Authority), Team 10 (Gateway Orchestration)
 date: 2026-03-08
+historical_record: true
 status: BLOCK_FOR_FIX
 gate_id: GOVERNANCE_PROGRAM
 program_id: S002-P002

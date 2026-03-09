@@ -1,3 +1,5 @@
+**date:** 2026-03-09
+
 # Team 10: Clean Table Protocol — רשימת סגירה מסודרת + קריטריונים
 **project_domain:** TIKTRACK
 

@@ -1,3 +1,5 @@
+**date:** 2026-03-09
+
 # תפקיד צוות 10 (The Gateway) — ניהול תהליך והפעלת צוותים
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 

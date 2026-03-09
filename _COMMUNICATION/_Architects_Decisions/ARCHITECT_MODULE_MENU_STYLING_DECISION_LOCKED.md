@@ -1,3 +1,5 @@
+**date:** 2026-03-09
+
 # ✅ החלטה אדריכלית נעולה — Module/Menu Styling (SSOT)
 **project_domain:** TIKTRACK
 

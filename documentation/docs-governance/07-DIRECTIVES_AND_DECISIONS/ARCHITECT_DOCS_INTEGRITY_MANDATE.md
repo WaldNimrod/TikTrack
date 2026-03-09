@@ -1,3 +1,5 @@
+**date:** 2026-03-09
+
 ---
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_DOCS_INTEGRITY_MANDATE.md

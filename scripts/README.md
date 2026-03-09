@@ -15,6 +15,25 @@
 
 ## 🛠️ Available Scripts
 
+### **איתחול מסודר (פיתוח — מומלץ)**
+
+#### **`start-dev.sh`**
+**הפעלה מסודרת: קודם Backend, המתנה ל-health, ואז Frontend.** מונע proxy ETIMEDOUT כשמריצים ממשימת Cursor או מהטרמינל.
+
+**שימוש:**
+```bash
+./scripts/start-dev.sh
+```
+
+**מה זה עושה:**
+- אם 8082 פנוי — מפעיל Backend ברקע
+- מחכה עד ש־`http://127.0.0.1:8082/health` מחזיר 200 (עד 60s)
+- מפעיל Frontend (8080) ב־foreground; ב־Ctrl+C סוגר גם את הבקאנד שהסקריפט הפעיל
+
+**משימת Cursor:** ברירת המחדל ל־Run Build Task היא עכשיו «Start Dev (Coordinated)» — מריצה את `start-dev.sh`.
+
+---
+
 ### **איתחול לבדיקות QA**
 
 #### **`init-servers-for-qa.sh`**

@@ -36,6 +36,10 @@ fi
 
 # Check if port 8080 is already in use
 if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    if [ "${COORDINATED_DEV}" = "1" ]; then
+        echo -e "${RED}❌ Port 8080 is in use. Stop the other process or use: ./scripts/start-dev.sh (only one dev session).${NC}"
+        exit 1
+    fi
     echo -e "${YELLOW}⚠️  Port 8080 is already in use${NC}"
     echo "Do you want to kill the existing process? (y/n)"
     read -r response
@@ -47,6 +51,13 @@ if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
         echo -e "${RED}❌ Cannot start server. Port 8080 is in use.${NC}"
         exit 1
     fi
+fi
+
+# When not run via start-dev.sh: warn if backend (8082) is not running
+if [ "${COORDINATED_DEV}" != "1" ] && ! (lsof -Pi :8082 -sTCP:LISTEN -t >/dev/null 2>&1); then
+    echo -e "${YELLOW}⚠️  Backend not detected on port 8082. API proxy will time out.${NC}"
+    echo -e "${YELLOW}   Use coordinated init: $SCRIPT_DIR/start-dev.sh${NC}"
+    echo ""
 fi
 
 # Start the dev server

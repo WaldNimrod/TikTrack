@@ -187,8 +187,8 @@ export class DataStage extends StageBase {
         importPath += '.js';
       }
       
-      // Dynamic import for ES modules
-      const module = await import(importPath);
+      // Dynamic import for ES modules (path is runtime-known; Vite cannot statically analyze)
+      const module = await import(/* @vite-ignore */ importPath);
       
       // Store the module for later use
       this.loaders[loaderPath] = module;

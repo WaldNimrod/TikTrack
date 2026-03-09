@@ -107,6 +107,19 @@ For BLOCK/HOLD, WSM must include blocker id, gate status, next required action, 
 
 ---
 
+## 3.5) GATE_7 human-execution pack (always required)
+
+When GATE_7 is activated and a human approver is the executor, Team 90 must publish the full execution pack proactively (without waiting for an extra request):
+
+1. `...GATE7_HUMAN_APPROVAL_SCENARIOS...` with exact browser steps and expected results.
+2. `...GATE7_HUMAN_FEEDBACK_TEMPLATE...` in Hebrew-ready format (`אישור` / `פסילה + סעיפים`).
+3. Coverage matrix mapping scenario ids to validated scope requirements.
+
+Operational rule:
+- No generic guidance only. Team 90 must deliver runnable scenario instructions with deterministic PASS/FAIL criteria every time.
+
+---
+
 ## 4) Artifact enforcement (Channel 10<->90)
 
 - Request path: `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_<WORK_PACKAGE_ID>_VALIDATION_REQUEST.md`
@@ -139,3 +152,4 @@ This document is Team 90 permanent internal operating lock and applies across al
 **log_entry | TEAM_90 | INTERNAL_ROLE_REFRESH_GLOBAL | ALL_STAGES_ALL_WORK_PACKAGES | LOCKED_FOR_OPERATION | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_DUTY_LOCK | PASS_REQUIRES_NEXT_GATE_TRIGGER | 2026-02-26**
 **log_entry | TEAM_90 | GATE7_SCOPE_OVERRIDE_RULE | ARCHITECT_AUTHORIZED_INFRA_ROUTING_ALLOWED | 2026-03-08**
+**log_entry | TEAM_90 | GATE7_EXECUTION_PACK_RULE | SCENARIOS_TEMPLATE_COVERAGE_ALWAYS_REQUIRED | 2026-03-10**

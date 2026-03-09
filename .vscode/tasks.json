@@ -31,11 +31,20 @@
       "label": "🚀 Start Frontend Dev Server (Port 8080 - V2)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-frontend.sh",
-      "detail": "scripts/start-frontend.sh",
+      "detail": "scripts/start-frontend.sh (frontend only; use Start Dev for coordinated init)",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
       "group": { "kind": "build", "isDefault": false },
       "runOptions": { "runOn": "default" }
+    },
+    {
+      "label": "🚀 Start Dev (Coordinated — Backend then Frontend)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/start-dev.sh",
+      "detail": "scripts/start-dev.sh — איתחול מסודר: Backend 8082 → wait health → Frontend 8080",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
+      "group": { "kind": "build", "isDefault": true }
     },
     {
       "label": "🛑 Stop Frontend Dev Server",
@@ -52,10 +61,10 @@
         "🚀 Start Frontend Dev Server (Port 8080 - V2)"
       ],
       "dependsOrder": "parallel",
-      "detail": "→ start-backend.sh + start-frontend.sh (parallel)",
+      "detail": "→ start-backend.sh + start-frontend.sh (parallel). Prefer «Start Dev (Coordinated)» for ordered init.",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new" },
-      "group": { "kind": "build", "isDefault": true }
+      "group": { "kind": "build", "isDefault": false }
     },
     {
       "label": "🛑 Stop All Servers",

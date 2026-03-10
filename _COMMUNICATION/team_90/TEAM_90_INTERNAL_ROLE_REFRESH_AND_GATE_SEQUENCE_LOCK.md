@@ -79,21 +79,18 @@ If any of the four steps is missing, gate handling is incomplete.
 
 ---
 
-## 3.3) GATE_7 operating mode lock (human approval semantics)
-
-Program-scope override (architect-authorized):
-- If Team 00/Team 100 decision explicitly defines GATE_7 as infrastructure/program-level human routing (non-UX), Team 90 executes document/process scenarios instead of Nimrod browser UX scenarios.
-- Such override must be explicit by path in the activation artifact and WSM `next_required_action`.
+## 3.3) GATE_7 operating mode lock (human-only semantics)
 
 For every GATE_7 cycle, Team 90 must:
 
-1. Issue a browser-based scenario artifact to the human approver.
+1. Issue a human-execution scenario artifact to the human approver (browser UI or dedicated verification page).
 2. Define concrete UI flows (for example: create, edit, delete, toggle, filter, validation errors).
 3. Include edge cases and wrong-value checks where relevant.
 4. Ensure the scenarios cover the intended API surface through UI behavior, not through direct API commands by the human approver.
 5. Explicitly avoid terminal commands, shell scripts, log review, `/tmp` checks, or file-presence checks as the main human approval method.
 6. Accept human response in Hebrew (`אישור` / `פסילה`) and normalize it into the canonical GATE_7 decision artifact.
 
+If there is no production UI flow (infrastructure scope), Team 90 must provide a dedicated verification UI/test page before running GATE_7.
 If Team 90 issues a command-line-based GATE_7 prompt as the primary approval route, that GATE_7 package is procedurally non-compliant and must be corrected before human execution.
 
 ---
@@ -112,7 +109,7 @@ For BLOCK/HOLD, WSM must include blocker id, gate status, next required action, 
 When GATE_7 is activated and a human approver is the executor, Team 90 must publish the full execution pack proactively (without waiting for an extra request):
 
 1. `...GATE7_HUMAN_APPROVAL_SCENARIOS...` with exact browser steps and expected results.
-2. `...GATE7_HUMAN_FEEDBACK_TEMPLATE...` in Hebrew-ready format (`אישור` / `פסילה + סעיפים`).
+2. Internal normalization rule: Team 90 ingests free-text Hebrew feedback from the approver and converts it to canonical decision artifacts (no external human template required).
 3. Coverage matrix mapping scenario ids to validated scope requirements.
 
 Operational rule:
@@ -152,4 +149,6 @@ This document is Team 90 permanent internal operating lock and applies across al
 **log_entry | TEAM_90 | INTERNAL_ROLE_REFRESH_GLOBAL | ALL_STAGES_ALL_WORK_PACKAGES | LOCKED_FOR_OPERATION | 2026-02-26**
 **log_entry | TEAM_90 | GATE_OWNER_DUTY_LOCK | PASS_REQUIRES_NEXT_GATE_TRIGGER | 2026-02-26**
 **log_entry | TEAM_90 | GATE7_SCOPE_OVERRIDE_RULE | ARCHITECT_AUTHORIZED_INFRA_ROUTING_ALLOWED | 2026-03-08**
-**log_entry | TEAM_90 | GATE7_EXECUTION_PACK_RULE | SCENARIOS_TEMPLATE_COVERAGE_ALWAYS_REQUIRED | 2026-03-10**
+**log_entry | TEAM_90 | GATE7_EXECUTION_PACK_RULE | SCENARIOS_COVERAGE_ALWAYS_REQUIRED | 2026-03-10**
+**log_entry | TEAM_90 | GATE7_HUMAN_ONLY_LOCK | HUMAN_APPROVER_EXECUTION_REQUIRED_ALL_SCOPES | 2026-03-10**
+**log_entry | TEAM_90 | GATE7_FEEDBACK_NORMALIZATION_LOCK | FREE_TEXT_HEBREW_TO_CANONICAL_DECISION | 2026-03-10**

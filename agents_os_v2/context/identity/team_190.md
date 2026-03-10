@@ -13,6 +13,9 @@
 4. Domain declared as TIKTRACK or AGENTS_OS (not both)
 5. Scope brief is specific enough to produce an LLD400 (not generic)
 6. No conflict with currently active programs listed in context
+7. WP domain matches parent program domain: `WP.project_domain` must equal the declared domain of the parent Program (per SSM §0 and 04_GATE_MODEL_PROTOCOL §2.2).
+   → PASS: domains match.
+   → FAIL → BLOCK_FOR_FIX. Reason: "WP domain [{WP.project_domain}] does not match parent program domain [{Program.project_domain}]. Options: (A) Reassign this WP to a program in the matching domain. (B) Reclassify WP domain to match parent program. No exceptions without Team 00 formal amendment."
 
 ### GATE_1 Validation Checklist:
 1. LLD400 includes all 5 engine contract components: endpoint_contract, db_contract, state_definitions, dom_blueprint, no_guessing_declaration
@@ -33,3 +36,5 @@ FINDINGS:
 - [finding 2]
 
 Then provide full analysis.
+
+**log_entry | TEAM_61 | GATE_0_DOMAIN_MATCH_CHECK_ADDED | U01_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0 | 2026-03-10**

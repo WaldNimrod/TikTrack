@@ -31,9 +31,6 @@ from ..context.injection import (
     build_state_summary,
     load_team_identity,
 )
-from ..conversations.gate_3_implementation import run_g35_build_work_plan
-
-
 GATE_SEQUENCE = [
     "GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
     "G3_PLAN", "G3_5", "G3_6_MANDATES",
@@ -57,6 +54,10 @@ GATE_CONFIG = {
     "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews Team 100 GATE_6 analysis and decides"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
+    "WAITING_FOR_IMPLEMENTATION_COMMIT": {
+        "owner": "team_61", "engine": "cursor",
+        "desc": "No commits detected — Team 61 must commit implementation first"
+    },
 }
 
 
@@ -153,8 +154,10 @@ def show_next(state: PipelineState | None = None):
     print(f"╚══════════════════════════════════════════════════════════╝")
 
 
-def generate_prompt(gate_id: str):
+def generate_prompt(gate_id: str, force_gate4: bool = False):
     state = PipelineState.load()
+    if gate_id == "WAITING_FOR_IMPLEMENTATION_COMMIT":
+        gate_id = "GATE_4"  # Alias: retry GATE_4 after commit
 
     if gate_id == "GATE_0":
         prompt = _generate_gate_0_prompt(state)
@@ -183,14 +186,20 @@ def generate_prompt(gate_id: str):
     elif gate_id == "CURSOR_IMPLEMENTATION":
         prompt = _generate_cursor_prompts(state)
     elif gate_id == "GATE_4":
-        import subprocess
-        result = subprocess.run(
-            ["git", "diff", "--stat", "HEAD~1", "HEAD"],
-            capture_output=True, text=True, cwd=str(REPO_ROOT),
-        )
-        if not result.stdout.strip():
-            _log("⚠️ WARNING: No new commits since last run. GATE_4 may test stale code.")
-            _log("Ensure implementation is committed before proceeding.")
+        if not force_gate4:
+            import subprocess
+            result = subprocess.run(
+                ["git", "diff", "--stat", "HEAD~1", "HEAD"],
+                capture_output=True, text=True, cwd=str(REPO_ROOT),
+            )
+            if not result.stdout.strip():
+                state.current_gate = "WAITING_FOR_IMPLEMENTATION_COMMIT"
+                state.save()
+                _log("⛔ STOPPED: No new commits since HEAD~1.")
+                _log("GATE_4 blocked — implementation not committed.")
+                _log("Fix: commit your implementation, then re-run --generate-prompt GATE_4")
+                _log("Override: --generate-prompt GATE_4 --force-gate4")
+                return
         prompt = _generate_gate_4_prompt(state)
     elif gate_id == "GATE_5":
         prompt = _generate_gate_5_prompt(state)
@@ -500,6 +509,10 @@ def main():
     parser.add_argument("--query", type=str, metavar="GATE", help="Query gate for follow-up (GATE_2, GATE_6)")
     parser.add_argument("--question", type=str, default="", help="Follow-up question for --query")
     parser.add_argument("--wp", type=str, default="", help="Work package ID (format: S###-P###-WP###)")
+    parser.add_argument(
+        "--force-gate4", action="store_true", dest="force_gate4",
+        help="Override commit freshness check before GATE_4 (use when commits exist on a different branch)"
+    )
     args = parser.parse_args()
 
     if args.status:
@@ -550,7 +563,10 @@ def main():
         else:
             _log(f"ERROR: --query only valid for GATE_2, GATE_6 (got {gate})")
     elif args.generate_prompt:
-        generate_prompt(args.generate_prompt)
+        generate_prompt(
+            args.generate_prompt,
+            force_gate4=getattr(args, "force_gate4", False),
+        )
     else:
         parser.print_help()
 

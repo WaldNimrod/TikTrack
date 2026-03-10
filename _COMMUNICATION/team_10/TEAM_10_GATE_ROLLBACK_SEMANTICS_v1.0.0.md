@@ -3,7 +3,7 @@
 **project_domain:** SHARED  
 **id:** TEAM_10_GATE_ROLLBACK_SEMANTICS_v1.0.0  
 **from:** Team 10 (Gateway Orchestration)  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** LOCKED  
 **authority:** GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0 §4  
 

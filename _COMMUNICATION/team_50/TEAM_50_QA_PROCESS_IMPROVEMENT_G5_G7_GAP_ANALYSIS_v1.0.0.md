@@ -4,7 +4,7 @@
 **id:** TEAM_50_QA_PROCESS_IMPROVEMENT_G5_G7_GAP_ANALYSIS  
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (Gateway), Team 90 (Dev Validation), צוותים אדריכליים, Nimrod  
-**date:** 2026-01-31  
+**date:** 2026-03-10  
 **status:** RECOMMENDATION — להעברה לבדיקת צוותים אדריכליים לפני נעילה ויישום  
 **trigger:** 8 ממצאי Nimrod ב-GATE_7 שלא אותרו ב-GATE_4/GATE_5  
 **reference:** `TEAM_50_TO_TEAM_10_S002_P002_WP003_GATE7_DETAILED_QA_FINDINGS_v1.0.0.md`

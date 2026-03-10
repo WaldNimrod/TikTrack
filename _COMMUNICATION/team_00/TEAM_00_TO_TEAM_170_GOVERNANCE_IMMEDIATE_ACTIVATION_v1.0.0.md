@@ -5,7 +5,7 @@
 **from:** Team 00 (Chief Architect)
 **to:** Team 170 (Librarian / SSOT Authority)
 **cc:** Team 100, Team 190, Team 90, Team 10
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** MANDATE — ACTION REQUIRED (IMMEDIATE)
 **authority:** ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0
 

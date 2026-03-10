@@ -4,7 +4,7 @@
 **id:** TEAM_50_ROLE_DEFINITION_AND_PROCEDURES_v1.0.0  
 **from:** Team 50 (QA & Fidelity)  
 **owner:** Team 50  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** CANONICAL — חובה לצוות 50  
 **canonical:** נהלי עבודה מחייבים; אימוץ כתפקיד קבוע  
 

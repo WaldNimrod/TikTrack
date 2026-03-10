@@ -5,7 +5,7 @@
 **from:** Team 00 (Chief Architect)
 **to:** Team 170 (Librarian / SSOT Authority)
 **cc:** Team 100, Team 10
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** MANDATE — QUEUED FOR S003 INITIALIZATION (not immediate)
 **authority:** ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0
 

@@ -1,5 +1,7 @@
 # GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0
 
+**date:** 2026-03-10
+
 project_domain: SHARED
 status: LOCKED
 owner: Team 190

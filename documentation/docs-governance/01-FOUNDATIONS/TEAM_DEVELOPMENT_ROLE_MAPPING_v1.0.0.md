@@ -3,7 +3,7 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0  
 **owner:** Team 170 (canonical); consumed by Team 10 for scope and orchestration  
-**date:** 2026-02-23  
+**date:** 2026-03-10  
 **status:** LOCKED  
 **purpose:** Single canonical source for development squad roles and Team 10 orchestration rule. `.cursorrules` is a tooling mirror only; this document is governance SSOT.
 

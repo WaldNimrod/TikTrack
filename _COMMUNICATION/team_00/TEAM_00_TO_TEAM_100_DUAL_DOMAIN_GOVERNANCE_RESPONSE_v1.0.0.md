@@ -5,7 +5,7 @@
 **from:** Team 00 (Chief Architect — Nimrod)
 **to:** Team 100 (Development Architecture Authority)
 **cc:** Team 190, Team 90, Team 170, Team 10, Team 61
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** DECISIONS_ISSUED
 **in_response_to:** TEAM_100_TO_TEAM_00_DUAL_DOMAIN_GOVERNANCE_RECOMMENDATION_v1.0.0
 

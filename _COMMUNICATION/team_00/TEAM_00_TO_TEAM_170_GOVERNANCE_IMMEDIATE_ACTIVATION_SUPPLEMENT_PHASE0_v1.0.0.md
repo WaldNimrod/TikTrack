@@ -5,7 +5,7 @@
 **from:** Team 00 (Chief Architect)
 **to:** Team 170 (Librarian / SSOT Authority)
 **cc:** Team 100, Team 50, Team 90, Team 10
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** MANDATE — ACTION REQUIRED (IMMEDIATE)
 **supplements:** TEAM_00_TO_TEAM_170_GOVERNANCE_IMMEDIATE_ACTIVATION_v1.0.0 (Tasks 1-3 are unchanged)
 **authority:** ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0

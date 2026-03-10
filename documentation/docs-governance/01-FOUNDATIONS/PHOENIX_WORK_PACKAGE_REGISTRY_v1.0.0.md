@@ -4,7 +4,7 @@
 **id:** PHOENIX_WORK_PACKAGE_REGISTRY  
 **version:** 1.0.0  
 **owner:** Work Package creation by Team 10 (execution); registry sync per PORTFOLIO_WSM_SYNC_RULES  
-**date:** 2026-02-23  
+**date:** 2026-03-10  
 **directive:** TEAM_190_TO_TEAM_170_PORTFOLIO_CANONICALIZATION_MIGRATION_WORK_PACKAGE_v1.0.0
 
 ---

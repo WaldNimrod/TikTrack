@@ -5,7 +5,7 @@
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 20 (Backend)  
 **cc:** Team 10  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** CANONICAL — use as primary execution instruction  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

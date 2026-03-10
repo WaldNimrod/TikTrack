@@ -4,7 +4,7 @@
 **id:** TEAM_10_TO_TEAM_20_S002_P002_WP003_GATE7_R2_MANDATE  
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 20 (Backend)  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** ON_HOLD — **הפעלה רק לאחר Team 60 R2 completion**  
 **authority:** TEAM_10_S002_P002_WP003_GATE7_REMEDIATION_ROUND2_MANDATE_v1.0.0  
 

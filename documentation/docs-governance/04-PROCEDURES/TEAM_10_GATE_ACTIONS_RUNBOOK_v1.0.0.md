@@ -3,7 +3,7 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0  
 **owner:** Team 170 (canonical); applied by Team 10  
-**date:** 2026-02-23  
+**date:** 2026-03-10  
 **status:** LOCKED  
 **canonical basis:** 04_GATE_MODEL_PROTOCOL_v2.3.0 (§7 references this runbook as single operational source)
 

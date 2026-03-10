@@ -5,7 +5,7 @@
 **from:** Team 00 (Chief Architect)
 **to:** Team 100 (Development Architecture Authority)
 **cc:** Team 61, Team 190
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** MANDATE — ACTION REQUIRED
 **authority:** ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0
 **response_to:** TEAM_100_TO_TEAM_00_DUAL_DOMAIN_GOVERNANCE_RECOMMENDATION_v1.0.0

@@ -3,7 +3,7 @@
 **project_domain:** SHARED  
 **id:** TEAM_10_GOVERNANCE_PHASE0_OPERATIONAL_ALIGNMENT  
 **owner:** Team 10  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** LOCKED (מחייב)  
 **trigger:** TEAM_190_TO_TEAM_10_GOVERNANCE_PHASE0_OPERATIONAL_ACTIVATION_v1.0.0  
 **basis:** GATES_4_5_6_7_GOVERNANCE_POLICY_v1.0.0, G5/G6/G7 contracts  

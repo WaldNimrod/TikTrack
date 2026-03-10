@@ -11,7 +11,7 @@
 **project_domain:** TIKTRACK
 
 **status:** LOCKED (official canonical; includes §6.2 Context Boundary Rule; approved for formal replacement of v2.2.0)  
-**date:** 2026-02-22  
+**date:** 2026-03-10  
 **scope:** Gate IDs, authority model, hierarchy, numbering for PHOENIX DEV OS  
 **directive:** TEAM_100_TO_TEAM_170_CONTEXT_BOUNDARY_RULE_UPDATE_DIRECTIVE_v1.0.0  
 **supersedes:** 04_GATE_MODEL_PROTOCOL_v2.2.0 (adds §6.2 Context Boundary Rule — drift prevention and context-injection freeze rule)

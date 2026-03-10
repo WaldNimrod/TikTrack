@@ -3,7 +3,7 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 **id:** ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0
 **from:** Team 00 (Chief Architect)
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** LOCKED
 **effective:** Phase 0 — IMMEDIATE | Phase 1 — WP003 pilot | Phase 2 — S003+
 **authority:** Team 00 constitutional authority

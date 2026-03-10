@@ -3,7 +3,7 @@
 **source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md
 **canonical_path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 **promotion_date:** 2026-02-22
-**date:** 2026-02-22
+**date:** 2026-03-10
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
 ---
@@ -108,7 +108,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (remediation owner; GATE_3 gate owner) |
-| last_gate_event | R3_RE_QA_BLOCK \| 2026-03-11 \| 1.3, 1.7 PASS; 1.2 BLOCK (QQQ, SPY price_source null — Yahoo/Alpha cooldown). |
+| last_gate_event | R3_RE_QA_BLOCK \| 2026-03-10 \| 1.3, 1.7 PASS; 1.2 BLOCK (QQQ, SPY price_source null — Yahoo/Alpha cooldown). |
 | next_required_action | Team 60: retry sync-ticker-prices כשספקים זמינים → Team 50 re-verify 1.2 → re-submit GATE_7. |
 | next_responsible_team | Team 60 (sync retry) |
 

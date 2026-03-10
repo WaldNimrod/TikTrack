@@ -3,7 +3,7 @@
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 **id:** ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0
 **from:** Team 00 (Chief Architect)
-**date:** 2026-03-11
+**date:** 2026-03-10
 **status:** LOCKED
 **effective:** U-01, U-03 — IMMEDIATE | U-02 — S003 CLEAN START
 **authority:** Team 00 constitutional authority

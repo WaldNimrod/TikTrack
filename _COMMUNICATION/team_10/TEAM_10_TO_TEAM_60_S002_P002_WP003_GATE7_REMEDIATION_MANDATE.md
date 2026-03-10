@@ -4,7 +4,7 @@
 **id:** TEAM_10_TO_TEAM_60_S002_P002_WP003_GATE7_REMEDIATION_MANDATE  
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 60 (Infrastructure)  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** MANDATE_ACTIVE  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

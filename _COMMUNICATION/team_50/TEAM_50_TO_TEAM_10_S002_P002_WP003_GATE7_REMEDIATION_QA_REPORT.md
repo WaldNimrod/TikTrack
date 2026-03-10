@@ -4,7 +4,7 @@
 **id:** TEAM_50_TO_TEAM_10_S002_P002_WP003_GATE7_REMEDIATION_QA_REPORT  
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (Gateway Orchestration)  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **last_updated:** 2026-01-31 (Nimrod findings)  
 **status:** **BLOCK** — Nimrod verification: 8 ממצאים קריטיים; see DETAILED_QA_FINDINGS  
 **gate_id:** GATE_7  

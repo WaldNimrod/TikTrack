@@ -1,1 +1,15 @@
-test_cursor_prompt_20260310_234831.md
+# Cursor Composer Prompt
+
+**date:** 2026-03-10
+
+**Paste this entire content into a Cursor Composer session.**
+
+---
+
+You are Team 20 Backend.
+
+---
+
+## Task
+
+Implement CRUD for strategies.

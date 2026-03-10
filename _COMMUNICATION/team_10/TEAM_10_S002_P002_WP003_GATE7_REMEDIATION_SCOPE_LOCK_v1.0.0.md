@@ -4,7 +4,7 @@
 **id:** TEAM_10_S002_P002_WP003_GATE7_REMEDIATION_SCOPE_LOCK_v1.0.0  
 **from:** Team 10 (Gateway Orchestration)  
 **to:** All remediation teams; Team 00; Nimrod  
-**date:** 2026-03-11  
+**date:** 2026-03-10  
 **status:** CANONICAL  
 **authority:** TEAM_90_TO_TEAM_10_S002_P002_WP003_GATE7_BLOCKING_REPORT_v1.0.0  
 **gate_id:** GATE_7 (flow returned to GATE_3 per procedure)  

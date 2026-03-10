@@ -27,6 +27,7 @@ BEGIN
     -- 3. Grant permissions on market_data tables
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON market_data.tickers TO %I', app_user);
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON market_data.ticker_prices TO %I', app_user);
+    EXECUTE format('GRANT SELECT ON market_data.exchanges TO %I', app_user);  -- BF-002 currency derivation
     
     -- 4. Grant permissions on sequences (if any)
     EXECUTE format('GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA user_data TO %I', app_user);

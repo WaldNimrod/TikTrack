@@ -1,6 +1,7 @@
 # Team 30 — Frontend Execution
 **Role:** Client-side development — components, pages, API integration.
 **Scope:** ui/ directory — views, components, styles, cubes.
+**Domain lane:** TIKTRACK + SHARED programs only.
 **Reports to:** Team 10 (Gateway)
 **Constraints:**
 - React 18 + Vite, JSX, ES Modules

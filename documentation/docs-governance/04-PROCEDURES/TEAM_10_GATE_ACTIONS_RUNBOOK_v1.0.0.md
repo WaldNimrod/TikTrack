@@ -21,8 +21,9 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 - Team 10 uses TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 for scope (20/30/40/60); activates **every** development team in scope with explicit mandate/prompt.
 - Fast-track operations (when declared) are governed by `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`; this runbook remains the canonical execution reference for GATE_3 internals.
 - Cross-owner gate artifact contracts are mandatory references:
-  - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
-  - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
+  - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
+  - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
+  - **Phase 0 (GATE_4/5/6/7):** `documentation/docs-governance/04-PROCEDURES/GATES_4_5_6_7_GOVERNANCE_POLICY_v1.0.0.md`; `G5_AUTOMATION_EVIDENCE_CONTRACT`, `G6_TRACEABILITY_MATRIX_CONTRACT`, `G7_HUMAN_RESIDUALS_MATRIX_CONTRACT` (05-CONTRACTS).
 
 ---
 
@@ -73,7 +74,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **Entry** | GATE_5 PASS. |
 | **Owner** | Team 90 (execution). **Approval authority:** Team 100. |
 | **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists and WSM on PASS. |
-| **Required artifacts** | GATE_6 submission (canonical); Team 90 / architect decision; route classification per GATE_6 rejection protocol. |
+| **Required artifacts** | GATE_6 submission (canonical) including `G6_TRACEABILITY_MATRIX.md`; Team 90 / architect decision; route classification per GATE_6 rejection protocol. |
 | **Exit** | GATE_6 PASS (architectural dev validation approved). |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
 
@@ -86,7 +87,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **Entry** | GATE_6 PASS. |
 | **Owner** | Team 90. |
 | **Team 10 mandatory actions** | (1) Provide clarifications only if Team 90 requests them. (2) Wait for human decision routed by Team 90. (3) Do not operate GATE_7 directly. |
-| **Required artifacts** | Team 90 browser-scenario request + human decision record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`. |
+| **Required artifacts** | Team 90: `G7_HUMAN_RESIDUALS_MATRIX.md` only (HUMAN_ONLY items); human decision record per `GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`. |
 | **Execution mode** | Human browser/UI review only: real pages, user actions, visible outcomes, edge cases. No terminal/log review as primary approval path. |
 | **Exit** | Human sign-off (`אישור`) received and normalized by Team 90 into canonical decision artifact. |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |

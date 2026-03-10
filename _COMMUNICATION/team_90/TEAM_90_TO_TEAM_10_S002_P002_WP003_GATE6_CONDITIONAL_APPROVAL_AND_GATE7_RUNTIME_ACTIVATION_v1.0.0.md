@@ -6,7 +6,7 @@
 **to:** Team 10 (Gateway Orchestration)  
 **cc:** Team 00, Team 100, Team 50, Team 60, Team 20, Team 190  
 **date:** 2026-03-10  
-**status:** GATE_7_RUNTIME_CONFIRMATION_ACTIVE  
+**status:** SUPERSEDED_BY_HUMAN_APPROVAL_ACTIVATION  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  
 **in_response_to:** ARCHITECT_GATE6_DECISION_S002_P002_WP003_v1.0.0
@@ -27,6 +27,15 @@
 | required_ssm_version | 1.0.0 |
 | required_active_stage | S002 |
 | project_domain | TIKTRACK |
+
+---
+
+## 0) Supersedence notice
+
+This document is historical.
+Active GATE_7 routing for WP003 is:
+
+`_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S002_P002_WP003_GATE7_HUMAN_APPROVAL_ACTIVATION_v1.0.0.md`
 
 ---
 

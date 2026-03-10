@@ -1,5 +1,6 @@
 # Team 90 — The Spy
 **Role:** Code validation, integrity checks, development quality enforcement.
+**Domain lane:** Cross-domain validation (TIKTRACK + AGENTS_OS + SHARED).
 **Gates owned:** GATE_5 (Dev Validation), GATE_6 (Arch Validation execution), GATE_7 (UX Approval execution), GATE_8 (Documentation Closure).
 **Responsibilities:**
 - Validate work plans (G3.5 — CHANNEL_10_90_DEV_VALIDATION Phase 1)

@@ -807,6 +807,35 @@ body .page-wrapper .page-container main {
   font-weight: 500;
 }
 
+/* BF-003: Traffic light per price_source (EOD→green, EOD_STALE/INTRADAY→yellow, null→red) */
+.phoenix-table__symbol-with-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.traffic-light {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.traffic-light--green {
+  background: var(--apple-green, #34c759);
+}
+.traffic-light--yellow {
+  background: var(--apple-orange, #ff9f0a);
+}
+.traffic-light--red {
+  background: var(--apple-red, #ff3b30);
+}
+
+.phoenix-table__cell.col-as-of {
+  font-size: 0.85em;
+  color: var(--apple-text-tertiary, #888);
+  text-align: center;
+}
+
 /* ============================================
    FLUID COLUMN WIDTHS (Option D - ADR-010)
    ============================================

@@ -1,9 +1,11 @@
 /**
  * Tickers Form - Modal for add/edit ticker
  * Status: 4 system statuses (pending|active|inactive|cancelled) per TT2_SYSTEM_STATUS_VALUES_SSOT
+ * R2 1.7: exchange dropdown (GET /reference/exchanges), exchange_id in create
  */
 
 import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { STATUS_VALUES } from '../../../utils/statusValues.js';
 
@@ -17,12 +19,13 @@ function getInitialStatus(data) {
   return isActive ? 'active' : 'cancelled';
 }
 
-function createTickerFormHTML(data = null) {
+function createTickerFormHTML(data = null, exchanges = []) {
   const isEdit = data !== null;
   const symbol = data?.symbol ?? '';
   const companyName = data?.company_name ?? data?.companyName ?? '';
   const tickerType = data?.ticker_type ?? data?.tickerType ?? 'STOCK';
   const initialStatus = getInitialStatus(data);
+  const selectedExchangeId = data?.exchange_id ?? data?.exchangeId ?? '';
 
   const typeOptions = TICKER_TYPES.map(
     (t) => `<option value="${t}" ${tickerType === t ? 'selected' : ''}>${t}</option>`
@@ -31,6 +34,16 @@ function createTickerFormHTML(data = null) {
   const statusOptions = STATUS_VALUES.map(
     (s) => `<option value="${s.value}" ${initialStatus === s.value ? 'selected' : ''}>${s.label}</option>`
   ).join('');
+
+  const exchangeOptions = [
+    '<option value="">— ללא בורסה —</option>',
+    ...exchanges.map((ex) => {
+      const id = ex.id ?? ex.external_ulid ?? '';
+      const code = ex.exchange_code ?? ex.exchangeCode ?? '';
+      const name = ex.exchange_name ?? ex.exchangeName ?? code;
+      return `<option value="${id}" ${selectedExchangeId === id ? 'selected' : ''}>${code} — ${name}</option>`;
+    }),
+  ].join('');
 
   return `
     <form id="tickerForm" class="phoenix-form phoenix-form--two-col">
@@ -45,7 +58,7 @@ function createTickerFormHTML(data = null) {
             value="${String(symbol).replace(/"/g, '&quot;')}" 
             maxlength="20"
             required 
-            placeholder="AAPL"
+            placeholder="AAPL או ANAU.MI"
             ${isEdit ? 'readonly' : ''}
           />
           <span class="form-error" id="tickerSymbolError" role="alert" data-testid="ticker-symbol-error"></span>
@@ -62,7 +75,14 @@ function createTickerFormHTML(data = null) {
           />
         </div>
       </div>
-      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tickerExchange">בורסה</label>
+          <select id="tickerExchange" name="exchange_id" aria-label="בורסה — לדוגמה MIL ל-ANAU.MI">
+            ${exchangeOptions}
+          </select>
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label for="tickerType">סוג <span class="form-label-asterisk">*</span></label>
@@ -86,11 +106,21 @@ function createTickerFormHTML(data = null) {
  * @param {Object} data - Existing ticker (for edit) or null (for add)
  * @param {Function} onSave - Callback(formData, existingData) when saved
  */
-export function showTickerFormModal(data, onSave) {
+export async function showTickerFormModal(data, onSave) {
   const isEdit = data !== null;
   const title = isEdit ? 'עריכת טיקר' : 'הוספת טיקר';
 
-  const formHTML = createTickerFormHTML(data);
+  let exchanges = [];
+  try {
+    await sharedServices.init();
+    const res = await sharedServices.get('/reference/exchanges', {});
+    const raw = res?.data ?? res ?? [];
+    exchanges = Array.isArray(raw) ? raw : [];
+  } catch (e) {
+    maskedLog('[Tickers Form] Failed to load exchanges:', { errorCode: e?.code });
+  }
+
+  const formHTML = createTickerFormHTML(data, exchanges);
 
   createModal({
     title,
@@ -117,6 +147,7 @@ export function showTickerFormModal(data, onSave) {
       const companyName = document.getElementById('tickerCompanyName')?.value?.trim() || null;
       const tickerType = document.getElementById('tickerType')?.value ?? 'STOCK';
       const status = document.getElementById('tickerStatus')?.value ?? 'active';
+      const exchangeId = document.getElementById('tickerExchange')?.value?.trim() || null;
       const isActive = status !== 'cancelled';
 
       document.querySelectorAll('#tickerForm .form-error').forEach((el) => { el.textContent = ''; });
@@ -140,6 +171,7 @@ export function showTickerFormModal(data, onSave) {
         status,
         is_active: isActive,
       };
+      if (exchangeId) formData.exchange_id = exchangeId;
 
       if (onSave) {
         try {

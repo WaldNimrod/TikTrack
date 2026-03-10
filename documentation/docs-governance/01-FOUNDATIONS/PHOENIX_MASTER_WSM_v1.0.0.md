@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-10** by **Team 90** — GATE_6 CONDITIONAL_APPROVED for S002-P002-WP003; GATE_7 human sign-off activated (runtime checks as human criteria).
+**Gate-owner update evidence:** This block was updated **2026-03-11** by **Team 10** — R2 QA BLOCK; gate rollback per GATE_7 contract §4.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_6 CONDITIONAL_APPROVED; GATE_7 HUMAN_SIGNOFF_ACTIVE** (CC-WP003-01..04 executed via human-facing verification scenarios) |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow. |
 | active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
 | active_work_package_id | S002-P002-WP003 |
 | in_progress_work_package_id | S002-P002-WP003 |
@@ -101,16 +101,16 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_7 (HUMAN_SIGNOFF_ACTIVE) |
+| current_gate | GATE_3 (REMEDIATION_IN_PROGRESS) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (gate owner for GATE_7); Team 10 (execution orchestrator) |
-| last_gate_event | GATE_7_HUMAN_SIGNOFF_ACTIVATED \| 2026-03-10 \| Team 90 aligned GATE_7 to human-only execution; CC-WP003-01/02/03/04 retained as mandatory acceptance checks. |
-| next_required_action | Team 90 to issue Nimrod GATE_7 execution scenarios (browser/UI or dedicated verification page), collect Hebrew human feedback, and publish canonical PASS/BLOCK decision to Team 00/Team 190. |
-| next_responsible_team | Team 90 (GATE_7 package + canonical decision owner) |
+| phase_owner_team | Team 10 (remediation owner; GATE_3 gate owner) |
+| last_gate_event | R3_RE_QA_BLOCK \| 2026-03-11 \| 1.3, 1.7 PASS; 1.2 BLOCK (QQQ, SPY price_source null — Yahoo/Alpha cooldown). |
+| next_required_action | Team 60: retry sync-ticker-prices כשספקים זמינים → Team 50 re-verify 1.2 → re-submit GATE_7. |
+| next_responsible_team | Team 60 (sync retry) |
 
 ---
 
@@ -235,6 +235,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P003-WP002; GATE_8 activated and Team 70 execution requested | 2026-03-07**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P003-WP002; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-07**
 **log_entry | TEAM_10 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | post GATE_8 S002-P003-WP002; active_program_id → S002-P002; next_required_action S002-P002 activation triggers + first-cycle mandates per Team 190 prompt | 2026-03-07**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | WP003 GATE_7 R2 QA BLOCK (Team 50); 3 blockers; flow returned to GATE_3 per CODE_CHANGE_REQUIRED; R3 mandates issued to Teams 60, 20 | 2026-03-11**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | G3.8 pre-check PASS S002-P002 (60/50/90 completion reports collected); G3.9 GATE_3 close; GATE_4 open; handover to Team 50 per TEAM_10_TO_TEAM_50_S002_P002_GATE4_QA_HANDOVER.md | 2026-03-07**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 NOT PASS S002-P002 per Team 50 QA report (7 PASS, 3 FAIL, 2 SKIP); remediation routed to Teams 20, 30, 60 | 2026-03-07**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 re-QA S002-P002: 7 PASS, 5 FAIL, 0 SKIP (Login fixed); 5 blockers → Team 30 remediation (Guest flow, Type C redirect, User Icon Guest, 0 SEVERE) | 2026-03-07**
@@ -254,6 +255,9 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted for S002-P002-WP003 to Team 00/Team 100; awaiting decision | 2026-03-10**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 CONDITIONAL_APPROVED for S002-P002-WP003; GATE_7 runtime confirmation activated with conditions CC-WP003-01..04 | 2026-03-10**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | Temporary de-drift applied: GATE_7 semantics aligned to human-only execution; scenarios to Nimrod required (UI/browser or dedicated verification page) | 2026-03-10**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 human execution package published for S002-P002-WP003; waiting Nimrod feedback | 2026-03-10**
+**log_entry | NIMROD | GATE_7 | S002_P002_WP003 | BLOCK | USER_FEEDBACK_REJECTED | 2026-03-10**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 BLOCK S002-P002-WP003; blocking report issued to Team 10 with BF-G7-WP003-001..005 | 2026-03-10**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

@@ -49,6 +49,20 @@ class BrokerReferenceResponse(BaseModel):
     total: int = Field(..., description="Total count")
 
 
+class ExchangeReferenceItem(BaseModel):
+    """Single exchange for add-ticker form (R2 1.7)."""
+    id: str = Field(..., description="Exchange ULID")
+    exchange_code: str = Field(..., description="Code (NASDAQ, TASE, MIL, …)")
+    exchange_name: str = Field(..., description="Display name")
+    country: str = Field(..., description="ISO country (USA, ISR, ITA, GBR)")
+
+
+class ExchangeReferenceResponse(BaseModel):
+    """Response for GET /api/v1/reference/exchanges."""
+    data: List[ExchangeReferenceItem] = Field(..., description="List of exchanges")
+    total: int = Field(..., description="Total count")
+
+
 class ExchangeRateItem(BaseModel):
     """Single exchange rate per MARKET_DATA_PIPE_SPEC."""
     from_currency: str = Field(..., max_length=3, description="ISO 4217 source")

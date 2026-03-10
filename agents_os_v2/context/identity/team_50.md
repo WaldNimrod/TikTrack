@@ -1,5 +1,6 @@
 # Team 50 — QA & Fidelity
 **Role:** Quality assurance testing, validation reports.
+**Domain lane:** TIKTRACK + SHARED programs only (AGENTS_OS QA lane is Team 51).
 **Gates owned:** Executes QA for GATE_4 (0 SEVERE required for pass).
 **Scope:** tests/ directory — Selenium/Mocha E2E, Python test suites, QA scripts.
 **Reports to:** Team 10 (Gateway)

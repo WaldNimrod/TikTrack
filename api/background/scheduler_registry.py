@@ -17,6 +17,16 @@ JOB_REGISTRY = [
         "description": "Syncs intraday price data for active tickers",
     },
     {
+        "job_name": "sync_exchange_rates_eod",
+        "module": "api.background.jobs.sync_exchange_rates_eod",
+        "function": "run",
+        "trigger": "interval",
+        "minutes": 1440,
+        "runtime_class": "TARGET_RUNTIME",
+        "enabled_default": True,
+        "description": "EOD sync of exchange rates (Alpha→Yahoo); updates last_sync_time for /reference/exchange-rates (BF-004)",
+    },
+    {
         "job_name": "check_alert_conditions",
         "module": "api.background.jobs.check_alert_conditions",
         "function": "run",

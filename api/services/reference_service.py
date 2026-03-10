@@ -13,11 +13,13 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, cast, String
 from sqlalchemy.sql import and_
 
 from ..models.trading_accounts import TradingAccount
+from ..models.market_reference import Exchange
 from ..schemas.reference import BrokerReferenceItem, DefaultFeeItem
+from ..utils.identity import uuid_to_ulid
 
 logger = logging.getLogger(__name__)
 
@@ -113,3 +115,24 @@ async def get_reference_brokers(user_id: uuid.UUID, db: AsyncSession) -> List[Br
     others = [it for it in defaults if it.value.lower() == "other"]
     known = [it for it in defaults if it.value.lower() != "other"]
     return known + custom_items + others
+
+
+async def get_reference_exchanges(db: AsyncSession) -> List[dict]:
+    """R2 1.7: Get exchanges for add-ticker form (symbol + exchange dropdown)."""
+    # DB uses market_data.exchange_status enum; cast to string for comparison (fixes 500)
+    stmt = (
+        select(Exchange)
+        .where(cast(Exchange.status, String) == "ACTIVE")
+        .order_by(Exchange.exchange_code.asc())
+    )
+    result = await db.execute(stmt)
+    rows = result.scalars().all()
+    return [
+        {
+            "id": uuid_to_ulid(r.id),
+            "exchange_code": r.exchange_code,
+            "exchange_name": r.exchange_name,
+            "country": r.country,
+        }
+        for r in rows
+    ]

@@ -9,11 +9,14 @@ import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
+import { getPriceSourceLabel, formatPriceAsOf, getTrafficLightFromSource } from '../../../utils/priceReliabilityLabels.js';
 
+/** BF-002: Currency symbols per Team 20 API (COUNTRY_TO_CURRENCY, CRYPTO parsing) */
+const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
-  return `${currency === 'USD' ? '$' : ''}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
+  return `${sym}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 const formatChangePct = (pct) => {
   if (pct == null || isNaN(pct)) return '—';
@@ -109,7 +112,7 @@ const formatChangePct = (pct) => {
     if (!pageData.length) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="9" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
+      row.innerHTML = '<td colspan="11" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -120,41 +123,53 @@ const formatChangePct = (pct) => {
       row.className = 'phoenix-table__row';
       row.setAttribute('data-ticker-id', id);
 
+      const currency = t.currency ?? 'USD';
+      const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const priceSource = t.price_source ?? t.priceSource ?? null;
+      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
+      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+      const trafficLight = getTrafficLightFromSource(priceSource);
+
       const symbolCell = document.createElement('td');
       symbolCell.className = 'phoenix-table__cell col-symbol';
-      symbolCell.textContent = t.symbol ?? '';
+      const symbolWrap = document.createElement('span');
+      symbolWrap.className = 'phoenix-table__symbol-with-light';
+      const lightSpan = document.createElement('span');
+      lightSpan.className = `traffic-light traffic-light--${trafficLight}`;
+      lightSpan.setAttribute('aria-label', getPriceSourceLabel(priceSource) || 'מקור מחיר');
+      lightSpan.title = getPriceSourceLabel(priceSource) || '';
+      symbolWrap.appendChild(lightSpan);
+      symbolWrap.appendChild(document.createTextNode(t.symbol ?? ''));
+      symbolCell.appendChild(symbolWrap);
       row.appendChild(symbolCell);
 
       const priceCell = document.createElement('td');
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
-      const priceVal = t.current_price ?? t.currentPrice ?? null;
-      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
-      const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
-      priceSpan.textContent = formatCurrency(priceVal);
+      priceSpan.textContent = formatCurrency(priceVal, currency);
       priceSpan.setAttribute('data-price-source', priceSource || '');
       priceCell.appendChild(priceSpan);
-      const asOfSpan = document.createElement('div');
-      asOfSpan.className = 'price-as-of phoenix-table__cell-meta';
-      asOfSpan.textContent = formatPriceAsOf(priceAsOf);
-      priceCell.appendChild(asOfSpan);
       row.appendChild(priceCell);
 
       const sourceCell = document.createElement('td');
       sourceCell.className = 'phoenix-table__cell col-source';
-      const sourceLabel = getPriceSourceLabel(priceSource);
-      sourceCell.textContent = sourceLabel;
+      sourceCell.textContent = getPriceSourceLabel(priceSource) || '—';
       if (priceSource === 'EOD_STALE') sourceCell.classList.add('price-source-stale');
       row.appendChild(sourceCell);
 
       const lastCloseCell = document.createElement('td');
       lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
       lastCloseCell.setAttribute('dir', 'ltr');
-      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
-      lastCloseCell.textContent = formatCurrency(lastClose);
+      lastCloseCell.textContent = formatCurrency(lastClose, currency);
       row.appendChild(lastCloseCell);
+
+      const asOfCell = document.createElement('td');
+      asOfCell.className = 'phoenix-table__cell col-as-of phoenix-table__cell-meta';
+      asOfCell.setAttribute('dir', 'ltr');
+      asOfCell.textContent = priceAsOf ? formatPriceAsOf(priceAsOf) : '—';
+      row.appendChild(asOfCell);
 
       const changeCell = document.createElement('td');
       changeCell.className = 'phoenix-table__cell col-change phoenix-table__cell--numeric';
@@ -171,6 +186,11 @@ const formatChangePct = (pct) => {
       companyCell.className = 'phoenix-table__cell col-company';
       companyCell.textContent = t.company_name ?? t.companyName ?? '';
       row.appendChild(companyCell);
+
+      const exchangeCell = document.createElement('td');
+      exchangeCell.className = 'phoenix-table__cell col-exchange';
+      exchangeCell.textContent = t.exchange_code ?? t.exchangeCode ?? '—';
+      row.appendChild(exchangeCell);
 
       const typeCell = document.createElement('td');
       typeCell.className = 'phoenix-table__cell col-type';
@@ -204,6 +224,12 @@ const formatChangePct = (pct) => {
             </svg>
           </button>
           <div class="table-actions-menu">
+            <button class="table-action-btn js-action-details" aria-label="פרטים" title="פרטים" data-ticker-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
             <button class="table-action-btn js-action-edit" aria-label="ערוך טיקר" title="ערוך טיקר" data-ticker-id="${id}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -307,6 +333,13 @@ const formatChangePct = (pct) => {
   }
 
   function initActionHandlers() {
+    document.querySelectorAll('.js-action-details').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const id = btn.getAttribute('data-ticker-id');
+        if (id) handleDetails(id);
+      };
+    });
     document.querySelectorAll('.js-action-edit').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
@@ -324,6 +357,87 @@ const formatChangePct = (pct) => {
     });
   }
 
+  async function handleDetails(tickerId) {
+    try {
+      await sharedServices.init();
+      const [tickerRes, integrityRes] = await Promise.all([
+        sharedServices.get(`/tickers/${tickerId}`, {}),
+        sharedServices.get(`/tickers/${tickerId}/data-integrity`, {}).catch(() => ({})),
+      ]);
+      const t = tickerRes?.data ?? tickerRes ?? {};
+      const data = integrityRes?.data ?? integrityRes ?? {};
+      const eod = data?.eod_prices ?? {};
+      const intra = data?.intraday_prices ?? {};
+      const hist = data?.history_250d ?? {};
+      const fmt = (ts) => !ts ? '—' : new Date(ts).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      const gapLabel = (g) => (g === 'OK' ? 'מלא' : g === 'NO_DATA' ? 'אין נתון' : g === 'INSUFFICIENT' ? 'חלקי' : g || '—');
+      const level = (g) => (g === 'OK' ? 'success' : g === 'NO_DATA' || g === 'INSUFFICIENT' ? 'warning' : 'error');
+      const eodTs = eod.latest_fetched_at ?? eod.last_update;
+      const intraTs = intra.latest_fetched_at ?? intra.last_update;
+      const histTs = hist.latest_fetched_at ?? hist.last_update;
+      const esc = (v) => (v == null || v === '' ? '—' : String(v).replace(/</g, '&lt;'));
+      const curr = t.currency ?? t.currencyCode ?? 'USD';
+      const priceVal = t.current_price ?? t.currentPrice ?? null;
+      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+      const statusCanon = t.status ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
+      const statusLabel = toHebrewStatus(statusCanon) || (t.is_active ? 'פתוח' : 'מבוטל');
+      const editSection = `
+        <div class="data-integrity-detail-section">
+          <strong>שדות עריכה</strong>
+          <div class="data-integrity-detail-row"><strong>סמל</strong><span dir="ltr">${esc(t.symbol)}</span></div>
+          <div class="data-integrity-detail-row"><strong>שם חברה</strong><span>${esc(t.company_name ?? t.companyName)}</span></div>
+          <div class="data-integrity-detail-row"><strong>סוג</strong><span>${esc(t.ticker_type ?? t.tickerType)}</span></div>
+          <div class="data-integrity-detail-row"><strong>מטבע</strong><span dir="ltr">${esc(curr)}</span></div>
+          <div class="data-integrity-detail-row"><strong>בורסה</strong><span dir="ltr">${esc(t.exchange_code ?? t.exchangeCode)}</span></div>
+          <div class="data-integrity-detail-row"><strong>סטטוס</strong><span>${esc(statusLabel)}</span></div>
+          <div class="data-integrity-detail-row"><strong>מחיר נוכחי</strong><span dir="ltr">${formatCurrency(priceVal, curr)}</span></div>
+          <div class="data-integrity-detail-row"><strong>סגירה</strong><span dir="ltr">${formatCurrency(lastClose, curr)}</span></div>
+          <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceLabel(t.price_source ?? t.priceSource)}</span></div>
+          <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${t.price_as_of_utc ?? t.priceAsOfUtc ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
+        </div>
+      `;
+      const marketSection = `
+        <tt-section-row class="data-integrity-summary-row">
+          <div class="data-integrity-card staleness-level--${level(eod.gap_status)}">
+            <div class="data-integrity-card__title">נתוני EOD</div>
+            <div class="data-integrity-card__value">${gapLabel(eod.gap_status)} — ${fmt(eodTs)}</div>
+          </div>
+          <div class="data-integrity-card staleness-level--${level(intra.gap_status)}">
+            <div class="data-integrity-card__title">נתוני Intraday</div>
+            <div class="data-integrity-card__value">${gapLabel(intra.gap_status)} — ${fmt(intraTs)}</div>
+          </div>
+          <div class="data-integrity-card staleness-level--${level(hist.gap_status)}">
+            <div class="data-integrity-card__title">היסטוריה 250d</div>
+            <div class="data-integrity-card__value">${gapLabel(hist.gap_status)} — ${fmt(histTs)}</div>
+          </div>
+        </tt-section-row>
+      `;
+      const html = `
+        <div class="data-integrity-panel">
+          ${editSection}
+          <div class="data-integrity-detail-section" style="margin-top:1rem;"><strong>נתוני שוק + סטטוס תקינות</strong></div>
+          ${marketSection}
+        </div>
+      `;
+      createModal({
+        title: 'פרטי טיקר — בקרת תקינות',
+        content: html,
+        entity: 'ticker',
+        showSaveButton: false,
+        cancelButtonText: 'סגור',
+        onClose: () => {}
+      });
+    } catch (e) {
+      maskedLog('[Tickers] Data integrity failed:', { errorCode: e?.code, status: e?.status });
+      createModal({
+        title: 'שגיאה',
+        content: `<p>${String(e?.message ?? 'לא ניתן לטעון בקרת תקינות').replace(/</g, '&lt;')}</p>`,
+        showSaveButton: false,
+        cancelButtonText: 'סגור'
+      });
+    }
+  }
+
   function initAddButton() {
     const addBtn = document.querySelector('.js-add-ticker');
     if (addBtn) {
@@ -338,6 +452,16 @@ const formatChangePct = (pct) => {
       updateSummary(result.summary);
       updateTable(tableData.data);
       updatePagination();
+      if (typeof window.updateStalenessClock === 'function' && tableData.data?.length > 0) {
+        let maxTs = null;
+        for (const t of tableData.data) {
+          const ts = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
+          if (ts && (!maxTs || new Date(ts) > new Date(maxTs))) maxTs = ts;
+        }
+        if (maxTs) {
+          window.updateStalenessClock('ok', { price_timestamp: maxTs, fetched_at: maxTs }, null);
+        }
+      }
     } catch (e) {
       maskedLog('[Tickers] Error:', { errorCode: e?.code });
     }

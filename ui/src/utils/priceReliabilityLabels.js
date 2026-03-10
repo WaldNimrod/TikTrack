@@ -54,3 +54,16 @@ export function formatPriceAsOf(iso8601) {
 export function isStalePriceSource(source) {
   return source === 'EOD_STALE';
 }
+
+/**
+ * GATE_7 BF-003: Traffic light from price_source
+ * EOD→green, EOD_STALE/INTRADAY_FALLBACK→yellow, null→red
+ * @param {string|null} source - price_source from API
+ * @returns {'green'|'yellow'|'red'}
+ */
+export function getTrafficLightFromSource(source) {
+  if (!source) return 'red';
+  if (source === 'EOD') return 'green';
+  if (source === 'EOD_STALE' || source === 'INTRADAY_FALLBACK') return 'yellow';
+  return 'red';
+}

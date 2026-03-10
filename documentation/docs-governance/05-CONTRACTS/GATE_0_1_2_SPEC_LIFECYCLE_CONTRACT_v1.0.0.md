@@ -63,3 +63,4 @@ Every GATE_0..GATE_2 decision artifact must include:
 ---
 
 **log_entry | TEAM_190 | GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT | LOCKED | 2026-02-23**
+**log_entry | TEAM_170 | GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT | SUPERSEDED_BY_v1.1.0 | 2026-03-11**

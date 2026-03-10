@@ -19,8 +19,10 @@ from ..schemas.reference import (
     BrokerReferenceResponse,
     ExchangeRatesResponse,
     ExchangeRateItem,
+    ExchangeReferenceResponse,
+    ExchangeReferenceItem,
 )
-from ..services.reference_service import get_reference_brokers
+from ..services.reference_service import get_reference_brokers, get_reference_exchanges
 from ..services.exchange_rates_service import get_exchange_rates
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -51,6 +53,27 @@ async def get_brokers(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch broker list",
+            error_code=ErrorCodes.SERVER_ERROR
+        )
+
+
+@router.get("/exchanges", response_model=ExchangeReferenceResponse)
+async def get_exchanges(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """R2 1.7: Get exchanges for add-ticker form (symbol + exchange, ANAU.MI + MIL)."""
+    try:
+        items = await get_reference_exchanges(db)
+        return ExchangeReferenceResponse(
+            data=[ExchangeReferenceItem(**x) for x in items],
+            total=len(items)
+        )
+    except Exception as e:
+        logger.error("Error fetching exchanges: %s", e, exc_info=True)
+        raise HTTPExceptionWithCode(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e) if settings.debug else "Failed to fetch exchanges",
             error_code=ErrorCodes.SERVER_ERROR
         )
 

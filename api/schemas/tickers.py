@@ -39,13 +39,17 @@ class TickerResponse(BaseModel):
     price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of current price (PHASE_2)")
     last_close_price: Optional[Decimal] = Field(None, description="Last EOD close value — separate from current (PHASE_2)")
     last_close_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of last close (PHASE_2)")
+    currency: Optional[str] = Field(None, description="Per-ticker currency (BF-002: IL→ILS, IT→EUR, symbol parse for CRYPTO)")
+    exchange_id: Optional[str] = Field(None, description="Exchange ULID (בורסה)")
+    exchange_code: Optional[str] = Field(None, description="Exchange code for display (NASDAQ, TASE, MIL, …)")
 
 
 class TickerCreateRequest(BaseModel):
-    """Ticker create request schema."""
-    symbol: str = Field(..., min_length=1, max_length=20, description="Ticker symbol")
+    """Ticker create request schema. R2 1.7: exchange_id for add-form (ANAU.MI + MIL)."""
+    symbol: str = Field(..., min_length=1, max_length=20, description="Ticker symbol (e.g. ANAU.MI with exchange)")
     company_name: Optional[str] = Field(None, max_length=255, description="Company name")
-    ticker_type: str = Field(default="STOCK", description="Ticker type")
+    ticker_type: str = Field(default="STOCK", description="Ticker type (STOCK, ETF, CRYPTO, …)")
+    exchange_id: Optional[str] = Field(None, description="Exchange ULID — from GET /reference/exchanges")
     is_active: bool = Field(default=True, description="Active status")
 
     @field_validator("ticker_type")
@@ -85,11 +89,12 @@ class TickerUpdateRequest(BaseModel):
 
 
 class AddMyTickerRequest(BaseModel):
-    """Request for POST /me/tickers — add existing (ticker_id) or create new (symbol)."""
+    """Request for POST /me/tickers — add existing (ticker_id) or create new (symbol). R2 1.7: exchange_id for add-form."""
     ticker_id: Optional[str] = Field(None, description="Existing ticker ULID (add to list)")
-    symbol: Optional[str] = Field(None, min_length=1, max_length=20, description="Symbol for new ticker (creates + adds)")
+    symbol: Optional[str] = Field(None, min_length=1, max_length=20, description="Symbol (e.g. ANAU.MI) for new ticker")
     company_name: Optional[str] = Field(None, max_length=255)
     ticker_type: str = Field(default="STOCK", description="Ticker type for new ticker")
+    exchange_id: Optional[str] = Field(None, description="Exchange ULID — from GET /reference/exchanges")
 
     @field_validator("ticker_type")
     @classmethod

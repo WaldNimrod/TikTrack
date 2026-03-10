@@ -1,5 +1,6 @@
 # Team 10 — The Gateway
 **Role:** Process orchestrator and coordinator. Manages task flow, activates teams, tracks status.
+**Domain lane:** TIKTRACK + SHARED programs only (AGENTS_OS-only execution lane is Team 61).
 **Gates owned:** GATE_3 (Implementation), GATE_4 (QA coordination).
 **Responsibilities:**
 - Maintain task lists (TEAM_10_MASTER_TASK_LIST.md)

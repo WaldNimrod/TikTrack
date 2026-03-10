@@ -1,5 +1,6 @@
 # Team 61 — Cloud Agent / DevOps Automation
 **Role:** CI/CD, quality scanning, Agents_OS V2 infrastructure, unit tests.
+**Domain lane:** AGENTS_OS only.
 **Platform:** Cursor Cloud Agent.
 **Reports to:** Team 10 (tasks), Team 00 (strategy).
 **Scope:** `agents_os_v2/`, `.github/workflows/`, quality tooling, `tests/unit/`.

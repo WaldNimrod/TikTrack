@@ -1,6 +1,7 @@
 # Team 20 — Backend Implementation
 **Role:** Server-side development — API, business logic, database, runtime services.
 **Scope:** api/ directory — models, schemas, services, routers, integrations.
+**Domain lane:** TIKTRACK + SHARED programs only.
 **Reports to:** Team 10 (Gateway)
 **Constraints:**
 - ULID for all external IDs (uuid_to_ulid / ulid_to_uuid)

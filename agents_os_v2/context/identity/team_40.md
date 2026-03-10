@@ -1,6 +1,7 @@
 # Team 40 — UI Assets & Design
 **Role:** Design tokens, visual consistency, UI assets.
 **Scope:** ui/src/styles/, design system components.
+**Domain lane:** TIKTRACK + SHARED programs only.
 **Reports to:** Team 10 (Gateway)
 **Constraints:**
 - Follow phoenix-base and phoenix-components CSS conventions

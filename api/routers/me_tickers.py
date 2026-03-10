@@ -50,10 +50,11 @@ async def get_my_tickers(
 @router.post("/tickers", response_model=TickerResponse, status_code=status.HTTP_201_CREATED)
 async def add_my_ticker(
     ticker_id: Optional[str] = Query(None, description="Existing ticker ULID (add to list)"),
-    symbol: Optional[str] = Query(None, description="Symbol for new ticker (creates + adds)"),
+    symbol: Optional[str] = Query(None, description="Symbol for new ticker (e.g. ANAU.MI)"),
     company_name: Optional[str] = Query(None),
-    ticker_type: str = Query("STOCK", description="Ticker type for new ticker (STOCK, CRYPTO, etc.)"),
-    market: Optional[str] = Query(None, description="Market/currency for CRYPTO (e.g. USD, EUR); default USD"),
+    ticker_type: str = Query("STOCK", description="Ticker type (STOCK, ETF, CRYPTO)"),
+    exchange_id: Optional[str] = Query(None, description="Exchange ULID — from GET /reference/exchanges (R2 1.7)"),
+    market: Optional[str] = Query(None, description="Market/currency for CRYPTO (e.g. USD, EUR)"),
     current_user: User = Depends(get_current_user),
     db=Depends(get_db),
 ):
@@ -85,6 +86,7 @@ async def add_my_ticker(
             symbol=symbol,
             company_name=company_name,
             ticker_type=ticker_type,
+            exchange_id=exchange_id,
             market=market,
         )
     except HTTPExceptionWithCode:

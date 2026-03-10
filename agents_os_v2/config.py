@@ -21,6 +21,7 @@ TEAM_ENGINE_MAP = {
     "team_30":  "cursor",
     "team_40":  "cursor",
     "team_50":  "gemini",
+    "team_51":  "cursor",   # Agents_OS QA agent (FAST_2.5)
     "team_60":  "cursor",
     "team_70":  "gemini",
     "team_90":  "openai",

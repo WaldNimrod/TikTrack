@@ -31,7 +31,7 @@
       "label": "🚀 Start Frontend Dev Server (Port 8080 - V2)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/start-frontend.sh",
-      "detail": "scripts/start-frontend.sh (frontend only; use Start Dev for coordinated init)",
+      "detail": "scripts/start-frontend.sh (frontend only; for full stack use «Start Dev» or «Restart All Servers»)",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
       "group": { "kind": "build", "isDefault": false },
@@ -56,14 +56,11 @@
     },
     {
       "label": "🚀 Start All Servers (Backend + Frontend)",
-      "dependsOn": [
-        "🚀 Start Backend Server (Port 8082)",
-        "🚀 Start Frontend Dev Server (Port 8080 - V2)"
-      ],
-      "dependsOrder": "parallel",
-      "detail": "→ start-backend.sh + start-frontend.sh (parallel). Prefer «Start Dev (Coordinated)» for ordered init.",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/restart-all-servers.sh",
+      "detail": "scripts/restart-all-servers.sh — stop → Backend (wait health) → Frontend (ordered)",
       "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "new" },
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
       "group": { "kind": "build", "isDefault": false }
     },
     {
@@ -73,20 +70,17 @@
         "🛑 Stop Frontend Dev Server"
       ],
       "dependsOrder": "parallel",
-      "detail": "→ stop-backend.sh + stop-frontend.sh (parallel)",
+      "detail": "scripts/stop-backend.sh + scripts/stop-frontend.sh (parallel)",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new" }
     },
     {
       "label": "🔄 Restart All Servers",
-      "dependsOn": [
-        "🛑 Stop All Servers",
-        "🚀 Start All Servers (Backend + Frontend)"
-      ],
-      "dependsOrder": "sequence",
-      "detail": "stop-all → start-all (sequence)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/restart-all-servers.sh",
+      "detail": "scripts/restart-all-servers.sh — stop → Backend (wait health) → Frontend (ordered)",
       "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
     },
     {
       "label": "🌐 Init Full Env (DB + Servers)",
@@ -100,7 +94,7 @@
       "label": "📋 Init Servers for QA",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/init-servers-for-qa.sh",
-      "detail": "scripts/init-servers-for-qa.sh",
+      "detail": "scripts/init-servers-for-qa.sh — stop → Backend (wait health) → Frontend (ordered)",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true }
     },
@@ -108,7 +102,7 @@
       "label": "📋 Check Server Status",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/check-ports.sh",
-      "detail": "scripts/check-ports.sh",
+      "detail": "scripts/check-ports.sh — 8080, 8082 status",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new" }
     },

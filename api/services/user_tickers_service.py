@@ -18,6 +18,7 @@ from ..models.identity import User
 from ..models.tickers import Ticker
 from ..models.user_tickers import UserTicker
 from ..models.ticker_prices import TickerPrice
+from ..models.market_reference import Exchange
 from ..utils.identity import uuid_to_ulid, ulid_to_uuid
 from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from ..schemas.tickers import TickerResponse
@@ -32,10 +33,15 @@ def _ticker_to_response(
     t: Ticker,
     price_data: Optional[Dict[str, Any]] = None,
     display_name: Optional[str] = None,
+    currency: Optional[str] = None,
+    exchange_id: Optional[str] = None,
+    exchange_code: Optional[str] = None,
 ) -> TickerResponse:
     """Uses shared TickerResponse; price_data from tickers_service._get_price_with_fallback (PHASE_1+2)."""
-    from .tickers_service import _ticker_to_response as _shared_response
+    from .tickers_service import _ticker_to_response as _shared_response, _derive_currency
     pd = price_data or {}
+    if currency is None:
+        currency = _derive_currency(t, None)
     return _shared_response(
         t,
         price_data=price_data,
@@ -43,6 +49,9 @@ def _ticker_to_response(
         price_as_of_utc=pd.get("price_as_of_utc"),
         last_close_price=pd.get("last_close_price"),
         last_close_as_of_utc=pd.get("last_close_as_of_utc"),
+        currency=currency,
+        exchange_id=exchange_id,
+        exchange_code=exchange_code,
     ).model_copy(update={"display_name": display_name})
 
 
@@ -60,12 +69,13 @@ class UserTickersService:
     ) -> List[TickerResponse]:
         """List tickers for the current user (auth + tenant)."""
         stmt = (
-            select(Ticker, UserTicker.display_name)
+            select(Ticker, UserTicker.display_name, Exchange.country, Exchange.exchange_code, Exchange.id.label("ex_id"))
             .join(UserTicker, and_(
                 UserTicker.ticker_id == Ticker.id,
                 UserTicker.user_id == user_id,
                 UserTicker.deleted_at.is_(None),
             ))
+            .outerjoin(Exchange, Ticker.exchange_id == Exchange.id)
             .where(Ticker.deleted_at.is_(None))
             .order_by(Ticker.symbol.asc())
         )
@@ -73,14 +83,25 @@ class UserTickersService:
         rows = result.all()
         tickers = [r[0] for r in rows]
         display_names = {r[0].id: r[1] for r in rows}
+        country_per_ticker = {r[0].id: r[2] for r in rows}
+        exchange_code_per_ticker = {r[0].id: r[3] for r in rows}
+        exchange_id_per_ticker = {r[0].id: r[4] for r in rows}
         ticker_ids = [t.id for t in tickers]
         active_ids = {t.id for t in tickers if t.is_active} if tickers else None
         price_map: Dict[uuid.UUID, Dict[str, Any]] = {}
         if ticker_ids:
             from .tickers_service import _get_price_with_fallback
             price_map = await _get_price_with_fallback(db, ticker_ids, active_ids)
+        from .tickers_service import _derive_currency
         return [
-            _ticker_to_response(t, price_map.get(t.id), display_names.get(t.id))
+            _ticker_to_response(
+                t,
+                price_map.get(t.id),
+                display_names.get(t.id),
+                currency=_derive_currency(t, country_per_ticker.get(t.id)),
+                exchange_id=uuid_to_ulid(exchange_id_per_ticker[t.id]) if exchange_id_per_ticker.get(t.id) else None,
+                exchange_code=exchange_code_per_ticker.get(t.id),
+            )
             for t in tickers
         ]
 
@@ -92,6 +113,7 @@ class UserTickersService:
         symbol: Optional[str] = None,
         company_name: Optional[str] = None,
         ticker_type: str = "STOCK",
+        exchange_id: Optional[str] = None,
         market: Optional[str] = None,
         provider_mapping: Optional[Dict[str, Any]] = None,
     ) -> TickerResponse:
@@ -148,11 +170,18 @@ class UserTickersService:
             )
             ticker = (await db.execute(stmt)).scalar_one_or_none()
             if not ticker:
+                exchange_uuid = None
+                if exchange_id:
+                    try:
+                        exchange_uuid = ulid_to_uuid(exchange_id)
+                    except Exception:
+                        pass
                 ticker = await create_system_ticker(
                     db=db,
                     symbol=lookup_sym,
                     ticker_type=ticker_type_uc,
                     company_name=company_name,
+                    exchange_id=exchange_uuid,
                     metadata={"provider_mapping_data": pm},
                     skip_live_check=False,
                     status=_USER_CREATED_TICKER_STATUS,

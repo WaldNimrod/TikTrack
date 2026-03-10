@@ -230,6 +230,7 @@ async def create_ticker(
             company_name=payload.company_name,
             ticker_type=payload.ticker_type,
             is_active=payload.is_active,
+            exchange_id=payload.exchange_id,
         )
     except HTTPExceptionWithCode:
         raise

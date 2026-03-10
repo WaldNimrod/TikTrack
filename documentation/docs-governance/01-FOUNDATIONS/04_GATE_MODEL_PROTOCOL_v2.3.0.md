@@ -91,6 +91,7 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 - Inheritance check: program_id must reference existing stage_id; work_package_id must reference existing program_id; task_id must reference existing work_package_id.  
 - Duplicate check: no two artifacts may share the same full identifier.  
 - Lexicographic: NNN is numeric; leading zeros required (e.g. 001, 002).
+- Domain-match enforcement: `WP.project_domain` must equal the `project_domain` of the parent Program. Mismatch = BLOCK_FOR_FIX at GATE_0 (enforced by Team 190 per §3 authority). This enforcement operationalizes §2.2 "One domain per Program." Reference: ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0.
 
 ---
 
@@ -207,17 +208,20 @@ If missing, Team 100 MUST halt discussion and request completion.
 
 ---
 
-### 6.3 Fast-track overlay rule (optional, non-default)
+### 6.3 Fast-track overlay rule (domain-aware)
 
-Fast-track is an optional execution mode for urgent blocking items; it does not redefine the gate enum.
+Fast-track is a runtime execution overlay; it does not redefine the gate enum.
 
 1. `gate_id` stays canonical (`GATE_0..GATE_8`).
 2. Fast-track status is represented by `track_mode` (`NORMAL` / `FAST`) in WSM/runtime context.
-3. Only one track can be active at a time:
+3. Domain application:
+  - `TIKTRACK`: optional activation path.
+  - `AGENTS_OS`: default execution path per `ARCHITECT_DIRECTIVE_AGENTS_OS_FAST_TRACK_DEFAULT_v1.0.0.md`.
+4. Only one track can be active at a time:
   - `track_mode=FAST` requires normal flow HOLD.
   - `track_mode=NORMAL` means fast-track is inactive or scheduled-next.
-4. FAST stages are operational only (`FAST_0..FAST_4`) and reference canonical gates, especially GATE_3 internals.
-5. Full protocol: `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`.
+5. FAST stages are operational only (`FAST_0..FAST_4`) and reference canonical gates, especially GATE_3 internals.
+6. Full protocol: `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0.md`.
 
 ---
 
@@ -228,9 +232,9 @@ Fast-track is an optional execution mode for urgent blocking items; it does not 
 Operational detail and artifact contracts are referenced canonically:
 
 - **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
-- **Fast-track overlay (optional, non-default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`
-- **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
-- **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
+- **Fast-track overlay (domain-aware; AGENTS_OS default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0.md`
+- **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
+- **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
 
 All teams must use these references for deterministic gate execution and artifact naming. No duplicate gate-action tables in other governance docs.
 
@@ -241,3 +245,5 @@ All teams must use these references for deterministic gate execution and artifac
 **log_entry | TEAM_170 | GATE_PROTOCOL_v2.3.0 | GATE_GOVERNANCE_REALIGNMENT_v1.1.0 | PRE_GATE_3_REMOVED_GATE_TABLE_WSM_OWNERS | 2026-02-23**
 **log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | OPERATIONAL_REFERENCES_HARDENED_GATES_0_2_AND_7 | 2026-02-23**
 **log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | FAST_TRACK_OVERLAY_RULE_AND_REFERENCE_ADDED | 2026-02-26**
+**log_entry | TEAM_170 | GATE_MODEL_PROTOCOL_v2.3.0 | DOMAIN_MATCH_ENFORCEMENT_ADDED_TO_SEC_2_3 | ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0 | 2026-03-10**
+**log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | FAST_TRACK_DOMAIN_AWARE_AND_V1_1_REFERENCE_LOCKED | 2026-03-11**

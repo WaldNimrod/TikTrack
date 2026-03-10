@@ -4,7 +4,7 @@
 **id:** TEAM_90_S002_P002_WP003_GATE7_RUNTIME_CONFIRMATION_PROTOCOL_v1.0.0  
 **owner:** Team 90 (Validation)  
 **date:** 2026-03-10  
-**status:** ACTIVE  
+**status:** SUPPORTING_EVIDENCE_ONLY_FOR_HUMAN_GATE7  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003
 
@@ -28,6 +28,11 @@
 ---
 
 ## Runtime Conditions and Evidence Contract
+
+Note:
+This protocol is supporting evidence only.
+Human gate execution is governed by:
+`_COMMUNICATION/team_90/TEAM_90_TO_NIMROD_S002_P002_WP003_GATE7_HUMAN_APPROVAL_SCENARIOS_v1.0.0.md`.
 
 | Condition ID | Requirement | Evidence artifact |
 |---|---|---|

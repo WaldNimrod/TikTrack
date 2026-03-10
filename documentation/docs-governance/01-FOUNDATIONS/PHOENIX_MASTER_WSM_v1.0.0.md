@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-10** by **Team 90** — GATE_6 submission sent for S002-P002-WP003; awaiting Team 00/100 decision.
+**Gate-owner update evidence:** This block was updated **2026-03-10** by **Team 90** — GATE_6 CONDITIONAL_APPROVED for S002-P002-WP003; GATE_7 runtime-confirmation gate activated.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision** |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_6 CONDITIONAL_APPROVED; GATE_7 runtime confirmation active (CC-WP003-01..04)** |
 | active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
 | active_work_package_id | S002-P002-WP003 |
 | in_progress_work_package_id | S002-P002-WP003 |
@@ -101,16 +101,16 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
+| current_gate | GATE_7 (AWAITING_RUNTIME_CONFIRMATION) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (execution gateway owner) |
-| last_gate_event | GATE_6_SUBMITTED \| 2026-03-10 \| Team 90 submitted S002-P002-WP003 execution approval package to Team 00/100 via Architect Inbox (SUBMISSION_v1.0.0). |
-| next_required_action | Await Team 00/Team 100 GATE_6 decision; on APPROVED -> activate GATE_7 scenarios per protocol. |
-| next_responsible_team | Team 00 / Team 100 (approval authority) |
+| last_gate_event | GATE_6_CONDITIONAL_APPROVED \| 2026-03-10 \| Team 00 decision: FIX-1..4 PASS; CC-WP003-01/02/03/04 elevated as mandatory runtime conditions for GATE_7. |
+| next_required_action | Team 90 to verify CC-WP003-01..04 within 72h of first live deployment and issue GATE_7 runtime confirmation to Team 00. |
+| next_responsible_team | Team 90 (GATE_7 runtime confirmation owner) |
 
 ---
 
@@ -252,6 +252,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | WSM_DEDRIFT_EXECUTION | CURRENT_OPERATIONAL_STATE | Corrected stale GATE_7 active mirror; set S002-P002-WP003 intake baseline for Team 10 GATE_0 opening | 2026-03-10**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P002-WP003; FIX-1..FIX-4 validated, no blockers; GATE_6 routing preparation activated with runtime carry-over EV-WP003-01/02/08/10 | 2026-03-10**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted for S002-P002-WP003 to Team 00/Team 100; awaiting decision | 2026-03-10**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 CONDITIONAL_APPROVED for S002-P002-WP003; GATE_7 runtime confirmation activated with conditions CC-WP003-01..04 | 2026-03-10**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

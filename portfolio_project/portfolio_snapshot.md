@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-09T22:44:01.783115+00:00`
+- Generated (UTC): `2026-03-10T10:54:01.924095+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -9,15 +9,15 @@
 
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
-- active_work_package_id: `NONE`
-- current_gate: `GATE_7 (VALIDATION_ACTIVE)`
-- next_required_action: `Execute GATE_7 validation closure for S002-P002 Price Reliability package and issue PASS/BLOCK; on PASS activate GATE_8 to Team 70.`
+- active_work_package_id: `S002-P002-WP003`
+- current_gate: `GATE_6 (SUBMITTED_AWAITING_DECISION)`
+- next_required_action: `Await Team 00/Team 100 GATE_6 decision; on APPROVED -> activate GATE_7 scenarios per protocol.`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `28`
-- work_packages: `5`
+- work_packages: `6`
 
 ## Roadmap (hierarchical)
 
@@ -40,6 +40,7 @@
         └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_6 (SUBMITTED_AWAITING_DECISION) | domain: **AGENTS_OS** (active)
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**

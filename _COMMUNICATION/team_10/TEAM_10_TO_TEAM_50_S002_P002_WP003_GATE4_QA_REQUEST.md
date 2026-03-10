@@ -5,6 +5,7 @@
 **from:** Team 10 (Gateway Orchestration)  
 **to:** Team 50 (QA & Fidelity)  
 **date:** 2026-03-10  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 **gate_id:** GATE_4  
 **work_package_id:** S002-P002-WP003  

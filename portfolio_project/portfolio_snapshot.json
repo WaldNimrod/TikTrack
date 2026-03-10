@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-09T22:44:01.783115+00:00",
+  "generated_at_utc": "2026-03-10T10:54:01.924095+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S002",
-    "active_work_package_id": "NONE",
-    "in_progress_work_package_id": "NONE",
-    "current_gate": "GATE_7 (VALIDATION_ACTIVE)",
+    "active_work_package_id": "S002-P002-WP003",
+    "in_progress_work_package_id": "S002-P002-WP003",
+    "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
     "active_program_id": "S002-P002",
-    "last_gate_event": "GATE_6_PASS \\",
-    "next_required_action": "Execute GATE_7 validation closure for S002-P002 Price Reliability package and issue PASS/BLOCK; on PASS activate GATE_8 to Team 70.",
-    "next_responsible_team": "Team 90 (GATE_7 owner)"
+    "last_gate_event": "GATE_6_SUBMITTED \\",
+    "next_required_action": "Await Team 00/Team 100 GATE_6 decision; on APPROVED -> activate GATE_7 scenarios per protocol.",
+    "next_responsible_team": "Team 00 / Team 100 (approval authority)"
   },
   "stages": [
     {
@@ -103,7 +103,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_7 (VALIDATION_ACTIVE); active_flow=S002-P002 (Price Reliability 3-phase final approval) — GATE_7 active after Team 190 revalidation PASS; awaiting GATE_7 closure; active_work_package_id=NONE"
+      "current_gate_mirror": "GATE_6 (SUBMITTED_AWAITING_DECISION); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision**; active_work_package_id=S002-P002-WP003"
     },
     {
       "program_id": "S002-P003",
@@ -336,6 +336,15 @@
       "active_marker_reason": "Lifecycle complete 2026-02-26"
     },
     {
+      "work_package_id": "S002-P002-WP003",
+      "program_id": "S002-P002",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
+      "is_active": true,
+      "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision**"
+    },
+    {
       "work_package_id": "S002-P003-WP002",
       "program_id": "S002-P003",
       "domain": "TIKTRACK",
@@ -435,8 +444,18 @@
           "program_name": "MCP-QA Transition (Full Pipeline Orchestrator)",
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_7 (VALIDATION_ACTIVE); active_flow=S002-P002 (Price Reliability 3-phase final approval) — GATE_7 active after Team 190 revalidation PASS; awaiting GATE_7 closure; active_work_package_id=NONE",
-          "work_packages": []
+          "current_gate_mirror": "GATE_6 (SUBMITTED_AWAITING_DECISION); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision**; active_work_package_id=S002-P002-WP003",
+          "work_packages": [
+            {
+              "work_package_id": "S002-P002-WP003",
+              "program_id": "S002-P002",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_6 (SUBMITTED_AWAITING_DECISION)",
+              "is_active": true,
+              "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision**"
+            }
+          ]
         },
         {
           "program_id": "S002-P003",

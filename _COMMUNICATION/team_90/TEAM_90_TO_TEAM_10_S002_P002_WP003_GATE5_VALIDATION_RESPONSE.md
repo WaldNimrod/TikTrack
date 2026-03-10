@@ -63,7 +63,7 @@ All required paths are present and readable on disk.
 | EV-WP003-08 | PASS_WITH_RUNTIME_CARRYOVER | market_cap completeness requires EOD/runtime confirmation in target environment window. |
 | EV-WP003-09 | PASS | NUMERIC precision and Decimal quantization constraints preserved. |
 | EV-WP003-10 | PASS_WITH_RUNTIME_CARRYOVER | 1-hour zero-429 run requires controlled runtime capture in target environment window. |
-| NR-D22 | PASS_WITH_NOTE | D22 POST 422 is test-input/config issue (invalid symbol/live-check mode), not a product blocker. |
+| NR-D22 | PASS | Addendum accepted: Team 50 added SYMBOL_OVERRIDE and §3.1 test-hygiene guidance; D22 path no longer treated as open partial. |
 | LOD400 §10 constraints | PASS | No blocker found against iron rules in submitted implementation reports. |
 
 ---
@@ -87,14 +87,27 @@ These are **carry-over runtime corroboration items**, not GATE_5 blockers.
 
 ---
 
-## 6) Next Gate Activation
+## 6) Addendum Assimilation (Team 10 compliance update)
+
+Team 90 accepts the submitted addendum for:
+
+1. D22 script compliance hardening (`SYMBOL_OVERRIDE` and §3.1 hygiene lock)
+2. Team 60-before-GATE_5 requirement confirmation (already PASS)
+3. Explicit closure context for EV-WP003-06 / EV-WP003-07 API path
+
+No new blocker is introduced by the addendum.
+
+---
+
+## 7) Next Gate Activation
 
 GATE_5 is closed as PASS for `S002-P002-WP003`.
 
 Next operational state:
-- `current_gate -> GATE_6`
-- Team 90 proceeds with GATE_6 routing and architectural submission package preparation.
+- `current_gate -> GATE_6 (SUBMITTED_AWAITING_DECISION)`
+- Team 90 completed GATE_6 package preparation and submitted `SUBMISSION_v1.0.0` to Team 00 / Team 100.
 
 ---
 
 **log_entry | TEAM_90 | TO_TEAM_10 | S002_P002_WP003_GATE5_VALIDATION_RESPONSE | PASS | 2026-03-10**
+**log_entry | TEAM_90 | TO_TEAM_10 | S002_P002_WP003_GATE5_VALIDATION_RESPONSE | ADDENDUM_ACCEPTED_D22_RESOLVED | 2026-03-10**

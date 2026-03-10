@@ -4,6 +4,7 @@
 **from:** Team 20 (Backend)  
 **to:** Team 10 (The Gateway)  
 **date:** 2026-03-10  
+**historical_record:** true
 **ssot:** `_COMMUNICATION/_ARCHITECT_INBOX/TIKTRACK_PHASE_2/INFRASTRUCTURE_STAGE_2/S002_P002_WP003_MARKET_DATA_HARDENING/LOD400_v1.0.0.md`  
 **mandate:** `TEAM_10_TO_TEAM_20_S002_P002_WP003_IMPLEMENTATION_MANDATE`
 

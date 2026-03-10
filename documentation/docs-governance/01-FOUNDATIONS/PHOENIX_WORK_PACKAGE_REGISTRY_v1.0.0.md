@@ -40,12 +40,12 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_6 (SUBMITTED_AWAITING_DECISION) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_6 package submitted; awaiting architect decision** |
+| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_7 (AWAITING_RUNTIME_CONFIRMATION) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_6 CONDITIONAL_APPROVED; GATE_7 runtime confirmation active (CC-WP003-01..04)** |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_6 (SUBMITTED_AWAITING_DECISION)`, `active_work_package_id=S002-P002-WP003`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_7 (AWAITING_RUNTIME_CONFIRMATION)`, `active_work_package_id=S002-P002-WP003`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-10). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

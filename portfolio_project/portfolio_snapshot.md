@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-10T12:27:20.085777+00:00`
+- Generated (UTC): `2026-03-10T18:18:32.283309+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
 - active_work_package_id: `S002-P002-WP003`
-- current_gate: `GATE_7 (AWAITING_RUNTIME_CONFIRMATION)`
-- next_required_action: `Team 90 to verify CC-WP003-01..04 within 72h of first live deployment and issue GATE_7 runtime confirmation to Team 00.`
+- current_gate: `GATE_7 (HUMAN_SIGNOFF_ACTIVE)`
+- next_required_action: `Team 90 to issue Nimrod GATE_7 execution scenarios (browser/UI or dedicated verification page), collect Hebrew human feedback, and publish canonical PASS/BLOCK decision to Team 00/Team 190.`
 
 ## Portfolio Counts
 
@@ -39,8 +39,8 @@
         ├── **WP** `S002-P001-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
         └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
-    ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_7 (AWAITING_RUNTIME_CONFIRMATION) | domain: **AGENTS_OS** (active)
+    ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_7 (HUMAN_SIGNOFF_ACTIVE) | domain: **TIKTRACK** (active)
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**

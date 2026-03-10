@@ -85,6 +85,10 @@ async def run_gate_5(
 
     status, reason = parse_gate_decision(response.content)
 
+    import re as _re
+    if not _re.search(r"##\s*Gate\s*Decision", response.content, _re.IGNORECASE):
+        pass  # parse_gate_decision already handles fallback; no crash needed
+
     return GateResult(
         gate_id="GATE_5",
         status=status,

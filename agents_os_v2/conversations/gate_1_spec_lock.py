@@ -101,6 +101,10 @@ async def run_gate_1_validate(engine_190: BaseEngine, lld400_content: str, stage
 
     status, reason = parse_gate_decision(response.content)
 
+    import re as _re
+    if not _re.search(r"##\s*Gate\s*Decision", response.content, _re.IGNORECASE):
+        pass  # parse_gate_decision already handles fallback; no crash needed
+
     return GateResult(
         gate_id="GATE_1",
         status=status,

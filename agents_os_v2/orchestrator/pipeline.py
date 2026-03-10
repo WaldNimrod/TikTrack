@@ -35,16 +35,18 @@ from ..conversations.gate_3_implementation import run_g35_build_work_plan
 
 
 GATE_SEQUENCE = [
-    "GATE_0", "GATE_1", "GATE_2",
+    "GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
     "G3_PLAN", "G3_5", "G3_6_MANDATES",
     "CURSOR_IMPLEMENTATION",
-    "GATE_4", "GATE_5", "GATE_6", "GATE_7", "GATE_8",
+    "GATE_4", "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL",
+    "GATE_7", "GATE_8",
 ]
 
 GATE_CONFIG = {
     "GATE_0":    {"owner": "team_190", "engine": "codex",   "desc": "Team 190 validates LOD200 scope"},
     "GATE_1":    {"owner": "team_190", "engine": "codex",   "desc": "Team 170 produces LLD400 → Team 190 validates"},
     "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Team 100 analysis → human pause for approval"},
+    "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews Team 100 GATE_2 analysis and decides"},
     "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",  "desc": "Build work plan from approved spec"},
     "G3_5":      {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
@@ -52,6 +54,7 @@ GATE_CONFIG = {
     "GATE_4":    {"owner": "team_10",  "engine": "cursor",  "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 dev validation (code vs spec)"},
     "GATE_6":    {"owner": "team_90",  "engine": "codex+human",   "desc": "Team 90 analysis → human pause for approval"},
+    "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews Team 100 GATE_6 analysis and decides"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
 }
@@ -159,6 +162,18 @@ def generate_prompt(gate_id: str):
         prompt = _generate_gate_1_prompt(state)
     elif gate_id == "GATE_2":
         prompt = _generate_gate_2_prompt(state)
+    elif gate_id == "WAITING_GATE2_APPROVAL":
+        analysis = state.lld400_content[:500] if state.lld400_content else "(no analysis stored)"
+        _print_human_approval_prompt("GATE_2", analysis, state.spec_brief)
+        prompt = (
+            "# WAITING_GATE2_APPROVAL — Human Decision Required\n\n"
+            "Team 100 has completed GATE_2 analysis.\n"
+            "Nimrod must review and decide.\n\n"
+            "## Actions\n"
+            "  --approve GATE_2   → PASS and continue to G3_PLAN\n"
+            "  --reject  GATE_2 --reason '…' → FAIL with reason\n"
+            "  --query   GATE_2 --question '…' → Ask follow-up\n"
+        )
     elif gate_id == "G3_PLAN":
         prompt = _generate_g3_plan_prompt(state)
     elif gate_id == "G3_5":
@@ -168,11 +183,31 @@ def generate_prompt(gate_id: str):
     elif gate_id == "CURSOR_IMPLEMENTATION":
         prompt = _generate_cursor_prompts(state)
     elif gate_id == "GATE_4":
+        import subprocess
+        result = subprocess.run(
+            ["git", "diff", "--stat", "HEAD~1", "HEAD"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        if not result.stdout.strip():
+            _log("⚠️ WARNING: No new commits since last run. GATE_4 may test stale code.")
+            _log("Ensure implementation is committed before proceeding.")
         prompt = _generate_gate_4_prompt(state)
     elif gate_id == "GATE_5":
         prompt = _generate_gate_5_prompt(state)
     elif gate_id == "GATE_6":
         prompt = _generate_gate_6_prompt(state)
+    elif gate_id == "WAITING_GATE6_APPROVAL":
+        impl_summary = ", ".join(state.implementation_files[:10]) if state.implementation_files else "(no impl files stored)"
+        _print_human_approval_prompt("GATE_6", impl_summary, state.spec_brief)
+        prompt = (
+            "# WAITING_GATE6_APPROVAL — Human Decision Required\n\n"
+            "Team 100 has completed GATE_6 analysis.\n"
+            "Nimrod must review and decide.\n\n"
+            "## Actions\n"
+            "  --approve GATE_6   → PASS and continue to GATE_7\n"
+            "  --reject  GATE_6 --reason '…' → FAIL with reason\n"
+            "  --query   GATE_6 --question '…' → Ask follow-up\n"
+        )
     elif gate_id == "GATE_7":
         prompt = _generate_gate_7_prompt(state)
     elif gate_id == "GATE_8":
@@ -424,11 +459,16 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
 
     if status == "PASS":
         state.gates_completed.append(gate_id)
-        idx = GATE_SEQUENCE.index(gate_id) if gate_id in GATE_SEQUENCE else -1
-        if idx >= 0 and idx + 1 < len(GATE_SEQUENCE):
-            state.current_gate = GATE_SEQUENCE[idx + 1]
+        if gate_id == "GATE_2":
+            state.current_gate = "WAITING_GATE2_APPROVAL"
+        elif gate_id == "GATE_6":
+            state.current_gate = "WAITING_GATE6_APPROVAL"
         else:
-            state.current_gate = "COMPLETE"
+            idx = GATE_SEQUENCE.index(gate_id) if gate_id in GATE_SEQUENCE else -1
+            if idx >= 0 and idx + 1 < len(GATE_SEQUENCE):
+                state.current_gate = GATE_SEQUENCE[idx + 1]
+            else:
+                state.current_gate = "COMPLETE"
     else:
         state.gates_failed.append(gate_id)
         _log(f"GATE {gate_id} FAILED: {reason}")
@@ -472,16 +512,34 @@ def main():
         advance_gate(args.advance[0], args.advance[1], args.reason)
     elif args.approve:
         gate = args.approve
-        if gate in ("GATE_2", "GATE_6", "GATE_7"):
+        approve_map = {
+            "GATE_2": "WAITING_GATE2_APPROVAL",
+            "gate2": "WAITING_GATE2_APPROVAL",
+            "GATE_6": "WAITING_GATE6_APPROVAL",
+            "gate6": "WAITING_GATE6_APPROVAL",
+            "GATE_7": "GATE_7",
+            "gate7": "GATE_7",
+        }
+        wait_gate = approve_map.get(gate)
+        if wait_gate:
             _log(f"Human APPROVED {gate}")
-            advance_gate(gate, "PASS")
+            advance_gate(wait_gate, "PASS")
         else:
             _log(f"ERROR: --approve only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
     elif args.reject:
         gate = args.reject
-        if gate in ("GATE_2", "GATE_6", "GATE_7"):
+        reject_map = {
+            "GATE_2": "WAITING_GATE2_APPROVAL",
+            "gate2": "WAITING_GATE2_APPROVAL",
+            "GATE_6": "WAITING_GATE6_APPROVAL",
+            "gate6": "WAITING_GATE6_APPROVAL",
+            "GATE_7": "GATE_7",
+            "gate7": "GATE_7",
+        }
+        wait_gate = reject_map.get(gate)
+        if wait_gate:
             _log(f"Human REJECTED {gate}: {args.reason}")
-            advance_gate(gate, "FAIL", args.reason)
+            advance_gate(wait_gate, "FAIL", args.reason)
         else:
             _log(f"ERROR: --reject only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
     elif args.query:

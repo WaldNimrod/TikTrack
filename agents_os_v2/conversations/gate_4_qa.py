@@ -1,8 +1,11 @@
+from __future__ import annotations
 """
 GATE_4 — QA
 Owner: Team 10 (coordination), Team 50 (execution)
 Requirement: 0 SEVERE for PASS.
 """
+
+from typing import Optional
 
 from ..engines.base import BaseEngine
 from ..context.injection import build_full_agent_prompt
@@ -10,7 +13,7 @@ from ..validators.code_quality import run_all_quality_checks
 from .base import GateResult
 
 
-async def run_gate_4(engine_50: BaseEngine | None = None) -> GateResult:
+async def run_gate_4(engine_50: Optional[BaseEngine] = None) -> GateResult:
     """Run automated QA checks + optional LLM QA review."""
     results = run_all_quality_checks()
 

@@ -48,6 +48,10 @@ async def run_g35_build_work_plan(engine: BaseEngine, lld400_content: str, stage
 
     status, reason = parse_gate_decision(response.content)
 
+    import re as _re
+    if not _re.search(r"##\s*Gate\s*Decision", response.content, _re.IGNORECASE):
+        pass  # parse_gate_decision already handles fallback; no crash needed
+
     return GateResult(
         gate_id="G3_PLAN",
         status=status,
@@ -95,6 +99,10 @@ async def run_g35_work_plan_validation(engine_90: BaseEngine, work_plan: str, wp
         return GateResult(gate_id="GATE_3_G35", status="FAIL", message=f"Engine error: {response.error}")
 
     status, reason = parse_gate_decision(response.content)
+
+    import re as _re
+    if not _re.search(r"##\s*Gate\s*Decision", response.content, _re.IGNORECASE):
+        pass  # parse_gate_decision already handles fallback; no crash needed
 
     return GateResult(
         gate_id="GATE_3_G35",

@@ -17,12 +17,14 @@ from agents_os_v2.conversations.response_parser import parse_gate_decision
 class TestPipelineHappyPath:
     def test_all_gates_pass(self):
         state = PipelineState(work_package_id="S002-P002-WP001", pipe_run_id="test001")
-        gates = ["GATE_0", "GATE_1", "GATE_2", "G3_PLAN", "G3_5",
+        gates = ["GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
+                 "G3_PLAN", "G3_5",
                  "G3_6_MANDATES", "CURSOR_IMPLEMENTATION", "GATE_4",
-                 "GATE_5", "GATE_6", "GATE_7", "GATE_8"]
+                 "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL",
+                 "GATE_7", "GATE_8"]
         for gate in gates:
             state.advance_gate(gate, "PASS")
-        assert len(state.gates_completed) == 12
+        assert len(state.gates_completed) == 14
         assert len(state.gates_failed) == 0
 
     def test_conditional_pass_advances(self):
@@ -37,6 +39,22 @@ class TestGateFailStops:
         state.advance_gate("GATE_0", "FAIL")
         assert "GATE_0" in state.gates_failed
         assert len(state.gates_completed) == 0
+
+
+class TestG35G36Chain:
+    def test_g35_plan_then_g36_mandates(self):
+        """G3.5 work plan feeds into G3.6 mandates."""
+        state = PipelineState(work_package_id="S002-P002-WP001")
+        state.advance_gate("GATE_0", "PASS")
+        state.advance_gate("GATE_1", "PASS")
+        state.advance_gate("GATE_2", "PASS")
+        state.advance_gate("WAITING_GATE2_APPROVAL", "PASS")
+        state.advance_gate("G3_PLAN", "PASS")
+        state.advance_gate("G3_5", "PASS")
+        state.advance_gate("G3_6_MANDATES", "PASS")
+        assert "G3_PLAN" in state.gates_completed
+        assert "G3_5" in state.gates_completed
+        assert "G3_6_MANDATES" in state.gates_completed
 
 
 class TestResponseParser:

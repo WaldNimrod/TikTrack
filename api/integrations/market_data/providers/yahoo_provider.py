@@ -11,7 +11,7 @@ import logging
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from ..provider_interface import (
     ExchangeRateResult,
@@ -51,6 +51,77 @@ def _to_decimal(val) -> Optional[Decimal]:
 
 # US market proxy for market status (SPY = S&P 500 ETF)
 _MARKET_STATUS_SYMBOL = "SPY"
+
+
+def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
+    """
+    Synchronous batch price fetch using Yahoo v7/finance/quote. FIX-2.
+    Returns dict {symbol: PriceResult} for symbols with valid, non-zero price.
+    Symbols absent or invalid are NOT in the return dict — caller does individual fallback.
+    """
+    from api.integrations.market_data.market_data_settings import get_max_symbols_per_request
+
+    batch_size = get_max_symbols_per_request()
+    result: Dict[str, PriceResult] = {}
+
+    for i in range(0, len(symbols), batch_size):
+        batch = symbols[i : i + batch_size]
+        symbols_param = ",".join(batch)
+        try:
+            import httpx
+
+            url = "https://query1.finance.yahoo.com/v7/finance/quote"
+            params = {
+                "symbols": symbols_param,
+                "fields": (
+                    "regularMarketPrice,regularMarketOpen,regularMarketDayHigh,"
+                    "regularMarketDayLow,regularMarketPreviousClose,"
+                    "regularMarketVolume,marketCap,regularMarketTime"
+                ),
+            }
+            headers = {"User-Agent": _next_user_agent()}
+            with httpx.Client(timeout=10) as client:
+                resp = client.get(url, params=params, headers=headers)
+                resp.raise_for_status()
+                data = resp.json()
+            quotes = (data or {}).get("quoteResponse", {}).get("result") or []
+            for q in quotes:
+                sym = q.get("symbol")
+                raw_price = q.get("regularMarketPrice")
+                if not sym or raw_price is None:
+                    continue
+                try:
+                    price = _to_decimal(raw_price)
+                    if not price or price <= 0:
+                        continue
+                    raw_time = q.get("regularMarketTime")
+                    as_of = (
+                        datetime.fromtimestamp(int(raw_time), tz=timezone.utc)
+                        if raw_time
+                        else datetime.now(timezone.utc)
+                    )
+                    close_raw = q.get("regularMarketPreviousClose")
+                    vol_raw = q.get("regularMarketVolume")
+                    vol = int(vol_raw) if vol_raw is not None and str(vol_raw) != "nan" else None
+                    result[sym] = PriceResult(
+                        symbol=sym,
+                        price=price,
+                        open_price=_to_decimal(q.get("regularMarketOpen")),
+                        high_price=_to_decimal(q.get("regularMarketDayHigh")),
+                        low_price=_to_decimal(q.get("regularMarketDayLow")),
+                        close_price=_to_decimal(close_raw) if close_raw else price,
+                        volume=vol,
+                        market_cap=_to_decimal(q.get("marketCap")),
+                        as_of=as_of,
+                        provider="YAHOO_FINANCE",
+                    )
+                except (TypeError, ValueError):
+                    continue
+        except httpx.HTTPStatusError:
+            raise
+        except Exception:
+            continue
+    return result
 
 
 def _fetch_market_status_sync() -> Optional[str]:
@@ -607,6 +678,15 @@ class YahooProvider(MarketDataProvider):
             return _replay_price(self._fixtures_dir, symbol)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _fetch_price_sync, symbol)
+
+    async def get_ticker_prices_batch(self, symbols: List[str]) -> Dict[str, PriceResult]:
+        """FIX-2: Batch fetch via v7/finance/quote. REPLAY returns {}; caller falls back to per-symbol."""
+        if not symbols:
+            return {}
+        if self._mode == "REPLAY":
+            return {}
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _fetch_prices_batch_sync, symbols)
 
     async def get_exchange_rate(
         self, from_ccy: str, to_ccy: str

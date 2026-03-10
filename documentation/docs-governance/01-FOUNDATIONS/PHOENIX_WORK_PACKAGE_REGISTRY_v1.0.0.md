@@ -40,13 +40,14 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
+| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_0 (INTAKE_PENDING_TEAM10_OPEN_REQUIRED) | true | S002-P002-WP003 (Market Data Hardening) — architect lock accepted; intake baseline prepared; awaiting Team 10 GATE_0 opening |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_7 (VALIDATION_ACTIVE)`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_0 (INTAKE_PENDING_TEAM10_OPEN_REQUIRED)`, `active_work_package_id=S002-P002-WP003`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-09). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-10). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

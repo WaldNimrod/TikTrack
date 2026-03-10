@@ -76,71 +76,138 @@ def _is_429(e: Exception) -> bool:
     return "429" in s or "too many" in s or "rate limit" in s
 
 
+async def _get_active_trade_ticker_ids(db: AsyncSession) -> set:
+    """Return set of ticker_ids that have at least one ACTIVE trade. FIX-1."""
+    result = await db.execute(
+        text("SELECT DISTINCT ticker_id FROM user_data.trades WHERE status = 'ACTIVE'")
+    )
+    return {row[0] for row in result.fetchall()}
+
+
+async def _get_last_fetched_at(db: AsyncSession, ticker_id: UUID) -> Optional[datetime]:
+    """Return the most recent fetched_at for a ticker from ticker_prices_intraday, or None. FIX-1."""
+    result = await db.execute(
+        text("""
+            SELECT fetched_at FROM market_data.ticker_prices_intraday
+            WHERE ticker_id = :tid
+            ORDER BY fetched_at DESC LIMIT 1
+        """),
+        {"tid": str(ticker_id)},
+    )
+    row = result.fetchone()
+    if row and row[0]:
+        ts = row[0]
+        if getattr(ts, "tzinfo", None) is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        return ts
+    return None
+
+
 async def _fetch_prices_for_tickers(
     db: AsyncSession,
     tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]],
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
     """Yahoo → Alpha fallback. Uses market_data_settings for config (no .env in this module)."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
-    from api.integrations.market_data.providers.alpha_provider import AlphaProvider
-    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown
+    from api.integrations.market_data.providers.alpha_provider import AlphaProvider, AlphaQuotaExhaustedException
+    from api.integrations.market_data.provider_cooldown import set_cooldown, set_cooldown_hours, is_in_cooldown
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import (
+        get_alpha_quota_cooldown_hours,
+        get_current_cadence_minutes,
+        get_intraday_interval_minutes,
+        get_off_hours_interval_minutes,
         get_provider_cooldown_minutes,
         get_delay_between_symbols_seconds,
     )
 
     cooldown_min = get_provider_cooldown_minutes()
     delay_sec = get_delay_between_symbols_seconds()
+    off_hours_interval = get_off_hours_interval_minutes()
+    market_is_open = get_current_cadence_minutes() == get_intraday_interval_minutes()
+    active_trade_ids = await _get_active_trade_ticker_ids(db)
+    now_utc = datetime.now(timezone.utc)
+
+    # --- FIX-1: Build tickers to fetch (priority filter) ---
+    tickers_to_fetch: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]] = []
+    for ticker_id, symbol, ticker_type, metadata in tickers:
+        last_fetched = await _get_last_fetched_at(db, ticker_id)
+        has_no_data = last_fetched is None
+        is_high = ticker_id in active_trade_ids and market_is_open
+        if not has_no_data and not is_high:
+            if last_fetched is not None:
+                age_minutes = (now_utc - last_fetched).total_seconds() / 60
+                if age_minutes < off_hours_interval:
+                    continue
+        tickers_to_fetch.append((ticker_id, symbol, ticker_type, metadata))
+
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []
-    yahoo_skipped = alpha_skipped = False
 
-    for ticker_id, symbol, ticker_type, metadata in tickers:
-        pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
-        yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
-        # B-01: for...else — fallback runs exactly once, ONLY after all providers exhausted
-        for provider, name, use_sym, use_crypto in [
-            (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
-            (alpha, "ALPHA_VANTAGE", alpha_sym, ticker_type == "CRYPTO"),
-        ]:
-            if is_in_cooldown(name):
-                if name == "YAHOO_FINANCE":
-                    yahoo_skipped = True
-                else:
-                    alpha_skipped = True
-                continue
+    # --- FIX-2: Batch Yahoo first ---
+    yahoo_batch: Dict[str, Any] = {}
+    if tickers_to_fetch and not is_in_cooldown("YAHOO_FINANCE"):
+        yahoo_symbols = []
+        for ticker_id, symbol, ticker_type, metadata in tickers_to_fetch:
+            pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
+            yahoo_sym, _, _ = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+            if yahoo_sym:
+                yahoo_symbols.append(yahoo_sym)
+        yahoo_symbols_unique = list(dict.fromkeys(yahoo_symbols))
+        if yahoo_symbols_unique:
             try:
-                if use_crypto and provider is alpha:
-                    pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
-                else:
-                    pr = await provider.get_ticker_price(use_sym)
-                if pr and pr.price and pr.price > 0:
-                    results.append((
-                        ticker_id,
-                        symbol,
-                        pr.price,
-                        pr.open_price,
-                        pr.high_price,
-                        pr.low_price,
-                        pr.close_price or pr.price,
-                        pr.volume,
-                        pr.market_cap,
-                        pr.as_of or datetime.now(timezone.utc),
-                        pr.provider or "unknown",
-                    ))
-                    break
+                yahoo_batch = await yahoo.get_ticker_prices_batch(yahoo_symbols_unique)
             except Exception as e:
                 if _is_429(e):
-                    set_cooldown(name, cooldown_min)
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+
+    # --- Per-ticker: batch result → individual Yahoo → Alpha → LAST_KNOWN ---
+    for ticker_id, symbol, ticker_type, metadata in tickers_to_fetch:
+        pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
+        yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+        pr = None
+
+        if yahoo_sym and yahoo_sym in yahoo_batch:
+            pr = yahoo_batch[yahoo_sym]
+        elif not is_in_cooldown("YAHOO_FINANCE") and yahoo_sym:
+            try:
+                pr = await yahoo.get_ticker_price(yahoo_sym)
+            except Exception as e:
+                if _is_429(e):
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+
+        if not pr and not is_in_cooldown("ALPHA_VANTAGE") and alpha_sym:
+            try:
+                if ticker_type == "CRYPTO":
+                    pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
+                else:
+                    pr = await alpha.get_ticker_price(alpha_sym)
+            except AlphaQuotaExhaustedException:
+                set_cooldown_hours("ALPHA_VANTAGE", get_alpha_quota_cooldown_hours())
+
+        if pr and pr.price and pr.price > 0:
+            results.append((
+                ticker_id,
+                symbol,
+                pr.price,
+                pr.open_price,
+                pr.high_price,
+                pr.low_price,
+                pr.close_price or pr.price,
+                pr.volume,
+                pr.market_cap,
+                pr.as_of or datetime.now(timezone.utc),
+                pr.provider or "unknown",
+            ))
         else:
-            # No break — all providers exhausted without usable price. Fallback exactly once.
             last = await _get_last_known_price(db, ticker_id, symbol)
             if last:
                 results.append(last)
+
         if delay_sec > 0:
             await asyncio.sleep(delay_sec)
+
     return results
 
 

@@ -357,7 +357,15 @@ class TickersService:
             ticker.ticker_type = ticker_type.upper()
         if status is not None:
             ticker.status = status
+        # WP003 FIX-4: Eligibility gate — validate when transitioning is_active false → true
         if is_active is not None:
+            if is_active is True and (ticker.is_active is False or ticker.is_active is None):
+                from .canonical_ticker_service import validate_ticker_with_providers
+                await validate_ticker_with_providers(
+                    ticker.symbol,
+                    ticker_type=ticker.ticker_type or "STOCK",
+                    market=None,
+                )
             ticker.is_active = is_active
         try:
             await db.commit()

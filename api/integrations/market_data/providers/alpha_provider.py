@@ -26,6 +26,11 @@ from ..provider_interface import (
 logger = logging.getLogger(__name__)
 
 ALPHA_BASE_URL = "https://www.alphavantage.co/query"
+
+
+class AlphaQuotaExhaustedException(Exception):
+    """Raised when Alpha Vantage returns Information/Note quota/rate signal."""
+
 ALPHA_RATE_LIMIT_SECONDS = 12.5  # 5 calls/min per spec
 
 # Module-level rate limit — shared across ALL AlphaProvider instances (per EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC)
@@ -162,12 +167,9 @@ class AlphaProvider(MarketDataProvider):
                 r.raise_for_status()
                 data = r.json()
             if data.get("Information") or data.get("Note"):
-                logger.warning(
-                    "Alpha Vantage rate limit (crypto) for %s/%s: %s",
-                    symbol, market,
-                    (data.get("Information") or data.get("Note"))[:120],
-                )
-                return None
+                msg = (data.get("Information") or data.get("Note") or "")[:200]
+                logger.warning("Alpha Vantage quota/rate signal for %s: %s", symbol, msg)
+                raise AlphaQuotaExhaustedException(msg)
             series = data.get("Time Series (Digital Currency Daily)", {})
             if not series:
                 return None
@@ -207,6 +209,8 @@ class AlphaProvider(MarketDataProvider):
                 as_of=datetime.now(timezone.utc),
                 provider="ALPHA_VANTAGE",
             )
+        except AlphaQuotaExhaustedException:
+            raise
         except Exception as e:
             logger.warning("Alpha crypto price fetch failed for %s/%s: %s", symbol, market, e)
             return None
@@ -229,14 +233,11 @@ class AlphaProvider(MarketDataProvider):
                 r = await client.get(ALPHA_BASE_URL, params=params)
                 r.raise_for_status()
                 data = r.json()
-            # Rate limit: Alpha returns {"Information":"..."} or {"Note":"..."} — do NOT call fallback (saves quota)
+            # Rate limit: Alpha returns {"Information":"..."} or {"Note":"..."} — raise for cooldown (WP003 FIX-3)
             if data.get("Information") or data.get("Note"):
-                logger.warning(
-                    "Alpha Vantage rate limit for %s: %s",
-                    symbol,
-                    (data.get("Information") or data.get("Note"))[:120],
-                )
-                return None
+                msg = (data.get("Information") or data.get("Note") or "")[:200]
+                logger.warning("Alpha Vantage quota/rate signal for %s: %s", symbol, msg)
+                raise AlphaQuotaExhaustedException(msg)
             quote = data.get("Global Quote", {})
             price = self._to_decimal(quote.get("05. price")) if quote else None
             if price and price > 0:
@@ -258,6 +259,8 @@ class AlphaProvider(MarketDataProvider):
             if result:
                 return result
             return None
+        except AlphaQuotaExhaustedException:
+            raise
         except Exception as e:
             logger.warning("Alpha price fetch failed for %s: %s", symbol, e)
             return None
@@ -276,6 +279,10 @@ class AlphaProvider(MarketDataProvider):
                 r = await client.get(ALPHA_BASE_URL, params=params)
                 r.raise_for_status()
                 data = r.json()
+            if data.get("Information") or data.get("Note"):
+                msg = (data.get("Information") or data.get("Note") or "")[:200]
+                logger.warning("Alpha Vantage quota/rate signal for %s: %s", symbol, msg)
+                raise AlphaQuotaExhaustedException(msg)
             series = data.get("Time Series (Daily)", {})
             if not series:
                 return None
@@ -305,6 +312,8 @@ class AlphaProvider(MarketDataProvider):
                 as_of=datetime.now(timezone.utc),
                 provider="ALPHA_VANTAGE",
             )
+        except AlphaQuotaExhaustedException:
+            raise
         except Exception as e:
             logger.debug("Alpha TIME_SERIES_DAILY fallback failed for %s: %s", symbol, e)
             return None

@@ -2,6 +2,7 @@
 # D22 Tickers — FAV API verification (S002-P003-WP002)
 # Team 50 — TEAM_10_TO_TEAM_50_S002_P003_WP002_D22_FAV_ACTIVATION
 # LLD400 §2.5: env vars, JSON summary, exit codes. Tests: summary, list, filter (ticker_type, is_active, search), CRUD, data-integrity.
+# LOD400 §6.3 (E2E Hygiene): Use SKIP_LIVE_DATA_CHECK=true (api/.env) or SYMBOL_OVERRIDE=<valid_symbol> for create test. Never activate fake symbols.
 
 set -e
 BACKEND="${BACKEND_URL:-http://127.0.0.1:8082}"
@@ -65,8 +66,8 @@ CODE=$(curl -s -o "$OUT/search.json" -w "%{http_code}" \
   -H "Authorization: Bearer $ADMIN_TOKEN" "$BACKEND/api/v1/tickers?search=A")
 [ "$CODE" = "200" ] && _ok "GET /tickers?search=A → 200" || _fail "GET search → $CODE"
 
-# 7. POST /tickers → 201
-SYM="QA_D22_$$"
+# 7. POST /tickers → 201 (LOD400 §6.3: use SYMBOL_OVERRIDE for valid symbol or SKIP_LIVE_DATA_CHECK=true in api/.env)
+SYM="${SYMBOL_OVERRIDE:-QA_D22_$$}"
 CREATE_CODE=$(curl -s -o "$OUT/create.json" -w "%{http_code}" -X POST "$BACKEND/api/v1/tickers" \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \

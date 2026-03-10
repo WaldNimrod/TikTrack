@@ -17,6 +17,7 @@ _ENV_KEYS = {
     "intraday_interval_minutes": "INTRADAY_INTERVAL_MINUTES",
     "off_hours_interval_minutes": "OFF_HOURS_INTERVAL_MINUTES",
     "provider_cooldown_minutes": "PROVIDER_COOLDOWN_MINUTES",
+    "alpha_quota_cooldown_hours": "ALPHA_QUOTA_COOLDOWN_HOURS",
     "max_symbols_per_request": "MAX_SYMBOLS_PER_REQUEST",
     "delay_between_symbols_seconds": "DELAY_BETWEEN_SYMBOLS_SECONDS",
     "intraday_enabled": "INTRADAY_ENABLED",
@@ -28,7 +29,8 @@ _SSOT = {
     "intraday_interval_minutes": (5, 240, 15),
     "off_hours_interval_minutes": (15, 240, 60),
     "provider_cooldown_minutes": (5, 120, 15),
-    "max_symbols_per_request": (1, 50, 5),
+    "alpha_quota_cooldown_hours": (6, 48, 24),
+    "max_symbols_per_request": (1, 50, 50),
     "delay_between_symbols_seconds": (0, 30, 0),
     "intraday_enabled": (None, None, True),
 }
@@ -158,6 +160,12 @@ def get_provider_cooldown_minutes() -> int:
     return _resolve_int("provider_cooldown_minutes", 5, 120, d)
 
 
+def get_alpha_quota_cooldown_hours() -> int:
+    """Hours to block Alpha after daily quota exhaustion. Default 24. SSOT: 6-48. FIX-3."""
+    _, _, d = _SSOT["alpha_quota_cooldown_hours"]
+    return _resolve_int("alpha_quota_cooldown_hours", 6, 48, d)
+
+
 def get_max_symbols_per_request() -> int:
     """Max symbols per batch (if provider supports). Default 5. SSOT: 1-50."""
     _, _, d = _SSOT["max_symbols_per_request"]
@@ -183,6 +191,7 @@ def get_all_settings() -> dict:
         "intraday_interval_minutes": get_intraday_interval_minutes(),
         "off_hours_interval_minutes": get_off_hours_interval_minutes(),
         "provider_cooldown_minutes": get_provider_cooldown_minutes(),
+        "alpha_quota_cooldown_hours": get_alpha_quota_cooldown_hours(),
         "max_symbols_per_request": get_max_symbols_per_request(),
         "delay_between_symbols_seconds": get_delay_between_symbols_seconds(),
         "intraday_enabled": get_intraday_enabled(),
@@ -196,7 +205,8 @@ def get_ssot_constraints() -> dict:
         "intraday_interval_minutes": {"min": 5, "max": 240, "default": 15},
         "off_hours_interval_minutes": {"min": 15, "max": 240, "default": 60},
         "provider_cooldown_minutes": {"min": 5, "max": 120, "default": 15},
-        "max_symbols_per_request": {"min": 1, "max": 50, "default": 5},
+        "alpha_quota_cooldown_hours": {"min": 6, "max": 48, "default": 24},
+        "max_symbols_per_request": {"min": 1, "max": 50, "default": 50},
         "delay_between_symbols_seconds": {"min": 0, "max": 30, "default": 0},
         "intraday_enabled": {"default": True},
     }

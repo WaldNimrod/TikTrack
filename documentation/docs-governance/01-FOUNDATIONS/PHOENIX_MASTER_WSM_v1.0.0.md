@@ -108,7 +108,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 10 (remediation owner; GATE_3 gate owner) |
-| last_gate_event | R3_SYNC_RETRY_PARTIAL \| 2026-03-11 \| Team 60 הרצת sync; 7 tickers עודכנו; QQQ, SPY — cooldown. 1.2 BLOCK. |
+| last_gate_event | R3_SYNC_RETRY_PARTIAL \| 2026-03-10 \| Team 60 הרצת sync; 7 tickers עודכנו; QQQ, SPY — cooldown. 1.2 BLOCK. |
 | next_required_action | Team 60: retry sync-ticker-prices אחרי cooldown (Yahoo ~15 דק') → Team 50 re-verify 1.2 → re-submit GATE_7. |
 | next_responsible_team | Team 60 (sync retry after cooldown) |
 

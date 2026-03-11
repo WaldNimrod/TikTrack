@@ -7,6 +7,7 @@
 **status:** FAST_2_COMPLETE — READY FOR FAST_3
 **work_package_id:** S002-P002-WP001
 **in_response_to:** TEAM_00_TO_TEAM_61_WP001_ANSWERS_AND_PATH_TO_CLOSURE_v1.0.0 §6
+historical_record: true
 ---
 
 # WP001 — FAST_2 Execution Closeout

@@ -5,6 +5,7 @@
 **from:** Team 10 (The Gateway)  
 **to:** Team 90 (GATE_7), Team 50 (QA), Team 00 (Architect)  
 **date:** 2025-01-30  
+**historical_record:** true
 **status:** HANDOFF — לטיפול בערוץ נפרד  
 **context:** S002-P002-WP003 GATE_7 | משוב Nimrod (סעיף 2.5)
 

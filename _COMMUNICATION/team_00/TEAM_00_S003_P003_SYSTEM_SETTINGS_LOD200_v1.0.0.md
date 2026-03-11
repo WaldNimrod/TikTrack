@@ -5,6 +5,7 @@
 **to:** Team 100 (GATE_0 packaging), Team 190 (GATE_1 validation), Team 170 (registry sync)
 **cc:** Team 10 (intake orchestration), Team 20 (backend), Team 30 (frontend)
 **date:** 2026-03-04 (formalized 2026-03-11)
+**historical_record:** true
 **status:** LOD200 APPROVED — all decisions locked; queued for GATE_0 at S003 activation
 **authority:** ARCHITECT_DIRECTIVE_S003_PREP_DECISIONS_v1.0.0 + direct Nimrod session decisions (2026-03-04)
 

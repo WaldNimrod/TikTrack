@@ -5,6 +5,7 @@
 **from:** Team 170 (Spec & Governance Authority)  
 **to:** Team 10 (Gateway), אדריכלית  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** CLOSED  
 
 ---

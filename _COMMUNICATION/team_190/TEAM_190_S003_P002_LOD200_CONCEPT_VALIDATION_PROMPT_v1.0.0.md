@@ -7,6 +7,7 @@
 **purpose:** Activation prompt for Team 190 concept validation of S003-P002 Test Template Generator LOD200
 **validation_type:** LOD200 CONCEPT REVIEW (pre-FAST_0) — not a formal FAST_1 yet; LOD400 pending
 **note:** S003-P002 activates after S003-P001 FAST_4. This is concept-level validation. Team 190 answers: "Is this architectural concept sound? Can LOD400 authoring proceed?"
+historical_record: true
 ---
 
 # ═══════════════════════════════════════════

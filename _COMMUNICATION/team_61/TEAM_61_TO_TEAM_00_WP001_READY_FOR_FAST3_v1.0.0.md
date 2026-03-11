@@ -6,6 +6,7 @@
 **cc:** Team 100, Team 170, Team 190
 **date:** 2026-03-10
 **status:** SUBMITTED — AWAITING FAST_3
+historical_record: true
 ---
 
 # WP001 — Ready for FAST_3

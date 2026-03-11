@@ -5,6 +5,7 @@
 **from:** Team 170 (Spec & Governance)
 **to:** Team 10, Team 100, Team 70 (archive operations)
 **date:** 2026-03-10
+**historical_record:** true
 **status:** FAST_4_DOCUMENTATION_CLOSURE
 **work_package_id:** S002-P002-WP001
 **purpose:** תיעוד איכותי להמשך פיתוח + מניפסט להעברה לארכיון תקשורת וקבצים זמניים של החבילה. Per FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0 §9 (minimal artifact set) and GATE_8 principle (archive temporary artifacts by Stage).

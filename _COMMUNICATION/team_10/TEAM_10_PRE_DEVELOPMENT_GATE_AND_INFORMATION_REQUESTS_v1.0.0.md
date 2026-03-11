@@ -5,6 +5,7 @@
 **from:** Team 10 (The Gateway / Orchestrator)  
 **to:** Nimrod, Team 00, Team 90, Team 20, Team 30, Team 50, Team 60  
 **date:** 2025-01-30  
+**historical_record:** true
 **status:** **GATE CLOSED** — ממתין להשלמות לפני אישור פיתוח  
 
 ---

@@ -6,6 +6,7 @@
 **to:** Team 20 (Backend) — צוות מקצועי לתיקון  
 **cc:** Team 10 (Gateway) — לידיעה  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

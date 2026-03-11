@@ -6,6 +6,7 @@
 **to:** Team 50 (QA & Fidelity)  
 **cc:** Team 10 (Gateway)  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** READY_FOR_QA  
 **context:** תיקוני האדריכלית (Market Data Provider Fix) — אימות טעינת נתונים בפועל הושלם; החבילה מוחזרת ל-QA.
 

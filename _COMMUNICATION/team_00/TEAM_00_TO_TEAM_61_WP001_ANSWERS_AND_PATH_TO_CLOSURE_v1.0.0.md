@@ -7,6 +7,7 @@
 **date:** 2026-03-10
 **status:** ANSWERS_ISSUED — EXECUTE
 **in_response_to:** TEAM_61_TO_TEAM_100_QUESTIONS_AND_RECOMMENDATIONS_v1.0.0
+historical_record: true
 ---
 
 # תשובות לשאלות Team 61 + מסלול מלא לסגירת WP001

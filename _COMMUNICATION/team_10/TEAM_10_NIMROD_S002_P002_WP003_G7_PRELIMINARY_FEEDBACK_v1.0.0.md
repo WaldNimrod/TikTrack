@@ -5,6 +5,7 @@
 **from:** Team 10 (מתווך — מקור: Nimrod)  
 **to:** Team 90, Team 30, Team 20, Team 60  
 **date:** 2025-01-30  
+**historical_record:** true
 **status:** **BLOCK** — משוב ראשוני חלקי  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

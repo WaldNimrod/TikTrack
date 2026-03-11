@@ -4,6 +4,7 @@
 **id:** TEAM_10_TO_TEAM_60_RE_VERIFY_CANONICAL_PROMPT_v1.0.0  
 **owner:** Team 10 (Gateway)  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** LOCKED  
 **canonical:** להעברה ל-Team 60 בעת הפעלת אימות חוזר; חובה כאשר תוצאת אימות = BLOCK — דרישת תיקון מפורטת לצוות האחראי + cc Team 10.  
 **procedure_ref:** `documentation/docs-governance/04-PROCEDURES/TEAM_50_QA_BLOCK_DIRECT_ROUTING_PROCEDURE_v1.0.0.md` §2.1, §2.2  

@@ -5,6 +5,7 @@
 **from:** Team 50 (QA & Fidelity)  
 **to:** Team 10 (Gateway), Team 60 (Infrastructure)  
 **date:** 2026-01-31  
+**historical_record:** true
 **status:** **PASS**  
 **trigger:** TEAM_60_TO_TEAM_50_MARKET_DATA_PROVIDER_FIX_QA_HANDOFF  
 **context:** תיקוני האדריכלית (Market Data Provider Fix) — אימות QA

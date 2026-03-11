@@ -5,6 +5,7 @@
 **from:** Team 10 (The Gateway)  
 **to:** Team 20, Team 30  
 **date:** 2025-01-30  
+**historical_record:** true
 **context:** ממצאים 13, 14 — PRE_DEVELOPMENT_GATE
 
 ---

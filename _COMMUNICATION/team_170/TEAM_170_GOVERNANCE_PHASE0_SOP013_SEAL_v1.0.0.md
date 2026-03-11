@@ -6,6 +6,7 @@
 **to:** Team 10 (Gateway), Team 00 (Architect)
 **cc:** Team 190, Team 100, Team 90
 **date:** 2026-03-10
+**historical_record:** true
 **re:** SOP-013 Closure Gate — סגירה סופית לאחר אישור Team 190
 **סטטוס:** 🔒 **FINAL SEAL — SOP-013**
 

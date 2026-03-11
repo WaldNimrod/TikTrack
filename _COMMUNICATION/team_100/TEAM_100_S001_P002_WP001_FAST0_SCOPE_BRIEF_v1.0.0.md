@@ -8,6 +8,7 @@
 **status:** ACTIVE — FAST_0 OUTPUT; FAST_1 TRIGGERED
 **in_response_to:** TEAM_00_S001_P002_FAST_TRACK_ACTIVATION_DECISION_v1.0.0
 **protocol:** FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0 §6.2 (AGENTS_OS sequence)
+historical_record: true
 ---
 
 ## Mandatory Identity Header

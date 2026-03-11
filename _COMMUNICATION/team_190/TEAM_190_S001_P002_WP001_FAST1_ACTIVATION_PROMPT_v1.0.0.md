@@ -5,6 +5,7 @@
 **to:** Team 190 (Constitutional Validator — FAST_1)
 **date:** 2026-03-10
 **purpose:** Activation prompt for Team 190 FAST_1 validation of S001-P002 WP001 FAST_0 scope brief
+historical_record: true
 ---
 
 # ═══════════════════════════════════════════

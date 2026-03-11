@@ -5,6 +5,7 @@
 **from:** Team 10 (The Gateway)  
 **to:** Team 50, Team 90  
 **date:** 2025-01-30  
+**historical_record:** true
 **context:** ממצא 2.5, TEAM_10_TO_ARCHITECT_TEAMS_QA_PROCESS_GAP_ANALYSIS — PRE_DEVELOPMENT_GATE
 
 ---

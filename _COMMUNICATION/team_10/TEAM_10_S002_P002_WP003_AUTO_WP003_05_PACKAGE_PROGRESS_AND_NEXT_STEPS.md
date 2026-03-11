@@ -4,6 +4,7 @@
 **id:** TEAM_10_S002_P002_WP003_AUTO_WP003_05_PACKAGE_PROGRESS_AND_NEXT_STEPS  
 **from:** Team 10 (Gateway)  
 **date:** 2025-01-31  
+**historical_record:** true
 **work_package_id:** S002-P002-WP003  
 **gate_id:** GATE_7  
 

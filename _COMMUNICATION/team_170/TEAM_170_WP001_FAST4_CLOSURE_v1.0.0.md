@@ -8,6 +8,7 @@
 **status:** WP001_CLOSED
 **work_package_id:** S002-P002-WP001
 **in_response_to:** TEAM_61_TO_TEAM_170_WP001_FAST4_HANDOFF_PROMPT_v1.0.0
+historical_record: true
 ---
 
 # WP001 — FAST_4 Knowledge Closure

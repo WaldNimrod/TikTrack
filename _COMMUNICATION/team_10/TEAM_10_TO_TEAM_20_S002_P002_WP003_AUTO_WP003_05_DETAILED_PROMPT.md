@@ -6,6 +6,7 @@
 **to:** Team 20 (Backend)  
 **cc:** Team 60, Team 50, Team 90  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 **שורה תחתונה:** אימות נוכחי = **BLOCK**. נדרש עד PASS בסקריפט האימות.  
 

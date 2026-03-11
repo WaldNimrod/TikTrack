@@ -8,6 +8,7 @@
 **status:** HANDOFF — EXECUTE FAST_4
 **work_package_id:** S002-P002-WP001
 **handoff_type:** FAST_2+FAST_3 → FAST_4 (מסלול מהיר)
+historical_record: true
 ---
 
 # Handoff Prompt: WP001 — FAST_4 Execution

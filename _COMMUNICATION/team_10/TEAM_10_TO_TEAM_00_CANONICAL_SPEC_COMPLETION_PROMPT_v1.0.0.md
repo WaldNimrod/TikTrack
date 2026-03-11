@@ -5,6 +5,7 @@
 **from:** Team 10 (The Gateway / Orchestrator)  
 **to:** Team 00 (Architect)  
 **date:** 2025-01-30  
+**historical_record:** true
 **status:** PROMPT — להעברה ל-Team 00
 
 ---

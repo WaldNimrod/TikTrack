@@ -5,6 +5,7 @@
 **from:** Team 60 (Infrastructure)  
 **to:** Team 10 (Gateway), אדריכלית (Team 00/190)  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** REQUEST_CONSULTATION  
 **מטרה:** יישור מדיניות ספקים עם המגבלות המפורשות והרפרנס Legacy — כדי שהמערכת תפעל ברמה שכבר הושגה (ולפחות לא פחות).  
 

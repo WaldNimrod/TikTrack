@@ -6,6 +6,7 @@
 **to:** Team 10 (Gateway Orchestration)  
 **cc:** Team 90, Team 60, Team 50  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** **DONE**  
 **gate_id:** GATE_3 / G3.7  
 **in_response_to:** TEAM_10_TO_TEAM_20_S002_P002_WP003_TASE_AGOROT_FIX_MANDATE  

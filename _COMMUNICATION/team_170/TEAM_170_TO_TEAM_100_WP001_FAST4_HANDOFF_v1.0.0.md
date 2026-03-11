@@ -6,6 +6,7 @@
 **to:** Team 100 (Architectural authority — FAST_0 owner for next WP)
 **cc:** Team 00, Team 61, Team 190, Team 10
 **date:** 2026-03-10
+**historical_record:** true
 **status:** HANDOFF — EXECUTE NEXT STEP
 **work_package_id:** S002-P002-WP001 (CLOSED)
 **handoff_type:** FAST_4 → FAST_0 (מסלול מהיר — הפעלת חבילת עבודה הבאה)

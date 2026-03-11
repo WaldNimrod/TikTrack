@@ -7,6 +7,7 @@
 **status:** DECISION — ACTIVE
 **in_response_to:** TEAM_170_TO_TEAM_100_WP001_FAST4_HANDOFF_v1.0.0
 **supersedes_scope:** S001_P002_ALERTS_POC_LOD200_CONCEPT_v1.0.0 (execution mechanism only — behavioral spec remains valid)
+historical_record: true
 ---
 
 ## §1 — קבלה: WP001 CLOSED

@@ -6,6 +6,7 @@
 **to:** האדריכלית הראשית (Team 00 / Chief Architect)  
 **cc:** Team 90 (Validation)  
 **date:** 2026-01-31  
+**historical_record:** true
 **status:** PENDING_REVIEW — הסלמה לבדיקה מקצועית  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

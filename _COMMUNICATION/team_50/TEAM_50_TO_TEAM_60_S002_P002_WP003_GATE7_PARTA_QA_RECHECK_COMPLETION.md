@@ -6,6 +6,7 @@
 **to:** Team 60 (Runtime/Infrastructure)  
 **cc:** Team 10, Team 20, Team 90  
 **date:** 2026-01-31  
+**historical_record:** true
 **status:** **DONE** — CC-04 עבר; העברה ל־Team 60 מתאפשרת (ראה v2.0.2)  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

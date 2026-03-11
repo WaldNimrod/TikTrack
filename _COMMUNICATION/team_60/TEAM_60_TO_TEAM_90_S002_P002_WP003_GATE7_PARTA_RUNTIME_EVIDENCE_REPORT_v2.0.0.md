@@ -6,6 +6,7 @@
 **to:** Team 90 (GATE_7 owner)  
 **cc:** Team 10, Team 50  
 **date:** 2025-01-31  
+**historical_record:** true
 **status:** SUBMITTED  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

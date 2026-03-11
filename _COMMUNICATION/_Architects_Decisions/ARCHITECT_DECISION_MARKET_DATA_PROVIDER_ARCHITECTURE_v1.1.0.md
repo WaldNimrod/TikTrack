@@ -4,7 +4,7 @@ id: ARCHITECT_DECISION_MARKET_DATA_PROVIDER_ARCHITECTURE_v1.1.0
 from: Team 00 (Chief Architect — Nimrod)
 to: Team 10 (Gateway), Team 20 (Backend), Team 50 (QA), Team 90 (Validation)
 cc: Team 100 (Architecture Authority)
-date: 2026-03-12
+date: 2026-03-11
 status: APPROVED — BINDING
 gate_id: GATE_7 (S002-P002-WP003)
 work_package_id: S002-P002-WP003

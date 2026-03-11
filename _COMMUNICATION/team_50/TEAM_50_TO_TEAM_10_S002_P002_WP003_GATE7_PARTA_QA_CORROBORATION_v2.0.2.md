@@ -6,6 +6,7 @@
 **to:** Team 10 (Gateway)  
 **cc:** Team 20, Team 60, Team 90  
 **date:** 2026-01-31  
+**historical_record:** true
 **status:** DONE — CC-04 עבר  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  

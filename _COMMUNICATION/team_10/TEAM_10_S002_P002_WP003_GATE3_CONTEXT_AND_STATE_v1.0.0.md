@@ -32,9 +32,9 @@
 | G3.4 | WORK_PACKAGE_DETAILED_BUILD | ✅ | Implementation docs v1.1.0 |
 | G3.5 | WORK_PACKAGE_VALIDATION | ✅ | Team 190 + Team 00 PASS |
 | G3.6 | TEAM_ACTIVATION_MANDATES | ✅ | B1 (T30), B2 (T20), B4 (T50) |
-| **G3.7** | **IMPLEMENTATION_ORCHESTRATION** | **🔜 ACTIVE** | Teams 20, 30, 50 ממומשים |
-| G3.8 | COMPLETION_COLLECTION_AND_PRECHECK | ⏳ | אחרי G3.7 |
-| G3.9 | GATE3_CLOSE_AND_GATE4_QA_REQUEST | ⏳ | סגירת GATE_3 → GATE_4 |
+| **G3.7** | **IMPLEMENTATION_ORCHESTRATION** | **✅** | B1, B2, B4 הושלמו |
+| **G3.8** | **COMPLETION_COLLECTION_AND_PRECHECK** | **✅** | Consolidation PASS |
+| **G3.9** | **GATE3_CLOSE_AND_GATE4_QA_REQUEST** | **✅** | GATE_3 סגור, GATE_4 פתוח |
 
 ---
 
@@ -43,7 +43,7 @@
 | שדה | ערך |
 |-----|-----|
 | **gate_id** | GATE_3 |
-| **current_sub_stage** | G3.7 |
+| **current_sub_stage** | GATE_4 (QA) |
 | **phase_owner** | Team 10 |
 | **remediation_round** | 4 (סבב תיקון רביעי אחרי פסילת חבילה ב־GATE_7) |
 | **plan_validation** | PASS (Team 190 + Team 00) |

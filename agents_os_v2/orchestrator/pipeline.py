@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .state import PipelineState, STATE_FILE
+from .gate_router import run_data_model_checks
 from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR
 from ..context.injection import (
     build_full_agent_prompt,
@@ -160,8 +161,23 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
         gate_id = "GATE_4"  # Alias: retry GATE_4 after commit
 
     if gate_id == "GATE_0":
+        dm_findings = run_data_model_checks("GATE_0", state.spec_brief, "spec_brief")
+        blocks = [f for f in dm_findings if f.status == "BLOCK"]
+        if blocks:
+            for b in blocks:
+                _log(f"⛔ {b.check_id}: {b.message}")
+            _log("GATE_0 blocked by Data Model Validator. Fix schema issues and re-run.")
+            return
         prompt = _generate_gate_0_prompt(state)
     elif gate_id == "GATE_1":
+        spec_content = state.lld400_content or state.spec_brief
+        dm_findings = run_data_model_checks("GATE_1", spec_content, "lld400_or_spec")
+        blocks = [f for f in dm_findings if f.status == "BLOCK"]
+        if blocks:
+            for b in blocks:
+                _log(f"⛔ {b.check_id}: {b.message}")
+            _log("GATE_1 blocked by Data Model Validator. Fix schema issues and re-run.")
+            return
         prompt = _generate_gate_1_prompt(state)
     elif gate_id == "GATE_2":
         prompt = _generate_gate_2_prompt(state)
@@ -202,6 +218,13 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
                 return
         prompt = _generate_gate_4_prompt(state)
     elif gate_id == "GATE_5":
+        dm_findings = run_data_model_checks("GATE_5")
+        blocks = [f for f in dm_findings if f.status == "BLOCK"]
+        if blocks:
+            for b in blocks:
+                _log(f"⛔ {b.check_id}: {b.message}")
+            _log("GATE_5 blocked by Data Model Validator. Fix migration and re-run.")
+            return
         prompt = _generate_gate_5_prompt(state)
     elif gate_id == "GATE_6":
         prompt = _generate_gate_6_prompt(state)

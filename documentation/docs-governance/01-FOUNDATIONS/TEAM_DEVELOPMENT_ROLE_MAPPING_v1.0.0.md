@@ -8,7 +8,7 @@
 **purpose:** Single canonical source for development squad roles and Team 10 orchestration rule. `.cursorrules` is a tooling mirror only; this document is governance SSOT.
 
 **IRON RULE:** Team 50 = QA + FAV for TIKTRACK domain; Team 51 = QA for AGENTS_OS domain (child QA team inheriting Team 50 standards/procedures with domain split). NEVER assign QA/testing/FAV to Team 40. Team 40 = UI Assets & Design ONLY. Source: `ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md` (2026-03-02, Nimrod-approved) + `ARCHITECT_DIRECTIVE_AGENTS_OS_FAST_TRACK_DEFAULT_v1.0.0.md` (2026-03-10).
-**DOMAIN SPLIT LOCK (2026-03-11):** Teams 10/20/30/40/50 operate in TIKTRACK or SHARED programs only; Team 60 operates in all domains; Teams 90+190 are cross-domain validators; Team 61 is AGENTS_OS-only development/automation.
+**DOMAIN SPLIT LOCK (2026-03-12):** Teams 10/20/30/40/50 operate in TIKTRACK or SHARED programs only; Team 60 operates in all domains; Teams 90+190 are cross-domain validators; Team 61 is AGENTS_OS-only development/automation; Team 191 is a cross-domain Git-governance operations child team of Team 190.
 
 ---
 
@@ -28,6 +28,7 @@
 | **Team 100** | Architectural Review | Stage-level architectural authority, GATE_6 architectural review, program authority. |
 | **Team 170** | Spec & Governance (AGENTS_OS + Governance Canonical) | LOD contracts, AGENTS_OS/governance canonical maintenance, registry synchronization, governance procedure locks. |
 | **Team 190** | Constitutional Validation | GATE_0-GATE_2 constitutional integrity and validation authority — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
+| **Team 191** | Git Governance Operations (child of Team 190) | Commit/push guard operations, date-lint/snapshot/sync remediation, clean-tree enforcement, Git drift triage — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
 
 ## 1.1) Team 61 registration record (canonical)
 
@@ -53,6 +54,18 @@
 | Non-authority | Must not execute TIKTRACK QA lane (Team 50 ownership); must not replace Team 90 gate authority; must not bypass Team 10 orchestration. |
 | Reports to | Team 10 for orchestration; Team 100 for AGENTS_OS architecture lane. |
 
+## 1.3) Team 191 registration record (canonical)
+
+| Field | Value |
+|---|---|
+| Team ID | 191 |
+| Name | Git Governance Operations |
+| Role | Child team of Team 190 for Git workflow governance and pre-push guard operational reliability. |
+| Scope | Git operations and repository hygiene only: commit/push blockers, pre-push guard triage (`DATE-LINT`, `SYNC CHECK`, `SNAPSHOT CHECK`), clean-tree enforcement, historical-record/date-header normalization, guard evidence packaging. |
+| Authority | Execute technical remediation for non-semantic Git blockers; run check/write sync tools and snapshot refresh tools; prepare blocker reports and recommended routing. |
+| Non-authority | Must not issue constitutional gate verdicts; must not alter business logic under cover of Git fixes; must not override policy semantics without Team 190/Team 00 ruling. |
+| Reports to | Team 190 (primary), Team 10 (operational coordination). |
+
 ---
 
 ## 2) Rule: scope by domain
@@ -65,6 +78,7 @@ A Work Package must assign implementation **by domain** — Backend→20, Fronte
 - **Automation / Cloud tooling package:** Scope = 61 for CI, quality scans, unit-test infra, and Agents_OS V2 automation; include 60 only when manual platform/runtime changes are required.
 - **QA by domain:** TIKTRACK QA/FAV = Team 50; AGENTS_OS QA (Team 50 child model) = Team 51.
 - **AGENTS_OS-only development package:** Execution scope = Team 61 (with Team 60 as needed for platform/runtime), QA scope = Team 51, validation scope = Teams 90/190.
+- **Git-governance operations package:** Execution scope = Team 191; constitutional/policy escalation scope = Team 190.
 
 ---
 
@@ -94,3 +108,4 @@ This document must be updated whenever a new squad is added. Missing squad defin
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_ROSTER_LOCK_APPLIED_v1.0.0 | 2026-03-03**
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_51_CHILD_QA_MODEL_REGISTERED_WITH_DOMAIN_SPLIT | 2026-03-11**
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | DOMAIN_SPLIT_REINFORCED_10_20_30_40_50__60__90_190__61 | 2026-03-11**
+**log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_191_CHILD_GIT_GOVERNANCE_OPERATIONS_REGISTERED | 2026-03-12**

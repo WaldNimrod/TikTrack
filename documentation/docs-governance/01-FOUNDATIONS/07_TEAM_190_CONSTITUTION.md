@@ -72,3 +72,11 @@ Within the approved single-local-writer workflow, pre-push mixed-scope classific
 - Wide pushes that include code, governance, and communication artifacts in the same cycle are normal and do not require split pushes by default.
 - Team 190 requires remediation only for deterministic guard failures: `date-lint`, WSM/registry sync failure, snapshot drift, or dirty authority files in an authority push.
 - Mixed-scope alone is not constitutional process debt.
+
+## 8) Operational child lane (Team 191)
+
+Team 190 may delegate Git-governance operational remediation to Team 191 (child team), under these constraints:
+
+- Team 191 scope: technical guard remediation and clean-tree enforcement only.
+- Team 191 cannot issue constitutional verdicts or gate rulings.
+- Policy/semantic ambiguity must be escalated back to Team 190.

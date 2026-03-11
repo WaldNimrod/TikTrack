@@ -86,6 +86,20 @@ Template anchor:
 
 ---
 
+## 7) Child-team delegation lock (Team 191)
+
+Team 191 is the operational child lane of Team 190 for Git-governance operations.
+
+- Team 191 handles technical commit/push blockers (`DATE-LINT`, `SYNC CHECK`, `SNAPSHOT CHECK`), clean-tree enforcement, and remediation evidence packaging.
+- Team 190 retains constitutional authority and final policy interpretation.
+- Team 191 must escalate any semantic/policy ambiguity to Team 190 and must not issue gate or constitutional verdicts.
+
+Canonical activation prompt:
+- `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_191_GIT_GOVERNANCE_ACTIVATION_PROMPT_v1.0.0.md`
+
+---
+
 **log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | DOC_MICRO_REMEDIATION_EXCEPTION_AND_ARCHITECT_INBOX_PATH_DISCIPLINE | 2026-02-20**  
 **log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | SUBMISSION_PACKAGE_CONTRACT_SECTION_5 | 2026-02-20**  
 **log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_SECTION_6 | 2026-02-20**
+**log_entry | TEAM_190 | INTERNAL_OPERATING_RULES_UPDATED | TEAM_191_CHILD_TEAM_DELEGATION_SECTION_7 | 2026-03-12**

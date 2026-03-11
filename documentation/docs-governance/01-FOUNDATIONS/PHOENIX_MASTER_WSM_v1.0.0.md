@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-11** by **Team 90** — GATE_6 PASS accepted for S002-P002-WP003; GATE_7 human approval activated (browser-only), with runtime evidence as supporting input only.
+**Gate-owner update evidence:** This block was updated **2026-03-11** by **Team 90** — GATE_6 PASS `v2.0.0` accepted for S002-P002-WP003; GATE_7 activated with split scope: runtime conditions + Nimrod browser review.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision. |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A currently BLOCK (CC-WP003-04) pending rerun, Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-02,CC-WP003-04,CC-WP003-05; conditions_closed=CC-WP003-03. |
 | active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
 | active_work_package_id | S002-P002-WP003 |
 | in_progress_work_package_id | S002-P002-WP003 |
@@ -101,16 +101,17 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_7 (HUMAN_APPROVAL_ACTIVE) |
+| current_gate | GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
+| agents_os_parallel_track | S003-P001 WP001 FAST_4 CLOSED (2026-03-11). S003-P002 (Test Template Generator) — FAST_0 next; Team 100 to issue scope brief. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod (human approver/sign-off authority); Team 10 (execution orchestrator); Team 60 (runtime corroboration partner) |
-| last_gate_event | AUTO_WP003_05_RE_VERIFY_PASS \| 2026-03-11 \| Team 60: verify script PASS (market_cap 3/3). 8/8 automation complete. |
-| next_required_action | Team 90: לשחרר תרחישי GATE_7 Human לנימרוד (scenarios, coverage matrix, sign-off rule). |
-| next_responsible_team | Team 90 (GATE_7 owner) |
+| phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
+| last_gate_event | GATE_7_PARTA_BLOCK \| 2026-03-11 \| Team 90 accepted Team 60 runtime report: CC-WP003-04 failed (`429` > 0); rerun mandate v2.0.1 issued to Team 60/50. |
+| next_required_action | Team 60/50 to re-run Part A runtime evidence and close CC-WP003-04; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after both parts PASS. |
+| next_responsible_team | Team 60/50 (Part A rerun), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
 
@@ -263,6 +264,10 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted for S002-P002-WP003 (SUBMISSION_v1.1.0) to Team 00/Team 100; awaiting architectural decision | 2026-03-11**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 PASS accepted for S002-P002-WP003 per Team 00 decision v1.1.0; GATE_7 runtime confirmation activated with CC-WP003-01..04 | 2026-03-11**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 semantics de-drift: browser-only human sign-off is mandatory; runtime evidence is supporting only (cannot replace Nimrod decision) | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P002-WP003 (post-remediation round 4); no blockers; GATE_6 routing re-activated; G5_AUTOMATION_EVIDENCE v1.2.0 issued | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted for S002-P002-WP003 (`SUBMISSION_v2.0.0`) to Team 00/Team 100; awaiting architectural decision | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 PASS accepted for S002-P002-WP003 per Team 00 decision v2.0.0; GATE_7 activated with Part A runtime (CC-01/02/04) + Part B Nimrod browser review (CC-05); CC-03 closed | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A BLOCK for S002-P002-WP003 (CC-WP003-04); Part A rerun mandate v2.0.1 issued; Part B browser flow remains active in parallel | 2026-03-11**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

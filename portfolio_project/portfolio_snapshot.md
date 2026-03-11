@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-11T20:37:57.786593+00:00`
+- Generated (UTC): `2026-03-11T23:18:33.835356+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,14 +10,14 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
 - active_work_package_id: `S002-P002-WP003`
-- current_gate: `GATE_7 (HUMAN_APPROVAL_ACTIVE)`
-- next_required_action: `Team 90: לשחרר תרחישי GATE_7 Human לנימרוד (scenarios, coverage matrix, sign-off rule).`
+- current_gate: `GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION)`
+- next_required_action: `Team 60/50 to re-run Part A runtime evidence and close CC-WP003-04; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after both parts PASS.`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `28`
-- work_packages: `6`
+- work_packages: `7`
 
 ## Roadmap (hierarchical)
 
@@ -30,7 +30,7 @@
         ├── **WP** `S001-P001-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
         └── **WP** `S001-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
-    └── **Program** `S001-P002` — Alerts POC | PIPELINE | domain: **AGENTS_OS**
+    └── **Program** `S001-P002` — Alerts POC | DEFERRED | domain: **TIKTRACK**
 
 
 ### S002 — שלב 2 — השלב הפעיל | ACTIVE [SHARED]
@@ -40,7 +40,7 @@
         └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_7 (HUMAN_APPROVAL_ACTIVE) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) | domain: **TIKTRACK** (active)
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
@@ -50,7 +50,8 @@
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
 
-    ├── **Program** `S003-P001` — Data Model Validator | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P001` — Data Model Validator | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P001-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S003-P002` — Test Template Generator | PLANNED | domain: **AGENTS_OS**
 

@@ -1,8 +1,22 @@
 """
 Gate Router — maps gates to engines and team IDs.
+S003-P001: Adds data_model validator dispatch for GATE_0, GATE_1, GATE_5.
 """
 
 from ..config import TEAM_ENGINE_MAP
+from ..validators.data_model import validate_spec_schema, validate_migration_file
+
+
+def run_data_model_checks(gate_id: str, spec_content: str = "", spec_path: str = "") -> list:
+    """
+    Run data_model validator for gates that require schema/migration checks.
+    Returns list of Finding. Any BLOCK stops gate progression.
+    """
+    if gate_id in ("GATE_0", "GATE_1"):
+        return validate_spec_schema(spec_content or "", spec_path)
+    if gate_id == "GATE_5":
+        return validate_migration_file()
+    return []
 
 
 GATE_TEAM_MAP = {

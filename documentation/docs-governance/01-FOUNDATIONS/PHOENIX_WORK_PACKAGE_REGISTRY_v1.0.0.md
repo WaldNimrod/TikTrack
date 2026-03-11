@@ -40,12 +40,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_7 (HUMAN_APPROVAL_ACTIVE) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision. |
+| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A currently BLOCK (CC-WP003-04) pending rerun, Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-02,CC-WP003-04,CC-WP003-05; conditions_closed=CC-WP003-03. |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
+| S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_7 (HUMAN_APPROVAL_ACTIVE)`, `active_work_package_id=S002-P002-WP003`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION)`, `active_work_package_id=S002-P002-WP003`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-11). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
@@ -68,3 +69,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_10 | PHOENIX_WORK_PACKAGE_REGISTRY | SYNC_WSM_POST_GATE8_S002_P002_ACTIVE_NO_ACTIVE_WP | 2026-03-07**
 **log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P002_PRICE_RELIABILITY_TEAM190_REVALIDATION_PASS_GATE7_ACTIVE_NO_ACTIVE_WP | 2026-03-09**
 **log_entry | TEAM_10 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P002_WP003_GATE7_BLOCK_TO_GATE3_REMEDIATION_SYNCED | 2026-03-11**
+**log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P001_WP001_FAST4_CLOSED_ADDED | 2026-03-11**

@@ -1,0 +1,12 @@
+{
+  "report_date_utc": "2026-03-11T22:39:11Z",
+  "backend_url": "http://127.0.0.1:8082",
+  "log_path": "documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223911.log",
+  "evidence_run": "4-cycle EOD (run_g7_part_a_evidence.py) — certified run (0×429)",
+  "cc_01_yahoo_call_count": null,
+  "cc_02_yahoo_call_count": null,
+  "cc_04_yahoo_429_count": 0,
+  "pass_01": false,
+  "pass_02": false,
+  "pass_04": true
+}

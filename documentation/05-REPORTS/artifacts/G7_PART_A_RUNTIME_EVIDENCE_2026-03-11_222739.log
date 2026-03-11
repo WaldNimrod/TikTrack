@@ -1,0 +1,38 @@
+--- G7 Part A evidence run started 2026-03-11T22:27:39.989675+00:00 ---
+
+=== CYCLE 1/4 ===
+📊 [FIX-4] Alpha Vantage quota: 0/25 used, 25 remaining (FX reserve: 8)
+⚠️ Yahoo batch failed: Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=ANAU.MI%2CBTC-USD%2CSPY%2CTEVA.TA%2CAAPL%2CAMZN%2CGOOGL%2CMETA%2CQQQ&fields=regularMarketPrice%2CregularMarketOpen%2CregularMarketDayHigh%2CregularMarketDayLow%2CregularMarketPreviousClose%2CregularMarketVolume%2CmarketCap%2CregularMarketTime'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+Yahoo v8/chart 429 for ANAU.MI (attempt 1/3) — backing off 5s
+Yahoo v8/chart 429 for ANAU.MI (attempt 2/3) — backing off 10s
+Yahoo 429 — cooldown 15 min (SOP-015)
+/Users/nimrod/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+⚠️ ALPHA_VANTAGE in cooldown — skipping
+⚠️ YAHOO_FINANCE in cooldown — skipping
+
+
+=== CYCLE 2/4 ===
+📋 [SOP-015] YAHOO_FINANCE in cooldown: 838s remaining
+📋 [SOP-015] ALPHA_VANTAGE in cooldown: 1273s remaining
+📊 [FIX-4] Alpha Vantage quota: 0/25 used, 25 remaining (FX reserve: 8)
+⚠️ YAHOO_FINANCE in cooldown — skipping
+⚠️ ALPHA_VANTAGE in cooldown — skipping
+
+
+=== CYCLE 3/4 ===
+📋 [SOP-015] YAHOO_FINANCE in cooldown: 778s remaining
+📋 [SOP-015] ALPHA_VANTAGE in cooldown: 1213s remaining
+📊 [FIX-4] Alpha Vantage quota: 0/25 used, 25 remaining (FX reserve: 8)
+⚠️ YAHOO_FINANCE in cooldown — skipping
+⚠️ ALPHA_VANTAGE in cooldown — skipping
+
+
+=== CYCLE 4/4 ===
+📋 [SOP-015] YAHOO_FINANCE in cooldown: 718s remaining
+📋 [SOP-015] ALPHA_VANTAGE in cooldown: 1152s remaining
+📊 [FIX-4] Alpha Vantage quota: 0/25 used, 25 remaining (FX reserve: 8)
+⚠️ YAHOO_FINANCE in cooldown — skipping
+⚠️ ALPHA_VANTAGE in cooldown — skipping
+

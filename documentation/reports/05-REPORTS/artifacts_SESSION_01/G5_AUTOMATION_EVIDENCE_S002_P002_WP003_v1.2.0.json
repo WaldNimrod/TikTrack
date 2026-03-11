@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "G5_AUTOMATION_EVIDENCE_S002_P002_WP003_v1.2.0",
+  "date_utc": "2026-03-11",
+  "gate_id": "GATE_5",
+  "program_id": "S002-P002",
+  "work_package_id": "S002-P002-WP003",
+  "issuer_team": "Team 90",
+  "overall_status": "PASS",
+  "checks": [
+    {
+      "check_id": "G5-WP003-01",
+      "title": "Package completeness",
+      "result": "PASS",
+      "severity": "NONE"
+    },
+    {
+      "check_id": "G5-WP003-02",
+      "title": "Round-4 remediation closure artifacts",
+      "result": "PASS",
+      "severity": "NONE"
+    },
+    {
+      "check_id": "G5-WP003-03",
+      "title": "Phase-2 runtime assertions (4/4)",
+      "result": "PASS",
+      "severity": "NONE"
+    },
+    {
+      "check_id": "G5-WP003-04",
+      "title": "Runtime results JSON integrity",
+      "result": "PASS",
+      "severity": "NONE"
+    },
+    {
+      "check_id": "G5-WP003-05",
+      "title": "Gate-flow admissibility (G3.8/G3.9 chain)",
+      "result": "PASS",
+      "severity": "NONE"
+    }
+  ],
+  "summary": {
+    "total_checks": 5,
+    "passed": 5,
+    "failed": 0,
+    "severe_blockers": 0
+  },
+  "input_artifacts": [
+    "_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P002_WP003_GATE5_SUBMISSION.md",
+    "_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P002_WP003_GATE7_FULL_MANDATE_COMPLETION.md",
+    "_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P002_WP003_TASE_AGOROT_FIX_COMPLETION.md",
+    "_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P002_WP003_PHASE2_RUNTIME_COMPLETION.md",
+    "documentation/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json",
+    "_COMMUNICATION/team_10/TEAM_10_S002_P002_WP003_G3_8_CONSOLIDATION_SIGNOFF_v1.0.0.md",
+    "_COMMUNICATION/team_10/TEAM_10_S002_P002_WP003_G3_9_GATE4_HANDOFF_v1.0.0.md"
+  ]
+}

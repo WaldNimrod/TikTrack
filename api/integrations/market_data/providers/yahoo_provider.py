@@ -8,6 +8,7 @@ REPLAY mode: returns fixtures — zero HTTP calls (TEAM_90 Automated Testing Dir
 
 import asyncio
 import logging
+import os
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -95,7 +96,15 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
                     "regularMarketVolume,marketCap,regularMarketTime"
                 ),
             }
-            headers = {"User-Agent": _next_user_agent()}
+            headers = {
+                "User-Agent": _next_user_agent(),
+                "Accept": "application/json",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Origin": "https://finance.yahoo.com",
+                "Referer": "https://finance.yahoo.com/",
+            }
+            if os.environ.get("GATE7_CC_EVIDENCE"):
+                logger.info("GATE7_CC_YAHOO_HTTP")
             with httpx.Client(timeout=10) as client:
                 resp = client.get(url, params=params, headers=headers)
                 resp.raise_for_status()
@@ -214,6 +223,8 @@ def _fetch_last_close_via_v8_chart_inner(
     headers = {"User-Agent": _next_user_agent()}
     for attempt in range(3):
         try:
+            if os.environ.get("GATE7_CC_EVIDENCE"):
+                logger.info("GATE7_CC_YAHOO_HTTP")
             with httpx.Client(timeout=10.0, headers=headers) as client:
                 r = client.get(url, params=params)
                 if r.status_code == 429:
@@ -293,12 +304,20 @@ def _fetch_last_close_via_v8_chart_inner(
 
 
 def _fetch_market_cap_only_v7(symbol: str) -> Optional[Decimal]:
-    """AUTO-WP003-05: Minimal v7/quote request to get marketCap. v8/chart does not return it."""
+    """AUTO-WP003-05: Minimal v7/quote request to get marketCap. v8/chart does not return it. H3: headers for 401."""
     try:
         import httpx
+        if os.environ.get("GATE7_CC_EVIDENCE"):
+            logger.info("GATE7_CC_YAHOO_HTTP")
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
         params = {"symbols": symbol}
-        headers = {"User-Agent": _next_user_agent()}
+        headers = {
+            "User-Agent": _next_user_agent(),
+            "Accept": "application/json",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Origin": "https://finance.yahoo.com",
+            "Referer": "https://finance.yahoo.com/",
+        }
         with httpx.Client(timeout=5.0, headers=headers) as client:
             r = client.get(url, params=params)
             r.raise_for_status()
@@ -313,13 +332,20 @@ def _fetch_market_cap_only_v7(symbol: str) -> Optional[Decimal]:
 
 
 def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
-    """Last fallback: v7/finance/quote when history() fails. Requires User-Agent.
-    Per YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC: history first (less 429), quote last."""
+    """v7/finance/quote — CC-WP003-04 v7-first path; also used as fallback. H3: Accept/Referer to reduce 401."""
     try:
         import httpx
+        if os.environ.get("GATE7_CC_EVIDENCE"):
+            logger.info("GATE7_CC_YAHOO_HTTP")
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
         params = {"symbols": symbol}
-        headers = {"User-Agent": _next_user_agent()}
+        headers = {
+            "User-Agent": _next_user_agent(),
+            "Accept": "application/json",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Origin": "https://finance.yahoo.com",
+            "Referer": "https://finance.yahoo.com/",
+        }
         with httpx.Client(timeout=10.0, headers=headers) as client:
             r = client.get(url, params=params)
             r.raise_for_status()
@@ -364,10 +390,12 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
 
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
     """מחיר סגירה EOD — חייב להחזיר תמיד. לא תוך־יום; שוק סגור לא משנה.
-    Primary: v8/chart (היסטוריה תמיד קיימת). Fallback: yfinance → v7/quote."""
-    result = _fetch_last_close_via_v8_chart(symbol)
+    CC-WP003-04 / Team 50: v7→yfinance→v8. v7 (401) + v8 (429) common; yfinance bypasses Yahoo direct HTTP."""
+    # v7 first (least 429 when it works)
+    result = _fetch_price_via_quote_api(symbol)
     if result and result.price and result.price > 0:
         return result
+    # yfinance before v8 — avoids v8 429 when v7 returns 401 (Yahoo anti-scraping)
     try:
         import yfinance as yf
         from datetime import timedelta
@@ -390,7 +418,8 @@ def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
     except Exception as e:
         logger.warning("Yahoo history fetch failed for %s: %s", symbol, e)
 
-    return _fetch_price_via_quote_api(symbol)
+    # v8 last — most rate-limited, only when v7 and yfinance both fail
+    return _fetch_last_close_via_v8_chart(symbol)
 
 
 def _history_to_price_result(symbol: str, last) -> Optional[PriceResult]:

@@ -212,63 +212,111 @@ async def fetch_prices_for_tickers(
     yahoo_skipped = alpha_skipped = False
     alpha_equity_blocked_logged = False  # log once when Alpha blocked for non-CRYPTO
 
+    # CC-WP003-04: Batch-first Yahoo (1 HTTP for all) — reduces 429 risk vs N per-ticker v8/chart calls
+    yahoo_batch: Dict[str, Any] = {}
+    if not is_in_cooldown("YAHOO_FINANCE"):
+        yahoo_symbols = []
+        for ticker_id, symbol, ticker_type, metadata in tickers:
+            pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
+            yahoo_sym, _, _ = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+            if yahoo_sym:
+                yahoo_symbols.append(yahoo_sym)
+        yahoo_symbols_unique = list(dict.fromkeys(yahoo_symbols))
+        if yahoo_symbols_unique:
+            try:
+                yahoo_batch = await yahoo.get_ticker_prices_batch(yahoo_symbols_unique)
+                if yahoo_batch:
+                    print(f"📊 [CC-WP003-04] Yahoo batch: {len(yahoo_batch)}/{len(yahoo_symbols_unique)} symbols")
+                    # CC-WP003-04: Populate pre_fetched_market_caps from batch (no separate prefetch HTTP)
+                    if pre_fetched_market_caps is not None:
+                        for sym in AUTO_WP003_05_SYMBOLS:
+                            if sym in yahoo_batch and yahoo_batch[sym].market_cap is not None:
+                                pre_fetched_market_caps[sym] = yahoo_batch[sym].market_cap
+            except Exception as e:
+                if _is_429(e):
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+                    print(f"⚠️ YAHOO_FINANCE batch 429 — cooldown {cooldown_min}min")
+                elif "401" in str(e) or "Unauthorized" in str(e).lower():
+                    # H3: 401 = Yahoo blocking; avoid per-ticker v8 (429). Use Alpha fallback.
+                    set_cooldown("YAHOO_FINANCE", cooldown_min)
+                    print(f"⚠️ Yahoo batch 401 — cooldown {cooldown_min}min (use Alpha fallback)")
+                print(f"⚠️ Yahoo batch failed: {e}")
+
     for ticker_id, symbol, ticker_type, metadata in tickers:
         pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
         yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
         is_crypto = ticker_type == "CRYPTO"
         pr = None
-        for provider, name, use_sym, use_crypto in [
-            (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
-            (alpha, "ALPHA_VANTAGE", alpha_sym, is_crypto),
-        ]:
-            if is_in_cooldown(name):
-                if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
-                    print(f"⚠️ {name} in cooldown — skipping")
-                if name == "YAHOO_FINANCE":
-                    yahoo_skipped = True
-                else:
-                    alpha_skipped = True
-                continue
+        # CC-WP003-04: Use batch result first (1 HTTP total vs N per-ticker)
+        if yahoo_sym and yahoo_sym in yahoo_batch:
+            pr = yahoo_batch[yahoo_sym]
+        if pr and pr.price and pr.price > 0:
+            results.append((
+                ticker_id,
+                symbol,
+                pr.price,
+                pr.open_price,
+                pr.high_price,
+                pr.low_price,
+                pr.close_price or pr.price,
+                pr.volume,
+                pr.market_cap,
+                pr.as_of or datetime.now(timezone.utc),
+                pr.provider or "unknown",
+            ))
+        elif not pr:
+            for provider, name, use_sym, use_crypto in [
+                (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
+                (alpha, "ALPHA_VANTAGE", alpha_sym, is_crypto),
+            ]:
+                if is_in_cooldown(name):
+                    if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
+                        print(f"⚠️ {name} in cooldown — skipping")
+                    if name == "YAHOO_FINANCE":
+                        yahoo_skipped = True
+                    else:
+                        alpha_skipped = True
+                    continue
 
-            # FIX-4: Alpha quota guard for non-CRYPTO equities
-            # Policy: Alpha price fallback for non-CRYPTO only when quota above FX reserve
-            # CRYPTO always gets Alpha fallback (DIGITAL_CURRENCY_DAILY is the only path for crypto)
-            if name == "ALPHA_VANTAGE" and not is_crypto:
-                current_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
-                if current_remaining <= ALPHA_FX_RESERVE:
-                    if not alpha_equity_blocked_logged:
-                        print(
-                            f"⚠️ [FIX-4] Alpha quota low ({current_remaining} remaining ≤ reserve {ALPHA_FX_RESERVE}) "
-                            f"— skipping Alpha price fallback for non-CRYPTO equities"
-                        )
-                        alpha_equity_blocked_logged = True
-                    continue  # Fall through to last-known / yfinance fallback
+                # FIX-4: Alpha quota guard for non-CRYPTO equities
+                # Policy: Alpha price fallback for non-CRYPTO only when quota above FX reserve
+                # CRYPTO always gets Alpha fallback (DIGITAL_CURRENCY_DAILY is the only path for crypto)
+                if name == "ALPHA_VANTAGE" and not is_crypto:
+                    current_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+                    if current_remaining <= ALPHA_FX_RESERVE:
+                        if not alpha_equity_blocked_logged:
+                            print(
+                                f"⚠️ [FIX-4] Alpha quota low ({current_remaining} remaining ≤ reserve {ALPHA_FX_RESERVE}) "
+                                f"— skipping Alpha price fallback for non-CRYPTO equities"
+                            )
+                            alpha_equity_blocked_logged = True
+                        continue  # Fall through to last-known / yfinance fallback
 
-            try:
-                if use_crypto and provider is alpha:
-                    pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
-                else:
-                    pr = await provider.get_ticker_price(use_sym)
-                if pr and pr.price and pr.price > 0:
-                    results.append((
-                        ticker_id,
-                        symbol,
-                        pr.price,
-                        pr.open_price,
-                        pr.high_price,
-                        pr.low_price,
-                        pr.close_price or pr.price,
-                        pr.volume,
-                        pr.market_cap,
-                        pr.as_of or datetime.now(timezone.utc),
-                        pr.provider or "unknown",
-                    ))
-                    break
-            except Exception as e:
-                if _is_429(e):
-                    set_cooldown(name, cooldown_min)
-                    print(f"⚠️ {name} 429 — cooldown {cooldown_min}min")
-                print(f"⚠️ {name} {symbol}: {e}")
+                try:
+                    if use_crypto and provider is alpha:
+                        pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
+                    else:
+                        pr = await provider.get_ticker_price(use_sym)
+                    if pr and pr.price and pr.price > 0:
+                        results.append((
+                            ticker_id,
+                            symbol,
+                            pr.price,
+                            pr.open_price,
+                            pr.high_price,
+                            pr.low_price,
+                            pr.close_price or pr.price,
+                            pr.volume,
+                            pr.market_cap,
+                            pr.as_of or datetime.now(timezone.utc),
+                            pr.provider or "unknown",
+                        ))
+                        break
+                except Exception as e:
+                    if _is_429(e):
+                        set_cooldown(name, cooldown_min)
+                        print(f"⚠️ {name} 429 — cooldown {cooldown_min}min")
+                    print(f"⚠️ {name} {symbol}: {e}")
         else:
             # Both providers failed (e.g. weekend) — fallback to last-known price from DB
             last = _get_last_known_price(ticker_id, symbol)
@@ -588,6 +636,30 @@ def _prioritize_auto_wp003_05(
     return priority + rest
 
 
+def run_one_cycle() -> Tuple[int, int, bool]:
+    """
+    Run one EOD sync cycle. H4 fix: used by run_g7_part_a_evidence for in-process 4-cycle run (cooldown persists).
+    Returns (rows_upserted, rows_backfilled, had_tickers).
+    """
+    tickers = load_tickers()
+    if not tickers:
+        return 0, 0, False
+    tickers = _prioritize_auto_wp003_05(tickers)
+    pre_fetched_mc: Dict[str, Decimal] = {}
+    rows = asyncio.run(fetch_prices_for_tickers(tickers, pre_fetched_market_caps=pre_fetched_mc))
+    if not rows:
+        return 0, 0, True
+    patched = []
+    for r in rows:
+        if r[1] in AUTO_WP003_05_SYMBOLS and r[8] is None and pre_fetched_mc.get(r[1]):
+            r = r[:8] + (pre_fetched_mc[r[1]],) + r[9:]
+        patched.append(r)
+    rows = patched
+    n = upsert_prices(rows)
+    bf = backfill_market_cap_auto_wp003_05(pre_fetched=pre_fetched_mc)
+    return n, bf, True
+
+
 def main():
     fd = None
     if fcntl:
@@ -606,33 +678,14 @@ def main():
 
     try:
         print("🔄 EOD sync — ticker_prices (Yahoo→Alpha, Single-Flight)")
-        # AUTO-WP003-05: pre-fetch market_cap via v7/quote batch BEFORE any v8/chart (avoids 429 cascade)
-        pre_fetched_mc = _prefetch_market_caps_auto_wp003_05()
-        if pre_fetched_mc:
-            print(f"📊 [AUTO-WP003-05] Pre-fetched market_cap for {list(pre_fetched_mc.keys())}")
-
-        tickers = load_tickers()
-        if not tickers:
+        n, bf, had_tickers = run_one_cycle()
+        if not had_tickers:
             print("⚠️ No tickers in market_data.tickers. Run: python3 scripts/seed_market_data_tickers.py")
             sys.exit(0)
-        tickers = _prioritize_auto_wp003_05(tickers)
-
-        rows = asyncio.run(fetch_prices_for_tickers(tickers, pre_fetched_market_caps=pre_fetched_mc))
-        if not rows:
+        if n == 0:
             print("⚠️ No prices fetched. Exit 0.")
             sys.exit(0)
-
-        # Patch rows: use pre-fetched market_cap for AUTO-WP003-05 symbols when missing
-        patched = []
-        for r in rows:
-            if r[1] in AUTO_WP003_05_SYMBOLS and r[8] is None and pre_fetched_mc.get(r[1]):
-                r = r[:8] + (pre_fetched_mc[r[1]],) + r[9:]
-            patched.append(r)
-        rows = patched
-
-        n = upsert_prices(rows)
         print(f"✅ Upserted {n} ticker prices to market_data.ticker_prices")
-        bf = backfill_market_cap_auto_wp003_05(pre_fetched=pre_fetched_mc)
         if bf > 0:
             print(f"✅ Backfilled market_cap for {bf} row(s) (AUTO-WP003-05)")
     finally:

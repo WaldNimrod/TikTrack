@@ -43,7 +43,7 @@
 | שדה | ערך |
 |-----|-----|
 | **gate_id** | GATE_3 |
-| **current_sub_stage** | GATE_4 (QA) |
+| **current_sub_stage** | GATE_6 (ROUTING_PREPARATION_ACTIVE) |
 | **phase_owner** | Team 10 |
 | **remediation_round** | 4 (סבב תיקון רביעי אחרי פסילת חבילה ב־GATE_7) |
 | **plan_validation** | PASS (Team 190 + Team 00) |
@@ -55,7 +55,7 @@
 
 Team 10 מעדכן WSM עבור GATE_3/GATE_4. סטטוס runtime ב־`CURRENT_OPERATIONAL_STATE` — Team 90 עדכן ל־GATE_7; **מבחינת ביצוע** אנחנו ב־GATE_3 remediation.
 
-סגירה צפויה: G3.7 → G3.8 → G3.9 → GATE_4 → GATE_5 → GATE_6 → GATE_7 (שוב) → GATE_8 — **סגירת חבילת העבודה S002-P002-WP003 במפת הדרכים**.
+**עדכון 2026-03-11:** GATE_4 ✓, GATE_5 PASS ✓. **GATE_6** — ROUTING_PREPARATION_ACTIVE. המשך: GATE_6 → GATE_7 → GATE_8 — **סגירת חבילת העבודה S002-P002-WP003 במפת הדרכים**.
 
 ---
 

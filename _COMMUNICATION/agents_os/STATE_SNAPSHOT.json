@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-03T22:34:27.610437+00:00",
+  "produced_at_iso": "2026-03-11T21:14:41.408306+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -19,12 +19,15 @@
         "enums",
         "exchange_rates",
         "identity",
+        "market_reference",
         "notes",
+        "notification",
         "positions",
         "ticker_prices",
         "ticker_prices_intraday",
         "tickers",
         "tokens",
+        "trade_plans",
         "trades",
         "trading_accounts",
         "user_tickers"
@@ -33,15 +36,19 @@
         "alerts",
         "api_keys",
         "auth",
+        "background_jobs",
         "brokers_fees",
         "cash_flows",
         "me_tickers",
         "notes",
+        "notifications",
         "positions",
         "reference",
         "settings",
         "system",
         "tickers",
+        "trade_plans",
+        "trades",
         "trading_accounts",
         "users"
       ],
@@ -50,6 +57,7 @@
         "api_keys",
         "auth",
         "brokers_fees_service",
+        "canonical_ticker_service",
         "cash_flows",
         "encryption",
         "exchange_rates_service",
@@ -57,15 +65,19 @@
         "market_status_service",
         "note_attachments_service",
         "notes_service",
+        "notifications_service",
         "password_reset",
         "positions",
         "reference_service",
         "smart_history_engine",
         "tickers_service",
+        "trade_plans_service",
+        "trades_service",
         "trading_accounts",
         "user_tickers_service"
       ],
       "schemas": [
+        "alert_conditions",
         "alerts",
         "brokers_fees",
         "cash_flows",
@@ -74,6 +86,8 @@
         "positions",
         "reference",
         "tickers",
+        "trade_plans",
+        "trades",
         "trading_accounts"
       ],
       "integrations": true
@@ -131,16 +145,16 @@
       "has_react": true
     },
     "database": {
-      "migration_count": 19,
+      "migration_count": 41,
       "has_ddl": true
     }
   },
   "quality": {
-    "unit_test_files": 3,
+    "unit_test_files": 5,
     "has_eslint_config": true,
     "has_mypy_config": true,
     "has_ci_pipeline": true,
-    "python_dependencies": 21
+    "python_dependencies": 23
   },
   "artifact_checks": [
     {

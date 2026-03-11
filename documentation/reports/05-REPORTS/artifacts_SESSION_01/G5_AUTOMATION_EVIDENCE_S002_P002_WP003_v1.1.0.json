@@ -1,0 +1,26 @@
+{
+  "work_package_id": "S002-P002-WP003",
+  "gate_id": "GATE_5",
+  "verdict": "PASS",
+  "run_timestamp": "2026-03-11T09:30:00Z",
+  "test_suite_type": "canonical_superset",
+  "total_tests": 4,
+  "passed": 4,
+  "failed": 0,
+  "skipped": 0,
+  "severe_blockers": 0,
+  "flakiness_controls": {
+    "seed": "S002-P002-WP003-R3-PROVIDER-FIX",
+    "timeout_policy": "explicit_per_test_timeout_ms",
+    "retry_policy": "no_retry_on_first_run"
+  },
+  "evidence_artifacts": [
+    "_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_TEAM_60_MARKET_DATA_PROVIDER_FIX_QA_REPORT.md",
+    "_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_S002_P002_WP003_GATE7_R2_COMPLETION.md",
+    "_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P002_WP003_GATE7_R2_COMPLETION.md",
+    "_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P002_WP003_GATE7_R2_COMPLETION.md",
+    "_COMMUNICATION/team_60/TEAM_60_TO_TEAM_10_S002_P002_WP003_GATE3_R3_COMPLETION.md",
+    "_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P002_WP003_GATE3_R3_COMPLETION.md"
+  ],
+  "issuer_team": "Team 90"
+}

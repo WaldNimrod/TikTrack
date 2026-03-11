@@ -22,12 +22,11 @@
 | Domain | Program | WP | Current Gate | Gate Owner | Execution Owner | Status |
 |--------|---------|-----|-------------|------------|-----------------|--------|
 | TIKTRACK | S002-P002 | WP003 | GATE_3 (REMEDIATION_IN_PROGRESS) | Team 10 | Teams 20/30/50/60 | ACTIVE — Team 50 QA in progress |
-| AGENTS_OS | S002-P002 | WP001 | GATE_1 (POST_G0_PASS_REVALIDATION) | Team 190 | Team 170 | ACTIVE — GATE_0 re-validation PASS; moved to GATE_1 |
 
 ## PARALLEL-TRACK RECONCILIATION NOTE
 
 - WSM/Registry mirrors currently expose a single runtime-active work package (`S002-P002-WP003`) in `CURRENT_OPERATIONAL_STATE`.
-- This Stage Active Portfolio is the approved supplementary layer for dual-domain visibility and therefore lists both active lanes: TIKTRACK `WP003` and AGENTS_OS `WP001`.
+- This Stage Active Portfolio is the approved supplementary layer for dual-domain visibility. AGENTS_OS WP001 is CLOSED (FAST_4); only TIKTRACK WP003 remains in ACTIVE TRACKS.
 - No structural contradiction: WSM remains runtime SSOT; this file remains parallel-stage visibility SSOT.
 
 ## S002 CLOSED TRACKS (for reference)
@@ -36,6 +35,7 @@
 |--------|---------|-----|-----------:|------|
 | TIKTRACK | S002-P003 | WP002 | GATE_8 PASS | 2026-03-07 |
 | AGENTS_OS | S002-P002 | historical_cycle | GATE_8 PASS (historical cycle before WP001 re-activation) | 2026-03-08 |
+| AGENTS_OS | S002-P002 | WP001 | GATE_8 (FAST_4 CLOSED) | 2026-03-10 |
 
 ## ANOMALY RECORD
 WP003 is a TIKTRACK domain WP registered under S002-P002 (AGENTS_OS program).
@@ -47,3 +47,4 @@ No renumbering. U-01 prevents future recurrence.
 **log_entry | TEAM_170 | STAGE_ACTIVE_PORTFOLIO_S002 | v1.0.0_CREATED | 2026-03-10**
 **log_entry | TEAM_170 | STAGE_ACTIVE_PORTFOLIO_S002 | AGENTS_OS_WP001_STATUS_REALIGNED_TO_POST_G0_PASS | 2026-03-11**
 **log_entry | TEAM_170 | STAGE_ACTIVE_PORTFOLIO_S002 | PARALLEL_TRACK_RECONCILIATION_NOTE_ADDED | 2026-03-11**
+**log_entry | TEAM_170 | STAGE_ACTIVE_PORTFOLIO_S002 | AGENTS_OS_WP001_FAST4_CLOSED_MOVED_TO_CLOSED_TRACKS | 2026-03-10**

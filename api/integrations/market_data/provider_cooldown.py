@@ -3,6 +3,7 @@ Provider Cooldown — TEAM_90_RATELIMIT_SCALING_LOCK / SOP-015
 When provider returns 429 → cooldown; no further calls during window.
 SSOT: MARKET_DATA_PIPE_SPEC §8.1 rule 3
 FIX-3: Alpha quota exhaustion → set_cooldown_hours with DB persistence.
+FIX-4: Alpha daily quota tracker (25/day) — proactive guard before calling Alpha.
 """
 
 import logging
@@ -13,6 +14,44 @@ from typing import Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 _cooldowns: Dict[str, float] = {}  # provider_name -> cooldown_until (epoch)
+
+# Alpha Vantage daily quota tracking (FIX-4)
+# Free plan: 25 requests/day hard limit. Track proactively to avoid burning quota.
+_alpha_daily_calls: Dict[str, int] = {}  # UTC date_str -> call count
+ALPHA_DAILY_LIMIT = 25  # Hard limit per Alpha Vantage free plan
+
+
+def _today_utc_str() -> str:
+    """UTC date string for today — quota resets at midnight UTC."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def increment_alpha_calls(n: int = 1) -> int:
+    """
+    Increment Alpha Vantage daily call counter.
+    Returns new total for today (UTC).
+    Call this immediately before each Alpha API request.
+    """
+    key = _today_utc_str()
+    _alpha_daily_calls[key] = _alpha_daily_calls.get(key, 0) + n
+    # Prune old keys to avoid unbounded growth
+    for k in list(_alpha_daily_calls.keys()):
+        if k != key:
+            del _alpha_daily_calls[k]
+    return _alpha_daily_calls[key]
+
+
+def get_alpha_calls_today() -> int:
+    """Alpha calls made today (UTC day)."""
+    return _alpha_daily_calls.get(_today_utc_str(), 0)
+
+
+def get_alpha_remaining_today(daily_limit: int = ALPHA_DAILY_LIMIT) -> int:
+    """
+    Remaining Alpha calls for today (UTC day).
+    Returns 0 if exhausted. Use before deciding to call Alpha.
+    """
+    return max(0, daily_limit - get_alpha_calls_today())
 
 
 def get_cooldown_status() -> List[Tuple[str, float, int]]:

@@ -71,33 +71,51 @@ def _is_429(e: Exception) -> bool:
 async def fetch_prices_for_tickers(
     tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
-    """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Per CORRECTIVE: CRYPTO uses provider mapping, Alpha DIGITAL_CURRENCY_DAILY."""
+    """
+    Yahoo (Primary) → Alpha (Fallback — CRYPTO only or when quota allows).
+    FIX-4: Alpha is now guarded by a daily quota reserve.
+    - Alpha CRYPTO: always attempted (DIGITAL_CURRENCY_DAILY is the only reliable path for crypto)
+    - Alpha non-CRYPTO: only when Yahoo is in cooldown AND remaining Alpha quota > ALPHA_FX_RESERVE
+    - This ensures FX sync (sync_exchange_rates_eod.py) always has quota for its 5 pairs
+    """
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
-    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
+    from api.integrations.market_data.provider_cooldown import (
+        set_cooldown, is_in_cooldown, get_cooldown_status, get_alpha_remaining_today,
+        ALPHA_DAILY_LIMIT,
+    )
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import (
         get_provider_cooldown_minutes,
         get_delay_between_symbols_seconds,
     )
 
+    # FIX-4: Reserve Alpha quota for FX sync (5 pairs) + buffer (3 extra) = 8 calls reserved
+    ALPHA_FX_RESERVE = 8
+
     cooldown_min = get_provider_cooldown_minutes()
     delay_sec = get_delay_between_symbols_seconds()
     # SOP-015: Cooldown Protocol — log status for Team 90 audit
     for prov, _until, sec in get_cooldown_status():
         print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
+    # FIX-4: Log Alpha quota status at sync start
+    alpha_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+    print(f"📊 [FIX-4] Alpha Vantage quota: {ALPHA_DAILY_LIMIT - alpha_remaining}/{ALPHA_DAILY_LIMIT} used, {alpha_remaining} remaining (FX reserve: {ALPHA_FX_RESERVE})")
+
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []
     yahoo_skipped = alpha_skipped = False
+    alpha_equity_blocked_logged = False  # log once when Alpha blocked for non-CRYPTO
 
     for ticker_id, symbol, ticker_type, metadata in tickers:
         pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
         yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+        is_crypto = ticker_type == "CRYPTO"
         pr = None
         for provider, name, use_sym, use_crypto in [
             (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
-            (alpha, "ALPHA_VANTAGE", alpha_sym, ticker_type == "CRYPTO"),
+            (alpha, "ALPHA_VANTAGE", alpha_sym, is_crypto),
         ]:
             if is_in_cooldown(name):
                 if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
@@ -107,6 +125,21 @@ async def fetch_prices_for_tickers(
                 else:
                     alpha_skipped = True
                 continue
+
+            # FIX-4: Alpha quota guard for non-CRYPTO equities
+            # Policy: Alpha price fallback for non-CRYPTO only when quota above FX reserve
+            # CRYPTO always gets Alpha fallback (DIGITAL_CURRENCY_DAILY is the only path for crypto)
+            if name == "ALPHA_VANTAGE" and not is_crypto:
+                current_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+                if current_remaining <= ALPHA_FX_RESERVE:
+                    if not alpha_equity_blocked_logged:
+                        print(
+                            f"⚠️ [FIX-4] Alpha quota low ({current_remaining} remaining ≤ reserve {ALPHA_FX_RESERVE}) "
+                            f"— skipping Alpha price fallback for non-CRYPTO equities"
+                        )
+                        alpha_equity_blocked_logged = True
+                    continue  # Fall through to last-known / yfinance fallback
+
             try:
                 if use_crypto and provider is alpha:
                     pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)
@@ -139,12 +172,64 @@ async def fetch_prices_for_tickers(
                 results.append(last)
                 print(f"📌 {symbol}: using last-known price (providers unavailable)")
             else:
-                print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
+                # Last resort: direct yfinance (different path than YahooProvider — can work when v8 429)
+                yf_row = await asyncio.to_thread(_yfinance_eod_fallback, symbol, ticker_type)
+                if yf_row:
+                    results.append((ticker_id, symbol) + yf_row + ("YF_FALLBACK",))
+                    print(f"📌 {symbol}: yfinance fallback (EOD)")
+                else:
+                    print(f"⚠️ No price for {symbol} (ticker_id={ticker_id})")
 
         if delay_sec > 0:
             await asyncio.sleep(delay_sec)
 
     return results
+
+
+def _yfinance_eod_fallback(symbol: str, ticker_type: str) -> Optional[Tuple[Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime]]:
+    """Last-resort EOD: yfinance direct (different path than YahooProvider — can work when v8 returns 429)."""
+    if ticker_type == "CRYPTO":
+        return None
+    try:
+        import yfinance as yf
+        hist = None
+        try:
+            # yf.download sometimes works when Ticker().history() returns no data (single symbol → columns: Open, High, Low, Close, Volume)
+            df = yf.download(symbol, period="1mo", progress=False, threads=False, auto_adjust=True)
+            if df is not None and not df.empty and hasattr(df, "columns") and "Close" in df.columns:
+                hist = df
+        except Exception:
+            pass
+        if hist is None or hist.empty:
+            t = yf.Ticker(symbol)
+            for period in ("1mo", "5d", "1d"):
+                hist = t.history(period=period)
+                if hist is not None and not hist.empty:
+                    break
+        if hist is None or hist.empty:
+            return None
+        row = hist.iloc[-1]
+        close = float(row.get("Close", 0) or 0)
+        if close <= 0:
+            return None
+        ts = row.name
+        if hasattr(ts, "tzinfo") and ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc) if hasattr(ts, "replace") else datetime.now(timezone.utc)
+        elif not isinstance(ts, datetime):
+            ts = datetime.now(timezone.utc)
+        return (
+            _quantize(close),
+            _quantize(float(row.get("Open")) if row.get("Open") is not None else None),
+            _quantize(float(row.get("High")) if row.get("High") is not None else None),
+            _quantize(float(row.get("Low")) if row.get("Low") is not None else None),
+            _quantize(close),
+            int(row.get("Volume", 0)) if row.get("Volume") is not None else None,
+            None,
+            ts,
+        )
+    except Exception as e:
+        print(f"⚠️ yfinance fallback {symbol}: {e}")
+        return None
 
 
 def _get_last_known_price(

@@ -45,7 +45,7 @@
 1. **Primary:** v8/chart (HTTP ישיר, httpx) — `https://query1.finance.yahoo.com/v8/finance/chart/{symbol}`
    - **Full 250d:** `range=2y` (trading_days > 252) או `range=1y` — מחזיר ~504/252 ימי לוח, לוקח 250 אחרונים
    - **Gap-fill:** `period1` + `period2` **בלבד** (ללא range). `period2` = תחילת יום לאחר date_to (כולל date_to)
-   - **Retry:** 3×5 שניות (SPEC-PROV-YF-HIST)
+   - **Retry על 429:** exponential backoff 5s→10s→20s (SPEC-PROV-YF-HIST)
    - **Deduplication:** הסרת תאריכים כפולים לפני החזרה
 2. **Fallback:** yfinance (בלי Session — RULE 1) — `history(start=..., end=...)` 400 ימים אחורה
 
@@ -105,7 +105,9 @@
 | **Cooldown על 429** | `provider_cooldown.py` | `PROVIDER_COOLDOWN_MINUTES` (ברירת מחדל: 15) |
 | **חלון Cooldown** | 15 דקות (ניתן להגדרה) | אין קריאות נוספות לספק בתקופה |
 | **Fallback** | Yahoo → Alpha (Prices) | אין חסימה של ה־UI |
-| **Retry** | v8/chart: 3× עם 5s ביניהם | בתוך אותו ספק |
+| **Retry על 429** | v8/chart (last-close + history): **exponential backoff** 5s → 10s → 20s (לא flat 5s×3) | `yahoo_provider.py` — `_fetch_last_close_via_v8_chart_inner`, `_fetch_history_v8_chart` |
+| **ריווח בין סמלים** | **1 שנייה** ברירת מחדל — מונע burst firing | `market_data_settings.py`: `delay_between_symbols_seconds` (default 1); סקריפטי sync מכבדים |
+| **ריווח בין batch chunks** | 100ms בין chunks בבקשות batch | `yahoo_provider.py`: `_fetch_prices_batch_sync` (Legacy pattern) |
 | **User-Agent** | Rotation חובה | `_next_user_agent()` |
 
 ### 6.4 המלצה ל־"בלי עומס"
@@ -116,4 +118,5 @@
 
 ---
 
-**log_entry | TEAM_20 | YAHOO_DATA_REQUEST_LOGIC | 2026-02-14**
+**log_entry | TEAM_20 | YAHOO_DATA_REQUEST_LOGIC | 2026-02-14**  
+**log_entry | TEAM_10 | SSOT_UPDATE | YAHOO_429_RETRY_DELAY | 2026-03-09** — Retry: exponential backoff 5s→10s→20s; delay_between_symbols_seconds default 1; batch chunks 100ms. מקור: Market Data Provider Fix (Team 60 consultation).

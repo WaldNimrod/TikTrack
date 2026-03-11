@@ -65,6 +65,10 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
     result: Dict[str, PriceResult] = {}
 
     for i in range(0, len(symbols), batch_size):
+        # 100ms between batches — Legacy pattern (yahoo_finance_adapter.py §1.2)
+        if i > 0:
+            import time
+            time.sleep(0.1)
         batch = symbols[i : i + batch_size]
         symbols_param = ",".join(batch)
         try:
@@ -198,10 +202,16 @@ def _fetch_last_close_via_v8_chart_inner(
             with httpx.Client(timeout=10.0, headers=headers) as client:
                 r = client.get(url, params=params)
                 if r.status_code == 429:
+                    # Exponential backoff: 5s → 10s → 20s (Legacy pattern: yahoo_finance_adapter.py L349-354)
+                    wait_time = (2 ** attempt) * 5
                     if attempt < 2:
-                        time.sleep(5)
+                        logger.warning(
+                            "Yahoo v8/chart 429 for %s (attempt %d/3) — backing off %ds",
+                            symbol, attempt + 1, wait_time,
+                        )
+                        time.sleep(wait_time)
                         continue
-                    # RULE 9: Cooldown on 429 (SOP-015) — set before raising
+                    # All retries exhausted — set cooldown (SOP-015)
                     from ..provider_cooldown import set_cooldown
                     from ..market_data_settings import get_provider_cooldown_minutes
                     cooldown_min = get_provider_cooldown_minutes()
@@ -476,10 +486,16 @@ def _fetch_history_v8_chart(
             with httpx.Client(timeout=15.0) as client:
                 r = client.get(url, params=params, headers=headers)
                 if r.status_code == 429:
+                    # Exponential backoff: 5s → 10s → 20s (Legacy pattern)
+                    wait_time = (2 ** attempt) * 5
                     if attempt < 2:
-                        time.sleep(5)
+                        logger.warning(
+                            "Yahoo v8/chart 429 for %s history (attempt %d/3) — backing off %ds",
+                            symbol, attempt + 1, wait_time,
+                        )
+                        time.sleep(wait_time)
                         continue
-                    # RULE 9: Cooldown on 429 (SOP-015)
+                    # All retries exhausted — set cooldown (SOP-015)
                     from ..provider_cooldown import set_cooldown
                     from ..market_data_settings import get_provider_cooldown_minutes
                     cooldown_min = get_provider_cooldown_minutes()

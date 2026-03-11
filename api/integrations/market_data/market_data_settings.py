@@ -31,7 +31,7 @@ _SSOT = {
     "provider_cooldown_minutes": (5, 120, 15),
     "alpha_quota_cooldown_hours": (6, 48, 24),
     "max_symbols_per_request": (1, 50, 50),
-    "delay_between_symbols_seconds": (0, 30, 0),
+    "delay_between_symbols_seconds": (0, 30, 1),  # FIX-4: default 1s (was 0) — prevents Yahoo burst 429
     "intraday_enabled": (None, None, True),
 }
 
@@ -207,6 +207,6 @@ def get_ssot_constraints() -> dict:
         "provider_cooldown_minutes": {"min": 5, "max": 120, "default": 15},
         "alpha_quota_cooldown_hours": {"min": 6, "max": 48, "default": 24},
         "max_symbols_per_request": {"min": 1, "max": 50, "default": 50},
-        "delay_between_symbols_seconds": {"min": 0, "max": 30, "default": 0},
+        "delay_between_symbols_seconds": {"min": 0, "max": 30, "default": 1},
         "intraday_enabled": {"default": True},
     }

@@ -268,11 +268,23 @@ System Settings must expose:
 - `intraday_interval_minutes`  
 - `provider_cooldown_minutes`  
 - `max_symbols_per_request` (if provider supports batching)
+- **`delay_between_symbols_seconds`** — ברירת מחדל **1** (למניעת burst firing בלולאת sync). מימוש: `market_data_settings.py`; סקריפטי sync (EOD, intraday, backfill) מכבדים.
 
 ### 8.4 Yahoo Guardrails
 
 - **User‑Agent rotation** required.  
 - If **429** → cooldown + fallback.  
+- **Retry על 429:** exponential backoff 5s → 10s → 20s (v8/chart last-close + history).  
+- **Batch:** 100ms delay בין batch chunks (`_fetch_prices_batch_sync`).
+
+### 8.5 Alpha Vantage — מכסת יומית ומדיניות שימוש (LOCKED)
+
+- **מכסה יומית:** **25 קריאות/יום** (UTC day reset). מימוש: `provider_cooldown.py` — `ALPHA_DAILY_LIMIT=25`, `increment_alpha_calls()`, `get_alpha_remaining_today()`; ספירה **לפני** ביצוע הקריאה (pessimistic).  
+- **FX reserve:** **8** קריאות שמורות ל־FX (5 זוגות + 3 buffer) — `ALPHA_FX_RESERVE=8` ב־`sync_ticker_prices_eod.py`; `sync_exchange_rates_eod.py` לא מושפע.  
+- **EOD sync:** Alpha non-CRYPTO רק כאשר `remaining > 8` (אחרי Yahoo cooldown); Alpha CRYPTO תמיד (במכסה).  
+- **Intraday sync:** Alpha non-CRYPTO **אף פעם** (intraday רץ ~32×/יום); Alpha CRYPTO בלבד, ורק כאשר `remaining > reserve`.  
+- **מחיר בודד:** `get_ticker_price` **לא** קורא ל־`_fetch_market_cap` — `market_cap=None` (חוסך 2 קריאות Alpha לטיקר).  
+- **תיעוד מפורט:** `documentation/docs-system/01-ARCHITECTURE/LOGIC/TT2_MARKET_DATA_RESILIENCE.md` — שורש הבעיות ומדיניות לאחר תיקון.  
 
 ---
 
@@ -297,4 +309,5 @@ System Settings must expose:
 **log_entry | TEAM_90 | INTRADAY_LOCK | STAGE1_DECISIONS | 2026-02-13** — Intraday לטיקרים עם is_active=true; טבלת intraday נפרדת; Cadence ב-System Settings (מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT).
 **log_entry | TEAM_90 | MAINTENANCE_RETENTION_LOCK | STAGE1 | 2026-02-13** — Retention + archive policy + cleanup cycles locked (Intraday 30d→archive 1y; EOD/FX 250d→archive; daily/weekly/monthly).
 **log_entry | TEAM_90 | RATELIMIT_SCALING_LOCK | STAGE1 | 2026-02-13** — Rate‑limit & scaling policy locked (cache‑first, single‑flight, cooldown on 429, system settings controls).  
-**log_entry | TEAM_10 | P3_010_SSOT_ALIGNMENT | 2026-02-15** — EOD sync: טוען את **כל** הטיקרים (active + inactive); העדפת סדר: ORDER BY is_active DESC. Intraday — רק is_active = true (ללא שינוי). מימוש: sync_ticker_prices_eod.py (TEAM_20_P3_010_AND_P3_004_ACTIVATION_ACK).
+**log_entry | TEAM_10 | P3_010_SSOT_ALIGNMENT | 2026-02-15**  
+**log_entry | TEAM_10 | SSOT_UPDATE | ALPHA_QUOTA_YAHOO_GUARDRAILS | 2026-03-09** — §8.5 Alpha 25/day, FX reserve 8, EOD/Intraday policy; §8.4 Yahoo exponential backoff + batch 100ms; delay_between_symbols_seconds default 1. מקור: Market Data Provider Fix. — EOD sync: טוען את **כל** הטיקרים (active + inactive); העדפת סדר: ORDER BY is_active DESC. Intraday — רק is_active = true (ללא שינוי). מימוש: sync_ticker_prices_eod.py (TEAM_20_P3_010_AND_P3_004_ACTIVATION_ACK).

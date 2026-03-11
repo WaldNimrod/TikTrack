@@ -125,9 +125,47 @@ class AlphaProvider(MarketDataProvider):
         self._fixtures_dir = fixtures_dir
 
     async def _rate_limit(self) -> None:
-        """Enforce 12.5s between calls — 5 calls/min per spec. Shared across ALL instances."""
+        """
+        Enforce 12.5s between calls — 5 calls/min per spec. Shared across ALL instances.
+        FIX-4: Also checks and increments the daily quota (25/day). Raises
+        AlphaQuotaExhaustedException if daily quota is exhausted — callers must treat
+        this as a hard stop (not retry).
+        """
         global _alpha_last_call
+        from ..provider_cooldown import (
+            increment_alpha_calls,
+            get_alpha_remaining_today,
+            set_cooldown_hours,
+            ALPHA_DAILY_LIMIT,
+        )
+        from ..market_data_settings import get_alpha_quota_cooldown_hours
+
         async with _alpha_rate_lock:
+            # --- Daily quota guard (FIX-4) ---
+            remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+            if remaining <= 0:
+                hours = get_alpha_quota_cooldown_hours()
+                set_cooldown_hours("ALPHA_VANTAGE", hours)
+                logger.warning(
+                    "Alpha Vantage daily quota exhausted (%d/day) — cooldown %dh",
+                    ALPHA_DAILY_LIMIT,
+                    hours,
+                )
+                raise AlphaQuotaExhaustedException(
+                    f"Daily quota of {ALPHA_DAILY_LIMIT} calls exhausted for today"
+                )
+            # Increment BEFORE the call (pessimistic counting = safe)
+            new_count = increment_alpha_calls()
+            logger.debug(
+                "Alpha Vantage: call %d/%d today", new_count, ALPHA_DAILY_LIMIT
+            )
+            if new_count >= ALPHA_DAILY_LIMIT - 2:
+                logger.warning(
+                    "Alpha Vantage quota low: %d/%d used today",
+                    new_count,
+                    ALPHA_DAILY_LIMIT,
+                )
+            # --- Rate limit (time-based: 5 calls/min) ---
             now = asyncio.get_event_loop().time()
             elapsed = now - _alpha_last_call
             if elapsed < ALPHA_RATE_LIMIT_SECONDS:
@@ -241,7 +279,8 @@ class AlphaProvider(MarketDataProvider):
             quote = data.get("Global Quote", {})
             price = self._to_decimal(quote.get("05. price")) if quote else None
             if price and price > 0:
-                market_cap = await self._fetch_market_cap(symbol)
+                # FIX-4: Do NOT call _fetch_market_cap — that burns a second Alpha call (2/ticker).
+                # With 25/day limit, every call is precious. market_cap = None is acceptable.
                 return PriceResult(
                     symbol=symbol,
                     price=price,
@@ -250,7 +289,7 @@ class AlphaProvider(MarketDataProvider):
                     low_price=self._to_decimal(quote.get("04. low")),
                     close_price=price,
                     volume=int(quote.get("06. volume", 0)) if quote.get("06. volume") else None,
-                    market_cap=market_cap,
+                    market_cap=None,  # FIX-4: skip OVERVIEW call — saves 1 Alpha call per ticker
                     as_of=datetime.now(timezone.utc),
                     provider="ALPHA_VANTAGE",
                 )

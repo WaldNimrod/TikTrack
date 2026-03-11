@@ -72,32 +72,47 @@ def _is_429(e: Exception) -> bool:
 async def fetch_prices_for_tickers(
     tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
-    """Yahoo (Primary) → Alpha (Fallback). Cooldown on 429. Per CORRECTIVE: CRYPTO uses provider mapping, Alpha DIGITAL_CURRENCY_DAILY."""
+    """
+    Yahoo (Primary) → Alpha (CRYPTO fallback only).
+    FIX-4: Intraday NEVER uses Alpha for non-CRYPTO equities.
+    Intraday runs ~32 times/day; even 1 Alpha call per run × N tickers = quota exhausted.
+    Alpha intraday: CRYPTO only, and only when quota > FX reserve.
+    """
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
-    from api.integrations.market_data.provider_cooldown import set_cooldown, is_in_cooldown, get_cooldown_status
+    from api.integrations.market_data.provider_cooldown import (
+        set_cooldown, is_in_cooldown, get_cooldown_status, get_alpha_remaining_today,
+        ALPHA_DAILY_LIMIT,
+    )
     from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
     from api.integrations.market_data.market_data_settings import (
         get_provider_cooldown_minutes,
         get_delay_between_symbols_seconds,
     )
 
+    ALPHA_FX_RESERVE = 8  # Reserve for FX sync (5 pairs + 3 buffer)
+
     cooldown_min = get_provider_cooldown_minutes()
     delay_sec = get_delay_between_symbols_seconds()
     for prov, _until, sec in get_cooldown_status():
         print(f"📋 [SOP-015] {prov} in cooldown: {sec}s remaining")
+    alpha_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+    print(f"📊 [FIX-4] Alpha quota: {ALPHA_DAILY_LIMIT - alpha_remaining}/{ALPHA_DAILY_LIMIT} used, {alpha_remaining} remaining")
+
     yahoo = YahooProvider()
     alpha = AlphaProvider()
     results = []
     yahoo_skipped = alpha_skipped = False
+    alpha_equity_blocked_logged = False
 
     for ticker_id, symbol, ticker_type, metadata in tickers:
         pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
         yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+        is_crypto = ticker_type == "CRYPTO"
         pr = None
         for provider, name, use_sym, use_crypto in [
             (yahoo, "YAHOO_FINANCE", yahoo_sym, False),
-            (alpha, "ALPHA_VANTAGE", alpha_sym, ticker_type == "CRYPTO"),
+            (alpha, "ALPHA_VANTAGE", alpha_sym, is_crypto),
         ]:
             if is_in_cooldown(name):
                 if not (yahoo_skipped if name == "YAHOO_FINANCE" else alpha_skipped):
@@ -107,6 +122,27 @@ async def fetch_prices_for_tickers(
                 else:
                     alpha_skipped = True
                 continue
+
+            # FIX-4: Intraday Alpha policy
+            if name == "ALPHA_VANTAGE":
+                if not is_crypto:
+                    # Non-CRYPTO: never use Alpha for intraday
+                    if not alpha_equity_blocked_logged:
+                        print("⚠️ [FIX-4] Intraday: Alpha skipped for non-CRYPTO (quota preserved for FX+CRYPTO)")
+                        alpha_equity_blocked_logged = True
+                    continue
+                else:
+                    # CRYPTO: only if quota above reserve
+                    current_remaining = get_alpha_remaining_today(ALPHA_DAILY_LIMIT)
+                    if current_remaining <= ALPHA_FX_RESERVE:
+                        if not alpha_equity_blocked_logged:
+                            print(
+                                f"⚠️ [FIX-4] Alpha quota low ({current_remaining} remaining ≤ reserve {ALPHA_FX_RESERVE}) "
+                                f"— skipping Alpha for CRYPTO intraday"
+                            )
+                            alpha_equity_blocked_logged = True
+                        continue
+
             try:
                 if use_crypto and provider is alpha:
                     pr = await alpha.get_ticker_price_crypto(alpha_sym, alpha_market)

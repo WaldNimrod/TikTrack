@@ -39,7 +39,7 @@ Define **which data is loaded per ticker**, cadence, storage, precision, and UI 
 7. **Retention + Archive:**  
    - Intraday DB: 30 days → archive files (1 year) → delete.  
    - EOD/FX DB: 250 trading days → archive files (no hard delete).
-8. **Rate‑Limit & Scaling Policy:** Cache‑First + Single‑Flight + cooldown on 429; configurable cadence in System Settings.
+8. **Rate‑Limit & Scaling Policy:** Cache‑First + Single‑Flight + cooldown on 429; configurable cadence in System Settings. Alpha: 25 קריאות/יום (UTC), FX reserve 8; ריווח בין סמלים ברירת מחדל 1s — **מקור:** MARKET_DATA_PIPE_SPEC §8.5, TT2_MARKET_DATA_RESILIENCE §2.
 9. **Smart History Fill (LOCKED):** 250 trading days minimum per ticker; **Gap-First** (fill only missing dates); **Full Reload only from Admin** (explicit confirmation); API: single endpoint `mode=gap_fill` (default) | `force_reload`; Provider interface: `date_from`/`date_to` optional; Retry: immediate + batch at night. **מקור SSOT:** MARKET_DATA_PIPE_SPEC §5.
 
 ---

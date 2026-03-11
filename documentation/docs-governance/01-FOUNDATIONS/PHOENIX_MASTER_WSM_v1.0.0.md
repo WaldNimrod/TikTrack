@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-11** by **Team 10** — R2 QA BLOCK; gate rollback per GATE_7 contract §4.
+**Gate-owner update evidence:** This block was updated **2026-03-11** by **Team 90** — GATE_6 package `v1.1.0` submitted for S002-P002-WP003; awaiting architect decision.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow. |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_6 SUBMITTED** (`SUBMISSION_v1.1.0`) post GATE_5 revalidation PASS; waiting Team 00/Team 100 decision. |
 | active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
 | active_work_package_id | S002-P002-WP003 |
 | in_progress_work_package_id | S002-P002-WP003 |
@@ -101,16 +101,16 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_3 (REMEDIATION_IN_PROGRESS) |
+| current_gate | GATE_6 (SUBMITTED_AWAITING_DECISION) |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 10 (remediation owner; GATE_3 gate owner) |
-| last_gate_event | R3_SYNC_RETRY_PARTIAL \| 2026-03-10 \| Team 60 הרצת sync; 7 tickers עודכנו; QQQ, SPY — cooldown. 1.2 BLOCK. |
-| next_required_action | Team 60: retry sync-ticker-prices אחרי cooldown (Yahoo ~15 דק') → Team 50 re-verify 1.2 → re-submit GATE_7. |
-| next_responsible_team | Team 60 (sync retry after cooldown) |
+| phase_owner_team | Team 90 (GATE_6 gate owner); Team 10 (execution orchestrator) |
+| last_gate_event | GATE_6_SUBMITTED \| 2026-03-11 \| Team 90 submitted post-remediation execution approval package `SUBMISSION_v1.1.0` to Team 00/Team 100. |
+| next_required_action | Team 00 and Team 100 to issue GATE_6 architectural decision for S002-P002-WP003. |
+| next_responsible_team | Team 00, Team 100 (architectural decision authority) |
 
 ---
 
@@ -258,6 +258,9 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 human execution package published for S002-P002-WP003; waiting Nimrod feedback | 2026-03-10**
 **log_entry | NIMROD | GATE_7 | S002_P002_WP003 | BLOCK | USER_FEEDBACK_REJECTED | 2026-03-10**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 BLOCK S002-P002-WP003; blocking report issued to Team 10 with BF-G7-WP003-001..005 | 2026-03-10**
+**log_entry | TEAM_10 | WSM_CANONICAL_UPDATE | CURRENT_OPERATIONAL_STATE | R2 QA block acknowledged; remediation loop progressed and GATE_5 revalidation submitted to Team 90 | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 REVALIDATION PASS S002-P002-WP003; G5_AUTOMATION_EVIDENCE issued; GATE_6 routing activated | 2026-03-11**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 submitted for S002-P002-WP003 (SUBMISSION_v1.1.0) to Team 00/Team 100; awaiting architectural decision | 2026-03-11**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

@@ -39,7 +39,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
 | S001 | S001-P002 | Alerts POC | AGENTS_OS | PIPELINE | — (activation authorized by Team 00 Decision A-1; LOD200 being packaged; pre-launch validation in progress) |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
-| S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | TIKTRACK | ACTIVE | GATE_3 (REMEDIATION_IN_PROGRESS); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow.; active_work_package_id=S002-P002-WP003 |
+| S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | TIKTRACK | ACTIVE | GATE_6 (SUBMITTED_AWAITING_DECISION); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_6 SUBMITTED** (`SUBMISSION_v1.1.0`) post GATE_5 revalidation PASS; waiting Team 00/Team 100 decision.; active_work_package_id=S002-P002-WP003 |
 | S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | COMPLETE | GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED; lifecycle complete (Team 90 validation report) |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S002-P002 enters GATE_3; scope: schema checks S-45..S-52, migration checks E-12..E-14) |
@@ -103,9 +103,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-10). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-11). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-10):** active_stage_id=S002; active_program_id=S002-P002; current_gate=GATE_3 (REMEDIATION_IN_PROGRESS); active_work_package_id=S002-P002-WP003; active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow..
+**WSM mirror (2026-03-11):** active_stage_id=S002; active_program_id=S002-P002; current_gate=GATE_6 (SUBMITTED_AWAITING_DECISION); active_work_package_id=S002-P002-WP003; active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_6 SUBMITTED** (`SUBMISSION_v1.1.0`) post GATE_5 revalidation PASS; waiting Team 00/Team 100 decision..
 
 ---
 

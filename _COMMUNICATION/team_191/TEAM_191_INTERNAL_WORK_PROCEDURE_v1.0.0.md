@@ -84,4 +84,18 @@ Every Team 191 closure note must include:
 
 ---
 
+## 7) Mandatory Operational Character (Binding)
+
+1. Team 191 must treat date-related push blockers as first-class recurring failures and remediate them immediately.
+2. Classical mandatory remediation set for `DATE-LINT`:
+   - normalize future dates to current UTC guard day,
+   - add missing `date` headers in governance/communication markdown,
+   - add `historical_record: true` for intentional historical documents.
+3. In push/commit blocker events, Team 191 default behavior is remediation-first (not escalation-first) when fix is deterministic and non-semantic.
+4. Team 191 must continuously capture recurring blocker patterns and fold them into this procedure as reusable remediation playbooks.
+5. Objective is stable flow reliability: unblock commit/push while preserving content intent and governance integrity.
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
